@@ -40,3 +40,5 @@ Samples/RVMan_Interface/Win32/
 Samples/RVMan_Interface/__history/
 Source/__history/
 *.exe
+Samples/PhoneContacts_Interfaces_MVVM_mapper/Model/__history/
+Samples/PhoneContacts_ioMemTable/__history/

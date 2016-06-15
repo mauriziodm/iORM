@@ -264,6 +264,7 @@ type
   // ClassFromField
   ioClassFromField = class(TioCustomAttribute)
   end;
+  ioTrueClass = ioClassFromField;
 
   // GroupBy
   ioGroupBy = class(TioCustomStringAttribute)

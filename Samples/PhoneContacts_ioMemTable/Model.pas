@@ -22,7 +22,7 @@ type
   end;
 
   [ioTable('Persons')]
-  [ioClassFromField]
+  [ioTrueClass]
   TPerson = class
   private
     FID: Integer;
@@ -50,7 +50,7 @@ type
   end;
 
   [ioTable('Persons')]
-  [ioClassFromField]
+  [ioTrueClass]
   TEmployee = class(TPerson)
   private
     FBranchOffice: String;
@@ -60,7 +60,7 @@ type
   end;
 
   [ioTable('Persons')]
-  [ioClassFromField]
+  [ioTrueClass]
   TCustomer = class(TPerson)
   private
     FFidelityCardCode: String;
@@ -70,7 +70,7 @@ type
   end;
 
   [ioTable('Persons')]
-  [ioClassFromField]
+  [ioTrueClass]
   TVipCustomer = class(TCustomer)
   private
     FVipCardCode: String;

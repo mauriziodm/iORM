@@ -21,7 +21,7 @@ type
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
   end;
 
-  [ioEntity('Persons'), ioClassFromField]
+  [ioEntity('Persons'), ioTrueClass]
   TPerson = class
   private
     FID: Integer;
@@ -45,7 +45,7 @@ type
     property ClassNameProp:String read GetClassNameProp;
   end;
 
-  [ioEntity('Persons'), ioClassFromField]
+  [ioEntity('Persons'), ioTrueClass]
   TEmployee = class(TPerson)
   private
     FBranchOffice: String;
@@ -54,7 +54,7 @@ type
     property BranchOffice:String read FBranchOffice write FBranchOffice;
   end;
 
-  [ioEntity('Persons'), ioClassFromField]
+  [ioEntity('Persons'), ioTrueClass]
   TCustomer = class(TPerson)
   private
     FFidelityCardCode: String;
@@ -63,7 +63,7 @@ type
     property FidelityCardCode:String read FFidelityCardCode write FFidelityCardCode;
   end;
 
-  [ioEntity('Persons'), ioClassFromField]
+  [ioEntity('Persons'), ioTrueClass]
   TVipCustomer = class(TCustomer)
   private
     FVipCardCode: String;
