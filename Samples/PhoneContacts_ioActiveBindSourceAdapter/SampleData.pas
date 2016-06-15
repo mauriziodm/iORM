@@ -13,20 +13,21 @@ type
 implementation
 
 uses
-  Model, iORM, System.Generics.Collections, FMX.Dialogs, System.UITypes;
+  Model, iORM, System.Generics.Collections, FMX.Dialogs, System.UITypes,
+  FireDAC.Comp.Client;
 
 { TSampleData }
 
 class procedure TSampleData.CheckForSampleDataCreation;
 var
-  AList: TObjectList<TPerson>;
+  LMemTable: TFDMemTable;
 begin
-  AList := io.Load<TPerson>.ToGenericList.OfType<TObjectList<TPerson>>;
+  LMemTable := io.SQL('select count(*) from [TPerson] union all select count(*) from [TAnotherPerson]').ToMemTable;
   try
-    if AList.Count = 0
-      then Self.CreateSampleData;
+    if LMemTable.Fields[0].AsInteger = 0 then
+      Self.CreateSampleData;
   finally
-    AList.Free;
+    LMemTable.Free;
   end;
 end;
 
