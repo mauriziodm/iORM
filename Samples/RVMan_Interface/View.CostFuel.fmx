@@ -1,0 +1,80 @@
+inherited ViewCostFuel: TViewCostFuel
+  inherited ListBox1: TListBox
+    Viewport.Width = 389.000000000000000000
+    Viewport.Height = 458.000000000000000000
+    object GroupDettagli: TListBoxGroupHeader
+      Position.Y = 137.000000000000000000
+      StyleLookup = 'listboxgroupheader'
+      TabOrder = 4
+      Text = 'Dettagli'
+    end
+    object ListBoxItem4: TListBoxItem
+      Position.Y = 156.000000000000000000
+      Size.Width = 389.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listboxitemnodetail'
+      TabOrder = 5
+      Text = 'KM percorsi'
+      object eKMTraveled: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 1
+        Text = '67,6699981689453'
+        Position.X = 106.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 273.000000000000000000
+        Size.Height = 49.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  inherited BSCost: TioPrototypeBindSource
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftSingle
+        Generator = 'UIntegers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Descrizione'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostDate'
+        FieldType = ftDateTime
+        Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostAmount'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostNote'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'KmTraveled'
+        FieldType = ftSingle
+        Generator = 'Floats'
+        ReadOnly = False
+      end>
+    ioTypeName = 'ICostFuel'
+  end
+  inherited BindingsList1: TBindingsList
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSCost
+      FieldName = 'KmTraveled'
+      Control = eKMTraveled
+      Track = False
+    end
+  end
+end

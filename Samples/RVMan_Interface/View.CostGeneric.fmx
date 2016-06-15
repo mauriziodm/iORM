@@ -1,0 +1,237 @@
+object ViewCostGeneric: TViewCostGeneric
+  Align = Client
+  Size.Width = 393.000000000000000000
+  Size.Height = 506.000000000000000000
+  Size.PlatformDefault = False
+  object ToolBar6: TToolBar
+    Size.Width = 393.000000000000000000
+    Size.Height = 44.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Label3: TLabel
+      Align = HorzCenter
+      AutoSize = True
+      Position.X = 193.000000000000000000
+      Size.Width = 31.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.WordWrap = False
+      Text = 'Costo'
+    end
+    object SBEdit: TSpeedButton
+      Action = acEdit
+      Align = Right
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 349.000000000000000000
+      Size.Width = 44.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'composetoolbutton'
+      Visible = True
+    end
+    object SBPost: TSpeedButton
+      Action = acPost
+      Align = Right
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 299.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'donetoolbutton'
+      Visible = True
+    end
+    object SBCancel: TSpeedButton
+      Action = acCancel
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 44.000000000000000000
+      Size.Width = 74.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toolbutton'
+      Visible = True
+    end
+    object SBBack: TSpeedButton
+      Action = acBack
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Size.Width = 44.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'priortoolbutton'
+      Visible = True
+    end
+  end
+  object ListBox1: TListBox
+    Align = Client
+    Size.Width = 393.000000000000000000
+    Size.Height = 462.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    DisableFocusEffect = True
+    DefaultItemStyles.ItemStyle = 'listboxitemnodetail'
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    GroupingKind = Grouped
+    Viewport.Width = 393.000000000000000000
+    Viewport.Height = 462.000000000000000000
+    object ListBoxItemDataPartenza: TListBoxItem
+      Size.Width = 389.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listboxitemnodetail'
+      TabOrder = 1
+      Text = 'Data'
+      object eData: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 0
+        Text = '31/10/2016 00:58:00'
+        Position.X = 106.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 273.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object ListBoxItem1: TListBoxItem
+      Position.Y = 44.000000000000000000
+      Size.Width = 389.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listboxitemnodetail'
+      TabOrder = 0
+      Text = 'Descrizione'
+      object eDescrizione: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 0
+        Text = 'Mark Anderson'
+        Position.X = 106.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 273.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object ListBoxItem3: TListBoxItem
+      Position.Y = 88.000000000000000000
+      Size.Width = 389.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listboxitemnodetail'
+      TabOrder = 2
+      Text = 'Importo'
+      object eImporto: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 1
+        Text = '67,67'
+        Position.X = 106.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 273.000000000000000000
+        Size.Height = 49.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  object BSCost: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftSingle
+        Generator = 'UIntegers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Descrizione'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostDate'
+        FieldType = ftDateTime
+        Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostAmount'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostNote'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ioTypeName = 'ICostGeneric'
+    ioAutoLoadData = True
+    ioAutoPersist = True
+    ioViewDataType = dtList
+    ioWhereDetailsFromDetailAdapters = False
+    ioMasterBindSource = MainForm.BSCosts
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    ioVM_UseBSPropsOnCreate = True
+    Left = 288
+    Top = 88
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 228
+    Top = 93
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSCost
+      FieldName = 'Descrizione'
+      Control = eDescrizione
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSCost
+      FieldName = 'CostAmount'
+      Control = eImporto
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSCost
+      FieldName = 'CostDate'
+      Control = eData
+      Track = False
+    end
+  end
+  object ActionList1: TActionList
+    Left = 210
+    Top = 295
+    object acBack: TAction
+      Text = 'Back'
+      OnExecute = acBackExecute
+    end
+    object acCancel: TAction
+      Text = 'Cancel'
+      OnExecute = acCancelExecute
+    end
+    object acPost: TAction
+      Text = 'Post'
+      OnExecute = acPostExecute
+    end
+    object acEdit: TAction
+      Text = 'Edit'
+      OnExecute = acEditExecute
+    end
+  end
+end

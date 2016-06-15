@@ -1,0 +1,270 @@
+{***************************************************************************}
+{                                                                           }
+{           iORM - (interfaced ORM)                                         }
+{                                                                           }
+{           Copyright (C) 2016 Maurizio Del Magno                           }
+{                                                                           }
+{           mauriziodm@levantesw.it                                         }
+{           mauriziodelmagno@gmail.com                                      }
+{           https://github.com/mauriziodm/iORM.git                          }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  Licensed under the Apache License, Version 2.0 (the "License");          }
+{  you may not use this file except in compliance with the License.         }
+{  You may obtain a copy of the License at                                  }
+{                                                                           }
+{      http://www.apache.org/licenses/LICENSE-2.0                           }
+{                                                                           }
+{  Unless required by applicable law or agreed to in writing, software      }
+{  distributed under the License is distributed on an "AS IS" BASIS,        }
+{  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. }
+{  See the License for the specific language governing permissions and      }
+{  limitations under the License.                                           }
+{                                                                           }
+{***************************************************************************}
+
+
+
+unit iORM.DB.SqLite.SqlGenerator;
+
+interface
+
+uses
+  iORM.Context.Interfaces,
+  iORM.DB.Interfaces, iORM.Context.Table.Interfaces, iORM.CommonTypes;
+
+type
+
+  // Classe che si occupa di generare il codice SQL delle varie query
+  TioSqlGeneratorSqLite = class(TioSqlGenerator)
+  public
+    class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
+    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; override;
+    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
+    class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); override;
+  end;
+
+implementation
+
+uses
+  System.Classes, iORM.DB.Factory, iORM.Context.Properties.Interfaces,
+  iORM.Attributes, iORM.Exceptions, System.IOUtils, System.SysUtils,
+  iORM.SqlTranslator
+  ;
+
+{ TioSqlGeneratorSqLite }
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlForCreateIndex(
+  const AQuery: IioQuery; const AContext:IioContext; AIndexName:String;
+  const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
+  const AUnique: Boolean);
+var
+  LFieldList: TStrings;
+  LQueryText, LIndexOrientationText, LField, LUniqueText: String;
+begin
+  // Index Name
+  if AIndexName.IsEmpty then
+    AIndexName := Self.BuildIndexName(AContext, ACommaSepFieldList, AIndexOrientation, AUnique)
+  else
+    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
+  // Index orientation
+  case AIndexOrientation of
+    ioAscending: LIndexOrientationText := ' ASC';
+    ioDescending:  LIndexOrientationText := ' DESC';
+  end;
+  // Unique
+  if AUnique then
+    LUniqueText := 'UNIQUE '
+  else
+    LUniqueText := '';
+  // Field list
+  LFieldList := TStringList.Create;
+  try
+    LFieldList.Delimiter := ',';
+    LFieldList.DelimitedText := ACommaSepFieldList;
+    LQueryText := '';
+    for LField in LFieldList do
+    begin
+      if not LQueryText.IsEmpty then
+        LQueryText := LQueryText + ', ';
+      LQueryText := LQueryText + LField + LIndexOrientationText;
+    end;
+  finally
+    LFieldList.Free;
+  end;
+  // Build the query text
+  // -----------------------------------------------------------------
+  // compose the query text
+  LQueryText := 'CREATE '
+              + LUniqueText
+              + 'INDEX IF NOT EXISTS '
+              + AIndexName + ' ON ' + AContext.GetTable.TableName
+              + ' (' + LQueryText + ')';
+  // Translate the query text
+  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, False);
+  // Assign the query text
+  AQuery.SQL.Add(LQueryText);
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
+  // If a Where exist then the query is an external query else
+  //  is an internal query.
+  if AContext.WhereExist then
+    AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
+  else
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlForDropIndex(
+  const AQuery: IioQuery; const AContext:IioContext; AIndexName: String);
+begin
+  // Index Name
+  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('DROP INDEX IF EXISTS ' + AIndexName);
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM '
+    + AContext.GetTable.GetSql
+    + ' WHERE '
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+    + ')'
+  );
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext);
+var
+  Comma: Char;
+  Prop: IioContextProperty;
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
+  AQuery.SQL.Add('(');
+  AQuery.SQL.Add(AContext.GetProperties.GetSql(ioInsert));
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField
+    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add(') VALUES (');
+  // -----------------------------------------------------------------
+  // Iterate for all properties
+  Comma := ' ';
+  for Prop in AContext.GetProperties do
+  begin
+    // If the current property is ReadOnly then skip it
+    // If the current property RelationType is HasMany then skip it
+    if (not Prop.IsSqlRequestCompliant(ioInsert))
+    or (Prop.GetRelationType = ioRTHasMany)
+    then Continue;
+    // Add the field param
+    AQuery.SQL.Add(Comma + ':' + Prop.GetSqlParamName);
+    Comma := ',';
+  end;
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField
+  then AQuery.SQL.Add(',:' + AContext.ClassFromField.GetSqlParamName);
+  AQuery.SQL.Add(')');
+  // -----------------------------------------------------------------
+end;
+
+class function TioSqlGeneratorSqLite.GenerateSqlJoinSectionItem(
+  const AJoinItem: IioJoinItem): String;
+begin
+  // Join
+  case AJoinItem.GetJoinType of
+    ioCross:      Result := 'CROSS JOIN ';
+    ioInner:      Result := 'INNER JOIN ';
+    ioLeftOuter:  Result := 'LEFT OUTER JOIN ';
+    ioRightOuter: Result := 'RIGHT OUTER JOIN ';
+    ioFullOuter:  Result := 'FULL OUTER JOIN ';
+    else raise EioException.Create(Self.ClassName + ': Join type not valid.');
+  end;
+  // Joined table name
+  Result := Result + '[' + AJoinItem.GetJoinClassRef.ClassName + ']';
+  // Conditions
+  if AJoinItem.GetJoinType <> ioCross
+    then Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  // Build the query text
+  AQuery.SQL.Add('SELECT last_insert_rowid()');
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
+  if AContext.IsClassFromField
+    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // From
+  AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSql);
+  // Join
+  AQuery.SQL.Add(AContext.GetJoin.GetSql(AContext.Map.GetTable.TableName));
+  // If a Where exist then the query is an external query else
+  //  is an internal query.
+  if AContext.WhereExist then
+    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+  else
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // GroupBy
+  AQuery.SQL.Add(AContext.GetGroupBySql);
+  // OrderBy
+  AQuery.SQL.Add(AContext.GetOrderBySql);
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext);
+var
+  Comma: Char;
+  Prop: IioContextProperty;
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSql + ' SET');
+  // Iterate for all properties
+  Comma := ' ';
+  for Prop in AContext.GetProperties do
+  begin
+    // If the current property is ReadOnly then skip it
+    // If the current property RelationType is HasMany then skip it
+    if (not Prop.IsSqlRequestCompliant(ioInsert))
+    or (Prop.GetRelationType = ioRTHasMany)
+    then Continue;
+    // Add the field param
+    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
+    Comma := ',';
+  end;
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField
+  then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=:' + AContext.ClassFromField.GetSqlParamName);
+  // Where conditions
+//  AQuery.SQL.Add(AContext.Where.GetSql);
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // -----------------------------------------------------------------
+end;
+
+end.

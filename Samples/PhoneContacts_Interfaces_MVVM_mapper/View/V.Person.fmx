@@ -1,0 +1,403 @@
+object ViewPerson: TViewPerson
+  Align = Client
+  Size.Width = 620.000000000000000000
+  Size.Height = 465.000000000000000000
+  Size.PlatformDefault = False
+  object ToolBar2: TToolBar
+    Size.Width = 620.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object ButtonBack: TSpeedButton
+      Align = Left
+      Cursor = crHandPoint
+      Margins.Left = 5.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 5.000000000000000000
+      Position.Y = 5.000000000000000000
+      Size.Width = 48.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'priortoolbutton'
+      Text = 'Close'
+    end
+    object lblTitle2: TLabel
+      Align = Center
+      StyledSettings = [Family, FontColor]
+      Size.Width = 271.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.Style = [fsBold]
+      TextSettings.HorzAlign = Center
+      Text = 'Current person'
+    end
+    object ButtonPost: TSpeedButton
+      Align = Right
+      Cursor = crHandPoint
+      Margins.Left = 5.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 567.000000000000000000
+      Position.Y = 5.000000000000000000
+      Size.Width = 48.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'donetoolbutton'
+      Text = 'Post'
+    end
+  end
+  object Panel1: TPanel
+    Align = Top
+    Position.Y = 40.000000000000000000
+    Size.Width = 620.000000000000000000
+    Size.Height = 137.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    object EditID: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 4
+      Text = '-33'
+      Position.X = 144.000000000000000000
+      Position.Y = 22.000000000000000000
+      Size.Width = 57.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Label1: TLabel
+      Position.X = 8.000000000000000000
+      Position.Y = 24.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'ID'
+    end
+    object EditFirstName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 3
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      Position.X = 144.000000000000000000
+      Position.Y = 54.000000000000000000
+      Size.Width = 289.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Label2: TLabel
+      Position.X = 8.000000000000000000
+      Position.Y = 56.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'First name'
+    end
+    object EditLastName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      Position.X = 144.000000000000000000
+      Position.Y = 86.000000000000000000
+      Size.Width = 289.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Label3: TLabel
+      Position.X = 8.000000000000000000
+      Position.Y = 88.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'Last name'
+    end
+  end
+  object Panel2: TPanel
+    Align = Bottom
+    Position.Y = 420.000000000000000000
+    Size.Width = 620.000000000000000000
+    Size.Height = 45.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    object Label4: TLabel
+      Position.X = 8.000000000000000000
+      Position.Y = 14.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'CLASS NAME'
+    end
+    object EditClassName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 1
+      TabStop = False
+      ReadOnly = True
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      Position.X = 144.000000000000000000
+      Position.Y = 12.000000000000000000
+      Enabled = False
+      Size.Width = 289.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
+  object PanelPhones: TPanel
+    Align = Client
+    Size.Width = 620.000000000000000000
+    Size.Height = 243.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    object DetailListView: TListView
+      ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+      ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
+      HeaderAppearanceClassName = 'TListHeaderObjects'
+      FooterAppearanceClassName = 'TListHeaderObjects'
+      ItemIndex = 0
+      Align = Client
+      Margins.Left = 10.000000000000000000
+      Margins.Top = 10.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 90.000000000000000000
+      Size.Width = 600.000000000000000000
+      Size.Height = 143.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
+    end
+    object Label5: TLabel
+      Anchors = [akLeft, akBottom]
+      Position.X = 8.000000000000000000
+      Position.Y = 176.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'Phone number'
+    end
+    object Label6: TLabel
+      Anchors = [akLeft, akBottom]
+      Position.X = 8.000000000000000000
+      Position.Y = 208.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'Number type'
+    end
+    object EditPhoneNumber: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akBottom]
+      TabOrder = 3
+      Text = 'Bitmap28'
+      Position.X = 144.000000000000000000
+      Position.Y = 174.000000000000000000
+      Size.Width = 289.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object EditNumberType: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akBottom]
+      TabOrder = 2
+      Text = 'Bitmap28'
+      Position.X = 144.000000000000000000
+      Position.Y = 206.000000000000000000
+      Size.Width = 289.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object BindNavigator1: TBindNavigator
+      Anchors = [akRight, akBottom]
+      Position.X = 480.000000000000000000
+      Position.Y = 162.000000000000000000
+      Size.Width = 128.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      DataSource = BSPhones
+      VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
+      xRadius = 4.000000000000000000
+      yRadius = 4.000000000000000000
+    end
+  end
+  object BSPerson: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'FirstName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'LastName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'ClassNameProp'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ioTypeAlias = 'IPerson'
+    ioAutoLoadData = True
+    ioAutoPersist = True
+    ioViewDataType = dtList
+    ioWhereDetailsFromDetailAdapters = False
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    ioVM_Interface = 'IPersonViewModel'
+    ioVM_UseBSPropsOnCreate = True
+    Left = 20
+    Top = 48
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 196
+    Top = 5
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPerson
+      FieldName = 'ClassNameProp'
+      Control = EditClassName
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPerson
+      FieldName = 'FirstName'
+      Control = EditFirstName
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPerson
+      FieldName = 'LastName'
+      Control = EditLastName
+      Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPerson
+      FieldName = 'ID'
+      Control = EditID
+      Track = False
+    end
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPhones
+      FieldName = 'PhoneNumber'
+      Control = DetailListView
+      FillExpressions = <
+        item
+          SourceMemberName = 'PhoneType'
+          ControlMemberName = 'Detail'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPhones
+      FieldName = 'PhoneType'
+      Control = EditNumberType
+      Track = False
+    end
+    object LinkControlToField6: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPhones
+      FieldName = 'PhoneNumber'
+      Control = EditPhoneNumber
+      Track = False
+    end
+  end
+  object ActionList1: TActionList
+    Left = 400
+    Top = 8
+    object acFree: TAction
+      Text = 'acFree'
+      OnExecute = acFreeExecute
+    end
+  end
+  object BSPhones: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'PhoneType'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ioTypeName = 'IPhoneNumber'
+    ioAutoLoadData = True
+    ioAutoPersist = True
+    ioViewDataType = dtList
+    ioWhereDetailsFromDetailAdapters = False
+    ioMasterBindSource = BSPerson
+    ioMasterPropertyName = 'Phones'
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    ioVM_UseBSPropsOnCreate = True
+    Left = 24
+    Top = 184
+  end
+end

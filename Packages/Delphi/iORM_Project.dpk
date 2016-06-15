@@ -1,0 +1,156 @@
+package iORM_Project;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE ioPresent}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'iORM Runtime'}
+{$IMPLICITBUILD ON}
+
+{$I \..\..\source\ioGlobalDef.inc}   // iORM global definitions
+
+requires
+  rtl,
+  dbrtl,
+  bindengine,
+  bindcomp,
+  FireDACCommon,
+  FireDAC,
+  FireDACCommonDriver,
+  DbxCommonDriver,
+  FireDACIBDriver,
+{$IFDEF HAS_VCL}
+  vclFireDAC,
+  FireDACMSSQLDriver,
+{$ELSE}
+  fmxFireDAC,
+{$ENDIF}
+  soaprtl;
+
+contains
+  iORM.Attributes in '..\..\Source\iORM.Attributes.pas',
+  iORM.CommonTypes in '..\..\Source\iORM.CommonTypes.pas',
+  iORM.Context.Container in '..\..\Source\iORM.Context.Container.pas',
+  iORM.Context.Factory in '..\..\Source\iORM.Context.Factory.pas',
+  iORM.Context.Interfaces in '..\..\Source\iORM.Context.Interfaces.pas',
+  iORM.Context in '..\..\Source\iORM.Context.pas',
+  iORM.Context.Properties.Interfaces in '..\..\Source\iORM.Context.Properties.Interfaces.pas',
+  iORM.Context.Properties in '..\..\Source\iORM.Context.Properties.pas',
+  iORM.Context.Table.Interfaces in '..\..\Source\iORM.Context.Table.Interfaces.pas',
+  iORM.Context.Table in '..\..\Source\iORM.Context.Table.pas',
+  iORM.DB.Connection in '..\..\Source\iORM.DB.Connection.pas',
+  iORM.DB.DBCreator.Factory in '..\..\Source\iORM.DB.DBCreator.Factory.pas',
+  iORM.DB.DBCreator.Interfaces in '..\..\Source\iORM.DB.DBCreator.Interfaces.pas',
+  iORM.DB.DBCreator in '..\..\Source\iORM.DB.DBCreator.pas',
+  iORM.DB.Factory in '..\..\Source\iORM.DB.Factory.pas',
+  iORM.DB.Interfaces in '..\..\Source\iORM.DB.Interfaces.pas',
+  iORM.DB.Query in '..\..\Source\iORM.DB.Query.pas',
+  iORM.DuckTyped.Factory in '..\..\Source\iORM.DuckTyped.Factory.pas',
+  iORM.DuckTyped.Interfaces in '..\..\Source\iORM.DuckTyped.Interfaces.pas',
+  iORM.DuckTyped.List in '..\..\Source\iORM.DuckTyped.List.pas',
+  iORM.Exceptions in '..\..\Source\iORM.Exceptions.pas',
+  iORM.Interfaces in '..\..\Source\iORM.Interfaces.pas',
+  iORM.ObjectsForge.Factory in '..\..\Source\iORM.ObjectsForge.Factory.pas',
+  iORM.ObjectsForge.Interfaces in '..\..\Source\iORM.ObjectsForge.Interfaces.pas',
+  iORM.ObjectsForge.ObjectMaker in '..\..\Source\iORM.ObjectsForge.ObjectMaker.pas',
+  iORM.ObjectsForge.ObjectMakerClassFromField in '..\..\Source\iORM.ObjectsForge.ObjectMakerClassFromField.pas',
+  iORM in '..\..\Source\iORM.pas',
+  iORM.RttiContext.Factory in '..\..\Source\iORM.RttiContext.Factory.pas',
+  iORM.SqlItems in '..\..\Source\iORM.SqlItems.pas',
+  iORM.Where in '..\..\Source\iORM.Where.pas',
+  iORM.Where.SqlItems in '..\..\Source\iORM.Where.SqlItems.pas',
+  iORM.DB.SqLite.CompareOperators in '..\..\Source\iORM.DB.SqLite.CompareOperators.pas',
+  iORM.DB.SqLite.LogicRelations in '..\..\Source\iORM.DB.SqLite.LogicRelations.pas',
+  iORM.DB.SqLite.SqlDataConverter in '..\..\Source\iORM.DB.SqLite.SqlDataConverter.pas',
+  iORM.DB.SqLite.SqlGenerator in '..\..\Source\iORM.DB.SqLite.SqlGenerator.pas',
+  iORM.DB.DBCreator.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBCreator.SqLite.SqlGenerator.pas',
+  iORM.DuckTyped.StreamObject in '..\..\Source\iORM.DuckTyped.StreamObject.pas',
+  iORM.LiveBindings.ActiveListBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveListBindSourceAdapter.pas',
+  iORM.LiveBindings.ActiveObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveObjectBindSourceAdapter.pas',
+  iORM.LiveBindings.Interfaces in '..\..\Source\iORM.LiveBindings.Interfaces.pas',
+  iORM.LiveBindings.DetailAdaptersContainer in '..\..\Source\iORM.LiveBindings.DetailAdaptersContainer.pas',
+  iORM.LiveBindings.Factory in '..\..\Source\iORM.LiveBindings.Factory.pas',
+  iORM.LiveBindings.PrototypeBindSource in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.pas',
+  iORM.SqlTranslator in '..\..\Source\iORM.SqlTranslator.pas',
+  iORM.Context.Map in '..\..\Source\iORM.Context.Map.pas',
+  iORM.Context.Map.Interfaces in '..\..\Source\iORM.Context.Map.Interfaces.pas',
+  iORM.DB.ConnectionContainer in '..\..\Source\iORM.DB.ConnectionContainer.pas',
+  iORM.LazyLoad.Generics.List in '..\..\Source\iORM.LazyLoad.Generics.List.pas',
+  iORM.LazyLoad.Generics.ObjectList in '..\..\Source\iORM.LazyLoad.Generics.ObjectList.pas',
+  iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas',
+  iORM.LazyLoad.LazyLoader in '..\..\Source\iORM.LazyLoad.LazyLoader.pas',
+  iORM.LazyLoad.Factory in '..\..\Source\iORM.LazyLoad.Factory.pas',
+  iORM.LiveBindings.Notification in '..\..\Source\iORM.LiveBindings.Notification.pas',
+  iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas',
+  iORM.MVVM.Interfaces in '..\..\Source\iORM.MVVM.Interfaces.pas',
+  iORM.MVVM.ViewModel.ViewData in '..\..\Source\iORM.MVVM.ViewModel.ViewData.pas',
+  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.Global.Factory in '..\..\Source\iORM.Global.Factory.pas',
+  iORM.DependencyInjection in '..\..\Source\iORM.DependencyInjection.pas',
+  iORM.DependencyInjection.Interfaces in '..\..\Source\iORM.DependencyInjection.Interfaces.pas',
+  iORM.MVVM.Factory in '..\..\Source\iORM.MVVM.Factory.pas',
+  DuckListU in '..\..\ExtLibs\DMVC\DuckListU.pas',
+  ObjectsMappers in '..\..\ExtLibs\DMVC\ObjectsMappers.pas',
+  RTTIUtilsU in '..\..\ExtLibs\DMVC\RTTIUtilsU.pas',
+  DuckObjU in '..\..\ExtLibs\DMVC\DuckObjU.pas',
+  iORM.ObjectsForge.ObjectMapper in '..\..\Source\iORM.ObjectsForge.ObjectMapper.pas',
+  iORM.DMVC.ObjectsMappersAdapter in '..\..\Source\iORM.DMVC.ObjectsMappersAdapter.pas',
+  iORM.DB.QueryContainer in '..\..\Source\iORM.DB.QueryContainer.pas',
+  iORM.DB.QueryEngine in '..\..\Source\iORM.DB.QueryEngine.pas',
+  iORM.Where.SqlItems.Interfaces in '..\..\Source\iORM.Where.SqlItems.Interfaces.pas',
+  iORM.Containers.Interfaces in '..\..\Source\iORM.Containers.Interfaces.pas',
+  iORM.Containers.List in '..\..\Source\iORM.Containers.List.pas',
+  iORM.Containers.Factory in '..\..\Source\iORM.Containers.Factory.pas',
+  iORM.Containers.ObjectList in '..\..\Source\iORM.Containers.ObjectList.pas',
+  iORM.Resolver.Interfaces in '..\..\Source\iORM.Resolver.Interfaces.pas',
+  iORM.Rtti.Utilities in '..\..\Source\iORM.Rtti.Utilities.pas',
+  iORM.Resolver.Factory in '..\..\Source\iORM.Resolver.Factory.pas',
+  iORM.Resolver.ByDependencyInjection in '..\..\Source\iORM.Resolver.ByDependencyInjection.pas',
+  iORM.DB.TransactionCollection in '..\..\Source\iORM.DB.TransactionCollection.pas',
+  iORM.LiveBindings.InterfaceListBindSourceAdapter in '..\..\Source\iORM.LiveBindings.InterfaceListBindSourceAdapter.pas',
+  iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas',
+  iORM.LiveBindings.InterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.InterfaceObjectBindSourceAdapter.pas',
+  iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas',
+  ObjMapperEngine in '..\..\ExtLibs\DMVC\ObjMapperEngine.pas',
+  DuckPropFieldU in '..\..\ExtLibs\DMVC\DuckPropFieldU.pas',
+  ObjMapper in '..\..\ExtLibs\DMVC\ObjMapper.pas',
+  ObjMapperAttributes in '..\..\ExtLibs\DMVC\ObjMapperAttributes.pas',
+  iORM.DependencyInjection.ViewModelShuttleContainer in '..\..\Source\iORM.DependencyInjection.ViewModelShuttleContainer.pas',
+  iORM.DependencyInjection.Singletons in '..\..\Source\iORM.DependencyInjection.Singletons.pas',
+  iORM.DB.Firebird.SqlDataConverter in '..\..\Source\iORM.DB.Firebird.SqlDataConverter.pas',
+  iORM.DB.Firebird.SqlGenerator in '..\..\Source\iORM.DB.Firebird.SqlGenerator.pas',
+  iORM.Where.Interfaces in '..\..\Source\iORM.Where.Interfaces.pas',
+  iORM.Where.DetailsContainer in '..\..\Source\iORM.Where.DetailsContainer.pas',
+  iORM.Where.Factory in '..\..\Source\iORM.Where.Factory.pas',
+  iORM.Where.Destinations in '..\..\Source\iORM.Where.Destinations.pas',
+  iORM.DB.SQL.Destination in '..\..\Source\iORM.DB.SQL.Destination.pas',
+  iORM.DB.Components.MemTable in '..\..\Source\iORM.DB.Components.MemTable.pas',
+  iORM.DependencyInjection.Implementers in '..\..\Source\iORM.DependencyInjection.Implementers.pas',
+  DuckDictionaryU in '..\..\ExtLibs\DMVC\DuckDictionaryU.pas',
+  iORM.MVVM.Commands in '..\..\Source\iORM.MVVM.Commands.pas',
+  iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
+  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas';
+
+end.

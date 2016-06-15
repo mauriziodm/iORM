@@ -1,0 +1,9 @@
+{$IFDEF MSWINDOWS}
+  {$IF DECLARED(FireMonkeyVersion)}
+    {$DEFINE HAS_FMX}
+  {$ELSE}
+    {$DEFINE HAS_VCL}
+  {$IFEND}
+{$ELSE}
+  {$DEFINE HAS_FMX}
+{$ENDIF}
