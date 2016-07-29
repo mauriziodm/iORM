@@ -116,8 +116,8 @@ begin
   inherited Create;
   FSqlQuery := ASQLQuery;
   FSqlConnection := AConnection;  // Per utilizzare il reference counting
-  if Assigned(AConnection)
-    then FSqlQuery.Connection := AConnection.GetConnection;
+  if Assigned(AConnection) and AConnection.IsDBConnection
+    then FSqlQuery.Connection := AConnection.AsDBConnection.GetConnection;
 end;
 
 function TioQuery.CreateBlobStream(AProperty: IioContextProperty;
@@ -394,3 +394,5 @@ end;
 
 
 end.
+
+

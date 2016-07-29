@@ -1,3 +1,7 @@
+{ *******************************************************************************
+   Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
+  ******************************************************************************** }
+
 unit ObjMapper;
 
 interface
@@ -10,6 +14,7 @@ type
   TomValueDestination = class;
   TomJSONDestination  = class;
 
+  omRef = class of om;
   om = class
   strict private
     class function From(const AValue:TValue; const AParams:IomParams): TomValueDestination; overload;

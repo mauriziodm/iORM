@@ -424,7 +424,7 @@ begin
       // NB: Se la proprietà è l'ID e stiamo utilizzando una connessione a SQLServer
       //      e il flag IDSkipOnInsert = True evita di sinerire anche questa proprietà
       //      nell'elenco (della query insert).
-      if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionType = cdtSQLServer) then
+      if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer) then
         Result := False;
     end;
     ioUpdate: Result := (FReadWrite >= iorwReadWrite);

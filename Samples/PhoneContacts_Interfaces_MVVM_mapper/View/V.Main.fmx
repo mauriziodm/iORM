@@ -21,6 +21,11 @@ object ViewMain: TViewMain
     TabIndex = 0
     TabOrder = 0
     TabPosition = None
+    Sizes = (
+      1002s
+      705s
+      1002s
+      705s)
     object TabItemPersons: TTabItem
       CustomIcon = <
         item
@@ -48,7 +53,7 @@ object ViewMain: TViewMain
           StyleLookup = 'toollabel'
           TextSettings.Font.Family = 'Segoe UI Semibold'
           TextSettings.Font.Size = 16.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
           TextSettings.HorzAlign = Center
           Text = 'MVVM - Phone Book'
         end
@@ -129,7 +134,7 @@ object ViewMain: TViewMain
           TabOrder = 3
           Text = 'Load from DB by code'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
         object ButtonClearData: TButton
           Cursor = crHandPoint
@@ -142,7 +147,7 @@ object ViewMain: TViewMain
           TabOrder = 0
           Text = 'Clear data'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
         object ButtonSerializeToMemo: TButton
           Cursor = crHandPoint
@@ -155,7 +160,7 @@ object ViewMain: TViewMain
           TabOrder = 2
           Text = 'Serialize to JSON'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
         object ButtonDeserializeFromMemo: TButton
           Cursor = crHandPoint
@@ -168,7 +173,7 @@ object ViewMain: TViewMain
           TabOrder = 1
           Text = 'Deserialize from JSON'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
         object ButtonClearMemo: TButton
           Cursor = crHandPoint
@@ -181,7 +186,7 @@ object ViewMain: TViewMain
           TabOrder = 4
           Text = 'Clear JSON'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
         object ButtonSaveJSONToFile: TButton
           Cursor = crHandPoint
@@ -194,7 +199,7 @@ object ViewMain: TViewMain
           TabOrder = 6
           Text = 'Save JSON to file'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
         object ButtonLoadJSONFromFile: TButton
           Cursor = crHandPoint
@@ -207,7 +212,7 @@ object ViewMain: TViewMain
           TabOrder = 5
           Text = 'Load JSON from file'
           TextSettings.Font.Size = 14.000000000000000000
-          TextSettings.Font.Style = [fsBold]
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
         end
       end
       object Memo1: TMemo
@@ -230,7 +235,7 @@ object ViewMain: TViewMain
         Position.Y = 90.000000000000000000
         TextSettings.Font.Family = 'Segoe UI Semibold'
         TextSettings.Font.Size = 14.000000000000000000
-        TextSettings.Font.Style = [fsBold]
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'JSON'
       end
@@ -240,7 +245,7 @@ object ViewMain: TViewMain
         Position.Y = 90.000000000000000000
         TextSettings.Font.Family = 'Segoe UI Semibold'
         TextSettings.Font.Size = 14.000000000000000000
-        TextSettings.Font.Style = [fsBold]
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Persons'
       end
@@ -250,7 +255,7 @@ object ViewMain: TViewMain
         Position.Y = 525.000000000000000000
         TextSettings.Font.Family = 'Segoe UI Semibold'
         TextSettings.Font.Size = 14.000000000000000000
-        TextSettings.Font.Style = [fsBold]
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Phone numbers'
       end
@@ -380,7 +385,6 @@ object ViewMain: TViewMain
     ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
-    ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledReload
     ioVM_UseBSPropsOnCreate = True

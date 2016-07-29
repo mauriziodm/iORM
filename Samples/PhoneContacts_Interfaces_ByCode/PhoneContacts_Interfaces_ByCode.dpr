@@ -30,10 +30,10 @@ begin
   io.Connections.Monitor.Mode := mmRemote;
 
   // AutoCreation and AutoUpdate of the database
-  io.AutoCreateDatabase(False);
+//  io.AutoCreateDatabase(False);
 
   // Check for sample data creation
-  TSampleData.CheckForSampleDataCreation;
+//  TSampleData.CheckForSampleDataCreation;
   // ============ IupOrm initialization ====================
 
 

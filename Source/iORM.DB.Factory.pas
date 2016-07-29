@@ -54,7 +54,7 @@ type
     class function SqlGenerator: TioSqlGeneratorRef;
     class function SqlDataConverter: TioSqlDataConverterRef;
     class function Connection(AConnectionName:String=''): IioConnection;
-    class function NewConnection(AConnectionName:String): IioConnection;
+    class function NewConnection(const AConnectionName:String): IioConnection;
     class function TransactionCollection: IioTransactionCollection;
     class function Query(AConnectionDefName:String; const AQueryIdentity:String=''): IioQuery;
     class function ConnectionContainer: TioConnectionContainerRef;
@@ -83,7 +83,7 @@ begin
   Result := TioCompareOperatorSqLite;
 end;
 
-class function TioDbFactory.Connection(AConnectionName:String): IioConnection;
+class function TioDbFactory.Connection(AConnectionName:String=''): IioConnection;
 begin
   // If AConnectionName param is not specified (is empty) then
   //  use the default connection def
@@ -112,7 +112,7 @@ begin
   Result := TioLogicRelationSqLite;
 end;
 
-class function TioDbFactory.NewConnection(AConnectionName:String): IioConnection;
+class function TioDbFactory.NewConnection(const AConnectionName:String): IioConnection;
 var
   DBPath: String;
   LConnection: TioInternalSqlConnection;
@@ -135,7 +135,7 @@ begin
   // Open the connection
   LConnection.Open;
   // Create the ioConnection and his QueryContainer and return it
-  Result := TioConnection.Create(LConnection,   Self.QueryContainer   );
+  Result := TioConnectionDB.Create(LConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
 end;
 
 class function TioDbFactory.QueryContainer: IioQueryContainer;
@@ -150,29 +150,32 @@ end;
 
 class function TioDbFactory.Query(AConnectionDefName:String; const AQueryIdentity:String): IioQuery;
 var
-  AConnection: IioConnection;
+  LConnection: IioConnection;
 begin
   // If AConnectionName param is not specified (is empty) then
   //  use the default connection def
   if AConnectionDefName.IsEmpty then
     AConnectionDefName := Self.ConnectionManager.GetDefaultConnectionName;
   // Get the proper connection
-  AConnection := Self.Connection(AConnectionDefName);
+  LConnection := Self.Connection(AConnectionDefName);
+  // Operation allowed only for DB connections
+  if not LConnection.IsDBConnection then
+    raise EioException.Create(Self.ClassName + ': "Query" method: Operation not allowed by this type of connection.');
   // Else if the query is already present in the QueryContainer of the connection then
   //  get it and return
-  if AConnection.QueryContainer.Exist(AQueryIdentity) then
-    Exit(   AConnection.QueryContainer.GetQuery(AQueryIdentity)   );
+  if LConnection.AsDBConnection.QueryContainer.Exist(AQueryIdentity) then
+    Exit(   LConnection.AsDBConnection.QueryContainer.GetQuery(AQueryIdentity)   );
   // Else create a new query and insert it in the QueryContainer of the connection
   //  for future use if AConnectionDefName is valid (used by DBCreator)
-  Result := TioQuery.Create(AConnection, TioInternalSqlQuery.Create(nil));
+  Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
 //  if not AConnectionDefName.IsEmpty then
   if not AQueryIdentity.IsEmpty then
-    AConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
+    LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
 end;
 
 class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;
 begin
-  case TioConnectionManager.GetConnectionType of
+  case TioConnectionManager.GetConnectionInfo.ConnectionType of
     cdtFirebird:  Result := TioSqlDataConverterFirebird;
     cdtSQLite:    Result := TioSqlDataConverterSqLite;
     cdtSQLServer: Result := TioSqlDataConverterFirebird;
@@ -189,7 +192,7 @@ end;
 
 class function TioDbFactory.SqlGenerator: TioSqlGeneratorRef;
 begin
-  case TioConnectionManager.GetConnectionType of
+  case TioConnectionManager.GetConnectionInfo.ConnectionType of
     cdtFirebird: Result := TioSqlGeneratorFirebird;
     cdtSQLite:   Result := TioSqlGeneratorSqLite;
     cdtSQLServer:Result := TioSqlGeneratorMSSqlServer;

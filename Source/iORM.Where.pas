@@ -136,29 +136,47 @@ type
     function _EqualTo(AValue:Integer): IioWhere; overload;
     function _GreaterThan(AValue:TValue): IioWhere; overload;
     function _GreaterThan(AValue:TDateTime): IioWhere; overload;
+    function _GreaterThan(AValue:Double): IioWhere; overload;
+    function _GreaterThan(AValue:Integer): IioWhere; overload;
     function _LowerThan(AValue:TValue): IioWhere; overload;
     function _LowerThan(AValue:TDateTime): IioWhere; overload;
+    function _LowerThan(AValue:Double): IioWhere; overload;
+    function _LowerThan(AValue:Integer): IioWhere; overload;
     function _GreaterOrEqualThan(AValue:TValue): IioWhere; overload;
     function _GreaterOrEqualThan(AValue:TDateTime): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue:Double): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue:Integer): IioWhere; overload;
     function _LowerOrEqualThan(AValue:TValue): IioWhere; overload;
     function _LowerOrEqualThan(AValue:TDateTime): IioWhere; overload;
+    function _LowerOrEqualThan(AValue:Double): IioWhere; overload;
+    function _LowerOrEqualThan(AValue:Integer): IioWhere; overload;
     function _NotEqualTo(AValue:TValue): IioWhere; overload;
     function _NotEqualTo(AValue:TDateTime): IioWhere; overload;
+    function _NotEqualTo(AValue:Double): IioWhere; overload;
+    function _NotEqualTo(AValue:Integer): IioWhere; overload;
     function _LikeTo(AValue:TValue): IioWhere; overload;
     function _LikeTo(AValue:TDateTime): IioWhere; overload;
+    function _LikeTo(AValue:Double): IioWhere; overload;
+    function _LikeTo(AValue:Integer): IioWhere; overload;
     // ------
     function _Where: IioWhere; overload;
     function _Where(AWhere:IioWhere): IioWhere; overload;
     function _Where(ATextCondition:String): IioWhere; overload;
     function _Property(APropertyName:String): IioWhere;
     function _PropertyOID: IioWhere;
+
     function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:TDateTime): IioWhere; overload;
-    function _PropertyOIDEqualsTo(AValue:TValue): IioWhere;
+    function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere; overload;
+    function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere; overload;
+
+    function _PropertyOIDEqualsTo(AValue:Integer): IioWhere;
+
     function _Value(AValue:TValue): IioWhere; overload;
     function _Value(AValue:TDateTime): IioWhere; overload;
     function _Value(AValue:Integer): IioWhere; overload;
     function _Value(AValue:Double): IioWhere; overload;
+
     function _OrderBy(const ATextOrderBy:String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere; overload;
     procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
@@ -218,29 +236,47 @@ type
     function _EqualTo(AValue:Integer): IioWhere<T>; overload;
     function _GreaterThan(AValue:TValue): IioWhere<T>; overload;
     function _GreaterThan(AValue:TDateTime): IioWhere<T>; overload;
+    function _GreaterThan(AValue:Double): IioWhere<T>; overload;
+    function _GreaterThan(AValue:Integer): IioWhere<T>; overload;
     function _LowerThan(AValue:TValue): IioWhere<T>; overload;
     function _LowerThan(AValue:TDateTime): IioWhere<T>; overload;
+    function _LowerThan(AValue:Double): IioWhere<T>; overload;
+    function _LowerThan(AValue:Integer): IioWhere<T>; overload;
     function _GreaterOrEqualThan(AValue:TValue): IioWhere<T>; overload;
     function _GreaterOrEqualThan(AValue:TDateTime): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue:Double): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue:Integer): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue:TValue): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue:TDateTime): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue:Double): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue:Integer): IioWhere<T>; overload;
     function _NotEqualTo(AValue:TValue): IioWhere<T>; overload;
     function _NotEqualTo(AValue:TDateTime): IioWhere<T>; overload;
+    function _NotEqualTo(AValue:Double): IioWhere<T>; overload;
+    function _NotEqualTo(AValue:Integer): IioWhere<T>; overload;
     function _LikeTo(AValue:TValue): IioWhere<T>; overload;
     function _LikeTo(AValue:TDateTime): IioWhere<T>; overload;
+    function _LikeTo(AValue:Double): IioWhere<T>; overload;
+    function _LikeTo(AValue:Integer): IioWhere<T>; overload;
     // ------
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond:IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition:String): IioWhere<T>; overload;
     function _Property(APropertyName:String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
+
     function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:TDateTime): IioWhere<T>; overload;
-    function _PropertyOIDEqualsTo(AValue:TValue): IioWhere<T>;
+    function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere<T>; overload;
+    function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere<T>; overload;
+
+    function _PropertyOIDEqualsTo(AValue:Integer): IioWhere<T>;
+
     function _Value(AValue:TValue): IioWhere<T>; overload;
     function _Value(AValue:TDateTime): IioWhere<T>; overload;
     function _Value(AValue:Double): IioWhere<T>; overload;
     function _Value(AValue:Integer): IioWhere<T>; overload;
+
     function _OrderBy(const ATextOrderBy:String): IioWhere<T>; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere<T>; overload;
   end;
@@ -341,6 +377,16 @@ begin
   Self.FWhereItems.Add(TioDbFactory.CompareOperator._GreaterOrEqual);
 end;
 
+function TioWhere._GreaterOrEqualThan(AValue: Integer): IioWhere;
+begin
+  Result := Self._GreaterOrEqualThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._GreaterOrEqualThan(AValue: Double): IioWhere;
+begin
+  Result := Self._GreaterOrEqualThan(   TValue.From<Double>(AValue)   );
+end;
+
 function TioWhere._GreaterOrEqualThan(AValue: TDateTime): IioWhere;
 begin
   Result := Self._GreaterOrEqualThan(   TValue.From<TDateTime>(AValue)   );
@@ -400,6 +446,16 @@ function TioWhere._LowerOrEqual: IioWhere;
 begin
   Result := Self;
   Self.FWhereItems.Add(TioDbFactory.CompareOperator._LowerOrEqual);
+end;
+
+function TioWhere._LowerOrEqualThan(AValue: Double): IioWhere;
+begin
+  Result := Self._LowerOrEqualThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere._LowerOrEqualThan(AValue: Integer): IioWhere;
+begin
+  Result := Self._LowerOrEqualThan(   TValue.From<Integer>(AValue)   );
 end;
 
 function TioWhere._LowerOrEqualThan(AValue: TDateTime): IioWhere;
@@ -1119,6 +1175,18 @@ begin
 end;
 
 function TioWhere._PropertyEqualsTo(APropertyName: String;
+  AValue: Double): IioWhere;
+begin
+  Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere._PropertyEqualsTo(APropertyName: String;
+  AValue: Integer): IioWhere;
+begin
+  Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._PropertyEqualsTo(APropertyName: String;
   AValue: TDateTime): IioWhere;
 begin
   Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<TDateTime>(AValue)   );
@@ -1136,10 +1204,10 @@ begin
   Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOID);
 end;
 
-function TioWhere._PropertyOIDEqualsTo(AValue: TValue): IioWhere;
+function TioWhere._PropertyOIDEqualsTo(AValue: Integer): IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOIDEqualsTo(AValue));
+  Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOIDEqualsTo(   TValue.From<Integer>(AValue)   ));
 end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
@@ -1416,6 +1484,16 @@ begin
   TioWhere(Self)._Like;
 end;
 
+function TioWhere<T>._LikeTo(AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._LikeTo(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._LikeTo(AValue: Double): IioWhere<T>;
+begin
+  Result := Self._LikeTo(   TValue.From<Double>(AValue)   );
+end;
+
 function TioWhere<T>._LikeTo(AValue: TDateTime): IioWhere<T>;
 begin
   Result := Self._LikeTo(   TValue.From<TDateTime>(AValue)   );
@@ -1466,6 +1544,16 @@ function TioWhere<T>._NotEqual: IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._NotEqual;
+end;
+
+function TioWhere<T>._NotEqualTo(AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._NotEqualTo(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._NotEqualTo(AValue: Double): IioWhere<T>;
+begin
+  Result := Self._NotEqualTo(   TValue.From<Double>(AValue)   );
 end;
 
 function TioWhere<T>._NotEqualTo(AValue: TDateTime): IioWhere<T>;
@@ -1528,7 +1616,7 @@ begin
   TioWhere(Self)._PropertyOID;
 end;
 
-function TioWhere<T>._PropertyOIDEqualsTo(AValue: TValue): IioWhere<T>;
+function TioWhere<T>._PropertyOIDEqualsTo(AValue: Integer): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._PropertyOIDEqualsTo(AValue);
@@ -1598,6 +1686,98 @@ end;
 function TioWhere<T>._Value(AValue: Integer): IioWhere<T>;
 begin
   Result := Self._Value(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._GreaterThan(AValue: Integer): IioWhere;
+begin
+  Result := Self._GreaterThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._GreaterThan(AValue: Double): IioWhere;
+begin
+  Result := Self._GreaterThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere._LikeTo(AValue: Integer): IioWhere;
+begin
+  Result := Self._LikeTo(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._LikeTo(AValue: Double): IioWhere;
+begin
+  Result := Self._LikeTo(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere._LowerThan(AValue: Double): IioWhere;
+begin
+  Result := Self._LowerThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere._LowerThan(AValue: Integer): IioWhere;
+begin
+  Result := Self._LowerThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._NotEqualTo(AValue: Integer): IioWhere;
+begin
+  Result := Self._NotEqualTo(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere._NotEqualTo(AValue: Double): IioWhere;
+begin
+  Result := Self._NotEqualTo(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere<T>._GreaterOrEqualThan(AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._GreaterOrEqualThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._GreaterOrEqualThan(AValue: Double): IioWhere<T>;
+begin
+  Result := Self._GreaterOrEqualThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere<T>._GreaterThan(AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._GreaterThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._GreaterThan(AValue: Double): IioWhere<T>;
+begin
+  Result := Self._GreaterThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere<T>._LowerOrEqualThan(AValue: Double): IioWhere<T>;
+begin
+  Result := Self._LowerOrEqualThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere<T>._LowerOrEqualThan(AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._LowerOrEqualThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._LowerThan(AValue: Double): IioWhere<T>;
+begin
+  Result := Self._LowerThan(   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere<T>._LowerThan(AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._LowerThan(   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._PropertyEqualsTo(APropertyName: String;
+  AValue: Double): IioWhere<T>;
+begin
+  Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<Double>(AValue)   );
+end;
+
+function TioWhere<T>._PropertyEqualsTo(APropertyName: String;
+  AValue: Integer): IioWhere<T>;
+begin
+  Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<Integer>(AValue)   );
 end;
 
 end.

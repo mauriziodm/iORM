@@ -168,6 +168,11 @@
         <DCCReference Include="FireDACIBDriver.dcp"/>
         <DCCReference Include="fmxFireDAC.dcp"/>
         <DCCReference Include="soaprtl.dcp"/>
+        <DCCReference Include="vclFireDAC.dcp"/>
+        <DCCReference Include="FireDACCommonODBC.dcp"/>
+        <DCCReference Include="FireDACMSSQLDriver.dcp"/>
+        <DCCReference Include="CustomIPTransport.dcp"/>
+        <DCCReference Include="RESTComponents.dcp"/>
         <DCCReference Include="..\..\Source\iORM.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\iORM.Context.Container.pas"/>
@@ -232,10 +237,6 @@
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Factory.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\DuckListU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\ObjectsMappers.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\RTTIUtilsU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\DuckObjU.pas"/>
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMapper.pas"/>
         <DCCReference Include="..\..\Source\iORM.DMVC.ObjectsMappersAdapter.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.QueryContainer.pas"/>
@@ -254,10 +255,6 @@
         <DCCReference Include="..\..\Source\iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.InterfaceObjectBindSourceAdapter.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\ObjMapperEngine.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\DuckPropFieldU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\ObjMapper.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\ObjMapperAttributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.ViewModelShuttleContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Singletons.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Firebird.SqlDataConverter.pas"/>
@@ -269,10 +266,20 @@
         <DCCReference Include="..\..\Source\iORM.DB.SQL.Destination.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.MemTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Implementers.pas"/>
-        <DCCReference Include="..\..\ExtLibs\DMVC\DuckDictionaryU.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Commands.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
+        <DCCReference Include="..\..\Source\iORM.REST.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.REST.Connection.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckDictionaryU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckListU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckObjU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckPropFieldU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapperEngine.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\RTTIUtilsU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

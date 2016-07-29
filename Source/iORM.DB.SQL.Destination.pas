@@ -66,7 +66,7 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions;
 
 { TioSQLDestination }
 
@@ -97,7 +97,10 @@ var
   LConnection: IioConnection;
 begin
   LConnection := TioDBFactory.Connection(FConnectionDefName);
-  Result := LConnection.GetConnection.ExecSQL(Self.Translate, AParams, ATypes);
+  if LConnection.IsDBConnection then
+    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(Self.Translate, AParams, ATypes)
+  else
+    raise EioException.Create(Self.ClassName + ': "Execute" method: Operation not allowed by this connection type.');
 end;
 
 function TioSQLDestination.QualifiedFieldName(
@@ -112,7 +115,10 @@ var
   LConnection: IioConnection;
 begin
   LConnection := TioDBFactory.Connection(FConnectionDefName);
-  Result := LConnection.GetConnection.ExecSQL(Self.Translate, AIgnoreObjNotExists);
+  if LConnection.IsDBConnection then
+    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(Self.Translate, AIgnoreObjNotExists)
+  else
+    raise EioException.Create(Self.ClassName + ': "Execute" method: Operation not allowed by this connection type.');
 end;
 
 function TioSQLDestination.SelfClass(

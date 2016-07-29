@@ -26,10 +26,8 @@ package iORM_Project;
 {$DEFINE ioPresent}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'iORM Runtime'}
+{$DESCRIPTION 'IupOrm Runtime'}
 {$IMPLICITBUILD ON}
-
-{$I \..\..\source\ioGlobalDef.inc}   // iORM global definitions
 
 requires
   rtl,
@@ -41,13 +39,13 @@ requires
   FireDACCommonDriver,
   DbxCommonDriver,
   FireDACIBDriver,
-{$IFDEF HAS_VCL}
-  vclFireDAC,
-  FireDACMSSQLDriver,
-{$ELSE}
   fmxFireDAC,
-{$ENDIF}
-  soaprtl;
+  soaprtl,
+  vclFireDAC,
+  FireDACCommonODBC,
+  FireDACMSSQLDriver,
+  CustomIPTransport,
+  RESTComponents;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',
@@ -111,10 +109,6 @@ contains
   iORM.DependencyInjection in '..\..\Source\iORM.DependencyInjection.pas',
   iORM.DependencyInjection.Interfaces in '..\..\Source\iORM.DependencyInjection.Interfaces.pas',
   iORM.MVVM.Factory in '..\..\Source\iORM.MVVM.Factory.pas',
-  DuckListU in '..\..\ExtLibs\DMVC\DuckListU.pas',
-  ObjectsMappers in '..\..\ExtLibs\DMVC\ObjectsMappers.pas',
-  RTTIUtilsU in '..\..\ExtLibs\DMVC\RTTIUtilsU.pas',
-  DuckObjU in '..\..\ExtLibs\DMVC\DuckObjU.pas',
   iORM.ObjectsForge.ObjectMapper in '..\..\Source\iORM.ObjectsForge.ObjectMapper.pas',
   iORM.DMVC.ObjectsMappersAdapter in '..\..\Source\iORM.DMVC.ObjectsMappersAdapter.pas',
   iORM.DB.QueryContainer in '..\..\Source\iORM.DB.QueryContainer.pas',
@@ -133,10 +127,6 @@ contains
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas',
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.InterfaceObjectBindSourceAdapter.pas',
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas',
-  ObjMapperEngine in '..\..\ExtLibs\DMVC\ObjMapperEngine.pas',
-  DuckPropFieldU in '..\..\ExtLibs\DMVC\DuckPropFieldU.pas',
-  ObjMapper in '..\..\ExtLibs\DMVC\ObjMapper.pas',
-  ObjMapperAttributes in '..\..\ExtLibs\DMVC\ObjMapperAttributes.pas',
   iORM.DependencyInjection.ViewModelShuttleContainer in '..\..\Source\iORM.DependencyInjection.ViewModelShuttleContainer.pas',
   iORM.DependencyInjection.Singletons in '..\..\Source\iORM.DependencyInjection.Singletons.pas',
   iORM.DB.Firebird.SqlDataConverter in '..\..\Source\iORM.DB.Firebird.SqlDataConverter.pas',
@@ -148,9 +138,19 @@ contains
   iORM.DB.SQL.Destination in '..\..\Source\iORM.DB.SQL.Destination.pas',
   iORM.DB.Components.MemTable in '..\..\Source\iORM.DB.Components.MemTable.pas',
   iORM.DependencyInjection.Implementers in '..\..\Source\iORM.DependencyInjection.Implementers.pas',
-  DuckDictionaryU in '..\..\ExtLibs\DMVC\DuckDictionaryU.pas',
   iORM.MVVM.Commands in '..\..\Source\iORM.MVVM.Commands.pas',
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
-  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas';
+  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
+  iORM.REST.Interfaces in '..\..\Source\iORM.REST.Interfaces.pas',
+  iORM.REST.Connection in '..\..\Source\iORM.REST.Connection.pas',
+  DuckDictionaryU in '..\..\ExtLibs\ObjMapper\DuckDictionaryU.pas',
+  DuckListU in '..\..\ExtLibs\ObjMapper\DuckListU.pas',
+  DuckObjU in '..\..\ExtLibs\ObjMapper\DuckObjU.pas',
+  DuckPropFieldU in '..\..\ExtLibs\ObjMapper\DuckPropFieldU.pas',
+  ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
+  ObjMapper in '..\..\ExtLibs\ObjMapper\ObjMapper.pas',
+  ObjMapperEngine in '..\..\ExtLibs\ObjMapper\ObjMapperEngine.pas',
+  RTTIUtilsU in '..\..\ExtLibs\ObjMapper\RTTIUtilsU.pas',
+  ObjMapperAttributes in '..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas';
 
 end.

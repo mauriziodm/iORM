@@ -48,7 +48,19 @@ type
   TioParam = TFDParam;
   TioParams = TFDParams;
 
-  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL);
+  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
+  TioConnectionInfo = record
+    ConnectionName: String[20];
+    Persistent: Boolean;
+    constructor Create(const AConnectionName:String; const AConnectionType:TioConnectionType; const APersistent:Boolean);
+    case ConnectionType: TioConnectionType of
+      cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL:
+        ();
+      cdtREST:
+        (BaseURL: String[100];
+         UserName: String[20];
+         Password: String[20]);
+  end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
   TioLogicRelationRef = class of TioLogicRelation;
@@ -79,16 +91,30 @@ type
 
   // Interfaccia per il componente connection da fornire alla query per la
   //  connessione al database
+  IioConnectionDB = interface;
+  IioConnectionREST = interface;
   IioConnection = interface
     ['{FF5D54D7-7EBE-4E6E-830E-E091BA7AE929}']
     procedure Free;
-    function GetConnection: TioInternalSqlConnection;
-    function GetConnectionDefName: String;
-    function QueryContainer: IioQueryContainer;
+    function IsDBConnection: Boolean;
+    function IsRESTConnection: Boolean;
+    function AsDBConnection: IioConnectionDB;
+    function AsRESTConnection: IioConnectionREST;
+    function GetConnectionInfo: TioConnectionInfo;
     function InTransaction: Boolean;
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
+  end;
+
+  IioConnectionDB = interface(IioConnection)
+    ['{997CFE22-031A-468A-BF67-E076C43DC0E2}']
+    function GetConnection: TioInternalSqlConnection;
+    function QueryContainer: IioQueryContainer;
+  end;
+
+  IioConnectionREST = interface(IioConnection)
+    ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
   end;
 
   // Interfaccia per il componente Query, cioè del componente che si
@@ -249,6 +275,16 @@ begin
   for Prop in AContext.GetProperties do
     if Prop.IsBlob then
       AQuery.SaveStreamObjectToSqlParam(Prop.GetValue(AContext.DataObject).AsObject, Prop);
+end;
+
+{ TioConnectionInfo }
+
+constructor TioConnectionInfo.Create(const AConnectionName:String; const AConnectionType: TioConnectionType;
+  const APersistent: Boolean);
+begin
+  ConnectionName := AConnectionName;
+  ConnectionType := AConnectionType;
+  Persistent := APersistent;
 end;
 
 end.

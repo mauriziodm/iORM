@@ -44,7 +44,7 @@ type
   //  che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
   //  che utilizzano una sola ConnectionDef non è necessario specificare nulla nella dichiarazione delle classi perchè
   //  tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
-  TioConnectionManagerContainer = TDictionary<String, TioConnectionType>;
+  TioConnectionManagerContainer = TDictionary<String, TioConnectionInfo>;
   TioConnectionManagerRef = class of TioConnectionManager;
   TioConnectionManager = class
   strict private
@@ -55,13 +55,13 @@ type
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;
   public
-    class function NewSQLiteConnectionDef(const ADatabase: String; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewSQLiteConnectionDef(const ADatabase: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function GetConnectionDefByName(AConnectionName:String=''): IIoConnectionDef;
     class function GetDefaultConnectionName: String;
-    class function GetConnectionType(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionType;
+    class function GetConnectionInfo(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionInfo;
     class procedure SetDefaultConnectionName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
@@ -106,7 +106,7 @@ uses
 
 class procedure TioConnectionContainer.AddConnection(const AConnection: IioConnection);
 begin
-  FContainer.Add(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionDefName), AConnection   );
+  FContainer.Add(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName), AConnection   );
 end;
 
 class function TioConnectionContainer.ConnectionExist(const AConnectionName:String): Boolean;
@@ -132,10 +132,11 @@ begin
   //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
   //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
   //       a vicenda e rendevano inefficace il Reference Count
-  AConnection.QueryContainer.CleanQueryConnectionsRef;
+  if AConnection.IsDBConnection then
+    AConnection.AsDBConnection.QueryContainer.CleanQueryConnectionsRef;
   // RImuove la connessione causandone anche la distruzione perchè a questo punto non c'è
   //  più alcun riferimento ad essa.
-  FContainer.Remove(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionDefName)   );
+  FContainer.Remove(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName)   );
 end;
 
 class procedure TioConnectionContainer.FreeInternalContainer;
@@ -188,7 +189,8 @@ begin
     raise EioException.Create(Self.ClassName + ': ConnectionDef not found.');
 end;
 
-class function TioConnectionManager.GetConnectionType(AConnectionName: String): TioConnectionType;
+class function TioConnectionManager.GetConnectionInfo(
+  AConnectionName: String): TioConnectionInfo;
 begin
   // If desired ConnectionName is empty then get then Default one.
   if AConnectionName = '' then AConnectionName := Self.GetDefaultConnectionName;
@@ -220,8 +222,8 @@ begin
     Self.FDefaultConnectionName := AConnectionName;
 end;
 
-class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet,
-  AConnectionName: String): IIoConnectionDef;
+class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String;
+  const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
   Result.Params.Values['DriverID'] := 'FB';
@@ -232,11 +234,11 @@ begin
   Result.Params.Values['Protocol'] := 'TCPIP';
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, cdtFirebird);
+  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent));
 end;
 
-class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet,
-  AConnectionName: String): IIoConnectionDef;
+class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet:String;
+  const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
   Result.Params.Values['DriverID'] := 'MySQL';
@@ -246,10 +248,10 @@ begin
   Result.Params.Values['Password'] := APassword;
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, cdtMySQL);
+  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
 end;
 
-class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase, AConnectionName: String): IIoConnectionDef;
+class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase:String; const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
   Result.Params.Values['DriverID'] := 'SQLite';
@@ -257,11 +259,11 @@ begin
   Result.Params.Values['Database'] := ADatabase;
   Result.Params.Values['FailIfMissing'] := 'False';
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, cdtSQLite);
+  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
 end;
 
-class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword,
-  AConnectionName: String): IIoConnectionDef;
+class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword:String;
+  const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
   Result.Params.Values['DriverID'] := 'MSSQL';
@@ -270,12 +272,12 @@ begin
   Result.Params.Values['User_Name'] := AUserName;
   Result.Params.Values['Password'] := APassword;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, cdtSQLServer);
+  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
 end;
 
 class procedure TioConnectionManager.SetDefaultConnectionName(const AConnectionName: String);
 begin
-  // If a connectionDef with thie name is not founded then raise an exception
+  // If a connectionDef with this name is not founded then raise an exception
   if not Assigned(FDManager.FindConnection(AConnectionName)) then
     raise EioException.Create(Self.ClassName + ': Connection params definition "' + AConnectionName + '" not found!');
   // Set the connection as default

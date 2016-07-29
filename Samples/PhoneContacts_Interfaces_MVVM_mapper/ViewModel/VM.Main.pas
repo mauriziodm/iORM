@@ -56,7 +56,7 @@ var
 implementation
 
 uses
-  iORM, RegisterClassesUnit, ObjMapper, Factory, System.JSON, FMX.Forms, FMX.Dialogs,
+  iORM, RegisterClassesUnit, Factory, System.JSON, FMX.Forms, FMX.Dialogs,
   System.UITypes;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
@@ -150,7 +150,7 @@ var
   NewDataObject: TObject;
 begin
   inherited;
-  NewDataObject := om.FromJSON(Self.JSON).TypeAnnotationsON.ToObject;
+  NewDataObject := io.Mapper.FromJSON(Self.JSON).TypeAnnotationsON.ToObject;
   Self.ViewData.SetDataObj(NewDataObject);
 end;
 
@@ -172,7 +172,7 @@ var
   LStrings: TStrings;
 begin
   inherited;
-  LJSONValue := om.From(Self.ViewData.DataObj).TypeAnnotationsON.ToJSON;
+  LJSONValue := io.Mapper.From(Self.ViewData.DataObj).TypeAnnotationsON.ToJSON;
   try
     Self.JSON := LJSONValue.ToString;
   finally

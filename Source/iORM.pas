@@ -41,7 +41,7 @@ uses
   iORM.LiveBindings.Interfaces,
   iORM.Global.Factory,
   iORM.DB.ConnectionContainer, iORM.Where.Interfaces, iORM.Where.Factory,
-  System.TypInfo, System.Classes, Data.Bind.ObjectScope;
+  System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper;
 
 type
 
@@ -101,6 +101,7 @@ type
     class function Where(const ATextCondition:String): IioWhere; overload;
     class function Where<T>(const ATextCondition:String): IioWhere<T>; overload;
     class function SQL(const ASQL:String): IioSQLDestination;
+    class function Mapper:omRef;
   end;
 
 implementation
@@ -162,6 +163,11 @@ begin
   finally
     AQuery.Close;
   end;
+end;
+
+class function io.Mapper: omRef;
+begin
+  Result := ObjMapper.om;
 end;
 
 class procedure io.Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean);
@@ -401,7 +407,7 @@ end;
 class procedure io.AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean);
 begin
   // The AutoCreateDatabase feature is available only for SQLite database
-  if TioConnectionManager.GetConnectionType = cdtSQLite then
+  if TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLite then
     TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase
   else if RaiseExceptionIfNotAvailable then
     raise EioException.Create(ClassName + ':  "AutoCreateDatabase" feature is available for SQLite RDBMS only.');
@@ -458,7 +464,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   //  before the insert query (for Firebird/Interbase)
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionType = cdtFirebird) and AContext.IDIsNull then
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtFirebird) and AContext.IDIsNull then
   begin
     AQuery := TioDBFActory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -480,7 +486,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   //  in the last insert query.
-  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionType = cdtSQLite) or (TioConnectionManager.GetConnectionType = cdtSQLServer))
+  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLite) or (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer))
     and AContext.IDIsNull then
   begin
     AQuery := TioDBFActory.QueryEngine.GetQueryNextID(AContext);
