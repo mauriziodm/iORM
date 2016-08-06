@@ -27,46 +27,31 @@
 
 
 
-unit iORM.REST.Connection;
+unit iORM.Strategy.Factory;
 
 interface
 
 uses
-  iORM.DB.Connection, iORM.REST.Interfaces, iORM.DB.Interfaces, REST.Client;
+  iORM.DB.Interfaces, iORM.Strategy.Interfaces;
 
 type
 
-  // This is the specialized class for REST connections
-  TioConnectionREST = class(TioConnectionBase, IioConnectionREST)
-  strict private
-    FRESTClient: TRESTClient;
-    FRESTRequest: TRESTRequest;
-    FRESTResponse: TRESTResponse;
+  TioStrategyFactory = class
   public
-    constructor Create(const AConnectionInfo:TioConnectionInfo);
-    destructor Destroy; override;
+    class function GetStrategy(const AConnectionName: String): TioStrategyRef;
   end;
 
 implementation
 
-{ TioConnectionREST }
+uses
+  iORM.Strategy.DB, iORM.DB.ConnectionContainer;
 
-constructor TioConnectionREST.Create(const AConnectionInfo: TioConnectionInfo);
-begin
-  inherited Create(AConnectionInfo);
-  FRESTClient := TRESTClient.Create(AConnectionInfo.BaseURL);
-  FRESTResponse := TRESTResponse.Create(nil);
-  FRESTRequest := TRESTRequest.Create(nil);
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-end;
+{ TioStrategyFactory }
 
-destructor TioConnectionREST.Destroy;
+class function TioStrategyFactory.GetStrategy(
+  const AConnectionName: String): TioStrategyRef;
 begin
-  FRESTResponse.Free;
-  FRESTRequest.Free;
-  FRESTClient.Free;
-  inherited;
+  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).Strategy;
 end;
 
 end.

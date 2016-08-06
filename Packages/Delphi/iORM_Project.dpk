@@ -151,6 +151,10 @@ contains
   ObjMapper in '..\..\ExtLibs\ObjMapper\ObjMapper.pas',
   ObjMapperEngine in '..\..\ExtLibs\ObjMapper\ObjMapperEngine.pas',
   RTTIUtilsU in '..\..\ExtLibs\ObjMapper\RTTIUtilsU.pas',
-  ObjMapperAttributes in '..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas';
+  ObjMapperAttributes in '..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas',
+  iORM.Strategy.DB in '..\..\Source\iORM.Strategy.DB.pas',
+  iORM.Strategy.Interfaces in '..\..\Source\iORM.Strategy.Interfaces.pas',
+  iORM.Strategy.Factory in '..\..\Source\iORM.Strategy.Factory.pas',
+  iORM.Strategy.REST in '..\..\Source\iORM.Strategy.REST.pas';
 
 end.

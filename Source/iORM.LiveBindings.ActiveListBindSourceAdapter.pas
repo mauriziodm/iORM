@@ -224,7 +224,9 @@ begin
     if Self.IsDetail then
       io.Persist(Self.Current,
                       Self.FMasterProperty.GetRelationChildPropertyName,
-                      Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID)
+                      Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
+                      False,
+                      '')  // Connection name
     else
       io.Persist(Self.Current);
   // Send a notification to other ActiveBindSourceAdapters & BindSource

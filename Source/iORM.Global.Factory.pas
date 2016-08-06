@@ -36,7 +36,7 @@ uses
   iORM.DuckTyped.Factory, iORM.LazyLoad.Factory,
   iORM.LiveBindings.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM.MVVM.Factory, iORM.Containers.Factory,
-  iORM.Where.Factory;
+  iORM.Where.Factory, iORM.Strategy.Interfaces, iORM.Strategy.Factory;
 
 Type
 
@@ -51,6 +51,7 @@ Type
   TioMVVMFactoryRef = class of TioMVVMFactory;
   TioContainersFactoryRef = class of TioContainersFactory;
   TioWhereFactoryRef = class of TioWhereFactory;
+  TioStrategyFactoryRef = class of TioStrategyFactory;
 
   TioGlobalFactory = class
   public
@@ -65,6 +66,7 @@ Type
     class function MVVMFactory: TioMVVMFactoryRef;
     class function ContainersFactory: TioContainersFactoryRef;
     class function WhereFactory: TioWhereFactoryRef;
+    class function Strategy: TioStrategyFactoryRef;
   end;
 
   TioGlobalFactoryRef = class of TioGlobalFactory;
@@ -124,6 +126,11 @@ end;
 class function TioGlobalFactory.RttiFactory: TioRttiContextFactoryRef;
 begin
   Result := TioRttiContextFactory;
+end;
+
+class function TioGlobalFactory.Strategy: TioStrategyFactoryRef;
+begin
+  Result := TioStrategyFactory;
 end;
 
 class function TioGlobalFactory.WhereFactory: TioWhereFactoryRef;

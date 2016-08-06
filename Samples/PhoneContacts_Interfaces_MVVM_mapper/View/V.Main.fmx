@@ -385,6 +385,7 @@ object ViewMain: TViewMain
     ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
+    ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledReload
     ioVM_UseBSPropsOnCreate = True

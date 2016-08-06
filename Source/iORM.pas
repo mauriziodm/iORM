@@ -84,13 +84,17 @@ type
     class function Load(const ATypeInfo:PTypeInfo; const ATypeAlias:String=''): IioWhere; overload;
     class function Load(const AClassRef:TioClassRef; const ATypeAlias:String=''): IioWhere; overload;
     class function Load<T>(const ATypeAlias:String=''): IioWhere<T>; overload;
-    class procedure Delete(const AObj: TObject); overload;
-    class procedure Delete(const AIntfObj: IInterface); overload;
-    class procedure Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean=False); overload;
+    class procedure Delete(const AObj: TObject; const AConnectionName:String=''); overload;
+    class procedure Delete(const AIntfObj: IInterface; const AConnectionName:String=''); overload;
+    class procedure Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); overload;
     class procedure Persist(const AObj: TObject; const ABlindInsert:Boolean=False); overload;
+    class procedure Persist(const AObj: TObject; const AConnectionName:String; const ABlindInsert:Boolean=False); overload;
     class procedure Persist(const AIntfObj: IInterface; const ABlindInsert:Boolean=False); overload;
+    class procedure Persist(const AIntfObj: IInterface; const AConnectionName:String; const ABlindInsert:Boolean=False); overload;
     class procedure PersistCollection(const ACollection: TObject; const ABlindInsert:Boolean=False); overload;
+    class procedure PersistCollection(const ACollection: TObject; const AConnectionName:String; const ABlindInsert:Boolean=False); overload;
     class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert:Boolean=False); overload;
+    class procedure PersistCollection(const AIntfCollection: IInterface; const AConnectionName:String; const ABlindInsert:Boolean=False); overload;
     class procedure StartTransaction(const AConnectionName:String='');
     class procedure CommitTransaction(const AConnectionName:String='');
     class procedure RollbackTransaction(const AConnectionName:String='');
@@ -114,7 +118,7 @@ uses
   iORM.Exceptions,
   System.SysUtils,
   iORM.DB.Factory,
-  iORM.DB.DBCreator.Factory, iORM.Rtti.Utilities;
+  iORM.DB.DBCreator.Factory, iORM.Rtti.Utilities, iORM.Strategy.Factory;
 
 
 { io }
@@ -122,13 +126,17 @@ uses
 class function io.Load(const ATypeName, ATypeAlias: String): IioWhere;
 begin
   Result := TioWhereFactory.NewWhere;
-  Result.SetType(ATypeName, ATypeAlias, nil);
+  Result.TypeName := ATypeName;
+  Result.TypeAlias := ATypeAlias;
+  Result.TypeInfo := nil;
 end;
 
 class function io.Load<T>(const ATypeAlias:String): IioWhere<T>;
 begin
   Result := TioWhereFactory.NewWhere<T>;
-  Result.SetType(TioRttiUtilities.GenericToString<T>, ATypeAlias, TypeInfo(T));
+  Result.TypeName := TioRttiUtilities.GenericToString<T>;
+  Result.TypeAlias := ATypeAlias;
+  Result.TypeInfo := TypeInfo(T);
 end;
 
 class function io.Where: IioWhere;
@@ -170,7 +178,7 @@ begin
   Result := ObjMapper.om;
 end;
 
-class procedure io.Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean);
+class procedure io.Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String);
 var
   AContext: IioContext;
 begin
@@ -196,12 +204,30 @@ end;
 class procedure io.Persist(const AObj: TObject;
   const ABlindInsert: Boolean);
 begin
-  Self.Persist(AObj, '', 0, ABlindInsert);
+  Self.Persist(AObj, '', 0, ABlindInsert, '');
+end;
+
+class procedure io.Persist(const AObj: TObject; const AConnectionName: String;
+  const ABlindInsert: Boolean);
+begin
+  Self.Persist(AObj, '', 0, ABlindInsert, AConnectionName);
+end;
+
+class procedure io.Persist(const AIntfObj: IInterface;
+  const AConnectionName: String; const ABlindInsert: Boolean);
+begin
+  Self.Persist(AIntfObj as TObject, AConnectionName, ABlindInsert);
 end;
 
 class procedure io.PersistCollection(const AIntfCollection: IInterface; const ABlindInsert:Boolean);
 begin
   Self.PersistCollection(AIntfCollection as TObject, ABlindInsert);
+end;
+
+class procedure io.PersistCollection(const ACollection: TObject;
+  const AConnectionName: String; const ABlindInsert: Boolean);
+begin
+
 end;
 
 class procedure io.PersistCollection_Internal(const ACollection: TObject;
@@ -423,21 +449,14 @@ begin
   Result := Self.GlobalFactory.DBFactory.ConnectionManager;
 end;
 
-class procedure io.Delete(const AObj: TObject);
-var
-  AContext: IioContext;
+class procedure io.Delete(const AObj: TObject; const AConnectionName:String='');
 begin
-  // Check
-  if not Assigned(AObj) then Exit;
-  // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-  // Execute
-  Self.DeleteObject(AContext);
+  TioStrategyFactory.GetStrategy(AConnectionName).DeleteObject(AObj, AConnectionName);
 end;
 
-class procedure io.Delete(const AIntfObj: IInterface);
+class procedure io.Delete(const AIntfObj: IInterface; const AConnectionName:String='');
 begin
-  Self.Delete(AIntfObj as TObject);
+  Self.Delete(AIntfObj as TObject, AConnectionName);
 end;
 
 class procedure io.DeleteObject(const AContext: IioContext);
@@ -513,7 +532,15 @@ class function io.Load(const ATypeInfo: PTypeInfo;
   const ATypeAlias: String): IioWhere;
 begin
   Result := TioWhereFactory.NewWhere;
-  Result.SetType(TioRttiUtilities.TypeInfoToTypeName(ATypeInfo), ATypeAlias, ATypeInfo);
+  Result.TypeName := TioRttiUtilities.TypeInfoToTypeName(ATypeInfo);
+  Result.TypeAlias := ATypeAlias;
+  Result.TypeInfo := ATypeInfo;
+end;
+
+class procedure io.PersistCollection(const AIntfCollection: IInterface;
+  const AConnectionName: String; const ABlindInsert: Boolean);
+begin
+
 end;
 
 { TioTObjectHelper }

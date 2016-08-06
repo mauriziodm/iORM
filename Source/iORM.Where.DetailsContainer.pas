@@ -39,6 +39,7 @@ type
   TioWhereDetailsContainer = class(TInterfacedObject, IioWhereDetailsContainer)
   private
     FInternalContainer_NoDirectAccess: TioWhereDetailsContainerInternalInstance;
+    FConnectionName: String;
     function GetInternalContainerCreateIfNoAssigned: TioWhereDetailsContainerInternalInstance;
     procedure AddOrUpdate(const AMasterPropertyName: string; const AWhere: IioWhere);
     procedure Delete(const AMasterPropertyName: string);
@@ -46,6 +47,7 @@ type
     function Get(const AMasterPropertyName: string): IioWhere;
     function Count: Integer;
     procedure Clear;
+    procedure SetConnectionName(const Value: String);
   public
     destructor Destroy; override;
   end;
@@ -71,7 +73,13 @@ begin
   if not (Self.Exists(AMasterPropertyName))
   or not (Supports(FInternalContainer_NoDirectAccess.Items[AMasterPropertyName], IioWhere, Result))
   then
+  begin
     Result := nil;
+    Exit;
+  end;
+  // If the connection name of the detail where is empty then return the master where connection name
+  if Result.GetConnectionName.IsEmpty then
+    Result.ConnectionName(FConnectionName);
 end;
 
 function TioWhereDetailsContainer.GetInternalContainerCreateIfNoAssigned: TioWhereDetailsContainerInternalInstance;
@@ -81,6 +89,11 @@ begin
   Result := FInternalContainer_NoDirectAccess
 end;
 
+procedure TioWhereDetailsContainer.SetConnectionName(const Value: String);
+begin
+  FConnectionName := Value;
+end;
+
 procedure TioWhereDetailsContainer.AddOrUpdate(const AMasterPropertyName: string;
   const AWhere: IioWhere);
 begin
@@ -88,9 +101,9 @@ begin
   if Assigned(AWhere) then
     GetInternalContainerCreateIfNoAssigned.AddOrSetValue(AMasterPropertyName, AWhere)
   else
-  // AWhere isn't assigned then remove it if exists
-  if Assigned(FInternalContainer_NoDirectAccess) then
-    Delete(AMasterPropertyName);
+    // AWhere isn't assigned then remove it if exists
+    if Assigned(FInternalContainer_NoDirectAccess) then
+      Delete(AMasterPropertyName);
 end;
 
 procedure TioWhereDetailsContainer.Clear;

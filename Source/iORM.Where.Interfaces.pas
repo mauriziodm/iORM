@@ -53,6 +53,7 @@ type
     function Count: Integer;
     function Get(const AMasterPropertyName: string): IioWhere;
     procedure AddOrUpdate(const AMasterPropertyName: string; const AWhere: IioWhere);
+    procedure SetConnectionName(const Value: String);
     procedure Clear;
   end;
 
@@ -66,7 +67,6 @@ type
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
     function GetDisableClassFromField: Boolean;
-    procedure SetType(const ATypeName, ATypeAlias: String; const ATypeInfo:PTypeInfo);
     function IsEmpty: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
@@ -97,6 +97,9 @@ type
     function DisableClassFromField: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
+    function IsLazy: Boolean;
+    function ConnectionName(const AConnectionName:String): IioWhere;
+    function GetConnectionName: String;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -171,6 +174,18 @@ type
     procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
     procedure CreateIndex(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
     procedure DropIndex(const AIndexName:String);
+    // TypeName
+    procedure SetTypeName(const Value: String);
+    function GetTypeName: String;
+    property TypeName: String read GetTypeName write SetTypeName;
+    // TypeAlias
+    procedure SetTypeAlias(const Value: String);
+    function GetTypeAlias: String;
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
+    // TypeInfo
+    procedure SetTypeInfo(const Value: PTypeInfo);
+    function GetTypeInfo: PTypeInfo;
+    property TypeInfo: PTypeInfo read GetTypeInfo write SetTypeInfo;
     // Details property
     function GetDetails: IioWhereDetailsContainer;
     property Details:IioWhereDetailsContainer read GetDetails;
@@ -197,6 +212,7 @@ type
     function DisableClassFromField: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
+    function ConnectionName(const AConnectionName:String): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;

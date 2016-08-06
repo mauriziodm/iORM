@@ -46,14 +46,13 @@ type
 
   // Where conditions (standard version)
   TioWhere = class (TioSqlItem, IioWhere)
-  strict
-  private
-  protected
+  strict protected
     FTypeName, FTypeAlias: String;
     FTypeInfo: PTypeInfo;
     FDisableClassFromField: Boolean;
     FLazyLoad: Boolean;
     FOrderBy: IioSqlItemWhere;
+    FConnectionName: String;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: IWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
@@ -64,6 +63,15 @@ type
     function GetDetails: IioWhereDetailsContainer;
     // Items property
     function GetItems: IWhereItems;
+    // TypeName
+    function GetTypeName: String;
+    procedure SetTypeName(const Value: String);
+    // TypeAlias
+    function GetTypeAlias: String;
+    procedure SetTypeAlias(const Value: String);
+    // TypeInfo
+    function GetTypeInfo: PTypeInfo;
+    procedure SetTypeInfo(const Value: PTypeInfo);
   public
     constructor Create; overload;
     function GetWhereItems: IWhereItems;
@@ -73,7 +81,6 @@ type
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap:IioMap): String;
     procedure SetOrderBySql(const AOrderByText:String);
-    procedure SetType(const ATypeName, ATypeAlias: String; const ATypeInfo:PTypeInfo);
     function IsEmpty: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
@@ -104,6 +111,9 @@ type
     function DisableClassFromField: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
+    function IsLazy: Boolean;
+    function ConnectionName(const AConnectionName:String): IioWhere;
+    function GetConnectionName: String;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -183,6 +193,9 @@ type
     procedure CreateIndex(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
     procedure DropIndex(const AIndexName:String);
     // ----- Properties -----
+    property TypeName: String read GetTypeName write SetTypeName;
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
+    property TypeInfo: PTypeInfo read GetTypeInfo write SetTypeInfo;
     property Details:IioWhereDetailsContainer read GetDetails;
     property Items: IWhereItems read GetItems;
   end;
@@ -205,6 +218,7 @@ type
     function DisableClassFromField: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
+    function ConnectionName(const AConnectionName:String): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;
@@ -517,6 +531,14 @@ begin
   Self._PropertyOIDEqualsTo(AOID);
 end;
 
+function TioWhere.ConnectionName(const AConnectionName: String): IioWhere;
+begin
+  Result := Self;
+  Self.FConnectionName := AConnectionName;
+  // Set the connection name in the deails where container even (for details propagation)
+  Self.Details.SetConnectionName(AConnectionName);
+end;
+
 constructor TioWhere.Create;
 begin
   FDisableClassFromField := False;
@@ -524,6 +546,7 @@ begin
   FWhereItems := TioWhereFactory.NewWhereItems;
   FDetailsContainer := TioWhereFactory.NewDetailsContainer;
   FOrderBy := nil;
+  FConnectionName := '';
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String;
@@ -660,6 +683,11 @@ begin
   end;
 end;
 
+function TioWhere.GetConnectionName: String;
+begin
+  Result := FConnectionName;
+end;
+
 function TioWhere.GetDetails: IioWhereDetailsContainer;
 begin
   Result := FDetailsContainer;
@@ -720,6 +748,21 @@ begin
   end;
 end;
 
+function TioWhere.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TioWhere.GetTypeInfo: PTypeInfo;
+begin
+  Result := FTypeInfo;
+end;
+
+function TioWhere.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
 function TioWhere.GetWhereItems: IWhereItems;
 begin
   Result := FWhereItems;
@@ -729,6 +772,11 @@ end;
 function TioWhere.IsEmpty: Boolean;
 begin
   Result := (FWhereItems.Count = 0);
+end;
+
+function TioWhere.IsLazy: Boolean;
+begin
+  Result := FLazyLoad;
 end;
 
 function TioWhere.Lazy(const ALazyEnabled: Boolean): IioWhere;
@@ -754,11 +802,19 @@ begin
     FOrderBy := TioSqlItemsOrderBy.Create(AOrderByText);
 end;
 
-procedure TioWhere.SetType(const ATypeName, ATypeAlias: String; const ATypeInfo:PTypeInfo);
+procedure TioWhere.SetTypeAlias(const Value: String);
 begin
-  FTypeName := ATypeName;
-  FTypeAlias := ATypeAlias;
-  FTypeInfo := ATypeInfo;
+  FTypeAlias := FTypeAlias;
+end;
+
+procedure TioWhere.SetTypeInfo(const Value: PTypeInfo);
+begin
+  FTypeInfo := Value;
+end;
+
+procedure TioWhere.SetTypeName(const Value: String);
+begin
+  FTypeName := Value;
 end;
 
 function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
@@ -1268,6 +1324,7 @@ begin
   Self.Add(AWhere);
   Self.FDetailsContainer := AWhere.Details;
   Self.FOrderBy := AWhere.GetOrderByInstance;
+  Self.FConnectionName := AWhere.GetConnectionName;
 end;
 
 function TioWhere._Where(ATextCondition: String): IioWhere;
@@ -1348,6 +1405,12 @@ function TioWhere<T>.ByOID(const AOID: Integer): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).ByOID(AOID);
+end;
+
+function TioWhere<T>.ConnectionName(const AConnectionName: String): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self).ConnectionName(AConnectionName);
 end;
 
 function TioWhere<T>.DisableClassFromField: IioWhere<T>;

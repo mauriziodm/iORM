@@ -42,3 +42,4 @@ Source/__history/
 *.exe
 Samples/PhoneContacts_Interfaces_MVVM_mapper/Model/__history/
 Samples/PhoneContacts_ioMemTable/__history/
+*.~1~

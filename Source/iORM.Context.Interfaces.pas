@@ -55,17 +55,17 @@ type
     // Blob field present
     function BlobFieldExists: Boolean;
     // DataObject
-    procedure SetDataObject(AValue: TObject);
+    procedure SetDataObject(const AValue: TObject);
     function GetDataObject: TObject;
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjStatusExist
     function ObjStatusExist: Boolean;
     // ObjectStatus
-    procedure SetObjectStatus(AValue: TioObjectStatus);
+    procedure SetObjectStatus(const AValue: TioObjectStatus);
     function GetObjectStatus: TioObjectStatus;
     property ObjectStatus:TioObjectStatus read GetObjectStatus write SetObjectStatus;
     // Where
-    procedure SetWhere(AWhere: IioWhere);
+    procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
     property Where:IioWhere read GetWhere write SetWhere;
     // GroupBy

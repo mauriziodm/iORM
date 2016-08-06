@@ -27,46 +27,33 @@
 
 
 
-unit iORM.REST.Connection;
+unit iORM.Strategy.Interfaces;
 
 interface
 
 uses
-  iORM.DB.Connection, iORM.REST.Interfaces, iORM.DB.Interfaces, REST.Client;
+  iORM.Context.Interfaces, iORM.Context.Properties.Interfaces,
+  iORM.Where.Interfaces;
 
 type
 
-  // This is the specialized class for REST connections
-  TioConnectionREST = class(TioConnectionBase, IioConnectionREST)
-  strict private
-    FRESTClient: TRESTClient;
-    FRESTRequest: TRESTRequest;
-    FRESTResponse: TRESTResponse;
+  // Strategy class reference
+  TioStrategyRef = class of TioStrategyIntf;
+
+  // Base class for strategy (Static class as an interface)
+  TioStrategyIntf = class abstract
   public
-    constructor Create(const AConnectionInfo:TioConnectionInfo);
-    destructor Destroy; override;
+    class procedure StartTransaction(const AConnectionName:String); virtual; abstract;
+    class procedure CommitTransaction(const AConnectionName:String); virtual; abstract;
+    class procedure RollbackTransaction(const AConnectionName:String); virtual; abstract;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
+    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
+    class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); virtual; abstract;
+    class procedure Delete(const AWhere: IioWhere); virtual; abstract;
+    class procedure LoadList(const AWhere: IioWhere; const AList:TObject); virtual; abstract;
+    class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
   end;
 
 implementation
-
-{ TioConnectionREST }
-
-constructor TioConnectionREST.Create(const AConnectionInfo: TioConnectionInfo);
-begin
-  inherited Create(AConnectionInfo);
-  FRESTClient := TRESTClient.Create(AConnectionInfo.BaseURL);
-  FRESTResponse := TRESTResponse.Create(nil);
-  FRESTRequest := TRESTRequest.Create(nil);
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-end;
-
-destructor TioConnectionREST.Destroy;
-begin
-  FRESTResponse.Free;
-  FRESTRequest.Free;
-  FRESTClient.Free;
-  inherited;
-end;
 
 end.

@@ -80,7 +80,7 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'DEL'));
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'DEL'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlDelete(AQuery, AContext);
   // If a Where exist then the query is an external query else
@@ -115,7 +115,7 @@ var
   AQuery: IioQuery;
 begin
   // Get the query object, the query is always empty because without query identity
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlForCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
@@ -126,7 +126,7 @@ var
   AQuery: IioQuery;
 begin
   // Get the query object, the query is always empty because without query identity
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlForDropIndex(AQuery, AContext, AIndexName);
 end;
@@ -137,7 +137,7 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlForExists(AQuery, AContext);
   // If a Where exist then the query is an external query else
@@ -152,7 +152,7 @@ var
  begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlInsert(AQuery, AContext);
   // Iterate for all properties
@@ -195,8 +195,8 @@ begin
   //      senza parametri.
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-//  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'LID'));
-  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, ''));  // NoQueryIdentity
+//  Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'LID'));
+  Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, ''));  // NoQueryIdentity
   if Result.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlNextID(Result, AContext);
 end;
 
@@ -206,7 +206,7 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELLST'));
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELLST'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlSelect(AQuery, AContext);
   // If a Where exist then the query is an external query else
@@ -223,7 +223,7 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELOBJ'));
+  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELOBJ'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlSelect(AQuery, AContext);
   // If a Where exist then the query is an external query else
@@ -236,26 +236,26 @@ end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
 var
-  AProp: IioContextProperty;
-  AQuery: IioQuery;
+  LProp: IioContextProperty;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //  then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'UPD'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlUpdate(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'UPD'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlUpdate(LQuery, AContext);
   // Iterate for all properties
-  for AProp in AContext.GetProperties do
+  for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not AProp.IsSqlRequestCompliant(ioUpdate) then Continue;
+    if not LProp.IsSqlRequestCompliant(ioUpdate) then Continue;
     // Relation type
-    case AProp.GetRelationType of
+    case LProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
       // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method
-      ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne: AQuery.SetParamValueByContext(AProp, AContext);
+      ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne: LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
-      ioRTBelongsTo: Self.SetIntegerToQueryParamNullIfZero(   AQuery.ParamByProp(AProp), AProp.GetRelationChildObjectID(AContext.DataObject)   );
+      ioRTBelongsTo: Self.SetIntegerToQueryParamNullIfZero(   LQuery.ParamByProp(LProp), LProp.GetRelationChildObjectID(AContext.DataObject)   );
       // else if RelationType = ioRTHasOne
       ioRTHasOne: {Nothing};
       // else if RelationType = ioRTHasMany
@@ -264,9 +264,9 @@ begin
   end;
   // Add the ClassFromField value if enabled
   if AContext.IsClassFromField
-  then AQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
+  then LQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
   // Where conditions
-  AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  LQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class procedure TioQueryEngine.SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);

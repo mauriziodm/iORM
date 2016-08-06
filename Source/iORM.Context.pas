@@ -45,18 +45,19 @@ type
     FMap: IioMap;
     FDataObject: TObject;
     FWhere: IioWhere;
+    FConnectionName: String;
   strict protected
     // DataObject
     function GetDataObject: TObject;
-    procedure SetDataObject(AValue: TObject);
+    procedure SetDataObject(const AValue: TObject);
     // ObjectStatus
     function GetObjectStatus: TioObjectStatus;
-    procedure SetObjectStatus(AValue: TioObjectStatus);
+    procedure SetObjectStatus(const AValue: TioObjectStatus);
     // Where
     function GetWhere: IioWhere;
-    procedure SetWhere(AWhere: IioWhere);
+    procedure SetWhere(const AWhere: IioWhere);
   public
-    constructor Create(AClassName:String; AMap:IioMap; AWhere:IioWhere=nil; ADataObject:TObject=nil); overload;
+    constructor Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String=''); overload;
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
@@ -92,7 +93,7 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
-  iORM.Context.Container;
+  iORM.Context.Container, System.SysUtils;
 
 { TioContext }
 
@@ -106,12 +107,13 @@ begin
   Result := Self.Map.GetTable.GetClassFromField;
 end;
 
-constructor TioContext.Create(AClassName:String; AMap:IioMap; AWhere:IioWhere=nil; ADataObject:TObject=nil);
+constructor TioContext.Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String='');
 begin
   inherited Create;
   FMap := AMap;
   FDataObject := ADataObject;
   FWhere := AWhere;
+  FConnectionName := AConnectionName;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -121,7 +123,15 @@ end;
 
 function TioContext.GetConnectionDefName: String;
 begin
-  Result := GetTable.GetConnectionDefName;
+  // Any connection name specified in the class/ioTable has precedence
+  //  if empty then take the name from ioWhere, else return empty.
+  //  L'ordine di precedenza è il seguente: ioTable, ioWhere, FConnectionName.
+  if not GetTable.GetConnectionDefName.isEmpty then
+    Result := GetTable.GetConnectionDefName
+  else if Assigned(FWhere) and not FWhere.GetConnectionName.IsEmpty then
+    Result := FWhere.GetConnectionName
+  else
+    Result := FConnectionName;
 end;
 
 function TioContext.GetDataObject: TObject;
@@ -172,12 +182,12 @@ begin
   Result := Self.Map.RttiType;
 end;
 
-procedure TioContext.SetDataObject(AValue: TObject);
+procedure TioContext.SetDataObject(const AValue: TObject);
 begin
   FDataObject := AValue;
 end;
 
-procedure TioContext.SetObjectStatus(AValue: TioObjectStatus);
+procedure TioContext.SetObjectStatus(const AValue: TioObjectStatus);
 var
   PropValue: TValue;
 begin
@@ -188,7 +198,7 @@ begin
   Self.GetProperties.ObjStatusProperty.SetValue(Self.FDataObject, PropValue);
 end;
 
-procedure TioContext.SetWhere(AWhere: IioWhere);
+procedure TioContext.SetWhere(const AWhere: IioWhere);
 begin
   FWhere := AWhere;
 end;

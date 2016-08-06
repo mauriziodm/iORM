@@ -224,6 +224,7 @@ begin
   inherited;
   Self.SetObjStatus(osDirty);
   // If AutoPersist is enabled then persist
+{ TODO : Qua è diverso rispetto al TioActiveListBindSourceAdapter vedere se deve essere sistemato }
   if Self.FAutoPersist then io.Persist(Self.Current);
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   Notify(

@@ -280,6 +280,11 @@
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapperEngine.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\RTTIUtilsU.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Strategy.DB.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Strategy.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Strategy.Factory.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Strategy.REST.pas"/>
+        <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

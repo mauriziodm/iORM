@@ -38,7 +38,7 @@ uses
   System.Classes,
   System.Rtti, iORM.Context.Table.Interfaces,
   FireDAC.Comp.Client, FireDAC.Stan.Param,
-  Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes;
+  Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes, iORM.Strategy.Interfaces;
 
 type
 
@@ -52,6 +52,7 @@ type
   TioConnectionInfo = record
     ConnectionName: String[20];
     Persistent: Boolean;
+    Strategy: TioStrategyRef;
     constructor Create(const AConnectionName:String; const AConnectionType:TioConnectionType; const APersistent:Boolean);
     case ConnectionType: TioConnectionType of
       cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL:
@@ -211,7 +212,7 @@ type
   IioSQLDestination = interface
     ['{37F6E5A8-267C-4EEA-9F32-5C8086D488E5}']
     // Destinations
-    {TODO -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
+    {TO 5DO -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
     function Translate: String; overload;
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
@@ -285,6 +286,7 @@ begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;
   Persistent := APersistent;
+  // Set strategy
 end;
 
 end.

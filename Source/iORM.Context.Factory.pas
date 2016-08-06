@@ -55,7 +55,7 @@ type
     class function GroupBy(const ASqlText:String): IioGroupBy;
     class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AioWhere:IioWhere=nil; const ADataObject:TObject=nil): IioContext;
+    class function Context(const AClassName: String; const AioWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String=''): IioContext;
   end;
 
 implementation
@@ -88,13 +88,14 @@ begin
 end;
 
 class function TioContextFactory.Context(const AClassName: String;
-  const AioWhere: IioWhere; const ADataObject: TObject): IioContext;
+  const AioWhere: IioWhere; const ADataObject: TObject; const AConnectionName:String): IioContext;
 begin
   // Get the Context from the ContextContainer
   Result := TioContext.Create(AClassName,
                               TioMapContainer.GetMap(AClassName),
                               AioWhere,
-                              ADataObject
+                              ADataObject,
+                              AConnectionName
                               );
 end;
 
