@@ -98,12 +98,13 @@ type
     class procedure StartTransaction(const AConnectionName:String='');
     class procedure CommitTransaction(const AConnectionName:String='');
     class procedure RollbackTransaction(const AConnectionName:String='');
-    class procedure AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean=True);
+    class procedure AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean=True);  // Default connection only for the moment
     class function Connections: TioConnectionManagerRef;
     class function Where: IioWhere; overload;
     class function Where<T>: IioWhere<T>; overload;
     class function Where(const ATextCondition:String): IioWhere; overload;
     class function Where<T>(const ATextCondition:String): IioWhere<T>; overload;
+{ TODO : Non tiene ancora conto della nuova parte REST }
     class function SQL(const ASQL:String): IioSQLDestination;
     class function Mapper:omRef;
   end;
@@ -184,10 +185,8 @@ var
 begin
   // Check
   if not Assigned(AObj) then Exit;
-  // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-  // Execute
-  Self.PersistObject(AContext, ARelationPropertyName, ARelationOID, ABlindInsert);
+  // Get the strategy and call the proper funtionality
+  TioStrategyFactory.GetStrategy(AConnectionName).PersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert, AConnectionName);
 end;
 
 class procedure io.Persist(const AIntfObj: IInterface; const ABlindInsert:Boolean);
@@ -198,7 +197,7 @@ end;
 class procedure io.PersistCollection(const ACollection: TObject; const ABlindInsert:Boolean);
 begin
   // Redirect to the internal PersistCollection_Internal (same of PersistRelationChildList)
-  PersistCollection_Internal(ACollection, '', 0, ABlindInsert);
+  TioStrategyFactory.GetStrategy('').PersistCollection(ACollection, '', 0, ABlindInsert, '');
 end;
 
 class procedure io.Persist(const AObj: TObject;
@@ -227,7 +226,8 @@ end;
 class procedure io.PersistCollection(const ACollection: TObject;
   const AConnectionName: String; const ABlindInsert: Boolean);
 begin
-
+  // Redirect to the internal PersistCollection_Internal (same of PersistRelationChildList)
+  TioStrategyFactory.GetStrategy('').PersistCollection(ACollection, '', 0, ABlindInsert, AConnectionName);
 end;
 
 class procedure io.PersistCollection_Internal(const ACollection: TObject;
@@ -409,7 +409,7 @@ end;
 
 class procedure io.RollbackTransaction(const AConnectionName:String);
 begin
-  TioDBFactory.Connection(AConnectionName).Rollback;
+  TioStrategyFactory.GetStrategy(AConnectionName).RollbackTransaction(AConnectionName);
 end;
 
 class function io.SQL(const ASQL: String): IioSQLDestination;
@@ -419,7 +419,7 @@ end;
 
 class procedure io.StartTransaction(const AConnectionName:String);
 begin
-  TioDBFactory.Connection(AConnectionName).StartTransaction;
+  TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
 end;
 
 class procedure io.UpdateObject(const AContext: IioContext);
@@ -441,7 +441,7 @@ end;
 
 class procedure io.CommitTransaction(const AConnectionName:String);
 begin
-  TioDBFactory.Connection(AConnectionName).Commit;
+  TioStrategyFactory.GetStrategy(AConnectionName).CommitTransaction(AConnectionName);
 end;
 
 class function io.Connections: TioConnectionManagerRef;
@@ -540,7 +540,7 @@ end;
 class procedure io.PersistCollection(const AIntfCollection: IInterface;
   const AConnectionName: String; const ABlindInsert: Boolean);
 begin
-
+  Self.PersistCollection(AIntfCollection as TObject, AConnectionName, ABlindInsert);
 end;
 
 { TioTObjectHelper }
