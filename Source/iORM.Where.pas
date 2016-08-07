@@ -85,6 +85,7 @@ type
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
     // ------ Destination methods
+{ TODO : I "TOMemTable" mancano nelle strategies }
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
 
@@ -312,7 +313,8 @@ uses
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
   iORM.LiveBindings.ActiveObjectBindSourceAdapter, iORM.Where.Factory,
-  iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory;
+  iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
+  iORM.Strategy.Factory;
 
 { TioWhere }
 
@@ -598,43 +600,8 @@ begin
 end;
 
 procedure TioWhere.Delete;
-var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
-    // Nested
-    procedure NestedDelete;
-    var
-      AQuery: IioQuery;
-    begin
-      // Create & execute query
-      AQuery := TioDbFactory.QueryEngine.GetQueryDelete(AContext);
-      AQuery.ExecSQL;
-    end;
 begin
-  // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-  // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
-  try
-    // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
-    begin
-      // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, Self);
-      // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
-      // Load the current class data into the list
-      NestedDelete;
-    end;
-    // Commit ALL transactions
-    ATransactionCollection.CommitAll;
-  except
-    // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
-    raise;
-  end;
+  TioStrategyFactory.GetStrategy(FConnectionName).Delete(Self);
 end;
 
 function TioWhere.DisableClassFromField: IioWhere;
@@ -819,15 +786,11 @@ end;
 
 function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
-  AResolvedTypeList: IioResolvedTypeList;
   AContext: IioContext;
 begin
   // If the master property type is an interface...
   if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
   begin
-    // Resolve the type and alias and get the context
-    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-    AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
     // Create the BSA
     Result := TioActiveInterfaceListBindSourceAdapter.Create(
       FTypeName,
@@ -848,7 +811,6 @@ begin
       Self,
       AOwner,
       TObjectList<TObject>.Create(AOwnsObject),
-//        TList<TObject>.Create,
       AAutoLoadData);
   end;
 end;
@@ -859,15 +821,11 @@ end;
 
 function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
-  AResolvedTypeList: IioResolvedTypeList;
   AContext: IioContext;
 begin
   // If the master property type is an interface...
   if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
   begin
-    // Resolve the type and alias and get the context
-    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-    AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
     // Create the BSA
     Result := TioActiveInterfaceObjectBindSourceAdapter.Create(
       FTypeName,
@@ -894,64 +852,8 @@ begin
 end;
 
 procedure TioWhere.ToList(const AList: TObject);
-var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
-  ADuckTypedList: IioDuckTypedList;
-    // Nested
-    procedure NestedLoadToList;
-    var
-      AQuery: IioQuery;
-      AObj: TObject;
-    begin
-      // Create & open query
-      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
-      AQuery.Open;
-      try
-        // Loop
-        while not AQuery.Eof do
-        begin
-          // Clean the DataObject (it contains the previous)
-          AContext.DataObject := nil;
-          // Create the object as TObject
-          AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
-          // Add current object to the list
-          ADuckTypedList.Add(AObj);
-          // Next
-          AQuery.Next;
-        end;
-      finally
-        // Close query
-        AQuery.Close;
-      end;
-    end;
 begin
-  // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-  // Wrap the list into a DuckTypedList
-  ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
-  // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
-  try
-    // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
-    begin
-      // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, Self);
-      // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
-      // Load the current class data into the list
-      NestedLoadToList;
-    end;
-    // Commit ALL transactions
-    ATransactionCollection.CommitAll;
-  except
-    // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
-    raise;
-  end;
+  TioStrategyFactory.GetStrategy(FConnectionName).LoadList(Self, AList);
 end;
 
 
@@ -1073,60 +975,8 @@ begin
 end;
 
 function TioWhere.ToObject(const AObj:TObject): TObject;
-var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
-    // Nested
-    function NestedLoadToObject: TObject;
-    var
-      AQuery: IioQuery;
-    begin
-      // Init
-      Result := nil;
-      // Create & open query
-      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
-      AQuery.Open;
-      try
-        // If a record is fuìound then load the object and return True
-        if not AQuery.Eof then
-          // Create the object as TObject
-          Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
-      finally
-        // Close query
-        AQuery.Close;
-      end;
-    end;
 begin
-  // if it is a LazyLoad....
-  if FLazyLoad then
-    Exit(   TioLazyLoadFactory.LazyLoadObject(FTypeInfo, FTypeName, FTypeAlias, '', 0, Self) as TObject   );
-  // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-  // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
-  try
-    // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
-    begin
-      // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, Self, AObj);
-      // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
-      // Load the current class object is founded
-      Result := NestedLoadToObject;
-      // If there is a result (an object) then exit;
-      if Assigned(Result) then
-        Break;
-    end;
-    // Commit ALL transactions
-    ATransactionCollection.CommitAll;
-  except
-    // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
-    raise;
-  end;
+  Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObject(Self, AObj);
 end;
 
 function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
@@ -1267,25 +1117,8 @@ begin
 end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
-var
-  AContext: IioContext;
-  AQuery: IioQuery;
 begin
-  // Init
-  Result := AObj;
-  // Get the Context
-  AContext := TioContextFactory.Context(FTypeName, Self, Result);
-  // Create & open query
-  AQuery := TioDbFactory.QueryEngine.GetQuerySelectForObject(AContext);
-  AQuery.Open;
-  try
-    // Create the object as TObject
-    if not AQuery.IsEmpty then
-      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
-  finally
-    // Close query
-    AQuery.Close;
-  end;
+  Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObjectByClassOnly(Self, AObj);
 end;
 
 function TioWhere._Value(AValue: Integer): IioWhere;

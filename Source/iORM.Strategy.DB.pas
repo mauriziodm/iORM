@@ -58,6 +58,7 @@ type
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
   end;
 
 implementation
@@ -243,6 +244,30 @@ begin
     // Rollback ALL transactions
     ATransactionCollection.RollbackAll;
     raise;
+  end;
+end;
+
+class function TioStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere;
+  const AObj: TObject): TObject;
+var
+  AContext: IioContext;
+  AQuery: IioQuery;
+begin
+  inherited;
+  // Init
+  Result := AObj;
+  // Get the Context
+  AContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result);
+  // Create & open query
+  AQuery := TioDbFactory.QueryEngine.GetQuerySelectForObject(AContext);
+  AQuery.Open;
+  try
+    // Create the object as TObject
+    if not AQuery.IsEmpty then
+      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+  finally
+    // Close query
+    AQuery.Close;
   end;
 end;
 

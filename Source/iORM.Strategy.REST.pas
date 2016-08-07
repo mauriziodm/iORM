@@ -48,6 +48,7 @@ type
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
   end;
 
 
@@ -83,6 +84,12 @@ begin
 end;
 
 class function TioStrategyREST.LoadObject(const AWhere: IioWhere;
+  const AObj: TObject): TObject;
+begin
+
+end;
+
+class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere;
   const AObj: TObject): TObject;
 begin
 

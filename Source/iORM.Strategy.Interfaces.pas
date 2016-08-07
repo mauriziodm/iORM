@@ -52,6 +52,7 @@ type
     class procedure Delete(const AWhere: IioWhere); virtual; abstract;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); virtual; abstract;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
   end;
 
 implementation
