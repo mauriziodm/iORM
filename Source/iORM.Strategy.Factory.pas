@@ -39,14 +39,26 @@ type
   TioStrategyFactory = class
   public
     class function GetStrategy(const AConnectionName: String): TioStrategyRef;
+    class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioStrategyRef;
   end;
 
 implementation
 
 uses
-  iORM.Strategy.DB, iORM.DB.ConnectionContainer;
+  iORM.Strategy.DB, iORM.DB.ConnectionContainer, iORM.Strategy.REST;
 
 { TioStrategyFactory }
+
+class function TioStrategyFactory.ConnectionTypeToStrategy(
+  const AConnectionType: TioConnectionType): TioStrategyRef;
+begin
+  case AConnectionType of
+    TioConnectionType.cdtREST:
+      Result := TioStrategyREST;
+  else
+    Result := TioStrategyDB;
+  end;
+end;
 
 class function TioStrategyFactory.GetStrategy(
   const AConnectionName: String): TioStrategyRef;

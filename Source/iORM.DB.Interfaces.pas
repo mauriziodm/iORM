@@ -232,7 +232,7 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator;
+  iORM.SqlTranslator, iORM.Strategy.Factory;
 
 
 { TioSqlGenerator }
@@ -286,7 +286,7 @@ begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;
   Persistent := APersistent;
-  // Set strategy
+  Strategy := TioStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
 end;
 
 end.

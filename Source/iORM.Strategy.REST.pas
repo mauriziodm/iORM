@@ -31,6 +31,90 @@ unit iORM.Strategy.REST;
 
 interface
 
+uses
+  iORM.Strategy.Interfaces, iORM.Where.Interfaces;
+
+type
+
+  // Strategy class for database
+  TioStrategyREST = class(TioStrategyIntf)
+  public
+    class procedure StartTransaction(const AConnectionName:String); override;
+    class procedure CommitTransaction(const AConnectionName:String); override;
+    class procedure RollbackTransaction(const AConnectionName:String); override;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); override;
+    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); override;
+    class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); override;
+    class procedure Delete(const AWhere: IioWhere); override;
+    class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
+    class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+  end;
+
+
 implementation
+
+{ TioStrategyREST }
+
+class procedure TioStrategyREST.CommitTransaction(
+  const AConnectionName: String);
+begin
+  inherited;
+
+end;
+
+class procedure TioStrategyREST.Delete(const AWhere: IioWhere);
+begin
+  inherited;
+
+end;
+
+class procedure TioStrategyREST.DeleteObject(const AObj: TObject;
+  const AConnectionName: String);
+begin
+  inherited;
+
+end;
+
+class procedure TioStrategyREST.LoadList(const AWhere: IioWhere;
+  const AList: TObject);
+begin
+  inherited;
+
+end;
+
+class function TioStrategyREST.LoadObject(const AWhere: IioWhere;
+  const AObj: TObject): TObject;
+begin
+
+end;
+
+class procedure TioStrategyREST.PersistCollection(const ACollection: TObject;
+  const ARelationPropertyName: String; const ARelationOID: Integer;
+  const ABlindInsert: Boolean; const AConnectionName: String);
+begin
+  inherited;
+
+end;
+
+class procedure TioStrategyREST.PersistObject(const AObj: TObject;
+  const ARelationPropertyName: String; const ARelationOID: Integer;
+  const ABlindInsert: Boolean; const AConnectionName: String);
+begin
+  inherited;
+
+end;
+
+class procedure TioStrategyREST.RollbackTransaction(
+  const AConnectionName: String);
+begin
+  inherited;
+
+end;
+
+class procedure TioStrategyREST.StartTransaction(const AConnectionName: String);
+begin
+  inherited;
+
+end;
 
 end.
