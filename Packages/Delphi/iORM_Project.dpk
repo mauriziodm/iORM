@@ -141,7 +141,6 @@ contains
   iORM.MVVM.Commands in '..\..\Source\iORM.MVVM.Commands.pas',
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
   iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
-  iORM.REST.Interfaces in '..\..\Source\iORM.REST.Interfaces.pas',
   iORM.REST.Connection in '..\..\Source\iORM.REST.Connection.pas',
   DuckDictionaryU in '..\..\ExtLibs\ObjMapper\DuckDictionaryU.pas',
   DuckListU in '..\..\ExtLibs\ObjMapper\DuckListU.pas',
