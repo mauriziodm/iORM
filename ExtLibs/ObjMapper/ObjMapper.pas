@@ -7,7 +7,7 @@ unit ObjMapper;
 interface
 
 uses
-  ObjMapperEngine, System.TypInfo, System.Rtti, System.JSON;
+  ObjMapper.Engine, System.TypInfo, System.Rtti, System.JSON;
 
 type
 
@@ -16,14 +16,13 @@ type
 
   omRef = class of om;
   om = class
-  strict private
-    class function From(const AValue:TValue; const AParams:IomParams): TomValueDestination; overload;
   public
     // Parameters
     class function Default: IomParams;
     class function DefaultByProperty: IomParams;
     class function DefaultByFields: IomParams;
     // Froms
+    class function From(const AValue:TValue; const AParams:IomParams=nil): TomValueDestination; overload;
     class function From(const AObject:TObject; const AParams:IomParams=nil): TomValueDestination; overload;
     class function From(const AInterface:IInterface; const AParams:IomParams=nil): TomValueDestination; overload;
     class function FromJSON(const AJSONValue:TJSONValue; const AParams:IomParams=nil): TomJSONDestination; overload;
@@ -94,7 +93,7 @@ type
 implementation
 
 uses
-  RTTIUtilsU, System.SysUtils;
+  ObjMapper.RTTIUtils, System.SysUtils;
 
 { om }
 
@@ -155,8 +154,6 @@ begin
     LRttiType := omEngine.TypeInfoToRttiType(AObject.ClassInfo);
     omEngine.DeserializePropField(FValue, LRttiType, nil, AObject, FParams);
   finally
-    if Assigned(FValue) then
-      FValue.Free;
     Self.Free;
   end;
 end;
@@ -196,8 +193,6 @@ begin
     LRttiType := omEngine.TypeInfoToRttiType(ATypeValue);
     Result := omEngine.DeserializePropField(FValue, LRttiType, nil, nil, FParams);
   finally
-    if Assigned(FValue) then
-      FValue.Free;
     Self.Free;
   end;
 end;
@@ -329,8 +324,6 @@ begin
     ResultValue := omEngine.DeserializePropField(FValue, LRttiType, nil, nil, FParams);
     Result := ResultValue.AsObject;
   finally
-    if Assigned(FValue) then
-      FValue.Free;
     Self.Free;
   end;
 end;

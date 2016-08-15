@@ -155,8 +155,7 @@ procedure TMainForm.Button1Click(Sender: TObject);
 var
   APerson: TPerson;
 begin
-  APerson := TPerson.Create;
-  io.Load<TPerson>.ByOID(Edit1.Text.ToInteger).ToObject(APerson);
+  APerson := io.Load<TPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
   ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString + ' Numbers');
   APerson.Free;
 end;
@@ -165,7 +164,7 @@ procedure TMainForm.Button2Click(Sender: TObject);
 var
   LPerson: IPerson;
 begin
-  LPerson := io.Load<IPerson>.Lazy.ByOID(Edit1.Text.ToInteger).ToObject;
+  LPerson := io.Load<IPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
   ShowMessage(LPerson.ID.ToString + ' - ' + LPerson.FullName + ' (' + LPerson.ClassNameProp + ') ' + LPerson.Phones.Count.ToString + ' Numbers');
 end;
 

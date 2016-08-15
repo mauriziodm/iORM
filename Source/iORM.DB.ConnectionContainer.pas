@@ -59,6 +59,7 @@ type
     class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class procedure NewRESTConnection(const ABaseURL:String; const APersistent:Boolean=True; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
     class function GetConnectionDefByName(AConnectionName:String=''): IIoConnectionDef;
     class function GetDefaultConnectionName: String;
     class function GetConnectionInfo(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionInfo;
@@ -249,6 +250,23 @@ begin
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
   FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
+end;
+
+class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String;
+  const APersistent: Boolean; const AConnectionName: String);
+var
+  LConnectionInfo: TioConnectionInfo;
+begin
+  // If the AsDefault param is True or this is the first ConnectionDef of the application
+  //  then set it as default
+//  if AsDefault or (Self.FDefaultConnectionName = '') then
+  if (Self.FDefaultConnectionName = '') then
+    Self.FDefaultConnectionName := AConnectionName;
+  // Setup the connection info
+  LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent);
+  LConnectionInfo.BaseURL := ABaseURL;
+  // Add the connection type to the internal container
+  FConnectionManagerContainer.Add(AConnectionName, LConnectionInfo);
 end;
 
 class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase:String; const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;

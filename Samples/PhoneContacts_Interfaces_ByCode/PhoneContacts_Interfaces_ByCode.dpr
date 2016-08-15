@@ -24,7 +24,8 @@ begin
   // Set connection for SQLite (under the Documents folder better for mobile use)
 //  io.Connections.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'ContactsIntf.db')).Apply;
 //  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.db')).Apply;
-  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.FDB'), 'SYSDBA', 'masterkey', '').Apply;
+//  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.FDB'), 'SYSDBA', 'masterkey', '').Apply;
+  io.Connections.NewRESTConnection('http://localhost:8080');
 
   // MSQL monitor
   io.Connections.Monitor.Mode := mmRemote;

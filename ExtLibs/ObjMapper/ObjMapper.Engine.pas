@@ -2,12 +2,12 @@
    Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
   ******************************************************************************** }
 
-unit ObjMapperEngine;
+unit ObjMapper.Engine;
 
 interface
 
 uses
-  System.Rtti, System.JSON, DuckPropFieldU,
+  System.Rtti, System.JSON, ObjMapper.DuckPropField,
   System.SysUtils, System.Generics.Collections, System.TypInfo;
 
 const
@@ -186,10 +186,10 @@ uses
 {$IFDEF ioPresent}
   iORM.DMVC.ObjectsMappersAdapter,
 {$ELSE}
-  DuckObjU,
+  ObjMapper.DuckObj,
 {$ENDIF}
-  DuckListU, System.Classes, Soap.EncdDecd,
-  RTTIUtilsU, ObjMapperAttributes, System.DateUtils, DuckDictionaryU;
+  ObjMapper.DuckList, System.Classes, Soap.EncdDecd,
+  ObjMapper.RTTIUtils, ObjMapper.Attributes, System.DateUtils, ObjMapper.DuckDictionary;
 
 
 type
@@ -596,7 +596,7 @@ var
   I: Integer;
 begin
   // If JSONValue not assigned
-  if not Assigned(AJSONValue) then
+  if (AJSONValue is TJSONNull) or not Assigned(AJSONValue) then
     Exit(TValue.Empty);
   // Defaults
   LDictionaryTypeName     := '';

@@ -38,7 +38,8 @@ uses
   System.Classes,
   System.Rtti, iORM.Context.Table.Interfaces,
   FireDAC.Comp.Client, FireDAC.Stan.Param,
-  Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes, iORM.Strategy.Interfaces;
+  Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes, iORM.Strategy.Interfaces,
+  iORM.REST.Interfaces;
 
 type
 
@@ -116,6 +117,13 @@ type
 
   IioConnectionREST = interface(IioConnection)
     ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
+    procedure Execute(const AResource:String);
+    // ioRequestBody property
+    function GetRequestBody:IioRESTRequestBody;
+    property RequestBody:IioRESTRequestBody read GetRequestBody;
+    // ioResponseBody property
+    function GetResponseBody:IioRESTResponseBody;
+    property ResponseBody:IioRESTResponseBody read GetResponseBody;
   end;
 
   // Interfaccia per il componente Query, cioè del componente che si

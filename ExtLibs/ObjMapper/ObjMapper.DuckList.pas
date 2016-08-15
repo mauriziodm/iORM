@@ -1,4 +1,4 @@
-unit DuckListU;
+unit ObjMapper.DuckList;
 { *******************************************************************************
   Copyright 2010-2013 Daniele Teti
 
@@ -123,7 +123,7 @@ function WrapAsList(const AObject: TObject): IWrappedList;
 implementation
 
 uses System.Math,
-  RTTIUtilsU;
+  ObjMapper.RTTIUtils;
 
 constructor TdormListEnumerator.Create(ADuckTypedList: TDuckTypedList);
 begin

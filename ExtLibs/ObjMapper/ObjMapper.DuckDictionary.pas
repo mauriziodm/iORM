@@ -2,7 +2,7 @@
    Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
   ******************************************************************************** }
 
-unit DuckDictionaryU;
+unit ObjMapper.DuckDictionary;
 
 interface
 
@@ -56,7 +56,7 @@ function WrapAsDictionary(const AObject: TObject): IWrappedDictionary;
 implementation
 
 uses
-  DuckListU;
+  ObjMapper.DuckList;
 
 function WrapAsDictionary(const AObject: TObject): IWrappedDictionary;
 begin
@@ -81,7 +81,6 @@ var
 begin
   Result :=
         (FCTX.GetType(AObjectAsDuck.ClassInfo).GetMethod('Add') <> nil)
-    and (FCTX.GetType(AObjectAsDuck.ClassInfo).GetProperty('Count') <> nil)
     and (FCTX.GetType(AObjectAsDuck.ClassInfo).GetProperty('Keys') <> nil)
     and (FCTX.GetType(AObjectAsDuck.ClassInfo).GetProperty('Values') <> nil);
 end;

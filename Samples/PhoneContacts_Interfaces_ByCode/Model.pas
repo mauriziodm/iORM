@@ -42,7 +42,7 @@ type
     FID: Integer;
     FLastName: String;
     FFirstName: String;
-    [ioHasMany('IPhoneNumber', 'PersonID'), ioInject]
+    [ioHasMany('IPhoneNumber', 'PersonID')]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);
@@ -56,6 +56,7 @@ type
     function GetFullName: String;
     function GetClassNameProp: String;
   public
+    constructor Create; overload;
     constructor Create(NewFirstName, NewLastName: String; NewID: Integer = 0); overload;
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
@@ -112,10 +113,16 @@ uses
 
 constructor TPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);
 begin
-  inherited Create;
+  Self.Create;
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;
+end;
+
+constructor TPerson.Create;
+begin
+  inherited;
+  FPhones := io.di.Locate<IioList<IPhoneNumber>>.Get;
 end;
 
 function TPerson.GetClassNameProp: String;

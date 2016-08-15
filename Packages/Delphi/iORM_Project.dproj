@@ -173,6 +173,10 @@
         <DCCReference Include="FireDACMSSQLDriver.dcp"/>
         <DCCReference Include="CustomIPTransport.dcp"/>
         <DCCReference Include="RESTComponents.dcp"/>
+        <DCCReference Include="IndySystem.dcp"/>
+        <DCCReference Include="IndyProtocols.dcp"/>
+        <DCCReference Include="IndyCore.dcp"/>
+        <DCCReference Include="IndyIPClient.dcp"/>
         <DCCReference Include="..\..\Source\iORM.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\iORM.Context.Container.pas"/>
@@ -270,19 +274,23 @@
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\iORM.REST.Connection.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckDictionaryU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckListU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckObjU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\DuckPropFieldU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckDictionary.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckList.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckObj.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckPropField.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapperEngine.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\RTTIUtilsU.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.Engine.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.RTTIUtils.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.DB.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.REST.pas"/>
+        <DCCReference Include="..\..\Source\iORM.REST.Body.Request.pas"/>
+        <DCCReference Include="..\..\Source\iORM.REST.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.REST.Body.Response.pas"/>
+        <DCCReference Include="..\..\Source\iORM.REST.Factory.pas"/>
         <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -379,7 +387,16 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
                         <RemoteDir>Contents\Resources</RemoteDir>
@@ -693,16 +710,7 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>

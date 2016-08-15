@@ -69,10 +69,12 @@ type
     class function RefTo(const ATypeName:String; const ATypeAlias:String=''): IioWhere; overload;
     class function RefTo(const AClassRef:TioClassRef; const ATypeAlias:String=''): IioWhere; overload;
     class function RefTo<T>(const ATypeAlias:String=''): IioWhere<T>; overload;
+    class function RefTo(const AWhere:IioWhere): IioWhere; overload;
     class function Load(const ATypeName:String; const ATypeAlias:String=''): IioWhere; overload;
     class function Load(const ATypeInfo:PTypeInfo; const ATypeAlias:String=''): IioWhere; overload;
     class function Load(const AClassRef:TioClassRef; const ATypeAlias:String=''): IioWhere; overload;
     class function Load<T>(const ATypeAlias:String=''): IioWhere<T>; overload;
+    class function Load(const AWhere:IioWhere): IioWhere; overload;
     class procedure Delete(const AObj: TObject; const AConnectionName:String=''); overload;
     class procedure Delete(const AIntfObj: IInterface; const AConnectionName:String=''); overload;
     class procedure Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); overload;
@@ -119,6 +121,11 @@ begin
   Result.TypeName := ATypeName;
   Result.TypeAlias := ATypeAlias;
   Result.TypeInfo := nil;
+end;
+
+class function io.Load(const AWhere: IioWhere): IioWhere;
+begin
+  Result := AWhere;
 end;
 
 class function io.Load<T>(const ATypeAlias:String): IioWhere<T>;
@@ -288,6 +295,11 @@ class procedure io.PersistCollection(const AIntfCollection: IInterface;
   const AConnectionName: String; const ABlindInsert: Boolean);
 begin
   Self.PersistCollection(AIntfCollection as TObject, AConnectionName, ABlindInsert);
+end;
+
+class function io.RefTo(const AWhere: IioWhere): IioWhere;
+begin
+  Result := Self.Load(AWhere);
 end;
 
 { TioTObjectHelper }

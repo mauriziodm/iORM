@@ -2,7 +2,7 @@
    Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
   ******************************************************************************** }
 
-unit DuckPropFieldU;
+unit ObjMapper.DuckPropField;
 
 interface
 
@@ -28,7 +28,7 @@ type
 implementation
 
 uses
-  ObjMapperEngine;
+  ObjMapper.Engine;
 
 { TDuckPropField }
 

@@ -45,7 +45,11 @@ requires
   FireDACCommonODBC,
   FireDACMSSQLDriver,
   CustomIPTransport,
-  RESTComponents;
+  RESTComponents,
+  IndySystem,
+  IndyProtocols,
+  IndyCore,
+  IndyIPClient;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',
@@ -142,18 +146,22 @@ contains
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
   iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
   iORM.REST.Connection in '..\..\Source\iORM.REST.Connection.pas',
-  DuckDictionaryU in '..\..\ExtLibs\ObjMapper\DuckDictionaryU.pas',
-  DuckListU in '..\..\ExtLibs\ObjMapper\DuckListU.pas',
-  DuckObjU in '..\..\ExtLibs\ObjMapper\DuckObjU.pas',
-  DuckPropFieldU in '..\..\ExtLibs\ObjMapper\DuckPropFieldU.pas',
+  ObjMapper.DuckDictionary in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckDictionary.pas',
+  ObjMapper.DuckList in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckList.pas',
+  ObjMapper.DuckObj in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckObj.pas',
+  ObjMapper.DuckPropField in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckPropField.pas',
   ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
   ObjMapper in '..\..\ExtLibs\ObjMapper\ObjMapper.pas',
-  ObjMapperEngine in '..\..\ExtLibs\ObjMapper\ObjMapperEngine.pas',
-  RTTIUtilsU in '..\..\ExtLibs\ObjMapper\RTTIUtilsU.pas',
-  ObjMapperAttributes in '..\..\ExtLibs\ObjMapper\ObjMapperAttributes.pas',
+  ObjMapper.Engine in '..\..\ExtLibs\ObjMapper\ObjMapper.Engine.pas',
+  ObjMapper.RTTIUtils in '..\..\ExtLibs\ObjMapper\ObjMapper.RTTIUtils.pas',
+  ObjMapper.Attributes in '..\..\ExtLibs\ObjMapper\ObjMapper.Attributes.pas',
   iORM.Strategy.DB in '..\..\Source\iORM.Strategy.DB.pas',
   iORM.Strategy.Interfaces in '..\..\Source\iORM.Strategy.Interfaces.pas',
   iORM.Strategy.Factory in '..\..\Source\iORM.Strategy.Factory.pas',
-  iORM.Strategy.REST in '..\..\Source\iORM.Strategy.REST.pas';
+  iORM.Strategy.REST in '..\..\Source\iORM.Strategy.REST.pas',
+  iORM.REST.Body.Request in '..\..\Source\iORM.REST.Body.Request.pas',
+  iORM.REST.Interfaces in '..\..\Source\iORM.REST.Interfaces.pas',
+  iORM.REST.Body.Response in '..\..\Source\iORM.REST.Body.Response.pas',
+  iORM.REST.Factory in '..\..\Source\iORM.REST.Factory.pas';
 
 end.

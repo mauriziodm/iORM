@@ -34,7 +34,7 @@ uses
 {$IF CompilerVersion > 25}
   FireDAC.Comp.Client, FireDAC.Stan.Param,
 {$IFEND}
-  DuckListU, System.SysUtils;
+  ObjMapper.DuckList, System.SysUtils;
 
 type
   { ***** Daniele Spinetti ***** }
@@ -371,7 +371,7 @@ uses
   SqlTimSt,
   DateUtils,
   Classes,
-  RTTIUtilsU,
+  ObjMapper.RTTIUtils,
   Xml.adomxmldom,
 {$IF CompilerVersion >= 28}
   System.NetEncoding, // so that the old functions in Soap.EncdDecd can be inlined

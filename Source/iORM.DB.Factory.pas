@@ -74,7 +74,8 @@ uses
   iORM.Where.SqlItems, System.SysUtils, iORM.DB.QueryContainer,
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
   iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
-  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator;
+  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
+  iORM.REST.Connection;
 
 { TioDbBuilder }
 
@@ -114,28 +115,43 @@ end;
 
 class function TioDbFactory.NewConnection(const AConnectionName:String): IioConnection;
 var
-  DBPath: String;
-  LConnection: TioInternalSqlConnection;
-begin
-  // Create the internal connection
-  LConnection := TioInternalSqlConnection.Create(nil);
-  // Load and set the connection parameters (from the connection manager)
-  LConnection.ConnectionDefName := AConnectionName;
-  // Set the monitor mode for the connection
-{$IFDEF MSWINDOWS}
-  case TioConnectionMonitor.mode of
-    mmDisabled: LConnection.Params.MonitorBy := mbNone;
-    mmRemote:   LConnection.Params.MonitorBy := mbRemote;
-    mmFlatFile: LConnection.Params.MonitorBy := mbFlatFile;
+  LConnectionInfo: TioConnectionInfo;
+  function NewConnectionDB: IioConnectionDB;
+  var
+    LConnection: TioInternalSqlConnection;
+    DBPath: String;
+  begin
+    // Create the internal connection
+    LConnection := TioInternalSqlConnection.Create(nil);
+    // Load and set the connection parameters (from the connection manager)
+    LConnection.ConnectionDefName := AConnectionName;
+    // Set the monitor mode for the connection
+  {$IFDEF MSWINDOWS}
+    case TioConnectionMonitor.mode of
+      mmDisabled: LConnection.Params.MonitorBy := mbNone;
+      mmRemote:   LConnection.Params.MonitorBy := mbRemote;
+      mmFlatFile: LConnection.Params.MonitorBy := mbFlatFile;
+    end;
+  {$ENDIF}
+    // Extract the file path anche create the directory if not exists
+    //DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
+    //if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
+    // Open the connection
+    LConnection.Open;
+    // Create the ioConnection and his QueryContainer and return it
+    Result := TioConnectionDB.Create(LConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
   end;
-{$ENDIF}
-  // Extract the file path anche create the directory if not exists
-  //DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
-  //if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
-  // Open the connection
-  LConnection.Open;
-  // Create the ioConnection and his QueryContainer and return it
-  Result := TioConnectionDB.Create(LConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
+  function NewConnectionREST: IioConnectionREST;
+  begin
+    Result := TioConnectionREST.Create(LConnectionInfo);
+  end;
+begin
+  // Get connection info
+  LConnectionInfo := TioConnectionManager.GetConnectionInfo(AConnectionName);
+  if LConnectionInfo.ConnectionType = TioConnectionType.cdtREST then
+    Result := NewConnectionREST
+  else
+    Result := NewConnectionDB;
 end;
 
 class function TioDbFactory.QueryContainer: IioQueryContainer;
@@ -233,3 +249,4 @@ end;
 
 
 end.
+

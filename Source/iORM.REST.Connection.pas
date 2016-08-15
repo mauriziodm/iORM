@@ -32,33 +32,56 @@ unit iORM.REST.Connection;
 interface
 
 uses
-  iORM.DB.Connection, iORM.REST.Interfaces, iORM.DB.Interfaces, REST.Client;
+  iORM.DB.Connection, iORM.DB.Interfaces, REST.Client, iORM.REST.Interfaces;
 
 type
 
   // This is the specialized class for REST connections
   TioConnectionREST = class(TioConnectionBase, IioConnectionREST)
-  strict private
+  private
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
+    FRESTRequestBody: IioRESTRequestBody;
+    FRESTResponseBody: IioRESTResponseBody;
+    procedure Execute(const AResource:String);
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
+    function AsRESTConnection: IioConnectionREST; override;
+    // ioRequestBody property
+    function GetRequestBody:IioRESTRequestBody;
+    // ioResponseBody property
+    function GetResponseBody:IioRESTResponseBody;
   end;
 
 implementation
 
+uses
+  iORM.REST.Factory, REST.Types, IPPeerClient;
+
 { TioConnectionREST }
+
+function TioConnectionREST.AsRESTConnection: IioConnectionREST;
+begin
+  inherited;
+  Result := Self;
+end;
 
 constructor TioConnectionREST.Create(const AConnectionInfo: TioConnectionInfo);
 begin
   inherited Create(AConnectionInfo);
+  // Create the RESTClient
   FRESTClient := TRESTClient.Create(AConnectionInfo.BaseURL);
+  // Create the RESTResponse
   FRESTResponse := TRESTResponse.Create(nil);
+  // Create & et the RESTRequest
   FRESTRequest := TRESTRequest.Create(nil);
   FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Method := TRESTRequestMethod.rmPUT;
   FRESTRequest.Response := FRESTResponse;
+  // create request body (not the response body)
+  FRESTRequestBody := TioRESTFactory.NewRequestBody;
 end;
 
 destructor TioConnectionREST.Destroy;
@@ -68,5 +91,27 @@ begin
   FRESTClient.Free;
   inherited;
 end;
+
+procedure TioConnectionREST.Execute(const AResource:String);
+begin
+  // Set the requesta & execute it
+  FRESTRequest.Resource := AResource;
+  FRESTRequest.ClearBody;
+  FRESTRequest.AddBody(FRESTRequestBody.ToJSONObject);
+  FRESTRequest.Execute;
+  // Create and set the ioRESTResponseBody
+  FRESTResponseBody := TioRESTFactory.NewResponseBody(FRESTResponse.Content);
+end;
+
+function TioConnectionREST.GetRequestBody: IioRESTRequestBody;
+begin
+  Result := FRESTRequestBody;
+end;
+
+function TioConnectionREST.GetResponseBody: IioRESTResponseBody;
+begin
+  Result := FRESTResponseBody;
+end;
+
 
 end.

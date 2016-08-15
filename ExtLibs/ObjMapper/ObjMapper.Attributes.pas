@@ -2,12 +2,12 @@
    Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
   ******************************************************************************** }
 
-unit ObjMapperAttributes;
+unit ObjMapper.Attributes;
 
 interface
 
 uses
-  System.TypInfo, ObjMapperEngine;
+  System.TypInfo, ObjMapper.Engine;
 
 type
 

@@ -53,7 +53,7 @@ type
 implementation
 
 uses
-  ObjMapperEngine;
+  ObjMapper.Engine;
 
 
 { TioObjectMapper }

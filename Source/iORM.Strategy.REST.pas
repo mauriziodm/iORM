@@ -54,6 +54,11 @@ type
 
 implementation
 
+uses
+  System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.Interfaces, iORM.DB.ConnectionContainer,
+  iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
+  iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory;
+
 { TioStrategyREST }
 
 class procedure TioStrategyREST.CommitTransaction(
@@ -78,15 +83,33 @@ end;
 
 class procedure TioStrategyREST.LoadList(const AWhere: IioWhere;
   const AList: TObject);
+var
+  LConnection: IioConnectionREST;
 begin
   inherited;
-
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection.RequestBody.Where := AWhere;
+  LConnection.Execute('LoadList');
+  // Deserialize  the JSONDataValue to the result object
+  io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AList);
 end;
 
 class function TioStrategyREST.LoadObject(const AWhere: IioWhere;
   const AObj: TObject): TObject;
+var
+  LConnection: IioConnectionREST;
 begin
-
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection.RequestBody.Where := AWhere;
+  LConnection.Execute('LoadObject');
+  // Deserialize  the JSONDataValue to the result object
+  if Assigned(AObj) then
+    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AObj)
+  else
+    Result := io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.ToObject;
 end;
 
 class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere;

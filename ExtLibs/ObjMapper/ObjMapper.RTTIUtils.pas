@@ -1,4 +1,4 @@
-unit RTTIUtilsU;
+unit ObjMapper.RTTIUtils;
 
 { *******************************************************************************
   Copyright 2010-2013 Daniele Teti
@@ -96,7 +96,7 @@ uses
   Classes,
   TypInfo,
   ObjectsMappers,
-  DuckListU;
+  ObjMapper.DuckList;
 
 class function TRTTIUtils.MethodCall(AObject: TObject; AMethodName: string;
   AParameters: array of TValue; RaiseExceptionIfNotFound: boolean): TValue;

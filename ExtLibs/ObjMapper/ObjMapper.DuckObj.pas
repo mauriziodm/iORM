@@ -2,7 +2,7 @@
    Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
   ******************************************************************************** }
 
-unit DuckObjU;
+unit ObjMapper.DuckObj;
 
 interface
 
