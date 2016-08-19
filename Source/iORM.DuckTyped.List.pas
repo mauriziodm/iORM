@@ -39,13 +39,14 @@ type
 
   // DuckTypedList
   TioDuckTypedList = class(TInterfacedObject, IioDuckTypedList)
-  strict protected
+  strict private
     FListObject: TObject;
     FCountProperty: TRttiProperty;
     FOwnsObjectsProperty: TRttiProperty;
     FAddMethod: TRttiMethod;
     FClearMethod: TRttiMethod;
     FGetItemMethod: TRttiMethod;
+  strict protected
     procedure SetOwnsObjects(AValue:Boolean);
     function GetOwnsObjects: Boolean;
   public
@@ -54,6 +55,7 @@ type
     procedure Clear;
     function Count: Integer;
     function GetItem(Index: Integer): TObject;
+    function GetGenericTypeName: String;
     function GetEnumerator: IEnumerator;
     property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
   end;
@@ -140,6 +142,11 @@ begin
     tkInterface:
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsInterface as TObject;
   end;
+end;
+
+function TioDuckTypedList.GetGenericTypeName: String;
+begin
+  result := FGetItemMethod.ReturnType.ToString;
 end;
 
 function TioDuckTypedList.GetOwnsObjects: Boolean;

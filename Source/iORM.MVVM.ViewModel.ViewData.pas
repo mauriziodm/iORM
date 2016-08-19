@@ -41,6 +41,9 @@ type
   TioViewData = class(TInterfacedObject, IioViewData)
   private
     FBindSourceAdapter: IioActiveBindSourceAdapter;
+    // Questo è un riferimento di tipo interfaccia e serve solo per
+    //  mantenere in vita l'oggetto
+    FDummyInterfaceRef: IInterface;
   protected
   public
     constructor Create; overload;
@@ -65,7 +68,8 @@ uses
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveObjectBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, iORM,
-  System.SysUtils, iORM.LiveBindings.Factory;
+  System.SysUtils, iORM.LiveBindings.Factory, iORM.DuckTyped.Interfaces,
+  iORM.DuckTyped.Factory;
 
 { TViewData }
 
@@ -82,6 +86,9 @@ end;
 constructor TioViewData.Create(const ADataIntf: IInterface; const AViewDataType:TioViewDataType);
 begin
   Create(ADataIntf as TObject, AViewDataType);
+  // Questo è un riferimento di tipo interfaccia e serve solo per
+  //  mantenere in vita l'oggetto
+  FDummyInterfaceRef := ADataIntf;
 {
   // Create the BindSourceAdapter
   Self.Create(
@@ -97,7 +104,15 @@ begin
 end;
 
 constructor TioViewData.Create(const ADataObj: TObject; const AViewDataType:TioViewDataType);
+var
+  LRealClassName : String;
+  LDuckList : IioDuckTypedList;
 begin
+  lRealClassName := ADataObj.ClassName;
+  if AViewDataType = TioViewDataType.dtList then begin
+    lDuckList := TioDuckTypedFactory.DuckTypedList(ADataObj);
+    lRealClassName := lDuckList.GetGenericTypeName;
+  end;
   // Create the BindSourceAdapter
   Self.Create(
     ADataObj.ClassName,  // TypeName

@@ -58,7 +58,7 @@ type
 implementation
 
 uses
-  iORM.REST.Factory, REST.Types, IPPeerClient;
+  iORM.REST.Factory, REST.Types, IPPeerClient, System.JSON;
 
 { TioConnectionREST }
 
@@ -93,12 +93,19 @@ begin
 end;
 
 procedure TioConnectionREST.Execute(const AResource:String);
+var
+  RequestBodyJSONObject: TJSONObject;
 begin
   // Set the requesta & execute it
   FRESTRequest.Resource := AResource;
   FRESTRequest.ClearBody;
-  FRESTRequest.AddBody(FRESTRequestBody.ToJSONObject);
-  FRESTRequest.Execute;
+  RequestBodyJSONObject := FRESTRequestBody.ToJSONObject;
+  try
+    FRESTRequest.AddBody(RequestBodyJSONObject);
+    FRESTRequest.Execute;
+  finally
+    RequestBodyJSONObject.Free;
+  end;
   // Create and set the ioRESTResponseBody
   FRESTResponseBody := TioRESTFactory.NewResponseBody(FRESTResponse.Content);
 end;

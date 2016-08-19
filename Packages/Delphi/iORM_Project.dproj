@@ -278,7 +278,6 @@
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckList.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckObj.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckPropField.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.Engine.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.RTTIUtils.pas"/>
@@ -291,6 +290,7 @@
         <DCCReference Include="..\..\Source\iORM.REST.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.REST.Body.Response.pas"/>
         <DCCReference Include="..\..\Source\iORM.REST.Factory.pas"/>
+        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
         <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

@@ -846,29 +846,51 @@ end;
 
 class function omEngine.DeserializePropField(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject;
   const AMasterObj: TObject; const AParams: IomParams): TValue;
+var
+  LJSONValue: TJSONValue;
+  LValueQualifiedTypeName: String;
+  LValueType: TRttiType;
 begin
   // Init
   Result := TValue.Empty;
+  // Determina il ValueType del valore/oggetto corrente
+  //  NB: If TypeAnnotations is enabled and a TypeAnnotation is present in the AJSONValue for the current
+  //  value/object then load and use it as AValueType
+  //  NB: Ho aggiunto questa parte perchè altrimenti in caso di una lista di interfacce (es: TList<IPerson>)
+  //  NB. Se alla fine del blocco non trova un ValueTypeValido allora usa quello ricevuto come parametro
+  LValueType := nil;
+  if AParams.TypeAnnotations and (AJSONValue is TJSONObject) then
+  begin
+    // Get the value type name
+    LJSONValue := TJSONObject(AJSONValue).GetValue(DMVC_TYPENAME);
+    if Assigned(LJSONValue) then
+    begin
+      LValueQualifiedTypeName := LJSONValue.Value;
+      LValueType := QualifiedTypeNameToRttiType(LValueQualifiedTypeName);
+    end;
+  end;
+ if not Assigned(LValueType) then
+    LValueType := AValueType;
   // If a custom serializer exists for the current type then use it
-  if DeserializeCustom(AJSONValue, AValueType, APropField, AMasterObj, AParams, Result) then
+  if DeserializeCustom(AJSONValue, LValueType, APropField, AMasterObj, AParams, Result) then
     Exit;
   // Deserialize by TypeKind
 //  case TDuckPropField.TypeKind(APropField) of
   case AValueType.TypeKind of
     tkEnumeration:
-      Result := DeserializeEnumeration(AJSONValue, AValueType);
+      Result := DeserializeEnumeration(AJSONValue, LValueType);
     tkInteger, tkInt64:
       Result := DeserializeInteger(AJSONValue);
     tkFloat:
-      Result := DeserializeFloat(AJSONValue, AValueType);
+      Result := DeserializeFloat(AJSONValue, LValueType);
     tkString, tkLString, tkWString, tkUString:
       Result := DeserializeString(AJSONValue);
     tkRecord:
-      Result := DeserializeRecord(AJSONValue, AValueType, AParams);
+      Result := DeserializeRecord(AJSONValue, LValueType, AParams);
     tkClass:
       Result := DeserializeClass(
         AJSONValue,
-        AValueType,
+        LValueType,
         APropField,
         AMasterObj,
         AParams
@@ -876,7 +898,7 @@ begin
     tkInterface:
       Result := DeserializeInterface(
         AJSONValue,
-        AValueType,
+        LValueType,
         APropField,
         AMasterObj,
         AParams

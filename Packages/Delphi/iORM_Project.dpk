@@ -150,7 +150,6 @@ contains
   ObjMapper.DuckList in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckList.pas',
   ObjMapper.DuckObj in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckObj.pas',
   ObjMapper.DuckPropField in '..\..\ExtLibs\ObjMapper\ObjMapper.DuckPropField.pas',
-  ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
   ObjMapper in '..\..\ExtLibs\ObjMapper\ObjMapper.pas',
   ObjMapper.Engine in '..\..\ExtLibs\ObjMapper\ObjMapper.Engine.pas',
   ObjMapper.RTTIUtils in '..\..\ExtLibs\ObjMapper\ObjMapper.RTTIUtils.pas',
@@ -162,6 +161,7 @@ contains
   iORM.REST.Body.Request in '..\..\Source\iORM.REST.Body.Request.pas',
   iORM.REST.Interfaces in '..\..\Source\iORM.REST.Interfaces.pas',
   iORM.REST.Body.Response in '..\..\Source\iORM.REST.Body.Response.pas',
-  iORM.REST.Factory in '..\..\Source\iORM.REST.Factory.pas';
+  iORM.REST.Factory in '..\..\Source\iORM.REST.Factory.pas',
+  ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas';
 
 end.

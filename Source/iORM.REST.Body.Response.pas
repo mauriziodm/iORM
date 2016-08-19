@@ -20,6 +20,7 @@ type
     constructor Create; overload;
     constructor Create(const AJSONObject:TJSONObject); overload;
     constructor Create(const AJSONString:String); overload;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -49,8 +50,8 @@ begin
   LJSONValue := AJSONObject.GetValue(KEY_JSONDATAVALUE);
   if Assigned(LJSONValue) then
   begin
-    FJSONDataValue := LJSONValue;
-    AJSONObject.RemovePair(KEY_JSONDATAVALUE);  // To prevent an AV error because AJSONObject own the FJSONDataValue
+    LJSONValue := AJSONObject.GetValue(KEY_JSONDATAVALUE);
+    FJSONDataValue := TJSONValue(LJSONValue.Clone);
   end;
 end;
 
@@ -64,6 +65,14 @@ begin
   finally
     LJSONObject.Free;
   end;
+end;
+
+destructor TioRESTResponseBody.Destroy;
+begin
+  // Clean up
+  if Assigned(FJSONDataValue) then
+    FJSONDataValue.Free;
+  inherited;
 end;
 
 function TioRESTResponseBody.GetDataObject: TObject;

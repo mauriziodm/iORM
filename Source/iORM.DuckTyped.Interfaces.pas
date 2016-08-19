@@ -50,6 +50,7 @@ type
     function Count: Integer;
     function GetEnumerator: IEnumerator;
     function GetItem(Index: Integer): TObject;
+    function GetGenericTypeName: String;
     // OwnsObjects property
     procedure SetOwnsObjects(AValue:Boolean);
     function GetOwnsObjects: Boolean;
