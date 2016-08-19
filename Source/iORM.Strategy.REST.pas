@@ -57,7 +57,8 @@ implementation
 uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.Interfaces, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
-  iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory;
+  iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
+  iORM.Exceptions;
 
 { TioStrategyREST }
 
@@ -69,16 +70,28 @@ begin
 end;
 
 class procedure TioStrategyREST.Delete(const AWhere: IioWhere);
+var
+  LConnection: IioConnectionREST;
 begin
   inherited;
-
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection.RequestBody.Where := AWhere;
+  LConnection.Execute('Delete');
 end;
 
 class procedure TioStrategyREST.DeleteObject(const AObj: TObject;
   const AConnectionName: String);
+var
+  LConnection: IioConnectionREST;
 begin
   inherited;
-
+  // Check
+  if not Assigned(AObj) then Exit;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
+  LConnection.RequestBody.DataObject := AObj;
+  LConnection.Execute('DeleteObject');
 end;
 
 class procedure TioStrategyREST.LoadList(const AWhere: IioWhere;
@@ -115,23 +128,51 @@ end;
 class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere;
   const AObj: TObject): TObject;
 begin
-
+  // This method is only used internally by the Object Maker,
+  //  and then you do not need to implement it in RESTStrategy.
+  raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
 class procedure TioStrategyREST.PersistCollection(const ACollection: TObject;
   const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: Boolean; const AConnectionName: String);
+var
+  LConnection: IioConnectionREST;
 begin
   inherited;
-
+  // Check
+  if not Assigned(ACollection) then Exit;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
+  LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
+  LConnection.RequestBody.RelationOID := ARelationOID;
+  LConnection.RequestBody.BlindInsert := ABlindInsert;
+  LConnection.RequestBody.DataObject := ACollection;
+  LConnection.Execute('PersistCollection');
+  // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
+  if not ABlindInsert then
+    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(ACollection);
 end;
 
 class procedure TioStrategyREST.PersistObject(const AObj: TObject;
   const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: Boolean; const AConnectionName: String);
+var
+  LConnection: IioConnectionREST;
 begin
   inherited;
-
+  // Check
+  if not Assigned(AObj) then Exit;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
+  LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
+  LConnection.RequestBody.RelationOID := ARelationOID;
+  LConnection.RequestBody.BlindInsert := ABlindInsert;
+  LConnection.RequestBody.DataObject := AObj;
+  LConnection.Execute('PersistObject');
+  // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
+  if not ABlindInsert then
+    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AObj)
 end;
 
 class procedure TioStrategyREST.RollbackTransaction(

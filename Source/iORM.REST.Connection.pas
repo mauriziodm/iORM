@@ -81,7 +81,7 @@ begin
   FRESTRequest.Method := TRESTRequestMethod.rmPUT;
   FRESTRequest.Response := FRESTResponse;
   // create request body (not the response body)
-  FRESTRequestBody := TioRESTFactory.NewRequestBody;
+  FRESTRequestBody := TioRESTFactory.NewRequestBody(False);
 end;
 
 destructor TioConnectionREST.Destroy;
@@ -107,7 +107,7 @@ begin
     RequestBodyJSONObject.Free;
   end;
   // Create and set the ioRESTResponseBody
-  FRESTResponseBody := TioRESTFactory.NewResponseBody(FRESTResponse.Content);
+  FRESTResponseBody := TioRESTFactory.NewResponseBody(FRESTResponse.Content, False);
 end;
 
 function TioConnectionREST.GetRequestBody: IioRESTRequestBody;

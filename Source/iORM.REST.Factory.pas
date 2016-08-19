@@ -38,10 +38,10 @@ type
 
   TioRESTFactory = class
   public
-    class function NewRequestBody: IioRESTRequestBody; overload;
-    class function NewRequestBody(const AJSONString:String): IioRESTRequestBody; overload;
-    class function NewResponseBody: IioRESTResponseBody; overload;
-    class function NewResponseBody(const AJSONString:String): IioRESTResponseBody; overload;
+    class function NewRequestBody(const AOwnDataObject:Boolean=True): IioRESTRequestBody; overload;
+    class function NewRequestBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioRESTRequestBody; overload;
+    class function NewResponseBody(const AOwnDataObject:Boolean=True): IioRESTResponseBody; overload;
+    class function NewResponseBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioRESTResponseBody; overload;
   end;
 
 implementation
@@ -51,26 +51,26 @@ uses
 
 { TioRESTFactory }
 
-class function TioRESTFactory.NewRequestBody: IioRESTREquestBody;
+class function TioRESTFactory.NewRequestBody(const AOwnDataObject:Boolean): IioRESTREquestBody;
 begin
-  Result := TioRESTRequestBody.Create;
+  Result := TioRESTRequestBody.Create(AOwnDataObject);
 end;
 
 class function TioRESTFactory.NewRequestBody(
-  const AJSONString: String): IioRESTREquestBody;
+  const AJSONString: String; const AOwnDataObject:Boolean): IioRESTREquestBody;
 begin
-  Result := TioRESTRequestBody.Create(AJSONString);
+  Result := TioRESTRequestBody.Create(AJSONString, AOwnDataObject);
 end;
 
-class function TioRESTFactory.NewResponseBody: IioRESTResponseBody;
+class function TioRESTFactory.NewResponseBody(const AOwnDataObject:Boolean): IioRESTResponseBody;
 begin
-  Result := TioRESTResponseBody.Create;
+  Result := TioRESTResponseBody.Create(AOwnDataObject);
 end;
 
 class function TioRESTFactory.NewResponseBody(
-  const AJSONString: String): IioRESTResponseBody;
+  const AJSONString: String; const AOwnDataObject:Boolean): IioRESTResponseBody;
 begin
-  Result := TioRESTResponseBody.Create(AJSONString);
+  Result := TioRESTResponseBody.Create(AJSONString, AOwnDataObject);
 end;
 
 end.

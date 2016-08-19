@@ -39,6 +39,7 @@ type
   TioRESTResponseBody = class(TInterfacedObject, IioRESTResponseBody)
   private
     FDataObject: TObject;
+    FOwnDataObject: Boolean;
     FJSONDataValue: TJSONValue;
     function GetDataObject: TObject;
     function GetJSONDataValue: TJSONValue;
@@ -46,9 +47,9 @@ type
     procedure SetJSONDataValue(const Value: TJSONValue);
     function ToJSONObject:TJSONObject;
   public
-    constructor Create; overload;
-    constructor Create(const AJSONObject:TJSONObject); overload;
-    constructor Create(const AJSONString:String); overload;
+    constructor Create(const AOwnDataObject:Boolean); overload;
+    constructor Create(const AJSONObject:TJSONObject; const AOwnDataObject:Boolean); overload;
+    constructor Create(const AJSONString:String; const AOwnDataObject:Boolean); overload;
     destructor Destroy; override;
   end;
 
@@ -59,18 +60,19 @@ uses
 
 { TioRESTResponseBody }
 
-constructor TioRESTResponseBody.Create;
+constructor TioRESTResponseBody.Create(const AOwnDataObject:Boolean);
 begin
-  inherited;
+  inherited Create;
   FDataObject := nil;
   FJSONDataValue := nil;
+  FOwnDataObject := AOwnDataObject;
 end;
 
-constructor TioRESTResponseBody.Create(const AJSONObject: TJSONObject);
+constructor TioRESTResponseBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
 var
   LJSONValue: TJSONValue;
 begin
-  Self.Create;
+  Self.Create(AOwnDataObject);
   // DataObject
   LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
   if Assigned(LJSONValue) then
@@ -84,13 +86,13 @@ begin
   end;
 end;
 
-constructor TioRESTResponseBody.Create(const AJSONString: String);
+constructor TioRESTResponseBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
 var
   LJSONObject: TJSONObject;
 begin
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    Self.Create(LJSONObject);
+    Self.Create(LJSONObject, AOwnDataObject);
   finally
     LJSONObject.Free;
   end;
@@ -101,6 +103,8 @@ begin
   // Clean up
   if Assigned(FJSONDataValue) then
     FJSONDataValue.Free;
+  if FOwnDataObject and Assigned(FDataObject) then
+    FDataObject.Free;
   inherited;
 end;
 

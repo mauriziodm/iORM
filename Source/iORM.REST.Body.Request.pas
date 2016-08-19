@@ -40,6 +40,7 @@ type
   private
     FWhere: IioWhere;
     FDataObject: TObject;
+    FOwnDataObject: Boolean;
     FRelationPropertyName: TioNullableString;
     FRelationOID: TioNullableInteger;
     FBlindInsert: TioNullableBoolean;
@@ -55,9 +56,10 @@ type
     procedure SetWhere(const Value: IioWhere);
     function ToJSONObject:TJSONObject;
   public
-    constructor Create; overload;
-    constructor Create(const AJSONObject:TJSONObject); overload;
-    constructor Create(const AJSONString:String); overload;
+    constructor Create(const AOwnDataObject:Boolean); overload;
+    constructor Create(const AJSONObject:TJSONObject; const AOwnDataObject:Boolean); overload;
+    constructor Create(const AJSONString:String; const AOwnDataObject:Boolean); overload;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -67,18 +69,19 @@ uses
 
 { TioRESTRequestBody }
 
-constructor TioRESTRequestBody.Create;
+constructor TioRESTRequestBody.Create(const AOwnDataObject:Boolean);
 begin
-  inherited;
+  inherited Create;
   FWhere := nil;
   FDataObject := nil;
+  FOwnDataObject := AOwnDataObject;
 end;
 
-constructor TioRESTRequestBody.Create(const AJSONObject: TJSONObject);
+constructor TioRESTRequestBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
 var
   LJSONValue: TJSONValue;
 begin
-  Self.Create;
+  Self.Create(AOwnDataObject);
   // RelationPropertyName
   LJSONValue := AJSONObject.GetValue(KEY_RELATIONPROPERTYNAME);
   if Assigned(LJSONValue) then
@@ -104,16 +107,24 @@ begin
     FDataObject := io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
 end;
 
-constructor TioRESTRequestBody.Create(const AJSONString: String);
+constructor TioRESTRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
 var
   LJSONObject: TJSONObject;
 begin
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    Self.Create(LJSONObject);
+    Self.Create(LJSONObject, AOwnDataObject);
   finally
     LJSONObject.Free;
   end;
+end;
+
+destructor TioRESTRequestBody.Destroy;
+begin
+  // Clean up
+  if FOwnDataObject and Assigned(FDataObject) then
+    FDataObject.Free;
+  inherited;
 end;
 
 function TioRESTRequestBody.GetBlindInsert: Boolean;
