@@ -38,13 +38,17 @@ type
 
   // This is the specialized class for REST connections
   TioConnectionREST = class(TioConnectionBase, IioConnectionREST)
-  private
+  strict private
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
     FRESTRequestBody: IioRESTRequestBody;
     FRESTResponseBody: IioRESTResponseBody;
     procedure Execute(const AResource:String);
+  strict protected
+    procedure DoStartTransaction; override;
+    procedure DoCommitTransaction; override;
+    procedure DoRollbackTransaction; override;
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
@@ -90,6 +94,24 @@ begin
   FRESTRequest.Free;
   FRESTClient.Free;
   inherited;
+end;
+
+procedure TioConnectionREST.DoCommitTransaction;
+begin
+  inherited;
+  // Nothing
+end;
+
+procedure TioConnectionREST.DoRollbackTransaction;
+begin
+  inherited;
+  // Nothing
+end;
+
+procedure TioConnectionREST.DoStartTransaction;
+begin
+  inherited;
+  // Nothing
 end;
 
 procedure TioConnectionREST.Execute(const AResource:String);

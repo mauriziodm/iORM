@@ -38,6 +38,10 @@ type
 
   // Strategy class for database
   TioStrategyREST = class(TioStrategyIntf)
+  private
+    class var FTransactionGUID: String;
+    class function NewGUIDAsString: String;
+    class function GetTransactionGUID: String;
   public
     class procedure StartTransaction(const AConnectionName:String); override;
     class procedure CommitTransaction(const AConnectionName:String); override;
@@ -58,7 +62,7 @@ uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.Interfaces, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
   iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
-  iORM.Exceptions;
+  iORM.Exceptions, System.SysUtils;
 
 { TioStrategyREST }
 
@@ -66,7 +70,7 @@ class procedure TioStrategyREST.CommitTransaction(
   const AConnectionName: String);
 begin
   inherited;
-
+  TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
 class procedure TioStrategyREST.Delete(const AWhere: IioWhere);
@@ -76,8 +80,20 @@ begin
   inherited;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
-  LConnection.RequestBody.Where := AWhere;
-  LConnection.Execute('Delete');
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Where := AWhere;
+    LConnection.Execute('Delete');
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class procedure TioStrategyREST.DeleteObject(const AObj: TObject;
@@ -90,8 +106,29 @@ begin
   if not Assigned(AObj) then Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
-  LConnection.RequestBody.DataObject := AObj;
-  LConnection.Execute('DeleteObject');
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.DataObject := AObj;
+    LConnection.Execute('DeleteObject');
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
+end;
+
+class function TioStrategyREST.GetTransactionGUID: String;
+begin
+  // Set the fixed part of the TransactionGUID if empty
+  if FTransactionGUID.IsEmpty then
+    FTransactionGUID := Self.NewGUIDAsString;
+  // Generate a TransactionGUID (Fixed GUID + Current thread ID
+  Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
 end;
 
 class procedure TioStrategyREST.LoadList(const AWhere: IioWhere;
@@ -102,10 +139,22 @@ begin
   inherited;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
-  LConnection.RequestBody.Where := AWhere;
-  LConnection.Execute('LoadList');
-  // Deserialize  the JSONDataValue to the result object
-  io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AList);
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Where := AWhere;
+    LConnection.Execute('LoadList');
+    // Deserialize  the JSONDataValue to the result object
+    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AList);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class function TioStrategyREST.LoadObject(const AWhere: IioWhere;
@@ -116,13 +165,25 @@ begin
   inherited;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
-  LConnection.RequestBody.Where := AWhere;
-  LConnection.Execute('LoadObject');
-  // Deserialize  the JSONDataValue to the result object
-  if Assigned(AObj) then
-    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AObj)
-  else
-    Result := io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.ToObject;
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Where := AWhere;
+    LConnection.Execute('LoadObject');
+    // Deserialize  the JSONDataValue to the result object
+    if Assigned(AObj) then
+      io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AObj)
+    else
+      Result := io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.ToObject;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere;
@@ -131,6 +192,14 @@ begin
   // This method is only used internally by the Object Maker,
   //  and then you do not need to implement it in RESTStrategy.
   raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
+end;
+
+class function TioStrategyREST.NewGUIDAsString: String;
+var
+  LGUID: TGUID;
+begin
+  CreateGUID(LGUID);
+  Result := GUIDToString(LGUID);
 end;
 
 class procedure TioStrategyREST.PersistCollection(const ACollection: TObject;
@@ -144,14 +213,26 @@ begin
   if not Assigned(ACollection) then Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
-  LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
-  LConnection.RequestBody.RelationOID := ARelationOID;
-  LConnection.RequestBody.BlindInsert := ABlindInsert;
-  LConnection.RequestBody.DataObject := ACollection;
-  LConnection.Execute('PersistCollection');
-  // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-  if not ABlindInsert then
-    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(ACollection);
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
+    LConnection.RequestBody.RelationOID := ARelationOID;
+    LConnection.RequestBody.BlindInsert := ABlindInsert;
+    LConnection.RequestBody.DataObject := ACollection;
+    LConnection.Execute('PersistCollection');
+    // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
+    if not ABlindInsert then
+      io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(ACollection);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class procedure TioStrategyREST.PersistObject(const AObj: TObject;
@@ -165,27 +246,39 @@ begin
   if not Assigned(AObj) then Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
-  LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
-  LConnection.RequestBody.RelationOID := ARelationOID;
-  LConnection.RequestBody.BlindInsert := ABlindInsert;
-  LConnection.RequestBody.DataObject := AObj;
-  LConnection.Execute('PersistObject');
-  // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-  if not ABlindInsert then
-    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AObj)
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
+    LConnection.RequestBody.RelationOID := ARelationOID;
+    LConnection.RequestBody.BlindInsert := ABlindInsert;
+    LConnection.RequestBody.DataObject := AObj;
+    LConnection.Execute('PersistObject');
+    // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
+    if not ABlindInsert then
+      io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AObj);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class procedure TioStrategyREST.RollbackTransaction(
   const AConnectionName: String);
 begin
   inherited;
-
+  TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
 class procedure TioStrategyREST.StartTransaction(const AConnectionName: String);
 begin
   inherited;
-
+  TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
 end.

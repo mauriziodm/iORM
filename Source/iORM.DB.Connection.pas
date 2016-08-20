@@ -64,6 +64,11 @@ type
   TioConnectionBase = class(TInterfacedObject, IioConnection)
   strict private
     FConnectionInfo: TioConnectionInfo;
+    FTransactionCounter: Integer;
+  strict protected
+    procedure DoStartTransaction; virtual; abstract;
+    procedure DoCommitTransaction; virtual; abstract;
+    procedure DoRollbackTransaction; virtual; abstract;
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     function IsDBConnection: Boolean;
@@ -72,18 +77,21 @@ type
     function AsRESTConnection: IioConnectionREST; virtual;
     function GetConnectionInfo: TioConnectionInfo;
     function InTransaction: Boolean; virtual; abstract;
-    procedure StartTransaction; virtual; abstract;
-    procedure Commit; virtual;
-    procedure Rollback; virtual;
+    procedure StartTransaction;
+    procedure Commit;
+    procedure Rollback;
   end;
 
   // This is the specialized class for DB connections
   TioConnectionDB = class(TioConnectionBase, IioConnectionDB)
   strict private
     FConnection: TioInternalSqlConnection;
-    FTransactionCounter: Integer;
     FFDGUIxWaitCursor: TFDGUIxWaitCursor;
     FQueryContainer: IioQueryContainer;
+  strict protected
+    procedure DoStartTransaction; override;
+    procedure DoCommitTransaction; override;
+    procedure DoRollbackTransaction; override;
   public
     constructor Create(const AConnection:TioInternalSqlConnection; const AQueryContainer:IioQueryContainer; const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
@@ -91,9 +99,6 @@ type
     function QueryContainer: IioQueryContainer;
     function GetConnection: TioInternalSqlConnection;
     function InTransaction: Boolean; override;
-    procedure StartTransaction; override;
-    procedure Commit; override;
-    procedure Rollback; override;
   end;
 
 implementation
@@ -117,7 +122,11 @@ end;
 
 procedure TioConnectionBase.Commit;
 begin
-  // Free conncetion if not persistent
+  inherited;
+  Dec(FTransactionCounter);
+  if FTransactionCounter > 0 then Exit;
+  DoCommitTransaction;
+  // Free connection if needed (if not persistent)
   if not FConnectionInfo.Persistent then
     TioDBFactory.ConnectionContainer.FreeConnection(Self);
 end;
@@ -126,6 +135,7 @@ constructor TioConnectionBase.Create(const AConnectionInfo:TioConnectionInfo);
 begin
   inherited Create;
   FConnectionInfo := AConnectionInfo;
+  FTransactionCounter := 0;
 end;
 
 function TioConnectionBase.GetConnectionInfo: TioConnectionInfo;
@@ -145,9 +155,22 @@ end;
 
 procedure TioConnectionBase.Rollback;
 begin
-  // Free conncetion if not persistent
+  DoRollbackTransaction;
+  FTransactionCounter := 0;
+  // Free connection if needed (if not persistent)
   if not FConnectionInfo.Persistent then
     TioDBFactory.ConnectionContainer.FreeConnection(Self);
+end;
+
+procedure TioConnectionBase.StartTransaction;
+begin
+  inherited;
+  if FTransactionCounter <= 0 then
+  begin
+    DoStartTransaction;
+    FTransactionCounter := 0;
+  end;
+  inc(FTransactionCounter);
 end;
 
 { TioConnectionDB }
@@ -156,15 +179,6 @@ function TioConnectionDB.AsDBConnection: IioConnectionDB;
 begin
   inherited;
   Result := Self;
-end;
-
-procedure TioConnectionDB.Commit;
-begin
-  Dec(FTransactionCounter);
-  if FTransactionCounter > 0 then Exit;
-  FConnection.Commit;
-  // Free connection if needed (if not persistent)
-  inherited;
 end;
 
 constructor TioConnectionDB.Create(const AConnection: TioInternalSqlConnection;
@@ -184,7 +198,6 @@ begin
   {$ENDIF}
 {$ENDIF}
 
-  FTransactionCounter := 0;
   FConnection := AConnection;
   FQueryContainer := AQueryContainer;
 end;
@@ -194,6 +207,24 @@ begin
   FConnection.Free;
   FFDGUIxWaitCursor.Free;
   inherited;
+end;
+
+procedure TioConnectionDB.DoCommitTransaction;
+begin
+  inherited;
+  FConnection.Commit;
+end;
+
+procedure TioConnectionDB.DoRollbackTransaction;
+begin
+  inherited;
+  FConnection.Rollback;
+end;
+
+procedure TioConnectionDB.DoStartTransaction;
+begin
+  inherited;
+  FConnection.StartTransaction;
 end;
 
 function TioConnectionDB.GetConnection: TioInternalSqlConnection;
@@ -210,25 +241,6 @@ end;
 function TioConnectionDB.QueryContainer: IioQueryContainer;
 begin
   Result := FQueryContainer;
-end;
-
-procedure TioConnectionDB.Rollback;
-begin
-  FConnection.Rollback;
-  FTransactionCounter := 0;
-  // Free connection if needed (if not persistent)
-  inherited;
-end;
-
-procedure TioConnectionDB.StartTransaction;
-begin
-  inherited;
-  if FTransactionCounter <= 0 then
-  begin
-    FConnection.StartTransaction;
-    FTransactionCounter := 0;
-  end;
-  inc(FTransactionCounter);
 end;
 
 end.
