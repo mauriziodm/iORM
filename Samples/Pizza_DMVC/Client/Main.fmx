@@ -1,0 +1,429 @@
+object MainForml: TMainForml
+  Left = 0
+  Top = 0
+  Caption = 'Pizzas'
+  ClientHeight = 460
+  ClientWidth = 320
+  FormFactor.Width = 1440
+  FormFactor.Height = 900
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object TabControl1: TTabControl
+    Align = Client
+    FullSize = True
+    Size.Width = 320.000000000000000000
+    Size.Height = 460.000000000000000000
+    Size.PlatformDefault = False
+    TabHeight = 49.000000000000000000
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = None
+    Sizes = (
+      320s
+      460s
+      320s
+      460s)
+    object TabItem1: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'TabItem1'
+      ExplicitSize.cx = 50.000000000000000000
+      ExplicitSize.cy = 50.000000000000000000
+      object MasterToolbar: TToolBar
+        Size.Width = 320.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object btNext: TButton
+          Action = NextTabAction1
+          Align = Right
+          Enabled = True
+          ImageIndex = -1
+          Position.X = 276.000000000000000000
+          Size.Width = 44.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'nexttoolbutton'
+          TabOrder = 6
+          Visible = True
+        end
+        object btClose: TButton
+          Action = WindowClose1
+          Align = Left
+          Enabled = True
+          ImageIndex = -1
+          Size.Width = 44.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'stoptoolbutton'
+          TabOrder = 3
+          Visible = True
+        end
+        object Button1: TButton
+          Action = LiveBindingsBindNavigateDelete1
+          Align = Right
+          Enabled = True
+          ImageIndex = -1
+          Position.X = 188.000000000000000000
+          Size.Width = 44.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'trashtoolbutton'
+          TabOrder = 5
+          Visible = True
+        end
+        object Button2: TButton
+          Action = LiveBindingsBindNavigateInsert1
+          Align = Right
+          Enabled = True
+          ImageIndex = -1
+          Position.X = 232.000000000000000000
+          Size.Width = 44.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'addtoolbutton'
+          TabOrder = 4
+          Visible = True
+        end
+      end
+      object ListView1: TListView
+        ItemAppearanceClassName = 'TImageListItemAppearance'
+        ItemEditAppearanceClassName = 'TImageListItemShowCheck'
+        HeaderAppearanceClassName = 'TListHeaderObjects'
+        FooterAppearanceClassName = 'TListHeaderObjects'
+        ItemIndex = 0
+        Align = Client
+        Size.Width = 320.000000000000000000
+        Size.Height = 416.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        CanSwipeDelete = False
+        SearchAlwaysOnTop = False
+      end
+    end
+    object TabItem2: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'TabItem2'
+      ExplicitSize.cx = 50.000000000000000000
+      ExplicitSize.cy = 50.000000000000000000
+      object DetailToolbar: TToolBar
+        Size.Width = 320.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object BackButton: TSpeedButton
+          Action = PreviousTabAction1
+          Align = Left
+          Enabled = True
+          ImageIndex = -1
+          Margins.Left = 5.000000000000000000
+          Position.X = 5.000000000000000000
+          Size.Width = 48.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'backtoolbutton'
+          Visible = True
+        end
+        object BindNavigator1: TBindNavigator
+          Align = Right
+          Position.X = 247.000000000000000000
+          Size.Width = 73.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 5
+          DataSource = PrototypeBindSource1
+          VisibleButtons = [nbPost, nbCancel]
+          xRadius = 4.000000000000000000
+          yRadius = 4.000000000000000000
+        end
+      end
+      object lblName: TLabel
+        StyledSettings = [Family, Style]
+        Position.X = 11.000000000000000000
+        Position.Y = 41.000000000000000000
+        Size.Width = 177.000000000000000000
+        Size.Height = 41.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'listboxitemlabel'
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.FontColor = claGray
+        Text = 'Pizza'
+      end
+      object imgContact: TImage
+        MultiResBitmap = <
+          item
+            Width = 75
+            Height = 75
+            PNG = {
+              89504E470D0A1A0A0000000D494844520000004B0000004B0806000000384E7A
+              EA000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+              0AF149444154785EED9B496C1BD71DC63F9233C355A44889A4245B16A5589255
+              9B96EB25891D14B0DD003DF41C20A722A720C8AD404F3DF6D2F6502040531FDA
+              2297A23D14485BA06802A44693A0681B1770D2B876E2D6F12E5BB665EDDC37F5
+              FFBD2155D5B02D6E6FEC14FC80216786E4F0BDDFFCB737F3C6957CE5ED0DF4D4
+              94DCF5F79E9A500F560BEAC16A413D582DA807AB053D55B036363650AD5451AB
+              D6EA7B9E2E3D15B008A752AEC26378303416C7C87842817BDAF4C4606D5A51AD
+              86BE681093FB53387C328D032FCCC0343D0ADED326C7616DD43636AD28B92B8E
+              598173F0F83E8CEFDD8940C88F8A00347D5E78FD960259ADD85647B0FCED9394
+              63157C4D3A4A77F3877C488E0E62381547281C9416D86EB8D5EDDC6E37F2B902
+              F2EBB2640B2815CBC8ACE4B0B6B48E42AE0897DBA5BEE3B41C814518BE80173B
+              278715287FD0BB09EF51720B10571D888B40E5FBC57C090BB7973077691ED9D5
+              1C3CE2AE4E4A3B2C02094602CADD02617F47EE448BF2783C0ADA950B3770EBF2
+              1D0594309D90565BA667B1335307C615A84AA9D251DCB1E35D0586E5C19EC3CF
+              489CDB858DC75867B7A51516AD2A968C209A882850DD12A1D524F04FEC1DC5B0
+              9419B45627A4394A6E203E1253F1A71BA24D0A2314AB1B28C84A55B2E5EED914
+              82E180CA9CBAA51516CB03D6500CCEED8ABF2C099C5C594A0839CE80DF83FD09
+              1FD2714912B2DFF45A1895C4E14459A12DC01310B3DEA11369E990D15267F855
+              82A115F90D1746C326D2026856003D13B510F1DAE7F8C39B39FCE4E365940A65
+              9CFDD3395562B834467B7DB0245E856321054BFDC163862FFC8480CA62295C0F
+              9A2EA422160E247D3828CB44BF09E311AE7CEA9365BC772D87CB672FE1CEF505
+              65CDBAA4D90D8DFA9A0DA1B12830F2C2D843F7E27AD872E3B9113F5EFB6A143F
+              3C91C4F78F27F0F24C185331EB91A0A817C782F09A6E8407FAEA7BF4499B6571
+              9892D81943FAD8344AE50D550B35BAEC13D78AF93C88070C4C0A8CDDE25AB41E
+              EE6B55B4C6EF7CB880F3571671FECF9FA95A4C9734C2AACAD86F105347A6901E
+              B4F0D27458C51F8F74A601CBF274A7633F38B384D39FDFC76702AB2AEEAF2B6C
+              E92D1DE434C889C74971957DF5E09C8A98180A1A5D0345EDE833E0F2B8E136D8
+              1D2DE75E49232C97D441409FC4934981A45301B154978BC31E3901FA58698425
+              ED2E8B2BF6592E84EBA95E97DC0E0D0EB5F582CDAF09AC4265438A4A7B9F2E31
+              BBAA4B3C6A305ADFA9415A2DAB56AD62BD58C59A665A8B7939BE80D27D295AA3
+              65B9501648ABD912EEE5F4C2BABE56521DD1CC4A1F2CB6DB94D7BD5143D5533A
+              159024929713F3A5B5AC42B98A6777C7F0C63777613CAC17D6EB52F5BF34EE43
+              B1C8CB40FA8296BE9825AAE9F68BBAA2926DBFF5FC309251BF942BFAFE531B2C
+              8FDB8D5B4B799478E9C001F10686DFF2683D41DA601952A1DF5ECC0BB05C7D8F
+              5E2D4B22595A2FA9E1942E69B42C9774A0887F5E5FADEFD1AB73D796B1B85EFC
+              72C2A27801EFAF1717EA5B7AF5EE27F3EA32B34E698565191E81755F5D46D1A9
+              BB2B05BC27B0FC96DEACAB1596D770E3F3B9555CB8A1D7157FF6C72F5432619C
+              D429ADB038BE2D48B1F8E63BFFAAEFE9BE4E7F7A07A7DEBD84A057FFDD69ADB0
+              A8A0CFC06F3EBA896F7CEF7DBCF3F1EDFADEEEE8C77FF8375EFED15F509401BB
+              CEC0DE9076589425EEC898F2FEB9BBF53D9D6B5EE2D41BBFBFA89288E971A41B
+              CEC0A2A2210B1F5CB88B4CA13B77A67F2E716A7E390F9F8C0B9D9263FF44EBBA
+              38B7866FBF7516950EB3E3D5BB59BC75FA3202E2E24ECAB9D32262E77EF1C155
+              BCFDB71BF53DADAB5CADE1BBBFFC0716568B8FBD45A6438EC262D70C892FBF3B
+              3367EF68436F4A50FFED477308F99DB52ACA515814DDF1D2FC3A72C5F62E089E
+              BFB9EA48E67B981C87C58EDE5F2BCA92AFEF694DA978C0B14B3F0FCA7158BC91
+              EF1157CCD43C2DDFB5E2C86F6A22011F279A3C015E8EC32A97AB989E4CC215F4
+              E36A06C8355949AC9781EB5929418662884683A85635DF327A881C85C55BEBA1
+              3E3FC2BB92582DD45090FE12D8AD1C9011680F5614DC26A49B02E99A2C65D9E6
+              9D9CD4BE5DF0FA2C3553C7493902CB7E40A006C3F460DFB3932819262EDECBC3
+              92E11CBBBB5804AEAC035FC87259E05D91E5727D9B30974B7643C9E6DC7C06B1
+              643FD247A761F94C35FDD27EF840BF5F6A9CCC565333F338AB854F4CF02180DD
+              FB5388EF88A150AC60B8CFC2AB87123254E1AD7760452CEDD7E7175112222AD7
+              C90B2FEDBC3811C1EC905FC5A81BAB65FCF4AC3D643224AB662549DC9F5F4666
+              258BB5E50CF299823A298C893A66D3741D161BCB8E86C20144E361F4C7236A6A
+              3761D1B2E83AEC38A7B8BF7E6408C990A1DC8D8671EAEF7731C76293975AD82A
+              797BED4812A97E4B01FCF44E1EBF3A775F01A678DDDD2DEB3C5E592C8CD0166E
+              2DE2DEAD2505CE2DD0BA359F95EA9A1B12025D6170388AFDC7A671E8645A4DBF
+              E6B4A3A0C4299EED468CA12591E97AA90AF6859DE5C86522EA55F3164CD9C9FD
+              89808964D054EEA72EF7C88FC8B0215A6FE351151E9FB3A2A70F4EE0C8D7F7AB
+              779E20F50CD0D61F75A0CE614943AAD2204EB49D7D610F66BF3683C4E8A06A7C
+              A323ECD483374079CB6A45223C213434D6EFDDDCAEC8D747C21602A64B591D77
+              E705D6A36A2C3B2E56D57F720EEBD8F40E1C3E91569373F99B6EC4B48E607152
+              2D33DCD8CC4E1C3C9EC6E0484C8121BCEDEE0EB3032B858A8240D1D246248E85
+              D4ED2C1BCE98B8DF562F2A946DCBDC4E8D870BBC010B3362DDE9A3533079DCBA
+              65B7ABB661F14C3126B03193B329153B78669B3579CEA55ACE5714188A6CBD86
+              4B2D04C94A3F11B436CB097E8F96D5CA6C64C2A1A5F1E9B3F4B13D2A7B7602AC
+              2D58B41A06CEBDCF4D2A3327A456E7A1D362E88684C1EE739BD393683D8C5BFC
+              8F3CD7E5337ECEA373B26EF3A8FE2B9617318967E9A37BC445DB07D6162C5AD5
+              8414868C4DCC42ED887F9C91C13401D158B810141F10E03A21AEC9E70D43A2E5
+              A9EFDA9B2D8B16164D84B1EFF929F534D97661E2616A1916FF74E7C4900AA08C
+              0BED8AEE941538B9122DC9B69E8C64C7AA7482EBEC0CB3A592ECA0E1321BB64D
+              4BC4B6335B8F7F65B42DEB6A091683775F7F405915D73B49C9CA92A4F359E900
+              D7B964055CC39B099313E1B84D3EF6BCF9F6DC70AB38361D9B1A51C948C5D816
+              D49A6549C35333A352BF981D3F2BC34EB37C5896B8B56959D2914669C06D5A96
+              82251B744F56F45CEF483CBE1C2425199C4F63B4E28D4DC36265DE2F41924FA2
+              F239E66E8820562423B2FF6C33DDB02102CC8A65D1F3D8488252B0D4B73B132D
+              AA7F302C3177A025EB6ADEB2A48D3BC693AA44E8C4FDFE47722866441E8EE032
+              453B13AA8FE48DA5025DD525ADA465A9E0AF3EED8E7648EC558F0E37D99FA660
+              31FB85647CC7E0C822B45BE29F2F4B61AAC29F3458C52FFB237977A9ECC785E7
+              87CFF9F01E61B768F17A5824D6A72CACD93E35074B0E3620A058A3741AABB68A
+              D6C3F24092A21ADEA83AAA0E83EF0CE8B42E5583094866C82EB152D6C4A23A3E
+              1295D5E6FAD4142C8EF30686FA5563BB29BA1C4B0702A18B29976BC092850980
+              B5985DB04AA6B43FEA9A98D1A3F1082C5346F14D746D5B5874415FD0AB4C9667
+              C29003776B312D0325D271BBA5C1325C92E0649AE6E6E76EC95665D917F14B3B
+              DC1EB5BDF5F79D2E3482507F10FE3EBF5D0A6DA36DAF67D19A4CCBC4702AA10E
+              DEACC9362B7A753A1140C8EBC699B98C7D86EBD6C5183519F3616AC08BF3F70A
+              B8AEE1C62AFB377F7501A56249ACFAF1C76EEEE29F7CC32E17B6F4A48BE2D551
+              7A3807D10F1E9FC5286FF7F3829FAE3BD01EA3FE90D436D27659F9FF514D05F8
+              9E6CF560B5A01EAC16D483D5827AB09A16F01FC0B0227D55F91BDC0000000049
+              454E44AE426082}
+          end
+          item
+            Scale = 2.000000000000000000
+          end>
+        Position.X = 24.000000000000000000
+        Position.Y = 164.000000000000000000
+        Size.Width = 265.000000000000000000
+        Size.Height = 269.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object lblID: TLabel
+        StyledSettings = [Family, Style]
+        Position.X = 8.000000000000000000
+        Position.Y = 112.000000000000000000
+        Size.Width = 113.000000000000000000
+        Size.Height = 41.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'listboxitemlabel'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.FontColor = claGray
+        Text = 'Bitmap28'
+      end
+      object edName: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 4
+        Text = 'Adam Brown'
+        Position.X = 8.000000000000000000
+        Position.Y = 75.000000000000000000
+        Size.Width = 300.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Button6: TButton
+        Action = acLoadImage
+        Enabled = True
+        ImageIndex = -1
+        Position.X = 264.000000000000000000
+        Position.Y = 116.000000000000000000
+        Size.Width = 44.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'searchtoolbutton'
+        TabOrder = 8
+        Visible = True
+      end
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 240
+    Top = 256
+  end
+  object PrototypeBindSource1: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        Options = [optRepeat]
+        ReadOnly = False
+      end
+      item
+        Name = 'Img'
+        FieldType = ftBitmap
+        Generator = 'ContactBitmaps'
+        Options = [optRepeat]
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ioTypeName = 'TPizza'
+    ioAutoLoadData = True
+    ioAutoPersist = True
+    ioViewDataType = dtList
+    ioWhereDetailsFromDetailAdapters = False
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    ioVM_UseBSPropsOnCreate = True
+    Left = 232
+    Top = 208
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 236
+    Top = 157
+    object LinkListControlToField2: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = PrototypeBindSource1
+      FieldName = 'Name'
+      Control = ListView1
+      FillExpressions = <
+        item
+          SourceMemberName = 'Img'
+          ControlMemberName = 'Bitmap'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkPropertyToFieldBitmap: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = PrototypeBindSource1
+      FieldName = 'Img'
+      Component = imgContact
+      ComponentProperty = 'Bitmap'
+    end
+    object LinkPropertyToFieldText2: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = PrototypeBindSource1
+      FieldName = 'ID'
+      Component = lblID
+      ComponentProperty = 'Text'
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PrototypeBindSource1
+      FieldName = 'Name'
+      Control = edName
+      Track = False
+    end
+  end
+  object ActionList1: TActionList
+    Left = 232
+    Top = 108
+    object NextTabAction1: TNextTabAction
+      Category = 'Tab'
+      TabControl = TabControl1
+    end
+    object PreviousTabAction1: TPreviousTabAction
+      Category = 'Tab'
+      TabControl = TabControl1
+    end
+    object WindowClose1: TWindowClose
+      Category = 'Window'
+      Hint = 'Close Window|Close active form'
+    end
+    object LiveBindingsBindNavigateInsert1: TFMXBindNavigateInsert
+      Category = 'LiveBindings'
+      Text = 'Insert'
+      DataSource = PrototypeBindSource1
+    end
+    object LiveBindingsBindNavigateDelete1: TFMXBindNavigateDelete
+      Category = 'LiveBindings'
+      Text = 'Delete'
+      DataSource = PrototypeBindSource1
+    end
+    object LiveBindingsBindNavigatePost1: TFMXBindNavigatePost
+      Category = 'LiveBindings'
+      Text = 'Post'
+      DataSource = PrototypeBindSource1
+    end
+    object LiveBindingsBindNavigateDelete2: TFMXBindNavigateDelete
+      Category = 'LiveBindings'
+      Text = 'Delete'
+      DataSource = PrototypeBindSource1
+    end
+    object acLoadImage: TAction
+      Category = 'LiveBindings'
+      Text = 'acLoadImage'
+      OnExecute = acLoadImageExecute
+    end
+  end
+end
