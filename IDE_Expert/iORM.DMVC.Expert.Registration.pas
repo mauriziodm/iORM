@@ -28,66 +28,23 @@
 {            https://github.com/VSoftTechnologies/DUnitX                    }
 {***************************************************************************}
 
-unit DMVC.Expert.CodeGen.NewWebModuleUnit;
+unit iORM.DMVC.Expert.Registration;
 
 interface
 
-uses
-  ToolsApi,
-  DMVC.Expert.CodeGen.NewUnit;
-
-type
-  TNewWebModuleUnitEx = class(TNewUnit)
-  private
-    FUnitIdent, FFormName, FFileName : String;
-  protected
-    FWebModuleClassName : string;
-    function GetCreatorType: string; override;
-    function NewFormFile(const FormIdent, AncestorIdent: string): IOTAFile; override;
-    function NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile; override;
-  public
-    constructor Create(const aWebModuleClassName: string; const APersonality : String = '' );
-  end;
+//Note: "Register" method name is case senstive.
+procedure Register;
 
 implementation
 
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  VCL.Dialogs,
-  DMVC.Expert.CodeGen.Templates,
-  DMVC.Expert.CodeGen.SourceFile;
+  ToolsApi,
+  Vcl.Dialogs,
+  iORM.DMVC.Expert.ProjectWizardEx;
 
-constructor TNewWebModuleUnitEx.Create(const aWebModuleClassName : string; const APersonality : String = '' );
+procedure Register;
 begin
-  Assert(Length(aWebModuleClassName) > 0);
-  FAncestorName := '';
-  FFormName := '';
-  FImplFileName := '';
-  FIntfFileName := '';
-  FWebModuleClassName := aWebModuleClassName;
-  Personality := APersonality;
-  (BorlandIDEServices as IOTAModuleServices).GetNewModuleAndClassName( '', FUnitIdent, FFormName, FFileName);
+  TDMVCNewProjectWizard.RegisterDMVCProjectWizard(sDelphiPersonality);
 end;
-
-function TNewWebModuleUnitEx.GetCreatorType: string;
-begin
-  Result := sForm;
-end;
-
-function TNewWebModuleUnitEx.NewFormFile(const FormIdent, AncestorIdent: string): IOTAFile;
-begin
-  Result := TSourceFile.Create(sWebModuleDFM, [FormIdent, FWebModuleClassName]);
-end;
-
-function TNewWebModuleUnitEx.NewImplSource(const ModuleIdent, FormIdent,  AncestorIdent: string): IOTAFile;
-begin
-  //ModuleIdent is blank for some reason.
-  // http://stackoverflow.com/questions/4196412/how-do-you-retrieve-a-new-unit-name-from-delphis-open-tools-api
-  // So using method mentioned by Marco Cantu.
-  Result := TSourceFile.Create(sWebModuleUnit, [FUnitIdent, FWebModuleClassName]);
-end;
-
-
 
 end.

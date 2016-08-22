@@ -28,7 +28,7 @@
 {            https://github.com/VSoftTechnologies/DUnitX                    }
 {***************************************************************************}
 
-unit DMVC.Expert.ProjectWizardEx;
+unit iORM.DMVC.Expert.ProjectWizardEx;
 
 interface
 
@@ -54,9 +54,9 @@ uses
   Vcl.Forms,
   WinApi.Windows,
   System.SysUtils,
-  DMVC.Expert.Forms.NewProjectWizard,
-  DMVC.Expert.CodeGen.NewDMVCProject,
-  DMVC.Expert.CodeGen.NewWebModuleUnit,
+  iORM.DMVC.Expert.Forms.NewProjectWizard,
+  iORM.DMVC.Expert.CodeGen.NewDMVCProject,
+  iORM.DMVC.Expert.CodeGen.NewWebModuleUnit,
   ExpertsRepository;
 
 resourcestring

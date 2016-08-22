@@ -1,4 +1,4 @@
-unit DMVC.Expert.Forms.NewProjectWizard;
+unit iORM.DMVC.Expert.Forms.NewProjectWizard;
 
 interface
 
@@ -43,7 +43,7 @@ var
 implementation
 
 uses
-  DMVC.Expert.CodeGen.Templates;
+  iORM.DMVC.Expert.CodeGen.Templates;
 
 {$R *.dfm}
 

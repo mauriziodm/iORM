@@ -26,7 +26,7 @@ package iORM_DMVC_IDE_Expert_D101Berlin;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'DUnitX IDE Expert'}
+{$DESCRIPTION 'iORM + DMVC IDE Expert'}
 {$DESIGNONLY}
 {$IMPLICITBUILD ON}
 
@@ -36,14 +36,14 @@ requires
   ExpertsCreators;
 
 contains
-  DMVC.Expert.CodeGen.SourceFile in 'DMVC.Expert.CodeGen.SourceFile.pas',
-  DMVC.Expert.Registration in 'DMVC.Expert.Registration.pas',
-  DMVC.Expert.Forms.NewProjectWizard in 'DMVC.Expert.Forms.NewProjectWizard.pas' {frmDMVCNewProject},
-  DMVC.Expert.CodeGen.NewDMVCProject in 'DMVC.Expert.CodeGen.NewDMVCProject.pas',
-  DMVC.Expert.CodeGen.Templates in 'DMVC.Expert.CodeGen.Templates.pas',
-  DMVC.Expert.CodeGen.NewProject in 'DMVC.Expert.CodeGen.NewProject.pas',
-  DMVC.Expert.ProjectWizardEx in 'DMVC.Expert.ProjectWizardEx.pas',
-  DMVC.Expert.CodeGen.NewWebModuleUnit in 'DMVC.Expert.CodeGen.NewWebModuleUnit.pas',
-  DMVC.Expert.CodeGen.NewUnit in 'DMVC.Expert.CodeGen.NewUnit.pas';
+  iORM.DMVC.Expert.CodeGen.SourceFile in 'iORM.DMVC.Expert.CodeGen.SourceFile.pas',
+  iORM.DMVC.Expert.Registration in 'iORM.DMVC.Expert.Registration.pas',
+  iORM.DMVC.Expert.Forms.NewProjectWizard in 'iORM.DMVC.Expert.Forms.NewProjectWizard.pas' {frmDMVCNewProject},
+  iORM.DMVC.Expert.CodeGen.NewDMVCProject in 'iORM.DMVC.Expert.CodeGen.NewDMVCProject.pas',
+  iORM.DMVC.Expert.CodeGen.Templates in 'iORM.DMVC.Expert.CodeGen.Templates.pas',
+  iORM.DMVC.Expert.CodeGen.NewProject in 'iORM.DMVC.Expert.CodeGen.NewProject.pas',
+  iORM.DMVC.Expert.ProjectWizardEx in 'iORM.DMVC.Expert.ProjectWizardEx.pas',
+  iORM.DMVC.Expert.CodeGen.NewWebModuleUnit in 'iORM.DMVC.Expert.CodeGen.NewWebModuleUnit.pas',
+  iORM.DMVC.Expert.CodeGen.NewUnit in 'iORM.DMVC.Expert.CodeGen.NewUnit.pas';
 
 end.

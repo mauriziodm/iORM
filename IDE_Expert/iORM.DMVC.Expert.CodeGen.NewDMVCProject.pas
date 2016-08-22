@@ -28,13 +28,13 @@
 { https://github.com/VSoftTechnologies/DUnitX }
 { *************************************************************************** }
 
-unit DMVC.Expert.CodeGen.NewDMVCProject;
+unit iORM.DMVC.Expert.CodeGen.NewDMVCProject;
 
 interface
 
 uses
   ToolsAPI,
-  DMVC.Expert.CodeGen.NewProject;
+  iORM.DMVC.Expert.CodeGen.NewProject;
 
 type
   TDMVCProjectFile = class(TNewProjectEx)
@@ -53,8 +53,8 @@ type
 implementation
 
 uses
-  DMVC.Expert.CodeGen.SourceFile,
-  DMVC.Expert.CodeGen.Templates,
+  iORM.DMVC.Expert.CodeGen.SourceFile,
+  iORM.DMVC.Expert.CodeGen.Templates,
   System.SysUtils;
 
 constructor TDMVCProjectFile.Create;
