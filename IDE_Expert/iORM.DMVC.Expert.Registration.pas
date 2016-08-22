@@ -1,5 +1,14 @@
 {***************************************************************************}
 {                                                                           }
+{           iORM - (interfaced ORM)                                         }
+{                                                                           }
+{           Copyright (C) 2016 Maurizio Del Magno                           }
+{                                                                           }
+{           mauriziodm@levantesw.it                                         }
+{           mauriziodelmagno@gmail.com                                      }
+{           https://github.com/mauriziodm/iORM.git                          }
+{                                                                           }
+{***************************************************************************}
 {                      Delphi MVC Framework                                 }
 {                                                                           }
 {     Copyright (c) 2010-2015 Daniele Teti and the DMVCFramework Team       }
