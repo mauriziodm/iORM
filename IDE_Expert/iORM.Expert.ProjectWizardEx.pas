@@ -70,8 +70,8 @@ uses
   ExpertsRepository;
 
 resourcestring
-  sNewDMVCProjectCaption = 'iORM + DMVC Server Project';
-  sNewDMVCProjectHint = 'Create New iORM + DMVC Server Project';
+  sNewDMVCProjectCaption = 'iORM Server Project';
+  sNewDMVCProjectHint = 'Create New iORM Server Project';
 
 { TDUnitXNewProjectWizard }
 

@@ -46,7 +46,6 @@ unit iORM.Expert.CodeGen.NewProject;
 interface
 
 uses
-  PlatformAPI,
   ToolsAPI;
 
 type
@@ -95,7 +94,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, PlatformAPI;
 
 
 { TNewProject }

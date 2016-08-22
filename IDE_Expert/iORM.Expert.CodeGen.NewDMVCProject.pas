@@ -43,8 +43,7 @@ unit iORM.Expert.CodeGen.NewDMVCProject;
 interface
 
 uses
-  ToolsAPI,
-  iORM.Expert.CodeGen.NewProject;
+  iORM.Expert.CodeGen.NewProject, ToolsAPI;
 
 type
   TIORMDMVCProjectFile = class(TIORMDMVCNewProjectEx)
