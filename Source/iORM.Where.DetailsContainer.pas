@@ -46,9 +46,11 @@ type
     function Exists(const AMasterPropertyName:String): Boolean;
     function Get(const AMasterPropertyName: string): IioWhere;
     function Count: Integer;
+    function GetKeyList: String;
     procedure Clear;
     procedure SetConnectionName(const Value: String);
   public
+    constructor Create;
     destructor Destroy; override;
   end;
 
@@ -89,6 +91,15 @@ begin
   Result := FInternalContainer_NoDirectAccess
 end;
 
+function TioWhereDetailsContainer.GetKeyList: String;
+var
+  LKey: String;
+begin
+  Result := '';
+  for LKey in FInternalContainer_NoDirectAccess.Keys do
+    Result := Result + LKey + '; ';
+end;
+
 procedure TioWhereDetailsContainer.SetConnectionName(const Value: String);
 begin
   FConnectionName := Value;
@@ -118,6 +129,12 @@ begin
     Result := FInternalContainer_NoDirectAccess.Count
   else
     Result := 0;
+end;
+
+constructor TioWhereDetailsContainer.Create;
+begin
+  inherited;
+  FInternalContainer_NoDirectAccess := TioWhereDetailsContainerInternalInstance.Create;
 end;
 
 procedure TioWhereDetailsContainer.Delete(const AMasterPropertyName: string);

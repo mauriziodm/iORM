@@ -50,8 +50,10 @@ type
   TioWhereDetailsContainerInternalInstance = TDictionary<String, IioWhere>;
   IioWhereDetailsContainer = interface
     ['{0BB026DD-F087-4B57-9CB6-59D4F80A3792}']
+    function GetKeyList: String;
     function Count: Integer;
     function Get(const AMasterPropertyName: string): IioWhere;
+    function Exists(const AMasterPropertyName:String): Boolean;
     procedure AddOrUpdate(const AMasterPropertyName: string; const AWhere: IioWhere);
     procedure SetConnectionName(const Value: String);
     procedure Clear;

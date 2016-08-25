@@ -13,7 +13,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj">
             <Dependencies>iORM_Project.dproj</Dependencies>
@@ -107,13 +107,13 @@
     <Target Name="PhoneContacts_DMVC_Server:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Server\PhoneContacts_DMVC_Server.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client">
+    <Target Name="PhoneContacts_DMVC_Client" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client:Clean">
+    <Target Name="PhoneContacts_DMVC_Client:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client:Make">
+    <Target Name="PhoneContacts_DMVC_Client:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="iORM_Project">

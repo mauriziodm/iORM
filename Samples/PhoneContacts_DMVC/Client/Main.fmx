@@ -406,7 +406,7 @@ object MainForm: TMainForm
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = False
+    ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
     ioVM_UseBSPropsOnCreate = True
     Left = 256

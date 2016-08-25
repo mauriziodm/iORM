@@ -655,7 +655,8 @@ begin
     case AParams.SerializationMode of
       smJavaScript:
       begin
-        LKeyJSONValue   := LJObj.Pairs[0].JsonString;
+        // Key can be any value (string, objects etc).
+        LKeyJSONValue   := TJSONObject.ParseJSONValue(   LJObj.Pairs[0].JsonString.ToJSON   );
         LValueJSONValue := LJObj.Pairs[0].JsonValue;
       end;
       smDataContract:
@@ -1536,7 +1537,13 @@ begin
     CurrJSONObj := TJSONObject.Create;
     case AParams.SerializationMode of
       smJavaScript:
-        CurrJSONObj.AddPair(LJSONKey.ToString, LJSONValue);
+      begin
+        if LJSONKey is TJSONString then
+          CurrJSONObj.AddPair(LJSONKey.Value, LJSONValue)
+        else
+          CurrJSONObj.AddPair(LJSONKey.ToJSON, LJSONValue);
+        LJSONKey.Free; // To avoid a memory leak
+      end;
       smDataContract:
       begin
         CurrJSONObj.AddPair(DMVC_KEY,   LJSONKey);
