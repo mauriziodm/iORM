@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  ObjMapperEngine, Interfaces, System.Generics.Collections;
+  ObjMapper.Engine, Interfaces, System.Generics.Collections;
 
 const
   MODE_JAVASCRIPT = 0;

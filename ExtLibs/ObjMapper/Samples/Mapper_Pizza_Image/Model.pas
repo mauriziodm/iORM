@@ -3,7 +3,7 @@ unit Model;
 interface
 
 uses
-  Vcl.Graphics, ObjMapperAttributes, System.Rtti;
+  Vcl.Graphics, ObjMapper.Attributes, System.Rtti;
 
 type
 

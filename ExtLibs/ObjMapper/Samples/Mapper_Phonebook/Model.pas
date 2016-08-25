@@ -3,7 +3,7 @@ unit Model;
 interface
 
 uses
-  System.Generics.Collections, ObjMapperAttributes, System.JSON;
+  System.Generics.Collections, ObjMapper.Attributes, System.JSON;
 
 type
 

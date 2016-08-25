@@ -3,7 +3,7 @@ unit Model;
 interface
 
 uses
-  System.Generics.Collections, ObjMapperAttributes, Interfaces, Serializers;
+  System.Generics.Collections, ObjMapper.Attributes, Interfaces, Serializers;
 
 type
 

@@ -360,8 +360,5 @@ object MainForm: TMainForm
       'Memo1')
     ScrollBars = ssVertical
     TabOrder = 1
-    ExplicitTop = -67
-    ExplicitWidth = 1085
-    ExplicitHeight = 668
   end
 end

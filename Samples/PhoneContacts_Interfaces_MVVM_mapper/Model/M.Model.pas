@@ -3,7 +3,7 @@ unit M.Model;
 interface
 
 uses iORM.Attributes, System.Generics.Collections,
-  iORM.Containers.Interfaces, iORM.CommonTypes, ObjMapperAttributes,
+  iORM.Containers.Interfaces, iORM.CommonTypes, ObjMapper.Attributes,
   M.Interfaces;
 
 type

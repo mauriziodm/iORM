@@ -42,9 +42,6 @@
         <Projects Include="..\..\Samples\Pizza_List\Pizza_List.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="..\..\Samples\Pizza_ioPrototypeBS\Pizza_ioPrototypeBS.dproj">
             <Dependencies/>
         </Projects>
@@ -61,6 +58,9 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ObjStatus_DMVC\Client\Pizza_ObjStatus_DMVC_Client.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj">
@@ -197,15 +197,6 @@
     <Target Name="Pizza_List:Make">
         <MSBuild Projects="..\..\Samples\Pizza_List\Pizza_List.dproj" Targets="Make"/>
     </Target>
-    <Target Name="RVMan_Interface">
-        <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj"/>
-    </Target>
-    <Target Name="RVMan_Interface:Clean">
-        <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="RVMan_Interface:Make">
-        <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Pizza_ioPrototypeBS">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS\Pizza_ioPrototypeBS.dproj"/>
     </Target>
@@ -260,6 +251,15 @@
     <Target Name="Pizza_ObjStatus_DMVC_Client:Make">
         <MSBuild Projects="..\..\Samples\Pizza_ObjStatus_DMVC\Client\Pizza_ObjStatus_DMVC_Client.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RVMan_Interface">
+        <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj"/>
+    </Target>
+    <Target Name="RVMan_Interface:Clean">
+        <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RVMan_Interface:Make">
+        <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj" Targets="Make"/>
+    </Target>
     <Target Name="MapperPhonebookExample">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj"/>
     </Target>
@@ -288,13 +288,13 @@
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM_mapper;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;Pizza_ioActiveBindSourceAdapter;Pizza_List;RVMan_Interface;Pizza_ioPrototypeBS;Pizza_DMVC_Client;Pizza_DMVC_Server;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample"/>
+        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM_mapper;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;Pizza_ioActiveBindSourceAdapter;Pizza_List;Pizza_ioPrototypeBS;Pizza_DMVC_Client;Pizza_DMVC_Server;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;RVMan_Interface;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean;PhoneContacts_DMVC_Server:Clean;PhoneContacts_DMVC_Client:Clean;PhoneContacts_ioPrototypeBindSource:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_Interfaces_MVVM_mapper:Clean;PhoneContacts_Interfaces:Clean;PhoneContacts_Interfaces_Ex:Clean;PhoneContacts_Interfaces_ByCode:Clean;PhoneContacts_ioMemTable:Clean;Pizza_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;RVMan_Interface:Clean;Pizza_ioPrototypeBS:Clean;Pizza_DMVC_Client:Clean;Pizza_DMVC_Server:Clean;Pizza_ioPrototypeBS_ObjStatus:Clean;Pizza_ObjStatus_DMVC_Server:Clean;Pizza_ObjStatus_DMVC_Client:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean"/>
+        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean;PhoneContacts_DMVC_Server:Clean;PhoneContacts_DMVC_Client:Clean;PhoneContacts_ioPrototypeBindSource:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_Interfaces_MVVM_mapper:Clean;PhoneContacts_Interfaces:Clean;PhoneContacts_Interfaces_Ex:Clean;PhoneContacts_Interfaces_ByCode:Clean;PhoneContacts_ioMemTable:Clean;Pizza_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;Pizza_ioPrototypeBS:Clean;Pizza_DMVC_Client:Clean;Pizza_DMVC_Server:Clean;Pizza_ioPrototypeBS_ObjStatus:Clean;Pizza_ObjStatus_DMVC_Server:Clean;Pizza_ObjStatus_DMVC_Client:Clean;RVMan_Interface:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make;PhoneContacts_DMVC_Server:Make;PhoneContacts_DMVC_Client:Make;PhoneContacts_ioPrototypeBindSource:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_Interfaces_MVVM_mapper:Make;PhoneContacts_Interfaces:Make;PhoneContacts_Interfaces_Ex:Make;PhoneContacts_Interfaces_ByCode:Make;PhoneContacts_ioMemTable:Make;Pizza_ioActiveBindSourceAdapter:Make;Pizza_List:Make;RVMan_Interface:Make;Pizza_ioPrototypeBS:Make;Pizza_DMVC_Client:Make;Pizza_DMVC_Server:Make;Pizza_ioPrototypeBS_ObjStatus:Make;Pizza_ObjStatus_DMVC_Server:Make;Pizza_ObjStatus_DMVC_Client:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make"/>
+        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make;PhoneContacts_DMVC_Server:Make;PhoneContacts_DMVC_Client:Make;PhoneContacts_ioPrototypeBindSource:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_Interfaces_MVVM_mapper:Make;PhoneContacts_Interfaces:Make;PhoneContacts_Interfaces_Ex:Make;PhoneContacts_Interfaces_ByCode:Make;PhoneContacts_ioMemTable:Make;Pizza_ioActiveBindSourceAdapter:Make;Pizza_List:Make;Pizza_ioPrototypeBS:Make;Pizza_DMVC_Client:Make;Pizza_DMVC_Server:Make;Pizza_ioPrototypeBS_ObjStatus:Make;Pizza_ObjStatus_DMVC_Server:Make;Pizza_ObjStatus_DMVC_Client:Make;RVMan_Interface:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -2,7 +2,7 @@ unit Serializers;
 
 interface
 
-uses ObjMapperEngine, System.Rtti, System.JSON;
+uses ObjMapper.Engine, System.Rtti, System.JSON;
 
 type
 
