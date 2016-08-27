@@ -505,7 +505,7 @@ object MainForm: TMainForm
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = False
+    ioWhereDetailsFromDetailAdapters = True
     ioOrderBy = '[.PhoneType]'
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'

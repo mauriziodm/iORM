@@ -84,10 +84,15 @@ uses
 
 procedure TMainForm.Button12Click(Sender: TObject);
 begin
+  // Master filter
+  BSMaster.ioWhereStr.Clear;
+  BSMaster.ioWhereStr.Add('[.ID] < 5');
+  // Detail filter
   BSDetail.ioWhereStr.Clear;
   BSDetail.ioWhereStr.Add('[.PhoneType] <> ''Mobile''');
   BSDetail.ioOrderBy := '[.PhoneType] desc';
-  BSDetail.Refresh(True);
+  // Refresh
+  BSMaster.Refresh(True);
 end;
 
 procedure TMainForm.Button8Click(Sender: TObject);

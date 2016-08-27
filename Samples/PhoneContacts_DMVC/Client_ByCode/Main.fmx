@@ -1,0 +1,310 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'TabbedwithNavigation'
+  ClientHeight = 567
+  ClientWidth = 384
+  FormFactor.Width = 1440
+  FormFactor.Height = 900
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 3
+  object TabControl1: TTabControl
+    Touch.GestureManager = GestureManager1
+    OnGesture = TabControl1Gesture
+    Align = Client
+    FullSize = True
+    Size.Width = 384.000000000000000000
+    Size.Height = 567.000000000000000000
+    Size.PlatformDefault = False
+    TabHeight = 49.000000000000000000
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = Bottom
+    Sizes = (
+      384s
+      518s
+      384s
+      518s
+      384s
+      518s)
+    object Main: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 128.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'tabitemfavorites'
+      TabOrder = 0
+      Text = 'Main'
+      ExplicitSize.cx = 50.000000000000000000
+      ExplicitSize.cy = 49.000000000000000000
+      object Edit1: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 15
+        Text = '1'
+        TextSettings.HorzAlign = Center
+        Position.X = 8.000000000000000000
+        Position.Y = 56.000000000000000000
+        Size.Width = 49.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Button1: TButton
+        Position.X = 80.000000000000000000
+        Position.Y = 56.000000000000000000
+        Size.Width = 137.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 14
+        Text = 'by Class'
+        OnClick = Button1Click
+      end
+      object Button2: TButton
+        Position.X = 224.000000000000000000
+        Position.Y = 56.000000000000000000
+        Size.Width = 137.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 13
+        Text = 'by Interface'
+        OnClick = Button2Click
+      end
+      object Button3: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 100.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 12
+        Text = 'TObjectList<TPerson>'
+        OnClick = Button3Click
+      end
+      object Button4: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 143.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 11
+        Text = 'TioInterfacedList<IPerson>'
+        OnClick = Button4Click
+      end
+      object Button5: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 186.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 10
+        Text = 'IioList<IPerson>'
+        OnClick = Button5Click
+      end
+      object Button6: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 229.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 9
+        Text = 'IioList<ICustomer>'
+        OnClick = Button6Click
+      end
+      object Button7: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 272.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 8
+        Text = 'IioList<IPerson> alias Customer'
+        OnClick = Button7Click
+      end
+      object Button10: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 315.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 7
+        Text = 'IioList<IPerson> details where'
+        OnClick = Button10Click
+      end
+      object Button11: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 358.000000000000000000
+        Size.Width = 353.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 6
+        Text = 'Where Instance'
+        OnClick = Button11Click
+      end
+      object ButtonSQLDestination: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 401.000000000000000000
+        Size.Width = 81.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 5
+        Text = 'SQL1'
+        OnClick = ButtonSQLDestinationClick
+      end
+      object SQLDestination2: TButton
+        Position.X = 96.000000000000000000
+        Position.Y = 401.000000000000000000
+        Size.Width = 81.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        Text = 'SQL2'
+        OnClick = SQLDestination2Click
+      end
+      object LoadSingleByProperty: TButton
+        Position.X = 176.000000000000000000
+        Position.Y = 401.000000000000000000
+        Size.Width = 193.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        Text = 'Load single by prop.'
+        OnClick = LoadSingleByPropertyClick
+      end
+      object ButtonAddIndex: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 431.000000000000000000
+        Size.Width = 177.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = 'Add Index'
+        OnClick = ButtonAddIndexClick
+      end
+      object ButtonDropIndex: TButton
+        Position.X = 192.000000000000000000
+        Position.Y = 431.000000000000000000
+        Size.Width = 177.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = 'Drop Index'
+        OnClick = ButtonDropIndexClick
+      end
+    end
+    object TabItem2: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 128.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'tabitemcontacts'
+      TabOrder = 0
+      Text = 'person'
+      ExplicitSize.cx = 50.000000000000000000
+      ExplicitSize.cy = 49.000000000000000000
+      object ToolBar3: TToolBar
+        Size.Width = 384.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblTitle3: TLabel
+          Align = Contents
+          Size.Width = 384.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'toollabel'
+          TextSettings.HorzAlign = Center
+          Text = 'Title'
+        end
+      end
+      object btPersonDemo: TButton
+        Position.X = 32.000000000000000000
+        Position.Y = 72.000000000000000000
+        Size.Width = 313.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = 'btPersonDemo'
+        OnClick = btPersonDemoClick
+      end
+    end
+    object TabItem3: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 128.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'tabitemsearch'
+      TabOrder = 0
+      Text = 'Lazy'
+      ExplicitSize.cx = 50.000000000000000000
+      ExplicitSize.cy = 49.000000000000000000
+      object ToolBar4: TToolBar
+        Size.Width = 384.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblTitle4: TLabel
+          Align = Contents
+          Size.Width = 384.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'toollabel'
+          TextSettings.HorzAlign = Center
+          Text = 'Title'
+        end
+      end
+      object btImmediateLoad: TButton
+        Position.X = 32.000000000000000000
+        Position.Y = 72.000000000000000000
+        Size.Width = 321.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        Text = 'Normal Load'
+        OnClick = btImmediateLoadClick
+      end
+      object btLazyLoad: TButton
+        Position.X = 32.000000000000000000
+        Position.Y = 136.000000000000000000
+        Size.Width = 321.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = 'Lazy Load'
+        OnClick = btLazyLoadClick
+      end
+      object btShowInfo: TButton
+        Position.X = 32.000000000000000000
+        Position.Y = 200.000000000000000000
+        Size.Width = 321.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = 'Show Info'
+        OnClick = btShowInfoClick
+      end
+    end
+  end
+  object GestureManager1: TGestureManager
+    Sensitivity = 80.000000000000000000
+    Left = 56
+    Top = 480
+    GestureData = <
+      item
+        Control = TabControl1
+        Collection = <
+          item
+            GestureID = sgiLeft
+          end
+          item
+            GestureID = sgiRight
+          end>
+      end>
+  end
+end

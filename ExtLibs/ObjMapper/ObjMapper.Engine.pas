@@ -189,7 +189,8 @@ uses
   ObjMapper.DuckObj,
 {$ENDIF}
   ObjMapper.DuckList, System.Classes, Soap.EncdDecd,
-  ObjMapper.RTTIUtils, ObjMapper.Attributes, System.DateUtils, ObjMapper.DuckDictionary;
+  ObjMapper.RTTIUtils, ObjMapper.Attributes, System.DateUtils, ObjMapper.DuckDictionary,
+  iORM.Rtti.Utilities;
 
 
 type
@@ -339,7 +340,7 @@ begin
   //  master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
     if TDuckPropField.IsValidPropField(APropField) then
-      LChildObj := TDuckPropField.GetValue(AMasterObj, APropField).AsObject
+      LChildObj := TioRttiUtilities.TValueToObject(   TDuckPropField.GetValue(AMasterObj, APropField)   )
     else
       LChildObj := AMasterObj;
   // If the LChildObj is not assigned and the AValueType is assigned then
@@ -852,7 +853,7 @@ var
   LValueQualifiedTypeName: String;
   LValueType: TRttiType;
 begin
-  // Init
+  // Init                      \
   Result := TValue.Empty;
   // Determina il ValueType del valore/oggetto corrente
   //  NB: If TypeAnnotations is enabled and a TypeAnnotation is present in the AJSONValue for the current
@@ -860,7 +861,8 @@ begin
   //  NB: Ho aggiunto questa parte perchè altrimenti in caso di una lista di interfacce (es: TList<IPerson>)
   //  NB. Se alla fine del blocco non trova un ValueTypeValido allora usa quello ricevuto come parametro
   LValueType := nil;
-  if AParams.TypeAnnotations and (AJSONValue is TJSONObject) then
+  if AParams.TypeAnnotations and (AJSONValue is TJSONObject) and (AValueType.Name <> 'TValue') then
+//  if AParams.TypeAnnotations and (AJSONValue is TJSONObject) then
   begin
     // Get the value type name
     LJSONValue := TJSONObject(AJSONValue).GetValue(DMVC_TYPENAME);
@@ -876,8 +878,7 @@ begin
   if DeserializeCustom(AJSONValue, LValueType, APropField, AMasterObj, AParams, Result) then
     Exit;
   // Deserialize by TypeKind
-//  case TDuckPropField.TypeKind(APropField) of
-  case AValueType.TypeKind of
+  case LValueType.TypeKind of
     tkEnumeration:
       Result := DeserializeEnumeration(AJSONValue, LValueType);
     tkInteger, tkInt64:

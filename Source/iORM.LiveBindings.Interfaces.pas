@@ -76,6 +76,7 @@ type
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure Append(AObject:TObject);
     procedure Insert(AObject:TObject);
+    procedure Delete;
     function UseObjStatus: Boolean;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;

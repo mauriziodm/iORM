@@ -24,17 +24,16 @@ begin
   // Set connection for SQLite (under the Documents folder better for mobile use)
 //  io.Connections.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'ContactsIntf.db')).Apply;
 //  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.db')).Apply;
-//  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.FDB'), 'SYSDBA', 'masterkey', '').Apply;
-  io.Connections.NewRESTConnection('http://localhost:8080');
+  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.FDB'), 'SYSDBA', 'masterkey', '').Apply;
 
   // MSQL monitor
   io.Connections.Monitor.Mode := mmRemote;
 
   // AutoCreation and AutoUpdate of the database
-//  io.AutoCreateDatabase(False);
+  io.AutoCreateDatabase(False);
 
   // Check for sample data creation
-//  TSampleData.CheckForSampleDataCreation;
+  TSampleData.CheckForSampleDataCreation;
   // ============ IupOrm initialization ====================
 
 
