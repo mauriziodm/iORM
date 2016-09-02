@@ -32,7 +32,8 @@ unit iORM.Strategy.REST;
 interface
 
 uses
-  iORM.Strategy.Interfaces, iORM.Where.Interfaces;
+  iORM.Strategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
+  FireDAC.Comp.DataSet;
 
 type
 
@@ -53,16 +54,19 @@ type
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+    // SQLDestinations
+    class procedure SQLDest_LoadDataset(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); override;
+    class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; override;
   end;
 
 
 implementation
 
 uses
-  System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.Interfaces, iORM.DB.ConnectionContainer,
+  System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
   iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
-  iORM.Exceptions, System.SysUtils;
+  iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf;
 
 { TioStrategyREST }
 
@@ -273,6 +277,63 @@ class procedure TioStrategyREST.RollbackTransaction(
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
+end;
+
+class function TioStrategyREST.SQLDest_Execute(
+  const ASQLDestination: IioSQLDestination): Integer;
+var
+  LConnection: IioConnectionREST;
+  LJSONValue: TJSONValue;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsRESTConnection;
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.SQLDestination := ASQLDestination;
+    LConnection.Execute('SQLDestExecute');
+    // Get the number of records affected by the SQL command
+    LJSONValue := LConnection.ResponseBody.JSONDataValue;
+    if Assigned(LJSONValue) and (LJSONValue is TJSONNumber) then
+      Result := TJSONNumber(LJSONValue).AsInt
+    else
+      raise EioException.Create(Self.ClassName + ': wrong JSONValue (SQLDest_Execute).');
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
+end;
+
+class procedure TioStrategyREST.SQLDest_LoadDataset(
+  const ASQLDestination: IioSQLDestination; const ADestDataset: TFDDataSet);
+var
+  LConnection: IioConnectionREST;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsRESTConnection;
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.SQLDestination := ASQLDestination;
+    LConnection.Execute('SQLDestLoadDataSet');
+    // Load the dataset
+    ADestDataset.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfBinary);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class procedure TioStrategyREST.StartTransaction(const AConnectionName: String);

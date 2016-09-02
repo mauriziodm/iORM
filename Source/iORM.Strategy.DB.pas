@@ -32,8 +32,9 @@ unit iORM.Strategy.DB;
 interface
 
 uses
-  iORM.Strategy.Interfaces, iORM.Context.Interfaces,
-  iORM.Context.Properties.Interfaces, iORM.Where.Interfaces;
+  iORM.Context.Interfaces,
+  iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
+  iORM.DB.Interfaces, FireDAC.Comp.DataSet;
 
 type
 
@@ -59,15 +60,19 @@ type
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+    // SQLDestinations
+    class procedure SQLDest_LoadDataset(const ASQLDestination:IioSQLDestination; const ADestDataSet:TFDDataSet); override;
+    class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; override;
   end;
 
 implementation
 
 uses
-  iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes, iORM.DB.Interfaces,
+  iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes,
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
-  iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory;
+  iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
+  iORM.Exceptions, iORM;
 
 { TioStrategyDB }
 
@@ -470,6 +475,58 @@ class procedure TioStrategyDB.RollbackTransaction(
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
+end;
+
+class function TioStrategyDB.SQLDest_Execute(
+  const ASQLDestination: IioSQLDestination): Integer;
+var
+  LConnection: IioConnectionDB;
+begin
+  inherited;
+  // Get the connection
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsDBConnection;
+  // Start transaction
+  LConnection.StartTransaction;
+  try
+    // Execute the SQL command
+    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(ASQLDestination.GetTranslatedSQL, ASQLDestination.GetIgnoreObjNotExists);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
+end;
+
+class procedure TioStrategyDB.SQLDest_LoadDataset(
+  const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+var
+  LQry: IioQuery;
+begin
+  inherited;
+  // Start transaction
+  io.StartTransaction(ASQLDestination.GetConnectionName);
+  try
+    // Get the query object
+    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionName);
+    // Set the SQL command text
+    LQry.SQL.Text := ASQLDestination.GetTranslatedSQL;
+    LQry.GetQuery.FetchOptions.Unidirectional := False;
+    LQry.Open;
+    try
+      LQry.GetQuery.FetchAll;
+      // Copy data to the MemoryTable
+      ADestDataSet.Data := LQry.GetQuery.Data;
+      ADestDataSet.First;
+    finally
+      LQry.Close;
+    end;
+    // Commit
+    io.CommitTransaction(ASQLDestination.GetConnectionName);
+  except
+    // Rollback
+    io.RollbackTransaction(ASQLDestination.GetConnectionName);
+  end;
 end;
 
 class procedure TioStrategyDB.StartTransaction(const AConnectionName: String);

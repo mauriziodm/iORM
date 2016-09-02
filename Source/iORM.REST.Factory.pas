@@ -32,7 +32,7 @@ unit iORM.REST.Factory;
 interface
 
 uses
-  iORM.REST.Interfaces;
+  iORM.DB.Interfaces;
 
 type
 

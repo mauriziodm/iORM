@@ -32,13 +32,15 @@ unit iORM.REST.Body.Request;
 interface
 
 uses
-  iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.REST.Interfaces;
+  iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.REST.Interfaces,
+  iORM.DB.Interfaces;
 
 type
 
   TioRESTRequestBody = class(TInterfacedObject, IioRESTRequestBody)
   private
     FWhere: IioWhere;
+    FSQLDestination: IioSQLDestination;
     FDataObject: TObject;
     FOwnDataObject: Boolean;
     FRelationPropertyName: TioNullableString;
@@ -49,11 +51,13 @@ type
     function GetRelationOID: Integer;
     function GetRelationPropertyName: String;
     function GetWhere: IioWhere;
+    function GetSQLDestination: IioSQLDestination;
     procedure SetBlindInsert(const Value: Boolean);
     procedure SetDataObject(const Value: TObject);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropertyName(const Value: String);
     procedure SetWhere(const Value: IioWhere);
+    procedure SetSQLDestination(const Value: IioSQLDestination);
     function ToJSONObject:TJSONObject;
   public
     constructor Create(const AOwnDataObject:Boolean); overload;
@@ -73,6 +77,7 @@ constructor TioRESTRequestBody.Create(const AOwnDataObject:Boolean);
 begin
   inherited Create;
   FWhere := nil;
+  FSQLDestination := nil;
   FDataObject := nil;
   FOwnDataObject := AOwnDataObject;
 end;
@@ -100,6 +105,13 @@ begin
   begin
     FWhere := io.GlobalFactory.WhereFactory.NewWhere;
     io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FWhere);
+  end;
+  // IioSQLDestination
+  LJSONValue := AJSONObject.GetValue(KEY_SQLDESTINATION);
+  if Assigned(LJSONValue) then
+  begin
+    FSQLDestination := io.GlobalFactory.DBFactory.SQLDestination('');
+    io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FSQLDestination);
   end;
   // DataObject
   LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
@@ -147,6 +159,11 @@ begin
   Result := FRelationPropertyName.Value;
 end;
 
+function TioRESTRequestBody.GetSQLDestination: IioSQLDestination;
+begin
+  Result := FSQLDestination;
+end;
+
 function TioRESTRequestBody.GetWhere: IioWhere;
 begin
   Result := FWhere;
@@ -170,6 +187,11 @@ end;
 procedure TioRESTRequestBody.SetRelationPropertyName(const Value: String);
 begin
   FRelationPropertyName.Value := Value;
+end;
+
+procedure TioRESTRequestBody.SetSQLDestination(const Value: IioSQLDestination);
+begin
+  FSQLDestination := Value;
 end;
 
 procedure TioRESTRequestBody.SetWhere(const Value: IioWhere);
@@ -205,6 +227,12 @@ begin
   begin
     LJSONValue := io.Mapper.From(FWhere).byFields.TypeAnnotationsON.ToJSON;
     Result.AddPair(KEY_WHERE, LJSONValue);
+  end;
+  // SQLDestination
+  if Assigned(FSQLDestination) then
+  begin
+    LJSONValue := io.Mapper.From(FSQLDestination).byFields.TypeAnnotationsON.ToJSON;
+    Result.AddPair(KEY_SQLDESTINATION, LJSONValue);
   end;
   // DataOject
   if Assigned(FDataObject) then

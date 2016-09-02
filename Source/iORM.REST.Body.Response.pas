@@ -32,7 +32,7 @@ unit iORM.REST.Body.Response;
 interface
 
 uses
-  iORM.REST.Interfaces, System.JSON;
+  System.JSON, System.Classes, iORM.DB.Interfaces;
 
 type
 
@@ -41,8 +41,10 @@ type
     FDataObject: TObject;
     FOwnDataObject: Boolean;
     FJSONDataValue: TJSONValue;
+    FStream: TStream;
     function GetDataObject: TObject;
     function GetJSONDataValue: TJSONValue;
+    function GetStream: TStream;
     procedure SetDataObject(const Value: TObject);
     procedure SetJSONDataValue(const Value: TJSONValue);
     function ToJSONObject:TJSONObject;
@@ -56,7 +58,7 @@ type
 implementation
 
 uses
-  iORM;
+  iORM, Soap.EncdDecd, iORM.Exceptions;
 
 { TioRESTResponseBody }
 
@@ -65,12 +67,14 @@ begin
   inherited Create;
   FDataObject := nil;
   FJSONDataValue := nil;
+  FStream := nil;
   FOwnDataObject := AOwnDataObject;
 end;
 
 constructor TioRESTResponseBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
 var
   LJSONValue: TJSONValue;
+  LStreamWriter: TStreamWriter;
 begin
   Self.Create(AOwnDataObject);
   // DataObject
@@ -83,6 +87,18 @@ begin
   begin
     LJSONValue := AJSONObject.GetValue(KEY_JSONDATAVALUE);
     FJSONDataValue := TJSONValue(LJSONValue.Clone);
+  end;
+  // Sream
+  LJSONValue := AJSONObject.GetValue(KEY_STREAM);
+  if Assigned(LJSONValue) then
+  begin
+    FStream.Position := 0;
+    LStreamWriter := TStreamWriter.Create(FStream);
+    try
+      LStreamWriter.Write(DecodeString(LJSONValue.Value));
+    finally
+      LStreamWriter.Free;
+    end;
   end;
 end;
 
@@ -118,6 +134,13 @@ begin
   Result := FJSONDataValue;
 end;
 
+function TioRESTResponseBody.GetStream: TStream;
+begin
+  if not Assigned(FStream) then
+    FStream := TMemoryStream.Create;
+  Result := FStream;
+end;
+
 procedure TioRESTResponseBody.SetDataObject(const Value: TObject);
 begin
   FDataObject := Value;
@@ -131,6 +154,7 @@ end;
 function TioRESTResponseBody.ToJSONObject: TJSONObject;
 var
   LJSONValue: TJSONValue;
+  LStringStream: TStringStream;
 begin
   Result := TJSONObject.Create;
   // JSONDataValue
@@ -141,6 +165,18 @@ begin
   begin
     LJSONValue := io.Mapper.From(FDataObject).byFields.TypeAnnotationsON.ToJSON;
     Result.AddPair(KEY_DATAOBJECT, LJSONValue);
+  end;
+  // Stream
+  if Assigned(FStream) then
+  begin
+    LStringStream := TStringStream.Create;
+    try
+      FStream.Position := 0;
+      EncodeStream(FStream, LStringStream);
+      Result.AddPair(KEY_STREAM, LStringStream.DataString);
+    finally
+      LStringStream.Free;
+    end;
   end;
 end;
 

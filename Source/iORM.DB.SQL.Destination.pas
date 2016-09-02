@@ -40,33 +40,32 @@ type
   TioSQLDestination = class(TInterfacedObject, IioSQLDestination)
   private
     FSQL: String;
-    FConnectionDefName: String;
+    FConnectionName: String;
     FSelfClassName: String;
     FQualifiedFieldName: Boolean;
-  public
-    constructor Create(const ASQL:String); overload;
+    FIgnoreObjNotExists: Boolean;
     // Destinations
     {TODO 5 -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
-    function Translate: String; overload;
+    function GetTranslatedSQL: String;
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
-    function ToQuery: IioQuery; overload;
-    procedure ToQuery(const AQuery:IioQuery); overload;
-    procedure ToQuery(const AQuery:TFDQuery); overload;
-    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer; overload;
-    function Execute(const AParams: array of Variant): Integer; overload;
-    function Execute(const AParams: array of Variant; const ATypes: array of TFieldType): Integer; overload;
+    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer;
     // Informations
     function Connection(const AConnectionName:String): IioSQLDestination;
     function SelfClass(const ASelfClassName:String): IioSQLDestination; overload;
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
+    // Getters
+    function GetConnectionName: String;
+    function GetIgnoreObjNotExists: Boolean;
+  public
+    constructor Create(const ASQL:String); overload;
   end;
 
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.Strategy.Factory;
 
 { TioSQLDestination }
 
@@ -74,33 +73,17 @@ function TioSQLDestination.Connection(
   const AConnectionName: String): IioSQLDestination;
 begin
   Result := Self;
-  FConnectionDefName := AConnectionName;
+  FConnectionName := AConnectionName;
 end;
 
 constructor TioSQLDestination.Create(const ASQL: String);
 begin
   inherited Create;
-  FConnectionDefName := '';
+  FConnectionName := '';
   FSelfClassName := '';
   FQualifiedFieldName := False;
+  FIgnoreObjNotExists := False;
   FSQL := ASQL;
-end;
-
-function TioSQLDestination.Execute(const AParams: array of Variant): Integer;
-begin
-  Result := Self.Execute(AParams, []);
-end;
-
-function TioSQLDestination.Execute(const AParams: array of Variant;
-  const ATypes: array of TFieldType): Integer;
-var
-  LConnection: IioConnection;
-begin
-  LConnection := TioDBFactory.Connection(FConnectionDefName);
-  if LConnection.IsDBConnection then
-    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(Self.Translate, AParams, ATypes)
-  else
-    raise EioException.Create(Self.ClassName + ': "Execute" method: Operation not allowed by this connection type.');
 end;
 
 function TioSQLDestination.QualifiedFieldName(
@@ -111,14 +94,19 @@ begin
 end;
 
 function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
-var
-  LConnection: IioConnection;
 begin
-  LConnection := TioDBFactory.Connection(FConnectionDefName);
-  if LConnection.IsDBConnection then
-    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(Self.Translate, AIgnoreObjNotExists)
-  else
-    raise EioException.Create(Self.ClassName + ': "Execute" method: Operation not allowed by this connection type.');
+  FIgnoreObjNotExists := AIgnoreObjNotExists;
+  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_Execute(Self);
+end;
+
+function TioSQLDestination.GetConnectionName: String;
+begin
+  Result := FConnectionName;
+end;
+
+function TioSQLDestination.GetIgnoreObjNotExists: Boolean;
+begin
+  Result := FIgnoreObjNotExists;
 end;
 
 function TioSQLDestination.SelfClass(
@@ -134,7 +122,7 @@ begin
   Result := Self.SelfClass(ASelfClassRef.ClassName);
 end;
 
-function TioSQLDestination.Translate: String;
+function TioSQLDestination.GetTranslatedSQL: String;
 begin
   Result := TioSqlTranslator.Translate(FSQL, FSelfClassName, FQualifiedFieldName);
 end;
@@ -146,37 +134,8 @@ begin
 end;
 
 procedure TioSQLDestination.ToMemTable(const AMemTable: TFDMemTable);
-var
-  LQry: IioQuery;
 begin
-  // Create and execute the query
-  LQry := Self.ToQuery;
-  LQry.GetQuery.FetchOptions.Unidirectional := False;
-  LQry.Open;
-  try
-    LQry.GetQuery.FetchAll;
-    // Copy data to the MemoryTable
-    AMemTable.Data := LQry.GetQuery.Data;
-    AMemTable.First;
-  finally
-    LQry.Close;
-  end;
-end;
-
-procedure TioSQLDestination.ToQuery(const AQuery: IioQuery);
-begin
-  Self.ToQuery(AQuery.GetQuery);
-end;
-
-function TioSQLDestination.ToQuery: IioQuery;
-begin
-  Result := TioDBFactory.Query(FConnectionDefName);
-  Self.ToQuery(Result);
-end;
-
-procedure TioSQLDestination.ToQuery(const AQuery: TFDQuery);
-begin
-  AQuery.SQL.Text := Self.Translate;
+  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_LoadDataset(Self, AMemTable);
 end;
 
 end.
