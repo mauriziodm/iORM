@@ -59,6 +59,7 @@ type
     procedure SetWhere(const Value: IioWhere);
     procedure SetSQLDestination(const Value: IioSQLDestination);
     function ToJSONObject:TJSONObject;
+    procedure Clear;
   public
     constructor Create(const AOwnDataObject:Boolean); overload;
     constructor Create(const AJSONObject:TJSONObject; const AOwnDataObject:Boolean); overload;
@@ -76,9 +77,7 @@ uses
 constructor TioRESTRequestBody.Create(const AOwnDataObject:Boolean);
 begin
   inherited Create;
-  FWhere := nil;
-  FSQLDestination := nil;
-  FDataObject := nil;
+  Self.Clear;
   FOwnDataObject := AOwnDataObject;
 end;
 
@@ -117,6 +116,13 @@ begin
   LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
   if Assigned(LJSONValue) then
     FDataObject := io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
+end;
+
+procedure TioRESTRequestBody.Clear;
+begin
+  FWhere := nil;
+  FSQLDestination := nil;
+  FDataObject := nil;
 end;
 
 constructor TioRESTRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);

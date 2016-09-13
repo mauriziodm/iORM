@@ -58,7 +58,7 @@ type
 implementation
 
 uses
-  iORM, Soap.EncdDecd, iORM.Exceptions;
+  iORM, System.NetEncoding, iORM.Exceptions;
 
 { TioRESTResponseBody }
 
@@ -67,7 +67,7 @@ begin
   inherited Create;
   FDataObject := nil;
   FJSONDataValue := nil;
-  FStream := nil;
+  FStream := TMemoryStream.Create;
   FOwnDataObject := AOwnDataObject;
 end;
 
@@ -88,14 +88,16 @@ begin
     LJSONValue := AJSONObject.GetValue(KEY_JSONDATAVALUE);
     FJSONDataValue := TJSONValue(LJSONValue.Clone);
   end;
-  // Sream
+  // Stream
   LJSONValue := AJSONObject.GetValue(KEY_STREAM);
   if Assigned(LJSONValue) then
   begin
     FStream.Position := 0;
     LStreamWriter := TStreamWriter.Create(FStream);
     try
-      LStreamWriter.Write(DecodeString(LJSONValue.Value));
+//      LStreamWriter.Write(DecodeString(LJSONValue.Value));
+      LStreamWriter.Write(   TNetEncoding.Base64.Decode(LJSONValue.Value)   );
+      FStream.Position := 0;
     finally
       LStreamWriter.Free;
     end;
@@ -117,6 +119,7 @@ end;
 destructor TioRESTResponseBody.Destroy;
 begin
   // Clean up
+  FStream.Free;
   if Assigned(FJSONDataValue) then
     FJSONDataValue.Free;
   if FOwnDataObject and Assigned(FDataObject) then
@@ -136,8 +139,6 @@ end;
 
 function TioRESTResponseBody.GetStream: TStream;
 begin
-  if not Assigned(FStream) then
-    FStream := TMemoryStream.Create;
   Result := FStream;
 end;
 
@@ -172,7 +173,8 @@ begin
     LStringStream := TStringStream.Create;
     try
       FStream.Position := 0;
-      EncodeStream(FStream, LStringStream);
+      TNetEncoding.Base64.Encode(FStream, LStringStream);
+      LStringStream.Position := 0;
       Result.AddPair(KEY_STREAM, LStringStream.DataString);
     finally
       LStringStream.Free;

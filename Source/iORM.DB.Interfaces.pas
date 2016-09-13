@@ -255,6 +255,7 @@ type
 
   IioRESTRequestBody = interface
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
+    procedure Clear;
     function ToJSONObject:TJSONObject;
     // Where
     procedure SetWhere(const Value: IioWhere);
@@ -311,8 +312,9 @@ type
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); virtual; abstract;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); virtual; abstract;
     // SQLDestinations
-    class procedure SQLDest_LoadDataset(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); virtual; abstract;
+    class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); virtual; abstract;
     class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; virtual; abstract;
   end;
 

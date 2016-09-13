@@ -85,7 +85,6 @@ type
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
     // ------ Destination methods
-{ TODO : I "TOMemTable" mancano nelle strategies }
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
 
@@ -915,68 +914,18 @@ begin
 end;
 
 procedure TioWhere.ToMemTable(const AMemTable: TFDMemTable);
-var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
-    // Nested
-    procedure NestedLoadToMemTable;
-    var
-      LQry: IioQuery;
-    begin
-      // Create & open query
-      LQry := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
-      LQry.Open;
-      try
-        // Copy data to the MemoryTable
-        //  NB: Per poter fare in modo che i dati rimangano anche con più passaggi
-        //       successivi in base a quante classi implementano l'interfaccia che si sta
-        //       caricando (se si tratta di un'interfaccia ovviamente) ho dovuto implementare due chiamate
-        //       differenti a CopyDataSet perchè se mantenevo l'opzione 'coStructure' ogni volta azzerava
-        //       i records e quindi la prima volta la eseguq con lìopzione sopra citata mentre le volte successive no.
-        //       Per sapere se è il primo passaggio verifico se la MemTable.Active = True perchè ho notato che al primo
-        //       passaggio la attiva automaticamente.
-        if AMemTable.FieldCount > 0 then
-        begin
-          if not AMemTable.Active then
-            AMemTable.Open;
-          AMemTable.CopyDataSet(LQry.GetQuery, [coAppend])
-        end
-        else
-          AMemTable.CopyDataSet(LQry.GetQuery, [coStructure, coAppend]);
-      finally
-        LQry.Close;
-      end;
-    end;
 begin
-  // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-  // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
-  try
-    // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
-    begin
-      // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, Self);
-      // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
-      // Load the current class data into the list
-      NestedLoadToMemTable;
-    end;
-    // Commit ALL transactions
-    ATransactionCollection.CommitAll;
-  except
-    // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
-    raise;
-  end;
+  TioStrategyFactory.GetStrategy(FConnectionName).LoadDataSet(Self, AMemTable);
 end;
 
 function TioWhere.ToObject(const AObj:TObject): TObject;
 begin
-  Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObject(Self, AObj);
+  // if it is a LazyLoad....
+  if Self.IsLazy then
+    Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject
+  // else...
+  else
+    Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObject(Self, AObj);
 end;
 
 function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;

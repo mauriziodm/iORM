@@ -135,7 +135,7 @@ end;
 
 procedure TioSQLDestination.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_LoadDataset(Self, AMemTable);
+  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_LoadDataSet(Self, AMemTable);
 end;
 
 end.

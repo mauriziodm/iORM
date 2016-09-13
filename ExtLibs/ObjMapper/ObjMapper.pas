@@ -61,9 +61,11 @@ type
   TomJSONDestination = class
   strict private
     FValue: TJSONValue;
+    FOwnJSONValue_Transient: Boolean;  // Usato da "FromJSON" con parametro stringa
     FParams: IomParams;
   public
     constructor Create(const AValue: TJSONValue; const AParams:IomParams);
+    destructor Destroy; override;
     // Destinations
     function ToValue(const ATypeValue:PTypeInfo): TValue;
     function ToObject: TObject;
@@ -88,6 +90,7 @@ type
     function CustomSerializer(const ATargetClass:TClass; const ASerializer:TomCustomSerializerRef; const AParams:IomParams=nil): TomJSONDestination; overload;
     function CustomSerializer<Target>(const ASerializer:TomCustomSerializerRef; const AParams:IomParams=nil): TomJSONDestination; overload;
     function CustomSerializer<Target; Serializer:TomCustomSerializer>(const AParams:IomParams=nil): TomJSONDestination; overload;
+    function OwnJSONValue(const AOwnJSONValue: Boolean = True): TomJSONDestination;
   end;
 
 implementation
@@ -142,6 +145,7 @@ class function om.FromJSON(const AJSONString: String;
   const AParams: IomParams): TomJSONDestination;
 begin
   Result := Self.FromJSON(TJSONObject.ParseJSONValue(AJSONString), AParams);
+  Result.OwnJSONValue(True);
 end;
 
 { TomJSONDestination }
@@ -179,6 +183,7 @@ constructor TomJSONDestination.Create(const AValue: TJSONValue; const AParams:Io
 begin
   inherited Create;
   FValue := AValue;
+  FOwnJSONValue_Transient := False; // JSONValue is not owned by default
   if Assigned(AParams) then
     FParams := AParams
   else
@@ -265,6 +270,14 @@ begin
   Result := Self;
 end;
 
+destructor TomJSONDestination.Destroy;
+begin
+  // Destroy the JSONValue if owned
+  if (FParams.OwnJSONValue or FOwnJSONValue_Transient) and Assigned(FValue) then
+    FValue.Free;
+  inherited;
+end;
+
 function TomJSONDestination.ItemsOfType(const AKeyType,
   AValueType: PTypeInfo): TomJSONDestination;
 begin
@@ -286,6 +299,13 @@ end;
 function TomJSONDestination.JavaScriptMode: TomJSONDestination;
 begin
   FParams.SerializationMode := smJavaScript;
+  Result := Self;
+end;
+
+function TomJSONDestination.OwnJSONValue(
+  const AOwnJSONValue: Boolean): TomJSONDestination;
+begin
+  FOwnJSONValue_Transient := AOwnJSONValue;
   Result := Self;
 end;
 

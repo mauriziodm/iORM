@@ -54,8 +54,9 @@ type
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); override;
     // SQLDestinations
-    class procedure SQLDest_LoadDataset(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); override;
+    class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); override;
     class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; override;
   end;
 
@@ -66,7 +67,7 @@ uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
   iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
-  iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf;
+  iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON;
 
 { TioStrategyREST }
 
@@ -90,6 +91,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('Delete');
     // Commit
@@ -116,6 +118,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.DataObject := AObj;
     LConnection.Execute('DeleteObject');
     // Commit
@@ -135,6 +138,33 @@ begin
   Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
 end;
 
+class procedure TioStrategyREST.LoadDataSet(const AWhere: IioWhere;
+  const ADestDataSet: TFDDataSet);
+var
+  LConnection: IioConnectionREST;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Clear;
+    LConnection.RequestBody.Where := AWhere;
+    LConnection.Execute('LoadDataSet');
+    // Load the dataset
+    ADestDataset.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
+end;
+
 class procedure TioStrategyREST.LoadList(const AWhere: IioWhere;
   const AList: TObject);
 var
@@ -149,6 +179,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('LoadList');
     // Deserialize  the JSONDataValue to the result object
@@ -175,6 +206,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('LoadObject');
     // Deserialize  the JSONDataValue to the result object
@@ -223,6 +255,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.RequestBody.RelationOID := ARelationOID;
     LConnection.RequestBody.BlindInsert := ABlindInsert;
@@ -256,6 +289,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.RequestBody.RelationOID := ARelationOID;
     LConnection.RequestBody.BlindInsert := ABlindInsert;
@@ -294,6 +328,7 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.SQLDestination := ASQLDestination;
     LConnection.Execute('SQLDestExecute');
     // Get the number of records affected by the SQL command
@@ -310,7 +345,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.SQLDest_LoadDataset(
+class procedure TioStrategyREST.SQLDest_LoadDataSet(
   const ASQLDestination: IioSQLDestination; const ADestDataset: TFDDataSet);
 var
   LConnection: IioConnectionREST;
@@ -324,10 +359,11 @@ begin
   //       perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
+    LConnection.RequestBody.Clear;
     LConnection.RequestBody.SQLDestination := ASQLDestination;
     LConnection.Execute('SQLDestLoadDataSet');
     // Load the dataset
-    ADestDataset.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfBinary);
+    ADestDataset.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
     LConnection.Commit;
   except
