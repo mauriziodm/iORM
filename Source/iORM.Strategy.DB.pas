@@ -32,8 +32,9 @@ unit iORM.Strategy.DB;
 interface
 
 uses
-  iORM.Strategy.Interfaces, iORM.Context.Interfaces,
-  iORM.Context.Properties.Interfaces, iORM.Where.Interfaces;
+  iORM.Context.Interfaces,
+  iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
+  iORM.DB.Interfaces, FireDAC.Comp.DataSet;
 
 type
 
@@ -59,15 +60,20 @@ type
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); override;
+    // SQLDestinations
+    class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataSet:TFDDataSet); override;
+    class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; override;
   end;
 
 implementation
 
 uses
-  iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes, iORM.DB.Interfaces,
+  iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes,
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
-  iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory;
+  iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
+  iORM.Exceptions, iORM;
 
 { TioStrategyDB }
 
@@ -217,9 +223,6 @@ var
     end;
 begin
   inherited;
-  // if it is a LazyLoad....
-  if AWhere.IsLazy then
-    Exit(   TioLazyLoadFactory.LazyLoadObject(AWhere.TypeInfo, AWhere.TypeName, AWhere.TypeAlias, '', 0, AWhere) as TObject   );
   // Resolve the type and alias
   AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
   // Get the transaction collection
@@ -472,10 +475,124 @@ begin
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
+class function TioStrategyDB.SQLDest_Execute(
+  const ASQLDestination: IioSQLDestination): Integer;
+var
+  LConnection: IioConnectionDB;
+begin
+  inherited;
+  // Get the connection
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsDBConnection;
+  // Start transaction
+  LConnection.StartTransaction;
+  try
+    // Execute the SQL command
+    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(ASQLDestination.GetTranslatedSQL, ASQLDestination.GetIgnoreObjNotExists);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
+end;
+
+class procedure TioStrategyDB.SQLDest_LoadDataSet(
+  const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+var
+  LQry: IioQuery;
+begin
+  inherited;
+  // Start transaction
+  io.StartTransaction(ASQLDestination.GetConnectionName);
+  try
+    // Get the query object
+    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionName);
+    // Set the SQL command text
+    LQry.SQL.Text := ASQLDestination.GetTranslatedSQL;
+    LQry.GetQuery.FetchOptions.Unidirectional := False;
+    LQry.Open;
+    try
+      LQry.GetQuery.FetchAll;
+      // Copy data to the MemoryTable
+      ADestDataSet.Data := LQry.GetQuery.Data;
+      ADestDataSet.First;
+    finally
+      LQry.Close;
+    end;
+    // Commit
+    io.CommitTransaction(ASQLDestination.GetConnectionName);
+  except
+    // Rollback
+    io.RollbackTransaction(ASQLDestination.GetConnectionName);
+  end;
+end;
+
 class procedure TioStrategyDB.StartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;
+end;
+
+class procedure TioStrategyDB.LoadDataSet(const AWhere: IioWhere;
+  const ADestDataSet: TFDDataSet);
+var
+  AResolvedTypeList: IioResolvedTypeList;
+  AResolvedTypeName: String;
+  AContext: IioContext;
+  ATransactionCollection: IioTransactionCollection;
+    // Nested
+    procedure NestedLoadToMemTable;
+    var
+      LQry: IioQuery;
+    begin
+      // Create & open query
+      LQry := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
+      LQry.Open;
+      try
+        // Copy data to the MemoryTable
+        //  NB: Per poter fare in modo che i dati rimangano anche con più passaggi
+        //       successivi in base a quante classi implementano l'interfaccia che si sta
+        //       caricando (se si tratta di un'interfaccia ovviamente) ho dovuto implementare due chiamate
+        //       differenti a CopyDataSet perchè se mantenevo l'opzione 'coStructure' ogni volta azzerava
+        //       i records e quindi la prima volta la eseguq con lìopzione sopra citata mentre le volte successive no.
+        //       Per sapere se è il primo passaggio verifico se la MemTable.Active = True perchè ho notato che al primo
+        //       passaggio la attiva automaticamente.
+        if ADestDataSet.FieldCount > 0 then
+        begin
+          if not ADestDataSet.Active then
+            ADestDataSet.Open;
+          ADestDataSet.CopyDataSet(LQry.GetQuery, [coAppend])
+        end
+        else
+          ADestDataSet.CopyDataSet(LQry.GetQuery, [coStructure, coAppend]);
+      finally
+        LQry.Close;
+      end;
+    end;
+begin
+  inherited;
+  // Resolve the type and alias
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  // Get the transaction collection
+  ATransactionCollection := TioDBFactory.TransactionCollection;
+  try
+    // Loop for all classes in the sesolved type list
+    for AResolvedTypeName in AResolvedTypeList do
+    begin
+      // Get the Context for the current ResolverTypeName
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere);
+      // Start transaction
+      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      // Load the current class data into the list
+      NestedLoadToMemTable;
+    end;
+    // Commit ALL transactions
+    ATransactionCollection.CommitAll;
+  except
+    // Rollback ALL transactions
+    ATransactionCollection.RollbackAll;
+    raise;
+  end;
 end;
 
 class procedure TioStrategyDB.LoadList(const AWhere: IioWhere;

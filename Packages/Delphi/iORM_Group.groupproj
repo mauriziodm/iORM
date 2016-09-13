@@ -67,7 +67,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook_Dictionary\MapperPhonebookDictionaryExample.dproj">
             <Dependencies/>
@@ -272,13 +272,13 @@
     <Target Name="RVMan_Interface:Make">
         <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj" Targets="Make"/>
     </Target>
-    <Target Name="MapperPhonebookExample">
+    <Target Name="MapperPhonebookExample" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj"/>
     </Target>
-    <Target Name="MapperPhonebookExample:Clean">
+    <Target Name="MapperPhonebookExample:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="MapperPhonebookExample:Make">
+    <Target Name="MapperPhonebookExample:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj" Targets="Make"/>
     </Target>
     <Target Name="MapperPhonebookDictionaryExample">

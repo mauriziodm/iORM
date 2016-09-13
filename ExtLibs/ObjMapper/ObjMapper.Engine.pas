@@ -72,6 +72,10 @@ type
     procedure SetItemsValueDefaultTypeInfo(const AValue:PTypeInfo);
     function GetItemsValueDefaultTypeInfo: PTypeInfo;
     property ItemsValueDefaultTypeInfo: PTypeInfo read GetItemsValueDefaultTypeInfo write SetItemsValueDefaultTypeInfo;
+    // OwnJSONValue
+    procedure SetOwnJSONValue(const AValue:Boolean);
+    function GetOwnJSONValue: Boolean;
+    property OwnJSONValue: Boolean read GetOwnJSONValue write SetOwnJSONValue;
   end;
 
   IomSerializersContainerItem = interface
@@ -220,6 +224,7 @@ type
     FSerializers: TomSerializersContainer;
     FItemsKeyDefaultQualifiedName: String;
     FItemsValueDefaultQualifiedName: String;
+    FOwnJSONValue: Boolean;
     // SerializationMode
     procedure SetSerializationMode(const AValue: TSerializationMode);
     function GetSerializationMode: TSerializationMode;
@@ -249,6 +254,9 @@ type
     // ItemsValueDefaultTypeInfo
     procedure SetItemsValueDefaultTypeInfo(const AValue:PTypeInfo);
     function GetItemsValueDefaultTypeInfo: PTypeInfo;
+    // OwnJSONValue
+    procedure SetOwnJSONValue(const AValue:Boolean);
+    function GetOwnJSONValue: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -1806,6 +1814,7 @@ begin
   FEnableCustomSerializers := False;
   FItemsKeyDefaultQualifiedName := 'System.String';
   FItemsValueDefaultQualifiedName := '';
+  FOwnJSONValue := False; // JSONValue is not owned by default
 end;
 
 destructor TomParams.Destroy;
@@ -1847,6 +1856,11 @@ end;
 function TomParams.GetItemsValueDefaultTypeInfo: PTypeInfo;
 begin
   Result := omEngine.QualifiedTypeNameToRttiType(FItemsValueDefaultQualifiedName).Handle;
+end;
+
+function TomParams.GetOwnJSONValue: Boolean;
+begin
+  Result := FOwnJSONValue;
 end;
 
 function TomParams.GetSerializationMode: TSerializationMode;
@@ -1897,6 +1911,11 @@ end;
 procedure TomParams.SetItemsValueDefaultTypeInfo(const AValue: PTypeInfo);
 begin
   FItemsValueDefaultQualifiedName := omEngine.TypeInfoToRttiType(AValue).QualifiedName;
+end;
+
+procedure TomParams.SetOwnJSONValue(const AValue: Boolean);
+begin
+  FOwnJSONValue := AValue;
 end;
 
 procedure TomParams.SetSerializationMode(const AValue: TSerializationMode);

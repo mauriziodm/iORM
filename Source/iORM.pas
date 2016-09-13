@@ -96,7 +96,8 @@ type
     class function Where(const ATextCondition:String): IioWhere; overload;
     class function Where<T>(const ATextCondition:String): IioWhere<T>; overload;
 { TODO : Non tiene ancora conto della nuova parte REST }
-    class function SQL(const ASQL:String): IioSQLDestination;
+    class function SQL(const ASQL:String): IioSQLDestination; overload;
+    class function SQL(const ASQLDestination:IioSQLDestination): IioSQLDestination; overload;
     class function Mapper:omRef;
   end;
 
@@ -231,6 +232,12 @@ end;
 class function io.SQL(const ASQL: String): IioSQLDestination;
 begin
   Result := TioDBFactory.SQLDestination(ASQL);
+end;
+
+class function io.SQL(
+  const ASQLDestination: IioSQLDestination): IioSQLDestination;
+begin
+  Result := ASQLDestination;
 end;
 
 class procedure io.StartTransaction(const AConnectionName:String);

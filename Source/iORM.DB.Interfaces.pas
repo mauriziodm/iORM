@@ -38,8 +38,19 @@ uses
   System.Classes,
   System.Rtti, iORM.Context.Table.Interfaces,
   FireDAC.Comp.Client, FireDAC.Stan.Param,
-  Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes, iORM.Strategy.Interfaces,
-  iORM.REST.Interfaces;
+  Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes,
+  System.JSON, iORM.Where.Interfaces,
+  FireDAC.Comp.DataSet;
+
+const
+    KEY_WHERE = 'Where';
+    KEY_SQLDESTINATION = 'SQLDestination';
+    KEY_DATAOBJECT = 'DataObj';
+    KEY_JSONDATAVALUE = 'JSONDataValue';
+    KEY_RELATIONPROPERTYNAME = 'RelPropName';
+    KEY_RELATIONOID = 'RelOID';
+    KEY_BLINDINSERT = 'Blind';
+    KEY_STREAM = 'Stream';
 
 type
 
@@ -48,6 +59,9 @@ type
   TioFields = TFields;
   TioParam = TFDParam;
   TioParams = TFDParams;
+
+  // Strategy class reference
+  TioStrategyRef = class of TioStrategyIntf;
 
   TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
   TioConnectionInfo = record
@@ -114,6 +128,9 @@ type
     function GetConnection: TioInternalSqlConnection;
     function QueryContainer: IioQueryContainer;
   end;
+
+  IioRESTRequestBody = interface;
+  IioRESTResponseBody = interface;
 
   IioConnectionREST = interface(IioConnection)
     ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
@@ -221,20 +238,84 @@ type
     ['{37F6E5A8-267C-4EEA-9F32-5C8086D488E5}']
     // Destinations
     {TO 5DO -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
-    function Translate: String; overload;
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
-    function ToQuery: IioQuery; overload;
-    procedure ToQuery(const AQuery:IioQuery); overload;
-    procedure ToQuery(const AQuery:TFDQuery); overload;
     function Execute(const AIgnoreObjNotExists:Boolean=False): Integer; overload;
-    function Execute(const AParams: array of Variant): Integer; overload;
-    function Execute(const AParams: array of Variant; const ATypes: array of TFieldType): Integer; overload;
     // Informations
     function Connection(const AConnectionName:String): IioSQLDestination;
     function SelfClass(const ASelfClassName:String): IioSQLDestination; overload;
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
+    // Getters
+    ['{D49E85DA-C71F-4E00-A8F8-31312EBEE642}']
+    function GetTranslatedSQL: String; overload;
+    function GetConnectionName: String;
+    function GetIgnoreObjNotExists: Boolean;
+  end;
+
+  IioRESTRequestBody = interface
+    ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
+    procedure Clear;
+    function ToJSONObject:TJSONObject;
+    // Where
+    procedure SetWhere(const Value: IioWhere);
+    function GetWhere: IioWhere;
+    property Where:IioWhere read GetWhere write SetWhere;
+    // SQLDestination
+    procedure SetSQLDestination(const Value: IioSQLDestination);
+    function GetSQLDestination: IioSQLDestination;
+    property SQLDestination:IioSQLDestination read GetSQLDestination write SetSQLDestination;
+    // DataObject
+    procedure SetDataObject(const Value: TObject);
+    function GetDataObject: TObject;
+    property DataObject:TObject read GetDataObject write SetDataObject;
+    // RelationPropertyName
+    procedure SetRelationPropertyName(const Value: String);
+    function GetRelationPropertyName: String;
+    property RelationPropertyName:String read GetRelationPropertyName write SetRelationPropertyName;
+    // RelationOID
+    procedure SetRelationOID(const Value: Integer);
+    function GetRelationOID: Integer;
+    property RelationOID:Integer read GetRelationOID write SetRelationOID;
+    // BlindInsert
+    procedure SetBlindInsert(const Value: Boolean);
+    function GetBlindInsert: Boolean;
+    property BlindInsert:Boolean read GetBlindInsert write SetBlindInsert;
+  end;
+
+  IioRESTResponseBody = interface
+    ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
+    function ToJSONObject:TJSONObject;
+    // JSONDataValue
+    procedure SetJSONDataValue(const Value: TJSONValue);
+    function GetJSONDataValue: TJSONValue;
+    property JSONDataValue:TJSONValue read GetJSONDataValue write SetJSONDataValue;
+    // DataObject
+    procedure SetDataObject(const Value: TObject);
+    function GetDataObject: TObject;
+    property DataObject:TObject read GetDataObject write SetDataObject;
+    // Stream
+    function GetStream: TStream;
+    property Stream: TStream read GetStream;
+  end;
+
+  // Base class for strategy (Static class as an interface)
+  TioStrategyIntf = class abstract
+  public
+    class procedure StartTransaction(const AConnectionName:String); virtual; abstract;
+    class procedure CommitTransaction(const AConnectionName:String); virtual; abstract;
+    class procedure RollbackTransaction(const AConnectionName:String); virtual; abstract;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
+    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
+    class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); virtual; abstract;
+    class procedure Delete(const AWhere: IioWhere); virtual; abstract;
+    class procedure LoadList(const AWhere: IioWhere; const AList:TObject); virtual; abstract;
+    class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); virtual; abstract;
+    // SQLDestinations
+    class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); virtual; abstract;
+    class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; virtual; abstract;
   end;
 
 implementation
