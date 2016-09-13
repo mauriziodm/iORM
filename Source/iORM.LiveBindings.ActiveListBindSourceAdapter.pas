@@ -223,10 +223,10 @@ begin
   if FAutoPersist then
     if Self.IsDetail then
       io.Persist(Self.Current,
-                      Self.FMasterProperty.GetRelationChildPropertyName,
-                      Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
-                      False,
-                      '')  // Connection name
+                 Self.FMasterProperty.GetRelationChildPropertyName,
+                 Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
+                 False,
+                 '')  // Connection name
     else
       io.Persist(Self.Current);
   // Send a notification to other ActiveBindSourceAdapters & BindSource
@@ -327,12 +327,8 @@ begin
 end;
 
 function TioActiveListBindSourceAdapter.GetCurrentOID: Integer;
-var
-  AMap: IioMap;
 begin
-  // Create context for current child object
-  AMap := TioContextFactory.Map(Self.Current.ClassType);
-  Result := AMap.GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
+  Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
 end;
 
 function TioActiveListBindSourceAdapter.GetDataObject: TObject;

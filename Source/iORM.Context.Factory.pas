@@ -56,6 +56,8 @@ type
     class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AioWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String=''): IioContext;
+    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName:String): IioContextProperty;
+    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
   end;
 
 implementation
@@ -99,6 +101,12 @@ begin
                               );
 end;
 
+class function TioContextFactory.GetIDPropertyByClassRef(
+  const AClassRef: TioClassRef): IioContextProperty;
+begin
+  Result := Self.Map(AClassRef).GetProperties.GetIdProperty;
+end;
+
 class function TioContextFactory.GetProperty(const AMapMode:TioMapModeType; const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
   AFieldType: String; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
   ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean): IioContextProperty;
@@ -137,6 +145,13 @@ begin
         ,ARelationChildAutoIndex
       );
   end;
+end;
+
+class function TioContextFactory.GetPropertyByClassRefAndName(
+  const AClassRef: TioClassRef;
+  const APropertyName: String): IioContextProperty;
+begin
+  Result := Self.Map(AClassRef).GetProperties.GetPropertyByName(APropertyName);
 end;
 
 class function TioContextFactory.GroupBy(const ASqlText:String): IioGroupBy;

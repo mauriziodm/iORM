@@ -223,12 +223,27 @@ begin
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterPost;
+var
+  LMasterProperty: IioContextProperty;
 begin
   inherited;
   Self.SetObjStatus(osDirty);
   // If AutoPersist is enabled then persist
-{ TODO : Qua è diverso rispetto al TioActiveListBindSourceAdapter vedere se deve essere sistemato }
-  if Self.FAutoPersist then io.Persist(Self.Current);
+  if FAutoPersist then
+    if Self.IsDetail then
+    begin
+      // Get the MasterProperty of the current object
+      LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(
+        FMasterAdaptersContainer.GetMasterBindSourceAdapter.Current.ClassType,
+        FMasterPropertyName);
+      io.Persist(Self.Current,
+                 LMasterProperty.GetRelationChildPropertyName,
+                 Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
+                 False,
+                 '')  // Connection name
+    end
+    else
+      io.Persist(Self.Current);
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   Notify(
          Self,
@@ -288,13 +303,12 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.ExtractDetailObject(
   AMasterObj: TObject);
 var
-  ADetailObj: TObject;
-  AValue: TValue;
-  ALazyLoadableObj: IioLazyLoadable;
-  AMap: IioMap;
-  AMasterProperty: IioContextProperty;
+  LDetailObj: TObject;
+  LValue: TValue;
+  LLazyLoadableObj: IioLazyLoadable;
+  LMasterProperty: IioContextProperty;
 begin
-  ADetailObj := nil;
+  LDetailObj := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -303,31 +317,26 @@ begin
     Exit;
   end;
   // Extract master property value
-  AMap := TioContextFactory.Map(AMasterObj.ClassType);
-  AMasterProperty := AMap.GetProperties.GetPropertyByName(FMasterPropertyName);
-  AValue := AMasterProperty.GetValue(AMasterObj);
+  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+  LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue
-  if not AValue.IsEmpty then
-    if AMasterProperty.IsInterface then
-      ADetailObj := TObject(AValue.AsInterface)
+  if not LValue.IsEmpty then
+    if LMasterProperty.IsInterface then
+      LDetailObj := TObject(LValue.AsInterface)
     else
-      ADetailObj := AValue.AsObject;
+      LDetailObj := LValue.AsObject;
   // If is a LazyLoadable list then set the internal List
   //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
   //       normali dava dei problemi (non dava errori ma non usciva nulla)
-  if Supports(ADetailObj, IioLazyLoadable, ALazyLoadableObj)
-    then ADetailObj := ALazyLoadableObj.GetInternalObject;
+  if Supports(LDetailObj, IioLazyLoadable, LLazyLoadableObj)
+    then LDetailObj := LLazyLoadableObj.GetInternalObject;
   // Set it to the Adapter itself
-  Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetCurrentOID: Integer;
-var
-  AMap: IioMap;
 begin
-  // Create context for current child object
-  AMap := TioContextFactory.Map(Self.Current.ClassType);
-  Result := AMap.GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
+  Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetDataObject: TObject;
