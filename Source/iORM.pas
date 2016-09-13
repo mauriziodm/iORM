@@ -95,7 +95,6 @@ type
     class function Where<T>: IioWhere<T>; overload;
     class function Where(const ATextCondition:String): IioWhere; overload;
     class function Where<T>(const ATextCondition:String): IioWhere<T>; overload;
-{ TODO : Non tiene ancora conto della nuova parte REST }
     class function SQL(const ASQL:String): IioSQLDestination; overload;
     class function SQL(const ASQLDestination:IioSQLDestination): IioSQLDestination; overload;
     class function Mapper:omRef;

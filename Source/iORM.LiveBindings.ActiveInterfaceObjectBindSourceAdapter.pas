@@ -279,12 +279,11 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
 var
-  ADetailObj: TObject;
-  AValue: TValue;
-  AMap: IioMap;
-  AMasterProperty: IioContextProperty;
+  LDetailObj: TObject;
+  LValue: TValue;
+  LMasterProperty: IioContextProperty;
 begin
-  ADetailObj := nil;
+  LDetailObj := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -293,26 +292,21 @@ begin
     Exit;
   end;
   // Extract master property value
-  AMap := TioContextFactory.Map(AMasterObj.ClassType);
-  AMasterProperty := AMap.GetProperties.GetPropertyByName(FMasterPropertyName);
-  AValue := AMasterProperty.GetValue(AMasterObj);
+  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+  LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue
-  if not AValue.IsEmpty then
-    if AMasterProperty.IsInterface then
-      ADetailObj := TObject(AValue.AsInterface)
+  if not LValue.IsEmpty then
+    if LMasterProperty.IsInterface then
+      LDetailObj := TObject(LValue.AsInterface)
     else
-      ADetailObj := AValue.AsObject;
+      LDetailObj := LValue.AsObject;
   // Set it to the Adapter itself
-  Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetCurrentOID: Integer;
-var
-  AMap: IioMap;
 begin
-  // Create context for current child object
-  AMap := TioContextFactory.Map(Self.Current.ClassType);
-  Result := AMap.GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
+  Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetDataObject: TObject;

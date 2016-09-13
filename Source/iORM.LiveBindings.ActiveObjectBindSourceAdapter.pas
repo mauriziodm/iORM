@@ -299,12 +299,8 @@ begin
 end;
 
 function TioActiveObjectBindSourceAdapter.GetCurrentOID: Integer;
-var
-  AMap: IioMap;
 begin
-  // Create context for current child object
-  AMap := TioContextFactory.Map(Self.Current.ClassType);
-  Result := AMap.GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
+  Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetDataObject: TObject;
