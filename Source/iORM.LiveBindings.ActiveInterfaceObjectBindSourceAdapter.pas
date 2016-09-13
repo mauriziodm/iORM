@@ -196,8 +196,11 @@ begin
   if FInsertObj_Enabled then
   begin
     try
-      ObjToFree := Self.DataObject as TObject;
-      ObjToFree.Free;
+// NB: Queste due righe le ho commentate perchè altrimenti dava un errore in un progetto di
+//      Omar ed eliminando queste righe invece sembra andare bene però ho un dubbio che questo
+//      possa generare un memory leak. Proviamo a tenerle commentate e poi vediamo
+//      ObjToFree := Self.DataObject as TObject;
+//      ObjToFree.Free;
       Self.SetDataObject(FInsertObj_NewObj, FLocalOwnsObject);
     finally
       // Reset InsertObj subsystem

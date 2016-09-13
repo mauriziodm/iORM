@@ -28,6 +28,13 @@ type
     [MVCDoc('Load an object or interface')]
     procedure LoadObject;
 
+    [MVCPath('/LoadDataSet')]
+    [MVCProduce('application/json')]
+    [MVCConsumes('application/json')]
+    [MVCHTTPMethod([httpPUT])]
+    [MVCDoc('Load a DataSet')]
+    procedure LoadDataSet;
+
     [MVCPath('/PersistObject')]
     [MVCProduce('application/json')]
     [MVCConsumes('application/json')]
@@ -56,6 +63,20 @@ type
     [MVCDoc('Delete objects or interfaces')]
     procedure Delete;
 
+    [MVCPath('/SQLDestExecute')]
+    [MVCProduce('application/json')]
+    [MVCConsumes('application/json')]
+    [MVCHTTPMethod([httpPUT])]
+    [MVCDoc('Execute a SQL command')]
+    procedure SQLDestExecute;
+
+    [MVCPath('/SQLDestLoadDataSet')]
+    [MVCProduce('application/json')]
+    [MVCConsumes('application/json')]
+    [MVCHTTPMethod([httpPUT])]
+    [MVCDoc('Execute a SQL command to load a DataSet')]
+    procedure SQLDestLoadDataSet;
+
     // Other
     procedure OnBeforeAction(Context: TWebContext; const AActionName: string; var Handled: Boolean); override;
     procedure OnAfterAction(Context: TWebContext; const AActionName: string); override;
@@ -66,8 +87,8 @@ implementation
 
 { TioDMVCController }
 
-uses iORM, iORM.REST.Factory, System.Generics.Collections,
-  iORM.REST.Interfaces;
+uses iORM, iORM.REST.Factory, System.Generics.Collections, iORM.DB.Interfaces,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON, System.JSON;
 
 procedure TioDMVCController.Delete;
 var
@@ -101,6 +122,27 @@ procedure TioDMVCController.Index;
 begin
   //use Context property to access to the HTTP request and response
   Render('TioDMVCController: Test passed.');
+end;
+
+procedure TioDMVCController.LoadDataSet;
+var
+  LRequestBody: IioRESTRequestBody;
+  LResponseBody: IioRESTResponseBody;
+  LMemTable: TFDMemTable;
+begin
+  // Get the IioRESTRequestBody
+  LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body);
+  try
+    // Execute iORM call
+    LMemTable := io.Load(LRequestBody.Where).ToMemTable;
+    // Create the IioRESTResponseBody and return it to the client
+    LResponseBody := TioRESTFactory.NewResponseBody;
+    LMemTable.SaveToStream(LResponseBody.Stream, TFDStorageFormat.sfJSON);
+    Render(LResponseBody.ToJSONObject, False);
+  finally
+    // Clean up
+    LMemTable.Free;
+  end;
 end;
 
 procedure TioDMVCController.LoadList;
@@ -196,6 +238,43 @@ begin
   if not LRequestBody.BlindInsert then
     LResponseBody.JSONDataValue := io.Mapper.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJSON;
   Render(LResponseBody.ToJSONObject, False);
+end;
+
+procedure TioDMVCController.SQLDestExecute;
+var
+  LRequestBody: IioRESTRequestBody;
+  LResponseBody: IioRESTResponseBody;
+  LRecordsAffected: Integer;
+begin
+  // Get the IioRESTRequestBody
+  LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body);
+  // Execute iORM call
+  LRecordsAffected := io.SQL(LRequestBody.SQLDestination).Execute(LRequestBody.SQLDestination.GetIgnoreObjNotExists);
+  // Create the IioRESTResponseBody and return it to the client
+  LResponseBody := TioRESTFactory.NewResponseBody;
+  LResponseBody.JSONDataValue := TJSONNumber.Create(LRecordsAffected);
+  Render(LResponseBody.ToJSONObject, False);
+end;
+
+procedure TioDMVCController.SQLDestLoadDataSet;
+var
+  LRequestBody: IioRESTRequestBody;
+  LResponseBody: IioRESTResponseBody;
+  LMemTable: TFDMemTable;
+begin
+  // Get the IioRESTRequestBody
+  LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body);
+  // Execute iORM call
+  LMemTable := io.SQL(LRequestBody.SQLDestination).ToMemTable;
+  try
+    // Create the IioRESTResponseBody and return it to the client
+    LResponseBody := TioRESTFactory.NewResponseBody;
+    LMemTable.SaveToStream(LResponseBody.Stream, TFDStorageFormat.sfJSON);
+    Render(LResponseBody.ToJSONObject, False);
+  finally
+    // Clean up
+    LMemTable.Free;
+  end;
 end;
 
 end.

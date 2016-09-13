@@ -203,8 +203,11 @@ begin
     try
       if Supports(FInsertObj_NewObj, IInterface, AInterface) then
       begin
-        ObjToFree := Self.List[Self.ItemIndex] as TObject;
-        ObjToFree.Free;
+// NB: Queste due righe le ho commentate perchè altrimenti dava un errore in un progetto di
+//      Omar ed eliminando queste righe invece sembra andare bene però ho un dubbio che questo
+//      possa generare un memory leak. Proviamo a tenerle commentate e poi vediamo
+//        ObjToFree := Self.List[Self.ItemIndex] as TObject;
+//        ObjToFree.Free;
         Self.List[Self.ItemIndex] := AInterface;
       end
       else
