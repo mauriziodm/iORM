@@ -65,17 +65,14 @@ type
 
   TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
   TioConnectionInfo = record
-    ConnectionName: String[20];
+    ConnectionName: String;
+    ConnectionType: TioConnectionType;
     Persistent: Boolean;
     Strategy: TioStrategyRef;
+    BaseURL: String;
+    UserName: String;
+    Password: String;
     constructor Create(const AConnectionName:String; const AConnectionType:TioConnectionType; const APersistent:Boolean);
-    case ConnectionType: TioConnectionType of
-      cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL:
-        ();
-      cdtREST:
-        (BaseURL: String[100];
-         UserName: String[20];
-         Password: String[20]);
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;

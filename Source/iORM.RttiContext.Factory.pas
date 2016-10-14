@@ -55,6 +55,7 @@ end;
 initialization
   // Create the unique global instance of RttiContext
   ARttiContext := TRttiContext.Create;
+  ARttiContext.FindType(''); // Workaround for thread safe: https://quality.embarcadero.com/browse/RSP-9815
 
 finalization
   // GlobalRttiContext cleanup

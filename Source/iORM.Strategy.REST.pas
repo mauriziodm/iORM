@@ -342,6 +342,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -369,6 +370,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 

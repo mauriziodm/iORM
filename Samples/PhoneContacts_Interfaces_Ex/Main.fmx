@@ -404,7 +404,7 @@ object MainForm: TMainForm
     ScopeMappings = <>
     ioTypeName = 'IPerson'
     ioAutoLoadData = True
-    ioAutoPersist = True
+    ioAutoPersist = False
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload

@@ -493,6 +493,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -524,6 +525,7 @@ begin
   except
     // Rollback
     io.RollbackTransaction(ASQLDestination.GetConnectionName);
+    raise;
   end;
 end;
 

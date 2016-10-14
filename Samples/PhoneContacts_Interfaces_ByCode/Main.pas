@@ -126,27 +126,29 @@ procedure TMainForm.Button10Click(Sender: TObject);
 var
   AList: IioList<IPerson>;
 begin
-  AList := io.Load<IPerson>._Where
-  ._Property('ID')._GreaterThan(10)
-  .AddDetail('Phones', '[TPhoneNumber.PhoneType] = ''Home''')
-  .ToInterfacedList;
+
+  AList := io.Load<IPerson>._Where('[.ID] > 10')
+    .AddDetail('Phones', '[.PhoneType] = ''Home''')
+    .ToInterfacedList;
+
   ShowMessage(AList.Count.ToString + ' IPerson');
 end;
 
 procedure TMainForm.Button11Click(Sender: TObject);
 var
   AList: IioList<IPerson>;
-  LWhere: IioWhere<IPerson>;
+  MasterWhere: IioWhere<IPerson>;
   DetailWhere: IioWhere;
 begin
-  // Create the master where condition
-  LWhere := io.Where<IPerson>._Property('ID')._GreaterThan(10);
-  // Create the detail where condition
-  DetailWhere := io.Where('[TPhoneNumber.PhoneType] = ''Home''');
-  // Add the detail where condition to the master where condition
-  LWhere.Details.AddOrUpdate('Phones', DetailWhere);
 
-  AList := io.Load<IPerson>._Where(LWhere).ToInterfacedList;
+  // Create the master where condition
+  MasterWhere := io.Where<IPerson>('[.ID] > 10');
+  // Create the detail where condition
+  DetailWhere := io.Where('[.PhoneType] = ''Home''');
+  // Add the detail where condition to the master where condition
+  MasterWhere.Details.AddOrUpdate('Phones', DetailWhere);
+
+  AList := io.Load<IPerson>._Where(MasterWhere).ToInterfacedList;
   ShowMessage(AList.Count.ToString + ' IPerson');
 
 end;

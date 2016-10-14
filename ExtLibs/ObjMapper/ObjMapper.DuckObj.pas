@@ -39,7 +39,7 @@ function WrapAsObject(const AObject: TObject): IWrappedObject;
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.RttiContext.Factory;
 
 
 function WrapAsObject(const AObject: TObject): IWrappedObject;
@@ -55,14 +55,12 @@ end;
 
 constructor TDuckTypedObject.Create(AObj: TObject);
 var
-  Ctx: TRttiContext;
   Typ: TRttiType;
 begin
   inherited Create;
   FObj := AObj;
   // Init Rtti
-  Ctx := TRttiContext.Create;
-  Typ := Ctx.GetType(AObj.ClassInfo);
+  Typ := TioRttiContextFactory.RttiContext.GetType(AObj.ClassInfo);
   // LoadFromStreamMethod method
   FLoadFromStreamMethod := Typ.GetMethod('LoadFromStream');
   if not Assigned(FLoadFromStreamMethod) then Exception.Create('DuckTypedStreamObject: "LoadFromStream" method not found in the object');

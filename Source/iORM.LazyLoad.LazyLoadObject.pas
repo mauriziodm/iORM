@@ -97,7 +97,7 @@ var
   LArgs: TArray<TValue>;
 begin
   // Get the destination RttiMethod
-  LDestMethod := TRttiContext.Create.GetType(GetInternalObject.ClassInfo).GetMethod(Method.Name);
+  LDestMethod := TioRttiContextFactory.RttiContext.GetType(GetInternalObject.ClassInfo).GetMethod(Method.Name);
   // Do not consider the first element of Args
   LArgs := Copy(Args, 1, Length(Args));
   // Invoke the method
