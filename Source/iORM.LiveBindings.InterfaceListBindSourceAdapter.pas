@@ -160,9 +160,6 @@ begin
   begin
     LObject := GetItemInstanceFactory.ConstructInstance;
     try
-//      if not (LObject is T) then
-//        BindSourceAdapterError(Format(sInvalidInstance, [LObject.ClassName, T.ClassName]));
-//      Result := LObject as T;
       Result := TioRttiUtilities.CastObjectToGeneric<T>(LObject);
     except
       LObject.Free;

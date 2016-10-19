@@ -74,7 +74,7 @@ uses
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, System.Classes,
   Data.DB, iORM.LazyLoad.Interfaces, System.SysUtils, iORM.Attributes,
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
-  iORM.ObjectsForge.Factory, iORM.Context.Container;
+  iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Rtti.Utilities;
 
 { TioObjectMakerIntf }
 
@@ -93,7 +93,7 @@ begin
     // Create the child object/list if it isn't not already created by the master class constructor
     if not Assigned(Result) then
       Result := io.di.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
-    Result.ioAsInterface<IInterface>._AddRef;    // Adjust the RefCount to prevent an access violation
+    TioRttiUtilities.ObjectAsIInterface(Result)._AddRef;
   end else
   // If the AProperty is of instance (class) type...
   begin

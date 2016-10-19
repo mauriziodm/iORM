@@ -844,9 +844,12 @@ function TioDependencyInjectionLocator.VM_byClass(
   const AWhere: String; const AViewDataType: TioViewDataType;
   const AAutoLoadData: Boolean;
   const AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byClass(AInterfaceName, AAlias, AClassRef, AWhere, AViewDataType, AAutoLoadData).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byClass(AInterfaceName, AAlias, AClassRef, AWhere, AViewDataType, AAutoLoadData).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -855,9 +858,12 @@ function TioDependencyInjectionLocator.VM_byDataObj(
   const AInterfaceName, AAlias: String; const ADataIntf: IInterface;
   const AViewDataType: TioViewDataType;
   const AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byDataObj(AInterfaceName, AAlias, ADataIntf, AViewDataType).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byDataObj(AInterfaceName, AAlias, ADataIntf, AViewDataType).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -866,9 +872,12 @@ function TioDependencyInjectionLocator.VM_byDataObj(
   const AInterfaceName, AAlias: String; const ADataObject: TObject;
   const AViewDataType: TioViewDataType;
   const AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byDataObj(AInterfaceName, AAlias, ADataObject, AViewDataType).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byDataObj(AInterfaceName, AAlias, ADataObject, AViewDataType).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -877,9 +886,12 @@ function TioDependencyInjectionLocator.VM_byMasterVMfromDI(
   const AInterfaceName, AAlias, AMasterViewModelTypeName,
   AMasterViewModelTypeAlias, AMasterViewModelMasterPropertyName,
   AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byTypeName(AInterfaceName, AAlias, AMasterViewModelTypeName, AMasterViewModelTypeAlias, AMasterViewModelMasterPropertyName).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byTypeName(AInterfaceName, AAlias, AMasterViewModelTypeName, AMasterViewModelTypeAlias, AMasterViewModelMasterPropertyName).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -887,9 +899,12 @@ end;
 function TioDependencyInjectionLocator.VM_byMasterVM(
   const AInterfaceName, AAlias: String; const AMasterViewModel: IioViewModel;
   const AMasterPropertyName, AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byMasterVM(AInterfaceName, AAlias, AMasterViewModel, AMasterPropertyName).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byMasterVM(AInterfaceName, AAlias, AMasterViewModel, AMasterPropertyName).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -898,9 +913,12 @@ function TioDependencyInjectionLocator.VM_byMasterBSA(
   const AInterfaceName, AAlias: String;
   const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
   const AMasterPropertyName, AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byMasterBSA(AInterfaceName, AAlias, AMasterBindSourceAdapter, AMasterPropertyName).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byMasterBSA(AInterfaceName, AAlias, AMasterBindSourceAdapter, AMasterPropertyName).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -919,27 +937,36 @@ begin
 end;
 
 function TioDependencyInjectionLocator.VM_byTypeName(const AInterfaceName, AAlias, AModelTypeName, AModelTypeAlias:String; const AWhere:String=''; const AViewDataType:TioViewDataType=TioViewDataType.dtList; const AAutoLoadData:Boolean=True; const AMarker:String=''): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byTypeName(AInterfaceName, AAlias, AModelTypeName, AModelTypeAlias, AWhere, AViewDataType, AAutoLoadData).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byTypeName(AInterfaceName, AAlias, AModelTypeName, AModelTypeAlias, AWhere, AViewDataType, AAutoLoadData).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
 
 function TioDependencyInjectionLocator.VM_byMasterBS(const AInterfaceName, AAlias: String; const AMasterBindSource: TioMasterBindSource;
   const AMasterPropertyName, AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byMasterBS(AInterfaceName, AAlias, AMasterBindSource, AMasterPropertyName).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byMasterBS(AInterfaceName, AAlias, AMasterBindSource, AMasterPropertyName).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
 
 function TioDependencyInjectionLocator.VM_byBSA(const AInterfaceName, AAlias: String;
   ABindSourceAdapter: IioActiveBindSourceAdapter; const AMarker: String): IioDependencyInjectionLocator;
+var
+  LObj: TObject;
 begin
+  LObj := TioDependencyInjection.LocateVM_byBSA(AInterfaceName, AAlias, ABindSourceAdapter).Get;
   Result := Self.VM(
-    TioDependencyInjection.LocateVM_byBSA(AInterfaceName, AAlias, ABindSourceAdapter).Get.ioAsInterface<IioViewModel>,
+    TioRttiUtilities.ObjectAsIioViewModel(LObj),
     AMarker
     );
 end;
@@ -994,7 +1021,7 @@ end;
 
 function TioDependencyInjectionLocator<TI>.Get: TI;
 begin
-  Result := inherited Get.ioAsInterface<TI>;
+  Result := TioRttiUtilities.CastObjectToGeneric<TI>(inherited Get);
 end;
 
 function TioDependencyInjectionLocator<TI>.VM_byClass(const AInterfaceName,

@@ -319,7 +319,6 @@ begin
   if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
     then AObj := ALazyLoadableObj.GetInternalObject;
   ADetailObj := TList<TObject>(AObj);
-//  ADetailObj := TioRttiUtilities.CastObjectToGeneric<TList<TObject>>(AObj);
 
 
   // Set it to the Adapter itself

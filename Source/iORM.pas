@@ -45,22 +45,6 @@ uses
 
 type
 
-  // TObject class helper
-  TioTObjectHelper = class helper for TObject
-  public
-    procedure ioPersist;
-    procedure ioDelete;
-    function ioAsInterface<T:IInterface>: T;
-  end;
-
-  // TioBaseBindSource class helper (PrototypeBindSource and so on)
-  TioBindSourceHelper = class helper for TioBaseBindSource
-  public
-    function ioGetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
-    function ioGetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
-    procedure Append;
-  end;
-
   // iORM
   io = class
   public
@@ -307,49 +291,6 @@ class function io.RefTo(const AWhere: IioWhere): IioWhere;
 begin
   Result := Self.Load(AWhere);
 end;
-
-{ TioTObjectHelper }
-
-procedure TioTObjectHelper.ioDelete;
-begin
-  io.Delete(Self);
-end;
-
-function TioTObjectHelper.ioAsInterface<T>: T;
-begin
-  if not Supports(Self, GetTypeData(TypeInfo(T))^.Guid, Result) then
-    raise EioException.Create(Self.ClassName + ': interface non implemented by object!');
-end;
-
-procedure TioTObjectHelper.ioPersist;
-begin
-  io.Persist(Self);
-end;
-
-{ TioBindSourceHelper }
-
-procedure TioBindSourceHelper.Append;
-begin
-  Self.InternalAdapter.Append;
-end;
-
-function TioBindSourceHelper.ioGetDetailBindSourceAdapter(
-  const AOwner: TComponent; const AMasterPropertyName: String;
-  const AWhere: IioWhere): TBindSourceAdapter;
-var
-  AContainedBSA: IioContainedBindSourceAdapter;
-begin
-  Result := nil;
-  if Supports(Self.InternalAdapter, IioContainedBindSourceAdapter, AContainedBSA) then
-    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
-end;
-
-function TioBindSourceHelper.ioGetNaturalObjectBindSourceAdapter(
-  const AOwner: TComponent): TBindSourceAdapter;
-begin
-  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner);
-end;
-
 
 
 initialization

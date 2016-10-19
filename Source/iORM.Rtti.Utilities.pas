@@ -33,12 +33,14 @@ interface
 
 uses
   iORM.CommonTypes, System.Rtti, System.Classes, iORM.Exceptions,
-  System.TypInfo;
+  System.TypInfo, iORM.MVVM.Interfaces;
 
 type
 
   TioRttiUtilities = class
   public
+    class function ObjectAsIInterface(const AObj:Tobject): IInterface;
+    class function ObjectAsIioViewModel(const AObj:Tobject): IioViewModel;
     class function IsAnInterface<T>: Boolean;
     class function GenericToString<T>(const AQualified:Boolean=False): String;
     class function GenericInterfaceToGUI<T:IInterface>: String;
@@ -96,6 +98,20 @@ end;
 class function TioRttiUtilities.IsAnInterfaceTypeName(const ATypeName: String): Boolean;
 begin
   Result := ATypeName.StartsWith('I');
+end;
+
+class function TioRttiUtilities.ObjectAsIInterface(
+  const AObj: Tobject): IInterface;
+begin
+  if not Supports(AObj, IInterface, Result) then
+    raise EioException.Create(Self.ClassName + ': IInterface not implemented by the object ( + AObj.ClassName + ).');
+end;
+
+class function TioRttiUtilities.ObjectAsIioViewModel(
+  const AObj: Tobject): IioViewModel;
+begin
+  if not Supports(AObj, IioViewModel, Result) then
+    raise EioException.Create(Self.ClassName + ': IioViewModel not implemented by the object ( + AObj.ClassName + ).');
 end;
 
 // Questa funzione, a partire dal RootObject, restituisce l'oggetto a relativo al ChildPropertyPath navigando le proprietà

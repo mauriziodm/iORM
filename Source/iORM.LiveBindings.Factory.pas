@@ -152,8 +152,8 @@ begin
   //  from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the
   //  MasterBindSource.
   if (AMasterPropertyName <> '')
-    then Result := AMAsterBindSource.ioGetDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere)
-    else Result := AMAsterBindSource.ioGetNaturalObjectBindSourceAdapter(AOwner);
+    then Result := AMAsterBindSource.GetDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere)
+    else Result := AMAsterBindSource.GetNaturalObjectBindSourceAdapter(AOwner);
 end;
 
 class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent;

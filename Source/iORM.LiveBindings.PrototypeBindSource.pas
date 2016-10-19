@@ -111,11 +111,13 @@ type
     procedure Persist(ReloadData:Boolean=False);
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
-    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDataObject: TObject;
     procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
     function ioViewModelAs<T: IInterface>: T;
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
+    function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     // ----------------------------------------------------------------------------------------------------------------------------
     property ioViewModel:IioViewModel read FioViewModel write FioViewModel;
     property ioWhere:IioWhere read GetWhere write SetWhere;
@@ -212,6 +214,7 @@ end;
 function TioPrototypeBindSource.CheckForViewModel: Boolean;
 var
   LWhereValue: TValue;
+  LObj: TObject;
 begin
   // Init
   Result := False;
@@ -236,37 +239,32 @@ begin
   begin
     // ViewModel with a MasterViewModel
     if FioVM_UseBSPropsOnCreate and not FioMasterVM_Interface.IsEmpty then
-      ioViewModel := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
+      LObj := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
         .ConstructorMarker('CreateByMasterViewModelFromDependencyInjection')
         .ConstructorParams([FioMasterVM_Interface, FioMasterVM_Alias, FioMasterPropertyName])
-        .Get.ioAsInterface<IioViewModel>
+        .Get
     // ViewModel with a MasterBindSource
     else if FioVM_UseBSPropsOnCreate and Assigned(FioMasterBindSource) then
-      ioViewModel := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
+      LObj := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
         .ConstructorMarker('CreateByMasterBindSource')
         .ConstructorParams([FioMasterBindSource, FioMasterPropertyName])
-        .Get.ioAsInterface<IioViewModel>
+        .Get
     // ViewModel with TypeName+TypeAlias+Where BindSourceAdapterCreation
     else if FioVM_UseBSPropsOnCreate and not FioTypeName.IsEmpty then
     begin
       LWhereValue := TValue.From<IioWhere>(TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy));
-      ioViewModel := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
+      LObj := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
         .ConstructorMarker('CreateByTypeName')
-
-
-
 //        .ConstructorParams([FioTypeName, FioTypeAlias, FioWhereStr.Text, TValue.From<TioViewDataType>(FioViewDataType), FioAutoLoadData])
         .ConstructorParams([FioTypeName, FioTypeAlias, LWhereValue, TValue.From<TioViewDataType>(FioViewDataType), FioAutoLoadData])
-
-
-
-        .Get.ioAsInterface<IioViewModel>;
+        .Get;
     end
     // Otherwise ViewModel only by ViewModelInterface and ViewModelAlias
     //  NB: Even if the "ioVM_UseBSPropsOnCreate" property is False
     else
-      ioViewModel := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias)
-        .Get.ioAsInterface<IioViewModel>;
+      LObj := TioDependencyInjection.Locate(FioVM_Interface).Alias(FioVM_Alias).Get;
+    // Set the result
+    ioViewModel := TioRttiUtilities.ObjectAsIioViewModel(LObj);
   end;
   // ===============================================================================================================================
   // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
@@ -368,6 +366,17 @@ begin
   Result := Self.GetActiveBindSourceAdapter.GetDataObject;
 end;
 
+function TioPrototypeBindSource.GetDetailBindSourceAdapter(
+  const AOwner: TComponent; const AMasterPropertyName: String;
+  const AWhere: IioWhere): TBindSourceAdapter;
+var
+  AContainedBSA: IioContainedBindSourceAdapter;
+begin
+  Result := nil;
+  if Supports(Self.InternalAdapter, IioContainedBindSourceAdapter, AContainedBSA) then
+    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
+end;
+
 function TioPrototypeBindSource.GetWhere: IioWhere;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
@@ -392,6 +401,12 @@ function TioPrototypeBindSource.GetIsDetail: Boolean;
 begin
   Result := Assigned(FioMasterBindSource)
             or (   Assigned(Self.ioViewModel) and Assigned(Self.ioViewModel.ioMasterBindSource)   );
+end;
+
+function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(
+  const AOwner: TComponent): TBindSourceAdapter;
+begin
+  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner);
 end;
 
 function TioPrototypeBindSource.GetOrderBy: String;
