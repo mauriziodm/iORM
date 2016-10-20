@@ -54,6 +54,7 @@ type
     ClassRef: TioClassref;
     ClassName: String;
     RttiType: TRttiInstanceType;
+    InterfaceGUID: TGUID;
     PropertiesOnCreate: TArray<TioDIPropFieldOnCreate>;
     DefaultConstructorMethod: String;
     DefaultConstructorMarker: String;

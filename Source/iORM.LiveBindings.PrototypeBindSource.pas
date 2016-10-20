@@ -392,7 +392,7 @@ var
   LIID: TGUID;
 begin
   Result := nil;
-  LIID := StringToGUID(   TioRttiUtilities.GenericInterfaceToGUI<T>   );
+  LIID := TioRttiUtilities.TypeInfoToGUID(TypeInfo(T));
   if not Supports(FioViewModel, LIID, Result) then
     raise EioException.Create(Self.ClassName + ': Interface not implemented by the ViewModel.');
 end;

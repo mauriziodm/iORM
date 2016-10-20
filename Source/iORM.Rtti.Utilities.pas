@@ -33,23 +33,24 @@ interface
 
 uses
   iORM.CommonTypes, System.Rtti, System.Classes, iORM.Exceptions,
-  System.TypInfo, iORM.MVVM.Interfaces;
+  System.TypInfo, iORM.MVVM.Interfaces, System.Types;
 
 type
 
   TioRttiUtilities = class
   public
-    class function ObjectAsIInterface(const AObj:Tobject): IInterface;
-    class function ObjectAsIioViewModel(const AObj:Tobject): IioViewModel;
-    class function IsAnInterface<T>: Boolean;
-    class function GenericToString<T>(const AQualified:Boolean=False): String;
-    class function GenericInterfaceToGUI<T:IInterface>: String;
-    class function ClassRefToRttiType(const AClassRef:TioClassRef): TRttiInstanceType;
-    class function CastObjectToGeneric<T>(const AObj:TObject): T;
-    class function IsAnInterfaceTypeName(const ATypeName:String): Boolean;
-    class function ResolveChildPropertyPath(const ARootObj:TObject; const AChildPropertyPath:TStrings): TObject;
-    class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject;
-    class function TypeInfoToTypeName(const ATypeInfo:PTypeInfo; const AQualified:Boolean=False): String;
+    class function ObjectAsIInterface(const AObj:Tobject): IInterface; static;
+    class function ObjectAsIioViewModel(const AObj:Tobject): IioViewModel; static;
+    class function IsAnInterface<T>: Boolean; static;
+    class function CastObjectToGeneric<T>(const AObj:TObject): T; overload; static;
+    class function CastObjectToGeneric<T>(const AObj:TObject; IID:TGUID): T; overload; static;
+    class function TypeInfoToGUID(const ATypeInfo:PTypeInfo):TGUID; static;
+    class function GenericToString<T>(const AQualified:Boolean=False): String; static;
+    class function ClassRefToRttiType(const AClassRef:TioClassRef): TRttiInstanceType; static;
+    class function IsAnInterfaceTypeName(const ATypeName:String): Boolean; static;
+    class function ResolveChildPropertyPath(const ARootObj:TObject; const AChildPropertyPath:TStrings): TObject; static;
+    class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
+    class function TypeInfoToTypeName(const ATypeInfo:PTypeInfo; const AQualified:Boolean=False): String; static;
   end;
 
 implementation
@@ -60,15 +61,26 @@ uses
 { TioRttiUtilities }
 
 
-class function TioRttiUtilities.CastObjectToGeneric<T>(const AObj: TObject): T;
+class function TioRttiUtilities.CastObjectToGeneric<T>(const AObj: TObject; IID:TGUID): T;
 begin
-  if Self.IsAnInterface<T> then
+  if IsAnInterface<T> then
   begin
-    if not Supports(AObj, GetTypeData(TypeInfo(T))^.Guid, Result) then
-      raise EioException.Create(Self.ClassName + ': Interface not supported.');
+    if IID = GUID_NULL then
+    begin
+      IID := TypeInfoToGUID(TypeInfo(T));
+      if IID = GUID_NULL then
+        raise EioException.Create('TioRttiUtilities.CastObjectToGeneric: The interface does not have the GUID.');
+    end;
+    if not Supports(AObj, IID, Result) then
+      raise EioException.Create('TioRttiUtilities.CastObjectToGeneric: Interface not supported.');
   end
   else
     Result := TValue.From<TObject>(AObj).AsType<T>;
+end;
+
+class function TioRttiUtilities.CastObjectToGeneric<T>(const AObj: TObject): T;
+begin
+  Result := CastObjectToGeneric<T>(AObj, GUID_NULL);
 end;
 
 class function TioRttiUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;
@@ -76,23 +88,9 @@ begin
   Result := TioRttiContextFactory.RttiContext.GetType(AClassref).AsInstance;
 end;
 
-class function TioRttiUtilities.GenericInterfaceToGUI<T>: String;
-begin
-  Result := GUIDToString(   GetTypeData(   PTypeInfo(TypeInfo(T))   ).Guid   );
-
-  // ----------------------------------------------------------------------------------
-  // Old code
-  // ----------------------------------------------------------------------------------
-//  pinfo := TypeInfo(T);
-//  if pinfo = nil then Exit(Self.ClassName + ': TypeInfo (GUI) not found!');
-//  pdata := GetTypeData(pinfo);
-//  Result := GUIDtoString(pdata.Guid);
-  // ----------------------------------------------------------------------------------
-end;
-
 class function TioRttiUtilities.GenericToString<T>(const AQualified:Boolean=False): String;
 begin
-  Result := Self.TypeInfoToTypeName(TypeInfo(T), AQualified);
+  Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
 end;
 
 class function TioRttiUtilities.IsAnInterfaceTypeName(const ATypeName: String): Boolean;
@@ -104,14 +102,14 @@ class function TioRttiUtilities.ObjectAsIInterface(
   const AObj: Tobject): IInterface;
 begin
   if not Supports(AObj, IInterface, Result) then
-    raise EioException.Create(Self.ClassName + ': IInterface not implemented by the object ( + AObj.ClassName + ).');
+    raise EioException.Create('TioRttiUtilities: IInterface not implemented by the object (' + AObj.ClassName + ').');
 end;
 
 class function TioRttiUtilities.ObjectAsIioViewModel(
   const AObj: Tobject): IioViewModel;
 begin
   if not Supports(AObj, IioViewModel, Result) then
-    raise EioException.Create(Self.ClassName + ': IioViewModel not implemented by the object ( + AObj.ClassName + ).');
+    raise EioException.Create('TioRttiUtilities: IioViewModel not implemented by the object (' + AObj.ClassName + ').');
 end;
 
 // Questa funzione, a partire dal RootObject, restituisce l'oggetto a relativo al ChildPropertyPath navigando le proprietà
@@ -133,7 +131,7 @@ var
     // Extract the object/interface (it must be an object or an interface)
     AValue := Prop.GetValue(AMasterObj);
     // Return the resolved child object
-    Result := Self.TValueToObject(AValue, True);
+    Result := TValueToObject(AValue, True);
   end;
 begin
   // Init
@@ -157,15 +155,28 @@ begin
     tkInterface: Result := AValue.AsInterface As TObject;
     tkClass: Result := AValue.AsObject;
     else if not ASilentException then
-      raise EioException.Create(Self.ClassName + '.TValueToObject: The TValue does not contain an object or interfaced object.');
+      raise EioException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
   end;
+end;
+
+class function TioRttiUtilities.TypeInfoToGUID(
+  const ATypeInfo: PTypeInfo): TGUID;
+var
+  LTyp: TRttiType;
+begin
+  if ATypeInfo.Kind <> tkInterface then
+    raise EioException.Create('TioRttiUtilities.TypeInfoToGUID: ATypeInfo is not relative to an interface.');
+  LTyp := TioRttiContextFactory.RttiContext.GetType(ATypeInfo);
+  if not Assigned(LTyp) then
+    raise EioException.Create('TioRttiUtilities.TypeInfoToGUID: RTTI type info not found, derive it from IInvokable or insert the {M+} directive before its declaration to solve the problem.');
+  Result := TRttiInterfaceType(LTyp).GUID;
 end;
 
 class function TioRttiUtilities.TypeInfoToTypeName(
   const ATypeInfo: PTypeInfo; const AQualified:Boolean=False): String;
 begin
 // From XE7
-{$IF CompilerVersion >= 28.0}
+{$IFDEF NEXTGEN}
   // Get the type name
   Result := ATypeInfo.NameFld.ToString;
   // Ig a qualifiedname is required...
@@ -179,9 +190,9 @@ begin
       Result := ATypeInfo.TypeData.UnitNameFld.ToString + '.' + Result;
   end;
 // Before XE7
-{$ELSE}
+{$ELSE  NEXTGEN}
   Result := ATypeInfo.Name;
-{$IFEND}
+{$ENDIF NEXTGEN}
 end;
 
 class function TioRttiUtilities.IsAnInterface<T>: Boolean;
