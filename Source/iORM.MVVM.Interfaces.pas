@@ -42,7 +42,7 @@ type
 
   TioCommandType = (ctNull, ctAction, ctMethod, ctAnonimousMethod);
 
-  IioView = interface
+  IioView = interface(IInvokable)
     ['{AE9431A3-4D53-4ACF-98A1-7870DB6F7B0F}']
     function FindComponent(const AName: string): TComponent;
   end;
@@ -58,7 +58,7 @@ type
 
   IioCommandsContainer = interface;
 
-  IioViewModel = interface
+  IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
