@@ -111,6 +111,7 @@ type
     procedure Persist(ReloadData:Boolean=False);
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
+    procedure Insert(AObject:TObject); overload;
     function GetDataObject: TObject;
     procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
@@ -385,6 +386,18 @@ begin
     Result := LActiveBSA.ioWhere
   else
     Result := nil;
+end;
+
+procedure TioPrototypeBindSource.Insert(AObject: TObject);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Insert(AObject);
+    AnActiveBSA.Refresh(False);
+  end
+  else raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 function TioPrototypeBindSource.ioViewModelAs<T>: T;
