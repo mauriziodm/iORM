@@ -291,6 +291,9 @@
         <DCCReference Include="..\..\Source\iORM.REST.Body.Response.pas"/>
         <DCCReference Include="..\..\Source\iORM.REST.Factory.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextContainer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas"/>
         <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

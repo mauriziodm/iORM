@@ -62,9 +62,7 @@ type
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
-    procedure BindView(const AView:TComponent);
-//    function GetActionByName(AActionName:String): TBasicAction;
-//    procedure BindActions(const AView:IioView);
+//    procedure BindView(const AView:TComponent);
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
@@ -89,9 +87,16 @@ type
     procedure SetViewDataType(const Value: TioViewDataType);
     function GetViewDataType: TioViewDataType;
     property ioViewDataType:TioViewDataType read GetViewDataType write SetViewDataType;
-    // NotifyContainer
-    function GetViewInvokables: IioCommandsContainer;
-    property ViewInvokables: IioCommandsContainer read GetViewInvokables;
+  end;
+
+  IioContainedViewContextProvider = interface
+    ['{DBD12364-D019-4F3B-83A9-FA011CD647AB}']
+    procedure GetViewContext(const AView:TComponent);
+    procedure ReleaseViewContext(const AView:TComponent);
+    // RegisterAsActive
+    function GetRegisterAsActive: Boolean;
+    procedure SetRegisterAsActive(const Value: Boolean);
+    property RegisterAsActive:Boolean read GetRegisterAsActive write SetRegisterAsActive;
   end;
 
   // Reference to an anonimous method called by a ViewModel when it need

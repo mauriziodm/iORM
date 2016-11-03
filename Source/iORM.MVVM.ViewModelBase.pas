@@ -59,7 +59,6 @@ type
     function GetTypeName: String;
     function GetViewDataType: TioViewDataType;
     function GetWhere: IioWhere;
-    function GetViewInvokables: IioCommandsContainer;
     procedure SetAutoLoadData(const Value: Boolean);
     procedure SetMasterBindSource(const Value: TObject);
     procedure SetMasterPropertyName(const Value: String);
@@ -67,8 +66,6 @@ type
     procedure SetTypeName(const Value: String);
     procedure SetViewDataType(const Value: TioViewDataType);
     procedure SetWhere(const Value: IioWhere);
-    procedure BindActions(const AView:TComponent);
-    procedure BindAction(const AType:TRttiType; const AView:TComponent; const AComponentName, AActionName: String);
   protected
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
@@ -108,9 +105,6 @@ type
 
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
-    function GetActionByName(AActionName: String): TBasicAction;
-    procedure BindView(const AView:TComponent);
-    property ViewInvokables: IioCommandsContainer read GetViewInvokables;
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
     procedure AfterConstruction; override;
@@ -173,31 +167,6 @@ end;
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
 
-
-
-
-
-
-
-
-
-function TioViewModel.GetActionByName(AActionName: String): TBasicAction;
-var
-  AObj: TObject;
-begin
-  // Init
-  Result := nil;
-  AObj := nil;
-  if AActionName.Trim = '' then raise EioException.Create(ClassName + ': invalid action name!');
-  // Find the action
-  AObj := FindComponent(AActionName);
-  // If found then return the action itself
-  if Assigned(AObj) and (AObj is TBasicAction) then
-    Exit(AObj as TBasicAction);
-  // Else raise an exception
-  raise EioException.Create(ClassName + ': action "' + AActionName + '" not found!');
-end;
-
 function TioViewModel.GetAutoLoadData: Boolean;
 begin
   Result := FioAutoLoadData;
@@ -216,11 +185,6 @@ end;
 function TioViewModel.GetMasterViewModel: IioViewModel;
 begin
   Result := FioMasterViewModel;
-end;
-
-function TioViewModel.GetViewInvokables: IioCommandsContainer;
-begin
-  Result := FCommands;
 end;
 
 function TioViewModel.GetTypeAlias: String;
@@ -248,50 +212,6 @@ begin
   Result := FioWhere;
 end;
 
-procedure TioViewModel.BindAction(const AType:TRttiType; const AView:TComponent; const AComponentName, AActionName: String);
-var
-  AObj: TObject;
-  AProp: TRttiProperty;
-  AAction: TBasicAction;
-  AValue: TValue;
-begin
-  // Get RttiProperty
-  AProp := AType.GetProperty('Action');
-  if not Assigned(AProp) then EioException.Create(Self.ClassName + ': RttiProperty not found!');
-  // Get the object
-  AObj := AView.FindComponent(AComponentName);
-  if not Assigned(AObj) then EioException.Create(Self.ClassName + ': View component not found!');
-  // Get action
-  AAction := Self.GetActionByName(AActionName);
-  if not Assigned(AAction) then EioException.Create(Self.ClassName + ': Action not found!');
-  // Set the action property of the object
-  AValue := TValue.From<TBasicAction>(AAction);
-  AProp.SetValue(AObj, AValue);
-end;
-
-procedure TioViewModel.BindActions(const AView: TComponent);
-var
-  Typ: TRttiType;
-  Fld: TRttiField;
-  Attr: TCustomAttribute;
-begin
-  // Retrieve the RttiType of the view
-  Typ := TioRttiContextFactory.RttiContext.GetType(AView.ClassType);
-  for Fld in Typ.GetFields do
-    for Attr in Fld.GetAttributes do
-      if Attr is ioBindAction then
-        Self.BindAction(Fld.FieldType, AView, Fld.Name, ioBindAction(Attr).Value);
-end;
-
-procedure TioViewModel.BindView(const AView: TComponent);
-begin
-  // Bind the VMActions to the View controls
-  Self.BindActions(AView);
-  // Regsiter the ViewActions/ViewMethods/ViewAnonimousMethods of the View for VMNotifications
-  //  to che NotifyContainer of the ViewModel
-//  Self.ViewInvokables.BindViewInvokables(AView);
-end;
-
 constructor TioViewModel.Create(const ADataObj: TObject; const AViewDataType:TioViewDataType);
 begin
   Self.Create;
@@ -303,14 +223,6 @@ begin
   Self.Create;
   FViewData := TioMVVMFactory.ViewData(ABindSourceAdapter);
 end;
-
-
-
-
-
-
-
-
 
 function TioViewModel.QueryInterface(const IID: TGUID; out Obj): HResult;
 begin

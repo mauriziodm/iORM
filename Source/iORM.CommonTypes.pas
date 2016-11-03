@@ -32,7 +32,7 @@ unit iORM.CommonTypes;
 interface
 
 uses
-  System.Rtti, System.Generics.Collections;
+  System.Rtti, System.Generics.Collections, System.SysUtils;
 
 const
   IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
@@ -46,13 +46,6 @@ type
 
   // Common ClassRef
   TioClassRef = class of TObject;
-
-  // Common interface getting the underlying object implementing the interface
-  IioGetObject = interface
-    ['{2CCE4A16-03B4-4CD1-BED8-B88AB87CC0B3}']
-    function GetObject: TObject;
-    function GetInternalList: TList<IInterface>;
-  end;
 
   // Orientation of  DB index
   TioIndexOrientation = (ioAscending = 0, ioDescending);
@@ -83,10 +76,26 @@ type
   TioNullableBoolean = TioNullable<Boolean>;
   TioNullableDateTime = TioNullable<TDateTime>;
 
+  IioThreadSafe<T:class> = interface(TFunc<T>)
+    ['{353443F7-0352-48E3-978C-56D32E8E9EE9}']
+    procedure Invoke(const value: T); overload;
+  end;
+
+  TioThreadSafe<T:class> = class(TInterfacedObject, IioThreadSafe<T>)
+  strict private
+    FObj: T;
+    FOwnObj: Boolean;
+  public
+    constructor Create(const AObj:T; const AOwnObj:Boolean=True);
+    destructor Destroy; override;
+    procedure Invoke(const AValue: T); overload;
+    function Invoke: T; overload;
+  end;
+
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions;
+  iORM.Exceptions;
 
 { ioNullable<T> }
 
@@ -116,6 +125,42 @@ procedure TioNullable<T>.SetValue(const Value: T);
 begin
   FValue := Value;
   FIsNull := ISNULL_VALUE;
+end;
+
+{ TioThreadSafe<T> }
+
+constructor TioThreadSafe<T>.Create(const AObj: T; const AOwnObj: Boolean);
+begin
+  inherited Create;
+  FObj := AObj;
+  FOwnObj := AOwnObj;
+end;
+
+procedure TioThreadSafe<T>.Invoke(const AValue: T);
+begin
+  TMonitor.Enter(FObj);
+  try
+    FObj := AValue;
+  finally
+    TMonitor.Exit(FObj);
+  end;
+end;
+
+destructor TioThreadSafe<T>.Destroy;
+begin
+  if FOwnObj and Assigned(FObj) then
+    FObj.Free;
+  inherited;
+end;
+
+function TioThreadSafe<T>.Invoke: T;
+begin
+  TMonitor.Enter(FObj);
+  try
+    Result := FObj;
+  finally
+    TMonitor.Exit(FObj);
+  end;
 end;
 
 end.

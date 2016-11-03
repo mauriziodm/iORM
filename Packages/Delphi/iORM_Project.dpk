@@ -162,6 +162,9 @@ contains
   iORM.REST.Interfaces in '..\..\Source\iORM.REST.Interfaces.pas',
   iORM.REST.Body.Response in '..\..\Source\iORM.REST.Body.Response.pas',
   iORM.REST.Factory in '..\..\Source\iORM.REST.Factory.pas',
-  ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas';
+  ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
+  iORM.MVVM.ViewContextProvider in '..\..\Source\iORM.MVVM.ViewContextProvider.pas',
+  iORM.MVVM.ViewContextContainer in '..\..\Source\iORM.MVVM.ViewContextContainer.pas',
+  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas';
 
 end.

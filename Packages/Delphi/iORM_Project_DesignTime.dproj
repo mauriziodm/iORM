@@ -83,7 +83,7 @@
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <EnabledSysJars>android-support-v4.dex.jar;apk-expansion.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</EnabledSysJars>
-        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;iORM_Project;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice32)'!=''">
@@ -111,21 +111,21 @@
         <CfgParent>Base</CfgParent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSSimulator)'!=''">
-        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;iORM_Project;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_OSX32)'!=''">
         <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;FireDACMSSQLDriver;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;vclFireDAC;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;FireDACMSSQLDriver;iORM_Project;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;vclFireDAC;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;FireDACMSSQLDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;vclFireDAC;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;FireDACMSSQLDriver;iORM_Project;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;soaprtl;dbrtl;DbxCommonDriver;bindengine;bindcomp;vclFireDAC;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACIBDriver;FireDACMSSQLDriver;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -156,6 +156,7 @@
         <DCCReference Include="iORM_Project.dcp"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -203,7 +204,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\17.0\Bpl\iORM_Project_DesignTime.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\iORM_Project_DesignTime.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>iORM_Project_DesignTime.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

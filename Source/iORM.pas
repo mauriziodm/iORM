@@ -82,6 +82,7 @@ type
     class function SQL(const ASQL:String): IioSQLDestination; overload;
     class function SQL(const ASQLDestination:IioSQLDestination): IioSQLDestination; overload;
     class function Mapper:omRef;
+    class function NewThreadSafe<T:class>(const AObj:T; const AOwnObj:Boolean=True): IioThreadSafe<T>;
   end;
 
 implementation
@@ -143,6 +144,12 @@ end;
 class function io.Mapper: omRef;
 begin
   Result := ObjMapper.om;
+end;
+
+class function io.NewThreadSafe<T>(const AObj: T;
+  const AOwnObj: Boolean): IioThreadSafe<T>;
+begin
+  Result := TioThreadSafe<T>.Create(AObj, AOwnObj);
 end;
 
 class procedure io.Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String);
