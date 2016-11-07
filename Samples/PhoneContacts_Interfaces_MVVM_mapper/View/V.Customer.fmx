@@ -1,6 +1,8 @@
 inherited ViewCustomer: TViewCustomer
+  ClipParent = True
   inherited ToolBar2: TToolBar
     inherited lblTitle2: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Current person (customer)'
     end
   end

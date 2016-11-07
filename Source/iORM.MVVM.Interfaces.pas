@@ -91,7 +91,7 @@ type
 
   IioContainedViewContextProvider = interface
     ['{DBD12364-D019-4F3B-83A9-FA011CD647AB}']
-    procedure GetViewContext(const AView:TComponent);
+    function NewViewContext(const AView:TComponent): TComponent;
     procedure ReleaseViewContext(const AView:TComponent);
     // RegisterAsActive
     function GetRegisterAsActive: Boolean;

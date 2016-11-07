@@ -46,7 +46,7 @@ uses
 {$IFDEF CONSOLE}
   FireDAC.ConsoleUI.Wait,
 {$ELSE}
-  {$IFDEF HAS_VCL}
+  {$IFDEF ioVCL}
     FireDAC.VCLUI.Wait,
     FireDAC.Phys.MSSQL,
   {$ELSE}
@@ -191,7 +191,7 @@ begin
 {$IFDEF CONSOLE}
   FFDGUIxWaitCursor.Provider := 'Console';
 {$ELSE}
-  {$IFDEF HAS_VCL}
+  {$IFDEF ioVCL}
     FFDGUIxWaitCursor.Provider := 'Forms';
   {$ELSE}
     FFDGUIxWaitCursor.Provider := 'FMX';

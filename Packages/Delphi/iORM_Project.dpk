@@ -26,7 +26,7 @@ package iORM_Project;
 {$DEFINE ioPresent}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'iORM Runtime'}
+{$DESCRIPTION 'IupOrm Runtime'}
 {$IMPLICITBUILD ON}
 
 requires
@@ -165,6 +165,7 @@ contains
   ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
   iORM.MVVM.ViewContextProvider in '..\..\Source\iORM.MVVM.ViewContextProvider.pas',
   iORM.MVVM.ViewContextContainer in '..\..\Source\iORM.MVVM.ViewContextContainer.pas',
-  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas';
+  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
+  iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas';
 
 end.

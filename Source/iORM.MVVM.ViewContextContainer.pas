@@ -15,7 +15,7 @@ type
     class var FInternalContainer: IioThreadSafe<TioViewContextContainerInternal>;
     class procedure Build; static;
   public
-    class procedure GetViewContext(const AView:TComponent; const AViewContextProvider:IioContainedViewContextProvider); static;
+    class function NewViewContext(const AView:TComponent; const AViewContextProvider:IioContainedViewContextProvider): TComponent; static;
     class procedure ReleaseViewContext(const AView:TComponent); static;
   end;
 
@@ -32,18 +32,15 @@ begin
   FInternalContainer := io.NewThreadSafe(TioViewContextContainerInternal.Create);
 end;
 
-class procedure TioViewContextContainer.GetViewContext(const AView: TComponent;
-  const AViewContextProvider: IioContainedViewContextProvider);
-var
-  LViewContext: TComponent;
+class function TioViewContextContainer.NewViewContext(const AView: TComponent;
+  const AViewContextProvider: IioContainedViewContextProvider): TComponent;
 begin
+  Result := nil;
   if not Assigned(AViewContextProvider) then
     EioException.Create('TioViewContextContainer.GetViewContext: Invalid provider.');
-  // Get the ViewContext for the form
-  AViewContextProvider.GetViewContext(AView);
-  // Extract the ViewContext and register it into the ViewContextContainer
-  LViewContext := TioViewContextProvider.ExtractViewContext(AView);
-  FInternalContainer.Add(LViewContext, AViewContextProvider);
+  // Get the ViewContext for the form and register it into the ViewContextContainer
+  Result := AViewContextProvider.NewViewContext(AView);
+  FInternalContainer.Add(Result, AViewContextProvider);
 end;
 
 class procedure TioViewContextContainer.ReleaseViewContext(const AView: TComponent);

@@ -31,7 +31,7 @@ object ViewPerson: TViewPerson
       Size.PlatformDefault = False
       StyleLookup = 'toollabel'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.Font.Style = [fsBold]
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Center
       Text = 'Current person'
     end

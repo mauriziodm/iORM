@@ -409,10 +409,10 @@ end;
 
 function TioCommandsContainerItemAction.GetCaption: String;
 begin
-{$IFDEF HAS_FMX}
+{$IFDEF ioFMX}
   Result := Self.Command.Caption;
 {$ENDIF}
-{$IFDEF HAS_VCL}
+{$IFDEF ioVCL}
   Result := Self.Command.Caption;
 {$ENDIF}
 end;
@@ -816,10 +816,10 @@ end;
 procedure TioCommandsContainerItemAction.SetCaption(const Value: String);
 begin
   inherited;
-{$IFDEF HAS_FMX}
+{$IFDEF ioFMX}
   Self.Command.Caption := Value;
 {$ENDIF}
-{$IFDEF HAS_VCL}
+{$IFDEF ioVCL}
   Self.Command.Caption := Value;
 {$ENDIF}
 end;
