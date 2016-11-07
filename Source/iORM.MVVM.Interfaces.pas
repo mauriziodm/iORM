@@ -99,6 +99,15 @@ type
     property RegisterAsActive:Boolean read GetRegisterAsActive write SetRegisterAsActive;
   end;
 
+  IioVMViews = interface
+    ['{0F35C859-695B-424A-99B3-B54CC54C2863}']
+    procedure RegisterView(const AView:TComponent);
+    procedure UnregisterView(const AView:TComponent);
+    procedure ReleaseViewContext(const AView:TComponent);
+    procedure ReleaseAllViewContexts;
+//    function InternalContainer: TioVMViewsInternalContainer;
+  end;
+
   // Reference to an anonimous method called by a ViewModel when it need
   //  to notify their views that something is changed
   TioCommandAnonimousMethod = reference to procedure;

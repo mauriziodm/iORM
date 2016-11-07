@@ -336,48 +336,51 @@ end;
 
 class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioContextTable;
 var
-  Attr: TCustomAttribute;
-  TableName, ConnectionDefName, AKeyGenerator: String;
-  ClassFromField: IioClassFromField;
-  AJoins: IioJoins;
-  AGroupBy: IioGroupBy;
-  AMapMode: TioMapModeType;
+  LAttr: TCustomAttribute;
+  LTableName, LConnectionDefName, LKeyGenerator: String;
+  LClassFromField: IioClassFromField;
+  LJoins: IioJoins;
+  LGroupBy: IioGroupBy;
+  LMapMode: TioMapModeType;
   LIndexList: TioIndexList;
+  LAutoCreateDB: Boolean;
 begin
   try
     // Prop Init
-    TableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
-    ConnectionDefName := '';
-    AKeyGenerator := '';
-    AJoins := Self.Joins;
-    AGroupBy := nil;
-    AMapMode := ioProperties;
+    LTableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+    LConnectionDefName := '';
+    LKeyGenerator := '';
+    LJoins := Self.Joins;
+    LGroupBy := nil;
+    LMapMode := ioProperties;
     LIndexList := nil;
+    LAutoCreateDB := True;
     // Check attributes
-    for Attr in Typ.GetAttributes do
+    for LAttr in Typ.GetAttributes do
     begin
-      if (Attr is ioTable) then
+      if (LAttr is ioTable) then
       begin
-        if not ioTable(Attr).Value.IsEmpty then TableName := ioTable(Attr).Value;
-        AMapMode := ioTable(Attr).MapMode;
+        if not ioTable(LAttr).Value.IsEmpty then LTableName := ioTable(LAttr).Value;
+        LMapMode := ioTable(LAttr).MapMode;
       end;
-      if Attr is ioKeyGenerator then AKeyGenerator := ioKeyGenerator(Attr).Value;
-      if Attr is ioConnectionDefName then ConnectionDefName := ioConnectionDefName(Attr).Value;
-      if Attr is ioClassFromField then ClassFromField := Self.ClassFromField(Typ);
-      if Attr is ioJoin then AJoins.Add(Self.JoinItem(   ioJoin(Attr)   ));
-      if (Attr is ioGroupBy) and (not Assigned(AGroupBy)) then AGroupBy := Self.GroupBy(   ioGroupBy(Attr).Value   );
+      if LAttr is ioKeyGenerator then LKeyGenerator := ioKeyGenerator(LAttr).Value;
+      if LAttr is ioConnectionDefName then LConnectionDefName := ioConnectionDefName(LAttr).Value;
+      if LAttr is ioClassFromField then LClassFromField := Self.ClassFromField(Typ);
+      if LAttr is ioJoin then LJoins.Add(Self.JoinItem(   ioJoin(LAttr)   ));
+      if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then LGroupBy := Self.GroupBy(   ioGroupBy(LAttr).Value   );
+      if LAttr is ioDisableAutoCreateDB then LAutoCreateDB := False;
       // Index attribute (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
-      if Attr is ioIndex then
+      if LAttr is ioIndex then
       begin
         if not Assigned(LIndexList) then
           LIndexList := TioIndexList.Create(False);
-        LIndexList.Add(ioIndex(Attr));
+        LIndexList.Add(ioIndex(LAttr));
       end;
     end;
     // KeyGenerator
-    if AKeyGenerator.IsEmpty then AKeyGenerator := TableName;
+    if LKeyGenerator.IsEmpty then LKeyGenerator := LTableName;
     // Create result Properties object
-    Result := TioContextTable.Create(TableName, AKeyGenerator, ClassFromField, AJoins, AGroupBy, ConnectionDefName, AMapMode, Typ);
+    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

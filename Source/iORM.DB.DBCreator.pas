@@ -379,6 +379,10 @@ var
   ATableName: String;
   ARttiType: TRttiInstanceType;
 begin
+  // If the current table is not to be considered for the AutoCreateDatabase...
+  if not AMap.GetTable.GetAutoCreateDB then
+    Exit;
+  // get the table name
   ATableName := AMap.GetTable.TableName;
   // Find or Create Table
   ATable := Self.FindOrCreateTable(AMap.GetTable.TableName, AMap.GetTable.IsClassFromField, AMap);

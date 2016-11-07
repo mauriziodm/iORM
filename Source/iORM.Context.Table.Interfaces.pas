@@ -79,6 +79,7 @@ type
     function GetConnectionDefName: String;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
+    function GetAutoCreateDB: Boolean;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;

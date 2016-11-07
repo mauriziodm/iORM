@@ -114,10 +114,11 @@ type
     FKeyGenerator: String;
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
+    FAutoCreateDB: Boolean;
   public
     constructor Create(const ASqlText, AKeyGenerator:String; const AClassFromField:IioClassFromField;
     const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
-    const AMapMode:TioMapModeType; const ARttiType:TRttiInstanceType); overload;
+    const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); overload;
     destructor Destroy; override;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
@@ -128,6 +129,7 @@ type
     function GetConnectionDefName: String;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
+    function GetAutoCreateDB: Boolean;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;
@@ -143,7 +145,7 @@ uses
 
 constructor TioContextTable.Create(const ASqlText, AKeyGenerator:String; const AClassFromField:IioClassFromField;
     const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
-    const AMapMode:TioMapModeType; const ARttiType:TRttiInstanceType);
+    const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType);
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
@@ -154,6 +156,7 @@ begin
   FMapMode := AMapMode;
   FRttiType := ARttiType;
   FIndexList := nil;
+  FAutoCreateDB := AAutoCreateDB;
 end;
 
 destructor TioContextTable.Destroy;
@@ -161,6 +164,11 @@ begin
   if Self.IndexListExists then
     FIndexList.Free;
   inherited;
+end;
+
+function TioContextTable.GetAutoCreateDB: Boolean;
+begin
+  Result := FAutoCreateDB;
 end;
 
 function TioContextTable.GetClassFromField: IioClassFromField;

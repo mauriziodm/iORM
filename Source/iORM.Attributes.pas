@@ -300,6 +300,9 @@ type
     property Unique:Boolean read FUnique;
   end;
 
+  // KeyGeneratorName attribute
+  ioDisableAutoCreateDB = class(TioCustomAttribute)
+  end;
   // ---------------------------------------------------------------------------
   // SEND CLASS ATTRIBUTES
   // ===========================================================================
