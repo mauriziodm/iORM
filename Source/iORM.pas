@@ -82,7 +82,7 @@ type
     class function SQL(const ASQL:String): IioSQLDestination; overload;
     class function SQL(const ASQLDestination:IioSQLDestination): IioSQLDestination; overload;
     class function Mapper:omRef;
-    class function NewThreadSafe<T:class>(const AObj:T; const AOwnObj:Boolean=True): IioThreadSafe<T>;
+    class function NewThreadSafe<T>(const AObj:T; const AOwnObj:Boolean=True): IioThreadSafe<T>;
   end;
 
 implementation

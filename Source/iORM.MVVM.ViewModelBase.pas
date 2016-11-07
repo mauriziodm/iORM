@@ -34,7 +34,7 @@ interface
 uses
   System.Classes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, System.Generics.Collections;
+  iORM.CommonTypes, iORM.Where.Interfaces;
 
 type
 
@@ -43,6 +43,7 @@ type
     { Private declarations }
     FViewData: IioViewData;
     FCommands: IioCommandsContainer;
+    FViews: IioThreadSafe<IioVMViews>;  // Per ora la lascio nascosta, deciderò poi se renderla pubblica (Solo RegisterView è pubblico come metodo del ViewModel).
     FioTypeName, FioTypeAlias: String;
     FioMasterViewModelTypeName, FioMasterViewModelTypeAlias: String;
     FioMasterViewModel: IioViewModel;
@@ -105,6 +106,8 @@ type
 
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
+    procedure RegisterView(const AView:TComponent);
+    procedure FreeViews;
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
     procedure AfterConstruction; override;
@@ -230,6 +233,11 @@ begin
     Result := 0
   else
     Result := E_NOINTERFACE;
+end;
+
+procedure TioViewModel.RegisterView(const AView: TComponent);
+begin
+  FViews.RegisterView(AView);
 end;
 
 procedure TioViewModel.SetAutoLoadData(const Value: Boolean);
@@ -366,8 +374,6 @@ begin
     FViewData := TioMVVMFactory.ViewData(FioTypeName, FioTypeAlias, FIoWhere, FioViewDataType, FioAutoLoadData);
 end;
 
-
-
 constructor TioViewModel.Create(const AMasterBindSourceAdapter: IioActiveBindSourceAdapter; const AMasterPropertyName: String);
 begin
   Self.Create;
@@ -396,12 +402,18 @@ begin
   FIoMasterPropertyName := AMasterViewModelMasterPropertyName;
 end;
 
+procedure TioViewModel.FreeViews;
+begin
+  FViews.ReleaseAllViewContexts;
+end;
+
 constructor TioViewModel.Create;
 begin
   inherited Create(nil);
   // Init
   FViewData := nil;
   FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
+  FViews := io.NewThreadSafe<IioVMViews>(TioMVVMFactory.VMViews);
 end;
 
 end.

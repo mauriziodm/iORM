@@ -34,7 +34,7 @@ interface
 uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.Actions, System.UITypes, iORM.CommonTypes,
-  iORM.Attributes;
+  iORM.Attributes, System.Generics.Collections;
 
 type
 
@@ -62,7 +62,7 @@ type
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
-//    procedure BindView(const AView:TComponent);
+    procedure RegisterView(const AView:TComponent);
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
@@ -99,13 +99,14 @@ type
     property RegisterAsActive:Boolean read GetRegisterAsActive write SetRegisterAsActive;
   end;
 
+  TioVMViewsInternalContainer = TList<TComponent>;
   IioVMViews = interface
     ['{0F35C859-695B-424A-99B3-B54CC54C2863}']
     procedure RegisterView(const AView:TComponent);
     procedure UnregisterView(const AView:TComponent);
     procedure ReleaseViewContext(const AView:TComponent);
     procedure ReleaseAllViewContexts;
-//    function InternalContainer: TioVMViewsInternalContainer;
+    function _InternalContainer: TioVMViewsInternalContainer;
   end;
 
   // Reference to an anonimous method called by a ViewModel when it need

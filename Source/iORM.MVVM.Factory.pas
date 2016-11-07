@@ -40,6 +40,8 @@ type
 
   TioMVVMFactory = class
   public
+    class function VMViews: IioVMViews;
+    // ViewData
     class function ViewData(const ADataObj:TObject; const AViewDataType:TioViewDataType): IioViewData; overload;
     class function ViewData(const ADataIntf:IInterface; const AViewDataType:TioViewDataType): IioViewData; overload;
     class function ViewData(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioViewData; overload;
@@ -59,7 +61,7 @@ implementation
 
 uses
   iORM.MVVM.ViewModel.ViewData, iORM.MVVM.Commands, System.SysUtils,
-  iORM.Exceptions;
+  iORM.Exceptions, iORM.MVVM.ViewModel.Views;
 
 { TioMVVMFactory }
 
@@ -124,6 +126,11 @@ begin
     AMasterViewModel.ViewData.ActiveBindSourceAdapter,
     AMasterPropertyName
   );
+end;
+
+class function TioMVVMFactory.VMViews: IioVMViews;
+begin
+  Result := TioVMViews.Create;
 end;
 
 class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioCommandsContainer;

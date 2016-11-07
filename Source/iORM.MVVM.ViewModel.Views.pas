@@ -8,8 +8,6 @@ uses
 
 type
 
-  TioVMViewsInternalContainer = TList<TComponent>;
-
   TioVMViews = class(TInterfacedObject, IioVMViews)
   private
     FInternalContainer: TioVMViewsInternalContainer;
@@ -55,8 +53,11 @@ begin
 end;
 
 procedure TioVMViews.ReleaseAllViewContexts;
+var
+  LView: TComponent;
 begin
-
+  for LView in FInternalContainer do
+    Self.RegisterView(LView);
 end;
 
 procedure TioVMViews.ReleaseViewContext(const AView: TComponent);

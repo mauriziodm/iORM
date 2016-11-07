@@ -32,7 +32,7 @@ unit iORM.CommonTypes;
 interface
 
 uses
-  System.Rtti, System.Generics.Collections, System.SysUtils;
+  System.Rtti, System.Generics.Collections, System.SysUtils, Winapi.Windows;
 
 const
   IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
@@ -76,17 +76,29 @@ type
   TioNullableBoolean = TioNullable<Boolean>;
   TioNullableDateTime = TioNullable<TDateTime>;
 
-  IioThreadSafe<T:class> = interface(TFunc<T>)
+  TioLocker = record
+  private
+    FCriticalSection: TRTLCriticalSection;
+  public
+    Padding: array[0..6] of TVarData;  // Only to fix CPU cache line dimension problem
+    procedure Init;
+    procedure Done;
+    procedure Lock;
+    procedure UnLock;
+  end;
+
+  IioThreadSafe<T> = interface(TFunc<T>)
     ['{353443F7-0352-48E3-978C-56D32E8E9EE9}']
     procedure Invoke(const value: T); overload;
   end;
 
-  TioThreadSafe<T:class> = class(TInterfacedObject, IioThreadSafe<T>)
+  TioThreadSafe<T> = class(TInterfacedObject, IioThreadSafe<T>)
   strict private
-    FObj: T;
+    FInternalValue: T;
+    FLocker: TioLocker;
     FOwnObj: Boolean;
   public
-    constructor Create(const AObj:T; const AOwnObj:Boolean=True);
+    constructor Create(const AValue:T; const AOwnObj:Boolean=True);
     destructor Destroy; override;
     procedure Invoke(const AValue: T); overload;
     function Invoke: T; overload;
@@ -95,7 +107,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions;
+  iORM.Exceptions, System.TypInfo;
 
 { ioNullable<T> }
 
@@ -129,38 +141,75 @@ end;
 
 { TioThreadSafe<T> }
 
-constructor TioThreadSafe<T>.Create(const AObj: T; const AOwnObj: Boolean);
+constructor TioThreadSafe<T>.Create(const AValue: T; const AOwnObj: Boolean);
+var
+  LTypeInfo: PTypeInfo;
 begin
   inherited Create;
-  FObj := AObj;
+  FLocker.Init;
+  FInternalValue := AValue;
+  // Own the value only if it is a class object
   FOwnObj := AOwnObj;
+  LTypeInfo := TypeInfo(T);
+  FOwnObj := AOwnObj and (LTypeInfo.Kind = tkClass);
 end;
 
 procedure TioThreadSafe<T>.Invoke(const AValue: T);
 begin
-  TMonitor.Enter(FObj);
+  FLocker.Lock;
   try
-    FObj := AValue;
+    FInternalValue := AValue;
   finally
-    TMonitor.Exit(FObj);
+    FLocker.UnLock;
   end;
 end;
 
 destructor TioThreadSafe<T>.Destroy;
+var
+  LObj: TObject;
 begin
-  if FOwnObj and Assigned(FObj) then
-    FObj.Free;
+  // Own class object value
+  if FOwnObj then
+  begin
+    LObj := TObject(@FInternalValue);
+    if Assigned(LObj) then
+      LObj.Free;
+  end;
+  // Clean the Locker
+  FLocker.Done;
   inherited;
 end;
 
 function TioThreadSafe<T>.Invoke: T;
 begin
-  TMonitor.Enter(FObj);
+  FLocker.Lock;
   try
-    Result := FObj;
+    Result := FInternalValue;
   finally
-    TMonitor.Exit(FObj);
+    FLocker.UnLock;
   end;
+end;
+
+{ TioLocker }
+
+procedure TioLocker.Done;
+begin
+  DeleteCriticalSection(FCriticalSection);
+end;
+
+procedure TioLocker.Init;
+begin
+  InitializeCriticalSection(FCriticalSection);
+end;
+
+procedure TioLocker.Lock;
+begin
+  EnterCriticalSection(FCriticalSection);
+end;
+
+procedure TioLocker.UnLock;
+begin
+  LeaveCriticalSection(FCriticalSection);
 end;
 
 end.
