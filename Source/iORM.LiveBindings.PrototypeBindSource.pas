@@ -63,6 +63,7 @@ type
     FioViewModel: IioViewModel;
     FonNotify: TioBSANotificationEvent;
     FOnNeedViewModel: TioNeedViewModelEvent;
+    FViewID: Byte;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -209,6 +210,12 @@ end;
 destructor TioPrototypeBindSource.Destroy;
 begin
   FioWhereStr.Free;
+  // ===========================================================================
+  // If the ViewModel is assigned then unbind the view
+  // ---------------------------------------------------------------------------
+  if Assigned(Self.ioViewModel) then
+    Self.ioViewModel.UnbindView(FViewID);
+  // ===========================================================================
   inherited;
 end;
 
@@ -460,9 +467,10 @@ begin
   // ===========================================================================
   // If the ViewModel is assigned (by the DoCreateAdapter method) then it try
   //  to Bind the View (Owner) components to ViewModel's actions
+  //  and register the view into the VMVoews container of the VM
   // ---------------------------------------------------------------------------
   if Assigned(Self.ioViewModel) then
-    Self.ioViewModel.Commands.BindView(Self.Owner);
+    FViewID := Self.ioViewModel.BindView(Self.Owner);
   // ===========================================================================
 end;
 

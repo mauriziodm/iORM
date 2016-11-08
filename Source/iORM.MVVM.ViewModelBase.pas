@@ -106,7 +106,8 @@ type
 
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
-    procedure RegisterView(const AView:TComponent);
+    function BindView(const AView:TComponent): Byte;
+    procedure UnbindView(const AViewID:Byte);
     procedure FreeViews;
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
@@ -235,9 +236,12 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioViewModel.RegisterView(const AView: TComponent);
+function TioViewModel.BindView(const AView: TComponent): Byte;
 begin
-  FViews.RegisterView(AView);
+  // Register view into the ViewsContainer of the VM
+  Result := FViews.RegisterView(AView);
+  // Bind the view to che commands of the VM
+  FCommands.BindView(AView);
 end;
 
 procedure TioViewModel.SetAutoLoadData(const Value: Boolean);
@@ -280,6 +284,11 @@ begin
   FioWhere := Value;
   if Assigned(FViewData) then
     FViewData.ActiveBindSourceAdapter.ioWhere := Value;
+end;
+
+procedure TioViewModel.UnbindView(const AViewID:Byte);
+begin
+  FViews.UnregisterView(AViewID);
 end;
 
 function TioViewModel.ViewData: IioViewData;

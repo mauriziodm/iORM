@@ -11,12 +11,13 @@ type
   TioVMViews = class(TInterfacedObject, IioVMViews)
   private
     FInternalContainer: TioVMViewsInternalContainer;
+    FLastViewID: Byte;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure RegisterView(const AView:TComponent);
-    procedure UnregisterView(const AView:TComponent);
-    procedure ReleaseViewContext(const AView:TComponent);
+    function RegisterView(const AView:TComponent): Byte;
+    procedure UnregisterView(const AViewID:Byte);
+    procedure ReleaseViewContext(const AViewID:Byte);
     procedure ReleaseAllViewContexts;
     function _InternalContainer: TioVMViewsInternalContainer;
   end;
@@ -32,6 +33,7 @@ constructor TioVMViews.Create;
 begin
   inherited;
   FInternalContainer := TioVMViewsInternalContainer.Create;
+  FLastViewID := 0;
 end;
 
 destructor TioVMViews.Destroy;
@@ -45,29 +47,32 @@ begin
   Result := FInternalContainer;
 end;
 
-procedure TioVMViews.RegisterView(const AView: TComponent);
+function TioVMViews.RegisterView(const AView: TComponent): Byte;
 begin
-  if FInternalContainer.Contains(Aview) then
-    Exit;
-  FInternalContainer.Add(AView);
+  Inc(FLastViewID);
+  FInternalContainer.Add(FLastViewID, AView);
+  Result := FLastViewID;
 end;
 
 procedure TioVMViews.ReleaseAllViewContexts;
 var
+  LViewID: Byte;
+begin
+  for LViewID in FInternalContainer.Keys do
+    Self.ReleaseViewContext(LViewID);
+end;
+
+procedure TioVMViews.ReleaseViewContext(const AViewID:Byte);
+var
   LView: TComponent;
 begin
-  for LView in FInternalContainer do
-    Self.RegisterView(LView);
+  LView := FInternalContainer.Items[AViewID];
+  TioViewContextContainer.ReleaseViewContext(LView);
 end;
 
-procedure TioVMViews.ReleaseViewContext(const AView: TComponent);
+procedure TioVMViews.UnregisterView(const AViewID:Byte);
 begin
-  TioViewContextContainer.ReleaseViewContext(AView);
-end;
-
-procedure TioVMViews.UnregisterView(const AView: TComponent);
-begin
-  FInternalContainer.Remove(Aview);
+  FInternalContainer.Remove(AViewID);
 end;
 
 end.

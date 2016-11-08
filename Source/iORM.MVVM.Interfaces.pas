@@ -62,7 +62,8 @@ type
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
-    procedure RegisterView(const AView:TComponent);
+    function BindView(const AView:TComponent): Byte;
+    procedure UnbindView(const AViewID:Byte);
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
@@ -99,12 +100,12 @@ type
     property RegisterAsActive:Boolean read GetRegisterAsActive write SetRegisterAsActive;
   end;
 
-  TioVMViewsInternalContainer = TList<TComponent>;
+  TioVMViewsInternalContainer = TDictionary<Integer,TComponent>;
   IioVMViews = interface
     ['{0F35C859-695B-424A-99B3-B54CC54C2863}']
-    procedure RegisterView(const AView:TComponent);
-    procedure UnregisterView(const AView:TComponent);
-    procedure ReleaseViewContext(const AView:TComponent);
+    function RegisterView(const AView:TComponent): Byte;
+    procedure UnregisterView(const AViewID:Byte);
+    procedure ReleaseViewContext(const AViewID:Byte);
     procedure ReleaseAllViewContexts;
     function _InternalContainer: TioVMViewsInternalContainer;
   end;
