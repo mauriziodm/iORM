@@ -12,8 +12,9 @@ type
 
   TioViewContextContainer = class
   private
-    class var FInternalContainer: IioThreadSafe<TioViewContextContainerInternal>;
+    class var FInternalContainer: TioViewContextContainerInternal;
     class procedure Build; static;
+    class procedure CleanUp; static;
   public
     class function NewViewContext(const AView:TComponent; const AViewContextProvider:IioContainedViewContextProvider): TComponent; static;
     class procedure ReleaseViewContext(const AView:TComponent); static;
@@ -29,7 +30,12 @@ uses
 
 class procedure TioViewContextContainer.Build;
 begin
-  FInternalContainer := io.NewThreadSafe(TioViewContextContainerInternal.Create);
+  FInternalContainer := TioViewContextContainerInternal.Create;
+end;
+
+class procedure TioViewContextContainer.CleanUp;
+begin
+  FInternalContainer.Free;
 end;
 
 class function TioViewContextContainer.NewViewContext(const AView: TComponent;
@@ -61,5 +67,9 @@ end;
 initialization
 
   TioViewContextContainer.Build;
+
+finalization
+
+  TioViewContextContainer.CleanUp;
 
 end.

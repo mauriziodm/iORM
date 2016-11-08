@@ -11,8 +11,9 @@ type
 
   TioViewContextProviderContainer = class
   private
-    class var FInternalContainer: IioThreadSafe<TioViewContextProviderContainerInternal>;
+    class var FInternalContainer: TioViewContextProviderContainerInternal;
     class procedure Build; static;
+    class procedure CleanUp; static;
     class function ItemIndexByName(const AProviderName:String): Integer; static;
   public
     class procedure RegisterProvider(const AProvider:IioContainedViewContextProvider); static;
@@ -32,7 +33,7 @@ uses
 
 class procedure TioViewContextProviderContainer.Build;
 begin
-  FInternalContainer := io.NewThreadSafe(TioViewContextProviderContainerInternal.Create);
+  FInternalContainer := TioViewContextProviderContainerInternal.Create;
 end;
 
 class function TioViewContextProviderContainer.GetProvider: IioContainedViewContextProvider;
@@ -41,6 +42,11 @@ begin
     raise EioException.Create('TioViewContextProviderContainer.GetProvider: No providers registered.');
   // Get the active provider (the active provider is the first of the list (ItemIndex = 0)
   Result := FInternalContainer.Items[0];
+end;
+
+class procedure TioViewContextProviderContainer.CleanUp;
+begin
+  FInternalContainer.Free;
 end;
 
 class function TioViewContextProviderContainer.GetProvider(
@@ -119,5 +125,9 @@ end;
 initialization
 
   TioViewContextProviderContainer.Build;
+
+finalization
+
+  TioViewContextProviderContainer.CleanUp;
 
 end.

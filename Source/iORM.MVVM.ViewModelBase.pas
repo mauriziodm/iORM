@@ -43,7 +43,7 @@ type
     { Private declarations }
     FViewData: IioViewData;
     FCommands: IioCommandsContainer;
-    FViews: IioThreadSafe<IioVMViews>;  // Per ora la lascio nascosta, deciderò poi se renderla pubblica (Solo RegisterView è pubblico come metodo del ViewModel).
+    FViews: IioVMViews;  // Per ora la lascio nascosta, deciderò poi se renderla pubblica (Solo RegisterView è pubblico come metodo del ViewModel).
     FioTypeName, FioTypeAlias: String;
     FioMasterViewModelTypeName, FioMasterViewModelTypeAlias: String;
     FioMasterViewModel: IioViewModel;
@@ -422,7 +422,7 @@ begin
   // Init
   FViewData := nil;
   FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
-  FViews := io.NewThreadSafe<IioVMViews>(TioMVVMFactory.VMViews);
+  FViews := TioMVVMFactory.VMViews;
 end;
 
 end.
