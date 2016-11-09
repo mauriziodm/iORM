@@ -107,6 +107,7 @@ type
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
+    function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): IioContainedViewContextProvider;
     procedure UnbindView(const AViewID:Byte);
     procedure FreeViews;
 // ---------------- Start: section added for IInterface support ---------------
@@ -139,7 +140,7 @@ implementation
 
 uses System.SysUtils, iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.MVVM.Factory, Data.Bind.ObjectScope,
-  iORM.LiveBindings.Factory, iORM;
+  iORM.LiveBindings.Factory, iORM, iORM.MVVM.ViewContextProviderContainer;
 
 {$R *.dfm}
 
@@ -381,6 +382,22 @@ begin
   // If there is a TypeName
   else if not FioTypeName.IsEmpty then
     FViewData := TioMVVMFactory.ViewData(FioTypeName, FioTypeAlias, FIoWhere, FioViewDataType, FioAutoLoadData);
+end;
+
+function TioViewModel.LocalVCProvider(const AName: String;
+  const AGlobalIfNotFound: Boolean): IioContainedViewContextProvider;
+begin
+  // Find local view context providers
+  Result := FViews.FindVCProvider(AName);
+  // If not found then find from globals
+  if AGlobalIfNotFound and not Assigned(Result) then
+    if AName.IsEmpty then
+      Result := TioViewContextProviderContainer.GetProvider
+    else
+      Result := TioViewContextProviderContainer.GetProvider(AName);
+  // If not found then raise an exception
+  if not Assigned(Result) then
+    raise EioException.Create('TioViewModel.LocalVCProvider: No provider found.');
 end;
 
 constructor TioViewModel.Create(const AMasterBindSourceAdapter: IioActiveBindSourceAdapter; const AMasterPropertyName: String);

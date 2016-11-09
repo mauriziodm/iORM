@@ -19,13 +19,14 @@ type
     procedure UnregisterView(const AViewID:Byte);
     procedure ReleaseViewContext(const AViewID:Byte);
     procedure ReleaseAllViewContexts;
+    function FindVCProvider(const AName:String=''): IioContainedViewContextProvider;
     function _InternalContainer: TioVMViewsInternalContainer;
   end;
 
 implementation
 
 uses
-  iORM, iORM.MVVM.ViewContextContainer;
+  iORM, iORM.MVVM.ViewContextContainer, System.SysUtils;
 
 { TioVMViews }
 
@@ -40,6 +41,23 @@ destructor TioVMViews.Destroy;
 begin
   FInternalContainer.Free;
   inherited;
+end;
+
+function TioVMViews.FindVCProvider(
+  const AName: String): IioContainedViewContextProvider;
+var
+  LView, LComponent: TComponent;
+begin
+  // Init
+  Result := nil;
+  // Loop for all views
+  for LView in FInternalContainer.Values do
+    // Loop for all owned component of the view
+    for LComponent in LView do
+      if  Supports(LComponent, IioContainedViewContextProvider)
+      and (   AName.IsEmpty or (LComponent.Name = AName)   )
+      then
+        Exit(LComponent as IioContainedViewContextProvider);
 end;
 
 function TioVMViews._InternalContainer: TioVMViewsInternalContainer;

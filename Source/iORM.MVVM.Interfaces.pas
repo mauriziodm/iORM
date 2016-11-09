@@ -107,6 +107,7 @@ type
     procedure UnregisterView(const AViewID:Byte);
     procedure ReleaseViewContext(const AViewID:Byte);
     procedure ReleaseAllViewContexts;
+    function FindVCProvider(const AName:String=''): IioContainedViewContextProvider;
     function _InternalContainer: TioVMViewsInternalContainer;
   end;
 
