@@ -38,10 +38,10 @@ end;
 
 class function TioViewContextProviderContainer.GetProvider: IioContainedViewContextProvider;
 begin
-  if FInternalContainer.Count = 0 then
-    raise EioException.Create('TioViewContextProviderContainer.GetProvider: No providers registered.');
+  Result := nil;
   // Get the active provider (the active provider is the first of the list (ItemIndex = 0)
-  Result := FInternalContainer.Items[0];
+  if FInternalContainer.Count > 0 then
+    Result := FInternalContainer.Items[0];
 end;
 
 class procedure TioViewContextProviderContainer.CleanUp;
@@ -54,12 +54,12 @@ class function TioViewContextProviderContainer.GetProvider(
 var
   LIndex: Integer;
 begin
+  Result := nil;
   // Get the Index
   LIndex := ItemIndexByName(AName);
-  if LIndex = -1 then
-    raise EioException.Create(Format('TioViewContextProviderContainer.SetActiveProvider: Provider not registered (%s).', [AName]));
   // Set the result value
-  Result := FInternalContainer.Items[LIndex];
+  if LIndex > -1 then
+    Result := FInternalContainer.Items[LIndex];
 end;
 
 class function TioViewContextProviderContainer.ItemIndexByName(

@@ -140,7 +140,7 @@ implementation
 
 uses System.SysUtils, iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.MVVM.Factory, Data.Bind.ObjectScope,
-  iORM.LiveBindings.Factory, iORM, iORM.MVVM.ViewContextProviderContainer;
+  iORM.LiveBindings.Factory, iORM;
 
 {$R *.dfm}
 
@@ -387,17 +387,9 @@ end;
 function TioViewModel.LocalVCProvider(const AName: String;
   const AGlobalIfNotFound: Boolean): IioContainedViewContextProvider;
 begin
+  Result := nil;
   // Find local view context providers
   Result := FViews.FindVCProvider(AName);
-  // If not found then find from globals
-  if AGlobalIfNotFound and not Assigned(Result) then
-    if AName.IsEmpty then
-      Result := TioViewContextProviderContainer.GetProvider
-    else
-      Result := TioViewContextProviderContainer.GetProvider(AName);
-  // If not found then raise an exception
-  if not Assigned(Result) then
-    raise EioException.Create('TioViewModel.LocalVCProvider: No provider found.');
 end;
 
 constructor TioViewModel.Create(const AMasterBindSourceAdapter: IioActiveBindSourceAdapter; const AMasterPropertyName: String);
