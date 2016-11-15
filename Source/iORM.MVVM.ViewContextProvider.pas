@@ -44,14 +44,14 @@ type
   TioViewContextProvider = class(TComponent)
   private
     FScope: TioViewContextProviderScope;
-    FRegisterAsActive: Boolean;
+    FRegisterAsDefault: Boolean;
     FOnRequest: TioRequestViewContextEvent;
     FOnAfterRequest: TioViewContextEvent;
     FOnRelease: TioViewContextEvent;
     FAutoParent: Boolean;
     FAutoOwner: Boolean;
-    function GetRegisterAsActive: Boolean;
-    procedure SetRegisterAsActive(const Value: Boolean);
+    function GetRegisterAsDefault: Boolean;
+    procedure SetRegisterAsDefault(const Value: Boolean);
     procedure DoOnRequest(const AView:TComponent; out ResultViewContext:TComponent);
     procedure DoOnAfterRequest(const AView, AViewContext:TComponent);
     procedure DoOnRelease(const AView, AViewContext:TComponent);
@@ -72,7 +72,7 @@ type
     property ioOnRelease:TioViewContextEvent read FOnRelease write FOnRelease;
     // Properties
     property Scope:TioViewContextProviderScope read FScope write FScope;
-    property RegisterAsActive:Boolean read GetRegisterAsActive write SetRegisterAsActive;
+    property RegisterAsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
     property AutoParent:Boolean read FAutoParent write FAutoParent;
     property AutoOwner:Boolean read FAutoOwner write FAutoOwner;
   end;
@@ -99,7 +99,7 @@ begin
   if (csDesigning in ComponentState) then
   begin
     FScope := TioViewContextProviderScope.psGlobal;
-    FRegisterAsActive := True;
+    FRegisterAsDefault := True;
     FAutoParent := True;
     FAutoOwner := True;
   end;
@@ -146,9 +146,9 @@ begin
   Result := TioRttiUtilities.SameObject(Self, TioViewContextProviderContainer.GetProvider);
 end;
 
-function TioViewContextProvider.GetRegisterAsActive: Boolean;
+function TioViewContextProvider.GetRegisterAsDefault: Boolean;
 begin
-  Result := FRegisterAsActive;
+  Result := FRegisterAsDefault;
 end;
 
 function TioViewContextProvider.NewViewContext(const AView: TComponent): TComponent;
@@ -193,9 +193,9 @@ begin
   TioViewContextProviderContainer.SetActiveProvider(Self);
 end;
 
-procedure TioViewContextProvider.SetRegisterAsActive(const Value: Boolean);
+procedure TioViewContextProvider.SetRegisterAsDefault(const Value: Boolean);
 begin
-  FRegisterAsActive := Value;
+  FRegisterAsDefault := Value;
 end;
 
 end.

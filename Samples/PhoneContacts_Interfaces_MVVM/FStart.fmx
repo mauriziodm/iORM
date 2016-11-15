@@ -51,7 +51,7 @@ object StartForm: TStartForm
     ioOnAfterRequest = TabsVCProviderioOnAfterRequest
     ioOnRelease = TabsVCProviderioOnRelease
     Scope = psGlobal
-    RegisterAsActive = True
+    RegisterAsDefault = True
     AutoParent = True
     AutoOwner = True
     Left = 112
@@ -61,7 +61,7 @@ object StartForm: TStartForm
     ioOnRequest = FormsVCProviderioOnRequest
     ioOnRelease = FormsVCProviderioOnRelease
     Scope = psGlobal
-    RegisterAsActive = False
+    RegisterAsDefault = False
     AutoParent = True
     AutoOwner = True
     Left = 112

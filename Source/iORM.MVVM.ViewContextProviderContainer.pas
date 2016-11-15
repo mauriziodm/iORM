@@ -84,7 +84,7 @@ begin
   if ItemIndexByName(LProviderName) <> -1 then
     raise EioException.Create(Format('TioViewContextProviderContainer.RegisterProvider: A provider with the same name is already registered (%s).', [LProviderName]));
   // Register the provider
-  if AProvider.RegisterAsActive then
+  if AProvider.RegisterAsDefault then
     FInternalContainer.Insert(0, AProvider)
   else
     FInternalContainer.Add(AProvider);
