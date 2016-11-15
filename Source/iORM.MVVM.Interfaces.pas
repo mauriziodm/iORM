@@ -34,7 +34,7 @@ interface
 uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.Actions, System.UITypes, iORM.CommonTypes,
-  iORM.Attributes, System.Generics.Collections;
+  iORM.Attributes, System.Generics.Collections, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -90,16 +90,6 @@ type
     property ioViewDataType:TioViewDataType read GetViewDataType write SetViewDataType;
   end;
 
-  IioContainedViewContextProvider = interface
-    ['{DBD12364-D019-4F3B-83A9-FA011CD647AB}']
-    function NewViewContext(const AView:TComponent): TComponent;
-    procedure ReleaseViewContext(const AView:TComponent);
-    // RegisterAsActive
-    function GetRegisterAsActive: Boolean;
-    procedure SetRegisterAsActive(const Value: Boolean);
-    property RegisterAsActive:Boolean read GetRegisterAsActive write SetRegisterAsActive;
-  end;
-
   TioVMViewsInternalContainer = TDictionary<Integer,TComponent>;
   IioVMViews = interface
     ['{0F35C859-695B-424A-99B3-B54CC54C2863}']
@@ -107,7 +97,7 @@ type
     procedure UnregisterView(const AViewID:Byte);
     procedure ReleaseViewContext(const AViewID:Byte);
     procedure ReleaseAllViewContexts;
-    function FindVCProvider(const AName:String=''): IioContainedViewContextProvider;
+    function FindVCProvider(const AName:String=''): TioViewContextProvider;
     function _InternalContainer: TioVMViewsInternalContainer;
   end;
 

@@ -3,12 +3,13 @@ unit iORM.MVVM.ViewContextContainer;
 interface
 
 uses
-  iORM.CommonTypes, System.Generics.Collections, system.Classes, iORM.MVVM.Interfaces,
-  iORM;
+  iORM.CommonTypes, System.Generics.Collections, system.Classes,
+  iORM, iORM.MVVM.ViewContextProvider;
 
 type
 
-  TioViewContextContainerInternal = TDictionary<TComponent,IioContainedViewContextProvider>;
+  // Key = ViewContext; Value = ViewContextProvider
+  TioViewContextContainerInternal = TDictionary<TComponent,TioViewContextProvider>;
 
   TioViewContextContainer = class
   private
@@ -16,15 +17,14 @@ type
     class procedure Build; static;
     class procedure CleanUp; static;
   public
-    class function NewViewContext(const AView:TComponent; const AViewContextProvider:IioContainedViewContextProvider): TComponent; static;
+    class function NewViewContext(const AView:TComponent; const AViewContextProvider:TioViewContextProvider): TComponent; static;
     class procedure ReleaseViewContext(const AView:TComponent); static;
   end;
 
 implementation
 
 uses
-  iORM.MVVM.ViewContextProvider, iORM.Exceptions,
-  iORM.MVVM.ViewContextProviderContainer;
+  iORM.Exceptions, iORM.MVVM.ViewContextProviderContainer;
 
 { TioViewContextContainer }
 
@@ -39,7 +39,7 @@ begin
 end;
 
 class function TioViewContextContainer.NewViewContext(const AView: TComponent;
-  const AViewContextProvider: IioContainedViewContextProvider): TComponent;
+  const AViewContextProvider: TioViewContextProvider): TComponent;
 begin
   Result := nil;
   if not Assigned(AViewContextProvider) then
@@ -52,7 +52,7 @@ end;
 class procedure TioViewContextContainer.ReleaseViewContext(const AView: TComponent);
 var
   LViewContext: TComponent;
-  LViewContextProvider: IioContainedViewContextProvider;
+  LViewContextProvider: TioViewContextProvider;
 begin
   // Get the ViewContext
   LViewContext := TioViewContextProvider.ExtractViewContext(AView, False);

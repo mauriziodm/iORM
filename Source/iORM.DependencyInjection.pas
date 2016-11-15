@@ -36,7 +36,8 @@ uses
   System.SyncObjs, iORM.DependencyInjection.Interfaces, System.Rtti,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
   iORM.Resolver.Interfaces, iORM.Context.Container,
-  iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers;
+  iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,
+  iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -128,7 +129,7 @@ type
     FViewModel: IioViewModel;
     FViewModelMarker: String;
     FSingletonKey: String;
-    FVCProvider: IioContainedViewContextProvider;
+    FVCProvider: TioViewContextProvider;
     FVCProviderEnabled: Boolean;
     function ViewModelExist: Boolean;
     procedure CheckConstructorInfo(const AContainerItem: TioDIContainerImplementersItem);
@@ -147,7 +148,7 @@ type
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator; virtual;
     function SingletonKey(const ASingletonKey:String): IioDependencyInjectionLocator; virtual;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider:IioContainedViewContextProvider): IioDependencyInjectionLocator; overload;
+    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     // ---------- LOCATE VIEW MODEL ----------
@@ -270,7 +271,8 @@ uses
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes,
   iORM.Where.Interfaces, iORM.Where.Factory,
-  iORM.MVVM.ViewContextProviderContainer, System.Classes;
+  iORM.MVVM.ViewContextProviderContainer, System.Classes,
+  iORM.MVVM.ViewContextContainer;
 
 { TioDependencyInjectionBase }
 
@@ -940,6 +942,8 @@ begin
     TioViewModelShuttleContainer.Add(FViewModel, FViewModelMarker);
   end;
   try
+    if FVCProviderEnabled then
+      FConstructorParams := [TValue.Empty];
     // If it is a singleton then get the Instance (if exists)...
     if  AContainerItem.IsSingleton
     and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result)
@@ -968,7 +972,7 @@ begin
       if not Assigned(FVCProvider) then
         FVCProvider := TioViewContextProviderContainer.GetProvider;
       if Assigned(FVCProvider) and (Result is TComponent) then
-        FVCProvider.NewViewContext(TComponent(Result));
+        TioViewContextContainer.NewViewContext(TComponent(Result), FVCProvider);
     end;
   finally
     // if the ViewModel is present then UnLock it (MVVM)
@@ -1004,7 +1008,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator.VCProvider(
-  const AVCProvider: IioContainedViewContextProvider): IioDependencyInjectionLocator;
+  const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator;
 begin
   Result := Self;
   FVCProvider := AVCProvider;

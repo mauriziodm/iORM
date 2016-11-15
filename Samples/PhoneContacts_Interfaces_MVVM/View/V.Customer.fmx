@@ -1,0 +1,116 @@
+inherited ViewCustomer: TViewCustomer
+  ClipParent = True
+  inherited ToolBar2: TToolBar
+    inherited lblTitle2: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Current person (customer)'
+    end
+  end
+  inherited Panel1: TPanel
+    Size.Height = 153.000000000000000000
+    inherited EditID: TEdit
+      TabOrder = 5
+    end
+    inherited EditFirstName: TEdit
+      TabOrder = 4
+    end
+    inherited EditLastName: TEdit
+      TabOrder = 3
+    end
+    object Label7: TLabel
+      Position.X = 8.000000000000000000
+      Position.Y = 120.000000000000000000
+      TextSettings.HorzAlign = Trailing
+      Text = 'Fidelity card code'
+    end
+    object EditFidelityCardCode: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      Position.X = 144.000000000000000000
+      Position.Y = 118.000000000000000000
+      Size.Width = 289.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
+  inherited PanelPhones: TPanel
+    Size.Height = 227.000000000000000000
+    inherited DetailListView: TListView
+      Size.Height = 127.000000000000000000
+    end
+    inherited Label5: TLabel
+      Position.Y = 160.000000000000000000
+    end
+    inherited Label6: TLabel
+      Position.Y = 192.000000000000000000
+    end
+    inherited EditPhoneNumber: TEdit
+      Position.Y = 158.000000000000000000
+    end
+    inherited EditNumberType: TEdit
+      Position.Y = 190.000000000000000000
+    end
+    inherited BindNavigator1: TBindNavigator
+      Position.Y = 146.000000000000000000
+    end
+  end
+  inherited BSPerson: TioPrototypeBindSource
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'FirstName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'LastName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'ClassNameProp'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'FidelityCardCode'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+  end
+  inherited BindingsList1: TBindingsList
+    object LinkControlToField7: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSPerson
+      FieldName = 'FidelityCardCode'
+      Control = EditFidelityCardCode
+      Track = False
+    end
+  end
+end

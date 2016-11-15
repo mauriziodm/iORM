@@ -34,7 +34,7 @@ interface
 uses
   System.Classes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces;
+  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -107,7 +107,7 @@ type
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
-    function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): IioContainedViewContextProvider;
+    function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): TioViewContextProvider;
     procedure UnbindView(const AViewID:Byte);
     procedure FreeViews;
 // ---------------- Start: section added for IInterface support ---------------
@@ -385,7 +385,7 @@ begin
 end;
 
 function TioViewModel.LocalVCProvider(const AName: String;
-  const AGlobalIfNotFound: Boolean): IioContainedViewContextProvider;
+  const AGlobalIfNotFound: Boolean): TioViewContextProvider;
 begin
   Result := nil;
   // Find local view context providers

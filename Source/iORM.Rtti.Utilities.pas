@@ -51,6 +51,7 @@ type
     class function ResolveChildPropertyPath(const ARootObj:TObject; const AChildPropertyPath:TStrings): TObject; static;
     class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
     class function TypeInfoToTypeName(const ATypeInfo:PTypeInfo; const AQualified:Boolean=False): String; static;
+    class function SameObject(const AObj1, AObj2: TObject): boolean;
   end;
 
 implementation
@@ -146,6 +147,12 @@ begin
     if not Assigned(Result) then Exit;
     Result := GetChildObject(Result, ACurrPropName);
   end;
+end;
+
+class function TioRttiUtilities.SameObject(const AObj1,
+  AObj2: TObject): boolean;
+begin
+  Result := (@AObj1 = @AObj2);
 end;
 
 class function TioRttiUtilities.TValueToObject(const AValue: TValue; const ASilentException:Boolean): TObject;

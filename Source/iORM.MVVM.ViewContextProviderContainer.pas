@@ -3,11 +3,11 @@ unit iORM.MVVM.ViewContextProviderContainer;
 interface
 
 uses
-  iORM.MVVM.Interfaces, iORM.CommonTypes, System.Generics.Collections;
+  iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.ViewContextProvider;
 
 type
 
-  TioViewContextProviderContainerInternal = TList<IioContainedViewContextProvider>;
+  TioViewContextProviderContainerInternal = TList<TioViewContextProvider>;
 
   TioViewContextProviderContainer = class
   private
@@ -16,12 +16,12 @@ type
     class procedure CleanUp; static;
     class function ItemIndexByName(const AProviderName:String): Integer; static;
   public
-    class procedure RegisterProvider(const AProvider:IioContainedViewContextProvider); static;
-    class procedure UnregisterProvider(const AProvider:IioContainedViewContextProvider); static;
+    class procedure RegisterProvider(const AProvider:TioViewContextProvider); static;
+    class procedure UnregisterProvider(const AProvider:TioViewContextProvider); static;
     class procedure SetActiveProvider(const AName:String); overload; static;
-    class procedure SetActiveProvider(const AProvider:IioContainedViewContextProvider); overload; static;
-    class function GetProvider: IioContainedViewContextProvider; overload; static;
-    class function GetProvider(const AName:String): IioContainedViewContextProvider; overload; static;
+    class procedure SetActiveProvider(const AProvider:TioViewContextProvider); overload; static;
+    class function GetProvider: TioViewContextProvider; overload; static;
+    class function GetProvider(const AName:String): TioViewContextProvider; overload; static;
   end;
 
 implementation
@@ -36,7 +36,7 @@ begin
   FInternalContainer := TioViewContextProviderContainerInternal.Create;
 end;
 
-class function TioViewContextProviderContainer.GetProvider: IioContainedViewContextProvider;
+class function TioViewContextProviderContainer.GetProvider: TioViewContextProvider;
 begin
   Result := nil;
   // Get the active provider (the active provider is the first of the list (ItemIndex = 0)
@@ -50,7 +50,7 @@ begin
 end;
 
 class function TioViewContextProviderContainer.GetProvider(
-  const AName: String): IioContainedViewContextProvider;
+  const AName: String): TioViewContextProvider;
 var
   LIndex: Integer;
 begin
@@ -74,7 +74,7 @@ begin
 end;
 
 class procedure TioViewContextProviderContainer.RegisterProvider(
-  const AProvider: IioContainedViewContextProvider);
+  const AProvider: TioViewContextProvider);
 var
   LProviderName: String;
 begin
@@ -91,7 +91,7 @@ begin
 end;
 
 class procedure TioViewContextProviderContainer.SetActiveProvider(
-  const AProvider: IioContainedViewContextProvider);
+  const AProvider: TioViewContextProvider);
 var
   LOldIndex: Integer;
 begin
@@ -117,7 +117,7 @@ begin
 end;
 
 class procedure TioViewContextProviderContainer.UnregisterProvider(
-  const AProvider: IioContainedViewContextProvider);
+  const AProvider: TioViewContextProvider);
 begin
   FInternalContainer.Remove(AProvider);
 end;

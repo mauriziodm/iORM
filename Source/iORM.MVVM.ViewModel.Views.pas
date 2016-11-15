@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.CommonTypes,
-  iORM.MVVM.Interfaces;
+  iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -19,7 +19,7 @@ type
     procedure UnregisterView(const AViewID:Byte);
     procedure ReleaseViewContext(const AViewID:Byte);
     procedure ReleaseAllViewContexts;
-    function FindVCProvider(const AName:String=''): IioContainedViewContextProvider;
+    function FindVCProvider(const AName:String=''): TioViewContextProvider;
     function _InternalContainer: TioVMViewsInternalContainer;
   end;
 
@@ -44,7 +44,7 @@ begin
 end;
 
 function TioVMViews.FindVCProvider(
-  const AName: String): IioContainedViewContextProvider;
+  const AName: String): TioViewContextProvider;
 var
   LView, LComponent: TComponent;
 begin
@@ -54,10 +54,10 @@ begin
   for LView in FInternalContainer.Values do
     // Loop for all owned component of the view
     for LComponent in LView do
-      if  Supports(LComponent, IioContainedViewContextProvider)
+      if (LComponent is TioViewContextProvider)
       and (   AName.IsEmpty or (LComponent.Name = AName)   )
       then
-        Exit(LComponent as IioContainedViewContextProvider);
+        Exit(TioViewContextProvider(LComponent));
 end;
 
 function TioVMViews._InternalContainer: TioVMViewsInternalContainer;
