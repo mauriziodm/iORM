@@ -11,9 +11,10 @@ uses
   System.Bindings.Outputs, Fmx.Bind.Editors, System.Actions, FMX.ActnList,
   Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.Layouts, Fmx.Bind.Navigator,
-  FMX.ListView, FMX.Edit, FMX.Controls.Presentation;
+  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, iORM.Attributes, V.Interfaces;
 
 type
+  [diImplements(IPersonView, 'TVipCustomer')]
   TViewVipCustomer = class(TViewCustomer)
     Label8: TLabel;
     EditVipCardCode: TEdit;

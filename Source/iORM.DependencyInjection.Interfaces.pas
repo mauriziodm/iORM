@@ -34,7 +34,7 @@ interface
 uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -47,6 +47,10 @@ type
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
+    // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
+    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
+    function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
+    // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     // ---------- LOCATE VIEW MODEL ----------
     function VM(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator; overload;
     // CreateByTypeName
@@ -70,7 +74,7 @@ type
     // ---------- LOCATE VIEW MODEL ----------
   end;
 
-  IioDependencyInjectionLocator<TI: IInterface> = interface(IioDependencyInjectionLocator)
+  IioDependencyInjectionLocator<TI> = interface(IioDependencyInjectionLocator)
     ['{EA9F3CAD-B9A2-4607-8D80-881EF4C36EDE}']
     function Get: TI; overload;
     function Alias(const AAlias:String): IioDependencyInjectionLocator<TI>;

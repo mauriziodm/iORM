@@ -52,6 +52,7 @@ type
     class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
     class function TypeInfoToTypeName(const ATypeInfo:PTypeInfo; const AQualified:Boolean=False): String; static;
     class function SameObject(const AObj1, AObj2: TObject): boolean;
+    class function GetImplementedInterfaceName(const AClassType:TRttiInstanceType; const IID:TGUID): String; static;
   end;
 
 implementation
@@ -92,6 +93,17 @@ end;
 class function TioRttiUtilities.GenericToString<T>(const AQualified:Boolean=False): String;
 begin
   Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
+end;
+
+class function TioRttiUtilities.GetImplementedInterfaceName(
+  const AClassType: TRttiInstanceType; const IID: TGUID): String;
+var
+  LRttiInterfaceType: TRttiInterfaceType;
+begin
+  for LRttiInterfaceType in AClassType.GetImplementedInterfaces do
+    if LRttiInterfaceType.GUID = IID then
+      Exit(LRttiInterfaceType.Name);
+  raise EioException.Create('TioRttiUtilities.GetImplementedInterfaceName: Interface non implemented by the class.');
 end;
 
 class function TioRttiUtilities.IsAnInterfaceTypeName(const ATypeName: String): Boolean;

@@ -14,6 +14,7 @@ uses
   Fmx.Bind.Navigator, V.Interfaces;
 
 type
+  [diImplements(IPersonView, 'TPerson'), diImplements(IPersonView, 'TAnotherPerson')]
   TViewPerson = class(TFrame, IPersonView)
     BSPerson: TioPrototypeBindSource;
     BindingsList1: TBindingsList;
@@ -26,8 +27,6 @@ type
     [ioBindAction('acPost')]
     ButtonPost: TSpeedButton;
 
-    ActionList1: TActionList;
-    acFree: TAction;
     Panel1: TPanel;
     EditID: TEdit;
     Label1: TLabel;
@@ -53,7 +52,6 @@ type
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
     BindNavigator1: TBindNavigator;
-    procedure acFreeExecute(Sender: TObject);
 
   private
     { Private declarations }
@@ -64,10 +62,5 @@ type
 implementation
 
 {$R *.fmx}
-
-procedure TViewPerson.acFreeExecute(Sender: TObject);
-begin
-  Self.Free;
-end;
 
 end.

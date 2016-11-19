@@ -11,9 +11,11 @@ uses
   System.Bindings.Outputs, Fmx.Bind.Editors, System.Actions, FMX.ActnList,
   Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.Layouts, Fmx.Bind.Navigator,
-  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, V.Person;
+  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, V.Person, iORM.Attributes,
+  V.Interfaces;
 
 type
+  [diImplements(IPersonView, 'TEmployee')]
   TViewEmployee = class(TViewPerson)
     EditBranchOffice: TEdit;
     Label7: TLabel;

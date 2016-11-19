@@ -303,6 +303,26 @@ type
   // KeyGeneratorName attribute
   ioDisableAutoCreateDB = class(TioCustomAttribute)
   end;
+
+  // DIC - diRegister attribute (register the class as is, without interfaces)
+  diRegister = class(TioCustomAttribute)
+  end;
+
+  // DIC - diImplements attribute
+  diImplements = class(TioCustomAttribute)
+  strict private
+    FIID: TGUID;
+    FAlias: String;
+  public
+    constructor Create(AIID:TGUID; const AAlias:String='');
+    property IID:TGUID read FIID;
+    property Alias:String read FAlias;
+  end;
+
+  // DIC - diAsSingleton attribute
+  diAsSingleton = class(TioCustomAttribute)
+  end;
+
   // ---------------------------------------------------------------------------
   // SEND CLASS ATTRIBUTES
   // ===========================================================================
@@ -365,7 +385,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.Rtti.Utilities;
 
 { TioStringAttribute }
 
@@ -519,6 +539,15 @@ constructor ioOID.Create(const ASkipOnInsert: Boolean);
 begin
   inherited Create;
   FSkipOnInsert := ASkipOnInsert;
+end;
+
+{ diImplements }
+
+constructor diImplements.Create(AIID:TGUID; const AAlias:String);
+begin
+  inherited Create;
+  FIID := AIID;
+  FAlias := AAlias;
 end;
 
 end.

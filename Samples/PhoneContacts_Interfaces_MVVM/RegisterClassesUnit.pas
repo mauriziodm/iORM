@@ -44,14 +44,6 @@ begin
   // ViewModels
   io.di.RegisterClass<TViewModelMain>.Implements<IPersonsViewModel>.Execute;
   io.di.RegisterClass<TPersonViewModel>.Implements<IPersonViewModel>.DefaultConstructorParams([TValue.Empty]).Execute;
-
-  // Views
-  io.di.RegisterClass<TViewMain>.Implements<IMainView>.Execute;
-  io.di.RegisterClass<TViewPerson>.Implements<IPersonView>('TPerson').Execute;
-  io.di.RegisterClass<TViewPerson>.Implements<IPersonView>('TAnotherPerson').Execute;
-  io.di.RegisterClass<TViewEmployee>.Implements<IPersonView>('TEmployee').Execute;
-  io.di.RegisterClass<TViewCustomer>.Implements<IPersonView>('TCustomer').Execute;
-  io.di.RegisterClass<TViewVipCustomer>.Implements<IPersonView>('TVipCustomer').Execute;
 end;
 
 

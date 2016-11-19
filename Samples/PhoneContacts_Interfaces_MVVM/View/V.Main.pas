@@ -13,6 +13,8 @@ uses
   FMX.Controls.Presentation, iORM.Attributes;
 
 type
+
+  [diImplements(IMainView)]
   TViewMain = class(TFrame, IMainView)
 
     [ioBindAction('acEditPerson')]
@@ -63,7 +65,6 @@ type
     { Private declarations }
   public
     { Public declarations }
-    destructor Destroy; override;
   end;
 
 implementation
@@ -76,11 +77,6 @@ uses
 procedure TViewMain.acRefreshMemoExecute(Sender: TObject);
 begin
   Memo1.Lines.Text := BSMaster.ioViewModelAs<IPersonsViewModel>.JSON;
-end;
-
-destructor TViewMain.Destroy;
-begin
-  inherited;
 end;
 
 end.

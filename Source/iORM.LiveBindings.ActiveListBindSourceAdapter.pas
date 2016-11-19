@@ -40,18 +40,15 @@ uses
 
 type
 
-//  TioActiveListBindSourceAdapter = class(TInterfaceListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   TioActiveListBindSourceAdapter = class(TListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   private
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
-//    FTypeName, FTypeAlias: String;
     FClassRef: TioClassRef;
     FLocalOwnsObject: Boolean;
     FAutoPersist: Boolean;
     FAutoLoadData: Boolean;
     FReloadDataOnRefresh: Boolean;
-//    FMasterPropertyName: String;
     FMasterProperty: IioContextProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;

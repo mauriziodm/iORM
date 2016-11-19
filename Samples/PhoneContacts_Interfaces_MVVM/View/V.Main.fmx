@@ -262,7 +262,7 @@ object ViewMain: TViewMain
     ioVM_Interface = 'IPersonsViewModel'
     ioVM_UseBSPropsOnCreate = True
     Left = 400
-    Top = 208
+    Top = 200
   end
   object BSDetail: TioPrototypeBindSource
     AutoActivate = True

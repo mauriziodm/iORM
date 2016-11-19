@@ -57,13 +57,17 @@ type
   //  for efficient ClassRef reference and is initializated at the start
   //  of the application itself
   TioMapContainer = class
+  private
+    class var FInternalContainer: TioMapContainerInstance;
   protected
-    class function IsValidEntity(AType:TRttiInstanceType): Boolean;
+    class function IsValidEntity_diAutoRegister(AType:TRttiInstanceType): Boolean;
     class procedure Init;
     class procedure SetPropertiesFieldData;
     class procedure SetPropertiesLoadSqlData;
     class procedure SetRelationIndexes;
   public
+    class procedure Build;
+    class procedure CleanUp;
     class procedure Add(AClassRef: TioClassRef);
     class function GetContainer: TioMapContainerInstance;
     class function Exist(AClassName:String): Boolean;
@@ -75,41 +79,51 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.Exceptions,
-  iORM.RttiContext.Factory, iORM.Attributes;
-
-var
-  ioMapContainerInstance: TioMapContainerInstance;
+  iORM.RttiContext.Factory, iORM.Attributes, iORM;
 
 { TioContextContainer }
 
 class procedure TioMapContainer.Add(AClassRef: TioClassRef);
 begin
   if Self.Exist(AClassRef.ClassName) then Exit;
-  ioMapContainerInstance.Add(AClassRef.ClassName, TioMapSlot.Create(AClassRef));
+  FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.Create(AClassRef));
+end;
+
+class procedure TioMapContainer.Build;
+begin
+  FInternalContainer := TioMapContainerInstance.Create([doOwnsValues]);
+  TioMapContainer.Init;
+  TioMapContainer.SetPropertiesFieldData;
+  TioMapContainer.SetPropertiesLoadSqlData;
+end;
+
+class procedure TioMapContainer.CleanUp;
+begin
+  FInternalContainer.Free;
 end;
 
 class function TioMapContainer.Exist(AClassName: String): Boolean;
 begin
-  Result := ioMapContainerInstance.ContainsKey(AClassName);
+  Result := FInternalContainer.ContainsKey(AClassName);
 end;
 
 class function TioMapContainer.GetClassRef(AClassName: String): TioClassRef;
 begin
   if Self.Exist(AClassName)
-    then Result := ioMapContainerInstance.Items[AClassName].GetClassRef
+    then Result := FInternalContainer.Items[AClassName].GetClassRef
     else raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
 
 class function TioMapContainer.GetContainer: TioMapContainerInstance;
 begin
-  Result := ioMapContainerInstance;
+  Result := FInternalContainer;
 end;
 
 class function TioMapContainer.GetMap(AClassName: String; RaiseAnExceptionIfNotFound:Boolean): IioMap;
 begin
   Result := nil;
   if Self.Exist(AClassName)
-    then Result := ioMapContainerInstance.Items[AClassName].GetMap
+    then Result := FInternalContainer.Items[AClassName].GetMap
     else if RaiseAnExceptionIfNotFound then
       raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
@@ -129,23 +143,63 @@ begin
     if not Typ.IsInstance then Continue;
     Inst := Typ.AsInstance;
     // Only classes with explicit ioTable attribute
-    if not Self.IsValidEntity(Inst) then Continue;
+    if not Self.IsValidEntity_diAutoRegister(Inst) then Continue;
     // Load the current class (entity) into the ContextContainer
     Self.Add(Inst.MetaclassType);
   end;
 end;
 
-class function TioMapContainer.IsValidEntity(AType: TRttiInstanceType): Boolean;
+class function TioMapContainer.IsValidEntity_diAutoRegister(AType: TRttiInstanceType): Boolean;
+type
+  TdiImplementsItem = record
+    IID: TGUID;
+    Alias: String;
+  end;
 var
-  Attr: TCustomAttribute;
+  LAttr: TCustomAttribute;
+  LdiRegister: Boolean;
+  LdiAsSingleton: Boolean;
+  LdiImplements: array of TdiImplementsItem;
+  Index: Integer;
 begin
+  // Init
   Result := False;
-  for Attr in AType.GetAttributes do
-    if Attr is ioTable then
-    begin
+  Index := 0;
+  LdiRegister := False;
+  LdiAsSingleton := False;
+  SetLength(LdiImplements, 0);
+  // Loop for attributes
+  for LAttr in AType.GetAttributes do
+  begin
+    // ioTable or ioEntity attribute
+    if LAttr is ioTable then
       Result := True;
-      Exit;
+    // DIC - diRegister
+    if LAttr is diRegister then
+      LdiRegister := True;
+    // DIC - diIsSingleton
+    if LAttr is diAsSingleton then
+      LdiAsSingleton := True;
+    // DIC - diRegister
+    if LAttr is diImplements then
+    begin
+      Index := Length(LdiImplements);
+      SetLength(LdiImplements, Index+1);
+      LdiImplements[Index].IID := diImplements(LAttr).IID;
+      LdiImplements[Index].Alias := diImplements(LAttr).Alias;
     end;
+  end;
+  // Dependency Injection Container - Register the class as is without any interface
+  if LdiRegister then
+    io.di.RegisterClass(AType).AsSingleton(LdiAsSingleton).Execute;
+  // Dependency Injection Container - Register the class as implenter of the interfaces
+  if Length(LdiImplements) > 0 then
+    for Index := Low(LdiImplements) to High(LdiImplements) do
+      io.di
+        .RegisterClass(AType)
+        .Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias)
+        .AsSingleton(LdiAsSingleton)
+        .Execute;
 end;
 
 class procedure TioMapContainer.SetPropertiesFieldData;
@@ -153,7 +207,7 @@ var
   AMapSlot: TioMapSlot;
 begin
   // Calculate field data for all properties in the container
-  for AMapSlot in ioMapContainerInstance.Values
+  for AMapSlot in FInternalContainer.Values
     do AMapSlot.GetMap.GetProperties.SetFieldData;
 end;
 
@@ -162,7 +216,7 @@ var
   AMapSlot: TioMapSlot;
 begin
   // Calculate field data for all properties in the container
-  for AMapSlot in ioMapContainerInstance.Values
+  for AMapSlot in FInternalContainer.Values
     do AMapSlot.GetMap.GetProperties.SetLoadSqlData;
 end;
 
@@ -193,14 +247,13 @@ end;
 
 
 initialization
+
+  // NB: Spostato sulla initialize della unit iORM
   // Create the ContextXontainer Instance and Init it by loading
   //  all entities declarated in the application
-  ioMapContainerInstance := TioMapContainerInstance.Create([doOwnsValues]);
-  TioMapContainer.Init;
-  TioMapContainer.SetPropertiesFieldData;
-  TioMapContainer.SetPropertiesLoadSqlData;
+//  TioMapContainer.Build;
 
 finalization
-  ioMapContainerInstance.Free;
+  TioMapContainer.CleanUp;
 
 end.

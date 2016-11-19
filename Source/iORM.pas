@@ -95,7 +95,8 @@ uses
   iORM.Exceptions,
   System.SysUtils,
   iORM.DB.Factory,
-  iORM.DB.DBCreator.Factory, iORM.Rtti.Utilities, iORM.Strategy.Factory;
+  iORM.DB.DBCreator.Factory, iORM.Rtti.Utilities, iORM.Strategy.Factory,
+  iORM.Context.Container;
 
 
 { io }
@@ -312,6 +313,11 @@ initialization
                         .Implements<IioDuckTypedStreamObject>
                         .DisableMapImplemetersRef  // Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
                         .Execute;
+
+  // Create the ContextXontainer Instance and Init it by loading
+  //  all entities declarated in the application
+  TioMapContainer.Build;
+
 end.
 
 

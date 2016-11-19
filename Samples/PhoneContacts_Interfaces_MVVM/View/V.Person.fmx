@@ -293,9 +293,9 @@ object ViewPerson: TViewPerson
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioTypeAlias = 'IPerson'
+    ioTypeName = 'IPerson'
     ioAutoLoadData = True
-    ioAutoPersist = True
+    ioAutoPersist = False
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
@@ -363,14 +363,6 @@ object ViewPerson: TViewPerson
       FieldName = 'PhoneNumber'
       Control = EditPhoneNumber
       Track = False
-    end
-  end
-  object ActionList1: TActionList
-    Left = 400
-    Top = 8
-    object acFree: TAction
-      Text = 'acFree'
-      OnExecute = acFreeExecute
     end
   end
   object BSPhones: TioPrototypeBindSource

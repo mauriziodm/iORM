@@ -103,12 +103,13 @@ type
     constructor Create(const AContainerValue:TioDIContainerImplementersItem);
     procedure Execute;
     function Implements<T: IInterface>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function Implements(const IID:TGUID; const AAlias:String=''): TioDependencyInjectionRegister; overload;
     function Alias(const AAlias:String): TioDependencyInjectionRegister;
     function InjectProperty(const APropertyName:String; const AValue:TValue):TioDependencyInjectionRegister; overload;
     function InjectProperty(const APropertyName, ATypeName:String; const ATypeAlias:String=''):TioDependencyInjectionRegister; overload;
     function InjectField(const AFieldName:String; const AValue:TValue):TioDependencyInjectionRegister; overload;
     function InjectField(const AFieldName, ATypeName:String; const ATypeAlias:String=''):TioDependencyInjectionRegister; overload;
-    function AsSingleton:TioDependencyInjectionRegister;
+    function AsSingleton(const AIsSingleton:Boolean=True):TioDependencyInjectionRegister;
     function DefaultConstructorMethod(const AValue:String): TioDependencyInjectionRegister;
     function DefaultConstructorMarker(const AValue:String): TioDependencyInjectionRegister;
     function DefaultConstructorParams(const AParams: array of TValue): TioDependencyInjectionRegister;
@@ -174,7 +175,7 @@ type
     // ---------- LOCATE VIEW MODEL ----------
   end;
   // Generic version of the Service Locator Class
-  TioDependencyInjectionLocator<TI:IInterface> = class(TioDependencyInjectionLocator, IioDependencyInjectionLocator<TI>)
+  TioDependencyInjectionLocator<TI> = class(TioDependencyInjectionLocator, IioDependencyInjectionLocator<TI>)
   public
     function Get: TI; overload;
     function Alias(const AAlias:String): IioDependencyInjectionLocator<TI>;
@@ -218,6 +219,7 @@ type
   TioDependencyInjection = class(TioDependencyInjectionBase)
   public
     class function RegisterClass<T: class>: TioDependencyInjectionRegister; overload;
+    class function RegisterClass(const ARttiType:TRttiInstanceType): TioDependencyInjectionRegister; overload;
     class function Locate(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function Locate<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
     class function LocateView(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
@@ -260,7 +262,7 @@ type
   public
     class function GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName:String; const AAlias:String; const AVCProviderEnabled:Boolean): IioDependencyInjectionLocator; overload;
-    class function GetLocator<TI:IInterface>(const AAlias:String; const AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
+    class function GetLocator<TI>(const AAlias:String; const AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
   end;
 
 implementation
@@ -377,16 +379,22 @@ begin
                 .ConstructorParams([TValue.From(ABindSourceAdapter)]);
 end;
 
-class function TioDependencyInjection.RegisterClass<T>: TioDependencyInjectionRegister;
+class function TioDependencyInjection.RegisterClass(
+  const ARttiType:TRttiInstanceType): TioDependencyInjectionRegister;
 var
   ContainerValue: TioDIContainerImplementersItem;
 begin
   ContainerValue := TioDIContainerImplementersItem.Create;
-  ContainerValue.ClassRef := T;
-  ContainerValue.ClassName := T.ClassName;
-  ContainerValue.RttiType := TioRttiContextFactory.RttiContext.GetType(T).AsInstance;
+  ContainerValue.ClassRef := ARttiType.MetaclassType;
+  ContainerValue.ClassName := ARttiType.MetaclassType.ClassName;
+  ContainerValue.RttiType := ARttiType;
   ContainerValue.IsSingleton := False;
   Result := TioDependencyInjectionFactory.GetRegister(ContainerValue);
+end;
+
+class function TioDependencyInjection.RegisterClass<T>: TioDependencyInjectionRegister;
+begin
+  Result := RegisterClass(   TioRttiUtilities.ClassRefToRttiType(T)   );
 end;
 
 class function TioDependencyInjection.Singletons: TioSingletonsFacadeRef;
@@ -524,9 +532,9 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionRegister.AsSingleton: TioDependencyInjectionRegister;
+function TioDependencyInjectionRegister.AsSingleton(const AIsSingleton:Boolean): TioDependencyInjectionRegister;
 begin
-  Self.FContainerValue.IsSingleton := True;
+  Self.FContainerValue.IsSingleton := AIsSingleton;
   Result := Self;
 end;
 
@@ -535,6 +543,8 @@ begin
   inherited Create;
   Self.FSetMapImplementersRef := True;
   Self.FContainerValue := AContainerValue;
+  Self.FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
+  Self.FAlias := '';
 end;
 
 function TioDependencyInjectionRegister.DefaultConstructorMarker(const AValue: String): TioDependencyInjectionRegister;
@@ -572,6 +582,20 @@ begin
     Self.SetMapImplementersRef;
   Self.Container.Add(Self.FInterfaceName, Self.FAlias, Self.FContainerValue);
   Self.Free;
+end;
+
+function TioDependencyInjectionRegister.Implements(const IID:TGUID;
+  const AAlias: String): TioDependencyInjectionRegister;
+begin
+  // Set the InterfaceName
+  Self.FInterfaceName := TioRttiUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
+  // Set the interface GUID
+  FContainerValue.InterfaceGUID := IID;
+  // Set the Alias
+  if not AAlias.IsEmpty then
+    Self.FAlias := AAlias;
+  // Return itself
+  Result := Self;
 end;
 
 function TioDependencyInjectionRegister.Implements<T>(const AAlias:String): TioDependencyInjectionRegister;

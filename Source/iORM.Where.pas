@@ -770,7 +770,7 @@ end;
 
 procedure TioWhere.SetTypeAlias(const Value: String);
 begin
-  FTypeAlias := FTypeAlias;
+  FTypeAlias := Value;
 end;
 
 procedure TioWhere.SetTypeInfo(const Value: PTypeInfo);
@@ -1626,6 +1626,7 @@ begin
 end;
 
 end.
+
 
 
 
