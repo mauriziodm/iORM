@@ -81,8 +81,8 @@ type
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator<TI>;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>;
-    function ViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
     // ---------- LOCATE VIEW MODEL ----------
+    function VM(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
     // CreateByTypeName
     function VM_byTypeName(const AInterfaceName, AAlias, AModelTypeName, AModelTypeAlias:String; const AWhere:String=''; const AViewDataType:TioViewDataType=TioViewDataType.dtList; const AAutoLoadData:Boolean=True; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
     // CreateByMasterBindSource

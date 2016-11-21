@@ -183,7 +183,7 @@ type
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>; overload;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>; overload;
     function SingletonKey(const ASingletonKey:String): IioDependencyInjectionLocator<TI>; overload;
-    function ViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function VM(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
     // ---------- LOCATE VIEW MODEL ----------
     // CreateByTypeName
     function VM_byTypeName(const AInterfaceName, AAlias, AModelTypeName, AModelTypeAlias:String; const AWhere:String=''; const AViewDataType:TioViewDataType=TioViewDataType.dtList; const AAutoLoadData:Boolean=True; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
@@ -1188,7 +1188,7 @@ begin
   TioDependencyInjectionLocator(Self).VM_byBSA(AInterfaceName, AAlias, ABindSourceAdapter, AMarker);
 end;
 
-function TioDependencyInjectionLocator<TI>.ViewModel(const AViewModel: IioViewModel; const AMarker:String): IioDependencyInjectionLocator<TI>;
+function TioDependencyInjectionLocator<TI>.VM(const AViewModel: IioViewModel; const AMarker:String): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).VM(AViewModel, AMarker);
