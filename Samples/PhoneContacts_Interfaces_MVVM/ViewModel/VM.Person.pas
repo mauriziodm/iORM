@@ -7,6 +7,7 @@ uses
 
 type
 
+  [diImplements(IPersonViewModel)]
   TPersonViewModel = class(TioViewModel, IPersonViewModel)
   public
     // Close: Action declared by "ioAction" attribute

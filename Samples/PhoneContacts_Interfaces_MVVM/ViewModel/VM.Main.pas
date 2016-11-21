@@ -8,6 +8,7 @@ uses
   VM.Interfaces;
 
 type
+  [diImplements(IPersonsViewModel)]
   TViewModelMain = class(TioViewModel, IPersonsViewModel)
     ActionList1: TActionList;
     acLoadData: TAction;

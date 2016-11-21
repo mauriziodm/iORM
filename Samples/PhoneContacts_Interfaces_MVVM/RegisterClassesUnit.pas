@@ -3,12 +3,15 @@ unit RegisterClassesUnit;
 interface
 
 uses
-  iORM.Containers.List, iORM.LazyLoad.Generics.List, M.Interfaces;
+  iORM.Containers.List, iORM.LazyLoad.Generics.List, M.Interfaces, iORM.Attributes;
 
 type
 
   TPersonsList = class(TioInterfacedList<IPerson>);
+
+  [diImplemets()]
   TLazyLoadPhoneNumberList = class(TioList<IPhoneNumber>);
+
   TPhoneNumberList = class(TioInterfacedList<IPhoneNumber>);
 
   TDIClassRegister = class
@@ -38,12 +41,8 @@ begin
   io.di.RegisterClass<TPhoneNumber>.Implements<IPhoneNumber>.Execute;
 
   // Details containers
-  io.di.RegisterClass<TLazyLoadPhoneNumberList>.Implements<IioList<IPhoneNumber>>.Execute;
+  io.di.RegisterClass<TioList<IPhoneNumber>>.Implements<IioList<IPhoneNumber>>.Execute;
   io.di.RegisterClass<TPhoneNumberList>.Implements<IioList<IPhoneNumber>>.Alias('Another').Execute;
-
-  // ViewModels
-  io.di.RegisterClass<TViewModelMain>.Implements<IPersonsViewModel>.Execute;
-  io.di.RegisterClass<TPersonViewModel>.Implements<IPersonViewModel>.DefaultConstructorParams([TValue.Empty]).Execute;
 end;
 
 
