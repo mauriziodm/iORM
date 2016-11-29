@@ -2,7 +2,6 @@ program Pizza_ioPrototypeBS;
 
 uses
   System.StartUpCopy,
-//  FMX.MobilePreview,
   FMX.Forms,
   Main in 'Main.pas' {MainForml},
   Model in 'Model.pas',

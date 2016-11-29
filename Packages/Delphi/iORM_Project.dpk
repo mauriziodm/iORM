@@ -166,6 +166,7 @@ contains
   iORM.MVVM.ViewContextProvider in '..\..\Source\iORM.MVVM.ViewContextProvider.pas',
   iORM.MVVM.ViewContextContainer in '..\..\Source\iORM.MVVM.ViewContextContainer.pas',
   iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
-  iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas';
+  iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas',
+  iORM.DB.Components.ConnectionDef in '..\..\Source\iORM.DB.Components.ConnectionDef.pas';
 
 end.

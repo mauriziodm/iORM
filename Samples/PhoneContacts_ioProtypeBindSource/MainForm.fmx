@@ -396,8 +396,6 @@ object Form1: TForm1
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
-    ioWhereStr.Strings = (
-      '')
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
     ioVM_UseBSPropsOnCreate = True

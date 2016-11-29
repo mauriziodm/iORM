@@ -82,6 +82,7 @@ type
     procedure DoNeedViewModel;
     function CheckForViewModel: Boolean;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
+    procedure AfterConstruction; override;
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
     function GetAutoPersist: Boolean;
@@ -172,6 +173,12 @@ procedure TioPrototypeBindSource.Append;
 begin
   if not CheckAdapter then Exit;
   GetInternalAdapter.Append;
+end;
+
+procedure TioPrototypeBindSource.AfterConstruction;
+begin
+  inherited;
+  Sleep(100);
 end;
 
 procedure TioPrototypeBindSource.Append(AObject: TObject);
