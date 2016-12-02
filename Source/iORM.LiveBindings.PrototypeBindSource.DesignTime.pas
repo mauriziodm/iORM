@@ -50,7 +50,7 @@ type
 //    procedure GetValues(Proc: TGetStrProc); override;
   end;
 
-procedure Register;
+  procedure Register;
 
 implementation
 

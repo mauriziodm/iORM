@@ -88,6 +88,7 @@ type
     procedure DoNeedViewModel;
     function CheckForViewModel: Boolean;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
+    procedure RegisterConnectionDefComponents;
     procedure AfterConstruction; override;
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -160,7 +161,7 @@ uses
   iORM.Attributes, iORM.DependencyInjection, iORM,
   iORM.Context.Container, iORM.LiveBindings.Factory,
   iORM.DependencyInjection.ViewModelShuttleContainer,
-  iORM.Where.Factory, iORM.Rtti.Utilities;
+  iORM.Where.Factory, iORM.Rtti.Utilities, iORM.DB.Components.ConnectionDef;
 
 { TioPrototypeBindSource }
 
@@ -184,7 +185,7 @@ end;
 procedure TioPrototypeBindSource.AfterConstruction;
 begin
   inherited;
-  Sleep(100);
+//  Sleep(100);
 end;
 
 procedure TioPrototypeBindSource.Append(AObject: TObject);
@@ -462,7 +463,13 @@ procedure TioPrototypeBindSource.Loaded;
 var
   LAdapter: TBindSourceAdapter;
 begin
-  // DOCREATEADAPTER CALL MUST BE BEFORE INHERITED !!!!!!
+  // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
+  // ===========================================================================
+  if not (csDesigning in ComponentState) then
+    RegisterConnectionDefComponents;
+  // ===========================================================================
+
+  // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
   // ===========================================================================
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
   //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
@@ -475,8 +482,10 @@ begin
       SetRuntimeAdapter(LAdapter);
   end;
   // ===========================================================================
+
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;
+
   // ===========================================================================
   // If the ViewModel is assigned (by the DoCreateAdapter method) then it try
   //  to Bind the View (Owner) components to ViewModel's actions
@@ -524,6 +533,22 @@ begin
     AnActiveBSA.Refresh(ReloadData)
   else
     GetInternalAdapter.Refresh;
+end;
+
+procedure TioPrototypeBindSource.RegisterConnectionDefComponents;
+var
+  I: Integer;
+  LConnectionDef: TioCustomConnectionDef;
+begin
+  for I := 0 to Owner.ComponentCount-1 do
+  begin
+    if Owner.Components[I] is TioCustomConnectionDef then
+    begin
+      LConnectionDef := TioCustomConnectionDef(Owner.Components[I]);
+      if not LConnectionDef.IsRegistered then
+        LConnectionDef.RegisterConnectionDef;
+    end;
+  end;
 end;
 
 procedure TioPrototypeBindSource.SetAutoLoadData(const Value: Boolean);

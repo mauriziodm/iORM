@@ -81,7 +81,8 @@ type
     class procedure StartTransaction(const AConnectionName:String='');
     class procedure CommitTransaction(const AConnectionName:String='');
     class procedure RollbackTransaction(const AConnectionName:String='');
-    class procedure AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean=True);  // Default connection only for the moment
+    class procedure AutoCreateDatabase(const AConnectionName:String=''; const RaiseExceptionIfNotAvailable:Boolean=True); overload;
+    class procedure AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean); overload;   // Default connection only
     class function Connections: TioConnectionManagerRef;
     class function Where: IioWhere; overload;
     class function Where<T>: IioWhere<T>; overload;
@@ -244,13 +245,19 @@ begin
   TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
 end;
 
-class procedure io.AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean);
+class procedure io.AutoCreateDatabase(const AConnectionName:String; const RaiseExceptionIfNotAvailable:Boolean);
 begin
   // The AutoCreateDatabase feature is available only for SQLite database
-  if TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLite then
+  if TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType = cdtSQLite then
     TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase
   else if RaiseExceptionIfNotAvailable then
     raise EioException.Create(ClassName + ':  "AutoCreateDatabase" feature is available for SQLite RDBMS only.');
+end;
+
+class procedure io.AutoCreateDatabase(
+  const RaiseExceptionIfNotAvailable: Boolean);
+begin
+  AutoCreateDatabase('', RaiseExceptionIfNotAvailable);
 end;
 
 class procedure io.CommitTransaction(const AConnectionName:String);

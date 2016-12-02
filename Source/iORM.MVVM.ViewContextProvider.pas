@@ -202,8 +202,23 @@ begin
 end;
 
 procedure TioViewContextProvider.SetRegisterAsDefault(const Value: Boolean);
+var
+  I: Integer;
+  LPrevDef: TioViewContextProvider;
 begin
   FRegisterAsDefault := Value;
+  // Uncheck previous default
+  if Value then
+  begin
+    for I := 0 to Owner.ComponentCount-1 do
+    begin
+      if (Owner.Components[I] is TioViewContextProvider) and (Owner.Components[I] <> Self) then
+      begin
+        LPrevDef := TioViewContextProvider(Owner.Components[I]);
+        LPrevDef.RegisterAsDefault := False;
+      end;
+    end;
+  end;
 end;
 
 end.

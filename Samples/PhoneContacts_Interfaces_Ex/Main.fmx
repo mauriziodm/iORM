@@ -81,6 +81,20 @@ object MainForm: TMainForm
           TabOrder = 0
           Visible = True
         end
+        object RBSQLite: TRadioButton
+          IsChecked = True
+          Position.X = 182.000000000000000000
+          Position.Y = 2.000000000000000000
+          TabOrder = 5
+          Text = 'SQLite'
+          OnChange = RBSQLiteChange
+        end
+        object RBFirebird: TRadioButton
+          Position.X = 182.000000000000000000
+          Position.Y = 24.000000000000000000
+          TabOrder = 4
+          Text = 'Firebird'
+        end
       end
       object MasterListView: TListView
         ItemAppearanceClassName = 'TImageListItemAppearance'
@@ -409,14 +423,14 @@ object MainForm: TMainForm
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
     ioVM_UseBSPropsOnCreate = True
-    Left = 256
-    Top = 112
+    Left = 272
+    Top = 240
   end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 300
-    Top = 5
+    Left = 28
+    Top = 85
     object LinkListControlToField3: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = BSMaster
@@ -511,12 +525,12 @@ object MainForm: TMainForm
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
     ioVM_UseBSPropsOnCreate = True
-    Left = 256
-    Top = 176
+    Left = 272
+    Top = 296
   end
   object ActionList1: TActionList
-    Left = 216
-    Top = 240
+    Left = 24
+    Top = 136
     object NextTabAction1: TNextTabAction
       Category = 'Tab'
       TabControl = TabControl2
@@ -525,5 +539,38 @@ object MainForm: TMainForm
       Category = 'Tab'
       TabControl = TabControl2
     end
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = 'ContactsIntf.DB'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 272
+    Top = 136
+  end
+  object FirebirdConn: TioFirebirdConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    Database = '..\..\..\SamplesData\ContactsIntf.FDB'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = False
+    OSAuthent = oaNo
+    Password = 'masterkey'
+    Persistent = False
+    Pooled = False
+    Port = 3050
+    Protocol = pTCPIP
+    Server = 'localhost'
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    Left = 272
+    Top = 188
+  end
+  object ioSQLMonitor1: TioSQLMonitor
+    Mode = mmDisabled
+    Left = 160
+    Top = 208
   end
 end

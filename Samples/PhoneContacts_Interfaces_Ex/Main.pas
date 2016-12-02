@@ -10,7 +10,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, System.Classes, Data.Bind.Controls, FMX.Grid.Style,
-  FMX.ScrollBox, FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid;
+  FMX.ScrollBox, FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid,
+  iORM.DB.Components.ConnectionDef;
 
 type
   TMainForm = class(TForm)
@@ -60,10 +61,17 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
+    SQLiteConn: TioSQLiteConnectionDef;
+    FirebirdConn: TioFirebirdConnectionDef;
+    ioSQLMonitor1: TioSQLMonitor;
+    RBSQLite: TRadioButton;
+    RBFirebird: TRadioButton;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
+    procedure RBSQLiteChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -76,7 +84,7 @@ var
 implementation
 
 uses
-  System.Generics.Collections, iORM, Interfaces;
+  System.Generics.Collections, iORM, Interfaces, SampleData;
 
 
 
@@ -107,6 +115,21 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   BSMaster.Active := True;
   BSDetail.Active := True;
+end;
+
+procedure TMainForm.RBSQLiteChange(Sender: TObject);
+begin
+  if RBSQLite.IsChecked then
+    SQLiteConn.DefaultConnection := True
+  else
+    FirebirdConn.DefaultConnection := True;
+end;
+
+procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for sample data creation
+  if (Sender as TioCustomConnectionDef).DefaultConnection then
+    TSampleData.CheckForSampleDataCreation;
 end;
 
 end.

@@ -23,7 +23,7 @@ var
   LMemTable: TFDMemTable;
 begin
   // Check if the DB is empty
-  LMemTable := io.SQL('select count(*) from [TPerson] union all select count(*) from [TAnotherPerson]').ToMemTable;
+  LMemTable := io.SQL('select count(*) from [TPerson]').ToMemTable;
   try
     if LMemTable.Fields[0].AsInteger = 0 then
       Self.CreateSampleData;

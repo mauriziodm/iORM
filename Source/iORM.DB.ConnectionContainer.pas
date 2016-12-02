@@ -87,17 +87,18 @@ type
   strict private
     class var FDefaultConnectionName: String;
     class var FConnectionManagerContainer: TioConnectionManagerContainer;  // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
-    class function NewCustomConnectionDef(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME; const AsDefault:Boolean=False): IIoConnectionDef;
+    class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef;
   protected
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;
   public
-    class function NewSQLiteConnectionDef(const ADatabase: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const APersistent:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class procedure NewRESTConnection(const ABaseURL:String; const APersistent:Boolean=True; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
-    class function GetConnectionDefByName(AConnectionName:String=''): IIoConnectionDef;
+    class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class procedure NewRESTConnection(const ABaseURL:String; const AAsDefault:Boolean=True; const APersistent:Boolean=True; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
+    class function GetConnectionDefByName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function IsEmptyConnectionName(const AConnectionName:String): Boolean;
     class function GetDefaultConnectionName: String;
     class function GetConnectionInfo(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionInfo;
     class procedure SetDefaultConnectionName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
@@ -219,7 +220,7 @@ class function TioConnectionManager.GetConnectionDefByName(AConnectionName: Stri
 begin
   Result := nil;
   // If desired ConnectionName is empty then get then Default one.
-  if AConnectionName = '' then Self.GetDefaultConnectionName;
+  if Self.IsEmptyConnectionName(AConnectionName) then Self.GetDefaultConnectionName;
   // Get the ConnectionDef info's
   Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
   // Connection not found
@@ -231,7 +232,7 @@ class function TioConnectionManager.GetConnectionInfo(
   AConnectionName: String): TioConnectionInfo;
 begin
   // If desired ConnectionName is empty then get then Default one.
-  if AConnectionName = '' then AConnectionName := Self.GetDefaultConnectionName;
+  if Self.IsEmptyConnectionName(AConnectionName) then AConnectionName := Self.GetDefaultConnectionName;
   // Return the desired connection type
   Result := FConnectionManagerContainer.Items[AConnectionName];
 end;
@@ -241,6 +242,12 @@ begin
   Result := Self.FDefaultConnectionName;
 end;
 
+class function TioConnectionManager.IsEmptyConnectionName(const
+  AConnectionName: String): Boolean;
+begin
+  Result := (AConnectionName.IsEmpty or (AConnectionName = IO_CONNECTIONDEF_DEFAULTNAME));
+end;
+
 {$IFDEF MSWINDOWS}
 class function TioConnectionManager.Monitor: TioConnectionMonitorRef;
 begin
@@ -248,27 +255,29 @@ begin
 end;
 {$ENDIF}
 
-class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const AsDefault: Boolean): IIoConnectionDef;
+class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const APooled:Boolean; const AAsDefault: Boolean): IIoConnectionDef;
 begin
    // Create the ConnectionDef object and set his name
   //  NB: The name of the connectionDef should never be changed after
   Result := FDManager.ConnectionDefs.AddConnectionDef;
   Result.Name := AConnectionName;
+  Result.Params.Pooled := APooled;
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   //  then set it as default
-  if AsDefault or (Self.FDefaultConnectionName = '') then
+  if AAsDefault or (Self.FDefaultConnectionName = '') then
     Self.FDefaultConnectionName := AConnectionName;
 end;
 
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String;
-  const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
+  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.Params.Values['DriverID'] := 'FB';
+  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+  Result.Params.DriverID := 'FB';
   Result.Params.Values['Server'] := AServer;
-  Result.Params.Values['Database'] := ADatabase;
-  Result.Params.Values['User_Name'] := AUserName;
-  Result.Params.Values['Password'] := APassword;
+  Result.Params.Database := ADatabase;
+  Result.Params.UserName := AUserName;
+  Result.Params.Password := APassword;
   Result.Params.Values['Protocol'] := 'TCPIP';
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
@@ -276,28 +285,29 @@ begin
 end;
 
 class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet:String;
-  const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
+  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.Params.Values['DriverID'] := 'MySQL';
+  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+  Result.Params.DriverID := 'MySQL';
   Result.Params.Values['Server'] := AServer;
-  Result.Params.Values['Database'] := ADatabase;
-  Result.Params.Values['User_Name'] := AUserName;
-  Result.Params.Values['Password'] := APassword;
+  Result.Params.Database := ADatabase;
+  Result.Params.UserName := AUserName;
+  Result.Params.Password := APassword;
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
   FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
 end;
 
 class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String;
-  const APersistent: Boolean; const AConnectionName: String);
+  const AAsDefault:Boolean=True; const APersistent:Boolean=True;
+  const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
 var
   LConnectionInfo: TioConnectionInfo;
 begin
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   //  then set it as default
-//  if AsDefault or (Self.FDefaultConnectionName = '') then
-  if (Self.FDefaultConnectionName = '') then
+  if AAsDefault or (Self.FDefaultConnectionName = '') then
     Self.FDefaultConnectionName := AConnectionName;
   // Setup the connection info
   LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent);
@@ -306,26 +316,27 @@ begin
   FConnectionManagerContainer.Add(AConnectionName, LConnectionInfo);
 end;
 
-class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase:String; const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase:String;
+  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
+  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.Params.Values['DriverID'] := 'SQLite';
-//  Result.Params.Values['Server'] := 'localhost';
-  Result.Params.Values['Database'] := ADatabase;
+  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+  Result.Params.DriverID := 'SQLite';
+  Result.Params.Database := ADatabase;
   Result.Params.Values['FailIfMissing'] := 'False';
   // Add the connection type to the internal container
   FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
 end;
 
 class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword:String;
-  const APersistent:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
+  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.Params.Values['DriverID'] := 'MSSQL';
+  Result.Params.DriverID := 'MSSQL';
   Result.Params.Values['Server'] := AServer;
-  Result.Params.Values['Database'] := ADatabase;
-  Result.Params.Values['User_Name'] := AUserName;
-  Result.Params.Values['Password'] := APassword;
+  Result.Params.Database := ADatabase;
+  Result.Params.UserName := AUserName;
+  Result.Params.Password := APassword;
   // Add the connection type to the internal container
   FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
 end;
@@ -333,7 +344,7 @@ end;
 class procedure TioConnectionManager.SetDefaultConnectionName(const AConnectionName: String);
 begin
   // If a connectionDef with this name is not founded then raise an exception
-  if not Assigned(FDManager.FindConnection(AConnectionName)) then
+  if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(AConnectionName)) then
     raise EioException.Create(Self.ClassName + ': Connection params definition "' + AConnectionName + '" not found!');
   // Set the connection as default
   Self.FDefaultConnectionName := AConnectionName;

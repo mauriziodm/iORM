@@ -39,7 +39,7 @@ unit iORM.DB.Components.MemTable.DesignTime;
 
 interface
 
-procedure Register;
+  procedure Register;
 
 implementation
 

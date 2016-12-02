@@ -35,20 +35,25 @@
 
 
 
-unit iORM.MVVM.ViewContextProvider.DesignTime;
+unit iORM.DB.Components.ConnectionDef.DesignTime;
 
 interface
 
-   procedure Register;
+  procedure Register;
 
 implementation
 
 uses
-  System.Classes, iORM.MVVM.ViewContextProvider;
+  System.Classes, iORM.DB.Components.ConnectionDef;
 
   procedure Register;
   begin
-    RegisterComponents('iORM', [TioViewContextProvider]);
+    RegisterComponents('iORM', [TioSQLMonitor]);
+    RegisterComponents('iORM', [TioRESTConnectionDef]);
+    RegisterComponents('iORM', [TioSQLiteConnectionDef]);
+    RegisterComponents('iORM', [TioFirebirdConnectionDef]);
+    RegisterComponents('iORM', [TioSQLServerConnectionDef]);
+//    RegisterComponents('iORM', [TioMySQLConnectionDef]);
   end;
 
 end.

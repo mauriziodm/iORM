@@ -31,7 +31,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces_ByCode\PhoneContacts_Interfaces_ByCode.dproj">
             <Dependencies/>
@@ -167,13 +167,13 @@
     <Target Name="PhoneContacts_Interfaces:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_Ex">
+    <Target Name="PhoneContacts_Interfaces_Ex" DependsOnTargets="iORM_Project">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_Ex:Clean">
+    <Target Name="PhoneContacts_Interfaces_Ex:Clean" DependsOnTargets="iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_Ex:Make">
+    <Target Name="PhoneContacts_Interfaces_Ex:Make" DependsOnTargets="iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_Interfaces_ByCode">

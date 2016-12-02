@@ -23,10 +23,10 @@ begin
 //  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.FDB'), 'SYSDBA', 'masterkey', '').Apply;
 
   // AutoCreation and AutoUpdate of the database
-//  io.AutoCreateDatabase(False);
+  io.AutoCreateDatabase(False);
 
   // Check for sample data creation
-//  TSampleData.CheckForSampleDataCreation;
+  TSampleData.CheckForSampleDataCreation;
   // ============ IupOrm initialization ====================
 
 

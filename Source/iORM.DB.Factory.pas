@@ -59,7 +59,7 @@ type
     class function LogicRelation: TioLogicRelationRef;
     class function SqlGenerator: TioSqlGeneratorRef;
     class function SqlDataConverter: TioSqlDataConverterRef;
-    class function Connection(AConnectionName:String=''): IioConnection;
+    class function Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
     class function NewConnection(const AConnectionName:String): IioConnection;
     class function TransactionCollection: IioTransactionCollection;
     class function Query(AConnectionDefName:String; const AQueryIdentity:String=''): IioQuery;
@@ -90,11 +90,11 @@ begin
   Result := TioCompareOperatorSqLite;
 end;
 
-class function TioDbFactory.Connection(AConnectionName:String=''): IioConnection;
+class function TioDbFactory.Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
 begin
   // If AConnectionName param is not specified (is empty) then
   //  use the default connection def
-  if AConnectionName.IsEmpty then
+  if Self.ConnectionManager.IsEmptyConnectionName(AConnectionName) then
     AConnectionName := Self.ConnectionManager.GetDefaultConnectionName;
   // If the connection already exists in the COnnectionContainer then return then else
   //  create a new connection, add it to the COnnectionContainer thne return the connection
@@ -176,7 +176,7 @@ var
 begin
   // If AConnectionName param is not specified (is empty) then
   //  use the default connection def
-  if AConnectionDefName.IsEmpty then
+  if Self.ConnectionManager.IsEmptyConnectionName(AConnectionDefName) then
     AConnectionDefName := Self.ConnectionManager.GetDefaultConnectionName;
   // Get the proper connection
   LConnection := Self.Connection(AConnectionDefName);

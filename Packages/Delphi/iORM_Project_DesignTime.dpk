@@ -37,6 +37,7 @@ requires
 contains
   iORM.LiveBindings.PrototypeBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas',
   iORM.DB.Components.MemTable.DesignTime in '..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas',
-  iORM.MVVM.ViewContextProvider.DesignTime in '..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas';
+  iORM.MVVM.ViewContextProvider.DesignTime in '..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas',
+  iORM.DB.Components.ConnectionDef.DesignTime in '..\..\Source\iORM.DB.Components.ConnectionDef.DesignTime.pas';
 
 end.
