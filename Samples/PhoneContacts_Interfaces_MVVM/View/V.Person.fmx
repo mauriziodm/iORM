@@ -295,7 +295,7 @@ object ViewPerson: TViewPerson
     ScopeMappings = <>
     ioTypeName = 'IPerson'
     ioAutoLoadData = True
-    ioAutoPersist = False
+    ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
