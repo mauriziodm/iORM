@@ -91,7 +91,9 @@ type
     class function SQL(const ASQL:String): IioSQLDestination; overload;
     class function SQL(const ASQLDestination:IioSQLDestination): IioSQLDestination; overload;
     class function Mapper:omRef;
-    class function NewThreadSafe<T>(const AObj:T; const AOwnObj:Boolean=True): IioThreadSafe<T>;
+    class procedure SetShowHideWaitProc(const AShowWaitProc:TioShowWaitProc; const AHideWaitProc:TioHideWaitProc);
+    class function ShowWait: TioShowWaitProc;
+    class function HideWait: TioHideWaitProc;
   end;
 
 implementation
@@ -154,12 +156,6 @@ end;
 class function io.Mapper: omRef;
 begin
   Result := ObjMapper.om;
-end;
-
-class function io.NewThreadSafe<T>(const AObj: T;
-  const AOwnObj: Boolean): IioThreadSafe<T>;
-begin
-  Result := TioThreadSafe<T>.Create(AObj, AOwnObj);
 end;
 
 class procedure io.Persist(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String);
@@ -234,6 +230,17 @@ begin
   Result := TioDBFactory.SQLDestination(ASQL);
 end;
 
+class procedure io.SetShowHideWaitProc(const AShowWaitProc: TioShowWaitProc;
+  const AHideWaitProc: TioHideWaitProc);
+begin
+  TioConnectionManager.SetShowHideWaitProc(AShowWaitProc, AHideWaitProc);
+end;
+
+class function io.ShowWait: TioShowWaitProc;
+begin
+  TioConnectionManager.GetShowWaitProc;
+end;
+
 class function io.SQL(
   const ASQLDestination: IioSQLDestination): IioSQLDestination;
 begin
@@ -288,6 +295,11 @@ end;
 class function io.GlobalFactory: TioGlobalFactoryRef;
 begin
   Result := TioGlobalFactory;
+end;
+
+class function io.HideWait: TioHideWaitProc;
+begin
+  TioConnectionManager.GetHideWaitProc;
 end;
 
 class function io.Load(const AClassRef:TioClassRef; const ATypeAlias:String): IioWhere;

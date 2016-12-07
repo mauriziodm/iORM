@@ -6,12 +6,10 @@ uses
   Main in 'Main.pas' {MainForm},
   Model in 'Model.pas',
   System.IOUtils,
-  iORM,
   SampleData in 'SampleData.pas',
   Interfaces in 'Interfaces.pas',
   RegisterClassesUnit in 'RegisterClassesUnit.pas',
-  AnotherModel in 'AnotherModel.pas',
-  iORM.CommonTypes;
+  AnotherModel in 'AnotherModel.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

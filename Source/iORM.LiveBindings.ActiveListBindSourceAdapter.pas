@@ -48,6 +48,7 @@ type
 
   TioActiveListBindSourceAdapter = class(TListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   private
+    FAsync: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
     FClassRef: TioClassRef;
@@ -62,6 +63,20 @@ type
     FonNotify: TioBSANotificationEvent;
     FInsertObj_Enabled: Boolean;
     FInsertObj_NewObj: TObject;
+    function TypeName: String;
+    function TypeAlias: String;
+    // Async property
+    function GetIoAsync: Boolean;
+    procedure SetIoAsync(const Value: Boolean);
+    // AutoPersist property
+    function GetioAutoPersist: Boolean;
+    procedure SetioAutoPersist(const Value: Boolean);
+    // WhereStr property
+    procedure SetIoWhere(const Value: IioWhere);
+    function GetioWhere: IioWhere;
+    // ioWhereDetailsFromDetailAdapters property
+    function GetioWhereDetailsFromDetailAdapters: Boolean;
+    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -84,15 +99,6 @@ type
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
-    // AutoPersist property
-    function GetioAutoPersist: Boolean;
-    procedure SetioAutoPersist(const Value: Boolean);
-    // WhereStr property
-    procedure SetIoWhere(const Value: IioWhere);
-    function GetioWhere: IioWhere;
-    // ioWhereDetailsFromDetailAdapters property
-    function GetioWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AList: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
@@ -115,6 +121,7 @@ type
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
 
+    property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioWhere:IioWhere read GetIoWhere write SetIoWhere;
@@ -160,8 +167,9 @@ constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef;
   AWhere: IioWhere; AOwner: TComponent; AList: TList<TObject>; AutoLoadData,
   AOwnsObject: Boolean);
 begin
-  FAutoPersist := True;
   FAutoLoadData := AutoLoadData;
+  FAsync := False;
+  FAutoPersist := True;
   FReloadDataOnRefresh := True;
   inherited Create(AOwner, AList, AClassRef, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
@@ -201,7 +209,7 @@ var
   ObjToFree: TObject;
 begin
   // If enabled subsitute the new object with the FInsertObj_NewObj (Append(AObject:TObject))
-  //  then destroy the "olr" new object
+  //  then destroy the "old" new object
   if FInsertObj_Enabled then
   begin
     try
@@ -342,6 +350,11 @@ function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapterByMasterProper
   const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   Result := FDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(AMasterPropertyName);
+end;
+
+function TioActiveListBindSourceAdapter.GetIoAsync: Boolean;
+begin
+  Result := FAsync;
 end;
 
 function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
@@ -502,6 +515,11 @@ begin
   // -------------------------------------------------------------------------------------------------------
 end;
 
+procedure TioActiveListBindSourceAdapter.SetIoAsync(const Value: Boolean);
+begin
+  FAsync := Value;
+end;
+
 procedure TioActiveListBindSourceAdapter.SetioAutoPersist(const Value: Boolean);
 begin
   FAutoPersist := Value;
@@ -534,6 +552,16 @@ procedure TioActiveListBindSourceAdapter.SetObjStatus(
   AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+end;
+
+function TioActiveListBindSourceAdapter.TypeAlias: String;
+begin
+  Result := '';
+end;
+
+function TioActiveListBindSourceAdapter.TypeName: String;
+begin
+  Result := FClassRef.ClassName;
 end;
 
 function TioActiveListBindSourceAdapter.UseObjStatus: Boolean;

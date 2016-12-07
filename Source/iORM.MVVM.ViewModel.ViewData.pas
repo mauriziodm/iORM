@@ -97,18 +97,6 @@ begin
   // Questo è un riferimento di tipo interfaccia e serve solo per
   //  mantenere in vita l'oggetto
   FDummyInterfaceRef := ADataIntf;
-{
-  // Create the BindSourceAdapter
-  Self.Create(
-    (ADataIntf as TObject).ClassName,  // TypeName
-    '',  // TypeAlias
-    '',  // Where
-    AViewDataType,  // ViewDataType
-    False  // AutoLoadData
-  );
-  // Set the DataObject
-  FBindSourceAdapter.SetDataObject(ADataIntf as TObject, False);  // OwnsObject = False for externally received objects
-}
 end;
 
 constructor TioViewData.Create(const ADataObj: TObject; const AViewDataType:TioViewDataType);

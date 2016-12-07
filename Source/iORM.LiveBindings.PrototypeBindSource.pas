@@ -55,6 +55,7 @@ type
     FioTypeName: String;
     FioTypeAlias: String;
     FioAutoLoadData: Boolean;
+    FioAsync: Boolean;
     FioAutoPersist: Boolean;
     FioViewDataType: TioViewDataType;
     FioMasterBindSource: TioMasterBindSource;
@@ -92,22 +93,15 @@ type
     procedure AfterConstruction; override;
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
-    function GetAutoPersist: Boolean;
-    procedure SetAutoPersist(const Value: Boolean);
     procedure SetIoWhereStr(const Value: TStrings);
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioWhere property
     function GetWhere: IioWhere;
     procedure SetWhere(const Value: IioWhere);
     // OrderBy property
-    function GetOrderBy: String;
     procedure SetOrderBy(const Value: String);
 //    procedure ioSetBindSourceAdapter(AAdapter: TBindSourceAdapter);
     property IsDetail:Boolean read GetIsDetail;
-    function GetAutoLoadData: Boolean;
-    function GetViewDataType: TioViewDataType;
-    procedure SetAutoLoadData(const Value: Boolean);
-    procedure SetViewDataType(const Value: TioViewDataType);
     procedure WhereOnChangeEventHandler(Sender:TObject);
   public
     constructor Create(AOwner: TComponent); override;
@@ -137,12 +131,13 @@ type
 
     property ioTypeName:String read FioTypeName write FioTypeName;
     property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
-    property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
-    property ioAutoPersist:Boolean read GetAutoPersist write SetAutoPersist;
-    property ioViewDataType:TioViewDataType read GetViewDataType write SetViewDataType;
+    property ioAsync:Boolean read FioAsync write FioAsync;
+    property ioAutoLoadData:Boolean read FioAutoLoadData write FioAutoLoadData;
+    property ioAutoPersist:Boolean read FioAutoPersist write FioAutoPersist;
+    property ioViewDataType:TioViewDataType read FioViewDataType write FioViewDataType;
     property ioWhereStr:TStrings read FioWhereStr write SetIoWhereStr;
     property ioWhereDetailsFromDetailAdapters: Boolean read FioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
-    property ioOrderBy:String read GetOrderBy Write SetOrderBy;
+    property ioOrderBy:String read FioOrderBy Write SetOrderBy;
     property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
     property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
     property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
@@ -210,6 +205,7 @@ begin
   inherited;
   FioLoaded := False;
   FioAutoRefreshOnNotification := arEnabledNoReload;
+  FioAsync := False;
   FioAutoLoadData := True;
   FioAutoPersist := True;
   FioViewDataType := dtList;
@@ -331,11 +327,13 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
   //  in the ActiveBindSourceAdapter
+  //  PS: Set ioAsync also
   if  Assigned(ADataObject)
   and Supports(ADataObject, IioActiveBindSourceAdapter, AActiveBSA)
   and Supports(Self, IioNotifiableBindSource)
   then
   begin
+    AActiveBSA.ioAsync := FioAsync;
     AActiveBSA.ioWhereDetailsFromDetailAdapters := FioWhereDetailsFromDetailAdapters;
     AActiveBSA.ioAutoPersist := FioAutoPersist;
     AActiveBSA.SetBindSource(Self);
@@ -370,16 +368,6 @@ function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceA
 begin
   Result := nil;
   Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
-end;
-
-function TioPrototypeBindSource.GetAutoLoadData: Boolean;
-begin
-  Result := FioAutoLoadData;
-end;
-
-function TioPrototypeBindSource.GetAutoPersist: Boolean;
-begin
-  Result := FioAutoPersist;
 end;
 
 function TioPrototypeBindSource.GetDataObject: TObject;
@@ -442,22 +430,6 @@ function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(
 begin
   Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner);
 end;
-
-function TioPrototypeBindSource.GetOrderBy: String;
-begin
-  Result := FioOrderBy;
-end;
-
-function TioPrototypeBindSource.GetViewDataType: TioViewDataType;
-begin
-  Result := FioViewDataType;
-end;
-
-//procedure TioPrototypeBindSource.ioSetBindSourceAdapter(
-//  AAdapter: TBindSourceAdapter);
-//begin
-//  Self.ConnectAdapter(AAdapter);
-//end;
 
 procedure TioPrototypeBindSource.Loaded;
 var
@@ -551,16 +523,6 @@ begin
   end;
 end;
 
-procedure TioPrototypeBindSource.SetAutoLoadData(const Value: Boolean);
-begin
-  FioAutoLoadData := Value;
-end;
-
-procedure TioPrototypeBindSource.SetAutoPersist(const Value: Boolean);
-begin
-  FioAutoPersist := Value;
-end;
-
 procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);
 begin
   Self.GetActiveBindSourceAdapter.SetDataObject(AObj, AOwnsObject);
@@ -613,11 +575,6 @@ begin
   // Update the adapter
   if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhereDetailsFromDetailAdapters := Value;
-end;
-
-procedure TioPrototypeBindSource.SetViewDataType(const Value: TioViewDataType);
-begin
-  FioViewDataType := Value;
 end;
 
 procedure TioPrototypeBindSource.WhereOnChangeEventHandler(Sender: TObject);

@@ -22,6 +22,7 @@ type
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
     acTerminate: TAction;
+    acRefresh: TAction;
     procedure acClearDataExecute(Sender: TObject);
     procedure acClearDataUpdate(Sender: TObject);
     procedure acLoadDataExecute(Sender: TObject);
@@ -37,6 +38,8 @@ type
     procedure acSaveJSONtoFileExecute(Sender: TObject);
     procedure acEditPersonExecute(Sender: TObject);
     procedure acTerminateExecute(Sender: TObject);
+    procedure acRefreshExecute(Sender: TObject);
+    procedure acRefreshUpdate(Sender: TObject);
   private
     FJSON: String;
     function GetJSON: String;
@@ -124,6 +127,19 @@ procedure TViewModelMain.acLoadJSONfromFileUpdate(Sender: TObject);
 begin
   inherited;
   (Sender as TCOntainedAction).Enabled := not Self.JSONPresent;
+end;
+
+procedure TViewModelMain.acRefreshExecute(Sender: TObject);
+begin
+  inherited;
+  // Clear the data object of the ActiveBindSourceAdapter
+  Self.ViewData.ActiveBindSourceAdapter.Refresh(True);
+end;
+
+procedure TViewModelMain.acRefreshUpdate(Sender: TObject);
+begin
+  inherited;
+  (Sender as TCOntainedAction).Enabled := Self.DataPresent;
 end;
 
 procedure TViewModelMain.acSaveJSONtoFileExecute(Sender: TObject);

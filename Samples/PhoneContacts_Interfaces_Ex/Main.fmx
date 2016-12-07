@@ -46,7 +46,7 @@ object MainForm: TMainForm
           Size.Width = 59.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 3
+          TabOrder = 4
           Text = 'Clear'
           OnClick = Button8Click
         end
@@ -55,7 +55,7 @@ object MainForm: TMainForm
           Size.Width = 57.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 2
+          TabOrder = 3
           Text = 'Load'
           OnClick = Button9Click
         end
@@ -64,7 +64,7 @@ object MainForm: TMainForm
           Size.Width = 63.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 1
+          TabOrder = 2
           Text = 'Filter'
           OnClick = Button12Click
         end
@@ -83,17 +83,32 @@ object MainForm: TMainForm
         end
         object RBSQLite: TRadioButton
           IsChecked = True
-          Position.X = 182.000000000000000000
+          Position.X = 256.000000000000000000
           Position.Y = 2.000000000000000000
-          TabOrder = 5
+          Size.Width = 87.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 6
           Text = 'SQLite'
           OnChange = RBSQLiteChange
         end
         object RBFirebird: TRadioButton
-          Position.X = 182.000000000000000000
+          Position.X = 256.000000000000000000
           Position.Y = 24.000000000000000000
-          TabOrder = 4
+          Size.Width = 87.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 5
           Text = 'Firebird'
+        end
+        object Button3: TButton
+          Position.X = 173.000000000000000000
+          Size.Width = 76.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Refresh'
+          OnClick = Button3Click
         end
       end
       object MasterListView: TListView
@@ -417,6 +432,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPerson'
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -516,6 +532,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPhoneNumber'
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -569,7 +586,7 @@ object MainForm: TMainForm
     Top = 188
   end
   object ioSQLMonitor1: TioSQLMonitor
-    Mode = mmDisabled
+    Mode = mmRemote
     Left = 160
     Top = 208
   end

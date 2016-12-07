@@ -47,6 +47,11 @@ inherited ViewModelMain: TViewModelMain
       Caption = 'acTerminate'
       OnExecute = acTerminateExecute
     end
+    object acRefresh: TAction
+      Caption = 'acRefresh'
+      OnExecute = acRefreshExecute
+      OnUpdate = acRefreshUpdate
+    end
   end
   object OpenDialog1: TOpenDialog
     Left = 48

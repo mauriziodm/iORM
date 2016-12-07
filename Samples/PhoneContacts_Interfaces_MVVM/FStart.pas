@@ -6,7 +6,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Graphics, FMX.Dialogs, FMX.TabControl,
   System.Actions, FMX.ActnList, iORM.MVVM.ViewContextProvider,
-  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Forms;
+  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Forms,
+  iORM.DB.Components.ConnectionDef;
 
 type
   TStartForm = class(TForm)
@@ -19,6 +20,7 @@ type
     ActionList1: TActionList;
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
+    SQLiteConn: TioSQLiteConnectionDef;
     procedure FormCreate(Sender: TObject);
     procedure RBTabsChange(Sender: TObject);
     procedure TabsVCProviderioOnRelease(const Sender: TObject; const AView,
@@ -31,6 +33,7 @@ type
       const AView: TComponent; out ResultViewContext: TComponent);
     procedure TabsVCProviderioOnAfterRequest(const Sender: TObject; const AView,
       AViewContext: TComponent);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -43,7 +46,7 @@ var
 implementation
 
 uses
-  FMX.Styles, iORM, V.Interfaces, FViewContext;
+  FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData;
 
 {$R *.fmx}
 
@@ -76,6 +79,13 @@ begin
     FormsVCProvider.SetAsDefault
   else
     TabsVCProvider.SetAsDefault;
+end;
+
+procedure TStartForm.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for sample data creation
+  if (Sender as TioCustomConnectionDef).DefaultConnection then
+    TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TStartForm.TabsVCProviderioOnAfterRequest(const Sender: TObject;

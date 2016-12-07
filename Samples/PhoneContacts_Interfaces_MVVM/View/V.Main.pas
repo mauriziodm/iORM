@@ -41,6 +41,9 @@ type
     [ioBindAction('acLoadJSONfromFile')]
     ButtonLoadJSONFromFile: TButton;
 
+    [ioBindAction('acRefresh')]
+    ButtonRefresh: TSpeedButton;
+
     [ioBindAction('acTerminate')]
     ButtonTerminate: TSpeedButton;
 

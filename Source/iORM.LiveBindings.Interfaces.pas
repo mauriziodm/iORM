@@ -92,9 +92,15 @@ type
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
+    function TypeName: String;
+    function TypeAlias: String;
     // Current property
     function GetCurrent: TObject;
     property Current: TObject read GetCurrent;
+    // Async property
+    procedure SetIoAsync(const Value: Boolean);
+    function GetIoAsync: Boolean;
+    property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     // AutoPersist property
     procedure SetioAutoPersist(const Value: Boolean);
     function GetioAutoPersist: Boolean;

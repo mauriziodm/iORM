@@ -47,6 +47,7 @@ type
 
   TioActiveInterfaceObjectBindSourceAdapter = class(TInterfaceObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   strict private
+    FAsync: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
     FTypeName, FTypeAlias: String;
@@ -62,6 +63,21 @@ type
 //    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FInsertObj_Enabled: Boolean;
     FInsertObj_NewObj: TObject;
+    function TypeName: String;
+    function TypeAlias: String;
+    // Async property
+    function GetIoAsync: Boolean;
+    procedure SetIoAsync(const Value: Boolean);
+    // AutoPersist property
+    function GetioAutoPersist: Boolean;
+    procedure SetioAutoPersist(const Value: Boolean); protected
+    // WhereStr property
+    procedure SetIoWhere(const Value: IioWhere);
+    function GetioWhere: IioWhere;
+    // ioWhereDetailsFromDetailAdapters property
+    function GetioWhereDetailsFromDetailAdapters: Boolean;
+    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+  protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -83,15 +99,6 @@ type
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
-    // AutoPersist property
-    function GetioAutoPersist: Boolean;
-    procedure SetioAutoPersist(const Value: Boolean); protected
-    // WhereStr property
-    procedure SetIoWhere(const Value: IioWhere);
-    function GetioWhere: IioWhere;
-    // ioWhereDetailsFromDetailAdapters property
-    function GetioWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
   public
     constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const AObject: TObject; const AutoLoadData: Boolean); overload;
     destructor Destroy; override;
@@ -115,6 +122,7 @@ type
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
 
+    property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioWhere:IioWhere read GetIoWhere write SetIoWhere;
@@ -126,7 +134,8 @@ implementation
 
 uses
   iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory,
-  System.Rtti, iORM.Context.Map.Interfaces, iORM.Where.Factory;
+  System.Rtti, iORM.Context.Map.Interfaces, iORM.Where.Factory,
+  iORM.Exceptions;
 
 { TioActiveInterfaceObjectBindSourceAdapter }
 
@@ -158,8 +167,9 @@ end;
 constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
   const AOwner: TComponent; const AObject: TObject; const AutoLoadData: Boolean);
 begin
-  FAutoPersist := True;
   FAutoLoadData := AutoLoadData;
+  FAsync := False;
+  FAutoPersist := True;
   FReloadDataOnRefresh := True;
   inherited Create(AOwner, AObject, ATypeAlias, ATypeName);
   FLocalOwnsObject := False;  // Always false because it's a BSA for an interface (AutoRefCount)
@@ -326,6 +336,11 @@ begin
   Result := FDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(AMasterPropertyName);
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetIoAsync: Boolean;
+begin
+  Result := FAsync;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
@@ -473,6 +488,12 @@ begin
   end;
 end;
 
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetIoAsync(
+  const Value: Boolean);
+begin
+  FAsync := Value;
+end;
+
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetioAutoPersist(const Value: Boolean);
 begin
   FAutoPersist := Value;
@@ -504,6 +525,16 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.TypeAlias: String;
+begin
+  result := FTypeAlias;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.TypeName: String;
+begin
+  Result := FTypeName;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.UseObjStatus: Boolean;

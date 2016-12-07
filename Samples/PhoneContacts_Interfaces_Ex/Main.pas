@@ -66,12 +66,14 @@ type
     ioSQLMonitor1: TioSQLMonitor;
     RBSQLite: TRadioButton;
     RBFirebird: TRadioButton;
+    Button3: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
     procedure SQLiteConnAfterRegister(Sender: TObject);
     procedure RBSQLiteChange(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -96,6 +98,11 @@ begin
   BSDetail.ioWhereStr.Add('[.PhoneType] <> ''Mobile''');
   BSDetail.ioOrderBy := '[.PhoneType] desc';
   BSDetail.Refresh(True);
+end;
+
+procedure TMainForm.Button3Click(Sender: TObject);
+begin
+  BSMaster.Refresh(True);
 end;
 
 procedure TMainForm.Button8Click(Sender: TObject);

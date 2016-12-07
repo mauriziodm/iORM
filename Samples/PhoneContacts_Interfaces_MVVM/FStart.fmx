@@ -79,4 +79,15 @@ object StartForm: TStartForm
       TabControl = MainTabControl
     end
   end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\ContactsIntfMVVM.db'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 216
+    Top = 88
+  end
 end

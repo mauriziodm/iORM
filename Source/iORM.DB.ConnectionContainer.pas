@@ -87,6 +87,8 @@ type
   strict private
     class var FDefaultConnectionName: String;
     class var FConnectionManagerContainer: TioConnectionManagerContainer;  // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
+    class var FShowWaitProc: TioShowWaitProc;
+    class var FHideWaitProc: TioHideWaitProc;
     class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef;
   protected
     class procedure CreateInternalContainer;
@@ -102,6 +104,9 @@ type
     class function GetDefaultConnectionName: String;
     class function GetConnectionInfo(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionInfo;
     class procedure SetDefaultConnectionName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
+    class procedure SetShowHideWaitProc(const AShowWaitProc:TioShowWaitProc; const AHideWaitProc:TioHideWaitProc);
+    class function GetShowWaitProc: TioShowWaitProc;
+    class function GetHideWaitProc: TioHideWaitProc;
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
 {$ENDIF}
@@ -242,6 +247,16 @@ begin
   Result := Self.FDefaultConnectionName;
 end;
 
+class function TioConnectionManager.GetHideWaitProc: TioHideWaitProc;
+begin
+  Result := FHideWaitProc;
+end;
+
+class function TioConnectionManager.GetShowWaitProc: TioShowWaitProc;
+begin
+  Result := FShowWaitProc;
+end;
+
 class function TioConnectionManager.IsEmptyConnectionName(const
   AConnectionName: String): Boolean;
 begin
@@ -348,6 +363,13 @@ begin
     raise EioException.Create(Self.ClassName + ': Connection params definition "' + AConnectionName + '" not found!');
   // Set the connection as default
   Self.FDefaultConnectionName := AConnectionName;
+end;
+
+class procedure TioConnectionManager.SetShowHideWaitProc(
+  const AShowWaitProc: TioShowWaitProc; const AHideWaitProc: TioHideWaitProc);
+begin
+  FShowWaitProc := AShowWaitProc;
+  FHideWaitProc := AHideWaitProc;
 end;
 
 { TioConnectionMonitor }
