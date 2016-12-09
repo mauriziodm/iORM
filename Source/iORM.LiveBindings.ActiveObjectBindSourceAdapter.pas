@@ -40,7 +40,10 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.CommonTypes, System.Classes, System.Generics.Collections,
   iORM.Context.Properties.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.Notification, iORM.Where.Interfaces;
+  iORM.LiveBindings.Notification, iORM.Where.Interfaces, iORM.MVVM.Interfaces;
+
+const
+  VIEW_DATA_TYPE = TioViewDataType.dtSingle;
 
 type
 
@@ -76,6 +79,10 @@ type
     // ioWhereDetailsFromDetailAdapters property
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+    // ioViewDataType
+    function GetIoViewDataType: TioViewDataType;
+    // ioOwnsObjects
+    function GetOwnsObjects: Boolean;
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -109,6 +116,7 @@ type
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure Append(AObject:TObject); overload;
     procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
@@ -126,6 +134,8 @@ type
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioWhere:IioWhere read GetIoWhere write SetIoWhere;
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
+    property ioViewDataType:TioViewDataType read GetIoViewDataType;
+    property ioOwnsObjects:Boolean read GetOwnsObjects;
   end;
 
 implementation
@@ -346,6 +356,11 @@ begin
   Result := FAutoPersist;
 end;
 
+function TioActiveObjectBindSourceAdapter.GetIoViewDataType: TioViewDataType;
+begin
+  Result := VIEW_DATA_TYPE;
+end;
+
 function TioActiveObjectBindSourceAdapter.GetIoWhere: IioWhere;
 begin
   Result := FWhere;
@@ -364,9 +379,21 @@ begin
   Result := FWhereDetailsFromDetailAdapters;
 end;
 
+function TioActiveObjectBindSourceAdapter.GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+begin
+  Result := nil;
+  if Self.IsDetail then
+    Result := FMasterAdaptersContainer.GetMasterBindSourceAdapter;
+end;
+
 function TioActiveObjectBindSourceAdapter.GetMasterPropertyName: String;
 begin
   Result := FMasterProperty.GetName;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetOwnsObjects: Boolean;
+begin
+  Result := FLocalOwnsObject;
 end;
 
 function TioActiveObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(

@@ -44,8 +44,6 @@ uses
 
 type
 
-  TioViewDataType = (dtSingle, dtList);
-
   TioCommandType = (ctNull, ctAction, ctMethod, ctAnonimousMethod);
 
   IioView = interface(IInvokable)

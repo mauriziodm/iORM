@@ -294,6 +294,7 @@ object ViewPerson: TViewPerson
       end>
     ScopeMappings = <>
     ioTypeName = 'IPerson'
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -381,6 +382,7 @@ object ViewPerson: TViewPerson
       end>
     ScopeMappings = <>
     ioTypeName = 'IPhoneNumber'
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList

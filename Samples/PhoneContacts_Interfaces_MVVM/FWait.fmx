@@ -1,0 +1,36 @@
+object WaitForm: TWaitForm
+  Left = 0
+  Top = 0
+  BorderStyle = None
+  Caption = 'Form2'
+  ClientHeight = 161
+  ClientWidth = 352
+  Position = DesktopCenter
+  Transparency = True
+  FormStyle = StayOnTop
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Rectangle1: TRectangle
+    Align = Client
+    Fill.Color = claOrangered
+    Opacity = 0.800000011920928900
+    Sides = []
+    Size.Width = 352.000000000000000000
+    Size.Height = 161.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Label1: TLabel
+    Align = Client
+    StyledSettings = [Family]
+    Size.Width = 352.000000000000000000
+    Size.Height = 161.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.Size = 20.000000000000000000
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claWhite
+    TextSettings.HorzAlign = Center
+    Text = 'Please wait...'
+  end
+end

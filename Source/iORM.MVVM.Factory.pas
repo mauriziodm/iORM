@@ -40,7 +40,7 @@ interface
 uses
   iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.Where.Interfaces,
-  System.Rtti, System.Actions, System.Classes;
+  System.Rtti, System.Actions, System.Classes, iORM.CommonTypes;
 
 type
 

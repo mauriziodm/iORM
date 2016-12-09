@@ -46,7 +46,7 @@ var
 implementation
 
 uses
-  FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData;
+  FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData, FWait;
 
 {$R *.fmx}
 
@@ -54,6 +54,18 @@ procedure TStartForm.FormCreate(Sender: TObject);
 var
   Style : TFMXObject;
 begin
+  // Register the ShowWait & CloseWait proc
+  Application.CreateForm(TWaitForm, WaitForm);
+  io.SetWaitProc(
+    procedure
+    begin
+      WaitForm.Show;
+    end,
+    procedure
+    begin
+      WaitForm.Hide;
+    end
+    );
   // Set the stype
   Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
   TStyleManager.SetStyle(Style);

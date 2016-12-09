@@ -42,7 +42,11 @@ uses
   System.Generics.Collections, iORM.Where.SqlItems.Interfaces,
   iORM.CommonTypes, iORM.Context.Properties.Interfaces,
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
-  iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.Where.Interfaces;
+  iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.Where.Interfaces,
+  iORM.MVVM.Interfaces;
+
+const
+  VIEW_DATA_TYPE = TioViewDataType.dtList;
 
 type
 
@@ -77,6 +81,10 @@ type
     // ioWhereDetailsFromDetailAdapters property
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+    // ioViewDataType
+    function GetIoViewDataType: TioViewDataType;
+    // ioOwnsObjects
+    function GetOwnsObjects: Boolean;
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -110,6 +118,7 @@ type
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure Append(AObject:TObject); overload;
     procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
@@ -126,6 +135,8 @@ type
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioWhereStr:IioWhere read GetIoWhere write SetIoWhere;
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
+    property ioViewDataType:TioViewDataType read GetIoViewDataType;
+    property ioOwnsObjects:Boolean read GetOwnsObjects;
   end;
 
 implementation
@@ -198,10 +209,14 @@ procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
 begin
   inherited;
   // Send a notification to other ActiveBindSourceAdapters & BindSource
-  Notify(
-         Self,
-         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
-        );
+  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  //       if FAutoPersist is True then the notify is performed by
+  //       the "CommonBSAPersistence" else by this method
+  if not FAutoPersist then
+    Notify(
+           Self,
+           TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
+          );
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterInsert;
@@ -236,32 +251,21 @@ begin
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterPost;
-var
-  LMasterProperty: IioContextProperty;
 begin
   inherited;
   Self.SetObjStatus(osDirty);
   // If AutoPersist is enabled then persist
   if FAutoPersist then
-    if Self.IsDetail then
-    begin
-      // Get the MasterProperty of the current object
-      LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(
-        FMasterAdaptersContainer.GetMasterBindSourceAdapter.Current.ClassType,
-        FMasterPropertyName);
-      io.Persist(Self.Current,
-                 LMasterProperty.GetRelationChildPropertyName,
-                 Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
-                 False,
-                 '')  // Connection name
-    end
-    else
-      io.Persist(Self.Current);
+    TioCommonBSAPersistence.Persist(Self)
   // Send a notification to other ActiveBindSourceAdapters & BindSource
-  Notify(
-         Self,
-         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
-        );
+  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  //       if FAutoPersist is True then the notify is performed by
+  //       the "CommonBSAPersistence" else by this method
+  else
+    Notify(
+           Self,
+           TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
+          );
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterScroll;
@@ -272,7 +276,7 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
 begin
-inherited;
+  inherited;
   // If ObjectStatus exists in the class then set it as osDirty
   if Self.UseObjStatus then
   begin
@@ -280,15 +284,15 @@ inherited;
     Abort;
   end;
   // If AutoPersist is enabled then persist
-  if Self.FAutoPersist then io.Delete(Self.Current);
+  if Self.FAutoPersist then
+    TioCommonBSAPersistence.Delete(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
   if FAutoLoadData then
-    TioCommonBSAPersistence.LoadList(Self);
-//    io.Load(FTypeName, FTypeAlias)._Where(GetioWhere).ToList(Self.List);  // Use GetioWhere to fill the WhereDetails
+    TioCommonBSAPersistence.Load(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeRefresh;
@@ -381,6 +385,11 @@ begin
   Result := FAutoPersist;
 end;
 
+function TioActiveInterfaceListBindSourceAdapter.GetIoViewDataType: TioViewDataType;
+begin
+  Result := VIEW_DATA_TYPE;
+end;
+
 function TioActiveInterfaceListBindSourceAdapter.GetioWhere: IioWhere;
 begin
   Result := FWhere;
@@ -399,9 +408,21 @@ begin
   Result := FWhereDetailsFromDetailAdapters;
 end;
 
+function TioActiveInterfaceListBindSourceAdapter.GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+begin
+  Result := nil;
+  if Self.IsDetail then
+    Result := FMasterAdaptersContainer.GetMasterBindSourceAdapter;
+end;
+
 function TioActiveInterfaceListBindSourceAdapter.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetOwnsObjects: Boolean;
+begin
+  Result := FLocalOwnsObject;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(

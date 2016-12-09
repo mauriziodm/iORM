@@ -21,7 +21,8 @@ uses
   VM.Person in 'ViewModel\VM.Person.pas',
   System.IOUtils,
   V.Main in 'View\V.Main.pas' {ViewMain: TFrame},
-  FViewContext in 'FViewContext.pas' {ViewContextForm};
+  FViewContext in 'FViewContext.pas' {ViewContextForm},
+  FWait in 'FWait.pas' {WaitForm};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

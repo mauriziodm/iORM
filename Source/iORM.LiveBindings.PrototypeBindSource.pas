@@ -40,7 +40,7 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.Interfaces, System.Classes,
   iORM.LiveBindings.Notification, System.Rtti, iORM.MVVM.Interfaces,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, iORM.CommonTypes;
 
 type
 

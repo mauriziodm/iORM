@@ -49,7 +49,8 @@ uses
   iORM.LiveBindings.Interfaces,
   iORM.Global.Factory,
   iORM.DB.ConnectionContainer, iORM.Where.Interfaces, iORM.Where.Factory,
-  System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper;
+  System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper,
+  System.SysUtils;
 
 type
 
@@ -91,9 +92,9 @@ type
     class function SQL(const ASQL:String): IioSQLDestination; overload;
     class function SQL(const ASQLDestination:IioSQLDestination): IioSQLDestination; overload;
     class function Mapper:omRef;
-    class procedure SetShowHideWaitProc(const AShowWaitProc:TioShowWaitProc; const AHideWaitProc:TioHideWaitProc);
-    class function ShowWait: TioShowWaitProc;
-    class function HideWait: TioHideWaitProc;
+    class procedure SetWaitProc(const AShowWaitProc:TProc=nil; const AHideWaitProc:TProc=nil);
+    class procedure ShowWait;
+    class procedure HideWait;
   end;
 
 implementation
@@ -104,7 +105,6 @@ uses
   iORM.DuckTyped.StreamObject,
   iORM.Attributes,
   iORM.Exceptions,
-  System.SysUtils,
   iORM.DB.Factory,
   iORM.DB.DBCreator.Factory, iORM.Rtti.Utilities, iORM.Strategy.Factory,
   iORM.Context.Container;
@@ -230,15 +230,15 @@ begin
   Result := TioDBFactory.SQLDestination(ASQL);
 end;
 
-class procedure io.SetShowHideWaitProc(const AShowWaitProc: TioShowWaitProc;
-  const AHideWaitProc: TioHideWaitProc);
+class procedure io.SetWaitProc(const AShowWaitProc: TProc;
+  const AHideWaitProc: TProc);
 begin
   TioConnectionManager.SetShowHideWaitProc(AShowWaitProc, AHideWaitProc);
 end;
 
-class function io.ShowWait: TioShowWaitProc;
+class procedure io.ShowWait;
 begin
-  TioConnectionManager.GetShowWaitProc;
+  TioConnectionManager.ShowWaitProc;
 end;
 
 class function io.SQL(
@@ -297,9 +297,9 @@ begin
   Result := TioGlobalFactory;
 end;
 
-class function io.HideWait: TioHideWaitProc;
+class procedure io.HideWait;
 begin
-  TioConnectionManager.GetHideWaitProc;
+  TioConnectionManager.HideWaitProc;
 end;
 
 class function io.Load(const AClassRef:TioClassRef; const ATypeAlias:String): IioWhere;

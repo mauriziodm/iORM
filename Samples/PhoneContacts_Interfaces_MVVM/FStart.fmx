@@ -4,6 +4,7 @@ object StartForm: TStartForm
   Caption = 'Form1'
   ClientHeight = 734
   ClientWidth = 1002
+  Position = DesktopCenter
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -55,7 +56,7 @@ object StartForm: TStartForm
     AutoParent = True
     AutoOwner = True
     Left = 112
-    Top = 56
+    Top = 128
   end
   object FormsVCProvider: TioViewContextProvider
     ioOnRequest = FormsVCProviderioOnRequest
@@ -65,11 +66,11 @@ object StartForm: TStartForm
     AutoParent = True
     AutoOwner = True
     Left = 112
-    Top = 120
+    Top = 176
   end
   object ActionList1: TActionList
     Left = 112
-    Top = 185
+    Top = 257
     object NextTabAction1: TNextTabAction
       Category = 'Tab'
       TabControl = MainTabControl
@@ -87,7 +88,7 @@ object StartForm: TStartForm
     DefaultConnection = True
     Persistent = False
     Pooled = False
-    Left = 216
-    Top = 88
+    Left = 112
+    Top = 48
   end
 end

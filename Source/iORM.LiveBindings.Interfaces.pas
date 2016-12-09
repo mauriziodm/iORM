@@ -87,6 +87,7 @@ type
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDataObject: TObject;
     procedure SetDataObject(const AObj:TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
@@ -94,6 +95,7 @@ type
     function IsDetail: Boolean;
     function TypeName: String;
     function TypeAlias: String;
+    function GetMasterPropertyName: String;
     // Current property
     function GetCurrent: TObject;
     property Current: TObject read GetCurrent;
@@ -113,6 +115,12 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
+    // ioViewDataType
+    function GetIoViewDataType: TioViewDataType;
+    property ioViewDataType:TioViewDataType read GetIoViewDataType;
+    // ioOwnsObjects
+    function GetOwnsObjects: Boolean;
+    property ioOwnsObjects:Boolean read GetOwnsObjects;
   end;
 
   // Bind source adapter container

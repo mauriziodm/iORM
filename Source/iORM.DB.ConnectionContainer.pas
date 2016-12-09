@@ -48,7 +48,7 @@ uses
   System.Generics.Collections,
   FireDAC.Comp.Client,
   iORM.DB.Interfaces,
-  iORM.CommonTypes;
+  iORM.CommonTypes, System.SysUtils;
 
 type
 {$IFDEF MSWINDOWS}
@@ -87,8 +87,8 @@ type
   strict private
     class var FDefaultConnectionName: String;
     class var FConnectionManagerContainer: TioConnectionManagerContainer;  // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
-    class var FShowWaitProc: TioShowWaitProc;
-    class var FHideWaitProc: TioHideWaitProc;
+    class var FShowWaitProc: TProc;
+    class var FHideWaitProc: TProc;
     class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef;
   protected
     class procedure CreateInternalContainer;
@@ -104,9 +104,9 @@ type
     class function GetDefaultConnectionName: String;
     class function GetConnectionInfo(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionInfo;
     class procedure SetDefaultConnectionName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
-    class procedure SetShowHideWaitProc(const AShowWaitProc:TioShowWaitProc; const AHideWaitProc:TioHideWaitProc);
-    class function GetShowWaitProc: TioShowWaitProc;
-    class function GetHideWaitProc: TioHideWaitProc;
+    class procedure SetShowHideWaitProc(const AShowWaitProc:TProc; const AHideWaitProc:TProc);
+    class procedure ShowWaitProc;
+    class procedure HideWaitProc;
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
 {$ENDIF}
@@ -144,7 +144,7 @@ type
 implementation
 
 uses
-  System.Classes, System.SysUtils, iORM.Exceptions;
+  System.Classes, iORM.Exceptions;
 
 { TioConnectionContainer }
 
@@ -247,14 +247,16 @@ begin
   Result := Self.FDefaultConnectionName;
 end;
 
-class function TioConnectionManager.GetHideWaitProc: TioHideWaitProc;
+class procedure TioConnectionManager.HideWaitProc;
 begin
-  Result := FHideWaitProc;
+  if Assigned(FHideWaitProc) then
+    FHideWaitProc;
 end;
 
-class function TioConnectionManager.GetShowWaitProc: TioShowWaitProc;
+class procedure TioConnectionManager.ShowWaitProc;
 begin
-  Result := FShowWaitProc;
+  if Assigned(FShowWaitProc) then
+    FShowWaitProc;
 end;
 
 class function TioConnectionManager.IsEmptyConnectionName(const
@@ -366,7 +368,7 @@ begin
 end;
 
 class procedure TioConnectionManager.SetShowHideWaitProc(
-  const AShowWaitProc: TioShowWaitProc; const AHideWaitProc: TioHideWaitProc);
+  const AShowWaitProc: TProc; const AHideWaitProc: TProc);
 begin
   FShowWaitProc := AShowWaitProc;
   FHideWaitProc := AHideWaitProc;

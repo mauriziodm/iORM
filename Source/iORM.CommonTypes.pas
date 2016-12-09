@@ -63,6 +63,7 @@ type
   TioShowWaitProc = reference to procedure;
   TioHideWaitProc = reference to procedure;
 
+  TioViewDataType = (dtSingle, dtList);
 
   // Nullables
   TioNullable<T> = record

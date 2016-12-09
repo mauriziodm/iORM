@@ -42,7 +42,7 @@ interface
 uses
   iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, iORM.CommonTypes;
 
 type
 

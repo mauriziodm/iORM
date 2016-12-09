@@ -447,9 +447,11 @@ end;
 procedure TioSQLMonitor.SetMode(const Value: TioMonitorMode);
 begin
   FMode := Value;
+{$IFDEF MSWINDOWS}
   // Set the monitor mode
   if not (csDesigning in ComponentState) then
     io.Connections.Monitor.Mode := FMode;
+{$ENDIF}
 end;
 
 end.

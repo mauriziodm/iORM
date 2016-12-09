@@ -350,6 +350,10 @@
             <Form>ViewContextForm</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="FWait.pas">
+            <Form>WaitForm</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <None Include="Styles\Diamond.style"/>
         <RcItem Include="Styles\Copper.style">
             <ContainerId>ResourceItem</ContainerId>
@@ -377,7 +381,8 @@
                     <Source Name="MainSource">PhoneContacts_Interfaces_MVVM.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\DMVC_IDE_Expert_D101Berlin.bpl">DMVC IDE Expert</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\iORM_Project.bpl">iORM Runtime</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\iORM_Project_DesignTime.bpl">iORM Designtime</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
