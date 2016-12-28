@@ -11,7 +11,7 @@ uses
   Fmx.Bind.DBEngExt, iORM.Attributes, System.Actions, FMX.ActnList,
   Fmx.Bind.GenData, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.ListView, Data.Bind.Controls, FMX.Layouts,
-  Fmx.Bind.Navigator, V.Interfaces;
+  Fmx.Bind.Navigator, V.Interfaces, iORM.MVVM.Components.ViewModelBridge;
 
 type
   [diImplements(IPersonView, 'TPerson'), diImplements(IPersonView, 'TAnotherPerson')]
@@ -52,6 +52,7 @@ type
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
     BindNavigator1: TBindNavigator;
+    VMBridge: TioViewModelBridge;
 
   private
     { Private declarations }

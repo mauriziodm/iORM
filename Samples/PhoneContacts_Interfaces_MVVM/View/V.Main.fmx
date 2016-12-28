@@ -274,12 +274,11 @@ object ViewMain: TViewMain
     ioTypeName = 'IPerson'
     ioAsync = True
     ioAutoLoadData = True
-    ioAutoPersist = True
+    ioAutoPersist = False
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_Interface = 'IPersonsViewModel'
-    ioVM_UseBSPropsOnCreate = True
+    ioViewModelBridge = VMBridge
     Left = 400
     Top = 200
   end
@@ -307,7 +306,6 @@ object ViewMain: TViewMain
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 400
     Top = 264
   end
@@ -348,5 +346,10 @@ object ViewMain: TViewMain
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
+  end
+  object VMBridge: TioViewModelBridge
+    VM_TypeName = 'IPersonsViewModel'
+    Left = 472
+    Top = 232
   end
 end

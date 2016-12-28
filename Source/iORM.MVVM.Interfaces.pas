@@ -195,6 +195,21 @@ type
     function Get(const AName:String; const ANoException:Boolean=False): IioCommandsContainerItem;
   end;
 
+  // Interface implemented by TioPrototypeBindSource & TioLiveMemTable to communicate
+  //  to the TioViewModelBridge component the type data to create the ViewModel correctly
+  IioVMBridgeTypeDataSource = interface
+    ['{013EE0CB-6D72-4DA4-A98F-6094E030D31E}']
+{ TODO : Da eliminare una volta fatti i componenti TioBindSourceAdapterProvider }    procedure ClearViewModelBridge;
+    function GetName: String;
+    function GetTypeName: String;
+    function GetTypeAlias: String;
+    function GetAutoLoadData: Boolean;
+    function GetViewDataType: TioViewDataType;
+    function GetWhereStr: TStrings;
+    function GetOrderBy: String;
+    function IsLinkedTo(const AVMBridgePointer:Pointer): Boolean;
+  end;
+
 implementation
 
 uses

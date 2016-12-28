@@ -54,13 +54,19 @@ object Form1: TForm1
           TabOrder = 1
           Visible = True
         end
+        object Button3: TButton
+          Position.X = 8.000000000000000000
+          Position.Y = 8.000000000000000000
+          TabOrder = 2
+          Text = 'Button3'
+          OnClick = Button3Click
+        end
       end
       object MasterListView: TListView
         ItemAppearanceClassName = 'TImageListItemAppearance'
         ItemEditAppearanceClassName = 'TImageListItemDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
-        ItemIndex = 1
         Align = Client
         Size.Width = 320.000000000000000000
         Size.Height = 250.000000000000000000
@@ -84,7 +90,6 @@ object Form1: TForm1
         ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
-        ItemIndex = 0
         Align = Bottom
         Position.Y = 317.000000000000000000
         Size.Width = 320.000000000000000000
@@ -161,9 +166,9 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TabOrder = 6
         RowHeight = 21.000000000000000000
-        RowCount = 200
-        Viewport.Width = 300.000000000000000000
-        Viewport.Height = 109.000000000000000000
+        RowCount = 0
+        Viewport.Width = 316.000000000000000000
+        Viewport.Height = 125.000000000000000000
       end
       object Panel1: TPanel
         Align = Client
@@ -186,7 +191,6 @@ object Form1: TForm1
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 7
           ReadOnly = True
-          Text = '-33'
           Position.X = 120.000000000000000000
           Position.Y = 42.000000000000000000
           Size.Width = 97.000000000000000000
@@ -214,7 +218,6 @@ object Form1: TForm1
         object EditFirstname: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 6
-          Text = 'Mark Anderson'
           Position.X = 120.000000000000000000
           Position.Y = 82.000000000000000000
           Size.Width = 249.000000000000000000
@@ -233,27 +236,6 @@ object Form1: TForm1
         object EditLastname: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 5
-          Text = 
-            'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-            'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-            'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-            'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-            'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-            'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-            ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-            'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-            ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-            ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-            'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-            'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-            'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-            'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-            'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-            'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-            'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-            'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-            'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-            'por, velit sit'
           Position.X = 120.000000000000000000
           Position.Y = 122.000000000000000000
           Size.Width = 249.000000000000000000
@@ -273,7 +255,6 @@ object Form1: TForm1
         object EditFidelityCardCode: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 4
-          Text = '-33'
           Position.X = 120.000000000000000000
           Position.Y = 162.000000000000000000
           Size.Width = 249.000000000000000000
@@ -294,7 +275,6 @@ object Form1: TForm1
         object EditVipCard: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 3
-          Text = '-33'
           Position.X = 120.000000000000000000
           Position.Y = 202.000000000000000000
           Size.Width = 249.000000000000000000
@@ -315,27 +295,6 @@ object Form1: TForm1
         object EditBranchOffice: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 2
-          Text = 
-            'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-            'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-            'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-            'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-            'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-            'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-            ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-            'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-            ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-            ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-            'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-            'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-            'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-            'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-            'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-            'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-            'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-            'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-            'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-            'por, velit sit'
           Position.X = 120.000000000000000000
           Position.Y = 242.000000000000000000
           Size.Width = 249.000000000000000000
@@ -347,7 +306,7 @@ object Form1: TForm1
     end
   end
   object MasterBS: TioPrototypeBindSource
-    AutoActivate = True
+    AutoActivate = False
     AutoPost = False
     FieldDefs = <
       item
@@ -393,6 +352,7 @@ object Form1: TForm1
       end>
     ScopeMappings = <>
     ioTypeName = 'TPerson'
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -403,7 +363,7 @@ object Form1: TForm1
     Top = 120
   end
   object DetailBS: TioPrototypeBindSource
-    AutoActivate = True
+    AutoActivate = False
     AutoPost = False
     FieldDefs = <
       item
@@ -430,6 +390,7 @@ object Form1: TForm1
       end>
     ScopeMappings = <>
     ioTypeName = 'TPhoneNumber'
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList

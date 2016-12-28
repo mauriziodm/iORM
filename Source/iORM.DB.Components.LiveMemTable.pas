@@ -34,21 +34,52 @@
 
 
 
-
-unit iORM.MVVM.ViewContextProvider.DesignTime;
+unit iORM.DB.Components.LiveMemTable;
 
 interface
 
-  procedure Register;
+uses
+  FireDAC.Comp.Client, Data.Bind.ObjectScope, iORM.CommonTypes, System.Classes,
+  iORM.LiveBindings.Notification, iORM.LiveBindings.Interfaces;
+
+type
+
+  TioLiveMemTable = class (TFDMemTable)
+  private
+    FInternalAdapter: TBindSourceAdapter;
+    FioTypeName: String;
+    FioTypeAlias: String;
+    FioAutoLoadData: Boolean;
+    FioAsync: Boolean;
+    FioAutoPersist: Boolean;
+    FioViewDataType: TioViewDataType;
+    FioMasterLiveMemTable: TioLiveMemTable;
+    FioMasterPropertyName: String;
+    FioWhereStr: TStrings;
+    FioWhereDetailsFromDetailAdapters: Boolean;
+    FioOrderBy: String;
+    FioAutoRefreshOnNotification: TioAutoRefreshType;
+    FioVM_Interface, FioVM_Alias, FioVM_Marker: String;
+    FioMasterVM_Interface, FioMasterVM_Alias: String;
+    FioVM_UseBSPropsOnCreate: Boolean;
+//    FioViewModel: IioViewModel;
+    FonNotify: TioBSANotificationEvent;
+//    FOnNeedViewModel: TioNeedViewModelEvent;
+
+    // Events
+    FOnCreateAdapter: TCreateAdapterEvent;
+  protected
+    procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter);
+  public
+  end;
 
 implementation
 
-uses
-  System.Classes, iORM.MVVM.ViewContextProvider;
+{ TioLiveMemTable }
 
-  procedure Register;
-  begin
-    RegisterComponents('iORM', [TioViewContextProvider]);
-  end;
+procedure TioLiveMemTable.DoCreateAdapter(var ADataObject: TBindSourceAdapter);
+begin
+
+end;
 
 end.

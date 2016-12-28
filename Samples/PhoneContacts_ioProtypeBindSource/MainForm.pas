@@ -58,6 +58,8 @@ type
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
+    Button3: TButton;
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -70,5 +72,10 @@ var
 implementation
 
 {$R *.fmx}
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  MasterBS.Active := True;
+end;
 
 end.

@@ -67,7 +67,6 @@ begin
   LExecute := function: TObject
   begin
     io.Delete(AActiveBindSourceAdapter.Current);
-    Sleep(5000);
   end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
@@ -110,13 +109,11 @@ begin
       LExecute := function: TObject
       begin
         Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToObject;
-    Sleep(5000);
       end;
     TioViewDataType.dtList:
       LExecute := function: TObject
       begin
         Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToList(LTargetClass);
-    Sleep(5000);
       end;
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
@@ -167,7 +164,6 @@ begin
       False, // BlindInsert
       ''     // Connection name
       );
-    Sleep(5000);
   end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)

@@ -168,6 +168,8 @@ contains
   iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
   iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas',
   iORM.DB.Components.ConnectionDef in '..\..\Source\iORM.DB.Components.ConnectionDef.pas',
-  iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas';
+  iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas',
+  iORM.DB.Components.LiveMemTable in '..\..\Source\iORM.DB.Components.LiveMemTable.pas',
+  iORM.MVVM.Components.ViewModelBridge in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas';
 
 end.

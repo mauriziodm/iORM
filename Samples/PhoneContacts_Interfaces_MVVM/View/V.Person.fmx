@@ -300,8 +300,7 @@ object ViewPerson: TViewPerson
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_Interface = 'IPersonViewModel'
-    ioVM_UseBSPropsOnCreate = True
+    ioViewModelBridge = VMBridge
     Left = 20
     Top = 48
   end
@@ -390,8 +389,11 @@ object ViewPerson: TViewPerson
     ioMasterBindSource = BSPerson
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 24
     Top = 184
+  end
+  object VMBridge: TioViewModelBridge
+    Left = 344
+    Top = 48
   end
 end

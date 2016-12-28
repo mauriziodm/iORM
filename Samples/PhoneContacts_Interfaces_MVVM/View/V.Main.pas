@@ -10,7 +10,8 @@ uses
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Components,
   FMX.ActnList, FMX.TabControl, System.Actions, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ScrollBox, FMX.Memo, FMX.ListView,
-  FMX.Controls.Presentation, iORM.Attributes;
+  FMX.Controls.Presentation, iORM.Attributes,
+  iORM.MVVM.Components.ViewModelBridge;
 
 type
 
@@ -50,7 +51,6 @@ type
     ToolBar1: TToolBar;
     lblTitle1: TLabel;
     Panel1: TPanel;
-    Label2: TLabel;
     MasterListView: TListView;
     Label3: TLabel;
     DetailListView: TListView;
@@ -63,6 +63,7 @@ type
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
     LinkListControlToField2: TLinkListControlToField;
+    VMBridge: TioViewModelBridge;
     procedure acRefreshMemoExecute(Sender: TObject);
   private
     { Private declarations }
@@ -79,7 +80,7 @@ uses
 
 procedure TViewMain.acRefreshMemoExecute(Sender: TObject);
 begin
-  Memo1.Lines.Text := BSMaster.ioViewModelAs<IPersonsViewModel>.JSON;
+  Memo1.Lines.Text :=  VMBridge.ViewModelAs<IPersonsViewModel>.JSON;
 end;
 
 end.
