@@ -301,8 +301,8 @@ object ViewPerson: TViewPerson
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
     ioViewModelBridge = VMBridge
-    Left = 20
-    Top = 48
+    Left = 28
+    Top = 136
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -393,7 +393,7 @@ object ViewPerson: TViewPerson
     Top = 184
   end
   object VMBridge: TioViewModelBridge
-    Left = 344
-    Top = 48
+    Left = 24
+    Top = 88
   end
 end
