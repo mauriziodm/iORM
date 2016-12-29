@@ -372,12 +372,12 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPerson'
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 256
     Top = 112
   end
@@ -464,6 +464,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPhoneNumber'
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -472,7 +473,6 @@ object MainForm: TMainForm
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 256
     Top = 176
   end

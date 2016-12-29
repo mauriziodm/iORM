@@ -273,7 +273,7 @@ object ViewMain: TViewMain
     ScopeMappings = <>
     ioTypeName = 'IPerson'
     ioAsync = True
-    ioAutoLoadData = True
+    ioAutoLoadData = False
     ioAutoPersist = False
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True

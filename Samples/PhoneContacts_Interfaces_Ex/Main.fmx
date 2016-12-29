@@ -438,7 +438,6 @@ object MainForm: TMainForm
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 272
     Top = 240
   end
@@ -541,7 +540,6 @@ object MainForm: TMainForm
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 272
     Top = 296
   end
