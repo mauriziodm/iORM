@@ -88,7 +88,7 @@ type
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    function GetDataObject: TObject;
+    function DataObject: TObject;
     procedure SetDataObject(const AObj:TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
     function GetCurrentOID: Integer;

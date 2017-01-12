@@ -40,7 +40,7 @@ unit iORM.MVVM.ViewContextProviderContainer;
 interface
 
 uses
-  iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.ViewContextProvider;
+  iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider;
 
 type
 

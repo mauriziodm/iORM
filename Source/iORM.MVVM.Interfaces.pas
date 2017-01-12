@@ -40,7 +40,7 @@ interface
 uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.Actions, System.UITypes, iORM.CommonTypes,
-  iORM.Attributes, System.Generics.Collections, iORM.MVVM.ViewContextProvider;
+  iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider;
 
 type
 

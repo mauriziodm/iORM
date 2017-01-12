@@ -43,7 +43,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
   iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,
-  iORM.MVVM.ViewContextProvider;
+  iORM.MVVM.Components.ViewContextProvider;
 
 type
 

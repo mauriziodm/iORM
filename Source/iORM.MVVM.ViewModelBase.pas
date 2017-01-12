@@ -37,10 +37,12 @@ unit iORM.MVVM.ViewModelBase;
 
 interface
 
+{$I ioGlobalDef.inc}   // io global definitions
+
 uses
   System.Classes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.Components.ViewContextProvider;
 
 type
 
@@ -147,6 +149,8 @@ implementation
 uses System.SysUtils, iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.MVVM.Factory, Data.Bind.ObjectScope,
   iORM.LiveBindings.Factory, iORM;
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
 

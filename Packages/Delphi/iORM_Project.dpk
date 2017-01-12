@@ -163,13 +163,15 @@ contains
   iORM.REST.Body.Response in '..\..\Source\iORM.REST.Body.Response.pas',
   iORM.REST.Factory in '..\..\Source\iORM.REST.Factory.pas',
   ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
-  iORM.MVVM.ViewContextProvider in '..\..\Source\iORM.MVVM.ViewContextProvider.pas',
+  iORM.MVVM.Components.ViewContextProvider in '..\..\Source\iORM.MVVM.Components.ViewContextProvider.pas',
   iORM.MVVM.ViewContextContainer in '..\..\Source\iORM.MVVM.ViewContextContainer.pas',
   iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
   iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas',
   iORM.DB.Components.ConnectionDef in '..\..\Source\iORM.DB.Components.ConnectionDef.pas',
   iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas',
   iORM.DB.Components.LiveMemTable in '..\..\Source\iORM.DB.Components.LiveMemTable.pas',
-  iORM.MVVM.Components.ViewModelBridge in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas';
+  iORM.MVVM.Components.ViewModelBridge in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas',
+  iORM.MVVM.Components.ModelPresenter in '..\..\Source\iORM.MVVM.Components.ModelPresenter.pas',
+  iORM.Components.Common in '..\..\Source\iORM.Components.Common.pas';
 
 end.

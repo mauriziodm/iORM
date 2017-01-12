@@ -100,7 +100,7 @@ begin
   // Copy values into local variables
   LTypeName := AActiveBindSourceAdapter.TypeName;
   LTypeAlias := AActiveBindSourceAdapter.TypeAlias;
-  LTargetClass := AActiveBindSourceAdapter.GetDataObject.ClassType;
+  LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
   LWhere := AActiveBindSourceAdapter.ioWhere;
   LOwnsObjects := AActiveBindSourceAdapter.ioOwnsObjects;
   // Set Execute anonimous methods

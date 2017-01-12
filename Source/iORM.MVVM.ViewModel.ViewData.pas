@@ -100,15 +100,7 @@ begin
 end;
 
 constructor TioViewData.Create(const ADataObj: TObject; const AViewDataType:TioViewDataType);
-var
-  LRealClassName : String;
-  LDuckList : IioDuckTypedList;
 begin
-  lRealClassName := ADataObj.ClassName;
-  if AViewDataType = TioViewDataType.dtList then begin
-    lDuckList := TioDuckTypedFactory.DuckTypedList(ADataObj);
-    lRealClassName := lDuckList.GetGenericTypeName;
-  end;
   // Create the BindSourceAdapter
   Self.Create(
     ADataObj.ClassName,  // TypeName
@@ -129,7 +121,7 @@ end;
 
 function TioViewData.DataObj: TObject;
 begin
-  Result := FBindSourceAdapter.GetDataObject;
+  Result := FBindSourceAdapter.DataObject;
 end;
 
 procedure TioViewData.SetDataObj(AObj: TObject);

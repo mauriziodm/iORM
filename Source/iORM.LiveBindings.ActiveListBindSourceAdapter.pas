@@ -123,7 +123,7 @@ type
     procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
-    function GetDataObject: TObject;
+    function DataObject: TObject;
     procedure SetDataObject(const AObj:TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
@@ -352,7 +352,7 @@ begin
   Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
 end;
 
-function TioActiveListBindSourceAdapter.GetDataObject: TObject;
+function TioActiveListBindSourceAdapter.DataObject: TObject;
 begin
   Result := Self.List;
 end;

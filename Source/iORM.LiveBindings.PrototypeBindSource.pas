@@ -80,7 +80,6 @@ type
 {$ENDIF}
     // =========================================================================
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
-    procedure RegisterConnectionDefComponents;
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
@@ -124,7 +123,8 @@ type
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
     procedure Insert(AObject:TObject); overload;
-    function GetDataObject: TObject;
+    function DataObject: TObject;
+    function DataObjectAs<T>: T;
     procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -153,7 +153,8 @@ type
 implementation
 
 uses System.SysUtils, iORM.Exceptions, iORM.LiveBindings.Factory,
-  iORM.Where.Factory, iORM.DB.Components.ConnectionDef;
+  iORM.Where.Factory, iORM.DB.Components.ConnectionDef, iORM.Rtti.Utilities,
+  iORM.Components.Common;
 
 { TioPrototypeBindSource }
 
@@ -301,10 +302,18 @@ begin
   Result := FioAutoLoadData;
 end;
 
-function TioPrototypeBindSource.GetDataObject: TObject;
+function TioPrototypeBindSource.DataObject: TObject;
 begin
   Result := nil;
-  Result := Self.GetActiveBindSourceAdapter.GetDataObject;
+  Result := Self.GetActiveBindSourceAdapter.DataObject;
+end;
+
+function TioPrototypeBindSource.DataObjectAs<T>: T;
+var
+  LObj: TObject;
+begin
+  LObj := Self.DataObject;
+  Result := TioRttiUtilities.CastObjectToGeneric<T>(LObj);
 end;
 
 function TioPrototypeBindSource.GetDetailBindSourceAdapter(
@@ -403,7 +412,7 @@ begin
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
   if not (csDesigning in ComponentState) then
-    RegisterConnectionDefComponents;
+    TioComponentsCommon.RegisterConnectionDefComponents(Owner);
   // ===========================================================================
 
   // VIEWMODELBRIDGE - CHECK FOR VIEWMODEL IF NOT ALREADY EXECUTED
@@ -470,25 +479,6 @@ begin
     GetInternalAdapter.Refresh;
 end;
 
-procedure TioPrototypeBindSource.RegisterConnectionDefComponents;
-var
-  I: Integer;
-  LConnectionDef: TioCustomConnectionDef;
-begin
-  // Loop for Owner's components
-  for I := 0 to Owner.ComponentCount-1 do
-  begin
-    // If the current component is a ConnectionDef then register it
-    //  if not already registered.
-    if Owner.Components[I] is TioCustomConnectionDef then
-    begin
-      LConnectionDef := TioCustomConnectionDef(Owner.Components[I]);
-      if not LConnectionDef.IsRegistered then
-        LConnectionDef.RegisterConnectionDef;
-    end;
-  end;
-end;
-
 procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);
 begin
   Self.GetActiveBindSourceAdapter.SetDataObject(AObj, AOwnsObject);
@@ -526,8 +516,6 @@ begin
 end;
 
 procedure TioPrototypeBindSource.SetWhereStr(const Value: TStrings);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
   FioWhereStr.Assign(Value);
   // If in DesignTime then Exit

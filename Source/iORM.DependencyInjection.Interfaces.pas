@@ -40,7 +40,7 @@ interface
 uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes, iORM.MVVM.ViewContextProvider;
+  iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider;
 
 type
 

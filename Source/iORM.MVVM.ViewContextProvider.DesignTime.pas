@@ -44,7 +44,7 @@ interface
 implementation
 
 uses
-  System.Classes, iORM.MVVM.ViewContextProvider;
+  System.Classes, iORM.MVVM.Components.ViewContextProvider;
 
   procedure Register;
   begin

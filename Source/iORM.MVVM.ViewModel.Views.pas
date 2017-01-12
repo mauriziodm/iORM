@@ -41,7 +41,7 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.CommonTypes,
-  iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.MVVM.Interfaces, iORM.MVVM.Components.ViewContextProvider;
 
 type
 
