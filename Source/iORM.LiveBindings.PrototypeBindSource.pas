@@ -118,11 +118,13 @@ type
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
+    function CurrentAs<T>: T;
     procedure Refresh(ReloadData:Boolean); overload;
     procedure Persist(ReloadData:Boolean=False);
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
     procedure Insert(AObject:TObject); overload;
+    function DataObjectAssigned: Boolean;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
     procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
@@ -291,6 +293,14 @@ begin
   Result := Self.InternalAdapter.Current
 end;
 
+function TioPrototypeBindSource.CurrentAs<T>: T;
+var
+  LCurrent: TObject;
+begin
+  LCurrent := Self.Current;
+  Result := TioRttiUtilities.CastObjectToGeneric<T>(LCurrent);
+end;
+
 function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := nil;
@@ -314,6 +324,14 @@ var
 begin
   LObj := Self.DataObject;
   Result := TioRttiUtilities.CastObjectToGeneric<T>(LObj);
+end;
+
+function TioPrototypeBindSource.DataObjectAssigned: Boolean;
+begin
+  if CheckAdapter then
+    Result := Assigned(Self.GetActiveBindSourceAdapter.DataObject)
+  else
+    Result := False;
 end;
 
 function TioPrototypeBindSource.GetDetailBindSourceAdapter(

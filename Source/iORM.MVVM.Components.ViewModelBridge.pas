@@ -31,6 +31,7 @@ type
     destructor Destroy; override;
     procedure SetLinkedBindSource(const ATypeDataSource:TObject);
     procedure CheckForViewModel;
+    function ViewModelIsAssigned: Boolean;
     function ViewModelAs<T: IInterface>: T;
     property ViewModel:IioViewModel read FViewModel;
   published
@@ -82,8 +83,8 @@ begin
     Exit;
   // If a ViewModel is already assigned then exit
   if Assigned(FViewModel) then Exit;
-  // If the VMBridge is "Loaded" before che linked BindSource or LiveMemTable
-  //  then find che linked TypeDataSource to continue
+  // If the VMBridge is "Loaded" before the linked BindSource or LiveMemTable
+  //  then find the linked TypeDataSource to continue
   CheckForTypeDataSource;
   // ===============================================================================================================================
   // LOCKED VIEW MODEL ALREADY CREATED IN THE DEPENDENCY INJECTION CONTAINER  (an external prepared ViewModel)
@@ -177,6 +178,11 @@ begin
   LIID := TioRttiUtilities.TypeInfoToGUID(TypeInfo(T));
   if not Supports(FViewModel, LIID, Result) then
     raise EioException.Create(Self.ClassName + ': Interface not implemented by the ViewModel.');
+end;
+
+function TioViewModelBridge.ViewModelIsAssigned: Boolean;
+begin
+  Result := Assigned(FViewModel);
 end;
 
 procedure TioViewModelBridge.Loaded;

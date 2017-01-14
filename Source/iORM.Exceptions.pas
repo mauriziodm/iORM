@@ -42,8 +42,24 @@ uses
 
 type
 
-  EioException = class(Exception);
+  EioException = class(Exception)
+  public
+    constructor Create(const AClassName, AMethodName, AMsg: string); overload;
+    constructor Create(const AClassName, AMsg: string); overload;
+  end;
 
 implementation
+
+{ EioException }
+
+constructor EioException.Create(const AClassName, AMethodName, AMsg: string);
+begin
+  Self.Message := Format('%s.%s: %s', [AClassName, AMethodName, AMsg]);
+end;
+
+constructor EioException.Create(const AClassName, AMsg: string);
+begin
+  Self.Message := Format('%s: %s', [AClassName, AMsg]);
+end;
 
 end.

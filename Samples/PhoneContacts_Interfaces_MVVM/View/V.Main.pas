@@ -11,7 +11,7 @@ uses
   FMX.ActnList, FMX.TabControl, System.Actions, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ScrollBox, FMX.Memo, FMX.ListView,
   FMX.Controls.Presentation, iORM.Attributes,
-  iORM.MVVM.Components.ViewModelBridge;
+  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource;
 
 type
 
@@ -64,6 +64,8 @@ type
     LinkListControlToField1: TLinkListControlToField;
     LinkListControlToField2: TLinkListControlToField;
     VMBridge: TioViewModelBridge;
+    PersonsModelBindSource: TioModelBindSource;
+    PhonesModelBindSource: TioModelBindSource;
     procedure acRefreshMemoExecute(Sender: TObject);
   private
     { Private declarations }

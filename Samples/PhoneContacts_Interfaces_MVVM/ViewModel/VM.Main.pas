@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase, System.Actions,
   FMX.ActnList, FMX.Types, iORM.Attributes, Vcl.ActnList, Vcl.Dialogs,
-  VM.Interfaces;
+  VM.Interfaces, iORM.MVVM.Components.ModelPresenter;
 
 type
   [diImplements(IPersonsViewModel)]
@@ -23,6 +23,8 @@ type
     SaveDialog1: TSaveDialog;
     acTerminate: TAction;
     acRefresh: TAction;
+    PersonsModelPresenter: TioModelPresenter;
+    PhonesModelPresenter: TioModelPresenter;
     procedure acClearDataExecute(Sender: TObject);
     procedure acClearDataUpdate(Sender: TObject);
     procedure acLoadDataExecute(Sender: TObject);
@@ -68,7 +70,7 @@ procedure TViewModelMain.acClearDataExecute(Sender: TObject);
 begin
   inherited;
   // Clear the data object of the ActiveBindSourceAdapter
-  Self.ViewData.ActiveBindSourceAdapter.ClearDataObject;
+  PersonsModelPresenter.ClearDataObject;
 end;
 
 procedure TViewModelMain.acClearDataUpdate(Sender: TObject);
@@ -95,9 +97,9 @@ var
 begin
   inherited;
   // Load new data
-  NewDataObject := io.Load(ioTypeName, ioTypeAlias).ToGenericList.OfType<TPersonsList>;
+  NewDataObject := io.Load(PersonsModelPresenter.TypeName).ToGenericList.OfType<TPersonsList>;
   // Set the new data as DataObject of the ActiveBindSourceAdapter
-  Self.ViewData.ActiveBindSourceAdapter.SetDataObject(NewDataObject);
+  PersonsModelPresenter.SetDataObject(NewDataObject);
 end;
 
 procedure TViewModelMain.acLoadDataUpdate(Sender: TObject);
@@ -214,7 +216,7 @@ end;
 
 function TViewModelMain.GetDataPresent: Boolean;
 begin
-  Result := Assigned(Self.ViewData.ActiveBindSourceAdapter.GetDataObject);
+  Result := PersonsModelPresenter.DataObjectAssigned;
 end;
 
 function TViewModelMain.GetJSON: String;

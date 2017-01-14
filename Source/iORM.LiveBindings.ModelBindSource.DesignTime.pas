@@ -35,7 +35,7 @@
 
 
 
-unit iORM.MVVM.Components.ModelPresenter.DEsignTime;
+unit iORM.LiveBindings.ModelBindSource.DesignTime;
 
 interface
 
@@ -44,11 +44,11 @@ interface
 implementation
 
 uses
-  System.Classes, iORM.MVVM.Components.ModelPresenter;
+  System.Classes, iORM.LiveBindings.ModelBindSource;
 
   procedure Register;
   begin
-    RegisterComponents('iORM', [TioModelPresenter]);
+    RegisterComponents('iORM', [TioModelBindSource]);
   end;
 
 end.

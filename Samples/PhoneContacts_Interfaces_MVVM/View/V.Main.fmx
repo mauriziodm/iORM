@@ -241,7 +241,7 @@ object ViewMain: TViewMain
     Viewport.Height = 567.000000000000000000
   end
   object BSMaster: TioPrototypeBindSource
-    AutoActivate = True
+    AutoActivate = False
     AutoPost = False
     FieldDefs = <
       item
@@ -271,19 +271,17 @@ object ViewMain: TViewMain
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioTypeName = 'IPerson'
     ioAsync = True
-    ioAutoLoadData = False
-    ioAutoPersist = False
+    ioAutoLoadData = True
+    ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioViewModelBridge = VMBridge
     Left = 400
     Top = 200
   end
   object BSDetail: TioPrototypeBindSource
-    AutoActivate = True
+    AutoActivate = False
     AutoPost = False
     FieldDefs = <
       item
@@ -297,14 +295,11 @@ object ViewMain: TViewMain
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioTypeName = 'IPhoneNumber'
     ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
-    ioMasterBindSource = BSMaster
-    ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledReload
     Left = 400
     Top = 264
@@ -324,7 +319,7 @@ object ViewMain: TViewMain
     Top = 381
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = BSMaster
+      DataSource = PersonsModelBindSource
       FieldName = 'FullName'
       Control = MasterListView
       FillExpressions = <>
@@ -335,7 +330,7 @@ object ViewMain: TViewMain
     end
     object LinkListControlToField2: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = BSDetail
+      DataSource = PhonesModelBindSource
       FieldName = 'PhoneNumber'
       Control = DetailListView
       FillExpressions = <
@@ -351,5 +346,61 @@ object ViewMain: TViewMain
     VM_TypeName = 'IPersonsViewModel'
     Left = 472
     Top = 232
+  end
+  object PersonsModelBindSource: TioModelBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'FirstName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'LastName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'FullName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'ClassNameProp'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'PersonsModelPresenter'
+    Left = 576
+    Top = 200
+  end
+  object PhonesModelBindSource: TioModelBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'PhoneType'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'PhonesModelPresenter'
+    Left = 576
+    Top = 264
   end
 end

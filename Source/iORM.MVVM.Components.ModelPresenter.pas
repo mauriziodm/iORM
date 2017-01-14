@@ -31,7 +31,6 @@ type
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
     function CheckAdapter(const ACreateIfNotAssigned:Boolean = False): Boolean;
-    procedure ClearDataObject;
   protected
     procedure Loaded; override;
     // BindSourceAdapter
@@ -55,6 +54,7 @@ type
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
+    function CurrentAs<T>: T;
     procedure Refresh(const AReloadData:Boolean); overload;
     procedure Persist(const AReloadData:Boolean=False);
     procedure Append; overload;
@@ -65,15 +65,17 @@ type
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
     // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
+    procedure ClearDataObject;
     procedure SetDataObject(const Value:TObject; const AOwnsObject:Boolean=True);
     function DataObject: TObject;
     function DataObjectAs<T>: T;
+    function DataObjectAssigned: Boolean;
     // Properties
     property BindSourceAdapter:IioActiveBindSourceAdapter read GetBindSourceAdapter write SetBindSourceAdapter;
     property Where:IioWhere read GetWhere write SetWhere;
   published
     // Events
-    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
+    property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     // Properties
     property Async:Boolean read FAsync write FAsync;
     property AutoLoadData:Boolean read FAutoLoadData write FAutoLoadData;
@@ -115,7 +117,7 @@ end;
 function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
-  if not CheckAdapter then
+  if ACreateIfNotAssigned and not Assigned(FBindSourceAdapter) then
   begin
     // If the property MasterModelPresenter is assigned then retrieve
     //  the DetailBindSourceAdapter from it
@@ -158,6 +160,14 @@ begin
     Result := nil;
 end;
 
+function TioModelPresenter.CurrentAs<T>: T;
+var
+  LCurrent: TObject;
+begin
+  LCurrent := Self.Current;
+  Result := TioRttiUtilities.CastObjectToGeneric<T>(LCurrent);
+end;
+
 destructor TioModelPresenter.Destroy;
 begin
   FWhereStr.Free;
@@ -168,7 +178,7 @@ procedure TioModelPresenter.DoNotify(ANotification: IioBSANotification);
 begin
   // If assigned execute the event handler
   if Assigned(FonNotify)
-    then ioOnNotify(Self, ANotification);
+    then OnNotify(Self, ANotification);
   // If enabled perform an AutoRefresh operation
   if Self.AutoRefreshOnNotification > arDisabled
     then Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload);
@@ -193,6 +203,14 @@ var
 begin
   LObj := Self.DataObject;
   Result := TioRttiUtilities.CastObjectToGeneric<T>(LObj);
+end;
+
+function TioModelPresenter.DataObjectAssigned: Boolean;
+begin
+  if CheckAdapter then
+    Result := Assigned(BindSourceAdapter.DataObject)
+  else
+    Result := False;
 end;
 
 function TioModelPresenter.GetDetailBindSourceAdapter(const AOwner: TComponent;

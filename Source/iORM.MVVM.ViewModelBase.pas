@@ -42,7 +42,8 @@ interface
 uses
   System.Classes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.Components.ViewContextProvider;
+  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.Components.ViewContextProvider,
+  iORM.MVVM.Components.ModelPresenter;
 
 type
 
@@ -112,6 +113,7 @@ type
     constructor Create(const AMasterViewModelTypeName, AMasterViewModelTypeAlias:String; const AMasterViewModelMasterPropertyName:String=''); overload;
     // End constructors
 
+    function GetModelPresenter(const AName:String): TioModelPresenter;
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
@@ -200,6 +202,16 @@ end;
 function TioViewModel.GetMasterViewModel: IioViewModel;
 begin
   Result := FioMasterViewModel;
+end;
+
+function TioViewModel.GetModelPresenter(const AName: String): TioModelPresenter;
+var
+  LComponent: TComponent;
+begin
+  LComponent := FindComponent(AName);
+  if not (Assigned(LComponent) and (LComponent is TioModelPresenter)) then
+    raise EioException.Create(Self.ClassName, 'GetModelPresenter', Format('ModelPresenter named "%s" not found.', [AName]));
+  Result := TioModelPresenter(LComponent);
 end;
 
 function TioViewModel.GetTypeAlias: String;

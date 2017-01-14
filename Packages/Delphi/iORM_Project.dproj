@@ -302,6 +302,7 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
+        <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.pas"/>
         <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

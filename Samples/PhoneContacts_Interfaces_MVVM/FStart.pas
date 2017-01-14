@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Graphics, FMX.Dialogs, FMX.TabControl,
-  System.Actions, FMX.ActnList, iORM.MVVM.ViewContextProvider,
+  System.Actions, FMX.ActnList, iORM.MVVM.Components.ViewContextProvider,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Forms,
   iORM.DB.Components.ConnectionDef;
 

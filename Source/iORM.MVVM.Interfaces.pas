@@ -40,7 +40,8 @@ interface
 uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.Actions, System.UITypes, iORM.CommonTypes,
-  iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider;
+  iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
+  iORM.MVVM.Components.ModelPresenter;
 
 type
 
@@ -64,6 +65,7 @@ type
 
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
+    function GetModelPresenter(const AName:String): TioModelPresenter;
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;

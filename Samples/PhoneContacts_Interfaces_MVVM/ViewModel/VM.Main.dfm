@@ -61,4 +61,28 @@ inherited ViewModelMain: TViewModelMain
     Left = 48
     Top = 136
   end
+  object PersonsModelPresenter: TioModelPresenter
+    Async = False
+    AutoLoadData = True
+    AutoPersist = True
+    AutoRefreshOnNotification = arEnabledNoReload
+    TypeName = 'IPerson'
+    ViewDataType = dtList
+    WhereDetailsFromDetailAdapters = False
+    Left = 208
+    Top = 24
+  end
+  object PhonesModelPresenter: TioModelPresenter
+    Async = False
+    AutoLoadData = True
+    AutoPersist = True
+    AutoRefreshOnNotification = arEnabledNoReload
+    MasterModelPresenter = PersonsModelPresenter
+    MasterPropertyName = 'Phones'
+    TypeName = 'IPhoneNumber'
+    ViewDataType = dtList
+    WhereDetailsFromDetailAdapters = False
+    Left = 208
+    Top = 88
+  end
 end
