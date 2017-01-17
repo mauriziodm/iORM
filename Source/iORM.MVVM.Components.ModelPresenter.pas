@@ -21,7 +21,7 @@ type
     FWhereStr: TStrings;
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
-    FMasterModelPresenter: TioModelPresenter;
+    FMasterPresenter: TioModelPresenter;
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
     // Questo è un riferimento di tipo interfaccia e serve solo per
@@ -46,6 +46,12 @@ type
     procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
+    // State
+    function GetState: TBindSourceAdapterState;
+    // IsDetail
+    function GetIsDetail: Boolean;
+    // Editing
+    function GetEditing: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -53,6 +59,12 @@ type
     procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
+    procedure Next;
+    procedure Prior;
+    procedure First;
+    procedure Last;
+    procedure Edit(AForce: Boolean = False);
+    procedure Post;
     function Current: TObject;
     function CurrentAs<T>: T;
     procedure Refresh(const AReloadData:Boolean); overload;
@@ -61,6 +73,8 @@ type
     procedure Append(AObject:TObject); overload;
     procedure Insert; overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Delete;
+    procedure Cancel;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
     // ----------------------------------------------------------------------------------------------------------------------------
@@ -73,6 +87,7 @@ type
     // Properties
     property BindSourceAdapter:IioActiveBindSourceAdapter read GetBindSourceAdapter write SetBindSourceAdapter;
     property Where:IioWhere read GetWhere write SetWhere;
+    property State: TBindSourceAdapterState read GetState;
   published
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -81,7 +96,9 @@ type
     property AutoLoadData:Boolean read FAutoLoadData write FAutoLoadData;
     property AutoPersist:Boolean read FAutoPersist write FAutoPersist;
     property AutoRefreshOnNotification:TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification;
-    property MasterModelPresenter:TioModelPresenter read FMasterModelPresenter write FMasterModelPresenter;
+    property Editing:Boolean read GetEditing;
+    property IsDetail:Boolean read GetIsDetail;
+    property MasterPresenter:TioModelPresenter read FMasterPresenter write FMasterPresenter;
     property MasterPropertyName:String read FMasterPropertyName write FMasterPropertyName;
     property OrderBy:String read FOrderBy Write SetOrderBy;
     property TypeAlias:String read FTypeAlias write FTypeAlias;
@@ -114,6 +131,12 @@ begin
     (BindSourceAdapter as TBindSourceAdapter).Append;
 end;
 
+procedure TioModelPresenter.Cancel;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Cancel;
+end;
+
 function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
@@ -121,9 +144,9 @@ begin
   begin
     // If the property MasterModelPresenter is assigned then retrieve
     //  the DetailBindSourceAdapter from it
-    if Assigned(MasterModelPresenter) then
+    if Assigned(MasterPresenter) then
       // Get the BindSourceAdapter
-      SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAfromMasterModelPresenter(nil, MasterModelPresenter, MasterPropertyName)  )
+      SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAfromMasterModelPresenter(nil, MasterPresenter, MasterPropertyName)  )
     // else create the BSA from TypeName & TypeAlias
     else
       SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)   );
@@ -168,6 +191,12 @@ begin
   Result := TioRttiUtilities.CastObjectToGeneric<T>(LCurrent);
 end;
 
+procedure TioModelPresenter.Delete;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Delete;
+end;
+
 destructor TioModelPresenter.Destroy;
 begin
   FWhereStr.Free;
@@ -182,6 +211,18 @@ begin
   // If enabled perform an AutoRefresh operation
   if Self.AutoRefreshOnNotification > arDisabled
     then Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload);
+end;
+
+procedure TioModelPresenter.Edit(AForce: Boolean);
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Edit(AForce);
+end;
+
+procedure TioModelPresenter.First;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.First;
 end;
 
 function TioModelPresenter.GetBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -221,11 +262,35 @@ begin
     then Result := nil;
 end;
 
+function TioModelPresenter.GetEditing: Boolean;
+begin
+  if CheckAdapter then
+    Result := BindSourceAdapter.State in seEditModes
+  else
+    Result := False
+end;
+
+function TioModelPresenter.GetIsDetail: Boolean;
+begin
+  if CheckAdapter then
+   Result := BindSourceAdapter.IsDetail
+  else
+   Result := Assigned(MasterPresenter);
+end;
+
 function TioModelPresenter.GetNaturalObjectBindSourceAdapter(
   const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
   if not Supports(GetBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
     Result := nil;
+end;
+
+function TioModelPresenter.GetState: TBindSourceAdapterState;
+begin
+  if CheckAdapter then
+    Result := BindSourceAdapter.State
+  else
+    Result := TBindSourceAdapterState.seInactive
 end;
 
 function TioModelPresenter.GetWhere: IioWhere;
@@ -253,6 +318,12 @@ begin
   end;
 end;
 
+procedure TioModelPresenter.Last;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Last;
+end;
+
 procedure TioModelPresenter.Loaded;
 begin
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
@@ -261,6 +332,12 @@ begin
     TioComponentsCommon.RegisterConnectionDefComponents(Owner);
   // ===========================================================================
   inherited;
+end;
+
+procedure TioModelPresenter.Next;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Next;
 end;
 
 procedure TioModelPresenter.Notify(const Sender: TObject;
@@ -273,6 +350,18 @@ procedure TioModelPresenter.Persist(const AReloadData: Boolean);
 begin
   if CheckAdapter then
     BindSourceAdapter.Persist(AReloadData);
+end;
+
+procedure TioModelPresenter.Post;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Post;
+end;
+
+procedure TioModelPresenter.Prior;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.Prior;
 end;
 
 procedure TioModelPresenter.Refresh(const AReloadData: Boolean);

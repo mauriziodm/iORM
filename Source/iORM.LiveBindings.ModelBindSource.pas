@@ -57,7 +57,7 @@ begin
   and ViewModelBridge.ViewModelIsAssigned
   then
   begin
-      LBindSourceAdapter := ViewModelBridge.ViewModel.GetModelPresenter(ModelPresenter).BindSourceAdapter;
+      LBindSourceAdapter := ViewModelBridge.ViewModel.Presenters[ModelPresenter].BindSourceAdapter;
       ADataObject := LBindSourceAdapter as TBindSourceAdapter;
   end;
 end;

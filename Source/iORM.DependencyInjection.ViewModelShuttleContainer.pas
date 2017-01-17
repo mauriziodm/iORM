@@ -56,9 +56,9 @@ type
     class function CriticalSection: TCriticalSection;
   public
     class procedure CleanUp;
-    class function TryGet(var AViewModel: IioViewModel; const AMarker:String = ''): Boolean;
-    class procedure TryDelete(const AMarker:String = '');
-    class procedure Add(const AViewModel: IioViewModel; const AMarker:String = '');
+    class function GetViewModel(const AMarker: string = ''): IioViewModel;
+    class procedure DeleteViewModel(const AMarker:String = '');
+    class procedure AddViewModel(const AViewModel: IioViewModel; const AMarker:String = '');
   end;
 
 implementation
@@ -76,7 +76,7 @@ begin
   Result := FCriticalSection;
 end;
 
-class procedure TioViewModelShuttleContainer.TryDelete(const AMarker: String);
+class procedure TioViewModelShuttleContainer.DeleteViewModel(const AMarker: String);
 begin
   if not Assigned(FContainer) then Exit;  // For optimization when not assigned
   Self.CriticalSection.Acquire;
@@ -87,16 +87,15 @@ begin
   end;
 end;
 
-class function TioViewModelShuttleContainer.TryGet(var AViewModel: IioViewModel; const AMarker: String): Boolean;
+class function TioViewModelShuttleContainer.GetViewModel(const AMarker: string = ''): IioViewModel;
 begin
-  Result := False;
-  if not Assigned(FContainer) then Exit;  // For optimization when not assigned
+  Result := nil;
+  if not Assigned(FContainer) then Exit;  // If not assigned do not enter in the critical section (optimization)
   Self.CriticalSection.Acquire;
   try
-    Result := Self.Container.ContainsKey(AMarker);
-    if Result then
+    if Self.Container.ContainsKey(AMarker) then
     begin
-      AViewModel := Self.Container.Items[AMarker];
+      Result := Self.Container.Items[AMarker];
       Self.Container.Remove(AMarker);
     end;
   finally
@@ -104,7 +103,7 @@ begin
   end;
 end;
 
-class procedure TioViewModelShuttleContainer.Add(const AViewModel: IioViewModel; const AMarker: String);
+class procedure TioViewModelShuttleContainer.AddViewModel(const AViewModel: IioViewModel; const AMarker: String);
 begin
   Self.CriticalSection.Acquire;
   try

@@ -69,6 +69,7 @@ type
     function GetTypeName: String;
     function GetViewDataType: TioViewDataType;
     function GetWhere: IioWhere;
+    function GetPresenters(const AName: String): TioModelPresenter;
     procedure SetAutoLoadData(const Value: Boolean);
     procedure SetMasterBindSource(const Value: TObject);
     procedure SetMasterPropertyName(const Value: String);
@@ -90,30 +91,7 @@ type
     function GetMasterViewModel: IioViewModel;
   public
     { Public declarations }
-
-    // Constructors
-    constructor Create; overload;  // Non togliere assolutamente altrimenti non vengono più bindate le Actions
-    [ioMarker('CreateByDataObject')]
-    constructor Create(const ADataObj:TObject; const AViewDataType:TioViewDataType); overload;
-    [ioMarker('CreateByDataInterface')]
-    constructor Create(const ADataIntf:IInterface; const AViewDataType:TioViewDataType); overload;
-    [ioMarker('CreateByClassRef')]
-    constructor Create(const AClassRef:TioClassRef; const AioWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean=True); overload;
-    [ioMarker('CreateByTypeName')]
-    constructor Create(const ATypeName, ATypeAlias:String; const AioWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean=True); overload;
-    [ioMarker('CreateByBindSourceAdapter')]
-    constructor Create(const ABindSourceAdapter:IioActiveBindSourceAdapter); overload;
-    [ioMarker('CreateByMasterBindSource')]
-    constructor Create(const AMasterBindSource:TioMasterBindSource; const AMasterPropertyName:String=''); overload;
-    [ioMarker('CreateByMasterBindSourceAdapter')]
-    constructor Create(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String=''); overload;
-    [ioMarker('CreateByMasterViewModel')]
-    constructor Create(const AMasterViewModel:IioViewModel; const AMasterPropertyName:String=''); overload;
-    [ioMarker('CreateByMasterViewModelFromDependencyInjection')]
-    constructor Create(const AMasterViewModelTypeName, AMasterViewModelTypeAlias:String; const AMasterViewModelMasterPropertyName:String=''); overload;
-    // End constructors
-
-    function GetModelPresenter(const AName:String): TioModelPresenter;
+    constructor Create(AOwner: TComponent); override;
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
@@ -128,6 +106,8 @@ type
     property RefCount: Integer read FRefCount;
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
+    // Properties
+    property Presenters[const AName:String]:TioModelPresenter read GetPresenters;
   published
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -204,13 +184,13 @@ begin
   Result := FioMasterViewModel;
 end;
 
-function TioViewModel.GetModelPresenter(const AName: String): TioModelPresenter;
+function TioViewModel.GetPresenters(const AName: String): TioModelPresenter;
 var
   LComponent: TComponent;
 begin
   LComponent := FindComponent(AName);
   if not (Assigned(LComponent) and (LComponent is TioModelPresenter)) then
-    raise EioException.Create(Self.ClassName, 'GetModelPresenter', Format('ModelPresenter named "%s" not found.', [AName]));
+    raise EioException.Create(Self.ClassName, 'GetPresenters', Format('ModelPresenter named "%s" not found.', [AName]));
   Result := TioModelPresenter(LComponent);
 end;
 
@@ -237,18 +217,6 @@ begin
   if Assigned(FViewData) then
     FioWhere := FViewData.ActiveBindSourceAdapter.ioWhere;  // Set the internal field directly
   Result := FioWhere;
-end;
-
-constructor TioViewModel.Create(const ADataObj: TObject; const AViewDataType:TioViewDataType);
-begin
-  Self.Create;
-  FViewData := TioMVVMFactory.ViewData(ADataObj, AViewDataType);
-end;
-
-constructor TioViewModel.Create(const ABindSourceAdapter: IioActiveBindSourceAdapter);
-begin
-  Self.Create;
-  FViewData := TioMVVMFactory.ViewData(ABindSourceAdapter);
 end;
 
 function TioViewModel.QueryInterface(const IID: TGUID; out Obj): HResult;
@@ -343,39 +311,6 @@ begin
 {$ENDIF}
 end;
 
-constructor TioViewModel.Create(const ATypeName, ATypeAlias:String; const AioWhere: IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean);
-begin
-  Self.Create;
-  FioTypeName := ATypeName;
-  FioTypeAlias := ATypeAlias;
-  FIoWhere := AIoWhere;
-  FioViewDataType := AViewDataType;
-  FioAutoLoadData := AAutoLoadData;
-end;
-
-constructor TioViewModel.Create(const AClassRef: TioClassRef; const AioWhere: IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean);
-begin
-  Self.Create;
-  FioTypeName     := AClassRef.ClassName;
-  FioTypeAlias    := '';
-  FIoWhere        := AioWhere;
-  FioViewDataType := AViewDataType;
-  FioAutoLoadData := AAutoLoadData;
-end;
-
-constructor TioViewModel.Create(const AMasterBindSource: TioMasterBindSource; const AMasterPropertyName: String);
-begin
-  Self.Create;
-  FIoMasterBindSource := AMasterBindSource;
-  FIoMasterPropertyName := AMasterPropertyName;
-end;
-
-constructor TioViewModel.Create(const ADataIntf: IInterface; const AViewDataType: TioViewDataType);
-begin
-  Self.Create;
-  FViewData := TioMVVMFactory.ViewData(ADataIntf, AViewDataType);
-end;
-
 procedure TioViewModel.ioLoadViewData;
 var
   AObj: TObject;
@@ -414,46 +349,23 @@ begin
   Result := FViews.FindVCProvider(AName);
 end;
 
-constructor TioViewModel.Create(const AMasterBindSourceAdapter: IioActiveBindSourceAdapter; const AMasterPropertyName: String);
-begin
-  Self.Create;
-  FioMasterBindSourceAdapter := AMasterBindSourceAdapter;
-  FIoMasterPropertyName := AMasterPropertyName;
-end;
-
-constructor TioViewModel.Create(const AMasterViewModel: IioViewModel; const AMasterPropertyName: String);
-begin
-  Self.Create;
-  FioMasterViewModel := AMasterViewModel;
-  FIoMasterPropertyName := AMasterPropertyName;
-end;
-
 function TioViewModel.Commands: IioCommandsContainer;
 begin
   Result := FCommands;
 end;
 
-constructor TioViewModel.Create(const AMasterViewModelTypeName, AMasterViewModelTypeAlias,
-  AMasterViewModelMasterPropertyName: String);
+constructor TioViewModel.Create(AOwner: TComponent);
 begin
-  Self.Create;
-  FioMasterViewModelTypeName := AMasterViewModelTypeName;
-  FioMasterViewModelTypeAlias := AMasterViewModelTypeAlias;
-  FIoMasterPropertyName := AMasterViewModelMasterPropertyName;
+  inherited;
+  // Init
+  FViewData := nil;
+  FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
+  FViews := TioMVVMFactory.VMViews;
 end;
 
 procedure TioViewModel.FreeViews;
 begin
   FViews.ReleaseAllViewContexts;
-end;
-
-constructor TioViewModel.Create;
-begin
-  inherited Create(nil);
-  // Init
-  FViewData := nil;
-  FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
-  FViews := TioMVVMFactory.VMViews;
 end;
 
 end.

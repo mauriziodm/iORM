@@ -56,16 +56,14 @@ type
     DetailListView: TListView;
     Label1: TLabel;
     Memo1: TMemo;
-    BSMaster: TioPrototypeBindSource;
-    BSDetail: TioPrototypeBindSource;
     ActionList1: TActionList;
     acRefreshMemo: TAction;
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
     LinkListControlToField2: TLinkListControlToField;
-    VMBridge: TioViewModelBridge;
     PersonsModelBindSource: TioModelBindSource;
     PhonesModelBindSource: TioModelBindSource;
+    VMBridge: TioViewModelBridge;
     procedure acRefreshMemoExecute(Sender: TObject);
   private
     { Private declarations }

@@ -85,6 +85,8 @@ type
     function GetIoViewDataType: TioViewDataType;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
+    // State
+    function GetState: TBindSourceAdapterState;
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -423,6 +425,11 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.GetOwnsObjects: Boolean;
 begin
   Result := FLocalOwnsObject;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetState: TBindSourceAdapterState;
+begin
+  Result := Self.State;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(

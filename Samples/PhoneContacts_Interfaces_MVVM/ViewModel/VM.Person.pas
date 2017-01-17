@@ -3,12 +3,17 @@ unit VM.Person;
 interface
 
 uses
-  iORM.MVVM.ViewModelBase, iORM.Attributes, VM.Interfaces;
+  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
+  iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces;
 
 type
 
   [diImplements(IPersonViewModel)]
   TPersonViewModel = class(TioViewModel, IPersonViewModel)
+    PersonModelPresenter: TioModelPresenter;
+    PhonesModelPresenter: TioModelPresenter;
+  private
+    { Private declarations }
   public
     // Close: Action declared by "ioAction" attribute
     [ioAction('acClose', 'Back', TioActionEvent.OnExecute)]
@@ -20,27 +25,33 @@ type
 
 implementation
 
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
 uses
-  Data.Bind.ObjectScope, System.Classes, System.Actions;
+  Data.Bind.ObjectScope, System.Actions;
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+{$R *.dfm}
 
 { TPersonViewModel }
 
 procedure TPersonViewModel.Action_acPost_OnExecute(Sender: TObject);
 begin
-  if Self.ViewData.BindSourceAdapter.State in [seEdit, seInsert] then
-    Self.ViewData.BindSourceAdapter.Post;
+  if PersonModelPresenter.Editing then
+    PersonModelPresenter.Post;
 end;
 
 procedure TPersonViewModel.Action_acPost_OnUpdate(Sender: TObject);
 begin
-  (Sender as TContainedAction).Enabled := Self.ViewData.BindSourceAdapter.State in [seEdit, seInsert];
+  (Sender as TContainedAction).Enabled := PersonModelPresenter.Editing;
 end;
 
 procedure TPersonViewModel.Close(Sender: TObject);
 begin
   // Cancel updates if editing or inserting
-  if Self.ViewData.BindSourceAdapter.State in [seEdit, seInsert] then
-    Self.ViewData.BindSourceAdapter.Cancel;
+  if PersonModelPresenter.Editing then
+    PersonModelPresenter.Cancel;
   // Close the view and release the view context
   FreeViews;
 end;

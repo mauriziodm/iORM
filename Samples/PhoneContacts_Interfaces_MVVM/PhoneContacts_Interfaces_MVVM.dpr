@@ -18,11 +18,12 @@ uses
   V.VipCustomer in 'View\V.VipCustomer.pas' {ViewVipCustomer: TFrame},
   VM.Interfaces in 'ViewModel\VM.Interfaces.pas',
   VM.Main in 'ViewModel\VM.Main.pas' {ViewModelMain: TDataModule},
-  VM.Person in 'ViewModel\VM.Person.pas',
   System.IOUtils,
   V.Main in 'View\V.Main.pas' {ViewMain: TFrame},
   FViewContext in 'FViewContext.pas' {ViewContextForm},
-  FWait in 'FWait.pas' {WaitForm};
+  FWait in 'FWait.pas' {WaitForm},
+  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  VM.Person in 'ViewModel\VM.Person.pas' {PersonViewModel: TDataModule};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

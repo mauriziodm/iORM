@@ -65,7 +65,6 @@ type
 
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    function GetModelPresenter(const AName:String): TioModelPresenter;
     function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
@@ -94,6 +93,9 @@ type
     procedure SetViewDataType(const Value: TioViewDataType);
     function GetViewDataType: TioViewDataType;
     property ioViewDataType:TioViewDataType read GetViewDataType write SetViewDataType;
+    // Presenters
+    function GetPresenters(const AName: String): TioModelPresenter;
+    property Presenters[const AName:String]:TioModelPresenter read GetPresenters;
   end;
 
   TioVMViewsInternalContainer = TDictionary<Integer,TComponent>;

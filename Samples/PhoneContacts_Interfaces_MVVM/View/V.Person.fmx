@@ -77,27 +77,7 @@ object ViewPerson: TViewPerson
     object EditFirstName: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       TabOrder = 3
-      Text = 
-        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-        'por, velit sit'
+      Text = 'Mark Anderson'
       Position.X = 144.000000000000000000
       Position.Y = 54.000000000000000000
       Size.Width = 289.000000000000000000
@@ -113,27 +93,7 @@ object ViewPerson: TViewPerson
     object EditLastName: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       TabOrder = 2
-      Text = 
-        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-        'por, velit sit'
+      Text = 'Mark Anderson'
       Position.X = 144.000000000000000000
       Position.Y = 86.000000000000000000
       Size.Width = 289.000000000000000000
@@ -165,27 +125,7 @@ object ViewPerson: TViewPerson
       TabOrder = 1
       TabStop = False
       ReadOnly = True
-      Text = 
-        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-        'por, velit sit'
+      Text = 'Mark Anderson'
       Position.X = 144.000000000000000000
       Position.Y = 12.000000000000000000
       Enabled = False
@@ -246,7 +186,7 @@ object ViewPerson: TViewPerson
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Anchors = [akLeft, akBottom]
       TabOrder = 2
-      Text = 'Bitmap28'
+      Text = 'Darkgoldenrod'
       Position.X = 144.000000000000000000
       Position.Y = 206.000000000000000000
       Size.Width = 289.000000000000000000
@@ -261,13 +201,74 @@ object ViewPerson: TViewPerson
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 5
-      DataSource = BSPhones
+      DataSource = PhonesModelBindSource
       VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
       xRadius = 4.000000000000000000
       yRadius = 4.000000000000000000
     end
   end
-  object BSPerson: TioPrototypeBindSource
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 196
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = PhonesModelBindSource
+      FieldName = 'PhoneNumber'
+      Control = DetailListView
+      FillExpressions = <
+        item
+          SourceMemberName = 'PhoneType'
+          ControlMemberName = 'Detail'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkControlToField6: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PhonesModelBindSource
+      FieldName = 'PhoneNumber'
+      Control = EditPhoneNumber
+      Track = False
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PhonesModelBindSource
+      FieldName = 'PhoneType'
+      Control = EditNumberType
+      Track = False
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonModelBindSource
+      FieldName = 'ClassNameProp'
+      Control = EditClassName
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonModelBindSource
+      FieldName = 'FirstName'
+      Control = EditFirstName
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonModelBindSource
+      FieldName = 'LastName'
+      Control = EditLastName
+      Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonModelBindSource
+      FieldName = 'ID'
+      Control = EditID
+      Track = False
+    end
+  end
+  object PersonModelBindSource: TioModelBindSource
     AutoActivate = True
     AutoPost = False
     FieldDefs = <
@@ -279,99 +280,32 @@ object ViewPerson: TViewPerson
       end
       item
         Name = 'FirstName'
-        Generator = 'LoremIpsum'
+        Generator = 'ContactNames'
         ReadOnly = False
       end
       item
         Name = 'LastName'
-        Generator = 'LoremIpsum'
+        Generator = 'ContactNames'
         ReadOnly = False
       end
       item
         Name = 'ClassNameProp'
-        Generator = 'LoremIpsum'
+        Generator = 'ContactNames'
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioTypeName = 'IPerson'
-    ioAsync = True
-    ioAutoLoadData = True
-    ioAutoPersist = True
-    ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = False
-    ioAutoRefreshOnNotification = arEnabledNoReload
-    ioViewModelBridge = VMBridge
-    Left = 28
-    Top = 136
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'PersonModelPresenter'
+    Left = 264
+    Top = 216
   end
-  object BindingsList1: TBindingsList
-    Methods = <>
-    OutputConverters = <>
-    Left = 196
-    Top = 5
-    object LinkControlToField1: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPerson
-      FieldName = 'ClassNameProp'
-      Control = EditClassName
-      Track = False
-    end
-    object LinkControlToField2: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPerson
-      FieldName = 'FirstName'
-      Control = EditFirstName
-      Track = False
-    end
-    object LinkControlToField3: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPerson
-      FieldName = 'LastName'
-      Control = EditLastName
-      Track = False
-    end
-    object LinkControlToField4: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPerson
-      FieldName = 'ID'
-      Control = EditID
-      Track = False
-    end
-    object LinkListControlToField1: TLinkListControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPhones
-      FieldName = 'PhoneNumber'
-      Control = DetailListView
-      FillExpressions = <
-        item
-          SourceMemberName = 'PhoneType'
-          ControlMemberName = 'Detail'
-        end>
-      FillHeaderExpressions = <>
-      FillBreakGroups = <>
-    end
-    object LinkControlToField5: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPhones
-      FieldName = 'PhoneType'
-      Control = EditNumberType
-      Track = False
-    end
-    object LinkControlToField6: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPhones
-      FieldName = 'PhoneNumber'
-      Control = EditPhoneNumber
-      Track = False
-    end
-  end
-  object BSPhones: TioPrototypeBindSource
+  object PhonesModelBindSource: TioModelBindSource
     AutoActivate = True
     AutoPost = False
     FieldDefs = <
       item
         Name = 'PhoneType'
-        Generator = 'BitmapNames'
+        Generator = 'ColorsNames'
         ReadOnly = False
       end
       item
@@ -380,20 +314,13 @@ object ViewPerson: TViewPerson
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioTypeName = 'IPhoneNumber'
-    ioAsync = True
-    ioAutoLoadData = True
-    ioAutoPersist = True
-    ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = False
-    ioMasterBindSource = BSPerson
-    ioMasterPropertyName = 'Phones'
-    ioAutoRefreshOnNotification = arEnabledNoReload
-    Left = 24
-    Top = 184
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'PhonesModelPresenter'
+    Left = 264
+    Top = 267
   end
   object VMBridge: TioViewModelBridge
-    Left = 24
-    Top = 88
+    Left = 263
+    Top = 160
   end
 end

@@ -12,7 +12,8 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.Layouts, Fmx.Bind.Navigator,
   FMX.ListView, FMX.Edit, FMX.Controls.Presentation, V.Person, iORM.Attributes,
-  V.Interfaces;
+  V.Interfaces, iORM.MVVM.Components.ViewModelBridge,
+  iORM.LiveBindings.ModelBindSource;
 
 type
   [diImplements(IPersonView, 'TEmployee')]

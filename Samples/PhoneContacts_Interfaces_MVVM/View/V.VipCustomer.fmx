@@ -77,7 +77,16 @@ inherited ViewVipCustomer: TViewVipCustomer
       Position.Y = 114.000000000000000000
     end
   end
-  inherited BSPerson: TioPrototypeBindSource
+  inherited BindingsList1: TBindingsList
+    object LinkControlToField8: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonModelBindSource
+      FieldName = 'VIPCardCode'
+      Control = EditVipCardCode
+      Track = False
+    end
+  end
+  inherited PersonModelBindSource: TioModelBindSource
     FieldDefs = <
       item
         Name = 'ID'
@@ -87,17 +96,17 @@ inherited ViewVipCustomer: TViewVipCustomer
       end
       item
         Name = 'FirstName'
-        Generator = 'LoremIpsum'
+        Generator = 'ContactNames'
         ReadOnly = False
       end
       item
         Name = 'LastName'
-        Generator = 'LoremIpsum'
+        Generator = 'ContactNames'
         ReadOnly = False
       end
       item
         Name = 'ClassNameProp'
-        Generator = 'LoremIpsum'
+        Generator = 'ContactNames'
         ReadOnly = False
       end
       item
@@ -106,18 +115,9 @@ inherited ViewVipCustomer: TViewVipCustomer
         ReadOnly = False
       end
       item
-        Name = 'VipCardCode'
+        Name = 'VIPCardCode'
         Generator = 'LoremIpsum'
         ReadOnly = False
       end>
-  end
-  inherited BindingsList1: TBindingsList
-    object LinkControlToField8: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSPerson
-      FieldName = 'VipCardCode'
-      Control = EditVipCardCode
-      Track = False
-    end
   end
 end

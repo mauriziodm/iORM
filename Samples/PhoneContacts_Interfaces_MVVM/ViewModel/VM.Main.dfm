@@ -77,7 +77,7 @@ inherited ViewModelMain: TViewModelMain
     AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload
-    MasterModelPresenter = PersonsModelPresenter
+    MasterPresenter = PersonsModelPresenter
     MasterPropertyName = 'Phones'
     TypeName = 'IPhoneNumber'
     ViewDataType = dtList

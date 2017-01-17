@@ -60,7 +60,7 @@ implementation
 
 uses
   iORM, RegisterClassesUnit, System.JSON, FMX.Forms, FMX.Dialogs,
-  System.UITypes, V.Interfaces;
+  System.UITypes, V.Interfaces, iORM.MVVM.Interfaces, VM.Person;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
 
@@ -135,7 +135,7 @@ procedure TViewModelMain.acRefreshExecute(Sender: TObject);
 begin
   inherited;
   // Clear the data object of the ActiveBindSourceAdapter
-  Self.ViewData.ActiveBindSourceAdapter.Refresh(True);
+  PersonsModelPresenter.Refresh(True);
 end;
 
 procedure TViewModelMain.acRefreshUpdate(Sender: TObject);
@@ -167,7 +167,7 @@ var
 begin
   inherited;
   NewDataObject := io.Mapper.FromJSON(Self.JSON).TypeAnnotationsON.ToObject;
-  Self.ViewData.SetDataObj(NewDataObject);
+  PersonsModelPresenter.SetDataObject(NewDataObject);
 end;
 
 procedure TViewModelMain.acDeserializeFromJSONUpdate(Sender: TObject);
@@ -179,12 +179,16 @@ end;
 procedure TViewModelMain.acEditPersonExecute(Sender: TObject);
 var
   LCurrentClassName: String;
+  LViewModel: IPersonViewModel;
 begin
   inherited;
+  // Get the ViewModel and set the ModelBindSource
+  LViewModel := io.di.LocateViewModel<IPersonViewModel>.Get;
+  LViewModel.Presenters['PersonModelPresenter'].MasterPresenter := PersonsModelPresenter;
   // Get the class name of the current person
-  LCurrentClassName := Self.ViewData.BindSourceAdapter.Current.ClassName;
+  LCurrentClassName := PersonsModelPresenter.Current.ClassName;
   // Get the view
-  io.di.LocateView<IPersonView>(LCurrentClassName).VM_byMasterVM('IPersonViewModel', '', Self).Get;
+  io.di.LocateView<IPersonView>(LCurrentClassName).VM(LViewModel).Get;
 end;
 
 procedure TViewModelMain.acSerializeToJSONExecute(Sender: TObject);
@@ -193,7 +197,7 @@ var
   LStrings: TStrings;
 begin
   inherited;
-  LJSONValue := io.Mapper.From(Self.ViewData.DataObj).TypeAnnotationsON.ToJSON;
+  LJSONValue := io.Mapper.From(PersonsModelPresenter.DataObject).TypeAnnotationsON.ToJSON;
   try
     Self.JSON := LJSONValue.ToString;
   finally

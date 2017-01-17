@@ -111,6 +111,8 @@ type
     // IsDetail
     function GetIsDetail: Boolean;
     property IsDetail:Boolean read GetIsDetail;
+    // State
+    function GetState: TBindSourceAdapterState;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -134,6 +136,7 @@ type
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     // ----------------------------------------------------------------------------------------------------------------------------
     property ioWhere:IioWhere read GetWhere write SetWhere;
+    property State: TBindSourceAdapterState read GetState;
   published
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
 
@@ -218,9 +221,6 @@ end;
 destructor TioPrototypeBindSource.Destroy;
 begin
   FioWhereStr.Free;
-  // Deregister itself from the ViewModelBridge if necessary
-  if Assigned(FioViewModelBridge) then
-    FioViewModelBridge.SetLinkedBindSource(nil);
   inherited;
 end;
 
@@ -406,6 +406,14 @@ end;
 function TioPrototypeBindSource.GetOrderBy: String;
 begin
   Result := FioOrderBy;
+end;
+
+function TioPrototypeBindSource.GetState: TBindSourceAdapterState;
+begin
+  if CheckAdapter then
+    Result := GetActiveBindSourceAdapter.State
+  else
+    Result := TBindSourceAdapterState.seInactive
 end;
 
 function TioPrototypeBindSource.GetTypeAlias: String;

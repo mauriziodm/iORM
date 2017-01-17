@@ -74,6 +74,10 @@ type
 
   IioActiveBindSourceAdapter = interface
     ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
+    procedure Next;
+    procedure Prior;
+    procedure First;
+    procedure Last;
     procedure Edit(AForce: Boolean = False);
     procedure Post;
     procedure Persist(ReloadData:Boolean=False);
@@ -83,6 +87,7 @@ type
     procedure Append(AObject:TObject);
     procedure Insert(AObject:TObject);
     procedure Delete;
+    procedure Cancel;
     function UseObjStatus: Boolean;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
@@ -121,6 +126,15 @@ type
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     property ioOwnsObjects:Boolean read GetOwnsObjects;
+    // State
+    function GetState: TBindSourceAdapterState;
+    property State: TBindSourceAdapterState read GetState;
+    // EOF
+    function GetEOF: Boolean;
+    property Eof: Boolean read GetEOF;
+    // BOF
+    function GetBOF: Boolean;
+    property BOF: Boolean read GetBOF;
   end;
 
   // Bind source adapter container

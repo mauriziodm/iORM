@@ -11,12 +11,12 @@ uses
   Fmx.Bind.DBEngExt, iORM.Attributes, System.Actions, FMX.ActnList,
   Fmx.Bind.GenData, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.ListView, Data.Bind.Controls, FMX.Layouts,
-  Fmx.Bind.Navigator, V.Interfaces, iORM.MVVM.Components.ViewModelBridge;
+  Fmx.Bind.Navigator, V.Interfaces, iORM.MVVM.Components.ViewModelBridge,
+  iORM.LiveBindings.ModelBindSource;
 
 type
   [diImplements(IPersonView, 'TPerson'), diImplements(IPersonView, 'TAnotherPerson')]
   TViewPerson = class(TFrame, IPersonView)
-    BSPerson: TioPrototypeBindSource;
     BindingsList1: TBindingsList;
     ToolBar2: TToolBar;
     lblTitle2: TLabel;
@@ -37,21 +37,22 @@ type
     Panel2: TPanel;
     Label4: TLabel;
     EditClassName: TEdit;
-    LinkControlToField1: TLinkControlToField;
-    LinkControlToField2: TLinkControlToField;
-    LinkControlToField3: TLinkControlToField;
-    LinkControlToField4: TLinkControlToField;
     PanelPhones: TPanel;
-    BSPhones: TioPrototypeBindSource;
     DetailListView: TListView;
     LinkListControlToField1: TLinkListControlToField;
     Label5: TLabel;
     Label6: TLabel;
     EditPhoneNumber: TEdit;
     EditNumberType: TEdit;
-    LinkControlToField5: TLinkControlToField;
-    LinkControlToField6: TLinkControlToField;
     BindNavigator1: TBindNavigator;
+    PersonModelBindSource: TioModelBindSource;
+    PhonesModelBindSource: TioModelBindSource;
+    LinkControlToField6: TLinkControlToField;
+    LinkControlToField5: TLinkControlToField;
+    LinkControlToField1: TLinkControlToField;
+    LinkControlToField2: TLinkControlToField;
+    LinkControlToField3: TLinkControlToField;
+    LinkControlToField4: TLinkControlToField;
     VMBridge: TioViewModelBridge;
 
   private

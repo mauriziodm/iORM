@@ -46,13 +46,15 @@ var
 implementation
 
 uses
-  FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData, FWait;
+  FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData, FWait,
+  VM.Interfaces;
 
 {$R *.fmx}
 
 procedure TStartForm.FormCreate(Sender: TObject);
 var
   Style : TFMXObject;
+  LViewModel: IPersonsViewModel;
 begin
   // Register the ShowWait & CloseWait proc
   Application.CreateForm(TWaitForm, WaitForm);
@@ -70,7 +72,8 @@ begin
   Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
   TStyleManager.SetStyle(Style);
   // Get the main view
-  io.di.LocateView<IMainView>.Get;
+  LViewModel := io.di.LocateViewModel<IPersonsViewModel>.Get;
+  io.di.LocateView<IMainView>.VM(LViewModel).Get;
 end;
 
 procedure TStartForm.FormsVCProviderioOnRelease(const Sender: TObject;

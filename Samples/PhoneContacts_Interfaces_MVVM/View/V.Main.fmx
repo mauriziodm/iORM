@@ -240,72 +240,8 @@ object ViewMain: TViewMain
     Viewport.Width = 631.000000000000000000
     Viewport.Height = 567.000000000000000000
   end
-  object BSMaster: TioPrototypeBindSource
-    AutoActivate = False
-    AutoPost = False
-    FieldDefs = <
-      item
-        Name = 'ID'
-        FieldType = ftInteger
-        Generator = 'Integers'
-        ReadOnly = False
-      end
-      item
-        Name = 'FirstName'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'LastName'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'FullName'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'ClassNameProp'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end>
-    ScopeMappings = <>
-    ioAsync = True
-    ioAutoLoadData = True
-    ioAutoPersist = True
-    ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = True
-    ioAutoRefreshOnNotification = arEnabledNoReload
-    Left = 400
-    Top = 200
-  end
-  object BSDetail: TioPrototypeBindSource
-    AutoActivate = False
-    AutoPost = False
-    FieldDefs = <
-      item
-        Name = 'PhoneType'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'PhoneNumber'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end>
-    ScopeMappings = <>
-    ioAsync = True
-    ioAutoLoadData = True
-    ioAutoPersist = True
-    ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = False
-    ioAutoRefreshOnNotification = arEnabledReload
-    Left = 400
-    Top = 264
-  end
   object ActionList1: TActionList
-    Left = 400
+    Left = 440
     Top = 328
     object acRefreshMemo: TAction
       Text = 'acRefreshMemo'
@@ -315,7 +251,7 @@ object ViewMain: TViewMain
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 400
+    Left = 440
     Top = 381
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
@@ -341,11 +277,6 @@ object ViewMain: TViewMain
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
-  end
-  object VMBridge: TioViewModelBridge
-    VM_TypeName = 'IPersonsViewModel'
-    Left = 472
-    Top = 232
   end
   object PersonsModelBindSource: TioModelBindSource
     AutoActivate = True
@@ -380,8 +311,8 @@ object ViewMain: TViewMain
     ScopeMappings = <>
     ViewModelBridge = VMBridge
     ModelPresenter = 'PersonsModelPresenter'
-    Left = 576
-    Top = 200
+    Left = 440
+    Top = 208
   end
   object PhonesModelBindSource: TioModelBindSource
     AutoActivate = True
@@ -400,7 +331,11 @@ object ViewMain: TViewMain
     ScopeMappings = <>
     ViewModelBridge = VMBridge
     ModelPresenter = 'PhonesModelPresenter'
-    Left = 576
+    Left = 440
     Top = 264
+  end
+  object VMBridge: TioViewModelBridge
+    Left = 440
+    Top = 152
   end
 end
