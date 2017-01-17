@@ -39,9 +39,7 @@ interface
 
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
-  System.Classes, iORM.LiveBindings.Notification,
-  iORM.MVVM.Components.ViewModelBridge, iORM.Where.Interfaces,
-  iORM.MVVM.Interfaces;
+  System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces;
 
 type
 
@@ -49,7 +47,7 @@ type
 
   TioMasterBindSource = TioPrototypeBindSource;
 
-  TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource, IioVMBridgeTypeDataSource)
+  TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   private
     FioTypeName: String;
     FioTypeAlias: String;
@@ -64,7 +62,6 @@ type
     FioOrderBy: String;
     FioAutoRefreshOnNotification: TioAutoRefreshType;
     FonNotify: TioBSANotificationEvent;
-    FioViewModelBridge: TioViewModelBridge;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -83,31 +80,15 @@ type
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
-    function GetName: String;
-    function IsLinkedTo(const AVMBridgePointer:Pointer): Boolean;
-    // ioTypeName
-    function GetTypeName: String;
-    // ioTypeAlias
-    function GetTypeAlias: String;
-    // ioAutoLoadData
-    function GetAutoLoadData: Boolean;
-    // ioViewDataType
-    function GetViewDataType: TioViewDataType;
     // ioWhereStr
     procedure SetWhereStr(const Value: TStrings);
-    function GetWhereStr: TStrings;
     // ioWhere property
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
     // OrderBy property
     procedure SetOrderBy(const Value: String);
-    function GetOrderBy: String;
     // ioWhereDetailsFromDetailAdapters
     procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-    // ViewModelBridge property
-    function GetViewModelBridge: TioViewModelBridge;
-    procedure SetViewModelBridge(const Value: TioViewModelBridge);
-    procedure ClearViewModelBridge;
     // IsDetail
     function GetIsDetail: Boolean;
     property IsDetail:Boolean read GetIsDetail;
@@ -135,31 +116,32 @@ type
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     // ----------------------------------------------------------------------------------------------------------------------------
+    // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
   published
+    // Events
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
-
-    property ioTypeName:String read GetTypeName write FioTypeName;
-    property ioTypeAlias:String read GetTypeAlias write FioTypeAlias;
+    // Properties
+    property ioTypeName:String read FioTypeName write FioTypeName;
+    property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
     property ioAsync:Boolean read FioAsync write FioAsync;
-    property ioAutoLoadData:Boolean read GetAutoLoadData write FioAutoLoadData;
+    property ioAutoLoadData:Boolean read FioAutoLoadData write FioAutoLoadData;
     property ioAutoPersist:Boolean read FioAutoPersist write FioAutoPersist;
-    property ioViewDataType:TioViewDataType read GetViewDataType write FioViewDataType;
-    property ioWhereStr:TStrings read GetWhereStr write SetWhereStr;
+    property ioViewDataType:TioViewDataType read FioViewDataType write FioViewDataType;
+    property ioWhereStr:TStrings read FioWhereStr write SetWhereStr;
     property ioWhereDetailsFromDetailAdapters: Boolean read FioWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
-    property ioOrderBy:String read GetOrderBy Write SetOrderBy;
+    property ioOrderBy:String read FioOrderBy Write SetOrderBy;
     property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
     property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
     property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
-    property ioViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
   end;
 
 implementation
 
-uses System.SysUtils, iORM.Exceptions, iORM.LiveBindings.Factory,
-  iORM.Where.Factory, iORM.DB.Components.ConnectionDef, iORM.Rtti.Utilities,
-  iORM.Components.Common;
+uses
+  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.Factory,
+  iORM.Where.Factory, iORM.Rtti.Utilities, iORM.Components.Common;
 
 { TioPrototypeBindSource }
 
@@ -197,11 +179,6 @@ begin
   Self.GetActiveBindSourceAdapter.ClearDataObject;
 end;
 
-procedure TioPrototypeBindSource.ClearViewModelBridge;
-begin
-  Self.ioViewModelBridge := nil;
-end;
-
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
 begin
   inherited;
@@ -211,7 +188,6 @@ begin
   FioAutoLoadData := True;
   FioAutoPersist := True;
   FioViewDataType := dtList;
-  FioViewModelBridge := nil;
   // Set even an onChange event handler
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;
@@ -240,15 +216,7 @@ begin
   or (not FioLoaded)
     then Exit;
   // -------------------------------------------------------------------------------------------------------------------------------
-  // ViewModel create/retrieve
-  //  NB: If a ViewModel was created/retrieved then get the BindSourceAdapter from it
-  if  Assigned(FioViewModelBridge)
-  and Assigned(FioViewModelBridge.ViewModel)
-  and Assigned(FioViewModelBridge.ViewModel.ViewData)
-  then
-    ADataObject := FioViewModelBridge.ViewModel.ViewData.BindSourceAdapter;
-  // -------------------------------------------------------------------------------------------------------------------------------
-  // If AdataObject is NOT already assigned (by onCreateAdapter event handler or from a ViewModel) then
+  // If AdataObject is NOT already assigned (by onCreateAdapter event handler) then
   //  retrieve a BindSourceAdapter automagically by iORM
   if (not Assigned(ADataObject)) and not ioTypeName.IsEmpty then
   begin
@@ -307,11 +275,6 @@ begin
   Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
 end;
 
-function TioPrototypeBindSource.GetAutoLoadData: Boolean;
-begin
-  Result := FioAutoLoadData;
-end;
-
 function TioPrototypeBindSource.DataObject: TObject;
 begin
   Result := nil;
@@ -355,11 +318,6 @@ begin
     Result := nil;
 end;
 
-function TioPrototypeBindSource.GetWhereStr: TStrings;
-begin
-  Result := FioWhereStr;
-end;
-
 procedure TioPrototypeBindSource.Insert(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
@@ -372,40 +330,15 @@ begin
   else raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
-function TioPrototypeBindSource.IsLinkedTo(
-  const AVMBridgePointer: Pointer): Boolean;
-begin
-  Result := (AVMBridgePointer = Self.FioViewModelBridge);
-end;
-
-function TioPrototypeBindSource.GetViewModelBridge: TioViewModelBridge;
-begin
-  Result := FioViewModelBridge;
-end;
-
 function TioPrototypeBindSource.GetIsDetail: Boolean;
 begin
-  Result := Assigned(FioMasterBindSource)
-            or (   Assigned(FioViewModelBridge)
-                   and Assigned(FioViewModelBridge.ViewModel)
-                   and Assigned(FioViewModelBridge.ViewModel.ioMasterBindSource)
-               );
-end;
-
-function TioPrototypeBindSource.GetName: String;
-begin
- Result := Self.Name;
+  Result := Assigned(FioMasterBindSource);
 end;
 
 function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(
   const AOwner: TComponent): TBindSourceAdapter;
 begin
   Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner);
-end;
-
-function TioPrototypeBindSource.GetOrderBy: String;
-begin
-  Result := FioOrderBy;
 end;
 
 function TioPrototypeBindSource.GetState: TBindSourceAdapterState;
@@ -416,21 +349,6 @@ begin
     Result := TBindSourceAdapterState.seInactive
 end;
 
-function TioPrototypeBindSource.GetTypeAlias: String;
-begin
-  Result := FioTypeAlias;
-end;
-
-function TioPrototypeBindSource.GetTypeName: String;
-begin
-  Result := FioTypeName;
-end;
-
-function TioPrototypeBindSource.GetViewDataType: TioViewDataType;
-begin
-  Result := FioViewDataType;
-end;
-
 procedure TioPrototypeBindSource.Loaded;
 var
   LAdapter: TBindSourceAdapter;
@@ -439,13 +357,6 @@ begin
   // ===========================================================================
   if not (csDesigning in ComponentState) then
     TioComponentsCommon.RegisterConnectionDefComponents(Owner);
-  // ===========================================================================
-
-  // VIEWMODELBRIDGE - CHECK FOR VIEWMODEL IF NOT ALREADY EXECUTED
-  //  (ALWAYS BEFORE DOCREATEADAPTER CALL)
-  // ===========================================================================
-  if Assigned(FioViewModelBridge) and not (csDesigning in ComponentState) then
-    FioViewModelBridge.CheckForViewModel;
   // ===========================================================================
 
   // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
@@ -508,28 +419,6 @@ end;
 procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);
 begin
   Self.GetActiveBindSourceAdapter.SetDataObject(AObj, AOwnsObject);
-end;
-
-procedure TioPrototypeBindSource.SetViewModelBridge(
-  const Value: TioViewModelBridge);
-var
-  I: Integer;
-  LVMBridgeTypeDataSource: IioVMBridgeTypeDataSource;
-begin
-  if Value = FioViewModelBridge then
-    Exit;
-  // Loop for all components of the owner anche, if the current is a
-  //  TioPrototypeBindSource, then set to nil the ioViewModelBridge.
-  //  NB: Only one TioPrototypeBindSource pointing to a ViewModelBridga at a time.
-{ TODO : Da eliminare una volta fatti i componenti TioBindSourceAdapterProvider }
-//  for I := 0 to Owner.ComponentCount-1 do
-//    if  Supports(Owner.Components[I], IioVMBridgeTypeDataSource, LVMBridgeTypeDataSource)
-//    and LVMBridgeTypeDataSource.IsLinkedTo(@Value)
-//    then
-//      LVMBridgeTypeDataSource.ClearViewModelBridge;
-  // Set the new VMBridge
-  FioViewModelBridge := Value;
-//  FioViewModelBridge.SetLinkedBindSource(Self);
 end;
 
 procedure TioPrototypeBindSource.SetWhere(const Value: IioWhere);

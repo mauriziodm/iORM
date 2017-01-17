@@ -236,7 +236,7 @@ end;
 procedure TViewModelMain.SetJSON(const Value: String);
 begin
   FJSON := Value;
-  Commands.Execute('acRefreshMemo');
+  Command['acRefreshMemo'].Execute;
 end;
 
 end.

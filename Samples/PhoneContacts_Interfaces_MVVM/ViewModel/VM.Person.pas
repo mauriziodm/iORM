@@ -25,12 +25,10 @@ type
 
 implementation
 
-{%CLASSGROUP 'FMX.Controls.TControl'}
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
   Data.Bind.ObjectScope, System.Actions;
-
-{%CLASSGROUP 'FMX.Controls.TControl'}
 
 {$R *.dfm}
 

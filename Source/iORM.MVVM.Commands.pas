@@ -56,6 +56,7 @@ type
     constructor Create(const AOwner:TComponent);
     destructor Destroy; override;
     procedure Add(const AName:String; const ACommandItem:IioCommandsContainerItem);
+    procedure AddOrUpdate(const AName:String; const ACommandItem:IioCommandsContainerItem);
     procedure LoadCommands(const AOwner:TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
     procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
@@ -600,6 +601,15 @@ begin
   // Bind the action
   AValue := TValue.From<TBasicAction>(LAction);
   LControlActionProperty.SetValue(AControl, AValue);
+end;
+
+procedure TioCommandsContainer.AddOrUpdate(const AName: String;
+  const ACommandItem: IioCommandsContainerItem);
+begin
+  if Self.Exist(AName) then
+    FContainer.Items[AName] := ACommandItem
+  else
+    Self.Add(AName, ACommandItem);
 end;
 
 procedure TioCommandsContainer.BindView(const AView: TComponent);

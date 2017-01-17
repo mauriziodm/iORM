@@ -233,7 +233,6 @@
         <DCCReference Include="..\..\Source\iORM.LiveBindings.Notification.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.ViewData.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewModelBase.pas">
             <Form>ioViewModel</Form>
             <DesignClass>TDataModule</DesignClass>
@@ -398,7 +397,16 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
                         <RemoteDir>Contents\Resources</RemoteDir>
@@ -712,16 +720,7 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>

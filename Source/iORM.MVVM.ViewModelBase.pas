@@ -50,33 +50,8 @@ type
   TioViewModel = class(TDataModule, IioViewModel)
   private
     { Private declarations }
-    FViewData: IioViewData;
     FCommands: IioCommandsContainer;
     FViews: IioVMViews;  // Per ora la lascio nascosta, deciderò poi se renderla pubblica (Solo RegisterView è pubblico come metodo del ViewModel).
-    FioTypeName, FioTypeAlias: String;
-    FioMasterViewModelTypeName, FioMasterViewModelTypeAlias: String;
-    FioMasterViewModel: IioViewModel;
-    FIoMasterBindSource: TioMasterBindSource;
-    FioMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    FIoMasterPropertyName: String;
-    FioWhere: IioWhere;
-    FioAutoLoadData: Boolean;
-    FioViewDataType: TioViewDataType;
-    function GetAutoLoadData: Boolean;
-    function GetMasterBindSource: TObject;
-    function GetMasterPropertyName: String;
-    function GetTypeAlias: String;
-    function GetTypeName: String;
-    function GetViewDataType: TioViewDataType;
-    function GetWhere: IioWhere;
-    function GetPresenters(const AName: String): TioModelPresenter;
-    procedure SetAutoLoadData(const Value: Boolean);
-    procedure SetMasterBindSource(const Value: TObject);
-    procedure SetMasterPropertyName(const Value: String);
-    procedure SetTypeAlias(const Value: String);
-    procedure SetTypeName(const Value: String);
-    procedure SetViewDataType(const Value: TioViewDataType);
-    procedure SetWhere(const Value: IioWhere);
   protected
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
@@ -86,13 +61,14 @@ type
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------
-    procedure ioLoadViewData;
-    procedure SetMasterViewModel(AMasterViewModel: IioViewModel);
-    function GetMasterViewModel: IioViewModel;
+    // Presenters
+    function GetPresenters(const AName: String): TioModelPresenter;
+    // Command
+    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    function ViewData: IioViewData;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
     function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): TioViewContextProvider;
@@ -107,15 +83,8 @@ type
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
     // Properties
+    property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
     property Presenters[const AName:String]:TioModelPresenter read GetPresenters;
-  published
-    property ioTypeName:String read GetTypeName write SetTypeName;
-    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
-    property ioWhere:IioWhere read GetWhere write SetWhere;
-    property ioMasterBindSource:TObject read GetMasterBindSource write SetMasterBindSource;
-    property ioMasterPropertyName:String read GetMasterPropertyName write SetMasterPropertyName;
-    property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
-    property ioViewDataType:TioViewDataType read GetViewDataType write SetViewDataType;
   end;
 // ---------------- Start: section added for IInterface support ---------------
   {$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
@@ -131,8 +100,6 @@ implementation
 uses System.SysUtils, iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.MVVM.Factory, Data.Bind.ObjectScope,
   iORM.LiveBindings.Factory, iORM;
-
-{%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
 
@@ -164,24 +131,11 @@ end;
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
 
-function TioViewModel.GetAutoLoadData: Boolean;
+function TioViewModel.GetCommand(
+  const ACmdName: String): IioCommandsContainerItem;
 begin
-  Result := FioAutoLoadData;
-end;
-
-function TioViewModel.GetMasterBindSource: TObject;
-begin
-  Result := FIoMasterBindSource;
-end;
-
-function TioViewModel.GetMasterPropertyName: String;
-begin
-  Result := FIoMasterPropertyName;
-end;
-
-function TioViewModel.GetMasterViewModel: IioViewModel;
-begin
-  Result := FioMasterViewModel;
+  // Get the CommandItem if exist
+  Result := Commands.Get(ACmdName, False);
 end;
 
 function TioViewModel.GetPresenters(const AName: String): TioModelPresenter;
@@ -192,31 +146,6 @@ begin
   if not (Assigned(LComponent) and (LComponent is TioModelPresenter)) then
     raise EioException.Create(Self.ClassName, 'GetPresenters', Format('ModelPresenter named "%s" not found.', [AName]));
   Result := TioModelPresenter(LComponent);
-end;
-
-function TioViewModel.GetTypeAlias: String;
-begin
-  Result := FioTypeAlias;
-end;
-
-function TioViewModel.GetTypeName: String;
-begin
-  Result := FioTypeName;
-end;
-
-function TioViewModel.GetViewDataType: TioViewDataType;
-begin
-  Result := FioViewDataType;
-end;
-
-function TioViewModel.GetWhere: IioWhere;
-begin
-  // If the ViewData is assigned then return the ViewData.ActiveBindSourceAdapter
-  //  Where and set the local ioWhere too.
-  //  Else return the local Where object
-  if Assigned(FViewData) then
-    FioWhere := FViewData.ActiveBindSourceAdapter.ioWhere;  // Set the internal field directly
-  Result := FioWhere;
 end;
 
 function TioViewModel.QueryInterface(const IID: TGUID; out Obj): HResult;
@@ -235,60 +164,15 @@ begin
   FCommands.BindView(AView);
 end;
 
-procedure TioViewModel.SetAutoLoadData(const Value: Boolean);
+procedure TioViewModel.SetCommand(const ACmdName: String;
+  const Value: IioCommandsContainerItem);
 begin
-  FioAutoLoadData := Value;
-end;
-
-procedure TioViewModel.SetMasterBindSource(const Value: TObject);
-begin
-  FIoMasterBindSource := Value as TioMasterBindSource;
-end;
-
-procedure TioViewModel.SetMasterPropertyName(const Value: String);
-begin
-  FIoMasterPropertyName := Value;
-end;
-
-procedure TioViewModel.SetMasterViewModel(AMasterViewModel: IioViewModel);
-begin
-  FioMasterViewModel := AMasterViewModel;
-end;
-
-procedure TioViewModel.SetTypeAlias(const Value: String);
-begin
-  FioTypeAlias := Value;
-end;
-
-procedure TioViewModel.SetTypeName(const Value: String);
-begin
-  FioTypeName := Value;
-end;
-
-procedure TioViewModel.SetViewDataType(const Value: TioViewDataType);
-begin
-  FioViewDataType := Value;
-end;
-
-procedure TioViewModel.SetWhere(const Value: IioWhere);
-begin
-  FioWhere := Value;
-  if Assigned(FViewData) then
-    FViewData.ActiveBindSourceAdapter.ioWhere := Value;
+  Commands.AddOrUpdate(ACmdName, Value);
 end;
 
 procedure TioViewModel.UnbindView(const AViewID:Byte);
 begin
   FViews.UnregisterView(AViewID);
-end;
-
-function TioViewModel.ViewData: IioViewData;
-begin
-  if not Assigned(FViewData) then
-  begin
-    Self.ioLoadViewData;
-  end;
-  Result := FViewData;
 end;
 
 function TioViewModel._AddRef: Integer;
@@ -311,36 +195,6 @@ begin
 {$ENDIF}
 end;
 
-procedure TioViewModel.ioLoadViewData;
-var
-  AObj: TObject;
-begin
-  // Checks
-  if Assigned(FViewData) then
-    raise EioException.Create(Self.ClassName + ': "ViewData" is already assigned!');
-  // If there is a MasterViewModel...
-  if Assigned(FioMasterViewModel) then
-    FViewData := TioMVVMFactory.ViewData(FioMasterViewModel, FIoMasterPropertyName)
-  // If  FioMasterViewModelTypeName is specified (retrieve the MasterVM by Dependency Injection)
-  else if not FioMasterViewModelTypeName.IsEmpty then
-  begin
-    AObj := io.di.Locate(FioMasterViewModelTypeName, FioMasterViewModelTypeAlias).Get;
-    if not Supports(AObj, IioViewModel, FioMasterViewModel) then
-      raise EioException.Create(Self.ClassName + ': The "IioViewModel" interface is not implemented by object.');
-    FViewData := TioMVVMFactory.ViewData(FioMasterViewModel, FIoMasterPropertyName)
-  end
-  // If there is a MasterBindSource then create the ViewData by MasterBindSource
-  //  else create it by TypeName, TypeAlias.........
-  else if Assigned(FIoMasterBindSource) then
-    FViewData := TioMVVMFactory.ViewData(FIoMasterBindSource, FIoMasterPropertyName)
-  // If there is a MasterBindSourceAdapter...
-  else if Assigned(FioMasterBindSourceAdapter) then
-    FViewData := TioMVVMFactory.ViewData(FioMasterBindSourceAdapter, FIoMasterPropertyName)
-  // If there is a TypeName
-  else if not FioTypeName.IsEmpty then
-    FViewData := TioMVVMFactory.ViewData(FioTypeName, FioTypeAlias, FIoWhere, FioViewDataType, FioAutoLoadData);
-end;
-
 function TioViewModel.LocalVCProvider(const AName: String;
   const AGlobalIfNotFound: Boolean): TioViewContextProvider;
 begin
@@ -358,7 +212,6 @@ constructor TioViewModel.Create(AOwner: TComponent);
 begin
   inherited;
   // Init
-  FViewData := nil;
   FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
   FViews := TioMVVMFactory.VMViews;
 end;

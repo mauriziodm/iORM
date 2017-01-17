@@ -107,7 +107,6 @@ contains
   iORM.LiveBindings.Notification in '..\..\Source\iORM.LiveBindings.Notification.pas',
   iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas',
   iORM.MVVM.Interfaces in '..\..\Source\iORM.MVVM.Interfaces.pas',
-  iORM.MVVM.ViewModel.ViewData in '..\..\Source\iORM.MVVM.ViewModel.ViewData.pas',
   iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
   iORM.Global.Factory in '..\..\Source\iORM.Global.Factory.pas',
   iORM.DependencyInjection in '..\..\Source\iORM.DependencyInjection.pas',

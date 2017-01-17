@@ -52,47 +52,18 @@ type
     function FindComponent(const AName: string): TComponent;
   end;
 
-  IioViewData = interface
-    ['{A8E74DA6-81BF-446C-A524-7E98F0D09CEF}']
-    function DataObj: TObject;
-    procedure SetDataObj(AObj:TObject); overload;
-    procedure SetDataObj(AIntf:IInterface); overload;
-    function BindSourceAdapter: TBindSourceAdapter;
-    function ActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-  end;
-
   IioCommandsContainer = interface;
+  IioCommandsContainerItem = interface;
 
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    function ViewData: IioViewData;
-    function Commands: IioCommandsContainer;
-    function BindView(const AView:TComponent): Byte;
     procedure UnbindView(const AViewID:Byte);
-    // TypeName
-    procedure SetTypeName(const Value: String);
-    function GetTypeName: String;
-    property ioTypeName:String read GetTypeName write SetTypeName;
-    // TypeAlias
-    procedure SetTypeAlias(const Value: String);
-    function GetTypeAlias: String;
-    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
-    // MasterBindSource
-    procedure SetMasterBindSource(const Value: TObject);
-    function GetMasterBindSource: TObject;
-    property ioMasterBindSource:TObject read GetMasterBindSource write SetMasterBindSource;
-    // MasterPropertyName
-    procedure SetMasterPropertyName(const Value: String);
-    function GetMasterPropertyName: String;
-    property ioMasterPropertyName:String read GetMasterPropertyName write SetMasterPropertyName;
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
-    function GetAutoLoadData: Boolean;
-    property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
-    // ViewDataType
-    procedure SetViewDataType(const Value: TioViewDataType);
-    function GetViewDataType: TioViewDataType;
-    property ioViewDataType:TioViewDataType read GetViewDataType write SetViewDataType;
+    function BindView(const AView:TComponent): Byte;
+    function Commands: IioCommandsContainer;
+    // Command
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
+    property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
     // Presenters
     function GetPresenters(const AName: String): TioModelPresenter;
     property Presenters[const AName:String]:TioModelPresenter read GetPresenters;
@@ -185,6 +156,7 @@ type
   IioCommandsContainer = interface
     ['{E20F72CB-9F84-44B4-A6DD-DFF73B53F0AC}']
     procedure Add(const AName:String; const ACommandItem:IioCommandsContainerItem);
+    procedure AddOrUpdate(const AName:String; const ACommandItem:IioCommandsContainerItem);
     procedure LoadCommands(const AOwner:TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
     procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
@@ -197,21 +169,7 @@ type
     procedure BindView(const AView:TComponent);
     procedure BindViewControl(const AControl:TObject; const ACommandName:String);
     function Get(const AName:String; const ANoException:Boolean=False): IioCommandsContainerItem;
-  end;
-
-  // Interface implemented by TioPrototypeBindSource & TioLiveMemTable to communicate
-  //  to the TioViewModelBridge component the type data to create the ViewModel correctly
-  IioVMBridgeTypeDataSource = interface
-    ['{013EE0CB-6D72-4DA4-A98F-6094E030D31E}']
-{ TODO : Da eliminare una volta fatti i componenti TioBindSourceAdapterProvider }    procedure ClearViewModelBridge;
-    function GetName: String;
-    function GetTypeName: String;
-    function GetTypeAlias: String;
-    function GetAutoLoadData: Boolean;
-    function GetViewDataType: TioViewDataType;
-    function GetWhereStr: TStrings;
-    function GetOrderBy: String;
-    function IsLinkedTo(const AVMBridgePointer:Pointer): Boolean;
+    function Exist(const AName:String): Boolean;
   end;
 
 implementation
