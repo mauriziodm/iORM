@@ -54,14 +54,26 @@ type
     TypeAlias: String;
   end;
 
+  // Default settings creating ViewModels.Presenters
+  TioDIPresenterSettingsType = (pstDataObject, pstBindSourceAdapter, pstMasterModelPresenter, pstWhere, pstOrderBy);
+  TioDIPresenterSettings = record
+    SettingsType:TioDIPresenterSettingsType;
+    Name: String;
+    InterfacedObj: IInterface;
+    Obj: TObject;
+    StringParameter: String;
+  end;
+
   // Dependency Injection Container Implementers Item (SubContainer value)
   TioDIContainerImplementersItem = class
+  private
   public
     ClassRef: TioClassref;
     ClassName: String;
     RttiType: TRttiInstanceType;
     InterfaceGUID: TGUID;
     PropertiesOnCreate: TArray<TioDIPropFieldOnCreate>;
+    PresenterSettings: TArray<TioDIPresenterSettings>;
     DefaultConstructorMethod: String;
     DefaultConstructorMarker: String;
     DefaultConstructorParams: array of TValue;

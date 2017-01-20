@@ -41,7 +41,8 @@ uses
   iORM.Context.Properties.Interfaces,
   iORM.Context.Interfaces,
   iORM.DB.Interfaces,
-  System.Rtti, iORM.CommonTypes, iORM.DependencyInjection.Implementers;
+  System.Rtti, iORM.CommonTypes, iORM.DependencyInjection.Implementers,
+  iORM.MVVM.Interfaces;
 
 type
   // ClassRef to ObjectMaker
@@ -62,6 +63,7 @@ type
     class function FindConstructor(ARttiType:TRttiType; const AParameters:Array of TValue; AMarkerText:String=''; AMethodName:String=''): TRttiMethod;
     class function FindMethod(ARttiType:TRttiType; AMethodName:String; const AParameters:Array of TValue; AMarkerText:String=''): TRttiMethod;
     class procedure InitializeObjectAfterCreate(const AObj:TObject; const AContainerItem:TioDIContainerImplementersItem);
+    class procedure InitializeViewModelPresentersAfterCreate(const AViewModel:TObject; const AContainerItem:TioDIContainerImplementersItem);
   public
     class function CreateObjectFromBlobField(AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function CreateObjectByClassRef(AClassRef: TClass): TObject;
@@ -80,7 +82,9 @@ uses
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, System.Classes,
   Data.DB, iORM.LazyLoad.Interfaces, System.SysUtils, iORM.Attributes,
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
-  iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Rtti.Utilities;
+  iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Rtti.Utilities,
+  iORM.LiveBindings.Interfaces, iORM.MVVM.Components.ModelPresenter,
+  iORM.Where.Interfaces;
 
 { TioObjectMakerIntf }
 
@@ -160,20 +164,79 @@ class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(ARttiType: TRttiType;
   const AConstructorParams:array of TValue; AConstructorMarkerText,
   AConstructorMethodName: String): TObject;
 var
-  AMethod: TRttiMethod;
+  LMethod: TRttiMethod;
 begin
   // init
   Result := nil;
-  AMethod := nil;
+  LMethod := nil;
   // Find the constructor
-  AMethod := Self.FindConstructor(ARttiType, AConstructorParams, AConstructorMarkerText, AConstructorMethodName);
+  LMethod := Self.FindConstructor(ARttiType, AConstructorParams, AConstructorMarkerText, AConstructorMethodName);
   // If constructor not found...
-  if not Assigned(AMethod) then EioException.Create(Self.ClassName + ': Constructor not found for class "' + ARttiType.Name + '"');
+  if not Assigned(LMethod) then EioException.Create(Self.ClassName + ': Constructor not found for class "' + ARttiType.Name + '"');
   // Execute
-  Result := AMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
+  Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
   // Inject Properties/Fields
   if TioMapContainer.Exist(ARttiType.Name) then
     Self.InitializeObjectAfterCreate(Result, TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem);
+  // Inject ModelPresenters settings for ViewModels only
+  Self.InitializeViewModelPresentersAfterCreate(Result, TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem);
+end;
+
+class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(
+  const AViewModel: TObject;
+  const AContainerItem: TioDIContainerImplementersItem);
+var
+  LViewModel: IioViewModel;
+  LBSA: IioActiveBindSourceAdapter;
+  LWhere: IioWhere;
+  LName: String;
+  LObj: TObject;
+  LIntf: IInterface;
+  I: Integer;
+begin
+  if not Assigned(AContainerItem) then
+    Exit;
+  // Only for ViewModels
+  if not Supports(AViewModel, IioViewModel, LViewModel) then
+    Exit;
+  // Loop for all settings
+  for I := 0 to Length(AContainerItem.PresenterSettings) -1 do
+  begin
+    LName := AContainerItem.PresenterSettings[I].Name;
+    case AContainerItem.PresenterSettings[I].SettingsType of
+      // DataObject
+      TioDIPresenterSettingsType.pstDataObject:
+        LViewModel.Presenters[LName].SetDataObject(AContainerItem.PresenterSettings[I].Obj);
+      // BindSourceAdapter
+      TioDIPresenterSettingsType.pstBindSourceAdapter:
+      begin
+        LIntf := AContainerItem.PresenterSettings[I].InterfacedObj;
+        if not Supports(LIntf, IioActiveBindSourceAdapter, LBSA) then
+          raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioActiveBindSourceAdapter" not implemented by object.');
+        LViewModel.Presenters[LName].BindSourceAdapter := LBSA;
+      end;
+      // MasterModelPresenter
+      TioDIPresenterSettingsType.pstMasterModelPresenter:
+      begin
+        LObj := AContainerItem.PresenterSettings[I].Obj;
+        if not (LObj is TioModelPresenter) then
+          raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'The object is not a TioModelPresenter instance.');
+        LViewModel.Presenters[LName].MasterPresenter := TioModelPresenter(LObj);
+        LViewModel.Presenters[LName].MasterPropertyName := AContainerItem.PresenterSettings[I].StringParameter;
+      end;
+      // Where
+      TioDIPresenterSettingsType.pstWhere:
+      begin
+        LIntf := AContainerItem.PresenterSettings[I].InterfacedObj;
+        if not Supports(LIntf, IioWhere, LWhere) then
+          raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
+        LViewModel.Presenters[LName].Where := LWhere;
+      end;
+      // OrderBy
+      TioDIPresenterSettingsType.pstOrderBy:
+        LViewModel.Presenters[LName].OrderBy := AContainerItem.PresenterSettings[I].StringParameter;
+    end;
+  end;
 end;
 
 class procedure TioObjectMakerIntf.InitializeObjectAfterCreate(
@@ -187,6 +250,9 @@ begin
   if not Assigned(AContainerItem) then
     Exit;
   LTyp := AContainerItem.RttiType;
+  // ===========================================================================
+  // PROPERTIES/FIELDS INJECTION
+  // ---------------------------------------------------------------------------
   // Loop for all properties to initialize (if exists)
   for I := 0 to Length(AContainerItem.PropertiesOnCreate) -1 do
   begin
@@ -215,6 +281,7 @@ begin
       end;
     end;
   end;
+  // ===========================================================================
 end;
 
 class function TioObjectMakerIntf.InternalFindMethod(ARttiType:TRttiType; AMethodName,AMarkerText:String; IsConstructor:Boolean; const AParameters:Array of TValue): TRttiMethod;
