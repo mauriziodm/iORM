@@ -63,23 +63,34 @@ type
     Obj: TObject;
     StringParameter: String;
   end;
+  TioDIPresenterSettingsContainer = TArray<TioDIPresenterSettings>;
+  PioDIPresenterSettingsContainer = ^TioDIPresenterSettingsContainer;
 
   // Dependency Injection Container Implementers Item (SubContainer value)
   TioDIContainerImplementersItem = class
   private
+    function GetPresenterSettingsPointer: PioDIPresenterSettingsContainer;
   public
     ClassRef: TioClassref;
     ClassName: String;
     RttiType: TRttiInstanceType;
     InterfaceGUID: TGUID;
     PropertiesOnCreate: TArray<TioDIPropFieldOnCreate>;
-    PresenterSettings: TArray<TioDIPresenterSettings>;
     DefaultConstructorMethod: String;
     DefaultConstructorMarker: String;
     DefaultConstructorParams: array of TValue;
     IsSingleton: Boolean;
+    PresenterSettings: TioDIPresenterSettingsContainer;
+    property PresenterSettingsPointer:PioDIPresenterSettingsContainer read GetPresenterSettingsPointer;
   end;
 
 implementation
+
+{ TioDIContainerImplementersItem }
+
+function TioDIContainerImplementersItem.GetPresenterSettingsPointer: PioDIPresenterSettingsContainer;
+begin
+  Result := @PresenterSettings;
+end;
 
 end.

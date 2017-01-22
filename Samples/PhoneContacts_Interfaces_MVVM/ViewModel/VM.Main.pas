@@ -188,7 +188,7 @@ begin
   // Get the class name of the current person
   LCurrentClassName := PersonsModelPresenter.Current.ClassName;
   // Get the view
-  io.di.LocateView<IPersonView>(LCurrentClassName).VM(LViewModel).Get;
+  io.di.LocateView<IPersonView>(LCurrentClassName).SetViewModel(LViewModel).Get;
 end;
 
 procedure TViewModelMain.acSerializeToJSONExecute(Sender: TObject);

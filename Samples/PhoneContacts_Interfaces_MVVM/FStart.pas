@@ -73,7 +73,7 @@ begin
   TStyleManager.SetStyle(Style);
   // Get the main view
   LViewModel := io.di.LocateViewModel<IPersonsViewModel>.Get;
-  io.di.LocateView<IMainView>.VM(LViewModel).Get;
+  io.di.LocateView<IMainView>.SetViewModel(LViewModel).Get;
 end;
 
 procedure TStartForm.FormsVCProviderioOnRelease(const Sender: TObject;

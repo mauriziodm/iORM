@@ -40,7 +40,8 @@ interface
 uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider;
+  iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider,
+  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces;
 
 type
 
@@ -53,6 +54,16 @@ type
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
+    // ---------- VIEW MODEL METHODS ----------
+    function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator;
+    function LocateViewModel(const AInterfaceName:String; const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator; overload;
+//    function LocateViewModel<TVM:IInterface>(const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const AOrderBy:String): IioDependencyInjectionLocator; overload;
+    // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
@@ -66,6 +77,20 @@ type
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator<TI>;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>;
+    // ---------- VIEW MODEL METHODS ----------
+    function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
+    function LocateViewModel(const AInterfaceName:String; const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
+//    function LocateViewModel<TVM:IInterface>(const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const AOrderBy:String): IioDependencyInjectionLocator<TI>; overload;
+    // ---------- VIEW MODEL METHODS ----------
+    // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
+    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
+    function VCProvider(const AName:String): IioDependencyInjectionLocator<TI>; overload;
+    // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
 
 implementation

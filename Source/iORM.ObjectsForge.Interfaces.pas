@@ -63,13 +63,15 @@ type
     class function FindConstructor(ARttiType:TRttiType; const AParameters:Array of TValue; AMarkerText:String=''; AMethodName:String=''): TRttiMethod;
     class function FindMethod(ARttiType:TRttiType; AMethodName:String; const AParameters:Array of TValue; AMarkerText:String=''): TRttiMethod;
     class procedure InitializeObjectAfterCreate(const AObj:TObject; const AContainerItem:TioDIContainerImplementersItem);
-    class procedure InitializeViewModelPresentersAfterCreate(const AViewModel:TObject; const AContainerItem:TioDIContainerImplementersItem);
   public
+    class procedure InitializeViewModelPresentersAfterCreate(const AViewModel:TObject; const APresenterSettingsPointer:PioDIPresenterSettingsContainer);
     class function CreateObjectFromBlobField(AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function CreateObjectByClassRef(AClassRef: TClass): TObject;
-    class function CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams:array of TValue; AConstructorMarkerText:String=''; AConstructorMethodName:String=''): TObject;
+    class function CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams:array of TValue; AConstructorMarkerText:String=''; AConstructorMethodName:String=''; AContainerItem:TioDIContainerImplementersItem=nil): TObject;
     class function CreateObjectByRttiType(ARttiType:TRttiType): TObject;
-    class function CreateObjectByRttiTypeEx(ARttiType:TRttiType; const AConstructorParams:array of TValue; AConstructorMarkerText:String=''; AConstructorMethodName:String=''): TObject;
+    class function CreateObjectByRttiTypeEx(ARttiType:TRttiType;
+      const AConstructorParams:array of TValue; AConstructorMarkerText:String; AConstructorMethodName:String;
+      AContainerItem:TioDIContainerImplementersItem=nil): TObject;
     class function CreateListByClassRef(AClassRef:TClass; AOwnsObjects:Boolean=True): TObject;
     class function CreateListByRttiType(const ARttiType:TRttiType; const AOwnsObject:Boolean=True): TObject;
     class function MakeObject(const AContext:IioContext; const AQuery:IioQuery): TObject; virtual; abstract;
@@ -84,7 +86,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
   iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Rtti.Utilities,
   iORM.LiveBindings.Interfaces, iORM.MVVM.Components.ModelPresenter,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, iORM.MVVM.ViewModelBase;
 
 { TioObjectMakerIntf }
 
@@ -144,25 +146,26 @@ begin
 end;
 
 class function TioObjectMakerIntf.CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams: array of TValue;
-  AConstructorMarkerText, AConstructorMethodName: String): TObject;
+  AConstructorMarkerText, AConstructorMethodName: String; AContainerItem:TioDIContainerImplementersItem): TObject;
 begin
   // Create object
   Result := Self.CreateObjectByRttiTypeEx(
                                           TioRttiContextFactory.RttiContext.GetType(AClassref),
                                           AConstructorParams,
                                           AConstructorMarkerText,
-                                          AConstructorMethodName
+                                          AConstructorMethodName,
+                                          AContainerItem
                                          );
 end;
 
 class function TioObjectMakerIntf.CreateObjectByRttiType(ARttiType: TRttiType): TObject;
 begin
-  Result := Self.CreateObjectByRttiTypeEx(ARttiType, []);
+  Result := Self.CreateObjectByRttiTypeEx(ARttiType, [], '', '');
 end;
 
 class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(ARttiType: TRttiType;
-  const AConstructorParams:array of TValue; AConstructorMarkerText,
-  AConstructorMethodName: String): TObject;
+  const AConstructorParams:array of TValue; AConstructorMarkerText, AConstructorMethodName: String;
+  AContainerItem:TioDIContainerImplementersItem=nil): TObject;
 var
   LMethod: TRttiMethod;
 begin
@@ -175,42 +178,50 @@ begin
   if not Assigned(LMethod) then EioException.Create(Self.ClassName + ': Constructor not found for class "' + ARttiType.Name + '"');
   // Execute
   Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
-  // Inject Properties/Fields
-  if TioMapContainer.Exist(ARttiType.Name) then
-    Self.InitializeObjectAfterCreate(Result, TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem);
-  // Inject ModelPresenters settings for ViewModels only
-  Self.InitializeViewModelPresentersAfterCreate(Result, TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem);
+  // Inject Properties/Fields: if the received ContainerItem is not assigned then
+  //  try to retrieve it from MapContainer
+  //  Inject ModelPresenters settings for ViewModels only.
+  if (not Assigned(AContainerItem)) and TioMapContainer.Exist(ARttiType.Name) then
+    AContainerItem := TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem;
+  if Assigned(AContainerItem) then
+  begin
+    Self.InitializeObjectAfterCreate(Result, AContainerItem);
+    Self.InitializeViewModelPresentersAfterCreate(Result, AContainerItem.PresenterSettingsPointer);
+  end;
 end;
 
 class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(
   const AViewModel: TObject;
-  const AContainerItem: TioDIContainerImplementersItem);
+  const APresenterSettingsPointer:PioDIPresenterSettingsContainer);
 var
-  LViewModel: IioViewModel;
+  LViewModel: TioViewModel;
   LBSA: IioActiveBindSourceAdapter;
   LWhere: IioWhere;
   LName: String;
   LObj: TObject;
   LIntf: IInterface;
   I: Integer;
+  LPresenterSettings: TioDIPresenterSettingsContainer;
 begin
-  if not Assigned(AContainerItem) then
-    Exit;
+  // *** DO NOT USE IioViewModel INTERFACE HERE ***
   // Only for ViewModels
-  if not Supports(AViewModel, IioViewModel, LViewModel) then
+  if not (AViewModel is TioViewModel) then
     Exit;
+  LViewModel := TioViewModel(AViewModel);
+  // Extract PresenterSettings
+  LPresenterSettings := APresenterSettingsPointer^;
   // Loop for all settings
-  for I := 0 to Length(AContainerItem.PresenterSettings) -1 do
+  for I := 0 to Length(LPresenterSettings) -1 do
   begin
-    LName := AContainerItem.PresenterSettings[I].Name;
-    case AContainerItem.PresenterSettings[I].SettingsType of
+    LName := LPresenterSettings[I].Name;
+    case LPresenterSettings[I].SettingsType of
       // DataObject
       TioDIPresenterSettingsType.pstDataObject:
-        LViewModel.Presenters[LName].SetDataObject(AContainerItem.PresenterSettings[I].Obj);
+        LViewModel.Presenters[LName].SetDataObject(LPresenterSettings[I].Obj);
       // BindSourceAdapter
       TioDIPresenterSettingsType.pstBindSourceAdapter:
       begin
-        LIntf := AContainerItem.PresenterSettings[I].InterfacedObj;
+        LIntf := LPresenterSettings[I].InterfacedObj;
         if not Supports(LIntf, IioActiveBindSourceAdapter, LBSA) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioActiveBindSourceAdapter" not implemented by object.');
         LViewModel.Presenters[LName].BindSourceAdapter := LBSA;
@@ -218,23 +229,23 @@ begin
       // MasterModelPresenter
       TioDIPresenterSettingsType.pstMasterModelPresenter:
       begin
-        LObj := AContainerItem.PresenterSettings[I].Obj;
+        LObj := LPresenterSettings[I].Obj;
         if not (LObj is TioModelPresenter) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'The object is not a TioModelPresenter instance.');
         LViewModel.Presenters[LName].MasterPresenter := TioModelPresenter(LObj);
-        LViewModel.Presenters[LName].MasterPropertyName := AContainerItem.PresenterSettings[I].StringParameter;
+        LViewModel.Presenters[LName].MasterPropertyName := LPresenterSettings[I].StringParameter;
       end;
       // Where
       TioDIPresenterSettingsType.pstWhere:
       begin
-        LIntf := AContainerItem.PresenterSettings[I].InterfacedObj;
+        LIntf := LPresenterSettings[I].InterfacedObj;
         if not Supports(LIntf, IioWhere, LWhere) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
         LViewModel.Presenters[LName].Where := LWhere;
       end;
       // OrderBy
       TioDIPresenterSettingsType.pstOrderBy:
-        LViewModel.Presenters[LName].OrderBy := AContainerItem.PresenterSettings[I].StringParameter;
+        LViewModel.Presenters[LName].OrderBy := LPresenterSettings[I].StringParameter;
     end;
   end;
 end;
