@@ -179,16 +179,14 @@ end;
 procedure TViewModelMain.acEditPersonExecute(Sender: TObject);
 var
   LCurrentClassName: String;
-  LViewModel: IPersonViewModel;
 begin
   inherited;
-  // Get the ViewModel and set the ModelBindSource
-  LViewModel := io.di.LocateViewModel<IPersonViewModel>.Get;
-  LViewModel.Presenters['PersonModelPresenter'].MasterPresenter := PersonsModelPresenter;
   // Get the class name of the current person
   LCurrentClassName := PersonsModelPresenter.Current.ClassName;
-  // Get the view
-  io.di.LocateView<IPersonView>(LCurrentClassName).SetViewModel(LViewModel).Get;
+  // Get the View and ViewModel
+  io.di.LocateView<IPersonView, IPersonViewModel>(LCurrentClassName)
+    .SetPresenter('PersonModelPresenter', PersonsModelPresenter)
+    .Get;
 end;
 
 procedure TViewModelMain.acSerializeToJSONExecute(Sender: TObject);

@@ -354,12 +354,12 @@ object MainForml: TMainForml
       end>
     ScopeMappings = <>
     ioTypeName = 'TPizza'
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = False
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 232
     Top = 208
   end

@@ -56,8 +56,6 @@ type
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator;
-    function LocateViewModel(const AInterfaceName:String; const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator; overload;
-//    function LocateViewModel<TVM:IInterface>(const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
@@ -79,8 +77,6 @@ type
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>;
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
-    function LocateViewModel(const AInterfaceName:String; const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
-//    function LocateViewModel<TVM:IInterface>(const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;

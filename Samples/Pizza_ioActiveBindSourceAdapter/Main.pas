@@ -84,7 +84,7 @@ end;
 
 procedure TMainForml.acNewExecute(Sender: TObject);
 begin
-  PrototypeBindSource1.Append;
+  PrototypeBindSource1.Insert;
 end;
 
 procedure TMainForml.acRefreshExecute(Sender: TObject);

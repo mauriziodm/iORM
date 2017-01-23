@@ -78,8 +78,8 @@ object ViewCostGeneric: TViewCostGeneric
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
     GroupingKind = Grouped
-    Viewport.Width = 393.000000000000000000
-    Viewport.Height = 462.000000000000000000
+    Viewport.Width = 389.000000000000000000
+    Viewport.Height = 458.000000000000000000
     object ListBoxItemDataPartenza: TListBoxItem
       Size.Width = 389.000000000000000000
       Size.Height = 44.000000000000000000
@@ -92,7 +92,7 @@ object ViewCostGeneric: TViewCostGeneric
         Align = Right
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
-        Text = '31/10/2016 00:58:00'
+        Text = '01/11/2017 00:58:00'
         Position.X = 106.000000000000000000
         Margins.Right = 10.000000000000000000
         Size.Width = 273.000000000000000000
@@ -177,13 +177,12 @@ object ViewCostGeneric: TViewCostGeneric
       end>
     ScopeMappings = <>
     ioTypeName = 'ICostGeneric'
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
-    ioMasterBindSource = MainForm.BSCosts
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioVM_UseBSPropsOnCreate = True
     Left = 288
     Top = 88
   end

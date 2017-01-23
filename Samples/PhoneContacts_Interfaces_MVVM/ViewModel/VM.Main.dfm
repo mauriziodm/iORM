@@ -62,7 +62,7 @@ inherited ViewModelMain: TViewModelMain
     Top = 136
   end
   object PersonsModelPresenter: TioModelPresenter
-    Async = False
+    Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload
@@ -73,8 +73,8 @@ inherited ViewModelMain: TViewModelMain
     Top = 24
   end
   object PhonesModelPresenter: TioModelPresenter
-    Async = False
-    AutoLoadData = False
+    Async = True
+    AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = PersonsModelPresenter

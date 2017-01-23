@@ -54,7 +54,6 @@ uses
 procedure TStartForm.FormCreate(Sender: TObject);
 var
   Style : TFMXObject;
-  LViewModel: IPersonsViewModel;
 begin
   // Register the ShowWait & CloseWait proc
   Application.CreateForm(TWaitForm, WaitForm);
@@ -72,8 +71,7 @@ begin
   Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
   TStyleManager.SetStyle(Style);
   // Get the main view
-  LViewModel := io.di.LocateViewModel<IPersonsViewModel>.Get;
-  io.di.LocateView<IMainView>.SetViewModel(LViewModel).Get;
+  io.di.LocateView<IMainView, IPersonsViewModel>.Get;
 end;
 
 procedure TStartForm.FormsVCProviderioOnRelease(const Sender: TObject;

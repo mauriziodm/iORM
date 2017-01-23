@@ -165,8 +165,6 @@ type
     function SingletonKey(const ASingletonKey:String): IioDependencyInjectionLocator; virtual;
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator;
-    function LocateViewModel(const AInterfaceName:String; const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator; overload;
-    function LocateViewModel<TVM:IInterface>(const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
@@ -189,8 +187,6 @@ type
     function SingletonKey(const ASingletonKey:String): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
-    function LocateViewModel(const AInterfaceName:String; const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
-    function LocateViewModel<TVM:IInterface>(const AAlias:String=''; const AMarker:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
@@ -221,6 +217,7 @@ type
     class function Locate<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
     class function LocateView(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateView<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
+    class function LocateView<TView:IInterface; TViewModel:IioViewModel>(const AViewAlias:String=''; const AViewModelAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator<TView>; overload;
     class function LocateViewModel(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewModel<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
     class function Singletons: TioSingletonsFacadeRef;
@@ -243,7 +240,8 @@ uses
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, System.Classes,
-  iORM.MVVM.ViewContextContainer, iORM.ObjectsForge.Interfaces;
+  iORM.MVVM.ViewContextContainer, iORM.ObjectsForge.Interfaces,
+  iORM.MVVM.ViewModelBase;
 
 { TioDependencyInjectionBase }
 
@@ -268,6 +266,18 @@ class function TioDependencyInjection.LocateView(const AInterfaceName,
   AAlias: String): IioDependencyInjectionLocator;
 begin
   Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, True);
+end;
+
+class function TioDependencyInjection.LocateView<TView, TViewModel>(const AViewAlias,
+  AViewModelAlias, AViewModelMarker: String): IioDependencyInjectionLocator<TView>;
+var
+  LViewModel: IioViewModel;
+begin
+  // Get the ViewLocator
+  Result := TioDependencyInjectionFactory.GetLocator<TView>(AViewAlias, True, True);
+  // Get the ViewModel instance
+  LViewModel := io.di.LocateViewModel<TViewModel>(AViewModelAlias).Get;
+  Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
 class function TioDependencyInjection.LocateView<T>(
@@ -708,21 +718,6 @@ begin
   Result := Self.Container.Get(Self.FInterfaceName, Self.FAlias);
 end;
 
-function TioDependencyInjectionLocator.LocateViewModel(const AInterfaceName,
-  AAlias: String; const AMarker:String): IioDependencyInjectionLocator;
-var
-  LObj: TObject;
-begin
-  LObj := io.di.Locate(AInterfaceName, AAlias).Get;
-  Result := Self.SetViewModel(TioRttiUtilities.ObjectAsIioViewModel(LObj), AMarker);
-end;
-
-function TioDependencyInjectionLocator.LocateViewModel<TVM>(
-  const AAlias: String; const AMarker:String): IioDependencyInjectionLocator;
-begin
-  Result := Self.LocateViewModel(TioRttiUtilities.GenericToString<TVM>, AAlias, AMarker);
-end;
-
 function TioDependencyInjectionLocator.PresenterSettingsExists: Boolean;
 begin
   Result := (Length(FPresenterSettings) > 0);
@@ -841,7 +836,8 @@ begin
       //  else use the default values
       Self.CheckConstructorInfo(AContainerItem);
       // Object creation
-      Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
+//      Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
+      Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
       // If some PresenterSettings exists and the result object is a ViewModel then
       //  apply it
       if PresenterSettingsExists and Supports(Result, IioViewModel) then
@@ -940,20 +936,6 @@ begin
     _Get(ContainerItem),
     ContainerItem.InterfaceGUID
     );
-end;
-
-function TioDependencyInjectionLocator<TI>.LocateViewModel(const AInterfaceName,
-  AAlias, AMarker: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).LocateViewModel(AInterfaceName, AAlias, AMarker);
-end;
-
-function TioDependencyInjectionLocator<TI>.LocateViewModel<TVM>(const AAlias,
-  AMarker: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).LocateViewModel<TVM>(AAlias, AMarker);
 end;
 
 function TioDependencyInjectionLocator<TI>.SingletonKey(const ASingletonKey: String): IioDependencyInjectionLocator<TI>;

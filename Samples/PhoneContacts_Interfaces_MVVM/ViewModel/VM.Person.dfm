@@ -3,7 +3,7 @@ inherited PersonViewModel: TPersonViewModel
   Height = 468
   Width = 496
   object PersonModelPresenter: TioModelPresenter
-    Async = False
+    Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload
@@ -14,7 +14,7 @@ inherited PersonViewModel: TPersonViewModel
     Top = 24
   end
   object PhonesModelPresenter: TioModelPresenter
-    Async = False
+    Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload

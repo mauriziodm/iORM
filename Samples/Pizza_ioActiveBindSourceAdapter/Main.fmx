@@ -20,6 +20,11 @@ object MainForml: TMainForml
     TabIndex = 0
     TabOrder = 0
     TabPosition = None
+    Sizes = (
+      320s
+      460s
+      320s
+      460s)
     object TabItem1: TTabItem
       CustomIcon = <
         item
@@ -104,13 +109,13 @@ object MainForml: TMainForml
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 50.000000000000000000
       object DetailToolbar: TToolBar
-        Size.Width = 50.000000000000000000
+        Size.Width = 320.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object DetailLabel: TLabel
           Align = Contents
-          Size.Width = 50.000000000000000000
+          Size.Width = 320.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'toollabel'
