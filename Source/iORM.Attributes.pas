@@ -38,7 +38,7 @@ unit iORM.Attributes;
 interface
 
 uses
-  iORM.CommonTypes, ObjMapper.Attributes, System.UITypes;
+  iORM.CommonTypes, System.UITypes, ObjMapper.Attributes;
 
 type
 

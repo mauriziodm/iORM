@@ -27,7 +27,7 @@ begin
 //  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsIntf.FDB'), 'SYSDBA', 'masterkey', '').Apply;
 
   // MSQL monitor
-  io.Connections.Monitor.Mode := mmRemote;
+//  io.Connections.Monitor.Mode := mmRemote;
 
   // AutoCreation and AutoUpdate of the database
   io.AutoCreateDatabase(False);

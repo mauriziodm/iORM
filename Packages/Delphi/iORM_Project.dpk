@@ -39,17 +39,15 @@ requires
   FireDACCommonDriver,
   DbxCommonDriver,
   FireDACIBDriver,
-  fmxFireDAC,
   soaprtl,
-  vclFireDAC,
-  FireDACCommonODBC,
-  FireDACMSSQLDriver,
   CustomIPTransport,
   RESTComponents,
   IndySystem,
   IndyProtocols,
   IndyCore,
-  IndyIPClient;
+  IndyIPClient,
+  fmx,
+  fmxFireDAC;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',

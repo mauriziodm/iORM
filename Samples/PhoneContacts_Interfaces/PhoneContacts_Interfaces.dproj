@@ -6,7 +6,7 @@
         <MainSource>PhoneContacts_Interfaces.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Android</Platform>
         <TargetedPlatforms>1113</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>

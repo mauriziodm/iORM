@@ -147,7 +147,7 @@ uses
   iORM, System.Rtti, iORM.LiveBindings.Factory, iORM.Context.Factory,
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Rtti.Utilities,
-  iORM.Context.Map.Interfaces, iORM.Where.Factory;
+  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -245,19 +245,35 @@ begin
   Self.SetObjStatus(osDirty);
   // If AutoPersist is enabled then persist
   if FAutoPersist then
-    if Self.IsDetail then
-      io.Persist(Self.Current,
-                 Self.FMasterProperty.GetRelationChildPropertyName,
-                 Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
-                 False,
-                 '')  // Connection name
-    else
-      io.Persist(Self.Current);
+    TioCommonBSAPersistence.Persist(Self)
   // Send a notification to other ActiveBindSourceAdapters & BindSource
-  Notify(
-         Self,
-         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
-        );
+  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  //       if FAutoPersist is True then the notify is performed by
+  //       the "CommonBSAPersistence" else by this method
+  else
+    Notify(
+           Self,
+           TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
+          );
+
+// --- OLD CODE ---
+//  inherited;
+//  Self.SetObjStatus(osDirty);
+  // If AutoPersist is enabled then persist
+//  if FAutoPersist then
+//    if Self.IsDetail then
+//      io.Persist(Self.Current,
+//                 Self.FMasterProperty.GetRelationChildPropertyName,
+//                 Self.FMasterAdaptersContainer.GetMasterBindSourceAdapter.GetCurrentOID,
+//                 False,
+//                 '')  // Connection name
+//    else
+//      io.Persist(Self.Current);
+  // Send a notification to other ActiveBindSourceAdapters & BindSource
+//  Notify(
+//         Self,
+//         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
+//        );
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterScroll;
@@ -268,7 +284,7 @@ end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeDelete;
 begin
-inherited;
+  inherited;
   // If ObjectStatus exists in the class then set it as osDirty
   if Self.UseObjStatus then
   begin
@@ -276,14 +292,20 @@ inherited;
     Abort;
   end;
   // If AutoPersist is enabled then persist
-  if Self.FAutoPersist then io.Delete(Self.Current);
+//  if Self.FAutoPersist then io.Delete(Self.Current);
+  if Self.FAutoPersist then
+    TioCommonBSAPersistence.Delete(Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
-  if FAutoLoadData
-    then io.Load(FClassRef, '')._Where(GetioWhere).ToList(Self.List);  // Use GetioWhere to fill the WhereDetails
+  // Load the object and assign it to the Adapter
+  if FAutoLoadData then
+    TioCommonBSAPersistence.Load(Self);
+  // Load the object and assign it to the Adapter
+//  if FAutoLoadData
+//    then io.Load(FClassRef, '')._Where(GetioWhere).ToList(Self.List);  // Use GetioWhere to fill the WhereDetails
 end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeRefresh;

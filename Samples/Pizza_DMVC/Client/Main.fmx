@@ -51,7 +51,7 @@ object MainForml: TMainForml
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'nexttoolbutton'
-          TabOrder = 6
+          TabOrder = 7
           Visible = True
         end
         object btClose: TButton
@@ -63,7 +63,7 @@ object MainForml: TMainForml
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'stoptoolbutton'
-          TabOrder = 3
+          TabOrder = 4
           Visible = True
         end
         object Button1: TButton
@@ -76,7 +76,7 @@ object MainForml: TMainForml
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'trashtoolbutton'
-          TabOrder = 5
+          TabOrder = 6
           Visible = True
         end
         object Button2: TButton
@@ -89,7 +89,20 @@ object MainForml: TMainForml
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'addtoolbutton'
-          TabOrder = 4
+          TabOrder = 5
+          Visible = True
+        end
+        object Button3: TButton
+          Action = LiveBindingsBindNavigateRefresh1
+          Align = Left
+          Enabled = True
+          ImageIndex = -1
+          Position.X = 44.000000000000000000
+          Size.Width = 44.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'refreshtoolbutton'
+          TabOrder = 3
           Visible = True
         end
       end
@@ -424,6 +437,11 @@ object MainForml: TMainForml
       Category = 'LiveBindings'
       Text = 'acLoadImage'
       OnExecute = acLoadImageExecute
+    end
+    object LiveBindingsBindNavigateRefresh1: TFMXBindNavigateRefresh
+      Category = 'LiveBindings'
+      Text = 'Refresh'
+      DataSource = PrototypeBindSource1
     end
   end
 end

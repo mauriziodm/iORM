@@ -147,7 +147,7 @@ implementation
 uses
   iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory,
   System.Rtti, iORM.Context.Map.Interfaces, iORM.Where.Factory,
-  iORM.Exceptions;
+  iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence;
 
 { TioActiveInterfaceObjectBindSourceAdapter }
 
@@ -245,12 +245,28 @@ begin
   inherited;
   Self.SetObjStatus(osDirty);
   // If AutoPersist is enabled then persist
-  if Self.FAutoPersist then io.Persist(Self.Current);
+  if FAutoPersist then
+    TioCommonBSAPersistence.Persist(Self)
   // Send a notification to other ActiveBindSourceAdapters & BindSource
-  Notify(
-         Self,
-         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
-        );
+  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  //       if FAutoPersist is True then the notify is performed by
+  //       the "CommonBSAPersistence" else by this method
+  else
+    Notify(
+           Self,
+           TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
+          );
+
+// --- OLD CODE ---
+//  inherited;
+//  Self.SetObjStatus(osDirty);
+  // If AutoPersist is enabled then persist
+//  if Self.FAutoPersist then io.Persist(Self.Current);
+  // Send a notification to other ActiveBindSourceAdapters & BindSource
+//  Notify(
+//         Self,
+//         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
+//        );
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoAfterScroll;
@@ -269,15 +285,20 @@ begin
     Abort;
   end;
   // If AutoPersist is enabled then persist
-  if Self.FAutoPersist then io.Delete(Self.Current);
+//  if Self.FAutoPersist then io.Delete(Self.Current);
+  if Self.FAutoPersist then
+    TioCommonBSAPersistence.Delete(Self);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
   // Load the object and assign it to the Adapter
-  if FAutoLoadData
-    then Self.SetDataObject(   io.Load(FTypeName, FTypeAlias)._Where(GetioWhere).ToObject   , FLocalOwnsObject);  // Use GetioWhere to fill the WhereDetails
+  if FAutoLoadData then
+    TioCommonBSAPersistence.Load(Self);
+  // Load the object and assign it to the Adapter
+//  if FAutoLoadData
+//    then Self.SetDataObject(   io.Load(FTypeName, FTypeAlias)._Where(GetioWhere).ToObject   , FLocalOwnsObject);  // Use GetioWhere to fill the WhereDetails
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeRefresh;

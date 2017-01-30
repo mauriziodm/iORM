@@ -51,6 +51,8 @@ type
     LiveBindingsBindNavigateDelete2: TFMXBindNavigateDelete;
     BindNavigator1: TBindNavigator;
     acLoadImage: TAction;
+    LiveBindingsBindNavigateRefresh1: TFMXBindNavigateRefresh;
+    Button3: TButton;
     procedure acLoadImageExecute(Sender: TObject);
   private
     { Private declarations }
