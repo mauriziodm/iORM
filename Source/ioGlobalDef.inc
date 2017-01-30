@@ -46,7 +46,7 @@
   //  here.
   //  NB: The global project definitions are most secure
   {$IF Defined(ioFMX) or Defined(ioVCL)}
-  {$ELSEIF }
+  {$ELSE}
     {$IFDEF MSWINDOWS}
       {$IF Declared(FireMonkeyVersion) or Defined(FireMonkeyVersion)}
         {$DEFINE ioFMX}
