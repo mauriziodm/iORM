@@ -36,17 +36,17 @@ var
 implementation
 
 uses
-  SampleData, iORM, V.Interfaces, VM.Interfaces;
+  SampleData, iORM, V.Interfaces, VM.Interfaces, FMX.Styles;
 
 {$R *.fmx}
 
 procedure TForm1.FormCreate(Sender: TObject);
-//var
-//  Style : TFMXObject;
+var
+  Style : TFMXObject;
 begin
   // Set the stype
-//  Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
-//  TStyleManager.SetStyle(Style);
+  Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
+  TStyleManager.SetStyle(Style);
   // Get the main view
   io.di.LocateView<IMainView, IPersonsViewModel>.Get;
 end;

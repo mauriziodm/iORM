@@ -47,11 +47,11 @@ requires
   IndyCore,
   IndyIPClient,
   fmx,
-  fmxFireDAC;
-//  vcl,
-//  vclFireDAC,
-//  FireDACCommonODBC,
-//  FireDACMSSQLDriver;
+  fmxFireDAC,
+  vcl,
+  vclFireDAC,
+  FireDACCommonODBC,
+  FireDACMSSQLDriver;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',

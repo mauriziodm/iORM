@@ -2,6 +2,8 @@ program PhoneContacts_MVVM_FMX;
 
 
 
+{$R *.dres}
+
 uses
   System.StartUpCopy,
   FMX.Forms,
