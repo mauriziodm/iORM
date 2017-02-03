@@ -5,7 +5,7 @@ interface
 uses System.SysUtils,
      System.Classes,
      Web.HTTPApp,
-     MVCFramework;
+     MVCFramework, iORM.DB.Components.ConnectionDef;
 
 type
   TMyWebModule = class(TWebModule)

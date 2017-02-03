@@ -354,7 +354,7 @@ object MainForml: TMainForml
       end>
     ScopeMappings = <>
     ioTypeName = 'TPizza'
-    ioAsync = True
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = False
     ioViewDataType = dtList
@@ -434,5 +434,12 @@ object MainForml: TMainForml
       CustomText = 'Back'
       Tab = TabItem2
     end
+  end
+  object RESTConn: TioRESTConnectionDef
+    BaseURL = 'http://localhost:8080'
+    DefaultConnection = True
+    Persistent = True
+    Left = 232
+    Top = 44
   end
 end

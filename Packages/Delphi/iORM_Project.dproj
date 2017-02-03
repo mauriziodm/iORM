@@ -6,7 +6,7 @@
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Android</Platform>
         <TargetedPlatforms>27</TargetedPlatforms>
         <AppType>Package</AppType>
     </PropertyGroup>
@@ -176,10 +176,6 @@
         <DCCReference Include="IndyIPClient.dcp"/>
         <DCCReference Include="fmx.dcp"/>
         <DCCReference Include="fmxFireDAC.dcp"/>
-        <DCCReference Include="vcl.dcp"/>
-        <DCCReference Include="vclFireDAC.dcp"/>
-        <DCCReference Include="FireDACCommonODBC.dcp"/>
-        <DCCReference Include="FireDACMSSQLDriver.dcp"/>
         <DCCReference Include="..\..\Source\iORM.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\iORM.Context.Container.pas"/>
@@ -304,7 +300,6 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.pas"/>
-        <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

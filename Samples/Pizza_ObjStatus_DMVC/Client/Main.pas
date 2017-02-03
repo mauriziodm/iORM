@@ -12,7 +12,7 @@ uses
   FMX.ListView.Types, FMX.ListView, System.Generics.Collections, Model,
   iORM.LiveBindings.PrototypeBindSource, FMX.Objects,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.Controls.Presentation;
+  FMX.Controls.Presentation, iORM.DB.Components.ConnectionDef;
 
 type
 
@@ -51,6 +51,7 @@ type
     acNew: TAction;
     acPost: TAction;
     acDelete: TAction;
+    RESTConn: TioRESTConnectionDef;
     procedure FormCreate(Sender: TObject);
     procedure acPersistExecute(Sender: TObject);
     procedure acRefreshExecute(Sender: TObject);

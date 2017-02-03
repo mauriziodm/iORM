@@ -35,12 +35,12 @@ requires
   iORM_Project;
 
 contains
-  iORM.LiveBindings.PrototypeBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas',
-  iORM.DB.Components.MemTable.DesignTime in '..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas',
   iORM.MVVM.ViewContextProvider.DesignTime in '..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas',
   iORM.DB.Components.ConnectionDef.DesignTime in '..\..\Source\iORM.DB.Components.ConnectionDef.DesignTime.pas',
-  iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas',
+  iORM.DB.Components.MemTable.DesignTime in '..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas',
+  iORM.LiveBindings.PrototypeBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas',
   iORM.MVVM.Components.ModelPresenter.DEsignTime in '..\..\Source\iORM.MVVM.Components.ModelPresenter.DEsignTime.pas',
-  iORM.LiveBindings.ModelBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas';
+  iORM.LiveBindings.ModelBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas',
+  iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas';
 
 end.

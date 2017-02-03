@@ -16,7 +16,7 @@ begin
 
   // ============ IupOrm initialization ====================
   // Connection params
-  io.Connections.NewRESTConnection('http://localhost:8080', False);
+//  io.Connections.NewRESTConnection('http://localhost:8080', False);
   // ============ IupOrm initialization ====================
 
   Application.Initialize;

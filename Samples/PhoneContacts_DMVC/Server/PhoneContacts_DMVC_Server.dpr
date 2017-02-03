@@ -10,7 +10,6 @@ uses
   Web.WebBroker,
   IdHTTPWebBrokerBridge,
   WebModule in 'WebModule.pas' {MyWebModule: TWebModule},
-  iORM.REST.DMVC.Controller in '..\..\..\Source\iORM.REST.DMVC.Controller.pas',
   AnotherModel in '..\Commons\AnotherModel.pas',
   Interfaces in '..\Commons\Interfaces.pas',
   Model in '..\Commons\Model.pas',
@@ -60,7 +59,7 @@ begin
   // Connection params
   io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\..\SamplesData\ContactsIntf.FDB'), 'SYSDBA', 'masterkey', '').Apply;
   // MSQL monitor
-  io.Connections.Monitor.Mode := mmRemote;
+//  io.Connections.Monitor.Mode := mmRemote;
   // Register classes in the dependency incjection container
   TDIClassRegister.RegisterClasses;
   // Check for sample data creation

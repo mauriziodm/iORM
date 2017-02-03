@@ -1,0 +1,94 @@
+object StartForm: TStartForm
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 734
+  ClientWidth = 1002
+  Position = DesktopCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Panel1: TPanel
+    Align = Top
+    Size.Width = 1002.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object RBTabs: TRadioButton
+      GroupName = 'VCP'
+      IsChecked = True
+      Position.X = 11.000000000000000000
+      Position.Y = 7.000000000000000000
+      Size.Width = 70.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Tabs'
+      OnChange = RBTabsChange
+    end
+    object RBForms: TRadioButton
+      GroupName = 'VCP'
+      Position.X = 84.000000000000000000
+      Position.Y = 7.000000000000000000
+      Size.Width = 70.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Forms'
+    end
+  end
+  object MainTabControl: TTabControl
+    Align = Client
+    Size.Width = 1002.000000000000000000
+    Size.Height = 701.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    TabPosition = None
+  end
+  object TabsVCProvider: TioViewContextProvider
+    ioOnRequest = TabsVCProviderioOnRequest
+    ioOnAfterRequest = TabsVCProviderioOnAfterRequest
+    ioOnRelease = TabsVCProviderioOnRelease
+    Scope = psGlobal
+    RegisterAsDefault = True
+    AutoParent = True
+    AutoOwner = True
+    Left = 112
+    Top = 128
+  end
+  object FormsVCProvider: TioViewContextProvider
+    ioOnRequest = FormsVCProviderioOnRequest
+    ioOnRelease = FormsVCProviderioOnRelease
+    Scope = psGlobal
+    RegisterAsDefault = False
+    AutoParent = True
+    AutoOwner = True
+    Left = 112
+    Top = 176
+  end
+  object ActionList1: TActionList
+    Left = 112
+    Top = 257
+    object NextTabAction1: TNextTabAction
+      Category = 'Tab'
+      TabControl = MainTabControl
+    end
+    object PreviousTabAction1: TPreviousTabAction
+      Category = 'Tab'
+      TabControl = MainTabControl
+    end
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\ContactsIntfMVVM.db'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 112
+    Top = 48
+  end
+end

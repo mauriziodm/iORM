@@ -106,7 +106,8 @@ begin
     if not Assigned(Result) then
       Result := io.di.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
     TioRttiUtilities.ObjectAsIInterface(Result)._AddRef;
-  end else
+  end
+  else
   // If the AProperty is of instance (class) type...
   begin
     // Create the child object/list if it isn't not already created by the master class constructor

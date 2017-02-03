@@ -21,7 +21,7 @@ begin
 
   // ============ IupOrm initialization ====================
   // Connection params
-  io.Connections.NewRESTConnection('http://localhost:8080', False);
+//  io.Connections.NewRESTConnection('http://localhost:8080', False);
 //  io.Connections.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'ContactsIntf.db')).Apply;
   // Register classes in the dependency incjection container
   TDIClassRegister.RegisterClasses;

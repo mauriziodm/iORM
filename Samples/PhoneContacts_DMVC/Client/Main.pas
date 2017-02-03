@@ -10,7 +10,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, System.Classes, Data.Bind.Controls, FMX.Grid.Style,
-  FMX.ScrollBox, FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid;
+  FMX.ScrollBox, FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid,
+  iORM.DB.Components.ConnectionDef;
 
 type
   TMainForm = class(TForm)
@@ -60,10 +61,14 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
+    RESTConn: TioRESTConnectionDef;
+    SQLiteConn: TioSQLiteConnectionDef;
+    Button3: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -92,6 +97,11 @@ begin
   BSDetail.ioWhereStr.Add('[.PhoneType] <> ''Mobile''');
   BSDetail.ioOrderBy := '[.PhoneType] desc';
   // Refresh
+  BSMaster.Refresh(True);
+end;
+
+procedure TMainForm.Button3Click(Sender: TObject);
+begin
   BSMaster.Refresh(True);
 end;
 

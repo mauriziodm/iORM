@@ -46,7 +46,7 @@ object MainForm: TMainForm
           Size.Width = 59.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 3
+          TabOrder = 4
           Text = 'Clear'
           OnClick = Button8Click
         end
@@ -55,7 +55,7 @@ object MainForm: TMainForm
           Size.Width = 57.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 2
+          TabOrder = 3
           Text = 'Load'
           OnClick = Button9Click
         end
@@ -64,7 +64,7 @@ object MainForm: TMainForm
           Size.Width = 63.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 1
+          TabOrder = 2
           Text = 'Filter'
           OnClick = Button12Click
         end
@@ -80,6 +80,15 @@ object MainForm: TMainForm
           StyleLookup = 'nexttoolbutton'
           TabOrder = 0
           Visible = True
+        end
+        object Button3: TButton
+          Position.X = 173.000000000000000000
+          Size.Width = 76.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Refresh'
+          OnClick = Button3Click
         end
       end
       object MasterListView: TListView
@@ -415,8 +424,8 @@ object MainForm: TMainForm
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 300
-    Top = 5
+    Left = 212
+    Top = 333
     object LinkListControlToField3: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = BSMaster
@@ -525,5 +534,22 @@ object MainForm: TMainForm
       Category = 'Tab'
       TabControl = TabControl2
     end
+  end
+  object RESTConn: TioRESTConnectionDef
+    BaseURL = 'http://192.168.130.132:8080'
+    DefaultConnection = True
+    Persistent = True
+    Left = 64
+    Top = 80
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    AutoCreateDatabase = False
+    Database = 'ContactsIntf.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = False
+    Persistent = False
+    Pooled = False
+    Left = 64
+    Top = 144
   end
 end
