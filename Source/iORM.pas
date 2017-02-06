@@ -95,11 +95,17 @@ type
     class procedure SetWaitProc(const AShowWaitProc:TProc=nil; const AHideWaitProc:TProc=nil);
     class procedure ShowWait;
     class procedure HideWait;
+    class procedure TerminateApplication;
   end;
 
 implementation
 
 uses
+{$IFDEF ioVCL}
+  Vcl.Forms,
+{$ELSE}
+  FMX.Forms,
+{$ENDIF}
   iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory,
   iORM.DuckTyped.StreamObject,
@@ -320,6 +326,11 @@ class procedure io.PersistCollection(const AIntfCollection: IInterface;
   const AConnectionName: String; const ABlindInsert: Boolean);
 begin
   Self.PersistCollection(AIntfCollection as TObject, AConnectionName, ABlindInsert);
+end;
+
+class procedure io.TerminateApplication;
+begin
+  Application.Terminate;
 end;
 
 class function io.RefTo(const AWhere: IioWhere): IioWhere;

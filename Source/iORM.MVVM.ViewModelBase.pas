@@ -74,6 +74,7 @@ type
     function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): TioViewContextProvider;
     procedure UnbindView(const AViewID:Byte);
     procedure FreeViews;
+    procedure TerminateApplication;
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
     procedure AfterConstruction; override;
@@ -168,6 +169,11 @@ procedure TioViewModel.SetCommand(const ACmdName: String;
   const Value: IioCommandsContainerItem);
 begin
   Commands.AddOrUpdate(ACmdName, Value);
+end;
+
+procedure TioViewModel.TerminateApplication;
+begin
+  io.TerminateApplication;
 end;
 
 procedure TioViewModel.UnbindView(const AViewID:Byte);

@@ -116,7 +116,7 @@ end;
 procedure TViewModelMain.acTerminateExecute(Sender: TObject);
 begin
   inherited;
-//  Application.Terminate;
+  TerminateApplication;
 end;
 
 function TViewModelMain.DataExist: Boolean;
