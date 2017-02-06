@@ -50,10 +50,10 @@ type
 
 implementation
 
-uses
-  System.Actions, iORM, RegisterClassesUnit, FMX.Forms, V.Interfaces;
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
-{%CLASSGROUP 'FMX.Controls.TControl'}
+uses
+  System.Actions, iORM, RegisterClassesUnit, V.Interfaces;
 
 {$R *.dfm}
 
@@ -116,7 +116,7 @@ end;
 procedure TViewModelMain.acTerminateExecute(Sender: TObject);
 begin
   inherited;
-  Application.Terminate;
+//  Application.Terminate;
 end;
 
 function TViewModelMain.DataExist: Boolean;

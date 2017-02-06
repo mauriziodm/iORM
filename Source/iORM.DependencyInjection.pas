@@ -44,7 +44,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,
   iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces;
+  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces, System.Classes;
 
 type
 
@@ -145,6 +145,7 @@ type
     FSingletonKey: String;
     FVCProvider: TioViewContextProvider;
     FVCProviderEnabled, FEmptyOwner: Boolean;
+    FViewContext: TComponent;  // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider
     procedure ClearPresenterSettings;
     function PresenterSettingsExists: Boolean;
     function ViewModelExist: Boolean;
@@ -174,6 +175,7 @@ type
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
+    function SetViewContext(const AViewContext: TComponent): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
   // Generic version of the Service Locator Class
@@ -196,6 +198,7 @@ type
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator<TI>; overload;
+    function SetViewContext(const AViewContext: TComponent): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
   // ===========================================================================
@@ -235,11 +238,18 @@ type
 implementation
 
 uses
+{$IFDEF ioVCL}
+  Vcl.Controls,
+{$ENDIF}
+{$IFDEF ioFMX}
+  Fmx.Types,
+  Fmx.Controls,
+{$ENDIF}
   iORM, iORM.Exceptions, SysUtils, System.TypInfo, iORM.ObjectsForge.ObjectMaker,
   iORM.Rtti.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
-  iORM.MVVM.ViewContextProviderContainer, System.Classes,
+  iORM.MVVM.ViewContextProviderContainer,
   iORM.MVVM.ViewContextContainer, iORM.ObjectsForge.Interfaces,
   iORM.MVVM.ViewModelBase;
 
@@ -696,6 +706,7 @@ begin
   FViewModelMarker := '';
   FVCProvider := nil;
   FVCProviderEnabled := AVCProviderEnabled;
+  FViewContext := nil;
   FEmptyOwner := AEmptyOwner;
   FSingletonKey := '';
 end;
@@ -796,6 +807,13 @@ begin
   Result := Self;
 end;
 
+function TioDependencyInjectionLocator.SetViewContext(
+  const AViewContext: TComponent): IioDependencyInjectionLocator;
+begin
+  Result := Self;
+  FViewContext := AViewContext;
+end;
+
 function TioDependencyInjectionLocator.SetViewModel(const AViewModel: IioViewModel; const AMarker:String): IioDependencyInjectionLocator;
 begin
   FViewModelMarker := AMarker;
@@ -851,12 +869,28 @@ begin
     //  If a specific VCProvider is already assigned then use it else try
     //  to retrieve the global default one, if not exist then do none
     //  (no ViewContext assigned to the view).
-    if FVCProviderEnabled then
+    //  NB: Se è stato specificato un ViewContext esplicito (SetViewContext), usa quello
+    if FVCProviderEnabled and (Result is TComponent) then
     begin
-      if not Assigned(FVCProvider) then
-        FVCProvider := TioViewContextProviderContainer.GetProvider;
-      if Assigned(FVCProvider) and (Result is TComponent) then
-        TioViewContextContainer.NewViewContext(TComponent(Result), FVCProvider);
+      if Assigned(FViewContext) then
+      begin
+        // Set the ViewContext as Owner of the view
+        TComponent(Result).InsertComponent(FViewContext);
+        // Set the ViewContext as parent view
+        {$IFDEF ioVCL}
+          (Result as TControl).Parent := (FViewContext as TWinControl);
+        {$ENDIF}
+        {$IFDEF ioFMX}
+          (Result as TFmxObject).Parent := (FViewContext as TFmxObject);
+        {$ENDIF}
+      end
+      else
+      begin
+        if not Assigned(FVCProvider) then
+          FVCProvider := TioViewContextProviderContainer.GetProvider;
+        if Assigned(FVCProvider) then
+          TioViewContextContainer.NewViewContext(TComponent(Result), FVCProvider);
+      end;
     end;
   finally
     // if the ViewModel is present then UnLock it (MVVM)
@@ -992,6 +1026,13 @@ function TioDependencyInjectionLocator<TI>.VCProvider(
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).VCProvider(AVCProvider);
+end;
+
+function TioDependencyInjectionLocator<TI>.SetViewContext(
+  const AViewContext: TComponent): IioDependencyInjectionLocator<TI>;
+begin
+  Result := Self;
+  TioDependencyInjectionLocator(Self).SetViewContext(AViewContext);
 end;
 
 function TioDependencyInjectionLocator<TI>.SetViewModel(const AViewModel: IioViewModel; const AMarker:String): IioDependencyInjectionLocator<TI>;

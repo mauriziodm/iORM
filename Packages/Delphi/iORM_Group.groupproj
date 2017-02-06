@@ -39,6 +39,9 @@
         <Projects Include="..\..\Samples\PhoneContacts_ioMemTable\PhoneContacts_ioMemTable.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj">
             <Dependencies/>
         </Projects>
@@ -197,6 +200,15 @@
     <Target Name="PhoneContacts_ioMemTable:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioMemTable\PhoneContacts_ioMemTable.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PhoneContacts_MVVM_VCL">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj"/>
+    </Target>
+    <Target Name="PhoneContacts_MVVM_VCL:Clean">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PhoneContacts_MVVM_VCL:Make">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj" Targets="Make"/>
+    </Target>
     <Target Name="PhoneContacts_MVVM_FMX">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj"/>
     </Target>
@@ -324,13 +336,13 @@
         <MSBuild Projects="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_DMVC_Client_ByCode;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;PhoneContacts_MVVM_FMX;Pizza_ioActiveBindSourceAdapter;Pizza_List;Pizza_ioPrototypeBS;Pizza_DMVC_Client;Pizza_DMVC_Server;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;RVMan_Interface;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample;NaturalBSAMultirecord"/>
+        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_DMVC_Client_ByCode;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;PhoneContacts_MVVM_VCL;PhoneContacts_MVVM_FMX;Pizza_ioActiveBindSourceAdapter;Pizza_List;Pizza_ioPrototypeBS;Pizza_DMVC_Client;Pizza_DMVC_Server;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;RVMan_Interface;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample;NaturalBSAMultirecord"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean;PhoneContacts_DMVC_Server:Clean;PhoneContacts_DMVC_Client:Clean;PhoneContacts_DMVC_Client_ByCode:Clean;PhoneContacts_ioPrototypeBindSource:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_Interfaces_MVVM:Clean;PhoneContacts_Interfaces:Clean;PhoneContacts_Interfaces_Ex:Clean;PhoneContacts_Interfaces_ByCode:Clean;PhoneContacts_ioMemTable:Clean;PhoneContacts_MVVM_FMX:Clean;Pizza_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;Pizza_ioPrototypeBS:Clean;Pizza_DMVC_Client:Clean;Pizza_DMVC_Server:Clean;Pizza_ioPrototypeBS_ObjStatus:Clean;Pizza_ObjStatus_DMVC_Server:Clean;Pizza_ObjStatus_DMVC_Client:Clean;RVMan_Interface:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean;NaturalBSAMultirecord:Clean"/>
+        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean;PhoneContacts_DMVC_Server:Clean;PhoneContacts_DMVC_Client:Clean;PhoneContacts_DMVC_Client_ByCode:Clean;PhoneContacts_ioPrototypeBindSource:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_Interfaces_MVVM:Clean;PhoneContacts_Interfaces:Clean;PhoneContacts_Interfaces_Ex:Clean;PhoneContacts_Interfaces_ByCode:Clean;PhoneContacts_ioMemTable:Clean;PhoneContacts_MVVM_VCL:Clean;PhoneContacts_MVVM_FMX:Clean;Pizza_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;Pizza_ioPrototypeBS:Clean;Pizza_DMVC_Client:Clean;Pizza_DMVC_Server:Clean;Pizza_ioPrototypeBS_ObjStatus:Clean;Pizza_ObjStatus_DMVC_Server:Clean;Pizza_ObjStatus_DMVC_Client:Clean;RVMan_Interface:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean;NaturalBSAMultirecord:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make;PhoneContacts_DMVC_Server:Make;PhoneContacts_DMVC_Client:Make;PhoneContacts_DMVC_Client_ByCode:Make;PhoneContacts_ioPrototypeBindSource:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_Interfaces_MVVM:Make;PhoneContacts_Interfaces:Make;PhoneContacts_Interfaces_Ex:Make;PhoneContacts_Interfaces_ByCode:Make;PhoneContacts_ioMemTable:Make;PhoneContacts_MVVM_FMX:Make;Pizza_ioActiveBindSourceAdapter:Make;Pizza_List:Make;Pizza_ioPrototypeBS:Make;Pizza_DMVC_Client:Make;Pizza_DMVC_Server:Make;Pizza_ioPrototypeBS_ObjStatus:Make;Pizza_ObjStatus_DMVC_Server:Make;Pizza_ObjStatus_DMVC_Client:Make;RVMan_Interface:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make;NaturalBSAMultirecord:Make"/>
+        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make;PhoneContacts_DMVC_Server:Make;PhoneContacts_DMVC_Client:Make;PhoneContacts_DMVC_Client_ByCode:Make;PhoneContacts_ioPrototypeBindSource:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_Interfaces_MVVM:Make;PhoneContacts_Interfaces:Make;PhoneContacts_Interfaces_Ex:Make;PhoneContacts_Interfaces_ByCode:Make;PhoneContacts_ioMemTable:Make;PhoneContacts_MVVM_VCL:Make;PhoneContacts_MVVM_FMX:Make;Pizza_ioActiveBindSourceAdapter:Make;Pizza_List:Make;Pizza_ioPrototypeBS:Make;Pizza_DMVC_Client:Make;Pizza_DMVC_Server:Make;Pizza_ioPrototypeBS_ObjStatus:Make;Pizza_ObjStatus_DMVC_Server:Make;Pizza_ObjStatus_DMVC_Client:Make;RVMan_Interface:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make;NaturalBSAMultirecord:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

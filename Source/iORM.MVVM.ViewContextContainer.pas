@@ -61,6 +61,13 @@ type
 implementation
 
 uses
+{$IFDEF ioVCL}
+  Vcl.Controls,
+{$ENDIF}
+{$IFDEF ioFMX}
+  Fmx.Types,
+  Fmx.Controls,
+{$ENDIF}
   iORM.Exceptions, iORM.MVVM.ViewContextProviderContainer;
 
 { TioViewContextContainer }

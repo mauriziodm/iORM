@@ -220,7 +220,7 @@ object ViewPerson: TViewPerson
       Anchors = [akRight, akBottom]
       Position.X = 203.000000000000000000
       Position.Y = 224.000000000000000000
-      Size.Width = 169.000000000000000000
+      Size.Width = 168.000000000000000000
       Size.Height = 25.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 5

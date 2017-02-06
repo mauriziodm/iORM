@@ -41,12 +41,7 @@ uses
 {$R *.fmx}
 
 procedure TForm1.FormCreate(Sender: TObject);
-//var
-//  Style : TFMXObject;
 begin
-  // Set the stype
-//  Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
-//  TStyleManager.SetStyle(Style);
   // Get the main view
   io.di.LocateView<IMainView, IPersonsViewModel>.Get;
 end;
@@ -61,6 +56,7 @@ end;
 procedure TForm1.TabsVCProviderioOnAfterRequest(const Sender: TObject;
   const AView, AViewContext: TComponent);
 begin
+  Application.ProcessMessages;
   NextTabAction1.Execute;
 end;
 

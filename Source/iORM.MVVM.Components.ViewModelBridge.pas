@@ -21,17 +21,22 @@ type
   protected
     procedure Loaded; override;
     procedure DoNeedViewModel;
+    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
+    procedure SetCommand(const ACmdName: String;
+      const Value: IioCommandsContainerItem);
   public
     constructor Create;
     destructor Destroy; override;
     procedure CheckForViewModel;
     function ViewModelIsAssigned: Boolean;
     function ViewModelAs<T: IInterface>: T;
+    // Properties
     property ViewModel:IioViewModel read FViewModel;
+    property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand; default;
   published
     // Events
     property OnNeedViewModel:TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
-    // Propertyes
+    // Properties
     property Marker:String read FMarker write FMarker;
   end;
 
@@ -84,6 +89,15 @@ begin
     FOnNeedViewModel(Self, FViewModel);
 end;
 
+function TioViewModelBridge.GetCommand(
+  const ACmdName: String): IioCommandsContainerItem;
+begin
+  if Assigned(FViewModel) then
+    Result := FViewModel.Command[ACmdName]
+  else
+    raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
+end;
+
 function TioViewModelBridge.ViewModelAs<T>: T;
 var
   LIID: TGUID;
@@ -116,5 +130,14 @@ end;
 
 
 
+
+procedure TioViewModelBridge.SetCommand(const ACmdName: String;
+  const Value: IioCommandsContainerItem);
+begin
+  if Assigned(FViewModel) then
+    FViewModel.SetCommand(ACmdName, Value)
+  else
+    raise EioException.Create(Self.Name, 'SetCommand', '"FViewModel" not assigned.');
+end;
 
 end.

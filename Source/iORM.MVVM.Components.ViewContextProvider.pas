@@ -170,7 +170,7 @@ begin
   // Set the ViewContext as parent view
   if FAutoParent then
   {$IFDEF ioVCL}
-    (AView as TControl).Parent := (Result as TControl);
+    (AView as TControl).Parent := (Result as TWinControl);
   {$ELSE}
     (AView as TFmxObject).Parent := (Result as TFmxObject);
   {$ENDIF}
@@ -182,7 +182,9 @@ procedure TioViewContextProvider.Loaded;
 begin
   inherited;
   // Register the provider into the container
-  if FScope = TioViewContextProviderScope.psGlobal then
+  if (FScope = TioViewContextProviderScope.psGlobal)
+  and not (csDesigning in ComponentState)
+  then
     TioViewContextProviderContainer.RegisterProvider(Self);
 end;
 

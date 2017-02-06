@@ -6,7 +6,7 @@
         <MainSource>PhoneContacts_MVVM_FMX.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Android</Platform>
         <TargetedPlatforms>1119</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -89,7 +89,8 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>C:\Delphi\Tools\iORM\Source;C:\Delphi\Tools\iORM\ExtLibs\ObjMapper;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_Define>ioFMX;$(DCC_Define)</DCC_Define>
+        <DCC_UnitSearchPath>..\..\source;..\..\packages\delphi\$(Platform)\$(Config);..\..\ExtLibs\ObjMapper;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <AUP_WRITE_CALENDAR>true</AUP_WRITE_CALENDAR>
         <AUP_CALL_PHONE>true</AUP_CALL_PHONE>
         <SanitizedProjectName>PhoneContacts_MVVM_FMX</SanitizedProjectName>
@@ -287,6 +288,8 @@
         <DCC_DebugInformation>1</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -340,7 +343,6 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View\V.Interfaces.pas"/>
         <DCCReference Include="View\V.Person.pas">
             <Form>ViewPerson</Form>
             <FormType>fmx</FormType>
@@ -361,11 +363,7 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <RcItem Include="..\Commons\Styles\Copper.style">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>CopperStyle</ResourceId>
-        </RcItem>
+        <DCCReference Include="..\Commons\View\V.Interfaces.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -477,12 +475,6 @@
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Release" Class="Android_LauncherIcon72">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="..\Commons\Styles\Copper.style" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Android">
-                        <RemoteDir>.\assets\internal\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -649,15 +641,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="OSX32\Debug\PhoneContacts_MVVM_FMX" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="OSX32">
-                        <RemoteName>PhoneContacts_MVVM_FMX</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Android\Release\classes.dex" Configuration="Release" Class="AndroidClassesDexFile">
                     <Platform Name="Android">
                         <RemoteName>classes.dex</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="OSX32\Debug\PhoneContacts_MVVM_FMX" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="OSX32">
+                        <RemoteName>PhoneContacts_MVVM_FMX</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -41,7 +41,7 @@ uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces;
+  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces, System.Classes;
 
 type
 
@@ -65,6 +65,7 @@ type
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
+    function SetViewContext(const AViewContext: TComponent): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
 
@@ -86,6 +87,7 @@ type
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator<TI>; overload;
+    function SetViewContext(const AViewContext: TComponent): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
 

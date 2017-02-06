@@ -1,27 +1,25 @@
-program PhoneContacts_MVVM_FMX;
-
-
+program PhoneContacts_MVVM_VCL;
 
 
 
 uses
-  System.StartUpCopy,
-  FMX.Forms,
-  FormStart in 'FormStart.pas' {Form1},
+  Vcl.Forms,
+  FormStart in 'FormStart.pas' {StartForm},
+  RegisterClassesUnit in '..\Commons\RegisterClassesUnit.pas',
   SampleData in '..\Commons\SampleData.pas',
   M.AnotherModel in '..\Commons\Model\M.AnotherModel.pas',
   M.Interfaces in '..\Commons\Model\M.Interfaces.pas',
   M.Model in '..\Commons\Model\M.Model.pas',
-  RegisterClassesUnit in '..\Commons\RegisterClassesUnit.pas' {$R *.res},
   VM.Interfaces in '..\Commons\ViewModel\VM.Interfaces.pas',
   VM.Main in '..\Commons\ViewModel\VM.Main.pas' {ViewModelMain: TDataModule},
   VM.Person in '..\Commons\ViewModel\VM.Person.pas' {PersonViewModel: TDataModule},
   V.Main in 'View\V.Main.pas' {ViewMain: TFrame},
+  V.Interfaces in '..\Commons\View\V.Interfaces.pas',
+  FormViewContext in 'FormViewContext.pas' {ViewContextForm},
   V.Person in 'View\V.Person.pas' {ViewPerson: TFrame},
   V.Customer in 'View\V.Customer.pas' {ViewCustomer: TFrame},
-  V.Employee in 'View\V.Employee.pas' {ViewEmployee: TFrame},
   V.VipCustomer in 'View\V.VipCustomer.pas' {ViewVipCustomer: TFrame},
-  V.Interfaces in '..\Commons\View\V.Interfaces.pas';
+  V.Employee in 'View\V.Employee.pas' {ViewEmployee: TFrame};
 
 {$R *.res}
 
@@ -33,6 +31,7 @@ begin
   TDIClassRegister.RegisterClasses;
 
   Application.Initialize;
-  Application.CreateForm(TForm1, Form1);
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TStartForm, StartForm);
   Application.Run;
 end.
