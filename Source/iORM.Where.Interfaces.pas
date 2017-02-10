@@ -76,7 +76,7 @@ type
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
     function GetDisableClassFromField: Boolean;
-    function IsEmpty: Boolean;
+    function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
     // ------ Destination methods

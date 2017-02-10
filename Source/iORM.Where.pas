@@ -89,7 +89,7 @@ type
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap:IioMap): String;
     procedure SetOrderBySql(const AOrderByText:String);
-    function IsEmpty: Boolean;
+    function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
     // ------ Destination methods
@@ -335,7 +335,7 @@ end;
 function TioWhere._And: IioWhere;
 begin
   Result := Self;
-  if not IsEmpty then
+  if not WhereConditionExists then
     Self.FWhereItems.Add(TioDbFactory.LogicRelation._And);
 end;
 
@@ -505,7 +505,7 @@ var
   AItem: IioSqlItem;
 begin
   Result := Self;
-  if (not Assigned(AWhereCond)) or (AWhereCond.IsEmpty) then
+  if (not Assigned(AWhereCond)) or (AWhereCond.WhereConditionExists) then
     Exit;
   Self._And;
   Self.Add(AWhereCond);
@@ -743,7 +743,7 @@ begin
 end;
 
 
-function TioWhere.IsEmpty: Boolean;
+function TioWhere.WhereConditionExists: Boolean;
 begin
   Result := (FWhereItems.Count = 0);
 end;
@@ -1000,7 +1000,7 @@ end;
 function TioWhere._Or: IioWhere;
 begin
   Result := Self;
-  if not IsEmpty then
+  if not WhereConditionExists then
     Self.FWhereItems.Add(TioDbFactory.LogicRelation._Or);
 end;
 
