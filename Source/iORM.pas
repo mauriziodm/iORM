@@ -96,6 +96,7 @@ type
     class procedure ShowWait;
     class procedure HideWait;
     class procedure TerminateApplication;
+    class procedure HandleException(Sender: TObject);
   end;
 
 implementation
@@ -301,6 +302,11 @@ end;
 class function io.GlobalFactory: TioGlobalFactoryRef;
 begin
   Result := TioGlobalFactory;
+end;
+
+class procedure io.HandleException(Sender: TObject);
+begin
+  Application.HandleException(Sender);
 end;
 
 class procedure io.HideWait;

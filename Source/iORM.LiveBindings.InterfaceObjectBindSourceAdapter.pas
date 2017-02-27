@@ -68,7 +68,8 @@ type
     procedure InternalCancelUpdates; override;
     procedure DoOnBeforeSetDataObject(ADataObject: T); virtual;
     procedure DoOnAfterSetDataObject; virtual;
-    property BaseObjectRttiType:TRttiType read FBaseObjectRttiType;
+    function GetBaseObjectRttiType: TRttiType;
+    function GetBaseObjectClassName: String;
   public
     constructor Create(const AOwner: TComponent; const AObject: T; const ATypeAlias:String=''; const ATypeName:String=''); reintroduce; overload; virtual;
     destructor Destroy; override;
@@ -144,6 +145,16 @@ procedure TInterfaceObjectBindSourceAdapter<T>.DoOnBeforeSetDataObject(ADataObje
 begin
   if Assigned(FOnBeforeSetDataObject) then
     FOnBeforeSetDataObject(Self, ADataObject as TObject);
+end;
+
+function TInterfaceObjectBindSourceAdapter<T>.GetBaseObjectClassName: String;
+begin
+  Result := FBaseObjectRttiType.Name;
+end;
+
+function TInterfaceObjectBindSourceAdapter<T>.GetBaseObjectRttiType: TRttiType;
+begin
+  Result := FBaseObjectRttiType;
 end;
 
 function TInterfaceObjectBindSourceAdapter<T>.GetCanActivate: Boolean;

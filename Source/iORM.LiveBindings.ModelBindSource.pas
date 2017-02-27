@@ -3,11 +3,12 @@ unit iORM.LiveBindings.ModelBindSource;
 interface
 
 uses
-  Data.Bind.ObjectScope, iORM.MVVM.Components.ViewModelBridge, System.Classes;
+  Data.Bind.ObjectScope, iORM.MVVM.Components.ViewModelBridge, System.Classes,
+  iORM.Components.Common.Interfaces;
 
 type
 
-  TioModelBindSource = class (TPrototypeBindSource)
+  TioModelBindSource = class (TPrototypeBindSource, IioVMBridgeClientComponent)
   private
     FViewModelBridge: TioViewModelBridge;
     FModelPresenter: String;
@@ -17,10 +18,15 @@ type
   protected
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
+    procedure Notification(AComponent: TComponent;
+      Operation: TOperation); override;
+    /// ViewModelBridge
+    procedure SetViewModelBridge(const AVMBridge:TioViewModelBridge);
+    function GetViewModelBridge: TioViewModelBridge;
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property ViewModelBridge: TioViewModelBridge read FViewModelBridge write FViewModelBridge;
+    property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property ModelPresenter:String read FModelPresenter write FModelPresenter;
   end;
 
@@ -36,6 +42,8 @@ begin
   inherited;
   FioLoaded := False;
   FViewModelBridge := nil;
+  if (csDesigning in ComponentState) and not Assigned(FViewModelBridge) then
+    TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
 end;
 
 procedure TioModelBindSource.DoCreateAdapter(
@@ -60,6 +68,11 @@ begin
       LBindSourceAdapter := ViewModelBridge.ViewModel.Presenters[ModelPresenter].BindSourceAdapter;
       ADataObject := LBindSourceAdapter as TBindSourceAdapter;
   end;
+end;
+
+function TioModelBindSource.GetViewModelBridge: TioViewModelBridge;
+begin
+  Result := FViewModelBridge;
 end;
 
 procedure TioModelBindSource.Loaded;
@@ -95,6 +108,21 @@ begin
 
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;
+end;
+
+procedure TioModelBindSource.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited;
+  if (Operation = opRemove) and (AComponent = FViewModelBridge)
+    then FViewModelBridge := nil;
+end;
+
+procedure TioModelBindSource.SetViewModelBridge(
+  const AVMBridge: TioViewModelBridge);
+begin
+  FViewModelBridge := AVMBridge;
+  if AVMBridge <> nil then AVMBridge.FreeNotification(Self);
 end;
 
 end.

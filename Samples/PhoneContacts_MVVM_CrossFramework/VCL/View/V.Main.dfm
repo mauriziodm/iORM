@@ -95,12 +95,23 @@ object ViewMain: TViewMain
       ExplicitTop = 1
       ExplicitHeight = 34
     end
+    object ButtonOpenDataSet: TSpeedButton
+      Left = 293
+      Top = 0
+      Width = 70
+      Height = 37
+      Align = alLeft
+      Caption = 'Open'
+      OnClick = ButtonOpenDataSetClick
+      ExplicitLeft = 335
+      ExplicitTop = -4
+    end
   end
   object MasterGrid: TStringGrid
     Tag = 4
     Left = 6
     Top = 60
-    Width = 439
+    Width = 155
     Height = 85
     Anchors = [akLeft, akTop, akRight, akBottom]
     ColCount = 4
@@ -128,6 +139,48 @@ object ViewMain: TViewMain
     ColWidths = (
       100
       300)
+  end
+  object DBGrid1: TDBGrid
+    Left = 163
+    Top = 88
+    Width = 282
+    Height = 57
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    DataSource = PersonsDataSource
+    TabOrder = 3
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+    Columns = <
+      item
+        Expanded = False
+        FieldName = 'ID'
+        Width = 30
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'FirstName'
+        Width = 150
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'LastName'
+        Width = 150
+        Visible = True
+      end>
+  end
+  object DBEdit1: TDBEdit
+    Left = 304
+    Top = 65
+    Width = 121
+    Height = 21
+    DataField = 'FirstName'
+    DataSource = PersonsDataSource
+    TabOrder = 4
   end
   object VMBridge: TioViewModelBridge
     Left = 176
@@ -236,5 +289,27 @@ object ViewMain: TViewMain
           Width = 300
         end>
     end
+  end
+  object PersonsModelDataSet: TioModelDataSet
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'PersonsModelPresenter'
+    Left = 320
+    Top = 88
+    object PersonsModelDataSetID: TIntegerField
+      FieldName = 'ID'
+    end
+    object PersonsModelDataSetFirstName: TWideStringField
+      FieldName = 'FirstName'
+      Size = 100
+    end
+    object PersonsModelDataSetLastName: TStringField
+      FieldName = 'LastName'
+      Size = 100
+    end
+  end
+  object PersonsDataSource: TDataSource
+    DataSet = PersonsModelDataSet
+    Left = 320
+    Top = 136
   end
 end

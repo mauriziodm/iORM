@@ -18,20 +18,24 @@ type
     FMarker: String;
     // Events
     FOnNeedViewModel: TioNeedViewModelEvent;
+    procedure AutoSetClientComponentsOnCreate;
   protected
     procedure Loaded; override;
     procedure DoNeedViewModel;
+    // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     procedure SetCommand(const ACmdName: String;
       const Value: IioCommandsContainerItem);
+    // ViewModel
+    function GetViewModel: IioViewModel;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure CheckForViewModel;
     function ViewModelIsAssigned: Boolean;
     function ViewModelAs<T: IInterface>: T;
     // Properties
-    property ViewModel:IioViewModel read FViewModel;
+    property ViewModel:IioViewModel read GetViewModel;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand; default;
   published
     // Events
@@ -44,10 +48,25 @@ implementation
 
 uses
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Rtti.Utilities,
-  System.SysUtils, iORM.Exceptions;
+  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces;
 
 
 { TioViewModelBridge }
+
+procedure TioViewModelBridge.AutoSetClientComponentsOnCreate;
+var
+  I: Integer;
+  LVMBridgeClientComponent: IioVMBridgeClientComponent;
+begin
+  // Loop for Owner's components
+  for I := 0 to Owner.ComponentCount-1 do
+    // If the current component is a ConnectionDef then register it
+    //  if not already registered.
+    if Supports(Owner.Components[I], IioVMBridgeClientComponent, LVMBridgeClientComponent)
+    and not Assigned(LVMBridgeClientComponent.ViewModelBridge)
+    then
+      LVMBridgeClientComponent.ViewModelBridge := Self;
+end;
 
 procedure TioViewModelBridge.CheckForViewModel;
 begin
@@ -67,9 +86,18 @@ begin
   Self.DoNeedViewModel;
 end;
 
-constructor TioViewModelBridge.Create;
+constructor TioViewModelBridge.Create(AOwner: TComponent);
 begin
+  inherited;
+  // Init
   FViewModel := nil;
+  // ===========================================================================
+  // Auto set itself as ViewModelBridge in the ModelBindSource and ModelDataSet
+  //   components
+  // ---------------------------------------------------------------------------
+  if (csDesigning in ComponentState) then
+    AutoSetClientComponentsOnCreate;
+  // ===========================================================================
 end;
 
 destructor TioViewModelBridge.Destroy;
@@ -98,6 +126,13 @@ begin
     raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
 end;
 
+function TioViewModelBridge.GetViewModel: IioViewModel;
+begin
+  if not Assigned(FViewModel) then
+    raise EioException.Create(Self.ClassName, 'GetViewModel', 'ViewModel not assigned.');
+  Result := FViewModel;
+end;
+
 function TioViewModelBridge.ViewModelAs<T>: T;
 var
   LIID: TGUID;
@@ -118,6 +153,13 @@ begin
   inherited;
   // If the ViewModel is not already loaded then load it
   CheckForViewModel;
+  // ===========================================================================
+  // Auto set itself as ViewModelBridge in the ModelBindSource and ModelDataSet
+  //   components
+  // ---------------------------------------------------------------------------
+  if (csDesigning in ComponentState) then
+    AutoSetClientComponentsOnCreate;
+  // ===========================================================================
   // ===========================================================================
   // If the ViewModel is assigned then try
   //  to Bind the View (Owner) components to ViewModel's actions

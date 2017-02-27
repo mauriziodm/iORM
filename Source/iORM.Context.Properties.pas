@@ -155,8 +155,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GetEnumerator
-      : TEnumerator<IioContextProperty>;
+    function GetEnumerator: TEnumerator<IioContextProperty>;
     function GetSql: String; overload;
     function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False; AIDSkipOnInsert:Boolean=True);
@@ -177,10 +176,10 @@ type
 implementation
 
 uses
-  System.TypInfo, iORM.Context.Interfaces, iORM.Context.Factory,
+  System.TypInfo, iORM.Context.Interfaces,
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
   System.StrUtils, iORM.Context.Map.Interfaces, iORM.Rtti.Utilities,
-  iORM.DB.ConnectionContainer, iORM.DB.Interfaces;
+  iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container;
 
 { TioProperty }
 
@@ -305,7 +304,8 @@ begin
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(ChildObject) then Exit;
   // Else create the ioContext for the object and return the ID
-  ChildMap := TioContextFactory.Map(ChildObject.ClassType);
+//  ChildMap := TioContextFactory.Map(ChildObject.ClassType);
+  ChildMap := TioMapContainer.GetMap(ChildObject.ClassName);
   Result := ChildMap.GetProperties.GetIdProperty.GetValue(ChildObject).AsInteger;
 end;
 

@@ -6,7 +6,7 @@
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>27</TargetedPlatforms>
         <AppType>Package</AppType>
     </PropertyGroup>
@@ -304,6 +304,10 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelDataset.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.Base.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Components.Common.Interfaces.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

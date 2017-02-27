@@ -33,38 +33,22 @@
 
 
 
-unit iORM.DuckTyped.Interfaces;
+
+
+unit iORM.MVVM.Components.ModelDataset.DesignTime;
 
 interface
 
-uses
-  System.Classes, System.TypInfo;
-
-type
-
-  IioDuckTypedStreamObject = interface
-    ['{D95AD3B5-02AC-49E6-B54E-2ECAA7D5B54B}']
-    procedure LoadFromStream(Stream: TStream);
-    procedure SaveToStream(Stream: TStream);
-    function IsEmpty: Boolean;
-  end;
-
-  IioDuckTypedList = interface
-    ['{BD3A3AC2-A7C4-46D1-9BE6-5C32E17D871C}']
-    procedure Add(AObject: TObject);
-    procedure Clear;
-    procedure Delete(Index: Integer);
-    function Count: Integer;
-    function GetEnumerator: IEnumerator;
-    function GetItem(Index: Integer): TObject;
-    function GetItemTypeName: String;
-    function GetItemTypeInfo: PTypeInfo;
-    // OwnsObjects property
-    procedure SetOwnsObjects(AValue:Boolean);
-    function GetOwnsObjects: Boolean;
-    property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
-  end;
+  procedure Register;
 
 implementation
+
+uses
+  System.Classes, iORM.DB.Components.DataSet.ModelDataSet;
+
+  procedure Register;
+  begin
+    RegisterComponents('iORM', [TioModelDataSet]);
+  end;
 
 end.

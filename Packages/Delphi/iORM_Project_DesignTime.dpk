@@ -41,6 +41,7 @@ contains
   iORM.LiveBindings.PrototypeBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas',
   iORM.MVVM.Components.ModelPresenter.DEsignTime in '..\..\Source\iORM.MVVM.Components.ModelPresenter.DEsignTime.pas',
   iORM.LiveBindings.ModelBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas',
-  iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas';
+  iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas',
+  iORM.MVVM.Components.ModelDataset.DesignTime in '..\..\Source\iORM.MVVM.Components.ModelDataset.DesignTime.pas';
 
 end.

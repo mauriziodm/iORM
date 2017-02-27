@@ -39,7 +39,7 @@ interface
 
 uses
   iORM.DuckTyped.Interfaces,
-  System.Rtti;
+  System.Rtti, System.TypInfo;
 
 type
 
@@ -52,6 +52,7 @@ type
     FAddMethod: TRttiMethod;
     FClearMethod: TRttiMethod;
     FGetItemMethod: TRttiMethod;
+    FDelete: TRttiMethod;
   strict protected
     procedure SetOwnsObjects(AValue:Boolean);
     function GetOwnsObjects: Boolean;
@@ -59,9 +60,11 @@ type
     constructor Create(AListObject: TObject);
     procedure Add(AObject: TObject);
     procedure Clear;
+    procedure Delete(Index: Integer);
     function Count: Integer;
     function GetItem(Index: Integer): TObject;
-    function GetGenericTypeName: String;
+    function GetItemTypeName: String;
+    function GetItemTypeInfo: PTypeInfo;
     function GetEnumerator: IEnumerator;
     property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
   end;
@@ -82,7 +85,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.RttiContext.Factory, System.TypInfo;
+  iORM.Exceptions, iORM.RttiContext.Factory;
 
 { TioDuckTypedList }
 
@@ -123,6 +126,9 @@ begin
   // Clear
   FClearMethod := Typ.GetMethod('Clear');
   if not Assigned(FClearMethod) then EioException.Create('DuckTypedList: "Clear" method not found in the object');
+  // Delete
+  FDelete := Typ.GetMethod('Delete');
+  if not Assigned(FDelete) then EioException.Create('DuckTypedList: "Delete" method not found in the object');
   // GetItem method
 {$IF CompilerVersion >= 23}
   FGetItemMethod := Typ.GetIndexedProperty('Items').ReadMethod;
@@ -130,6 +136,11 @@ begin
   if not Assigned(FGetItemMethod) then FGetItemMethod := Typ.GetMethod('GetItem');
   if not Assigned(FGetItemMethod) then FGetItemMethod := Typ.GetMethod('GetElement');
   if not Assigned(FGetItemMethod) then EioException.Create(Self.ClassName + ': "Items" property or "GetItem/GetElement" method not found in the object');
+end;
+
+procedure TioDuckTypedList.Delete(Index: Integer);
+begin
+  FClearMethod.Invoke(FDelete, [Index]);
 end;
 
 function TioDuckTypedList.GetEnumerator: IEnumerator;
@@ -150,7 +161,12 @@ begin
   end;
 end;
 
-function TioDuckTypedList.GetGenericTypeName: String;
+function TioDuckTypedList.GetItemTypeInfo: PTypeInfo;
+begin
+  Result := FGetItemMethod.ReturnType.Handle;
+end;
+
+function TioDuckTypedList.GetItemTypeName: String;
 begin
   result := FGetItemMethod.ReturnType.ToString;
 end;

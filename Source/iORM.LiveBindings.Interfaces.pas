@@ -101,6 +101,8 @@ type
     function TypeName: String;
     function TypeAlias: String;
     function GetMasterPropertyName: String;
+    function GetBaseObjectClassName: String;
+    function FindField(const AMemberName: string): TBindSourceAdapterField;
     // Current property
     function GetCurrent: TObject;
     property Current: TObject read GetCurrent;
@@ -135,6 +137,20 @@ type
     // BOF
     function GetBOF: Boolean;
     property BOF: Boolean read GetBOF;
+    // ItemCount
+    function GetCount: Integer;
+    property ItemCount: Integer read GetCount;
+    // ItemIndex
+    function GetItemIndex: Integer;
+    procedure SetItemIndex(const Value: Integer);
+    property ItemIndex:Integer read GetItemIndex write SetItemIndex;
+    // Items
+    function GetItems(const AIndex: Integer): TObject;
+    procedure SetItems(const AIndex: Integer; const Value: TObject);
+    property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
+    // Fields
+    function GetFields: TList<TBindSourceAdapterField>;
+    property Fields: TList<TBindSourceAdapterField> read GetFields;
   end;
 
   // Bind source adapter container

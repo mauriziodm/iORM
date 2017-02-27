@@ -41,7 +41,8 @@ uses
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter,
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, System.Classes, iORM.Context.Properties.Interfaces,
-  Data.Bind.ObjectScope, iORM.Where.Interfaces, iORM.MVVM.Interfaces;
+  Data.Bind.ObjectScope, iORM.Where.Interfaces, iORM.MVVM.Interfaces,
+  System.Generics.Collections;
 
 const
   VIEW_DATA_TYPE = TioViewDataType.dtSingle;
@@ -86,6 +87,14 @@ type
     function GetOwnsObjects: Boolean;
     // State
     function GetState: TBindSourceAdapterState;
+    // Fields
+    function GetFields: TList<TBindSourceAdapterField>;
+    // ItemIndex
+    function GetItemIndex: Integer;
+    procedure SetItemIndex(const Value: Integer);
+    // Items
+    function GetItems(const AIndex: Integer): TObject;
+    procedure SetItems(const AIndex: Integer; const Value: TObject);
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -139,6 +148,7 @@ type
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
     property ioViewDataType:TioViewDataType read GetIoViewDataType;
     property ioOwnsObjects:Boolean read GetOwnsObjects;
+    property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
   end;
 
 
@@ -369,6 +379,11 @@ begin
   Result := FDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(AMasterPropertyName);
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetFields: TList<TBindSourceAdapterField>;
+begin
+  Result := Self.Fields;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.GetIoAsync: Boolean;
 begin
   Result := FAsync;
@@ -377,7 +392,7 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, BaseObjectRttiType.Name, AMasterPropertyName, AWhere);
+  Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, GetBaseObjectRttiType.Name, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
@@ -407,6 +422,17 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.GetioWhereDetailsFromDetailAdapters: Boolean;
 begin
   Result := FWhereDetailsFromDetailAdapters;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetItemIndex: Integer;
+begin
+  Result := inherited ItemIndex;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetItems(
+  const AIndex: Integer): TObject;
+begin
+  Result := DataObject;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -564,6 +590,18 @@ procedure TioActiveInterfaceObjectBindSourceAdapter.SetioWhereDetailsFromDetailA
   const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetItemIndex(
+  const Value: Integer);
+begin
+  inherited ItemIndex := Value;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetItems(
+  const AIndex: Integer; const Value: TObject);
+begin
+  SetDataObject(Value);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetMasterAdapterContainer(

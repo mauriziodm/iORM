@@ -9,7 +9,9 @@ uses
   Vcl.ExtCtrls, Vcl.Buttons, Data.Bind.GenData, Vcl.Bind.GenData,
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource,
   Vcl.Grids, Data.Bind.EngExt, Vcl.Bind.DBEngExt, Vcl.Bind.Grid, System.Rtti,
-  System.Bindings.Outputs, Vcl.Bind.Editors, Data.Bind.Grid, Vcl.StdCtrls;
+  System.Bindings.Outputs, Vcl.Bind.Editors, Data.Bind.Grid, Vcl.StdCtrls,
+  Data.DB, Vcl.DBGrids, iORM.DB.Components.DataSet.Base,
+  iORM.DB.Components.DataSet.ModelDataSet, Vcl.Mask, Vcl.DBCtrls;
 
 type
   [diImplements(IMainView)]
@@ -38,7 +40,16 @@ type
     StringGrid1: TStringGrid;
     LinkGridToDataSourcePhonesModelBindSource: TLinkGridToDataSource;
     Label2: TLabel;
+    DBGrid1: TDBGrid;
+    PersonsModelDataSet: TioModelDataSet;
+    PersonsDataSource: TDataSource;
+    ButtonOpenDataSet: TSpeedButton;
+    DBEdit1: TDBEdit;
+    PersonsModelDataSetID: TIntegerField;
+    PersonsModelDataSetFirstName: TWideStringField;
+    PersonsModelDataSetLastName: TStringField;
     procedure MasterGridDblClick(Sender: TObject);
+    procedure ButtonOpenDataSetClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -48,6 +59,11 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TViewMain.ButtonOpenDataSetClick(Sender: TObject);
+begin
+  PersonsModelDataSet.Active := not PersonsModelDataSet.Active;
+end;
 
 procedure TViewMain.MasterGridDblClick(Sender: TObject);
 begin
