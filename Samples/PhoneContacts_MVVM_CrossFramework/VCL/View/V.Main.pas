@@ -40,16 +40,7 @@ type
     StringGrid1: TStringGrid;
     LinkGridToDataSourcePhonesModelBindSource: TLinkGridToDataSource;
     Label2: TLabel;
-    DBGrid1: TDBGrid;
-    PersonsModelDataSet: TioModelDataSet;
-    PersonsDataSource: TDataSource;
-    ButtonOpenDataSet: TSpeedButton;
-    DBEdit1: TDBEdit;
-    PersonsModelDataSetID: TIntegerField;
-    PersonsModelDataSetFirstName: TWideStringField;
-    PersonsModelDataSetLastName: TStringField;
     procedure MasterGridDblClick(Sender: TObject);
-    procedure ButtonOpenDataSetClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -59,11 +50,6 @@ type
 implementation
 
 {$R *.dfm}
-
-procedure TViewMain.ButtonOpenDataSetClick(Sender: TObject);
-begin
-  PersonsModelDataSet.Active := not PersonsModelDataSet.Active;
-end;
 
 procedure TViewMain.MasterGridDblClick(Sender: TObject);
 begin

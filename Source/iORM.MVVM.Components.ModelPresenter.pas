@@ -52,6 +52,8 @@ type
     function GetIsDetail: Boolean;
     // Editing
     function GetEditing: Boolean;
+    // ItemCount
+    function GetCount: Integer;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -88,6 +90,7 @@ type
     property BindSourceAdapter:IioActiveBindSourceAdapter read GetBindSourceAdapter write SetBindSourceAdapter;
     property Where:IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
+    property ItemCount: Integer read GetCount;
   published
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -230,6 +233,14 @@ begin
   // If the BindSourceAdapter is not assigned then create it
   if CheckAdapter(True) then
     Result := FBindSourceAdapter;
+end;
+
+function TioModelPresenter.GetCount: Integer;
+begin
+  if CheckAdapter then
+    Result := FBindSourceAdapter.ItemCount
+  else
+    Result := 0;
 end;
 
 function TioModelPresenter.DataObject: TObject;

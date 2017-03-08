@@ -94,6 +94,8 @@ type
     property IsDetail:Boolean read GetIsDetail;
     // State
     function GetState: TBindSourceAdapterState;
+    // ItemCount
+    function GetCount: Integer;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -119,6 +121,7 @@ type
     // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
+    property ItemCount: Integer read GetCount;
   published
     // Events
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -273,6 +276,14 @@ function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceA
 begin
   Result := nil;
   Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
+end;
+
+function TioPrototypeBindSource.GetCount: Integer;
+begin
+  if CheckAdapter then
+    Result := GetActiveBindSourceAdapter.ItemCount
+  else
+    Result := 0;
 end;
 
 function TioPrototypeBindSource.DataObject: TObject;

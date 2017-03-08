@@ -114,7 +114,7 @@ type
     procedure InternalPost; override;
     procedure InternalCancel; override;
     procedure InternalEdit; override;
-    procedure SetFieldData(Field: TField; Buffer: Pointer); override;
+    procedure SetFieldData(Field: TField; Buffer: TValueBuffer); override;
     function GetCanModify: Boolean; override;
     procedure DoAfterScroll; override;
   public
@@ -445,23 +445,37 @@ begin
 end;
 // -----------------------------------------------------------------------------
 
-procedure TMdListDataSet.SetFieldData(Field: TField; Buffer: Pointer);
+procedure TMdListDataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
 var
-  LProperty: IioContextProperty;
   LValue: TValue;
-  LObj: TObject;
+  LProperty: IioContextProperty;
+  IntValue: Integer;
+  StrValue: String;
 begin
   // If empty then exit
   if FBindSourceAdapter.ItemCount = 0 then
     Exit;
-  // Get the current BindSourceAdapterField
-  LProperty := FMap.GetProperties.GetPropertyByName(Field.Name);
-  // Get the current object
-  LObj := FBindSourceAdapter.Current;
-  // Make the TValue
-  TValue.Make(Buffer, LProperty.GetRttiType.Handle, LValue);
-  // Set the value
-  LProperty.SetValue(LObj, LValue);
+  // Move the buffer to the value
+  case Field.DataType of
+    // Integer
+    TFieldType.ftInteger, TFieldType.ftSmallint, TFieldType.ftWord,
+    TFieldType.ftByte, TFieldType.ftAutoInc, TFieldType.ftLargeint,
+    TFieldType.ftLongWord, TFieldType.ftShortint:
+    begin
+      Move (Buffer[0], IntValue, sizeof (Integer));
+      LValue := IntValue;
+    end;
+    // AnsiString
+    TFieldType.ftString:
+      LValue := PChar(TEncoding.ANSI.GetString(Buffer));
+    // WideString/Unicode
+    TFieldType.ftWideString:
+      LValue := pchar(Buffer);
+//      LValue := TEncoding.Unicode.GetString(Buffer);
+  end;
+  // Set the value into the object
+  LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
+  LProperty.SetValue(FBindSourceAdapter.Current, LValue);
   // Set modified
   SetModified(True);
 end;
