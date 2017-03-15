@@ -40,7 +40,7 @@ interface
 uses
   System.Generics.Collections, Data.Bind.ObjectScope,
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, Data.DB;
 
 type
 
@@ -72,6 +72,16 @@ type
   // The common ancestor for all PrototypeBindSource components
   TioBaseBindSource = TBaseObjectBindSource;
 
+  IioBSAToDataSetLinkContainer = interface
+    ['{DD47B60C-2265-4B5A-955E-155A7664D33B}']
+    procedure Disable;
+    procedure Enable;
+    procedure RegisterDataSet(const ADataSet:TDataSet);
+    procedure UnregisterDataSet(const ADataSet:TDataSet);
+    procedure Refresh(const AForce:Boolean=False);
+    procedure SetRecNo(const ARecNo:Integer);
+  end;
+
   IioActiveBindSourceAdapter = interface
     ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
     procedure Next;
@@ -84,8 +94,10 @@ type
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
     procedure Refresh(ReloadData:Boolean);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
-    procedure Append(AObject:TObject);
-    procedure Insert(AObject:TObject);
+    procedure Insert; overload;
+    procedure Insert(AObject:TObject); overload;
+    procedure Append; overload;
+    procedure Append(AObject:TObject); overload;
     procedure Delete;
     procedure Cancel;
     function UseObjStatus: Boolean;
@@ -103,6 +115,7 @@ type
     function GetMasterPropertyName: String;
     function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     // Current property
     function GetCurrent: TObject;
     property Current: TObject read GetCurrent;

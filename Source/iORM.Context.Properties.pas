@@ -117,9 +117,10 @@ type
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
-    function IsWriteEnabled: Boolean;
-    function IsReadEnabled: Boolean;
+    function IsDBWriteEnabled: Boolean;
+    function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
+    function IsWritable: Boolean; virtual;
   end;
 
   // Classe che rappresenta un field della classe
@@ -136,6 +137,7 @@ type
     function GetValue(Instance: Pointer): TValue; override;
     procedure SetValue(Instance: Pointer; AValue:TValue); override;
     function GetRttiType: TRttiType; override;
+    function IsWritable: Boolean; override;
   end;
 
 
@@ -413,7 +415,7 @@ begin
   Result := (Self.GetRttiType.TypeKind = tkInterface);
 end;
 
-function TioProperty.IsReadEnabled: Boolean;
+function TioProperty.IsDBReadEnabled: Boolean;
 begin
   Result := (FReadWrite <= iorwReadWrite);
 end;
@@ -444,7 +446,12 @@ begin
         and (Self.GetRttiType.AsInstance.MetaclassType.InheritsFrom(TSTream));
 end;
 
-function TioProperty.IsWriteEnabled: Boolean;
+function TioProperty.IsWritable: Boolean;
+begin
+  Result := FRttiProperty.IsWritable;
+end;
+
+function TioProperty.IsDBWriteEnabled: Boolean;
 begin
   Result := (FReadWrite >= iorwReadWrite);
 end;
@@ -706,6 +713,12 @@ function TioField.GetValue(Instance: Pointer): TValue;
 begin
   // No inherited
   Result := FRttiProperty.GetValue(Instance);
+end;
+
+function TioField.IsWritable: Boolean;
+begin
+  // A private field is always writable
+  Result := True;
 end;
 
 class function TioField.Remove_F_FromName(AFieldName:String): String;

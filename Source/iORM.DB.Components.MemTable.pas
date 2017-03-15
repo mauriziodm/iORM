@@ -58,6 +58,7 @@ type
     procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
     procedure DoBeforeOpen; override;
+    procedure DoAfterOpen; override;
     procedure Loaded; override;
     property ioLoadingData: Boolean read FioLoadingData write FioLoadingData;
   public
@@ -96,6 +97,12 @@ destructor TioMemTable.Destroy;
 begin
   FioWhereStr.Free;
   inherited;
+end;
+
+procedure TioMemTable.DoAfterOpen;
+begin
+  inherited;
+  Self.First;
 end;
 
 procedure TioMemTable.DoBeforeOpen;

@@ -67,6 +67,8 @@ type
     FonNotify: TioBSANotificationEvent;
     FInsertObj_Enabled: Boolean;
     FInsertObj_NewObj: TObject;
+    FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    FDeleteAfterCancel: Boolean;
     function TypeName: String;
     function TypeAlias: String;
     // Async property
@@ -112,8 +114,10 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
+    procedure DoBeforeCancel; override;
+    procedure DoAfterCancel; override;
     procedure DoAfterScroll; override;
-    procedure DoAfterInsert; override;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -140,6 +144,7 @@ type
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -199,6 +204,7 @@ begin
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;
   FClassRef := AClassRef;
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
@@ -217,36 +223,35 @@ begin
   inherited;
 end;
 
+procedure TioActiveListBindSourceAdapter.DoBeforeCancel;
+begin
+  inherited;
+
+  FDeleteAfterCancel := (Self.State = TBindSourceAdapterState.seInsert);
+
+end;
+
+procedure TioActiveListBindSourceAdapter.DoAfterCancel;
+begin
+  inherited;
+
+  if FDeleteAfterCancel then
+  begin
+    Self.Delete;
+  end;
+
+end;
+
 procedure TioActiveListBindSourceAdapter.DoAfterDelete;
 begin
   inherited;
+  // DataSet synchro
+  Self.GetDataSetLinkContainer.Refresh;
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   Notify(
          Self,
          TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
         );
-end;
-
-procedure TioActiveListBindSourceAdapter.DoAfterInsert;
-var
-  ObjToFree: TObject;
-begin
-  // If enabled subsitute the new object with the FInsertObj_NewObj (Append(AObject:TObject))
-  //  then destroy the "old" new object
-  if FInsertObj_Enabled then
-  begin
-    try
-      ObjToFree := Self.List[Self.ItemIndex];
-      ObjToFree.Free;
-      Self.List[Self.ItemIndex] := FInsertObj_NewObj;
-    finally
-      // Reset InsertObj subsystem
-      FInsertObj_Enabled := False;
-      FInsertObj_NewObj := nil;
-    end;
-  end;
-  // Execute AfterInsert event handler
-  inherited;
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterPost;
@@ -290,6 +295,8 @@ procedure TioActiveListBindSourceAdapter.DoAfterScroll;
 begin
   inherited;
   Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
+  // DataSet synchro
+  Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeDelete;
@@ -331,6 +338,25 @@ begin
     Self.Active := False;
     Self.List.Clear;
     Self.Active := True;
+  end;
+end;
+
+procedure TioActiveListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean;
+  out AInstance: TObject);
+begin
+  inherited;
+  if AHandled then
+    Exit;
+  if FInsertObj_Enabled then
+  begin
+    try
+      AInstance := FInsertObj_NewObj;
+      AHandled := True;
+    finally
+      // Reset InsertObj subsystem
+      FInsertObj_Enabled := False;
+      FInsertObj_NewObj := nil;
+    end;
   end;
 end;
 
@@ -394,6 +420,11 @@ end;
 function TioActiveListBindSourceAdapter.DataObject: TObject;
 begin
   Result := Self.List;
+end;
+
+function TioActiveListBindSourceAdapter.GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+begin
+  Result := FDataSetLinkContainer;
 end;
 
 function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(
@@ -592,6 +623,8 @@ begin
     Self.SetList(nil, AOwnsObject);
     Self.FDetailAdaptersContainer.SetMasterObject(nil);
   end;
+  // DataSet synchro
+  Self.GetDataSetLinkContainer.Refresh;
 
   // -------------------------------------------------------------------------------------------------------
   // If is a LazyLoadable list then set the internal List

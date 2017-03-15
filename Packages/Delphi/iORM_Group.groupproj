@@ -19,7 +19,7 @@
             <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj">
-            <Dependencies>iORM_Project.dproj</Dependencies>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj">
             <Dependencies/>
@@ -84,7 +84,7 @@
         <Projects Include="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj">
             <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
-        <Projects Include="..\..\..\iORM_NotInRepository\DataSetTest\DataSetTest.dproj">
+        <Projects Include="..\..\..\..\Temp\DataSetTest\DataSetTest.dproj">
             <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
     </ItemGroup>
@@ -140,13 +140,13 @@
     <Target Name="PhoneContacts_DMVC_Client_ByCode:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client_ByCode\PhoneContacts_DMVC_Client_ByCode.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="iORM_Project">
+    <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean" DependsOnTargets="iORM_Project:Clean">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Make" DependsOnTargets="iORM_Project:Make">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_ioActiveBindSourceAdapter">
@@ -339,13 +339,13 @@
         <MSBuild Projects="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj" Targets="Make"/>
     </Target>
     <Target Name="DataSetTest" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
-        <MSBuild Projects="..\..\..\iORM_NotInRepository\DataSetTest\DataSetTest.dproj"/>
+        <MSBuild Projects="..\..\..\..\Temp\DataSetTest\DataSetTest.dproj"/>
     </Target>
     <Target Name="DataSetTest:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
-        <MSBuild Projects="..\..\..\iORM_NotInRepository\DataSetTest\DataSetTest.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\..\..\..\Temp\DataSetTest\DataSetTest.dproj" Targets="Clean"/>
     </Target>
     <Target Name="DataSetTest:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
-        <MSBuild Projects="..\..\..\iORM_NotInRepository\DataSetTest\DataSetTest.dproj" Targets="Make"/>
+        <MSBuild Projects="..\..\..\..\Temp\DataSetTest\DataSetTest.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_DMVC_Client_ByCode;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;PhoneContacts_MVVM_VCL;PhoneContacts_MVVM_FMX;Pizza_ioActiveBindSourceAdapter;Pizza_List;Pizza_ioPrototypeBS;Pizza_DMVC_Client;Pizza_DMVC_Server;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;RVMan_Interface;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample;NaturalBSAMultirecord;DataSetTest"/>

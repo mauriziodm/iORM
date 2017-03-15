@@ -439,7 +439,7 @@ begin
   for Prop in AContext.GetProperties do
   begin
     // If the property is not WriteEnabled then skip it
-    if not Prop.IsWriteEnabled then Continue;
+    if not Prop.IsDBWriteEnabled then Continue;
     case Prop.GetRelationType of
       // If relation HasBelongsToOne
       ioRTBelongsTo: {Nothing};
@@ -461,7 +461,7 @@ begin
   for Prop in AContext.GetProperties do
   begin
     // If the property is not WriteEnabled then skip it
-    if not Prop.IsWriteEnabled then Continue;
+    if not Prop.IsDBWriteEnabled then Continue;
     case Prop.GetRelationType of
       // If relation BelongsTo: persist the child object to retrieve the ID (if new object or ID changed)
       ioRTBelongsTo: begin

@@ -40,11 +40,11 @@ interface
 uses
   System.Generics.Collections, iORM.CommonTypes, System.Types,
   System.Generics.Defaults, iORM.LazyLoad.Interfaces,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, iORM.Containers.Interfaces;
 
 type
 
-  TioObjectList<T: class> = class(TObjectList<T>, IioLazyLoadable, IInterface)
+  TioObjectList<T: class> = class(TObjectList<T>, IioList<T>, IioLazyLoadable, IInterface)
 
 
 

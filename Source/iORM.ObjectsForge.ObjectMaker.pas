@@ -74,7 +74,7 @@ begin
   for CurrProp in AContext.GetProperties do
   begin
     // If the property is not ReadEnabled then skip it
-    if not CurrProp.IsReadEnabled then Continue;
+    if not CurrProp.IsDBReadEnabled then Continue;
     case CurrProp.GetRelationType of
 // ------------------------------ NO RELATION --------------------------------------------------------------------------------------
       // If RelationType = ioRTNone then load normal property value (No relation)
@@ -103,7 +103,8 @@ begin
     if CurrProp.IsInterface then
       TioRttiUtilities.ObjectAsIInterface(AObj)._Release;
     // Assign the related object/s to the property   (***ChildPropertyPath***)
-    CurrProp.SetValue(Result, AObj);
+    if CurrProp.IsWritable then
+      CurrProp.SetValue(Result, AObj);
 // ---------------------------------------------------------------------------------------------------------------------------------
   end;
 end;

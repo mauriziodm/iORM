@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 460
-  ClientWidth = 320
+  ClientWidth = 371
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -11,7 +11,7 @@ object Form1: TForm1
   object TabControl1: TTabControl
     Align = Client
     FullSize = True
-    Size.Width = 320.000000000000000000
+    Size.Width = 371.000000000000000000
     Size.Height = 460.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
@@ -19,9 +19,9 @@ object Form1: TForm1
     TabOrder = 9
     TabPosition = None
     Sizes = (
-      320s
+      371s
       460s
-      320s
+      371s
       460s)
     object TabItem1: TTabItem
       CustomIcon = <
@@ -37,7 +37,7 @@ object Form1: TForm1
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 50.000000000000000000
       object ToolBar1: TToolBar
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
@@ -46,7 +46,7 @@ object Form1: TForm1
           Align = Right
           Enabled = True
           ImageIndex = -1
-          Position.X = 276.000000000000000000
+          Position.X = 327.000000000000000000
           Size.Width = 44.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
@@ -62,7 +62,7 @@ object Form1: TForm1
         FooterAppearanceClassName = 'TListHeaderObjects'
         ItemIndex = 1
         Align = Client
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 250.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
@@ -72,7 +72,7 @@ object Form1: TForm1
         Align = Bottom
         StyledSettings = [Family, Size, FontColor]
         Position.Y = 294.000000000000000000
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 23.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.StyleExt = {04070000000000000004000000}
@@ -87,7 +87,7 @@ object Form1: TForm1
         ItemIndex = 0
         Align = Bottom
         Position.Y = 317.000000000000000000
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 143.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 4
@@ -109,19 +109,19 @@ object Form1: TForm1
       object Label2: TLabel
         Align = Bottom
         Position.Y = 262.000000000000000000
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 23.000000000000000000
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Center
         Text = 'Phones'
       end
       object ToolBar2: TToolBar
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 4
         object ToolBar3: TToolBar
-          Size.Width = 320.000000000000000000
+          Size.Width = 371.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 5
@@ -142,7 +142,7 @@ object Form1: TForm1
       object DetailBindNavigator: TBindNavigator
         Align = Bottom
         Position.Y = 285.000000000000000000
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 25.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 5
@@ -156,24 +156,24 @@ object Form1: TForm1
         CanFocus = True
         ClipChildren = True
         Position.Y = 310.000000000000000000
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 150.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 6
         RowHeight = 21.000000000000000000
         RowCount = 200
-        Viewport.Width = 300.000000000000000000
-        Viewport.Height = 109.000000000000000000
+        Viewport.Width = 351.000000000000000000
+        Viewport.Height = 125.000000000000000000
       end
       object Panel1: TPanel
         Align = Client
-        Size.Width = 320.000000000000000000
+        Size.Width = 371.000000000000000000
         Size.Height = 218.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 7
         object MasterBindNavigator: TBindNavigator
           Align = Top
-          Size.Width = 320.000000000000000000
+          Size.Width = 371.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
@@ -213,11 +213,12 @@ object Form1: TForm1
         end
         object EditFirstname: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Anchors = [akLeft, akTop, akRight]
           TabOrder = 6
           Text = 'Mark Anderson'
           Position.X = 120.000000000000000000
           Position.Y = 82.000000000000000000
-          Size.Width = 249.000000000000000000
+          Size.Width = 237.000000000000000000
           Size.Height = 30.000000000000000000
           Size.PlatformDefault = False
         end
@@ -232,6 +233,7 @@ object Form1: TForm1
         end
         object EditLastname: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Anchors = [akLeft, akTop, akRight]
           TabOrder = 5
           Text = 
             'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
@@ -256,7 +258,7 @@ object Form1: TForm1
             'por, velit sit'
           Position.X = 120.000000000000000000
           Position.Y = 122.000000000000000000
-          Size.Width = 249.000000000000000000
+          Size.Width = 237.000000000000000000
           Size.Height = 30.000000000000000000
           Size.PlatformDefault = False
         end
@@ -444,8 +446,8 @@ object Form1: TForm1
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 68
-    Top = 61
+    Left = 116
+    Top = 29
     object LinkListControlToField5: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = MasterBS

@@ -170,7 +170,6 @@ contains
   iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas',
   iORM.DB.Components.ConnectionDef in '..\..\Source\iORM.DB.Components.ConnectionDef.pas',
   iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas',
-  iORM.DB.Components.LiveMemTable in '..\..\Source\iORM.DB.Components.LiveMemTable.pas',
   iORM.MVVM.Components.ViewModelBridge in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas',
   iORM.MVVM.Components.ModelPresenter in '..\..\Source\iORM.MVVM.Components.ModelPresenter.pas',
   iORM.Components.Common in '..\..\Source\iORM.Components.Common.pas',
@@ -178,6 +177,7 @@ contains
   iORM.MVVM.Components.ModelDataset in '..\..\Source\iORM.MVVM.Components.ModelDataset.pas',
   iORM.DB.Components.DataSet.Base in '..\..\Source\iORM.DB.Components.DataSet.Base.pas',
   iORM.DB.Components.DataSet.ModelDataSet in '..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas',
-  iORM.Components.Common.Interfaces in '..\..\Source\iORM.Components.Common.Interfaces.pas';
+  iORM.Components.Common.Interfaces in '..\..\Source\iORM.Components.Common.Interfaces.pas',
+  iORM.LiveBindings.BSAToDataSetLink in '..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas';
 
 end.

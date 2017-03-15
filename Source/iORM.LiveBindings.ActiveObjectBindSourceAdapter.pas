@@ -63,8 +63,7 @@ type
     FBindSource: IioNotifiableBindSource;
     FonNotify: TioBSANotificationEvent;
 //    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;  *** NB: Code presente (commented) in the unit body ***
-    FInsertObj_Enabled: Boolean;
-    FInsertObj_NewObj: TObject;
+    FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function TypeName: String;
     function TypeAlias: String;
     // Async property
@@ -111,7 +110,6 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
-    procedure DoAfterInsert; override;
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -139,6 +137,7 @@ type
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -172,11 +171,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Append(AObject: TObject);
 begin
-  // Set sone InsertObj subsystem variables
-  // Then call the standard code
-  FInsertObj_NewObj := AObject;
-  FInsertObj_Enabled := True;
-  Self.Append;
+  Assert(False);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.ClearDataObject;
@@ -196,12 +191,10 @@ begin
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;
   FClassRef := AClassRef;
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-  // Init InsertObj subsystem values
-  FInsertObj_Enabled := False;
-  FInsertObj_NewObj := nil;
 end;
 
 destructor TioActiveObjectBindSourceAdapter.Destroy;
@@ -222,28 +215,6 @@ begin
          Self,
          TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
         );
-end;
-
-procedure TioActiveObjectBindSourceAdapter.DoAfterInsert;
-var
-  ObjToFree: TObject;
-begin
-  // If enabled subsitute the new object with the FInsertObj_NewObj (Append(AObject:TObject))
-  //  then destroy the "olr" new object
-  if FInsertObj_Enabled then
-  begin
-    try
-      ObjToFree := Self.DataObject;
-      ObjToFree.Free;
-      Self.SetDataObject(FInsertObj_NewObj);
-    finally
-      // Reset InsertObj subsystem
-      FInsertObj_Enabled := False;
-      FInsertObj_NewObj := nil;
-    end;
-  end;
-  // Execute AfterInsert event handler
-  inherited;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterPost;
@@ -371,6 +342,11 @@ begin
   Result := Self.DataObject;
 end;
 
+function TioActiveObjectBindSourceAdapter.GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+begin
+  Result := FDataSetLinkContainer;
+end;
+
 function TioActiveObjectBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(
   const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
@@ -463,11 +439,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Insert(AObject: TObject);
 begin
-  // Set sone InsertObj subsystem variables
-  // Then call the standard code
-  FInsertObj_NewObj := AObject;
-  FInsertObj_Enabled := True;
-  Self.Insert;
+  Assert(False);
 end;
 
 function TioActiveObjectBindSourceAdapter.IsDetail: Boolean;

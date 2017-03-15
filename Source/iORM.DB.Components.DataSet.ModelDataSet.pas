@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioModelDataSet = class(TMdListDataSet, IioVMBridgeClientComponent)
+  TioModelDataSet = class(TioBSADataSet, IioVMBridgeClientComponent)
   private
     FViewModelBridge: TioViewModelBridge;
     FModelPresenter: String;
@@ -57,8 +57,10 @@ begin
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
   if FModelPresenter.IsEmpty then
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
-  // Get the BindSourceAdapter from ViewModel
+  // Get the BindSourceAdapter from ViewModel and open it
   SetInternalAdapter(   ViewModelBridge.ViewModel.Presenters[ModelPresenter].BindSourceAdapter   );
+  if Assigned(InternalAdapter) then
+    InternalAdapter.Active := True;
   inherited;
 end;
 

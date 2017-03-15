@@ -69,6 +69,9 @@ var
 
 implementation
 
+uses
+  Model;
+
 {$R *.fmx}
 
 end.

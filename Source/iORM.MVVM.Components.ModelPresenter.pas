@@ -91,6 +91,8 @@ type
     property Where:IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
     property ItemCount: Integer read GetCount;
+    property Editing:Boolean read GetEditing;
+    property IsDetail:Boolean read GetIsDetail;
   published
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -99,8 +101,6 @@ type
     property AutoLoadData:Boolean read FAutoLoadData write FAutoLoadData;
     property AutoPersist:Boolean read FAutoPersist write FAutoPersist;
     property AutoRefreshOnNotification:TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification;
-    property Editing:Boolean read GetEditing;
-    property IsDetail:Boolean read GetIsDetail;
     property MasterPresenter:TioModelPresenter read FMasterPresenter write FMasterPresenter;
     property MasterPropertyName:String read FMasterPropertyName write FMasterPropertyName;
     property OrderBy:String read FOrderBy Write SetOrderBy;

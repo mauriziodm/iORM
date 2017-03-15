@@ -91,9 +91,10 @@ type
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
-    function IsWriteEnabled: Boolean;
-    function IsReadEnabled: Boolean;
+    function IsDBWriteEnabled: Boolean;
+    function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
+    function IsWritable: Boolean;
   end;
 
   IioContextProperties = interface(IioSqlItem)

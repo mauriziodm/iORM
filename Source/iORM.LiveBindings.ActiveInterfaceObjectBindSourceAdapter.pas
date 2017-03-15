@@ -65,8 +65,7 @@ type
     FBindSource: IioNotifiableBindSource;
     FonNotify: TioBSANotificationEvent;
 //    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    FInsertObj_Enabled: Boolean;
-    FInsertObj_NewObj: TObject;
+    FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function TypeName: String;
     function TypeAlias: String;
     // Async property
@@ -113,7 +112,6 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
-    procedure DoAfterInsert; override;
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -140,6 +138,7 @@ type
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -174,11 +173,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Append(AObject: TObject);
 begin
-  // Set sone InsertObj subsystem variables
-  // Then call the standard code
-  FInsertObj_NewObj := AObject;
-  FInsertObj_Enabled := True;
-  Self.Append;
+  Assert(False);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ClearDataObject;
@@ -197,12 +192,10 @@ begin
   FLocalOwnsObject := False;  // Always false because it's a BSA for an interface (AutoRefCount)
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-  // Init InsertObj subsystem values
-  FInsertObj_Enabled := False;
-  FInsertObj_NewObj := nil;
 end;
 
 destructor TioActiveInterfaceObjectBindSourceAdapter.Destroy;
@@ -223,31 +216,6 @@ begin
          Self,
          TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
         );
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoAfterInsert;
-var
-  ObjToFree: TObject;
-begin
-  // If enabled subsitute the new object with the FInsertObj_NewObj (Append(AObject:TObject))
-  //  then destroy the "old" new object
-  if FInsertObj_Enabled then
-  begin
-    try
-// NB: Queste due righe le ho commentate perchè altrimenti dava un errore in un progetto di
-//      Omar ed eliminando queste righe invece sembra andare bene però ho un dubbio che questo
-//      possa generare un memory leak. Proviamo a tenerle commentate e poi vediamo
-//      ObjToFree := Self.DataObject as TObject;
-//      ObjToFree.Free;
-      Self.SetDataObject(FInsertObj_NewObj, FLocalOwnsObject);
-    finally
-      // Reset InsertObj subsystem
-      FInsertObj_Enabled := False;
-      FInsertObj_NewObj := nil;
-    end;
-  end;
-  // Execute AfterInsert event handler
-  inherited;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoAfterPost;
@@ -373,6 +341,11 @@ begin
   Result := Self.DataObject as TObject;
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+begin
+  Result := FDataSetLinkContainer;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(
   const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
@@ -464,11 +437,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Insert(AObject: TObject);
 begin
-  // Set sone InsertObj subsystem variables
-  // Then call the standard code
-  FInsertObj_NewObj := AObject;
-  FInsertObj_Enabled := True;
-  Self.Insert;
+  Assert(False);
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.IsDetail: Boolean;

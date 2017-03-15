@@ -58,6 +58,7 @@ type
     class function GetBSAfromMasterBindSourceAdapter(const AOwner:TComponent; const AMAsterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String=''; const AWhere:IioWhere=nil): TBindSourceAdapter;
     class function GetBSAfromDB(const AOwner:TComponent; const ATypeName, ATypeAlias:String; const AWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean): TBindSourceAdapter;
     class function GetBSAByTypeName(const ATypeName, ATypeAlias:String; const AWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean; const AOwner: TComponent): IioActiveBindSourceAdapter;
+    class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
   end;
 
 implementation
@@ -73,9 +74,14 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, iORM.Context.Factory,
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
-  System.SysUtils, iORM.Exceptions;
+  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink;
 
 { TioLiveBindingsFactory }
+
+class function TioLiveBindingsFactory.BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+begin
+  Result := TioBSAToDataSetLinkContainer.Create;
+end;
 
 class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner:TComponent; const AMasterProperty:IioContextProperty; const AWhere:IioWhere): IioContainedBindSourceAdapter;
 var

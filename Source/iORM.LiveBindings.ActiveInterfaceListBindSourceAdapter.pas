@@ -67,6 +67,7 @@ type
     FonNotify: TioBSANotificationEvent;
     FInsertObj_Enabled: Boolean;
     FInsertObj_NewObj: TObject;
+    FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function TypeName: String;
     function TypeAlias: String;
     // Async property
@@ -113,7 +114,7 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
-    procedure DoAfterInsert; override;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -139,6 +140,7 @@ type
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -198,6 +200,7 @@ begin
   FWhereDetailsFromDetailAdapters := False;
   FTypeName := ATypeName;
   FTypeAlias := ATypeAlias;
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
@@ -228,37 +231,6 @@ begin
            Self,
            TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
           );
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.DoAfterInsert;
-var
-  ObjToFree: TObject;
-  AInterface: IInterface;
-begin
-  // If enabled subsitute the new object with the FInsertObj_NewObj (Append(AObject:TObject))
-  //  then destroy the "olr" new object
-  if FInsertObj_Enabled then
-  begin
-    try
-      if Supports(FInsertObj_NewObj, IInterface, AInterface) then
-      begin
-// NB: Queste due righe le ho commentate perchè altrimenti dava un errore in un progetto di
-//      Omar ed eliminando queste righe invece sembra andare bene però ho un dubbio che questo
-//      possa generare un memory leak. Proviamo a tenerle commentate e poi vediamo
-//        ObjToFree := Self.List[Self.ItemIndex] as TObject;
-//        ObjToFree.Free;
-        Self.List[Self.ItemIndex] := AInterface;
-      end
-      else
-        raise EioException.Create(Self.ClassName + ': "FInsertObj_NewObj" does not implement IInterface.');
-    finally
-      // Reset InsertObj subsystem
-      FInsertObj_Enabled := False;
-      FInsertObj_NewObj := nil;
-    end;
-  end;
-  // Execute AfterInsert event handler
-  inherited;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterPost;
@@ -322,6 +294,23 @@ begin
   end;
 end;
 
+procedure TioActiveInterfaceListBindSourceAdapter.DoCreateInstance(
+  out AHandled: Boolean; out AInstance: TObject);
+begin
+  inherited;
+  if FInsertObj_Enabled then
+  begin
+    try
+      AInstance := FInsertObj_NewObj;
+      AHandled := True;
+    finally
+      // Reset InsertObj subsystem
+      FInsertObj_Enabled := False;
+      FInsertObj_NewObj := nil;
+    end;
+  end;
+end;
+
 procedure TioActiveInterfaceListBindSourceAdapter.DoNotify(
   ANotification: IioBSANotification);
 begin
@@ -371,6 +360,11 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.DataObject: TObject;
 begin
   Result := Self.List;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+begin
+  Result := FDataSetLinkContainer;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(
