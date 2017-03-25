@@ -8,11 +8,13 @@ uses
 
 type
 
-  TMdRecInfo = record
+  TioRecInfo = record
     Bookmark: Longint;
     BookmarkFlag: TBookmarkFlag;
   end;
-  PMdRecInfo = ^TMdRecInfo;
+  PioRecInfo = ^TioRecInfo;
+
+  PValueBuffer = ^TValueBuffer;
 
   TioCustomDataSet = class(TDataSet)
   protected
@@ -120,7 +122,7 @@ type
     function GetCanModify: Boolean; override;
     procedure DoAfterScroll; override;
   public
-    function GetFieldData(Field: TField; var Buffer: TValueBuffer): Boolean; override;
+    function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     property InternalAdapter: TBindSourceAdapter read GetInternalAdapter;  // Must be ReadOnly
   end;
 
@@ -129,7 +131,8 @@ implementation
 
 uses
   iORM.Exceptions, System.SysUtils, iORM.Context.Properties.Interfaces,
-  System.Rtti, iORM.Context.Container;
+  System.Rtti, iORM.Context.Container, System.Types, Data.FmtBcd,
+  Data.SqlTimSt, System.DateUtils;
 
 /////////////////////////////////////////////////
 ////// Part I:
@@ -158,7 +161,7 @@ begin
   BofCrack := -1;
   EofCrack := InternalRecordCount;
   FCurrentRecord := BofCrack;
-  FRecordBufferSize := FRecordSize + sizeof (TMdRecInfo);
+  FRecordBufferSize := FRecordSize + sizeof (TioRecInfo);
   BookmarkSize := sizeOf (Integer);
 
   // everything OK: table is now open
@@ -205,7 +208,7 @@ procedure TioCustomDataSet.InternalSetToRecord (Buffer: TRecordBuffer);
 var
   ReqBookmark: Integer;
 begin
-  ReqBookmark := PMdRecInfo(Buffer + FRecordSize).Bookmark;
+  ReqBookmark := PioRecInfo(Buffer + FRecordSize).Bookmark;
   InternalGotoBookmark (@ReqBookmark);
 end;
 
@@ -213,14 +216,14 @@ end;
 function TioCustomDataSet.GetBookmarkFlag (
   Buffer: TRecordBuffer): TBookmarkFlag;
 begin
-  Result := PMdRecInfo(Buffer + FRecordSize).BookmarkFlag;
+  Result := PioRecInfo(Buffer + FRecordSize).BookmarkFlag;
 end;
 
 // II: change the bookmark flags in the buffer
 procedure TioCustomDataSet.SetBookmarkFlag (Buffer: TRecordBuffer;
   Value: TBookmarkFlag);
 begin
-  PMdRecInfo(Buffer + FRecordSize).BookmarkFlag := Value;
+  PioRecInfo(Buffer + FRecordSize).BookmarkFlag := Value;
 end;
 
 // II: Go to a special position before the first record
@@ -241,14 +244,14 @@ procedure TioCustomDataSet.GetBookmarkData (
   Buffer: TRecordBuffer; Data: Pointer);
 begin
   Integer(Data^) :=
-    PMdRecInfo(Buffer + FRecordSize).Bookmark;
+    PioRecInfo(Buffer + FRecordSize).Bookmark;
 end;
 
 // II: set the bookmark data in the buffer
 procedure TioCustomDataSet.SetBookmarkData (
   Buffer: TRecordBuffer; Data: Pointer);
 begin
-  PMdRecInfo(Buffer + FRecordSize).Bookmark :=
+  PioRecInfo(Buffer + FRecordSize).Bookmark :=
     Integer(Data^);
 end;
 
@@ -382,6 +385,7 @@ end;
 procedure TioBSADataSet.DoAfterScroll;
 begin
   inherited;
+  // Propagate the operation to the linked BindSourceAdapter
   if Self.State = dsInsert then
     Exit;
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
@@ -407,6 +411,7 @@ end;
 
 procedure TioBSADataSet.InternalCancel;
 begin
+  // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     FBindSourceAdapter.Cancel;
@@ -417,6 +422,7 @@ end;
 
 procedure TioBSADataSet.InternalDelete;
 begin
+  // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     FBindSourceAdapter.Delete;
@@ -427,6 +433,7 @@ end;
 
 procedure TioBSADataSet.InternalEdit;
 begin
+  // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     FBindSourceAdapter.Edit;
@@ -475,9 +482,26 @@ end;
 
 procedure TioBSADataSet.InternalInsert;
 begin
+  // Disable all the DataSetLinks on the BindSourceAdapter
+  //  NB: DataSetLink is used to propagate the operation (insert, post,
+  //       delete, next etc.) from the BindSourceAdapter to all datasets linked
+  //       to BSA itself).
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
-    FBindSourceAdapter.Append;
+    // Strange behavior if not present with empty and just opened dataset
+    //  (displays the new record twice)
+    if FCurrentRecord = -1 then
+      Self.First;
+    // If EOF then performs an append on the linked BindSourceAdapter else
+    //  an insert.
+    //  (If EOF it means that the user has requested ad append, key down
+    //   pressed when on the last row)
+    if Self.Eof then
+      FBindSourceAdapter.Append
+    else
+      FBindSourceAdapter.Insert;
+    // Put the current record index in the record buffer
+    PInteger(ActiveBuffer)^ := FBindSourceAdapter.ItemIndex;
   finally
     FBindSourceAdapter.GetDataSetLinkContainer.Enable;
   end;
@@ -489,8 +513,9 @@ procedure TioBSADataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
 var
   LValue: TValue;
   LProperty: IioContextProperty;
-  IntValue: Integer;
-  StrValue: String;
+  LDateTime: TDateTime;
+  LDateTimeRec: TDateTimeRec;
+  LTempValueBuffer: TValueBuffer;
 begin
   // If empty then exit
   if FBindSourceAdapter.ItemCount = 0 then
@@ -498,12 +523,37 @@ begin
   // Move the buffer to the value
   case Field.DataType of
     // Integer
-    TFieldType.ftInteger, TFieldType.ftSmallint, TFieldType.ftWord,
-    TFieldType.ftByte, TFieldType.ftAutoInc, TFieldType.ftLargeint,
-    TFieldType.ftLongWord, TFieldType.ftShortint:
+    TFieldType.ftInteger:   LValue := TBitConverter.InTo<Integer>(Buffer);
+    TFieldType.ftAutoInc:   LValue := TBitConverter.InTo<Integer>(Buffer);
+    TFieldType.ftShortint:  LValue := TBitConverter.InTo<ShortInt>(Buffer);
+    TFieldType.ftByte:      LValue := TBitConverter.InTo<Byte>(Buffer);
+    TFieldType.ftSmallint:  LValue := TBitConverter.InTo<SmallInt>(Buffer);
+    TFieldType.ftLargeint:  LValue := TBitConverter.InTo<Largeint>(Buffer);
+    TFieldType.ftWord:      LValue := TBitConverter.InTo<Word>(Buffer);
+    TFieldType.ftLongWord:  LValue := TBitConverter.InTo<LongWord>(Buffer);
+    // Float
+    TFieldType.ftFloat:     LValue := TBitConverter.InTo<Double>(Buffer);
+    TFieldType.ftCurrency:  LValue := TBitConverter.InTo<Double>(Buffer);
+    TFieldType.ftBCD:       LValue := TBitConverter.InTo<Currency>(Buffer);
+    TFieldType.ftFMTBcd:    LValue := TValue.From<TBCD>(   TBitConverter.InTo<TBCD>(Buffer)   );
+    TFieldType.ftSingle:    LValue := TBitConverter.InTo<Single>(Buffer);
+    TFieldType.ftExtended:  LValue := TBitConverter.InTo<Extended>(Buffer);
+    // Boolean
+    TFieldType.ftBoolean:   LValue := TBitConverter.InTo<WordBool>(Buffer);
+    // Date & Time
+    TFieldType.ftDateTime, TFieldType.ftDate, TFieldType.ftTime:
     begin
-      Move (Buffer[0], IntValue, sizeof (Integer));
-      LValue := IntValue;
+      // If the buffer is not assigned then the value is NULL
+      if not Assigned(Buffer) then
+        LValue := TValue.From<TDateTime>(0)
+      else
+      begin
+        SetLength(LTempValueBuffer, SizeOf(TDateTimeRec));
+        DataConvert(Field, Buffer, LTempValueBuffer, False);
+        LDateTimeRec := TBitConverter.UnsafeInTo<TDateTimeRec>(LTempValueBuffer);
+        LDateTime := LDateTimeRec.DateTime;
+        LValue := TValue.From<TDateTime>(LDateTime);
+      end;
     end;
     // AnsiString
     TFieldType.ftString:
@@ -530,22 +580,69 @@ begin
   //  Set the BindSourceAdapter
   FBindSourceAdapter := AActiveBindSourceAdpter;
   // Register itself (the DataSet) into the DataSetLinkContainer of the BindSourceAdapter
+  //  NB: DataSetLink is used to propagate the operation (insert, post,
+  //       delete, next etc.) from the BindSourceAdapter to all datasets linked
+  //       to BSA itself).
   FBindSourceAdapter.GetDataSetLinkContainer.RegisterDataSet(Self);
 end;
 
-function TioBSADataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer): Boolean;
+
+function TioBSADataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
 var
   LValue: TValue;
   LRecordIndex: Integer;
   LObj: TObject;
   LProperty: IioContextProperty;
+  LDateTime: TDateTime;
+  LDateTimeRec: TDateTimeRec;
+  // Return true if the record is inserted/appended
+  function IsInsertingRecord: Boolean;
+  var
+    LBookmarkFlag: TBookmarkFlag;
+  begin
+    // Get the bookmark flag for current record
+    LBookmarkFlag := GetBookmarkFlag(ActiveBuffer);
+    Result := (State = dsInsert)
+      and ((LBookmarkFlag = TBookmarkFlag.bfInserted) or (LBookmarkFlag = TBookmarkFlag.bfEOF));
+  end;
+  // Calc the record index for all possibles situations
+  function GetRecordIdx: Integer;
+  var
+    LBookmarkFlag: TBookmarkFlag;
+  begin
+    // Get the current record index
+    Result := PInteger(ActiveBuffer)^;
+    // Get the bookmark flag for current record
+    LBookmarkFlag := GetBookmarkFlag(ActiveBuffer);
+    // Increments the index in some specific cases.
+    //  (If we are in an insert operation it adds one to all of the subsequent records
+    //   indices to what has just been inserted)
+    //  NB: Not for append
+    // -------------------------------------------
+    if  (State = dsInsert)
+    // ... when a new record is inserted (not appended) the relative BookmarkFlag is set to bfInserted
+    and (LBookmarkFlag <> TBookmarkFlag.bfInserted)
+    // ... when a new record is appended (not inserted) the relative BookmarkFlag is set to bfEOF
+    and (LBookmarkFlag <> TBookmarkFlag.bfEOF)
+    // ... when a new record is inserted (not appended) only records after the inserted record
+    //      must be incremented by one (the index is contained in the ActiveBuffer)
+    and (Result >= FBindSourceAdapter.ItemIndex)
+    // ... when a new record is inserted/appended in empty DataSet then BOF and EOF properties is both setted to True
+    and not (BOF and EOF)
+    then
+      Inc(Result);
+    // -------------------------------------------
+  end;
 begin
   Result := False;
   // If empty then exit
-  if FBindSourceAdapter.ItemCount = 0 then
+  if (FBindSourceAdapter.ItemCount = 0) or IsInsertingRecord then
     Exit;
-  // Get the current record index
-  LRecordIndex := PInteger(ActiveBuffer)^;
+  // Get the current record index (corrected by the situations)
+  LRecordIndex := GetRecordIdx;
+  Result := (LRecordIndex >= -1) and (LRecordIndex <= FBindSourceAdapter.ItemCount - 1);
+  if not Result then
+    Exit;
   // ---------- DATA FROM THE BINDSOURCEADAPTER ----------
   // Get the value
 //  FBindSourceAdapter.ItemIndex := LRecordIndex;
@@ -559,14 +656,34 @@ begin
   // Move the value to the buffer
   case Field.DataType of
     // Integer
-    TFieldType.ftInteger, TFieldType.ftSmallint, TFieldType.ftWord,
-    TFieldType.ftByte, TFieldType.ftAutoInc, TFieldType.ftLargeint,
-    TFieldType.ftFixedChar, TFieldType.ftFixedWideChar, TFieldType.ftLongWord,
-    TFieldType.ftShortint:
-      LValue.ExtractRawData(Buffer);
+    TFieldType.ftInteger:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
+    TFieldType.ftAutoInc:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
+    TFieldType.ftShortint:  TBitConverter.UnsafeFrom<ShortInt>(LValue.AsType<ShortInt>, Buffer);
+    TFieldType.ftByte:      TBitConverter.UnsafeFrom<Byte>(LValue.AsType<Byte>, Buffer);
+    TFieldType.ftSmallint:  TBitConverter.UnsafeFrom<SmallInt>(LValue.AsType<SmallInt>, Buffer);
+    TFieldType.ftLargeint:  TBitConverter.UnsafeFrom<Largeint>(LValue.AsType<Largeint>, Buffer);
+    TFieldType.ftWord:      TBitConverter.UnsafeFrom<Word>(LValue.AsType<Word>, Buffer);
+    TFieldType.ftLongWord:  TBitConverter.UnsafeFrom<LongWord>(LValue.AsType<LongWord>, Buffer);
     // Float
-    ftFloat, TFieldType.ftCurrency, ftBCD, TFieldType.ftDate, TFieldType.ftTime, TFieldType.ftDateTime, ftTimeStamp, ftExtended:
-      LValue.ExtractRawData(Buffer);
+    TFieldType.ftFloat:     TBitConverter.UnsafeFrom<Double>(LValue.AsType<Double>, Buffer);
+    TFieldType.ftCurrency:  TBitConverter.UnsafeFrom<Double>(LValue.AsType<Double>, Buffer);
+    TFieldType.ftBCD:       TBitConverter.UnsafeFrom<Currency>(LValue.AsType<Currency>, Buffer);
+    TFieldType.ftFMTBcd:    TBitConverter.UnsafeFrom<TBCD>(LValue.AsType<TBCD>, Buffer);
+    TFieldType.ftSingle:    TBitConverter.UnsafeFrom<Single>(LValue.AsType<Single>, Buffer);
+    TFieldType.ftExtended:  TBitConverter.UnsafeFrom<Extended>(LValue.AsType<Extended>, Buffer);
+    // Boolean
+    TFieldType.ftBoolean:   TBitConverter.From<WordBool>(LValue.AsType<WordBool>, Buffer);
+    // Date & Time
+    TFieldType.ftDateTime, TFieldType.ftDate, TFieldType.ftTime:
+    begin
+      LDateTime := LValue.AsType<TDateTime>;
+      Result := (LDateTime > 0);
+      if Result then
+      begin
+        LDateTimeRec.DateTime := LDateTime;
+        TBitConverter.UnsafeFrom<TDateTimeRec>(LDateTimeRec, Buffer);
+      end;
+    end;
     // AnsiString
     TFieldType.ftString:
     begin
@@ -574,21 +691,21 @@ begin
       StrCopy(pAnsiChar(Buffer), pAnsiChar(AnsiString(LValue.AsString)));
     end;
     // WideString/Unicode
-    ftWideString:
+    TFieldType.ftWideString:
     begin
       FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
       TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
     end;
   end;
-  // Set the result
-  Result := True;
 end;
 
 procedure TioBSADataSet.InternalLoadCurrentRecord(Buffer: TRecordBuffer);
+var
+  LBookmarkFlag: TBookmarkFlag;
 begin
   // Put the current record index in the record buffer
   PInteger(Buffer)^ := fCurrentRecord;
-  with PMdRecInfo(Buffer + FRecordSize)^ do
+  with PioRecInfo(Buffer + FRecordSize)^ do
   begin
     BookmarkFlag := bfCurrent;
     Bookmark := fCurrentRecord;
@@ -597,6 +714,7 @@ end;
 
 procedure TioBSADataSet.InternalPost;
 begin
+  // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     FBindSourceAdapter.Post;
@@ -607,11 +725,14 @@ end;
 
 procedure TioBSADataSet.InternalPreOpen;
 begin
-  FRecordSize := SizeOf(Integer); // Integer suze (4 or 8?)
+  // The buffer of the record contains the index of the current
+  //  record/object on the BindSourceAdapter
+  FRecordSize := SizeOf(Integer); // Integer size (4 or 8?)
 end;
 
 function TioBSADataSet.InternalRecordCount: Integer;
 begin
+  // Get the RecordCount from the linked BindSourceAdapter
   Result := FBindSourceAdapter.ItemCount;
 end;
 

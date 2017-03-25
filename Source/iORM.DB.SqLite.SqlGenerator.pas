@@ -182,6 +182,7 @@ begin
     // If the current property RelationType is HasMany then skip it
     if (not Prop.IsSqlRequestCompliant(ioInsert))
     or (Prop.GetRelationType = ioRTHasMany)
+    or (Prop.GetRelationType = ioRTHasOne)
     then Continue;
     // Add the field param
     AQuery.SQL.Add(Comma + ':' + Prop.GetSqlParamName);
@@ -259,6 +260,7 @@ begin
     // If the current property RelationType is HasMany then skip it
     if (not Prop.IsSqlRequestCompliant(ioInsert))
     or (Prop.GetRelationType = ioRTHasMany)
+    or (Prop.GetRelationType = ioRTHasOne)
     then Continue;
     // Add the field param
     AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);

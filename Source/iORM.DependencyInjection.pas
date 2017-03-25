@@ -839,7 +839,7 @@ begin
   try
     // EmptyOwner is True then add a nil as parameter for the constructor
     //  (used for Views and ViewModels and for object owned by someone)
-    if FEmptyOwner then
+    if FEmptyOwner and (Length(FConstructorParams) = 0) then
       FConstructorParams := [TValue.Empty];
     // If it is a singleton then get the Instance (if exists)...
     if  AContainerItem.IsSingleton

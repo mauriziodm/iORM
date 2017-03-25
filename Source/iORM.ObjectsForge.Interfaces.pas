@@ -437,6 +437,7 @@ class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
 var
   ALazyLoadableObj: IioLazyLoadable;
   AResolvedTypeList: IioResolvedTypeList;
+  LWhere, LDetailWhere: IioWhere;
 begin
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
@@ -445,6 +446,8 @@ begin
   //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
   //       la ChildProperty destinazione.
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // Get the where conditions for the details if exists (nil if not exists)
+  LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // If LazyLoadable then set LazyLoad data
   if (AProperty.GetRelationLoadType = ioLazyLoad)
   and Supports(Result, IioLazyLoadable, ALazyLoadableObj)
@@ -454,14 +457,19 @@ begin
       ,AProperty.GetRelationChildTypeAlias
       ,AProperty.GetRelationChildPropertyName
       ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
-      ,AContext.Where.Details.Get(AProperty.GetName)  // Eventuale detail where
-    )
+      ,LDetailWhere)  // Eventuale detail where
     // Fill the list
-    else io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-      ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty))
-      ._And(   AContext.Where.Details.Get(AProperty.GetName)   )  // Eventuale detail where
-      ._OrderBy(   AContext.Where.GetOrderByInstance   )  // Eventuale OrderBy
-      .ToList(Result);
+    else
+    begin
+      // It set the first part of the load operation
+      LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
+        ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty));
+      // If a Details Where conditions (for the details) is present then add it to the load operation
+      if Assigned(LDetailWhere) then
+        LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance);  // Eventuale DetailWhere & OrderBy
+      // Execute the load operation
+      LWhere.ToList(Result);
+    end
 end;
 
 class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;

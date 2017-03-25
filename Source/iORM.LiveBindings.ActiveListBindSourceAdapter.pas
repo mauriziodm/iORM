@@ -234,6 +234,7 @@ end;
 procedure TioActiveListBindSourceAdapter.DoAfterCancel;
 begin
   inherited;
+Exit;
 
   if FDeleteAfterCancel then
   begin

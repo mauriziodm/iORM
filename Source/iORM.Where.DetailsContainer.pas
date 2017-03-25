@@ -83,10 +83,7 @@ begin
   if not (Self.Exists(AMasterPropertyName))
   or not (Supports(FInternalContainer_NoDirectAccess.Items[AMasterPropertyName], IioWhere, Result))
   then
-  begin
-    Result := nil;
-    Exit;
-  end;
+    Exit(nil);
   // If the connection name of the detail where is empty then return the master where connection name
   if Result.GetConnectionName.IsEmpty then
     Result.ConnectionName(FConnectionName);
