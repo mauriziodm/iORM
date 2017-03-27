@@ -4,9 +4,19 @@ interface
 
 uses
   Data.DB, iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope,
-  iORM.Context.Map.Interfaces;
+  iORM.Context.Map.Interfaces, System.Classes, System.Rtti, Data.SqlTimSt;
+
+const
+
+  NULL_RECORD_BUFFER: TRecordBuffer = 0; // Before XE4 use "NullBuffer := nil"
 
 type
+
+  TSqlTimeStampUtils = class
+  public
+    class function DateTimeToSqlTimeStamp(const ADateTime:TDateTime): TSqlTimeStamp; static;
+    class function SqlTimeStampToTValue(const ASqlTimeStamp:TSqlTimeStamp): TValue; static;
+  end;
 
   TioRecInfo = record
     Bookmark: Longint;
@@ -121,18 +131,47 @@ type
     procedure SetFieldData(Field: TField; Buffer: TValueBuffer); override;
     function GetCanModify: Boolean; override;
     procedure DoAfterScroll; override;
+    function GetRecordInfo: TioRecInfo;
+    function GetRecordIdx: Integer;
   public
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
+    function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     property InternalAdapter: TBindSourceAdapter read GetInternalAdapter;  // Must be ReadOnly
+    property InternalActiveAdapter: IioActiveBindSourceAdapter read FBindSourceAdapter;  // Must be ReadOnly
+    property Map:IioMap read FMap;
   end;
 
+  TioAbstractBlobStream = class(TMemoryStream)
+  strict protected
+    FField: TBlobField;
+    FDataset: TioBSADataSet;
+    FModified: Boolean;
+    procedure ReadBlobData; virtual; abstract;
+    procedure WriteBlobData; virtual; abstract;
+  public
+    constructor Create(
+      const AField: TBlobField;
+      const AMode: TBlobStreamMode);
+    destructor Destroy; override;
+    function Write(const Buffer; Count: Longint): Longint; override;
+    procedure Truncate;
+  end;
+
+  TioWideMemoBlobStream = class(TioAbstractBlobStream)
+  strict protected
+    procedure ReadBlobData; override;
+    procedure WriteBlobData; override;
+  public
+    constructor Create(
+      const AField: TWideMemoField;
+      const AMode: TBlobStreamMode);
+  end;
 
 implementation
 
 uses
   iORM.Exceptions, System.SysUtils, iORM.Context.Properties.Interfaces,
-  System.Rtti, iORM.Context.Container, System.Types, Data.FmtBcd,
-  Data.SqlTimSt, System.DateUtils;
+  iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils;
 
 /////////////////////////////////////////////////
 ////// Part I:
@@ -382,6 +421,23 @@ end;
 
 { TMdListDataSet }
 
+function TioBSADataSet.CreateBlobStream(Field: TField;
+  Mode: TBlobStreamMode): TStream;
+var
+  LProperty: IioContextProperty;
+begin
+  // Get Property, Object, Value
+  LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
+  // Create the right blob stream by DataType
+  case Field.DataType of
+    TFieldType.ftMemo:;
+    TFieldType.ftWideMemo:
+      Result := TioWideMemoBlobStream.Create(Field as TWideMemoField, Mode);
+    TFieldType.ftGraphic:;
+    TFieldType.ftBlob:;
+  end;
+end;
+
 procedure TioBSADataSet.DoAfterScroll;
 begin
   inherited;
@@ -407,6 +463,11 @@ begin
     Result := FBindSourceAdapter as TBindSourceAdapter
   else
     Result := nil;
+end;
+
+function TioBSADataSet.GetRecordInfo: TioRecInfo;
+begin
+  Result := PioRecInfo(ActiveBuffer)^;
 end;
 
 procedure TioBSADataSet.InternalCancel;
@@ -515,6 +576,7 @@ var
   LProperty: IioContextProperty;
   LDateTime: TDateTime;
   LDateTimeRec: TDateTimeRec;
+  LTimeStamp: TSQLTimeStamp;
   LTempValueBuffer: TValueBuffer;
 begin
   // If empty then exit
@@ -523,23 +585,23 @@ begin
   // Move the buffer to the value
   case Field.DataType of
     // Integer
-    TFieldType.ftInteger:   LValue := TBitConverter.InTo<Integer>(Buffer);
-    TFieldType.ftAutoInc:   LValue := TBitConverter.InTo<Integer>(Buffer);
-    TFieldType.ftShortint:  LValue := TBitConverter.InTo<ShortInt>(Buffer);
-    TFieldType.ftByte:      LValue := TBitConverter.InTo<Byte>(Buffer);
-    TFieldType.ftSmallint:  LValue := TBitConverter.InTo<SmallInt>(Buffer);
-    TFieldType.ftLargeint:  LValue := TBitConverter.InTo<Largeint>(Buffer);
-    TFieldType.ftWord:      LValue := TBitConverter.InTo<Word>(Buffer);
-    TFieldType.ftLongWord:  LValue := TBitConverter.InTo<LongWord>(Buffer);
+    TFieldType.ftInteger:   LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
+    TFieldType.ftAutoInc:   LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
+    TFieldType.ftShortint:  LValue := TBitConverter.UnsafeInTo<ShortInt>(Buffer);
+    TFieldType.ftByte:      LValue := TBitConverter.UnsafeInTo<Byte>(Buffer);
+    TFieldType.ftSmallint:  LValue := TBitConverter.UnsafeInTo<SmallInt>(Buffer);
+    TFieldType.ftLargeint:  LValue := TBitConverter.UnsafeInTo<Largeint>(Buffer);
+    TFieldType.ftWord:      LValue := TBitConverter.UnsafeInTo<Word>(Buffer);
+    TFieldType.ftLongWord:  LValue := TBitConverter.UnsafeInTo<LongWord>(Buffer);
     // Float
-    TFieldType.ftFloat:     LValue := TBitConverter.InTo<Double>(Buffer);
-    TFieldType.ftCurrency:  LValue := TBitConverter.InTo<Double>(Buffer);
-    TFieldType.ftBCD:       LValue := TBitConverter.InTo<Currency>(Buffer);
-    TFieldType.ftFMTBcd:    LValue := TValue.From<TBCD>(   TBitConverter.InTo<TBCD>(Buffer)   );
-    TFieldType.ftSingle:    LValue := TBitConverter.InTo<Single>(Buffer);
-    TFieldType.ftExtended:  LValue := TBitConverter.InTo<Extended>(Buffer);
+    TFieldType.ftFloat:     LValue := TBitConverter.UnsafeInTo<Double>(Buffer);
+    TFieldType.ftCurrency:  LValue := TBitConverter.UnsafeInTo<Double>(Buffer);
+    TFieldType.ftBCD:       LValue := TBitConverter.UnsafeInTo<Currency>(Buffer);
+    TFieldType.ftFMTBcd:    LValue := TValue.From<TBCD>(   TBitConverter.UnsafeInTo<TBCD>(Buffer)   );
+    TFieldType.ftSingle:    LValue := TBitConverter.UnsafeInTo<Single>(Buffer);
+    TFieldType.ftExtended:  LValue := TBitConverter.UnsafeInTo<Extended>(Buffer);
     // Boolean
-    TFieldType.ftBoolean:   LValue := TBitConverter.InTo<WordBool>(Buffer);
+    TFieldType.ftBoolean:   LValue := TBitConverter.UnsafeInTo<WordBool>(Buffer);
     // Date & Time
     TFieldType.ftDateTime, TFieldType.ftDate, TFieldType.ftTime:
     begin
@@ -555,13 +617,25 @@ begin
         LValue := TValue.From<TDateTime>(LDateTime);
       end;
     end;
-    // AnsiString
-    TFieldType.ftString:
-      LValue := PChar(TEncoding.ANSI.GetString(Buffer));
+    TFieldType.ftTimeStamp:
+    begin
+      // If the buffer is not assigned then the value is NULL
+      if not Assigned(Buffer) then
+        LValue := TValue.From<TDateTime>(0)
+      else
+      begin
+        LTimeStamp := TBitConverter.UnsafeInTo<TSQLTimeStamp>(Buffer);
+        LValue := TSqlTimeStampUtils.SqlTimeStampToTValue(LTimeStamp);
+      end;
+    end;
+    // AnsiString è GUID
+    TFieldType.ftString, TFieldType.ftFixedChar, TFieldType.ftGuid:
+      LValue := PChar(TEncoding.ANSI.GetString(Buffer).TrimRight);
+//      LValue := AnsiString(PAnsiChar(Buffer));
     // WideString/Unicode
-    TFieldType.ftWideString:
-      LValue := pchar(Buffer);
-//      LValue := TEncoding.Unicode.GetString(Buffer);
+    TFieldType.ftWideString, TFieldType.ftFixedWideChar:
+      LValue := TEncoding.Unicode.GetString(Buffer).TrimRight;
+//      LValue := WideString(pWideChar(Buffer));
   end;
   // Set the value into the object
   LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
@@ -586,6 +660,34 @@ begin
   FBindSourceAdapter.GetDataSetLinkContainer.RegisterDataSet(Self);
 end;
 
+// Calc the record index for all possibles situations
+function TioBSADataSet.GetRecordIdx: Integer;
+var
+  LBookmarkFlag: TBookmarkFlag;
+begin
+  // Get the current record index
+  Result := PInteger(ActiveBuffer)^;
+  // Get the bookmark flag for current record
+  LBookmarkFlag := GetBookmarkFlag(ActiveBuffer);
+  // Increments the index in some specific cases.
+  //  (If we are in an insert operation it adds one to all of the subsequent records
+  //   indices to what has just been inserted)
+  //  NB: Not for append
+  // -------------------------------------------
+  if  (State = dsInsert)
+  // ... when a new record is inserted (not appended) the relative BookmarkFlag is set to bfInserted
+  and (LBookmarkFlag <> TBookmarkFlag.bfInserted)
+  // ... when a new record is appended (not inserted) the relative BookmarkFlag is set to bfEOF
+  and (LBookmarkFlag <> TBookmarkFlag.bfEOF)
+  // ... when a new record is inserted (not appended) only records after the inserted record
+  //      must be incremented by one (the index is contained in the ActiveBuffer)
+  and (Result >= FBindSourceAdapter.ItemIndex)
+  // ... when a new record is inserted/appended in empty DataSet then BOF and EOF properties is both setted to True
+  and not (BOF and EOF)
+  then
+    Inc(Result);
+  // -------------------------------------------
+end;
 
 function TioBSADataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
 var
@@ -605,34 +707,6 @@ var
     Result := (State = dsInsert)
       and ((LBookmarkFlag = TBookmarkFlag.bfInserted) or (LBookmarkFlag = TBookmarkFlag.bfEOF));
   end;
-  // Calc the record index for all possibles situations
-  function GetRecordIdx: Integer;
-  var
-    LBookmarkFlag: TBookmarkFlag;
-  begin
-    // Get the current record index
-    Result := PInteger(ActiveBuffer)^;
-    // Get the bookmark flag for current record
-    LBookmarkFlag := GetBookmarkFlag(ActiveBuffer);
-    // Increments the index in some specific cases.
-    //  (If we are in an insert operation it adds one to all of the subsequent records
-    //   indices to what has just been inserted)
-    //  NB: Not for append
-    // -------------------------------------------
-    if  (State = dsInsert)
-    // ... when a new record is inserted (not appended) the relative BookmarkFlag is set to bfInserted
-    and (LBookmarkFlag <> TBookmarkFlag.bfInserted)
-    // ... when a new record is appended (not inserted) the relative BookmarkFlag is set to bfEOF
-    and (LBookmarkFlag <> TBookmarkFlag.bfEOF)
-    // ... when a new record is inserted (not appended) only records after the inserted record
-    //      must be incremented by one (the index is contained in the ActiveBuffer)
-    and (Result >= FBindSourceAdapter.ItemIndex)
-    // ... when a new record is inserted/appended in empty DataSet then BOF and EOF properties is both setted to True
-    and not (BOF and EOF)
-    then
-      Inc(Result);
-    // -------------------------------------------
-  end;
 begin
   Result := False;
   // If empty then exit
@@ -643,12 +717,7 @@ begin
   Result := (LRecordIndex >= -1) and (LRecordIndex <= FBindSourceAdapter.ItemCount - 1);
   if not Result then
     Exit;
-  // ---------- DATA FROM THE BINDSOURCEADAPTER ----------
-  // Get the value
-//  FBindSourceAdapter.ItemIndex := LRecordIndex;
-//  LValue := FBindSourceAdapter.FindField(Field.FieldName).GetTValue;
-  // ---------- DATA FROM THE BINDSOURCEADAPTER ----------
-  // ---------- DATA FROM THE OBJECTS ----------
+  // Get Property, Object, Value
   LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
   LObj := FBindSourceAdapter.Items[LRecordIndex];
   LValue := LProperty.GetValue(LObj);
@@ -684,17 +753,30 @@ begin
         TBitConverter.UnsafeFrom<TDateTimeRec>(LDateTimeRec, Buffer);
       end;
     end;
-    // AnsiString
-    TFieldType.ftString:
+    TFieldType.ftTimeStamp:
+    begin
+      LDateTime := LValue.AsType<TDateTime>;
+      Result := (LDateTime > 0);
+      if Result then
+      begin
+          SetLength(Buffer, SizeOf(TSQLTimeStamp));
+          TBitConverter.From<TSQLTimeStamp>(
+            TSqlTimeStampUtils.DateTimeToSqlTimeStamp(LDateTime), Buffer);
+      end;
+    end;
+    // AnsiString + GUID
+    TFieldType.ftString, TFieldType.ftFixedChar, TFieldType.ftGuid:
     begin
       FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-      StrCopy(pAnsiChar(Buffer), pAnsiChar(AnsiString(LValue.AsString)));
+      StrLCopy(PAnsiChar(Buffer), PAnsiChar(AnsiString(LValue.AsString)), Field.Size);
+//      StrCopy(pAnsiChar(Buffer), pAnsiChar(AnsiString(LValue.AsString)));
     end;
     // WideString/Unicode
-    TFieldType.ftWideString:
+    TFieldType.ftWideString, TFieldType.ftFixedWideChar:
     begin
       FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-      TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
+      StrLCopy(PChar(Buffer), PChar(LValue.AsString), Field.Size);
+//      TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
     end;
   end;
 end;
@@ -734,6 +816,141 @@ function TioBSADataSet.InternalRecordCount: Integer;
 begin
   // Get the RecordCount from the linked BindSourceAdapter
   Result := FBindSourceAdapter.ItemCount;
+end;
+
+{ TSqlTimeStampUtils }
+
+class function TSqlTimeStampUtils.DateTimeToSqlTimeStamp(
+  const ADateTime:TDateTime): TSqlTimeStamp;
+var
+  LYY, LMM, LDD, LHH, LNN, LSS, LMS: Word;
+begin
+  DecodeDateTime(ADateTime, LYY, LMM, LDD, LHH, LNN, LSS, LMS);
+  Result.Year := LYY;
+  Result.Month := LMM;
+  Result.Day := LDD;
+  Result.Hour := LHH;
+  Result.Minute := LNN;
+  Result.Second := LSS;
+  Result.Fractions := LMS;
+end;
+
+class function TSqlTimeStampUtils.SqlTimeStampToTValue(
+  const ASqlTimeStamp:TSqlTimeStamp): TValue;
+var
+  LDateTime: TDateTime;
+begin
+  LDateTime := EncodeDateTime(ASqlTimeStamp.Year, ASqlTimeStamp.Month,
+    ASqlTimeStamp.Day, ASqlTimeStamp.Hour, ASqlTimeStamp.Minute,
+    ASqlTimeStamp.Second, ASqlTimeStamp.Fractions);
+  Result := TValue.From<TDateTime>(LDateTime);
+end;
+
+{ TioAbstractMemoryStream }
+
+constructor TioAbstractBlobStream.Create(const AField: TBlobField;
+  const AMode: TBlobStreamMode);
+begin
+  inherited Create;
+  FField := AField;
+  FDataset := (AField.DataSet as TioBSADataSet);
+  if AMode <> TBlobStreamMode.bmRead then
+  begin
+    if AField.ReadOnly or not AField.DataSet.CanModify then
+      DatabaseErrorFmt(SFieldReadOnly, [AField.DisplayName], AField.DataSet);
+    if not (AField.DataSet.State in [dsEdit, dsInsert, dsNewValue]) then
+      DatabaseError(SNotEditing, AField.DataSet);
+  end;
+  if AMode = bmWrite then
+    Truncate
+  else
+    ReadBlobData;
+end;
+
+destructor TioAbstractBlobStream.Destroy;
+begin
+  if FModified then
+  try
+      WriteBlobData;
+      FField.Modified := True;
+      FDataset.DataEvent(deFieldChange, IntPtr(FField));
+  except
+      if Assigned(System.Classes.ApplicationHandleException) then
+          ApplicationHandleException(Self);
+  end;
+  inherited Destroy;
+end;
+
+procedure TioAbstractBlobStream.Truncate;
+begin
+  Clear;
+  FModified := True;
+end;
+
+function TioAbstractBlobStream.Write(const Buffer; Count: Integer): Longint;
+begin
+  Result := inherited Write(Buffer, Count);
+  FModified := True;
+end;
+
+{ TioWideMemoBlobStream }
+
+constructor TioWideMemoBlobStream.Create(const AField: TWideMemoField;
+  const AMode: TBlobStreamMode);
+begin
+  inherited Create(AField, AMode);
+end;
+
+procedure TioWideMemoBlobStream.ReadBlobData;
+var
+  LRecordIndex: Integer;
+  LProperty: IioContextProperty;
+  LObj: TObject;
+  LStrings: TStrings;
+  LBytes: TBytes;
+  LValue: TValue;
+begin
+  // Get the current record index (corrected by the situations)
+  LRecordIndex := FDataset.GetRecordIdx;
+  // Get Property, Object, Value
+  LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+  LObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+  LValue := LProperty.GetValue(LObj);
+  // Get value as TStrings
+  LStrings := LValue.AsType<TStrings>;
+  // Encode
+  LBytes := TEncoding.Unicode.GetBytes(LStrings.Text);
+  // Write data from the record data to the stream
+  Self.Position := 0;
+  Self.WriteData(LBytes, Length(LBytes));
+  Self.Position := 0;
+end;
+
+procedure TioWideMemoBlobStream.WriteBlobData;
+var
+  LRecordIndex: Integer;
+  LProperty: IioContextProperty;
+  LObj: TObject;
+  LValue: TValue;
+  LStrings: TStrings;
+  LBytes: TBytes;
+  LLen: Integer;
+begin
+  // Get the current record index (corrected by the situations)
+  LRecordIndex := FDataset.GetRecordIdx;
+  // Get Property, Object, Value
+  LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+  LObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+  LValue := LProperty.GetValue(LObj);
+  // Get value as TStrings
+  LStrings := LValue.AsType<TStrings>;
+  // Read data to the record from the stream
+  Self.Position := 0;
+  LLen := Self.Size;
+  SetLength(LBytes, LLen);
+  Self.ReadData(LBytes, LLen);
+  // Decode
+  LStrings.Text := TEncoding.Unicode.GetString(LBytes);
 end;
 
 end.
