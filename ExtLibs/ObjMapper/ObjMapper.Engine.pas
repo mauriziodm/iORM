@@ -1663,6 +1663,7 @@ begin
       KeyName := GetKeyName(PropField, _type);
       // Check if there is properties to ignore
       if IsPropertyToBeIgnored(PropField, AParams) then
+        Continue;
       // Check for "DoNotSerializeAttribute"
       if HasAttribute<DoNotSerializeAttribute>(PropField) then
         Continue;
