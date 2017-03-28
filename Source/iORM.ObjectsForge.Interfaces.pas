@@ -516,8 +516,6 @@ var
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   ABlobStream: TStream;
 begin
-  // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
   //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
@@ -525,6 +523,8 @@ begin
   //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
   //       la ChildProperty destinazione.
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Wrap the object into a DuckTypedStreamObject
   ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
   // Get the BlobStream

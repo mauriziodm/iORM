@@ -146,6 +146,7 @@ type
     FField: TBlobField;
     FDataset: TioBSADataSet;
     FModified: Boolean;
+    FIsReadingBlobData: Boolean;
     procedure ReadBlobData; virtual; abstract;
     procedure WriteBlobData; virtual; abstract;
   public
@@ -167,11 +168,22 @@ type
       const AMode: TBlobStreamMode);
   end;
 
+  TioStreamableObjBlobStream = class(TioAbstractBlobStream)
+  strict protected
+    procedure ReadBlobData; override;
+    procedure WriteBlobData; override;
+  public
+    constructor Create(
+      const AField: TBlobField;
+      const AMode: TBlobStreamMode);
+  end;
+
 implementation
 
 uses
   iORM.Exceptions, System.SysUtils, iORM.Context.Properties.Interfaces,
-  iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils;
+  iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
+  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory;
 
 /////////////////////////////////////////////////
 ////// Part I:
@@ -433,8 +445,10 @@ begin
     TFieldType.ftMemo:;
     TFieldType.ftWideMemo:
       Result := TioWideMemoBlobStream.Create(Field as TWideMemoField, Mode);
-    TFieldType.ftGraphic:;
-    TFieldType.ftBlob:;
+    TFieldType.ftGraphic:
+      Result := TioStreamableObjBlobStream.Create(Field as TGraphicField, Mode);
+    TFieldType.ftBlob:
+      Result := TioStreamableObjBlobStream.Create(Field as TBlobField, Mode);
   end;
 end;
 
@@ -852,6 +866,8 @@ constructor TioAbstractBlobStream.Create(const AField: TBlobField;
   const AMode: TBlobStreamMode);
 begin
   inherited Create;
+  FIsReadingBlobData := False;
+  FModified := False;
   FField := AField;
   FDataset := (AField.DataSet as TioBSADataSet);
   if AMode <> TBlobStreamMode.bmRead then
@@ -884,13 +900,23 @@ end;
 procedure TioAbstractBlobStream.Truncate;
 begin
   Clear;
-  FModified := True;
+  // Se non siamo in fase di lettura dei dati del blob allora
+  //  imposta il flag MOdified = True, ho aggiunto il flag IsreadingBlobData
+  //  perchè altrimenti nel caso dei BLOB grafici (o cmq non i Memo) durante
+  //  il caricaemtneo dello stream veniva eseguito anche questo metodo e quindi
+  //  si ritrovava in un loop infinito.
+  FModified := not FIsReadingBlobData;
 end;
 
 function TioAbstractBlobStream.Write(const Buffer; Count: Integer): Longint;
 begin
   Result := inherited Write(Buffer, Count);
-  FModified := True;
+  // Se non siamo in fase di lettura dei dati del blob allora
+  //  imposta il flag MOdified = True, ho aggiunto il flag IsreadingBlobData
+  //  perchè altrimenti nel caso dei BLOB grafici (o cmq non i Memo) durante
+  //  il caricaemtneo dello stream veniva eseguito anche questo metodo e quindi
+  //  si ritrovava in un loop infinito.
+  FModified := not FIsReadingBlobData;
 end;
 
 { TioWideMemoBlobStream }
@@ -910,20 +936,25 @@ var
   LBytes: TBytes;
   LValue: TValue;
 begin
-  // Get the current record index (corrected by the situations)
-  LRecordIndex := FDataset.GetRecordIdx;
-  // Get Property, Object, Value
-  LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-  LObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
-  LValue := LProperty.GetValue(LObj);
-  // Get value as TStrings
-  LStrings := LValue.AsType<TStrings>;
-  // Encode
-  LBytes := TEncoding.Unicode.GetBytes(LStrings.Text);
-  // Write data from the record data to the stream
-  Self.Position := 0;
-  Self.WriteData(LBytes, Length(LBytes));
-  Self.Position := 0;
+  FIsReadingBlobData := True;
+  try
+    // Get the current record index (corrected by the situations)
+    LRecordIndex := FDataset.GetRecordIdx;
+    // Get Property, Object, Value
+    LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+    LObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+    LValue := LProperty.GetValue(LObj);
+    // Get value as TStrings
+    LStrings := LValue.AsType<TStrings>;
+    // Encode
+    LBytes := TEncoding.Unicode.GetBytes(LStrings.Text);
+    // Write data from the record data to the stream
+    Self.Position := 0;
+    Self.WriteData(LBytes, Length(LBytes));
+    Self.Position := 0;
+  finally
+    FIsReadingBlobData := False;
+  end;
 end;
 
 procedure TioWideMemoBlobStream.WriteBlobData;
@@ -951,6 +982,84 @@ begin
   Self.ReadData(LBytes, LLen);
   // Decode
   LStrings.Text := TEncoding.Unicode.GetString(LBytes);
+end;
+
+{ TioStreamableObjBlobStream }
+
+constructor TioStreamableObjBlobStream.Create(const AField: TBlobField;
+  const AMode: TBlobStreamMode);
+begin
+  inherited Create(AField, AMode);
+end;
+
+procedure TioStreamableObjBlobStream.ReadBlobData;
+var
+  LRecordIndex: Integer;
+  LProperty: IioContextProperty;
+  LCurrRecObj, LStreamableObj: TObject;
+  ADuckTypedStreamObject: IioDuckTypedStreamObject;
+begin
+  FIsReadingBlobData := True;
+  try
+    // Get the current record index (corrected by the situations)
+    LRecordIndex := FDataset.GetRecordIdx;
+    // Get Property, Object, Value (Value as StremableObj instance)
+    LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+    LCurrRecObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+    // At this point the property refer to a blob field (and to an Object) type then
+    //  check if the Object is assigned and if it isn't clear
+    //  the parameter
+    LStreamableObj := LProperty.GetValueAsObject(LCurrRecObj);
+    if Assigned(LStreamableObj) then
+    begin
+      // Wrap the object into a DuckTypedStreamObject
+      ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LStreamableObj);
+      // If the wrapped object IsEmpty then clear the BlobDataStream also
+      //  else load data from the object to the stream
+      if ADuckTypedStreamObject.IsEmpty then
+        Self.Clear
+      else
+      begin
+        Self.Position := 0;
+        ADuckTypedStreamObject.SaveToStream(Self);
+      end;
+    end
+    else
+      Self.Clear;
+    // At the top of the stream
+    Self.Position := 0;
+  finally
+    FIsReadingBlobData := False;
+  end;
+end;
+
+procedure TioStreamableObjBlobStream.WriteBlobData;
+var
+  LRecordIndex: Integer;
+  LProperty: IioContextProperty;
+  LCurrRecObj, LStreamableObj: TObject;
+  ADuckTypedStreamObject: IioDuckTypedStreamObject;
+begin
+  // Get the current record index (corrected by the situations)
+  LRecordIndex := FDataset.GetRecordIdx;
+  // Get Property, Object, Value (Value as StremableObj instance)
+  LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+  LCurrRecObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+  // At this point the property refer to a blob field (and to an Object) type then
+  //  check if the Object is assigned and if it isn't clear
+  //  the parameter
+  LStreamableObj := LProperty.GetValueAsObject(LCurrRecObj);
+  if Assigned(LStreamableObj) then
+  begin
+    // Wrap the object into a DuckTypedStreamObject
+    ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LStreamableObj);
+    // Save the data from the stream to the object
+    Self.Position := 0;
+    ADuckTypedStreamObject.LoadFromStream(Self);
+    Self.Position := 0;
+  end
+  else
+    raise EioException.Create(Self.ClassName, 'WriteBlobData', 'Streamable object not assigned.');
 end;
 
 end.

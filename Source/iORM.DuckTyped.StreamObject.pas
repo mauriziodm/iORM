@@ -46,7 +46,8 @@ type
   // DuckTypedStreamObject
   //  NB: IWrappedObject interface is for DMVC ObjectsMappers adapter
   TioDuckTypedStreamObject = class(TInterfacedObject, IioDuckTypedStreamObject, IWrappedObject)
-  strict protected
+  strict
+  private
     FObj: TObject;
     FLoadFromStreamMethod: TRttiMethod;
     FSaveToStreamMethod: TRttiMethod;
