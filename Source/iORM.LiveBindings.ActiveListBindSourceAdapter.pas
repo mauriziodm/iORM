@@ -226,21 +226,31 @@ end;
 procedure TioActiveListBindSourceAdapter.DoBeforeCancel;
 begin
   inherited;
-
+  // Flag che indica se poi, nel DoAfterCancer, deve provvedere
+  //  a fare il Delete del record/oggetto di cui si richiede l'annullamento.
+  //  NB. Tutto questo serve per fare in modo che il BSA e quindi anche il DataSet
+  //       si comporti come si comportano i DataSet normalmente quando si fa il
+  //       cancel durante l'ìnsert/append di un nuovo record/oggetto e cioè
+  //       che il nuovo record viene automaticamente eliminato (nei BSA invece
+  //       rimane il nuovo oggetto "vuoto".
   FDeleteAfterCancel := (Self.State = TBindSourceAdapterState.seInsert);
-
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterCancel;
 begin
   inherited;
-Exit;
-
+  // Flag che indica se poi, nel DoAfterCancer, deve provvedere
+  //  a fare il Delete del record/oggetto di cui si richiede l'annullamento.
+  //  NB. Tutto questo serve per fare in modo che il BSA e quindi anche il DataSet
+  //       si comporti come si comportano i DataSet normalmente quando si fa il
+  //       cancel durante l'ìnsert/append di un nuovo record/oggetto e cioè
+  //       che il nuovo record viene automaticamente eliminato (nei BSA invece
+  //       rimane il nuovo oggetto "vuoto".
   if FDeleteAfterCancel then
   begin
+    Self.GetDataSetLinkContainer.Refresh(True); // Altrimenti da un errore sull'Append
     Self.Delete;
   end;
-
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterDelete;
