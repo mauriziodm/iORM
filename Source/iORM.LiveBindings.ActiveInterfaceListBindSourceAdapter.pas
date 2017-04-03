@@ -97,6 +97,9 @@ type
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
+    // AutoLoadData
+    procedure SetAutoLoadData(const Value: Boolean);
+    function GetAutoLoadData: Boolean;
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -145,6 +148,7 @@ type
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
+    property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -390,6 +394,11 @@ begin
   Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
+function TioActiveInterfaceListBindSourceAdapter.GetAutoLoadData: Boolean;
+begin
+  Result := FAutoLoadData;
+end;
+
 function TioActiveInterfaceListBindSourceAdapter.GetCurrentOID: Integer;
 begin
   Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
@@ -564,6 +573,12 @@ begin
     inherited Refresh;
     Self.FReloadDataOnRefresh := PrecReloadData;
   end;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetAutoLoadData(
+  const Value: Boolean);
+begin
+  FAutoLoadData := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);

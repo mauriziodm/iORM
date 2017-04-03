@@ -31,6 +31,7 @@ type
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
     function CheckAdapter(const ACreateIfNotAssigned:Boolean = False): Boolean;
+    procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
     // BindSourceAdapter
@@ -54,6 +55,10 @@ type
     function GetEditing: Boolean;
     // ItemCount
     function GetCount: Integer;
+    // Async
+    procedure SetAsync(const Value: Boolean);
+    // AutoPersist
+    procedure SetAutoPersist(const Value: Boolean);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -97,9 +102,9 @@ type
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     // Properties
-    property Async:Boolean read FAsync write FAsync;
-    property AutoLoadData:Boolean read FAutoLoadData write FAutoLoadData;
-    property AutoPersist:Boolean read FAutoPersist write FAutoPersist;
+    property Async:Boolean read FAsync write SetAsync;
+    property AutoLoadData:Boolean read FAutoLoadData write SetAutoLoadData;
+    property AutoPersist:Boolean read FAutoPersist write SetAutoPersist;
     property AutoRefreshOnNotification:TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification;
     property MasterPresenter:TioModelPresenter read FMasterPresenter write FMasterPresenter;
     property MasterPropertyName:String read FMasterPropertyName write FMasterPropertyName;
@@ -381,6 +386,24 @@ begin
     FBindSourceAdapter.Refresh(AReloadData);
 end;
 
+procedure TioModelPresenter.SetAsync(const Value: Boolean);
+begin
+  FAsync := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.ioAsync := Value;
+end;
+
+procedure TioModelPresenter.SetAutoLoadData(const Value: Boolean);
+begin
+  FAutoLoadData := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.ioAutoLoadData := Value;
+end;
+
 procedure TioModelPresenter.SetBindSourceAdapter(
   const Value: IioActiveBindSourceAdapter);
 begin
@@ -450,6 +473,15 @@ begin
   //  update the where of the adapter also
   if CheckAdapter then
     FBindSourceAdapter.ioWhere.SetOrderBySql(Value);
+end;
+
+procedure TioModelPresenter.SetAutoPersist(const Value: Boolean);
+begin
+  FAutoPersist := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.ioAutoPersist := Value;
 end;
 
 procedure TioModelPresenter.SetWhere(const Value: IioWhere);

@@ -96,6 +96,12 @@ type
     function GetState: TBindSourceAdapterState;
     // ItemCount
     function GetCount: Integer;
+    // AutoLoadData
+    procedure SetAutoLoadData(const Value: Boolean);
+    // Async
+    procedure SetAsync(const Value: Boolean);
+    // AutoPersist
+    procedure SetAutoPersist(const Value: Boolean);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -128,9 +134,9 @@ type
     // Properties
     property ioTypeName:String read FioTypeName write FioTypeName;
     property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
-    property ioAsync:Boolean read FioAsync write FioAsync;
-    property ioAutoLoadData:Boolean read FioAutoLoadData write FioAutoLoadData;
-    property ioAutoPersist:Boolean read FioAutoPersist write FioAutoPersist;
+    property ioAsync:Boolean read FioAsync write SetAsync;
+    property ioAutoLoadData:Boolean read FioAutoLoadData write SetAutoLoadData;
+    property ioAutoPersist:Boolean read FioAutoPersist write SetAutoPersist;
     property ioViewDataType:TioViewDataType read FioViewDataType write FioViewDataType;
     property ioWhereStr:TStrings read FioWhereStr write SetWhereStr;
     property ioWhereDetailsFromDetailAdapters: Boolean read FioWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
@@ -425,6 +431,36 @@ begin
     AnActiveBSA.Refresh(ReloadData)
   else
     GetInternalAdapter.Refresh;
+end;
+
+procedure TioPrototypeBindSource.SetAsync(const Value: Boolean);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  FioAsync := Value;
+  // Update the adapter
+  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+    LActiveBSA.ioAsync := Value;
+end;
+
+procedure TioPrototypeBindSource.SetAutoLoadData(const Value: Boolean);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  FioAutoLoadData := Value;
+  // Update the adapter
+  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+    LActiveBSA.ioAutoLoadData := Value;
+end;
+
+procedure TioPrototypeBindSource.SetAutoPersist(const Value: Boolean);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  FioAutoPersist := Value;
+  // Update the adapter
+  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+    LActiveBSA.ioAutoPersist := Value;
 end;
 
 procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);

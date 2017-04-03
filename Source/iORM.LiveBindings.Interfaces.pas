@@ -116,6 +116,10 @@ type
     function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    // AutoLoadData
+    procedure SetAutoLoadData(const Value: Boolean);
+    function GetAutoLoadData: Boolean;
+    property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     // Current property
     function GetCurrent: TObject;
     property Current: TObject read GetCurrent;
