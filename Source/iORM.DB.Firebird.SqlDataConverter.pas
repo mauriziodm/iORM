@@ -65,7 +65,7 @@ begin
   Result := inherited TValueToSql(AValue);
   // If the value is of type TDateTime...
   if (AValue.TypeInfo.Kind = tkFloat) and (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
-    Result := FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended);
+    Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
 end;
 
 end.
