@@ -40,13 +40,17 @@ unit iORM.Resolver.ByDependencyInjection;
 interface
 
 uses
-  iORM.Resolver.Interfaces;
+  iORM.Resolver.Interfaces, System.Rtti;
 
 type
 
   // Service Locator Class
   TioResolverByDependencyInjection = class(TioResolver)
   public
+    // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
+    //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
+    //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
+    class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType; override;
     class function Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAll): IioResolvedTypeList; override;
   end;
 
@@ -61,6 +65,13 @@ class function TioResolverByDependencyInjection.Resolve(const ATypeName:String; 
 begin
   inherited;
   Result := TioDependencyInjectionResolverBase.Resolve(ATypeName, AAlias, AResolverMode);
+end;
+
+class function TioResolverByDependencyInjection.ResolveInaccurateAsRttiType(
+  const ATypeName, AAlias: String): TRttiType;
+begin
+  inherited;
+  Result := TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(ATypeName, AAlias);
 end;
 
 end.

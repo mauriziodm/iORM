@@ -40,7 +40,7 @@ unit iORM.Resolver.Interfaces;
 interface
 
 uses
-  iORM.Containers.Interfaces;
+  iORM.Containers.Interfaces, System.Rtti;
 
 type
 
@@ -57,6 +57,10 @@ type
   TioResolverRef = class of TioResolver;
   TioResolver = class abstract
   public
+    // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
+    //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
+    //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
+    class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType; virtual; abstract;
     class function Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAll): IioResolvedTypeList; virtual; abstract;
   end;
 

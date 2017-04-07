@@ -95,7 +95,8 @@ type
 
 implementation
 
-uses Data.Bind.Consts, System.SysUtils, iORM.Rtti.Utilities, System.TypInfo, iORM;
+uses Data.Bind.Consts, System.SysUtils, iORM.Rtti.Utilities, System.TypInfo, iORM,
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces;
 
 { TListBindSourceAdapter<T> }
 
@@ -151,7 +152,10 @@ begin
   if FTypeName.IsEmpty then
     FTypeName := TioRttiUtilities.GenericToString<T>;
   FTypeAlias := ATypeAlias;
-  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
+
+//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
+  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
+
   // Set the list
   SetList(AList, AOwnsObject);
 end;

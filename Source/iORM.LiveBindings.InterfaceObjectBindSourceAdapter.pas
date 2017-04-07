@@ -88,7 +88,8 @@ type
 implementation
 
 
-uses SysUtils, iORM.Rtti.Utilities, iORM, iORM.Exceptions;
+uses SysUtils, iORM.Rtti.Utilities, iORM, iORM.Exceptions,
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces;
 
 { TInterfaceObjectBindSourceAdapter<T> }
 
@@ -116,7 +117,10 @@ begin
   if FTypeName.IsEmpty then
     FTypeName := TioRttiUtilities.GenericToString<T>;
   FTypeAlias := ATypeAlias;
-  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
+
+//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
+  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
+
   // Set the data object
   //  NB: Force FOwnsObject := False because this BindSourceAdapter is for interface and his AutoRefCount
   FOwnsObject := False;

@@ -207,6 +207,10 @@ type
   // Class for ResolverByDependencyInjection
   TioDependencyInjectionResolverBase = class(TioDependencyInjectionBase)
   public
+    // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
+    //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
+    //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
+    class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType;
     class function Resolve(const ATypeName:String; const AAlias:String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
   end;
 
@@ -1079,6 +1083,26 @@ begin
   // If Alias IS specified
   else
     Result.Add(   Self.Container.Get(ATypeName, AAlias).ClassName   );
+end;
+
+class function TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(
+  const ATypeName, AAlias: String): TRttiType;
+var
+  LResolvedTypeList: IioResolvedTypeList;
+  LFirstResolvedClassName: String;
+  LFirstResolvedClassMap: IioMap;
+begin
+  // Resolve the type and alias
+  LResolvedTypeList := Self.Resolve(ATypeName, AAlias, TioResolverMode.rmAll);
+  // Se non trova nemmeno una classe solleva un'eccezione
+  if LResolvedTypeList.Count = 0 then
+    raise EioException.Create(Self.ClassName, 'ResolveInaccurateAsRttiType', Format('No class was found that implements the interface ("%s" alias "%s").', [ATypeName, AAlias]));
+  // Get the first resolved class name
+  LFirstResolvedClassName := LResolvedTypeList[0];
+  // Get the map of the first resolved class
+  LFirstResolvedClassMap := TioMapContainer.GetMap(LFirstResolvedClassName);
+  // Ritorna la prima classe trovata che implementa l'interfaccia desiderata
+  Result := LFirstResolvedClassMap.RttiType;
 end;
 
 { TioDIContainerImplementers }
