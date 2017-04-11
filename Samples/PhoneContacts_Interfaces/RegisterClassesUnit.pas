@@ -23,7 +23,7 @@ begin
   io.di.RegisterClass<TPhoneNumber>.Implements<IPhoneNumber>.Execute;
 
   // TPerson and details
-  io.di.RegisterClass<TPerson>.Implements<IPerson>.Execute;
+  io.di.RegisterClass<TPerson>.Implements<IPerson>('Normal').Execute;
   io.di.RegisterClass<TioList<IPhoneNumber>>.Implements<IioList<IPhoneNumber>>.Execute;
 
   // TAnotherPerson and details
