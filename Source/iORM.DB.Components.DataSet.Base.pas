@@ -4,7 +4,8 @@ interface
 
 uses
   Data.DB, iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope,
-  iORM.Context.Map.Interfaces, System.Classes, System.Rtti, Data.SqlTimSt;
+  iORM.Context.Map.Interfaces, System.Classes, System.Rtti, Data.SqlTimSt,
+  iORM.CommonTypes;
 
 const
 
@@ -117,6 +118,7 @@ type
     // Methods
     procedure SaveBeforeEditValues;
     procedure RestoreBeforeEditValues;
+    procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     function GetInternalAdapter: TBindSourceAdapter;
@@ -174,7 +176,7 @@ type
   end;
 
   TioStreamableObjBlobStream = class(TioAbstractBlobStream)
-  strict protected
+  strict private
     procedure ReadBlobData; override;
     procedure WriteBlobData; override;
   public
@@ -721,6 +723,21 @@ begin
   // -------------------------------------------
 end;
 
+// Convert and load Data into the buffer (GetFieldData)
+procedure TioBSADataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
+var
+  LTempValueBuffer: TValueBuffer;
+begin
+  // Set the length of the temporary value buffer
+  SetLength(LTempValueBuffer, SizeOf(T));
+  // If the buffer size is less than the size of the data type then set it to the correct size
+  if Length(ABuffer) < SizeOf(T) then
+    SetLength(ABuffer, SizeOf(T));
+  // Bit conversion into the temporary value buffer
+  TBitConverter.UnsafeFrom<T>(AValue.AsType<T>, LTempValueBuffer);
+  DataConvert(AField, LTempValueBuffer, ABuffer, ANativeFormat);
+end;
+
 function TioBSADataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
 var
   LValue: TValue;
@@ -729,6 +746,7 @@ var
   LProperty: IioContextProperty;
   LDateTime: TDateTime;
   LDateTimeRec: TDateTimeRec;
+  LTempValueBuffer: TValueBuffer;
   // Return true if the record is inserted/appended
   function IsInsertingRecord: Boolean;
   var
@@ -748,6 +766,7 @@ begin
   // Get the current record index (corrected by the situations)
   LRecordIndex := GetRecordIdx;
   Result := (LRecordIndex >= -1) and (LRecordIndex <= FBindSourceAdapter.ItemCount - 1);
+//  Result := Result and (Length(Buffer) > 0);
   if not Result then
     Exit;
   // Get Property, Object, Value
@@ -758,23 +777,24 @@ begin
   // Move the value to the buffer
   case Field.DataType of
     // Integer
-    TFieldType.ftInteger:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
-    TFieldType.ftAutoInc:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
-    TFieldType.ftShortint:  TBitConverter.UnsafeFrom<ShortInt>(LValue.AsType<ShortInt>, Buffer);
-    TFieldType.ftByte:      TBitConverter.UnsafeFrom<Byte>(LValue.AsType<Byte>, Buffer);
-    TFieldType.ftSmallint:  TBitConverter.UnsafeFrom<SmallInt>(LValue.AsType<SmallInt>, Buffer);
-    TFieldType.ftLargeint:  TBitConverter.UnsafeFrom<Largeint>(LValue.AsType<Largeint>, Buffer);
-    TFieldType.ftWord:      TBitConverter.UnsafeFrom<Word>(LValue.AsType<Word>, Buffer);
-    TFieldType.ftLongWord:  TBitConverter.UnsafeFrom<LongWord>(LValue.AsType<LongWord>, Buffer);
+//    TFieldType.ftInteger:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
+    TFieldType.ftInteger:   ValueToBuffer<Integer>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftAutoInc:   ValueToBuffer<Integer>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftShortint:  ValueToBuffer<Shortint>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftByte:      ValueToBuffer<Byte>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftSmallint:  ValueToBuffer<Smallint>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftLargeint:  ValueToBuffer<Largeint>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftWord:      ValueToBuffer<Word>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftLongWord:  ValueToBuffer<LongWord>(LValue, Field, Buffer, NativeFormat);
     // Float
-    TFieldType.ftFloat:     TBitConverter.UnsafeFrom<Double>(LValue.AsType<Double>, Buffer);
-    TFieldType.ftCurrency:  TBitConverter.UnsafeFrom<Double>(LValue.AsType<Double>, Buffer);
-    TFieldType.ftBCD:       TBitConverter.UnsafeFrom<Currency>(LValue.AsType<Currency>, Buffer);
-    TFieldType.ftFMTBcd:    TBitConverter.UnsafeFrom<TBCD>(LValue.AsType<TBCD>, Buffer);
-    TFieldType.ftSingle:    TBitConverter.UnsafeFrom<Single>(LValue.AsType<Single>, Buffer);
-    TFieldType.ftExtended:  TBitConverter.UnsafeFrom<Extended>(LValue.AsType<Extended>, Buffer);
+    TFieldType.ftFloat:     ValueToBuffer<Double>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftCurrency:  ValueToBuffer<Double>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftBCD:       ValueToBuffer<Currency>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftFMTBcd:    ValueToBuffer<TBCD>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftSingle:    ValueToBuffer<Single>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftExtended:  ValueToBuffer<Extended>(LValue, Field, Buffer, NativeFormat);
     // Boolean
-    TFieldType.ftBoolean:   TBitConverter.From<WordBool>(LValue.AsType<WordBool>, Buffer);
+    TFieldType.ftBoolean:   ValueToBuffer<WordBool>(LValue, Field, Buffer, NativeFormat);
     // Date & Time
     TFieldType.ftDateTime, TFieldType.ftDate, TFieldType.ftTime:
     begin
@@ -782,34 +802,46 @@ begin
       Result := (LDateTime > 0);
       if Result then
       begin
-        LDateTimeRec.DateTime := LDateTime;
-        TBitConverter.UnsafeFrom<TDateTimeRec>(LDateTimeRec, Buffer);
+        if NativeFormat then
+        begin
+          SetLength(LTempValueBuffer, SizeOf(TDatetime));
+          TBitConverter.UnsafeFrom<TDatetime>(LDateTime, LTempValueBuffer);
+          DataConvert(Field, LTempValueBuffer, Buffer, NativeFormat);
+        end
+        else
+        begin
+          LDateTimeRec.DateTime := LDateTime;
+          TBitConverter.UnsafeFrom<TDateTimeRec>(LDateTimeRec, Buffer);
+        end;
       end;
     end;
-    TFieldType.ftTimeStamp:
+    TFieldType.ftTimeStamp:  // NB: Per questo tipo non ho verificato la compatibilità con DevExpress (NativeFormat = True e Buffer con dimensione zero)
     begin
       LDateTime := LValue.AsType<TDateTime>;
       Result := (LDateTime > 0);
       if Result then
       begin
-          SetLength(Buffer, SizeOf(TSQLTimeStamp));
-          TBitConverter.From<TSQLTimeStamp>(
-            TSqlTimeStampUtils.DateTimeToSqlTimeStamp(LDateTime), Buffer);
+        SetLength(Buffer, SizeOf(TSQLTimeStamp));
+        TBitConverter.From<TSQLTimeStamp>(TSqlTimeStampUtils.DateTimeToSqlTimeStamp(LDateTime), Buffer);
       end;
     end;
     // AnsiString + GUID
     TFieldType.ftString, TFieldType.ftFixedChar, TFieldType.ftGuid:
     begin
+      if Length(Buffer) < (Field.DataSize) then // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
+        SetLength(Buffer, Field.DataSize);
       FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-      StrLCopy(PAnsiChar(Buffer), PAnsiChar(AnsiString(LValue.AsString)), Field.Size);
-//      StrCopy(pAnsiChar(Buffer), pAnsiChar(AnsiString(LValue.AsString)));
+      DataConvert(Field, PAnsiChar(AnsiString(LValue.AsString)), Buffer, NativeFormat);
+//      StrLCopy(PAnsiChar(Buffer), PAnsiChar(AnsiString(LValue.AsString)), Field.Size+1);
     end;
     // WideString/Unicode
     TFieldType.ftWideString, TFieldType.ftFixedWideChar:
     begin
+      if Length(Buffer) < (Field.DataSize) then // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
+        SetLength(Buffer, Field.DataSize);
       FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-      StrLCopy(PChar(Buffer), PChar(LValue.AsString), Field.Size);
-//      TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
+      TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
+//      StrLCopy(PChar(Buffer), PChar(LValue.AsString), Field.Size+1);
     end;
   end;
 end;
