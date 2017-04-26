@@ -1,6 +1,7 @@
 package iORM_Project_DesignTime;
 
 {$R *.res}
+{$R '..\..\source\iORM.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}

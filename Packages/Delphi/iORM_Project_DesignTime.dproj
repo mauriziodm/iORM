@@ -154,6 +154,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="..\..\source\iORM.dcr"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="Designide.dcp"/>
         <DCCReference Include="iORM_Project.dcp"/>
