@@ -69,6 +69,7 @@ type
     FInsertObj_NewObj: TObject;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    FAvoidDestruction: Boolean;
     function TypeName: String;
     function TypeAlias: String;
     // Async property
@@ -128,6 +129,8 @@ type
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AList: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
+    procedure FreeInstance; override;
+    procedure AvoidDestruction;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
@@ -190,6 +193,11 @@ begin
   Self.Append;
 end;
 
+procedure TioActiveListBindSourceAdapter.AvoidDestruction;
+begin
+  FAvoidDestruction := True;
+end;
+
 procedure TioActiveListBindSourceAdapter.ClearDataObject;
 begin
   Self.SetDataObject(nil, False);
@@ -199,6 +207,7 @@ constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef;
   AWhere: IioWhere; AOwner: TComponent; AList: TList<TObject>; AutoLoadData,
   AOwnsObject: Boolean);
 begin
+  FAvoidDestruction := False;
   FAutoLoadData := AutoLoadData;
   FAsync := False;
   FAutoPersist := True;
@@ -219,12 +228,34 @@ end;
 
 destructor TioActiveListBindSourceAdapter.Destroy;
 begin
+
+
+  try
+    if FAvoidDestruction then
+      raise EioException.Create('IORM: This is not a real exception.');
+  except
+//    FAvoidDestruction := False;
+    Exit;
+  end;
+
+
+
   // Detach itself from MasterAdapterContainer (if it's contained)
   if Assigned(FMasterAdaptersContainer) then
     FMasterAdaptersContainer.RemoveBindSourceAdapter(Self);
   // Free the DetailAdaptersContainer
   FDetailAdaptersContainer.Free;
   inherited;
+
+
+// ============= OLD CODE ======================================================
+  // Detach itself from MasterAdapterContainer (if it's contained)
+//  if Assigned(FMasterAdaptersContainer) then
+//    FMasterAdaptersContainer.RemoveBindSourceAdapter(Self);
+  // Free the DetailAdaptersContainer
+//  FDetailAdaptersContainer.Free;
+//  inherited;
+// ============= OLD CODE ======================================================
 end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeCancel;
@@ -420,6 +451,12 @@ begin
 
   // Set it to the Adapter itself
   Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+end;
+
+procedure TioActiveListBindSourceAdapter.FreeInstance;
+begin
+  if not FAvoidDestruction then
+    inherited;
 end;
 
 function TioActiveListBindSourceAdapter.GetAutoLoadData: Boolean;

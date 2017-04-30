@@ -47,7 +47,7 @@ uses
 
 type
 
-  TioViewModel = class(TDataModule, IioViewModel)
+  TioViewModel = class(TDataModule, IInterface, IioViewModel) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     { Private declarations }
     FCommands: IioCommandsContainer;
@@ -69,6 +69,7 @@ type
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function Commands: IioCommandsContainer;
     function BindView(const AView:TComponent): Byte;
     function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): TioViewContextProvider;
@@ -220,6 +221,12 @@ begin
   // Init
   FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
   FViews := TioMVVMFactory.VMViews;
+end;
+
+destructor TioViewModel.Destroy;
+begin
+
+  inherited;
 end;
 
 procedure TioViewModel.FreeViews;

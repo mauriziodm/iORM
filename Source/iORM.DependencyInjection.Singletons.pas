@@ -112,9 +112,9 @@ var
 begin
   inherited Create;
   // Set the ObjInstance reference for the singleton item
-  Self.FObjInstance := AObj;
+  FObjInstance := AObj;
   // If it is an interfaced object then set a reference (IInterface) to prevent someone else destroy it by RefCount
-  if Supports(AObj, IInterface, AInterfacedObject) then
+  if Supports(FObjInstance, IInterface, AInterfacedObject) then
     Self.FIntfInstance := AInterfacedObject
   else
     Self.FIntfInstance := nil;
