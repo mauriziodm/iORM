@@ -59,6 +59,7 @@ type
     class function GetBSAfromDB(const AOwner:TComponent; const ATypeName, ATypeAlias:String; const AWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean): TBindSourceAdapter;
     class function GetBSAByTypeName(const ATypeName, ATypeAlias:String; const AWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean; const AOwner: TComponent): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    class function BSAProxy(const ABindSourceAdapter:TBindSourceAdapter): TBindSourceAdapter;
   end;
 
 implementation
@@ -74,9 +75,16 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, iORM.Context.Factory,
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
-  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink;
+  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink,
+  iORM.LiveBindings.BSAProxy;
 
 { TioLiveBindingsFactory }
+
+class function TioLiveBindingsFactory.BSAProxy(
+  const ABindSourceAdapter: TBindSourceAdapter): TBindSourceAdapter;
+begin
+  Result := TBSAProxy.Create(ABindSourceAdapter);
+end;
 
 class function TioLiveBindingsFactory.BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 begin

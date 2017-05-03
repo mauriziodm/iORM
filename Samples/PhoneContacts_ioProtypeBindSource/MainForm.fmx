@@ -51,8 +51,17 @@ object Form1: TForm1
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'nexttoolbutton'
-          TabOrder = 1
+          TabOrder = 2
           Visible = True
+        end
+        object Button4: TButton
+          Position.X = 186.000000000000000000
+          Size.Width = 52.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Add'
+          OnClick = Button4Click
         end
       end
       object MasterListView: TListView

@@ -1,17 +1,17 @@
 object ViewMain: TViewMain
   Align = Client
-  Size.Width = 365.000000000000000000
+  Size.Width = 366.000000000000000000
   Size.Height = 573.000000000000000000
   Size.PlatformDefault = False
   object ToolBar1: TToolBar
-    Size.Width = 365.000000000000000000
+    Size.Width = 366.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     object lblTitle1: TLabel
       Align = Contents
       StyledSettings = [FontColor]
-      Size.Width = 365.000000000000000000
+      Size.Width = 366.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'toollabel'
@@ -29,7 +29,7 @@ object ViewMain: TViewMain
       Margins.Top = 5.000000000000000000
       Margins.Right = 5.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Position.X = 330.000000000000000000
+      Position.X = 331.000000000000000000
       Position.Y = 5.000000000000000000
       Size.Width = 30.000000000000000000
       Size.Height = 30.000000000000000000
@@ -73,7 +73,7 @@ object ViewMain: TViewMain
   object Panel1: TPanel
     Align = Top
     Position.Y = 40.000000000000000000
-    Size.Width = 365.000000000000000000
+    Size.Width = 366.000000000000000000
     Size.Height = 44.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
@@ -82,10 +82,10 @@ object ViewMain: TViewMain
       StyledSettings = [FontColor]
       Position.X = 92.000000000000000000
       Position.Y = 7.000000000000000000
-      Size.Width = 169.000000000000000000
+      Size.Width = 163.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
+      TabOrder = 3
       Text = 'Load from DB by code'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -98,22 +98,48 @@ object ViewMain: TViewMain
       Size.Width = 81.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 0
+      TabOrder = 2
       Text = 'Clear data'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+    end
+    object ButtonNewPerson: TButton
+      Cursor = crHandPoint
+      StyledSettings = [FontColor]
+      Position.X = 258.000000000000000000
+      Position.Y = 7.000000000000000000
+      Size.Width = 48.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'New'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+    end
+    object ButtonDelete: TButton
+      Cursor = crHandPoint
+      StyledSettings = [FontColor]
+      Position.X = 309.000000000000000000
+      Position.Y = 7.000000000000000000
+      Size.Width = 43.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Del'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
     end
   end
   object LayoutMaster: TLayout
     Align = Client
-    Size.Width = 365.000000000000000000
+    Size.Width = 366.000000000000000000
     Size.Height = 352.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 8
     object Label2: TLabel
       Align = Top
       StyledSettings = [FontColor]
-      Size.Width = 365.000000000000000000
+      Size.Width = 366.000000000000000000
       Size.Height = 17.000000000000000000
       Size.PlatformDefault = False
       TextSettings.Font.Family = 'Segoe UI Semibold'
@@ -129,7 +155,7 @@ object ViewMain: TViewMain
       FooterAppearanceClassName = 'TListHeaderObjects'
       ItemIndex = 1
       Align = Client
-      Size.Width = 365.000000000000000000
+      Size.Width = 366.000000000000000000
       Size.Height = 335.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
@@ -139,14 +165,14 @@ object ViewMain: TViewMain
   object LayoutDetail: TLayout
     Align = Bottom
     Position.Y = 436.000000000000000000
-    Size.Width = 365.000000000000000000
+    Size.Width = 366.000000000000000000
     Size.Height = 137.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 9
     object Label3: TLabel
       Align = Top
       StyledSettings = [FontColor]
-      Size.Width = 365.000000000000000000
+      Size.Width = 366.000000000000000000
       Size.Height = 17.000000000000000000
       Size.PlatformDefault = False
       TextSettings.Font.Family = 'Segoe UI Semibold'
@@ -162,7 +188,7 @@ object ViewMain: TViewMain
       FooterAppearanceClassName = 'TListHeaderObjects'
       ItemIndex = 0
       Align = Client
-      Size.Width = 365.000000000000000000
+      Size.Width = 366.000000000000000000
       Size.Height = 120.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1

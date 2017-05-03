@@ -32,6 +32,12 @@ type
     [ioBindAction('acTerminate')]
     ButtonTerminate: TSpeedButton;
 
+    [ioBindAction('acNewPerson')]
+    ButtonNewPerson: TButton;
+
+    [ioBindAction('acDelete')]
+    ButtonDelete: TButton;
+
     ToolBar1: TToolBar;
     lblTitle1: TLabel;
     Panel1: TPanel;

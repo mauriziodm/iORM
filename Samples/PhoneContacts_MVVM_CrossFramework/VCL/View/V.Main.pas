@@ -29,6 +29,12 @@ type
     [ioBindAction('acRefresh')]
     ButtonRefresh: TSpeedButton;
 
+    [ioBindAction('acNewPerson')]
+    ButtonNewPerson: TSpeedButton;
+
+    [ioBindAction('acDelete')]
+    ButtonDelete: TSpeedButton;
+
     VMBridge: TioViewModelBridge;
     Panel1: TPanel;
     PersonsModelBindSource: TioModelBindSource;

@@ -54,24 +54,18 @@ object ViewMain: TViewMain
     object ButtonClearData: TSpeedButton
       Left = 0
       Top = 0
-      Width = 83
+      Width = 62
       Height = 37
       Align = alLeft
       Caption = 'Clear data'
-      ExplicitLeft = 1
-      ExplicitTop = 1
-      ExplicitHeight = 34
     end
     object ButtonLoadFromDB: TSpeedButton
-      Left = 83
+      Left = 62
       Top = 0
-      Width = 140
+      Width = 117
       Height = 37
       Align = alLeft
       Caption = 'Load from DB by code'
-      ExplicitLeft = 85
-      ExplicitTop = 1
-      ExplicitHeight = 34
     end
     object ButtonEdit: TSpeedButton
       Left = 377
@@ -85,15 +79,30 @@ object ViewMain: TViewMain
       ExplicitHeight = 34
     end
     object ButtonRefresh: TSpeedButton
-      Left = 223
+      Left = 279
       Top = 0
-      Width = 70
+      Width = 50
       Height = 37
       Align = alLeft
       Caption = 'Refresh'
-      ExplicitLeft = 226
-      ExplicitTop = 1
-      ExplicitHeight = 34
+      ExplicitLeft = 179
+    end
+    object ButtonNewPerson: TSpeedButton
+      Left = 229
+      Top = 0
+      Width = 50
+      Height = 37
+      Align = alLeft
+      Caption = 'New'
+      ExplicitLeft = 179
+    end
+    object ButtonDelete: TSpeedButton
+      Left = 179
+      Top = 0
+      Width = 50
+      Height = 37
+      Align = alLeft
+      Caption = 'Delete'
     end
   end
   object MasterGrid: TStringGrid

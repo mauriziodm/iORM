@@ -167,8 +167,8 @@ end;
 
 procedure TioPrototypeBindSource.Append;
 begin
-  if not CheckAdapter then Exit;
-  GetInternalAdapter.Append;
+  if CheckAdapter then
+    GetInternalAdapter.Append;
 end;
 
 procedure TioPrototypeBindSource.Append(AObject: TObject);
@@ -180,7 +180,8 @@ begin
     AnActiveBSA.Append(AObject);
     AnActiveBSA.Refresh(False);
   end
-  else raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+  else
+    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 procedure TioPrototypeBindSource.ClearDataObject;
@@ -344,7 +345,8 @@ begin
     AnActiveBSA.Insert(AObject);
     AnActiveBSA.Refresh(False);
   end
-  else raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+  else
+    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 function TioPrototypeBindSource.GetIsDetail: Boolean;

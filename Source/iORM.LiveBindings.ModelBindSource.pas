@@ -25,7 +25,6 @@ type
     function GetViewModelBridge: TioViewModelBridge;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property ModelPresenter:String read FModelPresenter write FModelPresenter;
@@ -35,7 +34,7 @@ implementation
 
 uses
   iORM.LiveBindings.Interfaces, System.SysUtils, iORM.Components.Common,
-  iORM.LiveBindings.ActiveListBindSourceAdapter;
+  iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.LiveBindings.Factory;
 
 { TioModelBindSource }
 
@@ -46,22 +45,6 @@ begin
   FViewModelBridge := nil;
   if (csDesigning in ComponentState) and not Assigned(FViewModelBridge) then
     TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
-end;
-
-destructor TioModelBindSource.Destroy;
-begin
-
-
-
-
-  // Avoid ActiveBindSourceAdapter destruction
-  if not ModelPresenter.IsEmpty then
-    (ViewModelBridge.ViewModel.Presenters[ModelPresenter].BindSourceAdapter as TioActiveListBindSourceAdapter).AvoidDestruction;
-
-
-
-
-  inherited;
 end;
 
 procedure TioModelBindSource.DoCreateAdapter(

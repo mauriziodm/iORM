@@ -163,19 +163,29 @@ end;
 function TInterfaceListBindSourceAdapter<T>.CreateItemInstance: T;
 var
   LObject: TObject;
+  LHandled: Boolean;
 begin
   CheckList;
   Result := nil;
-  Assert(GetItemInstanceFactory.CanConstructInstance);
-  if GetItemInstanceFactory.CanConstructInstance then
+  LObject := nil;
+//  Assert(GetItemInstanceFactory.CanConstructInstance);
+  // In the DoCreate method the new object passed as Insert/Append parameter
+  //  is assigned to LObject and LHandled is setted to true
+  DoCreateInstance(LHandled, LObject);
+  // If not handled means that non object is passed to a Insert/Append call then
+  //  create itself an instance as possible
+  if not LHandled then
   begin
-    LObject := GetItemInstanceFactory.ConstructInstance;
-    try
-      Result := TioRttiUtilities.CastObjectToGeneric<T>(LObject);
-    except
-      LObject.Free;
-      raise;
-    end;
+    Assert(GetItemInstanceFactory.CanConstructInstance);
+    if GetItemInstanceFactory.CanConstructInstance then
+      LObject := GetItemInstanceFactory.ConstructInstance;
+  end;
+  // Cast the new object to return it of the right type
+  try
+    Result := TioRttiUtilities.CastObjectToGeneric<T>(LObject);
+  except
+    LObject.Free;
+    raise;
   end;
 end;
 

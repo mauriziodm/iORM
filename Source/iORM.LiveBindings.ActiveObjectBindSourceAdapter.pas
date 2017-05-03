@@ -290,7 +290,19 @@ begin
   //       cancel durante l'ìnsert/append di un nuovo record/oggetto e cioè
   //       che il nuovo record viene automaticamente eliminato (nei BSA invece
   //       rimane il nuovo oggetto "vuoto".
-  FDeleteAfterCancel := (Self.State = TBindSourceAdapterState.seInsert);
+  //  NB: DISABILITATO PERCHE' CAUSAVA ALCUNI PROBLEMI:
+  //       1) Quando si faceva un Append(AObject) causava l'eliminazione automatica
+  //           dell'oggetto appena inserito. Questo succedeva perchè nel
+  //           PrototypeBindSource/ModelPresenter, nel metodo Append(AObject),
+  //           subito dopo l'Append normale veniva fatto anche un Refresh, al suo interno
+  //           il refresh a sua volta faceva un cancel e innescava l'AutoDelete di cui sotto
+  //           che eliminava il nuovo oggetto appena inserito.
+  //       2) Quando si faceva l'append di un nuovo oggetto e poi si editava
+  //           l'istanza stessa con un NaturalBindSourceAdapter (MVVM) al Post
+  //           si innescava di nuovo un Cancel sul BSA master he a sua volta
+  //           innescava l'AutoDelete in modo simile al punto 1.
+//  FDeleteAfterCancel := (Self.State = TBindSourceAdapterState.seInsert);
+  FDeleteAfterCancel := False;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeDelete;

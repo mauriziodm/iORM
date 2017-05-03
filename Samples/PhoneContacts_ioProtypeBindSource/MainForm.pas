@@ -58,6 +58,8 @@ type
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
+    Button4: TButton;
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -73,5 +75,14 @@ uses
   Model;
 
 {$R *.fmx}
+
+procedure TForm1.Button4Click(Sender: TObject);
+var
+  LPerson: TPerson;
+begin
+  LPerson := TCustomer.Create;
+  MasterBS.Append(LPerson);
+//  BSMaster.Append;
+end;
 
 end.

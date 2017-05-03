@@ -67,6 +67,7 @@ type
     RBSQLite: TRadioButton;
     RBFirebird: TRadioButton;
     Button3: TButton;
+    Button4: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
@@ -74,6 +75,7 @@ type
     procedure SQLiteConnAfterRegister(Sender: TObject);
     procedure RBSQLiteChange(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -103,6 +105,15 @@ end;
 procedure TMainForm.Button3Click(Sender: TObject);
 begin
   BSMaster.Refresh(True);
+end;
+
+procedure TMainForm.Button4Click(Sender: TObject);
+var
+  LPerson: IPerson;
+begin
+  LPerson := io.di.Locate<ICustomer>.Get;
+  BSMaster.Append(LPerson as TObject);
+//  BSMaster.Append;
 end;
 
 procedure TMainForm.Button8Click(Sender: TObject);

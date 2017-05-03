@@ -178,6 +178,7 @@ contains
   iORM.DB.Components.DataSet.Base in '..\..\Source\iORM.DB.Components.DataSet.Base.pas',
   iORM.DB.Components.DataSet.ModelDataSet in '..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas',
   iORM.Components.Common.Interfaces in '..\..\Source\iORM.Components.Common.Interfaces.pas',
-  iORM.LiveBindings.BSAToDataSetLink in '..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas';
+  iORM.LiveBindings.BSAToDataSetLink in '..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas',
+  iORM.LiveBindings.BSAProxy in '..\..\Source\iORM.LiveBindings.BSAProxy.pas';
 
 end.

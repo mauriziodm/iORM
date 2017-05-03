@@ -46,6 +46,13 @@ type
     [ioAction('acRefresh',TioActionEvent.OnUpdate)]
     procedure acRefreshUpdate(Sender: TObject);
 
+    // acNewPerson
+    [ioAction('acNewPerson', 'New', TioActionEvent.OnExecute)]
+    procedure acNewPerson(Sender: TObject);
+
+    // acDelete
+    [ioAction('acDelete', 'Del', TioActionEvent.OnExecute)]
+    procedure acDelete(Sender: TObject);
   end;
 
 implementation
@@ -53,7 +60,7 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
-  System.Actions, iORM, RegisterClassesUnit, V.Interfaces;
+  System.Actions, iORM, RegisterClassesUnit, V.Interfaces, M.Interfaces;
 
 {$R *.dfm}
 
@@ -68,6 +75,11 @@ procedure TViewModelMain.acClearDataUpdate(Sender: TObject);
 begin
   inherited;
   (Sender as TCOntainedAction).Enabled := Self.DataExist;
+end;
+
+procedure TViewModelMain.acDelete(Sender: TObject);
+begin
+  PersonsModelPresenter.Delete;
 end;
 
 procedure TViewModelMain.acLoadDataExecute(Sender: TObject);
@@ -85,6 +97,15 @@ procedure TViewModelMain.acLoadDataUpdate(Sender: TObject);
 begin
   inherited;
   (Sender as TCOntainedAction).Enabled := not Self.DataExist;
+end;
+
+procedure TViewModelMain.acNewPerson(Sender: TObject);
+var
+  LPerson: IPerson;
+begin
+  LPerson := io.di.Locate<IPerson>.Get;
+  PersonsModelPresenter.Append(LPerson as TObject);
+  Command['acEditPerson'].Execute;
 end;
 
 procedure TViewModelMain.acRefreshExecute(Sender: TObject);
