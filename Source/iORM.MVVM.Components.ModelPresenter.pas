@@ -17,7 +17,7 @@ type
     FAutoLoadData: Boolean;
     FAutoPersist: Boolean;
     FViewDataType: TioViewDataType;
-    FWhere: IioWhere;
+    FWhere: IioWhere;  // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
@@ -314,9 +314,16 @@ begin
   // If the adapter exist the return the property of the adapter
   //  else return the Self.FWhere
   if CheckAdapter then
-    Result := FBindSourceAdapter.ioWhere
-  else
-    Result := FWhere;
+  begin
+    Result := FBindSourceAdapter.ioWhere;
+    Exit;
+  end;
+  // if not already assigned then create it (così lo crea solo se serve
+  //  davvero altrimenti no)
+  if not Assigned(FWhere) then
+    FWhere := TioWhereFactory.NewWhere;
+  // Return the Where instance
+  Result := FWhere;
 end;
 
 procedure TioModelPresenter.Insert;
@@ -468,7 +475,11 @@ end;
 
 procedure TioModelPresenter.SetOrderBy(const Value: String);
 begin
+  // Set the OrderBy in the Where object (questo ha veramnete effetto, FOrderBY
+  //  contiene il testo solo per pubblicarne il valore come proprietà editabile
+  //  a design-time sul componente.
   FOrderBy := Value;
+  Where.SetOrderBySQL(Value);
   // If the adapter is created and is an ActiveBindSourceAdapter then
   //  update the where of the adapter also
   if CheckAdapter then
@@ -519,7 +530,10 @@ end;
 
 procedure TioModelPresenter.WhereOnChangeEventHandler(Sender: TObject);
 begin
-  Self.SetWhere(TioWhereFactory.NewWhere.Add(FWhereStr.Text));
+  // Delete all previous criteria (_Where) and add the new criteria text
+  Where._Where(FWhereStr.Text);
+  // OLD_CODE
+//  Self.SetWhere(TioWhereFactory.NewWhere.Add(FWhereStr.Text));
 end;
 
 end.

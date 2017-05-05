@@ -43,7 +43,7 @@
             <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj">
             <Dependencies>iORM_Project.dproj</Dependencies>
@@ -212,13 +212,13 @@
     <Target Name="PhoneContacts_MVVM_VCL:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_FMX">
+    <Target Name="PhoneContacts_MVVM_FMX" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_FMX:Clean">
+    <Target Name="PhoneContacts_MVVM_FMX:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_FMX:Make">
+    <Target Name="PhoneContacts_MVVM_FMX:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="Pizza_ioActiveBindSourceAdapter" DependsOnTargets="iORM_Project">
