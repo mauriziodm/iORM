@@ -220,7 +220,6 @@ end;
 
 destructor TioActiveListBindSourceAdapter.Destroy;
 begin
-Exit;
   // Detach itself from MasterAdapterContainer (if it's contained)
   if Assigned(FMasterAdaptersContainer) then
     FMasterAdaptersContainer.RemoveBindSourceAdapter(Self);

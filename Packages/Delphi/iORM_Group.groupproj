@@ -61,7 +61,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ObjStatus_DMVC\Server\Pizza_ObjStatus_DMVC_Server.dproj">
             <Dependencies/>
@@ -266,13 +266,13 @@
     <Target Name="Pizza_DMVC_Server:Make">
         <MSBuild Projects="..\..\Samples\Pizza_DMVC\Server\Pizza_DMVC_Server.dproj" Targets="Make"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBS_ObjStatus">
+    <Target Name="Pizza_ioPrototypeBS_ObjStatus" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Clean">
+    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Make">
+    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj" Targets="Make"/>
     </Target>
     <Target Name="Pizza_ObjStatus_DMVC_Server">
