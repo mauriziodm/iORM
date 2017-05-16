@@ -254,6 +254,7 @@ type
     FMapMode: TioMapModeType;
   public
     constructor Create(const AValue:String=''; const AMapMode:TioMapModeType=ioProperties); overload;
+    constructor Create(const AMapMode:TioMapModeType); overload;
     property MapMode: TioMapModeType read FMapMode;
   end;
   ioEntity = class(ioTable)
@@ -457,6 +458,12 @@ end;
 constructor ioTable.Create(const AValue:String; const AMapMode: TioMapModeType);
 begin
   inherited Create(AValue);
+  FMapMode := AMapMode;
+end;
+
+constructor ioTable.Create(const AMapMode: TioMapModeType);
+begin
+  inherited Create('');
   FMapMode := AMapMode;
 end;
 
