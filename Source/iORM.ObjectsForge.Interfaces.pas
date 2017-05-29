@@ -218,14 +218,14 @@ begin
     case LPresenterSettings[I].SettingsType of
       // DataObject
       TioDIPresenterSettingsType.pstDataObject:
-        LViewModel.Presenters[LName].SetDataObject(LPresenterSettings[I].Obj);
+        LViewModel.Presenter[LName].SetDataObject(LPresenterSettings[I].Obj);
       // BindSourceAdapter
       TioDIPresenterSettingsType.pstBindSourceAdapter:
       begin
         LIntf := LPresenterSettings[I].InterfacedObj;
         if not Supports(LIntf, IioActiveBindSourceAdapter, LBSA) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioActiveBindSourceAdapter" not implemented by object.');
-        LViewModel.Presenters[LName].BindSourceAdapter := LBSA;
+        LViewModel.Presenter[LName].BindSourceAdapter := LBSA;
       end;
       // MasterModelPresenter
       TioDIPresenterSettingsType.pstMasterModelPresenter:
@@ -233,8 +233,8 @@ begin
         LObj := LPresenterSettings[I].Obj;
         if not (LObj is TioModelPresenter) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'The object is not a TioModelPresenter instance.');
-        LViewModel.Presenters[LName].MasterPresenter := TioModelPresenter(LObj);
-        LViewModel.Presenters[LName].MasterPropertyName := LPresenterSettings[I].StringParameter;
+        LViewModel.Presenter[LName].MasterPresenter := TioModelPresenter(LObj);
+        LViewModel.Presenter[LName].MasterPropertyName := LPresenterSettings[I].StringParameter;
       end;
       // Where
       TioDIPresenterSettingsType.pstWhere:
@@ -242,11 +242,11 @@ begin
         LIntf := LPresenterSettings[I].InterfacedObj;
         if not Supports(LIntf, IioWhere, LWhere) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
-        LViewModel.Presenters[LName].Where := LWhere;
+        LViewModel.Presenter[LName].Where := LWhere;
       end;
       // OrderBy
       TioDIPresenterSettingsType.pstOrderBy:
-        LViewModel.Presenters[LName].OrderBy := LPresenterSettings[I].StringParameter;
+        LViewModel.Presenter[LName].OrderBy := LPresenterSettings[I].StringParameter;
     end;
   end;
 end;

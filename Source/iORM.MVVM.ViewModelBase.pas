@@ -62,7 +62,7 @@ type
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------
     // Presenters
-    function GetPresenters(const AName: String): TioModelPresenter;
+    function GetPresenter(const AName: String): TioModelPresenter;
     // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
@@ -86,7 +86,7 @@ type
 // ---------------- End: section added for IInterface support ---------------
     // Properties
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
-    property Presenters[const AName:String]:TioModelPresenter read GetPresenters;
+    property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
   end;
 // ---------------- Start: section added for IInterface support ---------------
   {$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
@@ -140,7 +140,7 @@ begin
   Result := Commands.Get(ACmdName, False);
 end;
 
-function TioViewModel.GetPresenters(const AName: String): TioModelPresenter;
+function TioViewModel.GetPresenter(const AName: String): TioModelPresenter;
 var
   LComponent: TComponent;
 begin

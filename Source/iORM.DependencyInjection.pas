@@ -92,6 +92,8 @@ type
   TioDependencyInjectionBase = class abstract(TInterfacedObject)
   strict protected
     class function Container: TioDependencyInjectionContainerRef;
+    class function ModelToViewContainerKey(const AModel:TioClassRef): String;
+    class function ModelToViewModelContainerKey(const AModel:TioClassRef): String;
   end;
 
   // ===========================================================================
@@ -126,6 +128,10 @@ type
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): TioDependencyInjectionRegister; overload;
     function SetPresenter(const AName:String; const AWhere:IioWhere): TioDependencyInjectionRegister; overload;
     function SetPresenter(const AName:String; const AOrderBy:String): TioDependencyInjectionRegister; overload;
+    function AsViewFor<T: class>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function AsViewFor(const AClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function AsViewModelFor<T: class>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function AsViewModelFor(const AClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
   end;
   // ===========================================================================
 
@@ -158,6 +164,7 @@ type
     constructor Create(const AInterfaceName:String; const AAlias:String; const AEmptyOwner, AVCProviderEnabled:Boolean); virtual;
     function Exist: Boolean; virtual;
     function Get: TObject; virtual;
+    function Show: TComponent; virtual;
     function GetItem: TioDIContainerImplementersItem;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator; virtual;
@@ -228,6 +235,8 @@ type
     class function LocateViewModel(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewModel<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
     class function Singletons: TioSingletonsFacadeRef;
+    class function Model(const AModel:TObject): IioDependencyInjectionLocator; overload;
+    class function Model(const AModel:IInterface): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -262,6 +271,18 @@ uses
 class function TioDependencyInjectionBase.Container: TioDependencyInjectionContainerRef;
 begin
   Result := TioDependencyInjectionContainer;
+end;
+
+class function TioDependencyInjectionBase.ModelToViewContainerKey(
+  const AModel:TioClassRef): String;
+begin
+  Result := '<V>' + AModel.ClassName;
+end;
+
+class function TioDependencyInjectionBase.ModelToViewModelContainerKey(
+  const AModel:TioClassRef): String;
+begin
+  Result := '<VM>' + AModel.ClassName;
 end;
 
 { TioDependencyInjection }
@@ -310,6 +331,18 @@ class function TioDependencyInjection.LocateViewModel<T>(
   const AAlias: String): IioDependencyInjectionLocator<T>;
 begin
   Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, False);
+end;
+
+class function TioDependencyInjection.Model(
+  const AModel: TObject): IioDependencyInjectionLocator;
+begin
+
+end;
+
+class function TioDependencyInjection.Model(
+  const AModel: IInterface): IioDependencyInjectionLocator;
+begin
+  Result := Self.Model(AModel as TObject);
 end;
 
 class function TioDependencyInjection.RegisterClass(
@@ -473,7 +506,7 @@ begin
           LTypeName := LProp.PropertyType.Name
         else
           LTypeName := ioInject(LAttr).TypeName;
-        // Regster injection info
+        // Register injection info
         Self.InjectProperty(LProp.Name, LTypeName, ioInject(LAttr).TypeAlias);
       end;
   // ===========================================================================
@@ -602,6 +635,43 @@ begin
   FContainerValue.PresenterSettings[I].Name := AName;
   FContainerValue.PresenterSettings[I].StringParameter := AOrderBy;
   Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsViewFor(const AClassRef: TioClassRef;
+  const AAlias: String): TioDependencyInjectionRegister;
+begin
+  // Set the InterfaceName
+  FInterfaceName := ModelToViewContainerKey(AClassRef);
+  // Set the Alias
+  if not AAlias.IsEmpty then
+    Self.FAlias := AAlias;
+  // Return itself
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsViewFor<T>(
+  const AAlias: String): TioDependencyInjectionRegister;
+begin
+  Result := Self.AsViewFor(T, AAlias);
+end;
+
+function TioDependencyInjectionRegister.AsViewModelFor(
+  const AClassRef: TioClassRef;
+  const AAlias: String): TioDependencyInjectionRegister;
+begin
+  // Set the InterfaceName
+  FInterfaceName := ModelToViewModelContainerKey(AClassRef);
+  // Set the Alias
+  if not AAlias.IsEmpty then
+    Self.FAlias := AAlias;
+  // Return itself
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsViewModelFor<T>(
+  const AAlias: String): TioDependencyInjectionRegister;
+begin
+  Result := Self.AsViewModelFor(T, AAlias);
 end;
 
 { TioDependencyInjectionContainer }
@@ -825,11 +895,16 @@ begin
   Result := Self;
 end;
 
+function TioDependencyInjectionLocator.Show: TComponent;
+begin
+  Result := Self.Get as TComponent;
+end;
+
 function TioDependencyInjectionLocator._Get(
   const AContainerItem: TioDIContainerImplementersItem): TObject;
 begin
   Result := nil;
-  // if then ViewModel is present then Lock it (MVVM)
+  // if the ViewModel is present then Lock it (MVVM)
   //  and initializa it with PresenterSettings if exists
   if Self.ViewModelExist then
   begin

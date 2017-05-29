@@ -28,7 +28,6 @@ object StartForm: TStartForm
   object FormsVCProvider: TioViewContextProvider
     ioOnRequest = FormsVCProviderioOnRequest
     ioOnRelease = FormsVCProviderioOnRelease
-    Scope = psGlobal
     RegisterAsDefault = True
     AutoParent = True
     AutoOwner = True

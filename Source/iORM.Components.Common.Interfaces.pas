@@ -3,7 +3,8 @@ unit iORM.Components.Common.Interfaces;
 interface
 
 uses
-  iORM.MVVM.Components.ViewModelBridge;
+  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.Interfaces,
+  iORM.MVVM.Components.ModelPresenter;
 
 type
 
@@ -13,6 +14,13 @@ type
     procedure SetViewModelBridge(const AVMBridge:TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
     property ViewModelBridge:TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
+  end;
+
+  IioCrossViewMasterSource = interface
+    ['{5A2614C8-088E-4642-A2C0-A671EE62B517}']
+    // InternalActiveAdapter
+    function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
+    property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter;  // Must be ReadOnly
   end;
 
 implementation

@@ -4,18 +4,19 @@ interface
 
 uses
   iORM.DB.Components.DataSet.Base, iORM.MVVM.Components.ViewModelBridge, System.Classes,
-  iORM.Components.Common.Interfaces;
+  iORM.Components.Common.Interfaces, iORM.MVVM.Components.ModelPresenter;
 
 type
 
-  TioModelDataSet = class(TioBSADataSet, IioVMBridgeClientComponent)
+  TioModelDataSet = class(TioBSADataSet, IioVMBridgeClientComponent, IioCrossViewMasterSource)
   private
     FViewModelBridge: TioViewModelBridge;
     FModelPresenter: String;
+    FCrossView_MasterBindSource: IioCrossViewMasterSource;
+    FCrossView_MasterPropertyName: String;
   protected
     procedure Loaded; override;
-    procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     // dataset virtual methods
     procedure InternalPreOpen; override;
     /// ViewModelBridge
@@ -26,12 +27,16 @@ type
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property ModelPresenter:String read FModelPresenter write FModelPresenter;
+    property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
+    property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
   end;
 
 implementation
 
 uses
-  iORM.Exceptions, System.SysUtils, iORM.Components.Common;
+  iORM.Exceptions, System.SysUtils, iORM.Components.Common,
+  Data.Bind.ObjectScope, iORM.LiveBindings.Factory,
+  iORM.LiveBindings.Interfaces;
 
 { TioModelDataSet }
 
@@ -39,6 +44,8 @@ constructor TioModelDataSet.Create(AOwner: TComponent);
 begin
   inherited;
   FViewModelBridge := nil;
+  FCrossView_MasterBindSource := nil;
+  FCrossView_MasterPropertyName := '';
   if (csDesigning in ComponentState) and not Assigned(FViewModelBridge) then
     TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
 end;
@@ -49,6 +56,9 @@ begin
 end;
 
 procedure TioModelDataSet.InternalPreOpen;
+var
+  ADataObject: TBindSourceAdapter;
+  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Checks
   if not Assigned(FViewModelBridge) then
@@ -58,7 +68,16 @@ begin
   if FModelPresenter.IsEmpty then
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
   // Get the BindSourceAdapter from ViewModel and open it
-  SetInternalAdapter(   ViewModelBridge.ViewModel.Presenters[ModelPresenter].BindSourceAdapter   );
+  //  NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
+  //       from it (for cross view with microviews)
+  if Assigned(FCrossView_MasterBindSource) then
+  begin
+    ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FCrossView_MasterBindSource.InternalActiveAdapter, FCrossView_MasterPropertyName, nil);
+    if not Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) then
+      raise EioException.Create(Self.ClassName, 'DoCreateAdapter', '"IioActiveBindSourceAdapter" interface not implemented by object.');
+    ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter := LActiveBSA;
+  end;
+  SetInternalAdapter(   ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter   );
   if Assigned(InternalAdapter) then
     InternalAdapter.Active := True;
   inherited;

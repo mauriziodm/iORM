@@ -9,7 +9,7 @@ uses
 
 const
 
-  NULL_RECORD_BUFFER: TRecordBuffer = 0; // Before XE4 use "NullBuffer := nil"
+  NULL_RECORD_BUFFER: TRecordBuffer = nil;//0; // Before XE4 use "NullBuffer := nil"
 
 type
 
@@ -121,6 +121,7 @@ type
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
     // InternalAdapter (there is a setter but the property must be ReadOnly)
+    function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
     function GetInternalAdapter: TBindSourceAdapter;
     procedure SetInternalAdapter(const AActiveBindSourceAdpter:IioActiveBindSourceAdapter);
     // dataset virtual methods
@@ -144,7 +145,7 @@ type
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     property InternalAdapter: TBindSourceAdapter read GetInternalAdapter;  // Must be ReadOnly
-    property InternalActiveAdapter: IioActiveBindSourceAdapter read FBindSourceAdapter;  // Must be ReadOnly
+    property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter;  // Must be ReadOnly
     property Map:IioMap read FMap;
   end;
 
@@ -176,7 +177,7 @@ type
   end;
 
   TioStreamableObjBlobStream = class(TioAbstractBlobStream)
-  strict private
+  strict protected
     procedure ReadBlobData; override;
     procedure WriteBlobData; override;
   public
@@ -476,6 +477,11 @@ end;
 function TioBSADataSet.GetCanModify: Boolean;
 begin
   Result := True; // read-write
+end;
+
+function TioBSADataSet.GetInternalActiveAdapter: IioActiveBindSourceAdapter;
+begin
+  Result := FBindSourceAdapter;
 end;
 
 function TioBSADataSet.GetInternalAdapter: TBindSourceAdapter;

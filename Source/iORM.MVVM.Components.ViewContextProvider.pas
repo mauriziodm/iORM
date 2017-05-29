@@ -44,14 +44,11 @@ uses
 
 type
 
-  TioViewContextProviderScope = (psGlobal, psLocal);
-
   TioRequestViewContextEvent = procedure(const Sender:TObject; const AView:TComponent; out ResultViewContext:TComponent) of object;
   TioViewContextEvent = procedure(const Sender:TObject; const AView, AViewContext:TComponent) of object;
 
   TioViewContextProvider = class(TComponent)
   private
-    FScope: TioViewContextProviderScope;
     FRegisterAsDefault: Boolean;
     FOnRequest: TioRequestViewContextEvent;
     FOnAfterRequest: TioViewContextEvent;
@@ -79,7 +76,6 @@ type
     property ioOnAfterRequest:TioViewContextEvent read FOnAfterRequest write FOnAfterRequest;
     property ioOnRelease:TioViewContextEvent read FOnRelease write FOnRelease;
     // Properties
-    property Scope:TioViewContextProviderScope read FScope write FScope;
     property RegisterAsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
     property AutoParent:Boolean read FAutoParent write FAutoParent;
     property AutoOwner:Boolean read FAutoOwner write FAutoOwner;
@@ -106,7 +102,6 @@ begin
   // Default values at design time
   if (csDesigning in ComponentState) then
   begin
-    FScope := TioViewContextProviderScope.psGlobal;
     FRegisterAsDefault := True;
     FAutoParent := True;
     FAutoOwner := True;
@@ -182,8 +177,7 @@ procedure TioViewContextProvider.Loaded;
 begin
   inherited;
   // Register the provider into the container
-  if (FScope = TioViewContextProviderScope.psGlobal)
-  and not (csDesigning in ComponentState)
+  if not (csDesigning in ComponentState)
   then
     TioViewContextProviderContainer.RegisterProvider(Self);
 end;

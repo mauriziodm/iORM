@@ -303,7 +303,6 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelDataset.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.Interfaces.pas"/>

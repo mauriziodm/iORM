@@ -65,8 +65,8 @@ type
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
     // Presenters
-    function GetPresenters(const AName: String): TioModelPresenter;
-    property Presenters[const AName:String]:TioModelPresenter read GetPresenters;
+    function GetPresenter(const AName: String): TioModelPresenter;
+    property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
   end;
 
   TioVMViewsInternalContainer = TDictionary<Integer,TComponent>;

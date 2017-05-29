@@ -64,7 +64,7 @@ inherited ViewModelMain: TViewModelMain
   object PersonsModelPresenter: TioModelPresenter
     Async = True
     AutoLoadData = True
-    AutoPersist = True
+    AutoPersist = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IPerson'
     ViewDataType = dtList

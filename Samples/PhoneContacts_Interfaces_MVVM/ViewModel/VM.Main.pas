@@ -184,7 +184,8 @@ begin
   // Get the class name of the current person
   LCurrentClassName := PersonsModelPresenter.Current.ClassName;
   // Get the View and ViewModel
-  io.di.LocateView<IPersonView, IPersonViewModel>(LCurrentClassName)
+//  io.di.LocateView<IPersonView, IPersonViewModel>(LCurrentClassName)
+  io.di.LocateView<IPersonView>(LCurrentClassName)
     .SetPresenter('PersonModelPresenter', PersonsModelPresenter)
     .Get;
 end;

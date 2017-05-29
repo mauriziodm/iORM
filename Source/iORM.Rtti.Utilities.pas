@@ -208,7 +208,7 @@ begin
 {$IFDEF NEXTGEN}
   // Get the type name
   Result := ATypeInfo.NameFld.ToString;
-  // Ig a qualifiedname is required...
+  // If a qualifiedname is required...
   if AQualified then
   begin
     // If it is an interface then link the Interface unit to the TypeName

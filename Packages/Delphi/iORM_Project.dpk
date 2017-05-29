@@ -174,7 +174,6 @@ contains
   iORM.MVVM.Components.ModelPresenter in '..\..\Source\iORM.MVVM.Components.ModelPresenter.pas',
   iORM.Components.Common in '..\..\Source\iORM.Components.Common.pas',
   iORM.LiveBindings.ModelBindSource in '..\..\Source\iORM.LiveBindings.ModelBindSource.pas',
-  iORM.MVVM.Components.ModelDataset in '..\..\Source\iORM.MVVM.Components.ModelDataset.pas',
   iORM.DB.Components.DataSet.Base in '..\..\Source\iORM.DB.Components.DataSet.Base.pas',
   iORM.DB.Components.DataSet.ModelDataSet in '..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas',
   iORM.Components.Common.Interfaces in '..\..\Source\iORM.Components.Common.Interfaces.pas',

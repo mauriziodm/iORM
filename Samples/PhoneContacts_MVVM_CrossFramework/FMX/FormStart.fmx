@@ -33,7 +33,6 @@ object Form1: TForm1
     ioOnRequest = TabsVCProviderioOnRequest
     ioOnAfterRequest = TabsVCProviderioOnAfterRequest
     ioOnRelease = TabsVCProviderioOnRelease
-    Scope = psGlobal
     RegisterAsDefault = True
     AutoParent = True
     AutoOwner = True

@@ -3,7 +3,7 @@ unit iORM.MVVM.Components.ViewModelBridge;
 interface
 
 uses
-  System.Classes, iORM.MVVM.Interfaces;
+  System.Classes, iORM.MVVM.Interfaces, iORM.MVVM.Components.ModelPresenter;
 
 type
 
@@ -15,7 +15,9 @@ type
   private
     FViewModel: IioViewModel;
     FViewID: Byte;
-    FMarker: String;
+    FDI_VMAlias: String;
+    FDI_VMInterface: String;
+    FDI_VMMarker: String;
     // Events
     FOnNeedViewModel: TioNeedViewModelEvent;
     procedure AutoSetClientComponentsOnCreate;
@@ -24,8 +26,9 @@ type
     procedure DoNeedViewModel;
     // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
-    procedure SetCommand(const ACmdName: String;
-      const Value: IioCommandsContainerItem);
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+    // Presenter
+    function GetPresenter(const AName: String): TioModelPresenter;
     // ViewModel
     function GetViewModel: IioViewModel;
   public
@@ -37,18 +40,21 @@ type
     // Properties
     property ViewModel:IioViewModel read GetViewModel;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand; default;
+    property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
   published
     // Events
     property OnNeedViewModel:TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
     // Properties
-    property Marker:String read FMarker write FMarker;
+    property DI_VMInterface:String read FDI_VMInterface write FDI_VMInterface;
+    property DI_VMAlias:String read FDI_VMAlias write FDI_VMAlias;
+    property DI_VMMarker:String read FDI_VMMarker write FDI_VMMarker;
   end;
 
 implementation
 
 uses
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Rtti.Utilities,
-  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces;
+  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces, iORM;
 
 
 { TioViewModelBridge }
@@ -69,6 +75,8 @@ begin
 end;
 
 procedure TioViewModelBridge.CheckForViewModel;
+var
+  LObj: TObject;
 begin
   if (csDesigning in ComponentState) then
     Exit;
@@ -80,7 +88,20 @@ begin
   // If a LockedViewModel is present in the DIContainer (an external prepared ViewModel) and the BindSource is not
   //  a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
   //  and get the BindSourceAdapter from it.
-  FViewModel := TioViewModelShuttleContainer.GetViewModel(FMarker);
+  FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
+  // ===============================================================================================================================
+  // VIEW MODEL CREATION BY DI_VMINterface & DI_VMAlias property if not already created
+  // -------------------------------------------------------------------------------------------------------------------------------
+  if  (not Assigned(FViewModel))
+  and (not FDI_VMInterface.IsEmpty)
+//  and io.di.LocateViewModel(FDI_VMInterface, FDI_VMAlias).Exist
+  then
+  begin
+    LObj := io.di.LocateViewModel(FDI_VMInterface, FDI_VMAlias).Get;
+    if not Supports(LObj, IioViewModel, FViewModel) then
+      raise EioException.Create(Self.ClassName, 'CheckForViewModel', '"IioViewModel" interface not implemented by object.');
+  end;
+  // ===============================================================================================================================
   // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
   //  or for retrieve an external created ViewModel
   Self.DoNeedViewModel;
@@ -124,6 +145,15 @@ begin
     Result := FViewModel.Command[ACmdName]
   else
     raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
+end;
+
+function TioViewModelBridge.GetPresenter(
+  const AName: String): TioModelPresenter;
+begin
+  if Assigned(FViewModel) then
+    Result := FViewModel.Presenter[AName]
+  else
+    raise EioException.Create(Self.Name, 'GetPresenter', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetViewModel: IioViewModel;
