@@ -43,6 +43,6 @@ contains
   iORM.MVVM.Components.ModelPresenter.DEsignTime in '..\..\Source\iORM.MVVM.Components.ModelPresenter.DEsignTime.pas',
   iORM.LiveBindings.ModelBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas',
   iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas',
-  iORM.MVVM.Components.ModelDataset.DesignTime in '..\..\Source\iORM.MVVM.Components.ModelDataset.DesignTime.pas';
+  iORM.DB.Components.DataSet.DesignTime in '..\..\Source\iORM.DB.Components.DataSet.DesignTime.pas';
 
 end.
