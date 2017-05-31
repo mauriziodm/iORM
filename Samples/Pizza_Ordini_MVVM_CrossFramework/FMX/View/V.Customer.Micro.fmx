@@ -1,0 +1,118 @@
+object CustomerMicroView: TCustomerMicroView
+  Size.Width = 320.000000000000000000
+  Size.Height = 60.000000000000000000
+  Size.PlatformDefault = False
+  object EditID: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 4
+    Text = '-33'
+    Position.X = 9.000000000000000000
+    Position.Y = 22.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Label1: TLabel
+    Position.X = 10.000000000000000000
+    Position.Y = 4.000000000000000000
+    Size.Width = 40.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'ID'
+  end
+  object Label2: TLabel
+    Position.X = 54.000000000000000000
+    Position.Y = 4.000000000000000000
+    Size.Width = 140.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'First name'
+  end
+  object EditFirstName: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 3
+    Text = 'Mark Anderson'
+    Position.X = 53.000000000000000000
+    Position.Y = 22.000000000000000000
+    Size.Width = 140.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Label3: TLabel
+    Position.X = 198.000000000000000000
+    Position.Y = 4.000000000000000000
+    Size.Width = 113.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Last name'
+  end
+  object EditLastName: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 2
+    Text = 'Mark Anderson'
+    Position.X = 197.000000000000000000
+    Position.Y = 22.000000000000000000
+    Size.Width = 113.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object MBSCustomer: TioModelBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'FirstName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'LastName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBCustomerMicro
+    ModelPresenter = 'MPCustomer'
+    Left = 264
+    Top = 8
+  end
+  object VMBCustomerMicro: TioViewModelBridge
+    DI_VMInterface = 'TCustomerMicroVM'
+    Left = 128
+    Top = 8
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSCustomer
+      FieldName = 'ID'
+      Control = EditID
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSCustomer
+      FieldName = 'LastName'
+      Control = EditLastName
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSCustomer
+      FieldName = 'FirstName'
+      Control = EditFirstName
+      Track = False
+    end
+  end
+end

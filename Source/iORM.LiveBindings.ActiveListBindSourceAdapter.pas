@@ -128,7 +128,6 @@ type
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AList: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
-    procedure FreeInstance; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
@@ -433,12 +432,6 @@ begin
 
   // Set it to the Adapter itself
   Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
-end;
-
-procedure TioActiveListBindSourceAdapter.FreeInstance;
-begin
-//  inherited;
-
 end;
 
 function TioActiveListBindSourceAdapter.GetAutoLoadData: Boolean;

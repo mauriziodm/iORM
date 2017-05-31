@@ -18,6 +18,7 @@ type
 
   IioCrossViewMasterSource = interface
     ['{5A2614C8-088E-4642-A2C0-A671EE62B517}']
+    function GetModelPresenterInstance: TioModelPresenter;
     // InternalActiveAdapter
     function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
     property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter;  // Must be ReadOnly

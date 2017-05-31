@@ -22,6 +22,7 @@ type
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function GetModelPresenterInstance: TioModelPresenter;
     // ViewModelBridge
     procedure SetViewModelBridge(const AVMBridge:TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
@@ -80,16 +81,16 @@ begin
   begin
     if Assigned(FCrossView_MasterBindSource) then
     begin
-      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FCrossView_MasterBindSource.InternalActiveAdapter, FCrossView_MasterPropertyName, nil);
-      if not Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) then
-        raise EioException.Create(Self.ClassName, 'DoCreateAdapter', '"IioActiveBindSourceAdapter" interface not implemented by object.');
+      // Get the BSA from the MasterModelPresenter
+      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterModelPresenter(Self, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil);
+      // Set the retrieved BSA as adapter for this Presenter
       ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter := LActiveBSA;
     end
     else
-    begin
-      LActiveBSA := ViewModelBridge.ViewModel.Presenter[ModelPresenter].BindSourceAdapter;
-      ADataObject := LActiveBSA as TBindSourceAdapter;
-    end;
+      // Get the BSA from the presenter
+      LActiveBSA := ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter;
+    // Assign the BindSourceAdapter
+    ADataObject := LActiveBSA as TBindSourceAdapter;
   end;
 end;
 
@@ -97,6 +98,11 @@ function TioModelBindSource.GetInternalActiveAdapter: IioActiveBindSourceAdapter
 begin
   Result := nil;
   if CheckAdapter and Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
+end;
+
+function TioModelBindSource.GetModelPresenterInstance: TioModelPresenter;
+begin
+  Result := ViewModelBridge.Presenter[ModelPresenter];
 end;
 
 function TioModelBindSource.GetViewModelBridge: TioViewModelBridge;

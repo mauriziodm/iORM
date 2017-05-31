@@ -83,24 +83,22 @@ begin
   // If a ViewModel is already assigned then exit
   if Assigned(FViewModel) then Exit;
   // ===============================================================================================================================
-  // LOCKED VIEW MODEL ALREADY CREATED IN THE DEPENDENCY INJECTION CONTAINER  (an external prepared ViewModel)
-  // -------------------------------------------------------------------------------------------------------------------------------
-  // If a LockedViewModel is present in the DIContainer (an external prepared ViewModel) and the BindSource is not
-  //  a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
-  //  and get the BindSourceAdapter from it.
-  FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
-  // ===============================================================================================================================
   // VIEW MODEL CREATION BY DI_VMINterface & DI_VMAlias property if not already created
   // -------------------------------------------------------------------------------------------------------------------------------
-  if  (not Assigned(FViewModel))
-  and (not FDI_VMInterface.IsEmpty)
-//  and io.di.LocateViewModel(FDI_VMInterface, FDI_VMAlias).Exist
-  then
+  if not FDI_VMInterface.IsEmpty then
   begin
     LObj := io.di.LocateViewModel(FDI_VMInterface, FDI_VMAlias).Get;
     if not Supports(LObj, IioViewModel, FViewModel) then
       raise EioException.Create(Self.ClassName, 'CheckForViewModel', '"IioViewModel" interface not implemented by object.');
   end;
+  // ===============================================================================================================================
+  // LOCKED VIEW MODEL ALREADY CREATED IN THE DEPENDENCY INJECTION CONTAINER  (an external prepared ViewModel)
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // If a LockedViewModel is present in the DIContainer (an external prepared ViewModel) and the BindSource is not
+  //  a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
+  //  and get the BindSourceAdapter from it.
+  if  (not Assigned(FViewModel)) then
+    FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
   // ===============================================================================================================================
   // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
   //  or for retrieve an external created ViewModel
@@ -150,6 +148,7 @@ end;
 function TioViewModelBridge.GetPresenter(
   const AName: String): TioModelPresenter;
 begin
+  CheckForViewModel;
   if Assigned(FViewModel) then
     Result := FViewModel.Presenter[AName]
   else

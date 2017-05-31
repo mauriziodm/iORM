@@ -17,6 +17,7 @@ type
   protected
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function GetModelPresenterInstance: TioModelPresenter;
     // dataset virtual methods
     procedure InternalPreOpen; override;
     /// ViewModelBridge
@@ -48,6 +49,11 @@ begin
   FCrossView_MasterPropertyName := '';
   if (csDesigning in ComponentState) and not Assigned(FViewModelBridge) then
     TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
+end;
+
+function TioModelDataSet.GetModelPresenterInstance: TioModelPresenter;
+begin
+  Result := ViewModelBridge.Presenter[ModelPresenter];
 end;
 
 function TioModelDataSet.GetViewModelBridge: TioViewModelBridge;

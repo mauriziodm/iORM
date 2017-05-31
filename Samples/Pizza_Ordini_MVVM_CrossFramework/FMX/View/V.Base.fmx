@@ -1,0 +1,35 @@
+object BaseView: TBaseView
+  Align = Client
+  Size.Width = 367.000000000000000000
+  Size.Height = 441.000000000000000000
+  Size.PlatformDefault = False
+  object ToolBar1: TToolBar
+    Size.Width = 367.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object LabelTitle: TLabel
+      Align = Client
+      StyledSettings = [Style, FontColor]
+      Size.Width = 317.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Family = 'Segoe UI Semibold'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.HorzAlign = Center
+      Text = 'Title'
+    end
+    object ButtonBack: TSpeedButton
+      Align = Left
+      Size.Width = 50.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'priortoolbuttonbordered'
+      Text = 'Back'
+    end
+  end
+  object VMBridge: TioViewModelBridge
+    Left = 288
+    Top = 48
+  end
+end
