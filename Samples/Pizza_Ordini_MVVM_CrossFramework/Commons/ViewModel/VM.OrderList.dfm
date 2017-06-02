@@ -15,11 +15,9 @@ inherited OrderListVM: TOrderListVM
     Left = 160
     Top = 24
     object acBack: TAction
-      Text = 'acBack'
       OnExecute = acBackExecute
     end
     object acEditOrder: TAction
-      Text = 'acEditOrder'
       OnExecute = acEditOrderExecute
     end
   end

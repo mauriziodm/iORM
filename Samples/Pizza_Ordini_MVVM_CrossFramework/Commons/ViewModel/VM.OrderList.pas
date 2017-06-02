@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, iORM.Attributes, iORM.MVVM.ViewModelBase,
-  iORM.MVVM.Components.ModelPresenter, System.Actions, FMX.ActnList;
+  iORM.MVVM.Components.ModelPresenter, System.Actions, FMX.ActnList,
+  Vcl.ActnList;
 
 type
 

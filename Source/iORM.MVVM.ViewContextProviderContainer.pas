@@ -44,14 +44,26 @@ uses
 
 type
 
+  // Contiene l'elenco di tutti providers registrati in ordine di registrazione
+  //  il primo registrato è il primo elemento e l'ultimo... è l'ultimo.
   TioViewContextProviderContainerInternal = TList<TioViewContextProvider>;
+
+  // Lo stack contiene la sequenza di attivazione dei providers che sono stati
+  //  attivi (cioè che sono stati default), in pratica serve per gestire la sequenza
+  //  temporale dei providers di default
+  TioActiveViewContextProviderStack = TStack<TioViewContextProvider>;
 
   TioViewContextProviderContainer = class
   private
     class var FInternalContainer: TioViewContextProviderContainerInternal;
+    class var FInternalActiveStack: TioActiveViewContextProviderStack;
     class procedure Build; static;
     class procedure CleanUp; static;
+    class procedure CheckActiveProviderAfterUnregister(const AUnregisteredProvider:TioViewContextProvider); static;
+    class function IsTheActiveProvider(const AProvider:TioViewContextProvider): Boolean; static;
+    class function ActiveProviderIsNotRegistered: Boolean; static;
     class function ItemIndexByName(const AProviderName:String): Integer; static;
+    class function IsRegistered(const AProvider:TioViewContextProvider): Boolean; static;
   public
     class procedure RegisterProvider(const AProvider:TioViewContextProvider); static;
     class procedure UnregisterProvider(const AProvider:TioViewContextProvider); static;
@@ -68,35 +80,74 @@ uses
 
 { TioViewContextProviderContainer }
 
+class function TioViewContextProviderContainer.ActiveProviderIsNotRegistered: Boolean;
+begin
+  Result := (FInternalActiveStack.Count > 0) and not IsRegistered(FInternalActiveStack.Peek);
+end;
+
 class procedure TioViewContextProviderContainer.Build;
 begin
   FInternalContainer := TioViewContextProviderContainerInternal.Create;
+  FInternalActiveStack := TioActiveViewContextProviderStack.Create;
 end;
 
 class function TioViewContextProviderContainer.GetProvider: TioViewContextProvider;
 begin
-  Result := nil;
-  // Get the active provider (the active provider is the first of the list (ItemIndex = 0)
-  if FInternalContainer.Count > 0 then
-    Result := FInternalContainer.Items[0];
+  // Get the active provider
+  if FInternalActiveStack.Count > 0 then
+    Result := FInternalActiveStack.Peek
+  else
+    Result := nil;
+end;
+
+class procedure TioViewContextProviderContainer.CheckActiveProviderAfterUnregister(
+  const AUnregisteredProvider: TioViewContextProvider);
+var
+  LSomeProviderExtracted: Boolean;
+begin
+  // Check if the top element of the ActiveProvidersStack is valid (exist in
+  //  then internal list of registered providers); if not valid (not exist...)
+  //  then remove it from the stack also.
+  //  Make sure the new active provider is registered else remove it from the stack also
+  LSomeProviderExtracted := False;
+  while IsTheActiveProvider(AUnregisteredProvider) or ActiveProviderIsNotRegistered do
+  begin
+    FInternalActiveStack.Extract;
+    LSomeProviderExtracted := True;
+  end;
+  if LSomeProviderExtracted then
+    FInternalActiveStack.TrimExcess;
 end;
 
 class procedure TioViewContextProviderContainer.CleanUp;
 begin
   FInternalContainer.Free;
+  FInternalActiveStack.Free;
 end;
 
 class function TioViewContextProviderContainer.GetProvider(
   const AName: String): TioViewContextProvider;
 var
-  LIndex: Integer;
+  LItemIndex: Integer;
 begin
   Result := nil;
   // Get the Index
-  LIndex := ItemIndexByName(AName);
+  LItemIndex := ItemIndexByName(AName);
   // Set the result value
-  if LIndex > -1 then
-    Result := FInternalContainer.Items[LIndex];
+  if LItemIndex > -1 then
+    Result := FInternalContainer.Items[LItemIndex];
+end;
+
+class function TioViewContextProviderContainer.IsRegistered(
+  const AProvider: TioViewContextProvider): Boolean;
+begin
+  Result := FInternalContainer.Contains(AProvider);
+end;
+
+class function TioViewContextProviderContainer.IsTheActiveProvider(
+  const AProvider: TioViewContextProvider): Boolean;
+begin
+  Result := (FInternalActiveStack.Count > 0) and (FInternalActiveStack.Peek = AProvider);
 end;
 
 class function TioViewContextProviderContainer.ItemIndexByName(
@@ -105,26 +156,23 @@ var
   I : Integer;
 begin
   Result := -1;
-  for I := 0 to FInternalContainer.Count-1 do
+  // NB: Cerca in sequenza inversa in modo che, se esistono dei providers con lo
+  //      stesso nome (es. viste ricorsive) ritorni sempre quello registrato
+  //      più di recente.
+  for I := FInternalContainer.Count-1 downto 0 do
     if (FInternalContainer.Items[I] as TComponent).Name = AProviderName then
       Exit(I);
 end;
 
 class procedure TioViewContextProviderContainer.RegisterProvider(
   const AProvider: TioViewContextProvider);
-var
-  LProviderName: String;
 begin
-  // Get the provider name
-  LProviderName := (AProvider as TComponent).Name;
-  // Check if a provider with the same name already exist
-  if ItemIndexByName(LProviderName) <> -1 then
-    raise EioException.Create(Format('TioViewContextProviderContainer.RegisterProvider: A provider with the same name is already registered (%s).', [LProviderName]));
-  // Register the provider
+  // Register the provider into the collection of providers (append)
+  FInternalContainer.Add(AProvider);
+  // If the RegisterAsDefault property of the provider is set to True then set
+  //  the provider as the new default provider
   if AProvider.RegisterAsDefault then
-    FInternalContainer.Insert(0, AProvider)
-  else
-    FInternalContainer.Add(AProvider);
+    FInternalActiveStack.Push(AProvider);
 end;
 
 class procedure TioViewContextProviderContainer.SetActiveProvider(
@@ -132,31 +180,33 @@ class procedure TioViewContextProviderContainer.SetActiveProvider(
 var
   LOldIndex: Integer;
 begin
-  // Get the current/old ItemIndex
-  LOldIndex := FInternalContainer.IndexOf(AProvider);
-  if LOldIndex = -1 then
-    raise EioException.Create('TioViewContextProviderContainer.SetActiveProvider: Provider not registered (%s).');
-  // Move the provider at the top position of the list (Index = 0)
-  FInternalContainer.Move(LOldIndex, 0);
+  // The provider must be registered
+  if not IsRegistered(AProvider) then
+    raise EioException.Create(Format('TioViewContextProviderContainer.SetActiveProvider: Provider not registered (%s).', [AProvider.Name]));
+  // Activate the provider nly if the provider is not already the active provider
+  if not IsTheActiveProvider(AProvider) then
+    FInternalActiveStack.Push(AProvider);
 end;
 
 class procedure TioViewContextProviderContainer.SetActiveProvider(
   const AName: String);
 var
-  LOldIndex: Integer;
+  LItemIndex: Integer;
 begin
-  // Get the current/old ItemIndex
-  LOldIndex := ItemIndexByName(AName);
-  if LOldIndex = -1 then
+  // Get the current ItemIndex
+  LItemIndex := ItemIndexByName(AName);
+  if LItemIndex = -1 then
     raise EioException.Create(Format('TioViewContextProviderContainer.SetActiveProvider: Provider not registered (%s).', [AName]));
-  // Move the provider at the top position of the list (Index = 0)
-  FInternalContainer.Move(LOldIndex, 0);
+  // Activate the provider
+  SetActiveProvider(FInternalContainer.Items[LItemIndex]);
 end;
 
 class procedure TioViewContextProviderContainer.UnregisterProvider(
   const AProvider: TioViewContextProvider);
 begin
+  // Remove the provider from the internal list
   FInternalContainer.Remove(AProvider);
+  CheckActiveProviderAfterUnregister(AProvider);
 end;
 
 initialization
