@@ -80,6 +80,10 @@ type
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
+    // TypeName
+    procedure SetTypeName(const Value: String);
+    // TypeAlias
+    procedure SetTypeAlias(const Value: String);
     // ioWhereStr
     procedure SetWhereStr(const Value: TStrings);
     // ioWhere property
@@ -132,8 +136,8 @@ type
     // Events
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     // Properties
-    property ioTypeName:String read FioTypeName write FioTypeName;
-    property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
+    property ioTypeName:String read FioTypeName write SetTypeName;
+    property ioTypeAlias:String read FioTypeAlias write SetTypeAlias;
     property ioAsync:Boolean read FioAsync write SetAsync;
     property ioAutoLoadData:Boolean read FioAutoLoadData write SetAutoLoadData;
     property ioAutoPersist:Boolean read FioAutoPersist write SetAutoPersist;
@@ -504,6 +508,24 @@ begin
   //  update the where of the adapter also
   if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhere.SetOrderBySql(Value);
+end;
+
+procedure TioPrototypeBindSource.SetTypeAlias(const Value: String);
+begin
+  FioTypeAlias := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.ioTypeAlias := Value;
+end;
+
+procedure TioPrototypeBindSource.SetTypeName(const Value: String);
+begin
+  FioTypeName := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.ioTypeName := Value;
 end;
 
 procedure TioPrototypeBindSource.SetWhereDetailsFromDetailAdapters(

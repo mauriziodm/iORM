@@ -34,6 +34,10 @@ type
     procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
+    // TypeName
+    procedure SetTypeName(const Value: String);
+    // TypeAlias
+    procedure SetTypeAlias(const Value: String);
     // BindSourceAdapter
     procedure SetBindSourceAdapter(const Value: TBindSourceAdapter); overload;
     procedure SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter); overload;
@@ -109,8 +113,8 @@ type
     property MasterPresenter:TioModelPresenter read FMasterPresenter write FMasterPresenter;
     property MasterPropertyName:String read FMasterPropertyName write FMasterPropertyName;
     property OrderBy:String read FOrderBy Write SetOrderBy;
-    property TypeAlias:String read FTypeAlias write FTypeAlias;
-    property TypeName:String read FTypeName write FTypeName;
+    property TypeAlias:String read FTypeAlias write SetTypeAlias;
+    property TypeName:String read FTypeName write SetTypeName;
     property ViewDataType:TioViewDataType read FViewDataType write FViewDataType;
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
     property WhereStr:TStrings read FWhereStr write SetWhereStr;
@@ -484,6 +488,24 @@ begin
   //  update the where of the adapter also
   if CheckAdapter then
     FBindSourceAdapter.ioWhere.SetOrderBySql(Value);
+end;
+
+procedure TioModelPresenter.SetTypeAlias(const Value: String);
+begin
+  FTypeAlias := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.ioTypeAlias := Value;
+end;
+
+procedure TioModelPresenter.SetTypeName(const Value: String);
+begin
+  FTypeName := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.ioTypeName := Value;
 end;
 
 procedure TioModelPresenter.SetAutoPersist(const Value: Boolean);

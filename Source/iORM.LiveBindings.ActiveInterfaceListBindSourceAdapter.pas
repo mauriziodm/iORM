@@ -69,8 +69,12 @@ type
     FInsertObj_NewObj: TObject;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
-    function TypeName: String;
-    function TypeAlias: String;
+    // TypeName
+    procedure SetTypeName(const AValue:String);
+    function GetTypeName: String;
+    // TypeAlias
+    procedure SetTypeAlias(const AValue:String);
+    function GetTypeAlias: String;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -148,6 +152,8 @@ type
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
+    property ioTypeName:String read GetTypeName write SetTypeName;
+    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -509,6 +515,16 @@ begin
   Result := Self.State;
 end;
 
+function TioActiveInterfaceListBindSourceAdapter.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
 function TioActiveInterfaceListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(
   const AOwner: TComponent): TBindSourceAdapter;
 begin
@@ -697,14 +713,16 @@ begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.TypeAlias: String;
+procedure TioActiveInterfaceListBindSourceAdapter.SetTypeAlias(
+  const AValue: String);
 begin
-  Result := FTypeAlias;
+  FTypeAlias := AValue;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.TypeName: String;
+procedure TioActiveInterfaceListBindSourceAdapter.SetTypeName(
+  const AValue: String);
 begin
-  Result := FTypeName;
+  FTypeName := AValue;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.UseObjStatus: Boolean;

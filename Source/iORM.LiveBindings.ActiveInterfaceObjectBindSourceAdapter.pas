@@ -67,8 +67,12 @@ type
 //    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
-    function TypeName: String;
-    function TypeAlias: String;
+    // TypeName
+    procedure SetTypeName(const AValue:String);
+    function GetTypeName: String;
+    // TypeAlias
+    procedure SetTypeAlias(const AValue:String);
+    function GetTypeAlias: String;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -146,6 +150,8 @@ type
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
+    property ioTypeName:String read GetTypeName write SetTypeName;
+    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -488,6 +494,16 @@ begin
   Result := Self.State;
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
 begin
   Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
@@ -655,14 +671,16 @@ begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.TypeAlias: String;
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeAlias(
+  const AValue: String);
 begin
-  result := FTypeAlias;
+  FTypeAlias := AValue;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.TypeName: String;
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeName(
+  const AValue: String);
 begin
-  Result := FTypeName;
+  FTypeName := AValue;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.UseObjStatus: Boolean;

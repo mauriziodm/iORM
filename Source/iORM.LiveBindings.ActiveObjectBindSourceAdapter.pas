@@ -52,7 +52,8 @@ type
     FAsync: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
-    FClassRef: TioClassRef;
+//    FClassRef: TioClassRef;
+    FTypeName, FTypeAlias: String;  // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
     FAutoPersist: Boolean;
@@ -65,8 +66,12 @@ type
 //    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;  *** NB: Code presente (commented) in the unit body ***
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
-    function TypeName: String;
-    function TypeAlias: String;
+    // TypeName
+    procedure SetTypeName(const AValue:String);
+    function GetTypeName: String;
+    // TypeAlias
+    procedure SetTypeAlias(const AValue:String);
+    function GetTypeAlias: String;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -145,6 +150,8 @@ type
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
 
+    property ioTypeName:String read GetTypeName write SetTypeName;
+    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
@@ -197,7 +204,8 @@ begin
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;
-  FClassRef := AClassRef;
+  FTypeName := AClassRef.ClassName;
+  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
@@ -387,7 +395,7 @@ end;
 
 function TioActiveObjectBindSourceAdapter.GetBaseObjectClassName: String;
 begin
-   Result := FClassRef.ClassName;
+   Result := FTypeName;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetCurrentOID: Integer;
@@ -424,7 +432,7 @@ end;
 function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, Self.FClassRef.ClassName, AMasterPropertyName, AWhere);
+  Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
@@ -487,6 +495,16 @@ end;
 function TioActiveObjectBindSourceAdapter.GetState: TBindSourceAdapterState;
 begin
   Result := Self.State;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetTypeName: String;
+begin
+  Result := FTypeName;
 end;
 
 function TioActiveObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(
@@ -658,14 +676,14 @@ begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
 end;
 
-function TioActiveObjectBindSourceAdapter.TypeAlias: String;
+procedure TioActiveObjectBindSourceAdapter.SetTypeAlias(const AValue: String);
 begin
-  Result := '';
+  FTypeAlias := AValue;
 end;
 
-function TioActiveObjectBindSourceAdapter.TypeName: String;
+procedure TioActiveObjectBindSourceAdapter.SetTypeName(const AValue: String);
 begin
-  Result := FClassRef.ClassName;
+  FTypeName := AValue;
 end;
 
 function TioActiveObjectBindSourceAdapter.UseObjStatus: Boolean;

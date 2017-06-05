@@ -1,0 +1,53 @@
+object StartForm: TStartForm
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 603
+  ClientWidth = 383
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object TabControl: TTabControl
+    Align = Client
+    Size.Width = 383.000000000000000000
+    Size.Height = 603.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    TabPosition = None
+  end
+  object SQLIteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLIteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = 'BOM.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 152
+    Top = 80
+  end
+  object VCProviderMaster: TioViewContextProvider
+    ioOnRequest = VCProviderMasterioOnRequest
+    ioOnAfterRequest = VCProviderMasterioOnAfterRequest
+    ioOnRelease = VCProviderMasterioOnRelease
+    RegisterAsDefault = True
+    AutoParent = True
+    AutoOwner = True
+    Left = 152
+    Top = 136
+  end
+  object ActionList1: TActionList
+    Left = 152
+    Top = 192
+    object NextTabAction1: TNextTabAction
+      Category = 'Tab'
+      TabControl = TabControl
+    end
+    object PreviousTabAction1: TPreviousTabAction
+      Category = 'Tab'
+      TabControl = TabControl
+    end
+  end
+end

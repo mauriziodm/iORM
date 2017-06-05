@@ -110,12 +110,20 @@ type
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
-    function TypeName: String;
-    function TypeAlias: String;
+//    function TypeName: String;       // Added TypeName property
+//    function TypeAlias: String;      // Added TypeAlias property
     function GetMasterPropertyName: String;
     function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    // TypeName
+    procedure SetTypeName(const AValue:String);
+    function GetTypeName: String;
+    property ioTypeName:String read GetTypeName write SetTypeName;
+    // TypeAlias
+    procedure SetTypeAlias(const AValue:String);
+    function GetTypeAlias: String;
+    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;

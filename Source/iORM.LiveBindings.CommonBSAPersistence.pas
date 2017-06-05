@@ -98,8 +98,8 @@ var
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // Copy values into local variables
-  LTypeName := AActiveBindSourceAdapter.TypeName;
-  LTypeAlias := AActiveBindSourceAdapter.TypeAlias;
+  LTypeName := AActiveBindSourceAdapter.ioTypeName;
+  LTypeAlias := AActiveBindSourceAdapter.ioTypeAlias;
   LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
   LWhere := AActiveBindSourceAdapter.ioWhere;
   LOwnsObjects := AActiveBindSourceAdapter.ioOwnsObjects;
