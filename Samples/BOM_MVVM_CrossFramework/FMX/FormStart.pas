@@ -59,6 +59,7 @@ end;
 procedure TStartForm.VCProviderMasterioOnRelease(const Sender: TObject;
   const AView, AViewContext: TComponent);
 begin
+  PreviousTabAction1.Execute;
   TabControl.Delete((AViewContext as TTabItem).Index);
 end;
 

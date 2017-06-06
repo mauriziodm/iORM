@@ -5,16 +5,17 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
-  FMX.Controls.Presentation, iORM.MVVM.Components.ViewModelBridge, iORM.Attributes;
+  FMX.Controls.Presentation, iORM.MVVM.Components.ViewModelBridge, iORM.Attributes,
+  FMX.Layouts, FMX.Objects;
 
 type
   TBaseView = class(TFrame)
-    ToolBar1: TToolBar;
     LabelTitle: TLabel;
+    VMBridge: TioViewModelBridge;
 
     [ioBindAction('acBack')]
     ButtonBack: TSpeedButton;
-    VMBridge: TioViewModelBridge;
+    RectangleTop: TRectangle;
 
   private
     { Private declarations }

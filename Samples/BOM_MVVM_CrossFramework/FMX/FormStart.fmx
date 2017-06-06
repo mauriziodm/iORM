@@ -14,7 +14,7 @@ object StartForm: TStartForm
     Size.Width = 383.000000000000000000
     Size.Height = 603.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
+    TabOrder = 6
     TabPosition = None
   end
   object SQLIteConn: TioSQLiteConnectionDef

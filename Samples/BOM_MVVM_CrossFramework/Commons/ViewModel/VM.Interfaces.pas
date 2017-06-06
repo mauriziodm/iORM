@@ -11,6 +11,10 @@ type
     ['{9399B561-DE87-4EB3-B087-9F202A539117}']
   end;
 
+  IArticleVM = interface(IioViewModel)
+    ['{7FB33141-79FF-4C20-9C33-AE3A55A00058}']
+  end;
+
 implementation
 
 end.

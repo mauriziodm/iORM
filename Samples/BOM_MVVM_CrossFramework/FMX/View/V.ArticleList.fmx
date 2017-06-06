@@ -1,12 +1,148 @@
 inherited ArticleLIstView: TArticleLIstView
-  Size.Height = 481.000000000000000000
-  inherited ToolBar1: TToolBar
+  Size.Height = 538.000000000000000000
+  object ListView1: TListView [0]
+    ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+    ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
+    HeaderAppearanceClassName = 'TListHeaderObjects'
+    FooterAppearanceClassName = 'TListHeaderObjects'
+    ItemIndex = 1
+    Align = Client
+    Size.Width = 367.000000000000000000
+    Size.Height = 430.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    ItemAppearanceObjects.HeaderObjects.Text.Font.StyleExt = {00070000000000000004000000}
+    ItemAppearanceObjects.HeaderObjects.Text.Align = Center
+    OnItemClick = ListView1ItemClick
+  end
+  object MultiView1: TMultiView [1]
+    DrawerOptions.Placement = Right
+    MasterButton = ButtonNew
+    Mode = Drawer
+    SplitViewOptions.Placement = Right
+    Size.Width = 199.000000000000000000
+    Size.Height = 352.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    TabOrder = 8
+    object ButtonNewMaterial: TSpeedButton
+      Align = Top
+      StyledSettings = [Family, FontColor]
+      Size.Width = 198.000000000000000000
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'New material'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
+    end
+    object ButtonNewProduct: TSpeedButton
+      Align = Top
+      StyledSettings = [Family, FontColor]
+      Position.Y = 120.000000000000000000
+      Size.Width = 198.000000000000000000
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'New process'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
+    end
+    object ButtonNewProcess: TSpeedButton
+      Align = Top
+      StyledSettings = [Family, FontColor]
+      Position.Y = 60.000000000000000000
+      Size.Width = 198.000000000000000000
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'New Process'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
+    end
+  end
+  object RectangleFilters: TRectangle [2]
+    Align = Top
+    Corners = []
+    Fill.Color = claCoral
+    Position.Y = 40.000000000000000000
+    Size.Width = 367.000000000000000000
+    Size.Height = 68.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object ButtonSearch: TSpeedButton
+      Align = Right
+      Position.X = 317.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 68.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'searchtoolbuttonbordered'
+      Text = 'Back'
+    end
+    object EditFilterCode: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 1
+      Text = 'Darkgoldenrod'
+      Position.X = 215.000000000000000000
+      Position.Y = 3.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'Code'
+    end
+    object EditFilterDescription: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      Text = 'Darkgoldenrod'
+      Position.X = 215.000000000000000000
+      Position.Y = 30.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'Description'
+    end
+    object RadioButtonFilterAll: TRadioButton
+      IsChecked = True
+      Position.X = 7.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 83.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'All'
+    end
+    object RadioButtonFilterMaterlials: TRadioButton
+      Position.X = 7.000000000000000000
+      Position.Y = 36.000000000000000000
+      Size.Width = 83.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      Text = 'Materials'
+    end
+    object RadioButtonFilterProcesses: TRadioButton
+      Position.X = 106.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 83.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Text = 'Processes'
+    end
+    object RadioButtonFilterProducts: TRadioButton
+      Position.X = 106.000000000000000000
+      Position.Y = 36.000000000000000000
+      Size.Width = 83.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 6
+      Text = 'Products'
+    end
+  end
+  inherited RectangleTop: TRectangle
+    inherited ButtonBack: TSpeedButton
+      StyleLookup = 'stoptoolbuttonbordered'
+    end
     inherited LabelTitle: TLabel
       Size.Width = 267.000000000000000000
       Text = 'Articles'
-    end
-    inherited ButtonBack: TSpeedButton
-      StyleLookup = 'stoptoolbuttonbordered'
     end
     object ButtonNew: TSpeedButton
       Align = Right
@@ -18,100 +154,9 @@ inherited ArticleLIstView: TArticleLIstView
       Text = 'Back'
     end
   end
-  object ListView1: TListView [1]
-    ItemAppearanceClassName = 'TListItemRightDetailAppearance'
-    ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
-    HeaderAppearanceClassName = 'TListHeaderObjects'
-    FooterAppearanceClassName = 'TListHeaderObjects'
-    Align = Client
-    Size.Width = 367.000000000000000000
-    Size.Height = 352.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 2
-    ItemAppearanceObjects.HeaderObjects.Text.Font.StyleExt = {00070000000000000004000000}
-    ItemAppearanceObjects.HeaderObjects.Text.Align = Center
-  end
-  object ToolBar2: TToolBar [2]
-    Align = Bottom
-    Position.Y = 392.000000000000000000
-    Size.Width = 367.000000000000000000
-    Size.Height = 89.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 6
-    object GroupBoxArticleType: TGroupBox
-      Position.X = 5.000000000000000000
-      Position.Y = 5.000000000000000000
-      Size.Width = 204.000000000000000000
-      Size.Height = 77.000000000000000000
-      Size.PlatformDefault = False
-      Text = 'Type'
-      TabOrder = 0
-      object RadioButtonFilterAll: TRadioButton
-        IsChecked = True
-        Position.X = 8.000000000000000000
-        Position.Y = 21.000000000000000000
-        Size.Width = 83.000000000000000000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 0
-        Text = 'All'
-      end
-      object RadioButtonFilterMaterlials: TRadioButton
-        Position.X = 8.000000000000000000
-        Position.Y = 53.000000000000000000
-        Size.Width = 83.000000000000000000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 1
-        Text = 'Materials'
-      end
-      object RadioButtonFilterProcesses: TRadioButton
-        Position.X = 112.000000000000000000
-        Position.Y = 21.000000000000000000
-        Size.Width = 83.000000000000000000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 3
-        Text = 'Processes'
-      end
-      object RadioButtonFilterProducts: TRadioButton
-        Position.X = 112.000000000000000000
-        Position.Y = 53.000000000000000000
-        Size.Width = 83.000000000000000000
-        Size.Height = 19.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 2
-        Text = 'Products'
-      end
-    end
-    object EditFilterCode: TEdit
-      Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 2
-      Text = 'Darkgoldenrod'
-      Position.X = 214.000000000000000000
-      Position.Y = 13.000000000000000000
-      TextPrompt = 'Code'
-    end
-    object EditFilterDescription: TEdit
-      Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 1
-      Text = 'Darkgoldenrod'
-      Position.X = 214.000000000000000000
-      Position.Y = 45.000000000000000000
-      TextPrompt = 'Description'
-    end
-    object ButtonSearch: TSpeedButton
-      Align = Right
-      Position.X = 317.000000000000000000
-      Size.Width = 50.000000000000000000
-      Size.Height = 89.000000000000000000
-      Size.PlatformDefault = False
-      StyleLookup = 'searchtoolbuttonbordered'
-      Text = 'Back'
-    end
-  end
   inherited VMBridge: TioViewModelBridge
     DI_VMInterface = 'IArticleListVM'
+    Top = 160
   end
   object MBSArticleList: TioModelBindSource
     AutoActivate = True
@@ -136,30 +181,13 @@ inherited ArticleLIstView: TArticleLIstView
     ViewModelBridge = VMBridge
     ModelPresenter = 'MPArticleList'
     Left = 280
-    Top = 128
+    Top = 216
   end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 76
-    Top = 21
-    object LinkFillControlToField1: TLinkFillControlToField
-      Category = 'Quick Bindings'
-      Control = ListView1
-      Track = True
-      FillDataSource = MBSArticleList
-      FillDisplayFieldName = 'Description'
-      AutoFill = True
-      FillExpressions = <
-        item
-          SourceMemberName = 'Code'
-          ControlMemberName = 'Detail'
-        end>
-      FillHeaderExpressions = <>
-      FillBreakFieldName = 'ArticleType'
-      FillHeaderFieldName = 'ArticleType'
-      FillBreakGroups = <>
-    end
+    Left = 268
+    Top = 13
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = MBSFilters
@@ -173,6 +201,21 @@ inherited ArticleLIstView: TArticleLIstView
       FieldName = 'Description'
       Control = EditFilterDescription
       Track = False
+    end
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticleList
+      FieldName = 'Description'
+      Control = ListView1
+      FillExpressions = <
+        item
+          SourceMemberName = 'Code'
+          ControlMemberName = 'Detail'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakFieldName = 'ArticleType'
+      FillHeaderFieldName = 'ArticleType'
+      FillBreakGroups = <>
     end
   end
   object MBSFilters: TioModelBindSource

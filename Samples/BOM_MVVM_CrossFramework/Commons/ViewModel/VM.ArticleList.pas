@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
   iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces,
-  System.Actions, FMX.ActnList, Vcl.ActnList;
+  System.Actions;
 
 type
 
@@ -31,21 +31,32 @@ type
   [diImplements(IArticleListVM)]
   TArticleListVM = class(TioViewModel, IArticleListVM)
     MPArticleList: TioModelPresenter;
-    ActionList1: TActionList;
-    acBack: TAction;
-    acFilterAll: TAction;
-    acFilterMaterial: TAction;
     MPFilters: TioModelPresenter;
-    acApplyFilters: TAction;
-    acFilterProcess: TAction;
-    acFilterProduct: TAction;
-    procedure acFilterAllExecute(Sender: TObject);
-    procedure acFilterMaterialExecute(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
+
+    [ioAction('acFilterAll', OnExecute), ioGroupIndex(1000), ioChecked]
+    procedure acFilterAllExecute(Sender: TObject);
+
+    [ioAction('acFilterMaterial', OnExecute), ioGroupIndex(1000)]
+    procedure acFilterMaterialExecute(Sender: TObject);
+
+    [ioAction('acFilterProcess', OnExecute), ioGroupIndex(1000)]
     procedure acFilterProcessExecute(Sender: TObject);
+
+    [ioAction('acFilterProduct', OnExecute), ioGroupIndex(1000)]
     procedure acFilterProductExecute(Sender: TObject);
+
+    [ioAction('acBack', OnExecute)]
     procedure acBackExecute(Sender: TObject);
+
+    [ioAction('acApplyFilters', OnExecute)]
     procedure acApplyFiltersExecute(Sender: TObject);
+
+    [ioAction('acEditArticle', OnExecute)]
+    procedure acEditArticleExecute(Sender: TObject);
+
+    [ioAction('acNewMaterial', OnExecute)]
+    procedure acNewMaterialExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -55,7 +66,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Where.Interfaces;
+  iORM, iORM.Where.Interfaces, V.Interfaces, Model.Interfaces;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
 
@@ -85,6 +96,15 @@ begin
   io.TerminateApplication;
 end;
 
+procedure TArticleListVM.acEditArticleExecute(Sender: TObject);
+var
+  LAlias: String;
+begin
+  inherited;
+  LAlias := MPArticleList.Current.ClassName;
+  io.di.LocateView<IArticleView,IArticleVM>(LAlias).SetPresenter('MPArticle', MPArticleList).Show;
+end;
+
 procedure TArticleListVM.acFilterAllExecute(Sender: TObject);
 begin
   inherited;
@@ -111,6 +131,16 @@ begin
   inherited;
   MPArticleList.TypeName := 'IProduct';
   MPArticleList.Refresh(True);
+end;
+
+procedure TArticleListVM.acNewMaterialExecute(Sender: TObject);
+var
+  LMaterial: IMaterial;
+begin
+  inherited;
+  LMaterial := io.di.Locate<IMaterial>.Get;
+  MPArticleList.Append(LMaterial as TObject);
+  Command['acEditArticle'].Execute;
 end;
 
 procedure TArticleListVM.DataModuleCreate(Sender: TObject);

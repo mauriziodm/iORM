@@ -1,0 +1,205 @@
+inherited MaterialView: TMaterialView
+  Size.Height = 602.000000000000000000
+  object ListBox1: TListBox [0]
+    Align = Client
+    Size.Width = 367.000000000000000000
+    Size.Height = 562.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    DisableFocusEffect = True
+    DefaultItemStyles.ItemStyle = ''
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 363.000000000000000000
+    Viewport.Height = 558.000000000000000000
+    object ListBoxItem1: TListBoxItem
+      Size.Width = 363.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listboxitemstyle'
+      TabOrder = 0
+      Text = 'Code'
+      object EditCode: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 3
+        Text = 'Mark Anderson'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 111.000000000000000000
+        Size.Width = 252.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = [Family, Size, FontColor]
+      end
+    end
+    object ListBoxItem2: TListBoxItem
+      Position.Y = 40.000000000000000000
+      Size.Width = 363.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'listboxitemstyle'
+      TabOrder = 1
+      Text = 'Description'
+      object EditDescription: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 3
+        Text = 'Mark Anderson'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 111.000000000000000000
+        Size.Width = 252.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = [Family, Size, FontColor]
+      end
+    end
+    object ListBoxItem3: TListBoxItem
+      Position.Y = 80.000000000000000000
+      Size.Width = 363.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'U.M.'
+      object EditUM: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 3
+        Text = 'Bitmap28'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 111.000000000000000000
+        Size.Width = 252.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = [Family, Size, FontColor]
+      end
+    end
+    object ListBoxItem4: TListBoxItem
+      Position.Y = 120.000000000000000000
+      Size.Width = 363.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'Cost'
+      object EditCost: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 3
+        Text = '67,67'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 111.000000000000000000
+        Size.Width = 252.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = [Family, Size, FontColor]
+      end
+    end
+  end
+  inherited RectangleTop: TRectangle
+    inherited LabelTitle: TLabel
+      Size.Width = 267.000000000000000000
+      Text = 'Bitmap28'
+    end
+    object ButtonPost: TSpeedButton
+      Align = Right
+      Position.X = 317.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'organizetoolbuttonbordered'
+      Text = 'Back'
+    end
+  end
+  object MBSArticle: TioModelBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Code'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'UM'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'CreationDateTime'
+        FieldType = ftDateTime
+        Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'Cost'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'ArticleType'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'MPArticle'
+    Left = 280
+    Top = 128
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'Cost'
+      Control = EditCost
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'Code'
+      Control = EditCode
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'UM'
+      Control = EditUM
+      Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'Description'
+      Control = EditDescription
+      Track = False
+    end
+    object LinkPropertyToFieldText: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'ArticleType'
+      Component = LabelTitle
+      ComponentProperty = 'Text'
+    end
+  end
+end

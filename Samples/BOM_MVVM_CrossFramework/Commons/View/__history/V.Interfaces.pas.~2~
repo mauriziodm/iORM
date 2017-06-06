@@ -8,10 +8,6 @@ type
     ['{7F42E1B4-C323-423A-BAB2-84CD2C6C9453}']
   end;
 
-  IArticleView = interface
-    ['{0C46FF05-736F-43FD-9D7C-A1AA641185BD}']
-  end;
-
 implementation
 
 end.
