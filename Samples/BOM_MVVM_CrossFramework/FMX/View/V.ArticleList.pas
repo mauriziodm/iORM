@@ -39,10 +39,11 @@ type
 
     [ioBindAction('acNewMaterial')]
     ButtonNewMaterial: TSpeedButton;
-
+    [ioBindAction('acNewProcess')]
+    ButtonNewProcess: TSpeedButton;
+    [ioBindAction('acNewProduct')]
     ButtonNewProduct: TSpeedButton;
 
-    ButtonNewProcess: TSpeedButton;
     RectangleTop: TRectangle;
     LabelTitle: TLabel;
     RectangleFilters: TRectangle;
@@ -59,6 +60,7 @@ type
     MultiView1: TMultiView;
     procedure ListView1ItemClick(const Sender: TObject;
       const AItem: TListViewItem);
+    procedure ListView1DeleteItem(Sender: TObject; AIndex: Integer);
   private
     { Private declarations }
   public
@@ -68,6 +70,12 @@ type
 implementation
 
 {$R *.fmx}
+
+procedure TArticleListView.ListView1DeleteItem(Sender: TObject;
+  AIndex: Integer);
+begin
+  VMBridge.Command['acDelete'].Execute;
+end;
 
 procedure TArticleListView.ListView1ItemClick(const Sender: TObject;
   const AItem: TListViewItem);

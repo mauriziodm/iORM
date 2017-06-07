@@ -16,7 +16,8 @@ uses
   V.Interfaces in '..\Commons\View\V.Interfaces.pas',
   VM.Article in '..\Commons\ViewModel\VM.Article.pas' {ArticleViewModel: TDataModule},
   V.ArticleList in 'View\V.ArticleList.pas' {ArticleListView: TFrame},
-  V.Material in 'View\V.Material.pas' {MaterialView: TFrame};
+  V.Material in 'View\V.Material.pas' {MaterialView: TFrame},
+  V.Process in 'View\V.Process.pas' {ProcessView: TFrame};
 
 {$R *.res}
 

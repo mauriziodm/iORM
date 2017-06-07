@@ -131,6 +131,7 @@ object ArticleListView: TArticleListView
     ItemAppearanceObjects.HeaderObjects.Text.Font.StyleExt = {00070000000000000004000000}
     ItemAppearanceObjects.HeaderObjects.Text.Align = Center
     OnItemClick = ListView1ItemClick
+    OnDeleteItem = ListView1DeleteItem
   end
   object MultiView1: TMultiView
     DrawerOptions.Placement = Right

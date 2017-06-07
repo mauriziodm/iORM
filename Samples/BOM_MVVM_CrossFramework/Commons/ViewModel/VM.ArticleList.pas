@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
   iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces,
-  System.Actions;
+  System.Actions, Model.Interfaces;
 
 type
 
@@ -55,10 +55,18 @@ type
     [ioAction('acEditArticle', OnExecute)]
     procedure acEditArticleExecute(Sender: TObject);
 
+    [ioAction('acDelete', OnExecute)]
+    procedure acDeleteExecute(Sender: TObject);
+
     [ioAction('acNewMaterial', OnExecute)]
     procedure acNewMaterialExecute(Sender: TObject);
+    [ioAction('acNewProcess', OnExecute)]
+    procedure acNewProcessExecute(Sender: TObject);
+    [ioAction('acNewProduct', OnExecute)]
+    procedure acNewProductExecute(Sender: TObject);
   private
     { Private declarations }
+    procedure NewArticle<T:IBase>;
   public
     { Public declarations }
   end;
@@ -66,7 +74,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Where.Interfaces, V.Interfaces, Model.Interfaces;
+  iORM, iORM.Where.Interfaces, V.Interfaces;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
 
@@ -94,6 +102,11 @@ procedure TArticleListVM.acCloseExecute(Sender: TObject);
 begin
   inherited;
   io.TerminateApplication;
+end;
+
+procedure TArticleListVM.acDeleteExecute(Sender: TObject);
+begin
+  MPArticleList.Delete;
 end;
 
 procedure TArticleListVM.acEditArticleExecute(Sender: TObject);
@@ -134,13 +147,19 @@ begin
 end;
 
 procedure TArticleListVM.acNewMaterialExecute(Sender: TObject);
-var
-  LMaterial: IMaterial;
 begin
   inherited;
-  LMaterial := io.di.Locate<IMaterial>.Get;
-  MPArticleList.Append(LMaterial as TObject);
-  Command['acEditArticle'].Execute;
+  NewArticle<IMaterial>;
+end;
+
+procedure TArticleListVM.acNewProcessExecute(Sender: TObject);
+begin
+  NewArticle<IProcess>;
+end;
+
+procedure TArticleListVM.acNewProductExecute(Sender: TObject);
+begin
+  NewArticle<IProduct>;
 end;
 
 procedure TArticleListVM.DataModuleCreate(Sender: TObject);
@@ -150,6 +169,16 @@ begin
   inherited;
   LFilters := TArticleListFilter.Create;
   MPFilters.SetDataObject(LFilters);
+end;
+
+procedure TArticleListVM.NewArticle<T>;
+var
+  LArticle: T;
+begin
+  inherited;
+  LArticle := io.di.Locate<T>.Get;
+  MPArticleList.Append(LArticle as TObject);
+  Command['acEditArticle'].Execute;
 end;
 
 { TArticleListFilter }
