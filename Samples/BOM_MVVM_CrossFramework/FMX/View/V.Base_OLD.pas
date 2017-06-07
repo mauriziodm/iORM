@@ -1,4 +1,4 @@
-unit V.Base;
+unit V.Base_OLD;
 
 interface
 
@@ -9,12 +9,11 @@ uses
   FMX.Layouts, FMX.Objects;
 
 type
-  TBaseView = class(TFrame)
+
+  TBaseViewOld = class(TFrame)
+
     LabelTitle: TLabel;
     VMBridge: TioViewModelBridge;
-
-    [ioBindAction('acBack')]
-    ButtonBack: TSpeedButton;
     RectangleTop: TRectangle;
 
   private

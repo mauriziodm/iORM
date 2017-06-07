@@ -1,76 +1,57 @@
-inherited ArticleLIstView: TArticleLIstView
-  Size.Height = 538.000000000000000000
-  object ListView1: TListView [0]
-    ItemAppearanceClassName = 'TListItemRightDetailAppearance'
-    ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
-    HeaderAppearanceClassName = 'TListHeaderObjects'
-    FooterAppearanceClassName = 'TListHeaderObjects'
-    ItemIndex = 1
-    Align = Client
-    Size.Width = 367.000000000000000000
-    Size.Height = 430.000000000000000000
+object ArticleListView: TArticleListView
+  Align = Client
+  Size.Width = 358.000000000000000000
+  Size.Height = 518.000000000000000000
+  Size.PlatformDefault = False
+  object RectangleTop: TRectangle
+    Align = Top
+    Fill.Color = claCoral
+    Size.Width = 358.000000000000000000
+    Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 7
-    ItemAppearanceObjects.HeaderObjects.Text.Font.StyleExt = {00070000000000000004000000}
-    ItemAppearanceObjects.HeaderObjects.Text.Align = Center
-    OnItemClick = ListView1ItemClick
-  end
-  object MultiView1: TMultiView [1]
-    DrawerOptions.Placement = Right
-    MasterButton = ButtonNew
-    Mode = Drawer
-    SplitViewOptions.Placement = Right
-    Size.Width = 199.000000000000000000
-    Size.Height = 352.000000000000000000
-    Size.PlatformDefault = False
-    Visible = False
-    TabOrder = 8
-    object ButtonNewMaterial: TSpeedButton
-      Align = Top
-      StyledSettings = [Family, FontColor]
-      Size.Width = 198.000000000000000000
-      Size.Height = 60.000000000000000000
+    Stroke.Thickness = 0.000000000000000000
+    object ButtonClose: TSpeedButton
+      Align = Left
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      Text = 'New material'
-      TextSettings.Font.Size = 14.000000000000000000
-      TextSettings.Font.StyleExt = {00060000000000000004000000}
+      StyleLookup = 'stoptoolbuttonbordered'
+      Text = 'Back'
     end
-    object ButtonNewProduct: TSpeedButton
-      Align = Top
-      StyledSettings = [Family, FontColor]
-      Position.Y = 120.000000000000000000
-      Size.Width = 198.000000000000000000
-      Size.Height = 60.000000000000000000
+    object LabelTitle: TLabel
+      Align = Client
+      StyledSettings = [Style, FontColor]
+      Size.Width = 278.000000000000000000
+      Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      Text = 'New process'
-      TextSettings.Font.Size = 14.000000000000000000
-      TextSettings.Font.StyleExt = {00060000000000000004000000}
+      TextSettings.Font.Family = 'Segoe UI Semibold'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.HorzAlign = Center
+      Text = 'Articles'
     end
-    object ButtonNewProcess: TSpeedButton
-      Align = Top
-      StyledSettings = [Family, FontColor]
-      Position.Y = 60.000000000000000000
-      Size.Width = 198.000000000000000000
-      Size.Height = 60.000000000000000000
+    object ButtonNew: TSpeedButton
+      Align = Right
+      Position.X = 318.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      Text = 'New Process'
-      TextSettings.Font.Size = 14.000000000000000000
-      TextSettings.Font.StyleExt = {00060000000000000004000000}
+      StyleLookup = 'composetoolbuttonbordered'
+      Text = 'Back'
     end
   end
-  object RectangleFilters: TRectangle [2]
+  object RectangleFilters: TRectangle
     Align = Top
     Corners = []
     Fill.Color = claCoral
     Position.Y = 40.000000000000000000
-    Size.Width = 367.000000000000000000
+    Size.Width = 358.000000000000000000
     Size.Height = 68.000000000000000000
     Size.PlatformDefault = False
     Stroke.Kind = None
     object ButtonSearch: TSpeedButton
       Align = Right
-      Position.X = 317.000000000000000000
-      Size.Width = 50.000000000000000000
+      Position.X = 318.000000000000000000
+      Size.Width = 40.000000000000000000
       Size.Height = 68.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'searchtoolbuttonbordered'
@@ -136,27 +117,83 @@ inherited ArticleLIstView: TArticleLIstView
       Text = 'Products'
     end
   end
-  inherited RectangleTop: TRectangle
-    inherited ButtonBack: TSpeedButton
-      StyleLookup = 'stoptoolbuttonbordered'
-    end
-    inherited LabelTitle: TLabel
-      Size.Width = 267.000000000000000000
-      Text = 'Articles'
-    end
-    object ButtonNew: TSpeedButton
-      Align = Right
-      Position.X = 317.000000000000000000
-      Size.Width = 50.000000000000000000
-      Size.Height = 40.000000000000000000
+  object ListView1: TListView
+    ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+    ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
+    HeaderAppearanceClassName = 'TListHeaderObjects'
+    FooterAppearanceClassName = 'TListHeaderObjects'
+    ItemIndex = 1
+    Align = Client
+    Size.Width = 358.000000000000000000
+    Size.Height = 410.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    ItemAppearanceObjects.HeaderObjects.Text.Font.StyleExt = {00070000000000000004000000}
+    ItemAppearanceObjects.HeaderObjects.Text.Align = Center
+    OnItemClick = ListView1ItemClick
+  end
+  object MultiView1: TMultiView
+    DrawerOptions.Placement = Right
+    MasterButton = ButtonNew
+    Mode = Drawer
+    SplitViewOptions.Placement = Right
+    Size.Width = 199.000000000000000000
+    Size.Height = 410.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    TabOrder = 8
+    object ButtonNewMaterial: TSpeedButton
+      Align = Top
+      StyledSettings = [Family, FontColor]
+      Size.Width = 198.000000000000000000
+      Size.Height = 60.000000000000000000
       Size.PlatformDefault = False
-      StyleLookup = 'composetoolbuttonbordered'
-      Text = 'Back'
+      Text = 'New material'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
+    end
+    object ButtonNewProduct: TSpeedButton
+      Align = Top
+      StyledSettings = [Family, FontColor]
+      Position.Y = 120.000000000000000000
+      Size.Width = 198.000000000000000000
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'New process'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
+    end
+    object ButtonNewProcess: TSpeedButton
+      Align = Top
+      StyledSettings = [Family, FontColor]
+      Position.Y = 60.000000000000000000
+      Size.Width = 198.000000000000000000
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'New Process'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
     end
   end
-  inherited VMBridge: TioViewModelBridge
-    DI_VMInterface = 'IArticleListVM'
-    Top = 160
+  object MBSFilters: TioModelBindSource
+    AutoActivate = True
+    AutoPost = True
+    FieldDefs = <
+      item
+        Name = 'Code'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'MPFilters'
+    Left = 280
+    Top = 336
   end
   object MBSArticleList: TioModelBindSource
     AutoActivate = True
@@ -183,25 +220,16 @@ inherited ArticleLIstView: TArticleLIstView
     Left = 280
     Top = 216
   end
+  object VMBridge: TioViewModelBridge
+    DI_VMInterface = 'IArticleListVM'
+    Left = 280
+    Top = 144
+  end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 268
-    Top = 13
-    object LinkControlToField1: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = MBSFilters
-      FieldName = 'Code'
-      Control = EditFilterCode
-      Track = False
-    end
-    object LinkControlToField2: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = MBSFilters
-      FieldName = 'Description'
-      Control = EditFilterDescription
-      Track = False
-    end
+    Left = 20
+    Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = MBSArticleList
@@ -217,25 +245,19 @@ inherited ArticleLIstView: TArticleLIstView
       FillHeaderFieldName = 'ArticleType'
       FillBreakGroups = <>
     end
-  end
-  object MBSFilters: TioModelBindSource
-    AutoActivate = True
-    AutoPost = True
-    FieldDefs = <
-      item
-        Name = 'Code'
-        Generator = 'ColorsNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'Description'
-        Generator = 'ColorsNames'
-        ReadOnly = False
-      end>
-    ScopeMappings = <>
-    ViewModelBridge = VMBridge
-    ModelPresenter = 'MPFilters'
-    Left = 280
-    Top = 336
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSFilters
+      FieldName = 'Code'
+      Control = EditFilterCode
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSFilters
+      FieldName = 'Description'
+      Control = EditFilterDescription
+      Track = False
+    end
   end
 end

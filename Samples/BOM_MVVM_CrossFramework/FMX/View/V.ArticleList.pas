@@ -5,21 +5,22 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
-  V.Base, iORM.MVVM.Components.ViewModelBridge, FMX.Controls.Presentation,
-  FMX.ListView.Types, FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.ListView, Data.Bind.Components, Data.Bind.ObjectScope,
-  iORM.LiveBindings.ModelBindSource, Data.Bind.GenData, System.Rtti,
-  System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  iORM.Attributes, V.Interfaces, FMX.Edit, FMX.MultiView, FMX.Layouts,
-  FMX.Objects;
+  FMX.Objects, FMX.Controls.Presentation, FMX.Edit, FMX.ListView.Types,
+  FMX.ListView.Appearances, FMX.ListView.Adapters.Base, Data.Bind.GenData,
+  iORM.MVVM.Components.ViewModelBridge, Data.Bind.Components,
+  Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, FMX.ListView,
+  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, V.Interfaces, iORM.Attributes, FMX.MultiView;
 
 type
 
   [diImplements(IArticleListView)]
-  TArticleListView = class(TBaseView, IArticleListView)
-    ListView1: TListView;
-    MBSArticleList: TioModelBindSource;
-    BindingsList1: TBindingsList;
+  TArticleListView = class(TFrame, IArticleListView)
+
+    [ioBindAction('acClose')]
+    ButtonClose: TSpeedButton;
+
+    ButtonNew: TSpeedButton;
 
     [ioBindAction('acApplyFilters')]
     ButtonSearch: TSpeedButton;
@@ -40,17 +41,22 @@ type
     ButtonNewMaterial: TSpeedButton;
 
     ButtonNewProduct: TSpeedButton;
-    ButtonNewProcess: TSpeedButton;
-    ButtonNew: TSpeedButton;
 
-    MBSFilters: TioModelBindSource;
+    ButtonNewProcess: TSpeedButton;
+    RectangleTop: TRectangle;
+    LabelTitle: TLabel;
+    RectangleFilters: TRectangle;
     EditFilterCode: TEdit;
     EditFilterDescription: TEdit;
+    ListView1: TListView;
+    MBSFilters: TioModelBindSource;
+    MBSArticleList: TioModelBindSource;
+    VMBridge: TioViewModelBridge;
+    BindingsList1: TBindingsList;
+    LinkListControlToField1: TLinkListControlToField;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
-    LinkListControlToField1: TLinkListControlToField;
     MultiView1: TMultiView;
-    RectangleFilters: TRectangle;
     procedure ListView1ItemClick(const Sender: TObject;
       const AItem: TListViewItem);
   private
@@ -66,7 +72,6 @@ implementation
 procedure TArticleListView.ListView1ItemClick(const Sender: TObject;
   const AItem: TListViewItem);
 begin
-  inherited;
   VMBridge.Command['acEditArticle'].Execute;
 end;
 

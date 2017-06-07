@@ -5,30 +5,36 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
-  V.Base, iORM.MVVM.Components.ViewModelBridge, FMX.Controls.Presentation,
-  Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource,
-  Data.Bind.GenData, Fmx.Bind.GenData, FMX.ListBox, FMX.Layouts, FMX.Edit,
-  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt, iORM.Attributes, V.Interfaces, FMX.Objects;
+  FMX.Controls.Presentation, FMX.Objects, FMX.Layouts, FMX.ListBox, FMX.Edit,
+  iORM.MVVM.Components.ViewModelBridge, Data.Bind.Components,
+  Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, Fmx.Bind.GenData,
+  Data.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors,
+  Data.Bind.EngExt, Fmx.Bind.DBEngExt, iORM.Attributes, V.Interfaces;
 
 type
 
   [diImplements(IArticleView, 'TMaterial')]
-  TMaterialView = class(TBaseView, IArticleView)
+  TMaterialView = class(TFrame, IArticleView)
+
+    [ioBindAction('acBack')]
+    ButtonBack: TSpeedButton;
 
     [ioBindAction('acPost')]
     ButtonPost: TSpeedButton;
 
-    MBSArticle: TioModelBindSource;
+    RectangleTop: TRectangle;
+    LabelTitle: TLabel;
     ListBox1: TListBox;
     ListBoxItem1: TListBoxItem;
-    EditCode: TEdit;
     ListBoxItem2: TListBoxItem;
-    EditDescription: TEdit;
     ListBoxItem3: TListBoxItem;
     ListBoxItem4: TListBoxItem;
+    EditCode: TEdit;
+    EditDescription: TEdit;
     EditUM: TEdit;
     EditCost: TEdit;
+    VMBridge: TioViewModelBridge;
+    MBSArticle: TioModelBindSource;
     BindingsList1: TBindingsList;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
@@ -40,9 +46,6 @@ type
   public
     { Public declarations }
   end;
-
-var
-  MaterialView: TMaterialView;
 
 implementation
 

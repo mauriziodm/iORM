@@ -46,8 +46,8 @@ type
     [ioAction('acFilterProduct', OnExecute), ioGroupIndex(1000)]
     procedure acFilterProductExecute(Sender: TObject);
 
-    [ioAction('acBack', OnExecute)]
-    procedure acBackExecute(Sender: TObject);
+    [ioAction('acClose', OnExecute)]
+    procedure acCloseExecute(Sender: TObject);
 
     [ioAction('acApplyFilters', OnExecute)]
     procedure acApplyFiltersExecute(Sender: TObject);
@@ -90,7 +90,7 @@ begin
   MPArticleList.Refresh(True);
 end;
 
-procedure TArticleListVM.acBackExecute(Sender: TObject);
+procedure TArticleListVM.acCloseExecute(Sender: TObject);
 begin
   inherited;
   io.TerminateApplication;

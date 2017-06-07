@@ -10,18 +10,10 @@ object BaseView: TBaseView
     Size.Height = 45.000000000000000000
     Size.PlatformDefault = False
     Stroke.Thickness = 0.000000000000000000
-    object ButtonBack: TSpeedButton
-      Align = Left
-      Size.Width = 50.000000000000000000
-      Size.Height = 45.000000000000000000
-      Size.PlatformDefault = False
-      StyleLookup = 'priortoolbuttonbordered'
-      Text = 'Back'
-    end
     object LabelTitle: TLabel
       Align = Client
       StyledSettings = [Style, FontColor]
-      Size.Width = 317.000000000000000000
+      Size.Width = 367.000000000000000000
       Size.Height = 45.000000000000000000
       Size.PlatformDefault = False
       TextSettings.Font.Family = 'Segoe UI Semibold'
