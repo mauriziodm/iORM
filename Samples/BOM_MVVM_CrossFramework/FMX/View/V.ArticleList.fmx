@@ -59,6 +59,7 @@ object ArticleListView: TArticleListView
     end
     object EditFilterCode: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
       Text = 'Darkgoldenrod'
       Position.X = 215.000000000000000000
@@ -70,6 +71,7 @@ object ArticleListView: TArticleListView
     end
     object EditFilterDescription: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
       TabOrder = 2
       Text = 'Darkgoldenrod'
       Position.X = 215.000000000000000000

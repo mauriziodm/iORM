@@ -1,0 +1,156 @@
+inherited ProductView: TProductView
+  inherited ListBox1: TListBox
+    Viewport.Width = 333.000000000000000000
+    Viewport.Height = 423.000000000000000000
+    inherited ListBoxItem1: TListBoxItem
+      inherited EditCode: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+    end
+    inherited ListBoxItem2: TListBoxItem
+      inherited EditDescription: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+    end
+    inherited ListBoxItem3: TListBoxItem
+      inherited EditUM: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+    end
+    inherited ListBoxItem4: TListBoxItem
+      Text = 'Total cost'
+      inherited EditCost: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+    end
+    inherited ListBoxItem5: TListBoxItem
+      inherited EditTime: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+    end
+    object ListBoxItem6: TListBoxItem
+      Position.Y = 200.000000000000000000
+      Size.Width = 333.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Text = 'Mat. cost'
+      object EditMaterialCost: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 0
+        Text = '67,67'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 120.000000000000000000
+        Size.Width = 213.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = [Family, Size, FontColor]
+      end
+    end
+    object ListBoxItem7: TListBoxItem
+      Position.Y = 240.000000000000000000
+      Size.Width = 333.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 6
+      Text = 'Proc. cost'
+      object EditProcessCost: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 0
+        Text = '67,67'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 120.000000000000000000
+        Size.Width = 213.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = [Family, Size, FontColor]
+      end
+    end
+    object ListBoxGroupHeader1: TListBoxGroupHeader
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claChocolate
+      TextSettings.HorzAlign = Center
+      StyledSettings = [Family]
+      Position.Y = 280.000000000000000000
+      TabOrder = 7
+      Text = 'Bill Of Materials'
+      OnClick = ListBoxGroupHeader1Click
+    end
+  end
+  inherited MBSArticle: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'Code'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'UM'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Cost'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'ArticleType'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Time'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'MaterialCost'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'ProcessCost'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+  end
+  inherited BindingsList1: TBindingsList
+    object LinkControlToField6: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'ProcessCost'
+      Control = EditProcessCost
+      Track = False
+    end
+    object LinkControlToField7: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSArticle
+      FieldName = 'MaterialCost'
+      Control = EditMaterialCost
+      Track = False
+    end
+  end
+  object BOMVCProvider: TioViewContextProvider
+    ioOnRequest = BOMVCProviderioOnRequest
+    RegisterAsDefault = False
+    AutoParent = True
+    AutoOwner = True
+    Left = 242
+    Top = 100
+  end
+end

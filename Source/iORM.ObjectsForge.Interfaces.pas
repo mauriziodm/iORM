@@ -364,6 +364,23 @@ begin
   Result := Self.InternalFindMethod(ARttiType, AMethodName, AMarkerText, True, AParameters);
 end;
 
+class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;
+  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+begin
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
+  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
+  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
+  //       la ChildProperty destinazione.
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // Load the relation child object
+  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
+    ._Where  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
+    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+    .ToObject(Result);
+end;
+
 class function TioObjectMakerIntf.LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery;
   AProperty: IioContextProperty): TObject;
 begin
@@ -376,8 +393,48 @@ begin
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // Load the relation child object
   io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-    .ByOID(AQuery.GetValue(AProperty).AsInteger)
+    .ByOID(   AQuery.GetValue(AProperty).AsInteger   )
     .ToObject(Result);
+end;
+
+class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
+  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+var
+  ALazyLoadableObj: IioLazyLoadable;
+  AResolvedTypeList: IioResolvedTypeList;
+  LWhere, LDetailWhere: IioWhere;
+begin
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
+  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
+  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
+  //       la ChildProperty destinazione.
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // Get the where conditions for the details if exists (nil if not exists)
+  LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
+  // If LazyLoadable then set LazyLoad data
+  if (AProperty.GetRelationLoadType = ioLazyLoad)
+  and Supports(Result, IioLazyLoadable, ALazyLoadableObj)
+    // Set the lazy load relation data
+    then ALazyLoadableObj.SetRelationInfo(
+       AProperty.GetRelationChildTypeName
+      ,AProperty.GetRelationChildTypeAlias
+      ,AProperty.GetRelationChildPropertyName
+      ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
+      ,LDetailWhere)  // Eventuale detail where
+    // Fill the list
+    else
+    begin
+      // It set the first part of the load operation
+      LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
+        ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty));
+      // If a Details Where conditions (for the details) is present then add it to the load operation
+      if Assigned(LDetailWhere) then
+        LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance);  // Eventuale DetailWhere & OrderBy
+      // Execute the load operation
+      LWhere.ToList(Result);
+    end
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery;
@@ -430,63 +487,6 @@ begin
   finally
     AJSONObject.Free;
   end;
-end;
-
-class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
-  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
-var
-  ALazyLoadableObj: IioLazyLoadable;
-  AResolvedTypeList: IioResolvedTypeList;
-  LWhere, LDetailWhere: IioWhere;
-begin
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  //  then create it
-  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  //       la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
-  // Get the where conditions for the details if exists (nil if not exists)
-  LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
-  // If LazyLoadable then set LazyLoad data
-  if (AProperty.GetRelationLoadType = ioLazyLoad)
-  and Supports(Result, IioLazyLoadable, ALazyLoadableObj)
-    // Set the lazy load relation data
-    then ALazyLoadableObj.SetRelationInfo(
-       AProperty.GetRelationChildTypeName
-      ,AProperty.GetRelationChildTypeAlias
-      ,AProperty.GetRelationChildPropertyName
-      ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
-      ,LDetailWhere)  // Eventuale detail where
-    // Fill the list
-    else
-    begin
-      // It set the first part of the load operation
-      LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-        ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty));
-      // If a Details Where conditions (for the details) is present then add it to the load operation
-      if Assigned(LDetailWhere) then
-        LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance);  // Eventuale DetailWhere & OrderBy
-      // Execute the load operation
-      LWhere.ToList(Result);
-    end
-end;
-
-class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;
-  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
-begin
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  //  then create it
-  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  //       la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
-  // Load the relation child object
-  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-    ._Where  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
-    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty))
-    .ToObject(Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty);

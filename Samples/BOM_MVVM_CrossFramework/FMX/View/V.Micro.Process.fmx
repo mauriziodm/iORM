@@ -1,0 +1,72 @@
+inherited MicroProcessView: TMicroProcessView
+  inherited LabelCode: TLabel
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited LabelDescription: TLabel
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited LabelCost: TLabel
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited SpinBoxQty: TSpinBox
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  object LabelTime: TLabel [6]
+    StyledSettings = [Family, Size, FontColor]
+    Position.X = 149.000000000000000000
+    Position.Y = 35.000000000000000000
+    Size.Width = 68.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+    Text = '-33'
+  end
+  object Label4: TLabel [7]
+    StyledSettings = [Family, Size, FontColor]
+    Position.X = 85.000000000000000000
+    Position.Y = 35.000000000000000000
+    Size.Width = 65.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Time (min):'
+  end
+  inherited MBSBOMArticle: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'Code'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'UM'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Cost'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'Time'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end>
+  end
+  inherited BindingsList1: TBindingsList
+    object LinkPropertyToFieldText5: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = MBSBOMArticle
+      FieldName = 'Time'
+      Component = LabelTime
+      ComponentProperty = 'Text'
+    end
+  end
+end

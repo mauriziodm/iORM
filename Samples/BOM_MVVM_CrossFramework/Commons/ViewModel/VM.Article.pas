@@ -9,7 +9,7 @@ uses
 
 type
 
-  [diImplements(IArticleVM)]
+  [diImplements(IArticleVM, 'TMaterial'), diImplements(IArticleVM, 'TProcess')]
   TArticleViewModel = class(TioViewModel, IArticleVM)
     MPArticle: TioModelPresenter;
 

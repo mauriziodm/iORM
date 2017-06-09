@@ -3,15 +3,14 @@ unit Model.Product;
 interface
 
 uses
-  Model.Interfaces, iORM.Containers.Interfaces, iORM.Attributes, Model.Base;
+  Model.Interfaces, iORM.Attributes, Model.Base, iORM.Containers.Interfaces;
 
 type
 
   [ioEntity('ARTICLES', ioFields), ioTrueClass, diImplements(IProduct)]
   TProduct = class(TBase, IProduct)
   private
-    [ioInject]
-    [ioHasMany('IBOMItem', 'MasterID', ioLazyLoad)]
+    [ioHasMany('IBOMItem', 'MasterID')]
     FBOMItems: IioList<IBOMItem>;
   protected
     // BOMItems
@@ -25,6 +24,7 @@ type
     // ProcessCost
     function GetProcessCost: Currency;
   public
+    constructor Create; override;
     property BOMItems:IioList<IBOMItem> read GetBOMItems;
     property Cost:Currency read GetCost;
     property Time:Integer read GetTime;
@@ -39,6 +39,12 @@ uses
 
 { TProduct }
 
+constructor TProduct.Create;
+begin
+  inherited;
+  FBOMItems := TioList<IBOMItem>.Create;
+end;
+
 function TProduct.GetBOMItems: IioList<IBOMItem>;
 begin
   Result := FBOMItems;
@@ -48,36 +54,36 @@ function TProduct.GetCost: Currency;
 var
   LBOMItem: IBOMItem;
 begin
+  Result := 0;
   for LBOMItem in FBOMItems do
-    Result := Result + LBOMItem.GetItemCost;
+    Result := Result + LBOMItem.GetCost;
 end;
 
 function TProduct.GetMaterialCost: Currency;
 var
   LBOMItem: IBOMItem;
 begin
+  Result := 0;
   for LBOMItem in FBOMItems do
-    Result := Result + LBOMItem.GetItemMaterialCost;
+    Result := Result + LBOMItem.GetMaterialCost;
 end;
 
 function TProduct.GetProcessCost: Currency;
 var
   LBOMItem: IBOMItem;
 begin
+  Result := 0;
   for LBOMItem in FBOMItems do
-    Result := Result + LBOMItem.GetItemProcessCost;
+    Result := Result + LBOMItem.GetProcessCost;
 end;
 
 function TProduct.GetTime: Integer;
 var
   LBOMItem: IBOMItem;
 begin
+  Result := 0;
   for LBOMItem in FBOMItems do
-    Result := Result + LBOMItem.GetItemTime;
+    Result := Result + LBOMItem.GetTime;
 end;
-
-initialization
-
-  io.di.RegisterClass<TioList<IBOMItem>>.Implements<IioList<IBOMItem>>.Execute;
 
 end.

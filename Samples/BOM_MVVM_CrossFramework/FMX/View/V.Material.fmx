@@ -7,13 +7,13 @@ object MaterialView: TMaterialView
     Align = Top
     Fill.Color = claCoral
     Size.Width = 337.000000000000000000
-    Size.Height = 40.000000000000000000
+    Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     Stroke.Thickness = 0.000000000000000000
     object ButtonBack: TSpeedButton
       Align = Left
       Size.Width = 40.000000000000000000
-      Size.Height = 40.000000000000000000
+      Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'priortoolbuttonbordered'
       Text = 'Back'
@@ -22,7 +22,7 @@ object MaterialView: TMaterialView
       Align = Client
       StyledSettings = [Style, FontColor]
       Size.Width = 257.000000000000000000
-      Size.Height = 40.000000000000000000
+      Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TextSettings.Font.Family = 'Segoe UI Semibold'
       TextSettings.Font.Size = 18.000000000000000000
@@ -33,7 +33,7 @@ object MaterialView: TMaterialView
       Align = Right
       Position.X = 297.000000000000000000
       Size.Width = 40.000000000000000000
-      Size.Height = 40.000000000000000000
+      Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'organizetoolbuttonbordered'
       Text = 'Back'
@@ -42,7 +42,7 @@ object MaterialView: TMaterialView
   object ListBox1: TListBox
     Align = Client
     Size.Width = 337.000000000000000000
-    Size.Height = 437.000000000000000000
+    Size.Height = 427.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     DisableFocusEffect = True
@@ -50,7 +50,7 @@ object MaterialView: TMaterialView
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
     Viewport.Width = 333.000000000000000000
-    Viewport.Height = 433.000000000000000000
+    Viewport.Height = 423.000000000000000000
     object ListBoxItem1: TListBoxItem
       Size.Width = 333.000000000000000000
       Size.Height = 40.000000000000000000

@@ -15,6 +15,10 @@ type
     ['{7FB33141-79FF-4C20-9C33-AE3A55A00058}']
   end;
 
+  IBOMItemVM = interface(IioViewModel)
+    ['{D31BA1D1-5947-48F6-89B8-2B38F595AB74}']
+  end;
+
 implementation
 
 end.

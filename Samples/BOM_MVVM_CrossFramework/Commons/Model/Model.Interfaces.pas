@@ -9,10 +9,10 @@ type
 
   IBOMItem = interface
     ['{222570A6-EC4A-4BE4-8A51-102171125DAA}']
-    function GetItemCost: Currency;
-    function GetItemTime: Integer;
-    function GetItemMaterialCost: Currency;
-    function GetItemProcessCost: Currency;
+    function GetCost: Currency;
+    function GetTime: Integer;
+    function GetMaterialCost: Currency;
+    function GetProcessCost: Currency;
   end;
 
   IBase = interface

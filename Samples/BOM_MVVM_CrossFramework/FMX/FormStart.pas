@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.TabControl,
   System.Actions, FMX.ActnList, iORM.MVVM.Components.ViewContextProvider,
-  iORM.DB.Components.ConnectionDef;
+  iORM.DB.Components.ConnectionDef, FMX.Controls.Presentation, FMX.StdCtrls;
 
 type
   TStartForm = class(TForm)
@@ -36,7 +36,7 @@ var
 implementation
 
 uses
-  U.SampleData, V.Interfaces, iORM;
+  U.SampleData, V.Interfaces, iORM, Model.Interfaces;
 
 {$R *.fmx}
 

@@ -30,7 +30,6 @@ type
     // Methods
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
-    function CheckAdapter(const ACreateIfNotAssigned:Boolean = False): Boolean;
     procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
@@ -66,6 +65,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function CheckAdapter(const ACreateIfNotAssigned:Boolean = False): Boolean;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
     procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     // ----------------------------------------------------------------------------------------------------------------------------

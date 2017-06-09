@@ -1,14 +1,15 @@
-inherited ArticleViewModel: TArticleViewModel
-  OldCreateOrder = True
-  object MPArticle: TioModelPresenter
+inherited ProductViewModel: TProductViewModel
+  object MPBOMItemList: TioModelPresenter
     Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload
-    TypeName = 'IBase'
+    MasterPresenter = MPArticle
+    MasterPropertyName = 'BOMItems'
+    TypeName = 'IBOMItem'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
     Left = 192
-    Top = 24
+    Top = 96
   end
 end

@@ -185,14 +185,19 @@ begin
     raise EioException.Create(Self.ClassName + ': "Query" method: Operation not allowed by this type of connection.');
   // Else if the query is already present in the QueryContainer of the connection then
   //  get it and return
-  if LConnection.AsDBConnection.QueryContainer.Exist(AQueryIdentity) then
-    Exit(   LConnection.AsDBConnection.QueryContainer.GetQuery(AQueryIdentity)   );
+{ TODO : TEMPORANEO PER DELPHI DAY 2017 }
+// ----------------------------------------------------------------------------- TOGLIERE QUESTO COMMENTO
+//  if LConnection.AsDBConnection.QueryContainer.Exist(AQueryIdentity) then
+//    Exit(   LConnection.AsDBConnection.QueryContainer.GetQuery(AQueryIdentity)   );
+// ----------------------------------------------------------------------------- TOGLIERE QUESTO COMMENTO
   // Else create a new query and insert it in the QueryContainer of the connection
   //  for future use if AConnectionDefName is valid (used by DBCreator)
   Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
 //  if not AConnectionDefName.IsEmpty then
-  if not AQueryIdentity.IsEmpty then
-    LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
+// ----------------------------------------------------------------------------- TOGLIERE QUESTO COMMENTO
+//  if not AQueryIdentity.IsEmpty then
+//    LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
+// ----------------------------------------------------------------------------- TOGLIERE QUESTO COMMENTO
 end;
 
 class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;

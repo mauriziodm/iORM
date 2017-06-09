@@ -2,7 +2,7 @@ inherited ArticleListVM: TArticleListVM
   OldCreateOrder = True
   OnCreate = DataModuleCreate
   object MPArticleList: TioModelPresenter
-    Async = False
+    Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload

@@ -382,8 +382,11 @@ begin
   // Extract master property value
   AValue := FMasterProperty.GetValue(AMasterObj);
   // if not empty extract the detail object
-  if not AValue.IsEmpty
-    then ADetailObj := AValue.AsObject;
+   if not AValue.IsEmpty then
+    if FMasterProperty.IsInterface then
+      ADetailObj := TObject(AValue.AsInterface)
+    else
+      ADetailObj := AValue.AsObject;
   // Set it to the Adapter itself
   Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;

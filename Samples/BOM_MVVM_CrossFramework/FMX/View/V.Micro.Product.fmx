@@ -1,0 +1,118 @@
+inherited MicroProductView: TMicroProductView
+  inherited LabelCode: TLabel
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited LabelDescription: TLabel
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited LabelCost: TLabel
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited SpinBoxQty: TSpinBox
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited LabelTime: TLabel
+    Position.X = 184.000000000000000000
+    Size.Width = 41.000000000000000000
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+  end
+  inherited Label4: TLabel
+    Position.X = 120.000000000000000000
+  end
+  object Label3: TLabel [9]
+    StyledSettings = [Family, Size, FontColor]
+    Position.X = 5.000000000000000000
+    Position.Y = 59.000000000000000000
+    Size.Width = 56.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Cost mat:'
+  end
+  object LabelCostMaterial: TLabel [10]
+    StyledSettings = [Family, Size, FontColor]
+    Position.X = 64.000000000000000000
+    Position.Y = 59.000000000000000000
+    Size.Width = 68.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+    Text = '67,67'
+  end
+  object Label5: TLabel [11]
+    StyledSettings = [Family, Size, FontColor]
+    Position.X = 125.000000000000000000
+    Position.Y = 59.000000000000000000
+    Size.Width = 56.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Cost proc:'
+  end
+  object LabelCostProcess: TLabel [12]
+    StyledSettings = [Family, Size, FontColor]
+    Position.X = 184.000000000000000000
+    Position.Y = 59.000000000000000000
+    Size.Width = 68.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.StyleExt = {00060000000000000004000000}
+    Text = '67,67'
+  end
+  inherited MBSBOMArticle: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'Code'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'UM'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Cost'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'Time'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostMaterial'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostProcess'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+  end
+  inherited BindingsList1: TBindingsList
+    object LinkPropertyToFieldText3: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = MBSBOMArticle
+      FieldName = 'CostProcess'
+      Component = LabelCostProcess
+      ComponentProperty = 'Text'
+    end
+    object LinkPropertyToFieldText6: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = MBSBOMArticle
+      FieldName = 'CostMaterial'
+      Component = LabelCostMaterial
+      ComponentProperty = 'Text'
+    end
+  end
+end
