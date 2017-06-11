@@ -1,80 +1,169 @@
 object MicroMaterialView: TMicroMaterialView
   Align = Client
   Size.Width = 327.000000000000000000
-  Size.Height = 199.000000000000000000
+  Size.Height = 224.000000000000000000
   Size.PlatformDefault = False
-  object LabelCode: TLabel
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 5.000000000000000000
-    Position.Y = 3.000000000000000000
-    Size.Width = 68.000000000000000000
-    Size.Height = 17.000000000000000000
+  object LayoutMaster: TLayout
+    Align = Top
+    Size.Width = 327.000000000000000000
+    Size.Height = 96.000000000000000000
     Size.PlatformDefault = False
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Text = 'Bitmap28'
-  end
-  object LabelDescription: TLabel
-    Anchors = [akLeft, akTop, akRight]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 75.000000000000000000
-    Position.Y = 3.000000000000000000
-    Size.Width = 206.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Text = 'Mark Anderson'
-  end
-  object LabelCost: TLabel
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 37.000000000000000000
-    Position.Y = 35.000000000000000000
-    Size.Width = 68.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Text = '67,67'
-  end
-  object Label2: TLabel
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 5.000000000000000000
-    Position.Y = 35.000000000000000000
-    Size.Width = 36.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    Text = 'Cost:'
-  end
-  object SpinBoxQty: TSpinBox
-    Touch.InteractiveGestures = [LongTap, DoubleTap]
-    Anchors = [akTop, akRight]
-    TabOrder = 5
-    Cursor = crIBeam
-    Value = 67.669998168945320000
-    Position.X = 256.000000000000000000
-    Position.Y = 32.000000000000000000
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Size.Width = 65.000000000000000000
-    Size.Height = 22.000000000000000000
-    Size.PlatformDefault = False
-    StyledSettings = [Family, Size, FontColor]
-  end
-  object Label1: TLabel
-    Anchors = [akTop, akRight]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 229.000000000000000000
-    Position.Y = 35.000000000000000000
-    Size.Width = 28.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    Text = 'Qty'
-  end
-  object ButtonShow: TSpeedButton
-    Anchors = [akTop, akRight]
-    Position.X = 286.000000000000000000
-    Size.Width = 40.000000000000000000
-    Size.Height = 29.000000000000000000
-    Size.PlatformDefault = False
-    StyleLookup = 'nexttoolbuttonbordered'
-    Text = 'ButtonShow'
+    TabOrder = 9
+    object RectangleClientArea: TRectangle
+      Align = Client
+      Fill.Color = claPapayawhip
+      Margins.Left = 3.000000000000000000
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 3.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 321.000000000000000000
+      Size.Height = 90.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Thickness = 0.000000000000000000
+      object LayoutRight: TLayout
+        Align = MostRight
+        Position.X = 271.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 90.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object ButtonShow: TSpeedButton
+          Align = Top
+          Size.Width = 50.000000000000000000
+          Size.Height = 45.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'nexttoolbuttonbordered'
+          Text = 'ButtonShow'
+        end
+        object ButtonPost: TSpeedButton
+          Align = Bottom
+          Position.Y = 45.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 45.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'organizetoolbuttonbordered'
+          Text = 'ButtonShow'
+        end
+      end
+      object LayoutFirstLineLine: TLayout
+        Align = Top
+        Size.Width = 271.000000000000000000
+        Size.Height = 35.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object LabelCode: TLabel
+          Align = Left
+          StyledSettings = [Family, FontColor]
+          Margins.Left = 3.000000000000000000
+          Position.X = 3.000000000000000000
+          Size.Width = 89.000000000000000000
+          Size.Height = 35.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
+          Text = 'Bitmap28'
+        end
+        object LabelDescription: TLabel
+          Align = Client
+          StyledSettings = [Family, FontColor]
+          Size.Width = 179.000000000000000000
+          Size.Height = 35.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
+          Text = 'Mark Anderson'
+        end
+      end
+      object LayoutSecondLine: TLayout
+        Align = Client
+        Size.Width = 271.000000000000000000
+        Size.Height = 55.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object LayoutQty: TLayout
+          Align = Right
+          Position.X = 221.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          object EditQty: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            TabOrder = 0
+            Text = '67,6699981689453'
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Margins.Bottom = 5.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 33.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Size, FontColor]
+          end
+          object Label1: TLabel
+            Align = Top
+            StyledSettings = [Family, FontColor]
+            Size.Width = 50.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 10.000000000000000000
+            TextSettings.HorzAlign = Center
+            TextSettings.VertAlign = Leading
+            Text = 'Qty'
+          end
+        end
+        object LayoutCost: TLayout
+          Align = Left
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 6
+          object Label2: TLabel
+            Align = Top
+            StyledSettings = [Family, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 10.000000000000000000
+            TextSettings.HorzAlign = Center
+            TextSettings.VertAlign = Leading
+            Text = 'Cost'
+          end
+          object LabelCost: TLabel
+            Align = Client
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 38.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = '67,67'
+          end
+        end
+        object LayoutProcessCost: TLayout
+          Align = Left
+          Position.X = 165.000000000000000000
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 5
+        end
+        object LayoutMaterialCost: TLayout
+          Align = Left
+          Position.X = 110.000000000000000000
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+        end
+        object LayoutTime: TLayout
+          Align = Left
+          Position.X = 55.000000000000000000
+          Size.Width = 55.000000000000000000
+          Size.Height = 55.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+        end
+      end
+    end
   end
   object MBSBOMItem: TioModelBindSource
     AutoActivate = True
@@ -132,13 +221,6 @@ object MicroMaterialView: TMicroMaterialView
     OutputConverters = <>
     Left = 276
     Top = 141
-    object LinkControlToField1: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = MBSBOMItem
-      FieldName = 'Qty'
-      Control = SpinBoxQty
-      Track = False
-    end
     object LinkPropertyToFieldText: TLinkPropertyToField
       Category = 'Quick Bindings'
       DataSource = MBSBOMArticle
@@ -159,6 +241,13 @@ object MicroMaterialView: TMicroMaterialView
       FieldName = 'Cost'
       Component = LabelCost
       ComponentProperty = 'Text'
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSBOMItem
+      FieldName = 'Qty'
+      Control = EditQty
+      Track = False
     end
   end
 end

@@ -18,9 +18,16 @@ type
     { Public declarations }
     [ioAction('acEditArticle', OnExecute)]
     procedure acEditArticleExecute(Sender: TObject);
+
+    [ioAction('acPost', OnExecute)]
+    procedure acPostExecute(Sender: TObject);
+    [ioAction('acPost', OnUpdate)]
+    procedure acPostUpdate(Sender: TObject);
   end;
 
 implementation
+
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
   iORM, V.Interfaces;
@@ -38,6 +45,17 @@ begin
   inherited;
   LAlias := MPBOMArticle.Current.ClassName;
   io.di.LocateView<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPBOMArticle).Show;
+end;
+
+procedure TBOMItemVM.acPostExecute(Sender: TObject);
+begin
+  if MPBOMItem.Editing then
+    MPBOMItem.Post;
+end;
+
+procedure TBOMItemVM.acPostUpdate(Sender: TObject);
+begin
+  Command['acPost'].Enabled :=  MPBOMItem.Editing;
 end;
 
 end.

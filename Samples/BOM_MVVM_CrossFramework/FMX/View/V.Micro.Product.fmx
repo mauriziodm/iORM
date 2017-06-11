@@ -1,61 +1,78 @@
 inherited MicroProductView: TMicroProductView
-  inherited LabelCode: TLabel
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited LabelDescription: TLabel
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited LabelCost: TLabel
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited SpinBoxQty: TSpinBox
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited LabelTime: TLabel
-    Position.X = 184.000000000000000000
-    Size.Width = 41.000000000000000000
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited Label4: TLabel
-    Position.X = 120.000000000000000000
-  end
-  object Label3: TLabel [9]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 5.000000000000000000
-    Position.Y = 59.000000000000000000
-    Size.Width = 56.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    Text = 'Cost mat:'
-  end
-  object LabelCostMaterial: TLabel [10]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 64.000000000000000000
-    Position.Y = 59.000000000000000000
-    Size.Width = 68.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Text = '67,67'
-  end
-  object Label5: TLabel [11]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 125.000000000000000000
-    Position.Y = 59.000000000000000000
-    Size.Width = 56.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    Text = 'Cost proc:'
-  end
-  object LabelCostProcess: TLabel [12]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 184.000000000000000000
-    Position.Y = 59.000000000000000000
-    Size.Width = 68.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Text = '67,67'
+  inherited LayoutMaster: TLayout
+    inherited RectangleClientArea: TRectangle
+      inherited LayoutFirstLineLine: TLayout
+        inherited LabelCode: TLabel
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
+        end
+        inherited LabelDescription: TLabel
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
+        end
+      end
+      inherited LayoutSecondLine: TLayout
+        inherited LayoutQty: TLayout
+          inherited EditQty: TEdit
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+          end
+        end
+        inherited LayoutCost: TLayout
+          inherited LabelCost: TLabel
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+          end
+        end
+        inherited LayoutProcessCost: TLayout
+          object Label5: TLabel
+            Align = Top
+            StyledSettings = [Family, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 10.000000000000000000
+            TextSettings.HorzAlign = Center
+            TextSettings.VertAlign = Leading
+            Text = 'Cost proc.'
+          end
+          object LabelCostProcess: TLabel
+            Align = Client
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 38.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = '67,67'
+          end
+        end
+        inherited LayoutMaterialCost: TLayout
+          object Label3: TLabel
+            Align = Top
+            StyledSettings = [Family, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 10.000000000000000000
+            TextSettings.HorzAlign = Center
+            TextSettings.VertAlign = Leading
+            Text = 'Cost mat.'
+          end
+          object LabelCostMaterial: TLabel
+            Align = Client
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 38.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = '67,67'
+          end
+        end
+        inherited LayoutTime: TLayout
+          inherited LabelTime: TLabel
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+          end
+        end
+      end
+    end
   end
   inherited MBSBOMArticle: TioModelBindSource
     FieldDefs = <

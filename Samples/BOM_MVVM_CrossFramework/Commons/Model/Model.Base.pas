@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('ARTICLES', ioFields), ioTrueClass, diImplements(IBase)]
+  [ioEntity('ARTICLES'), ioTrueClass, diImplements(IBase)]
   TBase = class(TInterfacedObject, IBase)
   private
     FID: Integer;
@@ -29,6 +29,7 @@ type
     procedure SetUM(const AValue:String);
     function GetUM: String;
     // CreationDateTime
+    procedure SetCreationDateTime(const AValue: TDateTime);
     function GetCreationDateTime: TDateTime;
     // ArticleType
     function GetArticleType: String;
@@ -39,7 +40,8 @@ type
     property Code:String read GetCode write SetCode;
     property Description:String read GetDescription write SetDescription;
     property UM:String read GetUM write SetUM;
-    property CreationDateTime:TDateTime read GetCreationDateTime;
+    property CreationDateTime:TDateTime read GetCreationDateTime write SetCreationDateTime;
+    [ioSkip]
     property ArticleType:String read GetArticleType;
   end;
 
@@ -97,6 +99,11 @@ end;
 procedure TBase.SetCode(const AValue: String);
 begin
   FCode := AValue;
+end;
+
+procedure TBase.SetCreationDateTime(const AValue: TDateTime);
+begin
+  FCreationDateTime := AValue;
 end;
 
 procedure TBase.SetDescription(const AValue: String);

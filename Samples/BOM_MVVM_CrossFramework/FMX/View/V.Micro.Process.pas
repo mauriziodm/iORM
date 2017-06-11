@@ -10,7 +10,7 @@ uses
   Data.Bind.Components, iORM.MVVM.Components.ViewModelBridge,
   Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, FMX.Edit,
   FMX.EditBox, FMX.SpinBox, FMX.Controls.Presentation, iORM.Attributes,
-  V.Interfaces;
+  V.Interfaces, FMX.Objects, FMX.Layouts;
 
 type
 

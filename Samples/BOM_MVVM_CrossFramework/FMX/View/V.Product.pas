@@ -27,6 +27,8 @@ type
     procedure BOMVCProviderioOnRequest(const Sender: TObject;
       const AView: TComponent; out ResultViewContext: TComponent);
     procedure ListBoxGroupHeader1Click(Sender: TObject);
+    procedure BOMVCProviderioOnRelease(const Sender: TObject; const AView,
+      AViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -37,12 +39,19 @@ implementation
 
 {$R *.fmx}
 
+procedure TProductView.BOMVCProviderioOnRelease(const Sender: TObject;
+  const AView, AViewContext: TComponent);
+begin
+  inherited;
+  Sleep(100);
+end;
+
 procedure TProductView.BOMVCProviderioOnRequest(const Sender: TObject;
   const AView: TComponent; out ResultViewContext: TComponent);
 begin
   inherited;
   ResultViewContext := TListBoxItem.Create(ListBox1);
-  (ResultViewContext as TListBoxItem).Height := 80;
+  (ResultViewContext as TListBoxItem).Height := 96;
   ListBox1.AddObject(ResultViewContext as TListBoxItem);
 end;
 

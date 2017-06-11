@@ -51,7 +51,7 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const AMapMode:TioMapModeType; const ARttiPropField:TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType:String;
+    class function GetProperty(const AMapMode:TioMapModeType; const ARttiPropField:TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
       ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
@@ -114,7 +114,7 @@ begin
 end;
 
 class function TioContextFactory.GetProperty(const AMapMode:TioMapModeType; const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
-  AFieldType: String; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
+  AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
   ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean): IioContextProperty;
 begin
   case AMapMode of
@@ -126,6 +126,7 @@ begin
         ,ASqlFieldName
         ,ALoadSql
         ,AFieldType
+        ,ASkipped
         ,AReadWrite
         ,ARelationType
         ,ARelationChildTypeName
@@ -142,6 +143,7 @@ begin
         ,ASqlFieldName
         ,ALoadSql
         ,AFieldType
+        ,ASkipped
         ,AReadWrite
         ,ARelationType
         ,ARelationChildTypeName
@@ -242,7 +244,7 @@ begin
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False);
+      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False);
       Continue;
     end;
     // Prop Init
@@ -321,22 +323,26 @@ begin
       end;
     end;
     // Create and add property
-    if not PropSkip then Result.Add(Self.GetProperty(ATable.GetMapMode
-                                                    ,Prop
-                                                    ,PropTypeAlias
-                                                    ,PropFieldName
-                                                    ,PropLoadSql
-                                                    ,PropFieldType
-                                                    ,PropReadWrite
-                                                    ,PropRelationType
-                                                    ,PropRelationChildTypeName
-                                                    ,PropRelationChildTypeAlias
-                                                    ,PropRelationChildPropertyName
-                                                    ,PropRelationChildLoadType
-                                                    ,PropRelationChildAutoIndex)
-                                    ,PropId
-                                    ,PropIDSkipOnInsert
-                                    );
+    Result.Add(
+      Self.GetProperty(
+        ATable.GetMapMode,
+        Prop,
+        PropTypeAlias,
+        PropFieldName,
+        PropLoadSql,
+        PropFieldType,
+        PropSkip,
+        PropReadWrite,
+        PropRelationType,
+        PropRelationChildTypeName,
+        PropRelationChildTypeAlias,
+        PropRelationChildPropertyName,
+        PropRelationChildLoadType,
+        PropRelationChildAutoIndex
+      ),
+      PropId,
+      PropIDSkipOnInsert
+    );
   end;
 end;
 

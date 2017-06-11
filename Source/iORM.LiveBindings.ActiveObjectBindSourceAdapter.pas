@@ -408,7 +408,7 @@ end;
 
 function TioActiveObjectBindSourceAdapter.DataObject: TObject;
 begin
-  Result := Self.DataObject;
+  Result := TObjectBindSourceAdapter<TObject>(Self).DataObject;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;

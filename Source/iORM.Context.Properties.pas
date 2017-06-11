@@ -51,6 +51,7 @@ type
   TioProperty = class (TInterfacedObject, IioContextProperty)
   strict private
     FIsID: Boolean;
+    FSkipped: Boolean;
     FIDSkipOnInsert: Boolean;
     FRttiProperty: TRttiProperty;
     FTypeAlias: String;
@@ -72,11 +73,11 @@ type
     // NB: Gli altri due attributes (ioEmbeddedSkip e ioEmbeddedStreamable) non sono necessari qui
     //      perchè li usa solo l'ObjectsMappers al suo interno, iORM non li usa
   strict protected
-    constructor Create(const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String;
+    constructor Create(const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
       ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean); overload;
   public
-    constructor Create(const ARttiProperty:TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String;
+    constructor Create(const ARttiProperty:TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
       ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean); overload;
     function GetLoadSql: String;
@@ -129,7 +130,7 @@ type
     FRttiProperty: TRttiField;
     FName: String;
   public
-    constructor Create(const ARttiField:TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String;
+    constructor Create(const ARttiField:TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
       ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean); overload;
     class function Remove_F_FromName(AFieldName:String): String;
@@ -186,16 +187,16 @@ uses
 { TioProperty }
 
 constructor TioProperty.Create(const ARttiProperty: TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql,
-  AFieldType: String; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
+  AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
   ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean);
 begin
   // NB: No inherited here
-  Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, AReadWrite,
+  Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, ASkipped, AReadWrite,
     ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex);
   FRttiProperty := ARttiProperty;
 end;
 
-constructor TioProperty.Create(const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+constructor TioProperty.Create(const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ASkipped:Boolean;
   const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
   ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean);
 begin
@@ -203,6 +204,7 @@ begin
   FTypeAlias := ATypeAlias;
   FFieldDefinitionString := AFieldDefinitionString;
   FFieldType := AFieldType;
+  FSkipped := ASkipped;
   FReadWrite := AReadWrite;
   FLoadSql := ALoadSql;
   // Relation fields
@@ -417,7 +419,7 @@ end;
 
 function TioProperty.IsDBReadEnabled: Boolean;
 begin
-  Result := (FReadWrite <= iorwReadWrite);
+  Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
 end;
 
 function TioProperty.IsSqlRequestCompliant(
@@ -453,7 +455,7 @@ end;
 
 function TioProperty.IsDBWriteEnabled: Boolean;
 begin
-  Result := (FReadWrite >= iorwReadWrite);
+  Result := (FReadWrite >= iorwReadWrite) and not FSkipped;
 end;
 
 function TioProperty.LoadSqlExist: Boolean;
@@ -686,12 +688,12 @@ end;
 
 { TioField }
 
-constructor TioField.Create(const ARttiField: TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+constructor TioField.Create(const ARttiField: TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ASkipped:Boolean;
   const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
   ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean);
 begin
   // NB: No inherited here
-  Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, AReadWrite,
+  Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, ASkipped, AReadWrite,
     ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex);
   FRttiProperty := ARttiField;
   FName := Self.Remove_F_FromName(ARttiField.Name);
@@ -734,4 +736,5 @@ begin
 end;
 
 end.
+
 

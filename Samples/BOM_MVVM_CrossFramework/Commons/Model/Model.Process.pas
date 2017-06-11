@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('ARTICLES', ioFields), ioTrueClass, diImplements(IProcess)]
+  [ioEntity('ARTICLES'), ioTrueClass, diImplements(IProcess)]
   TProcess = class(TBase, IProcess)
   private
     FCost: Currency;

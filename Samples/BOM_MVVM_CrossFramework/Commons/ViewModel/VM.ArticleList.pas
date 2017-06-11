@@ -73,8 +73,10 @@ type
 
 implementation
 
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
 uses
-  iORM, iORM.Where.Interfaces, V.Interfaces;
+  iORM, iORM.Where.Interfaces, V.Interfaces, System.Generics.Collections;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
 

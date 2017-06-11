@@ -7,10 +7,9 @@ uses
 
 type
 
-  [ioEntity('ARTICLES', ioFields), ioTrueClass, diImplements(IProduct)]
+  [ioEntity('ARTICLES'), ioTrueClass, diImplements(IProduct)]
   TProduct = class(TBase, IProduct)
   private
-    [ioHasMany('IBOMItem', 'MasterID')]
     FBOMItems: IioList<IBOMItem>;
   protected
     // BOMItems
@@ -25,10 +24,15 @@ type
     function GetProcessCost: Currency;
   public
     constructor Create; override;
+    [ioHasMany('IBOMItem', 'MasterID')]
     property BOMItems:IioList<IBOMItem> read GetBOMItems;
+    [ioSkip]
     property Cost:Currency read GetCost;
+    [ioSkip]
     property Time:Integer read GetTime;
+    [ioSkip]
     property MaterialCost:Currency read GetMaterialCost;
+    [ioSkip]
     property ProcessCost:Currency read GetProcessCost;
   end;
 

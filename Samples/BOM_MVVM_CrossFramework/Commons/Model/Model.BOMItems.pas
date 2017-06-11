@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem)]
+  [ioEntity('BOMItems'), ioTrueClass, diImplements(IBOMItem)]
   TBOMItem = class(TInterfacedObject, IBOMItem)
   private
     FID: Integer;
@@ -25,17 +25,18 @@ type
     property Qty:Single read FQty write FQty;
   end;
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem, 'Material')]
+  [ioEntity('BOMItems'), ioTrueClass, diImplements(IBOMItem, 'Material')]
   TBOMItemMaterial = class(TBOMItem)
   private
-    [ioBelongsTo(TMaterial)]
     FArticle: IMaterial;
   protected
     function GetCost: Currency; override;
   public
     constructor Create(const AMaterial:IMaterial; const AQty:Single); overload;
-    property ItemCost:Currency read GetCost;
+    [ioBelongsTo(TMaterial)]
     property Article:IMaterial read FArticle write FArticle;
+    [ioSkip]
+    property ItemCost:Currency read GetCost;
   end;
 
   [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem, 'Process')]
@@ -48,9 +49,12 @@ type
     function GetTime: Integer; override;
   public
     constructor Create(const AProcess:IProcess; const AQty:Single); overload;
-    property ItemCost:Currency read GetCost;
-    property ItemTime:Integer read GetTime;
+    [ioBelongsTo(TProcess)]
     property Article:IProcess read FArticle write FArticle;
+    [ioSkip]
+    property ItemCost:Currency read GetCost;
+    [ioSkip]
+    property ItemTime:Integer read GetTime;
   end;
 
   [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem, 'Product')]
@@ -65,11 +69,16 @@ type
     function GetProcessCost: Currency; override;
   public
     constructor Create(const AProduct:IProduct; const AQty:Single); overload;
-    property ItemCost:Currency read GetCost;
-    property ItemTime:Integer read GetTime;
-    property ItemMaterialCost:Currency read GetCost;
-    property ItemProcessCost:Currency read GetCost;
+    [ioBelongsTo(TProduct)]
     property Article:IProduct read FArticle write FArticle;
+    [ioSkip]
+    property ItemCost:Currency read GetCost;
+    [ioSkip]
+    property ItemTime:Integer read GetTime;
+    [ioSkip]
+    property ItemMaterialCost:Currency read GetCost;
+    [ioSkip]
+    property ItemProcessCost:Currency read GetCost;
   end;
 
 implementation

@@ -1,34 +1,50 @@
 inherited MicroProcessView: TMicroProcessView
-  inherited LabelCode: TLabel
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited LabelDescription: TLabel
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited LabelCost: TLabel
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  inherited SpinBoxQty: TSpinBox
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-  end
-  object LabelTime: TLabel [6]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 149.000000000000000000
-    Position.Y = 35.000000000000000000
-    Size.Width = 68.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    TextSettings.Font.StyleExt = {00060000000000000004000000}
-    Text = '-33'
-  end
-  object Label4: TLabel [7]
-    StyledSettings = [Family, Size, FontColor]
-    Position.X = 85.000000000000000000
-    Position.Y = 35.000000000000000000
-    Size.Width = 65.000000000000000000
-    Size.Height = 17.000000000000000000
-    Size.PlatformDefault = False
-    Text = 'Time (min):'
+  inherited LayoutMaster: TLayout
+    inherited RectangleClientArea: TRectangle
+      inherited LayoutFirstLineLine: TLayout
+        inherited LabelCode: TLabel
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
+        end
+        inherited LabelDescription: TLabel
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
+        end
+      end
+      inherited LayoutSecondLine: TLayout
+        inherited LayoutQty: TLayout
+          inherited EditQty: TEdit
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+          end
+        end
+        inherited LayoutCost: TLayout
+          inherited LabelCost: TLabel
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+          end
+        end
+        inherited LayoutTime: TLayout
+          object Label4: TLabel
+            Align = Top
+            StyledSettings = [Family, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 10.000000000000000000
+            TextSettings.HorzAlign = Center
+            TextSettings.VertAlign = Leading
+            Text = 'Time (min)'
+          end
+          object LabelTime: TLabel
+            Align = Client
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 55.000000000000000000
+            Size.Height = 38.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00060000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = '-33'
+          end
+        end
+      end
+    end
   end
   inherited MBSBOMArticle: TioModelBindSource
     FieldDefs = <

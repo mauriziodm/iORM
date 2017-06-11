@@ -21,6 +21,8 @@ type
 
 implementation
 
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
 uses
   iORM, V.Interfaces;
 

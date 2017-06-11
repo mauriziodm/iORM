@@ -29,7 +29,7 @@ type
 
 implementation
 
-{%CLASSGROUP 'FMX.Controls.TControl'}
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
 

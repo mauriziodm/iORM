@@ -9,7 +9,8 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource,
   Data.Bind.GenData, iORM.Attributes, V.Interfaces, FMX.Edit, FMX.EditBox,
   FMX.SpinBox, Fmx.Bind.GenData, System.Rtti, System.Bindings.Outputs,
-  Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt;
+  Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, FMX.Objects,
+  FMX.Layouts;
 
 type
 
@@ -19,6 +20,9 @@ type
     [ioBindAction('acEditArticle')]
     ButtonShow: TSpeedButton;
 
+    [ioBindAction('acPost')]
+    ButtonPost: TSpeedButton;
+
     LabelCode: TLabel;
     LabelDescription: TLabel;
     MicroVMBridge: TioViewModelBridge;
@@ -26,13 +30,23 @@ type
     MBSBOMArticle: TioModelBindSource;
     LabelCost: TLabel;
     Label2: TLabel;
-    SpinBoxQty: TSpinBox;
     Label1: TLabel;
     BindingsList1: TBindingsList;
-    LinkControlToField1: TLinkControlToField;
     LinkPropertyToFieldText: TLinkPropertyToField;
     LinkPropertyToFieldText2: TLinkPropertyToField;
     LinkPropertyToFieldText4: TLinkPropertyToField;
+    LayoutMaster: TLayout;
+    LayoutRight: TLayout;
+    RectangleClientArea: TRectangle;
+    LayoutFirstLineLine: TLayout;
+    LayoutSecondLine: TLayout;
+    EditQty: TEdit;
+    LayoutQty: TLayout;
+    LinkControlToField1: TLinkControlToField;
+    LayoutCost: TLayout;
+    LayoutProcessCost: TLayout;
+    LayoutMaterialCost: TLayout;
+    LayoutTime: TLayout;
   private
     { Private declarations }
   public

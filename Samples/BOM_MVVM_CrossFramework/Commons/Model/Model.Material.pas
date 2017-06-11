@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('ARTICLES', ioFields), ioTrueClass, diImplements(IMaterial)]
+  [ioEntity('ARTICLES'), ioTrueClass, diImplements(IMaterial)]
   TMaterial = class(TBase, IMaterial)
   private
     FCost: Currency;

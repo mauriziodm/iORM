@@ -147,6 +147,7 @@ inherited ProductView: TProductView
   end
   object BOMVCProvider: TioViewContextProvider
     ioOnRequest = BOMVCProviderioOnRequest
+    ioOnRelease = BOMVCProviderioOnRelease
     RegisterAsDefault = False
     AutoParent = True
     AutoOwner = True
