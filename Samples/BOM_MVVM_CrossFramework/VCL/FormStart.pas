@@ -124,10 +124,7 @@ procedure TStartForm.WindowsVCProviderioOnRequest(const Sender: TObject;
   const AView: TComponent; out ResultViewContext: TComponent);
 begin
   if FStartUp then
-  begin
-    ResultViewContext := Self;
-//    Self.Menu := (AView as TArticleListView).MainMenu1;
-  end
+    ResultViewContext := Self
   else
     ResultViewContext := TViewContextForm.Create(Self);
 end;
