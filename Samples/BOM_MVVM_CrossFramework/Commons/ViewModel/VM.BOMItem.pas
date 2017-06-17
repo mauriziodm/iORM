@@ -32,7 +32,6 @@ implementation
 uses
   iORM, V.Interfaces;
 
-{%CLASSGROUP 'FMX.Controls.TControl'}
 
 {$R *.dfm}
 

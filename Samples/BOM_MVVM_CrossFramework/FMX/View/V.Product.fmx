@@ -79,7 +79,6 @@ inherited ProductView: TProductView
       Position.Y = 280.000000000000000000
       TabOrder = 7
       Text = 'Bill Of Materials'
-      OnClick = ListBoxGroupHeader1Click
     end
   end
   inherited MBSArticle: TioModelBindSource

@@ -104,13 +104,13 @@ inherited MicroProductView: TMicroProductView
         ReadOnly = False
       end
       item
-        Name = 'CostMaterial'
+        Name = 'MaterialCost'
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
       end
       item
-        Name = 'CostProcess'
+        Name = 'ProcessCost'
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
@@ -120,14 +120,14 @@ inherited MicroProductView: TMicroProductView
     object LinkPropertyToFieldText3: TLinkPropertyToField
       Category = 'Quick Bindings'
       DataSource = MBSBOMArticle
-      FieldName = 'CostProcess'
+      FieldName = 'ProcessCost'
       Component = LabelCostProcess
       ComponentProperty = 'Text'
     end
     object LinkPropertyToFieldText6: TLinkPropertyToField
       Category = 'Quick Bindings'
       DataSource = MBSBOMArticle
-      FieldName = 'CostMaterial'
+      FieldName = 'MaterialCost'
       Component = LabelCostMaterial
       ComponentProperty = 'Text'
     end

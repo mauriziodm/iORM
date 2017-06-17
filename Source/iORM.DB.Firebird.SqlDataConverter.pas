@@ -61,11 +61,16 @@ uses
 class function TioSqlDataConverterFirebird.TValueToSql(const AValue: TValue): String;
 begin
   // Usa il risultato della classe antenata e ne modifica il risultato solo in
-  //  caso di DateTime
+  // caso di DateTime
   Result := inherited TValueToSql(AValue);
   // If the value is of type TDateTime...
-  if (AValue.TypeInfo.Kind = tkFloat) and (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
-    Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
+  if (AValue.TypeInfo.Kind = tkFloat) then
+    if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
+      Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended))
+    else if (AValue.TypeInfo = System.TypeInfo(TDate)) then
+      Result := QuotedStr(FormatDateTime('mm/dd/yyyy', AValue.AsExtended))
+    else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
+      Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
 end;
 
 end.

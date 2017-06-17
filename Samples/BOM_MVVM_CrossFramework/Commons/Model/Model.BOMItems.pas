@@ -21,6 +21,7 @@ type
   public
     constructor Create(const AQty:Single); virtual;
     property ID:Integer read FID write FID;
+    [ioIndex]
     property MasterID:Integer read FMasterID write FMasterID;
     property Qty:Single read FQty write FQty;
   end;
@@ -31,6 +32,7 @@ type
     FArticle: IMaterial;
   protected
     function GetCost: Currency; override;
+    function GetMaterialCost: Currency; override;
   public
     constructor Create(const AMaterial:IMaterial; const AQty:Single); overload;
     [ioBelongsTo(TMaterial)]
@@ -47,6 +49,7 @@ type
   protected
     function GetCost: Currency; override;
     function GetTime: Integer; override;
+    function GetProcessCost: Currency; override;
   public
     constructor Create(const AProcess:IProcess; const AQty:Single); overload;
     [ioBelongsTo(TProcess)]
@@ -125,6 +128,11 @@ begin
   Result := FArticle.Cost * Qty;
 end;
 
+function TBOMItemMaterial.GetMaterialCost: Currency;
+begin
+  Result := FArticle.Cost * Qty;
+end;
+
 { TBOMItemProcess }
 
 constructor TBOMItemProcess.Create(const AProcess: IProcess;
@@ -135,6 +143,11 @@ begin
 end;
 
 function TBOMItemProcess.GetCost: Currency;
+begin
+  Result := FArticle.Cost * FQty;
+end;
+
+function TBOMItemProcess.GetProcessCost: Currency;
 begin
   Result := FArticle.Cost * FQty;
 end;

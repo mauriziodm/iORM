@@ -91,7 +91,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\BOM_MVVM_CrossFramework\VCL\BOM_MVVM_VCL.dproj">
             <Dependencies/>
@@ -365,13 +365,13 @@
     <Target Name="Pizza_Ordini_MVVM_FMX:Make">
         <MSBuild Projects="..\..\Samples\Pizza_Ordini_MVVM_CrossFramework\FMX\Pizza_Ordini_MVVM_FMX.dproj" Targets="Make"/>
     </Target>
-    <Target Name="BOM_MVVM_FMX">
+    <Target Name="BOM_MVVM_FMX" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj"/>
     </Target>
-    <Target Name="BOM_MVVM_FMX:Clean">
+    <Target Name="BOM_MVVM_FMX:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BOM_MVVM_FMX:Make">
+    <Target Name="BOM_MVVM_FMX:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="BOM_MVVM_VCL">

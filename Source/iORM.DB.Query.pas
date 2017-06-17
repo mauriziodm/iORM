@@ -71,6 +71,7 @@ type
     procedure Close;
     function IsEmpty: Boolean;
     function IsSqlEmpty: Boolean;
+    function IsActive: Boolean;
     function ExecSQL: Integer; virtual;
     function GetSQL: TStrings;
     function Fields: TioFields;
@@ -199,6 +200,11 @@ end;
 function TioQuery.IsSqlEmpty: Boolean;
 begin
   Result := (FSqlQuery.SQL.Count = 0);
+end;
+
+function TioQuery.IsActive: Boolean;
+begin
+  Result := FSqlQuery.Active;
 end;
 
 function TioQuery.IsEmpty: Boolean;

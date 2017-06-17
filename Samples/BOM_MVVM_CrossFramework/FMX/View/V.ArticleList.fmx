@@ -231,7 +231,7 @@ object ArticleListView: TArticleListView
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 20
+    Left = 52
     Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'

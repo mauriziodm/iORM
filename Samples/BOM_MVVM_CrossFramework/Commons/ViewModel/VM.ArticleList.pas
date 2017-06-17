@@ -78,8 +78,6 @@ implementation
 uses
   iORM, iORM.Where.Interfaces, V.Interfaces, System.Generics.Collections;
 
-{%CLASSGROUP 'FMX.Controls.TControl'}
-
 {$R *.dfm}
 
 procedure TArticleListVM.acApplyFiltersExecute(Sender: TObject);
@@ -117,7 +115,9 @@ var
 begin
   inherited;
   LAlias := MPArticleList.Current.ClassName;
-  io.di.LocateView<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPArticleList).Show;
+  io.di.LocateView<IArticleView,IArticleVM>(LAlias, LAlias)
+    .SetPresenter('MPArticle', MPArticleList)
+    .Show;
 end;
 
 procedure TArticleListVM.acFilterAllExecute(Sender: TObject);

@@ -26,13 +26,13 @@ type
     BOMVCProvider: TioViewContextProvider;
     procedure BOMVCProviderioOnRequest(const Sender: TObject;
       const AView: TComponent; out ResultViewContext: TComponent);
-    procedure ListBoxGroupHeader1Click(Sender: TObject);
     procedure BOMVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
   private
     { Private declarations }
   public
     { Public declarations }
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
@@ -43,7 +43,7 @@ procedure TProductView.BOMVCProviderioOnRelease(const Sender: TObject;
   const AView, AViewContext: TComponent);
 begin
   inherited;
-  Sleep(100);
+  AViewContext.Free;
 end;
 
 procedure TProductView.BOMVCProviderioOnRequest(const Sender: TObject;
@@ -55,7 +55,7 @@ begin
   ListBox1.AddObject(ResultViewContext as TListBoxItem);
 end;
 
-procedure TProductView.ListBoxGroupHeader1Click(Sender: TObject);
+constructor TProductView.Create(AOwner: TComponent);
 begin
   inherited;
   VMBridge.Command['acPopulateItemList'].Execute;

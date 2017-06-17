@@ -102,8 +102,7 @@ type
   //  coincide quindi con quello della connessione che a sua volta coincide con quello della transazione.
   IioQueryContainer = interface
     ['{9CF03765-6685-48A3-8DCC-85C7040D676D}']
-    function Exist(AQueryIdentity:String): Boolean;
-    function GetQuery(AQueryIdentity:String): IioQuery;
+    function TryGetQuery(AQueryIdentity:String; out ResultQuery:IioQuery): Boolean;
     procedure AddQuery(AQueryIdentity:String; AQuery:IioQuery);
     procedure CleanQueryConnectionsRef;
   end;
@@ -163,6 +162,7 @@ type
     procedure Close;
     function IsEmpty: Boolean;
     function IsSqlEmpty: Boolean;
+    function IsActive: Boolean;
     function ExecSQL: Integer;
     function GetSQL: TStrings;
     function Fields: TioFields;

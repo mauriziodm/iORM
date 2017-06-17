@@ -188,6 +188,9 @@ type
     function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere; overload;
 
+    function _PropertyIsNull(APropertyName:String): IioWhere;
+    function _PropertyIsNotNull(APropertyName:String): IioWhere;
+
     function _PropertyOIDEqualsTo(AValue:Integer): IioWhere;
 
     function _Value(AValue:TValue): IioWhere; overload;
@@ -291,6 +294,9 @@ type
     function _PropertyEqualsTo(APropertyName:String; AValue:TDateTime): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere<T>; overload;
+
+    function _PropertyIsNull(APropertyName:String): IioWhere<T>;
+    function _PropertyIsNotNull(APropertyName:String): IioWhere<T>;
 
     function _PropertyOIDEqualsTo(AValue:Integer): IioWhere<T>;
 
@@ -1049,6 +1055,20 @@ begin
   Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<Integer>(AValue)   );
 end;
 
+function TioWhere._PropertyIsNotNull(APropertyName: String): IioWhere;
+begin
+  Result := Self;
+  Self._Property(APropertyName);
+  Self._IsNotNull;
+end;
+
+function TioWhere._PropertyIsNull(APropertyName: String): IioWhere;
+begin
+  Result := Self;
+  Self._Property(APropertyName);
+  Self._IsNull;
+end;
+
 function TioWhere._PropertyEqualsTo(APropertyName: String;
   AValue: TDateTime): IioWhere;
 begin
@@ -1631,6 +1651,18 @@ function TioWhere<T>._PropertyEqualsTo(APropertyName: String;
   AValue: Integer): IioWhere<T>;
 begin
   Result := Self._PropertyEqualsTo(APropertyName,   TValue.From<Integer>(AValue)   );
+end;
+
+function TioWhere<T>._PropertyIsNotNull(APropertyName: String): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._PropertyIsNotNull(APropertyName);
+end;
+
+function TioWhere<T>._PropertyIsNull(APropertyName: String): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._PropertyIsNull(APropertyName);
 end;
 
 end.

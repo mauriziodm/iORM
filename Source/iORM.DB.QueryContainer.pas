@@ -49,14 +49,15 @@ type
   //  coincide quindi con quello della connessione che a sua volta coincide con quello della transazione.
   TioQueryContainer = class(TInterfacedObject, IioQueryContainer)
   type
-    TioInternalQueryContainerType = TDictionary<String, IioQuery>;
+    TioInternalQueryContainerItemType = TList<IioQuery>;
+    TioInternalQueryContainerType = TObjectDictionary<String, TioInternalQueryContainerItemType>;
   strict private
     FContainer: TioInternalQueryContainerType;
+    function ExistQueryIdentity(AQueryIdentity:String): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
-    function Exist(AQueryIdentity:String): Boolean;
-    function GetQuery(AQueryIdentity:String): IioQuery;
+    function TryGetQuery(AQueryIdentity:String; out ResultQuery:IioQuery): Boolean;
     procedure AddQuery(AQueryIdentity:String; AQuery:IioQuery);
     procedure CleanQueryConnectionsRef;
   end;
@@ -69,27 +70,36 @@ uses System.SysUtils;
 
 procedure TioQueryContainer.AddQuery(AQueryIdentity:String; AQuery: IioQuery);
 begin
-  FContainer.Add(AQueryIdentity, AQuery);
+  // If the Query (QueryIdentity) does not exist then create it in the container
+  if not ExistQueryIdentity(AQueryIdentity) then
+    FContainer.Add(AQueryIdentity, TioInternalQueryContainerItemType.Create);
+  // Add a new element that holds all queries for this identities
+  //  and insert the received Query (new query) in this list
+  FContainer.Items[AQueryIdentity].Add(AQuery);
 end;
 
 procedure TioQueryContainer.CleanQueryConnectionsRef;
 var
+  LQueryContainerItem: TioInternalQueryContainerItemType;
   AQuery: IioQuery;
 begin
   // Remove the reference to the connection
   //  NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
   //       tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
-  //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+  //       che sono state preparate e la query che mantiene un riferimento alla connessione al suo interno; in pratica
   //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
   //       a vicenda e rendevano inefficace il Reference Count
-  for AQuery in Self.FContainer.Values
-  do AQuery.CleanConnectionRef;
+  // NB: Loop for all query container items (for all query identities)
+  for LQueryContainerItem in Self.FContainer.Values do
+    // Loop for all queries in the current query identities array
+    for AQuery in LQueryContainerItem do
+      AQuery.CleanConnectionRef;
 end;
 
 constructor TioQueryContainer.Create;
 begin
   inherited;
-  FContainer := TioInternalQueryContainerType.Create;
+  FContainer := TioInternalQueryContainerType.Create([doOwnsValues]);
 end;
 
 destructor TioQueryContainer.Destroy;
@@ -98,14 +108,33 @@ begin
   inherited;
 end;
 
-function TioQueryContainer.Exist(AQueryIdentity:String): Boolean;
+function TioQueryContainer.ExistQueryIdentity(AQueryIdentity:String): Boolean;
 begin
-  Result := (not AQueryIdentity.IsEmpty) and FContainer.ContainsKey(AQueryIdentity);
+  Result := (not AQueryIdentity.IsEmpty)
+    and FContainer.ContainsKey(AQueryIdentity);
 end;
 
-function TioQueryContainer.GetQuery(AQueryIdentity:String): IioQuery;
+function TioQueryContainer.TryGetQuery(AQueryIdentity: String;
+  out ResultQuery: IioQuery): Boolean;
+var
+  LQuery: IioQuery;
 begin
-  Result := FContainer.Items[AQueryIdentity];
+  // Init
+  Result := False;
+  ResultQuery := nil;
+  // If the query identity is empty then exit
+  if not ExistQueryIdentity(AQueryIdentity) then
+    Exit;
+  // Return the first inactive query for this query identity
+  //  to resolve the recursion problem
+  for LQuery in FContainer.Items[AQueryIdentity] do
+  begin
+    if not LQuery.IsActive then
+    begin
+      ResultQuery := LQuery;
+      Exit(True);
+    end;
+  end;
 end;
 
 end.

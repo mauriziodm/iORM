@@ -33,8 +33,6 @@ uses
 {$STRONGLINKTYPES ON}
 
 begin
-//  ReportMemoryLeaksOnShutdown := True;
-
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TStartForm, StartForm);

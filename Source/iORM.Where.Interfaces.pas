@@ -174,6 +174,8 @@ type
     function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere; overload;
     function _PropertyOIDEqualsTo(AValue:Integer): IioWhere;
+    function _PropertyIsNull(APropertyName:String): IioWhere;
+    function _PropertyIsNotNull(APropertyName:String): IioWhere;
     function _Value(AValue:TValue): IioWhere; overload;
     function _Value(AValue:TDateTime): IioWhere; overload;
     function _Value(AValue:Integer): IioWhere; overload;
@@ -286,6 +288,8 @@ type
     function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere<T>; overload;
     function _PropertyOIDEqualsTo(AValue:Integer): IioWhere<T>;
+    function _PropertyIsNull(APropertyName:String): IioWhere<T>;
+    function _PropertyIsNotNull(APropertyName:String): IioWhere<T>;
     function _Value(AValue:TValue): IioWhere<T>; overload;
     function _Value(AValue:TDateTime): IioWhere<T>; overload;
     function _Value(AValue:Double): IioWhere<T>; overload;
