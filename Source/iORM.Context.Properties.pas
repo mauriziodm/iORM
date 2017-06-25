@@ -43,7 +43,8 @@ uses
   iORM.Attributes,
   iORM.SqlItems,
   System.Rtti,
-  System.Generics.Collections, iORM.Context.Table.Interfaces, System.Classes;
+  System.Generics.Collections, iORM.Context.Table.Interfaces, System.Classes,
+  System.TypInfo;
 
 type
 
@@ -97,6 +98,7 @@ type
     procedure SetValue(Instance: Pointer; AValue:TValue); virtual;
     function GetSqlValue(ADataObject:TObject): String;
     function GetRttiType: TRttiType; virtual;
+    function GetTypeInfo: PTypeInfo; virtual;
     function GetTypeName: String;
     function GetTypeAlias: String;
     function IsInterface: Boolean;
@@ -138,6 +140,7 @@ type
     function GetValue(Instance: Pointer): TValue; override;
     procedure SetValue(Instance: Pointer; AValue:TValue); override;
     function GetRttiType: TRttiType; override;
+    function GetTypeInfo: PTypeInfo; override;
     function IsWritable: Boolean; override;
   end;
 
@@ -179,7 +182,7 @@ type
 implementation
 
 uses
-  System.TypInfo, iORM.Context.Interfaces,
+  iORM.Context.Interfaces,
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
   System.StrUtils, iORM.Context.Map.Interfaces, iORM.Rtti.Utilities,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container;
@@ -341,6 +344,11 @@ end;
 function TioProperty.GetTypeAlias: String;
 begin
   Result := FTypeAlias;
+end;
+
+function TioProperty.GetTypeInfo: PTypeInfo;
+begin
+  Result := FRttiProperty.PropertyType.Handle;
 end;
 
 function TioProperty.GetTypeName: String;
@@ -709,6 +717,12 @@ function TioField.GetRttiType: TRttiType;
 begin
   // No inherited
   Result := FRttiProperty.FieldType;
+end;
+
+function TioField.GetTypeInfo: PTypeInfo;
+begin
+  // No inherited
+  Result := FRttiProperty.FieldType.Handle;
 end;
 
 function TioField.GetValue(Instance: Pointer): TValue;

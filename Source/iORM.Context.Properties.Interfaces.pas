@@ -42,7 +42,8 @@ uses
   iORM.CommonTypes,
   iORM.Interfaces,
   System.Rtti,
-  System.Generics.Collections, iORM.Context.Table.Interfaces, System.Classes;
+  System.Generics.Collections, iORM.Context.Table.Interfaces, System.Classes,
+  System.TypInfo;
 
 type
 
@@ -70,6 +71,7 @@ type
     procedure SetValue(Instance: Pointer; AValue: TValue);
     function GetSqlValue(ADataObject: TObject): string;
     function GetRttiType: TRttiType;
+    function GetTypeInfo: PTypeInfo;
     function GetTypeName: String;
     function GetTypeAlias: String;
     function IsInterface: Boolean;

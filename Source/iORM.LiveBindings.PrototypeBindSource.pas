@@ -106,6 +106,8 @@ type
     procedure SetAsync(const Value: Boolean);
     // AutoPersist
     procedure SetAutoPersist(const Value: Boolean);
+  protected
+    function CheckAdapter: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -186,6 +188,11 @@ begin
   end
   else
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+end;
+
+function TioPrototypeBindSource.CheckAdapter: Boolean;
+begin
+  Result := Inherited and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
 end;
 
 procedure TioPrototypeBindSource.ClearDataObject;

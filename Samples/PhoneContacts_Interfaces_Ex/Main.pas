@@ -68,6 +68,9 @@ type
     RBFirebird: TRadioButton;
     Button3: TButton;
     Button4: TButton;
+    Label10: TLabel;
+    EditDateOfBirth: TEdit;
+    LinkControlToField5: TLinkControlToField;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);

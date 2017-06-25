@@ -39,7 +39,7 @@ interface
 
 uses
   iORM.DB.Interfaces, iORM.Context.Properties.Interfaces, System.Rtti,
-  iORM.DB.SqLite.SqlDataConverter;
+  iORM.DB.SqLite.SqlDataConverter, iORM.Context.Interfaces;
 
 type
 
@@ -49,14 +49,56 @@ type
   strict protected
   public
     class function TValueToSql(const AValue:TValue): String; override;
+    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
   end;
 
 implementation
 
 uses
-  System.TypInfo, System.SysUtils;
+  System.TypInfo, System.SysUtils, Data.DB;
 
-{ TioSqlConverterSqLite }
+{ TioSqlDataConverterFirebird }
+
+class procedure TioSqlDataConverterFirebird.SetQueryParamByContext(
+  const AQuery: IioQuery; const AProp: IioContextProperty;
+  const AContext: IioContext);
+begin
+  // TDateTime (NULL is zero)
+  if (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) then
+  begin
+    AQuery.ParamByProp(AProp).AsDateTime := AProp.GetValue(AContext.DataObject).AsType<TDateTime>;
+    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftDateTime;
+    end;
+  end
+  // TDate (NULL is zero)
+  else
+  if (AProp.GetTypeInfo = System.TypeInfo(TDate)) then
+  begin
+    AQuery.ParamByProp(AProp).AsDate := AProp.GetValue(AContext.DataObject).AsType<TDate>;
+    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftDate;
+    end;
+  end
+  // TTime (NULL is zero)
+  else
+  if (AProp.GetTypeInfo = System.TypeInfo(TTime)) then
+  begin
+    AQuery.ParamByProp(AProp).AsTime := AProp.GetValue(AContext.DataObject).AsType<TTime>;
+    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftTime;
+    end;
+  end
+  // Other value types inherits from ancestor
+  else
+    inherited;
+end;
 
 class function TioSqlDataConverterFirebird.TValueToSql(const AValue: TValue): String;
 begin
@@ -65,12 +107,12 @@ begin
   Result := inherited TValueToSql(AValue);
   // If the value is of type TDateTime...
   if (AValue.TypeInfo.Kind = tkFloat) then
-    if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
-      Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended))
-    else if (AValue.TypeInfo = System.TypeInfo(TDate)) then
+    if (AValue.TypeInfo = System.TypeInfo(TDate)) then
       Result := QuotedStr(FormatDateTime('mm/dd/yyyy', AValue.AsExtended))
     else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
       Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
+    else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
+      Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
 end;
 
 end.

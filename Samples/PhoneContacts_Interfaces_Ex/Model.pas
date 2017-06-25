@@ -42,6 +42,7 @@ type
     FID: Integer;
     FLastName: String;
     FFirstName: String;
+    FDateOfBirth: TDate;
     [ioHasMany('IPhoneNumber', 'PersonID', ioLazyLoad)]
     FPhones: IioList<IPhoneNumber>;
   protected
@@ -49,21 +50,24 @@ type
     procedure SetFirstName(AValue:String);
     procedure SetLastName(AValue:String);
     procedure SetPhones(AValue:IioList<IPhoneNumber>);
+    procedure SetDateOfBirth(const Value: TDate);
     function GetID: Integer;
     function GetFirstName: String;
     function GetLastName: String;
     function GetPhones: IioList<IPhoneNumber>;
     function GetFullName: String;
     function GetClassNameProp: String;
+    function GetDateOfBirth: TDate;
   public
     constructor Create; overload;
-    constructor Create(NewFirstName, NewLastName: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName: String; NewDateOfBirth:TDate; NewID: Integer = 0); overload;
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
     property LastName:String read GetLastName write SetLastName;
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
     property FullName:String read GetFullName;
     property ClassNameProp:String read GetClassNameProp;
+    property DateOfBirth:TDate read GetDateOfBirth write SetDateOfBirth;
   end;
 
   [ioEntity('Persons',  ioFields), ioTrueClass]
@@ -74,7 +78,7 @@ type
     procedure SetBranchOffice(AValue:String);
     function GetBranchOffice: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewBranchOffice: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewBranchOffice: String; NewDateOfBirth:TDate; NewID: Integer = 0); overload;
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
@@ -88,7 +92,7 @@ type
     procedure SetFidelityCardCode(AValue:String);
     function GetFidelityCardCode: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode: String; NewDateOfBirth:TDate; NewID: Integer = 0); overload;
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
@@ -100,7 +104,7 @@ type
     procedure SetVipCardCode(AValue:String);
     function GetVipCardCode: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode, NewVipCardCode: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode, NewVipCardCode: String; NewDateOfBirth:TDate; NewID: Integer = 0); overload;
     property VipCardCode:String read GetVipCardCode write SetVipCardCode;
   end;
 
@@ -111,12 +115,13 @@ uses
 
 { TPerson }
 
-constructor TPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);
+constructor TPerson.Create(NewFirstName, NewLastName: String; NewDateOfBirth:TDate; NewID: Integer);
 begin
-  inherited Create;
+  Self.Create;
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;
+  FDateOfBirth := NewDateOfBirth;
 end;
 
 constructor TPerson.Create;
@@ -128,6 +133,11 @@ end;
 function TPerson.GetClassNameProp: String;
 begin
   Result := Self.ClassName;
+end;
+
+function TPerson.GetDateOfBirth: TDate;
+begin
+  Result := FDateOfBirth;
 end;
 
 function TPerson.GetFirstName: String;
@@ -155,6 +165,11 @@ begin
   Result := FPhones;
 end;
 
+procedure TPerson.SetDateOfBirth(const Value: TDate);
+begin
+  FDateOfBirth := Value;
+end;
+
 procedure TPerson.SetFirstName(AValue: String);
 begin
   FFirstName := AValue;
@@ -178,9 +193,9 @@ end;
 { TEmployee }
 
 constructor TEmployee.Create(NewFirstName, NewLastName, NewBranchOffice: String;
-  NewID: Integer);
+  NewDateOfBirth:TDate; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName);
+  inherited Create(NewFirstName, NewLastName, NewDateOfBirth);
   FBranchOffice := NewBranchOffice;
 end;
 
@@ -197,9 +212,9 @@ end;
 { TCustomer }
 
 constructor TCustomer.Create(NewFirstName, NewLastName,
-  NewFidelityCardCode: String; NewID: Integer);
+  NewFidelityCardCode: String; NewDateOfBirth:TDate; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName);
+  inherited Create(NewFirstName, NewLastName, NewDateOfBirth);
   FFidelityCardCode := NewFidelityCardCode;
 end;
 
@@ -216,9 +231,9 @@ end;
 { TVipCustomer }
 
 constructor TVipCustomer.Create(NewFirstName, NewLastName,
-  NewFidelityCardCode, NewVipCardCode: String; NewID: Integer);
+  NewFidelityCardCode, NewVipCardCode: String; NewDateOfBirth:TDate; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName, NewFidelityCardCode);
+  inherited Create(NewFirstName, NewLastName, NewFidelityCardCode, NewDateOfBirth);
   FVipCardCode := NewVipCardCode;
 end;
 

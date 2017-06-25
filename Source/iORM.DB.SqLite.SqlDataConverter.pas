@@ -39,7 +39,8 @@ interface
 
 uses
   iORM.DB.Interfaces,
-  System.Rtti, iORM.Context.Properties.Interfaces;
+  System.Rtti, iORM.Context.Properties.Interfaces, iORM.CommonTypes,
+  iORM.Context.Interfaces;
 
 type
 
@@ -53,12 +54,13 @@ type
 //    class function PropertyToFieldType(const AProp:IioContextProperty): String; override;
     class function TValueToSql(const AValue:TValue): String; override;
     class function QueryToTValue(const AQuery:IioQuery; const AProperty:IioContextProperty): TValue; override;
+    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
   end;
 
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes;
+  System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes, Data.DB;
 
 { TioSqlConverterSqLite }
 
@@ -119,6 +121,24 @@ begin
                                     AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsInteger  // This is the ordinal value
                                   );
   end;
+end;
+
+class procedure TioSqlDataConverterSqLite.SetQueryParamByContext(
+  const AQuery: IioQuery; const AProp: IioContextProperty;
+  const AContext: IioContext);
+begin
+  inherited;
+  // If the property is of type TDateTime or TDate or TTime and the value is equal to
+  //  zero then set che ParamValue to NULL
+  if(   (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))   )
+  and (AProp.GetValue(AContext.DataObject).AsExtended = 0)
+  then
+  begin
+    AQuery.ParamByProp(AProp).Clear;
+    AQuery.ParamByProp(AProp).DataType := TFieldType.ftFloat;
+  end
+  else
+    AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioSqlDataConverterSqLite.StringToSQL(const AString: String): String;

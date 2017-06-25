@@ -186,6 +186,7 @@ type
     class function PropertyToFieldType(const AProp:IioContextProperty): String; virtual; abstract;
     class function TValueToSql(const AValue:TValue): String; virtual; abstract;
     class function QueryToTValue(const AQuery:IioQuery; const AProperty:IioContextProperty): TValue; virtual; abstract;
+    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); virtual; abstract;
   end;
 
   // INterfaccia per le classi che devono generare i vari tipi di query

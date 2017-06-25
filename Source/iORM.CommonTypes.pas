@@ -65,6 +65,9 @@ type
 
   TioViewDataType = (dtSingle, dtList);
 
+  // Some pointers to TValue
+  PValue = ^TValue;
+
   // Nullables
   TioNullable<T> = record
   const

@@ -126,6 +126,7 @@ object MainForm: TMainForm
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
         Align = Client
+        CanParentFocus = True
         Size.Width = 384.000000000000000000
         Size.Height = 353.000000000000000000
         Size.PlatformDefault = False
@@ -206,7 +207,7 @@ object MainForm: TMainForm
         end
         object EditID: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
-          TabOrder = 8
+          TabOrder = 9
           ReadOnly = True
           Text = '-33'
           Position.X = 120.000000000000000000
@@ -235,7 +236,7 @@ object MainForm: TMainForm
         end
         object EditFirstname: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
-          TabOrder = 7
+          TabOrder = 8
           Text = 'Bitmap28'
           Position.X = 120.000000000000000000
           Position.Y = 82.000000000000000000
@@ -254,7 +255,7 @@ object MainForm: TMainForm
         end
         object EditLastname: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
-          TabOrder = 6
+          TabOrder = 7
           Text = 'Bitmap28'
           Position.X = 120.000000000000000000
           Position.Y = 122.000000000000000000
@@ -366,6 +367,25 @@ object MainForm: TMainForm
           Size.Height = 32.000000000000000000
           Size.PlatformDefault = False
         end
+        object Label10: TLabel
+          Position.X = 8.000000000000000000
+          Position.Y = 162.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 23.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Trailing
+          Text = 'Birth date'
+        end
+        object EditDateOfBirth: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 6
+          Text = 'Bitmap28'
+          Position.X = 120.000000000000000000
+          Position.Y = 162.000000000000000000
+          Size.Width = 249.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+        end
       end
       object Label2: TLabel
         Align = Bottom
@@ -437,6 +457,12 @@ object MainForm: TMainForm
       item
         Name = 'ClassNameProp'
         Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'DateOfBirth'
+        FieldType = ftDate
+        Generator = 'Date'
         ReadOnly = False
       end>
     ScopeMappings = <>
@@ -521,6 +547,13 @@ object MainForm: TMainForm
       DataSource = BSMaster
       FieldName = 'ID'
       Control = EditID
+      Track = False
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'DateOfBirth'
+      Control = EditDateOfBirth
       Track = False
     end
   end

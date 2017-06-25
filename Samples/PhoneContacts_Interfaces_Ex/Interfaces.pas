@@ -48,6 +48,10 @@ type
 
     function GetClassNameProp: String;
     property ClassNameProp:String read GetClassNameProp;
+
+    procedure SetDateOfBirth(const Value: TDate);
+    function GetDateOfBirth: TDate;
+    property DateOfBirth:TDate read GetDateOfBirth write SetDateOfBirth;
   end;
 
   IEmployee = interface(IPerson)

@@ -317,7 +317,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if not AProp.IsBlob then
   begin
-    Self.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
+    TioDbFactory.SqlDataConverter.SetQueryParamByContext(Self, AProp, AContext);
     Exit;
   end;
   // At this point the property refer to a blob field (and to an Object) type then

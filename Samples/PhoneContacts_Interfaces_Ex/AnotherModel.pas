@@ -13,6 +13,7 @@ type
     FID: Integer;
     FLastName: String;
     FFirstName: String;
+    FDateOfBirth: TDate;
     [ioEmbeddedHasMany('IPhoneNumber'), ioTypeAlias('Another'), ioInject]
     FPhones: IioList<IPhoneNumber>;
   protected
@@ -26,6 +27,8 @@ type
     function GetPhones: IioList<IPhoneNumber>;
     function GetFullName: String;
     function GetClassNameProp: String;
+    procedure SetDateOfBirth(const Value: TDate);
+    function GetDateOfBirth: TDate;
   public
     constructor Create(NewFirstName, NewLastName: String; NewID: Integer = 0); overload;
     destructor Destroy; override;
@@ -35,6 +38,7 @@ type
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
     property FullName:String read GetFullName;
     property ClassNameProp:String read GetClassNameProp;
+    property DateOfBirth:TDate read GetDateOfBirth write SetDateOfBirth;
   end;
 
 
@@ -64,6 +68,11 @@ begin
   Result := Self.ClassName + ' (Another)';
 end;
 
+function TAnotherPerson.GetDateOfBirth: TDate;
+begin
+  Result := FDateOfBirth;
+end;
+
 function TAnotherPerson.GetFirstName: String;
 begin
   Result := FFirstName;
@@ -87,6 +96,11 @@ end;
 function TAnotherPerson.GetPhones: IioList<IPhoneNumber>;
 begin
   Result := FPhones;
+end;
+
+procedure TAnotherPerson.SetDateOfBirth(const Value: TDate);
+begin
+  FDateOfBirth := Value;
 end;
 
 procedure TAnotherPerson.SetFirstName(AValue: String);
