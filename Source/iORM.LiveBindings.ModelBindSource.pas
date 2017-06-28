@@ -18,6 +18,7 @@ type
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
+    procedure PreventBindSourceAdapterDestruction;
   protected
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
@@ -30,6 +31,7 @@ type
     function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property ModelPresenter:String read FModelPresenter write FModelPresenter;
@@ -43,7 +45,7 @@ implementation
 uses
   System.SysUtils, iORM.Components.Common,
   iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.LiveBindings.Factory,
-  iORM.Exceptions;
+  iORM.Exceptions, System.Rtti, iORM.RttiContext.Factory;
 
 { TioModelBindSource }
 
@@ -56,6 +58,12 @@ begin
   FCrossView_MasterPropertyName := '';
   if (csDesigning in ComponentState) and not Assigned(FViewModelBridge) then
     TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
+end;
+
+destructor TioModelBindSource.Destroy;
+begin
+  PreventBindSourceAdapterDestruction;
+  inherited;
 end;
 
 procedure TioModelBindSource.DoCreateAdapter(
@@ -151,6 +159,16 @@ begin
   inherited;
   if (Operation = opRemove) and (AComponent = FViewModelBridge)
     then FViewModelBridge := nil;
+end;
+
+procedure TioModelBindSource.PreventBindSourceAdapterDestruction;
+var
+  LInstanceType: TRttiInstanceType;
+  LField: TRttiField;
+begin
+  LInstanceType := TioRttiContextFactory.RttiContext.GetType(Self.ClassInfo).AsInstance;
+  LField := LInstanceType.GetField('FRuntimeAdapter');
+  LField.SetValue(Self, TValue.Empty);
 end;
 
 procedure TioModelBindSource.SetViewModelBridge(

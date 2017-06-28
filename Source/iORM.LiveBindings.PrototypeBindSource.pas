@@ -49,6 +49,7 @@ type
 
   TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   private
+    FBindSourceAdapter: IioActiveBindSourceAdapter;
     FioTypeName: String;
     FioTypeAlias: String;
     FioAutoLoadData: Boolean;

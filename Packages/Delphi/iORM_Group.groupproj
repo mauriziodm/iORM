@@ -19,7 +19,7 @@
             <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies>iORM_Project.dproj;iORM_Project_DesignTime.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj">
             <Dependencies/>
@@ -28,7 +28,7 @@
             <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj">
             <Dependencies>iORM_Project.dproj</Dependencies>
@@ -149,13 +149,13 @@
     <Target Name="PhoneContacts_DMVC_Client_ByCode:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client_ByCode\PhoneContacts_DMVC_Client_ByCode.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="iORM_Project;iORM_Project_DesignTime">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean" DependsOnTargets="iORM_Project:Clean;iORM_Project_DesignTime:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Make" DependsOnTargets="iORM_Project:Make;iORM_Project_DesignTime:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_ioActiveBindSourceAdapter">
@@ -176,13 +176,13 @@
     <Target Name="PhoneContacts_Interfaces_MVVM:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_MVVM\PhoneContacts_Interfaces_MVVM.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces">
+    <Target Name="PhoneContacts_Interfaces" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces:Clean">
+    <Target Name="PhoneContacts_Interfaces:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces:Make">
+    <Target Name="PhoneContacts_Interfaces:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_Interfaces_Ex" DependsOnTargets="iORM_Project">
