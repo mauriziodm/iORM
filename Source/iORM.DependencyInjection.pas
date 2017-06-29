@@ -968,7 +968,9 @@ begin
         if not Assigned(FVCProvider) then
           FVCProvider := TioViewContextProviderContainer.GetProvider;
         if Assigned(FVCProvider) then
-          TioViewContextContainer.NewViewContext(TComponent(Result), FVCProvider);
+          TioViewContextContainer.NewViewContext(TComponent(Result), FVCProvider)
+        else
+          raise EioException.Create(Self.ClassName, '_Get', 'ViewContextProvider component not found!!!');
       end;
     end;
   finally

@@ -212,6 +212,8 @@ end;
 destructor TioModelPresenter.Destroy;
 begin
   FWhereStr.Free;
+  if CheckAdapter then
+    FBindSourceAdapter.Free;
   inherited;
 end;
 

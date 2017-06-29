@@ -1,15 +1,5 @@
 inherited ViewModel: TViewModel
   OldCreateOrder = True
-  object SQLiteConn: TioSQLiteConnectionDef
-    AutoCreateDatabase = True
-    Database = 'DataSetTest.DB'
-    DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
-    Persistent = False
-    Pooled = False
-    Left = 64
-    Top = 32
-  end
   object ModelMasterPresenter: TioModelPresenter
     Async = False
     AutoLoadData = True

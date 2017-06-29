@@ -2,7 +2,7 @@ object ViewContextForm: TViewContextForm
   Left = 0
   Top = 0
   Caption = 'iORM edit form example'
-  ClientHeight = 450
+  ClientHeight = 590
   ClientWidth = 624
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET

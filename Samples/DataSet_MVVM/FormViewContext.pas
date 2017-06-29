@@ -14,9 +14,6 @@ type
     { Public declarations }
   end;
 
-var
-  ViewContextForm: TViewContextForm;
-
 implementation
 
 {$R *.dfm}

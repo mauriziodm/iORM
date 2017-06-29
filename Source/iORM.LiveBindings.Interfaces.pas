@@ -84,6 +84,7 @@ type
 
   IioActiveBindSourceAdapter = interface
     ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
+    procedure Free;
     procedure Next;
     procedure Prior;
     procedure First;

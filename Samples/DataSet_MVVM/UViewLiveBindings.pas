@@ -10,7 +10,7 @@ uses
   Vcl.Bind.DBEngExt, Vcl.Bind.Grid, System.Rtti, System.Bindings.Outputs,
   Vcl.Bind.Editors, Data.Bind.Grid, Data.Bind.GenData, Data.Bind.Controls,
   Vcl.ExtCtrls, Vcl.Buttons, Vcl.Bind.Navigator, Vcl.StdCtrls, Vcl.Mask,
-  Vcl.DBCtrls;
+  Vcl.DBCtrls, Vcl.Bind.GenData;
 
 type
 
@@ -23,9 +23,7 @@ type
     LinkGridToDataSourceMasterModelBindSource: TLinkGridToDataSource;
     BindNavigator1: TBindNavigator;
     ScrollBox1: TScrollBox;
-    EditID: TEdit;
     EditDescrizione: TEdit;
-    LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
     Label1: TLabel;
     StringGrid2: TStringGrid;
@@ -33,6 +31,10 @@ type
     Label2: TLabel;
     DetailModelBindSource: TioModelBindSource;
     LinkGridToDataSourceDetailModelBindSource: TLinkGridToDataSource;
+    EditID: TEdit;
+    LinkControlToField1: TLinkControlToField;
+    Image1: TImage;
+    LinkControlToField3: TLinkControlToField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }

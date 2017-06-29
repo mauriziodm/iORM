@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM.Attributes,
   iORM.MVVM.Components.ViewModelBridge, Data.DB,
   iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet,
-  Vcl.Grids, Vcl.DBGrids;
+  Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBCtrls;
 
 type
 
@@ -17,6 +17,19 @@ type
     ModelMasterDataSet: TioModelDataSet;
     DBGrid1: TDBGrid;
     MasterDataSource: TDataSource;
+    Label1: TLabel;
+    Label2: TLabel;
+    DBGrid2: TDBGrid;
+    DBNavigator1: TDBNavigator;
+    DBNavigator2: TDBNavigator;
+    ModelDetailDataSet: TioModelDataSet;
+    DetailDataSource: TDataSource;
+    ScrollBox1: TScrollBox;
+    DBImage1: TDBImage;
+    ModelMasterDataSetID: TIntegerField;
+    ModelMasterDataSetDescrizione: TStringField;
+    ModelMasterDataSetPropDateTime: TDateTimeField;
+    ModelMasterDataSetPropBitMap: TGraphicField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
@@ -37,6 +50,7 @@ end;
 procedure TDataSetView.FormCreate(Sender: TObject);
 begin
   ModelMasterDataSet.Open;
+  ModelDetailDataSet.Open;
 end;
 
 end.

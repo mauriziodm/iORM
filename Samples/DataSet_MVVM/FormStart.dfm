@@ -31,4 +31,23 @@ object StartForm: TStartForm
     TabOrder = 1
     OnClick = Button2Click
   end
+  object VCProvider: TioViewContextProvider
+    ioOnRequest = VCProviderioOnRequest
+    ioOnRelease = VCProviderioOnRelease
+    RegisterAsDefault = True
+    AutoParent = True
+    AutoOwner = True
+    Left = 176
+    Top = 80
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\DataSetTest.DB'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 176
+    Top = 8
+  end
 end
