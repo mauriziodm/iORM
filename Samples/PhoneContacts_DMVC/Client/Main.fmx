@@ -536,20 +536,10 @@ object MainForm: TMainForm
     end
   end
   object RESTConn: TioRESTConnectionDef
-    BaseURL = 'http://192.168.130.132:8080'
+    BaseURL = 'http://localhost:8080'
     DefaultConnection = True
     Persistent = True
     Left = 64
     Top = 80
-  end
-  object SQLiteConn: TioSQLiteConnectionDef
-    AutoCreateDatabase = False
-    Database = 'ContactsIntf.db'
-    DatabaseStdFolder = sfDocuments
-    DefaultConnection = False
-    Persistent = False
-    Pooled = False
-    Left = 64
-    Top = 144
   end
 end

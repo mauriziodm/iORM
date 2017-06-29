@@ -10,28 +10,28 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_DMVC\Server\PhoneContacts_DMVC_Server.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_DMVC\Client_ByCode\PhoneContacts_DMVC_Client_ByCode.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj">
-            <Dependencies>iORM_Project.dproj;iORM_Project_DesignTime.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces_MVVM\PhoneContacts_Interfaces_MVVM.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj">
-            <Dependencies>iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_Interfaces_ByCode\PhoneContacts_Interfaces_ByCode.dproj">
             <Dependencies/>
@@ -40,18 +40,15 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
-        </Projects>
-        <Projects Include="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
-        </Projects>
-        <Projects Include="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj">
-            <Dependencies>iORM_Project.dproj</Dependencies>
-        </Projects>
-        <Projects Include="..\..\Samples\Pizza_List\Pizza_List.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj">
+        <Projects Include="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\Pizza_List\Pizza_List.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ioPrototypeBS\Pizza_ioPrototypeBS.dproj">
@@ -60,8 +57,11 @@
         <Projects Include="..\..\Samples\Pizza_DMVC\Server\Pizza_DMVC_Server.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ObjStatus_DMVC\Server\Pizza_ObjStatus_DMVC_Server.dproj">
             <Dependencies/>
@@ -73,7 +73,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook_Dictionary\MapperPhonebookDictionaryExample.dproj">
             <Dependencies/>
@@ -82,16 +82,13 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
-        </Projects>
-        <Projects Include="..\..\Samples\Pizza_Ordini_MVVM_CrossFramework\FMX\Pizza_Ordini_MVVM_FMX.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj">
-            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
+            <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\BOM_MVVM_CrossFramework\VCL\BOM_MVVM_VCL.dproj">
             <Dependencies/>
@@ -122,40 +119,40 @@
     <Target Name="iORM_Project:Make">
         <MSBuild Projects="iORM_Project.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Server" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_DMVC_Server">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Server\PhoneContacts_DMVC_Server.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Server:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_DMVC_Server:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Server\PhoneContacts_DMVC_Server.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Server:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_DMVC_Server:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Server\PhoneContacts_DMVC_Server.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_DMVC_Client">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_DMVC_Client:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_DMVC_Client:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client\PhoneContacts_DMVC_Client.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client_ByCode" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_DMVC_Client_ByCode">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client_ByCode\PhoneContacts_DMVC_Client_ByCode.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client_ByCode:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_DMVC_Client_ByCode:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client_ByCode\PhoneContacts_DMVC_Client_ByCode.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_DMVC_Client_ByCode:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_DMVC_Client_ByCode:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_DMVC\Client_ByCode\PhoneContacts_DMVC_Client_ByCode.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="iORM_Project;iORM_Project_DesignTime">
+    <Target Name="PhoneContacts_ioPrototypeBindSource">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean" DependsOnTargets="iORM_Project:Clean;iORM_Project_DesignTime:Clean">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Make" DependsOnTargets="iORM_Project:Make;iORM_Project_DesignTime:Make">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_ioActiveBindSourceAdapter">
@@ -167,31 +164,31 @@
     <Target Name="PhoneContacts_ioActiveBindSourceAdapter:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_MVVM" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_Interfaces_MVVM">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_MVVM\PhoneContacts_Interfaces_MVVM.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_MVVM:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_Interfaces_MVVM:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_MVVM\PhoneContacts_Interfaces_MVVM.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_MVVM:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_Interfaces_MVVM:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_MVVM\PhoneContacts_Interfaces_MVVM.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_Interfaces">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_Interfaces:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_Interfaces:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_Ex" DependsOnTargets="iORM_Project">
+    <Target Name="PhoneContacts_Interfaces_Ex">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_Ex:Clean" DependsOnTargets="iORM_Project:Clean">
+    <Target Name="PhoneContacts_Interfaces_Ex:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_Interfaces_Ex:Make" DependsOnTargets="iORM_Project:Make">
+    <Target Name="PhoneContacts_Interfaces_Ex:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_Interfaces_Ex\PhoneContacts_Interfaces_Ex.dproj" Targets="Make"/>
     </Target>
     <Target Name="PhoneContacts_Interfaces_ByCode">
@@ -212,31 +209,31 @@
     <Target Name="PhoneContacts_ioMemTable:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioMemTable\PhoneContacts_ioMemTable.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_VCL" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_MVVM_VCL">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_VCL:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_MVVM_VCL:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_VCL:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_MVVM_VCL:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\VCL\PhoneContacts_MVVM_VCL.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_FMX" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="PhoneContacts_MVVM_FMX">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_FMX:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="PhoneContacts_MVVM_FMX:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_MVVM_FMX:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="PhoneContacts_MVVM_FMX:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_MVVM_CrossFramework\FMX\PhoneContacts_MVVM_FMX.dproj" Targets="Make"/>
     </Target>
-    <Target Name="Pizza_ioActiveBindSourceAdapter" DependsOnTargets="iORM_Project">
+    <Target Name="Pizza_ioActiveBindSourceAdapter">
         <MSBuild Projects="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj"/>
     </Target>
-    <Target Name="Pizza_ioActiveBindSourceAdapter:Clean" DependsOnTargets="iORM_Project:Clean">
+    <Target Name="Pizza_ioActiveBindSourceAdapter:Clean">
         <MSBuild Projects="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="Pizza_ioActiveBindSourceAdapter:Make" DependsOnTargets="iORM_Project:Make">
+    <Target Name="Pizza_ioActiveBindSourceAdapter:Make">
         <MSBuild Projects="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj" Targets="Make"/>
     </Target>
     <Target Name="Pizza_List">
@@ -247,15 +244,6 @@
     </Target>
     <Target Name="Pizza_List:Make">
         <MSBuild Projects="..\..\Samples\Pizza_List\Pizza_List.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="Pizza_DMVC_Client">
-        <MSBuild Projects="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj"/>
-    </Target>
-    <Target Name="Pizza_DMVC_Client:Clean">
-        <MSBuild Projects="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Pizza_DMVC_Client:Make">
-        <MSBuild Projects="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj" Targets="Make"/>
     </Target>
     <Target Name="Pizza_ioPrototypeBS">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS\Pizza_ioPrototypeBS.dproj"/>
@@ -275,13 +263,22 @@
     <Target Name="Pizza_DMVC_Server:Make">
         <MSBuild Projects="..\..\Samples\Pizza_DMVC\Server\Pizza_DMVC_Server.dproj" Targets="Make"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBS_ObjStatus" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="Pizza_DMVC_Client">
+        <MSBuild Projects="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj"/>
+    </Target>
+    <Target Name="Pizza_DMVC_Client:Clean">
+        <MSBuild Projects="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pizza_DMVC_Client:Make">
+        <MSBuild Projects="..\..\Samples\Pizza_DMVC\Client\Pizza_DMVC_Client.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pizza_ioPrototypeBS_ObjStatus">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Clean">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="Pizza_ioPrototypeBS_ObjStatus:Make">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBS_ObjStatus\Pizza_ioPrototypeBS_ObjStatus.dproj" Targets="Make"/>
     </Target>
     <Target Name="Pizza_ObjStatus_DMVC_Server">
@@ -311,13 +308,13 @@
     <Target Name="RVMan_Interface:Make">
         <MSBuild Projects="..\..\Samples\RVMan_Interface\RVMan_Interface.dproj" Targets="Make"/>
     </Target>
-    <Target Name="MapperPhonebookExample" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="MapperPhonebookExample">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj"/>
     </Target>
-    <Target Name="MapperPhonebookExample:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="MapperPhonebookExample:Clean">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="MapperPhonebookExample:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="MapperPhonebookExample:Make">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj" Targets="Make"/>
     </Target>
     <Target Name="MapperPhonebookDictionaryExample">
@@ -338,40 +335,31 @@
     <Target Name="MapperPizzaImageExample:Make">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj" Targets="Make"/>
     </Target>
-    <Target Name="NaturalBSAMultirecord" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="NaturalBSAMultirecord">
         <MSBuild Projects="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj"/>
     </Target>
-    <Target Name="NaturalBSAMultirecord:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="NaturalBSAMultirecord:Clean">
         <MSBuild Projects="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="NaturalBSAMultirecord:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="NaturalBSAMultirecord:Make">
         <MSBuild Projects="..\..\..\iORM_NotInRepository\NaturalBSAMultirecord\NaturalBSAMultirecord.dproj" Targets="Make"/>
     </Target>
-    <Target Name="DataSet_MVVM" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="DataSet_MVVM">
         <MSBuild Projects="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj"/>
     </Target>
-    <Target Name="DataSet_MVVM:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="DataSet_MVVM:Clean">
         <MSBuild Projects="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="DataSet_MVVM:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="DataSet_MVVM:Make">
         <MSBuild Projects="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj" Targets="Make"/>
     </Target>
-    <Target Name="Pizza_Ordini_MVVM_FMX">
-        <MSBuild Projects="..\..\Samples\Pizza_Ordini_MVVM_CrossFramework\FMX\Pizza_Ordini_MVVM_FMX.dproj"/>
-    </Target>
-    <Target Name="Pizza_Ordini_MVVM_FMX:Clean">
-        <MSBuild Projects="..\..\Samples\Pizza_Ordini_MVVM_CrossFramework\FMX\Pizza_Ordini_MVVM_FMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Pizza_Ordini_MVVM_FMX:Make">
-        <MSBuild Projects="..\..\Samples\Pizza_Ordini_MVVM_CrossFramework\FMX\Pizza_Ordini_MVVM_FMX.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="BOM_MVVM_FMX" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
+    <Target Name="BOM_MVVM_FMX">
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj"/>
     </Target>
-    <Target Name="BOM_MVVM_FMX:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
+    <Target Name="BOM_MVVM_FMX:Clean">
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="BOM_MVVM_FMX:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
+    <Target Name="BOM_MVVM_FMX:Make">
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\FMX\BOM_MVVM_FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="BOM_MVVM_VCL">
@@ -384,13 +372,13 @@
         <MSBuild Projects="..\..\Samples\BOM_MVVM_CrossFramework\VCL\BOM_MVVM_VCL.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_DMVC_Client_ByCode;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;PhoneContacts_MVVM_VCL;PhoneContacts_MVVM_FMX;Pizza_ioActiveBindSourceAdapter;Pizza_List;Pizza_DMVC_Client;Pizza_ioPrototypeBS;Pizza_DMVC_Server;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;RVMan_Interface;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample;NaturalBSAMultirecord;DataSet_MVVM;Pizza_Ordini_MVVM_FMX;BOM_MVVM_FMX;BOM_MVVM_VCL"/>
+        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project;PhoneContacts_DMVC_Server;PhoneContacts_DMVC_Client;PhoneContacts_DMVC_Client_ByCode;PhoneContacts_ioPrototypeBindSource;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_Interfaces_MVVM;PhoneContacts_Interfaces;PhoneContacts_Interfaces_Ex;PhoneContacts_Interfaces_ByCode;PhoneContacts_ioMemTable;PhoneContacts_MVVM_VCL;PhoneContacts_MVVM_FMX;Pizza_ioActiveBindSourceAdapter;Pizza_List;Pizza_ioPrototypeBS;Pizza_DMVC_Server;Pizza_DMVC_Client;Pizza_ioPrototypeBS_ObjStatus;Pizza_ObjStatus_DMVC_Server;Pizza_ObjStatus_DMVC_Client;RVMan_Interface;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample;NaturalBSAMultirecord;DataSet_MVVM;BOM_MVVM_FMX;BOM_MVVM_VCL"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean;PhoneContacts_DMVC_Server:Clean;PhoneContacts_DMVC_Client:Clean;PhoneContacts_DMVC_Client_ByCode:Clean;PhoneContacts_ioPrototypeBindSource:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_Interfaces_MVVM:Clean;PhoneContacts_Interfaces:Clean;PhoneContacts_Interfaces_Ex:Clean;PhoneContacts_Interfaces_ByCode:Clean;PhoneContacts_ioMemTable:Clean;PhoneContacts_MVVM_VCL:Clean;PhoneContacts_MVVM_FMX:Clean;Pizza_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;Pizza_DMVC_Client:Clean;Pizza_ioPrototypeBS:Clean;Pizza_DMVC_Server:Clean;Pizza_ioPrototypeBS_ObjStatus:Clean;Pizza_ObjStatus_DMVC_Server:Clean;Pizza_ObjStatus_DMVC_Client:Clean;RVMan_Interface:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean;NaturalBSAMultirecord:Clean;DataSet_MVVM:Clean;Pizza_Ordini_MVVM_FMX:Clean;BOM_MVVM_FMX:Clean;BOM_MVVM_VCL:Clean"/>
+        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean;PhoneContacts_DMVC_Server:Clean;PhoneContacts_DMVC_Client:Clean;PhoneContacts_DMVC_Client_ByCode:Clean;PhoneContacts_ioPrototypeBindSource:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_Interfaces_MVVM:Clean;PhoneContacts_Interfaces:Clean;PhoneContacts_Interfaces_Ex:Clean;PhoneContacts_Interfaces_ByCode:Clean;PhoneContacts_ioMemTable:Clean;PhoneContacts_MVVM_VCL:Clean;PhoneContacts_MVVM_FMX:Clean;Pizza_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;Pizza_ioPrototypeBS:Clean;Pizza_DMVC_Server:Clean;Pizza_DMVC_Client:Clean;Pizza_ioPrototypeBS_ObjStatus:Clean;Pizza_ObjStatus_DMVC_Server:Clean;Pizza_ObjStatus_DMVC_Client:Clean;RVMan_Interface:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean;NaturalBSAMultirecord:Clean;DataSet_MVVM:Clean;BOM_MVVM_FMX:Clean;BOM_MVVM_VCL:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make;PhoneContacts_DMVC_Server:Make;PhoneContacts_DMVC_Client:Make;PhoneContacts_DMVC_Client_ByCode:Make;PhoneContacts_ioPrototypeBindSource:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_Interfaces_MVVM:Make;PhoneContacts_Interfaces:Make;PhoneContacts_Interfaces_Ex:Make;PhoneContacts_Interfaces_ByCode:Make;PhoneContacts_ioMemTable:Make;PhoneContacts_MVVM_VCL:Make;PhoneContacts_MVVM_FMX:Make;Pizza_ioActiveBindSourceAdapter:Make;Pizza_List:Make;Pizza_DMVC_Client:Make;Pizza_ioPrototypeBS:Make;Pizza_DMVC_Server:Make;Pizza_ioPrototypeBS_ObjStatus:Make;Pizza_ObjStatus_DMVC_Server:Make;Pizza_ObjStatus_DMVC_Client:Make;RVMan_Interface:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make;NaturalBSAMultirecord:Make;DataSet_MVVM:Make;Pizza_Ordini_MVVM_FMX:Make;BOM_MVVM_FMX:Make;BOM_MVVM_VCL:Make"/>
+        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make;PhoneContacts_DMVC_Server:Make;PhoneContacts_DMVC_Client:Make;PhoneContacts_DMVC_Client_ByCode:Make;PhoneContacts_ioPrototypeBindSource:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_Interfaces_MVVM:Make;PhoneContacts_Interfaces:Make;PhoneContacts_Interfaces_Ex:Make;PhoneContacts_Interfaces_ByCode:Make;PhoneContacts_ioMemTable:Make;PhoneContacts_MVVM_VCL:Make;PhoneContacts_MVVM_FMX:Make;Pizza_ioActiveBindSourceAdapter:Make;Pizza_List:Make;Pizza_ioPrototypeBS:Make;Pizza_DMVC_Server:Make;Pizza_DMVC_Client:Make;Pizza_ioPrototypeBS_ObjStatus:Make;Pizza_ObjStatus_DMVC_Server:Make;Pizza_ObjStatus_DMVC_Client:Make;RVMan_Interface:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make;NaturalBSAMultirecord:Make;DataSet_MVVM:Make;BOM_MVVM_FMX:Make;BOM_MVVM_VCL:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

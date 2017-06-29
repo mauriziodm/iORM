@@ -62,7 +62,6 @@ type
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
     RESTConn: TioRESTConnectionDef;
-    SQLiteConn: TioSQLiteConnectionDef;
     Button3: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
