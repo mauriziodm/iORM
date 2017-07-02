@@ -164,6 +164,7 @@ type
     constructor Create(const AInterfaceName:String; const AAlias:String; const AEmptyOwner, AVCProviderEnabled:Boolean); virtual;
     function Exist: Boolean; virtual;
     function Get: TObject; virtual;
+    function GetAsGeneric: TioDILocatorDestination;
     function Show: TComponent; virtual;
     function GetItem: TioDIContainerImplementersItem;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
@@ -225,18 +226,23 @@ type
   TioDependencyInjectionRef = class of TioDependencyInjection;
   TioDependencyInjection = class(TioDependencyInjectionBase)
   public
+    class function Singletons: TioSingletonsFacadeRef;
     class function RegisterClass<T: class>: TioDependencyInjectionRegister; overload;
     class function RegisterClass(const ARttiType:TRttiInstanceType): TioDependencyInjectionRegister; overload;
     class function Locate(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function Locate<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
     class function LocateView(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateView<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
-    class function LocateView<TView:IInterface; TViewModel:IioViewModel>(const AViewAlias:String=''; const AViewModelAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator<TView>; overload;
-    class function LocateViewModel(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
-    class function LocateViewModel<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
-    class function Singletons: TioSingletonsFacadeRef;
-    class function Model(const AModel:TObject): IioDependencyInjectionLocator; overload;
-    class function Model(const AModel:IInterface): IioDependencyInjectionLocator; overload;
+    class function LocateVM(const AInterfaceName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateVM<T:IInterface>(const AAlias:String=''): IioDependencyInjectionLocator<T>; overload;
+    class function LocateViewVM<TView:IInterface; TViewModel:IioViewModel>(const AViewAlias:String=''; const AViewModelAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator<TView>; overload;
+    // LocateFor
+    class function LocateViewFor(const AClassRef:TioClassRef; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor<T: class>(const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateVMfor(const AClassRef:TioClassRef; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateVMfor<T: class>(const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMFor(const AClassRef:TioClassRef; const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMFor<T: class>(const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -303,7 +309,7 @@ begin
   Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, True);
 end;
 
-class function TioDependencyInjection.LocateView<TView, TViewModel>(const AViewAlias,
+class function TioDependencyInjection.LocateViewVM<TView, TViewModel>(const AViewAlias,
   AViewModelAlias, AViewModelMarker: String): IioDependencyInjectionLocator<TView>;
 var
   LViewModel: IioViewModel;
@@ -311,8 +317,30 @@ begin
   // Get the ViewLocator
   Result := TioDependencyInjectionFactory.GetLocator<TView>(AViewAlias, True, True);
   // Get the ViewModel instance
-  LViewModel := io.di.LocateViewModel<TViewModel>(AViewModelAlias).Get;
+  LViewModel := io.di.LocateVM<TViewModel>(AViewModelAlias).Get;
   Result.SetViewModel(LViewModel, AViewModelMarker);
+end;
+
+class function TioDependencyInjection.LocateViewVMFor(
+  const AClassRef: TioClassRef;
+  const AAlias, AViewModelMarker:String): IioDependencyInjectionLocator;
+var
+  LDIContainerKey: String;
+  LViewModel: IioViewModel;
+begin
+  // Get the Dependency Injection Container Key then get the locator
+  LDIContainerKey := ModelToViewContainerKey(AClassRef);
+  // Get the ViewLocator
+  Result := TioDependencyInjectionFactory.GetLocator(LDIContainerKey, AAlias, True, True);
+  // Get the ViewModel instance
+  LViewModel := io.di.LocateVMfor(AClassRef, AAlias).GetAsGeneric.OfType<IioViewModel>;
+  Result.SetViewModel(LViewModel, AViewModelMarker);
+end;
+
+class function TioDependencyInjection.LocateViewVMFor<T>(
+  const AAlias, AViewModelMarker:String): IioDependencyInjectionLocator;
+begin
+  Result := LocateViewVMfor(T, AAlias, AViewModelMarker);
 end;
 
 class function TioDependencyInjection.LocateView<T>(
@@ -321,28 +349,50 @@ begin
   Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, True);
 end;
 
-class function TioDependencyInjection.LocateViewModel(const AInterfaceName,
+class function TioDependencyInjection.LocateViewFor(
+  const AClassRef: TioClassRef;
+  const AAlias: String): IioDependencyInjectionLocator;
+var
+  LDIContainerKey: String;
+begin
+  // Get the Dependency Injection Container Key then get the locator
+  LDIContainerKey := ModelToViewContainerKey(AClassRef);
+  // Get the ViewLocator
+  Result := TioDependencyInjectionFactory.GetLocator(LDIContainerKey, AAlias, True, True);
+end;
+
+class function TioDependencyInjection.LocateViewFor<T>(
+  const AAlias: String): IioDependencyInjectionLocator;
+begin
+  Result := LocateViewFor(T, AAlias);
+end;
+
+class function TioDependencyInjection.LocateVM(const AInterfaceName,
   AAlias: String): IioDependencyInjectionLocator;
 begin
   Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, False);
 end;
 
-class function TioDependencyInjection.LocateViewModel<T>(
+class function TioDependencyInjection.LocateVM<T>(
   const AAlias: String): IioDependencyInjectionLocator<T>;
 begin
   Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, False);
 end;
 
-class function TioDependencyInjection.Model(
-  const AModel: TObject): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor(const AClassRef: TioClassRef;
+  const AAlias: String): IioDependencyInjectionLocator;
+var
+  LDIContainerKey: String;
 begin
-
+  // Get the Dependency Injection Container Key then get the locator
+  LDIContainerKey := ModelToViewModelContainerKey(AClassRef);
+  Result := TioDependencyInjectionFactory.GetLocator(LDIContainerKey, AAlias, True, False);
 end;
 
-class function TioDependencyInjection.Model(
-  const AModel: IInterface): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor<T>(
+  const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := Self.Model(AModel as TObject);
+  Result := LocateVMfor(T, AAlias);
 end;
 
 class function TioDependencyInjection.RegisterClass(
@@ -796,6 +846,11 @@ var
 begin
   ContainerItem := Self.Container.Get(_InterfaceName, _Alias);
   Result := Self._Get(ContainerItem);
+end;
+
+function TioDependencyInjectionLocator.GetAsGeneric: TioDILocatorDestination;
+begin
+  Result := TioDILocatorDestination.Create(Self);
 end;
 
 function TioDependencyInjectionLocator.GetItem: TioDIContainerImplementersItem;

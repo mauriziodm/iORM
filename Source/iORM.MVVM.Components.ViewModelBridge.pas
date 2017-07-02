@@ -87,7 +87,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if not FDI_VMInterface.IsEmpty then
   begin
-    LObj := io.di.LocateViewModel(FDI_VMInterface, FDI_VMAlias).Get;
+    LObj := io.di.LocateVM(FDI_VMInterface, FDI_VMAlias).Get;
     if not Supports(LObj, IioViewModel, FViewModel) then
       raise EioException.Create(Self.ClassName, 'CheckForViewModel', '"IioViewModel" interface not implemented by object.');
   end;

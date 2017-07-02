@@ -45,10 +45,21 @@ uses
 
 type
 
+  IioDependencyInjectionLocator = interface;
+
+  TioDILocatorDestination = class
+  strict private
+    FLocator: IioDependencyInjectionLocator;   // TObject to avoid circular receference
+  public
+    constructor Create(const ALocator:IioDependencyInjectionLocator);
+    function OfType<TRESULT>: TRESULT;
+  end;
+
   IioDependencyInjectionLocator = interface
     ['{51289FD7-AA55-43D9-BF5B-EDA5BF27D301}']
     function Exist: Boolean;
     function Get: TObject;
+    function GetAsGeneric: TioDILocatorDestination;
     function Show: TComponent;
     function GetItem: TioDIContainerImplementersItem;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
@@ -95,6 +106,28 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.Rtti.Utilities;
+
+{ TioDILocatorDestination }
+
+constructor TioDILocatorDestination.Create(const ALocator: IioDependencyInjectionLocator);
+begin
+  inherited Create;
+  FLocator := ALocator;
+end;
+
+function TioDILocatorDestination.OfType<TRESULT>: TRESULT;
+var
+  LObj: TObject;
+begin
+  try
+    // Get the rest as TObject
+    LObj := FLocator.Get;
+    // Cast the obtained object to the desired type
+    Result := TioRttiUtilities.CastObjectToGeneric<TRESULT>(LObj);
+  finally
+    Self.Free;
+  end;
+end;
 
 end.
