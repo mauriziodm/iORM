@@ -40,7 +40,7 @@ begin
   for I := 1 to MPBOMItemList.ItemCount do
   begin
     LAlias := MPBOMItemList.Current.ClassName;
-    io.di.LocateView<IMicroArticleView, IBOMItemVM>(LAlias)
+    io.di.LocateViewVM<IMicroArticleView, IBOMItemVM>(LAlias)
       .SetPresenter('MPBOMItem', MPBOMItemList)
       .VCProvider('BOMVCProvider')
       .Show;

@@ -43,7 +43,7 @@ uses
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   // Get the main view
-  io.di.LocateView<IMainView, IPersonsViewModel>.Get;
+  io.di.LocateViewVM<IMainView, IPersonsViewModel>.Get;
 end;
 
 procedure TForm1.SQLiteConnAfterRegister(Sender: TObject);

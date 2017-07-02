@@ -38,12 +38,12 @@ uses
 
 procedure TStartForm.Button1Click(Sender: TObject);
 begin
-  io.di.LocateView<TLiveBindingsView, IioViewModel>.Get;
+  io.di.LocateViewVM<TLiveBindingsView, IioViewModel>.Get;
 end;
 
 procedure TStartForm.Button2Click(Sender: TObject);
 begin
-  io.di.LocateView<TDataSetView, IioViewModel>.Get;
+  io.di.LocateViewVM<TDataSetView, IioViewModel>.Get;
 end;
 
 procedure TStartForm.VCProviderioOnRelease(const Sender: TObject; const AView,

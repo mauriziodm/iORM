@@ -43,7 +43,7 @@ var
 begin
   inherited;
   LAlias := MPBOMArticle.Current.ClassName;
-  io.di.LocateView<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPBOMArticle).Show;
+  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPBOMArticle).Show;
 end;
 
 procedure TBOMItemVM.acPostExecute(Sender: TObject);

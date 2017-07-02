@@ -44,7 +44,7 @@ procedure TStartForm.FormCreate(Sender: TObject);
 begin
   // Get the main view
   FStartUp := True;
-  io.di.LocateView<IMainView, IPersonsViewModel>.Get;
+  io.di.LocateViewVM<IMainView, IPersonsViewModel>.Get;
   FStartUp := False;
 end;
 

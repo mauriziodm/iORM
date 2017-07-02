@@ -115,7 +115,7 @@ var
 begin
   inherited;
   LAlias := MPArticleList.Current.ClassName;
-  io.di.LocateView<IArticleView,IArticleVM>(LAlias, LAlias)
+  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias)
     .SetPresenter('MPArticle', MPArticleList)
     .Show;
 end;
