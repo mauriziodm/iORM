@@ -161,11 +161,18 @@ type
     IID: TGUID;
     Alias: String;
   end;
+  TdiVVMforItemType = (vvmitView, vvmitViewModel);
+  TdiVVMforItem = record
+    ItemType: TdiVVMforItemType;
+    Target: String;
+    Alias: String;
+  end;
 var
   LAttr: TCustomAttribute;
   LdiRegister: Boolean;
   LdiAsSingleton: Boolean;
   LdiImplements: array of TdiImplementsItem;
+  LdiVVMforItems: array of TdiVVMforItem;
   Index: Integer;
 begin
   // Init
@@ -194,6 +201,24 @@ begin
       LdiImplements[Index].IID := diImplements(LAttr).IID;
       LdiImplements[Index].Alias := diImplements(LAttr).Alias;
     end;
+    // DIC - diViewFor
+    if LAttr is diViewFor then
+    begin
+      Index := Length(LdiVVMforItems);
+      SetLength(LdiVVMforItems, Index+1);
+      LdiVVMforItems[Index].ItemType := vvmitView;
+      LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetClassName;
+      LdiVVMforItems[Index].Alias := diViewFor(LAttr).Alias;
+    end;
+    // DIC - diViewModelFor
+    if LAttr is diViewModelFor then
+    begin
+      Index := Length(LdiVVMforItems);
+      SetLength(LdiVVMforItems, Index+1);
+      LdiVVMforItems[Index].ItemType := vvmitViewModel;
+      LdiVVMforItems[Index].Target := diViewModelFor(LAttr).TargetClassName;
+      LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).Alias;
+    end;
   end;
   // Dependency Injection Container - Register the class as is without any interface
   if LdiRegister then
@@ -206,6 +231,25 @@ begin
         .Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias)
         .AsSingleton(LdiAsSingleton)
         .Execute;
+  // Dependency Injection Container - Register the class as View or ViewModel for som other classes
+  if Length(LdiVVMforItems) > 0 then
+    for Index := Low(LdiVVMforItems) to High(LdiVVMforItems) do
+    begin
+      case LdiVVMforItems[Index].ItemType of
+        vvmitView:
+          io.di
+            .RegisterClass(AType)
+            .AsViewFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias)
+            .AsSingleton(LdiAsSingleton)
+            .Execute;
+        vvmitViewModel:
+          io.di
+            .RegisterClass(AType)
+            .AsViewModelFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias)
+            .AsSingleton(LdiAsSingleton)
+            .Execute;
+      end;
+    end;
 end;
 
 class procedure TioMapContainer.SetPropertiesFieldData;

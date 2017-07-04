@@ -8,7 +8,10 @@ uses
 
 type
 
-  [diImplements(IBOMItemVM)]
+//  [diImplements(IBOMItemVM)]
+  [diViewModelFor('TBOMItemMaterial')]
+  [diViewModelFor('TBOMItemProcess')]
+  [diViewModelFor('TBOMItemProduct')]
   TBOMItemVM = class(TioViewModel, IBOMItemVM)
     MPBOMItem: TioModelPresenter;
     MPBOMArticle: TioModelPresenter;
@@ -38,12 +41,19 @@ uses
 { TBOMItemVM }
 
 procedure TBOMItemVM.acEditArticleExecute(Sender: TObject);
-var
-  LAlias: String;
+//var
+//  LAlias: String;
 begin
   inherited;
-  LAlias := MPBOMArticle.Current.ClassName;
-  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPBOMArticle).Show;
+
+
+  io.di.LocateViewVMfor(MPBOMArticle.Current)
+    .SetPresenter('MPArticle', MPBOMArticle)
+    .Show;
+
+
+//  LAlias := MPBOMArticle.Current.ClassName;
+//  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPBOMArticle).Show;
 end;
 
 procedure TBOMItemVM.acPostExecute(Sender: TObject);

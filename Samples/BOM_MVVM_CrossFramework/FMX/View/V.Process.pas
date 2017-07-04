@@ -14,7 +14,8 @@ uses
 
 type
 
-  [diImplements(IArticleView, 'TProcess')]
+//  [diImplements(IArticleView, 'TProcess')]
+  [diViewFor('TProcess')]
   TProcessView = class(TMaterialView)
     ListBoxItem5: TListBoxItem;
     EditTime: TEdit;

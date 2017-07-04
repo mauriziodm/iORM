@@ -8,7 +8,8 @@ uses
 
 type
 
-  [diImplements(IArticleVM, 'TProduct')]
+//  [diImplements(IArticleVM, 'TProduct')]
+  [diViewModelFor('TProduct')]
   TProductViewModel = class(TArticleViewModel)
     MPBOMItemList: TioModelPresenter;
   private
@@ -33,17 +34,27 @@ uses
 procedure TProductViewModel.acPopulateItemListExecute(Sender: TObject);
 var
   I: Integer;
-  LAlias: String;
+//  LAlias: String;
 begin
   MPBOMItemList.CheckAdapter(True);
   MPBOMItemList.First;
   for I := 1 to MPBOMItemList.ItemCount do
   begin
-    LAlias := MPBOMItemList.Current.ClassName;
-    io.di.LocateViewVM<IMicroArticleView, IBOMItemVM>(LAlias)
+
+
+    io.di.LocateViewVMfor(MPBOMItemList.Current)
       .SetPresenter('MPBOMItem', MPBOMItemList)
       .VCProvider('BOMVCProvider')
       .Show;
+
+
+//    LAlias := MPBOMItemList.Current.ClassName;
+//    io.di.LocateViewVM<IMicroArticleView, IBOMItemVM>(LAlias)
+//      .SetPresenter('MPBOMItem', MPBOMItemList)
+//      .VCProvider('BOMVCProvider')
+//      .Show;
+
+
     MPBOMItemList.Next;
   end;
 end;

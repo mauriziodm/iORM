@@ -93,7 +93,7 @@ type
   end;
 
   // Base class for relation attribute
-  TCustomRelationAttribute = class(TioCustomAttribute)
+  TioCustomRelationAttribute = class(TioCustomAttribute)
   strict private
     FChildTypeName: String;
     FChildTypeAlias: String;
@@ -106,6 +106,16 @@ type
 
   // Standard AttributeLabel
   ioMarker = class(TioCustomStringAttribute)
+  end;
+
+  TioCustomForTargetModelClass = class(TioCustomAttribute)
+  strict private
+    FTargetClassName: String;
+    FAlias: String;
+  public
+    constructor Create(ATargetClassName:String; const AAlias:String='');
+    property TargetClassName:String read FTargetClassName;
+    property Alias:String read FAlias;
   end;
 
   // ---------------------------------------------------------------------------
@@ -203,11 +213,11 @@ type
   end;
 
   // Relation BelongsTo attribute
-  ioBelongsTo = class(TCustomRelationAttribute)
+  ioBelongsTo = class(TioCustomRelationAttribute)
   end;
 
   // Relation HasMany attribute
-  ioHasMany = class(TCustomRelationAttribute)
+  ioHasMany = class(TioCustomRelationAttribute)
   strict private
     FChildPropertyName: String;
     FLoadType: TioLoadType;
@@ -330,8 +340,15 @@ type
   diAsSingleton = class(TioCustomAttribute)
   end;
 
+  // DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  diViewFor = class(TioCustomForTargetModelClass)
+  end;
+
+  // DIC - diViewModelFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  diViewModelFor = class(TioCustomForTargetModelClass)
+  end;
   // ---------------------------------------------------------------------------
-  // SEND CLASS ATTRIBUTES
+  // END CLASS ATTRIBUTES
   // ===========================================================================
 
 
@@ -342,12 +359,12 @@ type
   // ---------------------------------------------------------------------------
 
   // EmbeddedHasMany attribute
-  ioEmbeddedHasMany = class(TCustomRelationAttribute)
+  ioEmbeddedHasMany = class(TioCustomRelationAttribute)
 
   end;
 
   // EmbeddedHasOne attribute
-  ioEmbeddedHasOne = class(TCustomRelationAttribute)
+  ioEmbeddedHasOne = class(TioCustomRelationAttribute)
 
   end;
 
@@ -405,12 +422,12 @@ end;
 
 { TCustomRelationAttribute }
 
-constructor TCustomRelationAttribute.Create(AChildClassRef: TioClassRef);
+constructor TioCustomRelationAttribute.Create(AChildClassRef: TioClassRef);
 begin
   Create(AChildClassRef.ClassName, '');
 end;
 
-constructor TCustomRelationAttribute.Create(const AChildTypeName, AChildTypeAlias: String);
+constructor TioCustomRelationAttribute.Create(const AChildTypeName, AChildTypeAlias: String);
 begin
   FChildTypeName := AChildTypeName;
   FChildTypeAlias := AChildTypeAlias;
@@ -560,6 +577,15 @@ constructor diImplements.Create(AIID:TGUID; const AAlias:String);
 begin
   inherited Create;
   FIID := AIID;
+  FAlias := AAlias;
+end;
+
+{ diViewFor }
+
+constructor TioCustomForTargetModelClass.Create(ATargetClassName: String; const AAlias: String);
+begin
+  inherited Create;
+  FTargetClassName := ATargetClassName;
   FAlias := AAlias;
 end;
 

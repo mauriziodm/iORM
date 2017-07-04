@@ -114,10 +114,17 @@ var
   LAlias: String;
 begin
   inherited;
-  LAlias := MPArticleList.Current.ClassName;
-  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias)
+
+
+  io.di.LocateViewVMFor(MPArticleList.Current)
     .SetPresenter('MPArticle', MPArticleList)
     .Show;
+
+
+//  LAlias := MPArticleList.Current.ClassName;
+//  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias)
+//    .SetPresenter('MPArticle', MPArticleList)
+//    .Show;
 end;
 
 procedure TArticleListVM.acFilterAllExecute(Sender: TObject);

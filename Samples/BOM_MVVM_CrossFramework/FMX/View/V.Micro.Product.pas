@@ -14,7 +14,8 @@ uses
 
 type
 
-  [diImplements(IMicroArticleView, 'TBOMItemProduct')]
+//  [diImplements(IMicroArticleView, 'TBOMItemProduct')]
+  [diViewFor('TBOMItemProduct')]
   TMicroProductView = class(TMicroProcessView)
     Label3: TLabel;
     LabelCostMaterial: TLabel;

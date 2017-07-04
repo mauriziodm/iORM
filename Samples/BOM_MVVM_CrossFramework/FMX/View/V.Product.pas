@@ -14,7 +14,8 @@ uses
 
 type
 
-  [diImplements(IArticleView, 'TProduct')]
+//  [diImplements(IArticleView, 'TProduct')]
+  [diViewFor('TProduct')]
   TProductView = class(TProcessView)
     ListBoxItem6: TListBoxItem;
     ListBoxItem7: TListBoxItem;

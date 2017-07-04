@@ -14,7 +14,8 @@ uses
 
 type
 
-  [diImplements(IMicroArticleView, 'TBOMItemProcess')]
+//  [diImplements(IMicroArticleView, 'TBOMItemProcess')]
+  [diViewFor('TBOMItemProcess')]
   TMicroProcessView = class(TMicroMaterialView)
     LabelTime: TLabel;
     Label4: TLabel;
