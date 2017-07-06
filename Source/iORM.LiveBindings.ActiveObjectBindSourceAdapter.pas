@@ -141,7 +141,6 @@ type
     procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
-//    procedure NaturalBSA_SetMasterBindSourceAdapter(AActiveBindSourceAdapter:IioActiveBindSourceAdapter);
     function DataObject: TObject;
     procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;
@@ -525,12 +524,6 @@ function TioActiveObjectBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := Assigned(FMasterProperty);
 end;
-
-//procedure TioActiveObjectBindSourceAdapter.NaturalBSA_SetMasterBindSourceAdapter(
-//  AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-//begin
-//  Self.FNaturalBSA_MasterBindSourceAdapter := AActiveBindSourceAdapter;
-//end;
 
 procedure TioActiveObjectBindSourceAdapter.Notify(Sender: TObject;
   ANotification: IioBSANotification);

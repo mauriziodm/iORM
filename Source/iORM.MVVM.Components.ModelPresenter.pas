@@ -4,7 +4,8 @@ interface
 
 uses
   System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
-  iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope;
+  iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
+  System.Generics.Collections;
 
 type
 
@@ -24,6 +25,16 @@ type
     FMasterPresenter: TioModelPresenter;
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
+    // Questà è una collezione dove eventuali ModelPresenters di dettaglio
+    //  si registrano per rendere nota la loro esistenza al Master. Sarà poi
+    //  usata dal Master per fare in modo che, quando viene richiesta la creazione
+    //  del suo BindSourceAdapter (del master), venga scatenata anche la creazione
+    //  anche di tutti gli adapters relativi ai presenters di dettaglio (che si sono
+    //  registrati). In questo modo evito alcuni problemi di "sequenza" dovuti
+    //  al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
+    //  Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
+    //  DesignTime (WhereStr property) non funzionassero per questo motivo.
+    FDetailPresentersContainer: TList<TioModelPresenter>;
     // Questo è un riferimento di tipo interfaccia e serve solo per
     //  mantenere in vita l'oggetto
     FDummyInterfaceRef: IInterface;
@@ -67,7 +78,9 @@ type
     destructor Destroy; override;
     function CheckAdapter(const ACreateIfNotAssigned:Boolean = False): Boolean;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
-    procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
+//    procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
+    procedure RegisterDetailPresenter(const ADetailPresenter:TioModelPresenter);
+    procedure ForceDetailAdaptersCreation;
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     procedure Next;
@@ -161,7 +174,16 @@ begin
       SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAfromMasterModelPresenter(nil, MasterPresenter, MasterPropertyName)  )
     // else create the BSA from TypeName & TypeAlias
     else
+    begin
+      // Get the ActiveBindSourceAdapter
       SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)   );
+      // Force the creation of all the detail adapters (if exists)
+      //  NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
+      //       funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
+      //       stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
+      //       del Master.
+      ForceDetailAdaptersCreation;
+    end;
   end;
   Result := Assigned(FBindSourceAdapter);
 end;
@@ -185,6 +207,16 @@ begin
   // Set even an onChange event handler
   FWhereStr := TStringList.Create;
   SetWhereStr(FWhereStr);  // set TStringList.onChange event handler
+  // Questà è una collezione dove eventuali ModelPresenters di dettaglio
+  //  si registrano per rendere nota la loro esistenza al Master. Sarà poi
+  //  usata dal Master per fare in modo che, quando viene richiesta la creazione
+  //  del suo BindSourceAdapter (del master), venga scatenata anche la creazione
+  //  anche di tutti gli adapters relativi ai presenters di dettaglio (che si sono
+  //  registrati). In questo modo evito alcuni problemi di "sequenza" dovuti
+  //  al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
+  //  Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
+  //  DesignTime (WhereStr property) non funzionassero per questo motivo.
+  FDetailPresentersContainer := nil;
 end;
 
 function TioModelPresenter.Current: TObject;
@@ -212,8 +244,12 @@ end;
 destructor TioModelPresenter.Destroy;
 begin
   FWhereStr.Free;
+  // Destroy the BindSourceAdapter was created then destroy it
   if CheckAdapter then
     FBindSourceAdapter.Free;
+  // If the DetailPresenterContainer was created then destroy it
+  if Assigned(FDetailPresentersContainer) then
+    FDetailPresentersContainer.Free;
   inherited;
 end;
 
@@ -237,6 +273,14 @@ procedure TioModelPresenter.First;
 begin
   if CheckAdapter then
     BindSourceAdapter.First;
+end;
+
+procedure TioModelPresenter.ForceDetailAdaptersCreation;
+var
+  LPresenter: TioModelPresenter;
+begin
+  for LPresenter in FDetailPresentersContainer do
+    LPresenter.CheckAdapter(True);
 end;
 
 function TioModelPresenter.GetBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -360,6 +404,13 @@ begin
   if not (csDesigning in ComponentState) then
     TioComponentsCommon.RegisterConnectionDefComponents(Owner);
   // ===========================================================================
+
+  // REGISTER ITSELF AS DETAIL MODEL PRESENTER (IF IT IS A DETAIL) INTO THE MASTER PRESENTER
+  // ===========================================================================
+  if Self.IsDetail then
+    MasterPresenter.RegisterDetailPresenter(Self);
+  // ===========================================================================
+
   inherited;
 end;
 
@@ -399,6 +450,14 @@ begin
     FBindSourceAdapter.Refresh(AReloadData);
 end;
 
+procedure TioModelPresenter.RegisterDetailPresenter(
+  const ADetailPresenter: TioModelPresenter);
+begin
+  if not Assigned(FDetailPresentersContainer) then
+    FDetailPresentersContainer := TList<TioModelPresenter>.Create;
+  FDetailPresentersContainer.Add(ADetailPresenter);
+end;
+
 procedure TioModelPresenter.SetAsync(const Value: Boolean);
 begin
   FAsync := Value;
@@ -425,8 +484,9 @@ begin
   FBindSourceAdapter := Value;
   // Set some properties
   FBindSourceAdapter.ioAsync := FAsync;
-  FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   FBindSourceAdapter.ioAutoPersist := FAutoPersist;
+  FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
+  FBindSourceAdapter.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
   FBindSourceAdapter.SetBindSource(Self);
 end;
@@ -462,22 +522,22 @@ begin
   BindSourceAdapter.SetDataObject(Value, AOwnsObject)
 end;
 
-procedure TioModelPresenter.SetMasterBindSourceAdapter(
-  const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-  const AMasterPropertyName: String);
-var
-  LBindSourceAdapter: TBindSourceAdapter;
-begin
-  // Get the BSAdapter from the MasterBindSourceAdapter and register Self for
-  //  notifications
-  LBindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(
-    Self,
-    AMasterBindSourceAdapter,
-    AMasterPropertyName,
-    FWhere
-    );
-  Self.SetBindSourceAdapter(LBindSourceAdapter);
-end;
+//procedure TioModelPresenter.SetMasterBindSourceAdapter(
+//  const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+//  const AMasterPropertyName: String);
+//var
+//  LBindSourceAdapter: TBindSourceAdapter;
+//begin
+//  // Get the BSAdapter from the MasterBindSourceAdapter and register Self for
+//  //  notifications
+//  LBindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(
+//    Self,
+//    AMasterBindSourceAdapter,
+//    AMasterPropertyName,
+//    FWhere
+//    );
+//  Self.SetBindSourceAdapter(LBindSourceAdapter);
+//end;
 
 procedure TioModelPresenter.SetOrderBy(const Value: String);
 begin

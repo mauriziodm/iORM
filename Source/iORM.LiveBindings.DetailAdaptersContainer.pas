@@ -128,7 +128,7 @@ begin
   // Set the MasterAdapterConatainer reference (Self)
   NewAdapter.SetMasterAdapterContainer(Self);
   // Add the new adapter to the contained adapters
-  Self.FDetailAdapters.Add(AMasterPropertyName, NewAdapter);
+{ TODO : NB: BISOGNEREBBE AGGIUNGERE IL NOME DEL MODELPRESENTE O DEL PROTOTYPEBINDSOURCE ALLA CHIAVE DEL DICTIONARY IN MODO DA RISOLVERE UN POSSIBILE PROBLEMA SE DUE MODEL PRESENTER PRESENTANO LA STESSA CLASSE/INTERFACCIA COME DETTAGLI DI UNO STESSO MASTER E DELLA STESSA MASTERPROPERTYNAME }  Self.FDetailAdapters.Add(AMasterPropertyName, NewAdapter);
   // Return the new adapter
   Result := NewAdapter as TBindSourceAdapter;
 end;
