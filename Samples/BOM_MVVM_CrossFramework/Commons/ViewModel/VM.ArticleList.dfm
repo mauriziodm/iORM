@@ -2,6 +2,7 @@ inherited ArticleListVM: TArticleListVM
   OldCreateOrder = True
   OnCreate = DataModuleCreate
   object MPArticleList: TioModelPresenter
+    AsDefault = True
     Async = True
     AutoLoadData = True
     AutoPersist = True
@@ -13,6 +14,7 @@ inherited ArticleListVM: TArticleListVM
     Top = 32
   end
   object MPFilters: TioModelPresenter
+    AsDefault = False
     Async = False
     AutoLoadData = False
     AutoPersist = False

@@ -27,7 +27,8 @@ uses
 
 type
 
-  [diImplements(IMicroArticleView, 'TBOMItemMaterial')]
+//  [diImplements(IMicroArticleView, 'TBOMItemMaterial')]
+  [diViewFor('TBOMItemMaterial')]
   TMicroMaterialView = class(TFrame, IMicroArticleView)
 
     [ioBindAction('acEditArticle')]

@@ -1,5 +1,6 @@
 inherited ProductViewModel: TProductViewModel
   object MPBOMItemList: TioModelPresenter
+    AsDefault = False
     Async = True
     AutoLoadData = True
     AutoPersist = True

@@ -32,31 +32,9 @@ uses
 { TProductViewModel }
 
 procedure TProductViewModel.acPopulateItemListExecute(Sender: TObject);
-var
-  I: Integer;
-//  LAlias: String;
 begin
   MPBOMItemList.CheckAdapter(True);
-  MPBOMItemList.First;
-  for I := 1 to MPBOMItemList.ItemCount do
-  begin
-
-
-    io.di.LocateViewVMfor(MPBOMItemList.Current)
-      .SetPresenter('MPBOMItem', MPBOMItemList)
-      .VCProvider('BOMVCProvider')
-      .Show;
-
-
-//    LAlias := MPBOMItemList.Current.ClassName;
-//    io.di.LocateViewVM<IMicroArticleView, IBOMItemVM>(LAlias)
-//      .SetPresenter('MPBOMItem', MPBOMItemList)
-//      .VCProvider('BOMVCProvider')
-//      .Show;
-
-
-    MPBOMItemList.Next;
-  end;
+  io.di.LocateViewVMfor(MPBOMItemList).VCProvider('BOMVCProvider').ShowEach;
 end;
 
 end.

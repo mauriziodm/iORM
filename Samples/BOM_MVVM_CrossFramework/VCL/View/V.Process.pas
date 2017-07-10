@@ -27,7 +27,8 @@ uses
 
 type
 
-  [diImplements(IArticleView, 'TProcess')]
+//  [diImplements(IArticleView, 'TProcess')]
+  [diViewFor('TProcess')]
   TProcessView = class(TMaterialView, IArticleView)
     cxLabel6: TcxLabel;
     cxDBTextEdit4: TcxDBTextEdit;

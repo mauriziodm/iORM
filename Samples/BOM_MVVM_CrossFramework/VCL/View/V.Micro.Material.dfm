@@ -2,13 +2,12 @@ object MicroMaterialView: TMicroMaterialView
   Left = 0
   Top = 0
   Width = 451
-  Height = 100
+  Height = 305
   Align = alClient
   TabOrder = 0
-  ExplicitHeight = 305
   DesignSize = (
     451
-    100)
+    305)
   object ClientArea: TPanel
     Left = 3
     Top = 4
@@ -19,7 +18,6 @@ object MicroMaterialView: TMicroMaterialView
     Color = 16768443
     ParentBackground = False
     TabOrder = 0
-    ExplicitHeight = 298
     object Panel1: TPanel
       Left = 0
       Top = 0
@@ -28,7 +26,6 @@ object MicroMaterialView: TMicroMaterialView
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitWidth = 388
       object cxDBLabel2: TcxDBLabel
         Left = 0
         Top = 0
@@ -65,7 +62,6 @@ object MicroMaterialView: TMicroMaterialView
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        ExplicitLeft = 331
       end
       object cxDBLabel1: TcxDBLabel
         Left = 89
@@ -82,7 +78,6 @@ object MicroMaterialView: TMicroMaterialView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        ExplicitWidth = 191
         Height = 32
         Width = 248
         AnchorY = 16
@@ -103,7 +98,6 @@ object MicroMaterialView: TMicroMaterialView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        ExplicitLeft = 280
         Height = 32
         Width = 51
         AnchorX = 363
@@ -127,8 +121,6 @@ object MicroMaterialView: TMicroMaterialView
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 331
-      ExplicitHeight = 62
     end
     object PanelProcessCost: TPanel
       Left = 323
@@ -140,8 +132,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 2
-      ExplicitLeft = 266
-      ExplicitHeight = 62
       object Label2: TLabel
         Left = 0
         Top = 0
@@ -190,7 +180,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 3
-      ExplicitHeight = 62
     end
     object PanelTime: TPanel
       Left = 65
@@ -202,7 +191,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 4
-      ExplicitHeight = 62
     end
     object PanelCost: TPanel
       Left = 0
@@ -214,7 +202,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 5
-      ExplicitHeight = 62
       object Label1: TLabel
         Left = 0
         Top = 0
@@ -241,7 +228,6 @@ object MicroMaterialView: TMicroMaterialView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        ExplicitHeight = 49
         Height = 48
         Width = 65
         AnchorX = 33
@@ -258,7 +244,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 6
-      ExplicitHeight = 62
     end
   end
   object MicroVMBridge: TioViewModelBridge

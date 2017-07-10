@@ -1,6 +1,7 @@
 inherited ArticleViewModel: TArticleViewModel
   OldCreateOrder = True
   object MPArticle: TioModelPresenter
+    AsDefault = True
     Async = True
     AutoLoadData = True
     AutoPersist = True

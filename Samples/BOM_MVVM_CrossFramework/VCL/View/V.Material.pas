@@ -28,7 +28,8 @@ uses
 
 type
 
-  [diImplements(IArticleView, 'TMaterial')]
+//  [diImplements(IArticleView, 'TMaterial')]
+  [diViewFor('TMaterial')]
   TMaterialView = class(TFrame, IArticleView)
 
     [ioBindAction('acBack')]

@@ -204,7 +204,13 @@ var
   I: Integer;
   LPresenterSettings: TioDIPresenterSettingsContainer;
 begin
+  // **********************************************
+  // **********************************************
+  // ***                                        ***
   // *** DO NOT USE IioViewModel INTERFACE HERE ***
+  // ***                                        ***
+  // **********************************************
+  // **********************************************
   // Only for ViewModels
   if not (AViewModel is TioViewModel) then
     Exit;

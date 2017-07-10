@@ -110,21 +110,9 @@ begin
 end;
 
 procedure TArticleListVM.acEditArticleExecute(Sender: TObject);
-var
-  LAlias: String;
 begin
   inherited;
-
-
-  io.di.LocateViewVMFor(MPArticleList.Current)
-    .SetPresenter('MPArticle', MPArticleList)
-    .Show;
-
-
-//  LAlias := MPArticleList.Current.ClassName;
-//  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias)
-//    .SetPresenter('MPArticle', MPArticleList)
-//    .Show;
+  io.di.LocateViewVMfor(MPArticleList).ShowCurrent;
 end;
 
 procedure TArticleListVM.acFilterAllExecute(Sender: TObject);

@@ -65,9 +65,9 @@ uses
 procedure TStartForm.cxRadioGroupProductsPropertiesChange(Sender: TObject);
 begin
   case ProductDetailLayout.ItemIndex of
-    0: io.di.RegisterClass<TProductView>.Implements<IArticleView>('TProduct').Execute;
-    1: io.di.RegisterClass<TProductViewVertical>.Implements<IArticleView>('TProduct').Execute;
-    2: io.di.RegisterClass<TProductViewHorizontal>.Implements<IArticleView>('TProduct').Execute;
+    0: io.di.RegisterClass<TProductView>.AsViewFor('TProduct').Execute;
+    1: io.di.RegisterClass<TProductViewVertical>.AsViewFor('TProduct').Execute;
+    2: io.di.RegisterClass<TProductViewHorizontal>.AsViewFor('TProduct').Execute;
   end;
 end;
 

@@ -11,6 +11,7 @@ type
 
   TioModelPresenter = class(TComponent, IioNotifiableBindSource)
   private
+    FAsDefault: Boolean;
     FonNotify: TioBSANotificationEvent;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     FTypeName, FTypeAlias: String;
@@ -44,6 +45,9 @@ type
     procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
+    // AsDefault
+    procedure SetAsDefault(const Value: Boolean);
+    procedure InitAsDefaultOnCreate;
     // TypeName
     procedure SetTypeName(const Value: String);
     // TypeAlias
@@ -119,6 +123,7 @@ type
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     // Properties
+    property AsDefault:Boolean read FAsDefault write SetAsDefault;
     property Async:Boolean read FAsync write SetAsync;
     property AutoLoadData:Boolean read FAutoLoadData write SetAutoLoadData;
     property AutoPersist:Boolean read FAutoPersist write SetAutoPersist;
@@ -217,6 +222,10 @@ begin
   //  Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
   //  DesignTime (WhereStr property) non funzionassero per questo motivo.
   FDetailPresentersContainer := nil;
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  //  first ModelPresenter inserted (no other presenters presents).
+  //  NB: At Runtime set False as initial value (load real value from dfm file)
+  InitAsDefaultOnCreate;
 end;
 
 function TioModelPresenter.Current: TObject;
@@ -279,8 +288,9 @@ procedure TioModelPresenter.ForceDetailAdaptersCreation;
 var
   LPresenter: TioModelPresenter;
 begin
-  for LPresenter in FDetailPresentersContainer do
-    LPresenter.CheckAdapter(True);
+  if Assigned(FDetailPresentersContainer) then
+    for LPresenter in FDetailPresentersContainer do
+      LPresenter.CheckAdapter(True);
 end;
 
 function TioModelPresenter.GetBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -382,6 +392,29 @@ begin
     (BindSourceAdapter as TBindSourceAdapter).Insert;
 end;
 
+procedure TioModelPresenter.InitAsDefaultOnCreate;
+var
+  I: Integer;
+begin
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  //  first ModelPresenter inserted (no other presenters presents).
+  //  NB: At Runtime set False as initial value (load real value from dfm file)
+  if (csDesigning in ComponentState) then
+  begin
+    FAsDefault := True;
+    for I := 0 to Owner.ComponentCount-1 do
+      if (Owner.Components[I] is TioModelPresenter)
+      and (Owner.Components[I] <> Self)
+      then
+      begin
+        FAsDefault := False;
+        Exit;
+      end;
+  end
+  else
+    FAsDefault := False;
+end;
+
 procedure TioModelPresenter.Insert(AObject: TObject);
 begin
   if CheckAdapter then
@@ -456,6 +489,19 @@ begin
   if not Assigned(FDetailPresentersContainer) then
     FDetailPresentersContainer := TList<TioModelPresenter>.Create;
   FDetailPresentersContainer.Add(ADetailPresenter);
+end;
+
+procedure TioModelPresenter.SetAsDefault(const Value: Boolean);
+var
+  I: Integer;
+begin
+  // Uncheck AsDefault property for all presenters
+  if Value then
+    for I := 0 to Owner.ComponentCount-1 do
+      if (Owner.Components[I] is TioModelPresenter) then
+        TioModelPresenter(Owner.Components[I]).AsDefault := False;
+  // Set the value
+  FAsDefault := Value;
 end;
 
 procedure TioModelPresenter.SetAsync(const Value: Boolean);

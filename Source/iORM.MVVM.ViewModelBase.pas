@@ -61,7 +61,9 @@ type
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------
-    // Presenters
+    // DefaultPresenter
+    function GetDefaultPresenter: TioModelPresenter;
+    // Presenter
     function GetPresenter(const AName: String): TioModelPresenter;
     // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
@@ -86,6 +88,7 @@ type
 // ---------------- End: section added for IInterface support ---------------
     // Properties
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
+    property DefaultPresenter:TioModelPresenter read GetDefaultPresenter;
     property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
   end;
 // ---------------- Start: section added for IInterface support ---------------
@@ -140,10 +143,25 @@ begin
   Result := Commands.Get(ACmdName, False);
 end;
 
+function TioViewModel.GetDefaultPresenter: TioModelPresenter;
+var
+  I: Integer;
+begin
+  Result := nil;
+  for I := 0 to ComponentCount-1 do
+    if (Components[I] is TioModelPresenter)
+    and TioModelPresenter(Components[I]).AsDefault
+    then
+      Exit(TioModelPresenter(Components[I]));
+end;
+
 function TioViewModel.GetPresenter(const AName: String): TioModelPresenter;
 var
   LComponent: TComponent;
 begin
+  // If the ANAme param is empty then return de default presenter
+  if AName.IsEmpty then
+    Exit(GetDefaultPresenter);
   LComponent := FindComponent(AName);
   if not (Assigned(LComponent) and (LComponent is TioModelPresenter)) then
     raise EioException.Create(Self.ClassName, 'GetPresenters', Format('ModelPresenter named "%s" not found.', [AName]));

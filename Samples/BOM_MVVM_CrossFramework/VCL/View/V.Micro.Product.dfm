@@ -1,15 +1,9 @@
 inherited MicroProductView: TMicroProductView
-  Height = 101
-  ExplicitHeight = 101
   inherited ClientArea: TPanel
-    ExplicitHeight = 298
     inherited Panel1: TPanel
       inherited cxDBLabel2: TcxDBLabel
         Style.IsFontAssigned = True
         AnchorY = 16
-      end
-      inherited ButtonShow: TcxButton
-        ExplicitLeft = 388
       end
       inherited cxDBLabel1: TcxDBLabel
         Style.IsFontAssigned = True
@@ -21,18 +15,12 @@ inherited MicroProductView: TMicroProductView
         AnchorY = 16
       end
     end
-    inherited ButtonPost: TcxButton
-      ExplicitLeft = 388
-      ExplicitHeight = 61
-    end
     inherited PanelProcessCost: TPanel
-      ExplicitHeight = 61
       inherited cxDBSpinEdit1: TcxDBSpinEdit
         Style.IsFontAssigned = True
       end
     end
     inherited PanelMaterialCost: TPanel
-      ExplicitHeight = 61
       object Label4: TLabel
         Left = 0
         Top = 0
@@ -66,25 +54,20 @@ inherited MicroProductView: TMicroProductView
       end
     end
     inherited PanelTime: TPanel
-      ExplicitHeight = 61
       inherited cxDBLabel5: TcxDBLabel
         Style.IsFontAssigned = True
-        ExplicitHeight = 48
         AnchorX = 33
         AnchorY = 37
       end
     end
     inherited PanelCost: TPanel
-      ExplicitHeight = 61
       inherited cxDBLabel3: TcxDBLabel
         Style.IsFontAssigned = True
-        ExplicitHeight = 48
         AnchorX = 33
         AnchorY = 37
       end
     end
     inherited Panel2: TPanel
-      ExplicitHeight = 61
       object Label5: TLabel
         Left = 0
         Top = 0

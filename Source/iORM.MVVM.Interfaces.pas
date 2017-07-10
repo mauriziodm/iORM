@@ -64,9 +64,12 @@ type
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
-    // Presenters
+    // Presenter
     function GetPresenter(const AName: String): TioModelPresenter;
     property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
+    // DefaultPresenter
+    function GetDefaultPresenter: TioModelPresenter;
+    property DefaultPresenter:TioModelPresenter read GetDefaultPresenter;
   end;
 
   TioVMViewsInternalContainer = TDictionary<Integer,TComponent>;

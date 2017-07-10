@@ -186,7 +186,7 @@ end;
 procedure TioDetailAdaptersContainer.RemoveBindSourceAdapter(
   const ABindSourceAdapter: IioContainedBindSourceAdapter);
 begin
-//  FDetailAdapters.Extract(ABindSourceAdapter);  // Questo era prima quanto il container era una TList
+//  FDetailAdapters.Extract(ABindSourceAdapter);  // Questo era prima quando il container era una TList
   FDetailAdapters.Remove(ABindSourceAdapter.GetMasterPropertyName);
 end;
 

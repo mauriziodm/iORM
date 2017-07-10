@@ -1,38 +1,29 @@
 inherited MicroProcessView: TMicroProcessView
-  Height = 102
-  ExplicitHeight = 102
   DesignSize = (
     451
-    102)
+    305)
   inherited ClientArea: TPanel
-    ExplicitHeight = 93
     inherited Panel1: TPanel
-      ExplicitWidth = 445
       inherited cxDBLabel2: TcxDBLabel
         Style.IsFontAssigned = True
         AnchorY = 16
       end
       inherited cxDBLabel1: TcxDBLabel
         Style.IsFontAssigned = True
-        ExplicitWidth = 248
         AnchorY = 16
       end
       inherited cxDBLabel4: TcxDBLabel
         Style.IsFontAssigned = True
-        ExplicitLeft = 337
         AnchorX = 363
         AnchorY = 16
       end
     end
     inherited PanelProcessCost: TPanel
-      ExplicitLeft = 323
-      ExplicitHeight = 64
       inherited cxDBSpinEdit1: TcxDBSpinEdit
         Style.IsFontAssigned = True
       end
     end
     inherited PanelTime: TPanel
-      ExplicitHeight = 64
       object Label3: TLabel
         Left = 0
         Top = 0
@@ -59,7 +50,6 @@ inherited MicroProcessView: TMicroProcessView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        ExplicitHeight = 51
         Height = 48
         Width = 65
         AnchorX = 33
@@ -67,10 +57,8 @@ inherited MicroProcessView: TMicroProcessView
       end
     end
     inherited PanelCost: TPanel
-      ExplicitHeight = 64
       inherited cxDBLabel3: TcxDBLabel
         Style.IsFontAssigned = True
-        ExplicitHeight = 51
         AnchorX = 33
         AnchorY = 37
       end
