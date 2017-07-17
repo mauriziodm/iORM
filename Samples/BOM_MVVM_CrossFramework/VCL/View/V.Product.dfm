@@ -113,8 +113,4 @@ inherited ProductView: TProductView
       FieldName = 'ProcessCost'
     end
   end
-  inherited DSArticle: TDataSource
-    Left = 368
-    Top = 144
-  end
 end

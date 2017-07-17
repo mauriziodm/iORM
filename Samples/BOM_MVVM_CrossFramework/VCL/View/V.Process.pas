@@ -39,9 +39,6 @@ type
     { Public declarations }
   end;
 
-var
-  ProcessView: TProcessView;
-
 implementation
 
 {$R *.dfm}

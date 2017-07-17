@@ -64,6 +64,7 @@ begin
   LNewPanel.Parent := ScrollBox1;
   LNewPanel.Align := alTop;
   LNewPanel.Height := TControl(AView).Height;
+  TControl(AView).Align := alClient;
   ScrollBox1.VertScrollBar.Range := ScrollBox1.VertScrollBar.Range + LNewPanel.Height;
   ResultViewContext := LNewPanel;
 end;

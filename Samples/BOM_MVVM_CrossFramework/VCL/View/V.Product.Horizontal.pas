@@ -27,9 +27,10 @@ uses
   iORM.MVVM.Components.ViewContextProvider;
 
 type
+
   TProductViewHorizontal = class(TProductView)
-    BOMVCProvider: TioViewContextProvider;
     ScrollBox1: TScrollBox;
+    BOMVCProvider: TioViewContextProvider;
     procedure BOMVCProviderioOnRequest(const Sender: TObject;
       const AView: TComponent; out ResultViewContext: TComponent);
     procedure BOMVCProviderioOnRelease(const Sender: TObject; const AView,
@@ -65,6 +66,7 @@ begin
   LNewPanel.Parent := ScrollBox1;
   LNewPanel.Align := alLeft;
   LNewPanel.Width := TControl(AView).Width;
+  TControl(AView).Align := alClient;
   ScrollBox1.HorzScrollBar.Range := ScrollBox1.HorzScrollBar.Range + LNewPanel.Width;
   ResultViewContext := LNewPanel;
 end;

@@ -2,7 +2,7 @@ object ViewContextForm: TViewContextForm
   Left = 0
   Top = 0
   Caption = 'ViewContextForm'
-  ClientHeight = 437
+  ClientHeight = 441
   ClientWidth = 598
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
