@@ -177,8 +177,6 @@ end;
 
 class procedure TioViewContextProviderContainer.SetActiveProvider(
   const AProvider: TioViewContextProvider);
-var
-  LOldIndex: Integer;
 begin
   // The provider must be registered
   if not IsRegistered(AProvider) then

@@ -38,7 +38,7 @@ type
     FDetailPresentersContainer: TList<TioModelPresenter>;
     // Questo è un riferimento di tipo interfaccia e serve solo per
     //  mantenere in vita l'oggetto
-    FDummyInterfaceRef: IInterface;
+    // FDummyInterfaceRef: IInterface;
     // Methods
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
@@ -310,7 +310,6 @@ end;
 
 function TioModelPresenter.DataObject: TObject;
 begin
-  Result := nil;
   Result := BindSourceAdapter.DataObject;
 end;
 

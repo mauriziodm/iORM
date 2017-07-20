@@ -290,8 +290,6 @@ end;
 { TioDBCreator }
 
 procedure TioDBCreator.AutoCreateDatabase(const AAutoCreateIndexesByAttributes:Boolean=True; const AAutoCreateIndexesByRelations:Boolean=True);
-var
-  ATable: IioDBCreatorTable;
 begin
   // Build DB structure analizing Rtti informations
   Self.LoadDBStructure;
@@ -383,7 +381,6 @@ var
   AField: IioDBCreatorField;
   LIndex: ioIndex;
   ATableName: String;
-  ARttiType: TRttiInstanceType;
 begin
   // If the current table is not to be considered for the AutoCreateDatabase...
   if not AMap.GetTable.GetAutoCreateDB then

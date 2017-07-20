@@ -106,12 +106,10 @@ begin
     raise EdormException.Create
       ('Cannot find property "Values" in the duck object');
   // Keys enumerator
-  AObj := nil;
   AObj := FKeysProperty.GetValue(FObjectAsDuck).AsObject;
   AObj := FCTX.GetType(AObj.ClassInfo).GetMethod('GetEnumerator').Invoke(AObj, []).AsObject;
   FKeysEnumerator := TDuckTypedDictionaryEnumerator.Create(   AObj   );
   // Values enumerator
-  AObj := nil;
   AObj := FValuesProperty.GetValue(FObjectAsDuck).AsObject;
   AObj := FCTX.GetType(AObj.ClassInfo).GetMethod('GetEnumerator').Invoke(AObj, []).AsObject;
   FValuesEnumerator := TDuckTypedDictionaryEnumerator.Create(   AObj   );

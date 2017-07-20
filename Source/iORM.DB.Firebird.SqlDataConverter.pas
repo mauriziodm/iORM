@@ -55,7 +55,17 @@ type
 implementation
 
 uses
-  System.TypInfo, System.SysUtils, Data.DB;
+{$REGION 'System'}
+ System.TypInfo,
+ System.SysUtils,
+{$ENDREGION}
+{$REGION 'Data'}
+  Data.DB,
+{$ENDREGION}
+{$REGION 'FireDAC'}
+  FireDAC.Stan.Param
+{$ENDREGION}
+;
 
 { TioSqlDataConverterFirebird }
 

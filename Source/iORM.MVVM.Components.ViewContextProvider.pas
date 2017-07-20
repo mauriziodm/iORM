@@ -138,7 +138,6 @@ end;
 class function TioViewContextProvider.ExtractViewContext(
   const AView: TComponent; const ARaiseExceptionIfViewContextNotExist:Boolean): TComponent;
 begin
-  Result := nil;
   if ARaiseExceptionIfViewContextNotExist and not AView.HasParent then
     raise EioException.Create(Self.ClassName + '.ReleaseViewContext: The view has no parent component.');
   Result := AView.GetParentComponent

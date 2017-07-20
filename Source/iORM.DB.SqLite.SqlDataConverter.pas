@@ -38,9 +38,16 @@ unit iORM.DB.SqLite.SqlDataConverter;
 interface
 
 uses
+{$REGION 'System'}
+  System.Rtti,
+{$ENDREGION}
+{$REGION 'iORM'}
   iORM.DB.Interfaces,
-  System.Rtti, iORM.Context.Properties.Interfaces, iORM.CommonTypes,
-  iORM.Context.Interfaces;
+  iORM.Context.Properties.Interfaces,
+  iORM.CommonTypes,
+  iORM.Context.Interfaces
+{$ENDREGION}
+;
 
 type
 
@@ -60,13 +67,29 @@ type
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes, Data.DB;
+{$REGION 'System'}
+  System.SysUtils,
+  System.StrUtils,
+  System.TypInfo,
+{$ENDREGION}
+{$REGION 'Data'}
+  Data.DB,
+{$ENDREGION}
+{$REGION 'FireDAC'}
+  FireDAC.Stan.Param,
+{$ENDREGION}
+{$REGION 'iORM'}
+  iORM.Attributes
+{$ENDREGION}
+;
+
+
+
 
 { TioSqlConverterSqLite }
 
 class function TioSqlDataConverterSqLite.FloatToSQL(const AFloat: Extended): String;
 var
-  Sign, IntegerPart, DecimalPart: String;
   FormatSettings: TFormatSettings;
 begin
   FormatSettings := TFormatSettings.Create;

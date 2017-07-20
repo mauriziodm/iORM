@@ -38,11 +38,22 @@ unit iORM.DB.Query;
 interface
 
 uses
-  iORM.Context.Properties.Interfaces,
+{$REGION 'System'}
   System.Classes,
   System.Rtti,
+{$ENDREGION}
+{$REGION 'Data'}
+  Data.DB,
+{$ENDREGION}
+{$REGION 'FireDAC'}
   FireDAC.Comp.Client,
-  Data.DB, iORM.Context.Interfaces, iORM.DB.Interfaces;
+{$ENDREGION}
+{$REGION 'iORM'}
+  iORM.Context.Properties.Interfaces,
+  iORM.Context.Interfaces,
+  iORM.DB.Interfaces
+{$ENDREGION}
+;
 
 type
 
@@ -89,10 +100,26 @@ type
 implementation
 
 uses
-  System.TypInfo, iORM.Exceptions, iORM.Attributes,
-  iORM.ObjectsForge.Factory, iORM.DuckTyped.Interfaces,
-  iORM.DuckTyped.Factory, iORM.DB.Factory, System.JSON,
-  iORM.Rtti.Utilities;
+{$REGION 'System'}
+  System.TypInfo,
+  System.JSON,
+{$ENDREGION}
+{$REGION 'FireDAC'}
+  FireDAC.Stan.Param,
+{$ENDREGION}
+{$REGION 'iORM'}
+  iORM.Exceptions,
+  iORM.Attributes,
+  iORM.ObjectsForge.Factory,
+  iORM.DuckTyped.Interfaces,
+  iORM.DuckTyped.Factory,
+  iORM.DB.Factory,
+  iORM.Rtti.Utilities
+{$ENDREGION}
+;
+   
+
+   
 
 { TioQuerySqLite }
 
@@ -311,7 +338,6 @@ var
   AParam: TioParam;
   AJSONValue: TJSONValue;
 begin
-  AObj := nil;
   // -------------------------------------------------------------------------------------------------------------------------------
   // Normal property type (NO BLOB)
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -344,10 +370,15 @@ begin
         AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(AObj);
       ioRTEmbeddedHasOne:
         AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(AObj);
+    else 
+      AJSONValue := nil;
     end;
     try
-      AParam.AsString := AJSONValue.ToString;
-      Exit;
+      if Assigned(AJSONValue) then
+      begin
+        AParam.AsString := AJSONValue.ToString;
+        Exit;
+      end;
     finally
       AJSONValue.Free;
     end;

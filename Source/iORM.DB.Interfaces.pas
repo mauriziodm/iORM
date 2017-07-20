@@ -251,7 +251,6 @@ type
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     // Getters
-    ['{D49E85DA-C71F-4E00-A8F8-31312EBEE642}']
     function GetTranslatedSQL: String; overload;
     function GetConnectionName: String;
     function GetIgnoreObjNotExists: Boolean;

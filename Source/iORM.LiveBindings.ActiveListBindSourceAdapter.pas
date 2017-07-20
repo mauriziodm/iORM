@@ -410,7 +410,7 @@ var
   AValue: TValue;
   ALazyLoadableObj: IioLazyLoadable;
 begin
-  ADetailObj := nil;
+  AObj := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -485,7 +485,6 @@ end;
 
 function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
 begin
-  Result := nil;
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
@@ -759,11 +758,13 @@ end;
 function TioActiveListBindSourceAdapter._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := 0;
 end;
 
 function TioActiveListBindSourceAdapter._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := 0;
 end;
 
 end.

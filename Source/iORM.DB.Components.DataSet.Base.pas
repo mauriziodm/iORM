@@ -3,9 +3,9 @@ unit iORM.DB.Components.DataSet.Base;
 interface
 
 uses
-  Data.DB, iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope,
+  iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope,
   iORM.Context.Map.Interfaces, System.Classes, System.Rtti, Data.SqlTimSt,
-  iORM.CommonTypes;
+  iORM.CommonTypes, Data.DB;
 
 const
 
@@ -446,6 +446,7 @@ function TioBSADataSet.CreateBlobStream(Field: TField;
 var
   LProperty: IioContextProperty;
 begin
+  Result := nil;
   // Get Property, Object, Value
   LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
   // Create the right blob stream by DataType
@@ -457,6 +458,8 @@ begin
       Result := TioStreamableObjBlobStream.Create(Field as TGraphicField, Mode);
     TFieldType.ftBlob:
       Result := TioStreamableObjBlobStream.Create(Field as TBlobField, Mode);
+  else
+    raise Exception.Create('Unknown Field.DataType');
   end;
 end;
 
@@ -853,8 +856,6 @@ begin
 end;
 
 procedure TioBSADataSet.InternalLoadCurrentRecord(Buffer: TRecordBuffer);
-var
-  LBookmarkFlag: TBookmarkFlag;
 begin
   // Put the current record index in the record buffer
   PInteger(Buffer)^ := fCurrentRecord;

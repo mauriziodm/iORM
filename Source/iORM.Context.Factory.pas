@@ -365,11 +365,11 @@ begin
     LJoins := Self.Joins;
     LGroupBy := nil;
     LMapMode := ioProperties;
-    LIndexList := nil;
     LAutoCreateDB := True;
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
+    LIndexList := nil;
       if (LAttr is ioTable) then
       begin
         if not ioTable(LAttr).Value.IsEmpty then LTableName := ioTable(LAttr).Value;

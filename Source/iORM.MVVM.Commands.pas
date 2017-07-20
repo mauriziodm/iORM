@@ -729,7 +729,6 @@ procedure TioCommandsContainer.LoadCommands_ParseActions(
   const AOwner: TComponent; const ARttiElement: TRttiNamedObject);
 var
   LField: TRttiField;
-  LAttr: TCustomAttribute;
   LCmdItem: IioCommandsContainerItem;
   LAction: TContainedAction;
 begin
@@ -774,7 +773,6 @@ end;
 procedure TioCommandsContainer.Notify;
 var
   LKey: String;
-  LCmdItem: IioCommandsContainerItem;
 begin
   for LKey in FContainer.Keys do
     if FContainer.Items[LKey].IsNotificationTarget then
@@ -820,7 +818,6 @@ end;
 procedure TioCommandsContainer.Unregister(const AOwner: TComponent);
 var
   LKey: String;
-  LCmdItem: IioCommandsContainerItem;
 begin
   for LKey in FContainer.Keys do
     if FContainer.Items[LKey].Owner = AOwner then

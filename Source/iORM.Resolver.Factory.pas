@@ -53,7 +53,8 @@ type
 implementation
 
 uses
-  iORM.Containers.List, iORM.Resolver.ByDependencyInjection, iORM.Exceptions;
+  iORM.Containers.List, iORM.Resolver.ByDependencyInjection, iORM.Exceptions,
+  System.SysUtils;
 
 { TioResolverFactory }
 
@@ -64,10 +65,13 @@ end;
 
 class function TioResolverFactory.GetResolver(const AResolverMode: TioResolverStrategy): TioResolverRef;
 begin
+  Result := nil;
   case AResolverMode of
     rsByDependencyInjection: Result := TioResolverByDependencyInjection;
     rsByRtti: EioException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
     rsByMaps: EioException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
+  else
+    raise Exception.Create('Unknown AResolverMode');
   end;
 end;
 

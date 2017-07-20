@@ -351,7 +351,7 @@ initialization
   TioDependencyInjectionContainer.Build;
 
   // Register as default DuckTypedStreamObject invoker
-  //  NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
+  //  NB: L'ho messo qui perchï¿½ altrimenti nella unit dove ï¿½ dichiarata la classe non
   //       venive eseguito
   io.di.RegisterClass<TioDuckTypedStreamObject>
                         .Implements<IioDuckTypedStreamObject>

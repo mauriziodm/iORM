@@ -77,11 +77,26 @@ type
 implementation
 
 uses
-  iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes,
-  iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
-  iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
-  iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
-  iORM.Exceptions, iORM;
+{$REGION 'Data'}
+  Data.DB,
+{$ENDREGION}
+{$REGION 'iORM'}
+  iORM.Context.Factory,
+  iORM.CommonTypes,
+  iORM.Attributes,
+  iORM.DB.ConnectionContainer,
+  iORM.DB.Factory,
+  iORM.DuckTyped.Interfaces,
+  iORM.DuckTyped.Factory,
+  iORM.Resolver.Interfaces,
+  iORM.ObjectsForge.Factory,
+  iORM.LazyLoad.Factory,
+  iORM.Resolver.Factory,
+  iORM.Where.Factory,
+  iORM.Exceptions,
+  iORM
+{$ENDREGION}
+;
 
 { TioStrategyDB }
 
@@ -156,7 +171,6 @@ class procedure TioStrategyDB.InsertObject(const AContext: IioContext;
   const ABlindInsert: Boolean);
 var
   AQuery: IioQuery;
-  NextID: Integer;
 begin
   inherited;
   // -----------------------------------------------------------
@@ -231,6 +245,7 @@ var
     end;
 begin
   inherited;
+  Result := nil;
   // Resolve the type and alias
   AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
   // Get the transaction collection
@@ -669,8 +684,6 @@ begin
 end;
 
 class procedure TioStrategyDB.UpdateObject(const AContext: IioContext);
-var
-  AQuery: IioQuery;
 begin
   inherited;
   // Create and execute query

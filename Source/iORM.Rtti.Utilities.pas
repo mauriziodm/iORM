@@ -220,7 +220,7 @@ begin
   end;
 // Before XE7
 {$ELSE  NEXTGEN}
-  Result := ATypeInfo.Name;
+  Result := string(ATypeInfo.Name);
 {$ENDIF NEXTGEN}
 end;
 

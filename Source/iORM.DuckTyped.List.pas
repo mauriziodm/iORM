@@ -85,7 +85,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.RttiContext.Factory;
+  iORM.Exceptions, iORM.RttiContext.Factory, System.SysUtils;
 
 { TioDuckTypedList }
 
@@ -158,6 +158,8 @@ begin
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsObject;
     tkInterface:
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsInterface as TObject;
+  else
+    raise Exception.Create('Invalid AValue.Kind');
   end;
 end;
 

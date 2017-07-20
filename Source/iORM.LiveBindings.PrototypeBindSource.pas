@@ -49,7 +49,6 @@ type
 
   TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   private
-    FBindSourceAdapter: IioActiveBindSourceAdapter;
     FioTypeName: String;
     FioTypeAlias: String;
     FioAutoLoadData: Boolean;
@@ -307,7 +306,6 @@ end;
 
 function TioPrototypeBindSource.DataObject: TObject;
 begin
-  Result := nil;
   Result := Self.GetActiveBindSourceAdapter.DataObject;
 end;
 
@@ -555,11 +553,13 @@ end;
 function TioPrototypeBindSource._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := 0;
 end;
 
 function TioPrototypeBindSource._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := 0;
 end;
 
 end.

@@ -125,7 +125,6 @@ var
   function NewConnectionDB: IioConnectionDB;
   var
     LConnection: TioInternalSqlConnection;
-    DBPath: String;
   begin
     // Create the internal connection
     LConnection := TioInternalSqlConnection.Create(nil);

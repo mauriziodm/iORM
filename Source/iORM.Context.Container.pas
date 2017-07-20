@@ -177,7 +177,6 @@ var
 begin
   // Init
   Result := False;
-  Index := 0;
   LdiRegister := False;
   LdiAsSingleton := False;
   SetLength(LdiImplements, 0);

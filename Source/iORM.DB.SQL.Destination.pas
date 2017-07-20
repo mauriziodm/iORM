@@ -102,7 +102,7 @@ end;
 function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
-  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_Execute(Self);
+  Result := TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_Execute(Self);
 end;
 
 function TioSQLDestination.GetConnectionName: String;

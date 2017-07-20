@@ -223,7 +223,6 @@ end;
 function TioViewModel.LocalVCProvider(const AName: String;
   const AGlobalIfNotFound: Boolean): TioViewContextProvider;
 begin
-  Result := nil;
   // Find local view context providers
   Result := FViews.FindVCProvider(AName);
 end;

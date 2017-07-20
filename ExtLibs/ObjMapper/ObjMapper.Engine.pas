@@ -378,13 +378,7 @@ var
   SS: TStringStream;
   sw: TStreamWriter;
   MS: TMemoryStream;
-  LClassName: string;
-  Arr: TJSONArray;
-  list: IWrappedList;
-  I: Integer;
   wObj: IWrappedObject;
-  MapperClassTypeAttribute: MapperItemsClassType;
-  ClassRef: TClass;
 begin
   if not Assigned(AJSONValue) then   // JSONKey not present
   begin
@@ -487,7 +481,6 @@ var
   LParams: IomParams;
   LDone: Boolean;
   LValueType: TRttiType;
-  LJSONObj: TJSONObject;
   LQualifiedName: String;
   LExistingValue: TValue;
   LTypeJSONValue: TJSONValue;
@@ -659,7 +652,7 @@ begin
   // Loop
   for I := 0 to LJSONArray.Count - 1 do
   begin
-    LJObj := LJSONArray.Get(I) as TJSONObject;
+    LJObj := LJSONArray.Items[I] as TJSONObject;
     // Get the key anche value JSONValue
     case AParams.SerializationMode of
       smJavaScript:
@@ -673,6 +666,11 @@ begin
         LKeyJSONValue   := LJObj.GetValue(DMVC_KEY);
         LValueJSONValue := LJObj.GetValue(DMVC_VALUE);
       end;
+    else
+    begin
+      LKeyJSONValue := nil;
+      LValueJSONValue := nil;
+    end;
     end;
     // Deserialization key and value
     LKey   := DeserializePropField(LKeyJSONValue, LKeyRttiType, APropField, nil, AParams);
@@ -802,7 +800,6 @@ begin
   if not Assigned(AJSONValue) then
     Exit(TValue.Empty);
   // Defaults
-  LValueRTTIType          := nil;
   LListTypeName           := '';
   LValueQualifiedTypeName := '';
   // If AUseClassName is true then get the "items" JSONArray containing che containing the list items
@@ -844,7 +841,7 @@ begin
   for I := 0 to LJSONArray.Count - 1 do
   begin
     // Extract the current element
-    LValueJSONValue := LJSONArray.Get(I);
+    LValueJSONValue := LJSONArray.Items[I];
     // Deserialize the current element
     LValue := DeserializePropField(LValueJSONValue, LValueRttiType, APropField, nil, AParams);
     // Add to the list
@@ -1027,7 +1024,6 @@ begin
     AObject := TRTTIUtils.CreateObject(lJClassName.Value);
   end;
 
-  JValue := nil;
   _type := GetCtx.GetType(AObject.ClassInfo);
 
   try
@@ -1248,7 +1244,6 @@ end;
 class function omEngine.QualifiedTypeNameToRttiType(
   const AQualifiedTypeName: String): TRttiType;
 begin
-  Result := nil;
   Result := GetCtx.FindType(AQualifiedTypeName);
 end;
 
@@ -1314,19 +1309,15 @@ end;
 
 class function omEngine.SerializeClass(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue;
 var
-  AChildObj, Obj: TObject;
-  list: IWrappedList;
+  AChildObj: TObject;
   wObj: IWrappedObject;
-  Arr: TJSONArray;
-  ResultObj: TJSONObject;
   _attrser: MapperSerializeAsString;
   SerEnc: TEncoding;
   sr: TStringStream;
   SS: TStringStream;
   MS: TMemoryStream;
-  EncBytes: TBytes;
-  I: Integer;
 begin
+  Result := nil;
   AChildObj := AValue.AsObject;
   if Assigned(AChildObj) then
   begin
@@ -1632,15 +1623,11 @@ class function omEngine.SerializeObject(const AObject: TObject; const AParams: I
 var
   PropField: System.Rtti.TRttiNamedObject;
   PropsFields: TArray<System.Rtti.TRttiNamedObject>;
-  ThereAreIgnoredProperties: boolean;
-  DoNotSerializeThis: boolean;
   KeyName: String;
   _type: TRttiType;
-  I: Integer;
   JValue: TJSONValue;
   Value: TValue;
 begin
-  ThereAreIgnoredProperties := Length(AParams.IgnoredProperties) > 0;
   Result := TJSONBox.Create;
   try
     _type := GetCtx.GetType(AObject.ClassInfo);
@@ -1745,6 +1732,10 @@ begin
   else if LQualifiedTypeName = 'System.Rtti.TValue' then
   begin
     Result := SerializeTValue(AValue.AsType<TValue>, APropField, AParams);
+  end
+  else
+  begin
+    raise Exception.Create('Unknown LQualifiedTypeName');
   end;
 end;
 
@@ -1801,7 +1792,6 @@ end;
 
 class function omEngine.TypeInfoToRttiType(const ATypeInfo: Pointer): TRttiType;
 begin
-  Result := nil;
   Result := GetCtx.GetType(ATypeInfo);
 end;
 
@@ -2051,12 +2041,14 @@ class function TomCustomSerializer.Deserialize(const AJSONValue:TJSONValue;
   var ADone:Boolean): TValue;
 begin
   // None
+  Result := TValue.Empty;
 end;
 
 class function TomCustomSerializer.Serialize(const AValue: TValue;
   const AParams: IomParams; var ADone: Boolean): TJSONValue;
 begin
   // None
+  Result := nil;
 end;
 
 initialization

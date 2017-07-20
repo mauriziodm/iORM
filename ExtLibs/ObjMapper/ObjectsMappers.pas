@@ -1972,7 +1972,6 @@ var
   _attrser: MapperSerializeAsString;
   SerEnc: TEncoding;
 begin
-  jvalue := nil;
   _type := ctx.GetType(AObject.ClassInfo);
   _fields := _type.GetProperties;
   for _field in _fields do

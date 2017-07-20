@@ -85,7 +85,6 @@ end;
 class function TioViewContextContainer.NewViewContext(const AView: TComponent;
   const AViewContextProvider: TioViewContextProvider): TComponent;
 begin
-  Result := nil;
   if not Assigned(AViewContextProvider) then
     EioException.Create('TioViewContextContainer.GetViewContext: Invalid provider.');
   // Get the ViewContext for the form and register it into the ViewContextContainer

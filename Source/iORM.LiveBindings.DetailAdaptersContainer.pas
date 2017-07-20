@@ -113,7 +113,6 @@ var
   AMasterProperty: IioContextProperty;
   NewAdapter: IioContainedBindSourceAdapter;
 begin
-  Result := nil;
   // Retrieve MasterContext and MasterProperty
   AMasterContext := TioContextFactory.Context(AMasterClassName);
   AMasterProperty := AMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);
@@ -201,11 +200,13 @@ end;
 function TioDetailAdaptersContainer._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := 0;
 end;
 
 function TioDetailAdaptersContainer._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := 0;
 end;
 
 end.
