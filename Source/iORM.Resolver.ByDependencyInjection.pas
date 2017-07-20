@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Resolver.ByDependencyInjection;
 
 interface

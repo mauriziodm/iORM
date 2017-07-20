@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Where.SqlItems.Interfaces;
 
 interface
@@ -43,7 +39,6 @@ uses
   iORM.Interfaces, System.Rtti, iORM.Context.Map.Interfaces;
 
 type
-
   IioSqlItemWhere = interface(IioSqlItem)
     ['{0916A6EC-167E-4CD2-8C0B-ADE755E5157B}']
     function GetSql(const AMap:IioMap): String;

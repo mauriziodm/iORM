@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Strategy.Factory;
 
 interface
@@ -43,7 +39,6 @@ uses
   iORM.DB.Interfaces, iORM.Strategy.Interfaces;
 
 type
-
   TioStrategyFactory = class
   public
     class function GetStrategy(const AConnectionName: String): TioStrategyRef;

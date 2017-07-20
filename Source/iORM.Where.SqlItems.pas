@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Where.SqlItems;
 
 interface
@@ -45,7 +41,6 @@ uses
   System.Rtti, iORM.Context.Map.Interfaces;
 
 type
-
   // Base class for specialized SqlItemWhere needing reference ContextProperties
   TioSqlItemsWhere = class(TioSqlItem, IioSqlItemWhere)
   public

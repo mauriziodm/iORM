@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.SqlItems;
 
 interface
@@ -43,7 +39,6 @@ uses
   iORM.Interfaces, System.Rtti;
 
 type
-
   // Base per tuttle SqlItems basate su un valore costante
   //  Derivare una classe specificando solo il valore costante.
   TioSqlItem = class (TInterfacedObject, IioSqlItem)

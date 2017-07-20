@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Strategy.DB;
 
 interface
@@ -45,7 +41,6 @@ uses
   iORM.DB.Interfaces, FireDAC.Comp.DataSet;
 
 type
-
   // Strategy class for database
   TioStrategyDB = class(TioStrategyIntf)
   protected

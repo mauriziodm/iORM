@@ -31,8 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
 unit iORM.ObjectsForge.ObjectMakerClassFromField;
 
 interface
@@ -43,7 +41,6 @@ uses
   iORM.DB.Interfaces;
 
 type
-
   // Standard Object Maker
   TioObjectMakerClassFromField = class(TioObjectMakerIntf)
   public

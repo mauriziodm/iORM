@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.SqlTranslator;
 
 interface
@@ -43,7 +39,6 @@ uses
   System.RegularExpressions;
 
 type
-
   TioSqlTranslator = class
   protected
     FSelfClassName: String;

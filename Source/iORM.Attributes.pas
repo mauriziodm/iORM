@@ -58,7 +58,7 @@ type
   /// <summary>Join types</summary>
   TioJoinType = (ioInner, ioCross, ioLeftOuter, ioRightOuter, ioFullOuter);
 
- {$REGION 'BASE ATTRIBUTES'}
+{$REGION 'BASE ATTRIBUTES'}
   /// <summary>Base simple attribute</summary>
   TioCustomAttribute = class(TCustomAttribute)
   end;
@@ -117,7 +117,6 @@ type
   end;
 {$ENDREGION}
 {$REGION 'MVVM ATTRIBUTES'}
-
   ioBindAction = class(TioCustomStringAttribute)
   end;
 

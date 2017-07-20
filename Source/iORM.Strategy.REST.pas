@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Strategy.REST;
 
 interface
@@ -44,7 +40,6 @@ uses
   FireDAC.Comp.DataSet;
 
 type
-
   // Strategy class for database
   TioStrategyREST = class(TioStrategyIntf)
   private

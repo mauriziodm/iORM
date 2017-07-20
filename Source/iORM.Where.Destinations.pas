@@ -31,16 +31,11 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Where.Destinations;
 
 interface
 
 type
-
   TioWhereGenericListDestination = class
   strict private
     FWhere: TObject;   // TObject to avoid circular receference
@@ -52,7 +47,9 @@ type
 implementation
 
 uses
-  iORM.Rtti.Utilities, iORM.RttiContext.Factory, System.TypInfo,
+  iORM.Rtti.Utilities,
+  iORM.RttiContext.Factory,
+  System.TypInfo,
   iORM.Where;
 
 { TioWhereGenericListDestination }

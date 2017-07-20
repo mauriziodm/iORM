@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.REST.Factory;
 
 interface
@@ -43,7 +39,6 @@ uses
   iORM.DB.Interfaces;
 
 type
-
   TioRESTFactory = class
   public
     class function NewRequestBody(const AOwnDataObject:Boolean=True): IioRESTRequestBody; overload;
@@ -55,7 +50,8 @@ type
 implementation
 
 uses
-  iORM.REST.Body.Request, iORM.REST.Body.Response;
+  iORM.REST.Body.Request,
+  iORM.REST.Body.Response;
 
 { TioRESTFactory }
 

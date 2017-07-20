@@ -31,8 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
 unit iORM.ObjectsForge.ObjectMapper;
 
 interface
@@ -61,10 +59,6 @@ implementation
 uses
   ObjMapper.Engine;
 
-
-{ TioObjectMapper }
-
-
 { TioObjectMapperIntf }
 
 class function TioObjectMapperIntf.DeserializeEmbeddedList(AJValue: TJSONValue; AList: TObject): TObject;
@@ -86,7 +80,5 @@ class function TioObjectMapperIntf.SerializeEmbeddedList(AList: TObject): TJSONV
 begin
   Result := omEngine.SerializeList(AList, nil, omEngine.DefaultByFields);
 end;
-
-
 
 end.

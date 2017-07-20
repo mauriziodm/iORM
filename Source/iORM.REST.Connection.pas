@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.REST.Connection;
 
 interface
@@ -43,7 +39,6 @@ uses
   iORM.DB.Connection, iORM.DB.Interfaces, REST.Client, iORM.REST.Interfaces;
 
 type
-
   // This is the specialized class for REST connections
   TioConnectionREST = class(TioConnectionBase, IioConnectionREST)
   strict private
@@ -149,6 +144,5 @@ function TioConnectionREST.GetResponseBody: IioRESTResponseBody;
 begin
   Result := FRESTResponseBody;
 end;
-
 
 end.
