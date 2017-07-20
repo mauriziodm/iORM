@@ -105,7 +105,8 @@ end;
 function TioModelBindSource.GetInternalActiveAdapter: IioActiveBindSourceAdapter;
 begin
   Result := nil;
-  if CheckAdapter and Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
+  if CheckAdapter then
+    Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
 end;
 
 function TioModelBindSource.GetModelPresenterInstance: TioModelPresenter;

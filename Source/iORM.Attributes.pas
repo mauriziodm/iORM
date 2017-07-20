@@ -38,405 +38,353 @@ unit iORM.Attributes;
 interface
 
 uses
-  iORM.CommonTypes, System.UITypes, ObjMapper.Attributes;
+  iORM.CommonTypes,
+  System.UITypes,
+  ObjMapper.Attributes;
 
 type
-
-  // destination event for VM action
+  /// <summary>destination event for VM action</summary>
   TioActionEvent = (Null, OnExecute, OnUpdate, OnHint);
 
-  // Type of class mapping
+  /// <summary>Type of class mapping</summary>
   TioMapModeType = (ioProperties, ioFields);
 
-  // Relation types
+  /// <summary>Relation types</summary>
   TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne);
 
-  // LazyLoad
+  /// <summary>LazyLoad</summary>
   TioLoadType = (ioImmediateLoad = 0, ioLazyLoad);
 
-  // Join types
+  /// <summary>Join types</summary>
   TioJoinType = (ioInner, ioCross, ioLeftOuter, ioRightOuter, ioFullOuter);
 
-  // ===========================================================================
-  // START BASE ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // Base simple attribute
+ {$REGION 'BASE ATTRIBUTES'}
+  /// <summary>Base simple attribute</summary>
   TioCustomAttribute = class(TCustomAttribute)
   end;
 
-  // Base String attribute
+  /// <summary>Base String attribute</summary>
   TioCustomStringAttribute = class(TCustomAttribute)
   strict private
-    FValue: String;
+    FValue: string;
   public
-    constructor Create(const AValue:String='');
-    property Value:String read FValue;
+    constructor Create(const AValue: string = '');
+    property Value: string read FValue;
   end;
 
-  // Base integer attribute
+  /// <summary>Base integer attribute</summary>
   TioCustomIntegerAttribute = class(TCustomAttribute)
   strict private
     FValue: Integer;
   public
-    constructor Create(const AValue:Integer);
-    property Value:Integer read FValue;
+    constructor Create(const AValue: Integer);
+    property Value: Integer read FValue;
   end;
 
-  // Base boolean attribute
+  /// <summary>Base boolean attribute</summary>
   TioCustomBoolAttribute = class(TCustomAttribute)
   strict private
     FValue: Boolean;
   public
-    constructor Create(const AValue:Boolean);
-    property Value:Boolean read FValue;
+    constructor Create(const AValue: Boolean);
+    property Value: Boolean read FValue;
   end;
 
-  // Base class for relation attribute
+  /// <summary>Base class for relation attribute</summary>
   TioCustomRelationAttribute = class(TioCustomAttribute)
   strict private
-    FChildTypeName: String;
-    FChildTypeAlias: String;
+    FChildTypeName: string;
+    FChildTypeAlias: string;
   public
-    constructor Create(AChildClassRef:TioClassRef); overload;
-    constructor Create(const AChildTypeName:String; const AChildTypeAlias:String=''); overload;
-    property ChildTypeName: String read FChildTypeName;
-    property ChildTypeAlias: String read FChildTypeAlias;
+    constructor Create(AChildClassRef: TioClassRef); overload;
+    constructor Create(const AChildTypeName: string; const AChildTypeAlias: string = ''); overload;
+    property ChildTypeName: string read FChildTypeName;
+    property ChildTypeAlias: string read FChildTypeAlias;
   end;
 
-  // Standard AttributeLabel
+  /// <summary>Standard AttributeLabel</summary>
   ioMarker = class(TioCustomStringAttribute)
   end;
 
   TioCustomForTargetModelClass = class(TioCustomAttribute)
   strict private
-    FTargetClassName: String;
-    FAlias: String;
+    FTargetClassName: string;
+    FAlias: string;
   public
-    constructor Create(ATargetClassName:String; const AAlias:String='');
-    property TargetClassName:String read FTargetClassName;
-    property Alias:String read FAlias;
+    constructor Create(const ATargetClassName: string; const AAlias: string = '');
+    property TargetClassName: string read FTargetClassName;
+    property Alias: string read FAlias;
+  end;
+{$ENDREGION}
+{$REGION 'MVVM ATTRIBUTES'}
+
+  ioBindAction = class(TioCustomStringAttribute)
   end;
 
-  // ---------------------------------------------------------------------------
-  // END BASE ATTRIBUTES
-  // ===========================================================================
+  ioAction = class(TioCustomAttribute)
+  private
+    FName: string;
+    FCaption: string;
+    FEvent: TioActionEvent;
+  public
+    constructor Create(const AName, ACaption: string; const AEvent: TioActionEvent = TioActionEvent.Null); overload;
+    constructor Create(const AName: string; const AEvent: TioActionEvent = TioActionEvent.Null); overload;
+    property Name: string read FName;
+    property Caption: string read FCaption;
+    property Event: TioActionEvent read FEvent;
+  end;
 
+  ioCommand = class(TioCustomAttribute)
+  private
+    FName: string;
+  public
+    constructor Create(const AName: string);
+    property Name: string read FName;
+  end;
 
+  ioDisabled = class(TioCustomAttribute)
+  end;
 
+  ioChecked = class(TioCustomAttribute)
+  end;
 
+  ioGroupIndex = class(TioCustomIntegerAttribute)
+  end;
 
-  // ===========================================================================
-  // START MVVM ATTRIBUTES
-  // ---------------------------------------------------------------------------
+  ioHint = class(TioCustomStringAttribute)
+  end;
 
-   ioBindAction = class(TioCustomStringAttribute)
-   end;
+  ioImageIndex = class(TioCustomIntegerAttribute)
+  end;
 
-   ioAction = class(TioCustomAttribute)
-   private
-     FName: String;
-     FCaption: String;
-     FEvent: TioActionEvent;
-   public
-     constructor Create(const AName, ACaption:String; const AEvent:TioActionEvent=TioActionEvent.Null); overload;
-     constructor Create(const AName:String; const AEvent:TioActionEvent=TioActionEvent.Null); overload;
-     property Name:String read FName;
-     property Caption:String read FCaption;
-     property Event:TioActionEvent read FEvent;
-   end;
+  ioInvisible = class(TioCustomAttribute)
+  end;
 
-   ioCommand = class(TioCustomAttribute)
-   private
-     FName: String;
-   public
-     constructor Create(const AName: String);
-     property Name:String read FName;
-   end;
+  ioNotificationTarget = class(TioCustomAttribute)
+  end;
+{$ENDREGION}
+{$REGION 'PROPERTY ATTRIBUTES'}
+  /// <summary>Skip attribute</summary>
 
-   ioDisabled = class(TioCustomAttribute)
-   end;
-
-   ioChecked = class(TioCustomAttribute)
-   end;
-
-   ioGroupIndex = class(TioCustomIntegerAttribute)
-   end;
-
-   ioHint = class(TioCustomStringAttribute)
-   end;
-
-   ioImageIndex = class(TioCustomIntegerAttribute)
-   end;
-
-   ioInvisible = class(TioCustomAttribute)
-   end;
-
-   ioNotificationTarget = class(TioCustomAttribute)
-   end;
-
-  // ---------------------------------------------------------------------------
-  // END MVVM ATTRIBUTES
-  // ===========================================================================
-
-
-
-
-
-  // ===========================================================================
-  // START PROPERTY ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // Skip attribute
   ioSkip = class(TioCustomAttribute)
   end;
 
-  // ID attribute
+  /// <summary>ID attribute</summary>
   ioOID = class(TioCustomAttribute)
   strict private
     FSkipOnInsert: Boolean;
   public
-    constructor Create(const ASkipOnInsert:Boolean=True);
-    property SkipOnInsert:Boolean read FSkipOnInsert;
+    constructor Create(const ASkipOnInsert: Boolean = True);
+    property SkipOnInsert: Boolean read FSkipOnInsert;
   end;
 
-  // FieldName attribute
+  /// <summary>FieldName attribute</summary>
   ioField = class(TioCustomStringAttribute)
   end;
 
-  // FieldName attribute
+  /// <summary>FieldName attribute</summary>
   ioLoadSQL = class(TioCustomStringAttribute)
   end;
 
-  // FieldType attribute
+  /// <summary>FieldType attribute</summary>
   ioFieldType = class(TioCustomStringAttribute)
   end;
 
-  // Relation BelongsTo attribute
+  /// <summary>Relation BelongsTo attribute</summary>
   ioBelongsTo = class(TioCustomRelationAttribute)
   end;
 
-  // Relation HasMany attribute
+  /// <summary>Relation HasMany attribute</summary>
   ioHasMany = class(TioCustomRelationAttribute)
   strict private
-    FChildPropertyName: String;
+    FChildPropertyName: string;
     FLoadType: TioLoadType;
     FAutoIndex: Boolean;
   public
-    constructor Create(const AChildClassRef:TioClassRef; const AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    property ChildPropertyName: String read FChildPropertyName;
+    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: string; const ALoadType: TioLoadType = ioImmediateLoad; const AAutoIndex: Boolean = True); overload;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: string; const ALoadType: TioLoadType = ioImmediateLoad; const AAutoIndex: Boolean = True); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName: string; const ALoadType: TioLoadType = ioImmediateLoad; const AAutoIndex: Boolean = True); overload;
+    property ChildPropertyName: string read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
     property AutoIndex: Boolean read FAutoIndex;
   end;
 
-  // Relation BelongsTo attribute
+  /// <summary>Relation BelongsTo attribute</summary>
   ioHasOne = class(ioHasMany)
   end;
 
-  // ReadOnly attribute
+  /// <summary>ReadOnly attribute</summary>
   ioReadOnly = class(TioCustomAttribute)
   end;
 
-  // WriteOnly attribute
+  /// <summary>WriteOnly attribute</summary>
   ioWriteOnly = class(TioCustomAttribute)
   end;
 
-  // TypeAlias attribute
+  /// <summary>TypeAlias attribute</summary>
   ioTypeAlias = class(TioCustomStringAttribute)
   end;
+{$ENDREGION}
+{$REGION 'CLASS ATTRIBUTES'}
+  /// <summary>Table & Entity attribute</summary>
 
-  // ---------------------------------------------------------------------------
-  // END PROPERTY ATTRIBUTES
-  // ===========================================================================
-
-
-
-
-  // ===========================================================================
-  // START CLASS ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // Table & Entity attribute
   ioTable = class(TioCustomStringAttribute)
   strict private
     FMapMode: TioMapModeType;
   public
-    constructor Create(const AValue:String=''; const AMapMode:TioMapModeType=ioProperties); overload;
-    constructor Create(const AMapMode:TioMapModeType); overload;
+    constructor Create(const AValue: string = ''; const AMapMode: TioMapModeType = ioProperties); overload;
+    constructor Create(const AMapMode: TioMapModeType); overload;
     property MapMode: TioMapModeType read FMapMode;
   end;
+
   ioEntity = class(ioTable)
   end;
 
-  // KeyGeneratorName attribute
+  /// <summary>KeyGeneratorName attribute</summary>
   ioKeyGenerator = class(TioCustomStringAttribute)
   end;
 
-  // ConnectionDefName attribute
+  /// <summary>ConnectionDefName attribute</summary>
   ioConnectionDefName = class(TioCustomStringAttribute)
   end;
 
-  // ClassFromField
+  /// <summary>ClassFromField</summary>
   ioClassFromField = class(TioCustomAttribute)
   end;
+
   ioTrueClass = ioClassFromField;
 
-  // GroupBy
+  /// <summary>GroupBy</summary>
   ioGroupBy = class(TioCustomStringAttribute)
   end;
 
-  // Join attribute
+  /// <summary>Join attribute</summary>
   ioJoin = class(TioCustomAttribute)
   strict private
     FJoinType: TioJoinType;
     FJoinClassRef: TioClassRef;
-    FJoinCondition: String;
+    FJoinCondition: string;
   public
-    constructor Create(const AJoinType:TioJoinType; AJoinClassRef:TioClassRef; AJoinCondition:String='');
+    constructor Create(const AJoinType: TioJoinType; AJoinClassRef: TioClassRef; const AJoinCondition: string = '');
     property JoinType: TioJoinType read FJoinType;
     property JoinClassRef: TioClassRef read FJoinClassRef;
-    property JoinCondition: String read FJoinCondition;
+    property JoinCondition: string read FJoinCondition;
   end;
 
-  // Indexes attribute
+  /// <summary>Indexes attribute</summary>
   ioIndex = class(TioCustomAttribute)
   strict private
-    FIndexName: String;
-    FCommaSepFieldList: String;
+    FIndexName: string;
+    FCommaSepFieldList: string;
     FIndexOrientation: TioIndexOrientation;
     FUnique: Boolean;
   public
-    constructor Create(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    constructor Create(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    constructor Create(const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    property IndexName:String read FIndexName;
-    property CommaSepFieldList:String read FCommaSepFieldList write FCommaSepFieldList;
-    property IndexOrientation:TioIndexOrientation read FIndexOrientation;
-    property Unique:Boolean read FUnique;
+    constructor Create(const AIndexName: string; const ACommaSepFieldList: string; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(const ACommaSepFieldList: string; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    property IndexName: string read FIndexName;
+    property CommaSepFieldList: string read FCommaSepFieldList write FCommaSepFieldList;
+    property IndexOrientation: TioIndexOrientation read FIndexOrientation;
+    property Unique: Boolean read FUnique;
   end;
 
-  // KeyGeneratorName attribute
+  /// <summary>KeyGeneratorName attribute</summary>
   ioDisableAutoCreateDB = class(TioCustomAttribute)
   end;
 
-  // DIC - diRegister attribute (register the class as is, without interfaces)
+  /// <summary>DIC - diRegister attribute (register the class as is, without interfaces)</summary>
   diRegister = class(TioCustomAttribute)
   end;
 
-  // DIC - diImplements attribute
+  /// <summary>DIC - diImplements attribute</summary>
   diImplements = class(TioCustomAttribute)
   strict private
     FIID: TGUID;
-    FAlias: String;
+    FAlias: string;
   public
-    constructor Create(AIID:TGUID; const AAlias:String='');
-    property IID:TGUID read FIID;
-    property Alias:String read FAlias;
+    constructor Create(AIID: TGUID; const AAlias: string = '');
+    property IID: TGUID read FIID;
+    property Alias: string read FAlias;
   end;
 
-  // DIC - diAsSingleton attribute
+  /// <summary>DIC - diAsSingleton attribute</summary>
   diAsSingleton = class(TioCustomAttribute)
   end;
 
-  // DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  /// <summary>DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)</summary>
   diViewFor = class(TioCustomForTargetModelClass)
   end;
 
-  // DIC - diViewModelFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  /// <summary>DIC - diViewModelFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)</summary>
   diViewModelFor = class(TioCustomForTargetModelClass)
   end;
-  // ---------------------------------------------------------------------------
-  // END CLASS ATTRIBUTES
-  // ===========================================================================
+  {$ENDREGION}
 
+{$REGION 'EMBEDDED ATTRIBUTES'}
+  /// <summary>EmbeddedHasMany attribute</summary>
 
-
-
-  // ===========================================================================
-  // START EMBEDDED ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // EmbeddedHasMany attribute
   ioEmbeddedHasMany = class(TioCustomRelationAttribute)
-
   end;
 
-  // EmbeddedHasOne attribute
+  /// <summary>EmbeddedHasOne attribute</summary>
   ioEmbeddedHasOne = class(TioCustomRelationAttribute)
-
   end;
+  /// <summary>EmbeddedSkip attribute</summary>
 
-  // EmbeddedSkip attribute
   ioEmbeddedSkip = class(DoNotSerializeAttribute)  // from DMVC ObjectsMappers
-
   end;
 
-  // EmbeddedSkip attribute
+  /// <summary>EmbeddedSkip attribute</summary>
   ioEmbeddedStreamable = class(StreamableAttribute)  // from DMVC ObjectsMappers
-
   end;
+{$ENDREGION}
+{$REGION 'DEPENDENCY INJECTION ATTRIBUTES'}
+  /// <summary>ioInject attribute</summary>
 
-  // ---------------------------------------------------------------------------
-  // end EMBEDDED ATTRIBUTES
-  // ===========================================================================
-
-
-
-
-  // ===========================================================================
-  // START DEPENDENCY INJECTION ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // ioInject attribute
   ioInject = class(TioCustomAttribute)
   strict private
-    FTypeName: String;
-    FTypeAlias: String;
+    FTypeName: string;
+    FTypeAlias: string;
   public
-    constructor Create(const ATypeAlias:String=''); overload;
-    constructor Create(const ATypeName, ATypeAlias:String); overload;
-    property TypeName:String read FTypeName;
-    property TypeAlias:String read FTypeAlias;
+    constructor Create(const ATypeAlias: string = ''); overload;
+    constructor Create(const ATypeName, ATypeAlias: string); overload;
+    property TypeName: string read FTypeName;
+    property TypeAlias: string read FTypeAlias;
   end;
-
-  // ---------------------------------------------------------------------------
-  // END DEPENDENCY INJECTION ATTRIBUTES
-  // ===========================================================================
-
+{$ENDREGION}
 
 implementation
 
 uses
-  System.SysUtils, iORM.Rtti.Utilities;
+  System.SysUtils,
+  iORM.Rtti.Utilities;
 
 { TioStringAttribute }
 
-constructor TioCustomStringAttribute.Create(const AValue: String);
+constructor TioCustomStringAttribute.Create(const AValue: string);
 begin
+  inherited Create;
   FValue := AValue;
 end;
-
-{ ioSkip }
 
 { TCustomRelationAttribute }
 
 constructor TioCustomRelationAttribute.Create(AChildClassRef: TioClassRef);
 begin
+  inherited Create;
   Create(AChildClassRef.ClassName, '');
 end;
 
-constructor TioCustomRelationAttribute.Create(const AChildTypeName, AChildTypeAlias: String);
+constructor TioCustomRelationAttribute.Create(const AChildTypeName, AChildTypeAlias: string);
 begin
+  inherited Create;
   FChildTypeName := AChildTypeName;
   FChildTypeAlias := AChildTypeAlias;
 end;
 
 { ioHasMany }
 
-constructor ioHasMany.Create(const AChildClassRef: TioClassRef;
-  const AChildPropertyName: String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True);
+constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: string; const ALoadType: TioLoadType = ioImmediateLoad; const AAutoIndex: Boolean = True);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;
@@ -444,8 +392,7 @@ begin
   FAutoIndex := AAutoIndex;
 end;
 
-
-constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex:Boolean);
+constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: string; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
 begin
   inherited Create(AChildTypeName, AChildTypeAlias);
   FChildPropertyName := AChildPropertyName;
@@ -453,16 +400,16 @@ begin
   FAutoIndex := AAutoIndex;
 end;
 
-constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex:Boolean);
+constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: string; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
 begin
+  inherited Create;
   Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType);
   FAutoIndex := AAutoIndex;
 end;
 
 { ioJoin }
 
-constructor ioJoin.Create(const AJoinType: TioJoinType;
-  AJoinClassRef: TioClassRef; AJoinCondition: String);
+constructor ioJoin.Create(const AJoinType: TioJoinType; AJoinClassRef: TioClassRef; const AJoinCondition: string);
 begin
   inherited Create;
   FJoinType := AJoinType;
@@ -472,7 +419,7 @@ end;
 
 { ioTable }
 
-constructor ioTable.Create(const AValue:String; const AMapMode: TioMapModeType);
+constructor ioTable.Create(const AValue: string; const AMapMode: TioMapModeType);
 begin
   inherited Create(AValue);
   FMapMode := AMapMode;
@@ -486,8 +433,7 @@ end;
 
 { ioIndex }
 
-constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String;
-  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexName: string; const ACommaSepFieldList: string; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   inherited Create;
   FIndexName := AIndexName;
@@ -496,29 +442,30 @@ begin
   FUnique := AUnique;
 end;
 
-constructor ioIndex.Create(ACommaSepFieldList: String;
-  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const ACommaSepFieldList: string; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
+  inherited Create;
   Self.Create('', ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
-constructor ioIndex.Create(const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
+  inherited Create;
   Self.Create('', '', AIndexOrientation, AUnique);
 end;
 
 { ioInject }
 
-constructor ioInject.Create(const ATypeAlias: String);
+constructor ioInject.Create(const ATypeAlias: string);
 begin
   inherited Create;
   FTypeName := '';
   FTypeAlias := ATypeAlias;
 end;
 
-constructor ioInject.Create(const ATypeName, ATypeAlias: String);
+constructor ioInject.Create(const ATypeName, ATypeAlias: string);
 begin
+  inherited Create;
   Self.Create(ATypeAlias);
   FTypeName := ATypeName;
 end;
@@ -528,6 +475,7 @@ end;
 
 constructor TioCustomIntegerAttribute.Create(const AValue: Integer);
 begin
+  inherited Create;
   FValue := AValue;
 end;
 
@@ -535,13 +483,13 @@ end;
 
 constructor TioCustomBoolAttribute.Create(const AValue: Boolean);
 begin
+  inherited Create;
   FValue := AValue;
 end;
 
 { ioAction }
 
-constructor ioAction.Create(const AName, ACaption: String;
-  const AEvent: TioActionEvent);
+constructor ioAction.Create(const AName, ACaption: string; const AEvent: TioActionEvent);
 begin
   inherited Create;
   FName := AName;
@@ -549,19 +497,19 @@ begin
   FEvent := AEvent;
 end;
 
-constructor ioAction.Create(const AName: String; const AEvent: TioActionEvent);
+constructor ioAction.Create(const AName: string; const AEvent: TioActionEvent);
 begin
+  inherited Create;
   Self.Create(AName, '', AEvent);
 end;
 
 { ioCommand }
 
-constructor ioCommand.Create(const AName: String);
+constructor ioCommand.Create(const AName: string);
 begin
+  inherited Create;
   FName := AName;
 end;
-
-{ ioSkip }
 
 { ioOID }
 
@@ -573,7 +521,7 @@ end;
 
 { diImplements }
 
-constructor diImplements.Create(AIID:TGUID; const AAlias:String);
+constructor diImplements.Create(AIID: TGUID; const AAlias: string);
 begin
   inherited Create;
   FIID := AIID;
@@ -582,7 +530,7 @@ end;
 
 { diViewFor }
 
-constructor TioCustomForTargetModelClass.Create(ATargetClassName: String; const AAlias: String);
+constructor TioCustomForTargetModelClass.Create(const ATargetClassName: string; const AAlias: string);
 begin
   inherited Create;
   FTargetClassName := ATargetClassName;
@@ -590,3 +538,4 @@ begin
 end;
 
 end.
+
