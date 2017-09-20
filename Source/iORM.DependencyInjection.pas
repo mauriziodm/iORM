@@ -1170,6 +1170,7 @@ begin
     // EmptyOwner is True then add a nil as parameter for the constructor
     //  (used for Views and ViewModels and for object owned by someone)
     if FOwnerRequested and (Length(FConstructorParams) = 0) then
+    begin
       // If the use of the ViewContextProvider is enabled (Locating a View)
       //  then try to retrieve and set the ViewContext for the View.
       //  If a specific VCProvider is already assigned then use it else try
@@ -1191,6 +1192,7 @@ begin
       else
         LValue := TValue.Empty;
       FConstructorParams := [LValue];
+    end;
     // If it is a singleton then get the Instance (if exists)...
     if  AContainerItem.IsSingleton
     and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result)

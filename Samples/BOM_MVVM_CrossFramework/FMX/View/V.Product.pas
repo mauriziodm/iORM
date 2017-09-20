@@ -25,10 +25,10 @@ type
     LinkControlToField6: TLinkControlToField;
     LinkControlToField7: TLinkControlToField;
     BOMVCProvider: TioViewContextProvider;
-    procedure BOMVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
     procedure BOMVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
+    procedure BOMVCProviderioOnRequest(const Sender: TObject;
+      out ResultViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -48,7 +48,7 @@ begin
 end;
 
 procedure TProductView.BOMVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   inherited;
   ResultViewContext := TListBoxItem.Create(ListBox1);

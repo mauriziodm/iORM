@@ -67,6 +67,7 @@ inherited ProductViewVertical: TProductViewVertical
   end
   object BOMVCProvider: TioViewContextProvider
     ioOnRequest = BOMVCProviderioOnRequest
+    ioOnAfterRequest = BOMVCProviderioOnAfterRequest
     ioOnRelease = BOMVCProviderioOnRelease
     RegisterAsDefault = False
     AutoParent = True

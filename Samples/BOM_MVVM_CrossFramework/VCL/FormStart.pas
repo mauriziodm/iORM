@@ -33,17 +33,17 @@ type
     ViewsLayout: TcxRadioGroup;
     PagesVCProviders: TioViewContextProvider;
     procedure SQLIteConnAfterRegister(Sender: TObject);
-    procedure WindowsVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
     procedure WindowsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure FormCreate(Sender: TObject);
     procedure cxRadioGroupProductsPropertiesChange(Sender: TObject);
-    procedure PagesVCProvidersioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
     procedure PagesVCProvidersioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure ViewsLayoutPropertiesChange(Sender: TObject);
+    procedure WindowsVCProviderioOnRequest(const Sender: TObject;
+      out ResultViewContext: TComponent);
+    procedure PagesVCProvidersioOnRequest(const Sender: TObject;
+      out ResultViewContext: TComponent);
   private
     { Private declarations }
     FStartUp: Boolean;
@@ -90,7 +90,7 @@ begin
 end;
 
 procedure TStartForm.PagesVCProvidersioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 var
   LNewPanel: TPanel;
 begin
@@ -121,7 +121,7 @@ begin
 end;
 
 procedure TStartForm.WindowsVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   if FStartUp then
     ResultViewContext := Self

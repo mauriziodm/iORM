@@ -32,9 +32,11 @@ type
   TProductViewVertical = class(TProductView, IArticleView)
     BOMVCProvider: TioViewContextProvider;
     ScrollBox1: TScrollBox;
-    procedure BOMVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
     procedure BOMVCProviderioOnRelease(const Sender: TObject; const AView,
+      AViewContext: TComponent);
+    procedure BOMVCProviderioOnRequest(const Sender: TObject;
+      out ResultViewContext: TComponent);
+    procedure BOMVCProviderioOnAfterRequest(const Sender: TObject; const AView,
       AViewContext: TComponent);
   private
     { Private declarations }
@@ -47,6 +49,15 @@ implementation
 
 {$R *.dfm}
 
+procedure TProductViewVertical.BOMVCProviderioOnAfterRequest(
+  const Sender: TObject; const AView, AViewContext: TComponent);
+begin
+  inherited;
+  TControl(AViewContext).Height := TControl(AView).Height;
+  TControl(AView).Align := alClient;
+  ScrollBox1.VertScrollBar.Range := ScrollBox1.VertScrollBar.Range + TControl(AViewContext).Height;
+end;
+
 procedure TProductViewVertical.BOMVCProviderioOnRelease(const Sender: TObject;
   const AView, AViewContext: TComponent);
 begin
@@ -55,7 +66,7 @@ begin
 end;
 
 procedure TProductViewVertical.BOMVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 var
   LNewPanel: TPanel;
 begin
@@ -63,9 +74,6 @@ begin
   LNewPanel := TPanel.Create(nil);
   LNewPanel.Parent := ScrollBox1;
   LNewPanel.Align := alTop;
-  LNewPanel.Height := TControl(AView).Height;
-  TControl(AView).Align := alClient;
-  ScrollBox1.VertScrollBar.Range := ScrollBox1.VertScrollBar.Range + LNewPanel.Height;
   ResultViewContext := LNewPanel;
 end;
 

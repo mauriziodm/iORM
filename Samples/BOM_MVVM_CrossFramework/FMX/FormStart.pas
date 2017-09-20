@@ -16,14 +16,14 @@ type
     TabControl: TTabControl;
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
-    procedure VCProviderMasterioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
     procedure VCProviderMasterioOnAfterRequest(const Sender: TObject;
       const AView, AViewContext: TComponent);
     procedure VCProviderMasterioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure SQLIteConnAfterRegister(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure VCProviderMasterioOnRequest(const Sender: TObject;
+      out ResultViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -64,7 +64,7 @@ begin
 end;
 
 procedure TStartForm.VCProviderMasterioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   ResultViewContext := TabControl.Add;
 end;
