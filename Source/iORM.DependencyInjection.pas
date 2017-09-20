@@ -152,7 +152,7 @@ type
     FViewModelMarker: String;
     FSingletonKey: String;
     FVCProvider: TioViewContextProvider;
-    FVCProviderEnabled, FEmptyOwner: Boolean;
+    FVCProviderEnabled, FOwnerRequested: Boolean;
     FViewContext: TComponent;  // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     FForEachModelPresenter: TioModelPresenter;
@@ -167,7 +167,7 @@ type
     property _InterfaceName:String read FInterfaceName;
     property _Alias:String read FAlias;
   public
-    constructor Create(const AInterfaceName:String; const AAlias:String; const AEmptyOwner, AVCProviderEnabled:Boolean); virtual;
+    constructor Create(const AInterfaceName:String; const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean); virtual;
     function Exist: Boolean; virtual;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator; virtual;
@@ -292,8 +292,8 @@ type
   private
   public
     class function GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;
-    class function GetLocator(const AInterfaceName:String; const AAlias:String; const AEmptyOwner, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator; overload;
-    class function GetLocator<TI>(const AAlias:String; const AEmptyOwner, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
+    class function GetLocator(const AInterfaceName:String; const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator; overload;
+    class function GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
   end;
 
 implementation
@@ -936,7 +936,7 @@ begin
   Result := Self;
 end;
 
-constructor TioDependencyInjectionLocator.Create(const AInterfaceName, AAlias: String; const AEmptyOwner, AVCProviderEnabled:Boolean);
+constructor TioDependencyInjectionLocator.Create(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled:Boolean);
 begin
   inherited Create;
   FInterfaceName := AInterfaceName;
@@ -946,7 +946,7 @@ begin
   FVCProvider := nil;
   FVCProviderEnabled := AVCProviderEnabled;
   FViewContext := nil;
-  FEmptyOwner := AEmptyOwner;
+  FOwnerRequested := AOwnerRequested;
   FSingletonKey := '';
 end;
 
@@ -1151,6 +1151,8 @@ end;
 
 function TioDependencyInjectionLocator._Get(
   const AContainerItem: TioDIContainerImplementersItem): TObject;
+var
+  LValue: TValue;
 begin
   Result := nil;
   // if the ViewModel is present then Lock it (MVVM)
@@ -1167,8 +1169,28 @@ begin
   try
     // EmptyOwner is True then add a nil as parameter for the constructor
     //  (used for Views and ViewModels and for object owned by someone)
-    if FEmptyOwner and (Length(FConstructorParams) = 0) then
-      FConstructorParams := [TValue.Empty];
+    if FOwnerRequested and (Length(FConstructorParams) = 0) then
+      // If the use of the ViewContextProvider is enabled (Locating a View)
+      //  then try to retrieve and set the ViewContext for the View.
+      //  If a specific VCProvider is already assigned then use it else try
+      //  to retrieve the global default one, if not exist then do none
+      //  (no ViewContext assigned to the view).
+      //  NB: Se è stato specificato un ViewContext esplicito (SetViewContext), usa quello
+      //       e considera il tutto come con AutoOwner e AutoParent = True
+      if FVCProviderEnabled and not Assigned(FViewContext) then  //and (Result is TComponent) then
+      begin
+        if not Assigned(FVCProvider) then
+          FVCProvider := TioViewContextProviderContainer.GetProvider;
+        if Assigned(FVCProvider) and FVCProvider.AutoOwner then
+          FViewContext := TioViewContextContainer.NewViewContext(FVCProvider)
+        else
+          raise EioException.Create(Self.ClassName, '_Get', 'ViewContextProvider component not found!!!');
+      end;
+      if Assigned(FViewContext) then
+        TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
+      else
+        LValue := TValue.Empty;
+      FConstructorParams := [LValue];
     // If it is a singleton then get the Instance (if exists)...
     if  AContainerItem.IsSingleton
     and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result)
@@ -1193,17 +1215,11 @@ begin
         TioSingletonsContainer.Add(FSingletonKey, FInterfaceName, FAlias, Result);
     end;
     // If the use of the ViewContextProvider is enabled (Locating a View)
-    //  then try to retrieve and set the ViewContext for the View.
-    //  If a specific VCProvider is already assigned then use it else try
-    //  to retrieve the global default one, if not exist then do none
-    //  (no ViewContext assigned to the view).
-    //  NB: Se è stato specificato un ViewContext esplicito (SetViewContext), usa quello
-    if FVCProviderEnabled and (Result is TComponent) then
+    //  then set the parent of the view to the ViewContext
+    if FVCProviderEnabled and (Result is TComponent) and Assigned(FViewContext) then
     begin
-      if Assigned(FViewContext) then
+      if (not Assigned(FVCProvider)) or FVCProvider.AutoParent then
       begin
-        // Set the ViewContext as Owner of the view
-        TComponent(Result).InsertComponent(FViewContext);
         // Set the ViewContext as parent view
         {$IFDEF ioVCL}
           (Result as TControl).Parent := (FViewContext as TWinControl);
@@ -1211,17 +1227,11 @@ begin
         {$IFDEF ioFMX}
           (Result as TFmxObject).Parent := (FViewContext as TFmxObject);
         {$ENDIF}
-      end
-      else
-      begin
-        if not Assigned(FVCProvider) then
-          FVCProvider := TioViewContextProviderContainer.GetProvider;
-        if Assigned(FVCProvider) then
-          TioViewContextContainer.NewViewContext(TComponent(Result), FVCProvider)
-        else
-          raise EioException.Create(Self.ClassName, '_Get', 'ViewContextProvider component not found!!!');
       end;
-    end;
+      // Fire the onAfterRequest event handler of the ViewContextProvider component
+      if Assigned(FVCProvider) then
+        FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);
+    end
   finally
     // if the ViewModel is present then UnLock it (MVVM)
     if Self.ViewModelExist then
@@ -1287,14 +1297,14 @@ end;
 
 { TioDependencyInjectionFactory }
 
-class function TioDependencyInjectionFactory.GetLocator(const AInterfaceName, AAlias: String; const AEmptyOwner, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetLocator(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator;
 begin
-  Result := TioDependencyInjectionLocator.Create(AInterfaceName, AAlias, AEmptyOwner, AVCProviderEnabled);
+  Result := TioDependencyInjectionLocator.Create(AInterfaceName, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDependencyInjectionFactory.GetLocator<TI>(const AAlias:String; const AEmptyOwner, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>;
+class function TioDependencyInjectionFactory.GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>;
 begin
-  Result := TioDependencyInjectionLocator<TI>.Create(TioRttiUtilities.GenericToString<TI>, AAlias, AEmptyOwner, AVCProviderEnabled);
+  Result := TioDependencyInjectionLocator<TI>.Create(TioRttiUtilities.GenericToString<TI>, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
 class function TioDependencyInjectionFactory.GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;

@@ -15,12 +15,11 @@ type
     procedure FormCreate(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure FormsVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
+      out ResultViewContext: TComponent);
     procedure FormsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
   private
     { Private declarations }
-    FStartUp: Boolean;
   public
     { Public declarations }
   end;
@@ -43,9 +42,7 @@ end;
 procedure TStartForm.FormCreate(Sender: TObject);
 begin
   // Get the main view
-  FStartUp := True;
-  io.di.LocateViewVM<IMainView, IPersonsViewModel>.Get;
-  FStartUp := False;
+  io.di.LocateViewVM<IMainView, IPersonsViewModel>.SetViewContext(Self).Show;
 end;
 
 procedure TStartForm.FormsVCProviderioOnRelease(const Sender: TObject;
@@ -55,12 +52,9 @@ begin
 end;
 
 procedure TStartForm.FormsVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
-  if FStartUp then
-    ResultViewContext := Self
-  else
-    ResultViewContext := TViewContextForm.Create(Self);
+  ResultViewContext := TViewContextForm.Create(Self);
 end;
 
 end.

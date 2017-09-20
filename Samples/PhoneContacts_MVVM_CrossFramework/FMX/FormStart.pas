@@ -16,14 +16,14 @@ type
     ActionList1: TActionList;
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
-    procedure TabsVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
     procedure TabsVCProviderioOnAfterRequest(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure TabsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure SQLiteConnAfterRegister(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure TabsVCProviderioOnRequest(const Sender: TObject;
+      out ResultViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -68,7 +68,7 @@ begin
 end;
 
 procedure TForm1.TabsVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   ResultViewContext := MainTabControl.Add;
 end;

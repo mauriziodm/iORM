@@ -133,6 +133,22 @@ type
    ioBindAction = class(TioCustomStringAttribute)
    end;
 
+  //  NB: Questo metodo è stato aggiunto (con il relativo attributo "ioUniBindAction" perchè
+  //       si è visto che nel caso delle TUniForm e TUniFrame gli attributi relativi ai campi
+  //       non vengono creati e quindi l'attributo "ioBindAction" era inefficace. Però
+  //       si era notato che invece gli attributi della classe (non del campo) venivano creati
+  //       e quindi si è aggiunto l'attributo "ioUniBindAction" da usare appunto sulla classe
+  //       invece che sul controllo.
+   ioUniBindAction = class(TioCustomAttribute)
+   strict private
+     FControlName: String;
+     FCommandName: String;
+   public
+     constructor Create(const AControlName, ACommandName:String);
+     property ControlName:String read FControlName;
+     property CommandName:String read FCommandName;
+   end;
+
    ioAction = class(TioCustomAttribute)
    private
      FName: String;
@@ -587,6 +603,15 @@ begin
   inherited Create;
   FTargetClassName := ATargetClassName;
   FAlias := AAlias;
+end;
+
+{ ioUniBindAction }
+
+constructor ioUniBindAction.Create(const AControlName, ACommandName: String);
+begin
+  inherited Create;
+  FControlName := AControlName;
+  FCommandName := ACommandName;
 end;
 
 end.

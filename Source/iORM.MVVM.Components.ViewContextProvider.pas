@@ -44,7 +44,7 @@ uses
 
 type
 
-  TioRequestViewContextEvent = procedure(const Sender:TObject; const AView:TComponent; out ResultViewContext:TComponent) of object;
+  TioRequestViewContextEvent = procedure(const Sender:TObject; out ResultViewContext:TComponent) of object;
   TioViewContextEvent = procedure(const Sender:TObject; const AView, AViewContext:TComponent) of object;
 
   TioViewContextProvider = class(TComponent)
@@ -57,8 +57,7 @@ type
     FAutoOwner: Boolean;
     function GetRegisterAsDefault: Boolean;
     procedure SetRegisterAsDefault(const Value: Boolean);
-    procedure DoOnRequest(const AView:TComponent; out ResultViewContext:TComponent);
-    procedure DoOnAfterRequest(const AView, AViewContext:TComponent);
+    procedure DoOnRequest(out ResultViewContext:TComponent);
     procedure DoOnRelease(const AView, AViewContext:TComponent);
   protected
     procedure Loaded; override;
@@ -66,7 +65,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function ExtractViewContext(const AView:TComponent; const ARaiseExceptionIfViewContextNotExist:Boolean=True): TComponent;
-    function NewViewContext(const AView:TComponent): TComponent;
+    procedure DoOnAfterRequest(const AView, AViewContext:TComponent);
+    function NewViewContext: TComponent;
     procedure ReleaseViewContext(const AView:TComponent);
     function IsDefault: Boolean;
     procedure SetAsDefault;
@@ -128,11 +128,10 @@ begin
     FOnRelease(Self, AView, AViewContext);
 end;
 
-procedure TioViewContextProvider.DoOnRequest(const AView: TComponent;
-  out ResultViewContext: TComponent);
+procedure TioViewContextProvider.DoOnRequest(out ResultViewContext: TComponent);
 begin
   if Assigned(FOnRequest) then
-    FOnRequest(Self, AView, ResultViewContext);
+    FOnRequest(Self, ResultViewContext);
 end;
 
 class function TioViewContextProvider.ExtractViewContext(
@@ -154,23 +153,10 @@ begin
   Result := FRegisterAsDefault;
 end;
 
-function TioViewContextProvider.NewViewContext(const AView: TComponent): TComponent;
+function TioViewContextProvider.NewViewContext: TComponent;
 begin
   Result := nil;
-  // Event handler call
-  DoOnRequest(AView, Result);
-  // Set the ViewContext as owner of the view
-  if FAutoOwner then
-    Result.InsertComponent(AView);
-  // Set the ViewContext as parent view
-  if FAutoParent then
-  {$IFDEF ioVCL}
-    (AView as TControl).Parent := (Result as TWinControl);
-  {$ELSE}
-    (AView as TFmxObject).Parent := (Result as TFmxObject);
-  {$ENDIF}
-  // Event handler call
-  DoOnAfterRequest(AView, Result);
+  DoOnRequest(Result);
 end;
 
 procedure TioViewContextProvider.Loaded;

@@ -276,7 +276,9 @@ class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName
 begin
    // Create the ConnectionDef object and set his name
   //  NB: The name of the connectionDef should never be changed after
-  Result := FDManager.ConnectionDefs.AddConnectionDef;
+  Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
+  if not Assigned(Result) then
+    Result := FDManager.ConnectionDefs.AddConnectionDef;
   Result.Name := AConnectionName;
   Result.Params.Pooled := APooled;
   // If the AsDefault param is True or this is the first ConnectionDef of the application
@@ -298,7 +300,7 @@ begin
   Result.Params.Values['Protocol'] := 'TCPIP';
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent));
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent));
 end;
 
 class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet:String;
@@ -313,7 +315,7 @@ begin
   Result.Params.Password := APassword;
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
 end;
 
 class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String;
@@ -330,7 +332,7 @@ begin
   LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent);
   LConnectionInfo.BaseURL := ABaseURL;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, LConnectionInfo);
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
 end;
 
 class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase:String;
@@ -342,7 +344,7 @@ begin
   Result.Params.Database := ADatabase;
   Result.Params.Values['FailIfMissing'] := 'False';
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
 end;
 
 class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword:String;
@@ -355,7 +357,7 @@ begin
   Result.Params.UserName := AUserName;
   Result.Params.Password := APassword;
   // Add the connection type to the internal container
-  FConnectionManagerContainer.Add(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
 end;
 
 class procedure TioConnectionManager.SetDefaultConnectionName(const AConnectionName: String);

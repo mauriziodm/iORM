@@ -2,9 +2,10 @@ object ViewPerson: TViewPerson
   Left = 0
   Top = 0
   Width = 451
-  Height = 305
+  Height = 467
   Align = alClient
   TabOrder = 0
+  ExplicitHeight = 305
   object Panel1: TPanel
     Left = 0
     Top = 0
@@ -60,7 +61,7 @@ object ViewPerson: TViewPerson
   end
   object Panel2: TPanel
     Left = 0
-    Top = 269
+    Top = 431
     Width = 451
     Height = 36
     Align = alBottom
@@ -68,6 +69,7 @@ object ViewPerson: TViewPerson
     Ctl3D = True
     ParentCtl3D = False
     TabOrder = 1
+    ExplicitTop = 269
     DesignSize = (
       451
       36)
@@ -93,13 +95,14 @@ object ViewPerson: TViewPerson
     Left = 0
     Top = 182
     Width = 451
-    Height = 87
+    Height = 249
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitHeight = 87
     DesignSize = (
       451
-      87)
+      249)
     object Label2: TLabel
       Left = 0
       Top = 0
@@ -122,20 +125,21 @@ object ViewPerson: TViewPerson
       Left = 11
       Top = 25
       Width = 427
-      Height = 25
+      Height = 187
       Anchors = [akLeft, akTop, akRight, akBottom]
       ColCount = 2
       FixedCols = 0
       RowCount = 201
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
       TabOrder = 0
+      ExplicitHeight = 25
       ColWidths = (
         120
         300)
     end
     object BindNavigator1: TBindNavigator
       Left = 326
-      Top = 56
+      Top = 218
       Width = 112
       Height = 25
       DataSource = PhonesModelBindSource
@@ -143,6 +147,7 @@ object ViewPerson: TViewPerson
       Anchors = [akRight, akBottom]
       Orientation = orHorizontal
       TabOrder = 1
+      ExplicitTop = 56
     end
   end
   object Panel4: TPanel

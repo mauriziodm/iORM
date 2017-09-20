@@ -54,7 +54,7 @@ type
     class procedure Build; static;
     class procedure CleanUp; static;
   public
-    class function NewViewContext(const AView:TComponent; const AViewContextProvider:TioViewContextProvider): TComponent; static;
+    class function NewViewContext(const AViewContextProvider:TioViewContextProvider): TComponent; static;
     class procedure ReleaseViewContext(const AView:TComponent); static;
   end;
 
@@ -82,14 +82,14 @@ begin
   FInternalContainer.Free;
 end;
 
-class function TioViewContextContainer.NewViewContext(const AView: TComponent;
+class function TioViewContextContainer.NewViewContext(
   const AViewContextProvider: TioViewContextProvider): TComponent;
 begin
   Result := nil;
   if not Assigned(AViewContextProvider) then
     EioException.Create('TioViewContextContainer.GetViewContext: Invalid provider.');
   // Get the ViewContext for the form and register it into the ViewContextContainer
-  Result := AViewContextProvider.NewViewContext(AView);
+  Result := AViewContextProvider.NewViewContext;
   FInternalContainer.Add(Result, AViewContextProvider);
 end;
 

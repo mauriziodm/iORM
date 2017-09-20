@@ -40,8 +40,13 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
+{$IFDEF ioVCL}
+  Vcl.ActnList,
+{$ELSE}
+  FMX.ActnList,
+{$ENDIF}
   System.Rtti, iORM.MVVM.Interfaces,
-  System.Generics.Collections, System.Actions, System.Classes, System.UITypes,
+  System.Generics.Collections, System.Classes, System.UITypes,
   iORM.Attributes, iORM.CommonTypes;
 
 type
@@ -60,7 +65,7 @@ type
     procedure LoadCommands(const AOwner:TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
     procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
-    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TContainedAction; const AIsNotificationTarget:Boolean=False);
+    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
     procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
     procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
     procedure Unregister(const AOwner:TComponent);
@@ -68,6 +73,7 @@ type
     procedure Notify;
     procedure BindView(const AView:TComponent);
     procedure BindViewControl(const AControl:TObject; const ACommandName:String);
+    procedure UniBindViewCommands(const AView:TComponent; const AViewType:TRttiInstanceType);
     function Exist(const AName:String): Boolean;
     function Get(const AName:String; const ANoException:Boolean=False): IioCommandsContainerItem;
   end;
@@ -113,7 +119,7 @@ type
     function IsAction: Boolean; virtual;
     function IsMethod: Boolean; virtual;
     function IsAnonimousMethod: Boolean; virtual;
-    function AsAction: TContainedAction; virtual;
+    function AsAction: TAction; virtual;
     function AsMethod: TRttiMethod; virtual;
     function AsAnonimousMethod: TioCommandAnonimousMethod; virtual;
     property Owner:TObject read GetOwner write SetOwner;
@@ -127,7 +133,7 @@ type
     property IsNotificationTarget:Boolean read GetIsNotificationTarget write SetIsNotificationTarget;
   end;
 
-  TioCommandsContainerItemAction = class(TioCommandsContainerItem<TContainedAction>)
+  TioCommandsContainerItemAction = class(TioCommandsContainerItem<TAction>)
   strict private
     procedure BindActionEvent(const ACmdInfo: TioCommandInfo; const AMethodData:Pointer);
   strict protected
@@ -152,7 +158,7 @@ type
     procedure FillCommandInfo(const AOwner: TComponent; const ACmdInfo: TioCommandInfo); override;
     procedure Execute; override;
     function IsAction: Boolean; override;
-    function AsAction: TContainedAction; override;
+    function AsAction: TAction; override;
   end;
 
   TioCommandsContainerItemMethod = class(TioCommandsContainerItem<TRttiMethod>)
@@ -186,7 +192,7 @@ uses
 
 { TioVMNotifyItem<T> }
 
-function TioCommandsContainerItem<T>.AsAction: TContainedAction;
+function TioCommandsContainerItem<T>.AsAction: TAction;
 begin
   Result := nil;
 end;
@@ -454,7 +460,7 @@ begin
   Result := Self.Command.Visible;
 end;
 
-function TioCommandsContainerItemAction.AsAction: TContainedAction;
+function TioCommandsContainerItemAction.AsAction: TAction;
 begin
   inherited;
   Result := Command;
@@ -509,7 +515,8 @@ begin
   // If the internal action is not assigned then crate it
   if Self.IsEmpty then
   begin
-    Command := TContainedAction.Create(AOwner);
+//    Command := TAction.Create(AOwner);
+    Command := TAction.Create(AOwner);
     Command.Name := ACmdInfo.Name.Value;
   end;
   // Set the method as an action event handler
@@ -583,7 +590,7 @@ procedure TioCommandsContainer.BindViewControl(const AControl: TObject;
   const ACommandName: String);
 var
   LCommandItem: IioCommandsContainerItem;
-  LAction: TContainedAction;
+  LAction: TAction;
   LControlType: TRttiInstanceType;
   LControlActionProperty: TRttiProperty;
   AValue: TValue;
@@ -599,7 +606,7 @@ begin
   if not Assigned(LControlActionProperty) then
     EioException.Create(Self.ClassName + ': "Action" property not found.');
   // Bind the action
-  AValue := TValue.From<TBasicAction>(LAction);
+  AValue := TValue.From<TAction>(LAction);
   LControlActionProperty.SetValue(AControl, AValue);
 end;
 
@@ -625,6 +632,14 @@ begin
   LoadCommands(AView);
   // Retrieve the RttiType of the view
   LViewType := TioRttiContextFactory.RttiContext.GetType(AView.ClassType).AsInstance;
+  // Bind uniGUI controls
+  //  NB: Questo metodo è stato aggiunto (con il relativo attributo "ioUniBindAction" perchè
+  //       si è visto che nel caso delle TUniForm e TUniFrame gli attributi relativi ai campi
+  //       non vengono creati e quindi l'attributo "ioBindAction" era inefficace. Però
+  //       si era notato che invece gli attributi della classe (non del campo) venivano creati
+  //       e quindi si è aggiunto l'attributo "ioUniBindAction" da usare appunto sulla classe
+  //       invece che sul controllo.
+  UniBindViewCommands(AView, LViewType);
   // Loop for all fields searching "ioBindAction" attribute
   for LViewField in LViewType.GetFields do
     for LAttr in LViewField.GetAttributes do
@@ -731,17 +746,17 @@ var
   LField: TRttiField;
   LAttr: TCustomAttribute;
   LCmdItem: IioCommandsContainerItem;
-  LAction: TContainedAction;
+  LAction: TAction;
 begin
   // Loop for all fields searching actions
   for LField in TRttiInstanceType(ARttiElement).GetFields do
   begin
     if LField.FieldType.IsInstance
-    and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TContainedAction)
+    and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TAction)
     then
     begin
       // get the action
-      LAction := LField.GetValue(AOwner).AsType<TCOntainedAction>;
+      LAction := LField.GetValue(AOwner).AsType<TAction>;
       // Get or create the CommandsContainerItem and add it to the commands container
       LCmdItem := TioMVVMFactory.NewCommandsContainerItem(LAction.Name, LAction);
       LCmdItem.Owner := AOwner;
@@ -782,7 +797,7 @@ begin
 end;
 
 procedure TioCommandsContainer.RegisterAction(const AName: String;
-  const AOwner: TComponent; const AAction: TContainedAction;
+  const AOwner: TComponent; const AAction: TAction;
   const AIsNotificationTarget: Boolean);
 var
   LCmdItem: IioCommandsContainerItem;
@@ -815,6 +830,23 @@ begin
   LCmdItem.Owner := AOwner;
   LCmdItem.IsNotificationTarget := AIsNotificationTarget;
   Self.Add(AName, LCmdItem);
+end;
+
+procedure TioCommandsContainer.UniBindViewCommands(const AView:TComponent; const AViewType:TRttiInstanceType);
+var
+  LAttr: TCustomAttribute;
+  LComponent: TComponent;
+begin
+  for LAttr in AViewType.GetAttributes do
+  begin
+    if LAttr is ioUniBindAction then
+    begin
+      LComponent := AView.FindComponent(ioUniBindAction(LAttr).ControlName);
+      if not Assigned(LComponent) then
+        raise EioException.Create(Self.ClassName, 'UniBindViewCommands', Format('Component "%s" not found.', [ioUniBindAction(LAttr).ControlName]));
+      BindViewControl(LComponent, ioUniBindAction(LAttr).CommandName);
+    end;
+  end;
 end;
 
 procedure TioCommandsContainer.Unregister(const AOwner: TComponent);

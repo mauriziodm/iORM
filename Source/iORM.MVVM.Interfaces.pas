@@ -37,9 +37,16 @@ unit iORM.MVVM.Interfaces;
 
 interface
 
+{$I ioGlobalDef.inc}   // io global definitions
+
 uses
+{$IFDEF ioVCL}
+  Vcl.ActnList,
+{$ELSE}
+  FMX.ActnList,
+{$ENDIF}
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
-  System.Rtti, System.Actions, System.UITypes, iORM.CommonTypes,
+  System.Rtti, System.UITypes, iORM.CommonTypes,
   iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
   iORM.MVVM.Components.ModelPresenter;
 
@@ -103,7 +110,7 @@ type
     NotificationTarget: TioNullableBoolean;
     CommandType:        TioNullable<TioCommandType>;
     RttiMethod:         TioNullable<TRttiMethod>;
-    Action:             TioNullable<TContainedAction>;
+    Action:             TioNullable<TAction>;
     constructor Create(const ARttiElement:TRttiNamedObject);
   end;
 
@@ -115,7 +122,7 @@ type
     function IsAction: Boolean;
     function IsMethod: Boolean;
     function IsAnonimousMethod: Boolean;
-    function AsAction: TContainedAction;
+    function AsAction: TAction;
     function AsMethod: TRttiMethod;
     function AsAnonimousMethod: TioCommandAnonimousMethod;
     // Owner
@@ -163,7 +170,7 @@ type
     procedure LoadCommands(const AOwner:TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
     procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
-    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TContainedAction; const AIsNotificationTarget:Boolean=False);
+    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
     procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
     procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
     procedure Unregister(const AOwner:TComponent);
