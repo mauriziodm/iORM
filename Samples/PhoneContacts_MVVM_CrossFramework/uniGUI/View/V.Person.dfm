@@ -17,6 +17,9 @@ object ViewPerson: TViewPerson
     TabOrder = 0
     BorderStyle = ubsFrameLowered
     Caption = ''
+    DesignSize = (
+      451
+      47)
     object ButtonPost: TUniSpeedButton
       Left = 379
       Top = 2
@@ -46,12 +49,13 @@ object ViewPerson: TViewPerson
     object UniLabel6: TUniLabel
       Left = 78
       Top = 9
-      Width = 267
+      Width = 295
       Height = 30
       Hint = ''
       Alignment = taCenter
       AutoSize = False
       Caption = 'Edit person'
+      Anchors = [akLeft, akTop, akRight]
       ParentFont = False
       Font.Height = -21
       Font.Style = [fsBold]

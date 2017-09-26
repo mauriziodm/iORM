@@ -16,7 +16,10 @@ uses
   RegisterClassesUnit in '..\Commons\RegisterClassesUnit.pas',
   uniFormViewContext in 'uniFormViewContext.pas' {uniViewContextForm: TUniForm},
   V.Main in 'View\V.Main.pas' {ViewMain: TUniFrame},
-  V.Person in 'View\V.Person.pas' {ViewPerson: TUniFrame};
+  V.Person in 'View\V.Person.pas' {ViewPerson: TUniFrame},
+  V.Customer in 'View\V.Customer.pas' {ViewCustomer: TUniFrame},
+  V.VipCustomer in 'View\V.VipCustomer.pas' {ViewVipCustomer: TUniFrame},
+  V.Employee in 'View\V.Employee.pas' {ViewEmployee: TUniFrame};
 
 {$R *.res}
 
@@ -24,6 +27,7 @@ uses
 
 begin
   ReportMemoryLeaksOnShutdown := True;
+
   Application.Initialize;
   TUniServerModule.Create(Application);
   Application.Run;
