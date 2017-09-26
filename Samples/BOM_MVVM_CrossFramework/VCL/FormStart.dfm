@@ -110,20 +110,16 @@ object StartForm: TStartForm
     Top = 80
   end
   object WindowsVCProvider: TioViewContextProvider
-    ioOnRequest = WindowsVCProviderioOnRequest
-    ioOnRelease = WindowsVCProviderioOnRelease
+    OnRelease = WindowsVCProviderioOnRelease
+    OnRequest = WindowsVCProviderioOnRequest
     RegisterAsDefault = True
-    AutoParent = True
-    AutoOwner = True
     Left = 152
     Top = 136
   end
   object PagesVCProviders: TioViewContextProvider
-    ioOnRequest = PagesVCProvidersioOnRequest
-    ioOnRelease = PagesVCProvidersioOnRelease
+    OnRelease = PagesVCProvidersioOnRelease
+    OnRequest = PagesVCProvidersioOnRequest
     RegisterAsDefault = False
-    AutoParent = True
-    AutoOwner = True
     Left = 152
     Top = 192
   end

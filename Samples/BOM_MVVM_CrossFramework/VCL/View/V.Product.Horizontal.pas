@@ -57,6 +57,7 @@ begin
   inherited;
   TControl(AViewContext).Width := TControl(AView).Width;
   TControl(AView).Align := alClient;
+  ScrollBox1.HorzScrollBar.Range := ScrollBox1.HorzScrollBar.Range + TControl(AViewContext).Width;
 end;
 
 procedure TProductViewHorizontal.BOMVCProviderioOnRelease(const Sender: TObject;
@@ -75,7 +76,6 @@ begin
   LNewPanel := TPanel.Create(nil);
   LNewPanel.Parent := ScrollBox1;
   LNewPanel.Align := alLeft;
-  ScrollBox1.HorzScrollBar.Range := ScrollBox1.HorzScrollBar.Range + LNewPanel.Width;
   ResultViewContext := LNewPanel;
 end;
 

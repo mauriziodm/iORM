@@ -13,6 +13,7 @@ object ViewContextForm: TViewContextForm
   OldCreateOrder = False
   Position = poDesktopCenter
   Visible = True
+  OnClose = FormClose
   PixelsPerInch = 96
   TextHeight = 13
 end

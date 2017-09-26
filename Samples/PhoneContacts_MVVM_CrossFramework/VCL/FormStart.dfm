@@ -26,11 +26,9 @@ object StartForm: TStartForm
     Top = 88
   end
   object FormsVCProvider: TioViewContextProvider
-    ioOnRequest = FormsVCProviderioOnRequest
-    ioOnRelease = FormsVCProviderioOnRelease
+    OnRelease = FormsVCProviderRelease
+    OnRequest = FormsVCProviderioOnRequest
     RegisterAsDefault = True
-    AutoParent = True
-    AutoOwner = True
     Left = 152
     Top = 160
   end

@@ -47,24 +47,24 @@ inherited MicroProductView: TMicroProductView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        Height = 48
+        Height = 49
         Width = 65
         AnchorX = 33
-        AnchorY = 37
+        AnchorY = 38
       end
     end
     inherited PanelTime: TPanel
       inherited cxDBLabel5: TcxDBLabel
         Style.IsFontAssigned = True
         AnchorX = 33
-        AnchorY = 37
+        AnchorY = 38
       end
     end
     inherited PanelCost: TPanel
       inherited cxDBLabel3: TcxDBLabel
         Style.IsFontAssigned = True
         AnchorX = 33
-        AnchorY = 37
+        AnchorY = 38
       end
     end
     inherited Panel2: TPanel
@@ -94,10 +94,10 @@ inherited MicroProductView: TMicroProductView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        Height = 48
+        Height = 49
         Width = 65
         AnchorX = 33
-        AnchorY = 37
+        AnchorY = 38
       end
     end
   end

@@ -30,7 +30,7 @@ implementation
 
 uses
   uniGUIVars, MainModule, uniGUIApplication, uniFormViewContext, iORM,
-  V.Interfaces, VM.Interfaces, iORM.MVVM.ViewContextContainer;
+  V.Interfaces, VM.Interfaces;
 
 function MainForm: TMainForm;
 begin
@@ -52,7 +52,7 @@ end;
 procedure TMainForm.UniFormCreate(Sender: TObject);
 begin
   // Get the main view
-  io.di.LocateViewVM<IMainView, IPersonsViewModel>.SetViewContext(Self).Get;
+  io.di.LocateView<IMainView>.SetViewContext(Self).Show;
 end;
 
 initialization

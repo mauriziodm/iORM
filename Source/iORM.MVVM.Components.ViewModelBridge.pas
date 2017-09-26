@@ -14,16 +14,16 @@ type
   TioViewModelBridge = class (TComponent)
   private
     FViewModel: IioViewModel;
-    FViewID: Byte;
     FDI_VMAlias: String;
     FDI_VMInterface: String;
     FDI_VMMarker: String;
     // Events
     FOnNeedViewModel: TioNeedViewModelEvent;
     procedure AutoSetClientComponentsOnCreate;
-  protected
     procedure Loaded; override;
     procedure DoNeedViewModel;
+    // Commands
+    function GetCommands: IioCommandsContainer;
     // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
@@ -34,11 +34,13 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    class function ExtractVMBridge(const AView:TComponent): TioViewModelBridge;
     procedure CheckForViewModel;
     function ViewModelIsAssigned: Boolean;
     function ViewModelAs<T: IInterface>: T;
     // Properties
     property ViewModel:IioViewModel read GetViewModel;
+    property Commands:IioCommandsContainer read GetCommands;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand; default;
     property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
   published
@@ -121,12 +123,7 @@ end;
 
 destructor TioViewModelBridge.Destroy;
 begin
-  // ===========================================================================
-  // If the ViewModel is assigned then unbind the view
-  // ---------------------------------------------------------------------------
-  if Assigned(FViewModel) then
-    FViewModel.UnbindView(FViewID);
-  // ===========================================================================
+
   inherited;
 end;
 
@@ -136,6 +133,17 @@ begin
     FOnNeedViewModel(Self, FViewModel);
 end;
 
+class function TioViewModelBridge.ExtractVMBridge(
+  const AView: TComponent): TioViewModelBridge;
+var
+  I: Integer;
+begin
+  Result := nil;
+  for I := 0 to AView.ComponentCount-1 do
+    if AView.Components[I] is TioViewModelBridge then
+      Exit(TioViewModelBridge(AView.Components[I]));
+end;
+
 function TioViewModelBridge.GetCommand(
   const ACmdName: String): IioCommandsContainerItem;
 begin
@@ -143,6 +151,14 @@ begin
     Result := FViewModel.Command[ACmdName]
   else
     raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
+end;
+
+function TioViewModelBridge.GetCommands: IioCommandsContainer;
+begin
+  if Assigned(FViewModel) then
+    Result := FViewModel.Commands
+  else
+    raise EioException.Create(Self.Name, 'GetCommands', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetPresenter(
@@ -195,7 +211,7 @@ begin
   //  and register the view into the VMVoews container of the VM
   // ---------------------------------------------------------------------------
   if Assigned(FViewModel) then
-    FViewID := FViewModel.BindView(Self.Owner);
+    FViewModel.Commands.BindView(Self.Owner);
   // ===========================================================================
 end;
 

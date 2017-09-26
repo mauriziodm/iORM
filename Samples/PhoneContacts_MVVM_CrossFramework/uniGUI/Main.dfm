@@ -10,11 +10,9 @@ object MainForm: TMainForm
   PixelsPerInch = 96
   TextHeight = 13
   object FormsVCProvider: TioViewContextProvider
-    ioOnRequest = FormsVCProviderioOnRequest
-    ioOnRelease = FormsVCProviderioOnRelease
+    OnRelease = FormsVCProviderioOnRelease
+    OnRequest = FormsVCProviderioOnRequest
     RegisterAsDefault = True
-    AutoParent = True
-    AutoOwner = True
     Left = 152
     Top = 160
   end

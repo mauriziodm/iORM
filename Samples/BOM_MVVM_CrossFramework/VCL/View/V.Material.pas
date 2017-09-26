@@ -61,6 +61,7 @@ type
   public
     { Public declarations }
     constructor Create(AOwner:TComponent); override;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -73,6 +74,12 @@ constructor TMaterialView.Create(AOwner: TComponent);
 begin
   inherited;
   MDSArticle.Open;
+end;
+
+destructor TMaterialView.Destroy;
+begin
+
+  inherited;
 end;
 
 end.

@@ -17,7 +17,6 @@ object MicroMaterialView: TMicroMaterialView
     Color = 16768443
     ParentBackground = False
     TabOrder = 0
-    ExplicitHeight = 93
     object Panel1: TPanel
       Left = 0
       Top = 0
@@ -121,7 +120,6 @@ object MicroMaterialView: TMicroMaterialView
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitHeight = 61
     end
     object PanelProcessCost: TPanel
       Left = 323
@@ -133,7 +131,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 2
-      ExplicitHeight = 61
       object Label2: TLabel
         Left = 0
         Top = 0
@@ -142,6 +139,7 @@ object MicroMaterialView: TMicroMaterialView
         Align = alTop
         Alignment = taCenter
         Caption = 'Qty'
+        OnClick = Label2Click
         ExplicitWidth = 18
       end
       object cxDBSpinEdit1: TcxDBSpinEdit
@@ -182,7 +180,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 3
-      ExplicitHeight = 61
     end
     object PanelTime: TPanel
       Left = 65
@@ -194,7 +191,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 4
-      ExplicitHeight = 61
     end
     object PanelCost: TPanel
       Left = 0
@@ -206,7 +202,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 5
-      ExplicitHeight = 61
       object Label1: TLabel
         Left = 0
         Top = 0
@@ -233,7 +228,6 @@ object MicroMaterialView: TMicroMaterialView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        ExplicitHeight = 48
         Height = 49
         Width = 65
         AnchorX = 33
@@ -250,7 +244,6 @@ object MicroMaterialView: TMicroMaterialView
       ParentBackground = False
       ParentColor = True
       TabOrder = 6
-      ExplicitHeight = 61
     end
   end
   object MicroVMBridge: TioViewModelBridge

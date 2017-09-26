@@ -8,7 +8,7 @@ uses
 
 type
 
-//  [diImplements(IBOMItemVM)]
+  [diImplements(IBOMItemVM)]
   [diViewModelFor('TBOMItemMaterial')]
   [diViewModelFor('TBOMItemProcess')]
   [diViewModelFor('TBOMItemProduct')]
@@ -26,6 +26,9 @@ type
     procedure acPostExecute(Sender: TObject);
     [ioAction('acPost', OnUpdate)]
     procedure acPostUpdate(Sender: TObject);
+
+    [ioAction('acClose', OnExecute)]
+    procedure acCloseExecute(Sender: TObject);
   end;
 
 implementation
@@ -39,6 +42,11 @@ uses
 {$R *.dfm}
 
 { TBOMItemVM }
+
+procedure TBOMItemVM.acCloseExecute(Sender: TObject);
+begin
+  FreeViews;
+end;
 
 procedure TBOMItemVM.acEditArticleExecute(Sender: TObject);
 //var

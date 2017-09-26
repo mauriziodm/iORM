@@ -165,9 +165,6 @@ contains
   iORM.REST.Factory in '..\..\Source\iORM.REST.Factory.pas',
   ObjectsMappers in '..\..\ExtLibs\ObjMapper\ObjectsMappers.pas',
   iORM.MVVM.Components.ViewContextProvider in '..\..\Source\iORM.MVVM.Components.ViewContextProvider.pas',
-  iORM.MVVM.ViewContextContainer in '..\..\Source\iORM.MVVM.ViewContextContainer.pas',
-  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
-  iORM.MVVM.ViewModel.Views in '..\..\Source\iORM.MVVM.ViewModel.Views.pas',
   iORM.DB.Components.ConnectionDef in '..\..\Source\iORM.DB.Components.ConnectionDef.pas',
   iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas',
   iORM.MVVM.Components.ViewModelBridge in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas',
@@ -177,6 +174,9 @@ contains
   iORM.DB.Components.DataSet.Base in '..\..\Source\iORM.DB.Components.DataSet.Base.pas',
   iORM.DB.Components.DataSet.ModelDataSet in '..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas',
   iORM.Components.Common.Interfaces in '..\..\Source\iORM.Components.Common.Interfaces.pas',
-  iORM.LiveBindings.BSAToDataSetLink in '..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas';
+  iORM.LiveBindings.BSAToDataSetLink in '..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas',
+  iORM.MVVM.ViewContextRegister in '..\..\Source\iORM.MVVM.ViewContextRegister.pas',
+  iORM.MVVM.ViewContextRegisterItem in '..\..\Source\iORM.MVVM.ViewContextRegisterItem.pas',
+  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas';
 
 end.

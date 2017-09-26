@@ -53,8 +53,7 @@ type
 
   TioMVVMFactory = class
   public
-    class function VMViews: IioVMViews;
-    // ViewModel notify container
+    class function NewViewRegister: IioViewRegister;
     class function NewCommandsContainer(const AOwner:TComponent): IioCommandsContainer;
     class function NewCommandsContainerItem(const AName:String; const ACommandType:TioCommandType): IioCommandsContainerItem; overload;
     class function NewCommandsContainerItem(const AName:String; const AAction:TAction): IioCommandsContainerItem; overload;
@@ -66,7 +65,7 @@ implementation
 
 uses
   iORM.MVVM.Commands, System.SysUtils,
-  iORM.Exceptions, iORM.MVVM.ViewModel.Views;
+  iORM.Exceptions, iORM.MVVM.ViewContextRegister;
 
 { TioMVVMFactory }
 
@@ -92,11 +91,6 @@ begin
   Result := TioCommandsContainerItemAction.Create(AName, AAction);
 end;
 
-class function TioMVVMFactory.VMViews: IioVMViews;
-begin
-  Result := TioVMViews.Create;
-end;
-
 class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioCommandsContainer;
 begin
   Result := TioCommandsContainer.Create(AOwner);
@@ -106,6 +100,11 @@ class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
   const AAnonimousMethod: TioCommandAnonimousMethod): IioCommandsContainerItem;
 begin
   Result := TioCommandsContainerItemAnonimousMethod.Create(AName, AAnonimousMethod);
+end;
+
+class function TioMVVMFactory.NewViewRegister: IioViewRegister;
+begin
+  Result := TioViewRegister.Create;
 end;
 
 class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;

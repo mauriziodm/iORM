@@ -26,11 +26,11 @@ type
     procedure TabsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure TabsVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
+      out ResultViewContext: TComponent);
     procedure FormsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure FormsVCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
+      out ResultViewContext: TComponent);
     procedure TabsVCProviderioOnAfterRequest(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure SQLiteConnAfterRegister(Sender: TObject);
@@ -47,7 +47,7 @@ implementation
 
 uses
   FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData, FWait,
-  VM.Interfaces;
+  VM.Interfaces, Vcl.Controls;
 
 {$R *.fmx}
 
@@ -71,7 +71,6 @@ begin
   Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
   TStyleManager.SetStyle(Style);
   // Get the main view
-//  io.di.LocateView<IMainView, IPersonsViewModel>.Get;
   io.di.LocateView<IMainView>.Show;
 end;
 
@@ -82,7 +81,7 @@ begin
 end;
 
 procedure TStartForm.FormsVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   ResultViewContext := TViewContextForm.Create(Self);
 end;
@@ -105,6 +104,7 @@ end;
 procedure TStartForm.TabsVCProviderioOnAfterRequest(const Sender: TObject;
   const AView, AViewContext: TComponent);
 begin
+  (AView as TFrame).Align := TAlignLayout.Client;
   NextTabAction1.Execute;
 end;
 
@@ -116,7 +116,7 @@ begin
 end;
 
 procedure TStartForm.TabsVCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   ResultViewContext := MainTabControl.Add;
 end;

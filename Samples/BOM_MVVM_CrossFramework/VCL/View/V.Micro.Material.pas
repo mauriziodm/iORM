@@ -27,7 +27,7 @@ uses
 
 type
 
-//  [diImplements(IMicroArticleView, 'TBOMItemMaterial')]
+  [diImplements(IMicroArticleView, 'TBOMItemMaterial')]
   [diViewFor('TBOMItemMaterial')]
   TMicroMaterialView = class(TFrame, IMicroArticleView)
 
@@ -61,6 +61,7 @@ type
     Label2: TLabel;
     cxDBSpinEdit1: TcxDBSpinEdit;
     cxDBLabel4: TcxDBLabel;
+    procedure Label2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -79,6 +80,11 @@ begin
   inherited;
   MDSItem.Open;
   MDSArticle.Open;
+end;
+
+procedure TMicroMaterialView.Label2Click(Sender: TObject);
+begin
+  MicroVMBridge.Command['acClose'].Execute;
 end;
 
 end.

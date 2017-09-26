@@ -46,7 +46,6 @@ type
       out ResultViewContext: TComponent);
   private
     { Private declarations }
-    FStartUp: Boolean;
   public
     { Public declarations }
   end;
@@ -58,7 +57,7 @@ implementation
 
 uses
  U.SampleData, FormViewContext, iORM, V.Interfaces, V.ArticleList, V.Product,
- V.Product.Vertical, V.Product.Horizontal;
+ V.Product.Vertical, V.Product.Horizontal, VM.Interfaces;
 
 {$R *.dfm}
 
@@ -78,9 +77,7 @@ begin
   // Set the default ProductDetail layout
   cxRadioGroupProductsPropertiesChange(ProductDetailLayout);
   // Get the main view
-  FStartUp := True;
-  io.di.LocateView<IArticleListView>.Show;
-  FStartUp := False;
+  io.di.LocateView<IArticleListView>.SetViewContext(Self).Show;
 end;
 
 procedure TStartForm.PagesVCProvidersioOnRelease(const Sender: TObject;
@@ -123,10 +120,7 @@ end;
 procedure TStartForm.WindowsVCProviderioOnRequest(const Sender: TObject;
   out ResultViewContext: TComponent);
 begin
-  if FStartUp then
-    ResultViewContext := Self
-  else
-    ResultViewContext := TViewContextForm.Create(Self);
+  ResultViewContext := TViewContextForm.Create(Self);
 end;
 
 end.

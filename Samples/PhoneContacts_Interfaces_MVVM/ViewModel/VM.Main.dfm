@@ -62,6 +62,7 @@ inherited ViewModelMain: TViewModelMain
     Top = 136
   end
   object PersonsModelPresenter: TioModelPresenter
+    AsDefault = True
     Async = True
     AutoLoadData = True
     AutoPersist = False
@@ -73,6 +74,7 @@ inherited ViewModelMain: TViewModelMain
     Top = 24
   end
   object PhonesModelPresenter: TioModelPresenter
+    AsDefault = False
     Async = True
     AutoLoadData = True
     AutoPersist = True

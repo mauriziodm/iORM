@@ -41,7 +41,8 @@ uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces, System.Classes;
+  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces, System.Classes,
+  System.SysUtils;
 
 type
 
@@ -91,7 +92,7 @@ type
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
-    function SetViewContext(const AViewContext: TComponent): IioDependencyInjectionLocator;
+    function SetViewContext(const AViewContext:TComponent; const AViewContextFreeMethod:TProc=nil): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
 
@@ -120,14 +121,14 @@ type
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
     function VCProvider(const AName:String): IioDependencyInjectionLocator<TI>; overload;
-    function SetViewContext(const AViewContext: TComponent): IioDependencyInjectionLocator<TI>;
+    function SetViewContext(const AViewContext:TComponent; const AViewContextFreeMethod:TProc=nil): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.Rtti.Utilities;
+  iORM.Rtti.Utilities;
 
 { TioDILocatorDestination }
 

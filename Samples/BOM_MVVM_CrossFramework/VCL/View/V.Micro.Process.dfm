@@ -1,7 +1,4 @@
 inherited MicroProcessView: TMicroProcessView
-  DesignSize = (
-    451
-    305)
   inherited ClientArea: TPanel
     inherited Panel1: TPanel
       inherited cxDBLabel2: TcxDBLabel
@@ -50,17 +47,17 @@ inherited MicroProcessView: TMicroProcessView
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         Transparent = True
-        Height = 48
+        Height = 49
         Width = 65
         AnchorX = 33
-        AnchorY = 37
+        AnchorY = 38
       end
     end
     inherited PanelCost: TPanel
       inherited cxDBLabel3: TcxDBLabel
         Style.IsFontAssigned = True
         AnchorX = 33
-        AnchorY = 37
+        AnchorY = 38
       end
     end
   end

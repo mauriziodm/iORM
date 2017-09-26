@@ -48,7 +48,8 @@ uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.UITypes, iORM.CommonTypes,
   iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter;
+  iORM.MVVM.Components.ModelPresenter, iORM.MVVM.ViewContextRegisterItem,
+  System.SysUtils;
 
 type
 
@@ -61,12 +62,14 @@ type
 
   IioCommandsContainer = interface;
   IioCommandsContainerItem = interface;
+  IioViewRegister = interface;
 
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    procedure UnbindView(const AViewID:Byte);
-    function BindView(const AView:TComponent): Byte;
     function Commands: IioCommandsContainer;
+    procedure RegisterView(const AView, AViewContext: TComponent;
+      const AViewContextProvider:TioViewContextProvider;
+      const AViewContextFreeMethod:TProc);
     // Command
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
@@ -79,15 +82,16 @@ type
     property DefaultPresenter:TioModelPresenter read GetDefaultPresenter;
   end;
 
-  TioVMViewsInternalContainer = TDictionary<Integer,TComponent>;
-  IioVMViews = interface
-    ['{0F35C859-695B-424A-99B3-B54CC54C2863}']
-    function RegisterView(const AView:TComponent): Byte;
-    procedure UnregisterView(const AViewID:Byte);
-    procedure ReleaseViewContext(const AViewID:Byte);
+  IioViewRegister = interface
+    ['{7E0B50E8-B561-44E2-A8A0-6A13CA563875}']
+    procedure Add(const AView, AViewContext: TComponent;
+      const AViewContextProvider:TioViewContextProvider;
+      const AViewContextFreeMethod:TProc);
     procedure ReleaseAllViewContexts;
-    function FindVCProvider(const AName:String=''): TioViewContextProvider;
-    function _InternalContainer: TioVMViewsInternalContainer;
+    function GetItemByView(const AView: TComponent): TioViewContextRegisterItem;
+    function GetItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
+    property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
+    property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
   end;
 
   // Reference to an anonimous method called by a ViewModel when it need
@@ -183,9 +187,6 @@ type
   end;
 
 implementation
-
-uses
-  System.SysUtils;
 
 { TioCommandInfo }
 

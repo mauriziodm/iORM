@@ -43,7 +43,7 @@ uses
   System.Classes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
   iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter;
+  iORM.MVVM.Components.ModelPresenter, System.SysUtils;
 
 type
 
@@ -51,7 +51,7 @@ type
   private
     { Private declarations }
     FCommands: IioCommandsContainer;
-    FViews: IioVMViews;  // Per ora la lascio nascosta, deciderò poi se renderla pubblica (Solo RegisterView è pubblico come metodo del ViewModel).
+    FViewRegister: IioViewRegister;
   protected
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
@@ -73,9 +73,9 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function Commands: IioCommandsContainer;
-    function BindView(const AView:TComponent): Byte;
-    function LocalVCProvider(const AName:String=''; const AGlobalIfNotFound:Boolean=True): TioViewContextProvider;
-    procedure UnbindView(const AViewID:Byte);
+    procedure RegisterView(const AView, AViewContext: TComponent;
+      const AViewContextProvider:TioViewContextProvider;
+      const AViewContextFreeMethod:TProc);
     procedure FreeViews;
     procedure TerminateApplication;
 // ---------------- Start: section added for IInterface support ---------------
@@ -102,7 +102,7 @@ implementation
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
-uses System.SysUtils, iORM.Exceptions, iORM.RttiContext.Factory,
+uses iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.MVVM.Factory, Data.Bind.ObjectScope,
   iORM.LiveBindings.Factory, iORM;
 
@@ -176,12 +176,11 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-function TioViewModel.BindView(const AView: TComponent): Byte;
+procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent;
+  const AViewContextProvider: TioViewContextProvider;
+  const AViewContextFreeMethod: TProc);
 begin
-  // Register view into the ViewsContainer of the VM
-  Result := FViews.RegisterView(AView);
-  // Bind the view to che commands of the VM
-  FCommands.BindView(AView);
+  FViewRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
 end;
 
 procedure TioViewModel.SetCommand(const ACmdName: String;
@@ -193,11 +192,6 @@ end;
 procedure TioViewModel.TerminateApplication;
 begin
   io.TerminateApplication;
-end;
-
-procedure TioViewModel.UnbindView(const AViewID:Byte);
-begin
-  FViews.UnregisterView(AViewID);
 end;
 
 function TioViewModel._AddRef: Integer;
@@ -220,14 +214,6 @@ begin
 {$ENDIF}
 end;
 
-function TioViewModel.LocalVCProvider(const AName: String;
-  const AGlobalIfNotFound: Boolean): TioViewContextProvider;
-begin
-  Result := nil;
-  // Find local view context providers
-  Result := FViews.FindVCProvider(AName);
-end;
-
 function TioViewModel.Commands: IioCommandsContainer;
 begin
   Result := FCommands;
@@ -238,7 +224,7 @@ begin
   inherited;
   // Init
   FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
-  FViews := TioMVVMFactory.VMViews;
+  FViewRegister := TioMVVMFactory.NewViewRegister;
 end;
 
 destructor TioViewModel.Destroy;
@@ -249,7 +235,7 @@ end;
 
 procedure TioViewModel.FreeViews;
 begin
-  FViews.ReleaseAllViewContexts;
+  FViewRegister.ReleaseAllViewContexts;
 end;
 
 end.

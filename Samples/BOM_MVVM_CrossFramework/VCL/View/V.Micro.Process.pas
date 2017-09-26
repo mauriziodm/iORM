@@ -27,7 +27,7 @@ uses
 
 type
 
-//  [diImplements(IMicroArticleView, 'TBOMItemProcess')]
+  [diImplements(IMicroArticleView, 'TBOMItemProcess')]
   [diViewFor('TBOMItemProcess')]
   TMicroProcessView = class(TMicroMaterialView, IMicroArticleView)
     cxDBLabel5: TcxDBLabel;

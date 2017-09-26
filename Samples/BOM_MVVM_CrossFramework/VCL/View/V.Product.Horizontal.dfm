@@ -70,12 +70,10 @@ inherited ProductViewHorizontal: TProductViewHorizontal
     TabOrder = 15
   end
   object BOMVCProvider: TioViewContextProvider
-    ioOnRequest = BOMVCProviderioOnRequest
-    ioOnAfterRequest = BOMVCProviderioOnAfterRequest
-    ioOnRelease = BOMVCProviderioOnRelease
+    OnAfterRequest = BOMVCProviderioOnAfterRequest
+    OnRelease = BOMVCProviderioOnRelease
+    OnRequest = BOMVCProviderioOnRequest
     RegisterAsDefault = False
-    AutoParent = True
-    AutoOwner = True
     Left = 306
     Top = 44
   end

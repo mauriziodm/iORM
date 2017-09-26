@@ -49,36 +49,43 @@ type
 
   TioViewContextProvider = class(TComponent)
   private
+    // Fields
     FRegisterAsDefault: Boolean;
-    FOnRequest: TioRequestViewContextEvent;
+    // Events
+    FOnAfterRelease: TNotifyEvent;
     FOnAfterRequest: TioViewContextEvent;
+    FOnBeforeRequest: TNotifyEvent;
+    FOnBeforeRelease: TioViewContextEvent;
     FOnRelease: TioViewContextEvent;
-    FAutoParent: Boolean;
-    FAutoOwner: Boolean;
+    FOnRequest: TioRequestViewContextEvent;
+    // Methods
     function GetRegisterAsDefault: Boolean;
     procedure SetRegisterAsDefault(const Value: Boolean);
-    procedure DoOnRequest(out ResultViewContext:TComponent);
+    procedure DoOnAfterRelease;
+    procedure DoOnBeforeRequest;
+    procedure DoOnBeforeRelease(const AView, AViewContext:TComponent);
     procedure DoOnRelease(const AView, AViewContext:TComponent);
+    procedure DoOnRequest(out ResultViewContext:TComponent);
   protected
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    class function ExtractViewContext(const AView:TComponent; const ARaiseExceptionIfViewContextNotExist:Boolean=True): TComponent;
     procedure DoOnAfterRequest(const AView, AViewContext:TComponent);
     function NewViewContext: TComponent;
-    procedure ReleaseViewContext(const AView:TComponent);
+    procedure ReleaseViewContext(const AView, AViewContext:TComponent);
     function IsDefault: Boolean;
     procedure SetAsDefault;
   published
     // Events
-    property ioOnRequest:TioRequestViewContextEvent read FOnRequest write FOnRequest;
-    property ioOnAfterRequest:TioViewContextEvent read FOnAfterRequest write FOnAfterRequest;
-    property ioOnRelease:TioViewContextEvent read FOnRelease write FOnRelease;
+    property OnAfterRelease:TNotifyEvent read FOnAfterRelease write FOnAfterRelease;
+    property OnAfterRequest:TioViewContextEvent read FOnAfterRequest write FOnAfterRequest;
+    property OnBeforeRequest:TNotifyEvent read FOnBeforeRequest write FOnBeforeRequest;
+    property OnBeforeRelease:TioViewContextEvent read FOnBeforeRelease write FOnBeforeRelease;
+    property OnRelease:TioViewContextEvent read FOnRelease write FOnRelease;
+    property OnRequest:TioRequestViewContextEvent read FOnRequest write FOnRequest;
     // Properties
     property RegisterAsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
-    property AutoParent:Boolean read FAutoParent write FAutoParent;
-    property AutoOwner:Boolean read FAutoOwner write FAutoOwner;
   end;
 
 implementation
@@ -91,7 +98,6 @@ uses
     Fmx.Controls,
   {$ENDIF}
   iORM.Exceptions,
-  iORM.MVVM.ViewContextContainer,
   iORM.MVVM.ViewContextProviderContainer, iORM.Rtti.Utilities;
 
 { TioViewContextProvider }
@@ -101,11 +107,7 @@ begin
   inherited;
   // Default values at design time
   if (csDesigning in ComponentState) then
-  begin
     FRegisterAsDefault := True;
-    FAutoParent := True;
-    FAutoOwner := True;
-  end;
 end;
 
 destructor TioViewContextProvider.Destroy;
@@ -114,11 +116,30 @@ begin
   inherited;
 end;
 
+procedure TioViewContextProvider.DoOnAfterRelease;
+begin
+  if Assigned(FOnAfterRelease) then
+    FOnAfterRelease(Self);
+end;
+
 procedure TioViewContextProvider.DoOnAfterRequest(const AView,
   AViewContext: TComponent);
 begin
   if Assigned(FOnAfterRequest) then
     FOnAfterRequest(Self, AView, AViewContext);
+end;
+
+procedure TioViewContextProvider.DoOnBeforeRelease(const AView,
+  AViewContext: TComponent);
+begin
+  if Assigned(FOnBeforeRelease) then
+    FOnBeforeRelease(Self, AView, AViewContext);
+end;
+
+procedure TioViewContextProvider.DoOnBeforeRequest;
+begin
+  if Assigned(FOnBeforeRequest) then
+    FOnBeforeRequest(Self);
 end;
 
 procedure TioViewContextProvider.DoOnRelease(const AView,
@@ -134,15 +155,6 @@ begin
     FOnRequest(Self, ResultViewContext);
 end;
 
-class function TioViewContextProvider.ExtractViewContext(
-  const AView: TComponent; const ARaiseExceptionIfViewContextNotExist:Boolean): TComponent;
-begin
-  Result := nil;
-  if ARaiseExceptionIfViewContextNotExist and not AView.HasParent then
-    raise EioException.Create(Self.ClassName + '.ReleaseViewContext: The view has no parent component.');
-  Result := AView.GetParentComponent
-end;
-
 function TioViewContextProvider.IsDefault: Boolean;
 begin
   Result := TioRttiUtilities.SameObject(Self, TioViewContextProviderContainer.GetProvider);
@@ -156,7 +168,9 @@ end;
 function TioViewContextProvider.NewViewContext: TComponent;
 begin
   Result := nil;
+  DoOnBeforeRequest;
   DoOnRequest(Result);
+  // DoOnAfterRequest is called from inside the TioDependencyInjectionLocator._Get method
 end;
 
 procedure TioViewContextProvider.Loaded;
@@ -168,14 +182,17 @@ begin
     TioViewContextProviderContainer.RegisterProvider(Self);
 end;
 
-procedure TioViewContextProvider.ReleaseViewContext(const AView: TComponent);
-var
-  LViewContext: TComponent;
+procedure TioViewContextProvider.ReleaseViewContext(const AView, AViewContext: TComponent);
 begin
-  // Extract the ViewContext from the View
-  LViewContext := ExtractViewContext(AView);
   // Event handler call
-  DoOnRelease(AView, LViewContext);
+  // NB: Not fire some event handlers if the ViewContext es already
+  //      being destroyed
+  if not (csDestroying in AViewContext.ComponentState) then
+  begin
+    DoOnBeforeRelease(AView, AViewContext);
+    DoOnRelease(AView, AViewContext);
+  end;
+  DoOnAfterRelease;
 end;
 
 procedure TioViewContextProvider.SetAsDefault;

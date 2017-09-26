@@ -29,12 +29,10 @@ object StartForm: TStartForm
     Top = 80
   end
   object VCProviderMaster: TioViewContextProvider
-    ioOnRequest = VCProviderMasterioOnRequest
-    ioOnAfterRequest = VCProviderMasterioOnAfterRequest
-    ioOnRelease = VCProviderMasterioOnRelease
+    OnAfterRequest = VCProviderMasterioOnAfterRequest
+    OnRelease = VCProviderMasterioOnRelease
+    OnRequest = VCProviderMasterioOnRequest
     RegisterAsDefault = True
-    AutoParent = True
-    AutoOwner = True
     Left = 152
     Top = 136
   end

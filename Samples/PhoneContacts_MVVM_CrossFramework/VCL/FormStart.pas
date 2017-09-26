@@ -13,10 +13,9 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     FormsVCProvider: TioViewContextProvider;
     procedure FormCreate(Sender: TObject);
-    procedure Exit1Click(Sender: TObject);
     procedure FormsVCProviderioOnRequest(const Sender: TObject;
       out ResultViewContext: TComponent);
-    procedure FormsVCProviderioOnRelease(const Sender: TObject; const AView,
+    procedure FormsVCProviderRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
   private
     { Private declarations }
@@ -34,27 +33,22 @@ uses
 
 {$R *.dfm}
 
-procedure TStartForm.Exit1Click(Sender: TObject);
-begin
-  Application.Terminate;
-end;
-
 procedure TStartForm.FormCreate(Sender: TObject);
 begin
   // Get the main view
   io.di.LocateViewVM<IMainView, IPersonsViewModel>.SetViewContext(Self).Show;
 end;
 
-procedure TStartForm.FormsVCProviderioOnRelease(const Sender: TObject;
-  const AView, AViewContext: TComponent);
-begin
-  AViewContext.Free;
-end;
-
 procedure TStartForm.FormsVCProviderioOnRequest(const Sender: TObject;
   out ResultViewContext: TComponent);
 begin
   ResultViewContext := TViewContextForm.Create(Self);
+end;
+
+procedure TStartForm.FormsVCProviderRelease(const Sender: TObject; const AView,
+  AViewContext: TComponent);
+begin
+  AViewContext.Free;
 end;
 
 end.
