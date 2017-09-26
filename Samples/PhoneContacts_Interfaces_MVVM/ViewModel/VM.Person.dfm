@@ -3,6 +3,7 @@ inherited PersonViewModel: TPersonViewModel
   Height = 468
   Width = 496
   object PersonModelPresenter: TioModelPresenter
+    AsDefault = True
     Async = True
     AutoLoadData = True
     AutoPersist = True
@@ -14,6 +15,7 @@ inherited PersonViewModel: TPersonViewModel
     Top = 24
   end
   object PhonesModelPresenter: TioModelPresenter
+    AsDefault = False
     Async = True
     AutoLoadData = True
     AutoPersist = True

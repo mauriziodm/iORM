@@ -47,7 +47,7 @@ end;
 
 procedure TStartForm.SQLIteConnAfterRegister(Sender: TObject);
 begin
-//  TSampleData.CheckForSampleData;
+  TSampleData.CheckForSampleData;
 end;
 
 procedure TStartForm.VCProviderMasterioOnAfterRequest(const Sender: TObject;

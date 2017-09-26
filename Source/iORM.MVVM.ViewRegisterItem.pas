@@ -1,4 +1,4 @@
-unit iORM.MVVM.ViewContextRegisterItem;
+unit iORM.MVVM.ViewRegisterItem;
 
 interface
 

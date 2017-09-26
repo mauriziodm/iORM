@@ -747,16 +747,19 @@ var
   LAttr: TCustomAttribute;
   LCmdItem: IioCommandsContainerItem;
   LAction: TAction;
+  LObj: TObject;
 begin
   // Loop for all fields searching actions
   for LField in TRttiInstanceType(ARttiElement).GetFields do
   begin
     if LField.FieldType.IsInstance
-    and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TAction)
+    and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TBasicAction)
     then
     begin
       // get the action
-      LAction := LField.GetValue(AOwner).AsType<TAction>;
+//      LAction := LField.GetValue(AOwner).AsType<TAction>;
+      LObj := LField.GetValue(AOwner).AsObject;
+      LAction := LObj as TAction;
       // Get or create the CommandsContainerItem and add it to the commands container
       LCmdItem := TioMVVMFactory.NewCommandsContainerItem(LAction.Name, LAction);
       LCmdItem.Owner := AOwner;

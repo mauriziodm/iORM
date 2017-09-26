@@ -65,7 +65,7 @@ implementation
 
 uses
   iORM.MVVM.Commands, System.SysUtils,
-  iORM.Exceptions, iORM.MVVM.ViewContextRegister;
+  iORM.Exceptions, iORM.MVVM.ViewRegister;
 
 { TioMVVMFactory }
 

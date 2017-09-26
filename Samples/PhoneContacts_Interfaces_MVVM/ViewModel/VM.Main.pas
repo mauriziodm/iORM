@@ -3,13 +3,17 @@ unit VM.Main;
 interface
 
 uses
-  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase, System.Actions,
-  FMX.ActnList, FMX.Types, iORM.Attributes, Vcl.ActnList, Vcl.Dialogs,
-  VM.Interfaces, iORM.MVVM.Components.ModelPresenter;
+  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
+  FMX.Types, iORM.Attributes, VM.Interfaces, iORM.MVVM.Components.ModelPresenter,
+  FMX.Dialogs, FMX.ActnList, System.Actions;
 
 type
   [diImplements(IPersonsViewModel)]
   TViewModelMain = class(TioViewModel, IPersonsViewModel)
+    PersonsModelPresenter: TioModelPresenter;
+    PhonesModelPresenter: TioModelPresenter;
+    OpenDialog1: TOpenDialog;
+    SaveDialog1: TSaveDialog;
     ActionList1: TActionList;
     acLoadData: TAction;
     acClearData: TAction;
@@ -19,12 +23,8 @@ type
     acSaveJSONtoFile: TAction;
     acLoadJSONfromFile: TAction;
     acEditPerson: TAction;
-    OpenDialog1: TOpenDialog;
-    SaveDialog1: TSaveDialog;
     acTerminate: TAction;
     acRefresh: TAction;
-    PersonsModelPresenter: TioModelPresenter;
-    PhonesModelPresenter: TioModelPresenter;
     procedure acClearDataExecute(Sender: TObject);
     procedure acClearDataUpdate(Sender: TObject);
     procedure acLoadDataExecute(Sender: TObject);
@@ -58,11 +58,11 @@ type
 
 implementation
 
-uses
-  iORM, RegisterClassesUnit, System.JSON, FMX.Forms, FMX.Dialogs,
-  System.UITypes, V.Interfaces, iORM.MVVM.Interfaces, VM.Person;
-
 {%CLASSGROUP 'FMX.Controls.TControl'}
+
+uses
+  iORM, RegisterClassesUnit, System.JSON, FMX.Forms,
+  System.UITypes, V.Interfaces, iORM.MVVM.Interfaces, VM.Person;
 
 {$R *.dfm}
 
@@ -76,7 +76,7 @@ end;
 procedure TViewModelMain.acClearDataUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := Self.DataPresent;
+  (Sender as TAction).Enabled := Self.DataPresent;
 end;
 
 procedure TViewModelMain.acClearJSONExecute(Sender: TObject);
@@ -88,7 +88,7 @@ end;
 procedure TViewModelMain.acClearJSONUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := Self.JSONPresent;
+  (Sender as TAction).Enabled := Self.JSONPresent;
 end;
 
 procedure TViewModelMain.acLoadDataExecute(Sender: TObject);
@@ -105,7 +105,7 @@ end;
 procedure TViewModelMain.acLoadDataUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := not Self.DataPresent;
+  (Sender as TAction).Enabled := not Self.DataPresent;
 end;
 
 procedure TViewModelMain.acLoadJSONfromFileExecute(Sender: TObject);
@@ -128,7 +128,7 @@ end;
 procedure TViewModelMain.acLoadJSONfromFileUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := not Self.JSONPresent;
+  (Sender as TAction).Enabled := not Self.JSONPresent;
 end;
 
 procedure TViewModelMain.acRefreshExecute(Sender: TObject);
@@ -141,7 +141,7 @@ end;
 procedure TViewModelMain.acRefreshUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := Self.DataPresent;
+  (Sender as TAction).Enabled := Self.DataPresent;
 end;
 
 procedure TViewModelMain.acSaveJSONtoFileExecute(Sender: TObject);
@@ -173,7 +173,7 @@ end;
 procedure TViewModelMain.acDeserializeFromJSONUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := (Self.JSONPresent and not Self.DataPresent);
+  (Sender as TAction).Enabled := (Self.JSONPresent and not Self.DataPresent);
 end;
 
 procedure TViewModelMain.acEditPersonExecute(Sender: TObject);
@@ -184,10 +184,9 @@ begin
   // Get the class name of the current person
   LCurrentClassName := PersonsModelPresenter.Current.ClassName;
   // Get the View and ViewModel
-//  io.di.LocateView<IPersonView, IPersonViewModel>(LCurrentClassName)
-  io.di.LocateView<IPersonView>(LCurrentClassName)
+  io.di.LocateViewVM<IPersonView, IPersonViewModel>(LCurrentClassName)
     .SetPresenter('PersonModelPresenter', PersonsModelPresenter)
-    .Get;
+    .Show;
 end;
 
 procedure TViewModelMain.acSerializeToJSONExecute(Sender: TObject);
@@ -207,13 +206,13 @@ end;
 procedure TViewModelMain.acSerializeToJSONUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TCOntainedAction).Enabled := (Self.DataPresent and not Self.JSONPresent);
+  (Sender as TAction).Enabled := (Self.DataPresent and not Self.JSONPresent);
 end;
 
 procedure TViewModelMain.acTerminateExecute(Sender: TObject);
 begin
   inherited;
-  if FMX.Dialogs.MessageDlg('Close the application?', mtConfirmation, [mbOK, mbAbort], 0, mbOk) = mrOk then
+  if FMX.Dialogs.MessageDlg('Close the application?', TMsgDlgType.mtConfirmation, [System.UITypes.TMsgDlgBtn.mbOK, System.UITypes.TMsgDlgBtn.mbAbort], 0, System.UITypes.TMsgDlgBtn.mbOk) = mrOk then
     Application.Terminate;
 end;
 

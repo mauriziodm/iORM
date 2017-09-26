@@ -48,7 +48,7 @@ uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.UITypes, iORM.CommonTypes,
   iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, iORM.MVVM.ViewContextRegisterItem,
+  iORM.MVVM.Components.ModelPresenter, iORM.MVVM.ViewRegisterItem,
   System.SysUtils;
 
 type

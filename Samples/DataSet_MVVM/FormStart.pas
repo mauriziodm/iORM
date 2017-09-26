@@ -18,7 +18,7 @@ type
     procedure VCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure VCProviderioOnRequest(const Sender: TObject;
-      const AView: TComponent; out ResultViewContext: TComponent);
+      out ResultViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -53,7 +53,7 @@ begin
 end;
 
 procedure TStartForm.VCProviderioOnRequest(const Sender: TObject;
-  const AView: TComponent; out ResultViewContext: TComponent);
+  out ResultViewContext: TComponent);
 begin
   ResultViewContext := TViewContextForm.Create(Self);
 end;

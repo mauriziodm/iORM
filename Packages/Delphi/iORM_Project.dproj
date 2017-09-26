@@ -304,9 +304,10 @@
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextRegister.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextRegisterItem.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegister.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegisterItem.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas"/>
+        <None Include="..\..\Source\ioGlobalDef.inc"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

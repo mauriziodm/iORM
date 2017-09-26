@@ -1,9 +1,9 @@
-unit iORM.MVVM.ViewContextRegister;
+unit iORM.MVVM.ViewRegister;
 
 interface
 
 uses
-  System.Generics.Collections, iORM.MVVM.ViewContextRegisterItem,
+  System.Generics.Collections, iORM.MVVM.ViewRegisterItem,
   System.Classes, iORM.MVVM.Components.ViewContextProvider,
   iORM.MVVM.Interfaces, System.SysUtils;
 

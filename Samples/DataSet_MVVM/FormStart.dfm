@@ -32,11 +32,9 @@ object StartForm: TStartForm
     OnClick = Button2Click
   end
   object VCProvider: TioViewContextProvider
-    ioOnRequest = VCProviderioOnRequest
-    ioOnRelease = VCProviderioOnRelease
+    OnRelease = VCProviderioOnRelease
+    OnRequest = VCProviderioOnRequest
     RegisterAsDefault = True
-    AutoParent = True
-    AutoOwner = True
     Left = 176
     Top = 80
   end
