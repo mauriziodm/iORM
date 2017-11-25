@@ -5,18 +5,17 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
-  FMX.Controls.Presentation, iORM.MVVM.Components.ViewModelBridge,
+  FMX.Controls.Presentation, iORM.MVVM.Components.ViewModelBridge, Model.BOMItems,
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource,
-  Data.Bind.GenData, iORM.Attributes, V.Interfaces, FMX.Edit, FMX.EditBox,
+  Data.Bind.GenData, iORM.Attributes, FMX.Edit, FMX.EditBox,
   FMX.SpinBox, Fmx.Bind.GenData, System.Rtti, System.Bindings.Outputs,
   Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, FMX.Objects,
   FMX.Layouts;
 
 type
 
-//  [diImplements(IMicroArticleView, 'TBOMItemMaterial')]
-  [diViewFor('TBOMItemMaterial')]
-  TMicroMaterialView = class(TFrame, IMicroArticleView)
+  [diViewFor(TBOMItemMaterial)]
+  TMicroMaterialView = class(TFrame)
 
     [ioBindAction('acEditArticle')]
     ButtonShow: TSpeedButton;

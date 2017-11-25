@@ -320,29 +320,7 @@
             <Form>StartForm</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="..\Commons\Model\Model.Interfaces.pas"/>
-        <DCCReference Include="..\Commons\Model\Model.Base.pas"/>
-        <DCCReference Include="..\Commons\Model\Model.Material.pas"/>
-        <DCCReference Include="..\Commons\Model\Model.Process.pas"/>
-        <DCCReference Include="..\Commons\Model\Model.Product.pas"/>
-        <DCCReference Include="..\Commons\U.SampleData.pas"/>
-        <DCCReference Include="..\..\..\Source\iORM.MVVM.ViewModelBase.pas">
-            <Form>ioViewModel</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\Commons\ViewModel\VM.ArticleList.pas">
-            <Form>ArticleListVM</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\Commons\ViewModel\VM.Interfaces.pas"/>
         <DCCReference Include="..\Commons\View\V.Interfaces.pas"/>
-        <DCCReference Include="..\Commons\ViewModel\VM.Article.pas">
-            <Form>ArticleViewModel</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="View\V.ArticleList.pas">
             <Form>ArticleListView</Form>
             <FormType>fmx</FormType>
@@ -363,21 +341,10 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\Commons\Model\Model.BOMItems.pas"/>
-        <DCCReference Include="..\Commons\ViewModel\VM.Product.pas">
-            <Form>ProductViewModel</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="View\V.Micro.Material.pas">
             <Form>MicroMaterialView</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\Commons\ViewModel\VM.BOMItem.pas">
-            <Form>BOMItemVM</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="View\V.Micro.Process.pas">
             <Form>MicroProcessView</Form>
@@ -389,6 +356,39 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\..\..\Source\iORM.MVVM.ViewModelBase.pas">
+            <Form>ioViewModel</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Commons\Model\Model.Product.pas"/>
+        <DCCReference Include="..\Commons\Model\Model.Process.pas"/>
+        <DCCReference Include="..\Commons\Model\Model.Material.pas"/>
+        <DCCReference Include="..\Commons\Model\Model.Interfaces.pas"/>
+        <DCCReference Include="..\Commons\Model\Model.BOMItems.pas"/>
+        <DCCReference Include="..\Commons\Model\Model.Base.pas"/>
+        <DCCReference Include="..\Commons\ViewModel\VM.Product.pas">
+            <Form>ProductViewModel</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Commons\ViewModel\VM.Interfaces.pas"/>
+        <DCCReference Include="..\Commons\ViewModel\VM.BOMItem.pas">
+            <Form>BOMItemVM</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Commons\ViewModel\VM.ArticleList.pas">
+            <Form>ArticleListVM</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Commons\ViewModel\VM.Article.pas">
+            <Form>ArticleViewModel</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Commons\U.SampleData.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -80,6 +80,7 @@ end;
 procedure TArticleListView.ListView1ItemClick(const Sender: TObject;
   const AItem: TListViewItem);
 begin
+  Application.ProcessMessages;
   VMBridge.Command['acEditArticle'].Execute;
 end;
 

@@ -26,7 +26,7 @@ object ViewPerson: TViewPerson
     object lblTitle2: TLabel
       Align = Center
       StyledSettings = [Family, FontColor]
-      Size.Width = 271.000000000000000000
+      Size.Width = 251.000000000000000000
       Size.Height = 48.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'toollabel'

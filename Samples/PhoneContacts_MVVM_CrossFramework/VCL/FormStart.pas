@@ -17,6 +17,7 @@ type
       out ResultViewContext: TComponent);
     procedure FormsVCProviderRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -29,7 +30,7 @@ var
 implementation
 
 uses
-  iORM, V.Interfaces, VM.Interfaces, FormViewContext;
+  iORM, V.Interfaces, VM.Interfaces, FormViewContext, SampleData;
 
 {$R *.dfm}
 
@@ -49,6 +50,11 @@ procedure TStartForm.FormsVCProviderRelease(const Sender: TObject; const AView,
   AViewContext: TComponent);
 begin
   AViewContext.Free;
+end;
+
+procedure TStartForm.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  TSampleData.CheckForSampleDataCreation;
 end;
 
 end.

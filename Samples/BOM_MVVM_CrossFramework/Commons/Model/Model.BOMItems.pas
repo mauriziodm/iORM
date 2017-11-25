@@ -7,11 +7,12 @@ uses
 
 type
 
-  [ioEntity('BOMItems'), ioTrueClass, diImplements(IBOMItem)]
+  [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem)]
   TBOMItem = class(TInterfacedObject, IBOMItem)
   private
-    FID: Integer;
+    [ioIndex]
     FMasterID: Integer;
+    FID: Integer;
     FQty: Single;
   protected
     function GetCost: Currency; virtual;
@@ -21,27 +22,25 @@ type
   public
     constructor Create(const AQty:Single); virtual;
     property ID:Integer read FID write FID;
-    [ioIndex]
     property MasterID:Integer read FMasterID write FMasterID;
     property Qty:Single read FQty write FQty;
   end;
 
-  [ioEntity('BOMItems'), ioTrueClass, diImplements(IBOMItem, 'Material')]
+  [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemMaterial = class(TBOMItem)
   private
+    [ioBelongsTo(TMaterial)]
     FArticle: IMaterial;
   protected
     function GetCost: Currency; override;
     function GetMaterialCost: Currency; override;
   public
     constructor Create(const AMaterial:IMaterial; const AQty:Single); overload;
-    [ioBelongsTo(TMaterial)]
     property Article:IMaterial read FArticle write FArticle;
-    [ioSkip]
     property ItemCost:Currency read GetCost;
   end;
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem, 'Process')]
+  [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemProcess = class(TBOMItem)
   private
     [ioBelongsTo(TProcess)]
@@ -52,15 +51,12 @@ type
     function GetProcessCost: Currency; override;
   public
     constructor Create(const AProcess:IProcess; const AQty:Single); overload;
-    [ioBelongsTo(TProcess)]
     property Article:IProcess read FArticle write FArticle;
-    [ioSkip]
     property ItemCost:Currency read GetCost;
-    [ioSkip]
     property ItemTime:Integer read GetTime;
   end;
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem, 'Product')]
+  [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemProduct = class(TBOMItem)
   private
     [ioBelongsTo(TProduct)]
@@ -72,15 +68,10 @@ type
     function GetProcessCost: Currency; override;
   public
     constructor Create(const AProduct:IProduct; const AQty:Single); overload;
-    [ioBelongsTo(TProduct)]
     property Article:IProduct read FArticle write FArticle;
-    [ioSkip]
     property ItemCost:Currency read GetCost;
-    [ioSkip]
     property ItemTime:Integer read GetTime;
-    [ioSkip]
     property ItemMaterialCost:Currency read GetCost;
-    [ioSkip]
     property ItemProcessCost:Currency read GetCost;
   end;
 

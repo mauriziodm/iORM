@@ -36,14 +36,14 @@ var
 implementation
 
 uses
-  SampleData, iORM, V.Interfaces, VM.Interfaces, FMX.Styles;
+  SampleData, iORM, V.Interfaces, FMX.Styles;
 
 {$R *.fmx}
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   // Get the main view
-  io.di.LocateViewVM<IMainView, IPersonsViewModel>.Get;
+  io.di.LocateView<IMainView>.Show;
 end;
 
 procedure TForm1.SQLiteConnAfterRegister(Sender: TObject);

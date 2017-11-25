@@ -282,6 +282,7 @@ object ViewMain: TViewMain
     Top = 272
   end
   object VMBridge: TioViewModelBridge
+    DI_VMInterface = 'IPersonsViewModel'
     Left = 128
     Top = 160
   end

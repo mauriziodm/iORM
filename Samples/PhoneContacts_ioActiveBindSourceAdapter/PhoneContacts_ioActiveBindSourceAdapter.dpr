@@ -15,16 +15,15 @@ uses
 
 begin
 
-
   // ============ IupOrm initialization ====================
   // Set connection for SQLite (under the Documents folder better for mobile use)
-  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.db')).Apply;
+  io.Connections.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'ContactsObj.db')).Apply;
   // Set connection for Firebird SQL
 //  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.FDB'), 'SYSDBA', 'masterkey', '').Apply;
   // AutoCreation and AutoUpdate of the database
-//  io.AutoCreateDatabase(False);
+  io.AutoCreateDatabase(False);
   // Check for sample data creation
-//  TSampleData.CheckForSampleDataCreation;
+  TSampleData.CheckForSampleDataCreation;
   // ============ IupOrm initialization ====================
 
   Application.Initialize;

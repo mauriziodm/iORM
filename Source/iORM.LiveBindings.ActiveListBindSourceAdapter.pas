@@ -38,6 +38,11 @@ unit iORM.LiveBindings.ActiveListBindSourceAdapter;
 interface
 
 uses
+{$IFDEF ioVCL}
+  Vcl.ExtCtrls,
+{$ELSE}
+  Fmx.Types,
+{$ENDIF}
   Data.Bind.ObjectScope, System.Classes,
   System.Generics.Collections, iORM.Where.SqlItems.Interfaces,
   iORM.CommonTypes, iORM.Context.Properties.Interfaces,
@@ -70,6 +75,7 @@ type
     FInsertObj_NewObj: TObject;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -153,6 +159,7 @@ type
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -223,6 +230,18 @@ begin
   // Init InsertObj subsystem values
   FInsertObj_Enabled := False;
   FInsertObj_NewObj := nil;
+end;
+
+procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer);
+var
+  LTimer: TTimer;
+begin
+  LTimer := TTimer.Create(Self);
+  LTimer.Enabled := False;
+  LTimer.OnTimer := ListViewDeletingTimerEventHandler;
+  LTimer.Interval := ADelayMilliseconds;
+  LTimer.Tag := AItemIndex;
+  LTimer.Enabled := True;
 end;
 
 destructor TioActiveListBindSourceAdapter.Destroy;
@@ -580,6 +599,25 @@ end;
 function TioActiveListBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := Assigned(FMasterProperty);
+end;
+
+procedure TioActiveListBindSourceAdapter.ListViewDeletingTimerEventHandler(
+  Sender: TObject);
+var
+  LTimer: TTimer;
+  CurrItemIndex: Integer;
+begin
+  LTimer := (Sender as TTimer);
+  LTimer.Enabled := False;
+  // Delayed deletion of the current object for ListView
+  CurrItemIndex := ItemIndex;
+  try
+    ItemIndex := LTimer.Tag;
+    Delete;
+  finally
+    ItemIndex := CurrItemIndex;
+    Sender.Free;
+  end;
 end;
 
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;

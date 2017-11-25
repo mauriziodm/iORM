@@ -108,11 +108,12 @@ type
     // AutoPersist
     procedure SetAutoPersist(const Value: Boolean);
   protected
-    function CheckAdapter: Boolean; override;
+    function CheckActiveAdapter: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
+    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
@@ -182,7 +183,7 @@ procedure TioPrototypeBindSource.Append(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Append(AObject);
     AnActiveBSA.Refresh(False);
@@ -191,9 +192,12 @@ begin
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
-function TioPrototypeBindSource.CheckAdapter: Boolean;
+function TioPrototypeBindSource.CheckActiveAdapter: Boolean;
 begin
-  Result := Inherited and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+//  Result := (not (csDesigning in ComponentState))
+//    and CheckAdapter
+//    and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  Result := CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
 end;
 
 procedure TioPrototypeBindSource.ClearDataObject;
@@ -216,6 +220,12 @@ begin
   SetWhereStr(FioWhereStr);  // set TStringList.onChange event handler
 end;
 
+procedure TioPrototypeBindSource.DeleteListViewItem(const AItemIndex,
+  ADelayMilliseconds: integer);
+begin
+  GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
+end;
+
 destructor TioPrototypeBindSource.Destroy;
 begin
   FioWhereStr.Free;
@@ -225,12 +235,10 @@ end;
 procedure TioPrototypeBindSource.DoCreateAdapter(
   var ADataObject: TBindSourceAdapter);
 var
-  AActiveBSA: IioActiveBindSourceAdapter;
+  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Inherited
   inherited;
-  // Init
-  AActiveBSA  := nil;
   // If in DesignTime then Exit
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
   //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
@@ -254,14 +262,14 @@ begin
   //  in the ActiveBindSourceAdapter
   //  PS: Set ioAsync also
   if  Assigned(ADataObject)
-  and Supports(ADataObject, IioActiveBindSourceAdapter, AActiveBSA)
+  and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA)
   and Supports(Self, IioNotifiableBindSource)
   then
   begin
-    AActiveBSA.ioAsync := FioAsync;
-    AActiveBSA.ioWhereDetailsFromDetailAdapters := FioWhereDetailsFromDetailAdapters;
-    AActiveBSA.ioAutoPersist := FioAutoPersist;
-    AActiveBSA.SetBindSource(Self);
+    LActiveBSA.ioAsync := FioAsync;
+    LActiveBSA.ioWhereDetailsFromDetailAdapters := FioWhereDetailsFromDetailAdapters;
+    LActiveBSA.ioAutoPersist := FioAutoPersist;
+    LActiveBSA.SetBindSource(Self);
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
@@ -279,8 +287,8 @@ end;
 function TioPrototypeBindSource.Current: TObject;
 begin
   Result := nil;
-  if not CheckAdapter then Exit;
-  Result := Self.InternalAdapter.Current
+  if CheckAdapter then
+    Result := Self.InternalAdapter.Current;
 end;
 
 function TioPrototypeBindSource.CurrentAs<T>: T;
@@ -299,7 +307,7 @@ end;
 
 function TioPrototypeBindSource.GetCount: Integer;
 begin
-  if CheckAdapter then
+  if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.ItemCount
   else
     Result := 0;
@@ -321,7 +329,7 @@ end;
 
 function TioPrototypeBindSource.DataObjectAssigned: Boolean;
 begin
-  if CheckAdapter then
+  if CheckActiveAdapter then
     Result := Assigned(Self.GetActiveBindSourceAdapter.DataObject)
   else
     Result := False;
@@ -342,7 +350,7 @@ function TioPrototypeBindSource.GetWhere: IioWhere;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     Result := LActiveBSA.ioWhere
   else
     Result := nil;
@@ -352,7 +360,7 @@ procedure TioPrototypeBindSource.Insert(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Insert(AObject);
     AnActiveBSA.Refresh(False);
@@ -374,7 +382,7 @@ end;
 
 function TioPrototypeBindSource.GetState: TBindSourceAdapterState;
 begin
-  if CheckAdapter then
+  if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
@@ -418,7 +426,7 @@ procedure TioPrototypeBindSource.Persist(ReloadData: Boolean);
 var
  AioActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
-  if not CheckAdapter then Exit;
+  if not CheckActiveAdapter then Exit;
   // If the InternalAdapter support the IioActiveBindSourceAdapter (is an ActiveBindSourceAdapter)
   //  then call the Adapter Persist method
   AioActiveBindSourceAdapter := Self.GetActiveBindSourceAdapter;
@@ -453,7 +461,7 @@ var
 begin
   FioAsync := Value;
   // Update the adapter
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAsync := Value;
 end;
 
@@ -463,7 +471,7 @@ var
 begin
   FioAutoLoadData := Value;
   // Update the adapter
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAutoLoadData := Value;
 end;
 
@@ -473,13 +481,20 @@ var
 begin
   FioAutoPersist := Value;
   // Update the adapter
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAutoPersist := Value;
 end;
 
 procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);
 begin
-  Self.GetActiveBindSourceAdapter.SetDataObject(AObj, AOwnsObject);
+// NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
+//      si faceva un SetDataObject dava un errore perchè la funzione
+//      CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
+//      assegnato (se prima avevo chiamato il  ClearDataObject
+//  if CheckActiveAdapter then
+    Self.GetActiveBindSourceAdapter.SetDataObject(AObj, AOwnsObject)
+//  else
+//    raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
 
 procedure TioPrototypeBindSource.SetWhere(const Value: IioWhere);
@@ -487,7 +502,7 @@ var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Update the adapter where
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhere := Value;
 end;
 
@@ -514,7 +529,7 @@ begin
   FioOrderBy := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
   //  update the where of the adapter also
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhere.SetOrderBySql(Value);
 end;
 
@@ -523,7 +538,7 @@ begin
   FioTypeAlias := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
   //  update the where of the adapter also
-  if CheckAdapter then
+  if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ioTypeAlias := Value;
 end;
 
@@ -532,7 +547,7 @@ begin
   FioTypeName := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
   //  update the where of the adapter also
-  if CheckAdapter then
+  if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ioTypeName := Value;
 end;
 
@@ -543,7 +558,7 @@ var
 begin
   FioWhereDetailsFromDetailAdapters := Value;
   // Update the adapter
-  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhereDetailsFromDetailAdapters := Value;
 end;
 

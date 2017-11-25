@@ -313,7 +313,7 @@ uses
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces,
-  iORM.MVVM.ViewModelBase, iORM.MVVM.Components.ViewModelBridge;
+  iORM.MVVM.Components.ViewModelBridge;
 
 { TioDependencyInjectionBase }
 
@@ -433,9 +433,15 @@ class function TioDependencyInjection.LocateViewFor(
   const AModelPresenter: TioModelPresenter;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
+  // Check the ModelPresenter
+  if not Assigned(AModelPresenter) then
+    raise EioException.Create(Self.ClassName, 'LocateViewFor', 'Parameter "AModelPresenter" not assigned.');
   // Check the bind source adapter
   if not AModelPresenter.CheckAdapter then
     raise EioException.Create(Self.ClassName, 'LocateViewFor', 'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
+  // Check the ModelPresenter.Current object
+  if (AModelPresenter.Current = nil) then
+    raise EioException.Create(Self.ClassName, 'LocateViewFor', '"Current" object of the ModelPresenter not assigned.');
   Result := LocateViewFor(AModelPresenter.Current.ClassType, AAlias);
   Result.SetPresenter(AModelPresenter, '');
   Result._SetForEachModelPresenter(AModelPresenter, False);

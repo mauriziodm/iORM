@@ -3,31 +3,30 @@ unit VM.BOMItem;
 interface
 
 uses
-  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
-  iORM.MVVM.Components.ModelPresenter, VM.Interfaces, iORM.Attributes;
+  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase, Model.BOMItems,
+  iORM.MVVM.Components.ModelPresenter, iORM.Attributes;
 
 type
 
-  [diImplements(IBOMItemVM)]
-  [diViewModelFor('TBOMItemMaterial')]
-  [diViewModelFor('TBOMItemProcess')]
-  [diViewModelFor('TBOMItemProduct')]
-  TBOMItemVM = class(TioViewModel, IBOMItemVM)
+  [diViewModelFor(TBOMItemMaterial)]
+  [diViewModelFor(TBOMItemProcess)]
+  [diViewModelFor(TBOMItemProduct)]
+  TBOMItemVM = class(TioViewModel)
     MPBOMItem: TioModelPresenter;
     MPBOMArticle: TioModelPresenter;
   private
     { Private declarations }
   public
     { Public declarations }
-    [ioAction('acEditArticle', OnExecute)]
+    [ioAction('acEditArticle', 'Show', OnExecute)]
     procedure acEditArticleExecute(Sender: TObject);
 
-    [ioAction('acPost', OnExecute)]
+    [ioAction('acPost', 'Post', OnExecute)]
     procedure acPostExecute(Sender: TObject);
     [ioAction('acPost', OnUpdate)]
     procedure acPostUpdate(Sender: TObject);
 
-    [ioAction('acClose', OnExecute)]
+//    [ioAction('acClose', OnExecute)]
     procedure acCloseExecute(Sender: TObject);
   end;
 

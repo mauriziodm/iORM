@@ -7,15 +7,14 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   V.Micro.Material, Data.Bind.GenData, Fmx.Bind.GenData, Data.Bind.EngExt,
   Fmx.Bind.DBEngExt, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors,
-  Data.Bind.Components, iORM.MVVM.Components.ViewModelBridge,
+  Data.Bind.Components, iORM.MVVM.Components.ViewModelBridge, Model.BOMItems,
   Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, FMX.Edit,
   FMX.EditBox, FMX.SpinBox, FMX.Controls.Presentation, iORM.Attributes,
-  V.Interfaces, FMX.Objects, FMX.Layouts;
+  FMX.Objects, FMX.Layouts;
 
 type
 
-//  [diImplements(IMicroArticleView, 'TBOMItemProcess')]
-  [diViewFor('TBOMItemProcess')]
+  [diViewFor(TBOMItemProcess)]
   TMicroProcessView = class(TMicroMaterialView)
     LabelTime: TLabel;
     Label4: TLabel;

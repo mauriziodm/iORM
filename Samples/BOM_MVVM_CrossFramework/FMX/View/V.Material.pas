@@ -6,16 +6,15 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Objects, FMX.Layouts, FMX.ListBox, FMX.Edit,
-  iORM.MVVM.Components.ViewModelBridge, Data.Bind.Components,
+  iORM.MVVM.Components.ViewModelBridge, Data.Bind.Components, Model.Material,
   Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, Fmx.Bind.GenData,
   Data.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors,
-  Data.Bind.EngExt, Fmx.Bind.DBEngExt, iORM.Attributes, V.Interfaces;
+  Data.Bind.EngExt, Fmx.Bind.DBEngExt, iORM.Attributes;
 
 type
 
-//  [diImplements(IArticleView, 'TMaterial')]
-  [diViewFor('TMaterial')]
-  TMaterialView = class(TFrame, IArticleView)
+  [diViewFor(TMaterial)]
+  TMaterialView = class(TFrame)
 
     [ioBindAction('acBack')]
     ButtonBack: TSpeedButton;

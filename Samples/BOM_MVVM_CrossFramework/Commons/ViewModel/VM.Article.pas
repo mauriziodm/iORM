@@ -3,25 +3,20 @@ unit VM.Article;
 interface
 
 uses
-  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
-  iORM.MVVM.Components.ModelPresenter, System.Actions,
-  VM.Interfaces, iORM.Attributes;
+  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase, Model.Material, Model.Process,
+  iORM.MVVM.Components.ModelPresenter, System.Actions, iORM.Attributes;
 
 type
 
-//  [diImplements(IArticleVM, 'TMaterial'), diImplements(IArticleVM, 'TProcess')]
-  [diViewModelFor('TMaterial'), diViewModelFor('TProcess')]
-  TArticleViewModel = class(TioViewModel, IArticleVM)
+  [diViewModelFor(TMaterial), diViewModelFor(TProcess)]
+  TArticleViewModel = class(TioViewModel)
     MPArticle: TioModelPresenter;
-
-    [ioAction('acBack', OnExecute)]
+    [ioAction('acBack', 'Close', OnExecute)]
     procedure acBackExecute(Sender: TObject);
-
-    [ioAction('acPost', OnExecute)]
+    [ioAction('acPost', 'Post', OnExecute)]
     procedure acPostExecute(Sender: TObject);
     [ioAction('acPost', OnUpdate)]
     procedure acPostUpdate(Sender: TObject);
-
   private
     { Private declarations }
   public

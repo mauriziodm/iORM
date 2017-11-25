@@ -3,13 +3,12 @@ unit VM.Product;
 interface
 
 uses
-  System.SysUtils, System.Classes, VM.Article,
+  System.SysUtils, System.Classes, VM.Article, Model.Product,
   iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces;
 
 type
 
-//  [diImplements(IArticleVM, 'TProduct')]
-  [diViewModelFor('TProduct')]
+  [diViewModelFor(TProduct)]
   TProductViewModel = class(TArticleViewModel)
     MPBOMItemList: TioModelPresenter;
   private
@@ -32,24 +31,10 @@ uses
 { TProductViewModel }
 
 procedure TProductViewModel.acPopulateItemListExecute(Sender: TObject);
-var
-  I: Integer;
-  LAlias: String;
 begin
   MPBOMItemList.CheckAdapter(True);
-  io.di.LocateViewVMfor(MPBOMItemList).VCProvider('BOMVCProvider').ShowEach;
-
-Exit;
-  MPBOMItemList.First;
-  for I := 1 to MPBOMItemList.ItemCount do
-  begin
-    LAlias := MPBOMItemList.Current.ClassName;
-    io.di.LocateViewVM<IMicroArticleView, IBOMItemVM>(LAlias)
-      .SetPresenter('MPBOMItem', MPBOMItemList)
-      .VCProvider('BOMVCProvider')
-      .Get;
-    MPBOMItemList.Next;
-  end;
+  if (MPBOMItemList.ItemCount > 0) then
+    io.di.LocateViewVMfor(MPBOMItemList).VCProvider('BOMVCProvider').ShowEach;
 end;
 
 end.

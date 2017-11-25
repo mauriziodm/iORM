@@ -32,6 +32,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property ModelPresenter:String read FModelPresenter write FModelPresenter;
@@ -58,6 +59,12 @@ begin
   FCrossView_MasterPropertyName := '';
   if (csDesigning in ComponentState) and not Assigned(FViewModelBridge) then
     TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
+end;
+
+procedure TioModelBindSource.DeleteListViewItem(const AItemIndex,
+  ADelayMilliseconds: integer);
+begin
+  GetModelPresenterInstance.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
 destructor TioModelBindSource.Destroy;

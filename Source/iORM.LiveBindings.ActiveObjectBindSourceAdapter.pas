@@ -148,6 +148,7 @@ type
     function IsDetail: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -209,6 +210,12 @@ begin
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.DeleteListViewItem(const AItemIndex,
+  ADelayMilliseconds: integer);
+begin
+  raise EioException.Create(Self.ClassName, 'DeleteListViewItem', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
 destructor TioActiveObjectBindSourceAdapter.Destroy;

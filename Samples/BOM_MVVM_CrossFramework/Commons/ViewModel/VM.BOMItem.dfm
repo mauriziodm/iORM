@@ -4,7 +4,7 @@ inherited BOMItemVM: TBOMItemVM
     AsDefault = True
     Async = True
     AutoLoadData = True
-    AutoPersist = False
+    AutoPersist = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IBOMItem'
     ViewDataType = dtList

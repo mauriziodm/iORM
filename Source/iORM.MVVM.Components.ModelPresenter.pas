@@ -85,6 +85,7 @@ type
 //    procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailPresenter(const ADetailPresenter:TioModelPresenter);
     procedure ForceDetailAdaptersCreation;
+    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     procedure Next;
@@ -248,6 +249,12 @@ procedure TioModelPresenter.Delete;
 begin
   if CheckAdapter then
     BindSourceAdapter.Delete;
+end;
+
+procedure TioModelPresenter.DeleteListViewItem(const AItemIndex,
+  ADelayMilliseconds: integer);
+begin
+  GetBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
 destructor TioModelPresenter.Destroy;

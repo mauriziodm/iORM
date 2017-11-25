@@ -113,7 +113,8 @@ type
     FTargetClassName: String;
     FAlias: String;
   public
-    constructor Create(ATargetClassName:String; const AAlias:String='');
+    constructor Create(ATargetClassName:String; const AAlias:String=''); overload;
+    constructor Create(ATargetClass:TioClassRef; const AAlias:String=''); overload;
     property TargetClassName:String read FTargetClassName;
     property Alias:String read FAlias;
   end;
@@ -604,6 +605,15 @@ begin
   FTargetClassName := ATargetClassName;
   FAlias := AAlias;
 end;
+
+constructor TioCustomForTargetModelClass.Create(ATargetClass: TioClassRef;
+  const AAlias: String);
+begin
+  inherited Create;
+  FTargetClassName := ATargetClass.ClassName;
+  FAlias := AAlias;
+end;
+
 
 { ioUniBindAction }
 

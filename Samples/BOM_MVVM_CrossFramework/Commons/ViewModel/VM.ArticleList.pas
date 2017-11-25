@@ -34,35 +34,38 @@ type
     MPFilters: TioModelPresenter;
     procedure DataModuleCreate(Sender: TObject);
 
-    [ioAction('acFilterAll', OnExecute), ioGroupIndex(1000), ioChecked]
+    [ioAction('acFilterAll', 'All', OnExecute), ioGroupIndex(1000), ioChecked]
     procedure acFilterAllExecute(Sender: TObject);
 
-    [ioAction('acFilterMaterial', OnExecute), ioGroupIndex(1000)]
+    [ioAction('acFilterMaterial', 'Materials', OnExecute), ioGroupIndex(1000)]
     procedure acFilterMaterialExecute(Sender: TObject);
 
-    [ioAction('acFilterProcess', OnExecute), ioGroupIndex(1000)]
+    [ioAction('acFilterProcess', 'Processes', OnExecute), ioGroupIndex(1000)]
     procedure acFilterProcessExecute(Sender: TObject);
 
-    [ioAction('acFilterProduct', OnExecute), ioGroupIndex(1000)]
+    [ioAction('acFilterProduct','Products', OnExecute), ioGroupIndex(1000)]
     procedure acFilterProductExecute(Sender: TObject);
 
-    [ioAction('acClose', OnExecute)]
+    [ioAction('acClose', 'Exit', OnExecute)]
     procedure acCloseExecute(Sender: TObject);
 
-    [ioAction('acApplyFilters', OnExecute)]
+    [ioAction('acApplyFilters', 'Find', OnExecute)]
     procedure acApplyFiltersExecute(Sender: TObject);
 
     [ioAction('acEditArticle', OnExecute)]
     procedure acEditArticleExecute(Sender: TObject);
 
-    [ioAction('acDelete', OnExecute)]
+    [ioAction('acDelete', 'Delete', OnExecute)]
     procedure acDeleteExecute(Sender: TObject);
 
-    [ioAction('acNewMaterial', OnExecute)]
+    [ioAction('acRefresh', 'Refresh', OnExecute)]
+    procedure acRefreshExecute(Sender: TObject);
+
+    [ioAction('acNewMaterial', 'New material', OnExecute)]
     procedure acNewMaterialExecute(Sender: TObject);
-    [ioAction('acNewProcess', OnExecute)]
+    [ioAction('acNewProcess', 'New process', OnExecute)]
     procedure acNewProcessExecute(Sender: TObject);
-    [ioAction('acNewProduct', OnExecute)]
+    [ioAction('acNewProduct', 'New product', OnExecute)]
     procedure acNewProductExecute(Sender: TObject);
   private
     { Private declarations }
@@ -157,6 +160,11 @@ end;
 procedure TArticleListVM.acNewProductExecute(Sender: TObject);
 begin
   NewArticle<IProduct>;
+end;
+
+procedure TArticleListVM.acRefreshExecute(Sender: TObject);
+begin
+  MPArticleList.Refresh(True);
 end;
 
 procedure TArticleListVM.DataModuleCreate(Sender: TObject);

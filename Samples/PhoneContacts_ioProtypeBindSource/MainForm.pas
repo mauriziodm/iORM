@@ -10,7 +10,7 @@ uses FMX.ListView.Types, Data.Bind.Controls, System.Rtti, Data.Bind.GenData,
   FMX.StdCtrls, FMX.Layouts, FMX.Grid, Fmx.Bind.Navigator, FMX.ListView,
   FMX.Controls, FMX.Types, FMX.Forms, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.Controls.Presentation,
-  FMX.ScrollBox, FMX.Grid.Style;
+  FMX.ScrollBox, FMX.Grid.Style, Fmx.Bind.GenData;
 
 type
 

@@ -16,6 +16,7 @@ object StartForm: TStartForm
   PixelsPerInch = 96
   TextHeight = 13
   object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
     AutoCreateDatabase = True
     Database = 'ContactsIntfMVVM.db'
     DatabaseStdFolder = sfDocuments

@@ -17,9 +17,8 @@ begin
   ReportMemoryLeaksOnShutdown := True;
 
 
-  // ============ IupOrm initialization ====================
+  // ============ iORM initialization ====================
   io.Connections.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'ContactsObj.db')).Apply;
-//  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.db')).Apply;
 //  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.FDB'), 'SYSDBA', 'masterkey', '').Apply;
 
   // AutoCreation and AutoUpdate of the database
@@ -27,7 +26,7 @@ begin
 
   // Check for sample data creation
   TSampleData.CheckForSampleDataCreation;
-  // ============ IupOrm initialization ====================
+  // ============ iORM initialization ====================
 
 
   Application.Initialize;

@@ -100,6 +100,7 @@ type
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
     procedure Delete;
+    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     procedure Cancel;
     function UseObjStatus: Boolean;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
