@@ -515,7 +515,6 @@ begin
   // If the internal action is not assigned then crate it
   if Self.IsEmpty then
   begin
-//    Command := TAction.Create(AOwner);
     Command := TAction.Create(AOwner);
     Command.Name := ACmdInfo.Name.Value;
   end;
@@ -867,12 +866,7 @@ end;
 procedure TioCommandsContainerItemAction.SetCaption(const Value: String);
 begin
   inherited;
-{$IFDEF ioFMX}
   Self.Command.Caption := Value;
-{$ENDIF}
-{$IFDEF ioVCL}
-  Self.Command.Caption := Value;
-{$ENDIF}
 end;
 
 procedure TioCommandsContainerItemAction.SetChecked(const Value: Boolean);
