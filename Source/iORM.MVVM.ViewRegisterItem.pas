@@ -138,7 +138,7 @@ begin
     Exit;
   FViewContextProvider := AViewContextProvider;
   if Assigned(FViewContextProvider) then
-    FViewContext.FreeNotification(Self);
+    FViewContextProvider.FreeNotification(Self);
 end;
 
 end.

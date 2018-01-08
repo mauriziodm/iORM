@@ -120,10 +120,17 @@ end;
 
 procedure TioViewRegister.ReleaseAllViewContexts;
 var
-  LItem: TioViewContextRegisterItem;
+//  LItem: TioViewContextRegisterItem;
+  I: Integer;
 begin
-  for LItem in FInternalContainer do
-    LItem.ReleaseViewContext;
+//  for LItem in FInternalContainer do
+//    LItem.ReleaseViewContext;
+  // NB: Il codice sopra dava dei problemi perchè, con Marco Mottadelli, abbiamo notato
+  //      che quando viene chiamato il metoto "FreeViews" poi gli viene distrutto il
+  //      register stesso e questo causava un errore se usavamo il for-in. Con un
+  //      norlame ciclo for invece sembra andare bene.
+  for I := FInternalContainer.Count-1 downto 0 do
+    FInternalContainer.Items[I].ReleaseViewContext;
 end;
 
 end.

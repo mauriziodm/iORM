@@ -47,7 +47,7 @@ implementation
 
 uses
   FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData, FWait,
-  VM.Interfaces, Vcl.Controls;
+  VM.Interfaces, Vcl.Controls, Winapi.Windows;
 
 {$R *.fmx}
 

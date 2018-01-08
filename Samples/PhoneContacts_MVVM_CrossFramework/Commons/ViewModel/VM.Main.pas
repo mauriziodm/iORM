@@ -74,7 +74,7 @@ end;
 procedure TViewModelMain.acClearDataUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TContainedAction).Enabled := Self.DataExist;
+//  (Sender as TContainedAction).Enabled := Self.DataExist;
 end;
 
 procedure TViewModelMain.acDelete(Sender: TObject);
@@ -96,7 +96,7 @@ end;
 procedure TViewModelMain.acLoadDataUpdate(Sender: TObject);
 begin
   inherited;
-  (Sender as TContainedAction).Enabled := not Self.DataExist;
+//  (Sender as TContainedAction).Enabled := not Self.DataExist;
 end;
 
 procedure TViewModelMain.acNewPerson(Sender: TObject);

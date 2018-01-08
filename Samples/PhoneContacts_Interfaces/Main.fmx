@@ -60,6 +60,7 @@ object MainForm: TMainForm
         ItemEditAppearanceClassName = 'TImageListItemDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
+        ItemIndex = 1
         Align = Client
         Size.Width = 384.000000000000000000
         Size.Height = 353.000000000000000000
@@ -83,6 +84,7 @@ object MainForm: TMainForm
         ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
+        ItemIndex = 0
         Align = Bottom
         Position.Y = 424.000000000000000000
         Size.Width = 384.000000000000000000
