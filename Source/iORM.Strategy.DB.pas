@@ -148,8 +148,10 @@ end;
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
 begin
   inherited;
-  // Create and execute query
-  TioDbFactory.QueryEngine.GetQueryDelete(AContext).ExecSQL;
+  // If the ID is not null (object not persisted) then delete it from the DB
+  if not AContext.IDIsNull then
+    // Create and execute query
+    TioDbFactory.QueryEngine.GetQueryDelete(AContext).ExecSQL;
 end;
 
 class procedure TioStrategyDB.InsertObject(const AContext: IioContext;
