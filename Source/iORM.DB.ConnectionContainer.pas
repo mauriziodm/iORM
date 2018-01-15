@@ -351,6 +351,7 @@ class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADa
   const AAsDefault:Boolean=True; const APersistent:Boolean=False;
   const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
+  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
   Result.Params.DriverID := 'MSSQL';
   Result.Params.Values['Server'] := AServer;
   Result.Params.Database := ADatabase;
