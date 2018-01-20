@@ -77,8 +77,8 @@ object StartForm: TStartForm
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
     AutoCreateDatabase = True
-    Database = '..\..\..\SamplesData\ContactsIntfMVVM.db'
-    DatabaseStdFolder = sfUndefined
+    Database = 'ContactsIntfMVVM.db'
+    DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     Persistent = False
     Pooled = False

@@ -97,6 +97,7 @@ type
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean;
+    function IsSkipped: Boolean;
   end;
 
   IioContextProperties = interface(IioSqlItem)

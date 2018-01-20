@@ -124,6 +124,7 @@ type
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean; virtual;
+    function IsSkipped: Boolean;
   end;
 
   // Classe che rappresenta un field della classe
@@ -430,22 +431,27 @@ begin
   Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
 end;
 
+function TioProperty.IsSkipped: Boolean;
+begin
+  Result := FSkipped;
+end;
+
 function TioProperty.IsSqlRequestCompliant(
   ASqlRequestType: TioSqlRequestType): Boolean;
 begin
   Result := False;
   case ASqlRequestType of
-    ioSelect: Result := (FReadWrite <= iorwReadWrite);
+    ioSelect: Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
     ioInsert:
     begin
-      Result := (FReadWrite >= iorwReadWrite);
+      Result := (FReadWrite >= iorwReadWrite) and not FSkipped;
       // NB: Se la proprietà è l'ID e stiamo utilizzando una connessione a SQLServer
-      //      e il flag IDSkipOnInsert = True evita di sinerire anche questa proprietà
+      //      e il flag IDSkipOnInsert = True evita di inserire anche questa proprietà
       //      nell'elenco (della query insert).
       if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer) then
         Result := False;
     end;
-    ioUpdate: Result := (FReadWrite >= iorwReadWrite);
+    ioUpdate: Result := (FReadWrite >= iorwReadWrite) and not FSkipped;
   else Result := True;
   end;
 end;
