@@ -280,7 +280,7 @@ begin
   if AValue <> 0 then
     AParam.Value := Avalue
   else
-    AParam.Clear;
+    AParam.Value := Null; // Thanks to Marco Mottadelli
 end;
 
 end.
