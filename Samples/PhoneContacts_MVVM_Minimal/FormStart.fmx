@@ -18,6 +18,6 @@ object StartForm: TStartForm
     Persistent = False
     Pooled = False
     Left = 152
-    Top = 88
+    Top = 64
   end
 end

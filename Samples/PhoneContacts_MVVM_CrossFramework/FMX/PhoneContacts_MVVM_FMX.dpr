@@ -12,7 +12,7 @@ uses
   M.AnotherModel in '..\Commons\Model\M.AnotherModel.pas',
   M.Interfaces in '..\Commons\Model\M.Interfaces.pas',
   M.Model in '..\Commons\Model\M.Model.pas',
-  RegisterClassesUnit in '..\Commons\RegisterClassesUnit.pas' {$R *.res},
+  RegisterClassesUnit in '..\Commons\RegisterClassesUnit.pas',
   VM.Interfaces in '..\Commons\ViewModel\VM.Interfaces.pas',
   VM.Main in '..\Commons\ViewModel\VM.Main.pas' {ViewModelMain: TDataModule},
   VM.Person in '..\Commons\ViewModel\VM.Person.pas' {PersonViewModel: TDataModule},
