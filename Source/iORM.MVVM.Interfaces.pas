@@ -40,16 +40,11 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-{$IFDEF ioVCL}
-  Vcl.ActnList,
-{$ELSE}
-  FMX.ActnList,
-{$ENDIF}
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.UITypes, iORM.CommonTypes,
   iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
   iORM.MVVM.Components.ModelPresenter, iORM.MVVM.ViewRegisterItem,
-  System.SysUtils;
+  System.SysUtils, iORM.AbstractionLayer.Framework;
 
 type
 
@@ -114,7 +109,7 @@ type
     NotificationTarget: TioNullableBoolean;
     CommandType:        TioNullable<TioCommandType>;
     RttiMethod:         TioNullable<TRttiMethod>;
-    Action:             TioNullable<TAction>;
+    Action:             TioNullable<TioAction>;
     constructor Create(const ARttiElement:TRttiNamedObject);
   end;
 
@@ -126,7 +121,7 @@ type
     function IsAction: Boolean;
     function IsMethod: Boolean;
     function IsAnonimousMethod: Boolean;
-    function AsAction: TAction;
+    function AsAction: TioAction;
     function AsMethod: TRttiMethod;
     function AsAnonimousMethod: TioCommandAnonimousMethod;
     // Owner
@@ -174,10 +169,10 @@ type
     procedure LoadCommands(const AOwner:TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
     procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
-    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
-    procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
-    procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
-    procedure Unregister(const AOwner:TComponent);
+//    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
+//    procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
+//    procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
+//    procedure Unregister(const AOwner:TComponent);
     procedure Notify;
     procedure Execute(const AName:String; const ANoException:Boolean=False);
     procedure BindView(const AView:TComponent);

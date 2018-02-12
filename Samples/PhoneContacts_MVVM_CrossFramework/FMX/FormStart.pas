@@ -6,7 +6,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.TabControl, System.Actions, FMX.ActnList,
-  iORM.MVVM.Components.ViewContextProvider, iORM.DB.Components.ConnectionDef;
+  iORM.MVVM.Components.ViewContextProvider, iORM.DB.Components.ConnectionDef,
+  iORM.AbstractionLayer.Framework.FMX;
 
 type
   TForm1 = class(TForm)

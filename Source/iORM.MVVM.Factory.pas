@@ -41,13 +41,14 @@ interface
 
 uses
 {$IFDEF ioVCL}
-  Vcl.ActnList,
+//  Vcl.ActnList,
 {$ELSE}
-  FMX.ActnList,
+//  FMX.ActnList,
 {$ENDIF}
   iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.Where.Interfaces,
-  System.Rtti, System.Classes, iORM.CommonTypes;
+  System.Rtti, System.Classes, iORM.CommonTypes,
+  iORM.AbstractionLayer.Framework;
 
 type
 
@@ -56,7 +57,7 @@ type
     class function NewViewRegister: IioViewRegister;
     class function NewCommandsContainer(const AOwner:TComponent): IioCommandsContainer;
     class function NewCommandsContainerItem(const AName:String; const ACommandType:TioCommandType): IioCommandsContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const AAction:TAction): IioCommandsContainerItem; overload;
+    class function NewCommandsContainerItem(const AName:String; const AAction:TioAction): IioCommandsContainerItem; overload;
     class function NewCommandsContainerItem(const AName:String; const ARttiMethod:TRttiMethod): IioCommandsContainerItem; overload;
     class function NewCommandsContainerItem(const AName:String; const AAnonimousMethod:TioCommandAnonimousMethod): IioCommandsContainerItem; overload;
   end;
@@ -85,8 +86,7 @@ begin
   end;
 end;
 
-class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
-  const AAction: TAction): IioCommandsContainerItem;
+class function TioMVVMFactory.NewCommandsContainerItem(const AName:String; const AAction: TioAction): IioCommandsContainerItem;
 begin
   Result := TioCommandsContainerItemAction.Create(AName, AAction);
 end;

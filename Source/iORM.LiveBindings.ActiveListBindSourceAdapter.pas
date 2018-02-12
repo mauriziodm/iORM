@@ -38,11 +38,6 @@ unit iORM.LiveBindings.ActiveListBindSourceAdapter;
 interface
 
 uses
-{$IFDEF ioVCL}
-  Vcl.ExtCtrls,
-{$ELSE}
-  Fmx.Types,
-{$ENDIF}
   Data.Bind.ObjectScope, System.Classes,
   System.Generics.Collections, iORM.Where.SqlItems.Interfaces,
   iORM.CommonTypes, iORM.Context.Properties.Interfaces,
@@ -180,7 +175,8 @@ uses
   iORM, System.Rtti, iORM.LiveBindings.Factory, iORM.Context.Factory,
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Rtti.Utilities,
-  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence;
+  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
+  iORM.AbstractionLayer.Framework;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -234,9 +230,9 @@ end;
 
 procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer);
 var
-  LTimer: TTimer;
+  LTimer: TioTimer;
 begin
-  LTimer := TTimer.Create(Self);
+  LTimer := TioTimer.CreateNewTimer;
   LTimer.Enabled := False;
   LTimer.OnTimer := ListViewDeletingTimerEventHandler;
   LTimer.Interval := ADelayMilliseconds;
@@ -604,10 +600,10 @@ end;
 procedure TioActiveListBindSourceAdapter.ListViewDeletingTimerEventHandler(
   Sender: TObject);
 var
-  LTimer: TTimer;
+  LTimer: TioTimer;
   CurrItemIndex: Integer;
 begin
-  LTimer := (Sender as TTimer);
+  LTimer := (Sender as TioTimer);
   LTimer.Enabled := False;
   // Delayed deletion of the current object for ListView
   CurrItemIndex := ItemIndex;

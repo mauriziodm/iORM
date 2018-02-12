@@ -95,18 +95,13 @@ type
     class procedure SetWaitProc(const AShowWaitProc:TProc=nil; const AHideWaitProc:TProc=nil);
     class procedure ShowWait;
     class procedure HideWait;
-    class procedure TerminateApplication;
+    class function TerminateApplication: Boolean;
     class procedure HandleException(Sender: TObject);
   end;
 
 implementation
 
 uses
-{$IFDEF ioVCL}
-  Vcl.Forms,
-{$ELSE}
-  FMX.Forms,
-{$ENDIF}
   iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory,
   iORM.DuckTyped.StreamObject,
@@ -114,7 +109,7 @@ uses
   iORM.Exceptions,
   iORM.DB.Factory,
   iORM.DB.DBCreator.Factory, iORM.Rtti.Utilities, iORM.Strategy.Factory,
-  iORM.Context.Container;
+  iORM.Context.Container, iORM.AbstractionLayer.Framework;
 
 
 { io }
@@ -306,7 +301,7 @@ end;
 
 class procedure io.HandleException(Sender: TObject);
 begin
-  Application.HandleException(Sender);
+  TioApplication.HandleException(Sender);
 end;
 
 class procedure io.HideWait;
@@ -334,9 +329,9 @@ begin
   Self.PersistCollection(AIntfCollection as TObject, AConnectionName, ABlindInsert);
 end;
 
-class procedure io.TerminateApplication;
+class function io.TerminateApplication: Boolean;
 begin
-  Application.Terminate;
+  Result := TioApplication.Terminate;
 end;
 
 class function io.RefTo(const AWhere: IioWhere): IioWhere;

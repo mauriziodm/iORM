@@ -40,14 +40,9 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-{$IFDEF ioVCL}
-  Vcl.ActnList,
-{$ELSE}
-  FMX.ActnList,
-{$ENDIF}
   System.Rtti, iORM.MVVM.Interfaces,
   System.Generics.Collections, System.Classes, System.UITypes,
-  iORM.Attributes, iORM.CommonTypes;
+  iORM.Attributes, iORM.CommonTypes, iORM.AbstractionLayer.Framework;
 
 type
 
@@ -65,10 +60,11 @@ type
     procedure LoadCommands(const AOwner:TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
     procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
-    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
-    procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
-    procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
-    procedure Unregister(const AOwner:TComponent);
+    // NB: DI questi metodì è stata lasciata, per il momento, anche l'implementazione commentata
+//    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
+//    procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
+//    procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
+//    procedure Unregister(const AOwner:TComponent);
     procedure Execute(const AName:String; const ANoException:Boolean=False);
     procedure Notify;
     procedure BindView(const AView:TComponent);
@@ -119,7 +115,7 @@ type
     function IsAction: Boolean; virtual;
     function IsMethod: Boolean; virtual;
     function IsAnonimousMethod: Boolean; virtual;
-    function AsAction: TAction; virtual;
+    function AsAction: TioAction; virtual;
     function AsMethod: TRttiMethod; virtual;
     function AsAnonimousMethod: TioCommandAnonimousMethod; virtual;
     property Owner:TObject read GetOwner write SetOwner;
@@ -133,7 +129,7 @@ type
     property IsNotificationTarget:Boolean read GetIsNotificationTarget write SetIsNotificationTarget;
   end;
 
-  TioCommandsContainerItemAction = class(TioCommandsContainerItem<TAction>)
+  TioCommandsContainerItemAction = class(TioCommandsContainerItem<TioAction>)
   strict private
     procedure BindActionEvent(const ACmdInfo: TioCommandInfo; const AMethodData:Pointer);
   strict protected
@@ -158,7 +154,7 @@ type
     procedure FillCommandInfo(const AOwner: TComponent; const ACmdInfo: TioCommandInfo); override;
     procedure Execute; override;
     function IsAction: Boolean; override;
-    function AsAction: TAction; override;
+    function AsAction: TioAction; override;
   end;
 
   TioCommandsContainerItemMethod = class(TioCommandsContainerItem<TRttiMethod>)
@@ -192,7 +188,7 @@ uses
 
 { TioVMNotifyItem<T> }
 
-function TioCommandsContainerItem<T>.AsAction: TAction;
+function TioCommandsContainerItem<T>.AsAction: TioAction;
 begin
   Result := nil;
 end;
@@ -422,12 +418,7 @@ end;
 
 function TioCommandsContainerItemAction.GetCaption: String;
 begin
-{$IFDEF ioFMX}
   Result := Self.Command.Caption;
-{$ENDIF}
-{$IFDEF ioVCL}
-  Result := Self.Command.Caption;
-{$ENDIF}
 end;
 
 function TioCommandsContainerItemAction.GetChecked: Boolean;
@@ -460,7 +451,7 @@ begin
   Result := Self.Command.Visible;
 end;
 
-function TioCommandsContainerItemAction.AsAction: TAction;
+function TioCommandsContainerItemAction.AsAction: TioAction;
 begin
   inherited;
   Result := Command;
@@ -515,7 +506,7 @@ begin
   // If the internal action is not assigned then crate it
   if Self.IsEmpty then
   begin
-    Command := TAction.Create(AOwner);
+    Command := TioAction.CreateNewAction(AOwner);
     Command.Name := ACmdInfo.Name.Value;
   end;
   // Set the method as an action event handler
@@ -589,24 +580,20 @@ procedure TioCommandsContainer.BindViewControl(const AControl: TObject;
   const ACommandName: String);
 var
   LCommandItem: IioCommandsContainerItem;
-  LAction: TAction;
   LControlType: TRttiInstanceType;
   LControlActionProperty: TRttiProperty;
-  AValue: TValue;
 begin
   // Get the action
   LCommandItem := Self.Get(ACommandName);
   if not LCommandItem.IsAction then
     raise EioException.Create(Self.ClassName + ': The command is not an action.');
-  LAction := LCommandItem.AsAction;
   // Get the control action property
   LControlType := TioRttiContextFactory.RttiContext.GetType(AControl.ClassInfo).AsInstance;
   LControlActionProperty := LControlType.GetProperty('Action');
   if not Assigned(LControlActionProperty) then
     EioException.Create(Self.ClassName + ': "Action" property not found.');
   // Bind the action
-  AValue := TValue.From<TAction>(LAction);
-  LControlActionProperty.SetValue(AControl, AValue);
+  LControlActionProperty.SetValue(AControl, LCommandItem.AsAction.AsTValue);
 end;
 
 procedure TioCommandsContainer.AddOrUpdate(const AName: String;
@@ -745,8 +732,8 @@ var
   LField: TRttiField;
   LAttr: TCustomAttribute;
   LCmdItem: IioCommandsContainerItem;
-  LAction: TAction;
   LObj: TObject;
+  LAction: TioAction;
 begin
   // Loop for all fields searching actions
   for LField in TRttiInstanceType(ARttiElement).GetFields do
@@ -755,10 +742,9 @@ begin
     and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TBasicAction)
     then
     begin
-      // get the action
-//      LAction := LField.GetValue(AOwner).AsType<TAction>;
+      // Get the action
       LObj := LField.GetValue(AOwner).AsObject;
-      LAction := LObj as TAction;
+      LAction := TioAction.CreateNewAction(AOwner, LObj);
       // Get or create the CommandsContainerItem and add it to the commands container
       LCmdItem := TioMVVMFactory.NewCommandsContainerItem(LAction.Name, LAction);
       LCmdItem.Owner := AOwner;
@@ -798,41 +784,51 @@ begin
       FContainer.Items[LKey].Execute;
 end;
 
-procedure TioCommandsContainer.RegisterAction(const AName: String;
-  const AOwner: TComponent; const AAction: TAction;
-  const AIsNotificationTarget: Boolean);
-var
-  LCmdItem: IioCommandsContainerItem;
-begin
-  LCmdItem := TioMVVMFactory.NewCommandsContainerItem(AName, AAction);
-  LCmdItem.Owner := AOwner;
-  LCmdItem.IsNotificationTarget := AIsNotificationTarget;
-  Self.Add(AName, LCmdItem);
-end;
+//procedure TioCommandsContainer.RegisterAction(const AName: String;
+//  const AOwner: TComponent; const AAction: TAction;
+//  const AIsNotificationTarget: Boolean);
+//var
+//  LCmdItem: IioCommandsContainerItem;
+//begin
+//  LCmdItem := TioMVVMFactory.NewCommandsContainerItem(AName, AAction);
+//  LCmdItem.Owner := AOwner;
+//  LCmdItem.IsNotificationTarget := AIsNotificationTarget;
+//  Self.Add(AName, LCmdItem);
+//end;
 
-procedure TioCommandsContainer.RegisterAnonimousMethod(const AName:String;
-const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod;
-const AIsNotificationTarget:Boolean=False);
-var
-  LCmdItem: IioCommandsContainerItem;
-begin
-  LCmdItem := TioMVVMFactory.NewCommandsContainerItem(AName, AAnonimousMethod);
-  LCmdItem.Owner := AOwner;
-  LCmdItem.IsNotificationTarget := AIsNotificationTarget;
-  Self.Add(AName, LCmdItem);
-end;
+//procedure TioCommandsContainer.RegisterAnonimousMethod(const AName:String;
+//const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod;
+//const AIsNotificationTarget:Boolean=False);
+//var
+//  LCmdItem: IioCommandsContainerItem;
+//begin
+//  LCmdItem := TioMVVMFactory.NewCommandsContainerItem(AName, AAnonimousMethod);
+//  LCmdItem.Owner := AOwner;
+//  LCmdItem.IsNotificationTarget := AIsNotificationTarget;
+//  Self.Add(AName, LCmdItem);
+//end;
 
-procedure TioCommandsContainer.RegisterMethod(const AName: String;
-  const AOwner: TComponent; const ARttiMethod: TRttiMethod;
-  const AIsNotificationTarget: Boolean);
-var
-  LCmdItem: IioCommandsContainerItem;
-begin
-  LCmdItem := TioMVVMFactory.NewCommandsContainerItem(AName, ARttiMethod);
-  LCmdItem.Owner := AOwner;
-  LCmdItem.IsNotificationTarget := AIsNotificationTarget;
-  Self.Add(AName, LCmdItem);
-end;
+//procedure TioCommandsContainer.RegisterMethod(const AName: String;
+//  const AOwner: TComponent; const ARttiMethod: TRttiMethod;
+//  const AIsNotificationTarget: Boolean);
+//var
+//  LCmdItem: IioCommandsContainerItem;
+//begin
+//  LCmdItem := TioMVVMFactory.NewCommandsContainerItem(AName, ARttiMethod);
+//  LCmdItem.Owner := AOwner;
+//  LCmdItem.IsNotificationTarget := AIsNotificationTarget;
+//  Self.Add(AName, LCmdItem);
+//end;
+
+//procedure TioCommandsContainer.Unregister(const AOwner: TComponent);
+//var
+//  LKey: String;
+//  LCmdItem: IioCommandsContainerItem;
+//begin
+//  for LKey in FContainer.Keys do
+//    if FContainer.Items[LKey].Owner = AOwner then
+//      FContainer.Remove(LKey);
+//end;
 
 procedure TioCommandsContainer.UniBindViewCommands(const AView:TComponent; const AViewType:TRttiInstanceType);
 var
@@ -849,16 +845,6 @@ begin
       BindViewControl(LComponent, ioUniBindAction(LAttr).CommandName);
     end;
   end;
-end;
-
-procedure TioCommandsContainer.Unregister(const AOwner: TComponent);
-var
-  LKey: String;
-  LCmdItem: IioCommandsContainerItem;
-begin
-  for LKey in FContainer.Keys do
-    if FContainer.Items[LKey].Owner = AOwner then
-      FContainer.Remove(LKey);
 end;
 
 { TioVMNotifyItemAnonimousMethodEx }

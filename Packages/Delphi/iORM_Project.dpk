@@ -177,6 +177,8 @@ contains
   iORM.LiveBindings.BSAToDataSetLink in '..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas',
   iORM.MVVM.ViewRegister in '..\..\Source\iORM.MVVM.ViewRegister.pas',
   iORM.MVVM.ViewRegisterItem in '..\..\Source\iORM.MVVM.ViewRegisterItem.pas',
-  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas';
-
+  iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
+  iORM.AbstractionLayer.Framework in '..\..\Source\iORM.AbstractionLayer.Framework.pas',
+  iORM.AbstractionLayer.Framework.VCL in '..\..\Source\iORM.AbstractionLayer.Framework.VCL.pas',
+  iORM.AbstractionLayer.Framework.FMX in '..\..\Source\iORM.AbstractionLayer.Framework.FMX.pas';
 end.
