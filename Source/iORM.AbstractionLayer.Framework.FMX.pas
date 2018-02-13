@@ -3,6 +3,7 @@ unit iORM.AbstractionLayer.Framework.FMX;
 interface
 
 uses
+  FireDAC.FMXUI.Wait, // For FireDAC compatibility without insert the original component
   iORM.AbstractionLayer.Framework, FMX.Types, System.Classes, FMX.ActnList,
   System.Rtti;
 
@@ -14,9 +15,9 @@ type
     class function _Terminate: Boolean; override;
   end;
 
-  TioComponentFMX = class(TioComponent)
+  TioControlFMX = class(TioControl)
   protected
-    class procedure _SetParent(const AComponent, AParent: TObject); override;
+    class procedure _SetParent(const AControl, AParent: TObject); override;
   end;
 
   TioTimerFMX = class(TioTimer)
@@ -288,20 +289,20 @@ end;
 
 { TioControlFMX }
 
-class procedure TioComponentFMX._SetParent(const AComponent, AParent: TObject);
+class procedure TioControlFMX._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
-  if not (AComponent is TFmxObject) then
-    EioException.Create(Self.ClassName, '_SetParent', 'AComponent must descend from TFmxObject.');
+  if not (AControl is TFmxObject) then
+    EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TFmxObject.');
   if not (AParent is TFmxObject) then
     EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TFmxObject.');
-  TFmxObject(AComponent).Parent := TFmxObject(AParent);
+  TFmxObject(AControl).Parent := TFmxObject(AParent);
 end;
 
 initialization
 
   TioApplicationFMX.SetConcreteClass(TioApplicationFMX);
-  TioComponentFMX.SetConcreteClass(TioComponentFMX);
+  TioControlFMX.SetConcreteClass(TioControlFMX);
   TioTimerFMX.SetConcreteClass(TioTimerFMX);
   TioActionFMX.SetConcreteClass(TioActionFMX);
 end.

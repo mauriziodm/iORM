@@ -1238,7 +1238,7 @@ begin
     if FVCProviderEnabled and (Result is TComponent) and Assigned(FViewContext) then
     begin
       // Set the ViewContext as parent view
-      TioComponent.SetParent(Result, FViewContext);
+      TioControl.SetParent(Result, FViewContext);
       // Fire the onAfterRequest event handler of the ViewContextProvider component
       if Assigned(FVCProvider) then
         FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);

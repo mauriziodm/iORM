@@ -48,18 +48,9 @@ uses
   FireDAC.Phys,
   FireDAC.DApt,
   FireDAC.UI.Intf,
-
-{$IFDEF CONSOLE}
+//{$IFDEF CONSOLE}  // Non più necessaria
   FireDAC.ConsoleUI.Wait,
-{$ELSE}
-  {$IFDEF ioVCL}
-    FireDAC.VCLUI.Wait,
-    FireDAC.Phys.MSSQL,
-  {$ELSE}
-    FireDAC.FMXUI.Wait,
-  {$ENDIF}
-{$ENDIF}
-
+//{$ENDIF}
   FireDAC.Comp.UI,
   FireDAC.Stan.Async;
 

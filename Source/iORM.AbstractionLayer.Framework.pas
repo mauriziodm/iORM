@@ -19,15 +19,15 @@ type
     class function Terminate: Boolean;
   end;
 
-  TioComponentRef = class of TioComponent;
-  TioComponent = class abstract
+  TioControlRef = class of TioControl;
+  TioControl = class abstract
   private
-    class var FConcreteClass: TioComponentRef;
+    class var FConcreteClass: TioControlRef;
   protected
-    class procedure SetConcreteClass(const AClass: TioComponentRef);
-    class procedure _SetParent(const AComponent, AParent: TObject); virtual; abstract;
+    class procedure SetConcreteClass(const AClass: TioControlRef);
+    class procedure _SetParent(const AControl, AParent: TObject); virtual; abstract;
   public
-    class procedure SetParent(const AComponent, AParent: TObject);
+    class procedure SetParent(const AControl, AParent: TObject);
   end;
 
   TioTimerRef = class of TioTimer;
@@ -150,14 +150,14 @@ end;
 
 { TioControl }
 
-class procedure TioComponent.SetConcreteClass(const AClass: TioComponentRef);
+class procedure TioControl.SetConcreteClass(const AClass: TioControlRef);
 begin
   FConcreteClass := AClass;
 end;
 
-class procedure TioComponent.SetParent(const AComponent, AParent: TObject);
+class procedure TioControl.SetParent(const AControl, AParent: TObject);
 begin
-  FConcreteClass._SetParent(AComponent, AParent);
+  FConcreteClass._SetParent(AControl, AParent);
 end;
 
 end.

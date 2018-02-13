@@ -165,25 +165,6 @@ type
     property UserName;
   end;
 
-  // Class for MSSQLServer connection
-  TioSQLServerConnectionDef = class(TioCustomConnectionDef)
-  public
-    procedure RegisterConnectionDef; override;
-    property ConnectionDef;
-  published
-    // Properties
-    property Database;
-    property DatabaseStdFolder;
-    property DefaultConnection;
-    property Encrypt;
-    property OSAuthent;
-    property Password;
-    property Persistent;
-    property Pooled;
-    property Server;
-    property UserName;
-  end;
-
   // Class for MySQL connection
   TioMySQLConnectionDef = class(TioCustomConnectionDef)
   public
@@ -393,25 +374,6 @@ begin
     TioSQLDialect.sqlDialect3: ConnectionDef.Params.Values['SQLDialect'] := '3';
     TioSQLDialect.sqlDialect2: ConnectionDef.Params.Values['SQLDialect'] := '2';
     TioSQLDialect.sqlDialect1: ConnectionDef.Params.Values['SQLDialect'] := '1';
-  end;
-  // NB: Inherited must be the last line (set FIsRegistered)
-  inherited;
-end;
-
-{ TioSQLServerConnectionDef }
-
-procedure TioSQLServerConnectionDef.RegisterConnectionDef;
-begin
-  ConnectionDef := TioConnectionManager.NewSQLServerConnectionDef(Server,
-    GetFullPathDatabase, UserName, Password, DefaultConnection,
-    Persistent, Pooled, Name);
-  // Encript
-  if not Encrypt.IsEmpty then
-    ConnectionDef.Params.Values['Encrypt'] := Encrypt;
-  // OSAuthent
-  case OSAuthent of
-    TioOSAuthent.oaNo:  ConnectionDef.Params.Values['OSAuthent'] := 'No';
-    TioOSAuthent.oaYes: ConnectionDef.Params.Values['OSAuthent'] := 'Yes';
   end;
   // NB: Inherited must be the last line (set FIsRegistered)
   inherited;

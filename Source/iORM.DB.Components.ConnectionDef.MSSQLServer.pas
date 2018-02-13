@@ -35,27 +35,58 @@
 
 
 
-unit iORM.DB.Components.ConnectionDef.DesignTime;
+unit iORM.DB.Components.ConnectionDef.MSSQLServer;
 
 interface
 
-  procedure Register;
+uses
+  FireDAC.Phys.MSSQL,  // For compatibility with FireDAC without need to put then Phys driver in the project
+  iORM.DB.Components.ConnectionDef, System.SysUtils;
+
+type
+
+  // Class for MSSQLServer connection
+  TioSQLServerConnectionDef = class(TioCustomConnectionDef)
+  public
+    procedure RegisterConnectionDef; override;
+    property ConnectionDef;
+  published
+    // Properties
+    property Database;
+    property DatabaseStdFolder;
+    property DefaultConnection;
+    property Encrypt;
+    property OSAuthent;
+    property Password;
+    property Persistent;
+    property Pooled;
+    property Server;
+    property UserName;
+  end;
 
 implementation
 
 uses
-  System.Classes,
-  iORM.DB.Components.ConnectionDef,
-  iORM.DB.Components.ConnectionDef.MSSQLServer;
+  iORM.DB.ConnectionContainer;
 
-  procedure Register;
-  begin
-    RegisterComponents('iORM', [TioSQLMonitor]);
-    RegisterComponents('iORM', [TioRESTConnectionDef]);
-    RegisterComponents('iORM', [TioSQLiteConnectionDef]);
-    RegisterComponents('iORM', [TioFirebirdConnectionDef]);
-    RegisterComponents('iORM', [TioSQLServerConnectionDef]);
-//    RegisterComponents('iORM', [TioMySQLConnectionDef]);
+{ TioSQLServerConnectionDef }
+
+procedure TioSQLServerConnectionDef.RegisterConnectionDef;
+begin
+  inherited;
+  ConnectionDef := TioConnectionManager.NewSQLServerConnectionDef(Server,
+    GetFullPathDatabase, UserName, Password, DefaultConnection,
+    Persistent, Pooled, Name);
+  // Encript
+  if not Encrypt.IsEmpty then
+    ConnectionDef.Params.Values['Encrypt'] := Encrypt;
+  // OSAuthent
+  case OSAuthent of
+    TioOSAuthent.oaNo:  ConnectionDef.Params.Values['OSAuthent'] := 'No';
+    TioOSAuthent.oaYes: ConnectionDef.Params.Values['OSAuthent'] := 'Yes';
   end;
+  // NB: Inherited must be the last line (set FIsRegistered)
+  inherited;
+end;
 
 end.
