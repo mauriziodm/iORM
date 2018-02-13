@@ -10,6 +10,7 @@ uses
 type
   TStartForm = class(TForm)
     SQLiteConn: TioSQLiteConnectionDef;
+    ioFMX1: TioFMX;
     procedure FormCreate(Sender: TObject);
     procedure SQLiteConnAfterRegister(Sender: TObject);
   private

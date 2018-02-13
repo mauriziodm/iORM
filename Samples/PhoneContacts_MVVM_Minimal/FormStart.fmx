@@ -20,4 +20,8 @@ object StartForm: TStartForm
     Left = 152
     Top = 64
   end
+  object ioFMX1: TioFMX
+    Left = 328
+    Top = 184
+  end
 end

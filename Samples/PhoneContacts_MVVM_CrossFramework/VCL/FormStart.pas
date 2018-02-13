@@ -6,12 +6,13 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   iORM.MVVM.Components.ViewContextProvider, iORM.DB.Components.ConnectionDef,
-  Vcl.Menus;
+  Vcl.Menus, iORM.AbstractionLayer.Framework.VCL;
 
 type
   TStartForm = class(TForm)
     SQLiteConn: TioSQLiteConnectionDef;
     FormsVCProvider: TioViewContextProvider;
+    ioVCL1: TioVCL;
     procedure FormCreate(Sender: TObject);
     procedure FormsVCProviderioOnRequest(const Sender: TObject;
       out ResultViewContext: TComponent);

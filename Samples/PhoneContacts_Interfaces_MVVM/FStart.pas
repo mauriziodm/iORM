@@ -21,6 +21,7 @@ type
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
     SQLiteConn: TioSQLiteConnectionDef;
+    ioFMX1: TioFMX;
     procedure FormCreate(Sender: TObject);
     procedure RBTabsChange(Sender: TObject);
     procedure TabsVCProviderioOnRelease(const Sender: TObject; const AView,

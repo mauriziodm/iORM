@@ -9,6 +9,9 @@ uses
 
 type
 
+  TioFMX = class(TComponent)
+  end;
+
   TioApplicationFMX = class(TioApplication)
   protected
     class procedure _HandleException(const Sender: TObject); override;

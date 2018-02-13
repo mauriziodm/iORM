@@ -9,6 +9,9 @@ uses
 
 type
 
+  TioVCL = class(TComponent)
+  end;
+
   TioApplicationVCL = class(TioApplication)
   protected
     class procedure _HandleException(const Sender: TObject); override;
@@ -164,6 +167,7 @@ end;
 
 constructor TioActionVCL.Create(AOwner: TComponent);
 begin
+  inherited;
   FInternalAction := TAction.Create(AOwner);
 end;
 
@@ -297,5 +301,12 @@ class function TioActionVCL._CreateNewAction(const AOwner: TComponent): TioActio
 begin
   Result := Self.Create(AOwner);
 end;
+
+initialization
+
+  TioApplicationVCL.SetConcreteClass(TioApplicationVCL);
+  TioControlVCL.SetConcreteClass(TioControlVCL);
+  TioTimerVCL.SetConcreteClass(TioTimerVCL);
+  TioActionVCL.SetConcreteClass(TioActionVCL);
 
 end.
