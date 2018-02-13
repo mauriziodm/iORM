@@ -14,6 +14,11 @@ type
     class function _Terminate: Boolean; override;
   end;
 
+  TioComponentFMX = class(TioComponent)
+  protected
+    class procedure _SetParent(const AComponent, AParent: TObject); override;
+  end;
+
   TioTimerFMX = class(TioTimer)
   private
     FInternalTimer: TTimer;
@@ -69,7 +74,7 @@ type
 implementation
 
 uses
-  FMX.Forms;
+  FMX.Forms, iORM.Exceptions;
 
 { TioTimerFMX }
 
@@ -281,9 +286,22 @@ begin
   Result := Self.Create(AOwner, AAction);
 end;
 
+{ TioControlFMX }
+
+class procedure TioComponentFMX._SetParent(const AComponent, AParent: TObject);
+begin
+  inherited;
+  if not (AComponent is TFmxObject) then
+    EioException.Create(Self.ClassName, '_SetParent', 'AComponent must descend from TFmxObject.');
+  if not (AParent is TFmxObject) then
+    EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TFmxObject.');
+  TFmxObject(AComponent).Parent := TFmxObject(AParent);
+end;
+
 initialization
 
   TioApplicationFMX.SetConcreteClass(TioApplicationFMX);
+  TioComponentFMX.SetConcreteClass(TioComponentFMX);
   TioTimerFMX.SetConcreteClass(TioTimerFMX);
   TioActionFMX.SetConcreteClass(TioActionFMX);
 end.

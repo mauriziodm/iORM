@@ -40,11 +40,6 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-{$IFDEF ioVCL}
-//  Vcl.ActnList,
-{$ELSE}
-//  FMX.ActnList,
-{$ENDIF}
   iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.Where.Interfaces,
   System.Rtti, System.Classes, iORM.CommonTypes,

@@ -302,18 +302,12 @@ type
 implementation
 
 uses
-{$IFDEF ioVCL}
-  Vcl.Controls,
-{$ELSE}
-  Fmx.Types,
-  Fmx.Controls,
-{$ENDIF}
   iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker,
   iORM.Rtti.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces,
-  iORM.MVVM.Components.ViewModelBridge;
+  iORM.MVVM.Components.ViewModelBridge, iORM.AbstractionLayer.Framework;
 
 { TioDependencyInjectionBase }
 
@@ -1244,11 +1238,7 @@ begin
     if FVCProviderEnabled and (Result is TComponent) and Assigned(FViewContext) then
     begin
       // Set the ViewContext as parent view
-      {$IFDEF ioVCL}
-        (Result as TControl).Parent := (FViewContext as TWinControl);
-      {$ELSE}
-        (Result as TFmxObject).Parent := (FViewContext as TFmxObject);
-      {$ENDIF}
+      TioComponent.SetParent(Result, FViewContext);
       // Fire the onAfterRequest event handler of the ViewContextProvider component
       if Assigned(FVCProvider) then
         FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);

@@ -91,12 +91,6 @@ type
 implementation
 
 uses
-  {$IFDEF ioVCL}
-    Vcl.Controls,
-  {$ELSE}
-    Fmx.Types,
-    Fmx.Controls,
-  {$ENDIF}
   iORM.Exceptions,
   iORM.MVVM.ViewContextProviderContainer, iORM.Rtti.Utilities;
 
