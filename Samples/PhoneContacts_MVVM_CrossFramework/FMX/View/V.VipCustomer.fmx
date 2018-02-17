@@ -25,7 +25,10 @@ inherited ViewVipCustomer: TViewVipCustomer
       TabOrder = 4
       Size.Width = 327.000000000000000000
     end
-    object Label8: TLabel [7]
+    inherited EditFidelityCardCode: TEdit
+      Size.Width = 327.000000000000000000
+    end
+    object Label8: TLabel
       Position.X = 8.000000000000000000
       Position.Y = 152.000000000000000000
       Size.Width = 80.000000000000000000
@@ -34,7 +37,7 @@ inherited ViewVipCustomer: TViewVipCustomer
       TextSettings.HorzAlign = Trailing
       Text = 'V.I.P. card code'
     end
-    object EditVipCardCode: TEdit [8]
+    object EditVipCardCode: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 3
@@ -65,9 +68,6 @@ inherited ViewVipCustomer: TViewVipCustomer
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
     end
-    inherited EditFidelityCardCode: TEdit
-      Size.Width = 327.000000000000000000
-    end
   end
   inherited Panel2: TPanel
     Position.Y = 518.000000000000000000
@@ -81,7 +81,7 @@ inherited ViewVipCustomer: TViewVipCustomer
     Size.Height = 293.000000000000000000
     inherited DetailListView: TListView
       Size.Width = 412.000000000000000000
-      Size.Height = 183.000000000000000000
+      Size.Height = 193.000000000000000000
     end
     inherited Label5: TLabel
       Position.Y = 228.000000000000000000

@@ -11,7 +11,7 @@ uses
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource, FMX.ListView,
   FMX.ListBox, FMX.Edit, FMX.DateTimeCtrls, iORM.LiveBindings.Interfaces,
   System.Generics.Collections, Model.Travel, FMX.ListView.Appearances,
-  FMX.ListView.Adapters.Base, FMX.Controls.Presentation;
+  FMX.ListView.Adapters.Base, FMX.Controls.Presentation, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
   TMainForm = class(TForm)
@@ -106,6 +106,8 @@ type
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
+    SQLiteConn: TioSQLiteConnectionDef;
+    ioFMX1: TioFMX;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
@@ -128,6 +130,7 @@ type
     procedure LIstViewCostsItemClick(const Sender: TObject;
       const AItem: TListViewItem);
     procedure acCostDeleteExecute(Sender: TObject);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
     FTravelList: TObjectList<TTravel>;
@@ -144,7 +147,8 @@ uses
   GlobalFactory, iORM, Model.TravelWithCostTypeList,
   iORM.LazyLoad.Generics.ObjectList, iORM.LazyLoad.Interfaces,
   iORM.LiveBindings.ActiveListBindSourceAdapter,
-  Model.Factory, Model.BaseConst, Model.CostType, View.CostGeneric;
+  Model.Factory, Model.BaseConst, Model.CostType, View.CostGeneric,
+  Service.DefaultData;
 
 {$R *.fmx}
 
@@ -270,6 +274,12 @@ procedure TMainForm.ListViewTravelsItemClick(const Sender: TObject;
   const AItem: TListViewItem);
 begin
   ChangeTabActionToCostTypeList.ExecuteTarget(TabItemCostTypeList);
+end;
+
+procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for default data
+  TDefaultData.CheckForDefaultData;
 end;
 
 procedure TMainForm.TabControlMainGesture(Sender: TObject;

@@ -10,7 +10,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, Data.Bind.Controls, FMX.Grid.Style, FMX.ScrollBox,
-  FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid;
+  FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
   TMainForm = class(TForm)
@@ -56,6 +56,9 @@ type
     EditClassName: TEdit;
     LinkControlToField3: TLinkControlToField;
     LinkGridToDataSourceBSDetail: TLinkGridToDataSource;
+    SQLiteConn: TioSQLiteConnectionDef;
+    ioFMX1: TioFMX;
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -67,6 +70,15 @@ var
 
 implementation
 
+uses
+  SampleData;
+
 {$R *.fmx}
+
+procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for sample data creation
+  TSampleData.CheckForSampleDataCreation;
+end;
 
 end.

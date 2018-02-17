@@ -13,7 +13,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource, FMX.Objects,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, Data.Bind.Controls, Fmx.Bind.Navigator,
-  FMX.StdActns;
+  FMX.StdActns, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
 
@@ -51,6 +51,8 @@ type
     LiveBindingsBindNavigateDelete2: TFMXBindNavigateDelete;
     BindNavigator1: TBindNavigator;
     acLoadImage: TAction;
+    SQLiteConn: TioSQLiteConnectionDef;
+    ioFMX1: TioFMX;
     procedure acLoadImageExecute(Sender: TObject);
   private
     { Private declarations }

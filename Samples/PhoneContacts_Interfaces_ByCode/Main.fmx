@@ -17,7 +17,7 @@ object MainForm: TMainForm
     Size.Height = 567.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     TabPosition = Bottom
     Sizes = (
@@ -31,7 +31,7 @@ object MainForm: TMainForm
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 128.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
@@ -235,7 +235,7 @@ object MainForm: TMainForm
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 128.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
@@ -306,5 +306,25 @@ object MainForm: TMainForm
             GestureID = sgiRight
           end>
       end>
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = 'ContactsIntf.DB'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 40
+    Top = 8
+  end
+  object ioSQLMonitor1: TioSQLMonitor
+    Mode = mmRemote
+    Left = 120
+    Top = 8
+  end
+  object ioFMX1: TioFMX
+    Left = 208
+    Top = 8
   end
 end

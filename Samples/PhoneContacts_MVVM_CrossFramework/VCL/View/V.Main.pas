@@ -14,6 +14,7 @@ uses
   iORM.DB.Components.DataSet.ModelDataSet, Vcl.Mask, Vcl.DBCtrls;
 
 type
+
   [diImplements(IMainView)]
   TViewMain = class(TFrame, IMainView)
 

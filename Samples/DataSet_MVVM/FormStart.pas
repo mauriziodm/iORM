@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM.MVVM.Components.ViewContextProvider,
-  Vcl.StdCtrls, iORM.DB.Components.ConnectionDef;
+  Vcl.StdCtrls, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.VCL;
 
 type
   TStartForm = class(TForm)
@@ -13,6 +13,7 @@ type
     Button2: TButton;
     VCProvider: TioViewContextProvider;
     SQLiteConn: TioSQLiteConnectionDef;
+    ioVCL1: TioVCL;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure VCProviderioOnRelease(const Sender: TObject; const AView,

@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.TabControl,
   System.Actions, FMX.ActnList, iORM.MVVM.Components.ViewContextProvider,
-  iORM.DB.Components.ConnectionDef, FMX.Controls.Presentation, FMX.StdCtrls;
+  iORM.DB.Components.ConnectionDef, FMX.Controls.Presentation, FMX.StdCtrls, iORM.AbstractionLayer.Framework.FMX;
 
 type
   TStartForm = class(TForm)
@@ -16,6 +16,7 @@ type
     TabControl: TTabControl;
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
+    ioFMX1: TioFMX;
     procedure VCProviderMasterioOnAfterRequest(const Sender: TObject;
       const AView, AViewContext: TComponent);
     procedure VCProviderMasterioOnRelease(const Sender: TObject; const AView,

@@ -309,7 +309,7 @@ object MainForml: TMainForml
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 240
+    Left = 232
     Top = 256
   end
   object PrototypeBindSource1: TioPrototypeBindSource
@@ -425,5 +425,19 @@ object MainForml: TMainForml
       Text = 'acLoadImage'
       OnExecute = acLoadImageExecute
     end
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\Pizza.db'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 232
+    Top = 60
+  end
+  object ioFMX1: TioFMX
+    Left = 232
+    Top = 316
   end
 end

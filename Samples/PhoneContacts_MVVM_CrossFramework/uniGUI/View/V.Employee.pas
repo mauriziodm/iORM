@@ -8,11 +8,11 @@ uses
   iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet,
   iORM.MVVM.Components.ViewModelBridge, uniBasicGrid, uniDBGrid, uniGUIClasses,
   uniEdit, uniDBEdit, uniLabel, uniButton, uniBitBtn, uniSpeedButton,
-  uniGUIBaseClasses, uniPanel, iORM.Attributes, V.Interfaces;
+  uniGUIBaseClasses, uniPanel, M.Model, iORM.Attributes;
 
 type
 
-  [diImplements(IPersonView, 'TEmployee')]
+  [diViewFor(TEmployee)]
   [ioUniBindAction('ButtonBack', 'acClose')]
   [ioUniBindAction('ButtonPost', 'acPost')]
   TViewEmployee = class(TViewPerson)

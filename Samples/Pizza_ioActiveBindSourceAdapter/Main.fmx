@@ -30,8 +30,8 @@ object MainForml: TMainForml
         item
         end>
       IsSelected = True
-      Size.Width = 8.000000000000000000
-      Size.Height = 8.000000000000000000
+      Size.Width = 11.000000000000000000
+      Size.Height = 11.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
@@ -408,5 +408,9 @@ object MainForml: TMainForml
       Text = 'acRefresh'
       OnExecute = acRefreshExecute
     end
+  end
+  object ioFMX1: TioFMX
+    Left = 240
+    Top = 308
   end
 end

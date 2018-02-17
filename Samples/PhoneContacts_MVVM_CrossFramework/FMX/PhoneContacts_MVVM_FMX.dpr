@@ -30,8 +30,6 @@ uses
 begin
   ReportMemoryLeaksOnShutdown := True;
 
-  TDIClassRegister.RegisterClasses;
-
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
   Application.Run;

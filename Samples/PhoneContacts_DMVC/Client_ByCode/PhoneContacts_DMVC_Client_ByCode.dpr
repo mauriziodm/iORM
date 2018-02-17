@@ -22,7 +22,7 @@ begin
 
   // ============ IupOrm initialization ====================
   // Set connection for SQLite (under the Documents folder better for mobile use)
-  io.Connections.NewRESTConnection('http://localhost:8080');
+//  io.Connections.NewRESTConnection('http://localhost:8080');
   // ============ IupOrm initialization ====================
 
 

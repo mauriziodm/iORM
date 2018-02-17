@@ -33,17 +33,6 @@ uses
 begin
   ReportMemoryLeaksOnShutdown := True;
 
-
-  // ============ IupOrm initialization ====================
-  // Set the directory name (under the Documents folder)
-  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\RVMan.db')).Apply;
-  // AutoCreation and AutoUpdate of the database
-  io.AutoCreateDatabase;
-  // Check for default data
-  TDefaultData.CheckForDefaultData;
-  // ============ IupOrm initialization ====================
-
-
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;

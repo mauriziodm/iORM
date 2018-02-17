@@ -9,7 +9,7 @@ uses
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.Controls.Presentation, Interfaces;
+  FMX.Controls.Presentation, Interfaces, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
   TMainForm = class(TForm)
@@ -41,6 +41,9 @@ type
     btImmediateLoad: TButton;
     btLazyLoad: TButton;
     btShowInfo: TButton;
+    SQLiteConn: TioSQLiteConnectionDef;
+    ioSQLMonitor1: TioSQLMonitor;
+    ioFMX1: TioFMX;
     procedure TabControl1Gesture(Sender: TObject;
       const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);
@@ -61,6 +64,7 @@ type
     procedure btImmediateLoadClick(Sender: TObject);
     procedure btLazyLoadClick(Sender: TObject);
     procedure btShowInfoClick(Sender: TObject);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -78,7 +82,7 @@ uses
   iORM.Containers.Interfaces, iORM.LiveBindings.InterfaceListBindSourceAdapter,
   iORM.Rtti.Utilities, iORM.LiveBindings.Interfaces,
   iORM.Where.Interfaces, iORM.Where, FireDAC.Comp.Client,
-  iORM.DB.Interfaces;
+  iORM.DB.Interfaces, SampleData;
 
 {$R *.fmx}
 
@@ -257,6 +261,12 @@ begin
   finally
     LMemTable.Free;
   end;
+end;
+
+procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for sample data creation
+  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TMainForm.TabControl1Gesture(Sender: TObject;

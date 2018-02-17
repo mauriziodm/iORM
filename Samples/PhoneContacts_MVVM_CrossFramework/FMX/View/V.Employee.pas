@@ -3,7 +3,7 @@ unit V.Employee;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, Data.Bind.Controls, Data.Bind.GenData,
@@ -11,12 +11,11 @@ uses
   System.Bindings.Outputs, Fmx.Bind.Editors, System.Actions, FMX.ActnList,
   Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.Layouts, Fmx.Bind.Navigator,
-  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, V.Person, iORM.Attributes,
-  V.Interfaces, iORM.MVVM.Components.ViewModelBridge,
-  iORM.LiveBindings.ModelBindSource;
+  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, V.Person, M.Model, iORM.Attributes,
+  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource;
 
 type
-  [diImplements(IPersonView, 'TEmployee')]
+  [diViewFor(TEmployee)]
   TViewEmployee = class(TViewPerson)
     EditBranchOffice: TEdit;
     Label7: TLabel;

@@ -1,3 +1,40 @@
+{***************************************************************************}
+{                                                                           }
+{           iORM - (interfaced ORM)                                         }
+{                                                                           }
+{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
+{                                                                           }
+{           mauriziodm@levantesw.it                                         }
+{           mauriziodelmagno@gmail.com                                      }
+{           https://github.com/mauriziodm/iORM.git                          }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  This file is part of iORM (Interfaced Object Relational Mapper).         }
+{                                                                           }
+{  Licensed under the GNU Lesser General Public License, Version 3;         }
+{  you may not use this file except in compliance with the License.         }
+{                                                                           }
+{  iORM is free software: you can redistribute it and/or modify             }
+{  it under the terms of the GNU Lesser General Public License as published }
+{  by the Free Software Foundation, either version 3 of the License, or     }
+{  (at your option) any later version.                                      }
+{                                                                           }
+{  iORM is distributed in the hope that it will be useful,                  }
+{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
+{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
+{  GNU Lesser General Public License for more details.                      }
+{                                                                           }
+{  You should have received a copy of the GNU Lesser General Public License }
+{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
+{                                                                           }
+{***************************************************************************}
+
+
+
+
+
 unit iORM.AbstractionLayer.Framework;
 
 interface
@@ -9,8 +46,9 @@ type
   TioApplicationRef = class of TioApplication;
   TioApplication = class abstract
   private
-    class var FConcreteClass: TioApplicationRef;
+    class var FConcreteClass_NoDirectCall: TioApplicationRef;
   protected
+    class function GetConcreteClass: TioApplicationRef;
     class procedure SetConcreteClass(const AClass: TioApplicationRef);
     class procedure _HandleException(const Sender: TObject); virtual; abstract;
     class function _Terminate: Boolean; virtual; abstract;
@@ -22,8 +60,9 @@ type
   TioControlRef = class of TioControl;
   TioControl = class abstract
   private
-    class var FConcreteClass: TioControlRef;
+    class var FConcreteClass_NoDirectCall: TioControlRef;
   protected
+    class function GetConcreteClass: TioControlRef;
     class procedure SetConcreteClass(const AClass: TioControlRef);
     class procedure _SetParent(const AControl, AParent: TObject); virtual; abstract;
   public
@@ -33,8 +72,9 @@ type
   TioTimerRef = class of TioTimer;
   TioTimer = class abstract
   private
-    class var FConcreteClass: TioTimerRef;
+    class var FConcreteClass_NoDirectCall: TioTimerRef;
   protected
+    class function GetConcreteClass: TioTimerRef;
     class procedure SetConcreteClass(const AClass: TioTimerRef);
     function GetEnabled: Boolean; virtual; abstract;
     function GetInterval: Cardinal; virtual; abstract;
@@ -55,10 +95,11 @@ type
   TioActionRef = class of TioAction;
   TioAction = class(TComponent)
   private
-    class var FConcreteClass: TioActionRef;
+    class var FConcreteClass_NoDirectCall: TioActionRef;
   protected
     class function _CreateNewAction(const AOwner:TComponent): TioAction; overload; virtual; abstract;
     class function _CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; overload; virtual; abstract;
+    class function GetConcreteClass: TioActionRef;
     class procedure SetConcreteClass(const AClass: TioActionRef);
     function GetCaption: string; virtual; abstract;
     function GetChecked: boolean; virtual; abstract;
@@ -102,62 +143,93 @@ type
 
 implementation
 
+uses
+  iORM.Exceptions;
+
 { TioTimer }
 
 class function TioTimer.CreateNewTimer: TioTimer;
 begin
-  Result := FConcreteClass.Create;
+  Result := GetConcreteClass.Create;
+end;
+
+class function TioTimer.GetConcreteClass: TioTimerRef;
+begin
+  if not Assigned(FConcreteClass_NoDirectCall) then
+    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+  Result := FConcreteClass_NoDirectCall;
 end;
 
 class procedure TioTimer.SetConcreteClass(const AClass: TioTimerRef);
 begin
-  FConcreteClass := AClass;
+  FConcreteClass_NoDirectCall := AClass;
 end;
 
 { TioApplication }
 
+class function TioApplication.GetConcreteClass: TioApplicationRef;
+begin
+  if not Assigned(FConcreteClass_NoDirectCall) then
+    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+  Result := FConcreteClass_NoDirectCall;
+end;
+
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
-  FConcreteClass._HandleException(Sender);
+  GetConcreteClass._HandleException(Sender);
 end;
 
 class procedure TioApplication.SetConcreteClass(const AClass: TioApplicationRef);
 begin
-  FConcreteClass := AClass;
+  FConcreteClass_NoDirectCall := AClass;
 end;
 
 class function TioApplication.Terminate: Boolean;
 begin
-  Result := FConcreteClass._Terminate;
+  Result := GetConcreteClass._Terminate;
 end;
 
 { TioAction }
 
 class function TioAction.CreateNewAction(const AOwner: TComponent): TioAction;
 begin
-  Result := FConcreteClass._CreateNewAction(AOwner)
+  Result := GetConcreteClass._CreateNewAction(AOwner)
 end;
 
 class function TioAction.CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction;
 begin
-  Result := FConcreteClass._CreateNewAction(AOwner, AAction)
+  Result := GetConcreteClass._CreateNewAction(AOwner, AAction)
+end;
+
+class function TioAction.GetConcreteClass: TioActionRef;
+begin
+  if not Assigned(FConcreteClass_NoDirectCall) then
+    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+  Result := FConcreteClass_NoDirectCall;
 end;
 
 class procedure TioAction.SetConcreteClass(const AClass: TioActionRef);
 begin
-  FConcreteClass := AClass;
+  FConcreteClass_NoDirectCall := AClass;
 end;
 
 { TioControl }
 
+class function TioControl.GetConcreteClass: TioControlRef;
+begin
+  if not Assigned(FConcreteClass_NoDirectCall) then
+    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+  Result := FConcreteClass_NoDirectCall;
+end;
+
 class procedure TioControl.SetConcreteClass(const AClass: TioControlRef);
 begin
-  FConcreteClass := AClass;
+  FConcreteClass_NoDirectCall := AClass;
 end;
 
 class procedure TioControl.SetParent(const AControl, AParent: TObject);
 begin
-  FConcreteClass._SetParent(AControl, AParent);
+  FConcreteClass_NoDirectCall._SetParent(AControl, AParent);
 end;
 
 end.

@@ -11,7 +11,7 @@ uses
   Fmx.Bind.DBEngExt, FMX.Objects, FMX.Edit, System.Actions, FMX.ActnList,
   FMX.ListView.Types, FMX.ListView, System.Generics.Collections, Model,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.Controls.Presentation;
+  FMX.Controls.Presentation, iORM.AbstractionLayer.Framework.FMX;
 
 type
 
@@ -49,6 +49,7 @@ type
     acNew: TAction;
     btDelete: TButton;
     acRefresh: TAction;
+    ioFMX1: TioFMX;
     procedure ListView1ItemClick(const Sender: TObject;
       const AItem: TListViewItem);
     procedure FormCreate(Sender: TObject);

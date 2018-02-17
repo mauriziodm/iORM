@@ -22,7 +22,7 @@ uses
   dxSkinTheAsphaltWorld, dxSkinsDefaultPainters, dxSkinValentine,
   dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
   dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint,
-  dxSkinXmas2008Blue, cxGroupBox, cxRadioGroup, Vcl.ComCtrls;
+  dxSkinXmas2008Blue, cxGroupBox, cxRadioGroup, Vcl.ComCtrls, iORM.AbstractionLayer.Framework.VCL;
 
 type
   TStartForm = class(TForm)
@@ -32,6 +32,7 @@ type
     ProductDetailLayout: TcxRadioGroup;
     ViewsLayout: TcxRadioGroup;
     PagesVCProviders: TioViewContextProvider;
+    ioVCL1: TioVCL;
     procedure SQLIteConnAfterRegister(Sender: TObject);
     procedure WindowsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);

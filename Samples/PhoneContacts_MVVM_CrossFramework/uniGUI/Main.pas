@@ -6,11 +6,12 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, uniGUITypes, uniGUIAbstractClasses,
   uniGUIClasses, uniGUIRegClasses, uniGUIForm,
-  iORM.MVVM.Components.ViewContextProvider;
+  iORM.MVVM.Components.ViewContextProvider, iORM.AbstractionLayer.Framework.VCL;
 
 type
   TMainForm = class(TUniForm)
     FormsVCProvider: TioViewContextProvider;
+    ioVCL1: TioVCL;
     procedure FormsVCProviderioOnRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure UniFormCreate(Sender: TObject);

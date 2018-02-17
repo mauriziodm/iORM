@@ -432,4 +432,8 @@ object MainForml: TMainForml
       OnExecute = acIupOrmInitExecute
     end
   end
+  object ioFMX1: TioFMX
+    Left = 240
+    Top = 308
+  end
 end

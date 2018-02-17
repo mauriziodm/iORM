@@ -10,7 +10,7 @@ uses
   System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
   Fmx.Bind.DBEngExt, FMX.Objects, FMX.Edit, System.Actions, FMX.ActnList,
   FMX.ListView.Types, FMX.ListView, FMX.ListView.Appearances, System.Generics.Collections, Model,
-  FMX.ListView.Adapters.Base, FMX.Controls.Presentation;
+  FMX.ListView.Adapters.Base, FMX.Controls.Presentation, iORM.AbstractionLayer.Framework.FMX;
 type
 
   TPizzaList = TObjectList<TPizza>;
@@ -50,6 +50,7 @@ type
     acPersist: TAction;
     btDelete: TButton;
     acIupOrmInit: TAction;
+    ioFMX1: TioFMX;
     procedure ListView1ItemClick(const Sender: TObject;
       const AItem: TListViewItem);
     procedure FormCreate(Sender: TObject);

@@ -16,4 +16,8 @@ object MainForm: TMainForm
     Left = 152
     Top = 160
   end
+  object ioVCL1: TioVCL
+    Left = 152
+    Top = 224
+  end
 end

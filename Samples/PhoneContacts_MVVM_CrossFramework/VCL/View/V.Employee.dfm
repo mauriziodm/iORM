@@ -7,8 +7,8 @@ inherited ViewEmployee: TViewEmployee
   inherited Panel3: TPanel
     Top = 196
     Height = 73
-    ExplicitTop = 186
-    ExplicitHeight = 83
+    ExplicitTop = 196
+    ExplicitHeight = 73
     inherited StringGrid1: TStringGrid
       Height = 10
       ExplicitHeight = 10
@@ -16,7 +16,7 @@ inherited ViewEmployee: TViewEmployee
     inherited BindNavigator1: TBindNavigator
       Top = 42
       Hints.Strings = ()
-      ExplicitTop = 46
+      ExplicitTop = 42
     end
   end
   inherited Panel4: TPanel

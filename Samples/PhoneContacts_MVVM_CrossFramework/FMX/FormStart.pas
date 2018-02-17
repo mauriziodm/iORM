@@ -6,8 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.TabControl, System.Actions, FMX.ActnList,
-  iORM.MVVM.Components.ViewContextProvider, iORM.DB.Components.ConnectionDef,
-  iORM.AbstractionLayer.Framework.FMX;
+  iORM.MVVM.Components.ViewContextProvider, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
   TForm1 = class(TForm)
@@ -17,6 +16,7 @@ type
     ActionList1: TActionList;
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
+    ioFMX1: TioFMX;
     procedure TabsVCProviderioOnAfterRequest(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure TabsVCProviderioOnRelease(const Sender: TObject; const AView,

@@ -5,6 +5,8 @@ inherited ViewCustomer: TViewCustomer
     end
   end
   inherited Panel3: TPanel
+    Top = 191
+    Height = 78
     inherited BindNavigator1: TBindNavigator
       Hints.Strings = ()
     end

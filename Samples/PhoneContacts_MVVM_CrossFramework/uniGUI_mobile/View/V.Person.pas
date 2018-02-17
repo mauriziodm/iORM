@@ -9,14 +9,14 @@ uses
   uniGUIBaseClasses, uniGUImJSForm, unimPanel, Data.DB,
   iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet,
   iORM.MVVM.Components.ViewModelBridge, uniLabel, unimLabel, uniEdit, uniDBEdit,
-  unimDBEdit, V.Interfaces, iORM.Attributes;
+  unimDBEdit, M.Model, M.AnotherModel, iORM.Attributes;
 
 type
 
-  [diImplements(IPersonView, 'TPerson'), diImplements(IPersonView, 'TAnotherPerson')]
+  [diViewFor(TPerson), diViewFor(TAnotherPerson)]
   [ioUniBindAction('ButtonBack', 'acClose')]
   [ioUniBindAction('ButtonPost', 'acPost')]
-  TViewPerson = class(TUniFrame, IPersonView)
+  TViewPerson = class(TUniFrame)
     VMBridge: TioViewModelBridge;
     PersonModelDataSet: TioModelDataSet;
     PersonModelDataSetID: TIntegerField;

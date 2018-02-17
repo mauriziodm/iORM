@@ -630,4 +630,8 @@ object MainForm: TMainForm
     Left = 160
     Top = 208
   end
+  object ioFMX1: TioFMX
+    Left = 272
+    Top = 352
+  end
 end

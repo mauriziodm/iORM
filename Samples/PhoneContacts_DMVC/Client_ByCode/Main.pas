@@ -9,7 +9,7 @@ uses
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.Controls.Presentation, Interfaces;
+  FMX.Controls.Presentation, Interfaces, iORM.DB.Components.ConnectionDef;
 
 type
   TMainForm = class(TForm)
@@ -41,6 +41,7 @@ type
     btImmediateLoad: TButton;
     btLazyLoad: TButton;
     btShowInfo: TButton;
+    RESTConn: TioRESTConnectionDef;
     procedure TabControl1Gesture(Sender: TObject;
       const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);

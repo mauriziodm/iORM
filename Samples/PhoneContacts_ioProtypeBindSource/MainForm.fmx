@@ -552,4 +552,19 @@ object Form1: TForm1
       TabControl = TabControl1
     end
   end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = 'ContactsObj.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 240
+    Top = 68
+  end
+  object ioFMX1: TioFMX
+    Left = 120
+    Top = 104
+  end
 end

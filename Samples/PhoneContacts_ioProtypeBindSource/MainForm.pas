@@ -10,7 +10,7 @@ uses FMX.ListView.Types, Data.Bind.Controls, System.Rtti, Data.Bind.GenData,
   FMX.StdCtrls, FMX.Layouts, FMX.Grid, Fmx.Bind.Navigator, FMX.ListView,
   FMX.Controls, FMX.Types, FMX.Forms, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.Controls.Presentation,
-  FMX.ScrollBox, FMX.Grid.Style, Fmx.Bind.GenData;
+  FMX.ScrollBox, FMX.Grid.Style, Fmx.Bind.GenData, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
 
@@ -59,7 +59,10 @@ type
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
     Button4: TButton;
+    SQLiteConn: TioSQLiteConnectionDef;
+    ioFMX1: TioFMX;
     procedure Button4Click(Sender: TObject);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -72,7 +75,7 @@ var
 implementation
 
 uses
-  Model;
+  Model, SampleData;
 
 {$R *.fmx}
 
@@ -83,6 +86,12 @@ begin
   LPerson := TCustomer.Create;
   MasterBS.Append(LPerson);
 //  BSMaster.Append;
+end;
+
+procedure TForm1.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for sample data creation
+  TSampleData.CheckForSampleDataCreation;
 end;
 
 end.

@@ -4,12 +4,14 @@ interface
 
 uses
   System.SysUtils, System.Classes, iORM.Attributes,
-  iORM.MVVM.Components.ModelPresenter, VM.Interfaces, iORM.MVVM.ViewModelBase;
+  iORM.MVVM.Components.ModelPresenter, iORM.MVVM.ViewModelBase,
+  M.Model, M.AnotherModel;
 
 type
 
-  [diImplements(IPersonViewModel)]
-  TPersonViewModel = class(TioViewModel, IPersonViewModel)
+  [diViewModelFor(TPerson), diViewModelFor(TCustomer), diViewModelFor(TVipCustomer)]
+  [diViewModelFor(TEmployee), diViewModelFor(TAnotherPerson)]
+  TPersonViewModel = class(TioViewModel)
     PersonModelPresenter: TioModelPresenter;
     PhonesModelPresenter: TioModelPresenter;
   private

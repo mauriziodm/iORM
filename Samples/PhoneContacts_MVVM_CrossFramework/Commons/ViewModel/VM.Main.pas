@@ -122,16 +122,9 @@ begin
 end;
 
 procedure TViewModelMain.acEditPersonExecute(Sender: TObject);
-var
-  LCurrentClassName: String;
 begin
   inherited;
-  // Get the class name of the current person
-  LCurrentClassName := PersonsModelPresenter.Current.ClassName;
-  // Get the View and ViewModel
-  io.di.LocateViewVM<IPersonView, IPersonViewModel>(LCurrentClassName)
-    .SetPresenter('PersonModelPresenter', PersonsModelPresenter)
-    .Get;
+  io.di.LocateViewVMfor(PersonsModelPresenter).ShowCurrent;
 end;
 
 procedure TViewModelMain.acTerminateExecute(Sender: TObject);

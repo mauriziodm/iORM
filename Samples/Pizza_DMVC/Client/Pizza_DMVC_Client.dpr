@@ -14,11 +14,6 @@ uses
 begin
   ReportMemoryLeaksOnShutdown := True;
 
-  // ============ IupOrm initialization ====================
-  // Connection params
-  io.Connections.NewRESTConnection('http://localhost:8080', False);
-  // ============ IupOrm initialization ====================
-
   Application.Initialize;
   Application.CreateForm(TMainForml, MainForml);
   Application.Run;

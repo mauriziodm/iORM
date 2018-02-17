@@ -327,7 +327,7 @@ object MainForml: TMainForml
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 240
+    Left = 232
     Top = 256
   end
   object PrototypeBindSource1: TioPrototypeBindSource
@@ -366,7 +366,7 @@ object MainForml: TMainForml
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 236
+    Left = 228
     Top = 157
     object LinkListControlToField2: TLinkListControlToField
       Category = 'Quick Bindings'
@@ -434,5 +434,19 @@ object MainForml: TMainForml
       CustomText = 'Back'
       Tab = TabItem2
     end
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\Pizza.db'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 232
+    Top = 60
+  end
+  object ioFMX1: TioFMX
+    Left = 232
+    Top = 308
   end
 end

@@ -7,12 +7,13 @@ uses
   Controls, Forms, uniGUITypes, uniGUIAbstractClasses,
   uniGUIClasses, uniGUIRegClasses, uniGUIForm,
   iORM.MVVM.Components.ViewContextProvider, uniGUIBaseClasses, uniPanel,
-  uniRadioGroup;
+  uniRadioGroup, iORM.AbstractionLayer.Framework.VCL;
 
 type
   TStartForm = class(TUniForm)
     VCProvider: TioViewContextProvider;
     PanelTools: TUniPanel;
+    ioVCL1: TioVCL;
     procedure VCProviderRequest(const Sender: TObject;
       out ResultViewContext: TComponent);
     procedure VCProviderRelease(const Sender: TObject; const AView,

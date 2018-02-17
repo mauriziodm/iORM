@@ -49,4 +49,8 @@ object Form1: TForm1
       TabControl = MainTabControl
     end
   end
+  object ioFMX1: TioFMX
+    Left = 152
+    Top = 312
+  end
 end

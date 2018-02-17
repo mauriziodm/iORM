@@ -35,8 +35,8 @@ object StartForm: TStartForm
     OnRelease = VCProviderioOnRelease
     OnRequest = VCProviderioOnRequest
     RegisterAsDefault = True
-    Left = 176
-    Top = 80
+    Left = 152
+    Top = 88
   end
   object SQLiteConn: TioSQLiteConnectionDef
     AutoCreateDatabase = True
@@ -45,7 +45,11 @@ object StartForm: TStartForm
     DefaultConnection = True
     Persistent = False
     Pooled = False
-    Left = 176
-    Top = 8
+    Left = 152
+    Top = 16
+  end
+  object ioVCL1: TioVCL
+    Left = 32
+    Top = 56
   end
 end

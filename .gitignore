@@ -146,3 +146,5 @@ Samples/BOM_MVVM_CrossFramework/uniGUI/__history/
 Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/__history/
 Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/View/__history/
 Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/Win32/Debug/cache/phonecontacts_mvvm_unigui_mobile_exe/favicon.ico
+Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/Win32/
+*.DB-journal

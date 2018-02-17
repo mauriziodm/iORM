@@ -38,9 +38,9 @@ inherited ViewEmployee: TViewEmployee
     end
   end
   inherited PanelPhones: TPanel
-    Size.Height = 304.000000000000000000
+    Size.Height = 227.000000000000000000
     inherited DetailListView: TListView
-      Size.Height = 194.000000000000000000
+      Size.Height = 127.000000000000000000
     end
     inherited Label5: TLabel
       Position.Y = 239.000000000000000000

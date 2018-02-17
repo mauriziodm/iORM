@@ -379,7 +379,7 @@ object MainForm: TMainForm
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 256
-    Top = 112
+    Top = 184
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -474,11 +474,11 @@ object MainForm: TMainForm
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 256
-    Top = 176
+    Top = 248
   end
   object ActionList1: TActionList
     Left = 216
-    Top = 240
+    Top = 312
     object NextTabAction1: TNextTabAction
       Category = 'Tab'
       TabControl = TabControl2
@@ -487,5 +487,20 @@ object MainForm: TMainForm
       Category = 'Tab'
       TabControl = TabControl2
     end
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = 'ContactsIntf.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 256
+    Top = 128
+  end
+  object ioFMX1: TioFMX
+    Left = 256
+    Top = 72
   end
 end

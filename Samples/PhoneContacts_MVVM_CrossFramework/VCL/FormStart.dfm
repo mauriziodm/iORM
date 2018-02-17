@@ -35,6 +35,6 @@ object StartForm: TStartForm
   end
   object ioVCL1: TioVCL
     Left = 152
-    Top = 216
+    Top = 224
   end
 end

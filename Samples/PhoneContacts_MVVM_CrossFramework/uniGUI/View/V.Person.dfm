@@ -2,11 +2,10 @@ object ViewPerson: TViewPerson
   Left = 0
   Top = 0
   Width = 451
-  Height = 530
+  Height = 305
   Align = alClient
   Anchors = [akLeft, akTop, akRight, akBottom]
   TabOrder = 0
-  ExplicitHeight = 305
   object UniPanel1: TUniPanel
     Left = 0
     Top = 0
@@ -146,7 +145,7 @@ object ViewPerson: TViewPerson
   end
   object UniPanel3: TUniPanel
     Left = 0
-    Top = 483
+    Top = 258
     Width = 451
     Height = 47
     Hint = ''
@@ -155,7 +154,6 @@ object ViewPerson: TViewPerson
     TabOrder = 2
     BorderStyle = ubsSolid
     Caption = ''
-    ExplicitTop = 258
     DesignSize = (
       451
       47)
@@ -190,17 +188,16 @@ object ViewPerson: TViewPerson
     Left = 0
     Top = 225
     Width = 451
-    Height = 258
+    Height = 33
     Hint = ''
     Align = alClient
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
     BorderStyle = ubsNone
     Caption = ''
-    ExplicitHeight = 33
     DesignSize = (
       451
-      258)
+      33)
     object UniLabel5: TUniLabel
       Left = 0
       Top = 0
@@ -221,7 +218,7 @@ object ViewPerson: TViewPerson
       Left = 9
       Top = 21
       Width = 434
-      Height = 229
+      Height = 4
       Hint = ''
       DataSource = PhonesDataSource
       LoadMask.Message = 'Loading data...'

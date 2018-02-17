@@ -322,7 +322,7 @@ object MainForml: TMainForml
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 240
+    Left = 232
     Top = 256
   end
   object PrototypeBindSource1: TioPrototypeBindSource
@@ -443,5 +443,12 @@ object MainForml: TMainForml
       Text = 'Refresh'
       DataSource = PrototypeBindSource1
     end
+  end
+  object RESTConn: TioRESTConnectionDef
+    BaseURL = 'http://localhost:8080'
+    DefaultConnection = True
+    Persistent = True
+    Left = 232
+    Top = 60
   end
 end

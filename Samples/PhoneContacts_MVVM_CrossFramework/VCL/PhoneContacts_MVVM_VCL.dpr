@@ -28,8 +28,6 @@ uses
 begin
   ReportMemoryLeaksOnShutdown := True;
 
-  TDIClassRegister.RegisterClasses;
-
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TStartForm, StartForm);

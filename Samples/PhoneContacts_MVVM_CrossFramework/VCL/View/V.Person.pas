@@ -10,12 +10,12 @@ uses
   Vcl.Buttons, Vcl.ExtCtrls, Vcl.StdCtrls, Data.Bind.Controls,
   Vcl.Bind.Navigator, Vcl.Grids, System.Rtti, System.Bindings.Outputs,
   Vcl.Bind.Editors, Data.Bind.EngExt, Vcl.Bind.DBEngExt, Vcl.Bind.Grid,
-  Data.Bind.Grid, V.Interfaces, iORM.Attributes;
+  M.Model, M.AnotherModel, Data.Bind.Grid, iORM.Attributes;
 
 type
 
-  [diImplements(IPersonView, 'TPerson'), diImplements(IPersonView, 'TAnotherPerson')]
-  TViewPerson = class(TFrame, IPersonView)
+  [diViewFor(TPerson), diViewFor(TAnotherPerson)]
+  TViewPerson = class(TFrame)
 
     [ioBindAction('acClose')]
     ButtonBack: TSpeedButton;

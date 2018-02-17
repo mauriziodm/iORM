@@ -48,4 +48,8 @@ object StartForm: TStartForm
       TabControl = TabControl
     end
   end
+  object ioFMX1: TioFMX
+    Left = 152
+    Top = 256
+  end
 end

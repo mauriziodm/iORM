@@ -478,7 +478,7 @@ object MainForm: TMainForm
                 Touch.InteractiveGestures = [LongTap, DoubleTap]
                 Align = Right
                 TabOrder = 0
-                Text = '01/11/2017 00:58:00'
+                Text = '01/11/2018 00:58:00'
                 Position.X = 91.000000000000000000
                 Margins.Right = 10.000000000000000000
                 Size.Width = 199.000000000000000000
@@ -498,7 +498,7 @@ object MainForm: TMainForm
                 Touch.InteractiveGestures = [LongTap, DoubleTap]
                 Align = Right
                 TabOrder = 0
-                Text = '01/11/2017 00:58:00'
+                Text = '01/11/2018 00:58:00'
                 Position.X = 91.000000000000000000
                 Margins.Right = 10.000000000000000000
                 Size.Width = 199.000000000000000000
@@ -1045,5 +1045,20 @@ object MainForm: TMainForm
     ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 224
     Top = 300
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\RVMan.db'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 56
+    Top = 8
+  end
+  object ioFMX1: TioFMX
+    Left = 48
+    Top = 76
   end
 end

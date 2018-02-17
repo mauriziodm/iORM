@@ -10,7 +10,7 @@ uses
   System.Bindings.Outputs, Fmx.Bind.Editors, FMX.TabControl,Data.Bind.Controls, FMX.Layouts, Fmx.Bind.Navigator,
   System.Actions, FMX.ActnList, Fmx.Bind.Grid, Data.Bind.Grid, FMX.Grid,
   FMX.Edit, FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid.Style;
+  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid.Style, iORM.AbstractionLayer.Framework.FMX, iORM.DB.Components.ConnectionDef;
 
 type
   TForm1 = class(TForm)
@@ -57,11 +57,13 @@ type
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
+    ioFMX1: TioFMX;
     procedure MasterBSCreateAdapter(Sender: TObject;
       var ABindSourceAdapter: TBindSourceAdapter);
     procedure DetailBSCreateAdapter(Sender: TObject;
       var ABindSourceAdapter: TBindSourceAdapter);
     procedure FormCreate(Sender: TObject);
+    procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -74,7 +76,8 @@ var
 implementation
 
 uses
-  Model, iORM, iORM.LiveBindings.Interfaces, iORM.LiveBindings.ActiveListBindSourceAdapter;
+  Model, iORM, iORM.LiveBindings.Interfaces, iORM.LiveBindings.ActiveListBindSourceAdapter,
+  SampleData;
 
 {$R *.fmx}
 
@@ -83,6 +86,12 @@ procedure TForm1.MasterBSCreateAdapter(Sender: TObject;
 begin
   // Get the master active bind source adapter directly from IupOrm
   ABindSourceAdapter := io.Load<TPerson>.ToActiveListBindSourceAdapter(MasterBS);
+end;
+
+procedure TForm1.SQLiteConnAfterRegister(Sender: TObject);
+begin
+  // Check for sample data creation
+  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TForm1.DetailBSCreateAdapter(Sender: TObject;

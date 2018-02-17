@@ -38,7 +38,7 @@ uses
 procedure TStartForm.FormCreate(Sender: TObject);
 begin
   // Get the main view
-  io.di.LocateViewVM<IMainView, IPersonsViewModel>.SetViewContext(Self).Show;
+  io.di.LocateView<IMainView>.SetViewContext(Self).Show;
 end;
 
 procedure TStartForm.FormsVCProviderioOnRequest(const Sender: TObject;

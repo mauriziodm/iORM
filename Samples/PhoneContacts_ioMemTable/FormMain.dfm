@@ -11,6 +11,7 @@ object MainForm: TMainForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   DesignSize = (
     730
     592)
@@ -88,17 +89,7 @@ object MainForm: TMainForm
     TabOrder = 3
   end
   object MemTableMaster: TioMemTable
-    Active = True
-    FieldDefs = <
-      item
-        Name = 'PERSONS_ID'
-        DataType = ftInteger
-      end
-      item
-        Name = 'PERSONS_FIRST_NAME'
-        DataType = ftString
-        Size = 100
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
@@ -137,22 +128,7 @@ object MainForm: TMainForm
     Top = 87
   end
   object MemTableDetail: TioMemTable
-    Active = True
-    FieldDefs = <
-      item
-        Name = 'PHONES_PERSONID'
-        DataType = ftInteger
-      end
-      item
-        Name = 'PHONES_PHONETYPE'
-        DataType = ftString
-        Size = 100
-      end
-      item
-        Name = 'PHONES_PHONENUMBER'
-        DataType = ftString
-        Size = 100
-      end>
+    FieldDefs = <>
     IndexDefs = <>
     IndexFieldNames = 'PHONES_PERSONID'
     MasterSource = DataSourceMaster
@@ -188,5 +164,20 @@ object MainForm: TMainForm
     DataSet = MemTableDetail
     Left = 128
     Top = 447
+  end
+  object ioFMX1: TioFMX
+    Left = 400
+    Top = 104
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDatabase = True
+    Database = '..\..\..\SamplesData\ContactsObjMemTable.db'
+    DatabaseStdFolder = sfUndefined
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 280
+    Top = 104
   end
 end

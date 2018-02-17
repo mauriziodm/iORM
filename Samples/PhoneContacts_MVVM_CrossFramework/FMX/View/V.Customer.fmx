@@ -79,7 +79,7 @@ inherited ViewCustomer: TViewCustomer
     Size.Height = 309.000000000000000000
     inherited DetailListView: TListView
       Size.Width = 405.000000000000000000
-      Size.Height = 199.000000000000000000
+      Size.Height = 209.000000000000000000
     end
     inherited Label5: TLabel
       Position.Y = 244.000000000000000000

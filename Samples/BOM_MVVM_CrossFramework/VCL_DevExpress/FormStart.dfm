@@ -123,4 +123,8 @@ object StartForm: TStartForm
     Left = 152
     Top = 192
   end
+  object ioVCL1: TioVCL
+    Left = 152
+    Top = 256
+  end
 end

@@ -10,11 +10,11 @@ uses
   Data.Bind.Grid, Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.ModelBindSource, iORM.MVVM.Components.ViewModelBridge,
   Vcl.Buttons, Vcl.Bind.Navigator, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls,
-  iORM.Attributes, V.Interfaces;
+  M.Model, iORM.Attributes;
 
 type
 
-  [diImplements(IPersonView, 'TCustomer')]
+  [diViewFor(TCustomer)]
   TViewCustomer = class(TViewPerson)
     EditFidelityCard: TLabeledEdit;
     LinkControlToField5: TLinkControlToField;

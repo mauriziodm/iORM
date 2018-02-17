@@ -11,7 +11,7 @@ uses
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, System.Classes, Data.Bind.Controls, FMX.Grid.Style,
   FMX.ScrollBox, FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid,
-  iORM.DB.Components.ConnectionDef;
+  iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
 type
   TMainForm = class(TForm)
@@ -71,6 +71,7 @@ type
     Label10: TLabel;
     EditDateOfBirth: TEdit;
     LinkControlToField5: TLinkControlToField;
+    ioFMX1: TioFMX;
     procedure FormCreate(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);

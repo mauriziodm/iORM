@@ -1,5 +1,4 @@
 inherited ViewCustomer: TViewCustomer
-  Height = 414
   inherited UniPanel1: TUniPanel
     inherited UniLabel6: TUniLabel
       Caption = 'Edit customer'
@@ -27,15 +26,6 @@ inherited ViewCustomer: TViewCustomer
       DataSource = PersonDataSource
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 8
-    end
-  end
-  inherited UniPanel3: TUniPanel
-    Top = 367
-  end
-  inherited UniPanel4: TUniPanel
-    Height = 142
-    inherited UniDBGrid1: TUniDBGrid
-      Height = 113
     end
   end
   inherited PersonModelDataSet: TioModelDataSet
