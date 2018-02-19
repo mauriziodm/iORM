@@ -188,7 +188,10 @@ begin
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Append(AObject);
-    AnActiveBSA.Refresh(False);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    AnActiveBSA.Refresh(False);
   end
   else
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
@@ -381,7 +384,10 @@ begin
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Insert(AObject);
-    AnActiveBSA.Refresh(False);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    AnActiveBSA.Refresh(False);
   end
   else
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');

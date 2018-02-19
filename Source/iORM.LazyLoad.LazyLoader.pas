@@ -82,17 +82,24 @@ end;
 
 procedure TioLazyLoader<T>.CreateInternalObj;
 begin
-  if Self.FioRelationChildPropertyName = ''
-    then
-    begin
+  if Self.FioRelationChildPropertyName = '' then
+  begin
       FInternalObj := T.Create;
       TioDuckTypedFactory.DuckTypedList(FInternalObj).OwnsObjects := FOwnsObjects;
-    end
-    else FInternalObj := io.Load(FioRelationChildTypeName, FioRelationChildTypeAlias)
-                                ._PropertyEqualsTo(FioRelationChildPropertyName, FioRelationChildID)
-                                ._And(   FioRelationChildWhere   )  // Eventuale detail where
-                                ._OrderBy(   Self.GetOrderByInstanceNilAsDefault   )  // Eventuale OrderBy
-                                .ToGenericList.OfType<T>('', Self.FOwnsObjects);
+  end
+  else
+  begin
+    io.ShowWait;
+    try
+      FInternalObj := io.Load(FioRelationChildTypeName, FioRelationChildTypeAlias)
+        ._PropertyEqualsTo(FioRelationChildPropertyName, FioRelationChildID)
+        ._And(   FioRelationChildWhere   )  // Eventuale detail where
+        ._OrderBy(   Self.GetOrderByInstanceNilAsDefault   )  // Eventuale OrderBy
+        .ToGenericList.OfType<T>('', Self.FOwnsObjects);
+    finally
+      io.HideWait;
+    end;
+  end;
 end;
 
 destructor TioLazyLoader<T>.Destroy;

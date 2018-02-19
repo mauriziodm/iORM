@@ -154,7 +154,10 @@ begin
   if CheckAdapter then
   begin
     BindSourceAdapter.Append(AObject);
-    BindSourceAdapter.Refresh(False);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    BindSourceAdapter.Refresh(False);
   end;
 end;
 
@@ -429,7 +432,10 @@ begin
   if CheckAdapter then
   begin
     BindSourceAdapter.Insert(AObject);
-    BindSourceAdapter.Refresh(False);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    BindSourceAdapter.Refresh(False);
   end;
 end;
 
