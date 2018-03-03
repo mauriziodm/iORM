@@ -551,6 +551,9 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Persist(ReloadData:Boolean=False);
 begin
+  // If in editing then post
+  if State in seEditModes then
+    Post;
   // Persist
   io.Persist(Self.DataObject);
   // Reload

@@ -599,6 +599,9 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Persist(ReloadData:Boolean=False);
 begin
+  // If in editing then post
+  if State in seEditModes then
+    Post;
   // Persist
   io.PersistCollection(Self.List);
   // Reload
