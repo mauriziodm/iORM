@@ -62,7 +62,9 @@ class procedure TioCommonBSAPersistence.Delete(
 var
   LExecute: TioCommonBSAPersistenceThreadExecute;
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
+  LResultValue: TObject;
 begin
+  // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
   LExecute := function: TObject
   begin
@@ -71,6 +73,8 @@ begin
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
   begin
+    // DataSet synchro
+    AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
     // Send a notification to other ActiveBindSourceAdapters & BindSource
     //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
     //       if FAutoPersist is True then the notify is performed by
@@ -79,6 +83,16 @@ begin
       AActiveBindSourceAdapter as TObject,
       TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
       );
+  end;
+  // ----------------------- SET ANONIMOUS METHODS -----------------------------
+  // Set the ObjectStatus
+  AActiveBindSourceAdapter.SetObjStatus(osDeleted);
+  // If AutoPersist then send a notification to other ActiveBindSourceAdapters & BindSource and exit
+  //  else perform the persist to the DB
+  if not AActiveBindSourceAdapter.ioAutoPersist then
+  begin
+    LOnTerminate(LResultValue);
+    Exit;
   end;
   // Execute synchronous or asynchronous
   if AActiveBindSourceAdapter.ioAsync then
@@ -97,6 +111,9 @@ var
   LExecute: TioCommonBSAPersistenceThreadExecute;
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
 begin
+  // If AutoLoadData is disabled then exit
+  if not AActiveBindSourceAdapter.ioAutoLoadData then
+    Exit;
   // Copy values into local variables
   LTypeName := AActiveBindSourceAdapter.ioTypeName;
   LTypeAlias := AActiveBindSourceAdapter.ioTypeAlias;
@@ -138,11 +155,9 @@ var
   LMasterOID: Integer;
   LExecute: TioCommonBSAPersistenceThreadExecute;
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
+  LResultValue: TObject;
 begin
-  // Init
-  LMasterProperty := nil;
-  LRelationChildPropertyName := '';
-  LMasterOID := 0;
+  // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // If it is a detail adapter...
   if AActiveBindSourceAdapter.IsDetail then
   begin
@@ -176,6 +191,20 @@ begin
       AActiveBindSourceAdapter as TObject,
       TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost)
       );
+  end;
+  // ----------------------- SET ANONIMOUS METHODS -----------------------------
+  // Init
+  LMasterProperty := nil;
+  LRelationChildPropertyName := '';
+  LMasterOID := 0;
+  // Set the ObjectStatus
+  AActiveBindSourceAdapter.SetObjStatus(osDirty);
+  // If AutoPersist then send a notification to other ActiveBindSourceAdapters & BindSource and exit
+  //  else perform the persist to the DB
+  if not AActiveBindSourceAdapter.ioAutoPersist then
+  begin
+    LOnTerminate(LResultValue);
+    Exit;
   end;
   // Execute synchronous or asynchronous
   if AActiveBindSourceAdapter.ioAsync then

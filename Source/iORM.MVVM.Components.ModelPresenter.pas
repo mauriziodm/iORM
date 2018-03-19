@@ -26,6 +26,7 @@ type
     FMasterPresenter: TioModelPresenter;
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
+    FAutoPost: Boolean;
     // Questà è una collezione dove eventuali ModelPresenters di dettaglio
     //  si registrano per rendere nota la loro esistenza al Master. Sarà poi
     //  usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -77,6 +78,9 @@ type
     procedure SetAsync(const Value: Boolean);
     // AutoPersist
     procedure SetAutoPersist(const Value: Boolean);
+    // AutoPost
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -130,6 +134,7 @@ type
     property Async:Boolean read FAsync write SetAsync;
     property AutoLoadData:Boolean read FAutoLoadData write SetAutoLoadData;
     property AutoPersist:Boolean read FAutoPersist write SetAutoPersist;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     property AutoRefreshOnNotification:TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification;
     property MasterPresenter:TioModelPresenter read FMasterPresenter write FMasterPresenter;
     property MasterPropertyName:String read FMasterPropertyName write FMasterPropertyName;
@@ -195,6 +200,8 @@ begin
       //       del Master.
       ForceDetailAdaptersCreation;
     end;
+    // Init the BSA
+    FBindSourceAdapter.ioAutoPost := FAutoPost;
   end;
   Result := Assigned(FBindSourceAdapter);
 end;
@@ -208,6 +215,7 @@ end;
 constructor TioModelPresenter.Create(AOwner: TComponent);
 begin
   inherited;
+  FAutoPost := False;
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
   FAutoLoadData := True;
@@ -303,6 +311,14 @@ begin
   if Assigned(FDetailPresentersContainer) then
     for LPresenter in FDetailPresentersContainer do
       LPresenter.CheckAdapter(True);
+end;
+
+function TioModelPresenter.GetAutoPost: Boolean;
+begin
+  if CheckAdapter then
+    Result := Self.BindSourceAdapter.ioAutoPost
+  else
+    Result := FAutoPost;
 end;
 
 function TioModelPresenter.GetBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -654,6 +670,14 @@ begin
   //  update the where of the adapter also
   if CheckAdapter then
     FBindSourceAdapter.ioAutoPersist := Value;
+end;
+
+procedure TioModelPresenter.SetAutoPost(const Value: Boolean);
+begin
+  FAutoPost := Value;
+  // Update the adapter
+  if CheckAdapter then
+    Self.BindSourceAdapter.ioAutoPost := Value;
 end;
 
 procedure TioModelPresenter.SetWhere(const Value: IioWhere);

@@ -63,6 +63,7 @@ type
     FioOrderBy: String;
     FioAutoRefreshOnNotification: TioAutoRefreshType;
     FonNotify: TioBSANotificationEvent;
+    FAutoPost: Boolean;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -107,6 +108,9 @@ type
     procedure SetAsync(const Value: Boolean);
     // AutoPersist
     procedure SetAutoPersist(const Value: Boolean);
+    // AutoPost
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
   protected
     function CheckActiveAdapter: Boolean;
   public
@@ -154,6 +158,7 @@ type
     property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
     property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
     property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
   end;
 
 implementation
@@ -213,6 +218,7 @@ end;
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
 begin
   inherited;
+  FAutoPost := False;
   FioLoaded := False;
   FioAutoRefreshOnNotification := arEnabledNoReload;
   FioAsync := False;
@@ -265,12 +271,13 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
   //  in the ActiveBindSourceAdapter
-  //  PS: Set ioAsync also
+  //  PS: Set ioAsync also (and other properties)
   if  Assigned(ADataObject)
   and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA)
   and Supports(Self, IioNotifiableBindSource)
   then
   begin
+    LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.ioAsync := FioAsync;
     LActiveBSA.ioWhereDetailsFromDetailAdapters := FioWhereDetailsFromDetailAdapters;
     LActiveBSA.ioAutoPersist := FioAutoPersist;
@@ -324,6 +331,14 @@ function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceA
 begin
   Result := nil;
   Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
+end;
+
+function TioPrototypeBindSource.GetAutoPost: Boolean;
+begin
+  if CheckAdapter then
+    Result := Self.InternalAdapter.AutoPost
+  else
+    Result := FAutoPost;
 end;
 
 function TioPrototypeBindSource.GetCount: Integer;
@@ -507,6 +522,14 @@ begin
   // Update the adapter
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAutoPersist := Value;
+end;
+
+procedure TioPrototypeBindSource.SetAutoPost(const Value: Boolean);
+begin
+  FAutoPost := Value;
+  // Update the adapter
+  if CheckAdapter then
+    Self.InternalAdapter.AutoPost := Value;
 end;
 
 procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);

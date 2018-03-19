@@ -79,6 +79,9 @@ type
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
+    // AutoPost property
+    procedure SetioAutoPost(const Value: Boolean);
+    function GetioAutoPost: Boolean;
     // AutoPersist property
     function GetioAutoPersist: Boolean;
     procedure SetioAutoPersist(const Value: Boolean);
@@ -120,8 +123,8 @@ type
     procedure DoBeforeOpen; override;
     procedure DoBeforeRefresh; override;
     procedure DoBeforeDelete; override;
-    procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
+    procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoBeforeCancel; override;
     procedure DoAfterCancel; override;
     procedure DoAfterScroll; override;
@@ -153,11 +156,13 @@ type
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
+    function AsTBindSourceAdapter: TBindSourceAdapter;
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
+    property ioAutoPost:Boolean read GetioAutoPost write SetioAutoPost;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioWhereStr:IioWhere read GetIoWhere write SetIoWhere;
@@ -196,6 +201,11 @@ begin
   FInsertObj_NewObj := AObject;
   FInsertObj_Enabled := True;
   Self.Append;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.AsTBindSourceAdapter: TBindSourceAdapter;
+begin
+  Result := Self as TBindSourceAdapter;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.ClearDataObject;
@@ -265,38 +275,32 @@ begin
   end;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
-begin
-  inherited;
-  // DataSet synchro
-  Self.GetDataSetLinkContainer.Refresh;
-  // Send a notification to other ActiveBindSourceAdapters & BindSource
-  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-  //       if FAutoPersist is True then the notify is performed by
-  //       the "CommonBSAPersistence" else by this method
-  if not FAutoPersist then
-    Notify(
-           Self,
-           TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
-          );
-end;
-
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterPost;
 begin
   inherited;
-  Self.SetObjStatus(osDirty);
-  // If AutoPersist is enabled then persist
-  if FAutoPersist then
-    TioCommonBSAPersistence.Persist(Self)
-  // Send a notification to other ActiveBindSourceAdapters & BindSource
-  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-  //       if FAutoPersist is True then the notify is performed by
-  //       the "CommonBSAPersistence" else by this method
-  else
-    Notify(
-           Self,
-           TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
-          );
+  // NB: Effettua da qui la chiamata per la persistenza (AutoPersist = true) solo se
+  //      la proprietà "ioAutoPost" = false. In realtà non ci sarebbe nemmeno bisogno
+  //      dell'if perchè ho notato che se ioAutoPost=true già non ci passerebbe di suo
+  //      ma meglio andare sul sicuro.
+  //      In pratica se ioAutoPost=true esegue l'auto persist (se abilitato) nel metodo
+  //      DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
+  //      ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
+  if not Self.ioAutoPost then
+    TioCommonBSAPersistence.Persist(Self);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>);
+begin
+  inherited;
+  // NB: Effettua da qui la chiamata per la persistenza (AutoPersist = false) solo se
+  //      la proprietà "ioAutoPost" = true. In realtà non ci sarebbe nemmeno bisogno
+  //      dell'if perchè ho notato che se ioAutoPost=false già non ci passerebbe di suo
+  //      ma meglio andare sul sicuro.
+  //      In pratica se ioAutoPost=true esegue l'auto persist (se abilitato) nel metodo
+  //      DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
+  //      ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
+  if Self.ioAutoPost then
+    TioCommonBSAPersistence.Persist(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterScroll;
@@ -335,22 +339,13 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
 begin
   inherited;
-  // If ObjectStatus exists in the class then set it as osDirty
-  if Self.UseObjStatus then
-  begin
-    Self.SetObjStatus(osDeleted);
-    Abort;
-  end;
-  // If AutoPersist is enabled then persist
-  if Self.FAutoPersist then
-    TioCommonBSAPersistence.Delete(Self);
+  TioCommonBSAPersistence.Delete(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
-  if FAutoLoadData then
-    TioCommonBSAPersistence.Load(Self);
+  TioCommonBSAPersistence.Load(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeRefresh;
@@ -473,6 +468,11 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.GetioAutoPersist: Boolean;
 begin
   Result := FAutoPersist;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetioAutoPost: Boolean;
+begin
+  Result := Self.AutoPost;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetIoViewDataType: TioViewDataType;
@@ -702,6 +702,11 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPersist(const Value: Boolean);
 begin
   FAutoPersist := Value;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPost(const Value: Boolean);
+begin
+  Self.AutoPost := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetIoWhere(

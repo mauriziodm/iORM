@@ -372,7 +372,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPerson'
-    ioAsync = False
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList

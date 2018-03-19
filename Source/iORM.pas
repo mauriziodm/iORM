@@ -57,8 +57,8 @@ type
   // iORM
   io = class
   public
-    class function GlobalFactory: TioGlobalFactoryRef;
     class function di: TioDependencyInjectionRef;
+    class function GlobalFactory: TioGlobalFactoryRef;
     class function RefTo(const ATypeName:String; const ATypeAlias:String=''): IioWhere; overload;
     class function RefTo(const AClassRef:TioClassRef; const ATypeAlias:String=''): IioWhere; overload;
     class function RefTo<T>(const ATypeAlias:String=''): IioWhere<T>; overload;
@@ -358,6 +358,7 @@ initialization
   TioMapContainer.Build;
 
 end.
+
 
 
 

@@ -102,6 +102,7 @@ type
     procedure Delete;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     procedure Cancel;
+    procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
@@ -112,12 +113,13 @@ type
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
+//    function AsTBindSourceAdapter: TBindSourceAdapter;
 //    function TypeName: String;       // Added TypeName property
 //    function TypeAlias: String;      // Added TypeAlias property
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function GetMasterPropertyName: String;
     function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
-    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -137,6 +139,10 @@ type
     procedure SetIoAsync(const Value: Boolean);
     function GetIoAsync: Boolean;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
+    // AutoPost property
+    procedure SetioAutoPost(const Value: Boolean);
+    function GetioAutoPost: Boolean;
+    property ioAutoPost:Boolean read GetioAutoPost write SetioAutoPost;
     // AutoPersist property
     procedure SetioAutoPersist(const Value: Boolean);
     function GetioAutoPersist: Boolean;
