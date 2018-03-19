@@ -123,6 +123,13 @@ object MainForm: TMainForm
           TabOrder = 0
           Visible = True
         end
+        object Button3: TButton
+          Position.X = 104.000000000000000000
+          Position.Y = 16.000000000000000000
+          TabOrder = 2
+          Text = 'Button3'
+          OnClick = Button3Click
+        end
       end
       object Panel1: TPanel
         Align = Client

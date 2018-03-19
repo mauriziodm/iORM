@@ -118,6 +118,7 @@ type
     destructor Destroy; override;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
+    procedure Post; override;
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
@@ -478,6 +479,12 @@ procedure TioPrototypeBindSource.PersistCurrent;
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.PersistCurrent;
+end;
+
+procedure TioPrototypeBindSource.Post;
+begin
+  if Editing then
+    inherited;
 end;
 
 function TioPrototypeBindSource.QueryInterface(const IID: TGUID;

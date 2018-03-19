@@ -58,7 +58,9 @@ type
     LinkGridToDataSourceBSDetail: TLinkGridToDataSource;
     SQLiteConn: TioSQLiteConnectionDef;
     ioFMX1: TioFMX;
+    Button3: TButton;
     procedure SQLiteConnAfterRegister(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -74,6 +76,11 @@ uses
   SampleData;
 
 {$R *.fmx}
+
+procedure TMainForm.Button3Click(Sender: TObject);
+begin
+  BSMaster.Post;
+end;
 
 procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
 begin

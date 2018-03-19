@@ -521,7 +521,7 @@ end;
 
 procedure TioModelPresenter.Post;
 begin
-  if CheckAdapter then
+  if CheckAdapter and Editing then
     BindSourceAdapter.Post;
 end;
 
