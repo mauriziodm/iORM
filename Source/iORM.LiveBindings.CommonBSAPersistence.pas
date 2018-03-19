@@ -19,7 +19,8 @@ type
   public
     class procedure Delete(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
     class procedure Load(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
-    class procedure Persist(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
+    class procedure Post(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
+    class procedure PersistCurrent(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
   end;
 
 implementation
@@ -27,7 +28,8 @@ implementation
 uses
   System.Classes, System.SysUtils, iORM.Exceptions, iORM.Where.Interfaces,
   iORM, iORM.CommonTypes, iORM.LiveBindings.Factory,
-  iORM.Context.Properties.Interfaces, iORM.Context.Factory;
+  iORM.Context.Properties.Interfaces, iORM.Context.Factory,
+  Data.Bind.ObjectScope;
 
 type
 
@@ -147,7 +149,22 @@ begin
     SyncExecute(LExecute, LOnTerminate);
 end;
 
-class procedure TioCommonBSAPersistence.Persist(
+class procedure TioCommonBSAPersistence.PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+begin
+  // If in editing then post
+  //  NB: Se AutoPersist = True allora il Post già causa la persistenza dell'oggetto sul DB
+  //       quindi esce subito perchè altrimenti si avrebbe una doppia persistenza
+  if AActiveBindSourceAdapter.State in seEditModes then
+  begin
+    AActiveBindSourceAdapter.Post;
+    if AActiveBindSourceAdapter.ioAutoPersist then
+      Exit;
+  end;
+  // Persist
+  Post(AActiveBindSourceAdapter);
+end;
+
+class procedure TioCommonBSAPersistence.Post(
   const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
   LMasterProperty: IioContextProperty;

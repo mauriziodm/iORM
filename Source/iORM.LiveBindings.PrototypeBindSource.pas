@@ -126,6 +126,7 @@ type
     function CurrentMasterObjectAs<T>: T;
     procedure Refresh(ReloadData:Boolean); overload;
     procedure Persist(ReloadData:Boolean=False);
+    procedure PersistCurrent;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
     procedure Insert(AObject:TObject); overload;
@@ -471,6 +472,12 @@ begin
   AioActiveBindSourceAdapter := Self.GetActiveBindSourceAdapter;
   if Assigned(AioActiveBindSourceAdapter) then
     AioActiveBindSourceAdapter.Persist(ReloadData);
+end;
+
+procedure TioPrototypeBindSource.PersistCurrent;
+begin
+  if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.PersistCurrent;
 end;
 
 function TioPrototypeBindSource.QueryInterface(const IID: TGUID;

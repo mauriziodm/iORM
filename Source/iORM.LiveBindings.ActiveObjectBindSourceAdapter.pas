@@ -136,6 +136,7 @@ type
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure Persist(ReloadData:Boolean=False);
+    procedure PersistCurrent;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
@@ -266,7 +267,7 @@ begin
   //      DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
   //      ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
   if not Self.ioAutoPost then
-    TioCommonBSAPersistence.Persist(Self);
+    TioCommonBSAPersistence.Post(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>);
@@ -280,7 +281,7 @@ begin
   //      DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
   //      ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
   if Self.ioAutoPost then
-    TioCommonBSAPersistence.Persist(Self);
+    TioCommonBSAPersistence.Post(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterScroll;
@@ -546,6 +547,11 @@ begin
   io.Persist(Self.DataObject);
   // Reload
   if ReloadData then Self.DoBeforeOpen;
+end;
+
+procedure TioActiveObjectBindSourceAdapter.PersistCurrent;
+begin
+  TioCommonBSAPersistence.PersistCurrent(Self);
 end;
 
 function TioActiveObjectBindSourceAdapter.QueryInterface(const IID: TGUID;

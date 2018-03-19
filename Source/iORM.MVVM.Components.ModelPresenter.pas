@@ -104,6 +104,7 @@ type
     function CurrentMasterObjectAs<T>: T;
     procedure Refresh(const AReloadData:Boolean); overload;
     procedure Persist(const AReloadData:Boolean=False);
+    procedure PersistCurrent;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
     procedure Insert; overload;
@@ -510,6 +511,12 @@ procedure TioModelPresenter.Persist(const AReloadData: Boolean);
 begin
   if CheckAdapter then
     BindSourceAdapter.Persist(AReloadData);
+end;
+
+procedure TioModelPresenter.PersistCurrent;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.PersistCurrent;
 end;
 
 procedure TioModelPresenter.Post;

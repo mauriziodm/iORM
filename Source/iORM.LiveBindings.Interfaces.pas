@@ -92,6 +92,7 @@ type
     procedure Edit(AForce: Boolean = False);
     procedure Post;
     procedure Persist(ReloadData:Boolean=False);
+    procedure PersistCurrent;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
     procedure Refresh(ReloadData:Boolean);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
