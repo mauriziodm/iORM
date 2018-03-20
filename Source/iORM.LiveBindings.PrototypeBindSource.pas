@@ -118,7 +118,7 @@ type
     destructor Destroy; override;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
-    procedure Post; override;
+    procedure PostIfEditing;
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
@@ -126,7 +126,6 @@ type
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
     procedure Refresh(ReloadData:Boolean); overload;
-    procedure Persist(ReloadData:Boolean=False);
     procedure PersistCurrent;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
@@ -463,28 +462,16 @@ begin
   Self.DoNotify(ANotification);
 end;
 
-procedure TioPrototypeBindSource.Persist(ReloadData: Boolean);
-var
- AioActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-begin
-  if not CheckActiveAdapter then Exit;
-  // If the InternalAdapter support the IioActiveBindSourceAdapter (is an ActiveBindSourceAdapter)
-  //  then call the Adapter Persist method
-  AioActiveBindSourceAdapter := Self.GetActiveBindSourceAdapter;
-  if Assigned(AioActiveBindSourceAdapter) then
-    AioActiveBindSourceAdapter.Persist(ReloadData);
-end;
-
 procedure TioPrototypeBindSource.PersistCurrent;
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.PersistCurrent;
 end;
 
-procedure TioPrototypeBindSource.Post;
+procedure TioPrototypeBindSource.PostIfEditing;
 begin
   if Editing then
-    inherited;
+    Self.Post;
 end;
 
 function TioPrototypeBindSource.QueryInterface(const IID: TGUID;

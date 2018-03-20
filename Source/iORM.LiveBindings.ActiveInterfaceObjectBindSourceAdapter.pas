@@ -135,7 +135,6 @@ type
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure ExtractDetailObject(AMasterObj: TObject);
-    procedure Persist(ReloadData:Boolean=False);
     procedure PersistCurrent;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
@@ -528,17 +527,6 @@ begin
   // Replicate notification to the MasterAdaptersContainer
   if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer))
     then FMasterAdaptersContainer.Notify(Self, ANotification);
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.Persist(ReloadData: Boolean);
-begin
-  // If in editing then post
-  if State in seEditModes then
-    Post;
-  // Persist
-  io.Persist(Self.DataObject);
-  // Reload
-  if ReloadData then Self.DoBeforeOpen;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.PersistCurrent;

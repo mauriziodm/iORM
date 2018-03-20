@@ -98,12 +98,12 @@ type
     procedure Last;
     procedure Edit(AForce: Boolean = False);
     procedure Post;
+    procedure PostIfEditing;
     function Current: TObject;
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
     procedure Refresh(const AReloadData:Boolean); overload;
-    procedure Persist(const AReloadData:Boolean=False);
     procedure PersistCurrent;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
@@ -507,12 +507,6 @@ begin
   DoNotify(ANotification);
 end;
 
-procedure TioModelPresenter.Persist(const AReloadData: Boolean);
-begin
-  if CheckAdapter then
-    BindSourceAdapter.Persist(AReloadData);
-end;
-
 procedure TioModelPresenter.PersistCurrent;
 begin
   if CheckAdapter then
@@ -523,6 +517,12 @@ procedure TioModelPresenter.Post;
 begin
   if CheckAdapter and Editing then
     BindSourceAdapter.Post;
+end;
+
+procedure TioModelPresenter.PostIfEditing;
+begin
+  if CheckAdapter and Editing then
+    Self.Post;
 end;
 
 procedure TioModelPresenter.Prior;
