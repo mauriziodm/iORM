@@ -100,8 +100,8 @@ object MainForml: TMainForml
         Size.Height = 416.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        OnClick = ListView1Click
         CanSwipeDelete = False
+        OnItemClick = ListView1ItemClick
         SearchAlwaysOnTop = False
       end
     end

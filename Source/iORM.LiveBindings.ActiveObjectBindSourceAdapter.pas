@@ -136,12 +136,15 @@ type
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
+    procedure PersistAll;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure Append(AObject:TObject); overload;
+    procedure Append(AObject:IInterface); overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Insert(AObject:IInterface); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     function DataObject: TObject;
@@ -191,6 +194,11 @@ end;
 procedure TioActiveObjectBindSourceAdapter.Append(AObject: TObject);
 begin
   Assert(False);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.Append(AObject: IInterface);
+begin
+  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
 function TioActiveObjectBindSourceAdapter.AsTBindSourceAdapter: TBindSourceAdapter;
@@ -317,9 +325,13 @@ begin
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeDelete;
+var
+  LAbort: Boolean;
 begin
   inherited;
-  TioCommonBSAPersistence.Delete(Self);
+  TioCommonBSAPersistence.Delete(Self, LAbort);
+  if LAbort then
+    Abort;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeOpen;
@@ -515,6 +527,11 @@ begin
   Assert(False);
 end;
 
+procedure TioActiveObjectBindSourceAdapter.Insert(AObject: IInterface);
+begin
+  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+end;
+
 function TioActiveObjectBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := Assigned(FMasterProperty);
@@ -535,6 +552,11 @@ begin
   // Replicate notification to the MasterAdaptersContainer
   if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer))
     then FMasterAdaptersContainer.Notify(Self, ANotification);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.PersistAll;
+begin
+  TioCommonBSAPersistence.PersistAll(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.PersistCurrent;

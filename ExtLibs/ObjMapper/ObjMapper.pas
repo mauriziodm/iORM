@@ -82,6 +82,7 @@ type
     function DataContractMode: TomJSONDestination;
     function byProperties: TomJSONDestination;
     function byFields: TomJSONDestination;
+    function ClearListBefore: TomJSONDestination;
     function TypeAnnotationsON: TomJSONDestination;
     function TypeAnnotationsOFF: TomJSONDestination;
     function CustomSerializersON: TomJSONDestination;
@@ -176,6 +177,12 @@ end;
 function TomJSONDestination.byProperties: TomJSONDestination;
 begin
   FParams.SerializationType := stProperties;
+  Result := Self;
+end;
+
+function TomJSONDestination.ClearListBefore: TomJSONDestination;
+begin
+  FParams.ClearListBefore := True;
   Result := Self;
 end;
 

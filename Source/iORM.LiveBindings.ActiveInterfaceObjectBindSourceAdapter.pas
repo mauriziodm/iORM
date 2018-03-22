@@ -136,12 +136,15 @@ type
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
+    procedure PersistAll;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure Append(AObject:TObject); overload;
+    procedure Append(AObject:IInterface); overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Insert(AObject:IInterface); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     function DataObject: TObject;
@@ -190,6 +193,11 @@ end;
 {$ENDIF}
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Append(AObject: TObject);
+begin
+  Assert(False);
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.Append(AObject: IInterface);
 begin
   Assert(False);
 end;
@@ -316,9 +324,13 @@ begin
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeDelete;
+var
+  LAbort: Boolean;
 begin
   inherited;
-  TioCommonBSAPersistence.Delete(Self);
+  TioCommonBSAPersistence.Delete(Self, LAbort);
+  if LAbort then
+    Abort;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;
@@ -508,6 +520,11 @@ begin
   Assert(False);
 end;
 
+procedure TioActiveInterfaceObjectBindSourceAdapter.Insert(AObject: IInterface);
+begin
+  Assert(False);
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := not FMasterPropertyName.IsEmpty;
@@ -527,6 +544,11 @@ begin
   // Replicate notification to the MasterAdaptersContainer
   if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer))
     then FMasterAdaptersContainer.Notify(Self, ANotification);
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.PersistAll;
+begin
+  TioCommonBSAPersistence.PersistAll(Self);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.PersistCurrent;

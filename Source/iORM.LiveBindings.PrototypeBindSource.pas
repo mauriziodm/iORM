@@ -127,9 +127,12 @@ type
     function CurrentMasterObjectAs<T>: T;
     procedure Refresh(ReloadData:Boolean); overload;
     procedure PersistCurrent;
+    procedure PersistAll;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
+    procedure Append(AObject:IInterface); overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Insert(AObject:IInterface); overload;
     function DataObjectAssigned: Boolean;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
@@ -188,6 +191,22 @@ begin
 end;
 
 procedure TioPrototypeBindSource.Append(AObject: TObject);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Append(AObject);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    AnActiveBSA.Refresh(False);
+  end
+  else
+    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+end;
+
+procedure TioPrototypeBindSource.Append(AObject: IInterface);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -393,6 +412,22 @@ begin
     Result := nil;
 end;
 
+procedure TioPrototypeBindSource.Insert(AObject: IInterface);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Insert(AObject);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    AnActiveBSA.Refresh(False);
+  end
+  else
+    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+end;
+
 procedure TioPrototypeBindSource.Insert(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
@@ -460,6 +495,12 @@ procedure TioPrototypeBindSource.Notify(const Sender: TObject;
   const ANotification: IioBSANotification);
 begin
   Self.DoNotify(ANotification);
+end;
+
+procedure TioPrototypeBindSource.PersistAll;
+begin
+  if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.PersistAll;
 end;
 
 procedure TioPrototypeBindSource.PersistCurrent;

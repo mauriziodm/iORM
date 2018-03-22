@@ -116,8 +116,7 @@ var
   LPerson: IPerson;
 begin
   LPerson := io.di.Locate<ICustomer>.Get;
-  BSMaster.Append(LPerson as TObject);
-//  BSMaster.Append;
+  BSMaster.Append(LPerson);
 end;
 
 procedure TMainForm.Button8Click(Sender: TObject);

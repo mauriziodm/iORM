@@ -104,7 +104,7 @@ var
   LPerson: IPerson;
 begin
   LPerson := io.di.Locate<IPerson>.Get;
-  PersonsModelPresenter.Append(LPerson as TObject);
+  PersonsModelPresenter.Append(LPerson);
   Command['acEditPerson'].Execute;
 end;
 

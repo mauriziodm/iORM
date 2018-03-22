@@ -56,10 +56,10 @@ type
     procedure acPersistExecute(Sender: TObject);
     procedure acRefreshExecute(Sender: TObject);
     procedure acNewExecute(Sender: TObject);
-    procedure ListView1Click(Sender: TObject);
     procedure acPostExecute(Sender: TObject);
     procedure acDeleteExecute(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure ListView1ItemClick(const Sender: TObject; const AItem: TListViewItem);
   private
     { Private declarations }
   public
@@ -93,7 +93,7 @@ end;
 
 procedure TMainForml.acPersistExecute(Sender: TObject);
 begin
-  PrototypeBindSource1.Persist(True);
+  PrototypeBindSource1.PersistAll;
   ShowMessage('Changes persisted to the database');
 end;
 
@@ -123,7 +123,7 @@ begin
   TabControl1.ActiveTab := TabItem1;
 end;
 
-procedure TMainForml.ListView1Click(Sender: TObject);
+procedure TMainForml.ListView1ItemClick(const Sender: TObject; const AItem: TListViewItem);
 begin
   ChangeTabNext.ExecuteTarget(Self);
 end;

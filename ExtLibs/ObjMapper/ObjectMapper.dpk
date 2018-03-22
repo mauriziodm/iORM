@@ -27,25 +27,14 @@ package ObjectMapper;
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
-requires
-  rtl,
-  xmlrtl,
-  DbxCommonDriver,
-  dbrtl,
-  soaprtl,
-  FireDAC,
-  FireDACCommonDriver,
-  FireDACCommon;
-
 contains
-  DuckDictionaryU in 'DuckDictionaryU.pas',
-  DuckListU in 'DuckListU.pas',
-  DuckObjU in 'DuckObjU.pas',
-  DuckPropFieldU in 'DuckPropFieldU.pas',
-  ObjectsMappers in 'ObjectsMappers.pas',
+  ObjMapper.Attributes in 'ObjMapper.Attributes.pas',
+  ObjMapper.DuckDictionary in 'ObjMapper.DuckDictionary.pas',
+  ObjMapper.DuckList in 'ObjMapper.DuckList.pas',
+  ObjMapper.DuckObj in 'ObjMapper.DuckObj.pas',
+  ObjMapper.DuckPropField in 'ObjMapper.DuckPropField.pas',
+  ObjMapper.Engine in 'ObjMapper.Engine.pas',
   ObjMapper in 'ObjMapper.pas',
-  ObjMapperAttributes in 'ObjMapperAttributes.pas',
-  ObjMapperEngine in 'ObjMapperEngine.pas',
-  RTTIUtilsU in 'RTTIUtilsU.pas';
+  ObjMapper.RTTIUtils in 'ObjMapper.RTTIUtils.pas';
 
 end.

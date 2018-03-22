@@ -58,6 +58,7 @@ type
     procedure CheckList;
     function GetObjectType: TRttiType; override;
     function CreateItemInstance: T; virtual;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); virtual; abstract;
     procedure InitItemInstance(AInstance: T); virtual;
     function GetCurrent: TObject; override;
     function GetCount: Integer; override;
@@ -162,7 +163,7 @@ end;
 
 function TInterfaceListBindSourceAdapter<T>.CreateItemInstance: T;
 var
-  LObject: TObject;
+  LObject: IInterface;
   LHandled: Boolean;
 begin
   CheckList;
@@ -174,19 +175,20 @@ begin
   DoCreateInstance(LHandled, LObject);
   // If not handled means that non object is passed to a Insert/Append call then
   //  create itself an instance as possible
-  if not LHandled then
-  begin
-    Assert(GetItemInstanceFactory.CanConstructInstance);
-    if GetItemInstanceFactory.CanConstructInstance then
-      LObject := GetItemInstanceFactory.ConstructInstance;
-  end;
+//  if not LHandled then
+//  begin
+//    Assert(GetItemInstanceFactory.CanConstructInstance);
+//    if GetItemInstanceFactory.CanConstructInstance then
+//      LObject := GetItemInstanceFactory.ConstructInstance;
+//  end;
   // Cast the new object to return it of the right type
-  try
-    Result := TioRttiUtilities.CastObjectToGeneric<T>(LObject);
-  except
-    LObject.Free;
-    raise;
-  end;
+//  try
+//    Result := TioRttiUtilities.CastObjectToGeneric<T>(LObject);
+    Result := LObject;
+//  except
+//    LObject.Free;
+//    raise;
+//  end;
 end;
 
 function TInterfaceListBindSourceAdapter<T>.DeleteAt(AIndex: Integer): Boolean;

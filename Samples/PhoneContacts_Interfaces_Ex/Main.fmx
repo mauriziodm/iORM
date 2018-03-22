@@ -125,6 +125,7 @@ object MainForm: TMainForm
         ItemEditAppearanceClassName = 'TImageListItemDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
+        ItemIndex = 1
         Align = Client
         CanParentFocus = True
         Size.Width = 384.000000000000000000
@@ -149,6 +150,7 @@ object MainForm: TMainForm
         ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
+        ItemIndex = 0
         Align = Bottom
         Position.Y = 424.000000000000000000
         Size.Width = 384.000000000000000000
@@ -379,7 +381,7 @@ object MainForm: TMainForm
         object EditDateOfBirth: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 6
-          Text = 'Bitmap28'
+          Text = '01/11/2018'
           Position.X = 120.000000000000000000
           Position.Y = 162.000000000000000000
           Size.Width = 249.000000000000000000
@@ -430,7 +432,7 @@ object MainForm: TMainForm
     Top = 480
   end
   object BSMaster: TioPrototypeBindSource
-    AutoActivate = False
+    AutoActivate = True
     AutoPost = False
     FieldDefs = <
       item
@@ -467,7 +469,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPerson'
-    ioAsync = True
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -558,7 +560,7 @@ object MainForm: TMainForm
     end
   end
   object BSDetail: TioPrototypeBindSource
-    AutoActivate = False
+    AutoActivate = True
     AutoPost = False
     FieldDefs = <
       item
@@ -573,7 +575,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPhoneNumber'
-    ioAsync = True
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList

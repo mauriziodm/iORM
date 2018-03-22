@@ -105,10 +105,13 @@ type
     function CurrentMasterObjectAs<T>: T;
     procedure Refresh(const AReloadData:Boolean); overload;
     procedure PersistCurrent;
+    procedure PersistAll;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
+    procedure Append(AObject:IInterface); overload;
     procedure Insert; overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Insert(AObject:IInterface); overload;
     procedure Delete;
     procedure Cancel;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
@@ -171,6 +174,18 @@ procedure TioModelPresenter.Append;
 begin
   if CheckAdapter then
     (BindSourceAdapter as TBindSourceAdapter).Append;
+end;
+
+procedure TioModelPresenter.Append(AObject: IInterface);
+begin
+  if CheckAdapter then
+  begin
+    BindSourceAdapter.Append(AObject);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    BindSourceAdapter.Refresh(False);
+  end;
 end;
 
 procedure TioModelPresenter.Cancel;
@@ -507,6 +522,12 @@ begin
   DoNotify(ANotification);
 end;
 
+procedure TioModelPresenter.PersistAll;
+begin
+  if CheckAdapter then
+    BindSourceAdapter.PersistAll;
+end;
+
 procedure TioModelPresenter.PersistCurrent;
 begin
   if CheckAdapter then
@@ -726,6 +747,18 @@ begin
   Where._Where(FWhereStr.Text);
   // OLD_CODE
 //  Self.SetWhere(TioWhereFactory.NewWhere.Add(FWhereStr.Text));
+end;
+
+procedure TioModelPresenter.Insert(AObject: IInterface);
+begin
+  if CheckAdapter then
+  begin
+    BindSourceAdapter.Insert(AObject);
+// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+//      invocato un Post in seguito al Refresh stesso.
+//    BindSourceAdapter.Refresh(False);
+  end;
 end;
 
 end.

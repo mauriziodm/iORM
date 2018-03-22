@@ -93,13 +93,16 @@ type
     procedure Post;
 //    procedure Persist(ReloadData:Boolean=False);
     procedure PersistCurrent;
+    procedure PersistAll;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
     procedure Refresh(ReloadData:Boolean);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure Insert; overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Insert(AObject:IInterface); overload;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
+    procedure Append(AObject:IInterface); overload;
     procedure Delete;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     procedure Cancel;

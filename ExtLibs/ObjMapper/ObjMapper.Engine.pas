@@ -76,6 +76,10 @@ type
     procedure SetOwnJSONValue(const AValue:Boolean);
     function GetOwnJSONValue: Boolean;
     property OwnJSONValue: Boolean read GetOwnJSONValue write SetOwnJSONValue;
+    // OwnJSONValue
+    procedure SetClearListBefore(const AValue:Boolean);
+    function GetClearListBefore: Boolean;
+    property ClearListBefore: Boolean read GetClearListBefore write SetClearListBefore;
   end;
 
   IomSerializersContainerItem = interface
@@ -225,6 +229,7 @@ type
     FItemsKeyDefaultQualifiedName: String;
     FItemsValueDefaultQualifiedName: String;
     FOwnJSONValue: Boolean;
+    FClearListBefore: Boolean;
     // SerializationMode
     procedure SetSerializationMode(const AValue: TSerializationMode);
     function GetSerializationMode: TSerializationMode;
@@ -257,6 +262,9 @@ type
     // OwnJSONValue
     procedure SetOwnJSONValue(const AValue:Boolean);
     function GetOwnJSONValue: Boolean;
+    // OwnJSONValue
+    procedure SetClearListBefore(const AValue:Boolean);
+    function GetClearListBefore: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -840,6 +848,9 @@ begin
     raise EMapperException.Create('Value type not found deserializing a List');
   // Wrap the dictionary in the DuckObject
   LDuckList := WrapAsList(AList);
+  // Clear the list before deserialize if enabled
+  if AParams.ClearListBefore then
+    LDuckList.Clear;
   // Loop
   for I := 0 to LJSONArray.Count - 1 do
   begin
@@ -1816,6 +1827,7 @@ begin
   FItemsKeyDefaultQualifiedName := 'System.String';
   FItemsValueDefaultQualifiedName := '';
   FOwnJSONValue := False; // JSONValue is not owned by default
+  FClearListBefore := False;
 end;
 
 destructor TomParams.Destroy;
@@ -1827,6 +1839,11 @@ end;
 function TomParams.GetTypeAnnotations: Boolean;
 begin
   Result := FTypeAnnotations;
+end;
+
+function TomParams.GetClearListBefore: Boolean;
+begin
+  Result := FClearListBefore;
 end;
 
 function TomParams.GetEnableCustomSerializers: Boolean;
@@ -1882,6 +1899,11 @@ end;
 procedure TomParams.SetTypeAnnotations(const AValue: Boolean);
 begin
   FTypeAnnotations := AValue;
+end;
+
+procedure TomParams.SetClearListBefore(const AValue: Boolean);
+begin
+  FClearListBefore := AValue;
 end;
 
 procedure TomParams.SetEnableCustomSerializers(const AValue: Boolean);

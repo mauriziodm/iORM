@@ -100,8 +100,8 @@ object MainForml: TMainForml
         Size.Height = 416.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
-        OnClick = ListView1Click
         CanSwipeDelete = False
+        OnItemClick = ListView1ItemClick
         SearchAlwaysOnTop = False
       end
     end
@@ -327,8 +327,8 @@ object MainForml: TMainForml
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 240
-    Top = 256
+    Left = 232
+    Top = 264
   end
   object PrototypeBindSource1: TioPrototypeBindSource
     AutoActivate = True

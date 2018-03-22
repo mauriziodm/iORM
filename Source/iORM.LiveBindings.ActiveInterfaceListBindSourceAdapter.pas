@@ -66,7 +66,7 @@ type
     FBindSource: IioNotifiableBindSource;
     FonNotify: TioBSANotificationEvent;
     FInsertObj_Enabled: Boolean;
-    FInsertObj_NewObj: TObject;
+    FInsertObj_NewObj: IInterface;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
@@ -128,7 +128,7 @@ type
     procedure DoBeforeCancel; override;
     procedure DoAfterCancel; override;
     procedure DoAfterScroll; override;
-    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); override;
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -140,12 +140,15 @@ type
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
+    procedure PersistAll;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure Append(AObject:TObject); overload;
+    procedure Append(AObject:IInterface); overload;
     procedure Insert(AObject:TObject); overload;
+    procedure Insert(AObject:IInterface); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     function DataObject: TObject;
@@ -194,13 +197,18 @@ begin
 end;
 {$ENDIF}
 
-procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: TObject);
+procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: IInterface);
 begin
   // Set sone InsertObj subsystem variables
   // Then call the standard code
   FInsertObj_NewObj := AObject;
   FInsertObj_Enabled := True;
   Self.Append;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: TObject);
+begin
+  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.AsTBindSourceAdapter: TBindSourceAdapter;
@@ -337,9 +345,13 @@ begin
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
+var
+  LAbort: Boolean;
 begin
   inherited;
-  TioCommonBSAPersistence.Delete(Self);
+  TioCommonBSAPersistence.Delete(Self, LAbort);
+  if LAbort then
+    Abort;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeOpen;
@@ -364,8 +376,7 @@ begin
   end;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.DoCreateInstance(
-  out AHandled: Boolean; out AInstance: TObject);
+procedure TioActiveInterfaceListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface);
 begin
   inherited;
   if FInsertObj_Enabled then
@@ -547,13 +558,18 @@ begin
   Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.Insert(AObject: TObject);
+procedure TioActiveInterfaceListBindSourceAdapter.Insert(AObject: IInterface);
 begin
   // Set sone InsertObj subsystem variables
   // Then call the standard code
   FInsertObj_NewObj := AObject;
   FInsertObj_Enabled := True;
   Self.Insert;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.Insert(AObject: TObject);
+begin
+  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.IsDetail: Boolean;
@@ -595,6 +611,11 @@ begin
   // Replicate notification to the MasterAdaptersContainer
   if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer))
     then FMasterAdaptersContainer.Notify(Self, ANotification);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.PersistAll;
+begin
+  TioCommonBSAPersistence.PersistAll(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.PersistCurrent;
