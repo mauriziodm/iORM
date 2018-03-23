@@ -79,6 +79,7 @@ type
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
+    function TableNameAbbr: String; //%%%%%
     function GetKeyGenerator: String;
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;

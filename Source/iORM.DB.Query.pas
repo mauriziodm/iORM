@@ -75,6 +75,7 @@ type
     function ExecSQL: Integer; virtual;
     function GetSQL: TStrings;
     function Fields: TioFields;
+    function FindParam(AParamName:String): TioParam; //%%%%
     function ParamByName(AParamName:String): TioParam;
     function ParamByProp(AProp:IioContextProperty): TioParam;
     procedure SetParamValueByContext(AProp:IioContextProperty; AContext:IioContext);
@@ -154,6 +155,13 @@ function TioQuery.Fields: TioFields;
 begin
   Result := FSqlQuery.Fields;
 end;
+
+//%%%% inizio
+function TioQuery.FindParam(AParamName: String): TioParam;
+begin
+  Result:=FSqlQuery.FindParam(AParamName);
+end;
+//%%%% fine
 
 procedure TioQuery.First;
 begin

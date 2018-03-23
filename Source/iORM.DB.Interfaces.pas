@@ -69,22 +69,33 @@ type
   // Strategy class reference
   TioStrategyRef = class of TioStrategyIntf;
 
-  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
+//%%%%  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
+
+  TioDbPeculiarity = Class; //&&&& forward declaration
+  TioDbPeculiarityClassType = Class of TioDbPeculiarity; //&&&&
+
+//&&&&  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST, cdtOracle, cdtPostgres); //%%%%
   TioConnectionInfo = record
     ConnectionName: String;
-    ConnectionType: TioConnectionType;
+//&&&&    ConnectionType: TioConnectionType;
+    DbPeculiarity: TioDbPeculiarityClassType; //&&&&
     Persistent: Boolean;
     Strategy: TioStrategyRef;
     BaseURL: String;
     UserName: String;
     Password: String;
-    constructor Create(const AConnectionName:String; const AConnectionType:TioConnectionType; const APersistent:Boolean);
+    constructor Create(const AConnectionName:String; (*const AConnectionType:TioConnectionType;&&&&*) (*&&&& inizio*) ADbPeculiarity:TioDbPeculiarityClassType; (*&&&& fine*) const APersistent:Boolean);
+    Function IsRestConnection:Boolean; //&&&&
+    Function IsDBConnection:Boolean; //&&&&
   end;
 
-  TioCompareOperatorRef = class of TioCompareOperator;
-  TioLogicRelationRef = class of TioLogicRelation;
+//&&&&  TioCompareOperatorRef = class of TioCompareOperator;
+  TioSqlCompareOperatorRef = class of TioSqlCompareOperator; //&&&&
+//&&&&  TioLogicRelationRef = class of TioLogicRelation;
+  TioSqlLogicRelationRef = class of TioSqlLogicRelation; //&&&&
   TioSqlDataConverterRef = class of TioSqlDataConverter;
   TioSqlGeneratorRef = class of TioSqlGenerator;
+
 
   // -Classe per il connection manager che funge da repository dei parametri di tutte
   //   connessioni e da gestore del connection pooling
@@ -166,6 +177,7 @@ type
     function ExecSQL: Integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
+    function FindParam(AParamName:String): TioParam; //%%%%
     function ParamByName(AParamName:String): TioParam;
     function ParamByProp(AProp:IioContextProperty): TioParam;
     procedure SetParamValueByContext(AProp:IioContextProperty; AContext:IioContext);
@@ -198,7 +210,9 @@ type
   public
     class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
-    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
+//&&&&    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlNextIDBeforeInsert(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract; //&&&&
+    class procedure GenerateSqlLastIDAfterInsert(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract; //&&&&
     class procedure GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
     class procedure GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
     class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
@@ -208,7 +222,8 @@ type
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations
-  TioLogicRelation = class abstract
+//&&&&  TioLogicRelation = class abstract
+  TioSqlLogicRelation = class abstract //&&&&
     class function _And           : IioSqlItem; virtual; abstract;
     class function _Or            : IioSqlItem; virtual; abstract;
     class function _Not           : IioSqlItem; virtual; abstract;
@@ -217,7 +232,8 @@ type
   end;
 
   // Interfaccia per le classi che devono generare operatori di comparazione
-  TioCompareOperator = class abstract
+//&&&&  TioCompareOperator = class abstract
+  TioSqlCompareOperator = class abstract //&&&&
     class function _Equal: IioSqlItem; virtual; abstract;
     class function _Greater: IioSqlItem; virtual; abstract;
     class function _Lower: IioSqlItem; virtual; abstract;
@@ -228,6 +244,39 @@ type
     class function _IsNull: IioSqlItem; virtual; abstract;
     class function _IsNotNull: IioSqlItem; virtual; abstract;
   end;
+
+//&&&& inizio
+  TioDbPeculiarity = class abstract
+  public
+    class function SqlDataConverterRef: TioSqlDataConverterRef; virtual; abstract;
+    class function SqlGeneratorRef: TioSqlGeneratorRef; virtual; abstract;
+    class function SqlCompareOperatorRef: TioSqlCompareOperatorRef; virtual; abstract;
+    class function SqlLogicRelationRef: TioSqlLogicRelationRef; virtual; abstract;
+    class Function AutoCreateDatabase:Boolean; virtual; abstract;
+//  class Function IsDBConnection:Boolean; virtual; abstract;
+//  class Function IsRestConnection:Boolean; virtual; abstract;
+    class Function HasSqlNextIDBeforeInsert(Const AContextTable:IioContextTable):Boolean; virtual; abstract;
+// DB has a query to retrieve next ID to use before the insert command. No Autoinc ID.
+    class Function HasSqlLastIDAfterInsert(Const AContextTable:IioContextTable):Boolean; virtual; abstract;
+// DB has a query to retrieve last generated ID to use after the insert command. ID is autoincremental.
+//    class Function HasAutoIncrementIDRetrieveWithSeparateQuery:Boolean; virtual; abstract;
+    class Function HasAutoIncrementIDRetrieveWithInsertQuery(Const AContextTable:IioContextTable):Boolean; virtual; abstract;
+// DB has an Insert query that returns also new autoincremental ID.
+    class Function HasToSkipIDInInsert(Const AContextTable:IioContextTable):Boolean; virtual; Abstract;
+// DB don't want ID in insert query.
+  end;
+(*
+TioDbMapper = class(TioMapper)
+  public
+    class Function IsDBConnection:Boolean; override;
+    class Function IsRestConnection:Boolean; override;
+    class Function HasGenerateSqlNextID:Boolean; override;
+    class Function HasAutoIncrementIDRetrieveWithSeparateQuery:Boolean; override;
+    class Function HasAutoIncrementIDRetrieveWithInsertQuery:Boolean; override;
+    class Function AutoCreateDatabase:Boolean; override;
+  end;
+*)
+//&&&& fine
 
   // Interface for TransactionColection
   IioTransactionCollection = interface
@@ -373,13 +422,69 @@ end;
 
 { TioConnectionInfo }
 
-constructor TioConnectionInfo.Create(const AConnectionName:String; const AConnectionType: TioConnectionType;
-  const APersistent: Boolean);
+constructor TioConnectionInfo.Create(const AConnectionName:String; (*&&&&const AConnectionType: TioConnectionType;*)
+  (*&&&& inizio*) ADbPeculiarity:TioDbPeculiarityClassType; (*&&&& fine*) const APersistent: Boolean);
 begin
   ConnectionName := AConnectionName;
-  ConnectionType := AConnectionType;
+//&&&&  ConnectionType := AConnectionType;
+  DbPeculiarity:=ADbPeculiarity; //&&&&
   Persistent := APersistent;
-  Strategy := TioStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
+//&&&&  Strategy := TioStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
+  Strategy := TioStrategyFactory.ConnectionTypeToStrategy(Self); //&&&&
 end;
+
+//&&&& inizio
+(*
+{ TioMapper }
+
+class function TioMapper.ForceSkipID: Boolean;
+begin
+  Result:=HasAutoIncrementIDRetrieveWithSeparateQuery
+      or HasAutoIncrementIDRetrieveWithInsertQuery;
+end;
+
+{ TioDbMapper }
+
+class function TioDbMapper.AutoCreateDatabase: Boolean;
+begin
+  Result:=False;
+end;
+
+class function TioDbMapper.HasAutoIncrementIDRetrieveWithInsertQuery: Boolean;
+begin
+  Result:=False;
+end;
+
+class function TioDbMapper.HasAutoIncrementIDRetrieveWithSeparateQuery: Boolean;
+begin
+  Result:=False;
+end;
+
+class function TioDbMapper.HasGenerateSqlNextID: Boolean;
+begin
+  Result:=False;
+end;
+
+class function TioDbMapper.IsDBConnection: Boolean;
+begin
+  Result:=True;
+end;
+
+class function TioDbMapper.IsRestConnection: Boolean;
+begin
+  Result:=False;
+end;
+*)
+
+function TioConnectionInfo.IsDBConnection: Boolean;
+begin
+  Result:=Assigned(DbPeculiarity);
+end;
+
+function TioConnectionInfo.IsRestConnection: Boolean;
+begin
+  Result:=Not Assigned(DbPeculiarity);
+end;
+//&&&& fine
 
 end.

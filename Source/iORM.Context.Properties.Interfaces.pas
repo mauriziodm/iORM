@@ -86,6 +86,7 @@ type
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
     procedure SetTable(ATable:IioContextTable);
+    Function GetTable: IioContextTable; //&&&&
     procedure SetFieldData;
     procedure SetLoadSqlData;
     function IsSqlRequestCompliant(ASqlRequestType:TioSqlRequestType): Boolean;
@@ -97,7 +98,8 @@ type
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean;
-    function IsSkipped: Boolean;
+    procedure SetIDAutoIncremental(const AIDAutoIncremental: Boolean); //&&&&
+    function IDAutoIncremental: Boolean; //&&&&
   end;
 
   IioContextProperties = interface(IioSqlItem)

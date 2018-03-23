@@ -33,7 +33,7 @@
 
 
 
-unit iORM.DB.DBCreator.SqLite.SqlGenerator;
+unit iORM.DB.DBCreator.LogFile.SqlGenerator;
 
 interface
 
@@ -45,9 +45,36 @@ type
 
   TFieldTypeSet = set of TFieldType;
 
-  TioDBCreatorSqLiteSqlGenerator = class(TInterfacedObject, IioDBCreatorSqlGenerator)
+(*
+  TioMyStream = Class(TFileStream)
+  private
+    function GetSQL: TioMyStream;
+  public
+    Procedure Add(Const AString:String);
+    Procedure NewLine;
+    Property SQL:TioMyStream Read GetSQL;
+    Procedure ExecSQL;
+    Procedure Open;
+    Procedure Close;
+  End;
+*)
+
+  TioMyStream = Class(TStringList)
+  private
+    function GetSQL: TioMyStream;
+  public
+//    Procedure Add(Const AString:String);
+    Procedure NewLine;
+    Property SQL:TioMyStream Read GetSQL;
+    Procedure ExecSQL;
+    Procedure Open;
+    Procedure Close;
+  End;
+
+  TioDBCreatorLogFileSqlGenerator = class(TInterfacedObject, IioDBCreatorSqlGenerator)
   strict private
-    FQuery: IioQuery;
+    FQuery:TioMyStream;
+//    FQuery: IioQuery;
   strict protected
     procedure ClearQuery;
     function FieldTypeMatching(AField:IioDBCreatorField; ASqlField:TField): Boolean;
@@ -75,15 +102,16 @@ implementation
 uses
   System.SysUtils, iORM.Exceptions, iORM.Attributes;
 
-{ TioDBCreatorSqLiteSqlGenerator }
+{ TioDBCreatorLogFileSqlGenerator }
 
-procedure TioDBCreatorSqLiteSqlGenerator.AutoCreateDatabase(
+procedure TioDBCreatorLogFileSqlGenerator.AutoCreateDatabase(
   ADBCreator: IioDBCreator);
 var
   ATable: IioDBCreatorTable;
 begin
+  FQuery:=TioMyStream.Create;
   // Start transaction
-  FQuery.Connection.StartTransaction;
+//  FQuery.Connection.StartTransaction;
   try
     // Loop for all Tables
     for ATable in ADBCreator.Tables.Values do
@@ -91,15 +119,18 @@ begin
       Self.AutoCreateTable(ATable);
     end;
     // if all Ok then Commit
-    FQuery.Connection.Commit;
+    FQuery.SaveToFile('Trace.SQL');
+    FQuery.Free;
+//    FQuery.Connection.Commit;
   except
     // If errors then Roolback
-    FQuery.Connection.Rollback;
+//    FQuery.Connection.Rollback;
+    FQuery.Free;
     raise;
   end;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.AutoCreateTable(
+procedure TioDBCreatorLogFileSqlGenerator.AutoCreateTable(
   ATable: IioDBCreatorTable);
 begin
   case ATable.TableState of
@@ -116,13 +147,16 @@ begin
   end;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.ClearQuery;
+procedure TioDBCreatorLogFileSqlGenerator.ClearQuery;
 begin
-  FQuery.Close;
-  FQuery.SQL.Clear;
+  FQuery.NewLine;
+  FQuery.Add('//------------------------------------------------');
+  FQuery.NewLine;
+//  FQuery.Close;
+//  FQuery.SQL.Clear;
 end;
 
-function TioDBCreatorSqLiteSqlGenerator.FieldTypeMatching(
+function TioDBCreatorLogFileSqlGenerator.FieldTypeMatching(
   AField: IioDBCreatorField; ASqlField: TField): Boolean;
 var
   TextFieldTypeSet: TFieldTypeSet;
@@ -150,7 +184,7 @@ begin
   if Result then Exit;
 end;
 
-function TioDBCreatorSqLiteSqlGenerator.GenerateSqlTestValue(
+function TioDBCreatorLogFileSqlGenerator.GenerateSqlTestValue(
   AField: IioDBCreatorField): String;
 begin
   if AField.FieldType = 'TEXT'
@@ -164,12 +198,12 @@ begin
   // NB: BLOB type in the future
 end;
 
-function TioDBCreatorSqLiteSqlGenerator.GetClassFromFieldColumnType: String;
+function TioDBCreatorLogFileSqlGenerator.GetClassFromFieldColumnType: String;
 begin
   Result := 'TEXT';
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.InsertTestRow(
+procedure TioDBCreatorLogFileSqlGenerator.InsertTestRow(
   ATable: IioDBCreatorTable);
 var
   AField: IioDBCreatorField;
@@ -201,14 +235,14 @@ begin
   FQuery.ExecSQL;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.LoadFieldsState(
+procedure TioDBCreatorLogFileSqlGenerator.LoadFieldsState(
   ATable: IioDBCreatorTable);
 begin
   LoadFieldsState_Exists(ATable);
   LoadFieldsState_SameType(ATable);
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.LoadFieldsState_Exists(
+procedure TioDBCreatorLogFileSqlGenerator.LoadFieldsState_Exists(
   ATable: IioDBCreatorTable);
 var
   AField: IioDBCreatorField;
@@ -222,7 +256,7 @@ begin
     for AField in ATable.Fields.Values do
     begin
       ASqlField := nil;
-      ASqlField := FQuery.Fields.FindField(AField.FieldName);
+      ASqlField := Nil; //FQuery.Fields.FindField(AField.FieldName);
       AField.DBFieldExist := Assigned(ASqlField);
     end;
   finally
@@ -230,7 +264,7 @@ begin
   end;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.LoadFieldsState_SameType(
+procedure TioDBCreatorLogFileSqlGenerator.LoadFieldsState_SameType(
   ATable: IioDBCreatorTable);
 var
   AField: IioDBCreatorField;
@@ -251,7 +285,7 @@ begin
       for AField in ATable.Fields.Values do
       begin
         AField.DBFieldSameType := False;
-        ASqlField := FQuery.Fields.FindField(AField.FieldName);
+        ASqlField := Nil; //FQuery.Fields.FindField(AField.FieldName);
         if not Assigned(ASqlField) then Continue;
         AField.DBFieldSameType := Self.FieldTypeMatching(AField, ASqlField);
       end;
@@ -263,13 +297,13 @@ begin
   end;
 end;
 
-constructor TioDBCreatorSqLiteSqlGenerator.Create(AQuery: IioQuery);
+constructor TioDBCreatorLogFileSqlGenerator.Create(AQuery: IioQuery);
 begin
   inherited Create;
-  FQuery := AQuery;
+//  FQuery := AQuery;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.CreateTable(ATable:IioDBCreatorTable);
+procedure TioDBCreatorLogFileSqlGenerator.CreateTable(ATable:IioDBCreatorTable);
 var
   AField: IioDBCreatorField;
   Comma: Char;
@@ -293,14 +327,14 @@ begin
   FQuery.ExecSQL;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.DropTable(ATableName: String);
+procedure TioDBCreatorLogFileSqlGenerator.DropTable(ATableName: String);
 begin
   Self.ClearQuery;
   FQuery.SQL.Add('DROP TABLE ' + ATableName);
   FQuery.ExecSQL;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.CopyDataRows(
+procedure TioDBCreatorLogFileSqlGenerator.CopyDataRows(
   ADestTable: IioDBCreatorTable; SourceTableName: String);
 var
   AField: IioDBCreatorField;
@@ -335,7 +369,7 @@ begin
   FQuery.ExecSQL;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.RemoveTestRow(
+procedure TioDBCreatorLogFileSqlGenerator.RemoveTestRow(
   ATable: IioDBCreatorTable);
 begin
   Self.ClearQuery;
@@ -343,7 +377,7 @@ begin
   FQuery.ExecSQL;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.RenameTable(
+procedure TioDBCreatorLogFileSqlGenerator.RenameTable(
   ATable: IioDBCreatorTable; NewName: String);
 begin
   Self.ClearQuery;
@@ -351,7 +385,7 @@ begin
   FQuery.ExecSQL;
 end;
 
-procedure TioDBCreatorSqLiteSqlGenerator.RestructureTable(
+procedure TioDBCreatorLogFileSqlGenerator.RestructureTable(
   ATable: IioDBCreatorTable);
 var
   TempTableName: String;
@@ -367,18 +401,56 @@ begin
   Self.DropTable(TempTableName);
 end;
 
-function TioDBCreatorSqLiteSqlGenerator.TableExists(ATable:IioDBCreatorTable): Boolean;
+function TioDBCreatorLogFileSqlGenerator.TableExists(ATable:IioDBCreatorTable): Boolean;
 begin
   Self.ClearQuery;
   FQuery.SQL.Add('SELECT name FROM sqlite_master WHERE type = ' + 'table'.QuotedString + ' AND name = ' + ATable.TableName.QuotedString);
   FQuery.Open;
   try
-    Result := (not FQuery.Eof);
+    Result := False; //(not FQuery.Eof);
   finally
     FQuery.Close;
   end;
 end;
 
+{ TioMyStream }
+
+(*
+procedure TioMyStream.Add(const AString: String);
+begin
+  inherited Add(AString);
+//  Write(AString,  Length(AString));
+//  NewLine;
+end;
+*)
+
+procedure TioMyStream.Close;
+begin
+// Nothing
+end;
+
+procedure TioMyStream.ExecSQL;
+begin
+  // Nothing
+end;
+
+function TioMyStream.GetSQL: TioMyStream;
+begin
+  Result := Self;
+end;
+
+procedure TioMyStream.NewLine;
+//Const
+//  NL = #13#10;
+begin
+  Add('');
+//  Write(NL,  Length(NL));
+end;
+
+procedure TioMyStream.Open;
+begin
+  // Nothing
+end;
 
 end.
 

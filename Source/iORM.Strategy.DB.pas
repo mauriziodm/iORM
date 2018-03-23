@@ -78,6 +78,7 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes,
+  Data.DB, //%%%%
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
@@ -158,17 +159,21 @@ class procedure TioStrategyDB.InsertObject(const AContext: IioContext;
   const ABlindInsert: Boolean);
 var
   AQuery: IioQuery;
+  AParam: TIoParam;     //%%%%
   NextID: Integer;
 begin
   inherited;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   //  before the insert query (for Firebird/Interbase)
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtFirebird) and AContext.IDIsNull then
+//%%%%  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtFirebird) and AContext.IDIsNull then
+//&&&&  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo.ConnectionType in [cdtFirebird, cdtOracle]) and AContext.IDIsNull then //%%%%
+  if (not ABlindInsert) and TioConnectionManager.GetConnectionInfo.DbPeculiarity.HasSqlNextIDBeforeInsert(AContext.GetTable) and AContext.IDIsNull then //&&&&
   begin
-    AQuery := TioDBFActory.QueryEngine.GetQueryNextID(AContext);
+//&&&&    AQuery := TioDBFActory.QueryEngine.GetQueryNextID(AContext);
+    AQuery := TioDBFActory.QueryEngine.GetQueryNextIDBefore(AContext);
     try
-      AQuery.Open;
+        AQuery.Open;
       // Set the NextID as the ObjectID
       AContext.GetProperties.GetIdProperty.SetValue(
         AContext.DataObject,
@@ -181,15 +186,49 @@ begin
   // -----------------------------------------------------------
 
   // Create and execute insert query
-  TioDbFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
+//%%%%  TioDbFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
+//%%%% begin
+  AQuery:=TioDbFactory.QueryEngine.GetQueryInsert(AContext);
+  If Not TioConnectionManager.GetConnectionInfo.DbPeculiarity.HasAutoIncrementIDRetrieveWithInsertQuery(AContext.GetTable) Then
+    AQuery.ExecSQL
+  else
+  Begin
+    if (not ABlindInsert) and AContext.IDIsNull then
+    begin
+      Try
+        AParam:=AQuery.FindParam(Acontext.GetProperties.GetIdProperty.GetSqlParamName);
+      Except
+        AParam:=Nil;
+      End;
+      if Assigned(AParam) then
+      Begin
+        AQuery.ParamByName(Acontext.GetProperties.GetIdProperty.GetSqlParamName).DataType:=ftInteger;
+        AQuery.ParamByName(Acontext.GetProperties.GetIdProperty.GetSqlParamName).ParamType:=ptOutput;
+        AQuery.ExecSQL;
+        NextId := AQuery.ParamByName(Acontext.GetProperties.GetIdProperty.GetSqlParamName).AsInteger;
+      End
+      Else
+      try
+        AQuery.Open;
+        NextId := AQuery.Fields[0].AsInteger;
+      finally
+        AQuery.Close;
+      end;
+        // Set the ActualID as the ObjectID
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, NextId);
+    end;
+  End;
+//%%%% end
 
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   //  in the last insert query.
-  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLite) or (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer))
+//&&&&  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLite) or (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer))
+  if (not ABlindInsert) and TioConnectionManager.GetConnectionInfo.DbPeculiarity.HasSqlLastIDAfterInsert(AContext.GetTable) //&&&&
     and AContext.IDIsNull then
   begin
-    AQuery := TioDBFActory.QueryEngine.GetQueryNextID(AContext);
+//%%%%    AQuery := TioDBFActory.QueryEngine.GetQueryNextID(AContext);
+    AQuery := TioDBFActory.QueryEngine.GetQueryLastIDAfter(AContext);
     try
       AQuery.Open;
       // Set the NextID as the ObjectID
@@ -680,7 +719,6 @@ begin
 end;
 
 end.
-
 
 
 

@@ -33,7 +33,7 @@
 
 
 
-unit iORM.DB.SqLite.CompareOperators;
+unit iORM.DB.Peculiarity.Generic.SqlCompareOperators;
 
 interface
 
@@ -42,7 +42,7 @@ uses
   iORM.Interfaces;
 
 type
-  TioCompareOperatorSqLite = class(TioCompareOperator)
+  TioSqlCompareOperatorGeneric = class(TioSqlCompareOperator)
     class function _Equal: IioSqlItem; override;
     class function _Greater: IioSqlItem; override;
     class function _Lower: IioSqlItem; override;
@@ -60,47 +60,47 @@ uses
   iORM.SqlItems;
 
 
-class function TioCompareOperatorSqLite._Equal: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._Equal: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' = ');
 end;
 
-class function TioCompareOperatorSqLite._GreaterOrEqual: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._GreaterOrEqual: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' >= ');
 end;
 
-class function TioCompareOperatorSqLite._Greater: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._Greater: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' > ');
 end;
 
-class function TioCompareOperatorSqLite._IsNotNull: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._IsNotNull: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' IS NOT NULL ');
 end;
 
-class function TioCompareOperatorSqLite._IsNull: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._IsNull: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' IS NULL ');
 end;
 
-class function TioCompareOperatorSqLite._Like: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._Like: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' LIKE ');
 end;
 
-class function TioCompareOperatorSqLite._LowerOrEqual: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._LowerOrEqual: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' <= ');
 end;
 
-class function TioCompareOperatorSqLite._Lower: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._Lower: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' < ');
 end;
 
-class function TioCompareOperatorSqLite._NotEqual: IioSqlItem;
+class function TioSqlCompareOperatorGeneric._NotEqual: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' <> ');
 end;

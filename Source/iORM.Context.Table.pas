@@ -117,18 +117,22 @@ type
     FJoins: IioJoins;
     FGroupBy: IioGroupBy;
     FConnectionDefName: String;
+    FTableNameAbbr:String; //%%%%
     FKeyGenerator: String;
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
     FAutoCreateDB: Boolean;
   public
-    constructor Create(const ASqlText, AKeyGenerator:String; const AClassFromField:IioClassFromField;
-    const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
-    const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); overload;
+    constructor Create(const ASqlText,
+      ATableNameAbbr, //%%%%
+      AKeyGenerator:String; const AClassFromField:IioClassFromField;
+      const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
+      const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); overload;
     destructor Destroy; override;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
+    function TableNameAbbr: String; //%%%%
     function GetKeyGenerator: String;
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;
@@ -149,7 +153,9 @@ uses
 
 { TioContextTable }
 
-constructor TioContextTable.Create(const ASqlText, AKeyGenerator:String; const AClassFromField:IioClassFromField;
+constructor TioContextTable.Create(const ASqlText,
+    ATableNameAbbr, //%%%%
+    AKeyGenerator:String; const AClassFromField:IioClassFromField;
     const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
     const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType);
 begin
@@ -163,6 +169,7 @@ begin
   FRttiType := ARttiType;
   FIndexList := nil;
   FAutoCreateDB := AAutoCreateDB;
+  FTableNameAbbr := ATableNameAbbr; //%%%%
 end;
 
 destructor TioContextTable.Destroy;
@@ -239,6 +246,13 @@ function TioContextTable.TableName: String;
 begin
   Result := Self.FSqlText;
 end;
+
+//%%%% inizio
+function TioContextTable.TableNameAbbr: String;
+begin
+  Result := Self.FTableNameAbbr;
+end;
+//%%%% fine
 
 { TioClassFromField }
 

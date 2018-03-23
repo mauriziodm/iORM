@@ -48,7 +48,8 @@ type
   public
     class function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBCreatorSqlGenerator; AIsClassFromField:Boolean): IioDBCreatorField;
     class function GetTable(const ATableName: String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBCreatorSqlGenerator; const AMap:IioMap): IioDBCreatorTable;
-    class function GetDBCreator: IioDBCreator;
+    class function GetDBCreator: IioDBCreator;  overload;
+    class function GetDBCreator(ASqlGenerator:IioDBCreatorSqlGenerator) : IioDBCreator; overload;
     class function GetSqlGenerator: IioDBCreatorSqlGenerator;
   end;
 
@@ -56,6 +57,7 @@ implementation
 
 uses
   iORM.DB.DBCreator, iORM.DB.DBCreator.SqLite.SqlGenerator,
+  iORM.DB.DBCreator.LogFile.SqlGenerator, //!!!!
   iORM.DB.Factory;
 
 { TioDBCreatorFactory }
@@ -63,6 +65,12 @@ uses
 class function TioDBCreatorFactory.GetDBCreator: IioDBCreator;
 begin
   Result := TioDBCreator.Create(Self.GetSqlGenerator);
+end;
+
+class function TioDBCreatorFactory.GetDBCreator(
+  ASqlGenerator: IioDBCreatorSqlGenerator): IioDBCreator;
+begin
+  Result := TioDBCreator.Create(ASqlGenerator);
 end;
 
 class function TioDBCreatorFactory.GetField(AFieldName: String; AIsKeyField: Boolean;
@@ -73,8 +81,9 @@ end;
 
 class function TioDBCreatorFactory.GetSqlGenerator: IioDBCreatorSqlGenerator;
 begin
-  // NB: Query for BD Creation only for the default ConnectionDef
+  // NB: Query for DB Creation only for the default ConnectionDef
   Result := TioDBCreatorSqLiteSqlGenerator.Create(TioDbFactory.Query(''));
+//  Result := TioDBCreatorLogFileSqlGenerator.Create(TioDbFactory.Query('')); //!!!!
 end;
 
 class function TioDBCreatorFactory.GetTable(

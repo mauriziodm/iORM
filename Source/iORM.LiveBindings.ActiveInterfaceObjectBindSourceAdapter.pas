@@ -565,7 +565,7 @@ begin
   // Se il BindSourceAdapter è un dettaglio allora propaga il Refresh al suo Master
   //  questo perchè solo il master esegue realmente le query e quindi è quest'ultimo che
   //  deve gestire il refresh con reload.
-  if IsDetail and Assigned(FMasterAdaptersContainer) and ReloadData then
+  if IsDetail and Assigned(FMasterAdaptersContainer) then
     FMasterAdaptersContainer.GetMasterBindSourceAdapter.Refresh(ReloadData)
   else
   begin

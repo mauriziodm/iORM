@@ -350,6 +350,7 @@ class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioContext
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionDefName, LKeyGenerator: String;
+  LTableNameAbbr: String; //%%%%%%
   LClassFromField: IioClassFromField;
   LJoins: IioJoins;
   LGroupBy: IioGroupBy;
@@ -360,6 +361,7 @@ begin
   try
     // Prop Init
     LTableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+    LTableNameAbbr:='';
     LConnectionDefName := '';
     LKeyGenerator := '';
     LJoins := Self.Joins;
@@ -375,6 +377,7 @@ begin
         if not ioTable(LAttr).Value.IsEmpty then LTableName := ioTable(LAttr).Value;
         LMapMode := ioTable(LAttr).MapMode;
       end;
+      if LAttr is ioTableAbbr then LTableNameAbbr := ioTableAbbr(LAttr).Value; //%%%%
       if LAttr is ioKeyGenerator then LKeyGenerator := ioKeyGenerator(LAttr).Value;
       if LAttr is ioConnectionDefName then LConnectionDefName := ioConnectionDefName(LAttr).Value;
       if LAttr is ioClassFromField then LClassFromField := Self.ClassFromField(Typ);
@@ -392,8 +395,7 @@ begin
     // KeyGenerator
     if LKeyGenerator.IsEmpty then LKeyGenerator := LTableName;
     // Create result Properties object
-    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
-    // If an IndexList is present then assign it to the ioTable
+    Result := TioContextTable.Create(LTableName, (*%%%%*)LTableNameAbbr,(*%%%%*) LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);    // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);
   finally

@@ -33,47 +33,53 @@
 
 
 
-
-
-unit iORM.Strategy.Factory;
+unit iORM.DB.Peculiarity.Generic.SqlLogicRelations;
 
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.Strategy.Interfaces;
+  iORM.DB.Interfaces,
+  iORM.Interfaces;
 
 type
-
-  TioStrategyFactory = class
-  public
-    class function GetStrategy(const AConnectionName: String): TioStrategyRef;
-(*&&&&    class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioStrategyRef;*)
-    class function ConnectionTypeToStrategy(const AConnectionInfo: TioConnectionInfo): TioStrategyRef; //&&&&
+  TioSqlLogicRelationGeneric = class(TioSqlLogicRelation)
+    class function _And: IioSqlItem; override;
+    class function _Or: IioSqlItem; override;
+    class function _Not: IioSqlItem; override;
+    class function _OpenPar: IioSqlItem; override;
+    class function _ClosePar: IioSqlItem; override;
   end;
 
 implementation
 
 uses
-  iORM.Strategy.DB, iORM.DB.ConnectionContainer, iORM.Strategy.REST;
+  iORM.SqlItems;
 
-{ TioStrategyFactory }
+{ TioSqlLogicRelationGeneric }
 
-(*&&&&class function TioStrategyFactory.ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioStrategyRef;*)
-class function TioStrategyFactory.ConnectionTypeToStrategy(const AConnectionInfo: TioConnectionInfo): TioStrategyRef; //&&&&
+class function TioSqlLogicRelationGeneric._And: IioSqlItem;
 begin
-(*&&&&  case AConnectionType of
-    TioConnectionType.cdtREST:*)
-  if AConnectionInfo.IsRestConnection then //&&&&
-      Result := TioStrategyREST (*&&&;*)
-  else
-    Result := TioStrategyDB;
-(*&&&&  end;*)
+  Result := TioSqlItem.Create(' AND ');
 end;
 
-class function TioStrategyFactory.GetStrategy(
-  const AConnectionName: String): TioStrategyRef;
+class function TioSqlLogicRelationGeneric._ClosePar: IioSqlItem;
 begin
-  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).Strategy;
+  Result := TioSqlItem.Create(')');
+end;
+
+class function TioSqlLogicRelationGeneric._Not: IioSqlItem;
+begin
+  Result := TioSqlItem.Create(' NOT ');
+end;
+
+class function TioSqlLogicRelationGeneric._OpenPar: IioSqlItem;
+begin
+  Result := TioSqlItem.Create('(');
+end;
+
+class function TioSqlLogicRelationGeneric._Or: IioSqlItem;
+begin
+  Result := TioSqlItem.Create(' OR ');
 end;
 
 end.

@@ -58,7 +58,9 @@ type
     class function GetQuerySelectForObject(const AContext:IioContext): IioQuery;
     class function GetQuerySelectForList(const AContext:IioContext): IioQuery;
     class function GetQueryInsert(const AContext:IioContext): IioQuery;
-    class function GetQueryNextID(const AContext:IioContext): IioQuery;
+//&&&&    class function GetQueryNextID(const AContext:IioContext): IioQuery;
+    class function GetQueryNextIDBefore(const AContext:IioContext): IioQuery; //&&&&
+    class function GetQueryLastIDAfter(const AContext:IioContext): IioQuery; //&&&&
     class function GetQueryUpdate(const AContext:IioContext): IioQuery;
     class function GetQueryDelete(const AContext:IioContext): IioQuery;
     class function GetQueryForExists(const AContext:IioContext): IioQuery;
@@ -191,7 +193,8 @@ var
     AQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
 end;
 
-class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
+//&&&& class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQueryNextIDBefore(const AContext: IioContext): IioQuery;
 begin
   // NB: Ho dovuto togliere la QueryIdentity (messa = '' prima era = 'LID') perchè la query per farsi
   //      dare il prossimo ID dal genertore (firebird) e di questo tipo "SELECT GEN_ID(GeneratorName, 1) FROM RDB$DATABASE"
@@ -203,8 +206,17 @@ begin
   //  then call the sql query generator
 //  Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'LID'));
   Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, ''));  // NoQueryIdentity
-  if Result.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlNextID(Result, AContext);
+//&&&&  if Result.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlNextID(Result, AContext);
+  if Result.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlNextIDBeforeInsert(Result, AContext); //&&&&
 end;
+
+//&&&& Inizio
+class function TioQueryEngine.GetQueryLastIDAfter(const AContext: IioContext): IioQuery;
+begin
+  Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, ''));  // NoQueryIdentity
+  if Result.IsSqlEmpty then TioDBFactory.SqlGenerator.GenerateSqlLastIDAfterInsert(Result, AContext);
+end;
+//&&&& Fine
 
 class function TioQueryEngine.GetQuerySelectForList(const AContext: IioContext): IioQuery;
 var
@@ -280,7 +292,7 @@ begin
   if AValue <> 0 then
     AParam.Value := Avalue
   else
-    AParam.Value := Null; // Thanks to Marco Mottadelli
+    AParam.Clear;
 end;
 
 end.

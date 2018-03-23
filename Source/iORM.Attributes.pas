@@ -287,6 +287,14 @@ type
   ioEntity = class(ioTable)
   end;
 
+//%%%%%% inizio
+  ioTableAbbr = class(TioCustomStringAttribute)
+  end;
+
+  ioEntityAbbr = class(ioTableAbbr)
+  end;
+//%%%%%%% fine
+
   // KeyGeneratorName attribute
   ioKeyGenerator = class(TioCustomStringAttribute)
   end;

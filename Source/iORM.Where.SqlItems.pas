@@ -218,7 +218,8 @@ begin
   // NB: No inherited
   AProp := AMap.GetProperties.GetPropertyByName(FSqlText);
   Result := AProp.GetSqlQualifiedFieldName
-          + TioDBFactory.CompareOperator._Equal.GetSql
+//&&&&          + TioDBFactory.CompareOperator._Equal.GetSql
+          + TioDBFactory.SqlCompareOperator._Equal.GetSql //&&&&
           + ':' + AProp.GetSqlParamName;
 end;
 
@@ -254,7 +255,8 @@ function TioSqlItemsWherePropertyOIDEqualsTo.GetSql(const AMap:IioMap): String;
 begin
   // NB: No inherited
   Result := AMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName
-          + TioDBFactory.CompareOperator._Equal.GetSql
+//&&&&          + TioDBFactory.CompareOperator._Equal.GetSql
+          + TioDBFactory.SqlCompareOperator._Equal.GetSql //&&&&
           + ':' + AMap.GetProperties.GetIdProperty.GetSqlParamName;
 end;
 

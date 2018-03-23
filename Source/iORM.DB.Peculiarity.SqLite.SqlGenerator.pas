@@ -33,28 +33,25 @@
 
 
 
-unit iORM.DB.SqLite.SqlGenerator;
+unit iORM.DB.Peculiarity.SqLite.SqlGenerator;
 
 interface
 
 uses
   iORM.Context.Interfaces,
-  iORM.DB.Interfaces, iORM.Context.Table.Interfaces, iORM.CommonTypes;
+  iORM.DB.Interfaces, iORM.Context.Table.Interfaces, iORM.CommonTypes,
+  iORM.DB.Peculiarity.Generic.SqlGenerator;
 
 type
 
   // Classe che si occupa di generare il codice SQL delle varie query
-  TioSqlGeneratorSqLite = class(TioSqlGenerator)
-  public
-    class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
-    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; override;
-    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); override;
+  TioSqlGeneratorSqLite = class(TioSqlGeneratorGeneric)
+  private
+    class procedure GenerateSqlLastIDAfterInsert(const AQuery:IioQuery; const AContext:IioContext); override;
+//    class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
+//    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; override;
+//    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
+//    class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); override;
   end;
 
 implementation
@@ -67,7 +64,14 @@ uses
 
 { TioSqlGeneratorSqLite }
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlForCreateIndex(
+class procedure TioSqlGeneratorSqLite.GenerateSqlLastIDAfterInsert(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  // Build the query text
+  AQuery.SQL.Add('SELECT last_insert_rowid()');
+end;
+
+(*
+class procedure TioSqlGeneratorGeneric.GenerateSqlForCreateIndex(
   const AQuery: IioQuery; const AContext:IioContext; AIndexName:String;
   const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
   const AUnique: Boolean);
@@ -120,7 +124,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext);
+class procedure TioSqlGeneratorGeneric.GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext);
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -134,7 +138,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlForDropIndex(
+class procedure TioSqlGeneratorGeneric.GenerateSqlForDropIndex(
   const AQuery: IioQuery; const AContext:IioContext; AIndexName: String);
 begin
   // Index Name
@@ -145,7 +149,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext);
+class procedure TioSqlGeneratorGeneric.GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext);
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -158,7 +162,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext);
+class procedure TioSqlGeneratorGeneric.GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext);
 var
   Comma: Char;
   Prop: IioContextProperty;
@@ -195,7 +199,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class function TioSqlGeneratorSqLite.GenerateSqlJoinSectionItem(
+class function TioSqlGeneratorGeneric.GenerateSqlJoinSectionItem(
   const AJoinItem: IioJoinItem): String;
 begin
   // Join
@@ -214,13 +218,27 @@ begin
     then Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext);
+class procedure TioSqlGeneratorGeneric.GenerateSqlLastIDAfter(
+  const AQuery: IioQuery; const AContext: IioContext);
 begin
+  //No default query
+end;
+
+class procedure TioSqlGeneratorGeneric.GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  //No default query
   // Build the query text
   AQuery.SQL.Add('SELECT last_insert_rowid()');
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext);
+class procedure TioSqlGeneratorGeneric.GenerateSqlNextIDBefore(
+  const AQuery: IioQuery; const AContext: IioContext);
+begin
+  inherited;
+
+end;
+
+class procedure TioSqlGeneratorGeneric.GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext);
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -244,7 +262,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext);
+class procedure TioSqlGeneratorGeneric.GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext);
 var
   Comma: Char;
   Prop: IioContextProperty;
@@ -275,4 +293,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
+*)
+
 end.
+

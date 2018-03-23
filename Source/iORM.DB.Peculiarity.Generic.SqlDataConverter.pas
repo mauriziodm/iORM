@@ -33,7 +33,7 @@
 
 
 
-unit iORM.DB.SqLite.SqlDataConverter;
+unit iORM.DB.Peculiarity.Generic.SqlDataConverter;
 
 interface
 
@@ -43,10 +43,9 @@ uses
   iORM.Context.Interfaces;
 
 type
-
   // Classe che si occupa di convertire i dati per la compilazione
   //  dell'SQL
-  TioSqlDataConverterSqLite = class(TioSqlDataConverter)
+  TioSqlDataConverterGeneric = class(TioSqlDataConverter)
   strict protected
   public
     class function StringToSQL(const AString:String): String; override;
@@ -57,14 +56,21 @@ type
     class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
   end;
 
+  TioSqlDataConverterStructured = class(TioSqlDataConverterGeneric)
+  strict protected
+  public
+    class function TValueToSql(const AValue:TValue): String; override;
+    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
+  end;
+
 implementation
 
 uses
   System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes, Data.DB;
 
-{ TioSqlConverterSqLite }
+{ TioSqlDataConverterGeneric }
 
-class function TioSqlDataConverterSqLite.FloatToSQL(const AFloat: Extended): String;
+class function TioSqlDataConverterGeneric.FloatToSQL(const AFloat: Extended): String;
 var
   Sign, IntegerPart, DecimalPart: String;
   FormatSettings: TFormatSettings;
@@ -99,7 +105,7 @@ end;
 //  end;
 //end;
 
-class function TioSqlDataConverterSqLite.QueryToTValue(const AQuery: IioQuery; const AProperty: IioContextProperty): TValue;
+class function TioSqlDataConverterGeneric.QueryToTValue(const AQuery: IioQuery; const AProperty: IioContextProperty): TValue;
 begin
   // If the field is null
   // HO levato questo controllo perchè nel caso in cui il campo fosse NULL mi dava un errore
@@ -123,7 +129,7 @@ begin
   end;
 end;
 
-class procedure TioSqlDataConverterSqLite.SetQueryParamByContext(
+class procedure TioSqlDataConverterGeneric.SetQueryParamByContext(
   const AQuery: IioQuery; const AProp: IioContextProperty;
   const AContext: IioContext);
 begin
@@ -141,12 +147,12 @@ begin
     AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
 end;
 
-class function TioSqlDataConverterSqLite.StringToSQL(const AString: String): String;
+class function TioSqlDataConverterGeneric.StringToSQL(const AString: String): String;
 begin
   Result := QuotedStr(AString);
 end;
 
-class function TioSqlDataConverterSqLite.TValueToSql(const AValue: TValue): String;
+class function TioSqlDataConverterGeneric.TValueToSql(const AValue: TValue): String;
 begin
   inherited;
   // Default
@@ -173,6 +179,64 @@ TTypeKind = (tkUnknown, tkSet, tkClass, tkMethod,
     tkVariant, tkArray, tkRecord, tkInterface, tkDynArray,
     tkClassRef, tkPointer, tkProcedure);
 }
+end;
+
+{ TioSqlDataConverterStructured }
+
+class procedure TioSqlDataConverterStructured.SetQueryParamByContext(
+  const AQuery: IioQuery; const AProp: IioContextProperty;
+  const AContext: IioContext);
+begin
+  // TDateTime (NULL is zero)
+  if (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) then
+  begin
+    AQuery.ParamByProp(AProp).AsDateTime := AProp.GetValue(AContext.DataObject).AsType<TDateTime>;
+    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftDateTime;
+    end;
+  end
+  // TDate (NULL is zero)
+  else
+  if (AProp.GetTypeInfo = System.TypeInfo(TDate)) then
+  begin
+    AQuery.ParamByProp(AProp).AsDate := AProp.GetValue(AContext.DataObject).AsType<TDate>;
+    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftDate;
+    end;
+  end
+  // TTime (NULL is zero)
+  else
+  if (AProp.GetTypeInfo = System.TypeInfo(TTime)) then
+  begin
+    AQuery.ParamByProp(AProp).AsTime := AProp.GetValue(AContext.DataObject).AsType<TTime>;
+    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftTime;
+    end;
+  end
+  // Other value types inherits from ancestor
+  else
+    inherited;
+end;
+
+class function TioSqlDataConverterStructured.TValueToSql(const AValue: TValue): String;
+begin
+  // Usa il risultato della classe antenata e ne modifica il risultato solo in
+  // caso di DateTime
+  Result := inherited TValueToSql(AValue);
+  // If the value is of type TDateTime...
+  if (AValue.TypeInfo.Kind = tkFloat) then
+    if (AValue.TypeInfo = System.TypeInfo(TDate)) then
+      Result := QuotedStr(FormatDateTime('mm/dd/yyyy', AValue.AsExtended))
+    else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
+      Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
+    else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
+      Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
 end;
 
 end.

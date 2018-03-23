@@ -33,8 +33,6 @@
 
 
 
-
-
 unit iORM.REST.Connection;
 
 interface
@@ -43,6 +41,15 @@ uses
   iORM.DB.Connection, iORM.DB.Interfaces, REST.Client, iORM.REST.Interfaces;
 
 type
+(*
+//&&&& inizio
+  TioRestMapper = class(TioMapper)
+  public
+    class Function IsDBConnection:Boolean; override;
+    class Function IsRestConnection:Boolean; override;
+  end;
+//&&&& fine
+*)
 
   // This is the specialized class for REST connections
   TioConnectionREST = class(TioConnectionBase, IioConnectionREST)
@@ -150,5 +157,20 @@ begin
   Result := FRESTResponseBody;
 end;
 
+(*
+//&&&& inizio
+{ TioRestMapper }
+
+class function TioRestMapper.IsDBConnection: Boolean;
+begin
+  Result:=False;
+end;
+
+class function TioRestMapper.IsRestConnection: Boolean;
+begin
+  Result:=True;
+end;
+//&&&& fine
+*)
 
 end.

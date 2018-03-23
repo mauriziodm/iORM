@@ -47,7 +47,7 @@ uses
   iORM.DB.QueryEngine;
 
 type
-
+(* &&&&
   TioDbFactory = class
   public
     class function WhereItemProperty(APropertyName:String): IioSqlItemWhere;
@@ -69,25 +69,59 @@ type
     class function QueryEngine: TioQueryEngineRef;
     class function SQLDestination(const ASQL:String): IioSQLDestination;
   end;
+*)
 
+//&&&& Inizio
+  TioDbFactory = class
+  public
+    Class function WhereItemProperty(APropertyName:String): IioSqlItemWhere;
+    Class function WhereItemPropertyOID: IioSqlItemWhere;
+    Class function WhereItemTValue(AValue:TValue): IioSqlItemWhere;
+    Class function WhereItemPropertyEqualsTo(APropertyName:String; AValue:TValue): IioSqlItemWhere;
+    Class function WhereItemPropertyOIDEqualsTo(AValue:TValue): IioSqlItemWhere;
+//&&&&    Class function CompareOperator: TioCompareOperatorRef; //Virtual;
+//&&&&    Class function LogicRelation: TioLogicRelationRef; //Virtual;
+    Class function SqlCompareOperator: TioSqlCompareOperatorRef; //Virtual; //&&&&
+    Class function SqlLogicRelation: TioSqlLogicRelationRef; //Virtual; //&&&&
+    Class function SqlGenerator: TioSqlGeneratorRef; //Virtual;
+    Class function SqlDataConverter: TioSqlDataConverterRef; //Virtual;
+    Class function Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
+    Class function NewConnection(const AConnectionName:String): IioConnection;
+    Class function TransactionCollection: IioTransactionCollection;
+    Class function Query(AConnectionDefName:String; const AQueryIdentity:String=''): IioQuery;
+    Class function ConnectionContainer: TioConnectionContainerRef;
+    Class function ConnectionManager: TioConnectionManagerRef;
+    Class function QueryContainer: IioQueryContainer;
+    Class function QueryEngine: TioQueryEngineRef;
+    Class function SQLDestination(const ASQL:String): IioSQLDestination;
+  end;
+//&&&& Fine
 
 implementation
 
 uses
-  iORM.DB.SqLite.CompareOperators, System.IOUtils,
-  iORM.DB.Connection, iORM.DB.SqLite.LogicRelations, iORM.DB.Query,
-  iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator,
+//&&&&  iORM.DB.SqLite.CompareOperators,
+  System.IOUtils,
+  iORM.DB.Connection,
+//&&&&  iORM.DB.SqLite.LogicRelations,
+  iORM.DB.Peculiarity.Generic.SqlLogicRelations, //&&&&
+  iORM.DB.Query,
   iORM.Where.SqlItems, System.SysUtils, iORM.DB.QueryContainer,
-  iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
-  iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
-  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
+  iORM.DB.TransactionCollection, iORM.Exceptions,
+  iORM.DB.SQL.Destination, FireDAC.Stan.Intf,
+(*&&&&  iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator,
+  iORM.DB.Firebird.SqlDataConverter,, iORM.DB.Firebird.SqlGenerator,
+  iORM.DB.MSSqlServer.SqlGenerator,
+  iORM.DB.Oracle.SqlGenerator, iORM.DB.Postgres.SqlGenerator,  //%%%% *)
   iORM.REST.Connection;
 
 { TioDbBuilder }
 
-class function TioDbFactory.CompareOperator: TioCompareOperatorRef;
+//&&&&class function TioDbFactory.CompareOperator: TioCompareOperatorRef;
+class function TioDbFactory.SqlCompareOperator: TioSqlCompareOperatorRef; //&&&&
 begin
-  Result := TioCompareOperatorSqLite;
+//&&&&  Result := TioCompareOperatorSqLite;
+  Result:=TioConnectionManager.GetConnectionInfo.DbPeculiarity.SqlCompareOperatorRef; //&&&&
 end;
 
 class function TioDbFactory.Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
@@ -114,9 +148,11 @@ begin
   Result := TioConnectionManager;
 end;
 
-class function TioDbFactory.LogicRelation: TioLogicRelationRef;
+//&&&& class function TioDbFactory.LogicRelation: TioLogicRelationRef;
+class function TioDbFactory.SqlLogicRelation: TioSqlLogicRelationRef;
 begin
-  Result := TioLogicRelationSqLite;
+//&&&&  Result := TioLogicRelationSqLite;
+  Result:=TioConnectionManager.GetConnectionInfo.DbPeculiarity.SqlLogicRelationRef; //&&&&
 end;
 
 class function TioDbFactory.NewConnection(const AConnectionName:String): IioConnection;
@@ -154,7 +190,8 @@ var
 begin
   // Get connection info
   LConnectionInfo := TioConnectionManager.GetConnectionInfo(AConnectionName);
-  if LConnectionInfo.ConnectionType = TioConnectionType.cdtREST then
+//&&&&  if LConnectionInfo.ConnectionType = TioConnectionType.cdtREST then
+  if LConnectionInfo.IsRestConnection then //&&&&
     Result := NewConnectionREST
   else
     Result := NewConnectionDB;
@@ -197,13 +234,17 @@ end;
 
 class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;
 begin
-  case TioConnectionManager.GetConnectionInfo.ConnectionType of
+  Result:=TioConnectionManager.GetConnectionInfo.DbPeculiarity.SqlDataConverterRef; //&&&&
+(*&&&&  case TioConnectionManager.GetConnectionInfo.ConnectionType of
     cdtFirebird:  Result := TioSqlDataConverterFirebird;
     cdtSQLite:    Result := TioSqlDataConverterSqLite;
     cdtSQLServer: Result := TioSqlDataConverterFirebird;
-  else
+    cdtOracle: Result := TioSqlDataConverterFirebird; //%%%%%
+    cdtPostgres: Result := TioSqlDataConverterFirebird; //%%%%%
+  else&&&&*)
+  if Not Assigned(Result) Then //&&&&
     raise EioException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
-  end;
+//&&&&  end;
 end;
 
 class function TioDbFactory.SQLDestination(
@@ -214,13 +255,17 @@ end;
 
 class function TioDbFactory.SqlGenerator: TioSqlGeneratorRef;
 begin
-  case TioConnectionManager.GetConnectionInfo.ConnectionType of
+  Result:=TioConnectionManager.GetConnectionInfo.DbPeculiarity.SqlGeneratorRef; //&&&&
+(*&&&&  case TioConnectionManager.GetConnectionInfo.ConnectionType of
     cdtFirebird: Result := TioSqlGeneratorFirebird;
     cdtSQLite:   Result := TioSqlGeneratorSqLite;
     cdtSQLServer:Result := TioSqlGeneratorMSSqlServer;
-  else
+    cdtOracle:   Result := TioSqlGeneratorOracle;  //%%%%%%%%
+    cdtPostgres:   Result := TioSqlGeneratorPostgres;  //%%%%%%%%
+  else&&&&*)
+  if Not Assigned(Result) Then //&&&&
     raise EioException.Create(ClassName + ': Connection type not found (SqlGenerator).');
-  end;
+//&&&&  end;
 end;
 
 class function TioDbFactory.TransactionCollection: IioTransactionCollection;

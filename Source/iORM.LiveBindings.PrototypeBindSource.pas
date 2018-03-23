@@ -118,8 +118,6 @@ type
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
     function CurrentAs<T>: T;
-    function CurrentMasterObject: TObject;
-    function CurrentMasterObjectAs<T>: T;
     procedure Refresh(ReloadData:Boolean); overload;
     procedure Persist(ReloadData:Boolean=False);
     procedure Append; overload;
@@ -299,22 +297,6 @@ var
 begin
   LCurrent := Self.Current;
   Result := TioRttiUtilities.CastObjectToGeneric<T>(LCurrent);
-end;
-
-function TioPrototypeBindSource.CurrentMasterObject: TObject;
-begin
-  if CheckAdapter and IsDetail then
-    Result := Self.GetActivebindSourceAdapter.GetMasterBindSourceAdapter.Current
-  else
-    Result := nil;
-end;
-
-function TioPrototypeBindSource.CurrentMasterObjectAs<T>: T;
-var
-  LMasterObject: TObject;
-begin
-  LMasterObject := Self.CurrentMasterObject;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
 function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;

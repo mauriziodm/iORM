@@ -33,47 +33,58 @@
 
 
 
-
-
-unit iORM.Strategy.Factory;
+unit iORM.DB.Peculiarity.MSSqlServer.SqlGenerator;
 
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.Strategy.Interfaces;
+  iORM.DB.Peculiarity.Generic.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces;
 
 type
 
-  TioStrategyFactory = class
+  // Classe che si occupa di generare il codice SQL delle varie query
+  TioSqlGeneratorMSSqlServer = class(TioSqlGeneratorGeneric)
   public
-    class function GetStrategy(const AConnectionName: String): TioStrategyRef;
-(*&&&&    class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioStrategyRef;*)
-    class function ConnectionTypeToStrategy(const AConnectionInfo: TioConnectionInfo): TioStrategyRef; //&&&&
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); override; //%%%%
+//&&&&    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlLastIDAfterInsert(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
   end;
 
 implementation
 
-uses
-  iORM.Strategy.DB, iORM.DB.ConnectionContainer, iORM.Strategy.REST;
+{ TioSqlGeneratorMSSqlServer }
 
-{ TioStrategyFactory }
-
-(*&&&&class function TioStrategyFactory.ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioStrategyRef;*)
-class function TioStrategyFactory.ConnectionTypeToStrategy(const AConnectionInfo: TioConnectionInfo): TioStrategyRef; //&&&&
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlForExists(
+  const AQuery: IioQuery; const AContext: IioContext);
 begin
-(*&&&&  case AConnectionType of
-    TioConnectionType.cdtREST:*)
-  if AConnectionInfo.IsRestConnection then //&&&&
-      Result := TioStrategyREST (*&&&;*)
-  else
-    Result := TioStrategyDB;
-(*&&&&  end;*)
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT CAST(CASE WHEN EXISTS (SELECT * FROM '
+    + AContext.GetTable.GetSql
+    + ' WHERE '
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+    + ') THEN 1 ELSE 0 END AS INTEGER)'
+  );
+  // -----------------------------------------------------------------
 end;
 
-class function TioStrategyFactory.GetStrategy(
-  const AConnectionName: String): TioStrategyRef;
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlInsert(
+  const AQuery: IioQuery; const AContext: IioContext);
 begin
-  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).Strategy;
+  GenerateSqlInsertFirstPart(AQuery,AContext);
+// Passare per il Connection Manager o fare in modo che abbia tramite parametri il DbPeculiarity???
+  If HasAutoIncrementIDRetrieveWithInsertQuery(AContext) Then
+    AQuery.SQL.Add('OUTPUT INSERTED.' + AContext.GetProperties.GetIdProperty.GetSqlFieldName); // + ' INTO @'+AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  GenerateSqlInsertLastPart(AQuery,AContext);
 end;
+
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlLastIDAfterInsert(
+  const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query text
+  AQuery.SQL.Add('select @@IDENTITY');
+end;
+
 
 end.

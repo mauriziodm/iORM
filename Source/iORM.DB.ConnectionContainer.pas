@@ -85,20 +85,27 @@ type
   TioConnectionManagerRef = class of TioConnectionManager;
   TioConnectionManager = class
   strict private
-    class var FDefaultConnectionName: String;
-    class var FConnectionManagerContainer: TioConnectionManagerContainer;  // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
+//&&&&    class var FDefaultConnectionName: String;
+//&&&&    class var FConnectionManagerContainer: TioConnectionManagerContainer;  // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class var FShowWaitProc: TProc;
     class var FHideWaitProc: TProc;
-    class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef;
+//&&&&    class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef;
   protected
+    class var FConnectionManagerContainer: TioConnectionManagerContainer; //&&&& // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
+    class var FDefaultConnectionName: String; //&&&&
+    class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef; //&&&&
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;
   public
+(*&&&&    class function NewOracleConnectionDef(const ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;  //%%%
+    class function NewPostgresConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;  //%%%
+
     class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class procedure NewRESTConnection(const ABaseURL:String; const AAsDefault:Boolean=True; const APersistent:Boolean=True; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
+&&&&*)
     class function GetConnectionDefByName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName:String): Boolean;
     class function GetDefaultConnectionName: String;
@@ -287,6 +294,7 @@ begin
     Self.FDefaultConnectionName := AConnectionName;
 end;
 
+(* &&&&
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String;
   const AAsDefault:Boolean=True; const APersistent:Boolean=False;
   const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
@@ -317,6 +325,36 @@ begin
   // Add the connection type to the internal container
   FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
 end;
+
+//%%%
+class function TioConnectionManager.NewOracleConnectionDef(const ADatabase,
+  AUserName, APassword: String; const AAsDefault, APersistent,
+  APooled: Boolean; const AConnectionName: String): IIoConnectionDef;
+begin
+  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+  Result.Params.DriverID := 'Ora';
+//  Result.Params.Values['Server'] := AServer;
+  Result.Params.Database := ADatabase;
+  Result.Params.UserName := AUserName;
+  Result.Params.Password := APassword;
+  //if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
+  // Add the connection type to the internal container
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtOracle, APersistent));
+end;
+
+class function TioConnectionManager.NewPostgresConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;  //%%%
+begin
+  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+  Result.Params.DriverID := 'PG';
+  Result.Params.Values['Server'] := AServer;
+  Result.Params.Database := ADatabase;
+  Result.Params.UserName := AUserName;
+  Result.Params.Password := APassword;
+  //if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
+  // Add the connection type to the internal container
+  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtPostgres, APersistent));
+end;
+//%%%
 
 class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String;
   const AAsDefault:Boolean=True; const APersistent:Boolean=True;
@@ -351,7 +389,9 @@ class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADa
   const AAsDefault:Boolean=True; const APersistent:Boolean=False;
   const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
+
   Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+
   Result.Params.DriverID := 'MSSQL';
   Result.Params.Values['Server'] := AServer;
   Result.Params.Database := ADatabase;
@@ -360,6 +400,7 @@ begin
   // Add the connection type to the internal container
   FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
 end;
+&&&&*)
 
 class procedure TioConnectionManager.SetDefaultConnectionName(const AConnectionName: String);
 begin
@@ -442,7 +483,8 @@ finalization
 {$ENDIF}
 
 end.
-                              {***************************************************************************}
+
+{***************************************************************************}
 {                                                                           }
 {           iORM - (interfaced ORM)                                         }
 {                                                                           }

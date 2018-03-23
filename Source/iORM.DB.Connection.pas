@@ -41,20 +41,24 @@ interface
 uses
   iORM.DB.Interfaces,
   FireDAC.Stan.Def,
-  FireDAC.Phys.SQLite,
-  FireDAC.Phys.FB,
+//&&&&  FireDAC.Phys.SQLite,
+//&&&&  FireDAC.Phys.FB,
+//&&&&  FireDAC.Phys.IB, //%%%%
+  FireDAC.Phys.Oracle, //%%%%
+  FireDAC.Phys.Pg, //%%%%
   FireDAC.Stan.ExprFuncs,
   FireDAC.Stan.Intf,
   FireDAC.Phys,
   FireDAC.DApt,
   FireDAC.UI.Intf,
+  FireDAC.Phys.MSSQL, //%%%%
 
 {$IFDEF CONSOLE}
   FireDAC.ConsoleUI.Wait,
 {$ELSE}
   {$IFDEF ioVCL}
     FireDAC.VCLUI.Wait,
-    FireDAC.Phys.MSSQL,
+//%%%%    FireDAC.Phys.MSSQL,
   {$ELSE}
     FireDAC.FMXUI.Wait,
   {$ENDIF}
@@ -151,12 +155,14 @@ end;
 
 function TioConnectionBase.IsDBConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.cdtREST);
+  //&&&&Result := (FConnectionInfo.ConnectionType <> TioConnectionType.cdtREST);
+  Result := FConnectionInfo.IsDBConnection; //&&&&
 end;
 
 function TioConnectionBase.IsRESTConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType = TioConnectionType.cdtREST);
+//&&&&  Result := (FConnectionInfo.ConnectionType = TioConnectionType.cdtREST);
+  Result := FConnectionInfo.IsRestConnection; //&&&&
 end;
 
 procedure TioConnectionBase.Rollback;

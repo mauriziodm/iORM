@@ -1,3 +1,5 @@
+///%%%%% Tutto nuovo!!! (Preso da SqlServer)
+
 {***************************************************************************}
 {                                                                           }
 {           iORM - (interfaced ORM)                                         }
@@ -33,53 +35,54 @@
 
 
 
-unit iORM.DB.SqLite.LogicRelations;
+unit iORM.DB.Peculiarity.Oracle.SqlGenerator;
 
 interface
 
 uses
-  iORM.DB.Interfaces,
-  iORM.Interfaces;
+  iORM.DB.Peculiarity.Generic.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces;
 
 type
-  TioLogicRelationSqLite = class(TioLogicRelation)
-    class function _And: IioSqlItem; override;
-    class function _Or: IioSqlItem; override;
-    class function _Not: IioSqlItem; override;
-    class function _OpenPar: IioSqlItem; override;
-    class function _ClosePar: IioSqlItem; override;
+
+  // Classe che si occupa di generare il codice SQL delle varie query
+  TioSqlGeneratorOracle = class(TioSqlGeneratorStructured)
+  public
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextIDBeforeInsert(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
   end;
 
 implementation
 
-uses
-  iORM.SqlItems;
+{ TioSqlGeneratorOracle }
 
-{ TioLrFactory }
-
-class function TioLogicRelationSqLite._And: IioSqlItem;
+class procedure TioSqlGeneratorOracle.GenerateSqlForExists(
+  const AQuery: IioQuery; const AContext: IioContext);
 begin
-  Result := TioSqlItem.Create(' AND ');
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT COUNT(*) FROM '
+    + AContext.GetTable.GetSql
+    + ' WHERE '
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+  );
+  // -----------------------------------------------------------------
 end;
 
-class function TioLogicRelationSqLite._ClosePar: IioSqlItem;
+class procedure TioSqlGeneratorOracle.GenerateSqlInsert(const AQuery: IioQuery;
+  const AContext: IioContext);
 begin
-  Result := TioSqlItem.Create(')');
+  inherited;
+// Passare per il Connection Manager o fare in modo che abbia tramite parametri il DbPeculiarity???
+  If HasAutoIncrementIDRetrieveWithInsertQuery(AContext) Then
+    AQuery.SQL.Add('RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + ' INTO :'+AContext.GetProperties.GetIdProperty.GetSqlParamName);
 end;
 
-class function TioLogicRelationSqLite._Not: IioSqlItem;
+class procedure TioSqlGeneratorOracle.GenerateSqlNextIDBeforeInsert(
+  const AQuery: IioQuery; const AContext: IioContext);
 begin
-  Result := TioSqlItem.Create(' NOT ');
-end;
-
-class function TioLogicRelationSqLite._OpenPar: IioSqlItem;
-begin
-  Result := TioSqlItem.Create('(');
-end;
-
-class function TioLogicRelationSqLite._Or: IioSqlItem;
-begin
-  Result := TioSqlItem.Create(' OR ');
+  AQuery.SQL.Add('SELECT '+ AContext.GetTable.GetKeyGenerator + '.Nextval FROM Dual');
 end;
 
 end.
+

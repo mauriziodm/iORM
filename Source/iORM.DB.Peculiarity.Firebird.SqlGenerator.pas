@@ -33,23 +33,25 @@
 
 
 
-unit iORM.DB.Firebird.SqlGenerator;
+unit iORM.DB.Peculiarity.Firebird.SqlGenerator;
 
 interface
 
 uses
-  iORM.DB.SqLite.SqlGenerator, iORM.DB.Interfaces,
-  iORM.Context.Interfaces, iORM.CommonTypes;
+  iORM.DB.Interfaces,
+  iORM.Context.Interfaces, iORM.CommonTypes,
+  iORM.DB.Peculiarity.Generic.SqlGenerator;
+
 
 type
 
   // Classe che si occupa di generare il codice SQL delle varie query
-  TioSqlGeneratorFirebird = class(TioSqlGeneratorSqLite)
+  TioSqlGeneratorFirebird = class(TioSqlGeneratorStructured)
   public
-    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlNextIDBeforeInsert(const AQuery:IioQuery; const AContext:IioContext); override;
     class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); override;
+(*    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
+    class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); override;*)
   end;
 
 implementation
@@ -59,6 +61,7 @@ uses
 
 { TioSqlGeneratorFirebird }
 
+(*
 class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(
   const AQuery: IioQuery; const AContext:IioContext; AIndexName:String;
   const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
@@ -123,6 +126,7 @@ begin
   AQuery.SQL.Add('DROP INDEX ' + AIndexName);
   // -----------------------------------------------------------------
 end;
+*)
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext);
 begin
@@ -135,9 +139,11 @@ begin
     + AContext.GetProperties.GetIdProperty.GetSqlParamName
     + ')) THEN 1 ELSE 0 END FROM RDB$DATABASE');
   // -----------------------------------------------------------------
+
+//$$$$$ Da LAsciare? Da utilizzare come base per gli altri?
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorFirebird.GenerateSqlNextIDBeforeInsert(const AQuery: IioQuery; const AContext: IioContext);
 begin
 // No inherited
 //  inherited;

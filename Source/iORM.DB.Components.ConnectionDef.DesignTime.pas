@@ -44,7 +44,15 @@ interface
 implementation
 
 uses
-  System.Classes, iORM.DB.Components.ConnectionDef;
+  System.Classes, iORM.DB.Components.ConnectionDef,
+  iORM.REST.Peculiarity.REST.PeculiarityMapper,
+  iORM.DB.Peculiarity.SqLite.PeculiarityMapper,
+  iORM.DB.Peculiarity.Firebird.PeculiarityMapper,
+  iORM.DB.Peculiarity.Interbase.PeculiarityMapper,
+  iORM.DB.Peculiarity.MsSqlServer.PeculiarityMapper,
+  iORM.DB.Peculiarity.Oracle.PeculiarityMapper,
+  iORM.DB.Peculiarity.Postgres.PeculiarityMapper;
+
 
   procedure Register;
   begin
@@ -52,7 +60,10 @@ uses
     RegisterComponents('iORM', [TioRESTConnectionDef]);
     RegisterComponents('iORM', [TioSQLiteConnectionDef]);
     RegisterComponents('iORM', [TioFirebirdConnectionDef]);
+    RegisterComponents('iORM', [TioInterbaseConnectionDef]);
     RegisterComponents('iORM', [TioSQLServerConnectionDef]);
+    RegisterComponents('iORM', [TioOracleConnectionDef]);
+    RegisterComponents('iORM', [TioPostgresConnectionDef]);
 //    RegisterComponents('iORM', [TioMySQLConnectionDef]);
   end;
 

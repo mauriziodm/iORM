@@ -262,7 +262,8 @@ end;
 class procedure io.AutoCreateDatabase(const AConnectionName:String; const RaiseExceptionIfNotAvailable:Boolean);
 begin
   // The AutoCreateDatabase feature is available only for SQLite database
-  if TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType = cdtSQLite then
+//&&&&  if TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType = cdtSQLite then
+  if TioConnectionManager.GetConnectionInfo(AConnectionName).DbPeculiarity.AutoCreateDatabase then
     TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase
   else if RaiseExceptionIfNotAvailable then
     raise EioException.Create(ClassName + ':  "AutoCreateDatabase" feature is available for SQLite RDBMS only.');

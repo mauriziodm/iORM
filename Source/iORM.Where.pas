@@ -342,7 +342,8 @@ function TioWhere._And: IioWhere;
 begin
   Result := Self;
   if not WhereConditionExists then
-    Self.FWhereItems.Add(TioDbFactory.LogicRelation._And);
+//&&&&    Self.FWhereItems.Add(TioDbFactory.LogicRelation._And);
+    Self.FWhereItems.Add(TioDbFactory.SqlLogicRelation._And); //&&&&
 end;
 
 function TioWhere._And(ATextCondition: String): IioWhere;
@@ -356,7 +357,8 @@ end;
 function TioWhere._ClosePar: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.LogicRelation._ClosePar);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.LogicRelation._ClosePar);
+  Self.FWhereItems.Add(TioDbFactory.SqlLogicRelation._ClosePar); //&&&&
 end;
 
 function TioWhere._ClosePar(ATextCondition: String): IioWhere;
@@ -369,7 +371,8 @@ end;
 function TioWhere._Equal: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Equal);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Equal);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._Equal); //&&&&
 end;
 
 function TioWhere._EqualTo(AValue: Double): IioWhere;
@@ -397,13 +400,15 @@ end;
 function TioWhere._Greater: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Greater);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Greater);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._Greater); //&&&&
 end;
 
 function TioWhere._GreaterOrEqual: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._GreaterOrEqual);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._GreaterOrEqual);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._GreaterOrEqual); //&&&&
 end;
 
 function TioWhere._GreaterOrEqualThan(AValue: Integer): IioWhere;
@@ -438,19 +443,22 @@ end;
 function TioWhere._IsNotNull: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._IsNotNull);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._IsNotNull);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._IsNotNull); //&&&&
 end;
 
 function TioWhere._IsNull: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._IsNull);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._IsNull);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._IsNull); //&&&&
 end;
 
 function TioWhere._Like: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Like);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Like);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._Like);  //&&&&
 end;
 
 function TioWhere._LikeTo(AValue: TDateTime): IioWhere;
@@ -468,13 +476,15 @@ end;
 function TioWhere._Lower: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Lower);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._Lower);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._Lower); //&&&&
 end;
 
 function TioWhere._LowerOrEqual: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._LowerOrEqual);
+//  Self.FWhereItems.Add(TioDbFactory.CompareOperator._LowerOrEqual);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._LowerOrEqual); //&&&&
 end;
 
 function TioWhere._LowerOrEqualThan(AValue: Double): IioWhere;
@@ -976,7 +986,8 @@ end;
 function TioWhere._NotEqual: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.CompareOperator._NotEqual);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.CompareOperator._NotEqual);
+  Self.FWhereItems.Add(TioDbFactory.SqlCompareOperator._NotEqual); //&&&&
 end;
 
 function TioWhere._NotEqualTo(AValue: TDateTime): IioWhere;
@@ -994,20 +1005,23 @@ end;
 function TioWhere._Not: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.LogicRelation._Not);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.LogicRelation._Not);
+  Self.FWhereItems.Add(TioDbFactory.SqlLogicRelation._Not); //&&&&
 end;
 
 function TioWhere._OpenPar: IioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioDbFactory.LogicRelation._OpenPar);
+//&&&&  Self.FWhereItems.Add(TioDbFactory.LogicRelation._OpenPar);
+  Self.FWhereItems.Add(TioDbFactory.SqlLogicRelation._OpenPar); //&&&&
 end;
 
 function TioWhere._Or: IioWhere;
 begin
   Result := Self;
   if not WhereConditionExists then
-    Self.FWhereItems.Add(TioDbFactory.LogicRelation._Or);
+//&&&&    Self.FWhereItems.Add(TioDbFactory.LogicRelation._Or);
+    Self.FWhereItems.Add(TioDbFactory.SqlLogicRelation._Or); //&&&&
 end;
 
 function TioWhere._OpenPar(ATextCondition: String): IioWhere;
@@ -1666,11 +1680,6 @@ begin
 end;
 
 end.
-
-
-
-
-
 
 
 

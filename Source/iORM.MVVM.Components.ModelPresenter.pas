@@ -96,8 +96,6 @@ type
     procedure Post;
     function Current: TObject;
     function CurrentAs<T>: T;
-    function CurrentMasterObject: TObject;
-    function CurrentMasterObjectAs<T>: T;
     procedure Refresh(const AReloadData:Boolean); overload;
     procedure Persist(const AReloadData:Boolean=False);
     procedure Append; overload;
@@ -454,22 +452,6 @@ begin
   // ===========================================================================
 
   inherited;
-end;
-
-function TioModelPresenter.CurrentMasterObject: TObject;
-begin
-  if CheckAdapter and IsDetail then
-    Result := BindSourceAdapter.GetMasterBindSourceAdapter.Current
-  else
-    Result := nil;
-end;
-
-function TioModelPresenter.CurrentMasterObjectAs<T>: T;
-var
-  LMasterObject: TObject;
-begin
-  LMasterObject := Self.CurrentMasterObject;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
 procedure TioModelPresenter.Next;

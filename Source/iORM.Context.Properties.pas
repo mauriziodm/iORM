@@ -70,6 +70,7 @@ type
     FRelationLoadType: TioLoadType;
     FTable:IioContextTable;
     FReadWrite: TioReadWrite;
+    FIDAutoIncremental:Boolean; //&&&&
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName:String);
     // NB: Gli altri due attributes (ioEmbeddedSkip e ioEmbeddedStreamable) non sono necessari qui
     //      perchè li usa solo l'ObjectsMappers al suo interno, iORM non li usa
@@ -113,6 +114,7 @@ type
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
     procedure SetTable(ATable:IioContextTable);
+    Function GetTable:IioContextTable; //&&&&
     procedure SetFieldData;
     procedure SetLoadSqlData;
     function IsSqlRequestCompliant(ASqlRequestType:TioSqlRequestType): Boolean;
@@ -124,7 +126,8 @@ type
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean; virtual;
-    function IsSkipped: Boolean;
+    procedure SetIDAutoIncremental(const AIDAutoIncremental: Boolean); //&&&&
+    function IDAutoIncremental: Boolean; //&&&&
   end;
 
   // Classe che rappresenta un field della classe
@@ -219,6 +222,7 @@ begin
   FRelationLoadType := ARelationLoadType;
   // Set the RelationChildPropertyName & RelationChildPropertyPath
   Self.SetRelationChildNameAndPath(ARelationChildPropertyName);
+  FIDAutoIncremental:=False; //&&&&
 end;
 
 function TioProperty.GetFieldType: String;
@@ -342,6 +346,13 @@ begin
   Result := FRttiProperty.PropertyType;
 end;
 
+//&&&& inizio
+function TioProperty.GetTable: IioContextTable;
+begin
+  Result:=FTable;
+end;
+//&&&& fine
+
 function TioProperty.GetTypeAlias: String;
 begin
   Result := FTypeAlias;
@@ -431,27 +442,26 @@ begin
   Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
 end;
 
-function TioProperty.IsSkipped: Boolean;
-begin
-  Result := FSkipped;
-end;
-
 function TioProperty.IsSqlRequestCompliant(
-  ASqlRequestType: TioSqlRequestType): Boolean;
+  ASqlRequestType: TioSqlRequestType
+  ): Boolean;
 begin
   Result := False;
   case ASqlRequestType of
-    ioSelect: Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
+    ioSelect: Result := (FReadWrite <= iorwReadWrite);
     ioInsert:
     begin
-      Result := (FReadWrite >= iorwReadWrite) and not FSkipped;
+      Result := (FReadWrite >= iorwReadWrite);
       // NB: Se la proprietà è l'ID e stiamo utilizzando una connessione a SQLServer
       //      e il flag IDSkipOnInsert = True evita di inserire anche questa proprietà
       //      nell'elenco (della query insert).
-      if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer) then
+//%%%%      if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo.ConnectionType = cdtSQLServer) then
+//&&&&      if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo.ConnectionType in [cdtSQLServer,cdtPostgres]) then //%%%%
+//&&&&????      if Self.IsID and Self.IDSkipOnInsert and TioConnectionManager.GetConnectionInfo.DbPeculiarity.HasToSkipIDInInsert Then//&&&&
+      if Self.IsID and (Self.IDSkipOnInsert or TioConnectionManager.GetConnectionInfo.DbPeculiarity.HasToSkipIDInInsert(Self.GetTable)) Then//&&&&
         Result := False;
     end;
-    ioUpdate: Result := (FReadWrite >= iorwReadWrite) and not FSkipped;
+    ioUpdate: Result := (FReadWrite >= iorwReadWrite);
   else Result := True;
   end;
 end;
@@ -501,7 +511,10 @@ begin
   FSqlFieldName := MidStr(AValue, DotPos+1, AsPos-DotPos-1);
   // Retrieve Field Alias
   FSqlFieldAlias := MidStr(AValue, AsPos+4, AValue.Length);
-  if FSqlFieldAlias = '' then FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
+  if FSqlFieldAlias = '' then FSqlFieldAlias :=
+//%%%%    FSqlFieldTableName
+    IfThen(FTable.TableNameAbbr = '', FTable.TableName,FTable.TableNameAbbr) //%%%%%%
+    + '_' + FSqlFieldName;
   // Set QualifiedFieldName
   FQualifiedSqlFieldName := FSqlFieldTableName + '.' + FSqlFieldName;
   // Set FullQualifiedFieldName
@@ -552,6 +565,18 @@ begin
   FRttiProperty.SetValue(Instance, AValue);
 //  ***ChildPropertyPath***
 end;
+
+//&&&& Inizio
+procedure TioProperty.SetIDAutoIncremental(const AIDAutoIncremental: Boolean);
+Begin
+  FIDAutoIncremental:=AIDAutoIncremental;
+End;
+
+function TioProperty.IDAutoIncremental: Boolean;
+begin
+  Result:=FIDAutoIncremental;
+end;
+//&&&& Fine
 
 { TioProperties }
 
@@ -649,7 +674,8 @@ begin
 end;
 
 function TioProperties.InternalGetSql(ASqlRequestType:TioSqlRequestType;
-  AFunc: TioPropertiesGetSqlFunction): String;
+  AFunc: TioPropertiesGetSqlFunction
+  ): String;
 var
   Prop: IioContextProperty;
 begin

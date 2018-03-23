@@ -1,3 +1,5 @@
+///%%%%% Tutto nuovo!!! (Preso da SqlServer)
+
 {***************************************************************************}
 {                                                                           }
 {           iORM - (interfaced ORM)                                         }
@@ -33,45 +35,55 @@
 
 
 
-unit iORM.DB.MSSqlServer.SqlGenerator;
+unit iORM.DB.Peculiarity.Postgres.SqlGenerator;
 
 interface
 
 uses
-  iORM.DB.SqLite.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces;
+  iORM.DB.Peculiarity.Generic.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces;
 
 type
 
   // Classe che si occupa di generare il codice SQL delle varie query
-  TioSqlGeneratorMSSqlServer = class(TioSqlGeneratorSqLite)
-  public
-    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
+  TioSqlGeneratorPostgres = class(TioSqlGeneratorStructured)
+  private
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); override;
+//    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
     class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
   end;
 
 implementation
 
-{ TioSqlGeneratorMSSqlServer }
+{ TioSqlGeneratorPosrgres }
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlForExists(
+class procedure TioSqlGeneratorPostgres.GenerateSqlForExists(
   const AQuery: IioQuery; const AContext: IioContext);
 begin
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('SELECT CAST(CASE WHEN EXISTS (SELECT * FROM '
+  AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM '
     + AContext.GetTable.GetSql
     + ' WHERE '
     + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
-    + ') THEN 1 ELSE 0 END AS INTEGER)'
+    + ')) THEN 1 ELSE 0 END'
   );
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlNextID(
+(*
+class procedure TioSqlGeneratorPostgres.GenerateSqlNextID(
   const AQuery: IioQuery; const AContext: IioContext);
 begin
-  // Build the query text
-  AQuery.SQL.Add('select @@IDENTITY');
+  AQuery.SQL.Add('SELECT CURRVAL(''' + AContext.GetTable.GetKeyGenerator + '_id_seq'')');
+//%%%% NON MI PIACE!!! non posso variare il suffisso '_id_seq' al KeyGenerator in nessun modo da attributi!!!
+end;
+*)
+
+class procedure TioSqlGeneratorPostgres.GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext);
+begin
+  Inherited;
+  AQuery.SQL.Add('RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + ' as ' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
 end;
 
 end.
+

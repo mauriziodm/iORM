@@ -397,8 +397,7 @@ begin
   begin
     // For creation purpose a HasMany or HasOne relation property
     //  must not create the field
-    if AProperty.IsSkipped
-    or (AProperty.GetRelationType = ioRTHasMany)
+    if (AProperty.GetRelationType = ioRTHasMany)
     or (AProperty.GetRelationType = ioRTHasOne)
       then Continue;
     // If not already exixts create and add it to the list
