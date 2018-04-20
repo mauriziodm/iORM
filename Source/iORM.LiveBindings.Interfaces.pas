@@ -46,6 +46,7 @@ type
 
   // Forward declaration
   IioContainedBindSourceAdapter = interface;
+  IioDetailBindSourceAdaptersContainer = interface;
 
   // Bind source adapters notification type
   TioBSANotificationType = (ntAfterPost, ntAfterDelete);
@@ -112,6 +113,7 @@ type
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     function DataObject: TObject;
     procedure SetDataObject(const AObj:TObject; const AOwnsObject:Boolean=True);
     procedure ClearDataObject;

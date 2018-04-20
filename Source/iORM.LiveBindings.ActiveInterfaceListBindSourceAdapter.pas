@@ -145,6 +145,7 @@ type
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure Append(AObject:TObject); overload;
     procedure Append(AObject:IInterface); overload;
     procedure Insert(AObject:TObject); overload;
@@ -264,6 +265,11 @@ begin
   // Free the DetailAdaptersContainer
   FDetailAdaptersContainer.Free;
   inherited;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+begin
+  Result := FDetailAdaptersContainer;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterCancel;
