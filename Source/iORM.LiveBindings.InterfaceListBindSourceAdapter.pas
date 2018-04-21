@@ -39,7 +39,7 @@ interface
 
 uses
   Data.Bind.ObjectScope, System.Classes, System.Rtti,
-  System.Generics.Collections;
+  System.Generics.Collections, iORM.Containers.Interfaces;
 
 type
 
@@ -49,6 +49,7 @@ type
     FTypeName, FTypeAlias: String;
     FBaseObjectRttiType: TRttiType;
     FList: TList<T>;
+    FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FInstanceFactory: TBindSourceAdapterInstanceFactory;
     FOwnsList: Boolean;
     FOnBeforeSetList: TSetObjectEvent;
@@ -79,10 +80,13 @@ type
     procedure DoOnAfterSetList; virtual;
     function GetBaseObjectRttiType: TRttiType;
     function GetBaseObjectClassName: String;
+    constructor InternalCreate(const AOwner: TComponent; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
   public
-    constructor Create(const AOwner: TComponent; const AList: TList<T>; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
+    constructor Create(const AOwner: TComponent; const ADataObject: TList<T>; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
+    constructor Create(const AOwner: TComponent; const ADataObject: IioList<T>; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
     destructor Destroy; override;
-    procedure SetList(AList: TList<T>; AOwnsObject: Boolean = True);
+    procedure SetList(AList: TList<T>; AOwnsObject: Boolean = True); overload;
+    procedure SetList(AList: IioList<T>; AOwnsObject: Boolean = True); overload;
     property List: TList<T> read FList;
     property OnBeforeSetList: TSetObjectEvent read FOnBeforeSetList write FOnBeforeSetList;
     property OnAfterSetList: TAdapterNotifyEvent read FOnAfterSetList write FOnAfterSetList;
@@ -90,14 +94,15 @@ type
 
   TInterfaceListBindSourceAdapter =  class(TInterfaceListBindSourceAdapter<IInterface>)
   public
-    constructor Create(const AOwner: TComponent; const AList:TObject; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
+    constructor Create(const AOwner: TComponent; const ADataObject:TObject; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
+    constructor Create(const AOwner: TComponent; const ADataObject:IInterface; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
   end;
 
 
 implementation
 
 uses Data.Bind.Consts, System.SysUtils, iORM.Rtti.Utilities, System.TypInfo, iORM,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces;
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions;
 
 { TListBindSourceAdapter<T> }
 
@@ -145,20 +150,19 @@ begin
     BindSourceAdapterError(sNilList);
 end;
 
-constructor TInterfaceListBindSourceAdapter<T>.Create(const AOwner: TComponent; const AList: TList<T>; const ATypeAlias, ATypeName:String; const AOwnsObject: Boolean);
+constructor TInterfaceListBindSourceAdapter<T>.Create(const AOwner: TComponent; const ADataObject: TList<T>; const ATypeAlias, ATypeName:String; const AOwnsObject: Boolean);
 begin
-  Create(AOwner);
-  // Set the BaseObjectType
-  FTypeName := ATypeName;
-  if FTypeName.IsEmpty then
-    FTypeName := TioRttiUtilities.GenericToString<T>;
-  FTypeAlias := ATypeAlias;
-
-//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
-  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
-
+  InternalCreate(AOwner, ATypeAlias, ATypeName, AOwnsObject);
   // Set the list
-  SetList(AList, AOwnsObject);
+  SetList(ADataObject, AOwnsObject);
+end;
+
+constructor TInterfaceListBindSourceAdapter<T>.Create(const AOwner: TComponent; const ADataObject: IioList<T>; const ATypeAlias,
+  ATypeName: String; const AOwnsObject: Boolean);
+begin
+  InternalCreate(AOwner, ATypeAlias, ATypeName, AOwnsObject);
+  // Set the list
+  SetList(ADataObject, AOwnsObject);
 end;
 
 function TInterfaceListBindSourceAdapter<T>.CreateItemInstance: T;
@@ -366,6 +370,21 @@ begin
     OnCancelUpdates(Self);
 end;
 
+constructor TInterfaceListBindSourceAdapter<T>.InternalCreate(const AOwner: TComponent; const ATypeAlias, ATypeName: String;
+  const AOwnsObject: Boolean);
+begin
+  Create(AOwner);
+
+  // Set the BaseObjectType
+  FTypeName := ATypeName;
+  if FTypeName.IsEmpty then
+    FTypeName := TioRttiUtilities.GenericToString<T>;
+  FTypeAlias := ATypeAlias;
+
+//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
+  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
+end;
+
 procedure TInterfaceListBindSourceAdapter<T>.SetList(AList: TList<T>; AOwnsObject: Boolean);
 begin
   DoOnBeforeSetList(AList);
@@ -378,11 +397,23 @@ begin
   end;
   FOwnsList := AOwnsObject;
   FList := AList;
+  if not Assigned(FList) then
+    FInterfacedList := nil;
   if FList <> nil then
   begin
     AddFields;
   end;
   DoOnAfterSetList;
+end;
+
+procedure TInterfaceListBindSourceAdapter<T>.SetList(AList: IioList<T>; AOwnsObject: Boolean);
+begin
+  if Assigned(AList) then
+    SetList(TList<T>(AList), AOwnsObject)
+  else
+    SetList(nil, AOwnsObject);
+  // Set the FInterfacedList variable to keep a reference to the list to keep live the list itself
+  FInterfacedList := AList;
 end;
 
 function TInterfaceListBindSourceAdapter<T>.SupportsNestedFields: Boolean;
@@ -392,13 +423,23 @@ end;
 
 { TInterfaceListBindSourceAdapter }
 
-constructor TInterfaceListBindSourceAdapter.Create(const AOwner: TComponent; const AList: TObject; const ATypeAlias,
+constructor TInterfaceListBindSourceAdapter.Create(const AOwner: TComponent; const ADataObject: TObject; const ATypeAlias,
   ATypeName: String; const AOwnsObject: Boolean);
 var
-  AListInternal: TList<IInterface>;
+  LListInternal: TList<IInterface>;
 begin
-  AListInternal := TList<IInterface>(AList);
-  Create(AOwner, AListInternal, ATypeAlias, ATypeName, AOwnsObject);
+  LListInternal := TList<IInterface>(ADataObject);
+  Create(AOwner, LListInternal, ATypeAlias, ATypeName, AOwnsObject);
+end;
+
+constructor TInterfaceListBindSourceAdapter.Create(const AOwner: TComponent; const ADataObject: IInterface; const ATypeAlias,
+  ATypeName: String; const AOwnsObject: Boolean);
+var
+  LListInternal: IioList<IInterface>;
+begin
+  if not Supports(ADataObject, IioList<IInterface>, LListInternal) then
+    raise EioException.Create(Self.ClassName, 'Create', 'ADataObject does not support IioList<IInterce>.');
+  Create(AOwner, LListInternal, ATypeAlias, ATypeName, AOwnsObject);
 end;
 
 end.

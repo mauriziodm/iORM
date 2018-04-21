@@ -115,7 +115,8 @@ type
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     function DataObject: TObject;
-    procedure SetDataObject(const AObj:TObject; const AOwnsObject:Boolean=True);
+    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;

@@ -132,8 +132,10 @@ type
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
+    constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent;const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const AList:TObject; const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject:TObject; const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject:IInterface; const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
@@ -153,7 +155,8 @@ type
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     function DataObject: TObject;
-    procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
+    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
@@ -183,7 +186,7 @@ uses
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Rtti.Utilities, iORM.Context.Map.Interfaces,
   iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.AbstractionLayer.Framework;
+  iORM.AbstractionLayer.Framework, iORM.Containers.Interfaces;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -222,26 +225,18 @@ begin
   Self.SetDataObject(nil, False);
 end;
 
-constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const AList: TObject; const AutoLoadData, AOwnsObject: Boolean);
+constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
+  const AOwner: TComponent; const ADataObject: IInterface; const AutoLoadData, AOwnsObject: Boolean);
 begin
-  FAutoLoadData := AutoLoadData;
-  FAsync := False;
-  FAutoPersist := True;
-  FReloadDataOnRefresh := True;
-  inherited Create(AOwner, AList, ATypeAlias, ATypeName, AOwnsObject);
-  FLocalOwnsObject := AOwnsObject;
-  FWhere := AWhere;
-  FWhereDetailsFromDetailAdapters := False;
-  FTypeName := ATypeName;
-  FTypeAlias := ATypeAlias;
-  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
-  // Set Master & Details adapters reference
-  FMasterAdaptersContainer := nil;
-  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-  // Init InsertObj subsystem values
-  FInsertObj_Enabled := False;
-  FInsertObj_NewObj := nil;
+  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
+  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, AutoLoadData, AOwnsObject);
+end;
+
+constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
+  const AOwner: TComponent; const ADataObject: TObject; const AutoLoadData, AOwnsObject: Boolean);
+begin
+  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
+  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, AutoLoadData, AOwnsObject);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DeleteListViewItem(
@@ -573,6 +568,28 @@ begin
   Self.Insert;
 end;
 
+constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
+  const AOwner: TComponent; const AutoLoadData, AOwnsObject: Boolean);
+begin
+  FAutoLoadData := AutoLoadData;
+  FAsync := False;
+  FAutoPersist := True;
+  FReloadDataOnRefresh := True;
+//  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
+  FLocalOwnsObject := AOwnsObject;
+  FWhere := AWhere;
+  FWhereDetailsFromDetailAdapters := False;
+  FTypeName := ATypeName;
+  FTypeAlias := ATypeAlias;
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+  // Set Master & Details adapters reference
+  FMasterAdaptersContainer := nil;
+  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+  // Init InsertObj subsystem values
+  FInsertObj_Enabled := False;
+  FInsertObj_NewObj := nil;
+end;
+
 procedure TioActiveInterfaceListBindSourceAdapter.Insert(AObject: TObject);
 begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
@@ -668,7 +685,53 @@ begin
   FBindSource := ANotifiableBindSource;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const AObj:TObject; const AOwnsObject:Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+var
+  LPrecAutoLoadData: Boolean;
+  LInternalListRef: IioList<IInterface>;
+begin
+  // Disable the adapter
+  Self.First;  // Bug
+  Self.Active := False;
+  // AObj is assigned then set it as DataObject
+  //  else set DataObject to nil and set MasterObject to nil
+  //  to disable all Details adapters also
+  if Assigned(ADataObject) then
+  begin
+    // Extract the right interface
+    if not Supports(ADataObject, IioList<IInterface>, LInternalListRef) then
+      raise EioException.Create(Self.ClassName, 'SetDataObject', 'Instance does not implement the IioList<IInterface> interface.');
+    // Set the provided DataObject
+    Self.SetList(LInternalListRef, AOwnsObject);
+    // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
+    //  then restore the original value of the "AutoLoadData" property.
+    LPrecAutoLoadData := FAutoLoadData;
+    try
+      FAutoLoadData := False;
+      Self.Active := True;
+    finally
+      FAutoLoadData := LPrecAutoLoadData;
+    end;
+  end
+  else
+  begin
+    Self.SetList(nil, AOwnsObject);
+    Self.FDetailAdaptersContainer.SetMasterObject(nil);
+  end;
+  // DataSet synchro
+  Self.GetDataSetLinkContainer.Refresh;
+
+  // -------------------------------------------------------------------------------------------------------
+  // If is a LazyLoadable list then set the internal List
+  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
+  //       normali dava dei problemi (non dava errori ma non usciva nulla)
+//  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
+//    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
+//  Self.SetList(AObj as TList<IInterface>, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
+//// -------------------------------------------------------------------------------------------------------
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean);
 var
   LPrecAutoLoadData: Boolean;
 begin
@@ -678,10 +741,10 @@ begin
   // AObj is assigned then set it as DataObject
   //  else set DataObject to nil and set MasterObject to nil
   //  to disable all Details adapters also
-  if Assigned(AObj) then
+  if Assigned(ADataObject) then
   begin
     // Set the provided DataObject
-    Self.SetList(TList<IInterface>(AObj), AOwnsObject);
+    Self.SetList(TList<IInterface>(ADataObject), AOwnsObject);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
     LPrecAutoLoadData := FAutoLoadData;

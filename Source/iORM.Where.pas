@@ -944,24 +944,21 @@ end;
 
 function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
 var
-  AContext: IioContext;
+  LContext: IioContext;
+  LIntfObj: IInterface;
 begin
   // If the master property type is an interface...
   if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
-    Result := TInterfaceObjectBindSourceAdapter.Create(
-      AOwner,
-      Self.ToObject,
-      FTypeAlias,
-      FTypeName)
+  begin
+    if not Supports(Self.ToObject, IInterface, LIntfObj) then
+      raise EioException.Create(Self.ClassName, 'ToObjectBindSourceAdapter', 'Object does not implement IInterface.');
+    Result := TInterfaceObjectBindSourceAdapter.Create(AOwner, LIntfObj, FTypeAlias, FTypeName);
+  end
   // else if the master property type is a class...
   else
   begin
-    AContext := TioContextFactory.Context(FTypeName);
-    Result := TObjectBindSourceAdapter.Create(
-      AOwner,
-      Self.ToObject,
-      AContext.GetClassRef,
-      AOwnsObject);
+    LContext := TioContextFactory.Context(FTypeName);
+    Result := TObjectBindSourceAdapter.Create(AOwner, Self.ToObject, LContext.GetClassRef, AOwnsObject);
   end;
 end;
 

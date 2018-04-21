@@ -81,8 +81,8 @@ type
 
   TInterfaceObjectBindSourceAdapter = class(TInterfaceObjectBindSourceAdapter<IInterface>)
   public
-    constructor Create(const AOwner: TComponent; const AObject: TObject; const ATypeAlias:String=''; const ATypeName:String=''); reintroduce; overload; virtual;
-    procedure SetDataObject(ADataObject: TObject; AOwnsObject: Boolean = True);
+    constructor Create(const AOwner: TComponent; const ADataObject: IInterface; const ATypeAlias:String=''; const ATypeName:String=''); reintroduce; overload; virtual;
+    procedure SetDataObject(ADataObject: IInterface; AOwnsObject: Boolean = False);
   end;
 
 implementation
@@ -252,32 +252,34 @@ end;
 
 { TObjectBindSourceAdapter }
 
-constructor TInterfaceObjectBindSourceAdapter.Create(const AOwner: TComponent; const AObject: TObject; const ATypeAlias, ATypeName: String);
-var
-  AObjectInternal: IInterface;
+constructor TInterfaceObjectBindSourceAdapter.Create(const AOwner: TComponent; const ADataObject: IInterface; const ATypeAlias, ATypeName: String);
+//var
+//  AObjectInternal: IInterface;
 begin
   // Init
-  AObjectInternal := nil;
+//  AObjectInternal := nil;
   // Note: if AObject = nil then assign the object as is (nil) else verify if the
   //  object supports IInterface
-  if Assigned(AObject) and not Supports(AObject, IInterface, AObjectInternal) then
-    raise EioException.Create(Self.ClassName + ': AObject does not supports IInterface.');
+//  if Assigned(AInterfacedObject) and not Supports(AInterfacedObject, IInterface, AObjectInternal) then
+//    raise EioException.Create(Self.ClassName + ': AObject does not supports IInterface.');
   // Call the inherited
-  inherited Create(AOwner, AObjectInternal, ATypeAlias, ATypeName);
+//  inherited Create(AOwner, AObjectInternal, ATypeAlias, ATypeName);
+  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
 end;
 
-procedure TInterfaceObjectBindSourceAdapter.SetDataObject(ADataObject: TObject; AOwnsObject: Boolean);
-var
-  AObjectInternal: IInterface;
+procedure TInterfaceObjectBindSourceAdapter.SetDataObject(ADataObject: IInterface; AOwnsObject: Boolean);
+//var
+//  AObjectInternal: IInterface;
 begin
   // Init
-  AObjectInternal := nil;
+//  AObjectInternal := nil;
   // Note: if AObject = nil then assign the object as is (nil) else verify if the
   //  object supports IInterface
-  if Assigned(ADataObject) and not Supports(ADataObject, IInterface, AObjectInternal) then
-    raise EioException.Create(Self.ClassName + ': AObject does not supports IInterface.');
+//  if Assigned(ADataObject) and not Supports(ADataObject, IInterface, AObjectInternal) then
+//    raise EioException.Create(Self.ClassName + ': AObject does not supports IInterface.');
   // Call the inherited
-  inherited SetDataObject(AObjectInternal, AOwnsObject);
+//  inherited SetDataObject(AObjectInternal, AOwnsObject);
+  inherited SetDataObject(ADataObject, AOwnsObject);
 end;
 
 end.

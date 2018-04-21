@@ -129,7 +129,7 @@ type
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const AObject: TObject; const AutoLoadData: Boolean); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AutoLoadData: Boolean); overload;
     destructor Destroy; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
@@ -149,7 +149,8 @@ type
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     function DataObject: TObject;
-    procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
+    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
@@ -214,13 +215,13 @@ begin
 end;
 
 constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
-  const AOwner: TComponent; const AObject: TObject; const AutoLoadData: Boolean);
+  const AOwner: TComponent; const ADataObject: IInterface; const AutoLoadData: Boolean);
 begin
   FAutoLoadData := AutoLoadData;
   FAsync := False;
   FAutoPersist := True;
   FReloadDataOnRefresh := True;
-  inherited Create(AOwner, AObject, ATypeAlias, ATypeName);
+  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
   FLocalOwnsObject := False;  // Always false because it's a BSA for an interface (AutoRefCount)
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;
@@ -600,7 +601,7 @@ begin
   FBindSource := ANotifiableBindSource;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetDataObject(const AObj: TObject; const AOwnsObject:Boolean);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 var
   LPrecAutoLoadData: Boolean;
 begin
@@ -610,10 +611,10 @@ begin
   // AObj is assigned then set it as DataObject
   //  else set DataObject to nil and set MasterObject to nil
   //  to disable all Details adapters also
-  if Assigned(AObj) then
+  if Assigned(ADataObject) then
   begin
     // Set the provided DataObject
-    inherited SetDataObject(AObj, AOwnsObject);
+    inherited SetDataObject(ADataObject, AOwnsObject);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
     LPrecAutoLoadData := FAutoLoadData;
@@ -631,6 +632,11 @@ begin
   end;
   // DataSet synchro
   Self.GetDataSetLinkContainer.Refresh;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
+begin
+  raise EioException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetIoAsync(
