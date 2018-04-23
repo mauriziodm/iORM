@@ -375,6 +375,8 @@ constructor TInterfaceListBindSourceAdapter<T>.InternalCreate(const AOwner: TCom
 begin
   Create(AOwner);
 
+  FInterfacedList := nil;
+
   // Set the BaseObjectType
   FTypeName := ATypeName;
   if FTypeName.IsEmpty then

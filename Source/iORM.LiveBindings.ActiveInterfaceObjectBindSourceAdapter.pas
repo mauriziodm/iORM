@@ -373,11 +373,11 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
 var
-  LDetailObj: TObject;
+  LDetailIntf: IInterface;
   LValue: TValue;
   LMasterProperty: IioContextProperty;
 begin
-  LDetailObj := nil;
+  LDetailIntf := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -391,12 +391,38 @@ begin
   // Retrieve the object from the TValue
   if not LValue.IsEmpty then
     if LMasterProperty.IsInterface then
-      LDetailObj := TObject(LValue.AsInterface)
+      LDetailIntf := LValue.AsInterface
     else
-      LDetailObj := LValue.AsObject;
+      raise EioException.Create(Self.ClassName, 'ExtractDetailObject', 'Extracting detail object does not implement any interface.');
   // Set it to the Adapter itself
-  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  Self.SetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
+//procedure TioActiveInterfaceObjectBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
+//var
+//  LDetailObj: TObject;
+//  LValue: TValue;
+//  LMasterProperty: IioContextProperty;
+//begin
+//  LDetailObj := nil;
+//  // Check parameter, if the MasterObject is not assigned
+//  //  then close the BSA
+//  if not Assigned(AMasterObj) then
+//  begin
+//    Self.SetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+//    Exit;
+//  end;
+//  // Extract master property value
+//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+//  LValue := LMasterProperty.GetValue(AMasterObj);
+//  // Retrieve the object from the TValue
+//  if not LValue.IsEmpty then
+//    if LMasterProperty.IsInterface then
+//      LDetailObj := TObject(LValue.AsInterface)
+//    else
+//      LDetailObj := LValue.AsObject;
+//  // Set it to the Adapter itself
+//  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+//end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetAutoLoadData: Boolean;
 begin

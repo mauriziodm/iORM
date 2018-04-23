@@ -70,6 +70,7 @@ type
     FInsertObj_NewObj: TObject;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -134,6 +135,7 @@ type
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
     function GetBaseObjectClassName: String;
+    constructor InternalCreate(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
@@ -411,8 +413,7 @@ begin
     then FonNotify(Self, ANotification);
 end;
 
-procedure TioActiveListBindSourceAdapter.ExtractDetailObject(
-  AMasterObj: TObject);
+procedure TioActiveListBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
 var
   AObj: TObject;
   ADetailObj: TList<TObject>;
@@ -596,6 +597,28 @@ begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
+constructor TioActiveListBindSourceAdapter.InternalCreate(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; AutoLoadData,
+  AOwnsObject: Boolean);
+begin
+  FAutoLoadData := AutoLoadData;
+  FAsync := False;
+  FAutoPersist := True;
+  FReloadDataOnRefresh := True;
+  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+  FLocalOwnsObject := AOwnsObject;
+  FWhere := AWhere;
+  FWhereDetailsFromDetailAdapters := False;
+  FTypeName := AClassRef.ClassName;
+  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+  // Set Master & Details adapters reference
+  FMasterAdaptersContainer := nil;
+  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+  // Init InsertObj subsystem values
+  FInsertObj_Enabled := False;
+  FInsertObj_NewObj := nil;
+end;
+
 function TioActiveListBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := Assigned(FMasterProperty);
@@ -687,7 +710,12 @@ end;
 
 procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+  if Assigned(ADataObject) then
+    Self.SetDataObject(ADataObject as TObject, AOwnsObject)
+  else
+    Self.SetDataObject(nil, AOwnsObject);
+  // Set the FInterfacedList variable to keep a reference to the list to keep live the list itself
+  FInterfacedList := ADataObject;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
@@ -718,6 +746,7 @@ begin
   begin
     Self.SetList(nil, AOwnsObject);
     Self.FDetailAdaptersContainer.SetMasterObject(nil);
+    Self.FInterfacedList := nil;
   end;
   // DataSet synchro
   Self.GetDataSetLinkContainer.Refresh;

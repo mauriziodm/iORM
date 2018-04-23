@@ -69,6 +69,7 @@ type
     FInsertObj_NewObj: IInterface;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -400,15 +401,16 @@ begin
     then FonNotify(Self, ANotification);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.ExtractDetailObject(
-  AMasterObj: TObject);
+procedure TioActiveInterfaceListBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
 var
   LDetailObj: TObject;
+  LDetailIntf: IInterface;
   LValue: TValue;
   LLazyLoadableObj: IioLazyLoadable;
   LMasterProperty: IioContextProperty;
 begin
   LDetailObj := nil;
+  LDetailIntf := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -419,19 +421,30 @@ begin
   // Extract master property value
   LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
   LValue := LMasterProperty.GetValue(AMasterObj);
-  // Retrieve the object from the TValue
+  // Retrieve the object from the TValue (always as TObject)
   if not LValue.IsEmpty then
     if LMasterProperty.IsInterface then
       LDetailObj := TObject(LValue.AsInterface)
     else
       LDetailObj := LValue.AsObject;
-  // If is a LazyLoadable list then set the internal List
+  // If is a LazyLoadable list then set the internal List (GetInternalObject is always as TObject)
   //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
   //       normali dava dei problemi (non dava errori ma non usciva nulla)
-  if Supports(LDetailObj, IioLazyLoadable, LLazyLoadableObj)
-    then LDetailObj := LLazyLoadableObj.GetInternalObject;
-  // Set it to the Adapter itself
-  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  if Supports(LDetailObj, IioLazyLoadable, LLazyLoadableObj) then
+  begin
+    LDetailObj := LLazyLoadableObj.GetInternalObject;
+    Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  end
+  else
+  // else if it isn't a LazyLoadable list but the MasterProperty is an interface...
+  if LMasterProperty.IsInterface then
+  begin
+    LDetailIntf := LValue.AsInterface;
+    Self.SetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  end
+  // else it's a normal List object (not an interface)
+  else
+    Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetAutoLoadData: Boolean;
