@@ -393,7 +393,7 @@ begin
     if LMasterProperty.IsInterface then
       LDetailIntf := LValue.AsInterface
     else
-      raise EioException.Create(Self.ClassName, 'ExtractDetailObject', 'Extracting detail object does not implement any interface.');
+      raise EioException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is not of interface type.');
   // Set it to the Adapter itself
   Self.SetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;

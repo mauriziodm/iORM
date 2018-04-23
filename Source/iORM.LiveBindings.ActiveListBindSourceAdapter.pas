@@ -138,6 +138,7 @@ type
     constructor InternalCreate(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
+    constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: IInterface; AutoLoadData: Boolean; AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
@@ -227,27 +228,23 @@ begin
   Self.SetDataObject(nil, False);
 end;
 
+constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; ADataObject: IInterface;
+  AutoLoadData, AOwnsObject: Boolean);
+var
+  LDataObject: TObject;
+begin
+  LDataObject := ADataObject as TObject;
+  inherited Create(AOwner, TList<TObject>(LDataObject), AClassRef, AOwnsObject);
+  InternalCreate(AClassRef, AWhere, AOwner, AutoLoadData, AOwnsObject);
+  FInterfacedList := ADataObject;  // To keep che interfaced list live
+end;
+
 constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef;
   AWhere: IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData,
   AOwnsObject: Boolean);
 begin
-  FAutoLoadData := AutoLoadData;
-  FAsync := False;
-  FAutoPersist := True;
-  FReloadDataOnRefresh := True;
   inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
-  FLocalOwnsObject := AOwnsObject;
-  FWhere := AWhere;
-  FWhereDetailsFromDetailAdapters := False;
-  FTypeName := AClassRef.ClassName;
-  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
-  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
-  // Set Master & Details adapters reference
-  FMasterAdaptersContainer := nil;
-  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-  // Init InsertObj subsystem values
-  FInsertObj_Enabled := False;
-  FInsertObj_NewObj := nil;
+  InternalCreate(AClassRef, AWhere, AOwner, AutoLoadData, AOwnsObject);
 end;
 
 procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer);
@@ -415,12 +412,13 @@ end;
 
 procedure TioActiveListBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
 var
-  AObj: TObject;
-  ADetailObj: TList<TObject>;
-  AValue: TValue;
-  ALazyLoadableObj: IioLazyLoadable;
+  LDetailObj: TObject;
+  LDetailIntf: IInterface;
+  LValue: TValue;
+  LLazyLoadableObj: IioLazyLoadable;
 begin
-  ADetailObj := nil;
+  LDetailObj := nil;
+  LDetailIntf := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -429,27 +427,34 @@ begin
     Exit;
   end;
   // Extract master property value
-  AValue := FMasterProperty.GetValue(AMasterObj);
-  // if not empty extract the detail object
-//  if not AValue.IsEmpty
-//    then ADetailObj := TList<TObject>(AValue.AsObject);
-
-
-  if not AValue.IsEmpty then
+//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+  LValue := FMasterProperty.GetValue(AMasterObj);
+  // Retrieve the object from the TValue (always as TObject)
+  if not LValue.IsEmpty then
+  begin
     if FMasterProperty.IsInterface then
-      AObj := TObject(AValue.AsInterface)
+      LDetailObj := TObject(LValue.AsInterface)
     else
-      AObj := AValue.AsObject;
-  // If is a LazyLoadable list then set the internal List
+      LDetailObj := LValue.AsObject;
+  end;
+  // If is a LazyLoadable list then set the internal List (GetInternalObject is always as TObject)
   //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
   //       normali dava dei problemi (non dava errori ma non usciva nulla)
-  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
-    then AObj := ALazyLoadableObj.GetInternalObject;
-  ADetailObj := TList<TObject>(AObj);
-
-
-  // Set it to the Adapter itself
-  Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  if Supports(LDetailObj, IioLazyLoadable, LLazyLoadableObj) then
+  begin
+    LDetailObj := LLazyLoadableObj.GetInternalObject;
+    Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  end
+  else
+  // else if it isn't a LazyLoadable list but the MasterProperty is an interface...
+  if FMasterProperty.IsInterface then
+  begin
+    LDetailIntf := LValue.AsInterface;
+    Self.SetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  end
+  // else it's a normal List object (not an interface)
+  else
+    Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
 function TioActiveListBindSourceAdapter.GetAutoLoadData: Boolean;
@@ -600,11 +605,12 @@ end;
 constructor TioActiveListBindSourceAdapter.InternalCreate(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; AutoLoadData,
   AOwnsObject: Boolean);
 begin
+  FInterfacedList := nil;
   FAutoLoadData := AutoLoadData;
   FAsync := False;
   FAutoPersist := True;
   FReloadDataOnRefresh := True;
-  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+//  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;

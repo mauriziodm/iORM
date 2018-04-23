@@ -376,10 +376,10 @@ end;
 procedure TioActiveObjectBindSourceAdapter.ExtractDetailObject(
   AMasterObj: TObject);
 var
-  ADetailObj: TObject;
+  LDetailObj: TObject;
   AValue: TValue;
 begin
-  ADetailObj := nil;
+  LDetailObj := nil;
   // Check parameter, if the MasterObject is not assigned
   //  then close the BSA
   if not Assigned(AMasterObj) then
@@ -392,12 +392,37 @@ begin
   // if not empty extract the detail object
    if not AValue.IsEmpty then
     if FMasterProperty.IsInterface then
-      ADetailObj := TObject(AValue.AsInterface)
+      raise EioException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is an interface type.')
     else
-      ADetailObj := AValue.AsObject;
+      LDetailObj := AValue.AsObject;
   // Set it to the Adapter itself
-  Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
+//procedure TioActiveObjectBindSourceAdapter.ExtractDetailObject(
+//  AMasterObj: TObject);
+//var
+//  ADetailObj: TObject;
+//  AValue: TValue;
+//begin
+//  ADetailObj := nil;
+//  // Check parameter, if the MasterObject is not assigned
+//  //  then close the BSA
+//  if not Assigned(AMasterObj) then
+//  begin
+//    Self.SetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+//    Exit;
+//  end;
+//  // Extract master property value
+//  AValue := FMasterProperty.GetValue(AMasterObj);
+//  // if not empty extract the detail object
+//   if not AValue.IsEmpty then
+//    if FMasterProperty.IsInterface then
+//      ADetailObj := TObject(AValue.AsInterface)
+//    else
+//      ADetailObj := AValue.AsObject;
+//  // Set it to the Adapter itself
+//  Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+//end;
 
 function TioActiveObjectBindSourceAdapter.GetAutoLoadData: Boolean;
 begin

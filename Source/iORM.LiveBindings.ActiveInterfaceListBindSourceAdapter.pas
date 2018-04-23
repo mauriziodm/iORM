@@ -136,7 +136,7 @@ type
     constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent;const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
   public
     constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject:TObject; const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject:IInterface; const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject:IInterface; const AutoLoadData: Boolean; const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
@@ -423,10 +423,12 @@ begin
   LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue (always as TObject)
   if not LValue.IsEmpty then
+  begin
     if LMasterProperty.IsInterface then
       LDetailObj := TObject(LValue.AsInterface)
     else
       LDetailObj := LValue.AsObject;
+  end;
   // If is a LazyLoadable list then set the internal List (GetInternalObject is always as TObject)
   //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
   //       normali dava dei problemi (non dava errori ma non usciva nulla)
@@ -584,6 +586,7 @@ end;
 constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
   const AOwner: TComponent; const AutoLoadData, AOwnsObject: Boolean);
 begin
+  FInterfacedList := nil;
   FAutoLoadData := AutoLoadData;
   FAsync := False;
   FAutoPersist := True;
