@@ -49,7 +49,6 @@ type
     FTypeName, FTypeAlias: String;
     FBaseObjectRttiType: TRttiType;
     FList: TList<T>;
-    FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FInstanceFactory: TBindSourceAdapterInstanceFactory;
     FOwnsList: Boolean;
     FOnBeforeSetList: TSetObjectEvent;
@@ -80,13 +79,10 @@ type
     procedure DoOnAfterSetList; virtual;
     function GetBaseObjectRttiType: TRttiType;
     function GetBaseObjectClassName: String;
-    constructor InternalCreate(const AOwner: TComponent; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
   public
     constructor Create(const AOwner: TComponent; const ADataObject: TList<T>; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
-    constructor Create(const AOwner: TComponent; const ADataObject: IioList<T>; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
     destructor Destroy; override;
-    procedure SetList(AList: TList<T>; AOwnsObject: Boolean = True); overload;
-    procedure SetList(AList: IioList<T>; AOwnsObject: Boolean = True); overload;
+    procedure SetList(AList: TList<T>; AOwnsObject: Boolean = True);
     property List: TList<T> read FList;
     property OnBeforeSetList: TSetObjectEvent read FOnBeforeSetList write FOnBeforeSetList;
     property OnAfterSetList: TAdapterNotifyEvent read FOnAfterSetList write FOnAfterSetList;
@@ -152,15 +148,17 @@ end;
 
 constructor TInterfaceListBindSourceAdapter<T>.Create(const AOwner: TComponent; const ADataObject: TList<T>; const ATypeAlias, ATypeName:String; const AOwnsObject: Boolean);
 begin
-  InternalCreate(AOwner, ATypeAlias, ATypeName, AOwnsObject);
-  // Set the list
-  SetList(ADataObject, AOwnsObject);
-end;
+  Create(AOwner);
 
-constructor TInterfaceListBindSourceAdapter<T>.Create(const AOwner: TComponent; const ADataObject: IioList<T>; const ATypeAlias,
-  ATypeName: String; const AOwnsObject: Boolean);
-begin
-  InternalCreate(AOwner, ATypeAlias, ATypeName, AOwnsObject);
+  // Set the BaseObjectType
+  FTypeName := ATypeName;
+  if FTypeName.IsEmpty then
+    FTypeName := TioRttiUtilities.GenericToString<T>;
+  FTypeAlias := ATypeAlias;
+
+//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
+  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
+
   // Set the list
   SetList(ADataObject, AOwnsObject);
 end;
@@ -370,23 +368,6 @@ begin
     OnCancelUpdates(Self);
 end;
 
-constructor TInterfaceListBindSourceAdapter<T>.InternalCreate(const AOwner: TComponent; const ATypeAlias, ATypeName: String;
-  const AOwnsObject: Boolean);
-begin
-  Create(AOwner);
-
-  FInterfacedList := nil;
-
-  // Set the BaseObjectType
-  FTypeName := ATypeName;
-  if FTypeName.IsEmpty then
-    FTypeName := TioRttiUtilities.GenericToString<T>;
-  FTypeAlias := ATypeAlias;
-
-//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
-  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
-end;
-
 procedure TInterfaceListBindSourceAdapter<T>.SetList(AList: TList<T>; AOwnsObject: Boolean);
 begin
   DoOnBeforeSetList(AList);
@@ -399,23 +380,11 @@ begin
   end;
   FOwnsList := AOwnsObject;
   FList := AList;
-  if not Assigned(FList) then
-    FInterfacedList := nil;
   if FList <> nil then
   begin
     AddFields;
   end;
   DoOnAfterSetList;
-end;
-
-procedure TInterfaceListBindSourceAdapter<T>.SetList(AList: IioList<T>; AOwnsObject: Boolean);
-begin
-  if Assigned(AList) then
-    SetList(TList<T>(AList), AOwnsObject)
-  else
-    SetList(nil, AOwnsObject);
-  // Set the FInterfacedList variable to keep a reference to the list to keep live the list itself
-  FInterfacedList := AList;
 end;
 
 function TInterfaceListBindSourceAdapter<T>.SupportsNestedFields: Boolean;

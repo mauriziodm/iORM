@@ -128,6 +128,8 @@ type
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
     function GetBaseObjectClassName: String;
+    procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: TObject; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
@@ -178,7 +180,8 @@ implementation
 uses
   iORM, System.Rtti, iORM.Context.Factory, System.SysUtils,
   iORM.LiveBindings.Factory, iORM.Context.Map.Interfaces,
-  iORM.Where.Factory, iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence;
+  iORM.Where.Factory, iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
+  iORM.LiveBindings.CommonBSABehavior;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -210,7 +213,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.ClearDataObject;
 begin
-  Self.SetDataObject(nil, False);
+  Self.InternalSetDataObject(nil, False);
 end;
 
 constructor TioActiveObjectBindSourceAdapter.Create(AClassRef:TioClassRef; AWhere: IioWhere;
@@ -384,7 +387,7 @@ begin
   //  then close the BSA
   if not Assigned(AMasterObj) then
   begin
-    Self.SetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
     Exit;
   end;
   // Extract master property value
@@ -396,7 +399,7 @@ begin
     else
       LDetailObj := AValue.AsObject;
   // Set it to the Adapter itself
-  Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+  Self.InternalSetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 //procedure TioActiveObjectBindSourceAdapter.ExtractDetailObject(
 //  AMasterObj: TObject);
@@ -635,12 +638,25 @@ begin
   FBindSource := ANotifiableBindSource;
 end;
 
+procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+begin
+  if Self.IsDetail then
+    TioCommonBSABehavior.InternalSetDataObjectAsDetail<TObject>(Self, ADataObject)
+  else
+    InternalSetDataObject(ADataObject, AOwnsObject);
+end;
+
 procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
   raise EioException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
+procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+begin
+  raise EioException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+end;
+
+procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
 var
   LPrecAutoLoadData: Boolean;
 begin
@@ -707,7 +723,7 @@ end;
 procedure TioActiveObjectBindSourceAdapter.SetItems(const AIndex: Integer;
   const Value: TObject);
 begin
-  SetDataObject(Value);
+  InternalSetDataObject(Value);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetMasterAdapterContainer(

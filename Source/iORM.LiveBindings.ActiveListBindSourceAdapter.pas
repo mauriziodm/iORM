@@ -135,6 +135,11 @@ type
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
     function GetBaseObjectClassName: String;
+    // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
+    //  <TObject> (for non interfaced list such as TList<IInterface>)
+    procedure _InternalSetDataObject<T>(const ADataObject:TObject; const AOwnsObject:Boolean); overload;
+    procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     constructor InternalCreate(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
   public
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
@@ -189,7 +194,8 @@ uses
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Rtti.Utilities,
   iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.AbstractionLayer.Framework;
+  iORM.AbstractionLayer.Framework, iORM.Containers.Interfaces,
+  iORM.LiveBindings.CommonBSABehavior;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -225,7 +231,7 @@ end;
 
 procedure TioActiveListBindSourceAdapter.ClearDataObject;
 begin
-  Self.SetDataObject(nil, False);
+  Self.InternalSetDataObject(nil, False);
 end;
 
 constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; ADataObject: IInterface;
@@ -423,7 +429,7 @@ begin
   //  then close the BSA
   if not Assigned(AMasterObj) then
   begin
-    Self.SetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
     Exit;
   end;
   // Extract master property value
@@ -443,18 +449,18 @@ begin
   if Supports(LDetailObj, IioLazyLoadable, LLazyLoadableObj) then
   begin
     LDetailObj := LLazyLoadableObj.GetInternalObject;
-    Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
   end
   else
   // else if it isn't a LazyLoadable list but the MasterProperty is an interface...
   if FMasterProperty.IsInterface then
   begin
     LDetailIntf := LValue.AsInterface;
-    Self.SetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
   end
   // else it's a normal List object (not an interface)
   else
-    Self.SetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
 function TioActiveListBindSourceAdapter.GetAutoLoadData: Boolean;
@@ -714,57 +720,30 @@ begin
   FBindSource := ANotifiableBindSource;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  if Assigned(ADataObject) then
-    Self.SetDataObject(ADataObject as TObject, AOwnsObject)
+  if Self.IsDetail then
+    TioCommonBSABehavior.InternalSetDataObjectAsDetail<TObject>(Self, ADataObject)
   else
-    Self.SetDataObject(nil, AOwnsObject);
-  // Set the FInterfacedList variable to keep a reference to the list to keep live the list itself
-  FInterfacedList := ADataObject;
+    InternalSetDataObject(ADataObject, AOwnsObject);
 end;
 
-procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
-var
-  LPrecAutoLoadData: Boolean;
+procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  // Disable the adapter
-  Self.First;  // Bug
-  Self.Active := False;
-  // AObj is assigned then set it as DataObject
-  //  else set DataObject to nil and set MasterObject to nil
-  //  to disable all Details adapters also
-  if Assigned(ADataObject) then
-  begin
-    // Set the provided DataObject
-    Self.SetList(TList<TObject>(ADataObject), AOwnsObject);
-    // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
-    //  then restore the original value of the "AutoLoadData" property.
-    LPrecAutoLoadData := FAutoLoadData;
-    try
-      FAutoLoadData := False;
-      Self.Active := True;
-    finally
-      FAutoLoadData := LPrecAutoLoadData;
-    end;
-  end
+  if Self.IsDetail then
+    TioCommonBSABehavior.InternalSetDataObjectAsDetail<IInterface>(Self, ADataObject)
   else
-  begin
-    Self.SetList(nil, AOwnsObject);
-    Self.FDetailAdaptersContainer.SetMasterObject(nil);
-    Self.FInterfacedList := nil;
-  end;
-  // DataSet synchro
-  Self.GetDataSetLinkContainer.Refresh;
+    InternalSetDataObject(ADataObject, AOwnsObject);
+end;
 
-  // -------------------------------------------------------------------------------------------------------
-  // If is a LazyLoadable list then set the internal List
-  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
-  //       normali dava dei problemi (non dava errori ma non usciva nulla)
-//  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
-//    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
-//  Self.SetList(AObj as TList<TObject>, AOwnsObject);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!! NB: Non più
-  // -------------------------------------------------------------------------------------------------------
+procedure TioActiveListBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+begin
+  Self._InternalSetDataObject<IInterface>(ADataObject as TObject, AOwnsObject);
+end;
+
+procedure TioActiveListBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
+begin
+  Self._InternalSetDataObject<TObject>(ADataObject, AOwnsObject);
 end;
 
 procedure TioActiveListBindSourceAdapter.SetIoAsync(const Value: Boolean);
@@ -840,6 +819,56 @@ end;
 function TioActiveListBindSourceAdapter._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+end;
+
+procedure TioActiveListBindSourceAdapter._InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
+var
+  LPrecAutoLoadData: Boolean;
+begin
+  // Init
+  Self.FInterfacedList := nil;
+  // Disable the adapter
+  Self.First;  // Bug
+  Self.Active := False;
+  // AObj is assigned then set it as DataObject
+  //  else set DataObject to nil and set MasterObject to nil
+  //  to disable all Details adapters also
+  if Assigned(ADataObject) then
+  begin
+    // If the generic parameter is an interface then the DataObject must implements the IioList<IInterface> interface
+    if TioRttiUtilities.IsAnInterface<T> and not Supports(ADataObject, IioList<TObject>) then
+      raise EioException.Create(Self.ClassName, '_InternalSetDataObject', 'Instance does not implement the IioList<IInterface> interface.');
+    // Set the provided DataObject (always as TList<IInterface>)
+    Self.SetList(TList<TObject>(ADataObject), AOwnsObject);
+    // If the generic parameter is an interface then set the FInterfacedList field to it to keep alive the list itself
+    if TioRttiUtilities.IsAnInterface<T> then
+      Supports(ADataObject, IInterface, Self.FInterfacedList);
+    // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
+    //  then restore the original value of the "AutoLoadData" property.
+    LPrecAutoLoadData := FAutoLoadData;
+    try
+      FAutoLoadData := False;
+      Self.Active := True;
+    finally
+      FAutoLoadData := LPrecAutoLoadData;
+    end;
+  end
+  else
+  begin
+    Self.SetList(nil, AOwnsObject);
+    Self.FDetailAdaptersContainer.SetMasterObject(nil);
+  end;
+  // DataSet synchro
+  Self.GetDataSetLinkContainer.Refresh;
+
+  // -------------------------------------------------------------------------------------------------------
+  // If is a LazyLoadable list then set the internal List
+  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
+  //       normali dava dei problemi (non dava errori ma non usciva nulla)
+//  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
+//    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
+//  Self.SetList(AObj as TList<IInterface>, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
+//// -------------------------------------------------------------------------------------------------------
 end;
 
 function TioActiveListBindSourceAdapter._Release: Integer;

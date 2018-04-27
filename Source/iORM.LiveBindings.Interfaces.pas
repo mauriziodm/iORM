@@ -115,6 +115,10 @@ type
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     function DataObject: TObject;
+//    procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+//    procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
+    procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean); overload;
+    procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean); overload;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure ClearDataObject;

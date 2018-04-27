@@ -11,11 +11,9 @@ type
   TioCommonBSAPersistenceThreadOnTerminate = reference to procedure(AResultValue: TObject);
 
   TioCommonBSAPersistence = class
-  strict private
-    class procedure SyncExecute(AExecuteFunc:TioCommonBSAPersistenceThreadExecute;
-      AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); static;
-    class procedure AsyncExecute(AExecuteFunc:TioCommonBSAPersistenceThreadExecute;
-      AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); static;
+  private
+    class procedure SyncExecute(AExecuteFunc:TioCommonBSAPersistenceThreadExecute; AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); static;
+    class procedure AsyncExecute(AExecuteFunc:TioCommonBSAPersistenceThreadExecute; AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); static;
   public
     class procedure Load(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
     class procedure Delete(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; out AAbort:Boolean); static;
@@ -145,7 +143,7 @@ begin
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
   begin
-    AActiveBindSourceAdapter.SetDataObject(AResultValue, LOwnsObjects);
+    AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, LOwnsObjects);
   end;
   // Execute synchronous or asynchronous
   if AActiveBindSourceAdapter.ioAsync then

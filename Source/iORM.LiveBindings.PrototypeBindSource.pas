@@ -136,7 +136,8 @@ type
     function DataObjectAssigned: Boolean;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
-    procedure SetDataObject(const AObj: TObject; const AOwnsObject:Boolean=True);
+    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure ClearDataObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
@@ -574,14 +575,26 @@ begin
     Self.InternalAdapter.AutoPost := Value;
 end;
 
-procedure TioPrototypeBindSource.SetDataObject(const AObj: TObject; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSource.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
 // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
 //      si faceva un SetDataObject dava un errore perchè la funzione
 //      CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
 //      assegnato (se prima avevo chiamato il  ClearDataObject
 //  if CheckActiveAdapter then
-    Self.GetActiveBindSourceAdapter.SetDataObject(AObj, AOwnsObject)
+    Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+//  else
+//    raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+end;
+
+procedure TioPrototypeBindSource.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+begin
+// NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
+//      si faceva un SetDataObject dava un errore perchè la funzione
+//      CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
+//      assegnato (se prima avevo chiamato il  ClearDataObject
+//  if CheckActiveAdapter then
+    Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
 //  else
 //    raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;

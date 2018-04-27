@@ -119,7 +119,8 @@ type
     // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
     procedure ClearDataObject;
-    procedure SetDataObject(const Value:TObject; const AOwnsObject:Boolean=True);
+    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
+    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
     function DataObjectAssigned: Boolean;
@@ -597,8 +598,7 @@ begin
     FBindSourceAdapter.ioAutoLoadData := Value;
 end;
 
-procedure TioModelPresenter.SetBindSourceAdapter(
-  const Value: IioActiveBindSourceAdapter);
+procedure TioModelPresenter.SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
 begin
   if Value = FBindSourceAdapter then
     Exit;
@@ -612,8 +612,7 @@ begin
   FBindSourceAdapter.SetBindSource(Self);
 end;
 
-procedure TioModelPresenter.SetBindSourceAdapter(
-  const Value: TBindSourceAdapter);
+procedure TioModelPresenter.SetBindSourceAdapter(const Value: TBindSourceAdapter);
 var
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
@@ -621,26 +620,6 @@ begin
     Self.SetBindSourceAdapter(LActiveBindSourceAdapter)
   else
     raise EioException.Create(TioModelPresenter.ClassName + '.SetBindSourceAdapter: IioActiveBindSourceAdapter interface not implemented by object.');
-end;
-
-procedure TioModelPresenter.SetDataObject(const Value: TObject; const AOwnsObject:Boolean);
-begin
-  if not Assigned(Value) then
-    ClearDataObject;
-  // if the adapter is not already assigned then create it
-  if not CheckAdapter then
-  begin
-    // if the TypeName is empty then set it
-    if TypeName.IsEmpty then
-    begin
-      TypeName := Value.ClassName;
-      TypeAlias := EmptyStr;
-    end;
-    // Create the BSA
-    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)  );
-  end;
-  // Set the data object into the BSA
-  BindSourceAdapter.SetDataObject(Value, AOwnsObject)
 end;
 
 //procedure TioModelPresenter.SetMasterBindSourceAdapter(
@@ -659,6 +638,40 @@ end;
 //    );
 //  Self.SetBindSourceAdapter(LBindSourceAdapter);
 //end;
+
+procedure TioModelPresenter.SetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
+begin
+  if not Assigned(ADataObject) then
+    ClearDataObject;
+  // if the adapter is not already assigned then create it
+  if not CheckAdapter then
+  begin
+    // if the TypeName is empty then set it
+    if TypeName.IsEmpty then
+      raise EioException.Create(Self.ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
+    // Create the BSA
+    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)  );
+  end;
+  // Set the data object into the BSA
+  BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+end;
+
+procedure TioModelPresenter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+begin
+  if not Assigned(ADataObject) then
+    ClearDataObject;
+  // if the adapter is not already assigned then create it
+  if not CheckAdapter then
+  begin
+    // if the TypeName is empty then set it
+    if TypeName.IsEmpty then
+      raise EioException.Create(Self.ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
+    // Create the BSA
+    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)  );
+  end;
+  // Set the data object into the BSA
+  BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+end;
 
 procedure TioModelPresenter.SetOrderBy(const Value: String);
 begin

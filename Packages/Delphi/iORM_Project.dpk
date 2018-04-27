@@ -181,6 +181,7 @@ contains
   iORM.AbstractionLayer.Framework in '..\..\Source\iORM.AbstractionLayer.Framework.pas',
   iORM.AbstractionLayer.Framework.VCL in '..\..\Source\iORM.AbstractionLayer.Framework.VCL.pas',
   iORM.AbstractionLayer.Framework.FMX in '..\..\Source\iORM.AbstractionLayer.Framework.FMX.pas',
-  iORM.DB.Components.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.Components.ConnectionDef.MSSQLServer.pas';
+  iORM.DB.Components.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.Components.ConnectionDef.MSSQLServer.pas',
+  iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas';
 
 end.
