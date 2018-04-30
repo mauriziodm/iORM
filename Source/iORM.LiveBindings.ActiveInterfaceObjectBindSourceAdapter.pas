@@ -70,6 +70,7 @@ type
     FonBeforeSelection: TioBSABeforeAfterSelectionEvent;
     FonSelection: TioBSASelectionEvent;
     FonAfterSelection: TioBSABeforeAfterSelectionEvent;
+    FSelectionDestBSA: IioActiveBindSourceAdapter;
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -175,6 +176,10 @@ type
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     function AsTBindSourceAdapter: TBindSourceAdapter;
+    procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
+    procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
+    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure SetSelectionDestBSA(const ADestBSA:IioActiveBindSourceAdapter);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -187,8 +192,6 @@ type
     property ioViewDataType:TioViewDataType read GetIoViewDataType;
     property ioOwnsObjects:Boolean read GetOwnsObjects;
     property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
-    procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
-    procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioOnBeforeSelection:TioBSABeforeAfterSelectionEvent read FonBeforeSelection write FonBeforeSelection;
@@ -203,7 +206,7 @@ uses
   iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory,
   System.Rtti, iORM.Context.Map.Interfaces, iORM.Where.Factory,
   iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.LiveBindings.CommonBSABehavior;
+  iORM.LiveBindings.CommonBSABehavior, iORM.Rtti.Utilities;
 
 { TioActiveInterfaceObjectBindSourceAdapter }
 
@@ -628,6 +631,13 @@ begin
   Result := not FMasterPropertyName.IsEmpty;
 end;
 
+procedure TioActiveInterfaceObjectBindSourceAdapter.MakeSelection(const ASelectionType: TioSelectionType);
+begin
+  if not Assigned(FSelectionDestBSA) then
+    EioException.Create(Self.ClassName, 'MakeSelection', '"FSelectionDestBSA" not assigned.');
+  FSelectionDestBSA.ReceiveSelection(TioRttiUtilities.ObjectAsIInterface(Current), ASelectionType);
+end;
+
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
 begin
   // Fire the event handler
@@ -847,6 +857,11 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetOnSelection(const Value: TioBSASelectionEvent);
 begin
   FOnSelection := Value;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetSelectionDestBSA(const ADestBSA: IioActiveBindSourceAdapter);
+begin
+  FSelectionDestBSA := ADestBSA;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeAlias(

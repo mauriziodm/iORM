@@ -69,6 +69,7 @@ type
     FonBeforeSelection: TioBSABeforeAfterSelectionEvent;
     FonSelection: TioBSASelectionEvent;
     FonAfterSelection: TioBSABeforeAfterSelectionEvent;
+    FSelectionDestBSA: IioActiveBindSourceAdapter;
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -177,6 +178,8 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
+    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure SetSelectionDestBSA(const ADestBSA:IioActiveBindSourceAdapter);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -632,6 +635,13 @@ begin
   Result := Assigned(FMasterProperty);
 end;
 
+procedure TioActiveObjectBindSourceAdapter.MakeSelection(const ASelectionType: TioSelectionType);
+begin
+  if not Assigned(FSelectionDestBSA) then
+    EioException.Create(Self.ClassName, 'MakeSelection', '"FSelectionDestBSA" not assigned.');
+  FSelectionDestBSA.ReceiveSelection(Current, ASelectionType);
+end;
+
 procedure TioActiveObjectBindSourceAdapter.Notify(Sender: TObject;
   ANotification: IioBSANotification);
 begin
@@ -850,6 +860,11 @@ end;
 procedure TioActiveObjectBindSourceAdapter.SetOnSelection(const Value: TioBSASelectionEvent);
 begin
   FOnSelection := Value;
+end;
+
+procedure TioActiveObjectBindSourceAdapter.SetSelectionDestBSA(const ADestBSA: IioActiveBindSourceAdapter);
+begin
+  FSelectionDestBSA := ADestBSA;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetTypeAlias(const AValue: String);
