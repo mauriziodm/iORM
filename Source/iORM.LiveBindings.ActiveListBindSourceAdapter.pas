@@ -74,7 +74,6 @@ type
     FonBeforeSelection: TioBSABeforeAfterSelectionEvent;
     FonSelection: TioBSASelectionEvent;
     FonAfterSelection: TioBSABeforeAfterSelectionEvent;
-    FSelectionDestBSA: IioActiveBindSourceAdapter;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -188,8 +187,7 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
-    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
-    procedure SetSelectionDestBSA(const ADestBSA:IioActiveBindSourceAdapter);
+    procedure MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -716,11 +714,11 @@ begin
   end;
 end;
 
-procedure TioActiveListBindSourceAdapter.MakeSelection(const ASelectionType: TioSelectionType);
+procedure TioActiveListBindSourceAdapter.MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType: TioSelectionType);
 begin
-  if not Assigned(FSelectionDestBSA) then
-    EioException.Create(Self.ClassName, 'MakeSelection', '"FSelectionDestBSA" not assigned.');
-  FSelectionDestBSA.ReceiveSelection(Current, ASelectionType);
+  if not Assigned(ADestBSA) then
+    EioException.Create(Self.ClassName, 'MakeSelection', '"ADestBSA" not assigned.');
+  ADestBSA.ReceiveSelection(Current, ASelectionType);
 end;
 
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;
@@ -918,11 +916,6 @@ end;
 procedure TioActiveListBindSourceAdapter.SetOnSelection(const Value: TioBSASelectionEvent);
 begin
   FOnSelection := Value;
-end;
-
-procedure TioActiveListBindSourceAdapter.SetSelectionDestBSA(const ADestBSA: IioActiveBindSourceAdapter);
-begin
-  FSelectionDestBSA := ADestBSA;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetTypeAlias(const AValue: String);

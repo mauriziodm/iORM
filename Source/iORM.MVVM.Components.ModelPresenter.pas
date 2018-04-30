@@ -27,6 +27,7 @@ type
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
     FAutoPost: Boolean;
+    FSelectorFor: TioModelPresenter;
     // Questà è una collezione dove eventuali ModelPresenters di dettaglio
     //  si registrano per rendere nota la loro esistenza al Master. Sarà poi
     //  usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -116,6 +117,7 @@ type
     procedure Cancel;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
+    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
     procedure ClearDataObject;
@@ -149,6 +151,7 @@ type
     property ViewDataType:TioViewDataType read FViewDataType write FViewDataType;
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
     property WhereStr:TStrings read FWhereStr write SetWhereStr;
+    property SelectorFor: TioModelPresenter read FSelectorFor write FSelectorFor;
   end;
 
 implementation
@@ -240,6 +243,7 @@ begin
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
+  FSelectorFor := nil;
   // Set even an onChange event handler
   FWhereStr := TStringList.Create;
   SetWhereStr(FWhereStr);  // set TStringList.onChange event handler
@@ -493,6 +497,21 @@ begin
   // ===========================================================================
 
   inherited;
+end;
+
+procedure TioModelPresenter.MakeSelection(const ASelectionType: TioSelectionType);
+var
+  LSourceBSA, LDestBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
+  if not Assigned(FSelectorFor) then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
+  if not FSelectorFor.CheckAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
+  LSourceBSA := BindSourceAdapter;
+  LDestBSA := FSelectorFor.BindSourceAdapter;
+  LSourceBSA.MakeSelection(LDestBSA, ASelectionType);
 end;
 
 function TioModelPresenter.CurrentMasterObject: TObject;

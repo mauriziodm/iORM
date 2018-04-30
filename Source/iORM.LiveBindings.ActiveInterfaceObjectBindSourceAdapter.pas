@@ -70,7 +70,6 @@ type
     FonBeforeSelection: TioBSABeforeAfterSelectionEvent;
     FonSelection: TioBSASelectionEvent;
     FonAfterSelection: TioBSABeforeAfterSelectionEvent;
-    FSelectionDestBSA: IioActiveBindSourceAdapter;
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -178,8 +177,7 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
-    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
-    procedure SetSelectionDestBSA(const ADestBSA:IioActiveBindSourceAdapter);
+    procedure MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -631,11 +629,11 @@ begin
   Result := not FMasterPropertyName.IsEmpty;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.MakeSelection(const ASelectionType: TioSelectionType);
+procedure TioActiveInterfaceObjectBindSourceAdapter.MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType: TioSelectionType);
 begin
-  if not Assigned(FSelectionDestBSA) then
-    EioException.Create(Self.ClassName, 'MakeSelection', '"FSelectionDestBSA" not assigned.');
-  FSelectionDestBSA.ReceiveSelection(TioRttiUtilities.ObjectAsIInterface(Current), ASelectionType);
+  if not Assigned(ADestBSA) then
+    EioException.Create(Self.ClassName, 'MakeSelection', '"ADestBSA" not assigned.');
+  ADestBSA.ReceiveSelection(TioRttiUtilities.ObjectAsIInterface(Current), ASelectionType);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
@@ -857,11 +855,6 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetOnSelection(const Value: TioBSASelectionEvent);
 begin
   FOnSelection := Value;
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetSelectionDestBSA(const ADestBSA: IioActiveBindSourceAdapter);
-begin
-  FSelectionDestBSA := ADestBSA;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeAlias(

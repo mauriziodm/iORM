@@ -64,6 +64,7 @@ type
     FioAutoRefreshOnNotification: TioAutoRefreshType;
     FonNotify: TioBSANotificationEvent;
     FAutoPost: Boolean;
+    FSelectorFor: TioPrototypeBindSource;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -142,6 +143,7 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
+    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;
@@ -164,6 +166,7 @@ type
     property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
     property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
     property AutoPost: Boolean read GetAutoPost write SetAutoPost;
+    property ioSelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor;
   end;
 
 implementation
@@ -246,6 +249,7 @@ begin
   FioAutoLoadData := True;
   FioAutoPersist := True;
   FioViewDataType := dtList;
+  FSelectorFor := nil;
   // Set even an onChange event handler
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;
@@ -490,6 +494,21 @@ begin
 
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;
+end;
+
+procedure TioPrototypeBindSource.MakeSelection(const ASelectionType: TioSelectionType);
+var
+  LSourceBSA, LDestBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckActiveAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
+  if not Assigned(FSelectorFor) then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
+  if not FSelectorFor.CheckActiveAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
+  LSourceBSA := GetActiveBindSourceAdapter;
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
+  LSourceBSA.MakeSelection(LDestBSA, ASelectionType);
 end;
 
 procedure TioPrototypeBindSource.Notify(const Sender: TObject;

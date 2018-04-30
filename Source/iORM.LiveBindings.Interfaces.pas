@@ -129,8 +129,7 @@ type
     procedure ClearDataObject;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
-    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
-    procedure SetSelectionDestBSA(const ADestBSA:IioActiveBindSourceAdapter);
+    procedure MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
 //    function AsTBindSourceAdapter: TBindSourceAdapter;
