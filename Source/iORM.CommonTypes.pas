@@ -65,6 +65,9 @@ type
 
   TioViewDataType = (dtSingle, dtList);
 
+  // Selection Type (for selector ActiveBindSourceAdapters)
+  TioSelectionType = (stAppend, stInsert);
+
   // Some pointers to TValue
   PValue = ^TValue;
 

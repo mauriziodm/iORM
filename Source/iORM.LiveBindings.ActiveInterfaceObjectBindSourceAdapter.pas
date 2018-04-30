@@ -50,7 +50,7 @@ const
 type
 
   TioActiveInterfaceObjectBindSourceAdapter = class(TInterfaceObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
-  strict private
+  private
     FAsync: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
@@ -63,10 +63,13 @@ type
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FBindSource: IioNotifiableBindSource;
-    FonNotify: TioBSANotificationEvent;
 //    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    FonNotify: TioBSANotificationEvent;
+    FonBeforeSelection: TioBSABeforeAfterSelectionEvent;
+    FonSelection: TioBSASelectionEvent;
+    FonAfterSelection: TioBSABeforeAfterSelectionEvent;
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -81,7 +84,7 @@ type
     function GetioAutoPost: Boolean;
     // AutoPersist property
     function GetioAutoPersist: Boolean;
-    procedure SetioAutoPersist(const Value: Boolean); protected
+    procedure SetioAutoPersist(const Value: Boolean);
     // WhereStr property
     procedure SetIoWhere(const Value: IioWhere);
     function GetioWhere: IioWhere;
@@ -105,6 +108,12 @@ type
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
+    function GetOnAfterSelection: TioBSABeforeAfterSelectionEvent;
+    function GetOnBeforeSelection: TioBSABeforeAfterSelectionEvent;
+    function GetOnSelection: TioBSASelectionEvent;
+    procedure SetOnAfterSelection(const Value: TioBSABeforeAfterSelectionEvent);
+    procedure SetOnBeforeSelection(const Value: TioBSABeforeAfterSelectionEvent);
+    procedure SetOnSelection(const Value: TioBSASelectionEvent);
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -125,9 +134,14 @@ type
     procedure DoBeforeCancel; override;
     procedure DoAfterCancel; override;
     procedure DoAfterScroll; override;
+    procedure DoNotify(ANotification:IioBSANotification);
+    procedure DoBeforeSelection(const ASelectedObject: TObject; const ASelectionType:TioSelectionType);
+    procedure DoSelection(const ASelectedObject: TObject; const ASelectionType:TioSelectionType; var ADone:Boolean);
+    procedure DoAfterSelection(const ASelectedObject: TObject; const ASelectionType:TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
-    procedure DoNotify(ANotification:IioBSANotification);
+    // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
+    //  <TObject> (for non interfaced list such as TList<IInterface>)
     procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
   public
@@ -136,6 +150,7 @@ type
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+    function GetBindSource: IioNotifiableBindSource;
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
@@ -167,12 +182,18 @@ type
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPost:Boolean read GetioAutoPost write SetioAutoPost;
     property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
-    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
     property ioWhere:IioWhere read GetIoWhere write SetIoWhere;
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
     property ioViewDataType:TioViewDataType read GetIoViewDataType;
     property ioOwnsObjects:Boolean read GetOwnsObjects;
     property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
+    procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
+    procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
+
+    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
+    property ioOnBeforeSelection:TioBSABeforeAfterSelectionEvent read FonBeforeSelection write FonBeforeSelection;
+    property ioOnSelection:TioBSASelectionEvent read FonSelection write FonSelection;
+    property ioOnAfterSelection:TioBSABeforeAfterSelectionEvent read FonAfterSelection write FonAfterSelection;
   end;
 
 
@@ -308,6 +329,13 @@ begin
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
 end;
 
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoAfterSelection(const ASelectedObject: TObject;
+  const ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonAfterSelection)
+    then FonAfterSelection(Self, ASelectedObject, ASelectionType);
+end;
+
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeCancel;
 begin
   inherited;
@@ -368,10 +396,24 @@ begin
   end;
 end;
 
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeSelection(const ASelectedObject: TObject;
+  const ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonBeforeSelection)
+    then FonBeforeSelection(Self, ASelectedObject, ASelectionType);
+end;
+
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoNotify(ANotification: IioBSANotification);
 begin
   if Assigned(FonNotify)
     then ioOnNotify(Self, ANotification);
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoSelection(const ASelectedObject: TObject; const ASelectionType: TioSelectionType;
+  var ADone: Boolean);
+begin
+  if Assigned(FonSelection)
+    then FonSelection(Self, ASelectedObject, ASelectionType, ADone);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
@@ -430,6 +472,11 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.GetAutoLoadData: Boolean;
 begin
   Result := FAutoLoadData;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetBindSource: IioNotifiableBindSource;
+begin
+  Result := FBindSource;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetCurrentOID: Integer;
@@ -526,6 +573,21 @@ begin
   Result := FMasterPropertyName;
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetOnAfterSelection: TioBSABeforeAfterSelectionEvent;
+begin
+  Result := FonAfterSelection;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetOnBeforeSelection: TioBSABeforeAfterSelectionEvent;
+begin
+  Result := FonBeforeSelection;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetOnSelection: TioBSASelectionEvent;
+begin
+  Result := FonSelection;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.GetOwnsObjects: Boolean;
 begin
   Result := FLocalOwnsObject;
@@ -599,6 +661,41 @@ begin
     Result := 0
   else
     Result := E_NOINTERFACE;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.ReceiveSelection(const ASelectedObject: TObject;
+  const ASelectionType: TioSelectionType);
+var
+  LDone: Boolean;
+  LSelectedObject: TObject;
+begin
+  LDone := False;
+  // Extract the SelectedObject always as TObject (The only difference between two version of this method)
+  LSelectedObject := ASelectedObject;
+  DoBeforeSelection(LSelectedObject, ASelectionType);
+  DoSelection(LSelectedObject, ASelectionType, LDone);
+  if not LDone then
+    case ASelectionType of
+      TioSelectionType.stAppend: Self.Append(ASelectedObject);
+      TioSelectionType.stInsert: Self.Insert(ASelectedObject);
+    end;
+  DoAfterSelection(LSelectedObject, ASelectionType);
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.ReceiveSelection(const ASelectedObject: IInterface;
+  const ASelectionType: TioSelectionType);
+var
+  LDone: Boolean;
+  LSelectedObject: TObject;
+begin
+  LDone := False;
+  // Extract the SelectedObject always as TObject (The only difference between two version of this method)
+  LSelectedObject := ASelectedObject as TObject;
+  DoBeforeSelection(LSelectedObject, ASelectionType);
+  DoSelection(LSelectedObject, ASelectionType, LDone);
+  if not LDone then
+    Self.SetDataObject(ASelectedObject);
+  DoAfterSelection(LSelectedObject, ASelectionType);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Refresh(ReloadData: Boolean);
@@ -735,6 +832,21 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetOnAfterSelection(const Value: TioBSABeforeAfterSelectionEvent);
+begin
+  FOnAfterSelection := Value;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetOnBeforeSelection(const Value: TioBSABeforeAfterSelectionEvent);
+begin
+  FOnBeforeSelection := Value;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetOnSelection(const Value: TioBSASelectionEvent);
+begin
+  FOnSelection := Value;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeAlias(

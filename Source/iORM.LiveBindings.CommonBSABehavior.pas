@@ -17,8 +17,8 @@ type
 implementation
 
 uses
-  iORM.Context.Properties.Interfaces, System.Rtti, iORM.Context.Factory,
-  System.SysUtils, iORM.Containers.Interfaces, iORM.Exceptions;
+  iORM.Context.Properties.Interfaces, System.Rtti, iORM.Context.Factory;
+
 
 { TioCommonBSABehavior }
 

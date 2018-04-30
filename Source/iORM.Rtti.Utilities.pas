@@ -57,10 +57,11 @@ type
     class function ClassRefToRttiType(const AClassRef:TioClassRef): TRttiInstanceType; static;
     class function IsAnInterfaceTypeName(const ATypeName:String): Boolean; static;
     class function ResolveChildPropertyPath(const ARootObj:TObject; const AChildPropertyPath:TStrings): TObject; static;
-    class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
     class function TypeInfoToTypeName(const ATypeInfo:PTypeInfo; const AQualified:Boolean=False): String; static;
     class function SameObject(const AObj1, AObj2: TObject): boolean;
     class function GetImplementedInterfaceName(const AClassType:TRttiInstanceType; const IID:TGUID): String; static;
+    class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
+    class function TObjectFrom<T>(const AInstancePointer:Pointer): TObject;
   end;
 
 implementation
@@ -177,14 +178,22 @@ begin
   Result := (@AObj1 = @AObj2);
 end;
 
+class function TioRttiUtilities.TObjectFrom<T>(const AInstancePointer: Pointer): TObject;
+var
+  LValue: TValue;
+begin
+  TValue.Make(@AInstancePointer, TypeInfo(T), LValue);
+  Result := Self.TValueToObject(LValue, False);
+end;
+
 class function TioRttiUtilities.TValueToObject(const AValue: TValue; const ASilentException:Boolean): TObject;
 begin
   Result := nil;
   case AValue.TypeInfo.Kind of
     tkInterface: Result := AValue.AsInterface As TObject;
     tkClass: Result := AValue.AsObject;
-    else if not ASilentException then
-      raise EioException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
+  else if not ASilentException then
+    raise EioException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
   end;
 end;
 

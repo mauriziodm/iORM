@@ -44,6 +44,10 @@ uses
 
 type
 
+  // Events handler types
+  TioBSABeforeAfterSelectionEvent = procedure(const ASender, ASelectedObject: TObject; const ASelectionType:TioSelectionType) of object;
+  TioBSASelectionEvent = procedure(const ASender, ASelectedObject: TObject; const ASelectionType:TioSelectionType; var ADone:Boolean) of object;
+
   // Forward declaration
   IioContainedBindSourceAdapter = interface;
   IioDetailBindSourceAdaptersContainer = interface;
@@ -98,6 +102,7 @@ type
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
     procedure Refresh(ReloadData:Boolean);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+    function GetBindSource: IioNotifiableBindSource;
     procedure Insert; overload;
     procedure Insert(AObject:TObject); overload;
     procedure Insert(AObject:IInterface); overload;
