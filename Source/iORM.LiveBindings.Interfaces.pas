@@ -40,7 +40,7 @@ interface
 uses
   System.Generics.Collections, Data.Bind.ObjectScope,
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
-  iORM.Where.Interfaces, Data.DB;
+  iORM.Where.Interfaces, Data.DB, System.Rtti;
 
 type
 
@@ -129,7 +129,6 @@ type
     procedure ClearDataObject;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
-    procedure MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
 //    function AsTBindSourceAdapter: TBindSourceAdapter;

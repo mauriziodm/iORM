@@ -143,7 +143,7 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
-    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure SelectCurrentAs<T>(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;
@@ -173,7 +173,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Exceptions, iORM.LiveBindings.Factory,
-  iORM.Where.Factory, iORM.Rtti.Utilities, iORM.Components.Common;
+  iORM.Where.Factory, iORM.Rtti.Utilities, iORM.Components.Common, System.Rtti;
 
 { TioPrototypeBindSource }
 
@@ -496,21 +496,6 @@ begin
   inherited;
 end;
 
-procedure TioPrototypeBindSource.MakeSelection(const ASelectionType: TioSelectionType);
-var
-  LSourceBSA, LDestBSA: IioActiveBindSourceAdapter;
-begin
-  if CheckActiveAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
-  if not Assigned(FSelectorFor) then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
-  if not FSelectorFor.CheckActiveAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
-  LSourceBSA := GetActiveBindSourceAdapter;
-  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
-  LSourceBSA.MakeSelection(LDestBSA, ASelectionType);
-end;
-
 procedure TioPrototypeBindSource.Notify(const Sender: TObject;
   const ANotification: IioBSANotification);
 begin
@@ -554,6 +539,31 @@ begin
     AnActiveBSA.Refresh(ReloadData)
   else
     GetInternalAdapter.Refresh;
+end;
+
+procedure TioPrototypeBindSource.SelectCurrentAs<T>(const ASelectionType: TioSelectionType);
+var
+  LDestBSA: IioActiveBindSourceAdapter;
+  LValue: TValue;
+begin
+  // Some checks
+  if not CheckAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
+  if not Assigned(FSelectorFor) then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
+  if not FSelectorFor.CheckAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
+  // Get the selection destination BindSourceAdapter
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
+  // Encapsulate the SelectedInstance into a TValue then assign it
+  //  as selection in a proper way
+  //  NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
+  //       facendo cos' invece (cioè passando per un TValue) funziona correttamente.
+  LValue := TValue.From<T>(CurrentAs<T>);
+  if LValue.Kind = TTypeKind.tkInterface then
+    LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
+  else
+    LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType);
 end;
 
 procedure TioPrototypeBindSource.SetAsync(const Value: Boolean);

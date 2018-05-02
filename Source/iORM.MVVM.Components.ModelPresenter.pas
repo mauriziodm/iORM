@@ -117,7 +117,7 @@ type
     procedure Cancel;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
-    procedure MakeSelection(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure SelectCurrentAs<T>(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
     procedure ClearDataObject;
@@ -158,7 +158,8 @@ implementation
 
 uses
   System.SysUtils, iORM.Where.Factory, iORM.LiveBindings.Factory,
-  iORM.Exceptions, iORM.Rtti.Utilities, iORM, iORM.Components.Common;
+  iORM.Exceptions, iORM.Rtti.Utilities, iORM, iORM.Components.Common,
+  System.Rtti;
 
 { TioModelProvider }
 
@@ -499,19 +500,29 @@ begin
   inherited;
 end;
 
-procedure TioModelPresenter.MakeSelection(const ASelectionType: TioSelectionType);
+procedure TioModelPresenter.SelectCurrentAs<T>(const ASelectionType: TioSelectionType);
 var
-  LSourceBSA, LDestBSA: IioActiveBindSourceAdapter;
+  LDestBSA: IioActiveBindSourceAdapter;
+  LValue: TValue;
 begin
-  if CheckAdapter then
+  // Some checks
+  if not CheckAdapter then
     raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
   if not Assigned(FSelectorFor) then
     raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
   if not FSelectorFor.CheckAdapter then
     raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
-  LSourceBSA := BindSourceAdapter;
+  // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.BindSourceAdapter;
-  LSourceBSA.MakeSelection(LDestBSA, ASelectionType);
+  // Encapsulate the SelectedInstance into a TValue then assign it
+  //  as selection in a proper way
+  //  NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
+  //       facendo cos' invece (cioè passando per un TValue) funziona correttamente.
+  LValue := TValue.From<T>(CurrentAs<T>);
+  if LValue.Kind = TTypeKind.tkInterface then
+    LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
+  else
+    LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType);
 end;
 
 function TioModelPresenter.CurrentMasterObject: TObject;

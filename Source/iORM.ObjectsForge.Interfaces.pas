@@ -238,7 +238,7 @@ begin
       begin
         LObj := LPresenterSettings[I].Obj;
         if not (LObj is TioModelPresenter) then
-          raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'The object is not a TioModelPresenter instance.');
+          raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'The object is not a TioModelPresenter instance (MasterModelPresenter).');
         LViewModel.Presenter[LName].MasterPresenter := TioModelPresenter(LObj);
         LViewModel.Presenter[LName].MasterPropertyName := LPresenterSettings[I].StringParameter;
       end;
@@ -253,6 +253,14 @@ begin
       // OrderBy
       TioDIPresenterSettingsType.pstOrderBy:
         LViewModel.Presenter[LName].OrderBy := LPresenterSettings[I].StringParameter;
+      // MasterModelPresenter
+      TioDIPresenterSettingsType.pstSelectorFor:
+      begin
+        LObj := LPresenterSettings[I].Obj;
+        if not (LObj is TioModelPresenter) then
+          raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'The object is not a TioModelPresenter instance (SelectorFor).');
+        LViewModel.Presenter[LName].SelectorFor := TioModelPresenter(LObj);
+      end;
     end;
   end;
 end;

@@ -11,7 +11,7 @@ type
   TioCommonBSABehavior = class
   public
     // NB: Generic type for this methods must be only TObject or IInterface
-    class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; const ADataObject:T);
+    class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; const ADataObject:T); overload;
   end;
 
 implementation

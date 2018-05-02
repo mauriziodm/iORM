@@ -43,7 +43,7 @@ uses
   iORM.CommonTypes, iORM.Context.Properties.Interfaces,
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.Where.Interfaces,
-  iORM.MVVM.Interfaces, iORM.Rtti.Utilities;
+  iORM.MVVM.Interfaces, iORM.Rtti.Utilities, System.Rtti;
 
 const
   VIEW_DATA_TYPE = TioViewDataType.dtList;
@@ -179,7 +179,6 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
-    procedure MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -202,7 +201,7 @@ type
 implementation
 
 uses
-  iORM, System.Rtti, iORM.LiveBindings.Factory, iORM.Context.Factory,
+  iORM, iORM.LiveBindings.Factory, iORM.Context.Factory,
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Context.Map.Interfaces,
   iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
@@ -680,14 +679,6 @@ begin
     ItemIndex := CurrItemIndex;
     Sender.Free;
   end;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.MakeSelection(const ADestBSA:IioActiveBindSourceAdapter;
-  const ASelectionType: TioSelectionType);
-begin
-  if not Assigned(ADestBSA) then
-    EioException.Create(Self.ClassName, 'MakeSelection', '"ADestBSA" not assigned.');
-  ADestBSA.ReceiveSelection(TioRttiUtilities.ObjectAsIInterface(Current), ASelectionType);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Notify(Sender: TObject;

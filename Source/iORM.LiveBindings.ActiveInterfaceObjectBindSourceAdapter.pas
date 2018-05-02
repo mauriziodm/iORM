@@ -42,7 +42,7 @@ uses
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, System.Classes, iORM.Context.Properties.Interfaces,
   Data.Bind.ObjectScope, iORM.Where.Interfaces, iORM.MVVM.Interfaces,
-  System.Generics.Collections;
+  System.Generics.Collections, System.Rtti;
 
 const
   VIEW_DATA_TYPE = TioViewDataType.dtSingle;
@@ -177,7 +177,6 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
-    procedure MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
 
     property ioTypeName:String read GetTypeName write SetTypeName;
     property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
@@ -201,8 +200,7 @@ type
 implementation
 
 uses
-  iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory,
-  System.Rtti, iORM.Context.Map.Interfaces, iORM.Where.Factory,
+  iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory, iORM.Context.Map.Interfaces, iORM.Where.Factory,
   iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
   iORM.LiveBindings.CommonBSABehavior, iORM.Rtti.Utilities;
 
@@ -629,13 +627,6 @@ begin
   Result := not FMasterPropertyName.IsEmpty;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.MakeSelection(const ADestBSA:IioActiveBindSourceAdapter; const ASelectionType: TioSelectionType);
-begin
-  if not Assigned(ADestBSA) then
-    EioException.Create(Self.ClassName, 'MakeSelection', '"ADestBSA" not assigned.');
-  ADestBSA.ReceiveSelection(TioRttiUtilities.ObjectAsIInterface(Current), ASelectionType);
-end;
-
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
 begin
   // Fire the event handler
@@ -683,10 +674,7 @@ begin
   DoBeforeSelection(LSelectedObject, ASelectionType);
   DoSelection(LSelectedObject, ASelectionType, LDone);
   if not LDone then
-    case ASelectionType of
-      TioSelectionType.stAppend: Self.Append(ASelectedObject);
-      TioSelectionType.stInsert: Self.Insert(ASelectedObject);
-    end;
+    Self.SetDataObject(ASelectedObject);
   DoAfterSelection(LSelectedObject, ASelectionType);
 end;
 
