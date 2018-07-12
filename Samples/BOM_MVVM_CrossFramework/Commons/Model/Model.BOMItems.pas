@@ -29,7 +29,7 @@ type
   [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemMaterial = class(TBOMItem)
   private
-    [ioBelongsTo(TMaterial)]
+    [ioBelongsTo('IMaterial')]
     FArticle: IMaterial;
   protected
     function GetCost: Currency; override;
@@ -43,7 +43,7 @@ type
   [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemProcess = class(TBOMItem)
   private
-    [ioBelongsTo(TProcess)]
+    [ioBelongsTo('IProcess')]
     FArticle: IProcess;
   protected
     function GetCost: Currency; override;
@@ -59,7 +59,7 @@ type
   [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemProduct = class(TBOMItem)
   private
-    [ioBelongsTo(TProduct)]
+    [ioBelongsTo('IProduct')]
     FArticle: IProduct;
   protected
     function GetCost: Currency; override;
