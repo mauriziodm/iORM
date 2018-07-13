@@ -32,7 +32,7 @@ type
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
     property LastName:String read GetLastName write SetLastName;
-    [ioEmbeddedHasMany('IPhoneNumber')][ioTypeAlias('Another')]
+    [ioEmbeddedHasMany(IPhoneNumber, 'Another')]
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
     [ioSkip]
     property FullName:String read GetFullName;

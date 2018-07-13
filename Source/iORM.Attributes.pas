@@ -100,6 +100,7 @@ type
   public
     constructor Create(AChildClassRef:TioClassRef); overload;
     constructor Create(const AChildTypeName:String; const AChildTypeAlias:String=''); overload;
+    constructor Create(AIID:TGUID; const AChildTypeAlias:String=''); overload;
     property ChildTypeName: String read FChildTypeName;
     property ChildTypeAlias: String read FChildTypeAlias;
   end;
@@ -243,6 +244,8 @@ type
     constructor Create(const AChildClassRef:TioClassRef; const AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
     constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
     constructor Create(const AChildTypeName, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
+    constructor Create(AIID:TGUID; const AChildTypeAlias, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
+    constructor Create(AIID:TGUID; const AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
     property AutoIndex: Boolean read FAutoIndex;
@@ -450,6 +453,12 @@ begin
   FChildTypeAlias := AChildTypeAlias;
 end;
 
+constructor TioCustomRelationAttribute.Create(AIID: TGUID; const AChildTypeAlias: String);
+begin
+  FChildTypeName := TioRttiUtilities.GUIDtoInterfaceName(AIID);
+  FChildTypeAlias := AChildTypeAlias;
+end;
+
 { ioHasMany }
 
 constructor ioHasMany.Create(const AChildClassRef: TioClassRef;
@@ -472,8 +481,19 @@ end;
 
 constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex:Boolean);
 begin
-  Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType);
-  FAutoIndex := AAutoIndex;
+  Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType, AAutoIndex);
+end;
+
+constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType;
+  const AAutoIndex: Boolean);
+begin
+  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType, AAutoIndex);
+end;
+
+constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType;
+  const AAutoIndex: Boolean);
+begin
+  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType, AAutoIndex);
 end;
 
 { ioJoin }

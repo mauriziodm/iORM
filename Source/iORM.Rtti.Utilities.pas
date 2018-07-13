@@ -52,7 +52,6 @@ type
     class function IsAnInterface<T>: Boolean; static;
     class function CastObjectToGeneric<T>(const AObj:TObject): T; overload; static;
     class function CastObjectToGeneric<T>(const AObj:TObject; IID:TGUID): T; overload; static;
-    class function TypeInfoToGUID(const ATypeInfo:PTypeInfo):TGUID; static;
     class function GenericToString<T>(const AQualified:Boolean=False): String; static;
     class function ClassRefToRttiType(const AClassRef:TioClassRef): TRttiInstanceType; static;
     class function IsAnInterfaceTypeName(const ATypeName:String): Boolean; static;
@@ -62,6 +61,9 @@ type
     class function GetImplementedInterfaceName(const AClassType:TRttiInstanceType; const IID:TGUID): String; static;
     class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
     class function TObjectFrom<T>(const AInstancePointer:Pointer): TObject;
+    class function TypeInfoToGUID(const ATypeInfo:PTypeInfo):TGUID; static;
+    class function GUIDtoTypeInfo(const IID:TGUID): PTypeInfo; static;
+    class function GUIDtoInterfaceName(const IID:TGUID): String; static;
   end;
 
 implementation
@@ -115,6 +117,26 @@ begin
     if LRttiInterfaceType.GUID = IID then
       Exit(LRttiInterfaceType.Name);
   raise EioException.Create('TioRttiUtilities.GetImplementedInterfaceName: Interface non implemented by the class.');
+end;
+
+class function TioRttiUtilities.GUIDtoInterfaceName(const IID: TGUID): String;
+var
+  LType : TRttiType;
+begin
+  for LType in TioRttiContextFactory.RttiContext.GetTypes do
+   if LType is TRTTIInterfaceType and (TRTTIInterfaceType(LType).GUID = IID) then
+     exit(TRTTIInterfaceType(LType).Name);
+  raise EioException.Create('TioRttiUtilities.GUIDtoInterfaceName: IID is not an interface.');
+end;
+
+class function TioRttiUtilities.GUIDtoTypeInfo(const IID: TGUID): PTypeInfo;
+var
+  LType : TRttiType;
+begin
+  for LType in TioRttiContextFactory.RttiContext.GetTypes do
+   if LType is TRTTIInterfaceType and (TRTTIInterfaceType(LType).GUID = IID) then
+     exit(TRTTIInterfaceType(LType).Handle);
+  raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
 end;
 
 class function TioRttiUtilities.IsAnInterfaceTypeName(const ATypeName: String): Boolean;

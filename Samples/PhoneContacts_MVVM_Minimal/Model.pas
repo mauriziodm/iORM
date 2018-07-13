@@ -37,7 +37,7 @@ type
     property ID:Integer read FID write FID;
     property FirstName:String read FFirstName write FFirstName;
     property LastName:String read FLastName write FLastName;
-    [ioHasMany('TPhoneNumber', 'PersonID')]
+    [ioHasMany(TPhoneNumber, 'PersonID')]
     property Phones:TObjectList<TPhoneNumber> read FPhones write FPhones;
     [ioSkip]
     property FullName:String read GetFullName;

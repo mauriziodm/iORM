@@ -43,7 +43,7 @@ type
   [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemProcess = class(TBOMItem)
   private
-    [ioBelongsTo('IProcess')]
+    [ioBelongsTo(IProcess)]
     FArticle: IProcess;
   protected
     function GetCost: Currency; override;
@@ -59,7 +59,7 @@ type
   [ioEntity('BOMItems', ioFields), ioTrueClass]
   TBOMItemProduct = class(TBOMItem)
   private
-    [ioBelongsTo('IProduct')]
+    [ioBelongsTo(IProduct)]
     FArticle: IProduct;
   protected
     function GetCost: Currency; override;

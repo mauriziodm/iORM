@@ -14,7 +14,7 @@ type
     FLastName: String;
     FFirstName: String;
     FDateOfBirth: TDate;
-    [ioEmbeddedHasMany('IPhoneNumber'), ioTypeAlias('Another'), ioInject]
+    [ioEmbeddedHasMany(IPhoneNumber, 'Another'), ioInject]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);

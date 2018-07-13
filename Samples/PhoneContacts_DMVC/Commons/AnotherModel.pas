@@ -13,7 +13,7 @@ type
     FID: Integer;
     FLastName: String;
     FFirstName: String;
-    [ioEmbeddedHasMany('IPhoneNumber'), ioTypeAlias('Another')]
+    [ioEmbeddedHasMany(IPhoneNumber, 'Another')]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);

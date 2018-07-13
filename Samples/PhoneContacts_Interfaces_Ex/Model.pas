@@ -43,7 +43,7 @@ type
     FLastName: String;
     FFirstName: String;
     FDateOfBirth: TDate;
-    [ioHasMany('IPhoneNumber', 'PersonID', ioLazyLoad)]
+    [ioHasMany(IPhoneNumber, 'PersonID', ioLazyLoad)]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);

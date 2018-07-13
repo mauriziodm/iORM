@@ -41,7 +41,7 @@ type
     FID: Integer;
     FLastName: String;
     FFirstName: String;
-    [ioHasMany('IPhoneNumber', 'PersonID', ioLazyLoad), ioInject]
+    [ioHasMany(IPhoneNumber, 'PersonID', ioLazyLoad), ioInject]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);

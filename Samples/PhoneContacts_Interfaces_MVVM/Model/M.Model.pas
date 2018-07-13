@@ -58,7 +58,7 @@ type
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
     property LastName:String read GetLastName write SetLastName;
-    [ioHasMany('IPhoneNumber', 'PersonID', ioLazyLoad)]
+    [ioHasMany(IPhoneNumber, 'PersonID', ioLazyLoad)]
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
     [ioSkip]
     property FullName:String read GetFullName;
