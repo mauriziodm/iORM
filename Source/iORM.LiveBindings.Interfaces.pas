@@ -45,8 +45,11 @@ uses
 type
 
   // Events handler types
-  TioBSABeforeAfterSelectionEvent = procedure(const ASender, ASelectedObject: TObject; const ASelectionType:TioSelectionType) of object;
-  TioBSASelectionEvent = procedure(const ASender, ASelectedObject: TObject; const ASelectionType:TioSelectionType; var ADone:Boolean) of object;
+  TioBSABeforeAfterSelectionObjectEvent = procedure(const ASender:TObject; ASelectedObject: TObject; ASelectionType:TioSelectionType) of object;
+  TioBSASelectionObjectEvent = procedure(const ASender:TObject; ASelectedObject: TObject; ASelectionType:TioSelectionType; var ADone:Boolean) of object;
+
+  TioBSABeforeAfterSelectionInterfaceEvent = procedure(const ASender, ASelectedObject: IInterface; ASelectionType:TioSelectionType) of object;
+  TioBSASelectionInterfaceEvent = procedure(const ASender:TObject; ASelectedInterface: IInterface; ASelectionType:TioSelectionType; var ADone:Boolean) of object;
 
   // Forward declaration
   IioContainedBindSourceAdapter = interface;
@@ -127,8 +130,8 @@ type
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure ClearDataObject;
-    procedure ReceiveSelection(const ASelectedObject:TObject; const ASelectionType:TioSelectionType); overload;
-    procedure ReceiveSelection(const ASelectedObject:IInterface; const ASelectionType:TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
 //    function AsTBindSourceAdapter: TBindSourceAdapter;
