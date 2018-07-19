@@ -364,7 +364,8 @@ end;
 
 function TioProperty.GetSqlFieldName: String;
 begin
-  Result := FSqlFieldName;
+//  Result := FSqlFieldName;
+  Result := TioDbFactory.SqlDataConverter.GetSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;

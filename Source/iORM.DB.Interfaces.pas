@@ -187,6 +187,7 @@ type
     class function TValueToSql(const AValue:TValue): String; virtual; abstract;
     class function QueryToTValue(const AQuery:IioQuery; const AProperty:IioContextProperty): TValue; virtual; abstract;
     class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); virtual; abstract;
+    class function GetSqlFieldName(const AFieldName: string): string; virtual; abstract;
   end;
 
   // INterfaccia per le classi che devono generare i vari tipi di query

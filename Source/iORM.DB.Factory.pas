@@ -81,7 +81,7 @@ uses
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
   iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
   iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
-  iORM.REST.Connection;
+  iORM.REST.Connection, iORM.DB.MSSqlServer.SqlDataConverter;
 
 { TioDbBuilder }
 
@@ -200,7 +200,7 @@ begin
   case TioConnectionManager.GetConnectionInfo.ConnectionType of
     cdtFirebird:  Result := TioSqlDataConverterFirebird;
     cdtSQLite:    Result := TioSqlDataConverterSqLite;
-    cdtSQLServer: Result := TioSqlDataConverterFirebird;
+    cdtSQLServer: Result := TioSqlDataConverterMSSqlServer;
   else
     raise EioException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
   end;
