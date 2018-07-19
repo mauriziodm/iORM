@@ -68,6 +68,13 @@ type
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
+    // Selection related events
+    FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
+    FonSelectionObject: TioBSASelectionObjectEvent;
+    FonAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
+    FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    FonSelectionInterface: TioBSASelectionInterfaceEvent;
+    FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -114,6 +121,14 @@ type
     function GetAutoPost: Boolean;
   protected
     function CheckActiveAdapter: Boolean;
+    // Selectors related event for TObject selection
+    procedure DoBeforeSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(ASelected:TObject; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    // Selectors related event for IInterface selection
+    procedure DoBeforeSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(ASelected:IInterface; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -152,6 +167,12 @@ type
   published
     // Events
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
+    property ioOnBeforeSelectionObject:TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property ioOnSelectionObject:TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
+    property ioOnAfterSelectionObject:TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
+    property ioOnBeforeSelectionInterface:TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property ioOnSelectionInterface:TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
+    property ioOnAfterSelectionInterface:TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
     // Properties
     property ioTypeName:String read FioTypeName write SetTypeName;
     property ioTypeAlias:String read FioTypeAlias write SetTypeAlias;
@@ -268,6 +289,30 @@ begin
   inherited;
 end;
 
+procedure TioPrototypeBindSource.DoAfterSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonAfterSelectionObject) then
+    FonAfterSelectionInterface(Self, ASelected, ASelectionType);
+end;
+
+procedure TioPrototypeBindSource.DoAfterSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonAfterSelectionObject) then
+    FonAfterSelectionObject(Self, ASelected, ASelectionType);
+end;
+
+procedure TioPrototypeBindSource.DoBeforeSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonBeforeSelectionObject) then
+    FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
+end;
+
+procedure TioPrototypeBindSource.DoBeforeSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonBeforeSelectionObject) then
+    FonBeforeSelectionObject(Self, ASelected, ASelectionType);
+end;
+
 procedure TioPrototypeBindSource.DoCreateAdapter(
   var ADataObject: TBindSourceAdapter);
 var
@@ -319,6 +364,18 @@ begin
   // If enabled perform an AutoRefresh operation
   if Self.ioAutoRefreshOnNotification > arDisabled
     then Self.Refresh(Self.ioAutoRefreshOnNotification = arEnabledReload);
+end;
+
+procedure TioPrototypeBindSource.DoSelection(ASelected: TObject; ASelectionType: TioSelectionType; var ADone: Boolean);
+begin
+  if Assigned(FonAfterSelectionObject) then
+    FonSelectionObject(Self, ASelected, ASelectionType, ADone);
+end;
+
+procedure TioPrototypeBindSource.DoSelection(ASelected: IInterface; ASelectionType: TioSelectionType; var ADone: Boolean);
+begin
+  if Assigned(FonAfterSelectionObject) then
+    FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
 end;
 
 function TioPrototypeBindSource.Current: TObject;

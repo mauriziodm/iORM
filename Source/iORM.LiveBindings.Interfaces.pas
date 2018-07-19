@@ -72,9 +72,21 @@ type
   // Interface (without RefCount) for ioBindSources detection
   //  (useful for detect iORM bind sources to pass itself
   //  to the ActiveBindSourceAdapter for notify changes)
-  IioNotifiableBindSource = interface
-    ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
+  IioNotifiable = interface
+    ['{D08E956F-C836-4E2A-B966-62FFFB7FD09F}']
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
+  end;
+
+  IioNotifiableBindSource = interface(IioNotifiable)
+    ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
+    // Selectors related event for TObject selection
+    procedure DoBeforeSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(ASelected:TObject; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    // Selectors related event for IInterface selection
+    procedure DoBeforeSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(ASelected:IInterface; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
   end;
 
   // The common ancestor for all PrototypeBindSource components

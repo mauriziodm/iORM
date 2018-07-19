@@ -71,9 +71,6 @@ type
     FDeleteAfterCancel: Boolean;
     FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FonNotify: TioBSANotificationEvent;
-    FonBeforeSelection: TioBSABeforeAfterSelectionObjectEvent;
-    FonSelection: TioBSASelectionObjectEvent;
-    FonAfterSelection: TioBSABeforeAfterSelectionObjectEvent;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -113,12 +110,6 @@ type
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
-    function GetOnAfterSelection: TioBSABeforeAfterSelectionObjectEvent;
-    function GetOnBeforeSelection: TioBSABeforeAfterSelectionObjectEvent;
-    function GetOnSelection: TioBSASelectionObjectEvent;
-    procedure SetOnAfterSelection(const Value: TioBSABeforeAfterSelectionObjectEvent);
-    procedure SetOnBeforeSelection(const Value: TioBSABeforeAfterSelectionObjectEvent);
-    procedure SetOnSelection(const Value: TioBSASelectionObjectEvent);
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -201,9 +192,6 @@ type
     property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
-    property ioOnBeforeSelection:TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelection write FonBeforeSelection;
-    property ioOnSelection:TioBSASelectionObjectEvent read FonSelection write FonSelection;
-    property ioOnAfterSelection:TioBSABeforeAfterSelectionObjectEvent read FonAfterSelection write FonAfterSelection;
   end;
 
 implementation
@@ -379,8 +367,8 @@ end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterSelection(ASelected: TObject; ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonAfterSelection)
-    then FonAfterSelection(Self, ASelected, ASelectionType);
+  if Assigned(FBindSource) then
+    FBindSource.DoAfterSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeDelete;
@@ -417,8 +405,8 @@ end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeSelection(ASelected: TObject; ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonBeforeSelection)
-    then FonBeforeSelection(Self, ASelected, ASelectionType);
+  if Assigned(FBindSource) then
+    FBindSource.DoBeforeSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean;
@@ -450,8 +438,8 @@ end;
 procedure TioActiveListBindSourceAdapter.DoSelection(ASelected: TObject; ASelectionType: TioSelectionType;
   var ADone: Boolean);
 begin
-  if Assigned(FonSelection)
-    then FonSelection(Self, ASelected, ASelectionType, ADone);
+  if Assigned(FBindSource) then
+    FBindSource.DoSelection(ASelected, ASelectionType, ADone);
 end;
 
 procedure TioActiveListBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
@@ -609,21 +597,6 @@ end;
 function TioActiveListBindSourceAdapter.GetMasterPropertyName: String;
 begin
   Result := FMasterProperty.GetName;
-end;
-
-function TioActiveListBindSourceAdapter.GetOnAfterSelection: TioBSABeforeAfterSelectionObjectEvent;
-begin
-  Result := FonAfterSelection;
-end;
-
-function TioActiveListBindSourceAdapter.GetOnBeforeSelection: TioBSABeforeAfterSelectionObjectEvent;
-begin
-  Result := FonBeforeSelection;
-end;
-
-function TioActiveListBindSourceAdapter.GetOnSelection: TioBSASelectionObjectEvent;
-begin
-  Result := FonSelection;
 end;
 
 function TioActiveListBindSourceAdapter.GetOwnsObjects: Boolean;
@@ -877,21 +850,6 @@ procedure TioActiveListBindSourceAdapter.SetObjStatus(
   AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
-end;
-
-procedure TioActiveListBindSourceAdapter.SetOnAfterSelection(const Value: TioBSABeforeAfterSelectionObjectEvent);
-begin
-  FOnAfterSelection := Value;
-end;
-
-procedure TioActiveListBindSourceAdapter.SetOnBeforeSelection(const Value: TioBSABeforeAfterSelectionObjectEvent);
-begin
-  FOnBeforeSelection := Value;
-end;
-
-procedure TioActiveListBindSourceAdapter.SetOnSelection(const Value: TioBSASelectionObjectEvent);
-begin
-  FOnSelection := Value;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetTypeAlias(const AValue: String);

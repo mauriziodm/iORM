@@ -70,9 +70,6 @@ type
     FDeleteAfterCancel: Boolean;
     FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FonNotify: TioBSANotificationEvent;
-    FonBeforeSelection: TioBSABeforeAfterSelectionInterfaceEvent;
-    FonSelection: TioBSASelectionInterfaceEvent;
-    FonAfterSelection: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -193,9 +190,6 @@ type
     property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
-    property ioOnBeforeSelection:TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelection write FonBeforeSelection;
-    property ioOnSelection:TioBSASelectionInterfaceEvent read FonSelection write FonSelection;
-    property ioOnAfterSelection:TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelection write FonAfterSelection;
   end;
 
 implementation
@@ -343,8 +337,8 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonAfterSelection)
-    then FonAfterSelection(Self, ASelected, ASelectionType);
+  if Assigned(FBindSource) then
+    FBindSource.DoAfterSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeCancel;
@@ -406,8 +400,8 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonBeforeSelection)
-    then FonBeforeSelection(Self, ASelected, ASelectionType);
+  if Assigned(FBindSource) then
+    FBindSource.DoBeforeSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface);
@@ -436,8 +430,8 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.DoSelection(ASelected: IInterface; ASelectionType: TioSelectionType;
   var ADone: Boolean);
 begin
-  if Assigned(FonSelection)
-    then FonSelection(Self, ASelected, ASelectionType, ADone);
+  if Assigned(FBindSource) then
+    FBindSource.DoSelection(ASelected, ASelectionType, ADone);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);

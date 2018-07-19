@@ -7,6 +7,7 @@ inherited ViewModelMain: TViewModelMain
     Async = True
     AutoLoadData = True
     AutoPersist = False
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IPerson'
     ViewDataType = dtList
@@ -19,6 +20,7 @@ inherited ViewModelMain: TViewModelMain
     Async = True
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = PersonsModelPresenter
     MasterPropertyName = 'Phones'

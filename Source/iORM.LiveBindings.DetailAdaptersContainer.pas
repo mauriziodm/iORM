@@ -43,7 +43,7 @@ uses
 
 type
 
-  TioDetailAdaptersContainer = class (TInterfacedObject, IioDetailBindSourceAdaptersContainer, IioNotifiableBindSource)
+  TioDetailAdaptersContainer = class (TInterfacedObject, IioDetailBindSourceAdaptersContainer, IioNotifiable)
   strict private
     FMasterAdapter: IioContainedBindSourceAdapter;
     FDetailAdapters: TioDetailAdapters;

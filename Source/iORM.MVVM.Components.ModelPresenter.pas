@@ -41,12 +41,27 @@ type
     // Questo è un riferimento di tipo interfaccia e serve solo per
     //  mantenere in vita l'oggetto
     FDummyInterfaceRef: IInterface;
+    // Selection related events
+    FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
+    FonSelectionObject: TioBSASelectionObjectEvent;
+    FonAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
+    FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    FonSelectionInterface: TioBSASelectionInterfaceEvent;
+    FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Methods
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
     procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
+    // Selectors related event for TObject selection
+    procedure DoBeforeSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(ASelected:TObject; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    // Selectors related event for IInterface selection
+    procedure DoBeforeSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(ASelected:IInterface; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
     // AsDefault
     procedure SetAsDefault(const Value: Boolean);
     procedure InitAsDefaultOnCreate;
@@ -136,6 +151,12 @@ type
   published
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
+    property OnBeforeSelectionObject:TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property OnSelectionObject:TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
+    property OnAfterSelectionObject:TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
+    property OnBeforeSelectionInterface:TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property OnSelectionInterface:TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
+    property OnAfterSelectionInterface:TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
     // Properties
     property AsDefault:Boolean read FAsDefault write SetAsDefault;
     property Async:Boolean read FAsync write SetAsync;
@@ -304,6 +325,30 @@ begin
   inherited;
 end;
 
+procedure TioModelPresenter.DoAfterSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonAfterSelectionInterface) then
+    FonAfterSelectionInterface(Self, ASelected, ASelectionType);
+end;
+
+procedure TioModelPresenter.DoAfterSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonAfterSelectionObject) then
+    FonAfterSelectionObject(Self, ASelected, ASelectionType);
+end;
+
+procedure TioModelPresenter.DoBeforeSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonBeforeSelectionInterface) then
+    FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
+end;
+
+procedure TioModelPresenter.DoBeforeSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+begin
+  if Assigned(FonBeforeSelectionObject) then
+    FonBeforeSelectionObject(Self, ASelected, ASelectionType);
+end;
+
 procedure TioModelPresenter.DoNotify(ANotification: IioBSANotification);
 begin
   // If assigned execute the event handler
@@ -312,6 +357,18 @@ begin
   // If enabled perform an AutoRefresh operation
   if Self.AutoRefreshOnNotification > arDisabled
     then Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload);
+end;
+
+procedure TioModelPresenter.DoSelection(ASelected: TObject; ASelectionType: TioSelectionType; var ADone: Boolean);
+begin
+  if Assigned(FonAfterSelectionObject) then
+    FonSelectionObject(Self, ASelected, ASelectionType, ADone);
+end;
+
+procedure TioModelPresenter.DoSelection(ASelected: IInterface; ASelectionType: TioSelectionType; var ADone: Boolean);
+begin
+  if Assigned(FonSelectionInterface) then
+    FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
 end;
 
 procedure TioModelPresenter.Edit(AForce: Boolean);
