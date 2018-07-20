@@ -55,13 +55,13 @@ type
   protected
     procedure Loaded; override;
     // Selectors related event for TObject selection
-    procedure DoBeforeSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
-    procedure DoSelection(ASelected:TObject; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
-    procedure DoAfterSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    procedure DoBeforeSelection(var ASelected:TObject; var ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(var ASelected:TObject; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(var ASelected:TObject; var ASelectionType:TioSelectionType); overload;
     // Selectors related event for IInterface selection
-    procedure DoBeforeSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
-    procedure DoSelection(ASelected:IInterface; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
-    procedure DoAfterSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
+    procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
     // AsDefault
     procedure SetAsDefault(const Value: Boolean);
     procedure InitAsDefaultOnCreate;
@@ -325,25 +325,25 @@ begin
   inherited;
 end;
 
-procedure TioModelPresenter.DoAfterSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioModelPresenter.DoAfterSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioModelPresenter.DoBeforeSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionInterface) then
     FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioModelPresenter.DoBeforeSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
@@ -359,13 +359,13 @@ begin
     then Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload);
 end;
 
-procedure TioModelPresenter.DoSelection(ASelected: TObject; ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioModelPresenter.DoSelection(var ASelected: TObject;var  ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonAfterSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
 end;
 
-procedure TioModelPresenter.DoSelection(ASelected: IInterface; ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioModelPresenter.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionInterface) then
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);

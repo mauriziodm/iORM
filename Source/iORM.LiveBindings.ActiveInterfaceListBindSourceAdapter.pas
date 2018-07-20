@@ -131,9 +131,9 @@ type
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); override;
     procedure DoNotify(ANotification:IioBSANotification);
-    procedure DoBeforeSelection(ASelected:IInterface; ASelectionType:TioSelectionType);
-    procedure DoSelection(ASelected:IInterface; ASelectionType:TioSelectionType; var ADone:Boolean);
-    procedure DoAfterSelection(ASelected:IInterface; ASelectionType:TioSelectionType);
+    procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType);
+    procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean);
+    procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
@@ -335,7 +335,7 @@ begin
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoAfterSelection(ASelected, ASelectionType);
@@ -398,7 +398,7 @@ begin
   end;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
+procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoBeforeSelection(ASelected, ASelectionType);
@@ -427,7 +427,7 @@ begin
     then FonNotify(Self, ANotification);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.DoSelection(ASelected: IInterface; ASelectionType: TioSelectionType;
+procedure TioActiveInterfaceListBindSourceAdapter.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType;
   var ADone: Boolean);
 begin
   if Assigned(FBindSource) then

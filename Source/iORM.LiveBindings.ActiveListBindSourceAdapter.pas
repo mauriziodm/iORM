@@ -132,9 +132,9 @@ type
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
     procedure DoNotify(ANotification:IioBSANotification);
-    procedure DoBeforeSelection(ASelected: TObject; ASelectionType:TioSelectionType);
-    procedure DoSelection(ASelected: TObject; ASelectionType:TioSelectionType; var ADone:Boolean);
-    procedure DoAfterSelection(ASelected: TObject; ASelectionType:TioSelectionType);
+    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
+    procedure DoSelection(var ASelected: TObject; var ASelectionType:TioSelectionType; var ADone:Boolean);
+    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     function GetBaseObjectClassName: String;
@@ -365,7 +365,7 @@ begin
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
 end;
 
-procedure TioActiveListBindSourceAdapter.DoAfterSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+procedure TioActiveListBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoAfterSelection(ASelected, ASelectionType);
@@ -403,7 +403,7 @@ begin
   end;
 end;
 
-procedure TioActiveListBindSourceAdapter.DoBeforeSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+procedure TioActiveListBindSourceAdapter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoBeforeSelection(ASelected, ASelectionType);
@@ -435,7 +435,7 @@ begin
     then FonNotify(Self, ANotification);
 end;
 
-procedure TioActiveListBindSourceAdapter.DoSelection(ASelected: TObject; ASelectionType: TioSelectionType;
+procedure TioActiveListBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType;
   var ADone: Boolean);
 begin
   if Assigned(FBindSource) then

@@ -126,9 +126,9 @@ type
     procedure DoAfterCancel; override;
     procedure DoAfterScroll; override;
     procedure DoNotify(ANotification:IioBSANotification);
-    procedure DoBeforeSelection(ASelected: TObject; ASelectionType:TioSelectionType);
-    procedure DoSelection(ASelected: TObject; ASelectionType:TioSelectionType; var ADone:Boolean);
-    procedure DoAfterSelection(ASelected: TObject; ASelectionType:TioSelectionType);
+    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
+    procedure DoSelection(var ASelected: TObject; var ASelectionType:TioSelectionType; var ADone:Boolean);
+    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjectStatus);
     function UseObjStatus: Boolean;
     function GetBaseObjectClassName: String;
@@ -319,7 +319,7 @@ begin
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoAfterSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+procedure TioActiveObjectBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoAfterSelection(ASelected, ASelectionType);
@@ -385,7 +385,7 @@ begin
   end;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoBeforeSelection(ASelected: TObject; ASelectionType: TioSelectionType);
+procedure TioActiveObjectBindSourceAdapter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoBeforeSelection(ASelected, ASelectionType);
@@ -398,7 +398,7 @@ begin
     then ioOnNotify(Self, ANotification);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoSelection(ASelected: TObject; ASelectionType: TioSelectionType;
+procedure TioActiveObjectBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType;
   var ADone: Boolean);
 begin
   if Assigned(FBindSource) then

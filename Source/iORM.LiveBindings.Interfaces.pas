@@ -45,11 +45,11 @@ uses
 type
 
   // Events handler types
-  TioBSABeforeAfterSelectionObjectEvent = procedure(const ASender:TObject; ASelectedObject: TObject; ASelectionType:TioSelectionType) of object;
-  TioBSASelectionObjectEvent = procedure(const ASender:TObject; ASelectedObject: TObject; ASelectionType:TioSelectionType; var ADone:Boolean) of object;
+  TioBSABeforeAfterSelectionObjectEvent = procedure(const ASender:TObject; var ASelected: TObject; var ASelectionType:TioSelectionType) of object;
+  TioBSASelectionObjectEvent = procedure(const ASender:TObject; var ASelected: TObject; var ASelectionType:TioSelectionType; var ADone:Boolean) of object;
 
-  TioBSABeforeAfterSelectionInterfaceEvent = procedure(const ASender, ASelectedObject: IInterface; ASelectionType:TioSelectionType) of object;
-  TioBSASelectionInterfaceEvent = procedure(const ASender:TObject; ASelectedInterface: IInterface; ASelectionType:TioSelectionType; var ADone:Boolean) of object;
+  TioBSABeforeAfterSelectionInterfaceEvent = procedure(const ASender:TObject; var ASelected: IInterface; var ASelectionType:TioSelectionType) of object;
+  TioBSASelectionInterfaceEvent = procedure(const ASender:TObject; var ASelected: IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean) of object;
 
   // Forward declaration
   IioContainedBindSourceAdapter = interface;
@@ -80,13 +80,13 @@ type
   IioNotifiableBindSource = interface(IioNotifiable)
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
     // Selectors related event for TObject selection
-    procedure DoBeforeSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
-    procedure DoSelection(ASelected:TObject; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
-    procedure DoAfterSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
+    procedure DoBeforeSelection(var ASelected:TObject; var ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(var ASelected:TObject; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(var ASelected:TObject; var ASelectionType:TioSelectionType); overload;
     // Selectors related event for IInterface selection
-    procedure DoBeforeSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
-    procedure DoSelection(ASelected:IInterface; ASelectionType:TioSelectionType; var ADone:Boolean); overload;
-    procedure DoAfterSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
+    procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
+    procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
+    procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
   end;
 
   // The common ancestor for all PrototypeBindSource components
