@@ -64,6 +64,7 @@ type
     class function TypeInfoToGUID(const ATypeInfo:PTypeInfo):TGUID; static;
     class function GUIDtoTypeInfo(const IID:TGUID): PTypeInfo; static;
     class function GUIDtoInterfaceName(const IID:TGUID): String; static;
+    class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
   end;
 
 implementation
@@ -117,6 +118,11 @@ begin
     if LRttiInterfaceType.GUID = IID then
       Exit(LRttiInterfaceType.Name);
   raise EioException.Create('TioRttiUtilities.GetImplementedInterfaceName: Interface non implemented by the class.');
+end;
+
+class function TioRttiUtilities.GetQualifiedTypeName(const ATypeInfo: Pointer): String;
+begin
+  Result := TioRttiContextFactory.RttiContext.GetType(ATypeInfo).QualifiedName;
 end;
 
 class function TioRttiUtilities.GUIDtoInterfaceName(const IID: TGUID): String;

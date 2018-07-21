@@ -58,7 +58,6 @@ type
     FTypeAlias: String;
     FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
     FQualifiedSqlFieldName: String;
-    FFullQualifiedSqlFieldName: String;
     FLoadSql: String;
     FFieldType: String;
     FRelationType: TioRelationType;
@@ -263,7 +262,7 @@ end;
 
 function TioProperty.GetSqlFullQualifiedFieldName: String;
 begin
-  Result := FFullQualifiedSqlFieldName;
+  Result := GetSqlQualifiedFieldName + ' AS ' + FSqlFieldAlias;
 end;
 
 function TioProperty.GetName: String;
@@ -365,7 +364,7 @@ end;
 function TioProperty.GetSqlFieldName: String;
 begin
 //  Result := FSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter.GetSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;
@@ -375,7 +374,8 @@ end;
 
 function TioProperty.GetSqlQualifiedFieldName: String;
 begin
-  Result := FQualifiedSqlFieldName;
+//  Result := FQualifiedSqlFieldName;
+  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FQualifiedSqlFieldName);
 end;
 
 function TioProperty.GetSqlParamName: String;
@@ -505,8 +505,6 @@ begin
   if FSqlFieldAlias = '' then FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
   // Set QualifiedFieldName
   FQualifiedSqlFieldName := FSqlFieldTableName + '.' + FSqlFieldName;
-  // Set FullQualifiedFieldName
-  FFullQualifiedSqlFieldName := FQualifiedSqlFieldName + ' AS ' + FSqlFieldAlias;
 end;
 
 procedure TioProperty.SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);

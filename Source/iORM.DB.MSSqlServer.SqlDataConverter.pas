@@ -14,7 +14,7 @@ type
   strict protected
   public
     class function TValueToSql(const AValue: TValue): String; override;
-    class function GetSqlFieldName(const AFieldName: string): string; override;
+    class function FieldNameToSqlFieldName(const AFieldName: string): string; override;
   end;
 
 implementation
@@ -24,7 +24,7 @@ uses
 
 { TioSqlDataConverterMSSqlServer }
 
-class function TioSqlDataConverterMSSqlServer.GetSqlFieldName(
+class function TioSqlDataConverterMSSqlServer.FieldNameToSqlFieldName(
   const AFieldName: string): string;
 begin
   Result := '[' + AFieldName + ']';

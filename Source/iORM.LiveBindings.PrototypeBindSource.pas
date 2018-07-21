@@ -158,7 +158,8 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
-    procedure SelectCurrentAs<T>(const ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure SelectCurrent<T>(ASelectionType: TioSelectionType);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;
@@ -598,14 +599,12 @@ begin
     GetInternalAdapter.Refresh;
 end;
 
-procedure TioPrototypeBindSource.SelectCurrentAs<T>(const ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
 begin
   // Some checks
-  if not CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
   if not Assigned(FSelectorFor) then
     raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
   if not FSelectorFor.CheckAdapter then
@@ -616,11 +615,23 @@ begin
   //  as selection in a proper way
   //  NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
   //       facendo cos' invece (cioè passando per un TValue) funziona correttamente.
-  LValue := TValue.From<T>(CurrentAs<T>);
+  LValue := TValue.From<T>(AInstance);
   if LValue.Kind = TTypeKind.tkInterface then
     LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
   else
-    LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType);
+  if LValue.Kind = TTypeKind.tkClass then
+    LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
+  else
+    raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
+end;
+
+procedure TioPrototypeBindSource.SelectCurrent<T>(ASelectionType: TioSelectionType);
+begin
+  // Some checks
+  if not CheckAdapter then
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
+  // Make the selection of current
+  Select<T>(CurrentAs<T>, ASelectionType);
 end;
 
 procedure TioPrototypeBindSource.SetAsync(const Value: Boolean);

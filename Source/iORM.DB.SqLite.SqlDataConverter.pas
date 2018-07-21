@@ -55,7 +55,7 @@ type
     class function TValueToSql(const AValue:TValue): String; override;
     class function QueryToTValue(const AQuery:IioQuery; const AProperty:IioContextProperty): TValue; override;
     class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
-    class function GetSqlFieldName(const AFieldName: string): string; override;
+    class function FieldNameToSqlFieldName(const AFieldName: string): string; override;
   end;
 
 implementation
@@ -100,7 +100,7 @@ end;
 //  end;
 //end;
 
-class function TioSqlDataConverterSqLite.GetSqlFieldName(const AFieldName: string): string;
+class function TioSqlDataConverterSqLite.FieldNameToSqlFieldName(const AFieldName: string): string;
 begin
   inherited;
   Result := AFieldName;
