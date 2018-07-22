@@ -312,7 +312,8 @@ uses
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces,
-  iORM.MVVM.Components.ViewModelBridge, iORM.AbstractionLayer.Framework;
+  iORM.MVVM.Components.ViewModelBridge, iORM.AbstractionLayer.Framework,
+  iORM.MVVM.ViewModelBase;
 
 { TioDependencyInjectionBase }
 
@@ -1264,7 +1265,11 @@ begin
       Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
       // If some PresenterSettings exists and the result object is a ViewModel then
       //  apply it
-      if PresenterSettingsExists and Supports(Result, IioViewModel) then
+      //  NB: Il codice commentato a dx della riga sotto poteva causare un errore dovuto alla
+      //       morte prematura del ViewModel appena creato per via del reference count, sostituito
+      //       con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
+      //       perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
+      if PresenterSettingsExists and (Result is TioViewModel) then //Supports(Result, IioViewModel) then
         TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
       // If it is a new instance of a singleton then add it to the SingletonsContainer
       if AContainerItem.IsSingleton then
