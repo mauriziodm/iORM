@@ -109,15 +109,16 @@ type
   ioMarker = class(TioCustomStringAttribute)
   end;
 
-  TioCustomForTargetModelClass = class(TioCustomAttribute)
+  TioCustomForTargetModel = class(TioCustomAttribute)
   strict private
-    FTargetClassName: String;
-    FAlias: String;
+    FTargetTypeName: String;
+    FTargetTypeAlias: String;
   public
-    constructor Create(ATargetClassName:String; const AAlias:String=''); overload;
+    constructor Create(ATargetTypeName:String; const AAlias:String=''); overload;
     constructor Create(ATargetClass:TioClassRef; const AAlias:String=''); overload;
-    property TargetClassName:String read FTargetClassName;
-    property Alias:String read FAlias;
+    constructor Create(ATargetIID:TGUID; const AAlias:String=''); overload;
+    property TargetTypeName:String read FTargetTypeName;
+    property TargetTypeAlias:String read FTargetTypeAlias;
   end;
 
   // ---------------------------------------------------------------------------
@@ -361,11 +362,11 @@ type
   end;
 
   // DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
-  diViewFor = class(TioCustomForTargetModelClass)
+  diViewFor = class(TioCustomForTargetModel)
   end;
 
   // DIC - diViewModelFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
-  diViewModelFor = class(TioCustomForTargetModelClass)
+  diViewModelFor = class(TioCustomForTargetModel)
   end;
   // ---------------------------------------------------------------------------
   // END CLASS ATTRIBUTES
@@ -619,19 +620,19 @@ end;
 
 { diViewFor }
 
-constructor TioCustomForTargetModelClass.Create(ATargetClassName: String; const AAlias: String);
+constructor TioCustomForTargetModel.Create(ATargetTypeName: String; const AAlias: String);
 begin
   inherited Create;
-  FTargetClassName := ATargetClassName;
-  FAlias := AAlias;
+  FTargetTypeName := ATargetTypeName;
+  FTargetTypeAlias := AAlias;
 end;
 
-constructor TioCustomForTargetModelClass.Create(ATargetClass: TioClassRef;
+constructor TioCustomForTargetModel.Create(ATargetClass: TioClassRef;
   const AAlias: String);
 begin
   inherited Create;
-  FTargetClassName := ATargetClass.ClassName;
-  FAlias := AAlias;
+  FTargetTypeName := ATargetClass.ClassName;
+  FTargetTypeAlias := AAlias;
 end;
 
 
@@ -642,6 +643,11 @@ begin
   inherited Create;
   FControlName := AControlName;
   FCommandName := ACommandName;
+end;
+
+constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
+begin
+  FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
 end;
 
 end.

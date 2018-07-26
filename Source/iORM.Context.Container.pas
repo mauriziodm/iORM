@@ -207,8 +207,8 @@ begin
       Index := Length(LdiVVMforItems);
       SetLength(LdiVVMforItems, Index+1);
       LdiVVMforItems[Index].ItemType := vvmitView;
-      LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetClassName;
-      LdiVVMforItems[Index].Alias := diViewFor(LAttr).Alias;
+      LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetTypeName;
+      LdiVVMforItems[Index].Alias := diViewFor(LAttr).TargetTypeAlias;
     end;
     // DIC - diViewModelFor
     if LAttr is diViewModelFor then
@@ -216,8 +216,8 @@ begin
       Index := Length(LdiVVMforItems);
       SetLength(LdiVVMforItems, Index+1);
       LdiVVMforItems[Index].ItemType := vvmitViewModel;
-      LdiVVMforItems[Index].Target := diViewModelFor(LAttr).TargetClassName;
-      LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).Alias;
+      LdiVVMforItems[Index].Target := diViewModelFor(LAttr).TargetTypeName;
+      LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
     end;
   end;
   // Dependency Injection Container - Register the class as is without any interface
