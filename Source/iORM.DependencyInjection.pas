@@ -1168,7 +1168,7 @@ begin
     LLocator := io.di.LocateViewFor(FForEachModelPresenter.Current) as TioDependencyInjectionLocator;
   LLocator.SetPresenter(FForEachModelPresenter);
   LLocator._DuplicateLocatorForShowEachPurposeFrom(Self);
-  LLocator.Show;
+  Result := LLocator.Show;
 end;
 
 procedure TioDependencyInjectionLocator.ShowEach;
