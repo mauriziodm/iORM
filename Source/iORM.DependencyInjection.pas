@@ -439,9 +439,6 @@ begin
     raise EioException.Create(Self.ClassName, 'LocateViewFor', '"Current" object of the ModelPresenter not assigned.');
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetViewLocatorFor(AModelPresenter, AAlias);
-  // Set the locator
-  Result.SetPresenter(AModelPresenter, '');
-  Result._SetForEachModelPresenter(AModelPresenter, False);
 end;
 
 class function TioDependencyInjection.LocateViewFor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
@@ -544,10 +541,6 @@ begin
     raise EioException.Create(Self.ClassName, 'LocateViewVMfor', '"Current" object of the ModelPresenter not assigned.');
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AAlias);
-  // NB: Call LocateViewFor (same code) then recall the '_SetForEachModelPresenter'
-  //      method (already called by "LocateViewFor") but with "ALocateModel"
-  //      parameter setted to True instead of False.
-  Result._SetForEachModelPresenter(AModelPresenter, True);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(const ATargetTypeName, AAlias,
@@ -1419,18 +1412,18 @@ class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const AModelPre
 begin
   // Try to retrieve a locator for MP.Current instance
   if io.di.LocateViewFor(AModelPresenter.Current, AAlias).Exist and io.di.LocateVMfor(AModelPresenter.Current, AAlias).Exist then
-    Result := io.di.LocateViewFor(AModelPresenter.Current, AAlias)
+    Result := io.di.LocateViewVMFor(AModelPresenter.Current, AAlias)
   else
   // Try to retrieve a locator for MP.TypeName
   if io.di.LocateViewFor(AModelPresenter.TypeName, AAlias).Exist and io.di.LocateVMfor(AModelPresenter.TypeName, AAlias).Exist then
-    Result := io.di.LocateViewFor(AModelPresenter.TypeName, AAlias)
+    Result := io.di.LocateViewVMFor(AModelPresenter.TypeName, AAlias)
   else
     raise EioException.Create(Self.ClassName, 'GetViewVMLocatorFor',
       Format('There are no Views and ViewModels registered for "%s" or "%s" alias "%s".',
       [AModelPresenter.Current.ClassName, AModelPresenter.TypeName, AAlias]));
-  // NB: Call LocateViewFor (same code) then recall the '_SetForEachModelPresenter'
-  //      method (already called by "LocateViewFor") but with "ALocateModel"
-  //      parameter setted to True instead of False.
+  // Set the locator
+  Result.SetPresenter(AModelPresenter, '');
+  Result._SetForEachModelPresenter(AModelPresenter, True);
 end;
 
 class function TioDependencyInjectionFactory.GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>;
@@ -1456,6 +1449,9 @@ begin
     raise EioException.Create(Self.ClassName, 'GetViewLocatorFor',
       Format('There are no Views registered for "%s" or "%s" alias "%s".',
       [AModelPresenter.Current.ClassName, AModelPresenter.TypeName, AAlias]));
+  // Set the locator
+  Result.SetPresenter(AModelPresenter, '');
+  Result._SetForEachModelPresenter(AModelPresenter, False);
 end;
 
 //class function TioDependencyInjectionFactory.GetVMLocatorFor(const AModelPresenter: TioModelPresenter; const AAlias: String): IioDependencyInjectionLocator;
