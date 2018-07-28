@@ -648,6 +648,7 @@ end;
 constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
 begin
   FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
+  FTargetTypeAlias := AAlias;
 end;
 
 end.
