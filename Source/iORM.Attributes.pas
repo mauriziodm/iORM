@@ -230,6 +230,112 @@ type
   ioFieldType = class(TioCustomStringAttribute)
   end;
 
+  // M.M. 31/07/18 New Attributes to define Specific Data Type
+  // Define VarChar Type
+  ioVarchar = class(TioCustomAttribute)
+  strict private
+    FIsUnicode: Boolean;
+    FIsNullable: Boolean;
+    FLength: Integer;
+  public
+    constructor Create(const ALength:Integer=255; const AIsNullable:Boolean=True; const AIsUnicode:Boolean=True);
+    property IsUnicode:Boolean read FIsUnicode;
+    property IsNullable:Boolean read FIsNullable;
+    property Length:Integer read FLength;
+  end;
+
+  // Define Char Type
+  ioChar = class(ioVarchar)
+  end;
+
+  // Define Integer Type (SmallInt, Integer, BigInt)
+  ioInteger = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+    FPrecision: Integer;
+  public
+    constructor Create(const APrecision:Integer=10; const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+    property Precision:Integer read FPrecision;
+  end;
+
+  // Define Float Type (Float)
+  ioFloat = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+  public
+    constructor Create(const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+  end;
+
+  // Define Date Type (Date)
+  ioDate = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+  public
+    constructor Create(const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+  end;
+
+  // Define Date Type (Time)
+  ioTime = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+  public
+    constructor Create(const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+  end;
+
+  // Define DateTime Type (DateTime)
+  ioDateTime = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+  public
+    constructor Create(const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+  end;
+
+  // Define Decimal Or Numeric Type
+  // DECIMAL(p,s) --> DECIMAL(13,2) 11 Digits Before the decimal and 2 Digits after decimal
+  // NUMERIC(p,s) --> NUMERIC(13,2) Treated in the same way of Decimal
+  ioDecimal = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+    FPrecision: Integer;
+    FScale: Integer;
+  public
+    constructor Create(const APrecision:Integer=13; const AScale:Integer=2; const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+    property Precision:Integer read FPrecision;
+    property Scale:Integer read FScale;
+  end;
+  ioNumeric = ioDecimal;
+
+  // Define Date Type (Boolean)
+  ioBoolean = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+  public
+    constructor Create(const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+  end;
+
+  // Define Binary Type (Binary Data)
+  ioBinary = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+    FBinarySubType: string;
+  public
+    constructor Create(const ABinarySubType:string='';const AIsNullable:Boolean=True);
+    property IsNullable:Boolean read FIsNullable;
+    property BinarySubType:string read FBinarySubType;
+  end;
+
+  // Custom FieldType attribute
+  ioCustomFieldType = class(TioCustomStringAttribute)
+  end;
+  // M.M. 31/07/18 END - New Attributes to define Specific Data Type
+
   // Relation BelongsTo attribute
   ioBelongsTo = class(TioCustomRelationAttribute)
   end;
@@ -266,6 +372,10 @@ type
   // TypeAlias attribute
   ioTypeAlias = class(TioCustomStringAttribute)
   end;
+
+
+
+
 
   // ---------------------------------------------------------------------------
   // END PROPERTY ATTRIBUTES
@@ -642,6 +752,76 @@ begin
   inherited Create;
   FControlName := AControlName;
   FCommandName := ACommandName;
+end;
+
+{ ioVarchar }
+
+constructor ioVarchar.Create(const ALength:Integer=255; const AIsNullable:Boolean=True; const AIsUnicode:Boolean=True);
+begin
+  FLength := ALength;
+  FIsUnicode := AIsUnicode;
+  FIsNullable := AIsNullable;
+end;
+
+{ ioInteger }
+
+constructor ioInteger.Create(const APrecision: Integer;
+  const AIsNullable: Boolean);
+begin
+  FPrecision := APrecision;
+  FIsNullable := AIsNullable;
+end;
+
+{ ioFloat }
+
+constructor ioFloat.Create(const AIsNullable: Boolean);
+begin
+  FIsNullable := AIsNullable;
+end;
+
+{ ioDate }
+
+constructor ioDate.Create(const AIsNullable: Boolean);
+begin
+  FIsNullable := AIsNullable;
+end;
+
+{ ioTime }
+
+constructor ioTime.Create(const AIsNullable: Boolean);
+begin
+  FIsNullable := AIsNullable;
+end;
+
+{ ioDateTime }
+
+constructor ioDateTime.Create(const AIsNullable: Boolean);
+begin
+  FIsNullable := AIsNullable;
+end;
+
+{ ioDecimalOrNumeric }
+
+constructor ioDecimal.Create(const APrecision, AScale: Integer;
+  const AIsNullable: Boolean);
+begin
+  FPrecision := APrecision;
+  FScale := AScale;
+  FIsNullable := AIsNullable;
+end;
+
+{ ioBinary }
+
+constructor ioBinary.Create(const ABinarySubType:string='';const AIsNullable:Boolean=True);
+begin
+  FIsNullable := AIsNullable;
+end;
+
+{ ioBoolean }
+
+constructor ioBoolean.Create(const AIsNullable: Boolean);
+begin
+  FIsNullable := AIsNullable;
 end;
 
 end.
