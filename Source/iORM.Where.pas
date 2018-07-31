@@ -48,7 +48,8 @@ uses
   System.Classes, Data.Bind.ObjectScope, iORM.Where.SqlItems.Interfaces,
   iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
-  iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo;
+  iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
+  iORM.Rtti.Utilities;
 
 type
 
@@ -66,6 +67,9 @@ type
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
     //  e contiene il nome della MasterPropertyName
     FDetailsContainer: IioWhereDetailsContainer;
+
+    procedure _Show(const ADataObject:TObject; const AVVMAlias:String; const AForceTypeNameUse:Boolean); overload;
+    procedure _Show(const ADataObject:IInterface; const AVVMAlias:String; const AForceTypeNameUse:Boolean); overload;
     // -------------------------------------------
     // Details property
     function GetDetails: IioWhereDetailsContainer;
@@ -110,6 +114,11 @@ type
     function ToActiveObjectBindSourceAdapter(const AOwner:TComponent; const AAutoLoadData:Boolean=True; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
     function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     function ToObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
+
+    procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); virtual;
+    procedure ShowList(const AVVMAlias:String=''); virtual;
+    procedure ShowEach(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); virtual;
+
     // ------ Conditions
     function ByOID(const AOID:Integer): IioWhere;
     function Add(const ATextCondition:String): IioWhere; overload;
@@ -220,6 +229,9 @@ type
 //    function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<TObject>;
     function ToInterfacedList: IioList<T>; overload;
 //    function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
+
+//    procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); override;
+
     // ------ Conditions
     function ByOID(const AOID:Integer): IioWhere<T>;
     function Add(const ATextCondition:String): IioWhere<T>; overload;
@@ -319,15 +331,15 @@ uses
   iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM,
   iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems,
-  iORM.DB.Interfaces, iORM.Resolver.Factory,
-  iORM.Rtti.Utilities, iORM.Context.Interfaces, iORM.Containers.Factory,
+  iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Context.Interfaces, iORM.Containers.Factory,
   iORM.LiveBindings.InterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
   iORM.LiveBindings.ActiveObjectBindSourceAdapter, iORM.Where.Factory,
   iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
-  iORM.Strategy.Factory;
+  iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
+  iORM.MVVM.Interfaces;
 
 { TioWhere }
 
@@ -797,6 +809,61 @@ begin
   FTypeName := Value;
 end;
 
+procedure TioWhere.Show(const AVVMAlias: String; const AForceTypeNameUse:Boolean);
+var
+  LIntfInstance: IInterface;
+  LClassInstance: TObject;
+begin
+  LClassInstance := Self.ToObject;
+  if TioRttiUtilities.IsAnInterfaceTypeName(TypeName) then
+  begin
+    Supports(LClassInstance, IInterface, LIntfInstance);
+    _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
+  end
+  else
+    _Show(LClassInstance, AVVMAlias, AForceTypeNameUse);
+end;
+
+procedure TioWhere.ShowEach(const AVVMAlias: String; const AForceTypeNameUse:Boolean);
+var
+  LClassList: TList<TObject>;
+  LClassInstance: TObject;
+  LIntfList: TList<IInterface>;
+  LIntfInstance: IInterface;
+begin
+  if TioRttiUtilities.IsAnInterfaceTypeName(TypeName) then
+  begin
+    LIntfList := Self.ToGenericList.OfType<TList<IInterface>>;
+    try
+      for LIntfInstance in LIntfList do
+        _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
+    finally
+      LIntfList.Free;
+    end;
+  end
+  else
+  begin
+    LClassList := Self.ToGenericList.OfType<TList<TObject>>;
+    try
+      for LClassInstance in LClassList do
+        _Show(LClassInstance, AVVMAlias, AForceTypeNameUse);
+    finally
+      LClassList.Free;
+    end;
+  end;
+end;
+
+procedure TioWhere.ShowList(const AVVMAlias: String);
+var
+  LList: TObject;
+begin
+  if TioRttiUtilities.IsAnInterfaceTypeName(TypeName) then
+    LList := Self.ToList(TList<IInterface>)
+  else
+    LList := Self.ToList(TList<TObject>);
+  io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(LList).Show;
+end;
+
 function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AContext: IioContext;
@@ -1090,6 +1157,54 @@ begin
   Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOIDEqualsTo(   TValue.From<Integer>(AValue)   ));
 end;
 
+procedure TioWhere._Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse:Boolean);
+begin
+  if not Assigned(ADataObject) then
+    raise EioException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
+  // If specific View/ViewModel were found for the instance then use them...
+  // NB: But only if AForceTypeNameUse = False
+  if  io.di.LocateViewFor(ADataObject, AVVMAlias).Exist  // NB: Lasciare le due condizioni separate
+  and io.di.LocateVMFor(ADataObject, AVVMAlias).Exist       // NB: Lasciare le due condizioni separate
+  and not AForceTypeNameUse
+  then
+    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetPresenter(ADataObject).Show
+  else
+  // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
+  if  (not TypeName.IsEmpty)
+  and io.di.LocateViewFor(TypeName, AVVMAlias).Exist     // NB: Lasciare le due condizioni separate
+  and io.di.LocateVMFor(TypeName, AVVMAlias).Exist       // NB: Lasciare le due condizioni separate
+  then
+    io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(ADataObject).Show
+  else
+    raise EioException.Create(Self.ClassName, '_Show',
+      Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
+      [ADataObject.ClassName, TypeName, AVVMAlias]));
+end;
+
+procedure TioWhere._Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse:Boolean);
+begin
+  if not Assigned(ADataObject) then
+    raise EioException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
+  // If specific View/ViewModel were found for the instance then use them...
+  // NB: But only if AForceTypeNameUse = False
+  if  io.di.LocateViewFor(ADataObject, AVVMAlias).Exist  // NB: Lasciare le due condizioni separate
+  and io.di.LocateVMFor(ADataObject, AVVMAlias).Exist       // NB: Lasciare le due condizioni separate
+  and not AForceTypeNameUse
+  then
+    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetPresenter(ADataObject).Show
+  else
+  // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
+  if  (not TypeName.IsEmpty)
+  and io.di.LocateViewFor(TypeName, AVVMAlias).Exist     // NB: Lasciare le due condizioni separate
+  and io.di.LocateVMFor(TypeName, AVVMAlias).Exist       // NB: Lasciare le due condizioni separate
+  then
+    io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(ADataObject).Show
+  else
+    raise EioException.Create(Self.ClassName, '_Show',
+      Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
+      [(ADataObject as TObject).ClassName, TypeName, AVVMAlias]));
+end;
+
 function TioWhere._ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
 begin
   Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObjectByClassOnly(Self, AObj);
@@ -1238,6 +1353,21 @@ begin
   Result := Self;
   TioWhere(Self).SetDetailsContainer(ADetailsContainer);
 end;
+
+//procedure TioWhere<T>.Show(const AVVMAlias: String; const AForceTypeNameUse:Boolean);
+//var
+//  LIntfInstance: IInterface;
+//  LClassInstance: TObject;
+//begin
+//  LClassInstance := TioWhere(Self).ToObject;
+//  if TioRttiUtilities.IsAnInterface<T> then
+//  begin
+//    Supports(LClassInstance, IInterface, LIntfInstance);
+//    _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
+//  end
+//  else
+//    _Show(LClassInstance, AVVMAlias, AForceTypeNameUse);
+//end;
 
 function TioWhere<T>.ToInterfacedList: IioList<T>;
 begin
@@ -1663,6 +1793,7 @@ begin
 end;
 
 end.
+
 
 
 

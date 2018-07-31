@@ -215,6 +215,7 @@ type
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator;
     // SetPresenter (passing the name of the destination presenter)
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const AInterfacedObj:IInterface): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
@@ -222,6 +223,7 @@ type
     function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioModelPresenter): IioDependencyInjectionLocator; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetPresenter(const ADataObject:TObject): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AInterfacedObj:IInterface): IioDependencyInjectionLocator; overload;
     function SetPresenter(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
@@ -247,6 +249,7 @@ type
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
     // SetPresenter (passing the name of the destination presenter)
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const AInterfacedObj:IInterface): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
@@ -254,6 +257,7 @@ type
     function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioModelPresenter): IioDependencyInjectionLocator<TI>; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetPresenter(const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AInterfacedObj:IInterface): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
@@ -1161,6 +1165,24 @@ begin
   Result := SetPresenter('', AOrderBy);
 end;
 
+function TioDependencyInjectionLocator.SetPresenter(const AInterfacedObj: IInterface): IioDependencyInjectionLocator;
+begin
+  Result := SetPresenter('', AInterfacedObj);
+end;
+
+function TioDependencyInjectionLocator.SetPresenter(const AName: String;
+  const AInterfacedObj: IInterface): IioDependencyInjectionLocator;
+var
+  I: Integer;
+begin
+  I := Length(FPresenterSettings);
+  SetLength(FPresenterSettings, I+1);
+  FPresenterSettings[I].SettingsType := TioDIPresenterSettingsType.pstInterfacedObj;
+  FPresenterSettings[I].Name := AName;
+  FPresenterSettings[I].InterfacedObj := AInterfacedObj;
+  Result := Self;
+end;
+
 function TioDependencyInjectionLocator.SetPresenterAsSelectorFor(const ASourcePresenterName: String;
   const ASelectionDest: TioModelPresenter): IioDependencyInjectionLocator;
 var
@@ -1724,6 +1746,19 @@ function TioDependencyInjectionLocator<TI>.SetPresenter(
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetPresenter(AOrderBy);
+end;
+
+function TioDependencyInjectionLocator<TI>.SetPresenter(const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>;
+begin
+  Result := Self;
+  TioDependencyInjectionLocator(Self).SetPresenter(AInterfacedObj);
+end;
+
+function TioDependencyInjectionLocator<TI>.SetPresenter(const AName: String;
+  const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>;
+begin
+  Result := Self;
+  TioDependencyInjectionLocator(Self).SetPresenter(AName, AInterfacedObj);
 end;
 
 function TioDependencyInjectionLocator<TI>.SetPresenterAsSelectorFor(const ASourcePresenterName: String;

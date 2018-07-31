@@ -68,6 +68,7 @@ type
     class function Load(const ATypeName:String; const ATypeAlias:String=''): IioWhere; overload;
     class function Load(const ATypeInfo:PTypeInfo; const ATypeAlias:String=''): IioWhere; overload;
     class function Load(const AClassRef:TioClassRef; const ATypeAlias:String=''): IioWhere; overload;
+    class function Load(const AIID:TGUID; const ATypeAlias:String=''): IioWhere; overload;
     class function Load<T>(const ATypeAlias:String=''): IioWhere<T>; overload;
     class function Load(const AWhere:IioWhere): IioWhere; overload;
     class procedure Delete(const AObj: TObject; const AConnectionName:String=''); overload;
@@ -218,6 +219,11 @@ end;
 class function io.Load(const AWhere: IioWhere): IioWhere;
 begin
   Result := AWhere;
+end;
+
+class function io.Load(const AIID: TGUID; const ATypeAlias: String): IioWhere;
+begin
+  Result := Self.Load(TioRttiUtilities.GUIDtoTypeInfo(AIID), ATypeAlias);
 end;
 
 class function io.Load<T>(const ATypeAlias:String): IioWhere<T>;
