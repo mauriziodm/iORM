@@ -3,11 +3,12 @@ inherited ArticleViewModel: TArticleViewModel
   object MPArticle: TioModelPresenter
     AsDefault = True
     Async = True
-    AutoLoadData = True
+    AutoLoadData = False
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IBase'
-    ViewDataType = dtList
+    ViewDataType = dtSingle
     WhereDetailsFromDetailAdapters = False
     Left = 192
     Top = 24

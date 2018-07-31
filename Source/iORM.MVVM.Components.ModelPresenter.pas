@@ -5,7 +5,7 @@ interface
 uses
   System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
-  System.Generics.Collections;
+  System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider;
 
 type
 
@@ -134,6 +134,14 @@ type
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
     procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     procedure SelectCurrent<T>(ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowCurrent(const AAlias:String=''); overload;
+    procedure ShowCurrent(const AVCProvider:TioViewContextProvider; const AAlias:String=''); overload;
+    procedure ShowCurrent(const AViewContext:TComponent; const AAlias:String=''); overload;
+    // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowEach(const AAlias:String=''); overload;
+    procedure ShowEach(const AVCProvider:TioViewContextProvider; const AAlias:String=''); overload;
+    procedure ShowEach(const AViewContext:TComponent; const AAlias:String=''); overload;
     // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
     procedure ClearDataObject;
@@ -850,6 +858,36 @@ begin
   (FWhereStr as TStringList).OnChange := WhereOnChangeEventHandler;
   // Update the adapter where property
   WhereOnChangeEventHandler(Self);
+end;
+
+procedure TioModelPresenter.ShowCurrent(const AViewContext: TComponent; const AAlias: String);
+begin
+  io.ShowCurrent(Self, AViewContext, AAlias);
+end;
+
+procedure TioModelPresenter.ShowCurrent(const AVCProvider: TioViewContextProvider; const AAlias: String);
+begin
+  io.ShowCurrent(Self, AVCProvider, AAlias);
+end;
+
+procedure TioModelPresenter.ShowCurrent(const AAlias: String);
+begin
+  io.ShowCurrent(Self, AAlias);
+end;
+
+procedure TioModelPresenter.ShowEach(const AViewContext: TComponent; const AAlias: String);
+begin
+  io.ShowEach(Self, AViewContext, AAlias);
+end;
+
+procedure TioModelPresenter.ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String);
+begin
+  io.ShowEach(Self, AVCProvider, AAlias);
+end;
+
+procedure TioModelPresenter.ShowEach(const AAlias: String);
+begin
+  io.ShowEach(Self, AAlias);
 end;
 
 procedure TioModelPresenter.WhereOnChangeEventHandler(Sender: TObject);

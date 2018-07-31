@@ -225,6 +225,9 @@ begin
       // DataObject
       TioDIPresenterSettingsType.pstDataObject:
         LViewModel.Presenter[LName].SetDataObject(LPresenterSettings[I].Obj);
+      // InterfacedObject
+      TioDIPresenterSettingsType.pstInterfacedObj:
+        LViewModel.Presenter[LName].SetDataObject(LPresenterSettings[I].InterfacedObj);
       // BindSourceAdapter
       TioDIPresenterSettingsType.pstBindSourceAdapter:
       begin
