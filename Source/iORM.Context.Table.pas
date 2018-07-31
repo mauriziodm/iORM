@@ -100,6 +100,7 @@ type
     FSqlFieldName: String;
   public
     constructor Create(ASqlFieldName, AClassName, AQualifiedClassName, AAncestors: String);
+    function GetFieldName: string;
     function GetSqlFieldName: string;
     function GetSqlParamName: String;
     function GetValue: String;
@@ -126,6 +127,7 @@ type
     const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
     const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); overload;
     destructor Destroy; override;
+    function GetSql: String; override;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
@@ -219,6 +221,12 @@ begin
   Result := FRttiType;
 end;
 
+function TioContextTable.GetSql: String;
+begin
+  Result := inherited;
+  TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(Result);
+end;
+
 function TioContextTable.IndexListExists: Boolean;
 begin
   Result := Assigned(FIndexList);
@@ -255,6 +263,11 @@ begin
   Result := FClassName;
 end;
 
+function TioClassFromField.GetFieldName: string;
+begin
+  Result := FSqlFieldName;
+end;
+
 function TioClassFromField.GetQualifiedClassName: String;
 begin
   Result := FQualifiedClassName;
@@ -262,12 +275,12 @@ end;
 
 function TioClassFromField.GetSqlFieldName: string;
 begin
-  Result := FSqlFieldName;
+  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioClassFromField.GetSqlParamName: String;
 begin
-  Result := 'P_' + Self.GetSqlFieldName;
+  Result := 'P_' + FSqlFieldName;
 end;
 
 function TioClassFromField.GetSqlValue: string;

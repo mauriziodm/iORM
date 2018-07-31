@@ -57,7 +57,6 @@ type
     FRttiProperty: TRttiProperty;
     FTypeAlias: String;
     FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
-    FQualifiedSqlFieldName: String;
     FLoadSql: String;
     FFieldType: String;
     FRelationType: TioRelationType;
@@ -375,7 +374,7 @@ end;
 function TioProperty.GetSqlQualifiedFieldName: String;
 begin
 //  Result := FQualifiedSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FQualifiedSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldTableName) + '.' + TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlParamName: String;
@@ -503,8 +502,6 @@ begin
   // Retrieve Field Alias
   FSqlFieldAlias := MidStr(AValue, AsPos+4, AValue.Length);
   if FSqlFieldAlias = '' then FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
-  // Set QualifiedFieldName
-  FQualifiedSqlFieldName := FSqlFieldTableName + '.' + FSqlFieldName;
 end;
 
 procedure TioProperty.SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);

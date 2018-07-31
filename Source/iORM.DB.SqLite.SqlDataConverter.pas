@@ -122,11 +122,15 @@ begin
       Result := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsFloat;
     tkString, tkUString, tkWChar, tkLString, tkWString, tkChar:
       Result := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-    tkEnumeration:
-      Result := TValue.FromOrdinal(
-                                    AProperty.GetRttiType.Handle,  // This is the PTypeInfo of the PropertyType
-                                    AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsInteger  // This is the ordinal value
-                                  );
+    tkEnumeration: begin
+      if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias) is TBooleanField then
+        Result := TValue.From<Boolean>(AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsBoolean)
+      else
+        Result := TValue.FromOrdinal(
+                                      AProperty.GetRttiType.Handle,  // This is the PTypeInfo of the PropertyType
+                                      AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsInteger // This is the ordinal value
+                                    );
+    end;
   end;
 end;
 
