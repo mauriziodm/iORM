@@ -51,9 +51,12 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const AMapMode:TioMapModeType; const ARttiPropField:TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType:String; const ASkipped:Boolean;
-      const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean): IioContextProperty;
+    class function GetProperty(const AMapMode:TioMapModeType; const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
+  AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
+  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -115,7 +118,10 @@ end;
 
 class function TioContextFactory.GetProperty(const AMapMode:TioMapModeType; const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
   AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean): IioContextProperty;
+  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string): IioContextProperty;
 begin
   case AMapMode of
     // Properties map mode
@@ -134,6 +140,13 @@ begin
         ,ARelationChildPropertyName
         ,ARelationLoadType
         ,ARelationChildAutoIndex
+        ,AMetadata_FieldType
+        ,AMetadata_FieldLength
+        ,AMetadata_FieldPrecision
+        ,AMetadata_FieldScale
+        ,AMetadata_FieldNullable
+        ,AMetadata_FieldUnicode
+        ,AMetadata_CustomFieldType
       );
     // Fields map mode
     ioFields:
@@ -151,6 +164,13 @@ begin
         ,ARelationChildPropertyName
         ,ARelationLoadType
         ,ARelationChildAutoIndex
+        ,AMetadata_FieldType
+        ,AMetadata_FieldLength
+        ,AMetadata_FieldPrecision
+        ,AMetadata_FieldScale
+        ,AMetadata_FieldNullable
+        ,AMetadata_FieldUnicode
+        ,AMetadata_CustomFieldType
       );
   end;
 end;
@@ -220,6 +240,14 @@ var
   PropRelationChildPropertyName: String;
   PropRelationChildLoadType: TioLoadType;
   PropRelationChildAutoIndex: Boolean;
+  // M.M. 01/08/18 - Used by DBBuilder
+  PropMetadata_FieldType: TioMetadataFieldType;
+  PropMetadata_FieldLength: Integer;
+  PropMetadata_FieldPrecision: Integer;
+  PropMetadata_FieldScale: Integer;
+  PropMetadata_FieldNullable: Boolean;
+  PropMetadata_FieldUnicode: Boolean;
+  PropMetadata_CustomFieldType: string;
 begin
   // Get members list (Properties or Fields)
   case ATable.GetMapMode of
@@ -233,6 +261,15 @@ begin
   // Loop all properties
   for Prop in PropsFields do
   begin
+    // M.M. 01/08/18 - Used by DBBuilder
+    PropMetadata_FieldType := ioMdVarchar;
+    PropMetadata_FieldLength := 255;
+    PropMetadata_FieldPrecision := 0;
+    PropMetadata_FieldScale := 0;
+    PropMetadata_FieldNullable := True;
+    PropMetadata_FieldUnicode := True;
+    PropMetadata_CustomFieldType := '';
+
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
     if (ATable.GetMapMode = ioFields) then
@@ -244,7 +281,7 @@ begin
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False);
+      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType);
       Continue;
     end;
     // Prop Init
@@ -321,6 +358,76 @@ begin
         // Add the current index attribute
         ATable.GetIndexList(True).Add(ioIndex(Attr));
       end;
+      // M.M. 01/08/18 - Metadata Used by DBBuilder
+      if Attr is ioVarchar then
+      begin
+        PropMetadata_FieldType := ioMdVarchar;
+        PropMetadata_FieldLength := ioVarchar(Attr).Length;
+        PropMetadata_FieldNullable := ioVarchar(Attr).IsNullable;
+        PropMetadata_FieldUnicode := ioVarchar(Attr).IsUnicode;
+      end;
+      if Attr is ioChar then
+      begin
+        PropMetadata_FieldType := ioMdChar;
+        PropMetadata_FieldLength := ioChar(Attr).Length;
+        PropMetadata_FieldNullable := ioChar(Attr).IsNullable;
+        PropMetadata_FieldUnicode := ioChar(Attr).IsUnicode;
+      end;
+      if Attr is ioInteger then
+      begin
+        PropMetadata_FieldType := ioMdInteger;
+        PropMetadata_FieldPrecision := ioInteger(Attr).Precision;
+        PropMetadata_FieldNullable := ioChar(Attr).IsNullable;
+      end;
+      if Attr is ioFloat then
+      begin
+        PropMetadata_FieldType := ioMdFloat;
+        PropMetadata_FieldNullable := ioFloat(Attr).IsNullable;
+      end;
+      if Attr is ioDate then
+      begin
+        PropMetadata_FieldType := ioMdDate;
+        PropMetadata_FieldNullable := ioDate(Attr).IsNullable;
+      end;
+      if Attr is ioTime then
+      begin
+        PropMetadata_FieldType := ioMdTime;
+        PropMetadata_FieldNullable := ioTime(Attr).IsNullable;
+      end;
+      if Attr is ioDateTime then
+      begin
+        PropMetadata_FieldType := ioMdDateTime;
+        PropMetadata_FieldNullable := ioDateTime(Attr).IsNullable;
+      end;
+      if Attr is ioDecimal then
+      begin
+        PropMetadata_FieldType := ioMdDecimal;
+        PropMetadata_FieldPrecision := ioDecimal(Attr).Precision;
+        PropMetadata_FieldScale := ioDecimal(Attr).Scale;
+        PropMetadata_FieldNullable := ioDecimal(Attr).IsNullable;
+      end;
+      if Attr is ioNumeric then
+      begin
+        PropMetadata_FieldType := ioMdNumeric;
+        PropMetadata_FieldPrecision := ioNumeric(Attr).Precision;
+        PropMetadata_FieldScale := ioNumeric(Attr).Scale;
+        PropMetadata_FieldNullable := ioNumeric(Attr).IsNullable;
+      end;
+      if Attr is ioBoolean then
+      begin
+        PropMetadata_FieldType := ioMdBoolean;
+        PropMetadata_FieldNullable := ioBoolean(Attr).IsNullable;
+      end;
+      if Attr is ioBinary then
+      begin
+        PropMetadata_FieldType := ioMdBinary;
+        PropMetadata_FieldNullable := ioBinary(Attr).IsNullable;
+      end;
+      if Attr is ioCustomFieldType then
+      begin
+        PropMetadata_FieldType := ioMdCustomFieldType;
+        PropMetadata_CustomFieldType := ioCustomFieldType(Attr).Value;
+      end;
     end;
     // Create and add property
     Result.Add(
@@ -338,7 +445,14 @@ begin
         PropRelationChildTypeAlias,
         PropRelationChildPropertyName,
         PropRelationChildLoadType,
-        PropRelationChildAutoIndex
+        PropRelationChildAutoIndex,
+        PropMetadata_FieldType,
+        PropMetadata_FieldLength,
+        PropMetadata_FieldPrecision,
+        PropMetadata_FieldScale,
+        PropMetadata_FieldNullable,
+        PropMetadata_FieldUnicode,
+        PropMetadata_CustomFieldType
       ),
       PropId,
       PropIDSkipOnInsert

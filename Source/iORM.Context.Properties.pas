@@ -68,17 +68,32 @@ type
     FRelationLoadType: TioLoadType;
     FTable:IioContextTable;
     FReadWrite: TioReadWrite;
+    // M.M. 01/08/18 - MetadataType used by DBBuilder
+    FMetadata_FieldType: TioMetadataFieldType;
+    FMetadata_FieldLength: Integer;
+    FMetadata_FieldPrecision: Integer;
+    FMetadata_FieldScale: Integer;
+    FMetadata_FieldNullable: Boolean;
+    FMetadata_FieldUnicode: Boolean;
+    FMetadata_CustomFieldType: string;
+
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName:String);
     // NB: Gli altri due attributes (ioEmbeddedSkip e ioEmbeddedStreamable) non sono necessari qui
     //      perchè li usa solo l'ObjectsMappers al suo interno, iORM non li usa
   strict protected
     constructor Create(const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean); overload;
+      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean;
+      const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+      const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+      const AMetadata_CustomFieldType: string); overload;
   public
     constructor Create(const ARttiProperty:TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean); overload;
+      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean;
+      const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+      const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+      const AMetadata_CustomFieldType: string); overload;
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String; virtual;
@@ -123,6 +138,21 @@ type
     function IsInstance: Boolean;
     function IsWritable: Boolean; virtual;
     function IsSkipped: Boolean;
+    // M.M. 01/08/18 - DBBuilder
+    procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
+    procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
+    procedure SetMetadata_FieldPrecision(const AMetadata_FieldPrecision: Integer);
+    procedure SetMetadata_FieldScale(const AMetadata_FieldScale: Integer);
+    procedure SetMetadata_FieldNullable(const AMetadata_FieldNullable: Boolean);
+    procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
+    procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
+    function GetMetadata_FieldType: TioMetadataFieldType;
+    function GetMetadata_FieldLength: Integer;
+    function GetMetadata_FieldPrecision: Integer;
+    function GetMetadata_FieldScale: Integer;
+    function GetMetadata_FieldNullable: Boolean;
+    function GetMetadata_FieldUnicode: Boolean;
+    function GetMetadata_CustomFieldType: string;
   end;
 
   // Classe che rappresenta un field della classe
@@ -133,7 +163,10 @@ type
   public
     constructor Create(const ARttiField:TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const ASkipped:Boolean;
       const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean); overload;
+      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType; const ARelationChildAutoIndex:Boolean;
+      const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+      const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+      const AMetadata_CustomFieldType: string); overload;
     class function Remove_F_FromName(AFieldName:String): String;
     function GetName: String; override;
     function GetValue(Instance: Pointer): TValue; override;
@@ -190,17 +223,24 @@ uses
 
 constructor TioProperty.Create(const ARttiProperty: TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql,
   AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean);
+  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string);
 begin
   // NB: No inherited here
   Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, ASkipped, AReadWrite,
-    ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex);
+    ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
+    AMetadata_FieldType,AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType);
   FRttiProperty := ARttiProperty;
 end;
 
 constructor TioProperty.Create(const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ASkipped:Boolean;
   const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-  ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean);
+  ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string);
 begin
   inherited Create;
   FTypeAlias := ATypeAlias;
@@ -215,6 +255,15 @@ begin
   FRelationChildTypeAlias := ARelationChildTypeAlias;
   FRelationChildAutoIndex := ARelationChildAutoIndex;
   FRelationLoadType := ARelationLoadType;
+  // M.M. 01/08/18 - MetadataType used by DBBuilder
+  FMetadata_FieldType := AMetadata_FieldType;
+  FMetadata_FieldLength := AMetadata_FieldLength;
+  FMetadata_FieldPrecision := AMetadata_FieldPrecision;
+  FMetadata_FieldScale := AMetadata_FieldScale;
+  FMetadata_FieldNullable := AMetadata_FieldNullable;
+  FMetadata_FieldUnicode := AMetadata_FieldUnicode;
+  FMetadata_CustomFieldType := AMetadata_CustomFieldType;
+
   // Set the RelationChildPropertyName & RelationChildPropertyPath
   Self.SetRelationChildNameAndPath(ARelationChildPropertyName);
 end;
@@ -257,6 +306,41 @@ end;
 function TioProperty.GetLoadSql: String;
 begin
   Result := '(' + Self.FLoadSql + ') AS ' + Self.GetSqlFieldAlias;
+end;
+
+function TioProperty.GetMetadata_CustomFieldType: string;
+begin
+  Result := FMetadata_CustomFieldType;
+end;
+
+function TioProperty.GetMetadata_FieldLength: Integer;
+begin
+  Result := FMetadata_FieldLength;
+end;
+
+function TioProperty.GetMetadata_FieldNullable: Boolean;
+begin
+  Result := FMetadata_FieldNullable;
+end;
+
+function TioProperty.GetMetadata_FieldPrecision: Integer;
+begin
+  Result := FMetadata_FieldPrecision;
+end;
+
+function TioProperty.GetMetadata_FieldScale: Integer;
+begin
+  Result := FMetadata_FieldScale;
+end;
+
+function TioProperty.GetMetadata_FieldType: TioMetadataFieldType;
+begin
+  Result := FMetadata_FieldType;
+end;
+
+function TioProperty.GetMetadata_FieldUnicode: Boolean;
+begin
+  Result := FMetadata_FieldUnicode;
 end;
 
 function TioProperty.GetSqlFullQualifiedFieldName: String;
@@ -521,6 +605,48 @@ begin
     then FLoadSql := TioSqlTranslator.Translate(FLoadSql, '');
 end;
 
+procedure TioProperty.SetMetadata_CustomFieldType(
+  const AMetadata_CustomFieldType: string);
+begin
+  FMetadata_CustomFieldType := AMetadata_CustomFieldType;
+end;
+
+procedure TioProperty.SetMetadata_FieldLength(
+  const AMetadata_FieldLength: Integer);
+begin
+  FMetadata_FieldLength := AMetadata_FieldLength;
+end;
+
+procedure TioProperty.SetMetadata_FieldNullable(
+  const AMetadata_FieldNullable: Boolean);
+begin
+  FMetadata_FieldNullable := AMetadata_FieldNullable;
+end;
+
+procedure TioProperty.SetMetadata_FieldPrecision(
+  const AMetadata_FieldPrecision: Integer);
+begin
+  FMetadata_FieldPrecision := AMetadata_FieldPrecision;
+end;
+
+procedure TioProperty.SetMetadata_FieldScale(
+  const AMetadata_FieldScale: Integer);
+begin
+  FMetadata_FieldScale := AMetadata_FieldScale;
+end;
+
+procedure TioProperty.SetMetadata_FieldType(
+  const AMetadata_FieldType: TioMetadataFieldType);
+begin
+  FMetadata_FieldType := AMetadata_FieldType;
+end;
+
+procedure TioProperty.SetMetadata_FieldUnicode(
+  const AMetadata_FieldUnicode: Boolean);
+begin
+  FMetadata_FieldUnicode := AMetadata_FieldUnicode;
+end;
+
 procedure TioProperty.SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
 begin
   // If the AQualifiedChildPropertyName is empty then exit
@@ -700,11 +826,16 @@ end;
 
 constructor TioField.Create(const ARttiField: TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ASkipped:Boolean;
   const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-  ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean);
+  ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string);
 begin
   // NB: No inherited here
   Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, ASkipped, AReadWrite,
-    ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex);
+    ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
+    AMetadata_FieldType,AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType);
+
   FRttiProperty := ARttiField;
   FName := Self.Remove_F_FromName(ARttiField.Name);
 end;

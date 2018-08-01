@@ -53,6 +53,9 @@ type
   // Options set for GetSql functions parameter
   TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert, ioDelete, ioExist);
 
+  // Options set for field metadata used in DBBuilder
+  TioMetadataFieldType = (ioMdVarchar,ioMdChar,ioMdInteger,ioMdFloat,ioMdDate,ioMdTime,ioMdDateTime,ioMdDecimal,ioMdNumeric,ioMdBoolean,ioMdBinary,ioMdCustomFieldType);
+
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
     function GetLoadSql: String;
@@ -98,6 +101,21 @@ type
     function IsInstance: Boolean;
     function IsWritable: Boolean;
     function IsSkipped: Boolean;
+    // M.M. 01/08/18 - DBBuilder
+    procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
+    procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
+    procedure SetMetadata_FieldPrecision(const AMetadata_FieldPrecision: Integer);
+    procedure SetMetadata_FieldScale(const AMetadata_FieldScale: Integer);
+    procedure SetMetadata_FieldNullable(const AMetadata_FieldNullable: Boolean);
+    procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
+    procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: TioMetadataFieldType);
+    function GetMetadata_FieldType: TioMetadataFieldType;
+    function GetMetadata_FieldLength: Integer;
+    function GetMetadata_FieldPrecision: Integer;
+    function GetMetadata_FieldScale: Integer;
+    function GetMetadata_FieldNullable: Boolean;
+    function GetMetadata_FieldUnicode: Boolean;
+    function GetMetadata_CustomFieldType: TioMetadataFieldType;
   end;
 
   IioContextProperties = interface(IioSqlItem)
