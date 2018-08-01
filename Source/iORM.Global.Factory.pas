@@ -42,12 +42,14 @@ uses
   iORM.DuckTyped.Factory, iORM.LazyLoad.Factory,
   iORM.LiveBindings.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM.MVVM.Factory, iORM.Containers.Factory,
-  iORM.Where.Factory, iORM.Strategy.Interfaces, iORM.Strategy.Factory;
+  iORM.Where.Factory, iORM.Strategy.Interfaces, iORM.Strategy.Factory,
+  iORM.DB.DBBuilder.Engine;
 
 Type
 
   TioContextFactoryRef = class of TioContextFactory;
   TioDBCreatorFactoryRef = class of TioDBCreatorFactory;
+  TioDBBuilderRef = class of TioDBBuilder;
   TioDBFactoryRef = class of TioDBFactory;
   TioDuckTypedFactoryRef = class of TioDuckTypedFactory;
   TioLazyLoadFactoryRef = class of TioLazyLoadFactory;
@@ -63,6 +65,7 @@ Type
   public
     class function ContextFactory: TioContextFactoryRef;
     class function DBCreatorFactory: TioDBCreatorFactoryRef;
+    class function DBBuilder: TioDBBuilderRef;
     class function DBFactory: TioDBFactoryRef;
     class function DuckTypedFactory: TioDuckTypedFactoryRef;
     class function LazyLoadFactory: TioLazyLoadFactoryRef;
@@ -92,6 +95,11 @@ end;
 class function TioGlobalFactory.ContextFactory: TioContextFactoryRef;
 begin
   Result := TioContextFactory;
+end;
+
+class function TioGlobalFactory.DBBuilder: TioDBBuilderRef;
+begin
+  Result := TioDBBuilder;
 end;
 
 class function TioGlobalFactory.DBCreatorFactory: TioDBCreatorFactoryRef;

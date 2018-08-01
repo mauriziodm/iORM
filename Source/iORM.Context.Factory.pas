@@ -262,6 +262,7 @@ begin
   for Prop in PropsFields do
   begin
     // M.M. 01/08/18 - Used by DBBuilder
+    // TODO: Gestire in base al tipo della proprietà
     PropMetadata_FieldType := ioMdVarchar;
     PropMetadata_FieldLength := 255;
     PropMetadata_FieldPrecision := 0;

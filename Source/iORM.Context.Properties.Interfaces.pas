@@ -108,14 +108,14 @@ type
     procedure SetMetadata_FieldScale(const AMetadata_FieldScale: Integer);
     procedure SetMetadata_FieldNullable(const AMetadata_FieldNullable: Boolean);
     procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
-    procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: TioMetadataFieldType);
+    procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
     function GetMetadata_FieldType: TioMetadataFieldType;
     function GetMetadata_FieldLength: Integer;
     function GetMetadata_FieldPrecision: Integer;
     function GetMetadata_FieldScale: Integer;
     function GetMetadata_FieldNullable: Boolean;
     function GetMetadata_FieldUnicode: Boolean;
-    function GetMetadata_CustomFieldType: TioMetadataFieldType;
+    function GetMetadata_CustomFieldType: string;
   end;
 
   IioContextProperties = interface(IioSqlItem)

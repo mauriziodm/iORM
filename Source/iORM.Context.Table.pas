@@ -224,7 +224,7 @@ end;
 function TioContextTable.GetSql: String;
 begin
   Result := inherited;
-  TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(Result);
+  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(Result);
 end;
 
 function TioContextTable.IndexListExists: Boolean;
