@@ -412,7 +412,7 @@ begin
   //  then close the BSA
   if not Assigned(AMasterObj) then
   begin
-    Self.InternalSetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
     Exit;
   end;
   // Extract master property value

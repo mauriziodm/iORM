@@ -50,6 +50,8 @@ object MaterialView: TMaterialView
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
     end
     object ButtonPost: TcxButton
       Left = 368
