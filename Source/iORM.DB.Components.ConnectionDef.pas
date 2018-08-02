@@ -252,7 +252,10 @@ begin
   else
     LDBFolder := '';
   end;
-  Result := TPath.GetFullPath(TPath.Combine(LDBFolder, FDatabase));
+  if not LDBFolder.IsEmpty then
+    Result := TPath.GetFullPath(TPath.Combine(LDBFolder, FDatabase))
+  else
+    Result := FDatabase;
 end;
 
 procedure TioCustomConnectionDef.Loaded;
