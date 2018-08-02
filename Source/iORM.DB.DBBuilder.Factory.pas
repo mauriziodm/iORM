@@ -32,104 +32,55 @@
 {***************************************************************************}
 
 
-
-unit iORM.CommonTypes;
+unit iORM.DB.DBBuilder.Factory;
 
 interface
 
 uses
-  System.Rtti, System.Generics.Collections, System.SysUtils;
-
-const
-  IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
-  IO_CLASSFROMFIELD_FIELDLENGTH = '255';
-  IO_CONNECTIONDEF_DEFAULTNAME = 'NO_NAME';
-  IO_INTEGER_NULL_VALUE = 0;
+  System.TypInfo,
+  System.Rtti,
+  System.Classes,
+  iORM.DB.DBBuilder.Interfaces,
+  iORM.DB.Interfaces,
+  iORM.Context.Properties.Interfaces,
+  Data.DB;
 
 type
-
-  // Object Status
-  TioObjectStatus = (osDirty = 0, osClean, osDeleted);
-
-  // Common ClassRef
-  TioClassRef = class of TObject;
-
-  // Orientation of  DB index
-  TioIndexOrientation = (ioAscending = 0, ioDescending);
-
-  // FD monitor and trace mode
-  TioMonitorMode = (mmDisabled = 0, mmRemote, mmFlatFile);
-
-  // Anonimous methods for ShowWait & CloseWait
-  TioShowWaitProc = reference to procedure;
-  TioHideWaitProc = reference to procedure;
-
-  TioViewDataType = (dtSingle, dtList);
-
-  // Selection Type (for selector ActiveBindSourceAdapters)
-  TioSelectionType = (stAppend, stInsert);
-
-  // Some pointers to TValue
-  PValue = ^TValue;
-
-  // Nullables
-  TioNullable<T> = record
-  const
-    ISNULL_VALUE = '$';
-  private
-    FValue: T;
-    FIsNull: String;
-    function GetValue: T;
-    procedure SetValue(const Value: T);
-    function GetHasValue: Boolean;
-    function GetIsNull: Boolean;
+  TioDBBuilderFactory = class
   public
-    procedure Clear;
-    property Value:T read GetValue write SetValue;
-    property IsNull:Boolean read GetIsNull;
-    property HasValue:Boolean read GetHasValue;
+    class function NewSqlGenerator: IioDBBuilderSqlGenerator;
+    class function NewBuilder: IioDBBuilder;
   end;
-  TioNullableString = TioNullable<String>;
-  TioNullableInteger = TioNullable<Integer>;
-  TioNullableFloat = TioNullable<Extended>;
-  TioNullableBoolean = TioNullable<Boolean>;
-  TioNullableDateTime = TioNullable<TDateTime>;
 
 implementation
 
 uses
-  iORM.Exceptions, System.TypInfo;
+  System.SysUtils,
+  iORM.Exceptions,
+  iORM.Attributes,
+  iORM.DB.ConnectionContainer,
+  iORM.DB.DBBuilder.Engine,
+  iORM.DB.DBBuilder.MSSqlServer.SqlGenerator;
 
-{ ioNullable<T> }
+{ TioDBBuilderFactory }
 
-procedure TioNullable<T>.Clear;
+class function TioDBBuilderFactory.NewBuilder: IioDBBuilder;
 begin
-  FIsNull := String.Empty;
+  Result := TioDBBuilder.Create;
 end;
 
-function TioNullable<T>.GetHasValue: Boolean;
+class function TioDBBuilderFactory.NewSqlGenerator: IioDBBuilderSqlGenerator;
 begin
-  result := (not IsNull);
+  case TioConnectionManager.GetConnectionInfo.ConnectionType of
+    //cdtFirebird:  Result := TioSqlDataConverterFirebird;
+    //cdtSQLite:    Result := TioDBBuilderSqLiteServerSqlGenerator;
+    cdtSQLServer: Result := TioDBBuilderMSSqlServerSqlGenerator.Create;
+  else
+    raise EioException.Create(Self.ClassName, 'NewSqlService', 'Connection type not found.');
+  end;
 end;
-
-function TioNullable<T>.GetIsNull: Boolean;
-begin
-  Result := (Length(FIsNull) = 0);
-end;
-
-function TioNullable<T>.GetValue: T;
-begin
-  if IsNull then
-    raise EioException.Create('ioNullable: The value is null.');
-  Result := FValue;
-end;
-
-procedure TioNullable<T>.SetValue(const Value: T);
-begin
-  FValue := Value;
-  FIsNull := ISNULL_VALUE;
-end;
-
 
 end.
+
+
 
