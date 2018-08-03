@@ -112,11 +112,12 @@ type
     function TableExists(const ADbName: String; const ATableName:String): Boolean;
     function BeginCreateTable(const ATableName:String): String;
     function EndCreateTable: String;
-    function BeginAlterTable(const ATableName:String): String;
+    function BeginAlterTable(const ARemark: String; const ATableName:String): String;
     function EndAlterTable: String;
+    function GetRemark(const AWarnings: Boolean): String;
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
-    function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty): Boolean;
+    function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out OWarnings: Boolean): Boolean;
     function CreateField(const AProperty:IioContextProperty): String;
     function CreateClassInfoField: String;
     function AddField(const AProperty:IioContextProperty): String;

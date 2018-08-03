@@ -199,6 +199,8 @@ var
   LIndex: ioIndex;
   LContext: IioContext;
   LDbExists: Boolean;
+  LWarnings: Boolean;
+  LRemark: string;
 begin
   try
     // Build DB structure analizing Model Rtti informations
@@ -272,18 +274,20 @@ begin
               if not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName) then
               begin
                 LSb.AppendLine();
-                LSb.AppendLine(LSqlGenerator.BeginAlterTable(LTableName));
+                LSb.AppendLine(LSqlGenerator.BeginAlterTable('', LTableName));
                 LSb.AppendLine(LSqlGenerator.AddField(LPairField.Value.GetProperty));
                 LSb.AppendLine(LSqlGenerator.EndAlterTable);
               end
               else
               begin
-                if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty) then
+                if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty, LWarnings) then
                 begin
+                  LRemark := LSqlGenerator.GetRemark(LWarnings);
+
                   LSb.AppendLine();
-                  LSb.AppendLine(LSqlGenerator.BeginAlterTable(LTableName));
-                  LSb.AppendLine(LSqlGenerator.AlterField(LPairField.Value.GetProperty));
-                  LSb.AppendLine(LSqlGenerator.EndAlterTable);
+                  LSb.AppendLine(LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName));
+                  LSb.AppendLine(LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty));
+                  LSb.AppendLine(LRemark + LSqlGenerator.EndAlterTable);
                 end;
               end;
             end;

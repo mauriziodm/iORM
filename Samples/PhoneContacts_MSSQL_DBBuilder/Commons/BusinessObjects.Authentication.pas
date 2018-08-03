@@ -20,7 +20,7 @@ uses
 
 type
 
-  //[ioEntity('Domains'), ioTrueClass, diImplements(IDomain)]
+  [ioEntity('Domains'), ioTrueClass, diImplements(IDomain)]
   TDomain = class(TBaseBo, IDomain)
   private
     FCode: string;
@@ -37,7 +37,7 @@ type
     property Description: string read GetDescription write SetDescription;
   end;
 
-  //[ioEntity('Groups'), ioTrueClass, diImplements(IGroup)]
+  [ioEntity('Groups'), ioTrueClass, diImplements(IGroup)]
   TGroup = class(TBaseBo, IGroup)
   private
     FCode: string;
@@ -54,7 +54,7 @@ type
     property Description: string read GetDescription write SetDescription;
   end;
 
-  //[ioEntity('Users'), ioTrueClass, diImplements(IUser)]
+  [ioEntity('Users'), ioTrueClass, diImplements(IUser)]
   TUser = class(TBaseBo, IUser)
   private
     FUserName: string;

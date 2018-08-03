@@ -58,6 +58,7 @@ type
     FCreateTableScript: String;
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
+    function ConversionTypeAdmitted(AColumnType: string; AModelColumnType: string): Boolean;
   protected
   public
     constructor Create(AOnlyCreateScript: Boolean); overload;
@@ -68,11 +69,12 @@ type
     function TableExists(const ADbName: String; const ATableName:String): Boolean;
     function BeginCreateTable(const ATableName:String): String;
     function EndCreateTable: String;
-    function BeginAlterTable(const ATableName:String): String;
+    function BeginAlterTable(const ARemark: String; const ATableName:String): String;
     function EndAlterTable: String;
+    function GetRemark(const AWarnings: Boolean): String;
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
-    function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty): Boolean;
+    function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out AWarnings: Boolean): Boolean;
     function CreateField(const AProperty:IioContextProperty): String;
     function CreateClassInfoField: String;
     function AddField(const AProperty:IioContextProperty): String;
@@ -285,12 +287,11 @@ begin
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.BeginAlterTable(
-  const ATableName: String): String;
+function TioDBBuilderMSSqlServerSqlGenerator.BeginAlterTable(const ARemark: String; const ATableName:String): String;
 begin
   FAlterTableScript := '';
   Result := '-- BEGIN ALTER TABLE '+sLineBreak;
-  Result := Result + Format('ALTER TABLE %s',[ATableName]);
+  Result := Result + Format('%s ALTER TABLE %s',[ARemark, ATableName]);
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
@@ -300,6 +301,57 @@ begin
   FCreateTableScript := '';
   Result := Format('CREATE TABLE %s (', [ATableName]);
   FCreateTableScript := FCreateTableScript + ' ' + Result;
+end;
+
+function TioDBBuilderMSSqlServerSqlGenerator.ConversionTypeAdmitted(AColumnType,
+  AModelColumnType: string): Boolean;
+var
+  LInvalidConversions: TStringList;
+begin
+  LInvalidConversions:=TStringList.Create;
+
+  try
+
+    LInvalidConversions.Add('datetime->decimal');
+    LInvalidConversions.Add('datetime->numeric');
+    LInvalidConversions.Add('datetime->int');
+    LInvalidConversions.Add('date->decimal');
+    LInvalidConversions.Add('date->numeric');
+    LInvalidConversions.Add('date->int');
+    LInvalidConversions.Add('time->numeric');
+    LInvalidConversions.Add('time->decimal');
+    LInvalidConversions.Add('time->int');
+
+    LInvalidConversions.Add('varchar->decimal');
+    LInvalidConversions.Add('varchar->int');
+    LInvalidConversions.Add('varchar->date');
+    LInvalidConversions.Add('varchar->time');
+    LInvalidConversions.Add('varchar->datetime');
+
+    LInvalidConversions.Add('nvarchar->decimal');
+    LInvalidConversions.Add('nvarchar->int');
+    LInvalidConversions.Add('nvarchar->date');
+    LInvalidConversions.Add('nvarchar->time');
+    LInvalidConversions.Add('nvarchar->datetime');
+
+    LInvalidConversions.Add('char->decimal');
+    LInvalidConversions.Add('char->int');
+    LInvalidConversions.Add('char->date');
+    LInvalidConversions.Add('char->time');
+    LInvalidConversions.Add('char->datetime');
+
+    LInvalidConversions.Add('nchar->decimal');
+    LInvalidConversions.Add('nchar->int');
+    LInvalidConversions.Add('nchar->date');
+    LInvalidConversions.Add('nchar->time');
+    LInvalidConversions.Add('nchar->datetime');
+
+    Result:=True;
+    If LInvalidConversions.IndexOf(AColumnType+'->'+AModelColumnType)>0 then Result:=False;
+
+  finally
+    LInvalidConversions.Free;
+  end;
 end;
 
 constructor TioDBBuilderMSSqlServerSqlGenerator.Create(
@@ -385,7 +437,8 @@ begin
   if not FOnlyCreateScript then
   begin
     // Execute Query
-    LQueryDrop.ExecSQL;
+    if LQueryDrop.SQL.Text.Length>0 then
+      LQueryDrop.ExecSQL;
   end;
 
   Result := LQueryDrop.SQL.Text;
@@ -418,7 +471,8 @@ begin
   if not FOnlyCreateScript then
   begin
     // Execute Query
-    LQueryDrop.ExecSQL;
+    if LQueryDrop.SQL.Text.Length>0 then
+      LQueryDrop.ExecSQL;
   end;
 
   Result := LQueryDrop.SQL.Text;
@@ -483,7 +537,7 @@ begin
   LQuery.Close;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty): Boolean;
+function TioDBBuilderMSSqlServerSqlGenerator.FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out AWarnings: Boolean): Boolean;
 var
   LQuery: IioQuery;
   LColumnName: string;
@@ -527,8 +581,17 @@ begin
       // Verify if something has been changed in FieldType
       if LColumnTyp.ToLower<>GetColumnType(AProperty).ToLower then
       begin
-        Result := True;
-        Break;
+        if ConversionTypeAdmitted(LColumnTyp.ToLower, GetColumnType(AProperty).ToLower) then
+        begin
+          Result := True;
+          Break;
+        end
+        else
+        begin
+          AWarnings := True;
+          Result := True;
+          Break;
+        end;
       end;
 
       // Verify if something has been changed in FieldLength
@@ -537,10 +600,20 @@ begin
          (LQuery.Fields.FieldByName('type_name').AsString='char') or
          (LQuery.Fields.FieldByName('type_name').AsString='nchar') then
       begin
-        if LColumnLength<>AProperty.GetMetadata_FieldLength then
+        // Verify if model length is >= db column otherwise warnings and statement not execute
+        if AProperty.GetMetadata_FieldLength<LColumnLength then
         begin
+          AWarnings := True;
           Result := True;
           Break;
+        end
+        else
+        begin
+          if LColumnLength<>AProperty.GetMetadata_FieldLength then
+          begin
+            Result := True;
+            Break;
+          end;
         end;
       end;
 
@@ -548,26 +621,53 @@ begin
       if (LQuery.Fields.FieldByName('type_name').AsString.ToLower='decimal') or
          (LQuery.Fields.FieldByName('type_name').AsString.ToLower='numeric') then
       begin
-        if LColumnLength<>AProperty.GetMetadata_FieldPrecision then
+        if AProperty.GetMetadata_FieldPrecision<LColumnLength then
         begin
+          AWarnings := True;
           Result := True;
           Break;
+        end
+        else
+        begin
+          if LColumnLength<>AProperty.GetMetadata_FieldPrecision then
+          begin
+            Result := True;
+            Break;
+          end;
         end;
 
         // Verify if something has been changed in FieldScale
         if not LQuery.Fields.FieldByName('Scale').Isnull then
-          if LColumnDecimals<>AProperty.GetMetadata_FieldScale then
+          if LColumnDecimals<AProperty.GetMetadata_FieldScale then
           begin
+            AWarnings := True;
             Result := True;
             Break;
+          end
+          else
+          begin
+            if LColumnDecimals<>AProperty.GetMetadata_FieldScale then
+            begin
+              Result := True;
+              Break;
+            end;
           end;
       end;
 
       // Verify if something has been changed in FieldNullable
       if LColumnNullable<>AProperty.GetMetadata_FieldNullable then
       begin
-        Result := True;
-        Break;
+        if AProperty.GetMetadata_FieldNullable and (not LColumnNullable) then
+        begin
+          AWarnings := True;
+          Result := True;
+          Break;
+        end
+        else
+        begin
+          Result := True;
+          Break;
+        end;
       end;
     end;
 
@@ -628,6 +728,15 @@ begin
     ioMdCustomFieldType:
       Result := AProperty.GetMetadata_CustomFieldType;
   end;
+end;
+
+function TioDBBuilderMSSqlServerSqlGenerator.GetRemark(
+  const AWarnings: Boolean): String;
+begin
+  if AWarnings then
+    Result := '-- '
+  else
+    Result := '';
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.TableExists(const ADbName: String; const ATableName:String): Boolean;

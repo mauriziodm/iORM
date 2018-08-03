@@ -125,7 +125,7 @@ object BuilderForm: TBuilderForm
     OnClick = CopyScriptButtonClick
   end
   object ioVCL1: TioVCL
-    Left = 128
-    Top = 104
+    Left = 344
+    Top = 96
   end
 end

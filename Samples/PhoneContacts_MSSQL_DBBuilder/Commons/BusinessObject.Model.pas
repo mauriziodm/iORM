@@ -37,7 +37,7 @@ type
     property ID: Integer read GetID write SetID;
     [ioInteger(10, False)]
     property PersonID:Integer read GetPersonID write SetPersonID;
-    [ioVarchar(70, True)]
+    [ioVarchar(50, True)]
     property PhoneType:String read FPhoneType write FPhoneType;
     [ioVarchar(35, True)]
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
@@ -51,7 +51,8 @@ type
     FID: Integer;
     [ioVarchar(100, False)]
     FLastName: String;
-    [ioVarchar(50, False)]
+    //[ioVarchar(50, False)]
+    [ioDateTime(True)]
     FFirstName: String;
     [ioHasMany('IPhoneNumber', 'PersonID', ioLazyLoad), ioInject]
     FPhones: IioList<IPhoneNumber>;
