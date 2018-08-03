@@ -100,7 +100,7 @@ type
     function GetSqlQualifiedFieldName: String;
     function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldTableName: String;
-    function GetSqlFieldName: String;
+    function GetSqlFieldName(AClearDelimiters: Boolean=False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
@@ -444,10 +444,13 @@ begin
   Result := FSqlFieldAlias;
 end;
 
-function TioProperty.GetSqlFieldName: String;
+function TioProperty.GetSqlFieldName(AClearDelimiters: Boolean): String;
 begin
 //  Result := FSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
+  if AClearDelimiters then
+    Result := FSqlFieldName
+  else
+    Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;

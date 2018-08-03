@@ -39,7 +39,8 @@ interface
 uses
   System.Generics.Collections, System.Rtti, System.Classes,
   iORM.DB.Interfaces, iORM.Context.Properties.Interfaces,
-  iORM.Context.Map.Interfaces, iORM.Context.Table.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.Context.Table.Interfaces,
+  iORM.Context.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -55,7 +56,7 @@ type
     // FieldName
     function GetFieldName: String;
     property FieldName:String read GetFieldName;
-    // IsKeyFeld
+    // IsKeyField
     function GetIsKeyField: Boolean;
     property IsKeyField:Boolean read GetIsKeyField;
     // FieldType (contains field type description with length if necessary)
@@ -74,6 +75,9 @@ type
     // IsClassFromFIeld
     function GetIsClassFromField: Boolean;
     property IsClassFromField:Boolean read GetIsClassFromField;
+    // IsSqlField
+    function GetIsSqlField: Boolean;
+    property IsSqlField:Boolean read GetIsSqlField;
   end;
 
   IioDBBuilderTable = interface
@@ -119,13 +123,16 @@ type
     function AlterField(const AProperty:IioContextProperty): String;
 
     function AddPrimaryKey(const ATableName: String; const AIDProperty: IioContextProperty): String;
-
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+    function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
+
+    function DropAllForeignKey: String;
+    function DropAllIndex: String;
   end;
 
   IioDBBuilder = interface
   ['{0D8F8F8F-12FA-4C7B-9CB8-3A4A5EAD7C43}']
-    function GenerateDBScript(const ADbName: string): string;
+    function GenerateDB(AOnlyCreateScript: Boolean; out OOutputScript: String; out OErrorMessage: String): Boolean;
   end;
 
 implementation

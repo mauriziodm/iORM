@@ -38,7 +38,10 @@ unit iORM.DB.MSSqlServer.SqlGenerator;
 interface
 
 uses
-  iORM.DB.SqLite.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces;
+  System.Classes,
+  System.SysUtils,
+  iORM.DB.SqLite.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces,
+  iORM.CommonTypes;
 
 type
 
@@ -47,9 +50,13 @@ type
   public
     class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
     class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
+    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
   end;
 
 implementation
+
+uses
+  iORM.SqlTranslator;
 
 { TioSqlGeneratorMSSqlServer }
 
@@ -73,5 +80,76 @@ begin
   // Build the query text
   AQuery.SQL.Add('select @@IDENTITY');
 end;
+
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean);
+var
+  LFieldList: TStrings;
+  LQueryText, LIndexOrientationText, LField, LUniqueText: String;
+begin
+  // Index Name
+  if AIndexName.IsEmpty then
+    AIndexName := Self.BuildIndexName(AContext, ACommaSepFieldList, AIndexOrientation, AUnique)
+  else
+    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
+  // Index orientation
+  case AIndexOrientation of
+    ioAscending: LIndexOrientationText := ' ASC';
+    ioDescending:  LIndexOrientationText := ' DESC';
+  end;
+  // Unique
+  if AUnique then
+    LUniqueText := 'UNIQUE '
+  else
+    LUniqueText := '';
+  // Field list
+  LFieldList := TStringList.Create;
+  try
+    LFieldList.Delimiter := ',';
+    LFieldList.DelimitedText := ACommaSepFieldList;
+    LQueryText := '';
+    for LField in LFieldList do
+    begin
+      if not LQueryText.IsEmpty then
+        LQueryText := LQueryText + ', ';
+      LQueryText := LQueryText + LField + LIndexOrientationText;
+    end;
+  finally
+    LFieldList.Free;
+  end;
+  // Build the query text
+  // -----------------------------------------------------------------
+  // compose the query text
+//  LQueryText := 'IF OBJECT_ID('+ QuotedStr(AIndexName)+') IS NOT NULL '+sLineBreak  // Prevents Error if Index not exists
+//              + 'BEGIN ' + sLineBreak
+//              + '  DROP '
+//              + LUniqueText
+//              + 'INDEX '
+//              + AIndexName + ' ON ' + AContext.GetTable.TableName + ' ' + sLineBreak
+//              + '  CREATE '
+//              + LUniqueText
+//              + 'INDEX '
+//              + AIndexName + ' ON ' + AContext.GetTable.TableName
+//              + ' (' + LQueryText + ')' + sLineBreak + ' '
+//              + 'END '+ sLineBreak
+//              + 'ELSE ' + sLineBreak
+//              + '  CREATE '
+//              + LUniqueText
+//              + 'INDEX '
+//              + AIndexName + ' ON ' + AContext.GetTable.TableName
+//              + ' (' + LQueryText + ')';
+
+  LQueryText := '  CREATE '
+              + LUniqueText
+              + 'INDEX '
+              + AIndexName + ' ON ' + AContext.GetTable.TableName
+              + ' (' + LQueryText + ')';
+
+  // Translate the query text
+  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, False);
+  // Assign the query text
+  AQuery.SQL.Add(LQueryText);
+  // -----------------------------------------------------------------
+end;
+
 
 end.

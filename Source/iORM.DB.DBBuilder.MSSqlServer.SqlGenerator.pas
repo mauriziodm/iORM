@@ -44,18 +44,23 @@ uses
   iORM.Attributes,
   iORM.DB.DBBuilder.Interfaces,
   iORM.DB.Interfaces,
+  iORM.DB.QueryEngine,
   iORM.Context.Properties.Interfaces,
-  Data.DB;
+  Data.DB, iORM.Context.Interfaces, iORM.CommonTypes;
 
 const
-  MASTER_CONNECTION_NAME = 'MSSQL_MASTER';
+  ConnectionName_MSSQL_MASTER = 'MSSQL_MASTER';
 
 type
-  TioDBBuilderMSSqlServerSqlGenerator = class (TInterfacedObject, IioDBBuilderSqlGenerator)
+  TioDBBuilderMSSqlServerSqlGenerator = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
+    FOnlyCreateScript: Boolean;
+    FCreateTableScript: String;
+    FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
   protected
   public
+    constructor Create(AOnlyCreateScript: Boolean); overload;
     function DatabaseExists(const ADbName: string): Boolean;
     function CreateDatabase(const ADbName: string): String;
     function UseDatabase(const ADbName: string): String;
@@ -74,21 +79,23 @@ type
     function AlterField(const AProperty:IioContextProperty): String;
 
     function AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
-
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+    function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
+
+    function DropAllForeignKey: String;
+    function DropAllIndex: String;
+
   end;
 
 implementation
 
 uses
   iORM.Exceptions,
-  iORM.CommonTypes,
-  iORM;
+  iORM, iORM.DB.Factory;
 
 { TioDBBuilderMSSqlServerSqlService }
 
-function TioDBBuilderMSSqlServerSqlGenerator.CreateField(
-  const AProperty: IioContextProperty): String;
+function TioDBBuilderMSSqlServerSqlGenerator.CreateField(const AProperty:IioContextProperty): String;
 var
   LFieldName: string;
   LFieldType: string;
@@ -178,67 +185,170 @@ begin
   end;
 
   Result :=  LFieldName + '[' + LFieldType + ']' + LKeyOptions + ' '+LFieldLength+' '+LNullable + ',';
+
+  FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.AddField(
-  const AProperty: IioContextProperty): String;
+function TioDBBuilderMSSqlServerSqlGenerator.AddField(const AProperty:IioContextProperty): String;
+var
+  LRow: string;
 begin
-  Result := Format('ADD %s ',[Self.CreateField(AProperty)]);
+  LRow := Format('ADD %s ',[Self.CreateField(AProperty)]).Trim;
+  Result := LRow.Substring(0, LRow.Length-1);
+  FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+var
+  LQuery: IioQuery;
 begin
+//  Result:='IF OBJECT_ID('+QuotedStr('FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName)+') IS NOT NULL '+sLineBreak+
+//          'BEGIN '+sLineBreak+
+//          '  ALTER TABLE ['+ASourceTableName+'] '+
+//            'DROP CONSTRAINT '+
+//            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+sLineBreak+
+//          '  ALTER TABLE ['+ASourceTableName+'] '+
+//            'ADD CONSTRAINT '+
+//            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
+//            ' FOREIGN KEY'+
+//            '(['+ASourceFieldName+'])'+
+//            ' REFERENCES '+ADestinationTableName+
+//            '(['+ADestinationFieldName+'])'+sLineBreak+' '+
+//          'END '+sLineBreak+
+//          'ELSE '+sLineBreak+
+//          '  ALTER TABLE ['+ASourceTableName+'] '+
+//            'ADD CONSTRAINT '+
+//            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
+//            ' FOREIGN KEY'+
+//            '(['+ASourceFieldName+'])'+
+//            ' REFERENCES '+ADestinationTableName+
+//            '(['+ADestinationFieldName+'])'+sLineBreak+' ';
+
   Result:='ALTER TABLE ['+ASourceTableName+'] '+
-            'ADD CONSTRAINT '+
-            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
-            ' FOREIGN KEY'+
-            '(['+ASourceFieldName+'])'+
-            ' REFERENCES '+ADestinationTableName+
-            '(['+ADestinationFieldName+'])';
+          'ADD CONSTRAINT '+
+          'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
+          ' FOREIGN KEY'+
+          '(['+ASourceFieldName+'])'+
+          ' REFERENCES '+ADestinationTableName+
+          '(['+ADestinationFieldName+'])';
+
+  // Execute Query
+  if not FOnlyCreateScript then
+  begin
+    LQuery := io.GlobalFactory.DBFactory.Query('');
+    LQuery.SQL.Add(Result);
+    LQuery.ExecSQL;
+  end;
+end;
+
+function TioDBBuilderMSSqlServerSqlGenerator.AddIndex(const AContext: IioContext; const AIndexName,
+  ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
+  const AUnique: Boolean): String;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
+  Result := LQuery.SQL.Text;
+
+  // Execute Query
+  if not FOnlyCreateScript then
+  begin
+    LQuery := io.GlobalFactory.DBFactory.Query('');
+    LQuery.SQL.Add(Result);
+    LQuery.ExecSQL;
+  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
+var
+  LQuery: IioQuery;
 begin
   Result := 'ALTER TABLE ['+ATableName+'] '+
             'ADD CONSTRAINT '+'PK_'+ATableName+'_'+AIDProperty.GetName+' PRIMARY KEY CLUSTERED'+
             '('+AIDProperty.GetSqlFieldName+')';
+
+  // Execute Query
+  if not FOnlyCreateScript then
+  begin
+    LQuery := io.GlobalFactory.DBFactory.Query('');
+    LQuery.SQL.Add(Result);
+    LQuery.ExecSQL;
+  end;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.AlterField(
-  const AProperty: IioContextProperty): String;
+function TioDBBuilderMSSqlServerSqlGenerator.AlterField(const AProperty:IioContextProperty): String;
+var
+  LRow: String;
 begin
-  Result := Format('ALTER COLUMN %s ',[Self.CreateField(AProperty)]);
+  LRow := Format('ALTER COLUMN %s ',[Self.CreateField(AProperty)]).Trim;
+  Result := LRow.Substring(0, LRow.Length-1);
+  FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.BeginAlterTable(
   const ATableName: String): String;
 begin
+  FAlterTableScript := '';
   Result := '-- BEGIN ALTER TABLE '+sLineBreak;
   Result := Result + Format('ALTER TABLE %s',[ATableName]);
+  FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.BeginCreateTable(
   const ATableName: String): String;
 begin
+  FCreateTableScript := '';
   Result := Format('CREATE TABLE %s (', [ATableName]);
+  FCreateTableScript := FCreateTableScript + ' ' + Result;
+end;
+
+constructor TioDBBuilderMSSqlServerSqlGenerator.Create(
+  AOnlyCreateScript: Boolean);
+begin
+  FOnlyCreateScript := AOnlyCreateScript;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.CreateClassInfoField: String;
 begin
   Result := '[' + IO_CLASSFROMFIELD_FIELDNAME +']' + '[' + 'VARCHAR' + ']' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+'NULL' + ',';
+  FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.CreateDatabase(const ADbName: string): string;
+function TioDBBuilderMSSqlServerSqlGenerator.CreateDatabase(const ADbName: string): String;
+var
+  LQuery: IioQuery;
 begin
-  Result := Format('CREATE DATABASE [%s]',[ADbName]);
+  // Create new connection in database master
+  io.Connections.NewSQLServerConnectionDef(
+                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.AsString['Server'],
+                  'master',
+                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.UserName,
+                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.Password,False, False, False,
+                  ConnectionName_MSSQL_MASTER);
+
+  LQuery := io.GlobalFactory.DBFactory.Query(ConnectionName_MSSQL_MASTER);
+  LQuery.SQL.Add(Format('CREATE DATABASE [%s]',[ADbName]));
+
+  // N.B. Il database viene sempre generato per evitare problemi di permessi
+  // nei controlli successivi
+  LQuery.ExecSQL;
+
+  Result := LQuery.SQL.Text;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.DatabaseExists(const ADbName: string): Boolean;
 var
   LQuery: IioQuery;
 begin
-  LQuery := io.GlobalFactory.DBFactory.Query(MASTER_CONNECTION_NAME);
+  // Create new connection in database master
+  io.Connections.NewSQLServerConnectionDef(
+                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.AsString['Server'],
+                  'master',
+                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.UserName,
+                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.Password,False, False, False,
+                  ConnectionName_MSSQL_MASTER);
 
+  LQuery := io.GlobalFactory.DBFactory.Query(ConnectionName_MSSQL_MASTER);
   LQuery.SQL.Add('select db_id('+QuotedStr(ADbName)+') as DBID');
   LQuery.Open;
 
@@ -250,14 +360,102 @@ begin
   LQuery.Close;
 end;
 
+function TioDBBuilderMSSqlServerSqlGenerator.DropAllForeignKey: String;
+var
+  LQuery: IioQuery;
+  LQueryDrop: IioQuery;
+begin
+  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+
+  // Retrieve All Foreign Key
+  LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery.SQL.Add('select t.name as tname, i.name as cname from sys.tables t');
+  LQuery.SQL.Add('inner join sys.foreign_keys i');
+  LQuery.SQL.Add('on t.object_id=i.parent_object_id');
+  LQuery.SQL.Add('where i.name like ''FK_%''');
+  LQuery.Open;
+
+  while not LQuery.Eof do
+  begin
+    LQueryDrop.SQL.Add(Format('ALTER TABLE %s DROP CONSTRAINT %s',['['+LQuery.Fields.FieldByName('tname').AsString+']',LQuery.Fields.FieldByName('cname').AsString]));
+
+    LQuery.Next;
+  end;
+
+  if not FOnlyCreateScript then
+  begin
+    // Execute Query
+    LQueryDrop.ExecSQL;
+  end;
+
+  Result := LQueryDrop.SQL.Text;
+  LQuery.Close;
+end;
+
+function TioDBBuilderMSSqlServerSqlGenerator.DropAllIndex: String;
+var
+  LQuery: IioQuery;
+  LQueryDrop: IioQuery;
+begin
+  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+
+  // Retrieve All Foreign Key
+  LQuery := io.GlobalFactory.DBFactory.Query('');
+
+  LQuery.SQL.Add('select i.name as iname, t.name as tname from sys.tables t');
+  LQuery.SQL.Add('inner join sys.indexes i');
+  LQuery.SQL.Add('on t.object_id=i.object_id');
+  LQuery.SQL.Add('where i.name like ''IDX_%''');
+  LQuery.Open;
+
+  while not LQuery.Eof do
+  begin
+    LQueryDrop.SQL.Add(Format('DROP INDEX %s ON %s ',[LQuery.Fields.FieldByName('iname').AsString,'['+LQuery.Fields.FieldByName('tname').AsString+']']));
+
+    LQuery.Next;
+  end;
+
+  if not FOnlyCreateScript then
+  begin
+    // Execute Query
+    LQueryDrop.ExecSQL;
+  end;
+
+  Result := LQueryDrop.SQL.Text;
+
+  LQuery.Close;
+end;
+
 function TioDBBuilderMSSqlServerSqlGenerator.EndAlterTable: String;
+var
+  LQuery: IioQuery;
 begin
   Result := '-- END ALTER TABLE';
+  FAlterTableScript := FAlterTableScript + ' ' + Result;
+
+  // Execute Query
+  if not FOnlyCreateScript then
+  begin
+    LQuery := io.GlobalFactory.DBFactory.Query('');
+    LQuery.SQL.Add(FAlterTableScript);
+    LQuery.ExecSQL;
+  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.EndCreateTable: String;
+var
+  LQuery: IioQuery;
 begin
   Result := ')';
+  FCreateTableScript := FCreateTableScript + ' ' + Result;
+
+  // Execute Query
+  if not FOnlyCreateScript then
+  begin
+    LQuery := io.GlobalFactory.DBFactory.Query('');
+    LQuery.SQL.Add(FCreateTableScript);
+    LQuery.ExecSQL;
+  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
@@ -292,10 +490,11 @@ var
   LColumnTyp: string;
   LColumnLength: Integer;
   LColumnDecimals: Integer;
-  LColumnPrecision: Integer;
   LColumnNullable: Boolean;
   LConnectionDefName: string;
 begin
+  LColumnLength := 0;
+
   Result := False;
   LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
   LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
@@ -311,8 +510,12 @@ begin
       LColumnTyp:=LQuery.Fields.FieldByName('type_name').AsString.Replace('identity','',[rfReplaceAll]).Trim;
 
       if (LQuery.Fields.FieldByName('type_name').AsString='decimal') or
-         (LQuery.Fields.FieldByName('type_name').AsString='numeric') then
-        LColumnPrecision:=LQuery.Fields.FieldByName('Precision').AsInteger
+         (LQuery.Fields.FieldByName('type_name').AsString='numeric') or
+         (LQuery.Fields.FieldByName('type_name').AsString='varchar') or
+         (LQuery.Fields.FieldByName('type_name').AsString='nvarchar') or
+         (LQuery.Fields.FieldByName('type_name').AsString='char') or
+         (LQuery.Fields.FieldByName('type_name').AsString='nchar') then
+        LColumnLength:=LQuery.Fields.FieldByName('Precision').AsInteger
       else
         LColumnLength:=LQuery.Fields.FieldByName('Length').AsInteger;
       if LQuery.Fields.FieldByName('Scale').Isnull then
@@ -345,7 +548,7 @@ begin
       if (LQuery.Fields.FieldByName('type_name').AsString.ToLower='decimal') or
          (LQuery.Fields.FieldByName('type_name').AsString.ToLower='numeric') then
       begin
-        if LColumnPrecision<>AProperty.GetMetadata_FieldPrecision then
+        if LColumnLength<>AProperty.GetMetadata_FieldPrecision then
         begin
           Result := True;
           Break;
@@ -431,8 +634,8 @@ function TioDBBuilderMSSqlServerSqlGenerator.TableExists(const ADbName: String; 
 var
   LQuery: IioQuery;
 begin
-  LQuery := io.GlobalFactory.DBFactory.Query(MASTER_CONNECTION_NAME);
-  LQuery.SQL.Add('select object_id('+QuotedStr(ADbName+'..'+ATableName)+') as TableID');
+  LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery.SQL.Add('select object_id('+QuotedStr(ATableName)+') as TableID');
 
   LQuery.Open;
 

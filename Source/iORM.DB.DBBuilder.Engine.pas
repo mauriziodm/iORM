@@ -51,6 +51,7 @@ type
   strict private
     FFieldName: String;
     FIsKeyField: Boolean;
+    FIsSqlField: Boolean;
     FProperty: IioContextProperty;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     FDBFieldExist: Boolean;
@@ -61,8 +62,10 @@ type
     function GetFieldName: String;
     // FieldType
     function GetFieldType: String;
-    // IsKeyFeld
+    // IsKeyField
     function GetIsKeyField: Boolean;
+    // IsKeyField
+    function GetIsSqlField: Boolean;
     // DBFieldExists
     procedure SetDBFieldExist(AValue:Boolean);
     function GetDBFieldExist: Boolean;
@@ -73,10 +76,11 @@ type
     function GetIsClassFromField: Boolean;
     property IsClassFromField:Boolean read GetIsClassFromField;
   public
-    constructor Create(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean);
+    constructor Create(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField: Boolean);
     property FieldName:String read GetFieldName;
     property FieldType:String read GetFieldType;
     property IsKeyField:Boolean read GetIsKeyField;
+    property IsSqlField:Boolean read GetIsSqlField;
     property DBFieldExist:Boolean read GetDBFieldExist write SetDBFieldExist;
     property DBFieldSameType:Boolean read GetDBFieldSameType write SetDBFieldSameType;
     // Rtti property reference
@@ -119,7 +123,7 @@ type
     FTables: TioDBBuilderTableList;
     FSqlGenerator: IioDBBuilderSqlGenerator;
   strict protected
-    function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean): IioDBBuilderField;
+    function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
     function GetTable(const ATableName: String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBBuilderSqlGenerator; const AMap:IioMap): IioDBBuilderTable;
     function FindOrCreateTable(const ATableName:String; const AIsClassFromField:Boolean; const AMap:IioMap): IioDBBuilderTable;
     procedure LoadTableStructure(AMap: IioMap);
@@ -127,7 +131,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GenerateDBScript(const ADbName: string): string;
+    function GenerateDB(AOnlyCreateScript: Boolean; out OOutputScript: String; out OErrorMessage: String): Boolean;
   end;
 
 implementation
@@ -142,7 +146,7 @@ uses
   iORM.Containers.Interfaces,
   iORM.Resolver.Interfaces,
   iORM.Context.Factory,
-  iORM.Context.Interfaces, System.Rtti, iORM.CommonTypes;
+  iORM.Context.Interfaces, System.Rtti, iORM.CommonTypes, iORM.DB.Factory;
 
 { TioDBBuilder }
 
@@ -172,7 +176,7 @@ begin
   Self.FTables.Add(ATableName, Result);
 end;
 
-function TioDBBuilder.GenerateDBScript(const ADbName: string): string;
+function TioDBBuilder.GenerateDB(AOnlyCreateScript: Boolean; out OOutputScript: String; out OErrorMessage: String): Boolean;
 var
   LSb: TStringBuilder;
   LSqlGenerator: IioDBBuilderSqlGenerator;
@@ -192,135 +196,182 @@ var
   LSourceFieldName: string;
   LDestinationTableName: string;
   LDestinationFieldName: string;
+  LIndex: ioIndex;
+  LContext: IioContext;
+  LDbExists: Boolean;
 begin
-  // Build DB structure analizing Model Rtti informations
-  Self.LoadDBStructure;
-
-  LSb := TStringBuilder.Create;
-
   try
-    LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator;
-    LDatabaseName := ADbName;
+    // Build DB structure analizing Model Rtti informations
+    Self.LoadDBStructure;
 
-    // Verification of Database Existence
-    if not LSqlGenerator.DatabaseExists(LDatabaseName) then
-    begin
-      LSb.AppendLine(LSqlGenerator.CreateDatabase(LDatabaseName));
-    end;
+    LSb := TStringBuilder.Create;
 
-    // Move into Current Database
-    LSb.AppendLine();
-    LSb.AppendLine(LSqlGenerator.UseDatabase(LDatabaseName));
+    try
+      LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AOnlyCreateScript);
+      LDatabaseName := TioDBFactory.ConnectionManager.GetConnectionDefByName.Params.Database;
 
-    // Loop for all entities (model classes) of the application
-    for LPairTable in FTables do
-    begin
-      LTableName := LPairTable.Value.TableName;
+      // Verification of Database Existence
+      LDbExists := LSqlGenerator.DatabaseExists(LDatabaseName);
 
-      // Check Table Existence
-      if not LSqlGenerator.TableExists(LDatabaseName, LTableName) then
+      if not LDbExists then
+      begin
+        LSqlGenerator.CreateDatabase(LDatabaseName);
+      end;
+
+      // Move into Current Database
+      if AOnlyCreateScript then
       begin
         LSb.AppendLine();
-        LSb.AppendLine(LSqlGenerator.BeginCreateTable(LTableName));
+        LSb.AppendLine(LSqlGenerator.UseDatabase(LDatabaseName));
+      end;
 
-        //for LContextProperty in LPair.Value.GetMap.GetProperties do
-        //  LSb.AppendLine(LSqlGenerator.CreateField(LContextProperty));
-
-        for LPairField in LPairTable.Value.Fields do
-        begin
-          LSb.AppendLine(LSqlGenerator.CreateField(LPairField.Value.GetProperty));
-        end;
-
-        if LPairTable.Value.IsClassFromField then
-          LSb.AppendLine(LSqlGenerator.CreateClassInfoField);
-
-
-        LSb.AppendLine(LSqlGenerator.EndCreateTable);
-
-        // Generate Primary Key
-        LSb.AppendLine(LSqlGenerator.AddPrimaryKey(LTableName, LPairTable.Value.IDField.GetProperty));
-      end
-      else
+      if LDbExists then
       begin
+        // Remove All FK and Index
+        LSb.AppendLine();
+        LSb.AppendLine(LSqlGenerator.DropAllForeignKey);
+        LSb.AppendLine();
+        LSb.AppendLine(LSqlGenerator.DropAllIndex);
+      end;
 
-//        for LContextProperty in LPairTable.Value.GetMap.GetProperties do
-//        begin
-        for LPairField in LPairTable.Value.Fields do
+      // Loop for all entities (model classes) of the application
+      for LPairTable in FTables do
+      begin
+        LTableName := LPairTable.Value.TableName;
+
+        // Check Table Existence
+        if (not LDbExists) or (not LSqlGenerator.TableExists(LDatabaseName, LTableName)) then
         begin
-          if not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName) then
+          LSb.AppendLine();
+          LSb.AppendLine(LSqlGenerator.BeginCreateTable(LTableName));
+
+          //for LContextProperty in LPair.Value.GetMap.GetProperties do
+          //  LSb.AppendLine(LSqlGenerator.CreateField(LContextProperty));
+
+          for LPairField in LPairTable.Value.Fields do
           begin
-            LSb.AppendLine();
-            LSb.AppendLine(LSqlGenerator.BeginAlterTable(LTableName));
-            LSb.AppendLine(LSqlGenerator.AddField(LPairField.Value.GetProperty));
-            LSb.AppendLine(LSqlGenerator.EndAlterTable);
-          end
-          else
+            if LPairField.Value.IsSqlField then
+              LSb.AppendLine(LSqlGenerator.CreateField(LPairField.Value.GetProperty));
+          end;
+
+          if LPairTable.Value.IsClassFromField then
+            LSb.AppendLine(LSqlGenerator.CreateClassInfoField);
+
+
+          LSb.AppendLine(LSqlGenerator.EndCreateTable);
+
+          // Generate Primary Key
+          LSb.AppendLine(LSqlGenerator.AddPrimaryKey(LTableName, LPairTable.Value.IDField.GetProperty));
+        end
+        else
+        begin
+          for LPairField in LPairTable.Value.Fields do
           begin
-            if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty) then
+            if LPairField.Value.IsSqlField then
             begin
-              LSb.AppendLine();
-              LSb.AppendLine(LSqlGenerator.BeginAlterTable(LTableName));
-              LSb.AppendLine(LSqlGenerator.AlterField(LPairField.Value.GetProperty));
-              LSb.AppendLine(LSqlGenerator.EndAlterTable);
+              if not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName) then
+              begin
+                LSb.AppendLine();
+                LSb.AppendLine(LSqlGenerator.BeginAlterTable(LTableName));
+                LSb.AppendLine(LSqlGenerator.AddField(LPairField.Value.GetProperty));
+                LSb.AppendLine(LSqlGenerator.EndAlterTable);
+              end
+              else
+              begin
+                if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty) then
+                begin
+                  LSb.AppendLine();
+                  LSb.AppendLine(LSqlGenerator.BeginAlterTable(LTableName));
+                  LSb.AppendLine(LSqlGenerator.AlterField(LPairField.Value.GetProperty));
+                  LSb.AppendLine(LSqlGenerator.EndAlterTable);
+                end;
+              end;
             end;
           end;
         end;
       end;
-    end;
 
-    // Add Foreign Key After Generated All Table
-    for LPairTable in FTables do
-    begin
-      LSourceTableName := LPairTable.Value.TableName;
-
-      for LPairField in LPairTable.Value.Fields do
+      // Add Indexes After Generated All Tables
+      for LPairTable in FTables do
       begin
-        LRel := LPairField.Value.GetProperty.GetRelationType;
-
-        if LRel = ioRTNone then
-          Continue;
-
-        if LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo] then
+        for LIndex in LPairTable.Value.IndexList do
         begin
-          LChildTypeName:=LPairField.Value.GetProperty.GetRelationChildTypeName;
-          LChildTypeAlias:=LPairField.Value.GetProperty.GetRelationChildTypeAlias;
-          LChildPropertyName:=LPairField.Value.GetProperty.GetRelationChildPropertyName;
-          // Resolve the type and alias
-          LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LChildTypeName, LChildTypeAlias, rmAll);
-          // Loop for all classes in the sesolved type list
-          for LResolvedTypeName in LResolvedTypeList do
+          LContext := TioContextFactory.Context(LPairTable.Value.GetMap.GetClassName);
+
+          // Create Index
+          LSb.AppendLine();
+          LSb.AppendLine(LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique));
+        end;
+      end;
+
+      // Add Foreign Key After Generated All Tables
+      for LPairTable in FTables do
+      begin
+        for LPairField in LPairTable.Value.Fields do
+        begin
+          LRel := LPairField.Value.GetProperty.GetRelationType;
+
+          if LRel = ioRTNone then
+            Continue;
+
+          if LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo] then
           begin
-            // Get the Context for the current ResolverTypeName (Child)
-            LChildContext := TioContextFactory.Context(LResolvedTypeName);
+            LChildTypeName:=LPairField.Value.GetProperty.GetRelationChildTypeName;
+            LChildTypeAlias:=LPairField.Value.GetProperty.GetRelationChildTypeAlias;
+            LChildPropertyName:=LPairField.Value.GetProperty.GetRelationChildPropertyName;
+            // Resolve the type and alias
+            LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LChildTypeName, LChildTypeAlias, rmAll);
+            // Loop for all classes in the sesolved type list
+            for LResolvedTypeName in LResolvedTypeList do
+            begin
+              // Get the Context for the current ResolverTypeName (Child)
+              LChildContext := TioContextFactory.Context(LResolvedTypeName);
 
-            LSourceFieldName := LPairField.Value.GetProperty.GetName;
-            LDestinationTableName := LChildContext.GetTable.TableName;
+              // Search MasterTable ID Property
+              if LRel in [ioRTBelongsTo] then
+              begin
+                LSourceTableName := LPairTable.Value.TableName;
+                LSourceFieldName := LPairField.Value.GetProperty.GetName;
+                LDestinationTableName := LChildContext.GetTable.TableName;
+                LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
+              end
+              else
+              begin
+                LSourceTableName := LChildContext.GetTable.TableName;
+                LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetSqlFieldName(True);
+                LDestinationTableName := LPairTable.Value.TableName;
+                LDestinationFieldName := LChildContext.GetProperties.GetIdProperty.GetName;
+              end;
 
-            // Search MasterTable ID Property
-            if LRel in [ioRTBelongsTo] then
-              LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName
-            else
-              LDestinationFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetName;
-
-            LSb.AppendLine();
-            LSb.AppendLine(LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName));
+                // Create FK
+                LSb.AppendLine();
+                LSb.AppendLine(LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName));
+            end;
           end;
         end;
       end;
+
+      Result := True;
+      OErrorMessage := '';
+      OOutputScript := LSb.ToString;
+
+    finally
+      LSb.Free;
     end;
 
-    Result := LSb.ToString;
-
-  finally
-    LSb.Free;
+  except
+    on E: Exception do
+    begin
+      Result := False;
+      OErrorMessage := E.Message;
+      OOutputScript := '';
+    end;
   end;
 end;
 
-function TioDBBuilder.GetField(AFieldName: String; AIsKeyField: Boolean;
-  AProperty: IioContextProperty; ASqlGenerator: IioDBBuilderSqlGenerator;
-  AIsClassFromField: Boolean): IioDBBuilderField;
+function TioDBBuilder.GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
 begin
-  Result := TioDBBuilderField.Create(AFieldName, AIsKeyField, AProperty, ASqlGenerator, AIsClassFromField);
+  Result := TioDBBuilderField.Create(AFieldName, AIsKeyField, AProperty, ASqlGenerator, AIsClassFromField, AIsSqlField);
 end;
 
 function TioDBBuilder.GetTable(const ATableName: String;
@@ -349,6 +400,7 @@ var
   LIndex: ioIndex;
   ATableName: String;
   ARttiType: TRttiInstanceType;
+  LIsSqlField: Boolean;
 begin
   // If the current table is not to be considered for the AutoCreateDatabase...
   if not AMap.GetTable.GetAutoCreateDB then
@@ -360,48 +412,45 @@ begin
   // Loop for properties
   for AProperty in AMap.GetProperties do
   begin
+    // Used to discriminate the fields to be used in DDL statements
+    LIsSqlField := True;
+
     // For creation purpose a HasMany or HasOne relation property
     //  must not create the field
     if AProperty.IsSkipped
     or (AProperty.GetRelationType = ioRTHasMany)
     or (AProperty.GetRelationType = ioRTHasOne)
-      then Continue;
+      then LIsSqlField := False;
+
     // If not already exixts create and add it to the list
     if ATable.FieldExists(AProperty.GetSqlFieldName) then Continue;
+
     AField := Self.GetField(AProperty.GetSqlFieldName
                                           ,(AProperty = AMap.GetProperties.GetIdProperty)
                                           ,AProperty
                                           ,FSqlGenerator
                                           ,False
+                                          ,LIsSqlField
                                           );
     ATable.Fields.Add(AField.FieldName, AField);
   end;
-  // If ClassFromField is enabled then add the field
-  // If not already exixts create and add it to the list
-//  if ATable.IsClassFromField and (not ATable.FieldExists(IO_CLASSFROMFIELD_FIELDNAME)) then
-//  begin
-//    AField := Self.GetField(IO_CLASSFROMFIELD_FIELDNAME
-//                                          ,False
-//                                          ,nil
-//                                          ,FSqlGenerator
-//                                          ,True
-//                                          );
-//    ATable.Fields.Add(AField.FieldName, AField);
-//    ATable.IsClassForm
-//  end;
   // If some explicit index is present then add it to the list
   if AMap.GetTable.IndexListExists then
     for LIndex in AMap.GetTable.GetIndexList(False) do
-      ATable.IndexList.Add(LIndex);
+    begin
+      if ATable.IndexList.IndexOf(LIndex)=-1 then
+        ATable.IndexList.Add(LIndex);
+    end;
 end;
 
 { TioDBBuilderField }
 
-constructor TioDBBuilderField.Create(AFieldName: String; AIsKeyField: Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean);
+constructor TioDBBuilderField.Create(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField: Boolean);
 begin
   FSqlGenerator := ASqlGenerator;
   FFieldName := AFieldName;
   FIsKeyField := AIsKeyField;
+  FIsSqlField := AIsSqlField;
   FProperty := AProperty;
   FDBFieldExist := False;
   FDBFieldSameType := False;
@@ -440,6 +489,11 @@ end;
 function TioDBBuilderField.GetIsKeyField: Boolean;
 begin
   Result := FIsKeyField;
+end;
+
+function TioDBBuilderField.GetIsSqlField: Boolean;
+begin
+  Result := FIsSqlField;
 end;
 
 function TioDBBuilderField.GetProperty: IioContextProperty;

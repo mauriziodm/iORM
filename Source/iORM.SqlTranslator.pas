@@ -123,9 +123,9 @@ begin
   if APropName <> '' then
   begin
     if FQualifiedFieldName then
-      Result := Result + '.' + AMap.GetProperties.GetPropertyByName(APropName).GetSqlFieldName
+      Result := Result + '.' + AMap.GetProperties.GetPropertyByName(APropName).GetSqlFieldName(True)
     else
-      Result := AMap.GetProperties.GetPropertyByName(APropName).GetSqlFieldName;
+      Result := AMap.GetProperties.GetPropertyByName(APropName).GetSqlFieldName(True);
   end;
 end;
 

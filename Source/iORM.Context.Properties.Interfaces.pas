@@ -63,7 +63,7 @@ type
     function GetName: string;
     function GetSqlQualifiedFieldName: String;
     function GetSqlFullQualifiedFieldName: String;
-    function GetSqlFieldName: String;
+    function GetSqlFieldName(AClearDelimiters: Boolean=False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;

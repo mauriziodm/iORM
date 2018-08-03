@@ -183,6 +183,8 @@ contains
   iORM.AbstractionLayer.Framework.FMX in '..\..\Source\iORM.AbstractionLayer.Framework.FMX.pas',
   iORM.DB.Components.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.Components.ConnectionDef.MSSQLServer.pas',
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
-  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas';
+  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
+  iORM.DB.DBBuilder.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.MSSqlServer.SqlGenerator.pas',
+  iORM.DB.DBBuilder.Interfaces in '..\..\Source\iORM.DB.DBBuilder.Interfaces.pas';
 
 end.

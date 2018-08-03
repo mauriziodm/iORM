@@ -29,26 +29,43 @@ type
   IPerson = interface(IInvokable)
     ['{0F8EAEE5-6E59-4A95-B08C-8CD1F31C32D3}']
     procedure SetID(AValue:Integer);
-    function GetID: Integer;
-    property ID:Integer read GetID write SetID;
-
     procedure SetFirstName(AValue:String);
-    function GetFirstName: String;
-    property FirstName:String read GetFirstName write SetFirstName;
-
     procedure SetLastName(AValue:String);
-    function GetLastName: String;
-    property LastName:String read GetLastName write SetLastName;
-
     procedure SetPhones(AValue:IioList<IPhoneNumber>);
+    function GetID: Integer;
+    function GetFirstName: String;
+    function GetLastName: String;
     function GetPhones: IioList<IPhoneNumber>;
-    property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
-
     function GetFullName: String;
-    property FullName:String read GetFullName;
-
     function GetClassNameProp: String;
+    function GetSalary: Currency;
+    procedure SetSalary(const Value: Currency);
+    function GetPhoto: String;
+    procedure SetPhoto(const Value: String);
+    function GetBirthDate: TDate;
+    function GetBirthTime: TTime;
+    function GetLastUpdate: TDateTime;
+    procedure SetBirthDate(const Value: TDate);
+    procedure SetBirthTime(const Value: TTime);
+    procedure SetLastUpdate(const Value: TDateTime);
+    function GetFloatField: Double;
+    function GetIntegerField: Integer;
+    procedure SetFloatField(const Value: Double);
+    procedure SetIntegerField(const Value: Integer);
+
+    property ID:Integer read GetID write SetID;
+    property FirstName:String read GetFirstName write SetFirstName;
+    property LastName:String read GetLastName write SetLastName;
+    property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
+    property FullName:String read GetFullName;
     property ClassNameProp:String read GetClassNameProp;
+    property Salary: Currency read GetSalary write SetSalary;
+    property Photo: String read GetPhoto write SetPhoto;
+    property BirthDate: TDate read GetBirthDate write SetBirthDate;
+    property BirthTime: TTime read GetBirthTime write SetBirthTime;
+    property LastUpdate: TDateTime read GetLastUpdate write SetLastUpdate;
+    property FloatField: Double read GetFloatField write SetFloatField;
+    property IntegerField: Integer read GetIntegerField write SetIntegerField;
   end;
 
   IEmployee = interface(IPerson)
