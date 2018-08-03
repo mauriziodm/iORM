@@ -113,7 +113,7 @@ type
     function BeginCreateTable(const ATableName:String): String;
     function EndCreateTable: String;
     function BeginAlterTable(const ARemark: String; const ATableName:String): String;
-    function EndAlterTable: String;
+    function EndAlterTable(const APropertyIsID: Boolean): String;
     function GetRemark(const AWarnings: Boolean): String;
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;

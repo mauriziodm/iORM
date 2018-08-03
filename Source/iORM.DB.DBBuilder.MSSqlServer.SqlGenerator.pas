@@ -70,7 +70,7 @@ type
     function BeginCreateTable(const ATableName:String): String;
     function EndCreateTable: String;
     function BeginAlterTable(const ARemark: String; const ATableName:String): String;
-    function EndAlterTable: String;
+    function EndAlterTable(const APropertyIsID: Boolean): String;
     function GetRemark(const AWarnings: Boolean): String;
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
@@ -290,7 +290,6 @@ end;
 function TioDBBuilderMSSqlServerSqlGenerator.BeginAlterTable(const ARemark: String; const ATableName:String): String;
 begin
   FAlterTableScript := '';
-  Result := '-- BEGIN ALTER TABLE '+sLineBreak;
   Result := Result + Format('%s ALTER TABLE %s',[ARemark, ATableName]);
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
@@ -480,19 +479,25 @@ begin
   LQuery.Close;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.EndAlterTable: String;
+function TioDBBuilderMSSqlServerSqlGenerator.EndAlterTable(const APropertyIsID: Boolean): String;
 var
   LQuery: IioQuery;
 begin
-  Result := '-- END ALTER TABLE';
+  Result := '';
   FAlterTableScript := FAlterTableScript + ' ' + Result;
+
+  // Skip ID Property
+  if APropertyIsID then FAlterTableScript := '';
 
   // Execute Query
   if not FOnlyCreateScript then
   begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(FAlterTableScript);
-    LQuery.ExecSQL;
+    if FAlterTableScript.Length>0 then
+    begin
+      LQuery := io.GlobalFactory.DBFactory.Query('');
+      LQuery.SQL.Add(FAlterTableScript);
+      LQuery.ExecSQL;
+    end;
   end;
 end;
 

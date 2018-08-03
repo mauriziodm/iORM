@@ -276,7 +276,7 @@ begin
                 LSb.AppendLine();
                 LSb.AppendLine(LSqlGenerator.BeginAlterTable('', LTableName));
                 LSb.AppendLine(LSqlGenerator.AddField(LPairField.Value.GetProperty));
-                LSb.AppendLine(LSqlGenerator.EndAlterTable);
+                LSb.AppendLine(LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID) );
               end
               else
               begin
@@ -287,7 +287,7 @@ begin
                   LSb.AppendLine();
                   LSb.AppendLine(LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName));
                   LSb.AppendLine(LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty));
-                  LSb.AppendLine(LRemark + LSqlGenerator.EndAlterTable);
+                  LSb.AppendLine(LRemark + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID));
                 end;
               end;
             end;
