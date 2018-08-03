@@ -1,0 +1,48 @@
+package iORM_ProjectD101Berlin_DesignTime;
+
+{$R *.res}
+{$R '..\..\source\iORM.dcr'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'iORM Designtime'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  iORM_ProjectD101Berlin,
+  designide;
+
+contains
+  iORM.MVVM.ViewContextProvider.DesignTime in '..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas',
+  iORM.DB.Components.ConnectionDef.DesignTime in '..\..\Source\iORM.DB.Components.ConnectionDef.DesignTime.pas',
+  iORM.DB.Components.MemTable.DesignTime in '..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas',
+  iORM.LiveBindings.PrototypeBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas',
+  iORM.MVVM.Components.ModelPresenter.DEsignTime in '..\..\Source\iORM.MVVM.Components.ModelPresenter.DEsignTime.pas',
+  iORM.LiveBindings.ModelBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas',
+  iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas',
+  iORM.DB.Components.DataSet.DesignTime in '..\..\Source\iORM.DB.Components.DataSet.DesignTime.pas',
+  iORM.AbstractionLayer.Framework.DesignTime in '..\..\Source\iORM.AbstractionLayer.Framework.DesignTime.pas';
+
+end.
