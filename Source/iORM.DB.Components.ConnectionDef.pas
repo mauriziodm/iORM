@@ -252,7 +252,6 @@ begin
   else
     LDBFolder := '';
   end;
-
   if not LDBFolder.IsEmpty then
     Result := TPath.GetFullPath(TPath.Combine(LDBFolder, FDatabase))
   else
