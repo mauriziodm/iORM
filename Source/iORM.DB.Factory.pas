@@ -134,7 +134,7 @@ var
     // Disable Firedac MACRO
     LConnection.ResourceOptions.MacroCreate := False;
     LConnection.ResourceOptions.MacroExpand := False;
-    LConnection.ResourceOptions.PreprocessCmdText := False;
+    //LConnection.ResourceOptions.PreprocessCmdText := False;
     // Set the monitor mode for the connection
   {$IFDEF MSWINDOWS}
     case TioConnectionMonitor.mode of
