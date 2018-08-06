@@ -248,6 +248,74 @@ var
   PropMetadata_FieldNullable: Boolean;
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
+  LRttiProperty: TRttiProperty;
+
+  function GetMetadata_FieldTypeByPropertyTypeKind(const ARttiProperty: TRttiProperty): TioMetadataFieldType;
+  begin
+    Result := ioMdInteger;
+    case ARttiProperty.PropertyType.TypeKind of
+      tkEnumeration:
+        begin
+          if ARttiProperty.PropertyType.QualifiedName = 'System.Boolean' then
+          begin
+            Result := ioMdBoolean;
+            Exit;
+          end
+          else // it is an enumerated value but it's not a boolean.
+          begin
+            Result := ioMdInteger;
+            Exit;
+          end;
+        end;
+      tkInteger, tkInt64:
+        begin
+          Result := ioMdInteger;
+          Exit;
+        end;
+      tkFloat:
+        begin
+          if ARttiProperty.PropertyType.QualifiedName = 'System.TDate' then
+          begin
+            Result := ioMdDate;
+            Exit;
+          end
+          else if ARttiProperty.PropertyType.QualifiedName = 'System.TDateTime' then
+          begin
+            Result := ioMdDateTime;
+            Exit;
+          end
+          else if ARttiProperty.PropertyType.QualifiedName = 'System.TTime' then
+          begin
+            Result := ioMdTime;
+            Exit;
+          end
+          else { if _field.PropertyType.QualifiedName = 'System.Currency' then }
+          begin
+            Result := ioMdDecimal;
+            Exit;
+          end
+        end;
+      tkString, tkLString, tkWString, tkUString:
+        begin
+          Result := ioMdVarchar;
+          Exit;
+        end;
+      tkRecord:
+        begin
+          if ARttiProperty.PropertyType.QualifiedName = 'System.SysUtils.TTimeStamp' then
+          begin
+            Result := ioMdDateTime;
+            Exit;
+          end;
+        end;
+      tkClass: // try to restore child properties... but only if the collection is not nil!!!
+        begin
+          Result := ioMdBinary;
+          Exit;
+        end;
+    end;
+  end;
+
 begin
   // Get members list (Properties or Fields)
   case ATable.GetMapMode of
@@ -263,10 +331,13 @@ begin
   begin
     // M.M. 01/08/18 - Used by DBBuilder
     // TODO: Gestire in base al tipo della proprietà
-    PropMetadata_FieldType := ioMdVarchar;
+    if Prop is TRttiProperty then
+      LRttiProperty := Prop as TRttiProperty;
+
+    PropMetadata_FieldType := GetMetadata_FieldTypeByPropertyTypeKind(LRttiProperty);
     PropMetadata_FieldLength := 255;
-    PropMetadata_FieldPrecision := 0;
-    PropMetadata_FieldScale := 0;
+    PropMetadata_FieldPrecision := 10;
+    PropMetadata_FieldScale := 3;
     PropMetadata_FieldNullable := True;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';

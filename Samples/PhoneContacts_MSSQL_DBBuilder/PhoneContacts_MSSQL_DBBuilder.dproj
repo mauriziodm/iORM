@@ -100,13 +100,14 @@
             <Form>BuilderForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Commons\RegisterClasses.pas"/>
         <DCCReference Include="Commons\BusinessObjects.Authentication.Interfaces.pas"/>
         <DCCReference Include="Commons\BusinessObjects.Authentication.pas"/>
         <DCCReference Include="Commons\BusinessObjects.Base.Interfaces.pas"/>
         <DCCReference Include="Commons\BusinessObjects.Base.pas"/>
-        <DCCReference Include="Commons\BusinessObject.Model.pas"/>
-        <DCCReference Include="Commons\BusinessObject.Model.Interfaces.pas"/>
-        <DCCReference Include="Commons\RegisterClasses.pas"/>
+        <DCCReference Include="Commons\BusinessObjects.Interfaces.pas"/>
+        <DCCReference Include="Commons\BusinessObjects.pas"/>
+        <DCCReference Include="Commons\BusinessObjects.ProdItems.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

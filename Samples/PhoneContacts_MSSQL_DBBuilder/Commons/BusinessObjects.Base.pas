@@ -22,8 +22,17 @@ type
     procedure SetID(const Value: Integer);
     function GetID: Integer;
   public
-    [ioInteger(10, False)]
     property ID: Integer read GetID write SetID;
+  end;
+
+  //[ioEntity]
+  TSingletonString = class(TInterfacedObject, ISingletonString)
+  private
+    FValue: String;
+    procedure SetValue(const Value: String);
+    function GetValue: String;
+  public
+    property Value: String read GetValue write SetValue;
   end;
 
 implementation
@@ -38,6 +47,18 @@ end;
 procedure TBaseBo.SetID(const Value: Integer);
 begin
   FID := Value;
+end;
+
+{ TSingleton }
+
+function TSingletonString.GetValue: String;
+begin
+  Result := FValue;
+end;
+
+procedure TSingletonString.SetValue(const Value: String);
+begin
+  FValue := Value;
 end;
 
 end.

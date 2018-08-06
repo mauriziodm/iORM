@@ -19,7 +19,6 @@ uses
   iORM.LazyLoad.Generics.List;
 
 type
-
   [ioEntity('Domains'), ioTrueClass, diImplements(IDomain)]
   TDomain = class(TBaseBo, IDomain)
   private
@@ -32,8 +31,9 @@ type
   public
     constructor Create(const ACode: string; const ADescription: string);
     [ioVarchar(10,True,False)]
+    [ioIndex(ioAscending, True)]
     property Code: string read GetCode write SetCode;
-    [ioVarchar(200,True,False)]
+    [ioVarchar(255,True,False)]
     property Description: string read GetDescription write SetDescription;
   end;
 
@@ -49,8 +49,9 @@ type
   public
     constructor Create(const ACode: string; const ADescription: string);
     [ioVarchar(10,True,False)]
+    [ioIndex(ioAscending, True)]
     property Code: string read GetCode write SetCode;
-    [ioVarchar(250,True,False)]
+    [ioVarchar(255,True,False)]
     property Description: string read GetDescription write SetDescription;
   end;
 
@@ -81,6 +82,7 @@ type
   public
     constructor Create;
     [ioVarchar(50,False,True)]
+    [ioIndex(ioAscending, True)]
     property UserName: string read GetUserName write SetUserName;
     [ioVarchar(50,False,True)]
     property UserPassword: string read GetUserPassword write SetUserPassword;

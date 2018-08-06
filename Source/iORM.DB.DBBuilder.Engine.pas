@@ -478,11 +478,6 @@ end;
 
 function TioDBBuilderField.GetFieldType: String;
 begin
-  // TODO: Completare QUI
-//  if Self.IsClassFromField
-//    then Result := TioDBCreatorFactory.GetSqlGenerator.GetClassFromFieldColumnType
-//    else Result := FProperty.GetFieldType;
-  //
 end;
 
 function TioDBBuilderField.GetIsClassFromField: Boolean;

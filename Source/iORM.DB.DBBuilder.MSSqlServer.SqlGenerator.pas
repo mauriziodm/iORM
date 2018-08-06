@@ -290,7 +290,7 @@ end;
 function TioDBBuilderMSSqlServerSqlGenerator.BeginAlterTable(const ARemark: String; const ATableName:String): String;
 begin
   FAlterTableScript := '';
-  Result := Result + Format('%s ALTER TABLE %s',[ARemark, ATableName]);
+  Result := Format('%s ALTER TABLE %s',[ARemark, ATableName]);
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
@@ -659,8 +659,8 @@ begin
           end;
       end;
 
-      // Verify if something has been changed in FieldNullable
-      if LColumnNullable<>AProperty.GetMetadata_FieldNullable then
+      // Verify if something has been changed in FieldNullable. Skip ID field
+      if (not AProperty.IsID) and (LColumnNullable<>AProperty.GetMetadata_FieldNullable) then
       begin
         if AProperty.GetMetadata_FieldNullable and (not LColumnNullable) then
         begin

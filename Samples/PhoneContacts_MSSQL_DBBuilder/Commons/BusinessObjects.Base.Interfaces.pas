@@ -2,20 +2,6 @@ unit BusinessObjects.Base.Interfaces;
 
 interface
 
-uses
-  System.Generics.Collections,
-  System.Classes,
-{$IFDEF DESKTOP}
-  iORM.Attributes,
-{$ENDIF}
-{$IFDEF FMX}
-  FMX.Graphics,
-{$ELSE}
-  VCL.Graphics,
-{$ENDIF}
-  iORM.Containers.Interfaces,
-  iORM.CommonTypes;
-
 type
 
   IBaseBO = interface
@@ -23,6 +9,13 @@ type
     procedure SetID(const Value: Integer);
     function GetID: Integer;
     property ID: Integer read GetID write SetID;
+  end;
+
+  ISingletonString = interface
+    ['{FAEC5AEF-69A2-4B71-A74E-9072A273B05B}']
+    procedure SetValue(const Value: String);
+    function GetValue: String;
+    property Value: String read GetValue write SetValue;
   end;
 
 implementation
