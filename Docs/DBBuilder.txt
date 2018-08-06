@@ -1,0 +1,58 @@
+==================================
+iORM - DBBUILDER - 06/08/2018 M.M.
+==================================
+Per generare la base dati in automatico è necessario definire degli specifici attributi sulle proprietà
+della classe oppure sui campi privati in base al tipo di mappatura (ioFields o ioProperties)
+
+I nuovi attributi introdotti sono i seguenti:
+
+ioVarchar
+ioChar
+ioInteger
+ioFloat
+ioDate
+ioTime
+ioDateTime
+ioDecimal = ioNumeric
+ioBoolean
+ioBinary
+
+Per ogni attributo è possibile definire se il campo è NULL o NOT NULL 
+Per ogni attributo ioVarchar, ioChar è possibile definire se il campo è UNICODE o NON UNICODE. Questa definizione 
+viene sfruttata nella specifica classe di generazione del DB per sapere se generare un tipo di dato UNICODE o meno
+(Es. SQLSERVER se UNICODE=TRUE --> NVARCHAR  se UNICODE=FALSE --> VARCHAR)
+
+Per i campi numerici ioDecimal o ioNumeric è possibile definire anche la precisione e la scala che
+servono per stabilire la dimensione del campo --> (Es. DECIMAL(18,3))
+
+Attualmente è presente il solo Builder per MSSQL
+
+Per implementare un nuovo Builder è necessario andare a implementare 
+l'interfaccia IioDBBuilderSqlGenerator.
+
+Come esempio è possibile prendere spunto dal Builder per MSSQL già implementato e funzionante 
+Classe TioDBBuilderMSSqlServerSqlGenerator
+
+Riportiamo un esempio qui sotto di come corredare una classe con gli attributi dei tipi di dato
+
+  [ioEntity('Domains'), ioTrueClass, diImplements(IDomain)]
+  TDomain = class(TBaseBo, IDomain)
+  public
+    constructor Create(const ACode: string; const ADescription: string);
+    [ioVarchar(10,True,False)]
+    [ioIndex(ioAscending, True)]
+    property Code: string read GetCode write SetCode;
+    [ioVarchar(255,True,False)]
+    property Description: string read GetDescription write SetDescription;
+  end;
+
+Esiste un esempio nella cartella samples denominato PhoneContacts_MSSQL_DBBuilder.
+
+Nelle cartelle commons e commons1 sono presenti 2 modelli di business che possono essere 
+presi come esempio.
+Il primo modello nella cartella commons non definisce attributi specifici per i tipi di dato 
+e iORM cerca di generare il DB basandosi sui tipi di base delle proprietà.
+
+Il secondo modello nella cartella commons1 invece definisce gli attributi specifici per le diverse
+proprietà e iORM genera il DB basandosi sui questi attributi.
+
