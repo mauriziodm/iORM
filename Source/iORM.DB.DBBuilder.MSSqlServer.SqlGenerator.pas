@@ -76,7 +76,7 @@ type
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
     function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out AWarnings: Boolean): Boolean;
     function CreateField(const AProperty:IioContextProperty): String;
-    function CreateClassInfoField: String;
+    function CreateClassInfoField(ATable: IioDBBuilderTable): String;
     function AddField(const AProperty:IioContextProperty): String;
     function AlterField(const AProperty:IioContextProperty): String;
 
@@ -87,6 +87,7 @@ type
     function DropAllForeignKey: String;
     function DropAllIndex: String;
 
+    function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
   end;
 
 implementation
@@ -243,6 +244,13 @@ begin
   end;
 end;
 
+function TioDBBuilderMSSqlServerSqlGenerator.AddForeignKeyInCreate(
+  const ABuilderTable: IioDBBuilderTable): String;
+begin
+  // Do Nothing
+  Result := '';
+end;
+
 function TioDBBuilderMSSqlServerSqlGenerator.AddIndex(const AContext: IioContext; const AIndexName,
   ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
   const AUnique: Boolean): String;
@@ -359,7 +367,7 @@ begin
   FOnlyCreateScript := AOnlyCreateScript;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.CreateClassInfoField: String;
+function TioDBBuilderMSSqlServerSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
   Result := '[' + IO_CLASSFROMFIELD_FIELDNAME +']' + '[' + 'VARCHAR' + ']' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+'NULL' + ',';
   FCreateTableScript := FCreateTableScript + ' ' + Result;

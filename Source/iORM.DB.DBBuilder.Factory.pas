@@ -60,7 +60,8 @@ uses
   iORM.Attributes,
   iORM.DB.ConnectionContainer,
   iORM.DB.DBBuilder.Engine,
-  iORM.DB.DBBuilder.MSSqlServer.SqlGenerator;
+  iORM.DB.DBBuilder.MSSqlServer.SqlGenerator,
+  iORM.DB.DBBuilder.SqLite.SqlGenerator;
 
 { TioDBBuilderFactory }
 
@@ -73,7 +74,7 @@ class function TioDBBuilderFactory.NewSqlGenerator(AOnlyCreateScript: Boolean): 
 begin
   case TioConnectionManager.GetConnectionInfo.ConnectionType of
     //cdtFirebird:  Result := TioSqlDataConverterFirebird;
-    //cdtSQLite:    Result := TioDBBuilderSqLiteServerSqlGenerator;
+    cdtSQLite:    Result := TioDBBuilderSqLiteSqlGenerator.Create(AOnlyCreateScript);
     cdtSQLServer: Result := TioDBBuilderMSSqlServerSqlGenerator.Create(AOnlyCreateScript);
   else
     raise EioException.Create(Self.ClassName, 'NewSqlService', 'Connection type not found.');

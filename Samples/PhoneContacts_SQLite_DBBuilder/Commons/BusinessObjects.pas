@@ -203,7 +203,7 @@ type
     property Master_ID: Integer read GetMaster_ID write SetMaster_ID;
   end;
 
-  [ioEntity('vOrdiniClienti'), ioDisableAutoCreateDB, diImplements(ICommessaGestionale)]
+  [ioEntity('vOrdiniClienti'), diImplements(ICommessaGestionale)]
   TCommessaGestionale = class(TBaseBo, ICommessaGestionale)
   private
     FCommessa: String;
@@ -391,7 +391,7 @@ type
     property ID_Testa: Integer read FID_Testa write FID_Testa;
   end;
 
-  [ioEntity, ioDisableAutoCreateDB]
+  [ioEntity]
   TConfermaLavorazione = class(TBaseBo)
   private
     FBarcode: String;
@@ -406,7 +406,7 @@ type
     property Data: TDate read FData write SetData;
   end;
 
-  [ioEntity, ioDisableAutoCreateDB, diImplements(IRicercaCommessa)]
+  [ioEntity, diImplements(IRicercaCommessa)]
   TRicercaCommessa = class(TBaseBo, IRicercaCommessa)
   private
     FFrom_Date: TDate;

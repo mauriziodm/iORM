@@ -37,10 +37,12 @@ unit iORM.DB.DBBuilder.Interfaces;
 interface
 
 uses
-  System.Generics.Collections, System.Rtti, System.Classes,
+  System.Rtti, System.Classes,
+  iORM.Attributes,
   iORM.DB.Interfaces, iORM.Context.Properties.Interfaces,
   iORM.Context.Map.Interfaces, iORM.Context.Table.Interfaces,
-  iORM.Context.Interfaces, iORM.CommonTypes;
+  iORM.Context.Interfaces, iORM.CommonTypes,
+  System.Generics.Collections;
 
 type
 
@@ -48,8 +50,25 @@ type
 
   IioDBBuilderField = interface;
   IioDBBuilderTable = interface;
+  IioDBBuilderFKDefinition = interface;
+
   TioDBBuilderFieldList = TDictionary<String,IioDBBuilderField>;
   TioDBBuilderTableList = TDictionary<String,IioDBBuilderTable>;
+  TioDBBuilderFKList = class(TDictionary<String, IioDBBuilderFKDefinition>)
+  end;
+
+  IioDBBuilderFKDefinition = interface
+    function GetDestinationFieldName: string;
+    function GetDestinationTableName: string;
+    function GetSourceFieldName: string;
+    function GetSourceTableName: string;
+    function GetRelationType: TioRelationType;
+    property SourceTableName: string read GetSourceTableName;
+    property SourceFieldName: string read GetSourceFieldName;
+    property DestinationTableName: string read GetDestinationTableName;
+    property DestinationFieldName: string read GetDestinationFieldName;
+    property RelationType: TioRelationType read GetRelationType;
+  end;
 
   IioDBBuilderField = interface
     ['{45B1CD52-FBDA-460A-B0D4-C558960F8257}']
@@ -101,6 +120,9 @@ type
     procedure SetClassFromField(const AValue: Boolean);
     // IDField
     function IDField: IioDBBuilderField;
+    // ForeignKeyList
+    function GetForeignKeyList: TioDBBuilderFKList;
+    property ForeignKeyList:TioDBBuilderFKList read GetForeignKeyList;
   end;
 
   IioDBBuilderSqlGenerator = interface
@@ -119,7 +141,7 @@ type
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
     function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out OWarnings: Boolean): Boolean;
     function CreateField(const AProperty:IioContextProperty): String;
-    function CreateClassInfoField: String;
+    function CreateClassInfoField(ATable: IioDBBuilderTable): String;
     function AddField(const AProperty:IioContextProperty): String;
     function AlterField(const AProperty:IioContextProperty): String;
 
@@ -129,6 +151,8 @@ type
 
     function DropAllForeignKey: String;
     function DropAllIndex: String;
+
+    function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
   end;
 
   IioDBBuilder = interface

@@ -47,6 +47,27 @@ uses
   iORM.Context.Table.Interfaces;
 
 type
+  TioDBBuilderFKDefinition = class(TInterfacedObject, IioDBBuilderFKDefinition)
+  private
+    FSourceTableName: string;
+    FSourceFieldName: string;
+    FDestinationTableName: string;
+    FDestinationFieldName: string;
+    FRelationType: TioRelationType;
+    function GetDestinationFieldName: string;
+    function GetDestinationTableName: string;
+    function GetSourceFieldName: string;
+    function GetSourceTableName: string;
+    function GetRelationType: TioRelationType;
+  public
+    constructor Create(ASourceTableName: string; ASourceFieldName: string; ADestinationTableName: string; ADestinationFieldName: string; ARelationType: TioRelationType);
+    property SourceTableName: string read GetSourceTableName;
+    property SourceFieldName: string read GetSourceFieldName;
+    property DestinationTableName: string read GetDestinationTableName;
+    property DestinationFieldName: string read GetDestinationFieldName;
+    property RelationType: TioRelationType read GetRelationType;
+  end;
+
   TioDBBuilderField = class(TInterfacedObject, IioDBBuilderField)
   strict private
     FFieldName: String;
@@ -95,6 +116,7 @@ type
     FSqlGenerator: IioDBBuilderSqlGenerator;
     FMap: IioMap;
     FIndexList: TioIndexList;
+    FForeignKeyList: TioDBBuilderFKList;
     // TableName
     function GetTableName: String;
     Procedure SetTableName(AValue:String);
@@ -107,6 +129,8 @@ type
     procedure SetClassFromField(const AValue: Boolean);
     // IndexList
     function GetIndexList: TioIndexList;
+    // FK List
+    function GetForeignKeyList: TioDBBuilderFKList;
   public
     constructor Create(const ATableName:String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBBuilderSqlGenerator; const AMap:IioMap);
     destructor Destroy; override;
@@ -116,18 +140,21 @@ type
     property TableName:String read GetTableName write SetTableName;
     property Fields:TioDBBuilderFieldList read GetFields;
     property IndexList:TioIndexList read GetIndexList;
+    property ForeignKeyList:TioDBBuilderFKList read GetForeignKeyList;
   end;
 
   TioDBBuilder = class(TInterfacedObject, IioDBBuilder)
   strict private
     FTables: TioDBBuilderTableList;
     FSqlGenerator: IioDBBuilderSqlGenerator;
+    function GetSourceTable(ATableName: String): IioDBBuilderTable;
   strict protected
     function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
     function GetTable(const ATableName: String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBBuilderSqlGenerator; const AMap:IioMap): IioDBBuilderTable;
     function FindOrCreateTable(const ATableName:String; const AIsClassFromField:Boolean; const AMap:IioMap): IioDBBuilderTable;
     procedure LoadTableStructure(AMap: IioMap);
     procedure LoadDBStructure;
+    procedure LoadFKStructure(AMap: IioMap);
   public
     constructor Create;
     destructor Destroy; override;
@@ -257,8 +284,11 @@ begin
           end;
 
           if LPairTable.Value.IsClassFromField then
-            LSb.AppendLine(LSqlGenerator.CreateClassInfoField);
+            LSb.AppendLine(LSqlGenerator.CreateClassInfoField(LPairTable.Value));
 
+          // Generate Foreign Key in CREATE STATEMENT (use this feature only in the databases that provide it)
+          // Otherwise implements AddForeignKey methods
+          LSb.AppendLine(LSqlGenerator.AddForeignKeyInCreate(LPairTable.Value));
 
           LSb.AppendLine(LSqlGenerator.EndCreateTable);
 
@@ -378,6 +408,16 @@ begin
   Result := TioDBBuilderField.Create(AFieldName, AIsKeyField, AProperty, ASqlGenerator, AIsClassFromField, AIsSqlField);
 end;
 
+function TioDBBuilder.GetSourceTable(ATableName: String): IioDBBuilderTable;
+begin
+  Result := nil;
+  // If table is already present return it
+  if FTables.ContainsKey(ATableName) then
+  begin
+    Result := FTables.Items[ATableName];
+  end;
+end;
+
 function TioDBBuilder.GetTable(const ATableName: String;
   const AIsClassFromField: Boolean;
   const ASqlGenerator: IioDBBuilderSqlGenerator;
@@ -392,8 +432,95 @@ var
 begin
   // Loop for all entities (model classes) of the application
   //  and load the TableStructure
-  for AContextSlot in TioMapContainer.GetContainer.Values
-    do Self.LoadTableStructure(AContextSlot.GetMap);
+  for AContextSlot in TioMapContainer.GetContainer.Values do
+  begin
+    Self.LoadTableStructure(AContextSlot.GetMap);
+  end;
+
+  for AContextSlot in TioMapContainer.GetContainer.Values do
+  begin
+    Self.LoadFKStructure(AContextSlot.GetMap);
+  end;
+end;
+
+procedure TioDBBuilder.LoadFKStructure(AMap: IioMap);
+var
+  LPairTable: TPair<string,IioDBBuilderTable>;
+  LChildTypeName: string;
+  LChildTypeAlias: string;
+  LChildPropertyName: string;
+  LResolvedTypeList: IioList<string>;
+  LResolvedTypeName: string;
+  LChildContext: IioContext;
+  LSourceTableName: string;
+  LSourceFieldName: string;
+  LDestinationTableName: string;
+  LDestinationFieldName: string;
+  LRel: TioRelationType;
+  LFkName: string;
+  LProperty: IioContextProperty;
+  LSourceTable: IioDBBuilderTable;
+begin
+  for LPairTable in FTables do
+  begin
+    // Loop for properties
+    for LProperty in LPairTable.Value.GetMap.GetProperties do
+    begin
+      LRel := LProperty.GetRelationType;
+
+      if LRel = ioRTNone then
+        Continue;
+
+      // Add relation to list
+      LChildTypeName:=LProperty.GetRelationChildTypeName;
+      LChildTypeAlias:=LProperty.GetRelationChildTypeAlias;
+      LChildPropertyName:=LProperty.GetRelationChildPropertyName;
+      // Resolve the type and alias
+      LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LChildTypeName, LChildTypeAlias, rmAll);
+      // Loop for all classes in the sesolved type list
+      for LResolvedTypeName in LResolvedTypeList do
+      begin
+        // Get the Context for the current ResolverTypeName (Child)
+        LChildContext := TioContextFactory.Context(LResolvedTypeName);
+
+        // Search MasterTable ID Property
+        if LRel in [ioRTBelongsTo] then
+        begin
+          LSourceTableName := LPairTable.Value.TableName;
+          LSourceFieldName := LProperty.GetName;
+          LDestinationTableName := LChildContext.GetTable.TableName;
+          LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
+        end
+        else
+        begin
+          LSourceTableName := LChildContext.GetTable.TableName;
+          LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetSqlFieldName(True);
+          LDestinationTableName := LPairTable.Value.TableName;
+          LDestinationFieldName := LChildContext.GetProperties.GetIdProperty.GetName;
+        end;
+
+        // Create FK and add it to foreign key dictionary
+        LFkName := LSourceFieldName+'_'+LDestinationTableName;
+
+        if LPairTable.Value.TableName=LDestinationTableName then
+        begin
+          LSourceTable := GetSourceTable(LChildContext.GetTable.TableName);
+
+          if Assigned(LSourceTable) then
+          begin
+            if not LSourceTable.ForeignKeyList.ContainsKey(LFkName) then
+              LSourceTable.ForeignKeyList.Add(LFkName, TioDBBuilderFKDefinition.Create(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName, LRel));
+          end;
+        end
+        else
+        begin
+          if not LPairTable.Value.ForeignKeyList.ContainsKey(LFkName) then
+            LPairTable.Value.ForeignKeyList.Add(LFkName, TioDBBuilderFKDefinition.Create(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName, LRel));
+        end;
+
+      end;
+    end;
+  end;
 end;
 
 procedure TioDBBuilder.LoadTableStructure(AMap: IioMap);
@@ -520,12 +647,14 @@ begin
   FFields := TioDBBuilderFieldList.Create;
   FMap := AMap;
   FIndexList := TioIndexList.Create(False);
+  FForeignKeyList := TioDBBuilderFKList.Create();
 end;
 
 destructor TioDBBuilderTable.Destroy;
 begin
   FFields.Free;
   FIndexList.Free;
+  FForeignKeyList.Free;
   inherited;
 end;
 
@@ -537,6 +666,11 @@ end;
 function TioDBBuilderTable.GetFields: TioDBBuilderFieldList;
 begin
   Result := FFields;
+end;
+
+function TioDBBuilderTable.GetForeignKeyList: TioDBBuilderFKList;
+begin
+  Result := FForeignKeyList;
 end;
 
 function TioDBBuilderTable.GetIndexList: TioIndexList;
@@ -607,6 +741,42 @@ end;
 //end;
 
 
+
+{ TioDBBuilderFKDefinition }
+
+constructor TioDBBuilderFKDefinition.Create(ASourceTableName: string; ASourceFieldName: string; ADestinationTableName: string; ADestinationFieldName: string; ARelationType: TioRelationType);
+begin
+  FSourceTableName := ASourceTableName;
+  FSourceFieldName := ASourceFieldName;
+  FDestinationTableName := ADestinationTableName;
+  FDestinationFieldName := ADestinationFieldName;
+  FRelationType := ARelationType;
+end;
+
+function TioDBBuilderFKDefinition.GetDestinationFieldName: string;
+begin
+  Result := FDestinationFieldName;
+end;
+
+function TioDBBuilderFKDefinition.GetDestinationTableName: string;
+begin
+  Result := FDestinationTableName;
+end;
+
+function TioDBBuilderFKDefinition.GetRelationType: TioRelationType;
+begin
+  Result := FRelationType;
+end;
+
+function TioDBBuilderFKDefinition.GetSourceFieldName: string;
+begin
+  Result := FSourceFieldName;
+end;
+
+function TioDBBuilderFKDefinition.GetSourceTableName: string;
+begin
+  Result := FSourceTableName;
+end;
 
 end.
 
