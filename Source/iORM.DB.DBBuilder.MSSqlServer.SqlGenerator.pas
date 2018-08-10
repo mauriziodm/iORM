@@ -54,14 +54,13 @@ const
 type
   TioDBBuilderMSSqlServerSqlGenerator = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
-    FOnlyCreateScript: Boolean;
+    //FOnlyCreateScript: Boolean;
     FCreateTableScript: String;
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
     function ConversionTypeAdmitted(AColumnType: string; AModelColumnType: string): Boolean;
   protected
   public
-    constructor Create(AOnlyCreateScript: Boolean); overload;
     function DatabaseExists(const ADbName: string): Boolean;
     function CreateDatabase(const ADbName: string): String;
     function UseDatabase(const ADbName: string): String;
@@ -84,10 +83,12 @@ type
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
-    function DropAllForeignKey: String;
+    function DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+
+    procedure ExecuteSql(const ASql: string);
   end;
 
 implementation
@@ -235,13 +236,13 @@ begin
           ' REFERENCES '+ADestinationTableName+
           '(['+ADestinationFieldName+'])';
 
-  // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(Result);
-    LQuery.ExecSQL;
-  end;
+//  // Execute Query
+//  if not FOnlyCreateScript then
+//  begin
+//    LQuery := io.GlobalFactory.DBFactory.Query('');
+//    LQuery.SQL.Add(Result);
+//    LQuery.ExecSQL;
+//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddForeignKeyInCreate(
@@ -260,13 +261,13 @@ begin
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 
-  // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(Result);
-    LQuery.ExecSQL;
-  end;
+//  // Execute Query
+//  if not FOnlyCreateScript then
+//  begin
+//    LQuery := io.GlobalFactory.DBFactory.Query('');
+//    LQuery.SQL.Add(Result);
+//    LQuery.ExecSQL;
+//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
@@ -278,12 +279,12 @@ begin
             '('+AIDProperty.GetSqlFieldName+')';
 
   // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(Result);
-    LQuery.ExecSQL;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    LQuery := io.GlobalFactory.DBFactory.Query('');
+//    LQuery.SQL.Add(Result);
+//    LQuery.ExecSQL;
+//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AlterField(const AProperty:IioContextProperty): String;
@@ -361,12 +362,6 @@ begin
   end;
 end;
 
-constructor TioDBBuilderMSSqlServerSqlGenerator.Create(
-  AOnlyCreateScript: Boolean);
-begin
-  FOnlyCreateScript := AOnlyCreateScript;
-end;
-
 function TioDBBuilderMSSqlServerSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
   Result := '[' + IO_CLASSFROMFIELD_FIELDNAME +']' + '[' + 'VARCHAR' + ']' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+'NULL' + ',';
@@ -419,7 +414,7 @@ begin
   LQuery.Close;
 end;
 
-function TioDBBuilderMSSqlServerSqlGenerator.DropAllForeignKey: String;
+function TioDBBuilderMSSqlServerSqlGenerator.DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
 var
   LQuery: IioQuery;
   LQueryDrop: IioQuery;
@@ -441,12 +436,12 @@ begin
     LQuery.Next;
   end;
 
-  if not FOnlyCreateScript then
-  begin
-    // Execute Query
-    if LQueryDrop.SQL.Text.Length>0 then
-      LQueryDrop.ExecSQL;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    // Execute Query
+//    if LQueryDrop.SQL.Text.Length>0 then
+//      LQueryDrop.ExecSQL;
+//  end;
 
   Result := LQueryDrop.SQL.Text;
   LQuery.Close;
@@ -475,12 +470,12 @@ begin
     LQuery.Next;
   end;
 
-  if not FOnlyCreateScript then
-  begin
-    // Execute Query
-    if LQueryDrop.SQL.Text.Length>0 then
-      LQueryDrop.ExecSQL;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    // Execute Query
+//    if LQueryDrop.SQL.Text.Length>0 then
+//      LQueryDrop.ExecSQL;
+//  end;
 
   Result := LQueryDrop.SQL.Text;
 
@@ -498,15 +493,15 @@ begin
   if APropertyIsID then FAlterTableScript := '';
 
   // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    if FAlterTableScript.Length>0 then
-    begin
-      LQuery := io.GlobalFactory.DBFactory.Query('');
-      LQuery.SQL.Add(FAlterTableScript);
-      LQuery.ExecSQL;
-    end;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    if FAlterTableScript.Length>0 then
+//    begin
+//      LQuery := io.GlobalFactory.DBFactory.Query('');
+//      LQuery.SQL.Add(FAlterTableScript);
+//      LQuery.ExecSQL;
+//    end;
+//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.EndCreateTable: String;
@@ -517,12 +512,23 @@ begin
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 
   // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(FCreateTableScript);
-    LQuery.ExecSQL;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    LQuery := io.GlobalFactory.DBFactory.Query('');
+//    LQuery.SQL.Add(FCreateTableScript);
+//    LQuery.ExecSQL;
+//  end;
+end;
+
+procedure TioDBBuilderMSSqlServerSqlGenerator.ExecuteSql(const ASql: string);
+var
+  LQuery: IioQuery;
+begin
+  if ASql.IsEmpty then Exit;
+
+  LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery.SQL.Add(ASql);
+  LQuery.ExecSQL;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;

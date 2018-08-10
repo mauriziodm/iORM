@@ -25,7 +25,7 @@ type
     property ID: Integer read GetID write SetID;
   end;
 
-  //[ioEntity]
+  [ioEntity, ioDisableAutoCreateDB]
   TSingletonString = class(TInterfacedObject, ISingletonString)
   private
     FValue: String;

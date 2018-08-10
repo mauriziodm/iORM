@@ -46,12 +46,13 @@ uses
   iORM.DB.Interfaces,
   iORM.DB.QueryEngine,
   iORM.Context.Properties.Interfaces,
-  Data.DB, iORM.Context.Interfaces, iORM.CommonTypes;
+  Data.DB, iORM.Context.Interfaces,
+  iORM.CommonTypes;
 
 type
   TioDBBuilderSqLiteSqlGenerator = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
-    FOnlyCreateScript: Boolean;
+    //FOnlyCreateScript: Boolean;
     FCreateTableScript: String;
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
@@ -59,7 +60,6 @@ type
     function RemoveLastComma(const AValue: string): string;
   protected
   public
-    constructor Create(AOnlyCreateScript: Boolean); overload;
     function DatabaseExists(const ADbName: string): Boolean;
     function CreateDatabase(const ADbName: string): String;
     function UseDatabase(const ADbName: string): String;
@@ -82,17 +82,19 @@ type
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
-    function DropAllForeignKey: String;
+    function DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+
+    procedure ExecuteSql(const ASql: string);
   end;
 
 implementation
 
 uses
   iORM.Exceptions,
-  iORM, iORM.DB.Factory;
+  iORM, iORM.DB.Factory, System.Generics.Collections;
 
 { TioDBBuilderSqLiteSqlGenerator }
 
@@ -209,13 +211,13 @@ begin
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 
-  // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(Result);
-    LQuery.ExecSQL;
-  end;
+//  // Execute Query
+//  if not FOnlyCreateScript then
+//  begin
+//    LQuery := io.GlobalFactory.DBFactory.Query('');
+//    LQuery.SQL.Add(Result);
+//    LQuery.ExecSQL;
+//  end;
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
@@ -278,15 +280,9 @@ begin
   end;
 end;
 
-constructor TioDBBuilderSqLiteSqlGenerator.Create(
-  AOnlyCreateScript: Boolean);
-begin
-  FOnlyCreateScript := AOnlyCreateScript;
-end;
-
 function TioDBBuilderSqLiteSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
-  Result := IO_CLASSFROMFIELD_FIELDNAME + ' ' + 'TEXT' + ' ' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+'NULL';
+  Result := IO_CLASSFROMFIELD_FIELDNAME + ' ' + 'TEXT' + ' ' +'NULL';
   if ATable.ForeignKeyList.Count>0 then
     Result := Result + ',';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
@@ -311,10 +307,73 @@ begin
   Result:=FileExists(ADbName);
 end;
 
-function TioDBBuilderSqLiteSqlGenerator.DropAllForeignKey: String;
+function TioDBBuilderSqLiteSqlGenerator.DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
+var
+  LQuery: IioQuery;
+  LQueryDrop: IioQuery;
+  LPairTable: TPair<string, IioDBBuilderTable>;
+  LPairField: TPair<string,IioDBBuilderField>;
+  LCreate: string;
+  LSb: TStringBuilder;
 begin
-  // Do nothing FK are created in CREATE TABLE STATEMENT
-  Result := '';
+  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+
+  // Retrieve All Foreign Key
+  LQuery := io.GlobalFactory.DBFactory.Query('');
+
+  for LPairTable in ATableList do
+  begin
+    if LPairTable.Value.ForeignKeyList.Count>0 then
+    begin
+
+      LQueryDrop.SQL.Add('PRAGMA foreign_keys=off;');
+      LQueryDrop.SQL.Add('BEGIN TRANSACTION;');
+      LQueryDrop.SQL.Add(Format('DROP TABLE IF EXISTS _%s_old;',[LPairTable.Value.TableName]));
+      LQueryDrop.SQL.Add(Format('ALTER TABLE %s RENAME TO _%s_old;',[LPairTable.Value.TableName,LPairTable.Value.TableName]));
+
+      LSb := TStringBuilder.Create;
+
+      try
+
+        LSb.AppendLine(Self.BeginCreateTable(LPairTable.Value.TableName));
+
+        for LPairField in LPairTable.Value.Fields do
+        begin
+          if LPairField.Value.IsSqlField then
+            LSb.AppendLine(Self.CreateField(LPairField.Value.GetProperty));
+        end;
+
+        if LPairTable.Value.IsClassFromField then
+          LSb.AppendLine(Self.CreateClassInfoField(LPairTable.Value));
+
+        // Generate Foreign Key in CREATE STATEMENT (use this feature only in the databases that provide it)
+        // Otherwise implements AddForeignKey methods
+        LSb.AppendLine(Self.AddForeignKeyInCreate(LPairTable.Value));
+
+        LSb.AppendLine(');');
+
+        LQueryDrop.SQL.Add(LSb.ToString);
+
+      finally
+        LSb.Free;
+      end;
+
+      LQueryDrop.SQL.Add(Format('INSERT INTO %s SELECT * FROM _%s_old;',[LPairTable.Value.TableName,LPairTable.Value.TableName]));
+      LQueryDrop.SQL.Add('COMMIT;');
+      LQueryDrop.SQL.Add('PRAGMA foreign_keys=on;');
+    end;
+  end;
+
+//  if not FOnlyCreateScript then
+//  begin
+//    // Execute Query
+//    if LQueryDrop.SQL.Text.Length>0 then
+//      LQueryDrop.ExecSQL;
+//  end;
+
+  Result := LQueryDrop.SQL.Text;
+
+  LQuery.Close;
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.DropAllIndex: String;
@@ -332,17 +391,17 @@ begin
 
   while not LQuery.Eof do
   begin
-    LQueryDrop.SQL.Add(Format('DROP INDEX %s ON %s ',[LQuery.Fields.FieldByName('iname').AsString,'['+LQuery.Fields.FieldByName('tname').AsString+']']));
+    LQueryDrop.SQL.Add(Format('DROP INDEX %s;',[LQuery.Fields.FieldByName('name').AsString]));
 
     LQuery.Next;
   end;
 
-  if not FOnlyCreateScript then
-  begin
-    // Execute Query
-    if LQueryDrop.SQL.Text.Length>0 then
-      LQueryDrop.ExecSQL;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    // Execute Query
+//    if LQueryDrop.SQL.Text.Length>0 then
+//      LQueryDrop.ExecSQL;
+//  end;
 
   Result := LQueryDrop.SQL.Text;
 
@@ -360,15 +419,15 @@ begin
   if APropertyIsID then FAlterTableScript := '';
 
   // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    if FAlterTableScript.Length>0 then
-    begin
-      LQuery := io.GlobalFactory.DBFactory.Query('');
-      LQuery.SQL.Add(FAlterTableScript);
-      LQuery.ExecSQL;
-    end;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    if FAlterTableScript.Length>0 then
+//    begin
+//      LQuery := io.GlobalFactory.DBFactory.Query('');
+//      LQuery.SQL.Add(FAlterTableScript);
+//      LQuery.ExecSQL;
+//    end;
+//  end;
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.EndCreateTable: String;
@@ -379,12 +438,23 @@ begin
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 
   // Execute Query
-  if not FOnlyCreateScript then
-  begin
-    LQuery := io.GlobalFactory.DBFactory.Query('');
-    LQuery.SQL.Add(FCreateTableScript);
-    LQuery.ExecSQL;
-  end;
+//  if not FOnlyCreateScript then
+//  begin
+//    LQuery := io.GlobalFactory.DBFactory.Query('');
+//    LQuery.SQL.Add(FCreateTableScript);
+//    LQuery.ExecSQL;
+//  end;
+end;
+
+procedure TioDBBuilderSqLiteSqlGenerator.ExecuteSql(const ASql: string);
+var
+  LQuery: IioQuery;
+begin
+  if ASql.IsEmpty then Exit;
+
+  LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery.SQL.Add(ASql);
+  LQuery.ExecSQL;
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;

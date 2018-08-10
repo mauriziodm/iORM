@@ -148,6 +148,7 @@ type
     FTables: TioDBBuilderTableList;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     function GetSourceTable(ATableName: String): IioDBBuilderTable;
+    function RemoveLastComma(const AValue: string): string;
   strict protected
     function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
     function GetTable(const ATableName: String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBBuilderSqlGenerator; const AMap:IioMap): IioDBBuilderTable;
@@ -228,6 +229,14 @@ var
   LDbExists: Boolean;
   LWarnings: Boolean;
   LRemark: string;
+  LAddIndexSql: string;
+  LAddFKSql: string;
+  LAddPrimaryKeySql: string;
+  LDropAllForeignKeySql: string;
+  LDropAllIndexSql: string;
+  LAlterTableSql: string;
+  LCreateTableSql: string;
+  LFkInCreateSql: string;
 begin
   try
     // Build DB structure analizing Model Rtti informations
@@ -236,7 +245,7 @@ begin
     LSb := TStringBuilder.Create;
 
     try
-      LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AOnlyCreateScript);
+      LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator;
       LDatabaseName := TioDBFactory.ConnectionManager.GetConnectionDefByName.Params.Database;
 
       // Verification of Database Existence
@@ -256,11 +265,25 @@ begin
 
       if LDbExists then
       begin
-        // Remove All FK and Index
         LSb.AppendLine();
-        LSb.AppendLine(LSqlGenerator.DropAllForeignKey);
+
+        // Generate Sql x Drop All FK
+        LDropAllForeignKeySql := LSqlGenerator.DropAllForeignKey(FTables);
+        LSb.AppendLine(LDropAllForeignKeySql);
+
+        // Drop all FK
+        if not AOnlyCreateScript then
+          LSqlGenerator.ExecuteSql(LDropAllForeignKeySql);
+
         LSb.AppendLine();
-        LSb.AppendLine(LSqlGenerator.DropAllIndex);
+
+        // Generate Sql x Drop All Index
+        LDropAllIndexSql := LSqlGenerator.DropAllIndex;
+        LSb.AppendLine(LDropAllIndexSql);
+
+        // Drop all Index
+        if not AOnlyCreateScript then
+          LSqlGenerator.ExecuteSql(LDropAllIndexSql);
       end;
 
       // Loop for all entities (model classes) of the application
@@ -272,28 +295,47 @@ begin
         if (not LDbExists) or (not LSqlGenerator.TableExists(LDatabaseName, LTableName)) then
         begin
           LSb.AppendLine();
-          LSb.AppendLine(LSqlGenerator.BeginCreateTable(LTableName));
 
-          //for LContextProperty in LPair.Value.GetMap.GetProperties do
-          //  LSb.AppendLine(LSqlGenerator.CreateField(LContextProperty));
+          // Generate Sql x Create Table
+          LCreateTableSql := LSqlGenerator.BeginCreateTable(LTableName);
 
+          // Generate Sql x Fields
           for LPairField in LPairTable.Value.Fields do
           begin
             if LPairField.Value.IsSqlField then
-              LSb.AppendLine(LSqlGenerator.CreateField(LPairField.Value.GetProperty));
+              LCreateTableSql := LCreateTableSql + LSqlGenerator.CreateField(LPairField.Value.GetProperty);
           end;
 
+          // Generate Sql x ClassInfo
           if LPairTable.Value.IsClassFromField then
-            LSb.AppendLine(LSqlGenerator.CreateClassInfoField(LPairTable.Value));
+            LCreateTableSql := LCreateTableSql + LSqlGenerator.CreateClassInfoField(LPairTable.Value);
 
           // Generate Foreign Key in CREATE STATEMENT (use this feature only in the databases that provide it)
           // Otherwise implements AddForeignKey methods
-          LSb.AppendLine(LSqlGenerator.AddForeignKeyInCreate(LPairTable.Value));
+          LFkInCreateSql := LSqlGenerator.AddForeignKeyInCreate(LPairTable.Value);
 
-          LSb.AppendLine(LSqlGenerator.EndCreateTable);
+          // Remove Last Comma
+          if LFkInCreateSql.IsEmpty then
+            LCreateTableSql := RemoveLastComma(LCreateTableSql)
+          else
+            LCreateTableSql := LCreateTableSql + LFkInCreateSql;
 
-          // Generate Primary Key
-          LSb.AppendLine(LSqlGenerator.AddPrimaryKey(LTableName, LPairTable.Value.IDField.GetProperty));
+          // Generate Sql x End Create Table
+          LCreateTableSql := LCreateTableSql + LSqlGenerator.EndCreateTable;
+          LSb.AppendLine(LCreateTableSql);
+
+          // Create Table
+          if not AOnlyCreateScript then
+            LSqlGenerator.ExecuteSql(LCreateTableSql);
+
+          // Generate Sql x Primary Key
+          LAddPrimaryKeySql := LSqlGenerator.AddPrimaryKey(LTableName, LPairTable.Value.IDField.GetProperty);
+          LSb.AppendLine(LAddPrimaryKeySql);
+
+          // Create Primary Key
+          if not AOnlyCreateScript then
+            LSqlGenerator.ExecuteSql(LAddPrimaryKeySql);
+
         end
         else
         begin
@@ -304,9 +346,17 @@ begin
               if not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName) then
               begin
                 LSb.AppendLine();
-                LSb.AppendLine(LSqlGenerator.BeginAlterTable('', LTableName));
-                LSb.AppendLine(LSqlGenerator.AddField(LPairField.Value.GetProperty));
-                LSb.AppendLine(LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID) );
+
+                // Generate Sql x Alter Table
+                LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName);
+                LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty);
+                LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
+
+                LSb.AppendLine(LAlterTableSql);
+
+                // Execute Alter Table
+                if not AOnlyCreateScript then
+                  LSqlGenerator.ExecuteSql(LAlterTableSql);
               end
               else
               begin
@@ -315,9 +365,18 @@ begin
                   LRemark := LSqlGenerator.GetRemark(LWarnings);
 
                   LSb.AppendLine();
-                  LSb.AppendLine(LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName));
-                  LSb.AppendLine(LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty));
-                  LSb.AppendLine(LRemark + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID));
+
+                  // Generate Sql x Alter Table
+                  LAlterTableSql := LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName);
+                  LAlterTableSql := LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty);
+                  LAlterTableSql := LRemark + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
+
+                  LSb.AppendLine(LAlterTableSql);
+
+                  // Execute Alter Table
+                  if not AOnlyCreateScript then
+                    LSqlGenerator.ExecuteSql(LAlterTableSql);
+
                 end;
               end;
             end;
@@ -332,9 +391,17 @@ begin
         begin
           LContext := TioContextFactory.Context(LPairTable.Value.GetMap.GetClassName);
 
-          // Create Index
           LSb.AppendLine();
-          LSb.AppendLine(LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique));
+
+          // Generate Sql x Index
+          LAddIndexSql := LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique);
+
+          LSb.AppendLine(LAddIndexSql);
+
+          // Create Index
+          if not AOnlyCreateScript then
+            LSqlGenerator.ExecuteSql(LAddIndexSql);
+
         end;
       end;
 
@@ -377,9 +444,17 @@ begin
                 LDestinationFieldName := LChildContext.GetProperties.GetIdProperty.GetName;
               end;
 
-                // Create FK
-                LSb.AppendLine();
-                LSb.AppendLine(LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName));
+              LSb.AppendLine();
+
+              // Create Sql x FK
+              LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName);
+
+              LSb.AppendLine(LAddFKSql);
+
+              // Create FK
+              if not AOnlyCreateScript then
+                LSqlGenerator.ExecuteSql(LAddFKSql);
+
             end;
           end;
         end;
@@ -572,6 +647,12 @@ begin
       if ATable.IndexList.IndexOf(LIndex)=-1 then
         ATable.IndexList.Add(LIndex);
     end;
+end;
+
+function TioDBBuilder.RemoveLastComma(const AValue: string): string;
+begin
+  if AValue.EndsWith(',') then
+    Result := AValue.Substring(0, AValue.Length-1);
 end;
 
 { TioDBBuilderField }

@@ -3,7 +3,7 @@
         <ProjectGuid>{927B27D7-BAED-4B81-B600-9C999A40DCFB}</ProjectGuid>
         <ProjectVersion>18.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>PhoneContacts_SQLite_DBBuilder.dpr</MainSource>
+        <MainSource>DBBuilder_SQLite_ComplexModel.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -53,7 +53,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <SanitizedProjectName>PhoneContacts_SQLite_DBBuilder</SanitizedProjectName>
+        <SanitizedProjectName>DBBuilder_SQLite_ComplexModel</SanitizedProjectName>
         <DCC_Define>ioVCL;$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1040</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -100,14 +100,9 @@
             <Form>BuilderForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Commons\BusinessObjects.Authentication.Interfaces.pas"/>
-        <DCCReference Include="Commons\BusinessObjects.Authentication.pas"/>
-        <DCCReference Include="Commons\BusinessObjects.Base.Interfaces.pas"/>
-        <DCCReference Include="Commons\BusinessObjects.Base.pas"/>
-        <DCCReference Include="Commons\BusinessObjects.Interfaces.pas"/>
-        <DCCReference Include="Commons\BusinessObjects.pas"/>
-        <DCCReference Include="Commons\BusinessObjects.ProdItems.pas"/>
-        <DCCReference Include="Commons\RegisterClasses.pas"/>
+        <DCCReference Include="Commons\model\uInterfaces.pas"/>
+        <DCCReference Include="Commons\model\uModel.pas"/>
+        <DCCReference Include="Commons\registerclasses\uRegisterClasses.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -126,7 +121,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">PhoneContacts_SQLite_DBBuilder.dpr</Source>
+                    <Source Name="MainSource">DBBuilder_SQLite_ComplexModel.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -134,9 +129,9 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win32\Debug\PhoneContacts_SQLite_DBBuilder.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\DBBuilder_SQLite_ComplexModel.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>PhoneContacts_SQLite_DBBuilder.exe</RemoteName>
+                        <RemoteName>DBBuilder_SQLite_ComplexModel.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

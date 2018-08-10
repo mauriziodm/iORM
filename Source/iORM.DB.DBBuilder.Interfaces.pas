@@ -149,10 +149,12 @@ type
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
-    function DropAllForeignKey: String;
+    function DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+
+    procedure ExecuteSql(const ASql: string);
   end;
 
   IioDBBuilder = interface

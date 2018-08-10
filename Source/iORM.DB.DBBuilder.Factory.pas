@@ -48,7 +48,7 @@ uses
 type
   TioDBBuilderFactory = class
   public
-    class function NewSqlGenerator(AOnlyCreateScript: Boolean): IioDBBuilderSqlGenerator;
+    class function NewSqlGenerator: IioDBBuilderSqlGenerator;
     class function NewBuilder: IioDBBuilder;
   end;
 
@@ -70,12 +70,12 @@ begin
   Result := TioDBBuilder.Create;
 end;
 
-class function TioDBBuilderFactory.NewSqlGenerator(AOnlyCreateScript: Boolean): IioDBBuilderSqlGenerator;
+class function TioDBBuilderFactory.NewSqlGenerator: IioDBBuilderSqlGenerator;
 begin
   case TioConnectionManager.GetConnectionInfo.ConnectionType of
     //cdtFirebird:  Result := TioSqlDataConverterFirebird;
-    cdtSQLite:    Result := TioDBBuilderSqLiteSqlGenerator.Create(AOnlyCreateScript);
-    cdtSQLServer: Result := TioDBBuilderMSSqlServerSqlGenerator.Create(AOnlyCreateScript);
+    cdtSQLite:    Result := TioDBBuilderSqLiteSqlGenerator.Create;
+    cdtSQLServer: Result := TioDBBuilderMSSqlServerSqlGenerator.Create;
   else
     raise EioException.Create(Self.ClassName, 'NewSqlService', 'Connection type not found.');
   end;
