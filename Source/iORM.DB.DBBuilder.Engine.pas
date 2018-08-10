@@ -374,9 +374,9 @@ begin
                   LSb.AppendLine(LAlterTableSql);
 
                   // Execute Alter Table
-                  if not AOnlyCreateScript then
-                    LSqlGenerator.ExecuteSql(LAlterTableSql);
-
+//                  if not AOnlyCreateScript then
+//                    LSqlGenerator.ExecuteSql(LAlterTableSql);
+//
                 end;
               end;
             end;
@@ -462,9 +462,9 @@ begin
 
       Result := True;
       OErrorMessage := '';
-      OOutputScript := LSb.ToString;
 
     finally
+      OOutputScript := LSb.ToString;
       LSb.Free;
     end;
 
@@ -473,7 +473,7 @@ begin
     begin
       Result := False;
       OErrorMessage := E.Message;
-      OOutputScript := '';
+//      OOutputScript := '';
     end;
   end;
 end;
