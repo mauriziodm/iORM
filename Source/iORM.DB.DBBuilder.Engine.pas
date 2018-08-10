@@ -348,8 +348,8 @@ begin
                 LSb.AppendLine();
 
                 // Generate Sql x Alter Table
-                LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName);
-                LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty);
+                LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName)+' ';
+                LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty)+' ';
                 LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
                 LSb.AppendLine(LAlterTableSql);
@@ -367,8 +367,8 @@ begin
                   LSb.AppendLine();
 
                   // Generate Sql x Alter Table
-                  LAlterTableSql := LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName);
-                  LAlterTableSql := LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty);
+                  LAlterTableSql := LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName)+' ';
+                  LAlterTableSql := LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty)+' ';
                   LAlterTableSql := LRemark + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
                   LSb.AppendLine(LAlterTableSql);
