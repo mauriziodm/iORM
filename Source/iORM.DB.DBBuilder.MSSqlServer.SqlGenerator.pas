@@ -54,7 +54,6 @@ const
 type
   TioDBBuilderMSSqlServerSqlGenerator = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
-    //FOnlyCreateScript: Boolean;
     FCreateTableScript: String;
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
@@ -74,7 +73,7 @@ type
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
     function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out AWarnings: Boolean): Boolean;
-    function CreateField(const AProperty:IioContextProperty): String;
+    function CreateField(const AProperty:IioContextProperty; const AAddNullableSyntax: boolean = True; const AAddType: boolean = False): String;
     function CreateClassInfoField(ATable: IioDBBuilderTable): String;
     function AddField(const AProperty:IioContextProperty): String;
     function AlterField(const AProperty:IioContextProperty): String;
@@ -88,7 +87,7 @@ type
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
 
-    procedure ExecuteSql(const ASql: string);
+    procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
   end;
 
 implementation
@@ -99,7 +98,7 @@ uses
 
 { TioDBBuilderMSSqlServerSqlService }
 
-function TioDBBuilderMSSqlServerSqlGenerator.CreateField(const AProperty:IioContextProperty): String;
+function TioDBBuilderMSSqlServerSqlGenerator.CreateField(const AProperty:IioContextProperty; const AAddNullableSyntax: boolean = True; const AAddType: boolean = False): String;
 var
   LFieldName: string;
   LFieldType: string;
@@ -206,28 +205,6 @@ function TioDBBuilderMSSqlServerSqlGenerator.AddForeignKey(const ASourceTableNam
 var
   LQuery: IioQuery;
 begin
-//  Result:='IF OBJECT_ID('+QuotedStr('FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName)+') IS NOT NULL '+sLineBreak+
-//          'BEGIN '+sLineBreak+
-//          '  ALTER TABLE ['+ASourceTableName+'] '+
-//            'DROP CONSTRAINT '+
-//            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+sLineBreak+
-//          '  ALTER TABLE ['+ASourceTableName+'] '+
-//            'ADD CONSTRAINT '+
-//            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
-//            ' FOREIGN KEY'+
-//            '(['+ASourceFieldName+'])'+
-//            ' REFERENCES '+ADestinationTableName+
-//            '(['+ADestinationFieldName+'])'+sLineBreak+' '+
-//          'END '+sLineBreak+
-//          'ELSE '+sLineBreak+
-//          '  ALTER TABLE ['+ASourceTableName+'] '+
-//            'ADD CONSTRAINT '+
-//            'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
-//            ' FOREIGN KEY'+
-//            '(['+ASourceFieldName+'])'+
-//            ' REFERENCES '+ADestinationTableName+
-//            '(['+ADestinationFieldName+'])'+sLineBreak+' ';
-
   Result:='ALTER TABLE ['+ASourceTableName+'] '+
           'ADD CONSTRAINT '+
           'FK_'+ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
@@ -235,14 +212,6 @@ begin
           '(['+ASourceFieldName+'])'+
           ' REFERENCES '+ADestinationTableName+
           '(['+ADestinationFieldName+'])';
-
-//  // Execute Query
-//  if not FOnlyCreateScript then
-//  begin
-//    LQuery := io.GlobalFactory.DBFactory.Query('');
-//    LQuery.SQL.Add(Result);
-//    LQuery.ExecSQL;
-//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddForeignKeyInCreate(
@@ -260,14 +229,6 @@ var
 begin
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
-
-//  // Execute Query
-//  if not FOnlyCreateScript then
-//  begin
-//    LQuery := io.GlobalFactory.DBFactory.Query('');
-//    LQuery.SQL.Add(Result);
-//    LQuery.ExecSQL;
-//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
@@ -277,14 +238,6 @@ begin
   Result := 'ALTER TABLE ['+ATableName+'] '+
             'ADD CONSTRAINT '+'PK_'+ATableName+'_'+AIDProperty.GetName+' PRIMARY KEY CLUSTERED'+
             '('+AIDProperty.GetSqlFieldName+')';
-
-  // Execute Query
-//  if not FOnlyCreateScript then
-//  begin
-//    LQuery := io.GlobalFactory.DBFactory.Query('');
-//    LQuery.SQL.Add(Result);
-//    LQuery.ExecSQL;
-//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AlterField(const AProperty:IioContextProperty): String;
@@ -319,7 +272,7 @@ begin
   LInvalidConversions:=TStringList.Create;
 
   try
-
+    // TODO: Potrebbero esserci altre conversioni da gestire
     LInvalidConversions.Add('datetime->decimal');
     LInvalidConversions.Add('datetime->numeric');
     LInvalidConversions.Add('datetime->int');
@@ -436,13 +389,6 @@ begin
     LQuery.Next;
   end;
 
-//  if not FOnlyCreateScript then
-//  begin
-//    // Execute Query
-//    if LQueryDrop.SQL.Text.Length>0 then
-//      LQueryDrop.ExecSQL;
-//  end;
-
   Result := LQueryDrop.SQL.Text;
   LQuery.Close;
 end;
@@ -470,13 +416,6 @@ begin
     LQuery.Next;
   end;
 
-//  if not FOnlyCreateScript then
-//  begin
-//    // Execute Query
-//    if LQueryDrop.SQL.Text.Length>0 then
-//      LQueryDrop.ExecSQL;
-//  end;
-
   Result := LQueryDrop.SQL.Text;
 
   LQuery.Close;
@@ -491,17 +430,6 @@ begin
 
   // Skip ID Property
   if APropertyIsID then FAlterTableScript := '';
-
-  // Execute Query
-//  if not FOnlyCreateScript then
-//  begin
-//    if FAlterTableScript.Length>0 then
-//    begin
-//      LQuery := io.GlobalFactory.DBFactory.Query('');
-//      LQuery.SQL.Add(FAlterTableScript);
-//      LQuery.ExecSQL;
-//    end;
-//  end;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.EndCreateTable: String;
@@ -510,17 +438,9 @@ var
 begin
   Result := ')';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
-
-  // Execute Query
-//  if not FOnlyCreateScript then
-//  begin
-//    LQuery := io.GlobalFactory.DBFactory.Query('');
-//    LQuery.SQL.Add(FCreateTableScript);
-//    LQuery.ExecSQL;
-//  end;
 end;
 
-procedure TioDBBuilderMSSqlServerSqlGenerator.ExecuteSql(const ASql: string);
+procedure TioDBBuilderMSSqlServerSqlGenerator.ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
 var
   LQuery: IioQuery;
 begin

@@ -45,6 +45,8 @@ type
 
   // Classe che si occupa di generare il codice SQL delle varie query
   TioSqlGeneratorFirebird = class(TioSqlGeneratorSqLite)
+  protected
+    class function BuildIndexName(const AContext:IioContext; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean): String; override;
   public
     class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
     class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
@@ -58,6 +60,46 @@ uses
   System.Classes, System.SysUtils, iORM.SqlTranslator;
 
 { TioSqlGeneratorFirebird }
+
+class function TioSqlGeneratorFirebird.BuildIndexName(
+  const AContext: IioContext; const ACommaSepFieldList: String;
+  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
+var
+  LFieldList: TStrings;
+  LField: String;
+  LGuid: TGUID;
+begin
+  // M.M. 11/08/18 Non chiama la funzione ereditata perchè per FIREBIRD i nome degli indici hanno lunghezza massima 31 char
+
+  // Build the indexname
+//  Result := 'IDX_' + AContext.GetTable.TableName;
+  // Field list
+//  LFieldList := TStringList.Create;
+//  try
+//    LFieldList.Delimiter := ',';
+//    LFieldList.DelimitedText := ACommaSepFieldList;
+//    for LField in LFieldList do
+//      Result := Result + '_' + LField.Substring(0,5).Trim;   // TODO: si può pensare anche ad un progressivo
+//  finally
+//    LFieldList.Free;
+//  end;
+
+  Result := 'IDX';
+  // Prende gli ultimi 10 caratteri di un GUID
+  CreateGUID(LGuid);
+  Result := Result + '_' + LGuid.ToString.Replace('-','',[rfReplaceAll]).Replace('}','',[rfReplaceAll]).Substring(24);
+
+  // Index orientation
+  case AIndexOrientation of
+    ioAscending: Result := Result + '_A';
+    ioDescending: Result := Result + '_D';
+  end;
+  // Unique
+  if AUnique then
+    Result := Result + '_U';
+  // Translate
+  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
+end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(
   const AQuery: IioQuery; const AContext:IioContext; AIndexName:String;
@@ -74,8 +116,8 @@ begin
     AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
   // Index orientation
   case AIndexOrientation of
-    ioAscending: LIndexOrientationText := ' ASC';
-    ioDescending:  LIndexOrientationText := ' DESC';
+    ioAscending: LIndexOrientationText := ' ASCENDING ';
+    ioDescending:  LIndexOrientationText := ' DESCENDING ';
   end;
   // Unique
   if AUnique then

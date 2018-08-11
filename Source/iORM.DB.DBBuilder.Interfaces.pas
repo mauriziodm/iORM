@@ -140,7 +140,7 @@ type
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
     function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out OWarnings: Boolean): Boolean;
-    function CreateField(const AProperty:IioContextProperty): String;
+    function CreateField(const AProperty:IioContextProperty; const AAddNullableSyntax: boolean = True; const AAddType: boolean = False): String;
     function CreateClassInfoField(ATable: IioDBBuilderTable): String;
     function AddField(const AProperty:IioContextProperty): String;
     function AlterField(const AProperty:IioContextProperty): String;
@@ -154,7 +154,7 @@ type
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
 
-    procedure ExecuteSql(const ASql: string);
+    procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
   end;
 
   IioDBBuilder = interface

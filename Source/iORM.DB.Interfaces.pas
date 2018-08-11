@@ -195,7 +195,9 @@ type
   TioSqlGenerator = class abstract
   strict protected
     class procedure LoadSqlParamsFromContext(const AQuery:IioQuery; const AContext:IioContext);
-    class function BuildIndexName(const AContext:IioContext; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean): String;
+  // N.B. M.M. 11/08/18 Spostata come protected per poterla eventualmente ridefinire per database dove esiste una lunghezza massima dei nomi degli indici
+  protected
+    class function BuildIndexName(const AContext:IioContext; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean): String; virtual;
   public
     class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
@@ -206,6 +208,7 @@ type
     class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual; abstract;
     class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); virtual; abstract;
     class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); virtual; abstract;
+
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations
@@ -352,12 +355,12 @@ begin
   end;
   // Index orientation
   case AIndexOrientation of
-    ioAscending: Result := Result + '_ASC';
-    ioDescending: Result := Result + '_DESC';
+    ioAscending: Result := Result + '_A';
+    ioDescending: Result := Result + '_D';
   end;
   // Unique
   if AUnique then
-    Result := Result + '_UNIQUE';
+    Result := Result + '_U';
   // Translate
   Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
 end;

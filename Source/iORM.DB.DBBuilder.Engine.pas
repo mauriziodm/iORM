@@ -269,21 +269,23 @@ begin
 
         // Generate Sql x Drop All FK
         LDropAllForeignKeySql := LSqlGenerator.DropAllForeignKey(FTables);
-        LSb.AppendLine(LDropAllForeignKeySql);
+
+        if not LDropAllForeignKeySql.IsEmpty then
+          LSb.AppendLine(LDropAllForeignKeySql);
 
         // Drop all FK
         if not AOnlyCreateScript then
-          LSqlGenerator.ExecuteSql(LDropAllForeignKeySql);
-
-        LSb.AppendLine();
+          LSqlGenerator.ExecuteSql(LDropAllForeignKeySql, True);
 
         // Generate Sql x Drop All Index
         LDropAllIndexSql := LSqlGenerator.DropAllIndex;
-        LSb.AppendLine(LDropAllIndexSql);
+
+        if not LDropAllIndexSql.IsEmpty then
+          LSb.AppendLine(LDropAllIndexSql);
 
         // Drop all Index
         if not AOnlyCreateScript then
-          LSqlGenerator.ExecuteSql(LDropAllIndexSql);
+          LSqlGenerator.ExecuteSql(LDropAllIndexSql, True);
       end;
 
       // Loop for all entities (model classes) of the application
@@ -345,14 +347,13 @@ begin
             begin
               if not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName) then
               begin
-                LSb.AppendLine();
-
                 // Generate Sql x Alter Table
                 LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName)+' ';
                 LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty)+' ';
                 LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
-                LSb.AppendLine(LAlterTableSql);
+                if not LAlterTableSql.IsEmpty then
+                  LSb.AppendLine(LAlterTableSql);
 
                 // Execute Alter Table
                 if not AOnlyCreateScript then
@@ -360,23 +361,23 @@ begin
               end
               else
               begin
+                LWarnings := False;
+
                 if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty, LWarnings) then
                 begin
                   LRemark := LSqlGenerator.GetRemark(LWarnings);
 
-                  LSb.AppendLine();
-
                   // Generate Sql x Alter Table
-                  LAlterTableSql := LRemark + LSqlGenerator.BeginAlterTable(LRemark, LTableName)+' ';
-                  LAlterTableSql := LRemark + LSqlGenerator.AlterField(LPairField.Value.GetProperty)+' ';
-                  LAlterTableSql := LRemark + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
+                  LAlterTableSql := LSqlGenerator.BeginAlterTable(LRemark, LTableName)+' ';
+                  LAlterTableSql := LAlterTableSql + LSqlGenerator.AlterField(LPairField.Value.GetProperty)+' ';
+                  LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
-                  LSb.AppendLine(LAlterTableSql);
+                  if not LAlterTableSql.IsEmpty then
+                    LSb.AppendLine(LAlterTableSql);
 
                   // Execute Alter Table
-//                  if not AOnlyCreateScript then
-//                    LSqlGenerator.ExecuteSql(LAlterTableSql);
-//
+                  if not AOnlyCreateScript and not LWarnings then
+                    LSqlGenerator.ExecuteSql(LAlterTableSql);
                 end;
               end;
             end;
@@ -396,7 +397,8 @@ begin
           // Generate Sql x Index
           LAddIndexSql := LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique);
 
-          LSb.AppendLine(LAddIndexSql);
+          if not LAddIndexSql.isEmpty then
+            LSb.AppendLine(LAddIndexSql);
 
           // Create Index
           if not AOnlyCreateScript then
@@ -449,7 +451,8 @@ begin
               // Create Sql x FK
               LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName);
 
-              LSb.AppendLine(LAddFKSql);
+              if not LAddFKSql.IsEmpty then
+                LSb.AppendLine(LAddFKSql);
 
               // Create FK
               if not AOnlyCreateScript then
