@@ -249,14 +249,15 @@ var
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
   LRttiProperty: TRttiProperty;
+  LRttiField: TRttiField;
 
-  function GetMetadata_FieldTypeByPropertyTypeKind(const ARttiProperty: TRttiProperty): TioMetadataFieldType;
+  function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
   begin
     Result := ioMdInteger;
-    case ARttiProperty.PropertyType.TypeKind of
+    case ATypeKind of
       tkEnumeration:
         begin
-          if ARttiProperty.PropertyType.QualifiedName = 'System.Boolean' then
+          if AQualifiedName = 'System.Boolean' then
           begin
             Result := ioMdBoolean;
             Exit;
@@ -274,17 +275,17 @@ var
         end;
       tkFloat:
         begin
-          if ARttiProperty.PropertyType.QualifiedName = 'System.TDate' then
+          if AQualifiedName = 'System.TDate' then
           begin
             Result := ioMdDate;
             Exit;
           end
-          else if ARttiProperty.PropertyType.QualifiedName = 'System.TDateTime' then
+          else if AQualifiedName = 'System.TDateTime' then
           begin
             Result := ioMdDateTime;
             Exit;
           end
-          else if ARttiProperty.PropertyType.QualifiedName = 'System.TTime' then
+          else if AQualifiedName = 'System.TTime' then
           begin
             Result := ioMdTime;
             Exit;
@@ -302,7 +303,7 @@ var
         end;
       tkRecord:
         begin
-          if ARttiProperty.PropertyType.QualifiedName = 'System.SysUtils.TTimeStamp' then
+          if AQualifiedName = 'System.SysUtils.TTimeStamp' then
           begin
             Result := ioMdDateTime;
             Exit;
@@ -332,9 +333,17 @@ begin
     // M.M. 01/08/18 - Used by DBBuilder
     // TODO: Gestire in base al tipo della proprietà
     if Prop is TRttiProperty then
-      LRttiProperty := Prop as TRttiProperty;
+    begin
+      LRttiProperty := Prop as TRttiProperty  ;
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
+    end
+    else
+    if Prop is TRttiField then
+    begin
+      LRttiField := Prop as TRttiField;
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind,LRttiField.FieldType.QualifiedName);
+    end;
 
-    PropMetadata_FieldType := GetMetadata_FieldTypeByPropertyTypeKind(LRttiProperty);
     PropMetadata_FieldLength := 50{255}; //M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
     PropMetadata_FieldPrecision := 10;
     PropMetadata_FieldScale := 3;
