@@ -31,8 +31,6 @@ object BuilderForm: TBuilderForm
     Top = 37
     Width = 686
     Height = 622
-    Lines.Strings = (
-      'Memo1')
     ScrollBars = ssVertical
     TabOrder = 0
   end
@@ -61,7 +59,7 @@ object BuilderForm: TBuilderForm
     end
     object CreateDBSQLiteButton: TButton
       Left = 7
-      Top = 59
+      Top = 92
       Width = 170
       Height = 25
       Caption = 'Create SQLite DB'
@@ -78,7 +76,7 @@ object BuilderForm: TBuilderForm
     end
     object GenerateSQLiteScriptButton: TButton
       Left = 7
-      Top = 90
+      Top = 59
       Width = 170
       Height = 25
       Caption = 'Only CreateDB SQLite Script'

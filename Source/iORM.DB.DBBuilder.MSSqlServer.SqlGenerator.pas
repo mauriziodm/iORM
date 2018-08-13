@@ -327,10 +327,10 @@ var
 begin
   // Create new connection in database master
   io.Connections.NewSQLServerConnectionDef(
-                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.AsString['Server'],
+                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).AsString['Server'],
                   'master',
-                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.UserName,
-                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.Password,False, False, False,
+                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.UserName,
+                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Password,False, False, False,
                   ConnectionName_MSSQL_MASTER);
 
   LQuery := io.GlobalFactory.DBFactory.Query(ConnectionName_MSSQL_MASTER);
@@ -349,10 +349,10 @@ var
 begin
   // Create new connection in database master
   io.Connections.NewSQLServerConnectionDef(
-                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.AsString['Server'],
+                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).AsString['Server'],
                   'master',
-                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.UserName,
-                  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.Password,False, False, False,
+                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.UserName,
+                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Password,False, False, False,
                   ConnectionName_MSSQL_MASTER);
 
   LQuery := io.GlobalFactory.DBFactory.Query(ConnectionName_MSSQL_MASTER);

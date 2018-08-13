@@ -53,6 +53,7 @@ type
     procedure CreateDBFBButtonClick(Sender: TObject);
   private
     procedure GenerateDB(AOnlyScript: boolean);
+    procedure SetDefaultConnectionName(AName: string);
   public
     { Public declarations }
   end;
@@ -74,9 +75,10 @@ begin
 
   if LButtonSelected = mrOK then
   begin
-
     // Default Connection
-    io.Connections.NewFirebirdConnectionDef(ServerFBEdit.Text,DatabaseFBEdit.Text,UserNameFBEdit.Text,PasswordFBEdit.Text,'UTF8');
+    io.Connections.NewFirebirdConnectionDef(ServerFBEdit.Text,DatabaseFBEdit.Text,UserNameFBEdit.Text,PasswordFBEdit.Text,'UTF8',True,False,False,'FB');
+
+    SetDefaultConnectionName('FB');
 
     GenerateDB(False);
   end;
@@ -92,12 +94,18 @@ begin
 
   if LButtonSelected = mrOK then
   begin
-
     // Default Connection
-    io.Connections.NewSQLServerConnectionDef(ServerMSSQLEdit.Text,DatabaseMSSQLEdit.Text,UserNameMSSQLEdit.Text,PasswordMSSQLEdit.Text);
+    io.Connections.NewSQLServerConnectionDef(ServerMSSQLEdit.Text,DatabaseMSSQLEdit.Text,UserNameMSSQLEdit.Text,PasswordMSSQLEdit.Text,True,False,False,'MSSQL');
+
+    SetDefaultConnectionName('MSSQL');
 
     GenerateDB(False);
   end;
+end;
+
+procedure TBuilderForm.SetDefaultConnectionName(AName: string);
+begin
+  io.Connections.SetDefaultConnectionName(AName);
 end;
 
 procedure TBuilderForm.CopyScriptButtonClick(Sender: TObject);
@@ -115,7 +123,9 @@ begin
   begin
 
     // Default Connection
-    io.Connections.NewSQLiteConnectionDef(DatabaseSQLiteEdit.Text);
+    io.Connections.NewSQLiteConnectionDef(DatabaseSQLiteEdit.Text,True,False,False,'SQLITE');
+
+    SetDefaultConnectionName('SQLITE');
 
     GenerateDB(False);
   end;
@@ -123,11 +133,10 @@ end;
 
 procedure TBuilderForm.GeneraFBScriptButtonClick(Sender: TObject);
 begin
-  // Default Connection
-  io.Connections.NewFirebirdConnectionDef(ServerFBEdit.Text,DatabaseFBEdit.Text,UserNameFBEdit.Text,PasswordFBEdit.Text, 'UTF8');
-  //
+  SetDefaultConnectionName('FB');
 
-  Memo1.Lines.Clear;
+  // Default Connection
+  io.Connections.NewFirebirdConnectionDef(ServerFBEdit.Text,DatabaseFBEdit.Text,UserNameFBEdit.Text,PasswordFBEdit.Text, 'UTF8',True,False,False,'FB');
 
   GenerateDB(True);
 end;
@@ -137,6 +146,8 @@ var
   LOutputScript: string;
   LErrorMessage: string;
 begin
+  Memo1.Lines.Clear;
+
   // SOLO GENERAZIONE SCRIPT DI CREATE PER TUTTI GLI ELEMENTI DEL DB DA UTILIZZARE PER LA GENERAZIONE INIZIALE
   if io.GlobalFactory.DBBuilderFactory.NewBuilder.GenerateDB(AOnlyScript, LOutputScript, LErrorMessage) then
   begin
@@ -153,9 +164,9 @@ end;
 procedure TBuilderForm.GenerateMSSQLScriptButtonClick(Sender: TObject);
 begin
   // Default Connection
-  io.Connections.NewSQLServerConnectionDef(ServerMSSQLEdit.Text,DatabaseMSSQLEdit.Text,UserNameMSSQLEdit.Text,PasswordMSSQLEdit.Text);
+  io.Connections.NewSQLServerConnectionDef(ServerMSSQLEdit.Text,DatabaseMSSQLEdit.Text,UserNameMSSQLEdit.Text,PasswordMSSQLEdit.Text,True,False,False,'MSSQL');
 
-  Memo1.Lines.Clear;
+  SetDefaultConnectionName('MSSQL');
 
   GenerateDB(True);
 end;
@@ -166,9 +177,9 @@ var
   LErrorMessage: string;
 begin
   // Default Connection
-  io.Connections.NewSQLiteConnectionDef(DatabaseSQLiteEdit.Text);
+  io.Connections.NewSQLiteConnectionDef(DatabaseSQLiteEdit.Text,True,False,False,'SQLITE');
 
-  Memo1.Lines.Clear;
+  SetDefaultConnectionName('SQLITE');
 
   GenerateDB(True);
 end;

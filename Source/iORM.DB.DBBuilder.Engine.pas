@@ -246,7 +246,7 @@ begin
 
     try
       LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator;
-      LDatabaseName := TioDBFactory.ConnectionManager.GetConnectionDefByName.Params.Database;
+      LDatabaseName := TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Database;
 
       // Verification of Database Existence
       LDbExists := LSqlGenerator.DatabaseExists(LDatabaseName);

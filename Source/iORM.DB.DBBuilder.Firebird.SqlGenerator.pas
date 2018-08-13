@@ -314,7 +314,7 @@ end;
 function TioDBBuilderFirebirdSqlGenerator.CreateDatabase(const ADbName: string): String;
 begin
   // N.B. Sfrutta un parametro di Firedac per autocreare il db se non esiste
-  io.GlobalFactory.DBFactory.ConnectionManager.GetConnectionDefByName.Params.Values['CreateDatabase'] := BoolToStr(True,True);
+  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Values['CreateDatabase'] := BoolToStr(True,True);
   // N.B. Apriamo una connessione solo per fargli creare il db.
   io.GlobalFactory.DBFactory.Connection();
 
