@@ -467,7 +467,8 @@ begin
     case Prop.GetRelationType of
       // If relation BelongsTo: persist the child object to retrieve the ID (if new object or ID changed)
       ioRTBelongsTo: begin
-//        io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
+        // M.M. 17/08/18
+        io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
         {Nothing}  // Non persiste più nulla in caso di relazione BelongsTo
       end;
       // If relation HasMany
