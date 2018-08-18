@@ -600,13 +600,8 @@ var
   CurrProp: IioContextProperty;
 begin
   for CurrProp in FPropertyItems do
-  begin
     if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
-    begin
-        Result := CurrProp;
-        Exit;
-    end;
-  end;
+      Exit(CurrProp);
   raise EioException.Create(Self.ClassName +  ': Context property "' + APropertyName + '" not found');
 end;
 

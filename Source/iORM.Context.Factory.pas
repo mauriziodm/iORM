@@ -274,8 +274,8 @@ begin
       if Attr is ioFieldType then PropFieldType := ioFieldType(Attr).Value;
       if Attr is ioLoadSql then PropLoadSql := ioLoadSql(Attr).Value;
       if Attr is ioSkip then PropSkip := True;
-      if Attr is ioReadOnly then PropReadWrite := iorwReadOnly;
-      if Attr is ioWriteOnly then PropReadWrite := iorwWriteOnly;
+      if Attr is ioLoadOnly then PropReadWrite := iorwReadOnly;
+      if Attr is ioPersistOnly then PropReadWrite := iorwWriteOnly;
       // Relations
       if Attr is ioEmbeddedHasMany then
       begin

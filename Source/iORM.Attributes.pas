@@ -257,11 +257,11 @@ type
   end;
 
   // ReadOnly attribute
-  ioReadOnly = class(TioCustomAttribute)
+  ioLoadOnly = class(TioCustomAttribute)
   end;
 
   // WriteOnly attribute
-  ioWriteOnly = class(TioCustomAttribute)
+  ioPersistOnly = class(TioCustomAttribute)
   end;
 
   // TypeAlias attribute
