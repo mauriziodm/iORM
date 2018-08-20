@@ -466,15 +466,11 @@ begin
     if not Prop.IsDBWriteEnabled then Continue;
     case Prop.GetRelationType of
       // If relation BelongsTo: persist the child object to retrieve the ID (if new object or ID changed)
-<<<<<<< HEAD
       ioRTBelongsTo: begin
         // M.M. 17/08/18
         io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
         {Nothing}  // Non persiste più nulla in caso di relazione BelongsTo
       end;
-=======
-      ioRTBelongsTo: io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
->>>>>>> develop
       // If relation HasMany
       ioRTHasMany: {Nothing};
       // If relation HasOne
