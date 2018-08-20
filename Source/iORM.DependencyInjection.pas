@@ -402,14 +402,14 @@ end;
 class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias);
+  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias).SetPresenter(ATargetObj);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(
   const ATargetIntf: IInterface;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMFor(ATargetIntf as TObject, AAlias);
+  Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias).SetPresenter(ATargetIntf);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor<T>(
@@ -488,13 +488,13 @@ end;
 class function TioDependencyInjection.LocateVMfor(const ATargetObj: TObject;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMfor(ATargetObj.ClassName, AAlias);
+  Result := LocateVMfor(ATargetObj.ClassName, AAlias).SetPresenter(ATargetObj);
 end;
 
 class function TioDependencyInjection.LocateVMfor(const ATargetIntf: IInterface;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMFor(ATargetIntf as TObject, AAlias);
+  Result := LocateVMFor((ATargetIntf as TObject).ClassName, AAlias).SetPresenter(ATargetIntf);
 end;
 
 class function TioDependencyInjection.LocateVMfor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
@@ -539,7 +539,7 @@ class function TioDependencyInjection.LocateViewFor(
   const ATargetIntf: IInterface;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewFor(ATargetIntf as TObject, AAlias);
+  Result := LocateViewFor((ATargetIntf as TObject).ClassName, AAlias);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(
