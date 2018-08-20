@@ -402,14 +402,15 @@ end;
 class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias);
+  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias).SetPresenter(ATargetObj);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(
   const ATargetIntf: IInterface;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMFor(ATargetIntf as TObject, AAlias);
+  Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias).SetPresenter(ATargetIntf);
+//  Result := LocateViewVMFor(ATargetIntf as TObject, AAlias);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor<T>(
