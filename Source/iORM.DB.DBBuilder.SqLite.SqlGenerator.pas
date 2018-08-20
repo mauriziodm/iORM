@@ -80,6 +80,7 @@ type
 
     function AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+    function AddSequences(const ATableName: String; const AIDProperty: IioContextProperty): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
     function DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
@@ -200,6 +201,12 @@ begin
 
   if Result.Length>0 then
     FCreateTableScript := FCreateTableScript + ' ' +Result;
+end;
+
+function TioDBBuilderSqLiteSqlGenerator.AddSequences(const ATableName: String;
+  const AIDProperty: IioContextProperty): String;
+begin
+  // Do Nothing
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.AddIndex(const AContext: IioContext; const AIndexName,

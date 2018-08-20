@@ -78,6 +78,7 @@ type
 
     function AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
     function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+    function AddSequences(const ATableName: String; const AIDProperty: IioContextProperty): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
     function DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
@@ -183,7 +184,7 @@ begin
     LNullable := 'NOT NULL';
   end;
 
-  Result :=  LFieldName + ' '+ LType+' ' + ' ' + LFieldType + ' ' + ' ' + LKeyOptions + ' '+LFieldLength+' '+LNullable + ',';
+  Result := ' ' +  LFieldName + ' ' +' '+ LType+' ' + ' ' + LFieldType + ' ' + ' ' + LKeyOptions + ' '+LFieldLength+' '+LNullable + ',';
 
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
@@ -223,6 +224,12 @@ begin
   Result := '';
 end;
 
+function TioDBBuilderFirebirdSqlGenerator.AddSequences(
+  const ATableName: String; const AIDProperty: IioContextProperty): String;
+begin
+  Result := Format('CREATE SEQUENCE %s',[ATableName]);
+end;
+
 function TioDBBuilderFirebirdSqlGenerator.AddIndex(const AContext: IioContext; const AIndexName,
   ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
   const AUnique: Boolean): String;
@@ -234,8 +241,6 @@ begin
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
-var
-  LQuery: IioQuery;
 begin
   Result := 'ALTER TABLE '+ATableName+' '+
             'ADD PRIMARY KEY '+
@@ -307,7 +312,7 @@ end;
 
 function TioDBBuilderFirebirdSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
-  Result := ' ' + IO_CLASSFROMFIELD_FIELDNAME +' ' + ' ' + 'VARCHAR' + ' ' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+'NULL' + ',';
+  Result := ' ' + IO_CLASSFROMFIELD_FIELDNAME +' ' + ' ' + 'VARCHAR' + ' ' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+' ' + ',';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
@@ -317,6 +322,8 @@ begin
   TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Values['CreateDatabase'] := BoolToStr(True,True);
   // N.B. Apriamo una connessione solo per fargli creare il db.
   io.GlobalFactory.DBFactory.Connection();
+  // N.B. Rimuoviamo il parametro di Firedac per autocreare il db se non esiste
+  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Values['CreateDatabase'] := BoolToStr(False,True);
 
   Result := '';
 end;

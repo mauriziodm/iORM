@@ -237,6 +237,7 @@ var
   LAlterTableSql: string;
   LCreateTableSql: string;
   LFkInCreateSql: string;
+  LAddGeneratorsSql: string;
 begin
   try
     // Build DB structure analizing Model Rtti informations
@@ -338,6 +339,23 @@ begin
           if not AOnlyCreateScript then
             LSqlGenerator.ExecuteSql(LAddPrimaryKeySql);
 
+          // Generate Sql x SEQUENCE/GENERATORS
+          // TODO: Le sequenze vengono create solo se non esiste la tabella
+          // successivamente si potrebbe pensare di eseguire sempre questo
+          // pezzo di codice andando a verificare i metadati per capire
+          // se la sequenza esiste o meno e crearla solo se non esiste
+          for LPairField in LPairTable.Value.Fields do
+          begin
+            if LPairField.Value.IsKeyField  then
+            begin
+              LAddGeneratorsSql := LSqlGenerator.AddSequences(LTableName, LPairTable.Value.IDField.GetProperty);
+              LSb.AppendLine(LAddGeneratorsSql);
+
+              // Create Primary Key
+              if not AOnlyCreateScript then
+                LSqlGenerator.ExecuteSql(LAddGeneratorsSql);
+            end;
+          end;
         end
         else
         begin
