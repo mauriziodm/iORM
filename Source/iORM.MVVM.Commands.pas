@@ -738,9 +738,8 @@ begin
   // Loop for all fields searching actions
   for LField in TRttiInstanceType(ARttiElement).GetFields do
   begin
-    if LField.FieldType.IsInstance
-    and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TBasicAction)
-    then
+    // If the current field is a valid TAction type or derived...
+    if TioAction.IsValidAction(LField) then
     begin
       // Get the action
       LObj := LField.GetValue(AOwner).AsObject;

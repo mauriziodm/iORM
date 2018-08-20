@@ -83,6 +83,7 @@ type
   protected
     class function _CreateNewAction(const AOwner:TComponent): TioAction; override;
     class function _CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; override;
+    class function _IsValid(const AField: TRttiField): Boolean; override;
     function GetCaption: string; override;
     function GetChecked: boolean; override;
     function GetEnabled: boolean; override;
@@ -332,6 +333,12 @@ end;
 class function TioActionVCL._CreateNewAction(const AOwner: TComponent; const AAction: TObject): TioAction;
 begin
   Result := Self.Create(AOwner, AAction);
+end;
+
+class function TioActionVCL._IsValid(const AField: TRttiField): Boolean;
+begin
+  // A Valid Field is a Field of TAction type (or derived)
+  Result := AField.FieldType.IsInstance and AField.FieldType.AsInstance.MetaclassType.InheritsFrom(TAction);
 end;
 
 class function TioActionVCL._CreateNewAction(const AOwner: TComponent): TioAction;

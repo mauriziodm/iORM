@@ -99,6 +99,7 @@ type
   protected
     class function _CreateNewAction(const AOwner:TComponent): TioAction; overload; virtual; abstract;
     class function _CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; overload; virtual; abstract;
+    class function _IsValid(const AField: TRttiField): Boolean; virtual; abstract;
     class function GetConcreteClass: TioActionRef;
     class procedure SetConcreteClass(const AClass: TioActionRef);
     function GetCaption: string; virtual; abstract;
@@ -126,6 +127,7 @@ type
   public
     class function CreateNewAction(const AOwner:TComponent): TioAction; overload;
     class function CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; overload;
+    class function IsValidAction(const AField: TRttiField): Boolean;
     function Execute: Boolean; virtual; abstract;
     function AsTValue: TValue; virtual; abstract;
     property Caption:string read GetCaption write SetCaption;
@@ -206,6 +208,11 @@ begin
   if not Assigned(FConcreteClass_NoDirectCall) then
     EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
   Result := FConcreteClass_NoDirectCall;
+end;
+
+class function TioAction.IsValidAction(const AField: TRttiField): Boolean;
+begin
+  Result := GetConcreteClass._IsValid(AField);
 end;
 
 class procedure TioAction.SetConcreteClass(const AClass: TioActionRef);
