@@ -738,19 +738,17 @@ begin
   // Loop for all fields searching actions
   for LField in TRttiInstanceType(ARttiElement).GetFields do
   begin
-    if LField.FieldType.IsInstance
-    and LField.FieldType.AsInstance.MetaclassType.InheritsFrom(TBasicAction)
-    then
-      if TioAction.IsValidAction(LField) then
-      begin
-        // Get the action
-        LObj := LField.GetValue(AOwner).AsObject;
-        LAction := TioAction.CreateNewAction(AOwner, LObj);
-        // Get or create the CommandsContainerItem and add it to the commands container
-        LCmdItem := TioMVVMFactory.NewCommandsContainerItem(LAction.Name, LAction);
-        LCmdItem.Owner := AOwner;
-        Self.Add(LAction.Name, LCmdItem);
-      end;
+    // If the current field is a valid TAction type or derived...
+    if TioAction.IsValidAction(LField) then
+    begin
+      // Get the action
+      LObj := LField.GetValue(AOwner).AsObject;
+      LAction := TioAction.CreateNewAction(AOwner, LObj);
+      // Get or create the CommandsContainerItem and add it to the commands container
+      LCmdItem := TioMVVMFactory.NewCommandsContainerItem(LAction.Name, LAction);
+      LCmdItem.Owner := AOwner;
+      Self.Add(LAction.Name, LCmdItem);
+    end;
   end;
 end;
 

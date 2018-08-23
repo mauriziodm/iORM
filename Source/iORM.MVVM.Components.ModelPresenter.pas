@@ -135,11 +135,11 @@ type
     procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     procedure SelectCurrent<T>(ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    procedure ShowCurrent(const AAlias:String=''); overload;
+    procedure ShowCurrent(const AAlias:String=''; const AVCProviderName:String=''); overload;
     procedure ShowCurrent(const AVCProvider:TioViewContextProvider; const AAlias:String=''); overload;
     procedure ShowCurrent(const AViewContext:TComponent; const AAlias:String=''); overload;
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    procedure ShowEach(const AAlias:String=''); overload;
+    procedure ShowEach(const AAlias:String=''; const AVCProviderName:String=''); overload;
     procedure ShowEach(const AVCProvider:TioViewContextProvider; const AAlias:String=''); overload;
     procedure ShowEach(const AViewContext:TComponent; const AAlias:String=''); overload;
     // ----------------------------------------------------------------------------------------------------------------------------
@@ -870,9 +870,9 @@ begin
   io.ShowCurrent(Self, AVCProvider, AAlias);
 end;
 
-procedure TioModelPresenter.ShowCurrent(const AAlias: String);
+procedure TioModelPresenter.ShowCurrent(const AAlias: String; const AVCProviderName:String);
 begin
-  io.ShowCurrent(Self, AAlias);
+  io.ShowCurrent(Self, AAlias, AVCProviderName);
 end;
 
 procedure TioModelPresenter.ShowEach(const AViewContext: TComponent; const AAlias: String);
@@ -885,9 +885,9 @@ begin
   io.ShowEach(Self, AVCProvider, AAlias);
 end;
 
-procedure TioModelPresenter.ShowEach(const AAlias: String);
+procedure TioModelPresenter.ShowEach(const AAlias: String; const AVCProviderName:String);
 begin
-  io.ShowEach(Self, AAlias);
+  io.ShowEach(Self, AAlias, AVCProviderName);
 end;
 
 procedure TioModelPresenter.WhereOnChangeEventHandler(Sender: TObject);

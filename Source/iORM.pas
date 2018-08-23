@@ -152,7 +152,7 @@ type
     class function CreateViewModelFor<T>(const AParams: TioConstructorParams): IioViewModel; overload;
 
     // Create View & ViewModel coupled instances
-    class procedure CreateViewViewModel<TView:IInterface; TViewModel:IioViewModel>(const AAlias:String=''); overload;
+    class procedure CreateViewViewModel<TView:IInterface; TViewModel:IioViewModel>(const AAlias:String=''; const AVCProviderName:String=''); overload;
     // Create View & ViewModel coupled instances passing a ViewContextProvider
     class procedure CreateViewViewModel<TView:IInterface; TViewModel:IioViewModel>(const AVCProvider:TioViewContextProvider); overload;
     class procedure CreateViewViewModel<TView:IInterface; TViewModel:IioViewModel>(const AAlias:String; const AVCProvider:TioViewContextProvider); overload;
@@ -161,30 +161,30 @@ type
     class procedure CreateViewViewModel<TView:IInterface; TViewModel:IioViewModel>(const AAlias:String; const AViewContext:TComponent); overload;
 
     // Create View & ViewModel instance for a specified type of instances
-    class procedure CreateViewViewModelFor<T>(const AVVMAlias:String=''); overload;
+    class procedure CreateViewViewModelFor<T>(const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure CreateViewViewModelFor<T>(const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure CreateViewViewModelFor<T>(const AViewContext:TComponent; const AVVMAlias:String=''); overload;
 
     // Show instance as TObject (even passing ViewContextProvider or an already created ViewContext)
-    class procedure Show(const ATargetObj:TObject; const AVVMAlias:String=''); overload;
+    class procedure Show(const ATargetObj:TObject; const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure Show(const ATargetObj:TObject; const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure Show(const ATargetObj:TObject; const AViewContext:TComponent; const AVVMAlias:String=''); overload;
     // Show instance as IInterface (even passing ViewContextProvider or an already created ViewContext)
-    class procedure Show(const ATargetIntf:IInterface; const AVVMAlias:String=''); overload;
+    class procedure Show(const ATargetIntf:IInterface; const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure Show(const ATargetIntf:IInterface; const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure Show(const ATargetIntf:IInterface; const AViewContext:TComponent; const AVVMAlias:String=''); overload;
     // Show instance of generic type <T> (even passing ViewContextProvider or an already created ViewContext)
-    class procedure Show<T>(const AVVMAlias:String=''); overload;
+    class procedure Show<T>(const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure Show<T>(const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure Show<T>(const AViewContext:TComponent; const AVVMAlias:String=''); overload;
 
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    class procedure ShowCurrent(const AModelPresenter:TioModelPresenter; const AVVMAlias:String=''); overload;
+    class procedure ShowCurrent(const AModelPresenter:TioModelPresenter; const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure ShowCurrent(const AModelPresenter:TioModelPresenter; const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure ShowCurrent(const AModelPresenter:TioModelPresenter; const AViewContext:TComponent; const AVVMAlias:String=''); overload;
 
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    class procedure ShowEach(const AModelPresenter:TioModelPresenter; const AVVMAlias:String=''); overload;
+    class procedure ShowEach(const AModelPresenter:TioModelPresenter; const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure ShowEach(const AModelPresenter:TioModelPresenter; const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure ShowEach(const AModelPresenter:TioModelPresenter; const AViewContext:TComponent; const AVVMAlias:String=''); overload;
 
@@ -347,9 +347,9 @@ begin
   di.LocateViewVMfor(ATargetObj, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
-class procedure io.Show(const ATargetObj: TObject; const AVVMAlias: String);
+class procedure io.Show(const ATargetObj: TObject; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor(ATargetObj, AVVMAlias).Show;
+  di.LocateViewVMfor(ATargetObj, AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AViewContext: TComponent; const AVVMAlias: String);
@@ -357,9 +357,9 @@ begin
   di.LocateViewVMfor(ATargetIntf, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
-class procedure io.Show<T>(const AVVMAlias: String);
+class procedure io.Show<T>(const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor<T>(AVVMAlias).Show;
+  di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.Show<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
@@ -377,9 +377,9 @@ begin
   di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
-class procedure io.Show(const ATargetIntf: IInterface; const AVVMAlias: String);
+class procedure io.Show(const ATargetIntf: IInterface; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor(ATargetIntf, AVVMAlias).Show;
+  di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
@@ -393,9 +393,9 @@ begin
   di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProvider).ShowCurrent;
 end;
 
-class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVVMAlias: String);
+class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).ShowCurrent;
+  di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProviderName).ShowCurrent;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
@@ -418,9 +418,9 @@ begin
   di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProvider).ShowEach;
 end;
 
-class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVVMAlias: String);
+class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).ShowEach;
+  di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProviderName).ShowEach;
 end;
 
 class procedure io.ShowWait;
@@ -615,9 +615,9 @@ begin
   di.LocateViewVM<TView,TViewModel>(AAlias, AAlias).VCProvider(AVCProvider).Show;
 end;
 
-class procedure io.CreateViewViewModel<TView, TViewModel>(const AAlias: String);
+class procedure io.CreateViewViewModel<TView, TViewModel>(const AAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVM<TView,TViewModel>(AAlias, AAlias).Show;
+  di.LocateViewVM<TView,TViewModel>(AAlias, AAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.CreateViewViewModel<TView, TViewModel>(const AVCProvider: TioViewContextProvider);
@@ -635,9 +635,9 @@ begin
   di.LocateViewVM<TView,TViewModel>(AAlias, AAlias).SetViewContext(AViewContext).Show;
 end;
 
-class procedure io.CreateViewViewModelFor<T>(const AVVMAlias: String);
+class procedure io.CreateViewViewModelFor<T>(const AVVMAlias: String; const AVCProviderName:String);
 begin
-  Self.Show<T>(AVVMAlias);
+  Self.Show<T>(AVVMAlias, AVCProviderName);
 end;
 
 class procedure io.CreateViewViewModelFor<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
