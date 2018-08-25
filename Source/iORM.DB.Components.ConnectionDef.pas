@@ -49,14 +49,34 @@ type
   TioSQLDialect = (sqlDialect1, sqlDialect2, sqlDialect3);
   TioProtocol = (pLocal, pNetBEUI, pSPX, pTCPIP);
 
+  TioDBBuilderAfterCreateDBEvent = procedure(Sender: TObject; AScript, AError: String) of object;
+
+  TioDBBuilderProperty = class(TPersistent)
+  private
+    FEnabled: Boolean;
+    FReferentialIntegrityConstraints: Boolean;
+    FScriptOnly: Boolean;
+    FIndexes: Boolean;
+  published
+    constructor Create;
+    // Properties
+    //  NB: DBBuilder related events are on ConnectionDef component, not in this class
+    property Enabled: Boolean read FEnabled write FEnabled default False;
+    property Indexes: Boolean read FIndexes write FIndexes default True;
+    property ReferentialIntegrityConstraints: Boolean read FReferentialIntegrityConstraints write FReferentialIntegrityConstraints default True;
+    property ScriptOnly: Boolean read FScriptOnly write FScriptOnly default False;
+  end;
+
   // Base class for all ConnectionDef components
   TioCustomConnectionDef = class(TComponent)
   strict private
     // Events
+    FAfterCreateDBEvent: TioDBBuilderAfterCreateDBEvent;
     FOnAfterRegister: TNotifyEvent;
     FOnBeforeRegister: TNotifyEvent;
     // Fields
     FAutoCreateDatabase: Boolean;
+    FAutoCreateDB: TioDBBuilderProperty;
     FBaseURL: String;
     FCharSet: String;
     FConnectionDef: IIoConnectionDef;
@@ -80,6 +100,7 @@ type
     procedure DoBeforeRegister;
   protected
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Loaded; override;
     function GetFullPathDatabase: String;
     // Properties
@@ -106,7 +127,9 @@ type
     property IsRegistered:Boolean read FIsRegistered;
     property Persistent: Boolean read FPersistent write FPersistent;
   published
+    property AutoCreateDB: TioDBBuilderProperty read FAutoCreateDB write FAutoCreateDB;
     // Events
+    property OnAfterCreateDB: TioDBBuilderAfterCreateDBEvent read FAfterCreateDBEvent write FAfterCreateDBEvent;
     property OnAfterRegister: TNotifyEvent read FOnAfterRegister write FOnAfterRegister;
     property OnBeforeRegister: TNotifyEvent read FOnBeforeRegister write FOnBeforeRegister;
   end;
@@ -225,6 +248,13 @@ begin
   FServer := '';
   FSQLDialect := TioSQLDialect.sqlDialect3;
   FUserName := '';
+  FAutoCreateDB := TioDBBuilderProperty.Create;
+end;
+
+destructor TioCustomConnectionDef.Destroy;
+begin
+  FAutoCreateDB.Free;
+  inherited;
 end;
 
 procedure TioCustomConnectionDef.DoAfterRegister;
@@ -417,6 +447,17 @@ begin
   if not (csDesigning in ComponentState) then
     io.Connections.Monitor.Mode := FMode;
 {$ENDIF}
+end;
+
+{ TioDBBuilderProperty }
+
+constructor TioDBBuilderProperty.Create;
+begin
+  inherited;
+  FEnabled := False;
+  FIndexes := True;
+  FReferentialIntegrityConstraints := True;
+  FScriptOnly := False;
 end;
 
 end.

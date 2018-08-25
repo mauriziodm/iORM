@@ -86,6 +86,7 @@ type
     // Join
     function GetJoin: IioJoins;
     // ConnectionDefName
+    procedure SetConnectionDefName(const AConnectionName:String);
     function GetConnectionDefName: String;
     // DataObject
     property DataObject:TObject read GetDataObject write SetDataObject;
@@ -186,6 +187,11 @@ end;
 function TioContext.RttiType: TRttiInstanceType;
 begin
   Result := Self.Map.RttiType;
+end;
+
+procedure TioContext.SetConnectionDefName(const AConnectionName: String);
+begin
+  FConnectionName := AConnectionName;
 end;
 
 procedure TioContext.SetDataObject(const AValue: TObject);
