@@ -150,6 +150,7 @@ type
     FCreateScriptOnly: Boolean;
     FCreateIndexes: Boolean;
     FCreateReferentialIntegrityConstraints: Boolean;
+    FConnectionDefName: string;
     function GetSourceTable(ATableName: String): IioDBBuilderTable;
     function RemoveLastComma(const AValue: string): string;
     function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
@@ -165,7 +166,7 @@ type
     function GetCreateReferentialIntegrityConstraints: Boolean;
     function GetCreateScriptOnly: Boolean;
   public
-    constructor Create;
+    constructor Create(AConnectionDefName: string);
     destructor Destroy; override;
     function GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
     property CreateScriptOnly: Boolean read GetCreateScriptOnly write SetCreateScriptOnly;
@@ -189,12 +190,13 @@ uses
 
 { TioDBBuilder }
 
-constructor TioDBBuilder.Create;
+constructor TioDBBuilder.Create(AConnectionDefName: string);
 begin
   FTables := TioDBBuilderTableList.Create;
   FCreateScriptOnly := False;
   FCreateIndexes := True;
   FCreateReferentialIntegrityConstraints := True;
+  FConnectionDefName := AConnectionDefName;
 end;
 
 destructor TioDBBuilder.Destroy;

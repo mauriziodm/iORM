@@ -43,15 +43,17 @@ uses
   System.Classes,
   iORM.Attributes,
   iORM.DB.DBBuilder.Interfaces,
+  iORM.DB.DBBuilder.Custom.SqlGenerator,
   iORM.DB.Interfaces,
   iORM.DB.QueryEngine,
   iORM.Context.Properties.Interfaces,
-  Data.DB, iORM.Context.Interfaces, iORM.CommonTypes;
+  iORM.Context.Interfaces,
+  iORM.CommonTypes,
+  Data.DB;
 
 type
-  TioDBBuilderFirebirdSqlGenerator = class(TInterfacedObject, IioDBBuilderSqlGenerator)
+  TioDBBuilderFirebirdSqlGenerator = class(TioDBBuilderCustomSqlGenerator, IioDBBuilderSqlGenerator)
   private
-    //FOnlyCreateScript: Boolean;
     FCreateTableScript: String;
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
@@ -200,7 +202,6 @@ end;
 
 function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
 var
-  LQuery: IioQuery;
   LGuid: TGuid;
   LFKName: string;
 begin
@@ -236,6 +237,7 @@ function TioDBBuilderFirebirdSqlGenerator.AddIndex(const AContext: IioContext; c
 var
   LQuery: IioQuery;
 begin
+  AContext.SetConnectionDefName(GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 end;
@@ -338,10 +340,12 @@ var
   LQuery: IioQuery;
   LQueryDrop: IioQuery;
 begin
-  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  //LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  LQueryDrop := GetQuery;
 
   // Retrieve All Foreign Key
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
 
   LQuery.SQL.Add('select r.rdb$relation_name as tname, r.rdb$constraint_name as cname');
   LQuery.SQL.Add('from rdb$relation_constraints r');
@@ -365,10 +369,12 @@ var
   LQuery: IioQuery;
   LQueryDrop: IioQuery;
 begin
-  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  //LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  LQueryDrop := GetQuery;
 
   // Retrieve All Foreign Key
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
 
   LQuery.SQL.Add('select RDB$INDEX_NAME as iname, RDB$RELATION_NAME as tname');
   LQuery.SQL.Add('from rdb$indices');
@@ -401,8 +407,6 @@ begin
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.EndCreateTable: String;
-var
-  LQuery: IioQuery;
 begin
   Result := ')';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
@@ -416,7 +420,8 @@ var
 begin
   if ASql.IsEmpty then Exit;
 
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
 
   if AMultipleSQL then
   begin
@@ -449,7 +454,8 @@ var
 begin
   Result := False;
   LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
-  LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  LQuery := GetQuery;
 
   LQuery.SQL.Add('select f.rdb$relation_name as tablename, f.rdb$field_name as fieldname');
   LQuery.SQL.Add('from rdb$relation_fields f');
@@ -476,13 +482,12 @@ var
   LColumnLength: Integer;
   LColumnDecimals: Integer;
   LColumnNullable: Boolean;
-  LConnectionDefName: string;
 begin
   LColumnLength := 0;
 
   Result := False;
-  LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
-  LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  LQuery := GetQuery;
 
   LQuery.SQL.Add('SELECT r.RDB$FIELD_NAME AS column_name,');
   LQuery.SQL.Add('r.RDB$DESCRIPTION AS field_description,');
@@ -686,7 +691,8 @@ function TioDBBuilderFirebirdSqlGenerator.TableExists(const ADbName: String; con
 var
   LQuery: IioQuery;
 begin
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
   LQuery.SQL.Add('select rdb$relation_name as TableName');
   LQuery.SQL.Add('from rdb$relations');
   LQuery.SQL.Add('where rdb$view_blr is null');

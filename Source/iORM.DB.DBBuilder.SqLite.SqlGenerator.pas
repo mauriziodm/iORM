@@ -47,12 +47,12 @@ uses
   iORM.DB.QueryEngine,
   iORM.Context.Properties.Interfaces,
   Data.DB, iORM.Context.Interfaces,
-  iORM.CommonTypes;
+  iORM.CommonTypes,
+  iORM.DB.DBBuilder.Custom.SqlGenerator;
 
 type
-  TioDBBuilderSqLiteSqlGenerator = class(TInterfacedObject, IioDBBuilderSqlGenerator)
+  TioDBBuilderSqLiteSqlGenerator = class(TioDBBuilderCustomSqlGenerator, IioDBBuilderSqlGenerator)
   private
-    //FOnlyCreateScript: Boolean;
     FCreateTableScript: String;
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
@@ -215,6 +215,7 @@ function TioDBBuilderSqLiteSqlGenerator.AddIndex(const AContext: IioContext; con
 var
   LQuery: IioQuery;
 begin
+  AContext.SetConnectionDefName(GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 
@@ -299,7 +300,8 @@ function TioDBBuilderSqLiteSqlGenerator.CreateDatabase(const ADbName: string): S
 var
   LQuery: IioQuery;
 begin
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
   LQuery.SQL.Add('SELECT 1=1');
 
   LQuery.Open;
@@ -323,10 +325,12 @@ var
   LCreate: string;
   LSb: TStringBuilder;
 begin
-  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  //LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  LQueryDrop := GetQuery;
 
   // Retrieve All Foreign Key
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
 
   for LPairTable in ATableList do
   begin
@@ -388,10 +392,12 @@ var
   LQuery: IioQuery;
   LQueryDrop: IioQuery;
 begin
-  LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  //LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  LQueryDrop := GetQuery;
 
   // Retrieve All Foreign Key
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
 
   LQuery.SQL.Add('SELECT * FROM sqlite_master WHERE type = ''index''');
   LQuery.Open;
@@ -438,19 +444,9 @@ begin
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.EndCreateTable: String;
-var
-  LQuery: IioQuery;
 begin
   Result := ')';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
-
-  // Execute Query
-//  if not FOnlyCreateScript then
-//  begin
-//    LQuery := io.GlobalFactory.DBFactory.Query('');
-//    LQuery.SQL.Add(FCreateTableScript);
-//    LQuery.ExecSQL;
-//  end;
 end;
 
 procedure TioDBBuilderSqLiteSqlGenerator.ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
@@ -459,7 +455,8 @@ var
 begin
   if ASql.IsEmpty then Exit;
 
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
   LQuery.SQL.Add(ASql);
   LQuery.ExecSQL;
 end;
@@ -471,7 +468,8 @@ var
 begin
   Result := False;
   LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
-  LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  LQuery := GetQuery;
   LQuery.SQL.Add('pragma table_info('+QuotedStr(ATableName)+')');
 
   LQuery.Open;
@@ -497,13 +495,12 @@ var
   LColumnLength: Integer;
   LColumnDecimals: Integer;
   LColumnNullable: Boolean;
-  LConnectionDefName: string;
 begin
   LColumnLength := 0;
 
   Result := False;
-  LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
-  LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  LQuery := GetQuery;
   LQuery.SQL.Add('pragma table_info('+QuotedStr(ATableName)+')');
 
   LQuery.Open;
@@ -624,7 +621,8 @@ function TioDBBuilderSqLiteSqlGenerator.TableExists(const ADbName: String; const
 var
   LQuery: IioQuery;
 begin
-  LQuery := io.GlobalFactory.DBFactory.Query('');
+  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  LQuery := GetQuery;
   LQuery.SQL.Add('SELECT count(*) as TableExists FROM sqlite_master WHERE type=''table'' AND name='+QuotedStr(ATableName));
 
   LQuery.Open;

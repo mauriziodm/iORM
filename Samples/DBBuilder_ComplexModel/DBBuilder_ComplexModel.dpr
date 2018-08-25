@@ -5,7 +5,8 @@ uses
   uMain in 'uMain.pas' {BuilderForm},
   uInterfaces in 'Commons\model\uInterfaces.pas',
   uModel in 'Commons\model\uModel.pas',
-  uRegisterClasses in 'Commons\registerclasses\uRegisterClasses.pas';
+  uRegisterClasses in 'Commons\registerclasses\uRegisterClasses.pas',
+  iORM.DB.DBBuilder.Custom.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Custom.SqlGenerator.pas';
 
 {$STRONGLINKTYPES ON}
 
