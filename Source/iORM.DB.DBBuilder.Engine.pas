@@ -147,19 +147,30 @@ type
   strict private
     FTables: TioDBBuilderTableList;
     FSqlGenerator: IioDBBuilderSqlGenerator;
+    FCreateScriptOnly: Boolean;
+    FCreateIndexes: Boolean;
+    FCreateReferentialIntegrityConstraints: Boolean;
     function GetSourceTable(ATableName: String): IioDBBuilderTable;
     function RemoveLastComma(const AValue: string): string;
-  strict protected
     function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
     function GetTable(const ATableName: String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBBuilderSqlGenerator; const AMap:IioMap): IioDBBuilderTable;
     function FindOrCreateTable(const ATableName:String; const AIsClassFromField:Boolean; const AMap:IioMap): IioDBBuilderTable;
     procedure LoadTableStructure(AMap: IioMap);
     procedure LoadDBStructure;
     procedure LoadFKStructure(AMap: IioMap);
+    procedure SetCreateIndexes(const Value: Boolean);
+    procedure SetCreateReferentialIntegrityConstraints(const Value: Boolean);
+    procedure SetCreateScriptOnly(const Value: Boolean);
+    function GetCreateIndexes: Boolean;
+    function GetCreateReferentialIntegrityConstraints: Boolean;
+    function GetCreateScriptOnly: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
-    function GenerateDB(AOnlyCreateScript: Boolean; out OOutputScript: String; out OErrorMessage: String): Boolean;
+    function GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
+    property CreateScriptOnly: Boolean read GetCreateScriptOnly write SetCreateScriptOnly;
+    property CreateReferentialIntegrityConstraints: Boolean read GetCreateReferentialIntegrityConstraints write SetCreateReferentialIntegrityConstraints;
+    property CreateIndexes: Boolean read GetCreateIndexes write SetCreateIndexes;
   end;
 
 implementation
@@ -181,6 +192,9 @@ uses
 constructor TioDBBuilder.Create;
 begin
   FTables := TioDBBuilderTableList.Create;
+  FCreateScriptOnly := False;
+  FCreateIndexes := True;
+  FCreateReferentialIntegrityConstraints := True;
 end;
 
 destructor TioDBBuilder.Destroy;
@@ -204,7 +218,7 @@ begin
   Self.FTables.Add(ATableName, Result);
 end;
 
-function TioDBBuilder.GenerateDB(AOnlyCreateScript: Boolean; out OOutputScript: String; out OErrorMessage: String): Boolean;
+function TioDBBuilder.GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
 var
   LSb: TStringBuilder;
   LSqlGenerator: IioDBBuilderSqlGenerator;
@@ -212,7 +226,6 @@ var
   LPairTable: TPair<string,IioDBBuilderTable>;
   LPairField: TPair<string,IioDBBuilderField>;
   LTableName: string;
-  //LContextProperty: IioContextProperty;
   LSourceTableName: string;
   LRel: TioRelationType;
   LChildTypeName: string;
@@ -258,7 +271,7 @@ begin
       end;
 
       // Move into Current Database
-      if AOnlyCreateScript then
+      if FCreateScriptOnly then
       begin
         LSb.AppendLine();
         LSb.AppendLine(LSqlGenerator.UseDatabase(LDatabaseName));
@@ -268,25 +281,31 @@ begin
       begin
         LSb.AppendLine();
 
-        // Generate Sql x Drop All FK
-        LDropAllForeignKeySql := LSqlGenerator.DropAllForeignKey(FTables);
+        if FCreateReferentialIntegrityConstraints then
+        begin
+          // Generate Sql x Drop All FK
+          LDropAllForeignKeySql := LSqlGenerator.DropAllForeignKey(FTables);
 
-        if not LDropAllForeignKeySql.IsEmpty then
-          LSb.AppendLine(LDropAllForeignKeySql);
+          if not LDropAllForeignKeySql.IsEmpty then
+            LSb.AppendLine(LDropAllForeignKeySql);
 
-        // Drop all FK
-        if not AOnlyCreateScript then
-          LSqlGenerator.ExecuteSql(LDropAllForeignKeySql, True);
+          // Drop all FK
+          if not FCreateScriptOnly then
+            LSqlGenerator.ExecuteSql(LDropAllForeignKeySql, True);
+        end;
 
-        // Generate Sql x Drop All Index
-        LDropAllIndexSql := LSqlGenerator.DropAllIndex;
+        if FCreateIndexes then
+        begin
+          // Generate Sql x Drop All Index
+          LDropAllIndexSql := LSqlGenerator.DropAllIndex;
 
-        if not LDropAllIndexSql.IsEmpty then
-          LSb.AppendLine(LDropAllIndexSql);
+          if not LDropAllIndexSql.IsEmpty then
+            LSb.AppendLine(LDropAllIndexSql);
 
-        // Drop all Index
-        if not AOnlyCreateScript then
-          LSqlGenerator.ExecuteSql(LDropAllIndexSql, True);
+          // Drop all Index
+          if not FCreateScriptOnly then
+            LSqlGenerator.ExecuteSql(LDropAllIndexSql, True);
+        end;
       end;
 
       // Loop for all entities (model classes) of the application
@@ -313,22 +332,25 @@ begin
           if LPairTable.Value.IsClassFromField then
             LCreateTableSql := LCreateTableSql + LSqlGenerator.CreateClassInfoField(LPairTable.Value);
 
-          // Generate Foreign Key in CREATE STATEMENT (use this feature only in the databases that provide it)
-          // Otherwise implements AddForeignKey methods
-          LFkInCreateSql := LSqlGenerator.AddForeignKeyInCreate(LPairTable.Value);
+          if FCreateReferentialIntegrityConstraints then
+          begin
+            // Generate Foreign Key in CREATE STATEMENT (use this feature only in the databases that provide it)
+            // Otherwise implements AddForeignKey methods
+            LFkInCreateSql := LSqlGenerator.AddForeignKeyInCreate(LPairTable.Value);
 
-          // Remove Last Comma
-          if LFkInCreateSql.IsEmpty then
-            LCreateTableSql := RemoveLastComma(LCreateTableSql)
-          else
-            LCreateTableSql := LCreateTableSql + LFkInCreateSql;
+            // Remove Last Comma
+            if LFkInCreateSql.IsEmpty then
+              LCreateTableSql := RemoveLastComma(LCreateTableSql)
+            else
+              LCreateTableSql := LCreateTableSql + LFkInCreateSql;
+          end;
 
           // Generate Sql x End Create Table
           LCreateTableSql := LCreateTableSql + LSqlGenerator.EndCreateTable;
           LSb.AppendLine(LCreateTableSql);
 
           // Create Table
-          if not AOnlyCreateScript then
+          if not FCreateScriptOnly then
             LSqlGenerator.ExecuteSql(LCreateTableSql);
 
           // Generate Sql x Primary Key
@@ -336,7 +358,7 @@ begin
           LSb.AppendLine(LAddPrimaryKeySql);
 
           // Create Primary Key
-          if not AOnlyCreateScript then
+          if not FCreateScriptOnly then
             LSqlGenerator.ExecuteSql(LAddPrimaryKeySql);
 
           // Generate Sql x SEQUENCE/GENERATORS
@@ -352,7 +374,7 @@ begin
               LSb.AppendLine(LAddGeneratorsSql);
 
               // Create Primary Key
-              if not AOnlyCreateScript then
+              if not FCreateScriptOnly then
                 LSqlGenerator.ExecuteSql(LAddGeneratorsSql);
             end;
           end;
@@ -374,7 +396,7 @@ begin
                   LSb.AppendLine(LAlterTableSql);
 
                 // Execute Alter Table
-                if not AOnlyCreateScript then
+                if not FCreateScriptOnly then
                   LSqlGenerator.ExecuteSql(LAlterTableSql);
               end
               else
@@ -394,7 +416,7 @@ begin
                     LSb.AppendLine(LAlterTableSql);
 
                   // Execute Alter Table
-                  if not AOnlyCreateScript and not LWarnings then
+                  if not FCreateScriptOnly and not LWarnings then
                     LSqlGenerator.ExecuteSql(LAlterTableSql);
                 end;
               end;
@@ -403,79 +425,85 @@ begin
         end;
       end;
 
-      // Add Indexes After Generated All Tables
-      for LPairTable in FTables do
+      if CreateIndexes then
       begin
-        for LIndex in LPairTable.Value.IndexList do
+        // Add Indexes After Generated All Tables
+        for LPairTable in FTables do
         begin
-          LContext := TioContextFactory.Context(LPairTable.Value.GetMap.GetClassName);
+          for LIndex in LPairTable.Value.IndexList do
+          begin
+            LContext := TioContextFactory.Context(LPairTable.Value.GetMap.GetClassName);
 
-          LSb.AppendLine();
+            LSb.AppendLine();
 
-          // Generate Sql x Index
-          LAddIndexSql := LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique);
+            // Generate Sql x Index
+            LAddIndexSql := LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique);
 
-          if not LAddIndexSql.isEmpty then
-            LSb.AppendLine(LAddIndexSql);
+            if not LAddIndexSql.isEmpty then
+              LSb.AppendLine(LAddIndexSql);
 
-          // Create Index
-          if not AOnlyCreateScript then
-            LSqlGenerator.ExecuteSql(LAddIndexSql);
+            // Create Index
+            if not FCreateScriptOnly then
+              LSqlGenerator.ExecuteSql(LAddIndexSql);
 
+          end;
         end;
       end;
 
-      // Add Foreign Key After Generated All Tables
-      for LPairTable in FTables do
+      if CreateReferentialIntegrityConstraints then
       begin
-        for LPairField in LPairTable.Value.Fields do
+        // Add Foreign Key After Generated All Tables
+        for LPairTable in FTables do
         begin
-          LRel := LPairField.Value.GetProperty.GetRelationType;
-
-          if LRel = ioRTNone then
-            Continue;
-
-          if LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo] then
+          for LPairField in LPairTable.Value.Fields do
           begin
-            LChildTypeName:=LPairField.Value.GetProperty.GetRelationChildTypeName;
-            LChildTypeAlias:=LPairField.Value.GetProperty.GetRelationChildTypeAlias;
-            LChildPropertyName:=LPairField.Value.GetProperty.GetRelationChildPropertyName;
-            // Resolve the type and alias
-            LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LChildTypeName, LChildTypeAlias, rmAll);
-            // Loop for all classes in the sesolved type list
-            for LResolvedTypeName in LResolvedTypeList do
+            LRel := LPairField.Value.GetProperty.GetRelationType;
+
+            if LRel = ioRTNone then
+              Continue;
+
+            if LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo] then
             begin
-              // Get the Context for the current ResolverTypeName (Child)
-              LChildContext := TioContextFactory.Context(LResolvedTypeName);
+              LChildTypeName:=LPairField.Value.GetProperty.GetRelationChildTypeName;
+              LChildTypeAlias:=LPairField.Value.GetProperty.GetRelationChildTypeAlias;
+              LChildPropertyName:=LPairField.Value.GetProperty.GetRelationChildPropertyName;
+              // Resolve the type and alias
+              LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LChildTypeName, LChildTypeAlias, rmAll);
+              // Loop for all classes in the sesolved type list
+              for LResolvedTypeName in LResolvedTypeList do
+              begin
+                // Get the Context for the current ResolverTypeName (Child)
+                LChildContext := TioContextFactory.Context(LResolvedTypeName);
 
-              // Search MasterTable ID Property
-              if LRel in [ioRTBelongsTo] then
-              begin
-                LSourceTableName := LPairTable.Value.TableName;
-                LSourceFieldName := LPairField.Value.GetProperty.GetName;
-                LDestinationTableName := LChildContext.GetTable.TableName;
-                LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
-              end
-              else
-              begin
-                LSourceTableName := LChildContext.GetTable.TableName;
-                LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetSqlFieldName(True);
-                LDestinationTableName := LPairTable.Value.TableName;
-                LDestinationFieldName := LChildContext.GetProperties.GetIdProperty.GetName;
+                // Search MasterTable ID Property
+                if LRel in [ioRTBelongsTo] then
+                begin
+                  LSourceTableName := LPairTable.Value.TableName;
+                  LSourceFieldName := LPairField.Value.GetProperty.GetName;
+                  LDestinationTableName := LChildContext.GetTable.TableName;
+                  LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
+                end
+                else
+                begin
+                  LSourceTableName := LChildContext.GetTable.TableName;
+                  LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetSqlFieldName(True);
+                  LDestinationTableName := LPairTable.Value.TableName;
+                  LDestinationFieldName := LChildContext.GetProperties.GetIdProperty.GetName;
+                end;
+
+                LSb.AppendLine();
+
+                // Create Sql x FK
+                LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName);
+
+                if not LAddFKSql.IsEmpty then
+                  LSb.AppendLine(LAddFKSql);
+
+                // Create FK
+                if not FCreateScriptOnly then
+                  LSqlGenerator.ExecuteSql(LAddFKSql);
+
               end;
-
-              LSb.AppendLine();
-
-              // Create Sql x FK
-              LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName);
-
-              if not LAddFKSql.IsEmpty then
-                LSb.AppendLine(LAddFKSql);
-
-              // Create FK
-              if not AOnlyCreateScript then
-                LSqlGenerator.ExecuteSql(LAddFKSql);
-
             end;
           end;
         end;
@@ -497,6 +525,21 @@ begin
 //      OOutputScript := '';
     end;
   end;
+end;
+
+function TioDBBuilder.GetCreateIndexes: Boolean;
+begin
+  Result := FCreateIndexes;
+end;
+
+function TioDBBuilder.GetCreateReferentialIntegrityConstraints: Boolean;
+begin
+  Result := FCreateReferentialIntegrityConstraints;
+end;
+
+function TioDBBuilder.GetCreateScriptOnly: Boolean;
+begin
+  Result := FCreateScriptOnly;
 end;
 
 function TioDBBuilder.GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBBuilderSqlGenerator; AIsClassFromField:Boolean; AIsSqlField:Boolean): IioDBBuilderField;
@@ -674,6 +717,22 @@ function TioDBBuilder.RemoveLastComma(const AValue: string): string;
 begin
   if AValue.EndsWith(',') then
     Result := AValue.Substring(0, AValue.Length-1);
+end;
+
+procedure TioDBBuilder.SetCreateIndexes(const Value: Boolean);
+begin
+  FCreateIndexes := Value;
+end;
+
+procedure TioDBBuilder.SetCreateReferentialIntegrityConstraints(
+  const Value: Boolean);
+begin
+  FCreateReferentialIntegrityConstraints := Value;
+end;
+
+procedure TioDBBuilder.SetCreateScriptOnly(const Value: Boolean);
+begin
+  FCreateScriptOnly := Value;
 end;
 
 { TioDBBuilderField }

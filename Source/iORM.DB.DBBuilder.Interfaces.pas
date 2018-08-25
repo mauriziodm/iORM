@@ -160,7 +160,16 @@ type
 
   IioDBBuilder = interface
   ['{0D8F8F8F-12FA-4C7B-9CB8-3A4A5EAD7C43}']
-    function GenerateDB(AOnlyCreateScript: Boolean; out OOutputScript: String; out OErrorMessage: String): Boolean;
+    procedure SetCreateIndexes(const Value: Boolean);
+    procedure SetCreateReferentialIntegrityConstraints(const Value: Boolean);
+    procedure SetCreateScriptOnly(const Value: Boolean);
+    function GetCreateIndexes: Boolean;
+    function GetCreateReferentialIntegrityConstraints: Boolean;
+    function GetCreateScriptOnly: Boolean;
+    function GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
+    property CreateScriptOnly: Boolean read GetCreateScriptOnly write SetCreateScriptOnly;
+    property CreateReferentialIntegrityConstraints: Boolean read GetCreateReferentialIntegrityConstraints write SetCreateReferentialIntegrityConstraints;
+    property CreateIndexes: Boolean read GetCreateIndexes write SetCreateIndexes;
   end;
 
 implementation

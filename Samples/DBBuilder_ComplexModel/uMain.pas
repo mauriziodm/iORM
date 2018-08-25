@@ -52,7 +52,7 @@ type
     procedure GeneraFBScriptButtonClick(Sender: TObject);
     procedure CreateDBFBButtonClick(Sender: TObject);
   private
-    procedure GenerateDB(AOnlyScript: boolean);
+    procedure GenerateDB(ACreateScriptOnly: boolean; ACreateFK: boolean; ACreateIdx: boolean);
     procedure SetDefaultConnectionName(AName: string);
   public
     { Public declarations }
@@ -62,6 +62,9 @@ var
   BuilderForm: TBuilderForm;
 
 implementation
+
+uses
+  iORM.DB.DBBuilder.Interfaces;
 
 {$R *.dfm}
 
@@ -80,7 +83,7 @@ begin
 
     SetDefaultConnectionName('FB');
 
-    GenerateDB(False);
+    GenerateDB(False,True,True);
   end;
 end;
 
@@ -99,7 +102,7 @@ begin
 
     SetDefaultConnectionName('MSSQL');
 
-    GenerateDB(False);
+    GenerateDB(False,True,True);
   end;
 end;
 
@@ -127,7 +130,7 @@ begin
 
     SetDefaultConnectionName('SQLITE');
 
-    GenerateDB(False);
+    GenerateDB(False,True,True);
   end;
 end;
 
@@ -138,18 +141,24 @@ begin
   // Default Connection
   io.Connections.NewFirebirdConnectionDef(ServerFBEdit.Text,DatabaseFBEdit.Text,UserNameFBEdit.Text,PasswordFBEdit.Text, 'UTF8',True,False,False,'FB');
 
-  GenerateDB(True);
+  GenerateDB(True,True,True);
 end;
 
-procedure TBuilderForm.GenerateDB(AOnlyScript: boolean);
+procedure TBuilderForm.GenerateDB(ACreateScriptOnly: boolean; ACreateFK: boolean; ACreateIdx: boolean);
 var
   LOutputScript: string;
   LErrorMessage: string;
+  LBuilder: IioDBBuilder;
 begin
   Memo1.Lines.Clear;
 
   // SOLO GENERAZIONE SCRIPT DI CREATE PER TUTTI GLI ELEMENTI DEL DB DA UTILIZZARE PER LA GENERAZIONE INIZIALE
-  if io.GlobalFactory.DBBuilderFactory.NewBuilder.GenerateDB(AOnlyScript, LOutputScript, LErrorMessage) then
+  LBuilder := io.GlobalFactory.DBBuilderFactory.NewBuilder;
+  LBuilder.CreateScriptOnly := ACreateScriptOnly;
+  LBuilder.CreateReferentialIntegrityConstraints := ACreateFK;
+  LBuilder.CreateIndexes := ACreateIdx;
+
+  if LBuilder.GenerateDB(LOutputScript, LErrorMessage) then
   begin
     MessageLabel.Caption := 'Script Creation Successful';
     Memo1.Lines.Add(LOutputScript);
@@ -168,7 +177,7 @@ begin
 
   SetDefaultConnectionName('MSSQL');
 
-  GenerateDB(True);
+  GenerateDB(True,True,True);
 end;
 
 procedure TBuilderForm.GenerateSQLiteOnlyScriptButtonClick(Sender: TObject);
@@ -181,7 +190,7 @@ begin
 
   SetDefaultConnectionName('SQLITE');
 
-  GenerateDB(True);
+  GenerateDB(True,True,True);
 end;
 
 end.
