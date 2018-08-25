@@ -52,7 +52,7 @@ type
   TioDBBuilderAfterCreateDBEvent = procedure(Sender: TObject; AScript, AError: String) of object;
 
   TioDBBuilderProperty = class(TPersistent)
-  private
+  strict private
     FEnabled: Boolean;
     FReferentialIntegrityConstraints: Boolean;
     FScriptOnly: Boolean;
@@ -71,11 +71,10 @@ type
   TioCustomConnectionDef = class(TComponent)
   strict private
     // Events
-    FAfterCreateDBEvent: TioDBBuilderAfterCreateDBEvent;
+    FOnAfterCreateDBEvent: TioDBBuilderAfterCreateDBEvent;
     FOnAfterRegister: TNotifyEvent;
     FOnBeforeRegister: TNotifyEvent;
     // Fields
-    FAutoCreateDatabase: Boolean;
     FAutoCreateDB: TioDBBuilderProperty;
     FBaseURL: String;
     FCharSet: String;
@@ -97,14 +96,14 @@ type
     FUserName: String;
     procedure SetDefaultConnection(const Value: Boolean);
     procedure DoAfterRegister;
-    procedure DoBeforeRegister;
   protected
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Loaded; override;
     function GetFullPathDatabase: String;
+    procedure DoBeforeRegister;
     // Properties
-    property AutoCreateDatabase:Boolean read FAutoCreateDatabase write FAutoCreateDatabase;
+    property AutoCreateDB: TioDBBuilderProperty read FAutoCreateDB write FAutoCreateDB;
     property BaseURL: String read FBaseURL write FBaseURL;
     property CharSet: String read FCharSet write FCharSet;
     property Database: String read FDatabase write FDatabase;
@@ -119,7 +118,10 @@ type
     property Server:String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
+    // Events
+    property OnAfterCreateDB: TioDBBuilderAfterCreateDBEvent read FOnAfterCreateDBEvent write FOnAfterCreateDBEvent;
   public
+    function GenerateDB: String; virtual;
     procedure RegisterConnectionDef; virtual;
     // Properties
     property ConnectionDef: IIoConnectionDef read FConnectionDef write FConnectionDef;
@@ -127,9 +129,7 @@ type
     property IsRegistered:Boolean read FIsRegistered;
     property Persistent: Boolean read FPersistent write FPersistent;
   published
-    property AutoCreateDB: TioDBBuilderProperty read FAutoCreateDB write FAutoCreateDB;
     // Events
-    property OnAfterCreateDB: TioDBBuilderAfterCreateDBEvent read FAfterCreateDBEvent write FAfterCreateDBEvent;
     property OnAfterRegister: TNotifyEvent read FOnAfterRegister write FOnAfterRegister;
     property OnBeforeRegister: TNotifyEvent read FOnBeforeRegister write FOnBeforeRegister;
   end;
@@ -149,12 +149,11 @@ type
   // Class for SQLite connection
   TioSQLiteConnectionDef = class(TioCustomConnectionDef)
   public
-    constructor Create(AOwner: TComponent); override;
     procedure RegisterConnectionDef; override;
     property ConnectionDef;
   published
     // Properties
-    property AutoCreateDatabase;
+    property AutoCreateDB;
     property Database;
     property DatabaseStdFolder;
     property DefaultConnection;
@@ -163,6 +162,8 @@ type
     property Password;
     property Persistent;
     property Pooled;
+    // Events
+    property OnAfterCreateDB;
   end;
 
   // Class for Firebird connection
@@ -173,6 +174,7 @@ type
     property ConnectionDef;
   published
     // Properties
+    property AutoCreateDB;
     property CharSet;
     property Database;
     property DatabaseStdFolder;
@@ -186,6 +188,8 @@ type
     property Server;
     property SQLDialect;
     property UserName;
+    // Events
+    property OnAfterCreateDB;
   end;
 
   // Class for MySQL connection
@@ -196,6 +200,7 @@ type
     property ConnectionDef;
   published
     // Properties
+    property AutoCreateDB;
     property CharSet;
     property Database;
     property DatabaseStdFolder;
@@ -206,6 +211,8 @@ type
     property Port;
     property Server;
     property UserName;
+    // Events
+    property OnAfterCreateDB;
   end;
 
   // Class for SQL Monitor functionalities
@@ -223,14 +230,13 @@ implementation
 
 uses
   System.IOUtils, iORM.DB.ConnectionContainer, System.SysUtils,
-  iORM;
+  iORM, iORM.DB.DBBuilder.Interfaces, iORM.Exceptions;
 
 { TioCustomConnectionDef }
 
 constructor TioCustomConnectionDef.Create(AOwner: TComponent);
 begin
   inherited;
-  FAutoCreateDatabase := False;
   FBaseURL := '';
   FCharSet := '';
   FDatabase := '';
@@ -269,6 +275,24 @@ begin
     FOnBeforeRegister(Self);
 end;
 
+function TioCustomConnectionDef.GenerateDB: String;
+var
+  LDBBuilder: IioDBBuilder;
+  LError: String;
+begin
+  LDBBuilder := io.GlobalFactory.DBBuilderFactory.NewBuilder(Self.Name);
+  LDBBuilder.CreateIndexes := FAutoCreateDB.Indexes;
+  LDBBuilder.CreateReferentialIntegrityConstraints := FAutoCreateDB.ReferentialIntegrityConstraints;
+  LDBBuilder.CreateScriptOnly := FAutoCreateDB.ScriptOnly;
+  try
+    if not LDBBuilder.GenerateDB(Result, LError) then
+      raise EioException.Create(Self.ClassName, 'GenerateDB', LError);
+  finally
+    if Assigned(FOnAfterCreateDBEvent) then
+      FOnAfterCreateDBEvent(Self, Result, LError);
+  end;
+end;
+
 function TioCustomConnectionDef.GetFullPathDatabase: String;
 var
   LDBFolder: String;
@@ -303,13 +327,11 @@ begin
   inherited;
   // Mark the connection as registered in the ConnectionManager
   FIsRegistered := True;
-  // Fire the OnBeforeRegister event if implemented
-  DoBeforeRegister;
-  // Autocreate Database if enabled
-  if FAutoCreateDatabase then
-    io.AutoCreateDatabase(Self.Name);
   // Fire the OnAfterRegister event if implemented
   DoAfterRegister;
+  // Autocreate Database if enabled
+  if FAutoCreateDB.Enabled then
+    GenerateDB;
 end;
 
 procedure TioCustomConnectionDef.SetDefaultConnection(const Value: Boolean);
@@ -346,6 +368,9 @@ end;
 
 procedure TioRESTConnectionDef.RegisterConnectionDef;
 begin
+  // Fire the OnBeforeRegister event if implemented
+  DoBeforeRegister;
+  // Register the ConnectionDef
   TioConnectionManager.NewRESTConnection(BaseURL, DefaultConnection, Persistent, Name);
   // NB: Inherited must be the last line (set FIsRegistered)
   inherited;
@@ -353,14 +378,11 @@ end;
 
 { TioSQLiteConnectionDef }
 
-constructor TioSQLiteConnectionDef.Create(AOwner: TComponent);
-begin
-  inherited;
-  AutoCreateDatabase := True;
-end;
-
 procedure TioSQLiteConnectionDef.RegisterConnectionDef;
 begin
+  // Fire the OnBeforeRegister event if implemented
+  DoBeforeRegister;
+  // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewSQLiteConnectionDef(GetFullPathDatabase, DefaultConnection, Persistent, Pooled, Name);
   // Encript
   if not Encrypt.IsEmpty then
@@ -385,6 +407,9 @@ end;
 
 procedure TioFirebirdConnectionDef.RegisterConnectionDef;
 begin
+  // Fire the OnBeforeRegister event if implemented
+  DoBeforeRegister;
+  // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewFirebirdConnectionDef(Server,
     GetFullPathDatabase, UserName, Password, CharSet, DefaultConnection,
     Persistent, Pooled, Name);
@@ -422,6 +447,9 @@ end;
 
 procedure TioMySQLConnectionDef.RegisterConnectionDef;
 begin
+  // Fire the OnBeforeRegister event if implemented
+  DoBeforeRegister;
+  // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewMySQLConnectionDef(Server,
     GetFullPathDatabase, UserName, Password, CharSet, DefaultConnection,
     Persistent, Pooled, Name);

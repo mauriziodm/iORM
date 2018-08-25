@@ -341,61 +341,11 @@ object ArticleListView: TArticleListView
       GridView = cxGrid1DBTableView1
     end
   end
-  object MDSArticleList: TioModelDataSet
-    ViewModelBridge = VMBridge
-    ModelPresenter = 'MPArticleList'
-    Left = 88
-    Top = 152
-    object MDSArticleListID: TIntegerField
-      FieldName = 'ID'
-    end
-    object MDSArticleListCode: TStringField
-      FieldName = 'Code'
-      Size = 100
-    end
-    object MDSArticleListDescription: TStringField
-      FieldName = 'Description'
-      Size = 100
-    end
-    object MDSArticleListUM: TStringField
-      FieldName = 'UM'
-      Size = 10
-    end
-    object MDSArticleListCreationDateTime: TDateTimeField
-      FieldName = 'CreationDateTime'
-    end
-    object MDSArticleListArticleType: TStringField
-      FieldName = 'ArticleType'
-      ReadOnly = True
-      Size = 40
-    end
-  end
-  object VMBridge: TioViewModelBridge
-    DI_VMInterface = 'IArticleListVM'
-    Left = 88
-    Top = 96
-  end
   object DSArticleList: TDataSource
-    DataSet = MDSArticleList
     Left = 176
     Top = 152
   end
-  object MDSFilters: TioModelDataSet
-    ViewModelBridge = VMBridge
-    ModelPresenter = 'MPFilters'
-    Left = 88
-    Top = 208
-    object MDSFiltersCode: TStringField
-      FieldName = 'Code'
-      Size = 100
-    end
-    object MDSFiltersDescription: TStringField
-      FieldName = 'Description'
-      Size = 100
-    end
-  end
   object DSFilters: TDataSource
-    DataSet = MDSFilters
     Left = 176
     Top = 208
   end
