@@ -65,6 +65,7 @@ type
     procedure RegisterView(const AView, AViewContext: TComponent;
       const AViewContextProvider:TioViewContextProvider;
       const AViewContextFreeMethod:TProc);
+    procedure FreeViews;
     // Command
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;

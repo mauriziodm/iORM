@@ -294,7 +294,7 @@ begin
   //       rimane il nuovo oggetto "vuoto".
   if FDeleteAfterCancel then
   begin
-    Self.GetDataSetLinkContainer.Refresh(True); // Altrimenti da un errore sull'Append
+    Self.GetDataSetLinkContainer.Refresh (True); // Altrimenti da un errore sull'Append
     Self.Delete;
   end;
 end;
