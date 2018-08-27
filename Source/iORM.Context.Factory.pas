@@ -290,7 +290,7 @@ var
             Result := ioMdTime;
             Exit;
           end
-          else { if _field.PropertyType.QualifiedName = 'System.Currency' then }
+          else
           begin
             Result := ioMdDecimal;
             Exit;
@@ -309,7 +309,12 @@ var
             Exit;
           end;
         end;
-      tkClass: // try to restore child properties... but only if the collection is not nil!!!
+      tkClass:
+        begin
+          Result := ioMdBinary;
+          Exit;
+        end;
+      tkInterface:
         begin
           Result := ioMdBinary;
           Exit;
