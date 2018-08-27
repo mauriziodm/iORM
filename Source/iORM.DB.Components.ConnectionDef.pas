@@ -327,11 +327,11 @@ begin
   inherited;
   // Mark the connection as registered in the ConnectionManager
   FIsRegistered := True;
-  // Fire the OnAfterRegister event if implemented
-  DoAfterRegister;
   // Autocreate Database if enabled
   if FAutoCreateDB.Enabled then
     GenerateDB;
+  // Fire the OnAfterRegister event if implemented
+  DoAfterRegister;
 end;
 
 procedure TioCustomConnectionDef.SetDefaultConnection(const Value: Boolean);

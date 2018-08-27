@@ -574,14 +574,10 @@ begin
   // Loop for all entities (model classes) of the application
   //  and load the TableStructure
   for AContextSlot in TioMapContainer.GetContainer.Values do
-  begin
     Self.LoadTableStructure(AContextSlot.GetMap);
-  end;
 
   for AContextSlot in TioMapContainer.GetContainer.Values do
-  begin
     Self.LoadFKStructure(AContextSlot.GetMap);
-  end;
 end;
 
 procedure TioDBBuilder.LoadFKStructure(AMap: IioMap);
@@ -609,7 +605,7 @@ begin
     begin
       LRel := LProperty.GetRelationType;
 
-      if LRel = ioRTNone then
+      if LRel in [ioRTNone, ioRTEmbeddedHasOne, ioRTEmbeddedHasMany] then
         Continue;
 
       // Add relation to list
@@ -718,7 +714,9 @@ end;
 function TioDBBuilder.RemoveLastComma(const AValue: string): string;
 begin
   if AValue.EndsWith(',') then
-    Result := AValue.Substring(0, AValue.Length-1);
+    Result := AValue.Substring(0, AValue.Length-1)
+  else
+    Result := AValue;
 end;
 
 procedure TioDBBuilder.SetCreateIndexes(const Value: Boolean);
