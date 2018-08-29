@@ -314,11 +314,13 @@ var
           Result := ioMdBinary;
           Exit;
         end;
-      tkInterface:
-        begin
-          Result := ioMdBinary;
-          Exit;
-        end;
+// TODO: M.M. 29/08/18 DA RIVALUTARE PERCHE' NON PUO' ESSERE COSI
+//       ERA STATA MESSA PER GESTIRE LE RELAZIONI EMBEDDED
+//      tkInterface:
+//        begin
+//          Result := ioMdBinary;
+//          Exit;
+//        end;
     end;
   end;
 
