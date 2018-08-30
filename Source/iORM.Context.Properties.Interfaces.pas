@@ -109,6 +109,7 @@ type
     procedure SetMetadata_FieldNullable(const AMetadata_FieldNullable: Boolean);
     procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
     procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
+    procedure SetMetadata_DisableCreateFK(const AMetadata_DisableCreateFK: boolean);
     function GetMetadata_FieldType: TioMetadataFieldType;
     function GetMetadata_FieldLength: Integer;
     function GetMetadata_FieldPrecision: Integer;
@@ -116,6 +117,7 @@ type
     function GetMetadata_FieldNullable: Boolean;
     function GetMetadata_FieldUnicode: Boolean;
     function GetMetadata_CustomFieldType: string;
+    function GetMetadata_DisableCreateFK: boolean;
   end;
 
   IioContextProperties = interface(IioSqlItem)

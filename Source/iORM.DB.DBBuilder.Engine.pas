@@ -464,7 +464,10 @@ begin
             if LRel = ioRTNone then
               Continue;
 
-            if LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo] then
+            if LPairField.Value.GetProperty.GetMetadata_DisableCreateFK then
+              Continue;
+
+            if (LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo]) then
             begin
               LChildTypeName:=LPairField.Value.GetProperty.GetRelationChildTypeName;
               LChildTypeAlias:=LPairField.Value.GetProperty.GetRelationChildTypeAlias;

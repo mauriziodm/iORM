@@ -335,6 +335,15 @@ type
   // Custom FieldType attribute
   ioCustomFieldType = class(TioCustomStringAttribute)
   end;
+
+  // Define Disable Create FK
+  ioDisableCreateFK = class(TioCustomAttribute)
+  strict private
+    FDisableCreateFK: Boolean;
+  public
+    constructor Create(const ADisableCreateFK:Boolean=True);
+    property DisableCreateFK:Boolean read FDisableCreateFK;
+  end;
   // M.M. 31/07/18 END - New Attributes to define Specific Data Type
 
   // Relation BelongsTo attribute
@@ -829,6 +838,13 @@ constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: Stri
 begin
   FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
   FTargetTypeAlias := AAlias;
+end;
+
+{ ioDisableCreateFK }
+
+constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
+begin
+  FDisableCreateFK := ADisableCreateFK;
 end;
 
 end.
