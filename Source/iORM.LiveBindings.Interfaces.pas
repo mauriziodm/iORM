@@ -146,6 +146,7 @@ type
     procedure ReceiveSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
+    function IsInterfaceBSA: Boolean;
 //    function AsTBindSourceAdapter: TBindSourceAdapter;
 //    function TypeName: String;       // Added TypeName property
 //    function TypeAlias: String;      // Added TypeAlias property

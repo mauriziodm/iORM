@@ -105,7 +105,8 @@ type
     procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // IsDetail
     function GetIsDetail: Boolean;
-    property IsDetail:Boolean read GetIsDetail;
+    // IsInterfacePresenting
+    function GetIsInterfacePresenting: Boolean;
     // State
     function GetState: TBindSourceAdapterState;
     // ItemCount
@@ -165,6 +166,8 @@ type
     property ioWhere:IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
     property ItemCount: Integer read GetCount;
+    property IsDetail:Boolean read GetIsDetail;
+    property IsInterfacePresenting:Boolean read GetIsInterfacePresenting;
   published
     // Events
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -510,6 +513,14 @@ end;
 function TioPrototypeBindSource.GetIsDetail: Boolean;
 begin
   Result := Assigned(FioMasterBindSource);
+end;
+
+function TioPrototypeBindSource.GetIsInterfacePresenting: Boolean;
+begin
+  if CheckAdapter then
+   Result := GetActiveBindSourceAdapter.IsInterfaceBSA
+  else
+   Result := TioRttiUtilities.IsAnInterfaceTypeName(ioTypeName);
 end;
 
 function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(

@@ -163,6 +163,7 @@ type
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
+    function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
@@ -604,6 +605,11 @@ end;
 function TioActiveObjectBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := Assigned(FMasterProperty);
+end;
+
+function TioActiveObjectBindSourceAdapter.IsInterfaceBSA: Boolean;
+begin
+  Result := False;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.Notify(Sender: TObject;

@@ -86,6 +86,8 @@ type
     function GetState: TBindSourceAdapterState;
     // IsDetail
     function GetIsDetail: Boolean;
+    // IsInterfacePresenting
+    function GetIsInterfacePresenting: Boolean;
     // Editing
     function GetEditing: Boolean;
     // ItemCount
@@ -157,6 +159,7 @@ type
     property ItemCount: Integer read GetCount;
     property Editing:Boolean read GetEditing;
     property IsDetail:Boolean read GetIsDetail;
+    property IsInterfacePresenting:Boolean read GetIsInterfacePresenting;
   published
     // Events
     property OnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -468,6 +471,14 @@ begin
    Result := BindSourceAdapter.IsDetail
   else
    Result := Assigned(MasterPresenter);
+end;
+
+function TioModelPresenter.GetIsInterfacePresenting: Boolean;
+begin
+  if CheckAdapter then
+   Result := BindSourceAdapter.IsInterfaceBSA
+  else
+   Result := TioRttiUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
 function TioModelPresenter.GetNaturalObjectBindSourceAdapter(

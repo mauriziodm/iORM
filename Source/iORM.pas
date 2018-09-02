@@ -148,7 +148,7 @@ type
     class function CreateViewModel<T:IioViewModel>(const AAlias:String=''; const AParams: TioConstructorParams=nil): T; overload;
     class function CreateViewModel<T:IioViewModel>(const AParams:TioConstructorParams): T; overload;
     // Create ViewModel instance for a specified type of instances
-    class function CreateViewModelFor<T>(const AVVMAlias:String=''; const AParams: TioConstructorParams=nil): IioViewModel; overload;
+    class function CreateViewModelFor<T>(const AAlias:String=''; const AParams: TioConstructorParams=nil): IioViewModel; overload;
     class function CreateViewModelFor<T>(const AParams: TioConstructorParams): IioViewModel; overload;
 
     // Create View & ViewModel coupled instances
@@ -384,23 +384,23 @@ end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).SetViewContext(AViewContext).ShowCurrent;
+  TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowCurrent;
 end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProvider).ShowCurrent;
+  TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProvider).ShowCurrent;
 end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProviderName).ShowCurrent;
+  TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProviderName).ShowCurrent;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).SetViewContext(AViewContext).ShowEach;
+  TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
 end;
 
 class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AVVMAlias: String);
@@ -415,12 +415,12 @@ end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProvider).ShowEach;
+  TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProvider).ShowEach;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  di.LocateViewVMfor(AModelPresenter, AVVMAlias).VCProvider(AVCProviderName).ShowEach;
+  TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProviderName).ShowEach;
 end;
 
 class procedure io.ShowWait;
@@ -583,9 +583,9 @@ begin
   Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewModelFor<T>(const AVVMAlias: String; const AParams: TioConstructorParams): IioViewModel;
+class function io.CreateViewModelFor<T>(const AAlias: String; const AParams: TioConstructorParams): IioViewModel;
 begin
-  Result := io.di.LocateVMfor<T>(AVVMAlias).ConstructorParams(AParams).GetAsGeneric.OfType<IioViewModel>;
+  Result := io.di.LocateVMfor<T>(AAlias).ConstructorParams(AParams).GetAsGeneric.OfType<IioViewModel>;
 end;
 
 class function io.CreateViewModelFor<T>(const AParams: TioConstructorParams): IioViewModel;

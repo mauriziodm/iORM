@@ -1,8 +1,10 @@
 inherited ArticleViewModel: TArticleViewModel
   OldCreateOrder = True
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
   object MPArticle: TioModelPresenter
     AsDefault = True
-    Async = True
+    Async = False
     AutoLoadData = False
     AutoPersist = True
     AutoPost = False

@@ -45,10 +45,26 @@ type
     { Private declarations }
   public
     { Public declarations }
+    constructor Create(Owner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 implementation
 
 {$R *.fmx}
+
+{ TMaterialView }
+
+constructor TMaterialView.Create(Owner: TComponent);
+begin
+  inherited;
+
+end;
+
+destructor TMaterialView.Destroy;
+begin
+
+  inherited;
+end;
 
 end.
