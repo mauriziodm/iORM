@@ -234,7 +234,13 @@ begin
   FAsync := False;
   FAutoPersist := True;
   FReloadDataOnRefresh := True;
+
+  // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
+  //  AObject is always a TObject by generic constraint
+  if Assigned(ADataObject) then
+    AClassRef := ADataObject.ClassType;
   inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;

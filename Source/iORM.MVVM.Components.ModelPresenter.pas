@@ -5,7 +5,8 @@ interface
 uses
   System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
-  System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider;
+  System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
+  System.Rtti;
 
 type
 
@@ -49,6 +50,7 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Methods
+    procedure _CreateAdapter(const ADataObject:TObject);
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
     procedure SetAutoLoadData(const Value: Boolean);
@@ -132,6 +134,7 @@ type
     procedure Insert(AObject:IInterface); overload;
     procedure Delete;
     procedure Cancel;
+    procedure CancelIfEditing;
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
     procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
@@ -191,8 +194,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Where.Factory, iORM.LiveBindings.Factory,
-  iORM.Exceptions, iORM.Rtti.Utilities, iORM, iORM.Components.Common,
-  System.Rtti;
+  iORM.Exceptions, iORM.Rtti.Utilities, iORM, iORM.Components.Common;
 
 { TioModelProvider }
 
@@ -228,35 +230,22 @@ end;
 
 procedure TioModelPresenter.Cancel;
 begin
-  if CheckAdapter then
+  if CheckAdapter and Editing then
     BindSourceAdapter.Cancel;
+end;
+
+procedure TioModelPresenter.CancelIfEditing;
+begin
+  if CheckAdapter and Editing then
+    Self.Cancel;
 end;
 
 function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
   if ACreateIfNotAssigned and not Assigned(FBindSourceAdapter) then
-  begin
-    // If the property MasterModelPresenter is assigned then retrieve
-    //  the DetailBindSourceAdapter from it
-    if Assigned(MasterPresenter) then
-      // Get the BindSourceAdapter
-      SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAfromMasterModelPresenter(nil, MasterPresenter, MasterPropertyName)  )
-    // else create the BSA from TypeName & TypeAlias
-    else
-    begin
-      // Get the ActiveBindSourceAdapter
-      SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)   );
-      // Force the creation of all the detail adapters (if exists)
-      //  NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
-      //       funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
-      //       stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
-      //       del Master.
-      ForceDetailAdaptersCreation;
-    end;
-    // Init the BSA
-    FBindSourceAdapter.ioAutoPost := FAutoPost;
-  end;
+    _CreateAdapter(nil);
+  // Result
   Result := Assigned(FBindSourceAdapter);
 end;
 
@@ -762,13 +751,8 @@ begin
     ClearDataObject;
   // if the adapter is not already assigned then create it
   if not CheckAdapter then
-  begin
-    // if the TypeName is empty then set it
-    if TypeName.IsEmpty then
-      raise EioException.Create(Self.ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
     // Create the BSA
-    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)  );
-  end;
+    _CreateAdapter(ADataObject);
   // Set the data object into the BSA
   BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
 end;
@@ -779,13 +763,11 @@ begin
     ClearDataObject;
   // if the adapter is not already assigned then create it
   if not CheckAdapter then
-  begin
-    // if the TypeName is empty then set it
-    if TypeName.IsEmpty then
-      raise EioException.Create(Self.ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
     // Create the BSA
-    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAByTypeName(TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, nil)  );
-  end;
+    //  NB: Nel caso in cui si sita impostando il DataObject ma il BSA non era ancora creato lo crea (il BSA)
+    //       usando il ClassName dell'oggetto; in questo modo siamo sicuri che abbiamo il BSA più
+    //       adatto e non uno che magari è più generico e a cui mancano alcune proprietà (è successo).
+    _CreateAdapter(ADataObject as TObject);
   // Set the data object into the BSA
   BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
 end;
@@ -907,6 +889,35 @@ begin
   Where._Where(FWhereStr.Text);
   // OLD_CODE
 //  Self.SetWhere(TioWhereFactory.NewWhere.Add(FWhereStr.Text));
+end;
+
+procedure TioModelPresenter._CreateAdapter(const ADataObject:TObject);
+begin
+  // If an adapter already exists then raise an exception
+  if Assigned(FBindSourceAdapter) then
+    raise EioException.Create(Self.ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
+  // if the TypeName is empty then set it
+  if TypeName.IsEmpty then
+    raise EioException.Create(Self.ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
+  // If the property MasterModelPresenter is assigned then retrieve
+  //  the DetailBindSourceAdapter from it
+  if Assigned(MasterPresenter) then
+    // Get the BindSourceAdapter
+    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSAfromMasterModelPresenter(nil, MasterPresenter, MasterPropertyName)  )
+  // else create the BSA from TypeName & TypeAlias
+  else
+  begin
+    // Get the ActiveBindSourceAdapter
+    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject)   );
+    // Force the creation of all the detail adapters (if exists)
+    //  NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
+    //       funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
+    //       stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
+    //       del Master.
+    ForceDetailAdaptersCreation;
+  end;
+  // Init the BSA
+  FBindSourceAdapter.ioAutoPost := FAutoPost;
 end;
 
 procedure TioModelPresenter.Insert(AObject: IInterface);

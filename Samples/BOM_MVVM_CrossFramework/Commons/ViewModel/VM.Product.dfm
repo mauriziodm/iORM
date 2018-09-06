@@ -1,8 +1,8 @@
 inherited ProductViewModel: TProductViewModel
   object MPBOMItemList: TioModelPresenter
     AsDefault = False
-    Async = True
-    AutoLoadData = True
+    Async = False
+    AutoLoadData = False
     AutoPersist = True
     AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
@@ -12,6 +12,6 @@ inherited ProductViewModel: TProductViewModel
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
     Left = 192
-    Top = 96
+    Top = 104
   end
 end

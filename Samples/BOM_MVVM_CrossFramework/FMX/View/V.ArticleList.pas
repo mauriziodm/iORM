@@ -10,11 +10,10 @@ uses
   iORM.MVVM.Components.ViewModelBridge, Data.Bind.Components,
   Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, FMX.ListView,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt, V.Interfaces, iORM.Attributes, FMX.MultiView, Model.Interfaces;
+  Fmx.Bind.DBEngExt, iORM.Attributes, FMX.MultiView, Model.Interfaces;
 
 type
 
-//  [diImplements(IArticleListView)]
   [diViewFor(IBase)]
   TArticleListView = class(TFrame)
 
@@ -81,7 +80,7 @@ end;
 procedure TArticleListView.ListView1ItemClick(const Sender: TObject;
   const AItem: TListViewItem);
 begin
-  Application.ProcessMessages;
+//  Application.ProcessMessages;
   VMBridge.Command['acEditArticle'].Execute;
 end;
 

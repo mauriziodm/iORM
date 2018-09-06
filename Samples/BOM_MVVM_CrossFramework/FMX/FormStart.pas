@@ -37,13 +37,12 @@ var
 implementation
 
 uses
-  U.SampleData, V.Interfaces, iORM, Model.Interfaces;
+  U.SampleData, iORM, Model.Interfaces;
 
 {$R *.fmx}
 
 procedure TStartForm.FormCreate(Sender: TObject);
 begin
-//  io.di.LocateView<IArticleListView>.Show;
   io.Show<IBase>;
 end;
 

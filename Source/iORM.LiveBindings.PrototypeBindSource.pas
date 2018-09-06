@@ -136,6 +136,7 @@ type
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     procedure PostIfEditing;
+    procedure CancelIfEditing;
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
@@ -251,6 +252,12 @@ begin
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
+procedure TioPrototypeBindSource.CancelIfEditing;
+begin
+  if Editing then
+    Self.Cancel;
+end;
+
 function TioPrototypeBindSource.CheckActiveAdapter: Boolean;
 begin
 //  Result := (not (csDesigning in ComponentState))
@@ -340,7 +347,7 @@ begin
     if Assigned(Self.ioMasterBindSource) then
       ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy))
     else
-      ADataObject := TioLiveBindingsFactory.GetBSAfromDB(Self, FioTypeName, FioTypeAlias, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData);
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FioTypeName, FioTypeAlias, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil) as TBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself

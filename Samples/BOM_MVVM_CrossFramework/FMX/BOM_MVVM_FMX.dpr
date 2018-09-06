@@ -4,7 +4,6 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   FormStart in 'FormStart.pas' {StartForm},
-  V.Interfaces in '..\Commons\View\V.Interfaces.pas',
   V.ArticleList in 'View\V.ArticleList.pas' {ArticleListView: TFrame},
   V.Material in 'View\V.Material.pas' {MaterialView: TFrame},
   V.Process in 'View\V.Process.pas' {ProcessView: TFrame},
@@ -12,7 +11,7 @@ uses
   V.Micro.Material in 'View\V.Micro.Material.pas' {MicroMaterialView: TFrame},
   V.Micro.Process in 'View\V.Micro.Process.pas' {MicroProcessView: TFrame},
   V.Micro.Product in 'View\V.Micro.Product.pas' {MicroProductView: TFrame},
-  iORM.MVVM.ViewModelBase in 'C:\Delphi\Tools\iORM\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModelBase in '..\..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
   Model.Product in '..\Commons\Model\Model.Product.pas',
   Model.Process in '..\Commons\Model\Model.Process.pas',
   Model.Material in '..\Commons\Model\Model.Material.pas',
@@ -20,7 +19,6 @@ uses
   Model.BOMItems in '..\Commons\Model\Model.BOMItems.pas',
   Model.Base in '..\Commons\Model\Model.Base.pas',
   VM.Product in '..\Commons\ViewModel\VM.Product.pas' {ProductViewModel: TDataModule},
-  VM.Interfaces in '..\Commons\ViewModel\VM.Interfaces.pas',
   VM.BOMItem in '..\Commons\ViewModel\VM.BOMItem.pas' {BOMItemVM: TDataModule},
   VM.ArticleList in '..\Commons\ViewModel\VM.ArticleList.pas' {ArticleListVM: TDataModule},
   VM.Article in '..\Commons\ViewModel\VM.Article.pas' {ArticleViewModel: TDataModule},
@@ -31,7 +29,7 @@ uses
 {$STRONGLINKTYPES ON}
 
 begin
-//  ReportMemoryLeaksOnShutdown := True;
+  ReportMemoryLeaksOnShutdown := True;
 
   Application.Initialize;
   Application.CreateForm(TStartForm, StartForm);

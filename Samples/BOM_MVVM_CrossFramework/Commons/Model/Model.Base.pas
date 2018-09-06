@@ -34,7 +34,7 @@ type
     // ArticleType
     function GetArticleType: String;
   public
-    constructor Create;overload; virtual;
+    constructor Create; overload; virtual;
     constructor Create(const ACode, ADescription, UM: String); overload;
     property ID:Integer read GetID write SetID;
     property Code:String read GetCode write SetCode;

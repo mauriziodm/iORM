@@ -5,9 +5,10 @@ inherited BOMItemVM: TBOMItemVM
     Async = True
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IBOMItem'
-    ViewDataType = dtList
+    ViewDataType = dtSingle
     WhereDetailsFromDetailAdapters = False
     Left = 136
     Top = 16
@@ -17,11 +18,12 @@ inherited BOMItemVM: TBOMItemVM
     Async = True
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = MPBOMItem
     MasterPropertyName = 'Article'
     TypeName = 'IBase'
-    ViewDataType = dtList
+    ViewDataType = dtSingle
     WhereDetailsFromDetailAdapters = False
     Left = 136
     Top = 72

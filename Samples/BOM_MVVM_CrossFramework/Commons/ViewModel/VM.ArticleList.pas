@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
-  iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces,
+  iORM.MVVM.Components.ModelPresenter, iORM.Attributes,
   System.Actions, Model.Interfaces;
 
 type
@@ -28,7 +28,6 @@ type
     property Description:String read FDescription write FDescription;
   end;
 
-//  [diImplements(IArticleListVM)]
   [diViewModelFor(IBase)]
   TArticleListVM = class(TioViewModel)
     MPArticleList: TioModelPresenter;
@@ -80,7 +79,7 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
-  iORM, iORM.Where.Interfaces, V.Interfaces, System.Generics.Collections;
+  iORM, iORM.Where.Interfaces, System.Generics.Collections;
 
 {$R *.dfm}
 
@@ -116,7 +115,6 @@ end;
 procedure TArticleListVM.acEditArticleExecute(Sender: TObject);
 begin
   inherited;
-//  io.di.LocateViewVMfor(MPArticleList).ShowCurrent;
   MPArticleList.ShowCurrent;
 end;
 
@@ -183,8 +181,8 @@ var
   LArticle: T;
 begin
   inherited;
-  LArticle := io.di.Locate<T>.Get;
-  MPArticleList.Append(LArticle as TObject);
+  LArticle := io.Create<T>;
+  MPArticleList.Append(LArticle);
   Command['acEditArticle'].Execute;
 end;
 

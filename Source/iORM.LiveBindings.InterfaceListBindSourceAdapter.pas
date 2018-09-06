@@ -39,7 +39,8 @@ interface
 
 uses
   Data.Bind.ObjectScope, System.Classes, System.Rtti,
-  System.Generics.Collections, iORM.Containers.Interfaces;
+  System.Generics.Collections, iORM.Containers.Interfaces,
+  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
 
 type
 

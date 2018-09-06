@@ -58,7 +58,7 @@ var
     // Set position at design time
     LNewDesignInfo.Hi := Word(50);
     LNewDesignInfo.Lo := Word(50);
-    LVMBridge.DesignInfo := Longint(LNewDesignInfo);
+    LVMBridge.DesignInfo := Int32(LNewDesignInfo);
     // Call the ViewModelBridgeAutosetting again
     ViewModelBridgeAutosetting(AVMBridgeClientComponent, AOwner);
   end;

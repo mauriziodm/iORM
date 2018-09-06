@@ -35,7 +35,7 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
-  iORM, V.Interfaces;
+  iORM;
 
 
 {$R *.dfm}
@@ -48,30 +48,19 @@ begin
 end;
 
 procedure TBOMItemVM.acEditArticleExecute(Sender: TObject);
-//var
-//  LAlias: String;
 begin
   inherited;
-
-
-  io.di.LocateViewVMfor(MPBOMArticle.Current)
-    .SetPresenter('MPArticle', MPBOMArticle)
-    .Show;
-
-
-//  LAlias := MPBOMArticle.Current.ClassName;
-//  io.di.LocateViewVM<IArticleView,IArticleVM>(LAlias, LAlias).SetPresenter('MPArticle', MPBOMArticle).Show;
+  MPBOMArticle.ShowCurrent;
 end;
 
 procedure TBOMItemVM.acPostExecute(Sender: TObject);
 begin
-  if MPBOMItem.Editing then
-    MPBOMItem.Post;
+  MPBOMItem.PostIfEditing;
 end;
 
 procedure TBOMItemVM.acPostUpdate(Sender: TObject);
 begin
-  Command['acPost'].Enabled :=  MPBOMItem.Editing;
+  Command['acPost'].Enabled := MPBOMItem.Editing;
 end;
 
 end.

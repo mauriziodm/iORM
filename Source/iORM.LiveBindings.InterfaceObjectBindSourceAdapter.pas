@@ -38,7 +38,8 @@ unit iORM.LiveBindings.InterfaceObjectBindSourceAdapter;
 interface
 
 uses
-  Data.Bind.ObjectScope, System.Rtti, System.Classes;
+  Data.Bind.ObjectScope, System.Rtti, System.Classes,
+  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -118,8 +119,12 @@ begin
     FTypeName := TioRttiUtilities.GenericToString<T>;
   FTypeAlias := ATypeAlias;
 
-//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
-  FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
+  // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
+  //  AObject is always an interface by generic constraint
+  if Assigned(AObject) then
+    FBaseObjectRttiType := TioRttiUtilities.ClassRefToRttiType((AObject as TObject).ClassType)
+  else
+    FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
 
   // Set the data object
   //  NB: Force FOwnsObject := False because this BindSourceAdapter is for interface and his AutoRefCount
