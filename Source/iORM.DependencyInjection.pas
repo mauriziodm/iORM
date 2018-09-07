@@ -323,7 +323,7 @@ type
   // Dependency Injection Factory
   TioDependencyInjectionFactory = class abstract(TioDependencyInjectionBase)
   strict private
-    class procedure CheckModelPresenter(const ATargetMP:TioModelPresenter);
+    class procedure _CheckModelPresenter(const ATargetMP:TioModelPresenter);
   public
     class function GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName:String; const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator; overload;
@@ -1224,9 +1224,10 @@ end;
 
 function TioDependencyInjectionLocator.ShowCurrent: TComponent;
 begin
-  // Check the bind source adapter
-  if not FForEachModelPresenter.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'ShowCurrent', 'ActiveBindSourceAdapter not assigned in the FForEachModelPresenter.');
+  // Check for BindSourceAdapter and not empty
+  FForEachModelPresenter.CheckAdapter(True);
+  if FForEachModelPresenter.ItemCount = 0 then
+    Exit;
   // Show the current object
   Result := _ShowCurrent;
 end;
@@ -1235,9 +1236,10 @@ procedure TioDependencyInjectionLocator.ShowEach;
 var
   I: Integer;
 begin
-  // Check the bind source adapter
-  if not FForEachModelPresenter.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'ShowEach', 'ActiveBindSourceAdapter not assigned in the FForEachModelPresenter.');
+  // Check for BindSourceAdapter and not empty
+  FForEachModelPresenter.CheckAdapter(True);
+  if FForEachModelPresenter.ItemCount = 0 then
+    Exit;
   // Loop for all "records"
   FForEachModelPresenter.First;
   for I := 1 to FForEachModelPresenter.ItemCount do
@@ -1430,7 +1432,7 @@ end;
 
 { TioDependencyInjectionFactory }
 
-class procedure TioDependencyInjectionFactory.CheckModelPresenter(const ATargetMP: TioModelPresenter);
+class procedure TioDependencyInjectionFactory._CheckModelPresenter(const ATargetMP: TioModelPresenter);
 begin
   // Check the ModelPresenter
   if not Assigned(ATargetMP) then
@@ -1451,7 +1453,7 @@ end;
 class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetMP: TioModelPresenter; const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
-  CheckModelPresenter(ATargetMP);
+  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True);
   // Try to retrieve a locator for MP.Current instance as Interface
   if ATargetMP.IsInterfacePresenting
   and io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
@@ -1497,7 +1499,7 @@ end;
 class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: TioModelPresenter; const AAlias: String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
-  CheckModelPresenter(ATargetMP);
+  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True);
   // Try to retrieve a locator for MP.Current instance as Interface
   if ATargetMP.IsInterfacePresenting
   and io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist

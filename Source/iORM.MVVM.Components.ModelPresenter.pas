@@ -104,6 +104,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    class function IsValidForDependencyInjectionLocator(const AModelPresenter:TioModelPresenter; const ARaiseExceptions:Boolean): Boolean;
     function CheckAdapter(const ACreateIfNotAssigned:Boolean = False): Boolean;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
 //    procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
@@ -930,6 +931,24 @@ begin
 //      invocato un Post in seguito al Refresh stesso.
 //    BindSourceAdapter.Refresh(False);
   end;
+end;
+
+class function TioModelPresenter.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter; const ARaiseExceptions:Boolean): Boolean;
+begin
+  // Init
+  Result := True;
+  // Check the ModelPresenter
+  Result := Result and Assigned(AModelPresenter);
+  if ARaiseExceptions and not Result then
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
+  // Check the bind source adapter
+  Result := Result and AModelPresenter.CheckAdapter;
+  if ARaiseExceptions and not Result then
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
+  // Check the ModelPresenter.Current object
+  Result := Result and (AModelPresenter.Current <> nil);
+  if ARaiseExceptions and not Result then
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
 end;
 
 end.
