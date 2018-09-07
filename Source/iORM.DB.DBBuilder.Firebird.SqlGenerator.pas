@@ -159,7 +159,10 @@ begin
       end;
     ioMdBinary:
       begin
-        LFieldType := 'BLOB'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+          LFieldType := AProperty.GetMetadata_FieldSubType
+        else
+          LFieldType := 'BLOB'
       end;
     ioMdCustomFieldType:
       LFieldType := AProperty.GetMetadata_CustomFieldType;
@@ -671,7 +674,10 @@ begin
       end;
     ioMdBinary:
       begin
-        Result := 'BLOB'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+          Result := AProperty.GetMetadata_FieldSubType
+        else
+          Result := 'BLOB'
       end;
     ioMdCustomFieldType:
       Result := AProperty.GetMetadata_CustomFieldType;

@@ -169,10 +169,17 @@ begin
       end;
     ioMdBinary:
       begin
-        if AProperty.GetMetadata_FieldUnicode then
-          LFieldType := 'BINARY'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+        begin
+          LFieldType := AProperty.GetMetadata_FieldSubType
+        end
         else
-          LFieldType := 'NBINARY';
+        begin
+          if AProperty.GetMetadata_FieldUnicode then
+            LFieldType := 'BINARY'
+          else
+            LFieldType := 'NBINARY';
+        end;
       end;
     ioMdCustomFieldType:
       LFieldType := AProperty.GetMetadata_CustomFieldType;
@@ -667,10 +674,17 @@ begin
       end;
     ioMdBinary:
       begin
-        if AProperty.GetMetadata_FieldUnicode then
-          Result := 'BINARY'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+        begin
+          Result := AProperty.GetMetadata_FieldSubType;
+        end
         else
-          Result := 'NBINARY';
+        begin
+          if AProperty.GetMetadata_FieldUnicode then
+            Result := 'BINARY'
+          else
+            Result := 'NBINARY';
+        end;
       end;
     ioMdCustomFieldType:
       Result := AProperty.GetMetadata_CustomFieldType;
