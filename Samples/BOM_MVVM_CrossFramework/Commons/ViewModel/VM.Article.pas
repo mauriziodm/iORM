@@ -17,8 +17,6 @@ type
     procedure acPostExecute(Sender: TObject);
     [ioAction('acPost', OnUpdate)]
     procedure acPostUpdate(Sender: TObject);
-    procedure DataModuleCreate(Sender: TObject);
-    procedure DataModuleDestroy(Sender: TObject);
   private
     { Private declarations }
   public
@@ -34,34 +32,20 @@ implementation
 procedure TArticleViewModel.acBackExecute(Sender: TObject);
 begin
   inherited;
-  if MPArticle.Editing then
-    MPArticle.Cancel;
+  MPArticle.CancelIfEditing;
   Self.FreeViews;
 end;
 
 procedure TArticleViewModel.acPostExecute(Sender: TObject);
 begin
   inherited;
-  if MPArticle.Editing then
-    MPArticle.Post;
+  MPArticle.PostIfEditing;
 end;
 
 procedure TArticleViewModel.acPostUpdate(Sender: TObject);
 begin
   inherited;
   Command['acPost'].Enabled := MPArticle.Editing;
-end;
-
-procedure TArticleViewModel.DataModuleCreate(Sender: TObject);
-begin
-  inherited;
-//
-end;
-
-procedure TArticleViewModel.DataModuleDestroy(Sender: TObject);
-begin
-  inherited;
-//
 end;
 
 end.

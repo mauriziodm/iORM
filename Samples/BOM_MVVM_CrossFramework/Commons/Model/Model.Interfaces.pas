@@ -3,7 +3,7 @@ unit Model.Interfaces;
 interface
 
 uses
-  iORM.Containers.Interfaces;
+  iORM.Containers.Interfaces, System.Generics.Collections;
 
 type
 
@@ -64,8 +64,8 @@ type
   IProduct = interface(IBase)
     ['{F63D8A6A-74CF-4E23-AE90-CC55FA0B36D6}']
     // BOMItems
-    function GetBOMItems: IioList<IBOMItem>;
-    property BOMItems:IioList<IBOMItem> read GetBOMItems;
+    function GetBOMItems: TList<IBOMItem>;
+    property BOMItems:TList<IBOMItem> read GetBOMItems;
     // Cost
     function GetCost: Currency;
     property Cost:Currency read GetCost;

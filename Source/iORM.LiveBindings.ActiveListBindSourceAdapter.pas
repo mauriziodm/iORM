@@ -892,14 +892,11 @@ begin
   //  to disable all Details adapters also
   if Assigned(ADataObject) then
   begin
-    // If the generic parameter is an interface then the DataObject must implements the IioList<IInterface> interface
-    if TioRttiUtilities.IsAnInterface<T> and not Supports(ADataObject, IioList<TObject>) then
-      raise EioException.Create(Self.ClassName, '_InternalSetDataObject', 'Instance does not implement the IioList<IInterface> interface.');
     // Set the provided DataObject (always as TList<IInterface>)
     Self.SetList(TList<TObject>(ADataObject), AOwnsObject);
-    // If the generic parameter is an interface then set the FInterfacedList field to it to keep alive the list itself
-    if TioRttiUtilities.IsAnInterface<T> then
-      Supports(ADataObject, IInterface, Self.FInterfacedList);
+    // If the DataObject (List) is an interface referenced object then
+    //  set the FInterfacedList field to it to keep alive the list itself
+    Supports(ADataObject, IInterface, Self.FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
     LPrecAutoLoadData := FAutoLoadData;

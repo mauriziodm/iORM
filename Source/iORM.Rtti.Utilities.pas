@@ -78,7 +78,7 @@ uses
 class function TioRttiUtilities.CastObjectToGeneric<T>(const AObj: TObject; IID:TGUID): T;
 begin
   if not Assigned(AObj) then
-    Exit;
+    Exit(TValue.Empty.AsType<T>);
   if IsAnInterface<T> then
   begin
     if IID = GUID_NULL then

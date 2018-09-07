@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, VM.Article, Model.Product,
-  iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces;
+  iORM.MVVM.Components.ModelPresenter, iORM.Attributes;
 
 type
 
@@ -24,7 +24,7 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
-  iORM, V.Interfaces;
+  iORM;
 
 {$R *.dfm}
 
@@ -35,7 +35,6 @@ begin
   MPBOMItemList.CheckAdapter(True);
   if (MPBOMItemList.ItemCount > 0) then
     MPBOMItemList.ShowEach('', 'BOMVCProvider');
-//    io.di.LocateViewVMfor(MPBOMItemList).VCProvider('BOMVCProvider').ShowEach;
 end;
 
 end.

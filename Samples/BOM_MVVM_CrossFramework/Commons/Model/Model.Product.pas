@@ -3,17 +3,19 @@ unit Model.Product;
 interface
 
 uses
-  Model.Interfaces, iORM.Attributes, Model.Base, iORM.Containers.Interfaces;
+  Model.Interfaces, iORM.Attributes, Model.Base, iORM.Containers.Interfaces,
+  System.Generics.Collections;
 
 type
 
   [ioEntity('ARTICLES'), ioTrueClass, diImplements(IProduct)]
   TProduct = class(TBase, IProduct)
   private
-    FBOMItems: IioList<IBOMItem>;
+//    FBOMItems: IioList<IBOMItem>;
+    FBOMItems: TList<IBOMItem>;
   protected
     // BOMItems
-    function GetBOMItems: IioList<IBOMItem>;
+    function GetBOMItems: TList<IBOMItem>;
     // Cost
     function GetCost: Currency;
     // Time (minute)
@@ -24,8 +26,9 @@ type
     function GetProcessCost: Currency;
   public
     constructor Create; override;
+    destructor Destroy; override;
     [ioHasMany(IBOMItem, 'MasterID')]
-    property BOMItems:IioList<IBOMItem> read GetBOMItems;
+    property BOMItems:TList<IBOMItem> read GetBOMItems;
     [ioSkip]
     property Cost:Currency read GetCost;
     [ioSkip]
@@ -46,10 +49,17 @@ uses
 constructor TProduct.Create;
 begin
   inherited;
-  FBOMItems := TioList<IBOMItem>.Create;
+//  FBOMItems := TioList<IBOMItem>.Create;
+  FBOMItems := TList<IBOMItem>.Create;
 end;
 
-function TProduct.GetBOMItems: IioList<IBOMItem>;
+destructor TProduct.Destroy;
+begin
+  FBOMItems.Free;
+  inherited;
+end;
+
+function TProduct.GetBOMItems: TList<IBOMItem>;
 begin
   Result := FBOMItems;
 end;
