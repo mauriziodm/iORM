@@ -11,11 +11,10 @@ type
   [ioEntity('ARTICLES'), ioTrueClass, diImplements(IProduct)]
   TProduct = class(TBase, IProduct)
   private
-//    FBOMItems: IioList<IBOMItem>;
-    FBOMItems: TList<IBOMItem>;
+    FBOMItems: IioList<IBOMItem>;
   protected
     // BOMItems
-    function GetBOMItems: TList<IBOMItem>;
+    function GetBOMItems: IioList<IBOMItem>;
     // Cost
     function GetCost: Currency;
     // Time (minute)
@@ -26,9 +25,8 @@ type
     function GetProcessCost: Currency;
   public
     constructor Create; override;
-    destructor Destroy; override;
-    [ioHasMany(IBOMItem, 'MasterID')]
-    property BOMItems:TList<IBOMItem> read GetBOMItems;
+    [ioHasMany(IBOMItem, 'MasterID', ioLazyLoad)]
+    property BOMItems:IioList<IBOMItem> read GetBOMItems;
     [ioSkip]
     property Cost:Currency read GetCost;
     [ioSkip]
@@ -49,17 +47,10 @@ uses
 constructor TProduct.Create;
 begin
   inherited;
-//  FBOMItems := TioList<IBOMItem>.Create;
-  FBOMItems := TList<IBOMItem>.Create;
+  FBOMItems := TioList<IBOMItem>.Create;
 end;
 
-destructor TProduct.Destroy;
-begin
-  FBOMItems.Free;
-  inherited;
-end;
-
-function TProduct.GetBOMItems: TList<IBOMItem>;
+function TProduct.GetBOMItems: IioList<IBOMItem>;
 begin
   Result := FBOMItems;
 end;
