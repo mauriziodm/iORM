@@ -824,6 +824,7 @@ end;
 
 constructor ioBinary.Create(const ABinarySubType:string='';const AIsNullable:Boolean=True);
 begin
+  FBinarySubType := ABinarySubType;
   FIsNullable := AIsNullable;
 end;
 
