@@ -184,9 +184,12 @@ contains
   iORM.DB.Components.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.Components.ConnectionDef.MSSQLServer.pas',
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
   iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
-  iORM.DB.DBBuilder.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.MSSqlServer.SqlGenerator.pas',
-  iORM.DB.DBBuilder.Interfaces in '..\..\Source\iORM.DB.DBBuilder.Interfaces.pas',
+  iORM.DB.DBBuilder.Custom.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Custom.SqlGenerator.pas',
   iORM.DB.DBBuilder.Engine in '..\..\Source\iORM.DB.DBBuilder.Engine.pas',
-  iORM.DB.DBBuilder.Factory in '..\..\Source\iORM.DB.DBBuilder.Factory.pas';
+  iORM.DB.DBBuilder.Factory in '..\..\Source\iORM.DB.DBBuilder.Factory.pas',
+  iORM.DB.DBBuilder.Firebird.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Firebird.SqlGenerator.pas',
+  iORM.DB.DBBuilder.Interfaces in '..\..\Source\iORM.DB.DBBuilder.Interfaces.pas',
+  iORM.DB.DBBuilder.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.MSSqlServer.SqlGenerator.pas',
+  iORM.DB.DBBuilder.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.SqLite.SqlGenerator.pas';
 
 end.
