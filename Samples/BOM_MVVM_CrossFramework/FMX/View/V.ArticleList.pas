@@ -10,12 +10,13 @@ uses
   iORM.MVVM.Components.ViewModelBridge, Data.Bind.Components,
   Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource, FMX.ListView,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt, V.Interfaces, iORM.Attributes, FMX.MultiView;
+  Fmx.Bind.DBEngExt, V.Interfaces, iORM.Attributes, FMX.MultiView, Model.Interfaces;
 
 type
 
-  [diImplements(IArticleListView)]
-  TArticleListView = class(TFrame, IArticleListView)
+//  [diImplements(IArticleListView)]
+  [diViewFor(IBase)]
+  TArticleListView = class(TFrame)
 
     [ioBindAction('acClose')]
     ButtonClose: TSpeedButton;

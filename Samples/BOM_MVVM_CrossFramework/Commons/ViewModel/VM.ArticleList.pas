@@ -28,8 +28,9 @@ type
     property Description:String read FDescription write FDescription;
   end;
 
-  [diImplements(IArticleListVM)]
-  TArticleListVM = class(TioViewModel, IArticleListVM)
+//  [diImplements(IArticleListVM)]
+  [diViewModelFor(IBase)]
+  TArticleListVM = class(TioViewModel)
     MPArticleList: TioModelPresenter;
     MPFilters: TioModelPresenter;
     procedure DataModuleCreate(Sender: TObject);
@@ -115,7 +116,8 @@ end;
 procedure TArticleListVM.acEditArticleExecute(Sender: TObject);
 begin
   inherited;
-  io.di.LocateViewVMfor(MPArticleList).ShowCurrent;
+//  io.di.LocateViewVMfor(MPArticleList).ShowCurrent;
+  MPArticleList.ShowCurrent;
 end;
 
 procedure TArticleListVM.acFilterAllExecute(Sender: TObject);

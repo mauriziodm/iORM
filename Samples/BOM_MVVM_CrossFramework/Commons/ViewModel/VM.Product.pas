@@ -34,7 +34,8 @@ procedure TProductViewModel.acPopulateItemListExecute(Sender: TObject);
 begin
   MPBOMItemList.CheckAdapter(True);
   if (MPBOMItemList.ItemCount > 0) then
-    io.di.LocateViewVMfor(MPBOMItemList).VCProvider('BOMVCProvider').ShowEach;
+    MPBOMItemList.ShowEach('', 'BOMVCProvider');
+//    io.di.LocateViewVMfor(MPBOMItemList).VCProvider('BOMVCProvider').ShowEach;
 end;
 
 end.

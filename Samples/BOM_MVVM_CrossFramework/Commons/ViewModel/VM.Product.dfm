@@ -4,6 +4,7 @@ inherited ProductViewModel: TProductViewModel
     Async = True
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = MPArticle
     MasterPropertyName = 'BOMItems'

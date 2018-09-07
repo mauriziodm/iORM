@@ -170,6 +170,7 @@ type
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
+    function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
@@ -652,6 +653,11 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.IsDetail: Boolean;
 begin
   Result := not FMasterPropertyName.IsEmpty;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.IsInterfaceBSA: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.ListViewDeletingTimerEventHandler(

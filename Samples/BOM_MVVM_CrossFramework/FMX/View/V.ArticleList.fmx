@@ -224,7 +224,6 @@ object ArticleListView: TArticleListView
     Top = 216
   end
   object VMBridge: TioViewModelBridge
-    DI_VMInterface = 'IArticleListVM'
     Left = 280
     Top = 144
   end

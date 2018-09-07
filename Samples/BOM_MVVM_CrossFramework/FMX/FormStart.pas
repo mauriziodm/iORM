@@ -43,7 +43,8 @@ uses
 
 procedure TStartForm.FormCreate(Sender: TObject);
 begin
-  io.di.LocateView<IArticleListView>.Show;
+//  io.di.LocateView<IArticleListView>.Show;
+  io.Show<IBase>;
 end;
 
 procedure TStartForm.SQLIteConnAfterRegister(Sender: TObject);

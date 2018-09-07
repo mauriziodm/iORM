@@ -3,9 +3,10 @@ inherited ArticleListVM: TArticleListVM
   OnCreate = DataModuleCreate
   object MPArticleList: TioModelPresenter
     AsDefault = True
-    Async = True
+    Async = False
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IBase'
     ViewDataType = dtList
@@ -18,6 +19,7 @@ inherited ArticleListVM: TArticleListVM
     Async = False
     AutoLoadData = False
     AutoPersist = False
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'TArticleListFilter'
     ViewDataType = dtSingle
