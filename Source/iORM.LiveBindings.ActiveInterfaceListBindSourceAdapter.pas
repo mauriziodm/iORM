@@ -804,7 +804,8 @@ begin
     Self.SetList(TList<IInterface>(ADataObject), AOwnsObject);
     // If the DataObject (List) is an interface referenced object then
     //  set the FInterfacedList field to it to keep alive the list itself
-    Supports(ADataObject, IInterface, Self.FInterfacedList);
+    if TioRttiUtilities.IsAnInterface<T> then
+      Supports(ADataObject, IInterface, Self.FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
     LPrecAutoLoadData := FAutoLoadData;

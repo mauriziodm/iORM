@@ -3,7 +3,8 @@ unit RegisterClassesUnit;
 interface
 
 uses
-  iORM.Containers.List, iORM.LazyLoad.Generics.List, M.Interfaces, iORM.Attributes;
+  iORM.Containers.List, iORM.LazyLoad.Generics.List, M.Interfaces, iORM.Attributes,
+  System.Generics.Collections;
 
 type
 
@@ -12,7 +13,8 @@ type
   [diImplemets()]
   TLazyLoadPhoneNumberList = class(TioList<IPhoneNumber>);
 
-  TPhoneNumberList = class(TioInterfacedList<IPhoneNumber>);
+//  TPhoneNumberList = class(TioInterfacedList<IPhoneNumber>);
+  TPhoneNumberList = class(TioList<IPhoneNumber>);
 
   TDIClassRegister = class
   public

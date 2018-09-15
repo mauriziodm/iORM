@@ -62,7 +62,8 @@ implementation
 
 uses
   iORM, RegisterClassesUnit, System.JSON, FMX.Forms,
-  System.UITypes, V.Interfaces, iORM.MVVM.Interfaces, VM.Person;
+  System.UITypes, V.Interfaces, iORM.MVVM.Interfaces, VM.Person,
+  iORM.Containers.Interfaces, M.Interfaces, iORM.Containers.List;
 
 {$R *.dfm}
 
@@ -93,7 +94,8 @@ end;
 
 procedure TViewModelMain.acLoadDataExecute(Sender: TObject);
 var
-  NewDataObject: TObject;
+//  NewDataObject: TPersonsList;
+  NewDataObject: IioList<IPerson>;
 begin
   inherited;
   // Load new data
@@ -106,6 +108,7 @@ procedure TViewModelMain.acLoadDataUpdate(Sender: TObject);
 begin
   inherited;
   (Sender as TAction).Enabled := not Self.DataPresent;
+  (Sender as TAction).Enabled := True;
 end;
 
 procedure TViewModelMain.acLoadJSONfromFileExecute(Sender: TObject);
