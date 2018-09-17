@@ -9,11 +9,9 @@ uses
   M.AnotherModel in 'Model\M.AnotherModel.pas',
   M.Interfaces in 'Model\M.Interfaces.pas',
   M.Model in 'Model\M.Model.pas',
-  RegisterClassesUnit in 'RegisterClassesUnit.pas',
   FMX.Controls,
   V.Customer in 'View\V.Customer.pas' {ViewCustomer: TFrame},
   V.Employee in 'View\V.Employee.pas' {ViewEmployee: TFrame},
-  V.Interfaces in 'View\V.Interfaces.pas',
   V.Person in 'View\V.Person.pas' {ViewPerson: TFrame},
   V.VipCustomer in 'View\V.VipCustomer.pas' {ViewVipCustomer: TFrame},
   VM.Interfaces in 'ViewModel\VM.Interfaces.pas',
@@ -23,7 +21,8 @@ uses
   FViewContext in 'FViewContext.pas' {ViewContextForm},
   FWait in 'FWait.pas' {WaitForm},
   iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
-  VM.Person in 'ViewModel\VM.Person.pas' {PersonViewModel: TDataModule};
+  VM.Person in 'ViewModel\VM.Person.pas' {PersonViewModel: TDataModule},
+  SampleData in 'SampleData.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

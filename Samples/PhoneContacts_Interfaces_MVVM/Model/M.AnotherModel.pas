@@ -32,7 +32,7 @@ type
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
     property LastName:String read GetLastName write SetLastName;
-    [ioEmbeddedHasMany(IPhoneNumber, 'Another')]
+    [ioEmbeddedHasMany(IPhoneNumber), ioBinary]
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
     [ioSkip]
     property FullName:String read GetFullName;
@@ -44,14 +44,14 @@ type
 implementation
 
 uses
-  iORM, SysUtils;
+  iORM, SysUtils, iORM.Containers.List;
 
 { TAnotherPerson }
 
 constructor TAnotherPerson.Create;
 begin
   inherited;
-  FPhones := io.di.Locate<IioList<IPhoneNumber>>.Alias('Another').Get;
+  FPhones := TioInterfacedList<IPhoneNumber>.Create;
 end;
 
 constructor TAnotherPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);

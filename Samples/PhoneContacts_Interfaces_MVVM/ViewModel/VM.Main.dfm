@@ -4,10 +4,10 @@ inherited ViewModelMain: TViewModelMain
   Width = 471
   object PersonsModelPresenter: TioModelPresenter
     AsDefault = True
-    Async = False
-    AutoLoadData = False
-    AutoPersist = False
-    AutoPost = False
+    Async = True
+    AutoLoadData = True
+    AutoPersist = True
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IPerson'
     ViewDataType = dtList
@@ -20,8 +20,10 @@ inherited ViewModelMain: TViewModelMain
     Async = True
     AutoLoadData = True
     AutoPersist = True
-    AutoPost = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
+    MasterPresenter = PersonsModelPresenter
+    MasterPropertyName = 'Phones'
     TypeName = 'IPhoneNumber'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
@@ -42,7 +44,6 @@ inherited ViewModelMain: TViewModelMain
     object acLoadData: TAction
       Text = 'Load from DB by code'
       OnExecute = acLoadDataExecute
-      OnUpdate = acLoadDataUpdate
     end
     object acClearData: TAction
       Text = 'Clear data'

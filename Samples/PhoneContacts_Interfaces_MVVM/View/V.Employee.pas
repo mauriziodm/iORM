@@ -9,14 +9,13 @@ uses
   FMX.ListView.Adapters.Base, Data.Bind.Controls, Data.Bind.GenData,
   Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt, System.Rtti,
   System.Bindings.Outputs, Fmx.Bind.Editors, System.Actions, FMX.ActnList,
-  Data.Bind.Components, Data.Bind.ObjectScope,
+  Data.Bind.Components, Data.Bind.ObjectScope, M.Model,
   iORM.LiveBindings.PrototypeBindSource, FMX.Layouts, Fmx.Bind.Navigator,
   FMX.ListView, FMX.Edit, FMX.Controls.Presentation, V.Person, iORM.Attributes,
-  V.Interfaces, iORM.MVVM.Components.ViewModelBridge,
-  iORM.LiveBindings.ModelBindSource;
+  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource;
 
 type
-  [diImplements(IPersonView, 'TEmployee')]
+  [diViewFor(TEmployee)]
   TViewEmployee = class(TViewPerson)
     EditBranchOffice: TEdit;
     Label7: TLabel;

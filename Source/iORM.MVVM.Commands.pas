@@ -591,7 +591,7 @@ begin
   LControlType := TioRttiContextFactory.RttiContext.GetType(AControl.ClassInfo).AsInstance;
   LControlActionProperty := LControlType.GetProperty('Action');
   if not Assigned(LControlActionProperty) then
-    EioException.Create(Self.ClassName + ': "Action" property not found.');
+    raise EioException.Create(Self.ClassName + ': "Action" property not found.');
   // Bind the action
   LControlActionProperty.SetValue(AControl, LCommandItem.AsAction.AsTValue);
 end;

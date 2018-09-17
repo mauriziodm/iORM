@@ -71,7 +71,8 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.Strategy.Factory;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.Strategy.Factory,
+  iORM.AbstractionLayer.Framework;
 
 { TioSQLDestination }
 
@@ -85,6 +86,9 @@ end;
 constructor TioSQLDestination.Create(const ASQL: String);
 begin
   inherited Create;
+
+  TioApplication.CheckIfAbstractionLayerComponentExists;
+
   FConnectionName := '';
   FSelfClassName := '';
   FQualifiedFieldName := False;

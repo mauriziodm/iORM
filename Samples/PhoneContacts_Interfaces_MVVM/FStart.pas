@@ -47,8 +47,8 @@ var
 implementation
 
 uses
-  FMX.Styles, iORM, V.Interfaces, FViewContext, SampleData, FWait,
-  VM.Interfaces, Vcl.Controls, Winapi.Windows;
+  FMX.Styles, iORM, FViewContext, SampleData, FWait,
+  VM.Interfaces, Vcl.Controls, Winapi.Windows, M.Interfaces;
 
 {$R *.fmx}
 
@@ -72,7 +72,7 @@ begin
   Style := TStyleStreaming.LoadFromResource(hinstance, 'CopperStyle', RT_RCDATA);
   TStyleManager.SetStyle(Style);
   // Get the main view
-  io.di.LocateView<IMainView>.Show;
+  io.Show<IPerson>;
 end;
 
 procedure TStartForm.FormsVCProviderioOnRelease(const Sender: TObject;

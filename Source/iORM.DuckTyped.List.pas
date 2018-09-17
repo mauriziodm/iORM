@@ -119,23 +119,30 @@ begin
   FOwnsObjectsProperty := Typ.GetProperty('OwnsObjects');
   // Count Property
   FCountProperty := Typ.GetProperty('Count');
-  if not Assigned(FCountProperty) then EioException.Create('DuckTypedList: "Count" property not found in the object');
+  if not Assigned(FCountProperty) then
+    raise EioException.Create('DuckTypedList: "Count" property not found in the object');
   // Add method
   FAddMethod := Typ.GetMethod('Add');
-  if not Assigned(FAddMethod) then EioException.Create('DuckTypedList: "Add" method not found in the object');
+  if not Assigned(FAddMethod) then
+    raise EioException.Create('DuckTypedList: "Add" method not found in the object');
   // Clear
   FClearMethod := Typ.GetMethod('Clear');
-  if not Assigned(FClearMethod) then EioException.Create('DuckTypedList: "Clear" method not found in the object');
+  if not Assigned(FClearMethod) then
+    raise EioException.Create('DuckTypedList: "Clear" method not found in the object');
   // Delete
   FDelete := Typ.GetMethod('Delete');
-  if not Assigned(FDelete) then EioException.Create('DuckTypedList: "Delete" method not found in the object');
+  if not Assigned(FDelete) then
+    raise EioException.Create('DuckTypedList: "Delete" method not found in the object');
   // GetItem method
 {$IF CompilerVersion >= 23}
   FGetItemMethod := Typ.GetIndexedProperty('Items').ReadMethod;
 {$IFEND}
-  if not Assigned(FGetItemMethod) then FGetItemMethod := Typ.GetMethod('GetItem');
-  if not Assigned(FGetItemMethod) then FGetItemMethod := Typ.GetMethod('GetElement');
-  if not Assigned(FGetItemMethod) then EioException.Create(Self.ClassName + ': "Items" property or "GetItem/GetElement" method not found in the object');
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := Typ.GetMethod('GetItem');
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := Typ.GetMethod('GetElement');
+  if not Assigned(FGetItemMethod) then
+    raise EioException.Create(Self.ClassName + ': "Items" property or "GetItem/GetElement" method not found in the object');
 end;
 
 procedure TioDuckTypedList.Delete(Index: Integer);

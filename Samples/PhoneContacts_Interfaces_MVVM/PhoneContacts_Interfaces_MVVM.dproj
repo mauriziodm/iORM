@@ -324,7 +324,6 @@
         <DCCReference Include="Model\M.AnotherModel.pas"/>
         <DCCReference Include="Model\M.Interfaces.pas"/>
         <DCCReference Include="Model\M.Model.pas"/>
-        <DCCReference Include="RegisterClassesUnit.pas"/>
         <DCCReference Include="View\V.Customer.pas">
             <Form>ViewCustomer</Form>
             <FormType>fmx</FormType>
@@ -335,7 +334,6 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View\V.Interfaces.pas"/>
         <DCCReference Include="View\V.Person.pas">
             <Form>ViewPerson</Form>
             <FormType>fmx</FormType>
@@ -375,6 +373,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="SampleData.pas"/>
         <None Include="Styles\Diamond.style"/>
         <RcItem Include="Styles\Copper.style">
             <ContainerId>ResourceItem</ContainerId>

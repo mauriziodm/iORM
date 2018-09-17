@@ -4,12 +4,17 @@ interface
 
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
-  iORM.MVVM.Components.ModelPresenter, iORM.Attributes, VM.Interfaces;
+  iORM.MVVM.Components.ModelPresenter, iORM.Attributes, M.Model,
+  M.AnotherModel;
 
 type
 
-  [diImplements(IPersonViewModel)]
-  TPersonViewModel = class(TioViewModel, IPersonViewModel)
+  [diViewModelFor(TPerson)]
+  [diViewModelFor(TEmployee)]
+  [diViewModelFor(TCustomer)]
+  [diViewModelFor(TVipCustomer)]
+  [diViewModelFor(TAnotherPerson)]
+  TPersonViewModel = class(TioViewModel)
     PersonModelPresenter: TioModelPresenter;
     PhonesModelPresenter: TioModelPresenter;
   private
@@ -36,8 +41,7 @@ uses
 
 procedure TPersonViewModel.Action_acPost_OnExecute(Sender: TObject);
 begin
-  if PersonModelPresenter.Editing then
-    PersonModelPresenter.Post;
+  PersonModelPresenter.PostIfEditing;
 end;
 
 procedure TPersonViewModel.Action_acPost_OnUpdate(Sender: TObject);
@@ -47,10 +51,7 @@ end;
 
 procedure TPersonViewModel.Close(Sender: TObject);
 begin
-  // Cancel updates if editing or inserting
-  if PersonModelPresenter.Editing then
-    PersonModelPresenter.Cancel;
-  // Close the view and release the view context
+  PersonModelPresenter.CancelIfEditing;
   FreeViews;
 end;
 

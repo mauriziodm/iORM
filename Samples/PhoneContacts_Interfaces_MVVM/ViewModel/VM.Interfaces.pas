@@ -18,11 +18,6 @@ type
     property JSONPresent:Boolean read GetJSONPresent;
   end;
 
-  IPersonViewModel = interface(IioViewModel)
-    ['{961E8F8C-76DE-46C7-AEF3-9A2954C247F4}']
-  end;
-
-
 implementation
 
 end.

@@ -4,19 +4,19 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
-  FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls, V.Interfaces,
+  FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.ListView.Types, FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   Data.Bind.GenData, Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Components,
   FMX.ActnList, FMX.TabControl, System.Actions, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ScrollBox, FMX.Memo, FMX.ListView,
-  FMX.Controls.Presentation, iORM.Attributes,
+  FMX.Controls.Presentation, iORM.Attributes, M.Interfaces,
   iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource;
 
 type
 
-  [diImplements(IMainView)]
-  TViewMain = class(TFrame, IMainView)
+  [diViewFor(IPerson)]
+  TViewMain = class(TFrame)
 
     [ioBindAction('acEditPerson')]
     ButtonNext: TSpeedButton;

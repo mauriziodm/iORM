@@ -8,7 +8,7 @@ uses iORM.Attributes, System.Generics.Collections,
 
 type
 
-  [ioEntity('Phones')]
+  [ioEntity('Phones'), diImplements(IPhoneNumber)]
   TPhoneNumber = class(TInterfacedObject, IPhoneNumber)
   private
     FPhoneNumber: String;
@@ -26,7 +26,7 @@ type
     function GetPhoneNumber: String;
   public
     constructor Create; overload;
-    constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer; NewID: Integer = 0); overload;
+    constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer); overload;
     destructor Destroy; override;
     property ID: Integer read GetID write SetID;
     property PersonID:Integer read GetPersonID write SetPersonID;
@@ -34,7 +34,7 @@ type
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
   end;
 
-  [ioEntity('Persons'), ioTrueClass]
+  [ioEntity('Persons'), ioTrueClass, diImplements(IPerson)]
   TPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;
@@ -66,7 +66,7 @@ type
     property ClassNameProp:String read GetClassNameProp;
   end;
 
-  [ioEntity('Persons'), ioTrueClass]
+  [ioEntity('Persons'), ioTrueClass, diImplements(IEmployee)]
   TEmployee = class(TPerson, IEmployee)
   private
     FBranchOffice: String;
@@ -78,7 +78,7 @@ type
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Persons'), ioTrueClass]
+  [ioEntity('Persons'), ioTrueClass, diImplements(ICustomer)]
   TCustomer = class(TPerson, ICustomer)
   private
     FFidelityCardCode: String;
@@ -90,7 +90,7 @@ type
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('Persons'), ioTrueClass]
+  [ioEntity('Persons'), ioTrueClass, diImplements(IVipCustomer)]
   TVipCustomer = class(TCustomer, IVipCustomer)
   private
     FVipCardCode: String;
@@ -105,7 +105,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Containers.Factory, iORM;
+  System.SysUtils, iORM.Containers.Factory, iORM, iORM.LazyLoad.Generics.List;
 
 { TPerson }
 
@@ -120,7 +120,7 @@ end;
 constructor TPerson.Create;
 begin
   inherited;
-  FPhones := io.di.Locate<IioList<IPhoneNumber>>.Get;
+  FPhones := TioList<IPhoneNumber>.Create;
 end;
 
 function TPerson.GetClassNameProp: String;
@@ -223,10 +223,10 @@ end;
 { TPhoneNumbers }
 
 constructor TPhoneNumber.Create(NewPhoneType, NewPhoneNumber: String;
-  NewPersonID, NewID: Integer);
+  NewPersonID: Integer);
 begin
   inherited Create;
-  FPersonID := NewPersonID;
+  FPersonID := 0;
   FPhoneType := NewPhoneType;
   FPhoneNumber := NewPhoneNumber;
 end;

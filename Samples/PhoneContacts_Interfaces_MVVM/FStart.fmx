@@ -76,6 +76,7 @@ object StartForm: TStartForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntfMVVM.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
@@ -85,7 +86,7 @@ object StartForm: TStartForm
     Top = 48
   end
   object ioFMX1: TioFMX
-    Left = 104
-    Top = 336
+    Left = 112
+    Top = 329
   end
 end

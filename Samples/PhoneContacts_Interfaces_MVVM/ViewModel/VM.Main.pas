@@ -5,10 +5,10 @@ interface
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase,
   FMX.Types, iORM.Attributes, VM.Interfaces, iORM.MVVM.Components.ModelPresenter,
-  FMX.Dialogs, FMX.ActnList, System.Actions;
+  FMX.Dialogs, FMX.ActnList, System.Actions, M.Interfaces;
 
 type
-  [diImplements(IPersonsViewModel)]
+  [diViewModelFor(IPerson)]
   TViewModelMain = class(TioViewModel, IPersonsViewModel)
     PersonsModelPresenter: TioModelPresenter;
     PhonesModelPresenter: TioModelPresenter;
@@ -28,7 +28,6 @@ type
     procedure acClearDataExecute(Sender: TObject);
     procedure acClearDataUpdate(Sender: TObject);
     procedure acLoadDataExecute(Sender: TObject);
-    procedure acLoadDataUpdate(Sender: TObject);
     procedure acSerializeToJSONExecute(Sender: TObject);
     procedure acSerializeToJSONUpdate(Sender: TObject);
     procedure acDeserializeFromJSONExecute(Sender: TObject);
@@ -61,9 +60,9 @@ implementation
 {%CLASSGROUP 'FMX.Controls.TControl'}
 
 uses
-  iORM, RegisterClassesUnit, System.JSON, FMX.Forms,
-  System.UITypes, V.Interfaces, iORM.MVVM.Interfaces, VM.Person,
-  iORM.Containers.Interfaces, M.Interfaces, iORM.Containers.List;
+  iORM, System.JSON, FMX.Forms,
+  System.UITypes, iORM.MVVM.Interfaces, VM.Person,
+  iORM.Containers.Interfaces, iORM.Containers.List;
 
 {$R *.dfm}
 
@@ -94,21 +93,13 @@ end;
 
 procedure TViewModelMain.acLoadDataExecute(Sender: TObject);
 var
-//  NewDataObject: TPersonsList;
-  NewDataObject: IioList<IPerson>;
+  NewDataObject: IioList<IPerson>; // Così provo ad assegnargli anche una lista di quelle interfaced di iORM che in alcuni casi dava problemi
 begin
   inherited;
   // Load new data
-  NewDataObject := io.Load(PersonsModelPresenter.TypeName).ToGenericList.OfType<TPersonsList>;
+  NewDataObject := io.Load(PersonsModelPresenter.TypeName).ToGenericList.OfType<TioInterfacedList<IPerson>>;
   // Set the new data as DataObject of the ActiveBindSourceAdapter
   PersonsModelPresenter.SetDataObject(NewDataObject);
-end;
-
-procedure TViewModelMain.acLoadDataUpdate(Sender: TObject);
-begin
-  inherited;
-  (Sender as TAction).Enabled := not Self.DataPresent;
-  (Sender as TAction).Enabled := True;
 end;
 
 procedure TViewModelMain.acLoadJSONfromFileExecute(Sender: TObject);
@@ -137,7 +128,6 @@ end;
 procedure TViewModelMain.acRefreshExecute(Sender: TObject);
 begin
   inherited;
-  // Clear the data object of the ActiveBindSourceAdapter
   PersonsModelPresenter.Refresh(True);
 end;
 
@@ -180,16 +170,9 @@ begin
 end;
 
 procedure TViewModelMain.acEditPersonExecute(Sender: TObject);
-var
-  LCurrentClassName: String;
 begin
   inherited;
-  // Get the class name of the current person
-  LCurrentClassName := PersonsModelPresenter.Current.ClassName;
-  // Get the View and ViewModel
-  io.di.LocateViewVM<IPersonView, IPersonViewModel>(LCurrentClassName)
-    .SetPresenter('PersonModelPresenter', PersonsModelPresenter)
-    .Show;
+  PersonsModelPresenter.ShowCurrent;
 end;
 
 procedure TViewModelMain.acSerializeToJSONExecute(Sender: TObject);

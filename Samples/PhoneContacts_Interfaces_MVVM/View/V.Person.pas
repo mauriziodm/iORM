@@ -9,14 +9,14 @@ uses
   iORM.LiveBindings.PrototypeBindSource, FMX.Controls.Presentation, FMX.Edit,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
   Fmx.Bind.DBEngExt, iORM.Attributes, System.Actions, FMX.ActnList,
-  Fmx.Bind.GenData, FMX.ListView.Types, FMX.ListView.Appearances,
+  Fmx.Bind.GenData, FMX.ListView.Types, FMX.ListView.Appearances, M.Model, M.AnotherModel,
   FMX.ListView.Adapters.Base, FMX.ListView, Data.Bind.Controls, FMX.Layouts,
-  Fmx.Bind.Navigator, V.Interfaces, iORM.MVVM.Components.ViewModelBridge,
-  iORM.LiveBindings.ModelBindSource;
+  Fmx.Bind.Navigator, iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource;
 
 type
-  [diImplements(IPersonView, 'TPerson'), diImplements(IPersonView, 'TAnotherPerson')]
-  TViewPerson = class(TFrame, IPersonView)
+  [diViewFor(TPerson)]
+  [diViewFor(TAnotherPerson)]
+  TViewPerson = class(TFrame)
     BindingsList1: TBindingsList;
     ToolBar2: TToolBar;
     lblTitle2: TLabel;
