@@ -57,7 +57,7 @@ var
 implementation
 
 uses
- FormViewContext, iORM, U.SampleData, V.Interfaces, V.ArticleList,
+ FormViewContext, iORM, U.SampleData, V.ArticleList,
  V.Product.Vertical, V.Product.Horizontal, V.Product,
  VM.Interfaces;
 

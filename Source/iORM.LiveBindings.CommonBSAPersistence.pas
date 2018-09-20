@@ -122,7 +122,11 @@ begin
   // Copy values into local variables
   LTypeName := AActiveBindSourceAdapter.ioTypeName;
   LTypeAlias := AActiveBindSourceAdapter.ioTypeAlias;
-  LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
+
+  if Assigned(AActiveBindSourceAdapter.DataObject) then
+    LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
+
+
   LWhere := AActiveBindSourceAdapter.ioWhere;
   LOwnsObjects := AActiveBindSourceAdapter.ioOwnsObjects;
   // Set Execute anonimous methods
@@ -142,8 +146,13 @@ begin
   end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
+  var
+    LIntf: IInterface;
   begin
-    AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, LOwnsObjects);
+    if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
+      AActiveBindSourceAdapter.InternalSetDataObject(LIntf, LOwnsObjects)
+    else
+      AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, LOwnsObjects);
   end;
   // Execute synchronous or asynchronous
   if AActiveBindSourceAdapter.ioAsync then

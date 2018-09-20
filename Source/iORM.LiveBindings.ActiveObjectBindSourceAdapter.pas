@@ -106,6 +106,7 @@ type
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
   protected
+    function GetCanActivate: Boolean; override;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -476,6 +477,17 @@ end;
 function TioActiveObjectBindSourceAdapter.GetBindSource: IioNotifiableBindSource;
 begin
   Result := FBindSource;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetCanActivate: Boolean;
+begin
+  // Riportato allo stato originale della classe capostipite perchè
+  //  altrimenti e non veniva espressamente impostato il DataObject
+  //  con un SetDataObject e quindi l'oggetto si sarebbe dovuto caricare
+  //  dal DB (ORM) in realtà l'adapter non si attivava mai perchè
+  //  questa funzione avrebbe ritornato sempre False visto che il DataObject
+  //  era = a nil. IN questo modo invece funziona.
+  Result := True;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetCurrentOID: Integer;

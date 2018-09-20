@@ -89,8 +89,8 @@ var
   LFilter: TArticleListFilter;
 begin
   inherited;
-  if MPFilters.Editing then
-    MPFilters.Post;
+//  if MPFilters.Editing then
+//    MPFilters.Post;
   LFilter := MPFilters.CurrentAs<TArticleListFilter>;
   LWhere := io.Where;
   if not LFilter.Code.IsEmpty then

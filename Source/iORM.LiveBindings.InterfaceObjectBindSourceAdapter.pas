@@ -71,11 +71,19 @@ type
     procedure DoOnAfterSetDataObject; virtual;
     function GetBaseObjectRttiType: TRttiType;
     function GetBaseObjectClassName: String;
+    // TypeName
+    procedure SetTypeName(const AValue:String);
+    function GetTypeName: String;
+    // TypeAlias
+    procedure SetTypeAlias(const AValue:String);
+    function GetTypeAlias: String;
   public
     constructor Create(const AOwner: TComponent; const AObject: T; const ATypeAlias:String=''; const ATypeName:String=''); reintroduce; overload; virtual;
     destructor Destroy; override;
     procedure SetDataObject(ADataObject: T; AOwnsObject: Boolean = False);
     property DataObject: T read FDataObject;
+    property ioTypeName:String read GetTypeName write SetTypeName;
+    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property OnBeforeSetDataObject: TSetObjectEvent read FOnBeforeSetDataObject write FOnBeforeSetDataObject;
     property OnAfterSetDataObject: TAdapterNotifyEvent read FOnAfterSetDataObject write FOnAfterSetDataObject;
   end;
@@ -210,6 +218,16 @@ begin
   Result := FBaseObjectRttiType;
 end;
 
+function TInterfaceObjectBindSourceAdapter<T>.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TInterfaceObjectBindSourceAdapter<T>.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
 function TInterfaceObjectBindSourceAdapter<T>.InsertAt(AIndex: Integer): Integer;
 begin
   Assert(False);
@@ -248,6 +266,16 @@ begin
     AddFields;
   end;
   DoOnAfterSetDataObject;
+end;
+
+procedure TInterfaceObjectBindSourceAdapter<T>.SetTypeAlias(const AValue: String);
+begin
+  FTypeAlias := AValue;
+end;
+
+procedure TInterfaceObjectBindSourceAdapter<T>.SetTypeName(const AValue: String);
+begin
+  FTypeName := AValue;
 end;
 
 function TInterfaceObjectBindSourceAdapter<T>.SupportsNestedFields: Boolean;

@@ -80,11 +80,19 @@ type
     procedure DoOnAfterSetList; virtual;
     function GetBaseObjectRttiType: TRttiType;
     function GetBaseObjectClassName: String;
+    // TypeName
+    procedure SetTypeName(const AValue:String);
+    function GetTypeName: String;
+    // TypeAlias
+    procedure SetTypeAlias(const AValue:String);
+    function GetTypeAlias: String;
   public
     constructor Create(const AOwner: TComponent; const ADataObject: TList<T>; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
     destructor Destroy; override;
     procedure SetList(AList: TList<T>; AOwnsObject: Boolean = True);
     property List: TList<T> read FList;
+    property ioTypeName:String read GetTypeName write SetTypeName;
+    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property OnBeforeSetList: TSetObjectEvent read FOnBeforeSetList write FOnBeforeSetList;
     property OnAfterSetList: TAdapterNotifyEvent read FOnAfterSetList write FOnAfterSetList;
   end;
@@ -334,6 +342,16 @@ begin
   Result := FBaseObjectRttiType;
 end;
 
+function TInterfaceListBindSourceAdapter<T>.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TInterfaceListBindSourceAdapter<T>.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
 procedure TInterfaceListBindSourceAdapter<T>.InitItemInstance(AInstance: T);
 begin
   DoInitItemInstance(AInstance as TObject);
@@ -386,6 +404,16 @@ begin
     AddFields;
   end;
   DoOnAfterSetList;
+end;
+
+procedure TInterfaceListBindSourceAdapter<T>.SetTypeAlias(const AValue: String);
+begin
+  FTypeAlias := AValue;
+end;
+
+procedure TInterfaceListBindSourceAdapter<T>.SetTypeName(const AValue: String);
+begin
+  FTypeName := AValue;
 end;
 
 function TInterfaceListBindSourceAdapter<T>.SupportsNestedFields: Boolean;

@@ -54,7 +54,7 @@ type
     FAsync: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
-    FTypeName, FTypeAlias: String;
+//    FTypeName, FTypeAlias: String;
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
     FAutoPersist: Boolean;
@@ -67,12 +67,6 @@ type
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
     FonNotify: TioBSANotificationEvent;
-    // TypeName
-    procedure SetTypeName(const AValue:String);
-    function GetTypeName: String;
-    // TypeAlias
-    procedure SetTypeAlias(const AValue:String);
-    function GetTypeAlias: String;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -106,6 +100,7 @@ type
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
   protected
+    function GetCanActivate: Boolean; override;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -170,8 +165,6 @@ type
     procedure ReceiveSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
 
-    property ioTypeName:String read GetTypeName write SetTypeName;
-    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPost:Boolean read GetioAutoPost write SetioAutoPost;
@@ -222,8 +215,11 @@ begin
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ClearDataObject;
+var
+  LIntf: IInterface;
 begin
-  Self.InternalSetDataObject(nil, False);
+  LIntf := nil;
+  Self.InternalSetDataObject(LIntf, False);
 end;
 
 constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
@@ -465,6 +461,17 @@ begin
   Result := FBindSource;
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetCanActivate: Boolean;
+begin
+  // Riportato allo stato originale della classe capostipite perchè
+  //  altrimenti e non veniva espressamente impostato il DataObject
+  //  con un SetDataObject e quindi l'oggetto si sarebbe dovuto caricare
+  //  dal DB (ORM) in realtà l'adapter non si attivava mai perchè
+  //  questa funzione avrebbe ritornato sempre False visto che il DataObject
+  //  era = a nil. IN questo modo invece funziona.
+  Result := True;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.GetCurrentOID: Integer;
 begin
   Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
@@ -567,16 +574,6 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.GetState: TBindSourceAdapterState;
 begin
   Result := Self.State;
-end;
-
-function TioActiveInterfaceObjectBindSourceAdapter.GetTypeAlias: String;
-begin
-  Result := FTypeAlias;
-end;
-
-function TioActiveInterfaceObjectBindSourceAdapter.GetTypeName: String;
-begin
-  Result := FTypeName;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
@@ -790,18 +787,6 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeAlias(
-  const AValue: String);
-begin
-  FTypeAlias := AValue;
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetTypeName(
-  const AValue: String);
-begin
-  FTypeName := AValue;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.UseObjStatus: Boolean;

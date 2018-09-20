@@ -5,7 +5,7 @@ inherited PersonViewModel: TPersonViewModel
   object PersonModelPresenter: TioModelPresenter
     AsDefault = True
     Async = True
-    AutoLoadData = True
+    AutoLoadData = False
     AutoPersist = True
     AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
