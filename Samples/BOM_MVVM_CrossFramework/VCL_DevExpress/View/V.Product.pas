@@ -23,7 +23,7 @@ uses
   dxSkinXmas2008Blue, Vcl.Menus, Data.DB, iORM.MVVM.Components.ViewModelBridge,
   iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet,
   cxCurrencyEdit, cxDBEdit, cxTextEdit, Vcl.StdCtrls, cxButtons, cxLabel,
-  Vcl.Buttons, Vcl.ExtCtrls, iORM.Attributes, V.Interfaces, Vcl.DBCtrls;
+  Vcl.Buttons, Vcl.ExtCtrls, iORM.Attributes, Vcl.DBCtrls;
 
 type
 

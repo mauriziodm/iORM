@@ -27,12 +27,12 @@ uses
   cxGridCustomView, cxGridCustomTableView, cxGridTableView, cxGridDBTableView,
   cxGrid, Vcl.Buttons, Vcl.Menus, iORM.Attributes, Vcl.StdCtrls,
   Vcl.Mask, Vcl.DBCtrls, cxContainer, cxTextEdit, cxDBEdit, cxButtons,
-  cxRadioGroup;
+  cxRadioGroup, Model.Interfaces;
 
 type
 
-  [diImplements(IArticleListView)]
-  TArticleListView = class(TFrame, IArticleListView)
+  [diViewFor(IBase)]
+  TArticleListView = class(TFrame)
 
     [ioBindAction('acClose')]
     ButtonClose: TSpeedButton;
