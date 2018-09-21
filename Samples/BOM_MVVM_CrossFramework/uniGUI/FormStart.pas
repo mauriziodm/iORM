@@ -32,7 +32,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uniGUIVars, MainModule, uniGUIApplication, FormVC, iORM, V.Interfaces;
+  uniGUIVars, MainModule, uniGUIApplication, FormVC, iORM, Model.Interfaces;
 
 function StartForm: TStartForm;
 begin
@@ -41,7 +41,7 @@ end;
 
 procedure TStartForm.UniFormCreate(Sender: TObject);
 begin
-  io.di.LocateView<IArticleListView>.SetViewContext(Self).Show;
+  io.Show<IBase>(Self);
 end;
 
 procedure TStartForm.VCProviderRelease(const Sender: TObject;
