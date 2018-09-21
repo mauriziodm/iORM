@@ -59,7 +59,7 @@ implementation
 uses
  FormViewContext, iORM, U.SampleData, V.ArticleList,
  V.Product.Vertical, V.Product.Horizontal, V.Product,
- VM.Interfaces;
+ VM.Interfaces, Model.Interfaces;
 
 {$R *.dfm}
 
@@ -79,7 +79,7 @@ begin
   // Set the default ProductDetail layout
   cxRadioGroupProductsPropertiesChange(ProductDetailLayout);
   // Get the main view
-  io.di.LocateView<IArticleListView>.SetViewContext(Self).Show;
+  io.Show<IBase>;
 end;
 
 procedure TStartForm.PagesVCProvidersioOnRelease(const Sender: TObject;
