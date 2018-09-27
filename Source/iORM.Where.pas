@@ -339,7 +339,7 @@ uses
   iORM.LiveBindings.ActiveObjectBindSourceAdapter, iORM.Where.Factory,
   iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
   iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
-  iORM.MVVM.Interfaces;
+  iORM.MVVM.Interfaces, iORM.AbstractionLayer.Framework;
 
 { TioWhere }
 
@@ -568,6 +568,8 @@ end;
 
 constructor TioWhere.Create;
 begin
+  TioApplication.CheckIfAbstractionLayerComponentExists;
+
   FDisableClassFromField := False;
   FLazyLoad      := False;
   FWhereItems := TioWhereFactory.NewWhereItems;
@@ -1793,6 +1795,7 @@ begin
 end;
 
 end.
+
 
 
 

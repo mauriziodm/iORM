@@ -382,11 +382,6 @@ type
   // TypeAlias attribute
   ioTypeAlias = class(TioCustomStringAttribute)
   end;
-
-
-
-
-
   // ---------------------------------------------------------------------------
   // END PROPERTY ATTRIBUTES
   // ===========================================================================

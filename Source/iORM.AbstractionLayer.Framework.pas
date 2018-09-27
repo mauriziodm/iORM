@@ -53,6 +53,7 @@ type
     class procedure _HandleException(const Sender: TObject); virtual; abstract;
     class function _Terminate: Boolean; virtual; abstract;
   public
+    class procedure CheckIfAbstractionLayerComponentExists;
     class procedure HandleException(const Sender: TObject);
     class function Terminate: Boolean;
   end;
@@ -158,7 +159,7 @@ end;
 class function TioTimer.GetConcreteClass: TioTimerRef;
 begin
   if not Assigned(FConcreteClass_NoDirectCall) then
-    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+    raise EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
   Result := FConcreteClass_NoDirectCall;
 end;
 
@@ -169,10 +170,15 @@ end;
 
 { TioApplication }
 
+class procedure TioApplication.CheckIfAbstractionLayerComponentExists;
+begin
+  GetConcreteClass;
+end;
+
 class function TioApplication.GetConcreteClass: TioApplicationRef;
 begin
   if not Assigned(FConcreteClass_NoDirectCall) then
-    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+    raise EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
   Result := FConcreteClass_NoDirectCall;
 end;
 
@@ -206,7 +212,7 @@ end;
 class function TioAction.GetConcreteClass: TioActionRef;
 begin
   if not Assigned(FConcreteClass_NoDirectCall) then
-    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+    raise EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
   Result := FConcreteClass_NoDirectCall;
 end;
 
@@ -225,7 +231,7 @@ end;
 class function TioControl.GetConcreteClass: TioControlRef;
 begin
   if not Assigned(FConcreteClass_NoDirectCall) then
-    EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+    raise EioException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
   Result := FConcreteClass_NoDirectCall;
 end;
 

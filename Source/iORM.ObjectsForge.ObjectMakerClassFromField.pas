@@ -71,7 +71,8 @@ begin
   // Get rtti class type for classref
   Ctx := TioRttiContextFactory.RttiContext;
   Typ := Ctx.FindType(AClassName) as TRttiInstanceType;
-  if not Assigned(Typ) then EioException.Create(Self.ClassName + ': RttiType not found (' + AClassName + ')');
+  if not Assigned(Typ) then
+    raise EioException.Create(Self.ClassName + ': RttiType not found (' + AClassName + ')');
   // Load object
   Result := io.Load(Typ.MetaclassType).ByOID(AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger)
                                            .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context

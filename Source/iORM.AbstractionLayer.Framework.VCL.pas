@@ -137,9 +137,9 @@ class procedure TioControlVCL._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
   if not (AControl is TControl) then
-    EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+    raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   if not (AParent is TWinControl) then
-    EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
+    raise EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
   TControl(AControl).Parent := TWinControl(AParent);
 end;
 

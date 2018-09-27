@@ -18,7 +18,6 @@ object UniServerModule: TUniServerModule
   Width = 270
   object SQLIteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLIteConnAfterRegister
-    AutoCreateDatabase = True
     Database = 'BOM.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

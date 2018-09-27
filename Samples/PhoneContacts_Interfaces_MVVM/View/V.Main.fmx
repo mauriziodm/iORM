@@ -240,6 +240,16 @@ object ViewMain: TViewMain
     Viewport.Width = 631.000000000000000000
     Viewport.Height = 567.000000000000000000
   end
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 12
+    Text = 'Mark Anderson'
+    Position.X = 368.000000000000000000
+    Position.Y = 88.000000000000000000
+    Size.Width = 185.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
   object ActionList1: TActionList
     Left = 440
     Top = 328
@@ -253,17 +263,6 @@ object ViewMain: TViewMain
     OutputConverters = <>
     Left = 440
     Top = 381
-    object LinkListControlToField1: TLinkListControlToField
-      Category = 'Quick Bindings'
-      DataSource = PersonsModelBindSource
-      FieldName = 'FullName'
-      Control = MasterListView
-      FillExpressions = <>
-      FillHeaderExpressions = <>
-      FillBreakFieldName = 'ClassNameProp'
-      FillHeaderFieldName = 'ClassNameProp'
-      FillBreakGroups = <>
-    end
     object LinkListControlToField2: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = PhonesModelBindSource
@@ -275,6 +274,23 @@ object ViewMain: TViewMain
           ControlMemberName = 'Detail'
         end>
       FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonsModelBindSource
+      FieldName = 'FullName'
+      Control = Edit1
+      Track = False
+    end
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = PersonsModelBindSource
+      FieldName = 'FullName'
+      Control = MasterListView
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillHeaderFieldName = 'ClassNameProp'
       FillBreakGroups = <>
     end
   end
@@ -335,7 +351,6 @@ object ViewMain: TViewMain
     Top = 264
   end
   object VMBridge: TioViewModelBridge
-    DI_VMInterface = 'IPersonsViewModel'
     Left = 440
     Top = 152
   end

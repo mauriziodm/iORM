@@ -2,10 +2,10 @@ inherited BOMItemVM: TBOMItemVM
   OldCreateOrder = True
   object MPBOMItem: TioModelPresenter
     AsDefault = True
-    Async = True
-    AutoLoadData = True
+    Async = False
+    AutoLoadData = False
     AutoPersist = True
-    AutoPost = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IBOMItem'
     ViewDataType = dtSingle
@@ -15,10 +15,10 @@ inherited BOMItemVM: TBOMItemVM
   end
   object MPBOMArticle: TioModelPresenter
     AsDefault = False
-    Async = True
-    AutoLoadData = True
+    Async = False
+    AutoLoadData = False
     AutoPersist = True
-    AutoPost = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = MPBOMItem
     MasterPropertyName = 'Article'

@@ -66,8 +66,8 @@ class function TioResolverFactory.GetResolver(const AResolverMode: TioResolverSt
 begin
   case AResolverMode of
     rsByDependencyInjection: Result := TioResolverByDependencyInjection;
-    rsByRtti: EioException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
-    rsByMaps: EioException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
+    rsByRtti: raise EioException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
+    rsByMaps: raise EioException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
   end;
 end;
 

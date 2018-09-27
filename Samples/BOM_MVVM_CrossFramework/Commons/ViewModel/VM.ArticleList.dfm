@@ -19,7 +19,7 @@ inherited ArticleListVM: TArticleListVM
     Async = False
     AutoLoadData = False
     AutoPersist = False
-    AutoPost = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'TArticleListFilter'
     ViewDataType = dtSingle

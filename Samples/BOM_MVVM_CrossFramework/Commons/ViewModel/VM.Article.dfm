@@ -5,7 +5,7 @@ inherited ArticleViewModel: TArticleViewModel
     Async = False
     AutoLoadData = False
     AutoPersist = True
-    AutoPost = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IBase'
     ViewDataType = dtSingle

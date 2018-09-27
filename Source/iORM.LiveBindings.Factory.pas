@@ -56,7 +56,7 @@ type
     class function GetBSAfromMasterModelPresenter(const AOwner:TComponent; const AMasterModelPresenter:TioModelPresenter; const AMasterPropertyName:String=''; const AWhere:IioWhere=nil): IioActiveBindSourceAdapter;
     class function GetBSAfromMasterBindSource(const AOwner:TComponent; const AMAsterBindSource:TioMasterBindSource; const AMasterPropertyName:String=''; const AWhere:IioWhere=nil): TBindSourceAdapter;
     class function GetBSAfromMasterBindSourceAdapter(const AOwner:TComponent; const AMAsterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String=''; const AWhere:IioWhere=nil): TBindSourceAdapter;
-    class function GetBSA(const AOwner:TComponent; const ATypeName, ATypeAlias:String; const AWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean; const ADataObject:TObject): IioActiveBindSourceAdapter;
+    class function GetBSA(const AOwner:TComponent; const ATypeName, ATypeAlias:String; const AWhere:IioWhere; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean; const ADataObject:TObject; const AOwnsObject:Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
   end;
 
@@ -144,7 +144,7 @@ begin
 end;
 
 class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
-  const AViewDataType: TioViewDataType; const AAutoLoadData: Boolean; const ADataObject: TObject): IioActiveBindSourceAdapter;
+  const AViewDataType: TioViewDataType; const AAutoLoadData: Boolean; const ADataObject: TObject; const AOwnsObject:Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
   LContext: IioContext;
@@ -168,7 +168,8 @@ begin
           AWhere,
           AOwner,
           LDataObject,
-          AAutoLoadData);
+          AAutoLoadData,
+          AOwnsObject);
       end
       // Class
       else
@@ -183,7 +184,8 @@ begin
           AWhere,
           AOwner,
           TObjectList<TObject>(LDataObject),
-          AAutoLoadData);
+          AAutoLoadData,
+          AOwnsObject);
           end;
     end;
 
@@ -212,7 +214,8 @@ begin
           AOwner,
           ADataObject,
           AAutoLoadData,
-          False);
+          AOwnsObject);
+//          False);
       end;
 
     end;

@@ -176,7 +176,8 @@ begin
   // Find the constructor
   LMethod := Self.FindConstructor(ARttiType, AConstructorParams, AConstructorMarkerText, AConstructorMethodName);
   // If constructor not found...
-  if not Assigned(LMethod) then EioException.Create(Self.ClassName + ': Constructor not found for class "' + ARttiType.Name + '"');
+  if not Assigned(LMethod) then
+    raise EioException.Create(Self.ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
   // Execute
   Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
   // Inject Properties/Fields: if the received ContainerItem is not assigned then
@@ -340,7 +341,7 @@ begin
     then Exit(AMethod);
   end;
   // If method/constructor not found...
-  EioException.Create(Self.ClassName + ': Method "' + AMethodName + '" not found');
+  raise EioException.Create(Self.ClassName + ': Method "' + AMethodName + '" not found');
 end;
 
 
@@ -516,7 +517,8 @@ begin
   AStream := TStream(   AProperty.GetValue(AContext.DataObject).AsObject   );
   // If the stream is not assigned then raise an Exception
   //  (the stream must exist)
-  if not Assigned(AStream) then raise EioException.Create(Self.ClassName + ': Stream not assigned.');
+  if not Assigned(AStream) then
+    raise EioException.Create(Self.ClassName + ': Stream not assigned.');
   // Get the BlobStream
   ABlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
   try

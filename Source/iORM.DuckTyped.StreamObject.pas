@@ -79,10 +79,12 @@ begin
   Typ := Ctx.GetType(AObj.ClassInfo);
   // LoadFromStreamMethod method
   FLoadFromStreamMethod := Typ.GetMethod('LoadFromStream');
-  if not Assigned(FLoadFromStreamMethod) then EioException.Create('DuckTypedStreamObject: "LoadFromStream" method not found in the object');
+  if not Assigned(FLoadFromStreamMethod) then
+    raise EioException.Create('DuckTypedStreamObject: "LoadFromStream" method not found in the object');
   // SaveFromStreamMethod method
   FSaveToStreamMethod := Typ.GetMethod('SaveToStream');
-  if not Assigned(FSaveToStreamMethod) then EioException.Create('DuckTypedStreamObject: "SaveToStream" method not found in the object');
+  if not Assigned(FSaveToStreamMethod) then
+    raise EioException.Create('DuckTypedStreamObject: "SaveToStream" method not found in the object');
   // IsEmpty method
   FIsEmptyMethod := Typ.GetMethod('IsEmpty');
   // Count property method

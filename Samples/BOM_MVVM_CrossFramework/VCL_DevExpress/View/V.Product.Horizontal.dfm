@@ -30,7 +30,6 @@ inherited ProductViewHorizontal: TProductViewHorizontal
   end
   inherited cxDBCurrencyEdit2: TcxDBCurrencyEdit
     Style.IsFontAssigned = True
-    TabOrder = 1
   end
   inherited cxLabel8: TcxLabel
     Style.IsFontAssigned = True
@@ -41,7 +40,6 @@ inherited ProductViewHorizontal: TProductViewHorizontal
   end
   inherited cxDBCurrencyEdit1: TcxDBCurrencyEdit
     Style.IsFontAssigned = True
-    TabOrder = 2
   end
   inherited cxLabel6: TcxLabel
     Style.IsFontAssigned = True
@@ -49,7 +47,6 @@ inherited ProductViewHorizontal: TProductViewHorizontal
   end
   inherited cxDBTextEdit4: TcxDBTextEdit
     Style.IsFontAssigned = True
-    TabOrder = 3
   end
   object ScrollBox1: TScrollBox [15]
     Left = 14

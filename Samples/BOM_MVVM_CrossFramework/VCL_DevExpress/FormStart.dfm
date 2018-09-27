@@ -100,7 +100,6 @@ object StartForm: TStartForm
   end
   object SQLIteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLIteConnAfterRegister
-    AutoCreateDatabase = True
     Database = 'BOM.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

@@ -25,6 +25,7 @@ uses
   dxSkinXmas2008Blue, cxGroupBox, cxRadioGroup, Vcl.ComCtrls, iORM.AbstractionLayer.Framework.VCL, Vcl.StdCtrls;
 
 type
+
   TStartForm = class(TForm)
     SQLIteConn: TioSQLiteConnectionDef;
     WindowsVCProvider: TioViewContextProvider;
@@ -57,9 +58,9 @@ var
 implementation
 
 uses
- FormViewContext, iORM, U.SampleData, V.Interfaces, V.ArticleList,
+ FormViewContext, iORM, U.SampleData, V.ArticleList,
  V.Product.Vertical, V.Product.Horizontal, V.Product,
- VM.Interfaces;
+ Model.Interfaces;
 
 {$R *.dfm}
 
@@ -78,8 +79,8 @@ begin
   ViewsLayoutPropertiesChange(ViewsLayout);
   // Set the default ProductDetail layout
   cxRadioGroupProductsPropertiesChange(ProductDetailLayout);
-  // Get the main view
-  io.di.LocateView<IArticleListView>.SetViewContext(Self).Show;
+  // Get the main view (passing self as ViewContext)
+  io.Show<IBase>(Self);
 end;
 
 procedure TStartForm.PagesVCProvidersioOnRelease(const Sender: TObject;

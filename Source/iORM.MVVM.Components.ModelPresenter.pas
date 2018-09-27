@@ -50,7 +50,7 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Methods
-    procedure _CreateAdapter(const ADataObject:TObject);
+    procedure _CreateAdapter(const ADataObject:TObject; const AOwnsObject:Boolean);
     procedure DoNotify(ANotification:IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender:TObject);
     procedure SetAutoLoadData(const Value: Boolean);
@@ -245,7 +245,7 @@ function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned: Boolean): Bo
 begin
   // if the adapter is not already assigned then create it
   if ACreateIfNotAssigned and not Assigned(FBindSourceAdapter) then
-    _CreateAdapter(nil);
+    _CreateAdapter(nil, True);
   // Result
   Result := Assigned(FBindSourceAdapter);
 end;
@@ -753,9 +753,10 @@ begin
   // if the adapter is not already assigned then create it
   if not CheckAdapter then
     // Create the BSA
-    _CreateAdapter(ADataObject);
+    _CreateAdapter(ADataObject, AOwnsObject)
+  else
   // Set the data object into the BSA
-  BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+    BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 end;
 
 procedure TioModelPresenter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
@@ -768,9 +769,10 @@ begin
     //  NB: Nel caso in cui si sita impostando il DataObject ma il BSA non era ancora creato lo crea (il BSA)
     //       usando il ClassName dell'oggetto; in questo modo siamo sicuri che abbiamo il BSA più
     //       adatto e non uno che magari è più generico e a cui mancano alcune proprietà (è successo).
-    _CreateAdapter(ADataObject as TObject);
+    _CreateAdapter(ADataObject as TObject, AOwnsObject)
+  else
   // Set the data object into the BSA
-  BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+    BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 end;
 
 procedure TioModelPresenter.SetOrderBy(const Value: String);
@@ -892,7 +894,7 @@ begin
 //  Self.SetWhere(TioWhereFactory.NewWhere.Add(FWhereStr.Text));
 end;
 
-procedure TioModelPresenter._CreateAdapter(const ADataObject:TObject);
+procedure TioModelPresenter._CreateAdapter(const ADataObject:TObject; const AOwnsObject:Boolean);
 begin
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
@@ -909,7 +911,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject)   );
+    SetBindSourceAdapter(   TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject)   );
     // Force the creation of all the detail adapters (if exists)
     //  NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     //       funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

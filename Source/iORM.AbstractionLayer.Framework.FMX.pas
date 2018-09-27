@@ -340,9 +340,9 @@ class procedure TioControlFMX._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
   if not (AControl is TFmxObject) then
-    EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TFmxObject.');
+    raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TFmxObject.');
   if not (AParent is TFmxObject) then
-    EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TFmxObject.');
+    raise EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TFmxObject.');
   TFmxObject(AControl).Parent := TFmxObject(AParent);
 end;
 

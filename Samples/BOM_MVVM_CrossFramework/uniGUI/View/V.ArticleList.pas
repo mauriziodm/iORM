@@ -5,11 +5,11 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, uniGUITypes, uniGUIAbstractClasses,
-  uniGUIClasses, uniGUIFrame, iORM.Attributes, V.Interfaces, uniGUIBaseClasses,
+  uniGUIClasses, uniGUIFrame, iORM.Attributes, uniGUIBaseClasses,
   uniPanel, uniButton, uniBitBtn, uniSpeedButton, Data.DB,
   iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet,
   iORM.MVVM.Components.ViewModelBridge, uniBasicGrid, uniDBGrid, uniRadioButton,
-  uniEdit, uniLabel, uniDBEdit;
+  uniEdit, uniLabel, uniDBEdit, Model.Interfaces;
 
 type
 
@@ -25,8 +25,8 @@ type
   [ioUniBindAction('RadioButtonFilterProcesses', 'acFilterProcess')]
   [ioUniBindAction('RadioButtonFilterProducts', 'acFilterProduct')]
 
-  [diImplements(IArticleListView)]
-  TArticleListView = class(TUniFrame, IArticleListView)
+  [diViewFor(IBase)]
+  TArticleListView = class(TUniFrame)
     ButtonNewMaterial: TUniButton;
     ButtonNewProcess: TUniButton;
     ButtonNewProduct: TUniButton;

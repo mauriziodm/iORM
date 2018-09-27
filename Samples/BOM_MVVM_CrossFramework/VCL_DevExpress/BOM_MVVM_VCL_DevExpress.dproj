@@ -114,8 +114,6 @@
         <DCCReference Include="..\Commons\Model\Model.Material.pas"/>
         <DCCReference Include="..\Commons\Model\Model.Interfaces.pas"/>
         <DCCReference Include="..\Commons\Model\Model.Base.pas"/>
-        <DCCReference Include="..\Commons\View\V.Interfaces.pas"/>
-        <DCCReference Include="..\Commons\ViewModel\VM.Interfaces.pas"/>
         <DCCReference Include="..\Commons\ViewModel\VM.ArticleList.pas">
             <Form>ArticleListVM</Form>
             <FormType>dfm</FormType>

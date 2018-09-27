@@ -44,9 +44,6 @@ type
     constructor Create(AOwner:TComponent); override;
   end;
 
-var
-  ProductViewHorizontal: TProductViewHorizontal;
-
 implementation
 
 {$R *.dfm}

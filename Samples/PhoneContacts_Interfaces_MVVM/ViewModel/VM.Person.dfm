@@ -5,11 +5,12 @@ inherited PersonViewModel: TPersonViewModel
   object PersonModelPresenter: TioModelPresenter
     AsDefault = True
     Async = True
-    AutoLoadData = True
+    AutoLoadData = False
     AutoPersist = True
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IPerson'
-    ViewDataType = dtList
+    ViewDataType = dtSingle
     WhereDetailsFromDetailAdapters = False
     Left = 208
     Top = 24
@@ -17,8 +18,9 @@ inherited PersonViewModel: TPersonViewModel
   object PhonesModelPresenter: TioModelPresenter
     AsDefault = False
     Async = True
-    AutoLoadData = True
+    AutoLoadData = False
     AutoPersist = True
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = PersonModelPresenter
     MasterPropertyName = 'Phones'

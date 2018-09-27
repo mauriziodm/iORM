@@ -38,9 +38,6 @@ type
     { Public declarations }
   end;
 
-var
-  MicroProcessView: TMicroProcessView;
-
 implementation
 
 {$R *.dfm}

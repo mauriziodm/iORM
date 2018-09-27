@@ -71,12 +71,6 @@ type
     FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FonNotify: TioBSANotificationEvent;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
-    // TypeName
-    procedure SetTypeName(const AValue:String);
-    function GetTypeName: String;
-    // TypeAlias
-    procedure SetTypeAlias(const AValue:String);
-    function GetTypeAlias: String;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -178,8 +172,6 @@ type
     procedure ReceiveSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
 
-    property ioTypeName:String read GetTypeName write SetTypeName;
-    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
     property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync:Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPost:Boolean read GetioAutoPost write SetioAutoPost;
@@ -597,16 +589,6 @@ begin
   Result := Self.State;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetTypeAlias: String;
-begin
-  Result := FTypeAlias;
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetTypeName: String;
-begin
-  Result := FTypeName;
-end;
-
 function TioActiveInterfaceListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(
   const AOwner: TComponent): TBindSourceAdapter;
 begin
@@ -804,7 +786,8 @@ begin
     Self.SetList(TList<IInterface>(ADataObject), AOwnsObject);
     // If the DataObject (List) is an interface referenced object then
     //  set the FInterfacedList field to it to keep alive the list itself
-    Supports(ADataObject, IInterface, Self.FInterfacedList);
+    if TioRttiUtilities.IsAnInterface<T> then
+      Supports(ADataObject, IInterface, Self.FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
     LPrecAutoLoadData := FAutoLoadData;
@@ -899,18 +882,6 @@ procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(
   AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetTypeAlias(
-  const AValue: String);
-begin
-  FTypeAlias := AValue;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetTypeName(
-  const AValue: String);
-begin
-  FTypeName := AValue;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.UseObjStatus: Boolean;

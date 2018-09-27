@@ -162,7 +162,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TUniForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\Commons\View\V.Interfaces.pas"/>
         <DCCReference Include="FormVC.pas">
             <Form>VCForm</Form>
             <FormType>dfm</FormType>
@@ -214,7 +213,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\Commons\ViewModel\VM.Interfaces.pas"/>
         <DCCReference Include="..\Commons\ViewModel\VM.BOMItem.pas">
             <Form>BOMItemVM</Form>
             <FormType>dfm</FormType>

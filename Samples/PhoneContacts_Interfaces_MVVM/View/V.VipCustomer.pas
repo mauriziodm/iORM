@@ -9,13 +9,13 @@ uses
   FMX.ListView.Adapters.Base, Data.Bind.Controls, Data.Bind.GenData,
   Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt, System.Rtti,
   System.Bindings.Outputs, Fmx.Bind.Editors, System.Actions, FMX.ActnList,
-  Data.Bind.Components, Data.Bind.ObjectScope,
+  Data.Bind.Components, Data.Bind.ObjectScope, M.Model,
   iORM.LiveBindings.PrototypeBindSource, FMX.Layouts, Fmx.Bind.Navigator,
-  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, iORM.Attributes, V.Interfaces,
+  FMX.ListView, FMX.Edit, FMX.Controls.Presentation, iORM.Attributes,
   iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource;
 
 type
-  [diImplements(IPersonView, 'TVipCustomer')]
+  [diViewFor(TVipCustomer)]
   TViewVipCustomer = class(TViewCustomer)
     Label8: TLabel;
     EditVipCardCode: TEdit;
@@ -25,9 +25,6 @@ type
   public
     { Public declarations }
   end;
-
-var
-  ViewVipCustomer: TViewVipCustomer;
 
 implementation
 

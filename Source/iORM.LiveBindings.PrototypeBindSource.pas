@@ -347,7 +347,7 @@ begin
     if Assigned(Self.ioMasterBindSource) then
       ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy))
     else
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FioTypeName, FioTypeAlias, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil) as TBindSourceAdapter;
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FioTypeName, FioTypeAlias, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil, True) as TBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
