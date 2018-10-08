@@ -87,6 +87,7 @@ type
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+    function RestructureTable(const ATableList: TioDBBuilderTableList): String;
 
     procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
   end;
@@ -691,6 +692,12 @@ begin
     Result := '-- '
   else
     Result := '';
+end;
+
+function TioDBBuilderFirebirdSqlGenerator.RestructureTable(
+  const ATableList: TioDBBuilderTableList): String;
+begin
+  // Do Nothing
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.TableExists(const ADbName: String; const ATableName:String): Boolean;

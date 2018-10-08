@@ -85,8 +85,9 @@ type
     function GetFieldType: String;
     // IsKeyField
     function GetIsKeyField: Boolean;
-    // IsKeyField
+    // IsSqlField
     function GetIsSqlField: Boolean;
+    procedure SetIsSqlField(AValue: Boolean);
     // DBFieldExists
     procedure SetDBFieldExist(AValue:Boolean);
     function GetDBFieldExist: Boolean;
@@ -101,7 +102,7 @@ type
     property FieldName:String read GetFieldName;
     property FieldType:String read GetFieldType;
     property IsKeyField:Boolean read GetIsKeyField;
-    property IsSqlField:Boolean read GetIsSqlField;
+    property IsSqlField:Boolean read GetIsSqlField write SetIsSqlField;
     property DBFieldExist:Boolean read GetDBFieldExist write SetDBFieldExist;
     property DBFieldSameType:Boolean read GetDBFieldSameType write SetDBFieldSameType;
     // Rtti property reference
@@ -253,7 +254,10 @@ var
   LCreateTableSql: string;
   LFkInCreateSql: string;
   LAddGeneratorsSql: string;
+  LRestructureTableSql: string;
 begin
+  LRestructureTableSql := '';
+
   try
     // Build DB structure analizing Model Rtti informations
     Self.LoadDBStructure;
@@ -282,6 +286,19 @@ begin
       if LDbExists then
       begin
         LSb.AppendLine();
+
+        // N.B.
+        // Use this method when database engine not provide ALTER TABLE ALTER COLUMN command!
+        // Sqlite doesn't permit to modify type of column then we rename table,
+        // create new table and fill data into new table
+        LRestructureTableSql := LSqlGenerator.RestructureTable(FTables);
+
+        if not LRestructureTableSql.IsEmpty then
+          LSb.AppendLine(LRestructureTableSql);
+
+        // Restructure Table
+        if (not FCreateScriptOnly) and (not LRestructureTableSql.IsEmpty) then
+          LSqlGenerator.ExecuteSql(LRestructureTableSql, True);
 
         if FCreateReferentialIntegrityConstraints then
         begin
@@ -387,19 +404,23 @@ begin
           begin
             if LPairField.Value.IsSqlField then
             begin
-              if not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName) then
+              if (not LSqlGenerator.FieldExists(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty.GetName)) then
               begin
-                // Generate Sql x Alter Table
-                LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName)+' ';
-                LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty)+' ';
-                LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
+                // Skip Key Field
+                if (not LPairField.Value.IsKeyField) then
+                begin
+                  // Generate Sql x Alter Table
+                  LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName)+' ';
+                  LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty)+' ';
+                  LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
-                if not LAlterTableSql.IsEmpty then
-                  LSb.AppendLine(LAlterTableSql);
+                  if not LAlterTableSql.IsEmpty then
+                    LSb.AppendLine(LAlterTableSql);
 
-                // Execute Alter Table
-                if not FCreateScriptOnly then
-                  LSqlGenerator.ExecuteSql(LAlterTableSql);
+                  // Execute Alter Table
+                  if not FCreateScriptOnly then
+                    LSqlGenerator.ExecuteSql(LAlterTableSql);
+                end;
               end
               else
               begin
@@ -672,6 +693,7 @@ var
   ATableName: String;
   ARttiType: TRttiInstanceType;
   LIsSqlField: Boolean;
+  lField: IioDBBuilderField;
 begin
   // If the current table is not to be considered for the AutoCreateDatabase...
   if not AMap.GetTable.GetAutoCreateDB then
@@ -692,6 +714,22 @@ begin
     or (AProperty.GetRelationType = ioRTHasMany)
     or (AProperty.GetRelationType = ioRTHasOne)
       then LIsSqlField := False;
+
+    // M.M. 27/09/18 Verifica se il campo è già stato creato e nel caso
+    // fosse già stato inserito come skipped e la proprietà che stiamo
+    // trattando è presente più volte nel modello andiamo a modificare
+    // il flag IsSqlField per consentire la creazione del campo nel DB.AProperty.GetSqlFieldName
+    if ATable.Fields.TryGetValue(AProperty.GetSqlFieldName, lField) then
+    begin
+      if (AProperty.GetRelationType = ioRTHasMany)
+      or (AProperty.GetRelationType = ioRTHasOne) then
+        lField.IsSqlField := False
+      else
+      begin
+        if LIsSqlField then
+          lField.IsSqlField := True;
+      end;
+    end;
 
     // If not already exixts create and add it to the list
     if ATable.FieldExists(AProperty.GetSqlFieldName) then Continue;
@@ -799,6 +837,11 @@ end;
 procedure TioDBBuilderField.SetDBFieldSameType(AValue: Boolean);
 begin
   FDBFieldSameType := AValue;
+end;
+
+procedure TioDBBuilderField.SetIsSqlField(AValue: Boolean);
+begin
+  FIsSqlField := AValue;
 end;
 
 { TioDBBuilderTable }

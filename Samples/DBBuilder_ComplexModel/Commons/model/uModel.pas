@@ -6,7 +6,8 @@ uses
   iORM.Attributes, System.Generics.Collections,
   iORM.Containers.Interfaces, iORM.CommonTypes,
   ObjMapper.Attributes,
-  uInterfaces;
+  uInterfaces,
+  VCL.ExtCtrls;
 
 {$RTTI EXPLICIT METHODS([vcPublic, vcProtected])}
 
@@ -1193,15 +1194,20 @@ type
 
   [ioEntity('Utenti')]
   TUtente = class(TTabelleBase, IUtente)
-  protected
+  private
+    FImage: TImage;
     FPassword: String;
+    function GetImage: TImage;
+    procedure SetImage(const Value: TImage);
     function GetPassword: String;
     procedure SetPassword(const AValue: String);
+  protected
   public
     constructor Create; overload;
     constructor Create(ACodice: String; ADescrizione: String; APassword: string); overload;
     destructor Destroy; override;
     property Password: String read GetPassword write SetPassword;
+    property Image: TImage read GetImage write SetImage;
   end;
 
   [ioEntity('Clienti')]
@@ -1999,9 +2005,19 @@ begin
   inherited;
 end;
 
+function TUtente.GetImage: TImage;
+begin
+  Result := FImage;
+end;
+
 function TUtente.GetPassword: String;
 begin
   Result := FPassword;
+end;
+
+procedure TUtente.SetImage(const Value: TImage);
+begin
+  FImage := Value;
 end;
 
 procedure TUtente.SetPassword(const AValue: String);

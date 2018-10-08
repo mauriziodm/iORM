@@ -320,13 +320,6 @@ var
           Result := ioMdBinary;
           Exit;
         end;
-// TODO: M.M. 29/08/18 DA RIVALUTARE PERCHE' NON PUO' ESSERE COSI
-//       ERA STATA MESSA PER GESTIRE LE RELAZIONI EMBEDDED
-//      tkInterface:
-//        begin
-//          Result := ioMdBinary;
-//          Exit;
-//        end;
     end;
   end;
 
@@ -343,8 +336,6 @@ begin
   // Loop all properties
   for Prop in PropsFields do
   begin
-    // M.M. 01/08/18 - Used by DBBuilder
-    // TODO: Gestire in base al tipo della proprietà
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
@@ -355,6 +346,22 @@ begin
     begin
       LRttiField := Prop as TRttiField;
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind,LRttiField.FieldType.QualifiedName);
+    end;
+
+    // M.M. 08/10/18
+    // Controlla gli attributi per capire se ci sono relazioni Embedded
+    // per poter stabilire il tipo di default da utilizzare per la
+    // creazione del campo nel builder se non viene specificato un
+    // attributo specifico
+    for Attr in Prop.GetAttributes do
+    begin
+      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
+      // viene impostato un campo di tipo binary
+      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
+      begin
+        PropMetadata_FieldType := ioMdBinary;
+        Break;
+      end;
     end;
 
     PropMetadata_FieldLength := 50{255}; //M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
@@ -445,6 +452,7 @@ begin
         PropRelationChildPropertyName := ioHasOne(Attr).ChildPropertyName;
         PropRelationChildAutoIndex := ioHasMany(Attr).AutoIndex;
       end;
+
       // Indexes
       if Attr is ioIndex then
       begin

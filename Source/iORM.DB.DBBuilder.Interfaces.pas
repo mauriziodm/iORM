@@ -96,7 +96,8 @@ type
     property IsClassFromField:Boolean read GetIsClassFromField;
     // IsSqlField
     function GetIsSqlField: Boolean;
-    property IsSqlField:Boolean read GetIsSqlField;
+    procedure SetIsSqlField(AValue: Boolean);
+    property IsSqlField:Boolean read GetIsSqlField write SetIsSqlField;
   end;
 
   IioDBBuilderTable = interface
@@ -154,6 +155,7 @@ type
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+    function RestructureTable(const ATableList: TioDBBuilderTableList): String;
 
     procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
   end;
