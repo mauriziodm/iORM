@@ -87,6 +87,7 @@ type
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+    function RestructureTable(const ATableList: TioDBBuilderTableList): String;
 
     procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
   end;
@@ -159,7 +160,10 @@ begin
       end;
     ioMdBinary:
       begin
-        LFieldType := 'BLOB'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+          LFieldType := AProperty.GetMetadata_FieldSubType
+        else
+          LFieldType := 'BLOB'
       end;
     ioMdCustomFieldType:
       LFieldType := AProperty.GetMetadata_CustomFieldType;
@@ -671,7 +675,10 @@ begin
       end;
     ioMdBinary:
       begin
-        Result := 'BLOB'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+          Result := AProperty.GetMetadata_FieldSubType
+        else
+          Result := 'BLOB'
       end;
     ioMdCustomFieldType:
       Result := AProperty.GetMetadata_CustomFieldType;
@@ -685,6 +692,12 @@ begin
     Result := '-- '
   else
     Result := '';
+end;
+
+function TioDBBuilderFirebirdSqlGenerator.RestructureTable(
+  const ATableList: TioDBBuilderTableList): String;
+begin
+  // Do Nothing
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.TableExists(const ADbName: String; const ATableName:String): Boolean;

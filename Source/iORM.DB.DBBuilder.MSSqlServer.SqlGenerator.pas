@@ -90,6 +90,7 @@ type
     function DropAllIndex: String;
 
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
+    function RestructureTable(const ATableList: TioDBBuilderTableList): String;
 
     procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
   end;
@@ -169,10 +170,17 @@ begin
       end;
     ioMdBinary:
       begin
-        if AProperty.GetMetadata_FieldUnicode then
-          LFieldType := 'BINARY'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+        begin
+          LFieldType := AProperty.GetMetadata_FieldSubType
+        end
         else
-          LFieldType := 'NBINARY';
+        begin
+          if AProperty.GetMetadata_FieldUnicode then
+            LFieldType := 'BINARY'
+          else
+            LFieldType := 'NBINARY';
+        end;
       end;
     ioMdCustomFieldType:
       LFieldType := AProperty.GetMetadata_CustomFieldType;
@@ -667,10 +675,17 @@ begin
       end;
     ioMdBinary:
       begin
-        if AProperty.GetMetadata_FieldUnicode then
-          Result := 'BINARY'
+        if AProperty.GetMetadata_FieldSubType<>'' then
+        begin
+          Result := AProperty.GetMetadata_FieldSubType;
+        end
         else
-          Result := 'NBINARY';
+        begin
+          if AProperty.GetMetadata_FieldUnicode then
+            Result := 'BINARY'
+          else
+            Result := 'NBINARY';
+        end;
       end;
     ioMdCustomFieldType:
       Result := AProperty.GetMetadata_CustomFieldType;
@@ -684,6 +699,12 @@ begin
     Result := '-- '
   else
     Result := '';
+end;
+
+function TioDBBuilderMSSqlServerSqlGenerator.RestructureTable(
+  const ATableList: TioDBBuilderTableList): String;
+begin
+  // Do Nothing
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.TableExists(const ADbName: String; const ATableName:String): Boolean;

@@ -5,6 +5,7 @@ interface
 uses
   System.Generics.Collections,
   iORM.Containers.Interfaces,
+  VCL.ExtCtrls,
   VCL.Controls;
 
 type
@@ -177,7 +178,10 @@ type
     ['{52E77439-0E0D-4733-9ABE-C61075B3E4B6}']
     function GetPassword: String;
     procedure SetPassword(const AValue: String);
+    function GetImage: TImage;
+    procedure SetImage(const AValue: TImage);
     property Password: String read GetPassword write SetPassword;
+    property Image: TImage read GetImage write SetImage;
   end;
 
   IValuta = interface(ITabelleBase)

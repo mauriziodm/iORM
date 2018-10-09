@@ -56,7 +56,7 @@ type
   ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
   const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_DisableCreateFK: boolean): IioContextProperty;
+  const AMetadata_CustomFieldType: string; const AMetadata_DisableCreateFK: boolean; const AMetadata_FieldSubType: string): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -121,7 +121,7 @@ class function TioContextFactory.GetProperty(const AMapMode:TioMapModeType; cons
   ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
   const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_DisableCreateFK: boolean): IioContextProperty;
+  const AMetadata_CustomFieldType: string; const AMetadata_DisableCreateFK: boolean; const AMetadata_FieldSubType: string): IioContextProperty;
 begin
   case AMapMode of
     // Properties map mode
@@ -148,6 +148,7 @@ begin
         ,AMetadata_FieldUnicode
         ,AMetadata_CustomFieldType
         ,AMetadata_DisableCreateFK
+        ,AMetadata_FieldSubType
       );
     // Fields map mode
     ioFields:
@@ -173,6 +174,7 @@ begin
         ,AMetadata_FieldUnicode
         ,AMetadata_CustomFieldType
         ,AMetadata_DisableCreateFK
+        ,AMetadata_FieldSubType
       );
   end;
 end;
@@ -244,6 +246,7 @@ var
   PropRelationChildAutoIndex: Boolean;
   // M.M. 01/08/18 - Used by DBBuilder
   PropMetadata_FieldType: TioMetadataFieldType;
+  PropMetadata_FieldSubType: string;
   PropMetadata_FieldLength: Integer;
   PropMetadata_FieldPrecision: Integer;
   PropMetadata_FieldScale: Integer;
@@ -317,13 +320,6 @@ var
           Result := ioMdBinary;
           Exit;
         end;
-// TODO: M.M. 29/08/18 DA RIVALUTARE PERCHE' NON PUO' ESSERE COSI
-//       ERA STATA MESSA PER GESTIRE LE RELAZIONI EMBEDDED
-//      tkInterface:
-//        begin
-//          Result := ioMdBinary;
-//          Exit;
-//        end;
     end;
   end;
 
@@ -340,11 +336,9 @@ begin
   // Loop all properties
   for Prop in PropsFields do
   begin
-    // M.M. 01/08/18 - Used by DBBuilder
-    // TODO: Gestire in base al tipo della proprietà
     if Prop is TRttiProperty then
     begin
-      LRttiProperty := Prop as TRttiProperty  ;
+      LRttiProperty := Prop as TRttiProperty;
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
     end
     else
@@ -354,6 +348,22 @@ begin
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind,LRttiField.FieldType.QualifiedName);
     end;
 
+    // M.M. 08/10/18
+    // Controlla gli attributi per capire se ci sono relazioni Embedded
+    // per poter stabilire il tipo di default da utilizzare per la
+    // creazione del campo nel builder se non viene specificato un
+    // attributo specifico
+    for Attr in Prop.GetAttributes do
+    begin
+      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
+      // viene impostato un campo di tipo binary
+      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
+      begin
+        PropMetadata_FieldType := ioMdBinary;
+        Break;
+      end;
+    end;
+
     PropMetadata_FieldLength := 50{255}; //M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
     PropMetadata_FieldPrecision := 10;
     PropMetadata_FieldScale := 3;
@@ -361,6 +371,7 @@ begin
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';
     PropMetadata_DisableCreateFK := False;
+    PropMetadata_FieldSubType := '';
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
@@ -373,7 +384,7 @@ begin
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_DisableCreateFK);
+      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_DisableCreateFK, PropMetadata_FieldSubType);
       Continue;
     end;
     // Prop Init
@@ -441,6 +452,7 @@ begin
         PropRelationChildPropertyName := ioHasOne(Attr).ChildPropertyName;
         PropRelationChildAutoIndex := ioHasMany(Attr).AutoIndex;
       end;
+
       // Indexes
       if Attr is ioIndex then
       begin
@@ -513,6 +525,7 @@ begin
       if Attr is ioBinary then
       begin
         PropMetadata_FieldType := ioMdBinary;
+        PropMetadata_FieldSubType := ioBinary(Attr).BinarySubType;
         PropMetadata_FieldNullable := ioBinary(Attr).IsNullable;
       end;
       if Attr is ioCustomFieldType then
@@ -549,7 +562,8 @@ begin
         PropMetadata_FieldNullable,
         PropMetadata_FieldUnicode,
         PropMetadata_CustomFieldType,
-        PropMetadata_DisableCreateFK
+        PropMetadata_DisableCreateFK,
+        PropMetadata_FieldSubType
       ),
       PropId,
       PropIDSkipOnInsert
