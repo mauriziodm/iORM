@@ -85,7 +85,6 @@ var
 begin
   LPerson := TCustomer.Create;
   MasterBS.Append(LPerson);
-//  BSMaster.Append;
 end;
 
 procedure TForm1.SQLiteConnAfterRegister(Sender: TObject);

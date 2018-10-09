@@ -554,7 +554,6 @@ object Form1: TForm1
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
-    AutoCreateDatabase = True
     Database = 'ContactsObj.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

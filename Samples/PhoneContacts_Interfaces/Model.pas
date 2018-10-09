@@ -27,7 +27,7 @@ type
     procedure SetPhoneNumber(AValue:String);
     function GetPhoneNumber: String;
   public
-    constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer; NewID: Integer = 0); overload;
+    constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer); overload;
     destructor Destroy; override;
     property ID: Integer read GetID write SetID;
     property PersonID:Integer read GetPersonID write SetPersonID;
@@ -55,7 +55,7 @@ type
     function GetFullName: String;
     function GetClassNameProp: String;
   public
-    constructor Create(NewFirstName, NewLastName: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName: String; NewID: Integer); overload;
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
     property LastName:String read GetLastName write SetLastName;
@@ -72,7 +72,7 @@ type
     procedure SetBranchOffice(AValue:String);
     function GetBranchOffice: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewBranchOffice: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewBranchOffice: String; NewID: Integer); overload;
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
@@ -86,7 +86,7 @@ type
     procedure SetFidelityCardCode(AValue:String);
     function GetFidelityCardCode: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode: String; NewID: Integer); overload;
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
@@ -98,7 +98,7 @@ type
     procedure SetVipCardCode(AValue:String);
     function GetVipCardCode: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode, NewVipCardCode: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode, NewVipCardCode: String; NewID: Integer); overload;
     property VipCardCode:String read GetVipCardCode write SetVipCardCode;
   end;
 
@@ -172,7 +172,7 @@ end;
 constructor TEmployee.Create(NewFirstName, NewLastName, NewBranchOffice: String;
   NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName);
+  inherited Create(NewFirstName, NewLastName, NewID);
   FBranchOffice := NewBranchOffice;
 end;
 
@@ -191,7 +191,7 @@ end;
 constructor TCustomer.Create(NewFirstName, NewLastName,
   NewFidelityCardCode: String; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName);
+  inherited Create(NewFirstName, NewLastName, NewID);
   FFidelityCardCode := NewFidelityCardCode;
 end;
 
@@ -210,14 +210,14 @@ end;
 constructor TVipCustomer.Create(NewFirstName, NewLastName,
   NewFidelityCardCode, NewVipCardCode: String; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName, NewFidelityCardCode);
+  inherited Create(NewFirstName, NewLastName, NewFidelityCardCode, NewID);
   FVipCardCode := NewVipCardCode;
 end;
 
 { TPhoneNumbers }
 
 constructor TPhoneNumber.Create(NewPhoneType, NewPhoneNumber: String;
-  NewPersonID, NewID: Integer);
+  NewPersonID: Integer);
 begin
   inherited Create;
   FPersonID := NewPersonID;
