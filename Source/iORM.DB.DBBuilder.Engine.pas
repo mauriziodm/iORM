@@ -293,11 +293,11 @@ begin
         // create new table and fill data into new table
         LRestructureTableSql := LSqlGenerator.RestructureTable(FTables);
 
-        if not LRestructureTableSql.Trim.IsEmpty then
+        if not LRestructureTableSql.IsEmpty then
           LSb.AppendLine(LRestructureTableSql);
 
         // Restructure Table
-        if (not FCreateScriptOnly) and (not LRestructureTableSql.Trim.IsEmpty) then
+        if (not FCreateScriptOnly) and (not LRestructureTableSql.IsEmpty) then
           LSqlGenerator.ExecuteSql(LRestructureTableSql, True);
 
         if FCreateReferentialIntegrityConstraints then
