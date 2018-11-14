@@ -65,7 +65,8 @@ var
   LResultValue: TObject;
 begin
   // Init
-  AAbort := False;
+{ TODO : Abort da eliminare??? }
+//  AAbort := False;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
   LExecute := function: TObject
@@ -102,7 +103,8 @@ begin
   else
   begin
     LOnTerminate(LResultValue);
-    AAbort := True;
+{ TODO : Abort da eliminare??? }
+//    AAbort := True;
   end;
 end;
 

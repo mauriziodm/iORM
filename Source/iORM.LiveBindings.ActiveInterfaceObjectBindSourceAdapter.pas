@@ -350,8 +350,9 @@ var
 begin
   inherited;
   TioCommonBSAPersistence.Delete(Self, LAbort);
-  if LAbort then
-    Abort;
+{ TODO : Abort da eliminare??? }
+//  if LAbort then
+//    Abort;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;
