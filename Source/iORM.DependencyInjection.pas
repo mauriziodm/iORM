@@ -1403,9 +1403,9 @@ var
 begin
   // Retrieve the correct locator
   if FForEachLocateViewModel then
-    LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, '', True) as TioDependencyInjectionLocator
+    LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, FAlias, True) as TioDependencyInjectionLocator
   else
-    LLocator := TioDependencyInjectionFactory.GetViewLocatorFor(FForEachModelPresenter, '') as TioDependencyInjectionLocator;
+    LLocator := TioDependencyInjectionFactory.GetViewLocatorFor(FForEachModelPresenter, FAlias) as TioDependencyInjectionLocator;
   // Set the locator
   LLocator._DuplicateLocatorForShowEachPurposeFrom(Self);
   Result := LLocator.Show;

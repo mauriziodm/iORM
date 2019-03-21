@@ -53,7 +53,6 @@ type
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------
   public
-    destructor Destroy; override;
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
     procedure AfterConstruction; override;
@@ -91,12 +90,6 @@ procedure TioInterfacedList<T>.BeforeDestruction;
 begin
   if RefCount <> 0 then
     System.Error(reInvalidPtr);
-end;
-
-destructor TioInterfacedList<T>.Destroy;
-begin
-
-  inherited;
 end;
 
 class function TioInterfacedList<T>.NewInstance: TObject;
