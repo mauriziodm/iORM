@@ -173,6 +173,7 @@ var
   typ: TRttiType;
 begin
   inherited;
+  result := nil;
   typ := omEngine.QualifiedTypeNameToRttiType(FValueQualifiedName);
   if Assigned(typ) and typ.IsInstance then
     Result := typ.AsInstance.MetaclassType;

@@ -606,6 +606,8 @@ var
   I: Integer;
 begin
   result := nil;
+  LKeyJSONValue := nil;
+  LValueJSONValue := nil;
   // If JSONValue not assigned
   if (AJSONValue is TJSONNull) or not Assigned(AJSONValue) then
     Exit(TValue.Empty);

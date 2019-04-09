@@ -125,7 +125,7 @@ type
   public
     constructor Create(const ASqlText, AKeyGenerator:String; const AClassFromField:IioClassFromField;
     const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
-    const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); overload;
+    const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     function GetSql: String; override;
     function GetClassFromField: IioClassFromField;

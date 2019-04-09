@@ -239,12 +239,12 @@ type
   // Generic version of the Service Locator Class
   TioDependencyInjectionLocator<TI> = class(TioDependencyInjectionLocator, IioDependencyInjectionLocator<TI>)
   public
-    function Get: TI; overload;
+    function Get: TI; reintroduce; overload;
     function Alias(const AAlias:String): IioDependencyInjectionLocator<TI>;
-    function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator<TI>; overload;
-    function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>; overload;
-    function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>; overload;
-    function SingletonKey(const ASingletonKey:String): IioDependencyInjectionLocator<TI>; overload;
+    function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator<TI>; reintroduce; overload;
+    function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>; reintroduce; overload;
+    function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>; reintroduce; overload;
+    function SingletonKey(const ASingletonKey:String): IioDependencyInjectionLocator<TI>; reintroduce; overload;
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
     // SetPresenter (passing the name of the destination presenter)

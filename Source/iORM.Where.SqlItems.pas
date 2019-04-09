@@ -67,7 +67,7 @@ type
   //  return che OID property sql field name
   TioSqlItemsWherePropertyOID = class(TioSqlItemsWhereProperty)
   public
-    constructor Create; overload;
+    constructor Create; reintroduce;overload;
     function GetSql(const AMap:IioMap): String; override;
     function HasParameter: Boolean; override;
   end;
@@ -78,8 +78,8 @@ type
   strict private
     FValue: TValue;
   public
-    constructor Create(const ASqlText:String); overload;  // raise exception
-    constructor Create(const AValue:TValue); overload;
+    constructor Create(const ASqlText:String); reintroduce; overload;  // raise exception
+    constructor Create(const AValue:TValue); reintroduce;overload;
     function GetSql(const AMap:IioMap): String; override;
     function HasParameter: Boolean; override;
   end;
@@ -103,8 +103,8 @@ type
   strict private
     FValue: TValue;
   public
-    constructor Create(const ASqlText:String); overload;  // raise exception
-    constructor Create(const ASqlText:String; const AValue:TValue); overload;
+    constructor Create(const ASqlText:String); reintroduce; overload;  // raise exception
+    constructor Create(const ASqlText:String; const AValue:TValue); reintroduce; overload;
     function GetSql(const AMap:IioMap): String; override;
     function GetSqlParamName(const AMap:IioMap): String; override;
     function GetValue(const AMap:IioMap): TValue; override;
@@ -116,8 +116,8 @@ type
   strict private
     FValue: TValue;
   public
-    constructor Create(const ASqlText:String); overload;  // raise exception
-    constructor Create(const AValue:TValue); overload;
+    constructor Create(const ASqlText:String); reintroduce; overload;  // raise exception
+    constructor Create(const AValue:TValue); reintroduce; overload;
     function GetSql(const AMap:IioMap): String; override;
     function GetSqlParamName(const AMap:IioMap): String; override;
     function GetValue(const AMap:IioMap): TValue; override;

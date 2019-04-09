@@ -77,7 +77,7 @@ type
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
-    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 {$IFDEF AUTOREFCOUNT}
@@ -142,14 +142,14 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(ReloadData:Boolean); overload;
+    procedure Refresh(ReloadData:Boolean); reintroduce; overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
     procedure Append(AObject:TObject); overload;
     procedure Append(AObject:IInterface); overload;
-    procedure Insert(AObject:TObject); overload;
-    procedure Insert(AObject:IInterface); overload;
+    procedure Insert(AObject:TObject); reintroduce; overload;
+    procedure Insert(AObject:IInterface); reintroduce; overload;
     function DataObjectAssigned: Boolean;
     function DataObject: TObject;
     function DataObjectAs<T>: T;

@@ -197,11 +197,11 @@ type
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(AValue: IioContextProperty);
   public
-    constructor Create;
+    constructor Create;reintroduce;
     destructor Destroy; override;
     function GetEnumerator: TEnumerator<IioContextProperty>;
-    function GetSql: String; overload;
-    function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
+    function GetSql: String; reintroduce; overload;
+    function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; reintroduce; overload;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False; AIDSkipOnInsert:Boolean=True);
     function GetIdProperty:IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;

@@ -152,12 +152,12 @@ type
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
-    procedure Append(AObject:TObject); overload;
-    procedure Append(AObject:IInterface); overload;
-    procedure Insert(AObject:TObject); overload;
-    procedure Insert(AObject:IInterface); overload;
+    procedure Append(AObject:TObject); reintroduce; overload;
+    procedure Append(AObject:IInterface); reintroduce; overload;
+    procedure Insert(AObject:TObject); reintroduce; overload;
+    procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
-    procedure Refresh(ReloadData:Boolean); overload;
+    procedure Refresh(ReloadData:Boolean); reintroduce; overload;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;

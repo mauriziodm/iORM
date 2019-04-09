@@ -29,7 +29,7 @@ type
     constructor Create(const AView, AViewContext: TComponent;
       const AViewContextProvider:TioViewContextProvider;
       const AViewContextFreeMethod:TProc;
-      const AInternalContainer:TList<TioViewContextRegisterItem>); overload;
+      const AInternalContainer:TList<TioViewContextRegisterItem>); reintroduce; overload;
     destructor Destroy; override;
     procedure ReleaseViewContext;
     property View:TComponent read FView;
