@@ -400,8 +400,6 @@ begin
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.EndAlterTable(const APropertyIsID: Boolean): String;
-var
-  LQuery: IioQuery;
 begin
   Result := '';
   FAlterTableScript := FAlterTableScript + ' ' + Result;
@@ -487,7 +485,7 @@ var
   LColumnDecimals: Integer;
   LColumnNullable: Boolean;
 begin
-  LColumnLength := 0;
+//  LColumnLength := 0;
 
   Result := False;
   //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);

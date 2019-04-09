@@ -1224,6 +1224,7 @@ end;
 
 function TioDependencyInjectionLocator.ShowCurrent: TComponent;
 begin
+  result := nil;
   // Check for BindSourceAdapter and not empty
   FForEachModelPresenter.CheckAdapter(True);
   if FForEachModelPresenter.ItemCount = 0 then

@@ -165,6 +165,8 @@ begin
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsObject;
     tkInterface:
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsInterface as TObject;
+    else
+      Result := nil;
   end;
 end;
 

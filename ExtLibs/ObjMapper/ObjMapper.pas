@@ -468,8 +468,6 @@ begin
 end;
 
 function TomValueDestination.ToJSON: TJSONValue;
-var
-  LRttiType: TRttiType;
 begin
   try
     Result := omEngine.SerializePropField(FValue, nil, FParams);

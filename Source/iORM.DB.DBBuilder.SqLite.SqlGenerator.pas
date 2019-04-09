@@ -237,8 +237,8 @@ begin
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.AlterField(const AProperty:IioContextProperty): String;
-var
-  LRow: String;
+//var
+//  LRow: String;
 begin
 //  LRow := Format('ALTER COLUMN %s ',[Self.CreateField(AProperty)]).Trim;
 //  Result := LRow.Substring(0, LRow.Length-1);
@@ -409,8 +409,8 @@ begin
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.EndAlterTable(const APropertyIsID: Boolean): String;
-var
-  LQuery: IioQuery;
+//var
+//  LQuery: IioQuery;
 begin
   Result := '';
   FAlterTableScript := FAlterTableScript + ' ' + Result;
@@ -479,11 +479,10 @@ var
   LQuery: IioQuery;
   LColumnName: string;
   LColumnTyp: string;
-  LColumnLength: Integer;
-  LColumnDecimals: Integer;
+//  LColumnLength: Integer;
   LColumnNullable: Boolean;
 begin
-  LColumnLength := 0;
+//  LColumnLength := 0;
 
   Result := False;
   //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
@@ -610,7 +609,6 @@ var
   LQueryDrop: IioQuery;
   LPairTable: TPair<string, IioDBBuilderTable>;
   LPairField: TPair<string,IioDBBuilderField>;
-  LCreate: string;
   LSb: TStringBuilder;
   LSql: string;
 begin

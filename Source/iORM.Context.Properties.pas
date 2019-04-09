@@ -392,7 +392,6 @@ var
   AValue: TValue;
 begin
   // Init
-  Result := nil;
   // Extract the child related object
   AValue := Self.GetValue(Instance);
   Result := TioRttiUtilities.TValueToObject(AValue, True);
@@ -545,7 +544,6 @@ end;
 function TioProperty.IsSqlRequestCompliant(
   ASqlRequestType: TioSqlRequestType): Boolean;
 begin
-  Result := False;
   case ASqlRequestType of
     ioSelect: Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
     ioInsert:

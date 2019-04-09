@@ -49,7 +49,6 @@ type
 
   TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   private
-    FBindSourceAdapter: IioActiveBindSourceAdapter;
     FioTypeName: String;
     FioTypeAlias: String;
     FioAutoLoadData: Boolean;
@@ -444,7 +443,6 @@ end;
 
 function TioPrototypeBindSource.DataObject: TObject;
 begin
-  Result := nil;
   Result := Self.GetActiveBindSourceAdapter.DataObject;
 end;
 

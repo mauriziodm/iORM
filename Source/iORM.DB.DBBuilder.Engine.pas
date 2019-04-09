@@ -691,7 +691,6 @@ var
   AField: IioDBBuilderField;
   LIndex: ioIndex;
   ATableName: String;
-  ARttiType: TRttiInstanceType;
   LIsSqlField: Boolean;
   lField: IioDBBuilderField;
 begin

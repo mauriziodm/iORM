@@ -42,7 +42,7 @@ interface
 uses
   iORM.Context.Interfaces,
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
-  iORM.DB.Interfaces, FireDAC.Comp.DataSet;
+  iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB;
 
 type
 
@@ -158,7 +158,6 @@ class procedure TioStrategyDB.InsertObject(const AContext: IioContext;
   const ABlindInsert: Boolean);
 var
   AQuery: IioQuery;
-  NextID: Integer;
 begin
   inherited;
   // -----------------------------------------------------------
@@ -233,6 +232,7 @@ var
     end;
 begin
   inherited;
+  result := nil;
   // Resolve the type and alias
   AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
   // Get the transaction collection
@@ -672,8 +672,6 @@ begin
 end;
 
 class procedure TioStrategyDB.UpdateObject(const AContext: IioContext);
-var
-  AQuery: IioQuery;
 begin
   inherited;
   // Create and execute query

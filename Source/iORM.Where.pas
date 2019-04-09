@@ -519,8 +519,6 @@ begin
 end;
 
 function TioWhere._And(AWhereCond: IioWhere): IioWhere;
-var
-  AItem: IioSqlItem;
 begin
   Result := Self;
   if (not Assigned(AWhereCond)) or (AWhereCond.WhereConditionExists) then

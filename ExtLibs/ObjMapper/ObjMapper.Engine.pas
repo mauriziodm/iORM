@@ -196,7 +196,7 @@ uses
 {$ELSE}
   ObjMapper.DuckObj,
 {$ENDIF}
-  ObjMapper.DuckList, System.Classes, Soap.EncdDecd,
+  ObjMapper.DuckList, System.Classes, Soap.EncdDecd, System.NetEncoding,
   ObjMapper.RTTIUtils, ObjMapper.Attributes, System.DateUtils, ObjMapper.DuckDictionary,
   iORM.Rtti.Utilities;
 
@@ -386,13 +386,7 @@ var
   SS: TStringStream;
   sw: TStreamWriter;
   MS: TMemoryStream;
-  LClassName: string;
-  Arr: TJSONArray;
-  list: IWrappedList;
-  I: Integer;
   wObj: IWrappedObject;
-  MapperClassTypeAttribute: MapperItemsClassType;
-  ClassRef: TClass;
 begin
   if not Assigned(AJSONValue) then   // JSONKey not present
   begin
@@ -495,7 +489,6 @@ var
   LParams: IomParams;
   LDone: Boolean;
   LValueType: TRttiType;
-  LJSONObj: TJSONObject;
   LQualifiedName: String;
   LExistingValue: TValue;
   LTypeJSONValue: TJSONValue;
@@ -612,6 +605,7 @@ var
   LKey, LValue: TValue;
   I: Integer;
 begin
+  result := nil;
   // If JSONValue not assigned
   if (AJSONValue is TJSONNull) or not Assigned(AJSONValue) then
     Exit(TValue.Empty);
@@ -810,7 +804,7 @@ begin
   if not Assigned(AJSONValue) then
     Exit(TValue.Empty);
   // Defaults
-  LValueRTTIType          := nil;
+//  LValueRTTIType          := nil;
   LListTypeName           := '';
   LValueQualifiedTypeName := '';
   // If AUseClassName is true then get the "items" JSONArray containing che containing the list items
@@ -1038,7 +1032,7 @@ begin
     AObject := TRTTIUtils.CreateObject(lJClassName.Value);
   end;
 
-  JValue := nil;
+//  JValue := nil;
   _type := GetCtx.GetType(AObject.ClassInfo);
 
   try
@@ -1259,7 +1253,7 @@ end;
 class function omEngine.QualifiedTypeNameToRttiType(
   const AQualifiedTypeName: String): TRttiType;
 begin
-  Result := nil;
+//  Result := nil;
   Result := GetCtx.FindType(AQualifiedTypeName);
 end;
 
@@ -1325,19 +1319,15 @@ end;
 
 class function omEngine.SerializeClass(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue;
 var
-  AChildObj, Obj: TObject;
-  list: IWrappedList;
+  AChildObj: TObject;
   wObj: IWrappedObject;
-  Arr: TJSONArray;
-  ResultObj: TJSONObject;
   _attrser: MapperSerializeAsString;
   SerEnc: TEncoding;
   sr: TStringStream;
   SS: TStringStream;
   MS: TMemoryStream;
-  EncBytes: TBytes;
-  I: Integer;
 begin
+  Result := nil;
   AChildObj := AValue.AsObject;
   if Assigned(AChildObj) then
   begin
@@ -1643,15 +1633,11 @@ class function omEngine.SerializeObject(const AObject: TObject; const AParams: I
 var
   PropField: System.Rtti.TRttiNamedObject;
   PropsFields: TArray<System.Rtti.TRttiNamedObject>;
-  ThereAreIgnoredProperties: boolean;
-  DoNotSerializeThis: boolean;
   KeyName: String;
   _type: TRttiType;
-  I: Integer;
   JValue: TJSONValue;
   Value: TValue;
 begin
-  ThereAreIgnoredProperties := Length(AParams.IgnoredProperties) > 0;
   Result := TJSONBox.Create;
   try
     _type := GetCtx.GetType(AObject.ClassInfo);
@@ -1744,6 +1730,7 @@ var
   ts: TTimeStamp;
   LQualifiedTypeName: String;
 begin
+  result := nil;
 //  LQualifiedTypeName := TDuckPropField.QualifiedName(APropField);
   LQualifiedTypeName := GetQualifiedTypeName(AValue.TypeInfo);
   // TTimeStamp
@@ -1812,7 +1799,6 @@ end;
 
 class function omEngine.TypeInfoToRttiType(const ATypeInfo: Pointer): TRttiType;
 begin
-  Result := nil;
   Result := GetCtx.GetType(ATypeInfo);
 end;
 

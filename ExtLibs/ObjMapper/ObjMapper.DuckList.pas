@@ -262,6 +262,7 @@ function TDuckTypedList.GetItem(const index: Integer): TObject;
 var
   AValue: TValue;
 begin
+result := nil;
 //  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
 // --------- Maurizio Del Magno ----------    (For intefaces compatiblity)
   AValue := Self.GetItemValue(index);
