@@ -305,7 +305,7 @@ begin
           // Generate Sql x Drop All FK
           LDropAllForeignKeySql := LSqlGenerator.DropAllForeignKey(FTables);
 
-          if not LDropAllForeignKeySql.IsEmpty then
+          if not LDropAllForeignKeySql.Trim.IsEmpty then
             LSb.AppendLine(LDropAllForeignKeySql);
 
           // Drop all FK
@@ -318,7 +318,7 @@ begin
           // Generate Sql x Drop All Index
           LDropAllIndexSql := LSqlGenerator.DropAllIndex;
 
-          if not LDropAllIndexSql.IsEmpty then
+          if not LDropAllIndexSql.Trim.IsEmpty then
             LSb.AppendLine(LDropAllIndexSql);
 
           // Drop all Index
@@ -358,10 +358,15 @@ begin
             LFkInCreateSql := LSqlGenerator.AddForeignKeyInCreate(LPairTable.Value);
 
             // Remove Last Comma
-            if LFkInCreateSql.IsEmpty then
+            if LFkInCreateSql.Trim.IsEmpty then
               LCreateTableSql := RemoveLastComma(LCreateTableSql)
             else
               LCreateTableSql := LCreateTableSql + LFkInCreateSql;
+          end
+          else
+          begin
+            // Remove Last Comma
+            LCreateTableSql := RemoveLastComma(LCreateTableSql)
           end;
 
           // Generate Sql x End Create Table
@@ -414,7 +419,7 @@ begin
                   LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty)+' ';
                   LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
-                  if not LAlterTableSql.IsEmpty then
+                  if not LAlterTableSql.Trim.IsEmpty then
                     LSb.AppendLine(LAlterTableSql);
 
                   // Execute Alter Table
@@ -435,7 +440,7 @@ begin
                   LAlterTableSql := LAlterTableSql + LSqlGenerator.AlterField(LPairField.Value.GetProperty)+' ';
                   LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
-                  if not LAlterTableSql.IsEmpty then
+                  if not LAlterTableSql.Trim.IsEmpty then
                     LSb.AppendLine(LAlterTableSql);
 
                   // Execute Alter Table
@@ -462,7 +467,7 @@ begin
             // Generate Sql x Index
             LAddIndexSql := LSqlGenerator.AddIndex(LContext, LIndex.IndexName, LIndex.CommaSepFieldList, LIndex.IndexOrientation, LIndex.Unique);
 
-            if not LAddIndexSql.isEmpty then
+            if not LAddIndexSql.Trim.isEmpty then
               LSb.AppendLine(LAddIndexSql);
 
             // Create Index
@@ -522,7 +527,7 @@ begin
                 // Create Sql x FK
                 LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName, LDestinationFieldName);
 
-                if not LAddFKSql.IsEmpty then
+                if not LAddFKSql.Trim.IsEmpty then
                   LSb.AppendLine(LAddFKSql);
 
                 // Create FK
