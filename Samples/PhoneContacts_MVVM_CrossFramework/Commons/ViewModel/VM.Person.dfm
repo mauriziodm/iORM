@@ -7,9 +7,10 @@ inherited PersonViewModel: TPersonViewModel
     Async = False
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'IPerson'
-    ViewDataType = dtList
+    ViewDataType = dtSingle
     WhereDetailsFromDetailAdapters = False
     Left = 72
     Top = 24
@@ -19,6 +20,7 @@ inherited PersonViewModel: TPersonViewModel
     Async = False
     AutoLoadData = True
     AutoPersist = True
+    AutoPost = False
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = PersonModelPresenter
     MasterPropertyName = 'Phones'
