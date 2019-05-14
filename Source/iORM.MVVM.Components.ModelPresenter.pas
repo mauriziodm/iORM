@@ -419,7 +419,7 @@ end;
 
 function TioModelPresenter.DataObject: TObject;
 begin
-  Result := nil;
+//  Result := nil;
   Result := BindSourceAdapter.DataObject;
 end;
 

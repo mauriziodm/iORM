@@ -55,7 +55,7 @@ type
 implementation
 
 uses
-  System.TypInfo, System.SysUtils, Data.DB;
+  System.TypInfo, System.SysUtils, FireDac.Stan.Param, Data.DB;
 
 { TioSqlDataConverterFirebird }
 

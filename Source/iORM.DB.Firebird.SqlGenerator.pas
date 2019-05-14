@@ -65,8 +65,8 @@ class function TioSqlGeneratorFirebird.BuildIndexName(
   const AContext: IioContext; const ACommaSepFieldList: String;
   const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 var
-  LFieldList: TStrings;
-  LField: String;
+//  LFieldList: TStrings;
+//  LField: String;
   LGuid: TGUID;
 begin
   // M.M. 11/08/18 Non chiama la funzione ereditata perchè per FIREBIRD i nome degli indici hanno lunghezza massima 31 char

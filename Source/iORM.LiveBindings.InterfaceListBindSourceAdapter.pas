@@ -59,7 +59,7 @@ type
     procedure CheckList;
     function GetObjectType: TRttiType; override;
     function CreateItemInstance: T; virtual;
-    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); virtual; abstract;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); reintroduce; virtual; abstract;
     procedure InitItemInstance(AInstance: T); virtual;
     function GetCurrent: TObject; override;
     function GetCount: Integer; override;

@@ -68,4 +68,4 @@ begin
   Result := TioObjectMapperIntf;
 end;
 
-end.                                                                                                                                s
+end.

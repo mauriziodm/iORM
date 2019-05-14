@@ -89,7 +89,7 @@ type
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
 
-    class procedure Error(const Msg: string; Data: NativeInt); overload; virtual;
+    class procedure Error(const Msg: string; Data: NativeInt); reintroduce; overload; virtual;
 {$IFNDEF NEXTGEN}
     class procedure Error(Msg: PResStringRec; Data: NativeInt); overload;
 {$ENDIF  NEXTGEN}

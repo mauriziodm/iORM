@@ -499,9 +499,8 @@ var
   LColumnLength: Integer;
   LColumnDecimals: Integer;
   LColumnNullable: Boolean;
-  LConnectionDefName: string;
 begin
-  LColumnLength := 0;
+//  LColumnLength := 0;
 
   Result := False;
   //LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;

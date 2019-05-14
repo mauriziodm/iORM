@@ -89,7 +89,7 @@ type
 implementation
 
 uses
-  System.TypInfo, iORM.Exceptions, iORM.Attributes,
+  System.TypInfo, iORM.Exceptions, iORM.Attributes, FireDac.Stan.Param,
   iORM.ObjectsForge.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, System.JSON,
   iORM.Rtti.Utilities;
@@ -311,7 +311,7 @@ var
   AParam: TioParam;
   AJSONValue: TJSONValue;
 begin
-  AObj := nil;
+//  AObj := nil;
   // -------------------------------------------------------------------------------------------------------------------------------
   // Normal property type (NO BLOB)
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -344,6 +344,8 @@ begin
         AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(AObj);
       ioRTEmbeddedHasOne:
         AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(AObj);
+      else
+        AJSONValue := nil;
     end;
     try
       AParam.AsString := AJSONValue.ToString;

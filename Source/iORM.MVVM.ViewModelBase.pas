@@ -57,7 +57,7 @@ type
 {$IFNDEF AUTOREFCOUNT}
     [Volatile] FRefCount: Integer;
 {$ENDIF}
-    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------

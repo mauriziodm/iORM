@@ -96,7 +96,6 @@ uses
 //       la ChildProperty destinazione.
 class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioContextProperty): TObject;
 begin
-  Result := nil;
   // Get the child object if already assigned
   Result := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the AProperty is of interface type...
@@ -130,8 +129,6 @@ var
   Prop: TRttiProperty;
 begin
   inherited;
-  // Init
-  Result := nil;
   // Proprerty "OwnsObjects" by Rtti
   Prop := ARttiType.GetProperty('OwnsObjects');
   // Create object
@@ -171,8 +168,7 @@ var
   LMethod: TRttiMethod;
 begin
   // init
-  Result := nil;
-  LMethod := nil;
+//  Result := nil;
   // Find the constructor
   LMethod := Self.FindConstructor(ARttiType, AConstructorParams, AConstructorMarkerText, AConstructorMethodName);
   // If constructor not found...
@@ -289,7 +285,6 @@ begin
     case AContainerItem.PropertiesOnCreate[I].PropFieldType of
       // It is a property
       itProperty: begin
-        LProp := nil;
         LProp := LTyp.GetProperty(AContainerItem.PropertiesOnCreate[I].Name);
         case AContainerItem.PropertiesOnCreate[I].PropFieldValue of
           ivByDependencyInjection:
@@ -300,7 +295,6 @@ begin
       end;
       // It is a field
       itField: begin
-        LField := nil;
         LField := LTyp.GetField(AContainerItem.PropertiesOnCreate[I].Name);
         case AContainerItem.PropertiesOnCreate[I].PropFieldValue of
           ivByDependencyInjection:
@@ -328,8 +322,6 @@ var
       then Exit(True);
   end;
 begin
-  // init
-  Result := nil;
   // Loop for all methods
   for AMethod in ARttiType.GetMethods do
   begin
@@ -419,7 +411,6 @@ class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
   AQuery: IioQuery; AProperty: IioContextProperty): TObject;
 var
   ALazyLoadableObj: IioLazyLoadable;
-  AResolvedTypeList: IioResolvedTypeList;
   LWhere, LDetailWhere: IioWhere;
 begin
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't

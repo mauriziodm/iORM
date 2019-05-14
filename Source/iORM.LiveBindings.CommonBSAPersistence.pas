@@ -69,6 +69,7 @@ begin
 //  AAbort := False;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
+  LResultValue := nil;
   LExecute := function: TObject
   begin
     io.Delete(AActiveBindSourceAdapter.Current);
@@ -170,7 +171,6 @@ var
   LMasterOID: Integer;
   LExecute: TioCommonBSAPersistenceThreadExecute;
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
-  LResultValue: TObject;
 begin
   // If it's a single object then call the normal PersistCurrent method and exit
   if AActiveBindSourceAdapter.ioViewDataType = TioViewDataType.dtSingle then

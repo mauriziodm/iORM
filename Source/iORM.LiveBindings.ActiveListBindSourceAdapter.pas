@@ -114,7 +114,7 @@ type
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
-    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 {$IFDEF AUTOREFCOUNT}
@@ -160,12 +160,12 @@ type
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
-    procedure Append(AObject:TObject); overload;
-    procedure Append(AObject:IInterface); overload;
-    procedure Insert(AObject:TObject); overload;
-    procedure Insert(AObject:IInterface); overload;
+    procedure Append(AObject:TObject); reintroduce; overload;
+    procedure Append(AObject:IInterface); reintroduce; overload;
+    procedure Insert(AObject:TObject); reintroduce; overload;
+    procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
-    procedure Refresh(ReloadData:Boolean); overload;
+    procedure Refresh(ReloadData:Boolean); reintroduce; overload;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
@@ -539,7 +539,7 @@ end;
 
 function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
 begin
-  Result := nil;
+//  Result := nil;
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);

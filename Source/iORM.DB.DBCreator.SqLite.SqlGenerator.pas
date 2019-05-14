@@ -130,7 +130,7 @@ var
   RealFieldTypeSet: TFieldTypeSet;
   BlobFieldTypeSet: TFieldTypeSet;
 begin
-  Result := False;
+//  Result := False;
   // Define sets
   TextFieldTypeSet := [ftString, ftWideString, ftWideMemo, ftMemo];
   IntegerFieldTypeSet := [ftInteger, ftSmallint, ftWord, ftLargeInt, ftAutoinc];
@@ -221,7 +221,7 @@ begin
     // Loop for all fields
     for AField in ATable.Fields.Values do
     begin
-      ASqlField := nil;
+//      ASqlField := nil;
       ASqlField := FQuery.Fields.FindField(AField.FieldName);
       AField.DBFieldExist := Assigned(ASqlField);
     end;

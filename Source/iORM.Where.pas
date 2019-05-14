@@ -85,9 +85,9 @@ type
     function GetTypeInfo: PTypeInfo;
     procedure SetTypeInfo(const Value: PTypeInfo);
   public
-    constructor Create; overload;
+    constructor Create; reintroduce; overload;
     function GetWhereItems: IWhereItems;
-    function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
+    function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String; reintroduce;
     function GetSqlWithClassFromField(const AMap:IioMap; const AIsClassFromField:Boolean; const AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
@@ -224,7 +224,7 @@ type
   TioWhere<T> = class (TioWhere, IioWhere<T>)
   public
     // ------ Destination methods
-    function ToObject(const AObj:TObject=nil): T; overload;
+    function ToObject(const AObj:TObject=nil): T; reintroduce; overload;
     function ToList: TList<T>; overload;
 //    function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<TObject>;
     function ToInterfacedList: IioList<T>; overload;
@@ -519,8 +519,6 @@ begin
 end;
 
 function TioWhere._And(AWhereCond: IioWhere): IioWhere;
-var
-  AItem: IioSqlItem;
 begin
   Result := Self;
   if (not Assigned(AWhereCond)) or (AWhereCond.WhereConditionExists) then

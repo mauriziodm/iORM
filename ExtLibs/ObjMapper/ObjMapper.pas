@@ -37,7 +37,7 @@ type
     constructor Create(const AValue: TValue; const AParams:IomParams);
     // Destinations
     function ToJSON: TJSONValue;
-    function ToString: String;
+    function ToString: String; reintroduce;
     // Params
     function Params(const AParams:IomParams): TomValueDestination;
     function ItemsOfType(const AValueType: PTypeInfo): TomValueDestination; overload;
@@ -468,8 +468,6 @@ begin
 end;
 
 function TomValueDestination.ToJSON: TJSONValue;
-var
-  LRttiType: TRttiType;
 begin
   try
     Result := omEngine.SerializePropField(FValue, nil, FParams);

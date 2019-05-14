@@ -113,7 +113,6 @@ var
   AMasterProperty: IioContextProperty;
   NewAdapter: IioContainedBindSourceAdapter;
 begin
-  Result := nil;
   // Retrieve MasterContext and MasterProperty
   AMasterContext := TioContextFactory.Context(AMasterClassName);
   AMasterProperty := AMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);

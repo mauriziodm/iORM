@@ -69,7 +69,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, iORM.Context.Properties.Interfaces,
+  iORM.DB.Factory, iORM.Context.Properties.Interfaces, FireDac.Stan.Param,
   iORM.Attributes, Data.DB, iORM.Interfaces, SysUtils,
   iORM.Where.SqlItems.Interfaces, iORM.DB.ConnectionContainer;
 

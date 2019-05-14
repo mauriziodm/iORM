@@ -197,11 +197,11 @@ type
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(AValue: IioContextProperty);
   public
-    constructor Create;
+    constructor Create;reintroduce;
     destructor Destroy; override;
     function GetEnumerator: TEnumerator<IioContextProperty>;
-    function GetSql: String; overload;
-    function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
+    function GetSql: String; reintroduce; overload;
+    function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; reintroduce; overload;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False; AIDSkipOnInsert:Boolean=True);
     function GetIdProperty:IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
@@ -392,7 +392,6 @@ var
   AValue: TValue;
 begin
   // Init
-  Result := nil;
   // Extract the child related object
   AValue := Self.GetValue(Instance);
   Result := TioRttiUtilities.TValueToObject(AValue, True);
@@ -545,7 +544,6 @@ end;
 function TioProperty.IsSqlRequestCompliant(
   ASqlRequestType: TioSqlRequestType): Boolean;
 begin
-  Result := False;
   case ASqlRequestType of
     ioSelect: Result := (FReadWrite <= iorwReadWrite) and not FSkipped;
     ioInsert:

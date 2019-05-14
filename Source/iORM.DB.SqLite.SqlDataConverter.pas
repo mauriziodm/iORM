@@ -61,13 +61,12 @@ type
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes, Data.DB;
+  System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes, Data.DB, FireDac.Stan.Param;
 
 { TioSqlConverterSqLite }
 
 class function TioSqlDataConverterSqLite.FloatToSQL(const AFloat: Extended): String;
 var
-  Sign, IntegerPart, DecimalPart: String;
   FormatSettings: TFormatSettings;
 begin
   FormatSettings := TFormatSettings.Create;

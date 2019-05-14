@@ -120,7 +120,7 @@ type
     procedure SetGroupIndex(const Value: integer); virtual; abstract;
     procedure SetHint(const Value: string); virtual; abstract;
     procedure SetImageIndex(const Value: integer); virtual; abstract;
-    procedure SetName(const Value: TComponentName); virtual; abstract;
+    procedure SetName(const Value: TComponentName); reintroduce; virtual; abstract;
     procedure SetVisible(const Value: boolean); virtual; abstract;
     procedure SetOnExecute(const Value: TNotifyEvent); virtual; abstract;
     procedure SetOnHint(const Value: THintEvent); virtual; abstract;
