@@ -259,13 +259,16 @@ var
   LAddGeneratorsSql: string;
   LRestructureTableSql: string;
 
-  procedure AlterTable;
+  procedure AlterTable(aAlterField: Boolean);
   begin
     // Generate Sql x Alter Table
     LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName) + ' ';
     if not LAlterTableSql.Trim.IsEmpty then
     begin
-      LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty) + ' ';
+      if aAlterField then
+        LAlterTableSql := LAlterTableSql + LSqlGenerator.AlterField(LPairField.Value.GetProperty) + ' '
+      else
+        LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty) + ' ';
       LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
       if not LAlterTableSql.Trim.IsEmpty then
@@ -435,7 +438,7 @@ begin
               begin
                 // Skip Key Field
                 if (not LPairField.Value.IsKeyField) then
-                  AlterTable;
+                  AlterTable(false);
               end
               else
               begin
@@ -444,7 +447,7 @@ begin
                 if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty, LWarnings) then
                 begin
                   LRemark := LSqlGenerator.GetRemark(LWarnings);
-                  AlterTable;
+                  AlterTable(true);
                 end;
               end;
             end;
@@ -693,7 +696,7 @@ procedure TioDBBuilder.LoadTableStructure(AMap: IioMap);
 var
   AProperty: IioContextProperty;
   ATable: IioDBBuilderTable;
-  AField: IioDBBuilderField;
+  aField: IioDBBuilderField;
   LIndex: ioIndex;
   ATableName: String;
   ARttiType: TRttiInstanceType;
@@ -737,8 +740,8 @@ begin
     if ATable.FieldExists(AProperty.GetSqlFieldName) then
       Continue;
 
-    AField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty, FSqlGenerator, False, LIsSqlField);
-    ATable.Fields.Add(AField.FieldName, AField);
+    aField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty, FSqlGenerator, False, LIsSqlField);
+    ATable.Fields.Add(aField.FieldName, aField);
   end;
   // If some explicit index is present then add it to the list
   if AMap.GetTable.IndexListExists then
@@ -895,13 +898,13 @@ end;
 
 function TioDBBuilderTable.IDField: IioDBBuilderField;
 var
-  AField: IioDBBuilderField;
+  aField: IioDBBuilderField;
 begin
   Result := nil;
-  for AField in Self.Fields.Values do
-    if AField.IsKeyField then
+  for aField in Self.Fields.Values do
+    if aField.IsKeyField then
     begin
-      Result := AField;
+      Result := aField;
       Exit;
     end;
 end;
