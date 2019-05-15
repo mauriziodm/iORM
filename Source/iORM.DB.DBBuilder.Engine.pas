@@ -259,13 +259,16 @@ var
   LAddGeneratorsSql: string;
   LRestructureTableSql: string;
 
-  procedure AlterTable;
+  procedure AlterTable(aAlterField: Boolean);
   begin
     // Generate Sql x Alter Table
     LAlterTableSql := LSqlGenerator.BeginAlterTable('', LTableName) + ' ';
     if not LAlterTableSql.Trim.IsEmpty then
     begin
-      LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty) + ' ';
+      if aAlterField then
+        LAlterTableSql := LAlterTableSql + LSqlGenerator.AlterField(LPairField.Value.GetProperty) + ' '
+      else
+        LAlterTableSql := LAlterTableSql + LSqlGenerator.AddField(LPairField.Value.GetProperty) + ' ';
       LAlterTableSql := LAlterTableSql + LSqlGenerator.EndAlterTable(LPairField.Value.GetProperty.IsID);
 
       if not LAlterTableSql.Trim.IsEmpty then
@@ -435,7 +438,7 @@ begin
               begin
                 // Skip Key Field
                 if (not LPairField.Value.IsKeyField) then
-                  AlterTable;
+                  AlterTable(false);
               end
               else
               begin
@@ -443,7 +446,7 @@ begin
                 if LSqlGenerator.FieldModified(LDatabaseName, LPairTable.Value.TableName, LPairField.Value.GetProperty, LWarnings) then
                 begin
                   LRemark := LSqlGenerator.GetRemark(LWarnings);
-                  AlterTable;
+                  AlterTable(True);
                 end;
               end;
             end;
