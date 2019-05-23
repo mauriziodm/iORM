@@ -218,7 +218,8 @@ var
       // Init
       Result := nil;
       // Create & open query
-      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
+//      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext); // NB: Prima era così ma probabilmente era una svista
+      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForObject(AContext);
       AQuery.Open;
       try
         // If a record is fuìound then load the object and return True
