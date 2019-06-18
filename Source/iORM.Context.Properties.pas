@@ -203,6 +203,7 @@ type
     function GetSql: String; reintroduce; overload;
     function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; reintroduce; overload;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False; AIDSkipOnInsert:Boolean=True);
+    function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty:IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
     procedure SetTable(ATable:IioContextTable);
@@ -733,6 +734,16 @@ destructor TioProperties.Destroy;
 begin
   FPropertyItems.Free;
   inherited;
+end;
+
+function TioProperties.PropertyExists(const APropertyName: String): Boolean;
+var
+  CurrProp: IioContextProperty;
+begin
+  for CurrProp in FPropertyItems do
+    if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
+      Exit(True);
+  Result := False;
 end;
 
 function TioProperties.GetEnumerator

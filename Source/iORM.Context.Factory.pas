@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.Context.Factory;
 
@@ -51,22 +49,39 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const AMapMode:TioMapModeType; const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
-  AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
-  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
-  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_DisableCreateFK: boolean; const AMetadata_FieldSubType: string): IioContextProperty;
-    class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
-    class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
+    class function GetProperty(const AMapMode: TioMapModeType;
+      const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName,
+      ALoadSql, AFieldType: String; const ASkipped: Boolean;
+      const AReadWrite: TioReadWrite; const ARelationType: TioRelationType;
+      const ARelationChildTypeName, ARelationChildTypeAlias,
+      ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
+      const ARelationChildAutoIndex: Boolean;
+      const AMetadata_FieldType: TioMetadataFieldType;
+      const AMetadata_FieldLength: Integer;
+      const AMetadata_FieldPrecision: Integer;
+      const AMetadata_FieldScale: Integer;
+      const AMetadata_FieldNullable: Boolean;
+      const AMetadata_FieldUnicode: Boolean;
+      const AMetadata_CustomFieldType: string;
+      const AMetadata_DisableCreateFK: Boolean;
+      const AMetadata_FieldSubType: string): IioContextProperty;
+    class function Properties(const Typ: TRttiInstanceType;
+      const ATable: IioContextTable): IioContextProperties;
+    class function ClassFromField(Typ: TRttiInstanceType;
+      const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME)
+      : IioClassFromField;
     class function Joins: IioJoins;
-    class function JoinItem(const AJoinAttribute:ioJoin): IioJoinItem;
-    class function GroupBy(const ASqlText:String): IioGroupBy;
+    class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
+    class function GroupBy(const ASqlText: String): IioGroupBy;
     class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AioWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String=''): IioContext;
-    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName:String): IioContextProperty;
-    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
+    class function Context(const AClassName: String;
+      const AioWhere: IioWhere = nil; const ADataObject: TObject = nil;
+      const AConnectionName: String = ''): IioContext;
+    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef;
+      const APropertyName: String): IioContextProperty;
+    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef)
+      : IioContextProperty;
   end;
 
 implementation
@@ -82,121 +97,92 @@ uses
 class function TioContextFactory.ClassFromField(Typ: TRttiInstanceType;
   const ASqlFieldName: String): IioClassFromField;
 var
-  Ancestors, QualifiedClassName, ClassName:String;
+  Ancestors, QualifiedClassName, ClassName: String;
 begin
   // ClassName
   ClassName := Typ.MetaclassType.ClassName;
   QualifiedClassName := Typ.QualifiedName;
   // Loop for all ancestors
   repeat
-    begin
-      Ancestors := Ancestors + '<' + Typ.Name + '>';
-      Typ := Typ.BaseType;
-    end;
+  begin
+    Ancestors := Ancestors + '<' + Typ.Name + '>';
+    Typ := Typ.BaseType;
+  end;
   until not Assigned(Typ);
   // Create
-  Result := TioClassFromField.Create(ASqlFieldName, ClassName, QualifiedClassName, Ancestors);
+  Result := TioClassFromField.Create(ASqlFieldName, ClassName,
+    QualifiedClassName, Ancestors);
 end;
 
 class function TioContextFactory.Context(const AClassName: String;
-  const AioWhere: IioWhere; const ADataObject: TObject; const AConnectionName:String): IioContext;
+  const AioWhere: IioWhere; const ADataObject: TObject;
+  const AConnectionName: String): IioContext;
 begin
   // Get the Context from the ContextContainer
-  Result := TioContext.Create(AClassName,
-                              TioMapContainer.GetMap(AClassName),
-                              AioWhere,
-                              ADataObject,
-                              AConnectionName
-                              );
+  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName),
+    AioWhere, ADataObject, AConnectionName);
 end;
 
-class function TioContextFactory.GetIDPropertyByClassRef(
-  const AClassRef: TioClassRef): IioContextProperty;
+class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef
+  : TioClassRef): IioContextProperty;
 begin
   Result := Self.Map(AClassRef).GetProperties.GetIdProperty;
 end;
 
-class function TioContextFactory.GetProperty(const AMapMode:TioMapModeType; const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
-  AFieldType: String; const ASkipped:Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex:Boolean;
-  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
-  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_DisableCreateFK: boolean; const AMetadata_FieldSubType: string): IioContextProperty;
+class function TioContextFactory.GetProperty(const AMapMode: TioMapModeType;
+  const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
+  AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
+  const ARelationType: TioRelationType; const ARelationChildTypeName,
+  ARelationChildTypeAlias, ARelationChildPropertyName: String;
+  const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType;
+  const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean;
+  const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string;
+  const AMetadata_DisableCreateFK: Boolean;
+  const AMetadata_FieldSubType: string): IioContextProperty;
 begin
   case AMapMode of
     // Properties map mode
     ioProperties:
-      Result := TioProperty.Create(
-         ARttiPropField as TRttiProperty
-        ,ATypeAlias
-        ,ASqlFieldName
-        ,ALoadSql
-        ,AFieldType
-        ,ASkipped
-        ,AReadWrite
-        ,ARelationType
-        ,ARelationChildTypeName
-        ,ARelationChildTypeAlias
-        ,ARelationChildPropertyName
-        ,ARelationLoadType
-        ,ARelationChildAutoIndex
-        ,AMetadata_FieldType
-        ,AMetadata_FieldLength
-        ,AMetadata_FieldPrecision
-        ,AMetadata_FieldScale
-        ,AMetadata_FieldNullable
-        ,AMetadata_FieldUnicode
-        ,AMetadata_CustomFieldType
-        ,AMetadata_DisableCreateFK
-        ,AMetadata_FieldSubType
-      );
+      Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATypeAlias,
+        ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
+        ARelationType, ARelationChildTypeName, ARelationChildTypeAlias,
+        ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
+        AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
+        AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
+        AMetadata_CustomFieldType, AMetadata_DisableCreateFK,
+        AMetadata_FieldSubType);
     // Fields map mode
     ioFields:
-      Result := TioField.Create(
-         ARttiPropField as TRttiField
-        ,ATypeAlias
-        ,ASqlFieldName
-        ,ALoadSql
-        ,AFieldType
-        ,ASkipped
-        ,AReadWrite
-        ,ARelationType
-        ,ARelationChildTypeName
-        ,ARelationChildTypeAlias
-        ,ARelationChildPropertyName
-        ,ARelationLoadType
-        ,ARelationChildAutoIndex
-        ,AMetadata_FieldType
-        ,AMetadata_FieldLength
-        ,AMetadata_FieldPrecision
-        ,AMetadata_FieldScale
-        ,AMetadata_FieldNullable
-        ,AMetadata_FieldUnicode
-        ,AMetadata_CustomFieldType
-        ,AMetadata_DisableCreateFK
-        ,AMetadata_FieldSubType
-      );
+      Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias,
+        ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
+        ARelationType, ARelationChildTypeName, ARelationChildTypeAlias,
+        ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
+        AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
+        AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
+        AMetadata_CustomFieldType, AMetadata_DisableCreateFK,
+        AMetadata_FieldSubType);
   end;
 end;
 
-class function TioContextFactory.GetPropertyByClassRefAndName(
-  const AClassRef: TioClassRef;
-  const APropertyName: String): IioContextProperty;
+class function TioContextFactory.GetPropertyByClassRefAndName(const AClassRef
+  : TioClassRef; const APropertyName: String): IioContextProperty;
 begin
   Result := Self.Map(AClassRef).GetProperties.GetPropertyByName(APropertyName);
 end;
 
-class function TioContextFactory.GroupBy(const ASqlText:String): IioGroupBy;
+class function TioContextFactory.GroupBy(const ASqlText: String): IioGroupBy;
 begin
   Result := TioGroupBy.Create(ASqlText);
 end;
 
-class function TioContextFactory.JoinItem(const AJoinAttribute:ioJoin): IioJoinItem;
+class function TioContextFactory.JoinItem(const AJoinAttribute: ioJoin)
+  : IioJoinItem;
 begin
   Result := TioJoinItem.Create(AJoinAttribute.JoinType,
-                               AJoinAttribute.JoinClassRef,
-                               AJoinAttribute.JoinCondition
-                              );
+    AJoinAttribute.JoinClassRef, AJoinAttribute.JoinCondition);
 end;
 
 class function TioContextFactory.Joins: IioJoins;
@@ -216,16 +202,12 @@ begin
   // Get the table
   ATable := Self.Table(ARttiType);
   // Create the context
-  Result := TioMap.Create(AClassRef,
-                          ARttiContext,
-                          ARttiType,
-                          ATable,
-                          Self.Properties(ARttiType, ATable)
-                         );
+  Result := TioMap.Create(AClassRef, ARttiContext, ARttiType, ATable,
+    Self.Properties(ARttiType, ATable));
 end;
 
-class function TioContextFactory.Properties(
-  const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
+class function TioContextFactory.Properties(const Typ: TRttiInstanceType;
+  const ATable: IioContextTable): IioContextProperties;
 var
   Prop: System.Rtti.TRttiMember;
   PropsFields: TArray<System.Rtti.TRttiMember>;
@@ -253,11 +235,12 @@ var
   PropMetadata_FieldNullable: Boolean;
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
-  PropMetadata_DisableCreateFK: boolean;
+  PropMetadata_DisableCreateFK: Boolean;
   LRttiProperty: TRttiProperty;
   LRttiField: TRttiField;
 
-  function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
+  function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind;
+    const AQualifiedName: string): TioMetadataFieldType;
   begin
     Result := ioMdInteger;
     case ATypeKind of
@@ -327,9 +310,11 @@ begin
   // Get members list (Properties or Fields)
   case ATable.GetMapMode of
     ioProperties:
-      PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
+      PropsFields := TArray<System.Rtti.TRttiMember>
+        (TObject(Typ.AsInstance.GetProperties));
     ioFields:
-      PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetFields));
+      PropsFields := TArray<System.Rtti.TRttiMember>
+        (TObject(Typ.AsInstance.GetFields));
   end;
   // Create result Properties object
   Result := TioProperties.Create;
@@ -339,13 +324,15 @@ begin
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind
+        (LRttiProperty.PropertyType.TypeKind,
+        LRttiProperty.PropertyType.QualifiedName);
     end
-    else
-    if Prop is TRttiField then
+    else if Prop is TRttiField then
     begin
       LRttiField := Prop as TRttiField;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind,LRttiField.FieldType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind
+        (LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end;
 
     // M.M. 08/10/18
@@ -364,7 +351,8 @@ begin
       end;
     end;
 
-    PropMetadata_FieldLength := 50{255}; //M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
+    PropMetadata_FieldLength := 50 { 255 };
+    // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
     PropMetadata_FieldPrecision := 10;
     PropMetadata_FieldScale := 3;
     PropMetadata_FieldNullable := True;
@@ -376,19 +364,28 @@ begin
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
     if (ATable.GetMapMode = ioFields) then
-      PropFieldName := TioField.Remove_F_FromName(PropFieldName);  // Elimina il primo carattere (di solito la F)
+      PropFieldName := TioField.Remove_F_FromName(PropFieldName);
+    // Elimina il primo carattere (di solito la F)
     // Skip RefCount property from TInterfacedObject
-    if (PropFieldName = 'RefCount')
-    or (PropFieldName = 'Disposed')
-      then Continue;
+    // Se la proprietà esiste già nella mappa (può accadere quando si fa property override)
+    if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or
+      Result.PropertyExists(PropFieldName) then
+      Continue;
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_DisableCreateFK, PropMetadata_FieldSubType);
+      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '',
+        '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad,
+        False, PropMetadata_FieldType, PropMetadata_FieldLength,
+        PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        PropMetadata_FieldNullable, PropMetadata_FieldUnicode,
+        PropMetadata_CustomFieldType, PropMetadata_DisableCreateFK,
+        PropMetadata_FieldSubType);
       Continue;
     end;
     // Prop Init
-    PropId := (Uppercase(PropFieldName) = 'ID');  // Is a OID property if the name of the property itself is 'ID'
+    PropID := (Uppercase(PropFieldName) = 'ID');
+    // Is a OID property if the name of the property itself is 'ID'
     PropIDSkipOnInsert := True;
     PropTypeAlias := '';
     PropFieldType := '';
@@ -409,13 +406,20 @@ begin
         PropID := True;
         PropIDSkipOnInsert := ioOID(Attr).SkipOnInsert;
       end;
-      if Attr is ioTypeAlias then PropTypeAlias := ioTypeAlias(Attr).Value;
-      if Attr is ioField then PropFieldName := ioField(Attr).Value;
-      if Attr is ioFieldType then PropFieldType := ioFieldType(Attr).Value;
-      if Attr is ioLoadSql then PropLoadSql := ioLoadSql(Attr).Value;
-      if Attr is ioSkip then PropSkip := True;
-      if Attr is ioLoadOnly then PropReadWrite := iorwReadOnly;
-      if Attr is ioPersistOnly then PropReadWrite := iorwWriteOnly;
+      if Attr is ioTypeAlias then
+        PropTypeAlias := ioTypeAlias(Attr).Value;
+      if Attr is ioField then
+        PropFieldName := ioField(Attr).Value;
+      if Attr is ioFieldType then
+        PropFieldType := ioFieldType(Attr).Value;
+      if Attr is ioLoadSql then
+        PropLoadSql := ioLoadSql(Attr).Value;
+      if Attr is ioSkip then
+        PropSkip := True;
+      if Attr is ioLoadOnly then
+        PropReadWrite := iorwReadOnly;
+      if Attr is ioPersistOnly then
+        PropReadWrite := iorwWriteOnly;
       // Relations
       if Attr is ioEmbeddedHasMany then
       begin
@@ -539,39 +543,21 @@ begin
       end;
     end;
     // Create and add property
-    Result.Add(
-      Self.GetProperty(
-        ATable.GetMapMode,
-        Prop,
-        PropTypeAlias,
-        PropFieldName,
-        PropLoadSql,
-        PropFieldType,
-        PropSkip,
-        PropReadWrite,
-        PropRelationType,
-        PropRelationChildTypeName,
-        PropRelationChildTypeAlias,
-        PropRelationChildPropertyName,
-        PropRelationChildLoadType,
-        PropRelationChildAutoIndex,
-        PropMetadata_FieldType,
-        PropMetadata_FieldLength,
-        PropMetadata_FieldPrecision,
-        PropMetadata_FieldScale,
-        PropMetadata_FieldNullable,
-        PropMetadata_FieldUnicode,
-        PropMetadata_CustomFieldType,
-        PropMetadata_DisableCreateFK,
-        PropMetadata_FieldSubType
-      ),
-      PropId,
-      PropIDSkipOnInsert
-    );
+    Result.Add(Self.GetProperty(ATable.GetMapMode, Prop, PropTypeAlias,
+      PropFieldName, PropLoadSql, PropFieldType, PropSkip, PropReadWrite,
+      PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias,
+      PropRelationChildPropertyName, PropRelationChildLoadType,
+      PropRelationChildAutoIndex, PropMetadata_FieldType,
+      PropMetadata_FieldLength, PropMetadata_FieldPrecision,
+      PropMetadata_FieldScale, PropMetadata_FieldNullable,
+      PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
+      PropMetadata_DisableCreateFK, PropMetadata_FieldSubType), PropID,
+      PropIDSkipOnInsert);
   end;
 end;
 
-class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioContextTable;
+class function TioContextFactory.Table(const Typ: TRttiInstanceType)
+  : IioContextTable;
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionDefName, LKeyGenerator: String;
@@ -584,7 +570,8 @@ var
 begin
   try
     // Prop Init
-    LTableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+    LTableName := Typ.MetaclassType.ClassName.Substring(1);
+    // Elimina il primo carattere (di solito la T)
     LConnectionDefName := '';
     LKeyGenerator := '';
     LJoins := Self.Joins;
@@ -597,15 +584,22 @@ begin
     begin
       if (LAttr is ioTable) then
       begin
-        if not ioTable(LAttr).Value.IsEmpty then LTableName := ioTable(LAttr).Value;
+        if not ioTable(LAttr).Value.IsEmpty then
+          LTableName := ioTable(LAttr).Value;
         LMapMode := ioTable(LAttr).MapMode;
       end;
-      if LAttr is ioKeyGenerator then LKeyGenerator := ioKeyGenerator(LAttr).Value;
-      if LAttr is ioConnectionDefName then LConnectionDefName := ioConnectionDefName(LAttr).Value;
-      if LAttr is ioClassFromField then LClassFromField := Self.ClassFromField(Typ);
-      if LAttr is ioJoin then LJoins.Add(Self.JoinItem(   ioJoin(LAttr)   ));
-      if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then LGroupBy := Self.GroupBy(   ioGroupBy(LAttr).Value   );
-      if LAttr is ioDisableAutoCreateDB then LAutoCreateDB := False;
+      if LAttr is ioKeyGenerator then
+        LKeyGenerator := ioKeyGenerator(LAttr).Value;
+      if LAttr is ioConnectionDefName then
+        LConnectionDefName := ioConnectionDefName(LAttr).Value;
+      if LAttr is ioClassFromField then
+        LClassFromField := Self.ClassFromField(Typ);
+      if LAttr is ioJoin then
+        LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
+      if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
+        LGroupBy := Self.GroupBy(ioGroupBy(LAttr).Value);
+      if LAttr is ioDisableAutoCreateDB then
+        LAutoCreateDB := False;
       // Index attribute (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
       if LAttr is ioIndex then
       begin
@@ -615,9 +609,11 @@ begin
       end;
     end;
     // KeyGenerator
-    if LKeyGenerator.IsEmpty then LKeyGenerator := LTableName;
+    if LKeyGenerator.IsEmpty then
+      LKeyGenerator := LTableName;
     // Create result Properties object
-    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
+    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField,
+      LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

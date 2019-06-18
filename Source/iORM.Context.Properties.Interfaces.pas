@@ -126,6 +126,7 @@ type
     ['{AB30A3A2-640C-4BEF-B301-2CB7C855037B}']
     function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioContextProperty>;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False; AIDSkipOnInsert:Boolean=True);
+    function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
     procedure SetTable(ATable:IioContextTable);
