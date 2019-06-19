@@ -344,7 +344,22 @@ type
     constructor Create(const ADisableCreateFK:Boolean=True);
     property DisableCreateFK:Boolean read FDisableCreateFK;
   end;
+
   // M.M. 31/07/18 END - New Attributes to define Specific Data Type
+
+  // O.B. 19/06/19 START - New Attributes to define Specific Forein Key
+
+  ioFKRoles = class(TioCustomAttribute)
+  strict private
+    FFKDeleteCreate: Boolean;
+    FFKUpdateCreate: Boolean;
+  public
+    constructor Create(const AFKDeleteCreate:Boolean=true; const AFKUpdateCreate:Boolean=true);
+    property FKDeleteCreate:Boolean read FFKDeleteCreate;
+    property FKUpdateCreate:Boolean read FFKUpdateCreate;
+  end;
+
+  // O.B. 19/06/19 END - New Attributes to define Specific Forein Key
 
   // Relation BelongsTo attribute
   ioBelongsTo = class(TioCustomRelationAttribute)
@@ -841,6 +856,14 @@ end;
 constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
 begin
   FDisableCreateFK := ADisableCreateFK;
+end;
+
+{ ioFKRoles }
+
+constructor ioFKRoles.Create(const AFKDeleteCreate:Boolean; const AFKUpdateCreate:Boolean);
+begin
+  FFKDeleteCreate :=  AFKDeleteCreate;
+  FFKUpdateCreate :=  AFKUpdateCreate;
 end;
 
 end.
