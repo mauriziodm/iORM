@@ -546,14 +546,15 @@ begin
         PropMetadata_FieldType := ioMdCustomFieldType;
         PropMetadata_CustomFieldType := ioCustomFieldType(Attr).Value;
       end;
-      if Attr is ioDisableCreateFK then
+//      if Attr is ioDisableCreateFK then
+//      begin
+//        PropMetadata_DisableCreateFK := True;
+//      end;
+      if Attr is ioForeignKey then
       begin
-        PropMetadata_DisableCreateFK := True;
-      end;
-      if Attr is ioFKRoles then
-      begin
-        PropMetadata_FKDeleteCreate := ioFKRoles(Attr).FKDeleteCreate;
-        PropMetadata_FKUpdateCreate := ioFKRoles(Attr).FKUpdateCreate;
+        PropMetadata_DisableCreateFK := false;
+        PropMetadata_FKDeleteCreate := ioForeignKey(Attr).FKDeleteCreate;
+        PropMetadata_FKUpdateCreate := ioForeignKey(Attr).FKUpdateCreate;
       end;
 
     end;

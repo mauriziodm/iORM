@@ -232,16 +232,25 @@ type
   end;
 
   // M.M. 31/07/18 New Attributes to define Specific Data Type
+
+  // Define Base Type
+  ioFTBase = class(TioCustomAttribute)
+  strict private
+    FIsNullable: Boolean;
+  public
+    constructor Create(const AIsNullable:Boolean=True); virtual;
+    property IsNullable:Boolean read FIsNullable;
+  end;
+
   // Define VarChar Type
-  ioVarchar = class(TioCustomAttribute)
+  ioVarchar = class(ioFTBase)
   strict private
     FIsUnicode: Boolean;
-    FIsNullable: Boolean;
     FLength: Integer;
   public
-    constructor Create(const ALength:Integer=255; const AIsNullable:Boolean=True; const AIsUnicode:Boolean=True);
+    constructor Create(const AIsNullable:Boolean=True); overload;
+    constructor Create(const ALength:Integer; const AIsNullable:Boolean=True; const AIsUnicode:Boolean=True);overload;
     property IsUnicode:Boolean read FIsUnicode;
-    property IsNullable:Boolean read FIsNullable;
     property Length:Integer read FLength;
   end;
 
@@ -250,50 +259,33 @@ type
   end;
 
   // Define Integer Type (SmallInt, Integer, BigInt)
-  ioInteger = class(TioCustomAttribute)
+  ioInteger = class(ioFTBase)
   strict private
-    FIsNullable: Boolean;
     FPrecision: Integer;
   public
-    constructor Create(const APrecision:Integer=10; const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+    constructor Create(const AIsNullable:Boolean=True); overload;
+    constructor Create(const APrecision:Integer=10; const AIsNullable:Boolean=True);overload;
     property Precision:Integer read FPrecision;
   end;
 
   // Define Float Type (Float)
-  ioFloat = class(TioCustomAttribute)
-  strict private
-    FIsNullable: Boolean;
-  public
-    constructor Create(const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+  ioFloat = class(ioFTBase)
   end;
 
   // Define Date Type (Date)
-  ioDate = class(TioCustomAttribute)
-  strict private
-    FIsNullable: Boolean;
-  public
-    constructor Create(const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+  ioDate = class(ioFTBase)
   end;
 
   // Define Date Type (Time)
-  ioTime = class(TioCustomAttribute)
-  strict private
-    FIsNullable: Boolean;
-  public
-    constructor Create(const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+  ioTime = class(ioFTBase)
   end;
 
   // Define DateTime Type (DateTime)
-  ioDateTime = class(TioCustomAttribute)
-  strict private
-    FIsNullable: Boolean;
-  public
-    constructor Create(const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+  ioDateTime = class(ioFTBase)
+  end;
+
+  // Define Boolean Type (Boolean)
+  ioBoolean = class(ioFTBase)
   end;
 
   // Define Decimal Or Numeric Type
@@ -312,15 +304,6 @@ type
   end;
   ioNumeric = ioDecimal;
 
-  // Define Date Type (Boolean)
-  ioBoolean = class(TioCustomAttribute)
-  strict private
-    FIsNullable: Boolean;
-  public
-    constructor Create(const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
-  end;
-
   // Define Binary Type (Binary Data)
   ioBinary = class(TioCustomAttribute)
   strict private
@@ -337,7 +320,7 @@ type
   end;
 
   // Define Disable Create FK
-  ioDisableCreateFK = class(TioCustomAttribute)
+  ioDisableCreateFK = class(TioCustomAttribute)  // la togliamo????
   strict private
     FDisableCreateFK: Boolean;
   public
@@ -349,12 +332,12 @@ type
 
   // O.B. 19/06/19 START - New Attributes to define Specific Forein Key
 
-  ioFKRoles = class(TioCustomAttribute)
+  ioForeignKey = class(TioCustomAttribute)
   strict private
     FFKDeleteCreate: Boolean;
     FFKUpdateCreate: Boolean;
   public
-    constructor Create(const AFKDeleteCreate:Boolean=true; const AFKUpdateCreate:Boolean=true);
+    constructor Create(const AFKDeleteCreate: Boolean=true; const AFKUpdateCreate: Boolean=true);
     property FKDeleteCreate:Boolean read FFKDeleteCreate;
     property FKUpdateCreate:Boolean read FFKUpdateCreate;
   end;
@@ -776,48 +759,31 @@ end;
 
 { ioVarchar }
 
-constructor ioVarchar.Create(const ALength:Integer=255; const AIsNullable:Boolean=True; const AIsUnicode:Boolean=True);
+constructor ioVarchar.Create(const ALength:Integer; const AIsNullable:Boolean; const AIsUnicode:Boolean);
 begin
+  inherited create(AIsNullable);
   FLength := ALength;
   FIsUnicode := AIsUnicode;
-  FIsNullable := AIsNullable;
+end;
+
+constructor ioVarchar.Create(const AIsNullable: Boolean);
+begin
+  inherited;
+  FLength := 255;
 end;
 
 { ioInteger }
 
-constructor ioInteger.Create(const APrecision: Integer;
-  const AIsNullable: Boolean);
+constructor ioInteger.Create(const APrecision: Integer; const AIsNullable: Boolean);
 begin
+
   FPrecision := APrecision;
-  FIsNullable := AIsNullable;
 end;
 
-{ ioFloat }
-
-constructor ioFloat.Create(const AIsNullable: Boolean);
+constructor ioInteger.Create(const AIsNullable: Boolean);
 begin
-  FIsNullable := AIsNullable;
-end;
-
-{ ioDate }
-
-constructor ioDate.Create(const AIsNullable: Boolean);
-begin
-  FIsNullable := AIsNullable;
-end;
-
-{ ioTime }
-
-constructor ioTime.Create(const AIsNullable: Boolean);
-begin
-  FIsNullable := AIsNullable;
-end;
-
-{ ioDateTime }
-
-constructor ioDateTime.Create(const AIsNullable: Boolean);
-begin
-  FIsNullable := AIsNullable;
+  inherited;
+  FPrecision := 10;
 end;
 
 { ioDecimalOrNumeric }
@@ -830,18 +796,13 @@ begin
   FIsNullable := AIsNullable;
 end;
 
+
+
 { ioBinary }
 
 constructor ioBinary.Create(const ABinarySubType:string='';const AIsNullable:Boolean=True);
 begin
   FBinarySubType := ABinarySubType;
-  FIsNullable := AIsNullable;
-end;
-
-{ ioBoolean }
-
-constructor ioBoolean.Create(const AIsNullable: Boolean);
-begin
   FIsNullable := AIsNullable;
 end;
 
@@ -860,10 +821,17 @@ end;
 
 { ioFKRoles }
 
-constructor ioFKRoles.Create(const AFKDeleteCreate:Boolean; const AFKUpdateCreate:Boolean);
+constructor ioForeignKey.Create(const AFKDeleteCreate: Boolean; const AFKUpdateCreate: Boolean);
 begin
   FFKDeleteCreate :=  AFKDeleteCreate;
   FFKUpdateCreate :=  AFKUpdateCreate;
+end;
+
+{ ioFTBase }
+
+constructor ioFTBase.Create(const AIsNullable: Boolean);
+begin
+
 end;
 
 end.
