@@ -291,27 +291,27 @@ type
   // Define Decimal Or Numeric Type
   // DECIMAL(p,s) --> DECIMAL(13,2) 11 Digits Before the decimal and 2 Digits after decimal
   // NUMERIC(p,s) --> NUMERIC(13,2) Treated in the same way of Decimal
-  ioDecimal = class(TioCustomAttribute)
+  ioDecimal = class(ioFTBase)
   strict private
-    FIsNullable: Boolean;
     FPrecision: Integer;
     FScale: Integer;
   public
-    constructor Create(const APrecision:Integer=13; const AScale:Integer=2; const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+    constructor Create(const AIsNullable:Boolean=True); overload;
+    constructor Create(const APrecision:Integer; const AScale:Integer; const AIsNullable:Boolean=True); overload;
     property Precision:Integer read FPrecision;
     property Scale:Integer read FScale;
   end;
-  ioNumeric = ioDecimal;
+
+  ioNumeric = class(ioDecimal)
+  end;
 
   // Define Binary Type (Binary Data)
-  ioBinary = class(TioCustomAttribute)
+  ioBinary = class(ioFTBase)
   strict private
-    FIsNullable: Boolean;
     FBinarySubType: string;
   public
-    constructor Create(const ABinarySubType:string='';const AIsNullable:Boolean=True);
-    property IsNullable:Boolean read FIsNullable;
+    constructor Create(const AIsNullable:Boolean=True); overload;
+    constructor Create(const ABinarySubType:string;const AIsNullable:Boolean=True); overload;
     property BinarySubType:string read FBinarySubType;
   end;
 
@@ -776,7 +776,7 @@ end;
 
 constructor ioInteger.Create(const APrecision: Integer; const AIsNullable: Boolean);
 begin
-
+  inherited create(AIsNullable);
   FPrecision := APrecision;
 end;
 
@@ -788,28 +788,32 @@ end;
 
 { ioDecimalOrNumeric }
 
-constructor ioDecimal.Create(const APrecision, AScale: Integer;
-  const AIsNullable: Boolean);
+constructor ioDecimal.Create(const APrecision, AScale: Integer; const AIsNullable: Boolean);
 begin
+  inherited Create(AIsNullable);
   FPrecision := APrecision;
   FScale := AScale;
-  FIsNullable := AIsNullable;
 end;
 
-
+constructor ioDecimal.Create(const AIsNullable: Boolean);
+begin
+  inherited;
+  FPrecision := 13;
+  FScale := 2;
+end;
 
 { ioBinary }
 
-constructor ioBinary.Create(const ABinarySubType:string='';const AIsNullable:Boolean=True);
+constructor ioBinary.Create(const ABinarySubType:string; const AIsNullable:Boolean);
 begin
+  inherited Create(AIsNullable);
   FBinarySubType := ABinarySubType;
-  FIsNullable := AIsNullable;
 end;
 
-constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
+constructor ioBinary.Create(const AIsNullable: Boolean);
 begin
-  FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
-  FTargetTypeAlias := AAlias;
+  inherited;
+  FBinarySubType := '';
 end;
 
 { ioDisableCreateFK }
@@ -831,7 +835,14 @@ end;
 
 constructor ioFTBase.Create(const AIsNullable: Boolean);
 begin
-
+  FIsNullable := AIsNullable;
 end;
+
+constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
+begin
+  FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
+  FTargetTypeAlias := AAlias;
+end;
+
 
 end.
