@@ -79,7 +79,8 @@ type
     function AlterField(const AProperty:IioContextProperty): String;
 
     function AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
-    function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+    function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String;
+              const ACascadeOnDelete: Boolean; ACascadeOnUpdate : Boolean): String;
     function AddSequences(const ATableName: String; const AIDProperty: IioContextProperty): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
@@ -204,7 +205,8 @@ begin
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String;
+              const ACascadeOnDelete: Boolean; ACascadeOnUpdate : Boolean): String;
 var
   LGuid: TGuid;
   LFKName: string;
@@ -220,6 +222,12 @@ begin
           '('+ASourceFieldName+')'+
           ' REFERENCES '+ADestinationTableName+
           '('+ADestinationFieldName+')';
+
+  if ACascadeOnDelete then
+    Result := Result + ' ON DELETE CASCADE';
+
+  if ACascadeOnUpdate then
+    Result := Result + ' ON UPDATE CASCADE';
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.AddForeignKeyInCreate(

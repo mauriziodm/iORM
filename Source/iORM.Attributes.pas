@@ -320,13 +320,13 @@ type
   end;
 
   // Define Disable Create FK
-  ioDisableCreateFK = class(TioCustomAttribute)  // la togliamo????
-  strict private
-    FDisableCreateFK: Boolean;
-  public
-    constructor Create(const ADisableCreateFK:Boolean=True);
-    property DisableCreateFK:Boolean read FDisableCreateFK;
-  end;
+//  ioDisableCreateFK = class(TioCustomAttribute)  // la togliamo????
+//  strict private
+//    FDisableCreateFK: Boolean;
+//  public
+//    constructor Create(const ADisableCreateFK:Boolean=True);
+//    property DisableCreateFK:Boolean read FDisableCreateFK;
+//  end;
 
   // M.M. 31/07/18 END - New Attributes to define Specific Data Type
 
@@ -334,12 +334,14 @@ type
 
   ioForeignKey = class(TioCustomAttribute)
   strict private
-    FFKDeleteCreate: Boolean;
-    FFKUpdateCreate: Boolean;
+    FFKCascadeDelete: Boolean;
+    FFKCascadeUpdate: Boolean;
+    FFKCreate: Boolean;
   public
-    constructor Create(const AFKDeleteCreate: Boolean=true; const AFKUpdateCreate: Boolean=true);
-    property FKDeleteCreate:Boolean read FFKDeleteCreate;
-    property FKUpdateCreate:Boolean read FFKUpdateCreate;
+    constructor Create(const AFKCascadeDelete: Boolean=true; const AFKCascadeUpdate: Boolean=true);
+    property FKCreate:Boolean read FFKCreate;
+    property FKCascadeDelete:Boolean read FFKCascadeDelete;
+    property FKCascadeUpdate:Boolean read FFKCascadeUpdate;
   end;
 
   // O.B. 19/06/19 END - New Attributes to define Specific Forein Key
@@ -816,19 +818,20 @@ begin
   FBinarySubType := '';
 end;
 
-{ ioDisableCreateFK }
-
-constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
-begin
-  FDisableCreateFK := ADisableCreateFK;
-end;
+//{ ioDisableCreateFK }
+//
+//constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
+//begin
+//  FDisableCreateFK := ADisableCreateFK;
+//end;
 
 { ioFKRoles }
 
-constructor ioForeignKey.Create(const AFKDeleteCreate: Boolean; const AFKUpdateCreate: Boolean);
+constructor ioForeignKey.Create(const AFKCascadeDelete: Boolean; const AFKCascadeUpdate: Boolean);
 begin
-  FFKDeleteCreate :=  AFKDeleteCreate;
-  FFKUpdateCreate :=  AFKUpdateCreate;
+  FFKCreate := true;
+  FFKCascadeDelete :=  AFKCascadeDelete;
+  FFKCascadeUpdate :=  AFKCascadeUpdate;
 end;
 
 { ioFTBase }
