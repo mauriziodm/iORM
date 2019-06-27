@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.Attributes;
 
@@ -70,8 +68,8 @@ type
   strict private
     FValue: String;
   public
-    constructor Create(const AValue:String='');
-    property Value:String read FValue;
+    constructor Create(const AValue: String = '');
+    property Value: String read FValue;
   end;
 
   // Base integer attribute
@@ -79,8 +77,8 @@ type
   strict private
     FValue: Integer;
   public
-    constructor Create(const AValue:Integer);
-    property Value:Integer read FValue;
+    constructor Create(const AValue: Integer);
+    property Value: Integer read FValue;
   end;
 
   // Base boolean attribute
@@ -88,8 +86,8 @@ type
   strict private
     FValue: Boolean;
   public
-    constructor Create(const AValue:Boolean);
-    property Value:Boolean read FValue;
+    constructor Create(const AValue: Boolean);
+    property Value: Boolean read FValue;
   end;
 
   // Base class for relation attribute
@@ -98,9 +96,9 @@ type
     FChildTypeName: String;
     FChildTypeAlias: String;
   public
-    constructor Create(AChildClassRef:TioClassRef); overload;
-    constructor Create(const AChildTypeName:String; const AChildTypeAlias:String=''); overload;
-    constructor Create(AIID:TGUID; const AChildTypeAlias:String=''); overload;
+    constructor Create(AChildClassRef: TioClassRef); overload;
+    constructor Create(const AChildTypeName: String; const AChildTypeAlias: String = ''); overload;
+    constructor Create(AIID: TGUID; const AChildTypeAlias: String = ''); overload;
     property ChildTypeName: String read FChildTypeName;
     property ChildTypeAlias: String read FChildTypeAlias;
   end;
@@ -114,11 +112,11 @@ type
     FTargetTypeName: String;
     FTargetTypeAlias: String;
   public
-    constructor Create(ATargetTypeName:String; const AAlias:String=''); overload;
-    constructor Create(ATargetClass:TioClassRef; const AAlias:String=''); overload;
-    constructor Create(ATargetIID:TGUID; const AAlias:String=''); overload;
-    property TargetTypeName:String read FTargetTypeName;
-    property TargetTypeAlias:String read FTargetTypeAlias;
+    constructor Create(ATargetTypeName: String; const AAlias: String = ''); overload;
+    constructor Create(ATargetClass: TioClassRef; const AAlias: String = ''); overload;
+    constructor Create(ATargetIID: TGUID; const AAlias: String = ''); overload;
+    property TargetTypeName: String read FTargetTypeName;
+    property TargetTypeAlias: String read FTargetTypeAlias;
   end;
 
   // ---------------------------------------------------------------------------
@@ -133,66 +131,66 @@ type
   // START MVVM ATTRIBUTES
   // ---------------------------------------------------------------------------
 
-   ioBindAction = class(TioCustomStringAttribute)
-   end;
+  ioBindAction = class(TioCustomStringAttribute)
+  end;
 
-  //  NB: Questo metodo è stato aggiunto (con il relativo attributo "ioUniBindAction" perchè
-  //       si è visto che nel caso delle TUniForm e TUniFrame gli attributi relativi ai campi
-  //       non vengono creati e quindi l'attributo "ioBindAction" era inefficace. Però
-  //       si era notato che invece gli attributi della classe (non del campo) venivano creati
-  //       e quindi si è aggiunto l'attributo "ioUniBindAction" da usare appunto sulla classe
-  //       invece che sul controllo.
-   ioUniBindAction = class(TioCustomAttribute)
-   strict private
-     FControlName: String;
-     FCommandName: String;
-   public
-     constructor Create(const AControlName, ACommandName:String);
-     property ControlName:String read FControlName;
-     property CommandName:String read FCommandName;
-   end;
+  // NB: Questo metodo è stato aggiunto (con il relativo attributo "ioUniBindAction" perchè
+  // si è visto che nel caso delle TUniForm e TUniFrame gli attributi relativi ai campi
+  // non vengono creati e quindi l'attributo "ioBindAction" era inefficace. Però
+  // si era notato che invece gli attributi della classe (non del campo) venivano creati
+  // e quindi si è aggiunto l'attributo "ioUniBindAction" da usare appunto sulla classe
+  // invece che sul controllo.
+  ioUniBindAction = class(TioCustomAttribute)
+  strict private
+    FControlName: String;
+    FCommandName: String;
+  public
+    constructor Create(const AControlName, ACommandName: String);
+    property ControlName: String read FControlName;
+    property CommandName: String read FCommandName;
+  end;
 
-   ioAction = class(TioCustomAttribute)
-   private
-     FName: String;
-     FCaption: String;
-     FEvent: TioActionEvent;
-   public
-     constructor Create(const AName, ACaption:String; const AEvent:TioActionEvent=TioActionEvent.Null); overload;
-     constructor Create(const AName:String; const AEvent:TioActionEvent=TioActionEvent.Null); overload;
-     property Name:String read FName;
-     property Caption:String read FCaption;
-     property Event:TioActionEvent read FEvent;
-   end;
+  ioAction = class(TioCustomAttribute)
+  private
+    FName: String;
+    FCaption: String;
+    FEvent: TioActionEvent;
+  public
+    constructor Create(const AName, ACaption: String; const AEvent: TioActionEvent = TioActionEvent.Null); overload;
+    constructor Create(const AName: String; const AEvent: TioActionEvent = TioActionEvent.Null); overload;
+    property Name: String read FName;
+    property Caption: String read FCaption;
+    property Event: TioActionEvent read FEvent;
+  end;
 
-   ioCommand = class(TioCustomAttribute)
-   private
-     FName: String;
-   public
-     constructor Create(const AName: String);
-     property Name:String read FName;
-   end;
+  ioCommand = class(TioCustomAttribute)
+  private
+    FName: String;
+  public
+    constructor Create(const AName: String);
+    property Name: String read FName;
+  end;
 
-   ioDisabled = class(TioCustomAttribute)
-   end;
+  ioDisabled = class(TioCustomAttribute)
+  end;
 
-   ioChecked = class(TioCustomAttribute)
-   end;
+  ioChecked = class(TioCustomAttribute)
+  end;
 
-   ioGroupIndex = class(TioCustomIntegerAttribute)
-   end;
+  ioGroupIndex = class(TioCustomIntegerAttribute)
+  end;
 
-   ioHint = class(TioCustomStringAttribute)
-   end;
+  ioHint = class(TioCustomStringAttribute)
+  end;
 
-   ioImageIndex = class(TioCustomIntegerAttribute)
-   end;
+  ioImageIndex = class(TioCustomIntegerAttribute)
+  end;
 
-   ioInvisible = class(TioCustomAttribute)
-   end;
+  ioInvisible = class(TioCustomAttribute)
+  end;
 
-   ioNotificationTarget = class(TioCustomAttribute)
-   end;
+  ioNotificationTarget = class(TioCustomAttribute)
+  end;
 
   // ---------------------------------------------------------------------------
   // END MVVM ATTRIBUTES
@@ -215,8 +213,8 @@ type
   strict private
     FSkipOnInsert: Boolean;
   public
-    constructor Create(const ASkipOnInsert:Boolean=True);
-    property SkipOnInsert:Boolean read FSkipOnInsert;
+    constructor Create(const ASkipOnInsert: Boolean = True);
+    property SkipOnInsert: Boolean read FSkipOnInsert;
   end;
 
   // FieldName attribute
@@ -238,8 +236,8 @@ type
   strict private
     FIsNullable: Boolean;
   public
-    constructor Create(const AIsNullable:Boolean=True); virtual;
-    property IsNullable:Boolean read FIsNullable;
+    constructor Create(const AIsNullable: Boolean = True); virtual;
+    property IsNullable: Boolean read FIsNullable;
   end;
 
   // Define VarChar Type
@@ -248,10 +246,10 @@ type
     FIsUnicode: Boolean;
     FLength: Integer;
   public
-    constructor Create(const AIsNullable:Boolean=True); overload;
-    constructor Create(const ALength:Integer; const AIsNullable:Boolean=True; const AIsUnicode:Boolean=True);overload;
-    property IsUnicode:Boolean read FIsUnicode;
-    property Length:Integer read FLength;
+    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
+    constructor Create(const ALength: Integer; const AIsNullable: Boolean = True; const AIsUnicode: Boolean = True); overload;
+    property IsUnicode: Boolean read FIsUnicode;
+    property Length: Integer read FLength;
   end;
 
   // Define Char Type
@@ -263,9 +261,9 @@ type
   strict private
     FPrecision: Integer;
   public
-    constructor Create(const AIsNullable:Boolean=True); overload;
-    constructor Create(const APrecision:Integer=10; const AIsNullable:Boolean=True);overload;
-    property Precision:Integer read FPrecision;
+    constructor Create(const AIsNullable: Boolean = True); overload;
+    constructor Create(const APrecision: Integer = 10; const AIsNullable: Boolean = True); reintroduce; overload;
+    property Precision: Integer read FPrecision;
   end;
 
   // Define Float Type (Float)
@@ -296,10 +294,10 @@ type
     FPrecision: Integer;
     FScale: Integer;
   public
-    constructor Create(const AIsNullable:Boolean=True); overload;
-    constructor Create(const APrecision:Integer; const AScale:Integer; const AIsNullable:Boolean=True); overload;
-    property Precision:Integer read FPrecision;
-    property Scale:Integer read FScale;
+    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
+    constructor Create(const APrecision: Integer; const AScale: Integer; const AIsNullable: Boolean = True); reintroduce; overload;
+    property Precision: Integer read FPrecision;
+    property Scale: Integer read FScale;
   end;
 
   ioNumeric = class(ioDecimal)
@@ -310,9 +308,9 @@ type
   strict private
     FBinarySubType: string;
   public
-    constructor Create(const AIsNullable:Boolean=True); overload;
-    constructor Create(const ABinarySubType:string;const AIsNullable:Boolean=True); overload;
-    property BinarySubType:string read FBinarySubType;
+    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
+    constructor Create(const ABinarySubType: string; const AIsNullable: Boolean = True); reintroduce; overload;
+    property BinarySubType: string read FBinarySubType;
   end;
 
   // Custom FieldType attribute
@@ -320,13 +318,13 @@ type
   end;
 
   // Define Disable Create FK
-//  ioDisableCreateFK = class(TioCustomAttribute)  // la togliamo????
-//  strict private
-//    FDisableCreateFK: Boolean;
-//  public
-//    constructor Create(const ADisableCreateFK:Boolean=True);
-//    property DisableCreateFK:Boolean read FDisableCreateFK;
-//  end;
+  // ioDisableCreateFK = class(TioCustomAttribute)  // la togliamo????
+  // strict private
+  // FDisableCreateFK: Boolean;
+  // public
+  // constructor Create(const ADisableCreateFK:Boolean=True);
+  // property DisableCreateFK:Boolean read FDisableCreateFK;
+  // end;
 
   // M.M. 31/07/18 END - New Attributes to define Specific Data Type
 
@@ -338,10 +336,10 @@ type
     FFKCascadeUpdate: Boolean;
     FFKCreate: Boolean;
   public
-    constructor Create(const AFKCascadeDelete: Boolean=true; const AFKCascadeUpdate: Boolean=true);
-    property FKCreate:Boolean read FFKCreate;
-    property FKCascadeDelete:Boolean read FFKCascadeDelete;
-    property FKCascadeUpdate:Boolean read FFKCascadeUpdate;
+    constructor Create(const AFKCascadeDelete: Boolean = True; const AFKCascadeUpdate: Boolean = True);
+    property FKCreate: Boolean read FFKCreate;
+    property FKCascadeDelete: Boolean read FFKCascadeDelete;
+    property FKCascadeUpdate: Boolean read FFKCascadeUpdate;
   end;
 
   // O.B. 19/06/19 END - New Attributes to define Specific Forein Key
@@ -357,11 +355,16 @@ type
     FLoadType: TioLoadType;
     FAutoIndex: Boolean;
   public
-    constructor Create(const AChildClassRef:TioClassRef; const AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    constructor Create(AIID:TGUID; const AChildTypeAlias, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
-    constructor Create(AIID:TGUID; const AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True); overload;
+    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+      const AAutoIndex: Boolean = True); overload;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+      const AAutoIndex: Boolean = True); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+      const AAutoIndex: Boolean = True); overload;
+    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+      const AAutoIndex: Boolean = True); overload;
+    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+      const AAutoIndex: Boolean = True); overload;
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
     property AutoIndex: Boolean read FAutoIndex;
@@ -398,10 +401,11 @@ type
   strict private
     FMapMode: TioMapModeType;
   public
-    constructor Create(const AValue:String=''; const AMapMode:TioMapModeType=ioProperties); overload;
-    constructor Create(const AMapMode:TioMapModeType); overload;
+    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = ioProperties); overload;
+    constructor Create(const AMapMode: TioMapModeType); overload;
     property MapMode: TioMapModeType read FMapMode;
   end;
+
   ioEntity = class(ioTable)
   end;
 
@@ -416,6 +420,7 @@ type
   // ClassFromField
   ioClassFromField = class(TioCustomAttribute)
   end;
+
   ioTrueClass = ioClassFromField;
 
   // GroupBy
@@ -429,7 +434,7 @@ type
     FJoinClassRef: TioClassRef;
     FJoinCondition: String;
   public
-    constructor Create(const AJoinType:TioJoinType; AJoinClassRef:TioClassRef; AJoinCondition:String='');
+    constructor Create(const AJoinType: TioJoinType; AJoinClassRef: TioClassRef; AJoinCondition: String = '');
     property JoinType: TioJoinType read FJoinType;
     property JoinClassRef: TioClassRef read FJoinClassRef;
     property JoinCondition: String read FJoinCondition;
@@ -443,13 +448,15 @@ type
     FIndexOrientation: TioIndexOrientation;
     FUnique: Boolean;
   public
-    constructor Create(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    constructor Create(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    constructor Create(const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    property IndexName:String read FIndexName;
-    property CommaSepFieldList:String read FCommaSepFieldList write FCommaSepFieldList;
-    property IndexOrientation:TioIndexOrientation read FIndexOrientation;
-    property Unique:Boolean read FUnique;
+    constructor Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
+      const AUnique: Boolean = False); overload;
+    constructor Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
+      const AUnique: Boolean = False); overload;
+    constructor Create(const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    property IndexName: String read FIndexName;
+    property CommaSepFieldList: String read FCommaSepFieldList write FCommaSepFieldList;
+    property IndexOrientation: TioIndexOrientation read FIndexOrientation;
+    property Unique: Boolean read FUnique;
   end;
 
   // KeyGeneratorName attribute
@@ -466,9 +473,9 @@ type
     FIID: TGUID;
     FAlias: String;
   public
-    constructor Create(AIID:TGUID; const AAlias:String='');
-    property IID:TGUID read FIID;
-    property Alias:String read FAlias;
+    constructor Create(AIID: TGUID; const AAlias: String = '');
+    property IID: TGUID read FIID;
+    property Alias: String read FAlias;
   end;
 
   // DIC - diAsSingleton attribute
@@ -504,12 +511,12 @@ type
   end;
 
   // EmbeddedSkip attribute
-  ioEmbeddedSkip = class(DoNotSerializeAttribute)  // from DMVC ObjectsMappers
+  ioEmbeddedSkip = class(DoNotSerializeAttribute) // from DMVC ObjectsMappers
 
   end;
 
   // EmbeddedSkip attribute
-  ioEmbeddedStreamable = class(StreamableAttribute)  // from DMVC ObjectsMappers
+  ioEmbeddedStreamable = class(StreamableAttribute) // from DMVC ObjectsMappers
 
   end;
 
@@ -530,16 +537,15 @@ type
     FTypeName: String;
     FTypeAlias: String;
   public
-    constructor Create(const ATypeAlias:String=''); overload;
-    constructor Create(const ATypeName, ATypeAlias:String); overload;
-    property TypeName:String read FTypeName;
-    property TypeAlias:String read FTypeAlias;
+    constructor Create(const ATypeAlias: String = ''); overload;
+    constructor Create(const ATypeName, ATypeAlias: String); overload;
+    property TypeName: String read FTypeName;
+    property TypeAlias: String read FTypeAlias;
   end;
 
   // ---------------------------------------------------------------------------
   // END DEPENDENCY INJECTION ATTRIBUTES
   // ===========================================================================
-
 
 implementation
 
@@ -576,8 +582,8 @@ end;
 
 { ioHasMany }
 
-constructor ioHasMany.Create(const AChildClassRef: TioClassRef;
-  const AChildPropertyName: String; const ALoadType:TioLoadType=ioImmediateLoad; const AAutoIndex:Boolean=True);
+constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+  const AAutoIndex: Boolean = True);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;
@@ -585,8 +591,8 @@ begin
   FAutoIndex := AAutoIndex;
 end;
 
-
-constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex:Boolean);
+constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType;
+  const AAutoIndex: Boolean);
 begin
   inherited Create(AChildTypeName, AChildTypeAlias);
   FChildPropertyName := AChildPropertyName;
@@ -594,27 +600,24 @@ begin
   FAutoIndex := AAutoIndex;
 end;
 
-constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex:Boolean);
+constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
 begin
   Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType, AAutoIndex);
 end;
 
-constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType;
-  const AAutoIndex: Boolean);
+constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
 begin
   Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType, AAutoIndex);
 end;
 
-constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType;
-  const AAutoIndex: Boolean);
+constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
 begin
   Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType, AAutoIndex);
 end;
 
 { ioJoin }
 
-constructor ioJoin.Create(const AJoinType: TioJoinType;
-  AJoinClassRef: TioClassRef; AJoinCondition: String);
+constructor ioJoin.Create(const AJoinType: TioJoinType; AJoinClassRef: TioClassRef; AJoinCondition: String);
 begin
   inherited Create;
   FJoinType := AJoinType;
@@ -624,7 +627,7 @@ end;
 
 { ioTable }
 
-constructor ioTable.Create(const AValue:String; const AMapMode: TioMapModeType);
+constructor ioTable.Create(const AValue: String; const AMapMode: TioMapModeType);
 begin
   inherited Create(AValue);
   FMapMode := AMapMode;
@@ -638,8 +641,8 @@ end;
 
 { ioIndex }
 
-constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String;
-  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
+  const AUnique: Boolean);
 begin
   inherited Create;
   FIndexName := AIndexName;
@@ -648,14 +651,12 @@ begin
   FUnique := AUnique;
 end;
 
-constructor ioIndex.Create(ACommaSepFieldList: String;
-  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   Self.Create('', ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
-constructor ioIndex.Create(const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   Self.Create('', '', AIndexOrientation, AUnique);
 end;
@@ -675,7 +676,6 @@ begin
   FTypeName := ATypeName;
 end;
 
-
 { TioCustomIntegerAttribute }
 
 constructor TioCustomIntegerAttribute.Create(const AValue: Integer);
@@ -692,8 +692,7 @@ end;
 
 { ioAction }
 
-constructor ioAction.Create(const AName, ACaption: String;
-  const AEvent: TioActionEvent);
+constructor ioAction.Create(const AName, ACaption: String; const AEvent: TioActionEvent);
 begin
   inherited Create;
   FName := AName;
@@ -725,7 +724,7 @@ end;
 
 { diImplements }
 
-constructor diImplements.Create(AIID:TGUID; const AAlias:String);
+constructor diImplements.Create(AIID: TGUID; const AAlias: String);
 begin
   inherited Create;
   FIID := AIID;
@@ -741,14 +740,12 @@ begin
   FTargetTypeAlias := AAlias;
 end;
 
-constructor TioCustomForTargetModel.Create(ATargetClass: TioClassRef;
-  const AAlias: String);
+constructor TioCustomForTargetModel.Create(ATargetClass: TioClassRef; const AAlias: String);
 begin
   inherited Create;
   FTargetTypeName := ATargetClass.ClassName;
   FTargetTypeAlias := AAlias;
 end;
-
 
 { ioUniBindAction }
 
@@ -761,9 +758,9 @@ end;
 
 { ioVarchar }
 
-constructor ioVarchar.Create(const ALength:Integer; const AIsNullable:Boolean; const AIsUnicode:Boolean);
+constructor ioVarchar.Create(const ALength: Integer; const AIsNullable: Boolean; const AIsUnicode: Boolean);
 begin
-  inherited create(AIsNullable);
+  inherited Create(AIsNullable);
   FLength := ALength;
   FIsUnicode := AIsUnicode;
 end;
@@ -778,7 +775,7 @@ end;
 
 constructor ioInteger.Create(const APrecision: Integer; const AIsNullable: Boolean);
 begin
-  inherited create(AIsNullable);
+  inherited Create(AIsNullable);
   FPrecision := APrecision;
 end;
 
@@ -806,7 +803,7 @@ end;
 
 { ioBinary }
 
-constructor ioBinary.Create(const ABinarySubType:string; const AIsNullable:Boolean);
+constructor ioBinary.Create(const ABinarySubType: string; const AIsNullable: Boolean);
 begin
   inherited Create(AIsNullable);
   FBinarySubType := ABinarySubType;
@@ -818,20 +815,20 @@ begin
   FBinarySubType := '';
 end;
 
-//{ ioDisableCreateFK }
+// { ioDisableCreateFK }
 //
-//constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
-//begin
-//  FDisableCreateFK := ADisableCreateFK;
-//end;
+// constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
+// begin
+// FDisableCreateFK := ADisableCreateFK;
+// end;
 
 { ioFKRoles }
 
 constructor ioForeignKey.Create(const AFKCascadeDelete: Boolean; const AFKCascadeUpdate: Boolean);
 begin
-  FFKCreate := true;
-  FFKCascadeDelete :=  AFKCascadeDelete;
-  FFKCascadeUpdate :=  AFKCascadeUpdate;
+  FFKCreate := True;
+  FFKCascadeDelete := AFKCascadeDelete;
+  FFKCascadeUpdate := AFKCascadeUpdate;
 end;
 
 { ioFTBase }
@@ -846,6 +843,5 @@ begin
   FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
   FTargetTypeAlias := AAlias;
 end;
-
 
 end.

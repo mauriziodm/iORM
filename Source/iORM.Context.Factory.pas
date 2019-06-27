@@ -240,6 +240,7 @@ var
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
   PropMetadata_FKCreate: Boolean;
+  // O.B. 26/06/18 - Used by DBBuilder
   PropMetadata_FKCascadeUpdate: Boolean;
   PropMetadata_FKCascadeDelete: Boolean;
   LRttiProperty: TRttiProperty;
@@ -546,10 +547,6 @@ begin
         PropMetadata_FieldType := ioMdCustomFieldType;
         PropMetadata_CustomFieldType := ioCustomFieldType(Attr).Value;
       end;
-//      if Attr is ioDisableCreateFK then
-//      begin
-//        PropMetadata_DisableCreateFK := True;
-//      end;
       if Attr is ioForeignKey then
       begin
         PropMetadata_FKCreate := ioForeignKey(Attr).FKCreate;

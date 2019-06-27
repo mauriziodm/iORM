@@ -243,7 +243,7 @@ type
 
   // Interface for SQLDestination
   IioSQLDestination = interface
-    ['{37F6E5A8-267C-4EEA-9F32-5C8086D488E5}']
+    ['{B96F4E95-5609-4577-9C0D-E01013EE0093}']
     // Destinations
     {TO 5DO -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
     function ToMemTable: TFDMemTable; overload;
@@ -255,7 +255,6 @@ type
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     // Getters
-    ['{D49E85DA-C71F-4E00-A8F8-31312EBEE642}']
     function GetTranslatedSQL: String; overload;
     function GetConnectionName: String;
     function GetIgnoreObjNotExists: Boolean;
