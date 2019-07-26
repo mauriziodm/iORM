@@ -58,6 +58,7 @@ type
   TioControlFMX = class(TioControl)
   protected
     class procedure _SetParent(const AControl, AParent: TObject); override;
+    class procedure _SetVisible(const AControl: TObject; const AVisible: Boolean); override;
   end;
 
   TioTimerFMX = class(TioTimer)
@@ -73,7 +74,7 @@ type
     procedure SetOnTimer(const Value: TNotifyEvent); override;
     procedure SetTag(const Value: Integer); override;
   public
-    constructor Create;
+    constructor Create; override;
     destructor Destroy; override;
   end;
 
@@ -116,12 +117,13 @@ type
 implementation
 
 uses
-  FMX.Forms, iORM.Exceptions;
+  FMX.Forms, iORM.Exceptions, FMX.Controls;
 
 { TioTimerFMX }
 
 constructor TioTimerFMX.Create;
 begin
+  inherited;
   FInternalTimer := TTimer.Create(nil);
 end;
 
@@ -344,6 +346,14 @@ begin
   if not (AParent is TFmxObject) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TFmxObject.');
   TFmxObject(AControl).Parent := TFmxObject(AParent);
+end;
+
+class procedure TioControlFMX._SetVisible(const AControl: TObject; const AVisible: Boolean);
+begin
+  inherited;
+  if not (AControl is TControl) then
+    raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+  TControl(AControl).Visible := AVisible;
 end;
 
 initialization

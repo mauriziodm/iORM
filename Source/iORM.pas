@@ -192,6 +192,7 @@ type
     class procedure ShowAsSelector(const ATargetMP:TioModelPresenter; const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure ShowAsSelector(const ATargetMP:TioModelPresenter; const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure ShowAsSelector(const ATargetMP:TioModelPresenter; const AViewContext:TComponent; const AVVMAlias:String=''); overload;
+    // Show selector (Generic version)
     class procedure ShowAsSelector<T>(const ATargetMP:TioModelPresenter; const AVVMAlias:String=''; const AVCProviderName:String=''); overload;
     class procedure ShowAsSelector<T>(const ATargetMP:TioModelPresenter; const AVCProvider:TioViewContextProvider; const AVVMAlias:String=''); overload;
     class procedure ShowAsSelector<T>(const ATargetMP:TioModelPresenter; const AViewContext:TComponent; const AVVMAlias:String=''); overload;
@@ -388,76 +389,76 @@ end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowCurrent;
 end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProvider).ShowCurrent;
 end;
 
 class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProviderName).ShowCurrent;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
 end;
 
 class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AVVMAlias, AVCProviderName: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor(ATargetMP.TypeName, AVVMAlias).VCProvider(AVCProviderName).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor(ATargetMP.TypeName, AVVMAlias).VCProvider(AVCProvider).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor(ATargetMP.TypeName, AVVMAlias).SetViewContext(AViewContext).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor<T>(AVVMAlias).SetViewContext(AViewContext).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AVVMAlias, AVCProviderName: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProvider).ShowEach;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName:String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, False) then
+  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProviderName).ShowEach;
 end;
 

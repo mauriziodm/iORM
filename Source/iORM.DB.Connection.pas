@@ -48,11 +48,11 @@ uses
   FireDAC.Phys,
   FireDAC.DApt,
   FireDAC.UI.Intf,
-//{$IFDEF CONSOLE}  // Non più necessaria
+{$IFDEF CONSOLE}  // Non più necessaria???
   FireDAC.ConsoleUI.Wait,
-//{$ENDIF}
-  FireDAC.Comp.UI,
-  FireDAC.Stan.Async;
+{$ENDIF}
+  FireDAC.Stan.Async,
+  FireDAC.Comp.UI;
 
 
 type

@@ -40,9 +40,9 @@ unit iORM.AbstractionLayer.Framework.VCL;
 interface
 
 uses
-  FireDAC.VCLUI.Wait, // For FireDAC compatibility without insert the original component
   iORM.AbstractionLayer.Framework, Vcl.ActnList, Vcl.ExtCtrls,
-  System.Rtti, System.Classes;
+  System.Rtti, System.Classes,
+  FireDAC.VCLUI.Wait; // For FireDAC compatibility without insert the original component
 
 type
 
@@ -58,6 +58,7 @@ type
   TioControlVCL = class(TioControl)
   protected
     class procedure _SetParent(const AControl, AParent: TObject); override;
+    class procedure _SetVisible(const AControl: TObject; const AVisible: Boolean); override;
   end;
 
   TioTimerVCL = class(TioTimer)
@@ -73,7 +74,7 @@ type
     procedure SetOnTimer(const Value: TNotifyEvent); override;
     procedure SetTag(const Value: Integer); override;
   public
-    constructor Create;
+    constructor Create; override;
     destructor Destroy; override;
   end;
 
@@ -147,6 +148,7 @@ end;
 
 constructor TioTimerVCL.Create;
 begin
+  inherited;
   FInternalTimer := TTimer.Create(nil);
 end;
 
@@ -344,6 +346,14 @@ end;
 class function TioActionVCL._CreateNewAction(const AOwner: TComponent): TioAction;
 begin
   Result := Self.Create(AOwner);
+end;
+
+class procedure TioControlVCL._SetVisible(const AControl: TObject; const AVisible: Boolean);
+begin
+  inherited;
+  if not (AControl is TControl) then
+    raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+  TControl(AControl).Visible := AVisible;
 end;
 
 initialization

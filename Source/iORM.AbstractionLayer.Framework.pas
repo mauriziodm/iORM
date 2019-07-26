@@ -66,8 +66,10 @@ type
     class function GetConcreteClass: TioControlRef;
     class procedure SetConcreteClass(const AClass: TioControlRef);
     class procedure _SetParent(const AControl, AParent: TObject); virtual; abstract;
+    class procedure _SetVisible(const AControl: TObject; const AVisible: Boolean); virtual; abstract;
   public
     class procedure SetParent(const AControl, AParent: TObject);
+    class procedure SetVisible(const AControl: TObject; const AVisible: Boolean);
   end;
 
   TioTimerRef = class of TioTimer;
@@ -87,6 +89,7 @@ type
     procedure SetTag(const Value: Integer); virtual; abstract;
   public
     class function CreateNewTimer: TioTimer;
+    constructor Create; virtual; abstract;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
     property Interval: Cardinal read GetInterval write SetInterval default 1000;
     property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
@@ -243,6 +246,11 @@ end;
 class procedure TioControl.SetParent(const AControl, AParent: TObject);
 begin
   FConcreteClass_NoDirectCall._SetParent(AControl, AParent);
+end;
+
+class procedure TioControl.SetVisible(const AControl: TObject; const AVisible: Boolean);
+begin
+  FConcreteClass_NoDirectCall._SetVisible(AControl, AVisible);
 end;
 
 end.

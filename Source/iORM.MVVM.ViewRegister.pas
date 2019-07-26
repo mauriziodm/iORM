@@ -5,13 +5,16 @@ interface
 uses
   System.Generics.Collections, iORM.MVVM.ViewRegisterItem,
   System.Classes, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Interfaces, System.SysUtils;
+  iORM.MVVM.Interfaces, System.SysUtils, iORM.AbstractionLayer.Framework;
 
 type
 
   TioViewRegister = class(TInterfacedObject, IioViewRegister)
   private
     FInternalContainer: TList<TioViewContextRegisterItem>;
+    FFreeViewsTimer: TioTimer;
+    procedure _FreeViewTimerEventHandler(Sender: TObject);
+    procedure _PostponedReleaseAllViewContexts;
     function FindItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function FindItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
     function ContainsView(const AView:TComponent): Boolean;
@@ -21,10 +24,10 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(const AView, AViewContext: TComponent;
-      const AViewContextProvider:TioViewContextProvider;
-      const AViewContextFreeMethod:TProc);
+    procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
     procedure ReleaseAllViewContexts;
+    procedure HideAllViewContexts;
+    procedure ShowAllViewContexts;
     property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
     property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
   end;
@@ -48,12 +51,19 @@ begin
   if not Assigned(AViewContext) then
     raise EioException.Create('TioViewContextRegister', 'Add', 'The ViewContext must be assigned.');
   // Avoid duplicated Views or ViewContexts
-  if ContainsView(Aview) then
-    raise EioException.Create('TioViewContextRegister', 'Add', 'Duplicated View.');
-  if ContainsViewContext(AViewContext) then
-    raise EioException.Create('TioViewContextRegister', 'Add', 'Duplicated ViewContext.');
+  // NB: Il codice commentato qui sotto è stato sistutuito con l'if sottostante per risolvere
+  //      l'errore che si creva nel caso in cui una View (e relativo ViewModel) fosse registrata (nel D.I.C.) come
+  //      AsSingleton e quindi rimanendo vivi quando non servivano più, ma poi riutilizzati in seguito, ne causava
+  //      una ulteriore registrazione della vista stessa nel ViewRegister del ViewModel (sempre quello) con conseguente
+  //      errore di "Vista registrata due volte". Così sembra funzionare bene, vedere nel tempo se da problemi in altri casi.
+//  if ContainsView(Aview) then
+//    raise EioException.Create('TioViewContextRegister', 'Add', 'Duplicated View.');
+//  if ContainsViewContext(AViewContext) then
+//    raise EioException.Create('TioViewContextRegister', 'Add', 'Duplicated ViewContext.');
+  if ContainsView(Aview) or ContainsViewContext(AViewContext) then
+    Exit;
   // Register
-  LItem := TioViewContextRegisterItem.Create(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod, FInternalContainer);
+  LItem := TioViewContextRegisterItem.Create(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
   FInternalContainer.Add(LItem);
 end;
 
@@ -72,11 +82,16 @@ constructor TioViewRegister.Create;
 begin
   inherited;
   FInternalContainer := TList<TioViewContextRegisterItem>.Create;
+  FFreeViewsTimer := TioTimer.CreateNewTimer;
+  FFreeViewsTimer.Enabled := False;
+  FFreeViewsTimer.OnTimer := _FreeViewTimerEventHandler;
+  FFreeViewsTimer.Interval := 100;
 end;
 
 destructor TioViewRegister.Destroy;
 begin
   FInternalContainer.Free;
+  FFreeViewsTimer.Free;
   inherited;
 end;
 
@@ -118,7 +133,38 @@ begin
     raise EioException.Create('TioViewContextRegister', 'GetItemByViewContext', 'ViewContext not found.');
 end;
 
+procedure TioViewRegister.HideAllViewContexts;
+var
+  I: Integer;
+begin
+  for I := FInternalContainer.Count-1 downto 0 do
+    FInternalContainer.Items[I].HideViewContext;
+end;
+
 procedure TioViewRegister.ReleaseAllViewContexts;
+begin
+  // Avvia il timer per il release posticipato di tutti i ViewContexts
+  //  e, di conseguenza, di tutte le viste.
+  //  NB: Ho dovuto posticiparlo con un timer perchè altrimenti con i TcxButton
+  //       della DevExpress c'erano dei problemi in alcuni casi
+  FFreeViewsTimer.Enabled := True;
+end;
+
+procedure TioViewRegister.ShowAllViewContexts;
+var
+  I: Integer;
+begin
+  for I := FInternalContainer.Count-1 downto 0 do
+    FInternalContainer.Items[I].ShowViewContext;
+end;
+
+procedure TioViewRegister._FreeViewTimerEventHandler(Sender: TObject);
+begin
+  FFreeViewsTimer.Enabled := False;
+  _PostponedReleaseAllViewContexts;
+end;
+
+procedure TioViewRegister._PostponedReleaseAllViewContexts;
 var
 //  LItem: TioViewContextRegisterItem;
   I: Integer;

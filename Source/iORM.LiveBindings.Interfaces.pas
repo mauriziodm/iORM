@@ -218,6 +218,10 @@ type
     // Fields
     function GetFields: TList<TBindSourceAdapterField>;
     property Fields: TList<TBindSourceAdapterField> read GetFields;
+    // Active
+    procedure SetActive(Value: Boolean);
+    function GetActive: Boolean;
+    property Active: Boolean read GetActive write SetActive;
   end;
 
   // Bind source adapter container

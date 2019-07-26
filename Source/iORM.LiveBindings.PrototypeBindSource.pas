@@ -39,7 +39,8 @@ interface
 
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
-  System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces;
+  System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces,
+  System.SysUtils;
 
 type
 
@@ -136,6 +137,7 @@ type
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     procedure PostIfEditing;
     procedure CancelIfEditing;
+    procedure ForEach(const AForEachMethod: TProc);
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
@@ -197,7 +199,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.Factory,
+  iORM.Exceptions, iORM.LiveBindings.Factory,
   iORM.Where.Factory, iORM.Rtti.Utilities, iORM.Components.Common, System.Rtti;
 
 { TioPrototypeBindSource }
@@ -386,6 +388,23 @@ procedure TioPrototypeBindSource.DoSelection(var ASelected: IInterface; var ASel
 begin
   if Assigned(FonAfterSelectionObject) then
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
+end;
+
+procedure TioPrototypeBindSource.ForEach(const AForEachMethod: TProc);
+var
+  I, PreviousItemIndex: Integer;
+begin
+  PreviousItemIndex := GetInternalAdapter.ItemIndex;
+  try
+    First;
+    for I := 1 to ItemCount do
+    begin
+      AForEachMethod;
+      Next;
+    end;
+  finally
+    GetInternalAdapter.ItemIndex := PreviousItemIndex;
+  end;
 end;
 
 function TioPrototypeBindSource.Current: TObject;

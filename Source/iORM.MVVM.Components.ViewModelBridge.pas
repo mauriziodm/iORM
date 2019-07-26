@@ -27,6 +27,8 @@ type
     // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+    // Default presenter
+    function GetDefaultPresenter: TioModelPresenter;
     // Presenter
     function GetPresenter(const AName: String): TioModelPresenter;
     // ViewModel
@@ -42,6 +44,7 @@ type
     property ViewModel:IioViewModel read GetViewModel;
     property Commands:IioCommandsContainer read GetCommands;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand; default;
+    property DefaultPresenter:TioModelPresenter read GetDefaultPresenter;
     property Presenter[const AName:String]:TioModelPresenter read GetPresenter;
   published
     // Events
@@ -159,6 +162,15 @@ begin
     Result := FViewModel.Commands
   else
     raise EioException.Create(Self.Name, 'GetCommands', '"FViewModel" not assigned.');
+end;
+
+function TioViewModelBridge.GetDefaultPresenter: TioModelPresenter;
+begin
+  CheckForViewModel;
+  if Assigned(FViewModel) then
+    Result := FViewModel.DefaultPresenter
+  else
+    raise EioException.Create(Self.Name, 'GetDefaultPresenter', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetPresenter(

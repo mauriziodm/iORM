@@ -2,8 +2,8 @@ object StartForm: TStartForm
   Left = 0
   Top = 0
   Caption = 'Phonebook MVVM VCL'
-  ClientHeight = 582
-  ClientWidth = 603
+  ClientHeight = 472
+  ClientWidth = 595
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,26 +15,25 @@ object StartForm: TStartForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object SQLiteConn: TioSQLiteConnectionDef
-    OnAfterRegister = SQLiteConnAfterRegister
-    AutoCreateDatabase = True
-    Database = 'ContactsIntfMVVM.db'
-    DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
-    Persistent = False
-    Pooled = False
-    Left = 152
-    Top = 88
+  object ioVCL1: TioVCL
+    Left = 112
+    Top = 48
   end
   object FormsVCProvider: TioViewContextProvider
     OnRelease = FormsVCProviderRelease
     OnRequest = FormsVCProviderioOnRequest
     RegisterAsDefault = True
-    Left = 152
-    Top = 160
+    Left = 112
+    Top = 176
   end
-  object ioVCL1: TioVCL
-    Left = 152
-    Top = 224
+  object ioSQLiteConnectionDef1: TioSQLiteConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    Database = 'ContactsIntfMVVM.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 112
+    Top = 112
   end
 end

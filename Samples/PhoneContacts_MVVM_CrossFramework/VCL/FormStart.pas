@@ -10,9 +10,9 @@ uses
 
 type
   TStartForm = class(TForm)
-    SQLiteConn: TioSQLiteConnectionDef;
-    FormsVCProvider: TioViewContextProvider;
     ioVCL1: TioVCL;
+    FormsVCProvider: TioViewContextProvider;
+    ioSQLiteConnectionDef1: TioSQLiteConnectionDef;
     procedure FormCreate(Sender: TObject);
     procedure FormsVCProviderioOnRequest(const Sender: TObject;
       out ResultViewContext: TComponent);

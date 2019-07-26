@@ -66,6 +66,8 @@ type
       const AViewContextProvider:TioViewContextProvider;
       const AViewContextFreeMethod:TProc);
     procedure FreeViews;
+    procedure HideViews;
+    procedure ShowViews;
     // Command
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
@@ -84,6 +86,8 @@ type
       const AViewContextProvider:TioViewContextProvider;
       const AViewContextFreeMethod:TProc);
     procedure ReleaseAllViewContexts;
+    procedure HideAllViewContexts;
+    procedure ShowAllViewContexts;
     function GetItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function GetItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
     property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;

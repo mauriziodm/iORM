@@ -56,16 +56,20 @@ type
     FOnAfterRequest: TioViewContextEvent;
     FOnBeforeRequest: TNotifyEvent;
     FOnBeforeRelease: TioViewContextEvent;
+    FOnHide: TioViewContextEvent;
     FOnRelease: TioViewContextEvent;
     FOnRequest: TioRequestViewContextEvent;
+    FOnShow: TioViewContextEvent;
     // Methods
     function GetRegisterAsDefault: Boolean;
     procedure SetRegisterAsDefault(const Value: Boolean);
     procedure DoOnAfterRelease;
     procedure DoOnBeforeRequest;
     procedure DoOnBeforeRelease(const AView, AViewContext:TComponent);
+    procedure DoOnHide(const AView, AViewContext:TComponent);
     procedure DoOnRelease(const AView, AViewContext:TComponent);
     procedure DoOnRequest(out ResultViewContext:TComponent);
+    procedure DoOnShow(const AView, AViewContext:TComponent);
   protected
     procedure Loaded; override;
   public
@@ -74,6 +78,8 @@ type
     procedure DoOnAfterRequest(const AView, AViewContext:TComponent);
     function NewViewContext: TComponent;
     procedure ReleaseViewContext(const AView, AViewContext:TComponent);
+    procedure HideViewContext(const AView, AViewContext:TComponent);
+    procedure ShowViewContext(const AView, AViewContext:TComponent);
     function IsDefault: Boolean;
     procedure SetAsDefault;
   published
@@ -82,8 +88,10 @@ type
     property OnAfterRequest:TioViewContextEvent read FOnAfterRequest write FOnAfterRequest;
     property OnBeforeRequest:TNotifyEvent read FOnBeforeRequest write FOnBeforeRequest;
     property OnBeforeRelease:TioViewContextEvent read FOnBeforeRelease write FOnBeforeRelease;
+    property OnHide:TioViewContextEvent read FOnHide write FOnHide;
     property OnRelease:TioViewContextEvent read FOnRelease write FOnRelease;
     property OnRequest:TioRequestViewContextEvent read FOnRequest write FOnRequest;
+    property OnShow:TioViewContextEvent read FOnShow write FOnShow;
     // Properties
     property RegisterAsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
   end;
@@ -136,6 +144,12 @@ begin
     FOnBeforeRequest(Self);
 end;
 
+procedure TioViewContextProvider.DoOnHide(const AView, AViewContext: TComponent);
+begin
+  if Assigned(FOnHide) then
+    FOnHide(Self, AView, AViewContext);
+end;
+
 procedure TioViewContextProvider.DoOnRelease(const AView,
   AViewContext: TComponent);
 begin
@@ -149,6 +163,12 @@ begin
     FOnRequest(Self, ResultViewContext);
 end;
 
+procedure TioViewContextProvider.DoOnShow(const AView, AViewContext: TComponent);
+begin
+  if Assigned(FOnShow) then
+    FOnShow(Self, AView, AViewContext);
+end;
+
 function TioViewContextProvider.IsDefault: Boolean;
 begin
   Result := TioRttiUtilities.SameObject(Self, TioViewContextProviderContainer.GetProvider);
@@ -157,6 +177,17 @@ end;
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;
 begin
   Result := FRegisterAsDefault;
+end;
+
+procedure TioViewContextProvider.HideViewContext(const AView, AViewContext: TComponent);
+begin
+  // Event handler call
+  // NB: Not fire some event handlers if the ViewContext es already
+  //      being destroyed
+  if not (csDestroying in AViewContext.ComponentState) then
+  begin
+    DoOnHide(AView, AViewContext);
+  end;
 end;
 
 function TioViewContextProvider.NewViewContext: TComponent;
@@ -211,6 +242,17 @@ begin
         LPrevDef.RegisterAsDefault := False;
       end;
     end;
+  end;
+end;
+
+procedure TioViewContextProvider.ShowViewContext(const AView, AViewContext: TComponent);
+begin
+  // Event handler call
+  // NB: Not fire some event handlers if the ViewContext es already
+  //      being destroyed
+  if not (csDestroying in AViewContext.ComponentState) then
+  begin
+    DoOnShow(AView, AViewContext);
   end;
 end;
 

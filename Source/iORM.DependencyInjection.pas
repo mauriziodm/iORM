@@ -1454,70 +1454,57 @@ end;
 class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetMP: TioModelPresenter; const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
-  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True);
-  // Try to retrieve a locator for MP.Current instance as Interface
-  if ATargetMP.IsInterfacePresenting
-  and io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
-  then
-    Result := io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias)
-  else
-  // Try to retrieve a locator for MP.Current instance as Class
-  if (not ATargetMP.IsInterfacePresenting)
-  and io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist
-  then
+  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
+  // Try to retrieve a locator for MP.Current instance
+  if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist then
     Result := io.di.LocateViewFor(ATargetMP.Current, AAlias)
   else
   // Try to retrieve a locator for MP.TypeName
-  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist
-  then
-    Result := io.di.LocateViewFor(ATargetMP.TypeName, AAlias)
+  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist then
+    Result := io.di.LocateViewFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current)
   else
     raise EioException.Create(Self.ClassName, 'GetViewLocatorFor',
       Format('There are no Views registered for "%s" or "%s" alias "%s".',
       [ATargetMP.Current.ClassName, ATargetMP.TypeName, AAlias]));
   // Set the locator
-//  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia più necessaria questa riga
   Result._SetForEachModelPresenter(ATargetMP, True);
 
 
-  // ---------- OLD CODE -----------
-//class function TioDependencyInjectionFactory.GetVMLocatorFor(const AModelPresenter: TioModelPresenter; const AAlias: String): IioDependencyInjectionLocator;
-//begin
-//  // Try to retrieve a locator for MP.Current instance
-//  if io.di.LocateVMfor(AModelPresenter.Current, AAlias).Exist then
-//    Result := io.di.LocateVMFor(AModelPresenter.Current, AAlias)
+// ---------- OLD CODE -----------
+//  // Check for ModelPresenter validity
+//  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
+//  // Try to retrieve a locator for MP.Current instance as Interface
+//  if ATargetMP.IsInterfacePresenting
+//  and io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
+//  then
+//    Result := io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias)
+//  else
+//  // Try to retrieve a locator for MP.Current instance as Class
+//  if (not ATargetMP.IsInterfacePresenting)
+//  and io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist
+//  then
+//    Result := io.di.LocateViewFor(ATargetMP.Current, AAlias)
 //  else
 //  // Try to retrieve a locator for MP.TypeName
-//  if io.di.LocateVMfor(AModelPresenter.TypeName, AAlias).Exist then
-//    Result := io.di.LocateVMFor(AModelPresenter.TypeName, AAlias)
+//  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist
+//  then
+//    Result := io.di.LocateViewFor(ATargetMP.TypeName, AAlias)
 //  else
-//    raise EioException.Create(Self.ClassName, 'GetVMLocatorFor',
-//      Format('There are no ViewModels registered for "%s" or "%s" alias "%s".',
-//      [AModelPresenter.Current.ClassName, AModelPresenter.TypeName, AAlias]));
+//    raise EioException.Create(Self.ClassName, 'GetViewLocatorFor',
+//      Format('There are no Views registered for "%s" or "%s" alias "%s".',
+//      [ATargetMP.Current.ClassName, ATargetMP.TypeName, AAlias]));
+//  // Set the locator
+////  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia più necessaria questa riga
+//  Result._SetForEachModelPresenter(ATargetMP, True);
 // ---------- OLD CODE -----------
 end;
 
 class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: TioModelPresenter; const AAlias: String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
-  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True);
-  // Try to retrieve a locator for MP.Current instance as Interface
-  if ATargetMP.IsInterfacePresenting
-  and io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
-  and io.di.LocateVMfor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
-  then
-  begin
-    if ACreateViewModel then
-      Result := io.di.LocateViewVMFor(ATargetMP.CurrentAs<IInterface>, AAlias)
-    else
-      Result := io.di._InternalLocateViewVMfor(ATargetMP.Current.ClassName, AAlias);
-  end
-  else
-  // Try to retrieve a locator for MP.Current instance as Class
-  if (not ATargetMP.IsInterfacePresenting)
-  and io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist
-  and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist
-  then
+  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
+  // Try to retrieve a locator for MP.Current instance
+  if  io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist then
   begin
     if ACreateViewModel then
       Result := io.di.LocateViewVMFor(ATargetMP.Current, AAlias)
@@ -1526,38 +1513,63 @@ begin
   end
   else
   // Try to retrieve a locator for MP.TypeName
-  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist
-  and io.di.LocateVMfor(ATargetMP.TypeName, AAlias).Exist
-  then
+  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist and io.di.LocateVMfor(ATargetMP.TypeName, AAlias).Exist then
   begin
     if ACreateViewModel then
-      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias)
+      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current)
     else
       Result := io.di._InternalLocateViewVMfor(ATargetMP.TypeName, AAlias);
   end
   else
     raise EioException.Create(Self.ClassName, 'GetViewVMLocatorFor',
-      Format('There are no Views and ViewModels registered for "%s" or "%s" alias "%s".',
+      Format('There are no Views and/or ViewModels registered for "%s" or "%s" alias "%s".',
       [ATargetMP.Current.ClassName, ATargetMP.TypeName, AAlias]));
   // Set the locator
-//  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia più necessaria questa riga
   Result._SetForEachModelPresenter(ATargetMP, True);
 
 
-// ---------- OLD CODE -----------
-//  // Try to retrieve a locator for MP.Current instance
-//  if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist then
-//    Result := io.di.LocateViewVMFor(ATargetMP.Current, AAlias)
+ // ---------- OLD CODE -----------
+//  // Check for ModelPresenter validity
+//  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
+//  // Try to retrieve a locator for MP.Current instance as hInterface
+//  if ATargetMP.IsInterfacePresenting
+//  and io.di.LocateViewFor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
+//  and io.di.LocateVMfor(ATargetMP.CurrentAs<IInterface>, AAlias).Exist
+//  then
+//  begin
+//    if ACreateViewModel then
+//      Result := io.di.LocateViewVMFor(ATargetMP.CurrentAs<IInterface>, AAlias)
+//    else
+//      Result := io.di._InternalLocateViewVMfor(ATargetMP.Current.ClassName, AAlias);
+//  end
+//  else
+//  // Try to retrieve a locator for MP.Current instance as Class
+//  if (not ATargetMP.IsInterfacePresenting)
+//  and io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist
+//  and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist
+//  then
+//  begin
+//    if ACreateViewModel then
+//      Result := io.di.LocateViewVMFor(ATargetMP.Current, AAlias)
+//    else
+//      Result := io.di._InternalLocateViewVMfor(ATargetMP.Current.ClassName, AAlias);
+//  end
 //  else
 //  // Try to retrieve a locator for MP.TypeName
-//  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist and io.di.LocateVMfor(ATargetMP.TypeName, AAlias).Exist then
-//    Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias)
+//  if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist
+//  and io.di.LocateVMfor(ATargetMP.TypeName, AAlias).Exist
+//  then
+//  begin
+//    if ACreateViewModel then
+//      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current)
+//    else
+//      Result := io.di._InternalLocateViewVMfor(ATargetMP.TypeName, AAlias);
+//  end
 //  else
 //    raise EioException.Create(Self.ClassName, 'GetViewVMLocatorFor',
 //      Format('There are no Views and ViewModels registered for "%s" or "%s" alias "%s".',
 //      [ATargetMP.Current.ClassName, ATargetMP.TypeName, AAlias]));
 //  // Set the locator
-//  Result.SetPresenter(ATargetMP, '');
 //  Result._SetForEachModelPresenter(ATargetMP, True);
 // ---------- OLD CODE -----------
 end;

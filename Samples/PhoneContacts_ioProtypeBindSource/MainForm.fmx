@@ -52,7 +52,6 @@ object Form1: TForm1
           Size.PlatformDefault = False
           StyleLookup = 'nexttoolbutton'
           TabOrder = 2
-          Visible = True
         end
         object Button4: TButton
           Position.X = 186.000000000000000000
@@ -87,6 +86,7 @@ object Form1: TForm1
         TextSettings.Font.StyleExt = {04070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Phone Numbers'
+        TabOrder = 5
       end
       object DetailListView: TListView
         ItemAppearanceClassName = 'TListItemRightDetailAppearance'
@@ -123,6 +123,7 @@ object Form1: TForm1
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Center
         Text = 'Phones'
+        TabOrder = 0
       end
       object ToolBar2: TToolBar
         Size.Width = 371.000000000000000000
@@ -144,7 +145,6 @@ object Form1: TForm1
             Size.PlatformDefault = False
             StyleLookup = 'priortoolbutton'
             TabOrder = 1
-            Visible = True
           end
         end
       end
@@ -171,7 +171,7 @@ object Form1: TForm1
         TabOrder = 6
         RowHeight = 21.000000000000000000
         RowCount = 200
-        Viewport.Width = 351.000000000000000000
+        Viewport.Width = 367.000000000000000000
         Viewport.Height = 125.000000000000000000
       end
       object Panel1: TPanel

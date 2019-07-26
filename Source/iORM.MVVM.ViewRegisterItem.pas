@@ -10,7 +10,6 @@ type
 
   TioViewContextRegisterItem = class(TComponent)
   private
-    FInternalContainer: TList<TioViewContextRegisterItem>;
     FView: TComponent;
     FViewContext: TComponent;
     FViewContextProvider: TioViewContextProvider;
@@ -28,10 +27,10 @@ type
   public
     constructor Create(const AView, AViewContext: TComponent;
       const AViewContextProvider:TioViewContextProvider;
-      const AViewContextFreeMethod:TProc;
-      const AInternalContainer:TList<TioViewContextRegisterItem>); reintroduce; overload;
-    destructor Destroy; override;
+      const AViewContextFreeMethod:TProc); reintroduce; overload;
     procedure ReleaseViewContext;
+    procedure ShowViewContext;
+    procedure HideViewContext;
     property View:TComponent read FView;
     property ViewContext:TComponent read FViewContext;
     property ViewContextProvider:TioViewContextProvider read FViewContextProvider;
@@ -49,25 +48,16 @@ begin
     DisposeOf;
 end;
 
-constructor TioViewContextRegisterItem.Create(
-  const AView, AViewContext: TComponent;
-  const AViewContextProvider:TioViewContextProvider;
-  const AViewContextFreeMethod:TProc;
-  const AInternalContainer:TList<TioViewContextRegisterItem>);
+constructor TioViewContextRegisterItem.Create(const AView, AViewContext: TComponent;
+      const AViewContextProvider:TioViewContextProvider;
+      const AViewContextFreeMethod:TProc);
 begin
   inherited Create(nil);
-  FInternalContainer := AInternalContainer;
   FReleasingViewContext := False;
   SetView(AView);
   SetViewContext(AViewContext);
   SetViewContextProvider(AViewContextProvider);
   FViewContextFreeMethod := AViewContextFreeMethod;
-end;
-
-destructor TioViewContextRegisterItem.Destroy;
-begin
-//  FInternalContainer.Remove(Self);
-  inherited;
 end;
 
 function TioViewContextRegisterItem.GetView: TComponent;
@@ -83,6 +73,14 @@ end;
 function TioViewContextRegisterItem.GetViewContextProvider: TioViewContextProvider;
 begin
   Result := FViewContextProvider;
+end;
+
+procedure TioViewContextRegisterItem.HideViewContext;
+begin
+  if not Assigned(FViewContext) then
+    Exit;
+  if Assigned(FViewContextProvider) then
+    FViewContextProvider.HideViewContext(FView, FViewContext);
 end;
 
 procedure TioViewContextRegisterItem.Notification(AComponent: TComponent;
@@ -139,6 +137,14 @@ begin
   FViewContextProvider := AViewContextProvider;
   if Assigned(FViewContextProvider) then
     FViewContextProvider.FreeNotification(Self);
+end;
+
+procedure TioViewContextRegisterItem.ShowViewContext;
+begin
+  if not Assigned(FViewContext) then
+    Exit;
+  if Assigned(FViewContextProvider) then
+    FViewContextProvider.ShowViewContext(FView, FViewContext);
 end;
 
 end.

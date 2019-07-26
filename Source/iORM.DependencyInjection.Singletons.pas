@@ -67,7 +67,7 @@ type
 
   // Singleton keys container (MasterContainer)
   TioSingletonKeysContainerInstance = TObjectDictionary<String, TioSingletonInstancesContainer>;
-  TioSingletonsContainer = class abstract
+  TioSingletonsContainer = class
   strict private
     class var FContainer: TioSingletonKeysContainerInstance;
     class var FCriticalSection: TCriticalSection;

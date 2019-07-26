@@ -52,7 +52,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           StyleLookup = 'nexttoolbutton'
           TabOrder = 0
-          Visible = True
         end
       end
       object MasterListView: TListView
@@ -78,6 +77,7 @@ object MainForm: TMainForm
         TextSettings.Font.StyleExt = {04070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Phone Numbers'
+        TabOrder = 5
       end
       object DetailListView: TListView
         ItemAppearanceClassName = 'TListItemRightDetailAppearance'
@@ -121,7 +121,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           StyleLookup = 'priortoolbutton'
           TabOrder = 0
-          Visible = True
         end
       end
       object Panel1: TPanel
@@ -312,6 +311,7 @@ object MainForm: TMainForm
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Center
         Text = 'Phones'
+        TabOrder = 8
       end
       object DetailBindNavigator: TBindNavigator
         Align = Bottom
@@ -336,7 +336,7 @@ object MainForm: TMainForm
         TabOrder = 6
         RowHeight = 21.000000000000000000
         RowCount = 200
-        Viewport.Width = 364.000000000000000000
+        Viewport.Width = 380.000000000000000000
         Viewport.Height = 177.000000000000000000
       end
     end

@@ -43,7 +43,7 @@ uses
   System.Classes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
   iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, System.SysUtils;
+  iORM.MVVM.Components.ModelPresenter, System.SysUtils, iORM.AbstractionLayer.Framework;
 
 type
 
@@ -77,6 +77,8 @@ type
       const AViewContextProvider:TioViewContextProvider;
       const AViewContextFreeMethod:TProc);
     procedure FreeViews;
+    procedure HideViews;
+    procedure ShowViews;
     procedure TerminateApplication;
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
@@ -168,6 +170,11 @@ begin
   Result := TioModelPresenter(LComponent);
 end;
 
+procedure TioViewModel.HideViews;
+begin
+  FViewRegister.HideAllViewContexts;
+end;
+
 function TioViewModel.QueryInterface(const IID: TGUID; out Obj): HResult;
 begin
   if GetInterface(IID, Obj) then
@@ -187,6 +194,11 @@ procedure TioViewModel.SetCommand(const ACmdName: String;
   const Value: IioCommandsContainerItem);
 begin
   Commands.AddOrUpdate(ACmdName, Value);
+end;
+
+procedure TioViewModel.ShowViews;
+begin
+  FViewRegister.ShowAllViewContexts;
 end;
 
 procedure TioViewModel.TerminateApplication;
