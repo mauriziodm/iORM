@@ -141,7 +141,7 @@ begin
       begin
         // TODO: Gestire eventuale precision per SMALLINT, BIGINT per ora tutto come INTEGER
         //if AProperty.GetMetadata_FieldPrecision then
-        LFieldType := 'INT';
+        LFieldType := 'BIGINT';
       end;
     ioMdFloat:
         LFieldType := 'FLOAT';
@@ -658,7 +658,7 @@ begin
       end;
     ioMdInteger:
       begin
-        Result := 'INT';
+        Result := 'BIGINT';
       end;
     ioMdFloat:
         Result := 'FLOAT';
