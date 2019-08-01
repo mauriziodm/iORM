@@ -50,7 +50,7 @@ type
   private
     class var FTransactionGUID: String;
     class function NewGUIDAsString: String;
-    class function GetTransactionGUID: String;
+//    class function GetTransactionGUID: String;
   public
     class procedure StartTransaction(const AConnectionName:String); override;
     class procedure CommitTransaction(const AConnectionName:String); override;
@@ -137,14 +137,14 @@ begin
   end;
 end;
 
-class function TioStrategyREST.GetTransactionGUID: String;
-begin
-  // Set the fixed part of the TransactionGUID if empty
-  if FTransactionGUID.IsEmpty then
-    FTransactionGUID := Self.NewGUIDAsString;
-  // Generate a TransactionGUID (Fixed GUID + Current thread ID
-  Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
-end;
+//class function TioStrategyREST.GetTransactionGUID: String;
+//begin
+//  // Set the fixed part of the TransactionGUID if empty
+//  if FTransactionGUID.IsEmpty then
+//    FTransactionGUID := Self.NewGUIDAsString;
+//  // Generate a TransactionGUID (Fixed GUID + Current thread ID
+//  Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
+//end;
 
 class procedure TioStrategyREST.LoadDataSet(const AWhere: IioWhere;
   const ADestDataSet: TFDDataSet);

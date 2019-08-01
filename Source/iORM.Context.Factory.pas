@@ -63,8 +63,10 @@ type
       const AMetadata_FieldNullable: Boolean;
       const AMetadata_FieldUnicode: Boolean;
       const AMetadata_CustomFieldType: string;
-      const AMetadata_DisableCreateFK: Boolean;
-      const AMetadata_FieldSubType: string): IioContextProperty;
+      const AMetadata_FKCreate: Boolean;
+      const AMetadata_FieldSubType: string;
+      const AMetadata_FKDeleteCreate: Boolean;
+      const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType;
       const ATable: IioContextTable): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType;
@@ -140,8 +142,10 @@ class function TioContextFactory.GetProperty(const AMapMode: TioMapModeType;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean;
   const AMetadata_FieldUnicode: Boolean;
   const AMetadata_CustomFieldType: string;
-  const AMetadata_DisableCreateFK: Boolean;
-  const AMetadata_FieldSubType: string): IioContextProperty;
+  const AMetadata_FKCreate: Boolean;
+  const AMetadata_FieldSubType: string;
+  const AMetadata_FKDeleteCreate: Boolean;
+  const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
 begin
   case AMapMode of
     // Properties map mode
@@ -152,8 +156,8 @@ begin
         ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
         AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
         AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_DisableCreateFK,
-        AMetadata_FieldSubType);
+        AMetadata_CustomFieldType, AMetadata_FKCreate,
+        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
     // Fields map mode
     ioFields:
       Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias,
@@ -162,8 +166,8 @@ begin
         ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
         AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
         AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_DisableCreateFK,
-        AMetadata_FieldSubType);
+        AMetadata_CustomFieldType, AMetadata_FKCreate,
+        AMetadata_FieldSubType, AMetadata_FKDeleteCreate,AMetadata_FKUpdateCreate);
   end;
 end;
 
@@ -235,7 +239,10 @@ var
   PropMetadata_FieldNullable: Boolean;
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
-  PropMetadata_DisableCreateFK: Boolean;
+  PropMetadata_FKCreate: Boolean;
+  // O.B. 26/06/18 - Used by DBBuilder
+  PropMetadata_FKCascadeUpdate: Boolean;
+  PropMetadata_FKCascadeDelete: Boolean;
   LRttiProperty: TRttiProperty;
   LRttiField: TRttiField;
 
@@ -358,8 +365,10 @@ begin
     PropMetadata_FieldNullable := True;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';
-    PropMetadata_DisableCreateFK := False;
+    PropMetadata_FKCreate := False;
     PropMetadata_FieldSubType := '';
+    PropMetadata_FKCascadeUpdate := false;
+    PropMetadata_FKCascadeDelete := false;
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
@@ -379,8 +388,9 @@ begin
         False, PropMetadata_FieldType, PropMetadata_FieldLength,
         PropMetadata_FieldPrecision, PropMetadata_FieldScale,
         PropMetadata_FieldNullable, PropMetadata_FieldUnicode,
-        PropMetadata_CustomFieldType, PropMetadata_DisableCreateFK,
-        PropMetadata_FieldSubType);
+        PropMetadata_CustomFieldType, PropMetadata_FKCreate,
+        PropMetadata_FieldSubType, PropMetadata_FKCascadeUpdate,
+        PropMetadata_FKCascadeDelete);
       Continue;
     end;
     // Prop Init
@@ -537,10 +547,13 @@ begin
         PropMetadata_FieldType := ioMdCustomFieldType;
         PropMetadata_CustomFieldType := ioCustomFieldType(Attr).Value;
       end;
-      if Attr is ioDisableCreateFK then
+      if Attr is ioForeignKey then
       begin
-        PropMetadata_DisableCreateFK := True;
+        PropMetadata_FKCreate := ioForeignKey(Attr).FKCreate;
+        PropMetadata_FKCascadeDelete := ioForeignKey(Attr).FKCascadeDelete;
+        PropMetadata_FKCascadeUpdate := ioForeignKey(Attr).FKCascadeUpdate;
       end;
+
     end;
     // Create and add property
     Result.Add(Self.GetProperty(ATable.GetMapMode, Prop, PropTypeAlias,
@@ -551,7 +564,8 @@ begin
       PropMetadata_FieldLength, PropMetadata_FieldPrecision,
       PropMetadata_FieldScale, PropMetadata_FieldNullable,
       PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
-      PropMetadata_DisableCreateFK, PropMetadata_FieldSubType), PropID,
+      PropMetadata_FKCreate, PropMetadata_FieldSubType,
+      PropMetadata_FKCascadeDelete, PropMetadata_FKCascadeUpdate), PropID,
       PropIDSkipOnInsert);
   end;
 end;

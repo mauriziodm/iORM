@@ -253,6 +253,7 @@ var
   LResultValue: TObject;
 begin
   // Init
+  LResultValue := nil;
   LMasterProperty := nil;
   LRelationChildPropertyName := '';
   LMasterOID := 0;

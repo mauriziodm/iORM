@@ -79,7 +79,8 @@ type
     function AlterField(const AProperty:IioContextProperty): String;
 
     function AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
-    function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+    function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String;
+              const ACascadeOnDelete: Boolean; ACascadeOnUpdate : Boolean): String;
     function AddSequences(const ATableName: String; const AIDProperty: IioContextProperty): String;
     function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
@@ -130,7 +131,7 @@ begin
       end;
     ioMdInteger:
       begin
-        LFieldType := 'INTEGER';
+        LFieldType := 'BIGINT';
       end;
     ioMdFloat:
         LFieldType := 'FLOAT';
@@ -185,7 +186,7 @@ begin
   if AProperty.IsID then
   begin
     LKeyOptions := '';
-    LFieldType := 'INTEGER';
+    LFieldType := 'BIGINT';
     LFieldLength := '';
     LNullable := 'NOT NULL';
   end;
@@ -204,7 +205,8 @@ begin
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String): String;
+function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String;
+              const ACascadeOnDelete: Boolean; ACascadeOnUpdate : Boolean): String;
 var
   LGuid: TGuid;
   LFKName: string;
@@ -220,6 +222,12 @@ begin
           '('+ASourceFieldName+')'+
           ' REFERENCES '+ADestinationTableName+
           '('+ADestinationFieldName+')';
+
+  if ACascadeOnDelete then
+    Result := Result + ' ON DELETE CASCADE';
+
+  if ACascadeOnUpdate then
+    Result := Result + ' ON UPDATE CASCADE';
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.AddForeignKeyInCreate(
@@ -503,7 +511,7 @@ begin
   LQuery.SQL.Add('WHEN 261 THEN ''BLOB''');
   LQuery.SQL.Add('WHEN 37 THEN ''VARCHAR''');
   LQuery.SQL.Add('WHEN 14 THEN ''CHAR''');
-  LQuery.SQL.Add('WHEN 8 THEN ''INTEGER''');
+  LQuery.SQL.Add('WHEN 8 THEN ''BIGINT''');
   LQuery.SQL.Add('WHEN 7 THEN ''SMALLINT''');
   LQuery.SQL.Add('WHEN 16 THEN ''INT64''');  // --> DECIMAL field_subtype 2, NUMERIC field_subtype 1, BIGINT field_subtype 0
   LQuery.SQL.Add('WHEN 27 THEN ''DOUBLE''');
@@ -649,7 +657,7 @@ begin
       end;
     ioMdInteger:
       begin
-        Result := 'INTEGER';
+        Result := 'BIGINT';
       end;
     ioMdFloat:
         Result := 'FLOAT';
