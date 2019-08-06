@@ -131,7 +131,7 @@ begin
       end;
     ioMdInteger:
       begin
-        LFieldType := 'BIGINT';
+        LFieldType := 'INTEGER';
       end;
     ioMdFloat:
         LFieldType := 'FLOAT';
@@ -186,7 +186,7 @@ begin
   if AProperty.IsID then
   begin
     LKeyOptions := '';
-    LFieldType := 'BIGINT';
+    LFieldType := 'INTEGER';
     LFieldLength := '';
     LNullable := 'NOT NULL';
   end;
@@ -511,7 +511,7 @@ begin
   LQuery.SQL.Add('WHEN 261 THEN ''BLOB''');
   LQuery.SQL.Add('WHEN 37 THEN ''VARCHAR''');
   LQuery.SQL.Add('WHEN 14 THEN ''CHAR''');
-  LQuery.SQL.Add('WHEN 8 THEN ''BIGINT''');
+  LQuery.SQL.Add('WHEN 8 THEN ''INTEGER''');
   LQuery.SQL.Add('WHEN 7 THEN ''SMALLINT''');
   LQuery.SQL.Add('WHEN 16 THEN ''INT64''');  // --> DECIMAL field_subtype 2, NUMERIC field_subtype 1, BIGINT field_subtype 0
   LQuery.SQL.Add('WHEN 27 THEN ''DOUBLE''');
@@ -657,7 +657,7 @@ begin
       end;
     ioMdInteger:
       begin
-        Result := 'BIGINT';
+        Result := 'INTEGER';
       end;
     ioMdFloat:
         Result := 'FLOAT';
