@@ -49,11 +49,13 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    FConnectionName: String;
     // Methods
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure DoNotify(ANotification: IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     procedure SetAutoLoadData(const Value: Boolean);
+    procedure SetConnectionName(const Value: String);
   protected
     procedure Loaded; override;
     // Selectors related event for TObject selection
@@ -200,6 +202,9 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     property AutoRefreshOnNotification: TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification;
     property MasterPresenter: TioModelPresenter read FMasterPresenter write FMasterPresenter;
+    //start O.B. 08/08/2019 Gestione delle multiconnessioni
+    property ConnectionName : String read FConnectionName write SetConnectionName;
+    //end O.B. 08/08/2019 Gestione delle multiconnessioni
     property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName;
     property OrderBy: String read FOrderBy Write SetOrderBy;
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
@@ -800,8 +805,18 @@ begin
   FBindSourceAdapter.ioWhereDetailsFromDetailAdapters :=
     FWhereDetailsFromDetailAdapters;
   FBindSourceAdapter.ioWhere := FWhere;
+  FBindSourceAdapter.ioConnectionName := FConnectionName;
   // Register itself for notifications from BindSourceAdapter
   FBindSourceAdapter.SetBindSource(Self);
+end;
+
+procedure TioModelPresenter.SetConnectionName(const Value: String);
+begin
+  FConnectionName := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  //  update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.ioConnectionName := Value;
 end;
 
 procedure TioModelPresenter.SetBindSourceAdapter(const Value
@@ -1018,6 +1033,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
+    Where.ConnectionName(FConnectionName);
     SetBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias,
       Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)

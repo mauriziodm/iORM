@@ -118,6 +118,7 @@ var
   LOwnsObjects: Boolean;
   LExecute: TioCommonBSAPersistenceThreadExecute;
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
+  LConnectionName: string;
 begin
   // If AutoLoadData is disabled then exit
   if not AActiveBindSourceAdapter.ioAutoLoadData then
@@ -132,6 +133,7 @@ begin
 
   LWhere := AActiveBindSourceAdapter.ioWhere;
   LOwnsObjects := AActiveBindSourceAdapter.ioOwnsObjects;
+  LConnectionName := AActiveBindSourceAdapter.ioConnectionName;
   // Set Execute anonimous methods
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingle:

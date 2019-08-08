@@ -71,6 +71,7 @@ type
     FInterfacedList: IInterface;
     // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FonNotify: TioBSANotificationEvent;
+    FioConnectionName: String;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // Async property
     function GetIoAsync: Boolean;
@@ -104,6 +105,8 @@ type
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
+    procedure SetioConnectionName(const Value: String);
+    function GetioConnectionName: String;
   protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -145,18 +148,19 @@ type
       const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface;
       const AOwnsObject: Boolean = False); overload;
-    constructor InternalCreate(const ATypeName, ATypeAlias: String;
-      const AWhere: IioWhere; const AOwner: TComponent;
-      const AutoLoadData: Boolean; const AOwnsObject: Boolean = True); overload;
+    constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
+  const AOwner: TComponent; const AutoLoadData, AOwnsObject: Boolean; const AConnectionName : String); overload;
   public
     constructor Create(const ATypeName, ATypeAlias: String;
       const AWhere: IioWhere; const AOwner: TComponent;
       const ADataObject: TObject; const AutoLoadData: Boolean;
-      const AOwnsObject: Boolean = True); overload;
+      const AOwnsObject: Boolean = True;
+      const AConnectionName : String = ''); overload;
     constructor Create(const ATypeName, ATypeAlias: String;
       const AWhere: IioWhere; const AOwner: TComponent;
       const ADataObject: IInterface; const AutoLoadData: Boolean;
-      const AOwnsObject: Boolean = False); overload;
+      const AOwnsObject: Boolean = False;
+      const AConnectionName : String = ''); overload;
     destructor Destroy; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer
       : IioDetailBindSourceAdaptersContainer);
@@ -206,6 +210,7 @@ type
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
     property ioAutoPersist: Boolean read GetioAutoPersist
       write SetioAutoPersist;
+    property ioConnectionName: String read GetioConnectionName write SetioConnectionName;
     property ioWhereStr: IioWhere read GetioWhere write SetIoWhere;
     property ioWhereDetailsFromDetailAdapters: Boolean
       read GetioWhereDetailsFromDetailAdapters
@@ -270,21 +275,21 @@ end;
 
 constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName,
   ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const ADataObject: IInterface; const AutoLoadData, AOwnsObject: Boolean);
+  const ADataObject: IInterface; const AutoLoadData, AOwnsObject: Boolean; const AConnectionName : String);
 begin
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
   InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, AutoLoadData,
-    AOwnsObject);
+    AOwnsObject, AConnectionName);
   FInterfacedList := ADataObject;
 end;
 
 constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName,
   ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const ADataObject: TObject; const AutoLoadData, AOwnsObject: Boolean);
+  const ADataObject: TObject; const AutoLoadData, AOwnsObject: Boolean; const AConnectionName : String);
 begin
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
   InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, AutoLoadData,
-    AOwnsObject);
+    AOwnsObject, AConnectionName);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DeleteListViewItem
@@ -597,6 +602,11 @@ begin
   Result := Self.AutoPost;
 end;
 
+function TioActiveInterfaceListBindSourceAdapter.GetioConnectionName: String;
+begin
+  Result := FioConnectionName;
+end;
+
 function TioActiveInterfaceListBindSourceAdapter.GetIoViewDataType
   : TioViewDataType;
 begin
@@ -675,7 +685,7 @@ end;
 
 constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate
   (const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
-  const AOwner: TComponent; const AutoLoadData, AOwnsObject: Boolean);
+  const AOwner: TComponent; const AutoLoadData, AOwnsObject: Boolean; const AConnectionName : String);
 begin
   FInterfacedList := nil;
   FAutoLoadData := AutoLoadData;
@@ -688,6 +698,7 @@ begin
   FWhereDetailsFromDetailAdapters := False;
   FTypeName := ATypeName;
   FTypeAlias := ATypeAlias;
+  FioConnectionName := AConnectionName;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
@@ -923,6 +934,11 @@ procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPost
   (const Value: Boolean);
 begin
   Self.AutoPost := Value;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetioConnectionName(const Value: String);
+begin
+  FioConnectionName := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetIoWhere
