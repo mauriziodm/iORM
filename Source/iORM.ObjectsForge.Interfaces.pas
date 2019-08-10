@@ -534,7 +534,8 @@ begin
   //       la ChildProperty destinazione.
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
+    Exit;
   // Wrap the object into a DuckTypedStreamObject
   ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
   // Get the BlobStream
