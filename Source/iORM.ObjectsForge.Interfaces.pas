@@ -52,17 +52,17 @@ type
   TioObjectMakerIntf = class abstract
   strict protected
     class function CheckOrCreateRelationChildObject(const AContext:IioContext; const AProperty:IioContextProperty): TObject;
-    class function LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class procedure InitializeObjectAfterCreate(const AObj:TObject; const AContainerItem:TioDIContainerImplementersItem);
+    class procedure LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+    class procedure LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+    class procedure LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+    class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
     class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyBelongsTo(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
-    class function LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyEmbeddedHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
-    class function LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
-    class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
     class function InternalFindMethod(ARttiType:TRttiType; AMethodName,AMarkerText:String; IsConstructor:Boolean; const AParameters:Array of TValue): TRttiMethod;
     class function FindConstructor(ARttiType:TRttiType; const AParameters:Array of TValue; AMarkerText:String=''; AMethodName:String=''): TRttiMethod;
     class function FindMethod(ARttiType:TRttiType; AMethodName:String; const AParameters:Array of TValue; AMarkerText:String=''): TRttiMethod;
-    class procedure InitializeObjectAfterCreate(const AObj:TObject; const AContainerItem:TioDIContainerImplementersItem);
   public
     class procedure InitializeViewModelPresentersAfterCreate(const AViewModel:TObject; const APresenterSettingsPointer:PioDIPresenterSettingsContainer);
     class function CreateObjectFromBlobField(AQuery:IioQuery; AProperty:IioContextProperty): TObject;
@@ -407,76 +407,71 @@ begin
     .ToObject(Result);
 end;
 
-class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
-  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
 var
-  ALazyLoadableObj: IioLazyLoadable;
+  LChildObject: TObject;
+  LLazyLoadableObj: IioLazyLoadable;
   LWhere, LDetailWhere: IioWhere;
 begin
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  //  then create it
-  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  //       la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // Get the child object if already assigned
+  LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
+  // If the related child object not exists then exit (return 'NULL')
+  if not Assigned(LChildObject) then
+    raise EioException.Create(Self.ClassName, 'LoadPropertyHasMany', Format('Child collection object non assigned on property "%s", class "%s"', [AProperty.GetName, AContext.Map.GetClassName]));
   // Get the where conditions for the details if exists (nil if not exists)
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
-  // If LazyLoadable then set LazyLoad data
-  if (AProperty.GetRelationLoadType = ioLazyLoad)
-  and Supports(Result, IioLazyLoadable, ALazyLoadableObj)
-    // Set the lazy load relation data
-    then ALazyLoadableObj.SetRelationInfo(
+  // If LazyLoadable then set LazyLoad data - Set the lazy load relation data
+  if (AProperty.GetRelationLoadType = ioLazyLoad) and Supports(LChildObject, IioLazyLoadable, LLazyLoadableObj) then
+    LLazyLoadableObj.SetRelationInfo(
        AProperty.GetRelationChildTypeName
       ,AProperty.GetRelationChildTypeAlias
       ,AProperty.GetRelationChildPropertyName
       ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
       ,LDetailWhere)  // Eventuale detail where
-    // Fill the list
-    else
-    begin
-      // It set the first part of the load operation
-      LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-        ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty));
-      // If a Details Where conditions (for the details) is present then add it to the load operation
-      if Assigned(LDetailWhere) then
-        LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance);  // Eventuale DetailWhere & OrderBy
-      // Execute the load operation
-      LWhere.ToList(Result);
-    end
+  // Else fill the list
+  else
+  begin
+    // It set the first part of the load operation
+    LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
+      ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty));
+    // If a Details Where conditions (for the details) is present then add it to the load operation
+    if Assigned(LDetailWhere) then
+      LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance);  // Eventuale DetailWhere & OrderBy
+    // Execute the load operation
+    LWhere.ToList(LChildObject);
+  end
 end;
 
-class function TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery;
-  AProperty: IioContextProperty): TObject;
+class procedure TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
 var
-  AJSONValue: TJSONValue;
-  AJSONValueString: String;
+  LChildObject: TObject;
+  LJSONValue: TJSONValue;
+  LJSONValueString: String;
 begin
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  //  then create it
-  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  //       la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
+    Exit;
+  // Get the child object if already assigned
+  LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
+  // If the related child object not exists then exit (return 'NULL')
+  if not Assigned(LChildObject) then
+    raise EioException.Create(Self.ClassName, 'LoadPropertyEmbeddedHasMany', Format('Child collection object non assigned on property "%s", class "%s"', [AProperty.GetName, AContext.Map.GetClassName]));
   // Get the JSONObject
-  AJSONValueString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-  AJSONValue := TJSONObject.ParseJSONValue(AJSONValueString);
+  LJSONValueString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+  LJSONValue := TJSONObject.ParseJSONValue(LJSONValueString);
   try
     // Deserialize
-    Result := TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedList(AJSONValue, Result);
+    TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedList(LJSONValue, LChildObject);
   finally
-    AJSONValue.Free;
+    LJSONValue.Free;
   end;
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery;
   AProperty: IioContextProperty): TObject;
 var
-  AJSONObject: TJSONObject;
-  AJSONObjectString: String;
+  LJSONObject: TJSONObject;
+  LJSONObjectString: String;
 begin
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
@@ -488,63 +483,62 @@ begin
   // If the field is null then exit
   if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Get the JSONObject
-  AJSONObjectString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-  AJSONObject := TJSONObject.ParseJSONValue(AJSONObjectString) as TJSONObject;
+  LJSONObjectString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+  LJSONObject := TJSONObject.ParseJSONValue(LJSONObjectString) as TJSONObject;
   try
     // Deserialize
-    Result := TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedObject(AJSONObject, Result);
+    Result := TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedObject(LJSONObject, Result);
   finally
-    AJSONObject.Free;
+    LJSONObject.Free;
   end;
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty);
 var
-  AStream, ABlobStream: TStream;
+  LChildObject: TObject;
+  LChildStream, LBlobStream: TStream;
 begin
-  // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
-  // Get the stream from the DataObject property
-  AStream := TStream(   AProperty.GetValue(AContext.DataObject).AsObject   );
-  // If the stream is not assigned then raise an Exception
-  //  (the stream must exist)
-  if not Assigned(AStream) then
-    raise EioException.Create(Self.ClassName + ': Stream not assigned.');
-  // Get the BlobStream
-  ABlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
-  try
-    AStream.CopyFrom(ABlobStream, ABlobStream.Size);
-    AStream.Position := 0;
-  finally
-    ABlobStream.Free;
-  end;
-end;
-
-class function TioObjectMakerIntf.LoadPropertyStreamable(AContext: IioContext; AQuery: IioQuery;
-  AProperty: IioContextProperty): TObject;
-var
-  ADuckTypedStreamObject: IioDuckTypedStreamObject;
-  ABlobStream: TStream;
-begin
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  //  then create it
-  //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  //       la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // If the field is null then exit
   if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
     Exit;
-  // Wrap the object into a DuckTypedStreamObject
-  ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
+  // Get the stream from the DataObject property
+  LChildObject := AProperty.GetValue(AContext.DataObject).AsObject;
+  if not Assigned(LChildObject) then
+    raise EioException.Create(Self.ClassName, 'LoadPropertyStream', Format('Stream child object non assigned on property "%s", class "%s"', [AProperty.GetName, AContext.Map.GetClassName]));
+  LChildStream := LChildObject as TStream;
   // Get the BlobStream
-  ABlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
+  LBlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
+  try
+    LChildStream.CopyFrom(LBlobStream, LBlobStream.Size);
+    LChildStream.Position := 0;
+  finally
+    LBlobStream.Free;
+  end;
+end;
+
+class procedure TioObjectMakerIntf.LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+var
+  LChildObject: TObject;
+  LDuckTypedStreamObject: IioDuckTypedStreamObject;
+  LBlobStream: TStream;
+begin
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
+    Exit;
+  // Get the child object if already assigned
+  LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
+  // If the related child object not exists then exit (return 'NULL')
+  if not Assigned(LChildObject) then
+    raise EioException.Create(Self.ClassName, 'LoadPropertyStreamable', Format('Streamable child object non assigned on property "%s", class "%s"', [AProperty.GetName, AContext.Map.GetClassName]));
+  // Wrap the object into a DuckTypedStreamObject
+  LDuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LChildObject);
+  // Get the BlobStream
+  LBlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
   try
     // Load stream o the object
-    ADuckTypedStreamObject.LoadFromStream(ABlobStream);
+    LDuckTypedStreamObject.LoadFromStream(LBlobStream);
   finally
-    ABlobStream.Free;
+    LBlobStream.Free;
   end;
 end;
 

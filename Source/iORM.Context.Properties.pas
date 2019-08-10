@@ -417,7 +417,6 @@ function TioProperty.GetRelationChildObject(Instance: Pointer): TObject;
 var
   AValue: TValue;
 begin
-  // Init
   // Extract the child related object
   AValue := Self.GetValue(Instance);
   Result := TioRttiUtilities.TValueToObject(AValue, True);
@@ -428,19 +427,19 @@ end;
 
 function TioProperty.GetRelationChildObjectID(const Instance: Pointer): Integer;
 var
-  ChildMap: IioMap;
-  ChildObject: TObject;
+  FChildMap: IioMap;
+  FChildObject: TObject;
 begin
   // Init
   Result := IO_INTEGER_NULL_VALUE;
   // Extract the child related object
-  ChildObject := Self.GetRelationChildObject(Instance);
+  FChildObject := Self.GetRelationChildObject(Instance);
   // If the related child object not exists then exit (return 'NULL')
-  if not Assigned(ChildObject) then Exit;
+  if not Assigned(FChildObject) then
+    Exit;
   // Else create the ioContext for the object and return the ID
-//  ChildMap := TioContextFactory.Map(ChildObject.ClassType);
-  ChildMap := TioMapContainer.GetMap(ChildObject.ClassName);
-  Result := ChildMap.GetProperties.GetIdProperty.GetValue(ChildObject).AsInteger;
+  FChildMap := TioMapContainer.GetMap(FChildObject.ClassName);
+  Result := FChildMap.GetProperties.GetIdProperty.GetValue(FChildObject).AsInteger;
 end;
 
 function TioProperty.GetRelationChildPropertyName: String;

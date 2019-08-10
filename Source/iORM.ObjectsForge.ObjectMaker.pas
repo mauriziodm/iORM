@@ -85,27 +85,30 @@ begin
           CurrProp.SetValue(Result, AQuery.GetValue(CurrProp))
         // If it's related to a blob field and it is of TStream or descendant the load as stream
         else if CurrProp.IsStream then
-          Self.LoadPropertyStream(AContext, AQuery, CurrProp)
+          LoadPropertyStream(AContext, AQuery, CurrProp)
         // If it's related to a blob field and it is a "streamable object" (has LoadFromStream and SaveToStream methods)
         else
-          CurrProp.SetValue(Result, Self.LoadPropertyStreamable(AContext, AQuery, CurrProp));
+          LoadPropertyStreamable(AContext, AQuery, CurrProp);
         // Next property
         Continue;
       end;
 // ------------------------------ RELATION -----------------------------------------------------------------------------------------
       // Load the related object/s
-      ioRTBelongsTo:        AObj := Self.LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
-      ioRTHasMany:          AObj := Self.LoadPropertyHasMany(AContext, AQuery, CurrProp);
-      ioRTHasOne:           AObj := Self.LoadPropertyHasOne(AContext, AQuery, CurrProp);
-      ioRTEmbeddedHasMany:  AObj := Self.LoadPropertyEmbeddedHasMany(AContext, AQuery, CurrProp);
-      ioRTEmbeddedHasOne:   AObj := Self.LoadPropertyEmbeddedHasOne(AContext, AQuery, CurrProp);
+      ioRTHasMany:          LoadPropertyHasMany(AContext, AQuery, CurrProp);
+      ioRTEmbeddedHasMany:  LoadPropertyEmbeddedHasMany(AContext, AQuery, CurrProp);
+      ioRTBelongsTo:        AObj := LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
+      ioRTHasOne:           AObj := LoadPropertyHasOne(AContext, AQuery, CurrProp);
+      ioRTEmbeddedHasOne:   AObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, CurrProp);
     end;
-    // If is an Interface property then adjust the RefCount to prevent an access violation
-    if CurrProp.IsInterface then
-      TioRttiUtilities.ObjectAsIInterface(AObj)._Release;
-    // Assign the related object/s to the property   (***ChildPropertyPath***)
-    if CurrProp.IsWritable then
-      CurrProp.SetValue(Result, AObj);
+    if Assigned(AObj) then
+    begin
+      // If is an Interface property then adjust the RefCount to prevent an access violation
+      if CurrProp.IsInterface then
+        TioRttiUtilities.ObjectAsIInterface(AObj)._Release;
+      // Assign the related object/s to the property   (***ChildPropertyPath***)
+      if CurrProp.IsWritable then
+        CurrProp.SetValue(Result, AObj);
+    end;
 // ---------------------------------------------------------------------------------------------------------------------------------
   end;
 end;
