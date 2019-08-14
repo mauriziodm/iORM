@@ -64,7 +64,6 @@ var
   AObj: TObject;
 begin
   inherited;
-  AObj := nil;
   // DataObject creation if not already exists
   if not Assigned(AContext.DataObject) then
     AContext.DataObject := Self.CreateObjectByClassRef(AContext.GetClassRef);
@@ -74,6 +73,7 @@ begin
   // Load properties values
   for CurrProp in AContext.GetProperties do
   begin
+    AObj := nil;
     // If the property is not ReadEnabled then skip it
     if not CurrProp.IsDBReadEnabled then Continue;
     case CurrProp.GetRelationType of
