@@ -651,9 +651,9 @@ procedure TioCommandsContainer.CopyCommand(const ACommandName:String; const ADes
 var
   LCommandContainerItem: IioCommandsContainerItem;
 begin
-  if AUpdateIfExists and Exists(ACommandName) then
-    Delete(ACommandName);
-  LCommandContainerItem := Self.Get(ACommandName);
+  if AUpdateIfExists and ADestinationCommandsContainer.Exists(ACommandName) then
+    ADestinationCommandsContainer.Delete(ACommandName);
+  LCommandContainerItem := Get(ACommandName);
   ADestinationCommandsContainer.Add(ACommandName, LCommandContainerItem);
 end;
 
