@@ -400,7 +400,7 @@ begin
     Self.Owner := AOwner;
   end
   else
-    raise EioException.Create(Self.ClassName + ': Invalid Method (null).');
+    raise EioException.Create(Self.ClassName, 'FillCommandInfo', 'Invalid Method (null).');
 end;
 
 function TioCommandsContainerItemMethod.IsEmpty: Boolean;
@@ -553,7 +553,7 @@ procedure TioCommandsContainerItemAnonimousMethod.FillCommandInfo(
 begin
   // An anonimous method can be registered as Command only by runtime code
   //  therefore must never perform this method
-  raise EioException.Create(Self.ClassName + ': anonimous methods ca can be registered as Command only by runtime code therefore must never perform this method.');
+  raise EioException.Create(Self.ClassName, 'FillCommandInfo', 'anonimous methods ca can be registered as Command only by runtime code therefore must never perform this method.');
   inherited;
 end;
 
@@ -574,7 +574,9 @@ end;
 procedure TioCommandsContainer.Add(const AName: String;
   const ACommandItem: IioCommandsContainerItem);
 begin
-  FContainer.Add(   UpperCase(AName), ACommandItem   );
+  if Exists(AName) then
+    raise EioException.Create(Self.ClassName, 'Add', 'Command "' + AName + '" already exists.');
+  FContainer.Add(Uppercase(AName), ACommandItem);
 end;
 
 procedure TioCommandsContainer.BindViewControl(const AControl: TObject;
@@ -587,12 +589,12 @@ begin
   // Get the action
   LCommandItem := Self.Get(ACommandName);
   if not LCommandItem.IsAction then
-    raise EioException.Create(Self.ClassName + ': The command is not an action.');
+    raise EioException.Create(Self.ClassName, 'BindViewControl', 'The command is not an action.');
   // Get the control action property
   LControlType := TioRttiContextFactory.RttiContext.GetType(AControl.ClassInfo).AsInstance;
   LControlActionProperty := LControlType.GetProperty('Action');
   if not Assigned(LControlActionProperty) then
-    raise EioException.Create(Self.ClassName + ': "Action" property not found.');
+    raise EioException.Create(Self.ClassName, 'BindViewControl', '"Action" property not found.');
   // Bind the action
   LControlActionProperty.SetValue(AControl, LCommandItem.AsAction.AsTValue);
 end;
@@ -638,7 +640,7 @@ begin
         // Get view control
         LViewControlType := LViewField.FieldType;
         if not LViewControlType.IsInstance then
-          raise EioException.Create(Self.ClassName + ': The view field is not an instance.');
+          raise EioException.Create(Self.ClassName, 'BindView', 'The view field is not an instance.');
         LViewControl := LViewField.GetValue(AView).AsObject;
         // Bind
         Self.BindViewControl(LViewControl, LCommandName);
@@ -676,7 +678,7 @@ procedure TioCommandsContainer.Delete(AName: String);
 begin
   AName := Uppercase(AName);
   if not Exists(AName) then
-    raise EioException.Create(Self.ClassName + ': "' + AName + '" Command/Action not found.');
+    raise EioException.Create(Self.ClassName, 'Delete', '"' + AName + '" Command/Action not found.');
   FContainer.Remove(AName);
 end;
 
@@ -696,7 +698,7 @@ begin
   Result := nil;
   if FContainer.TryGetValue(UpperCase(AName), Result) or ANoException then
     Exit;
-  raise EioException.Create(Self.ClassName + ': "' + AName + '" Command/Action not found.');
+  raise EioException.Create(Self.ClassName, 'Get', '"' + AName + '" Command/Action not found.');
 end;
 
 function TioCommandsContainer.GetOrCreate(
@@ -773,7 +775,7 @@ begin
     Exit;
   // A CommandName is required
   if LCmdInfo.Name.IsNull or LCmdInfo.Name.Value.IsEmpty then
-    raise EioException.Create(Self.ClassName + ': Command/Action name is required.');
+    raise EioException.Create(Self.ClassName, 'LoadCommands_ParseRttiElement', 'Command/Action name is required.');
   // Get or create the CommandsContainerItem
   LCmdItem := Self.GetOrCreate(LCmdInfo.Name.Value, LCmdInfo.CommandType.Value);
   LCmdItem.Owner := AOwner;
