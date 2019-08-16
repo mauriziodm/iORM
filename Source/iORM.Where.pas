@@ -101,7 +101,8 @@ type
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
 
     function _ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
-    function ToObject(const AObj:TObject=nil): TObject; virtual;
+    function ToObject(const AObj:TObject=nil): TObject; overload;
+    function ToObject(const AIntf:IInterface): TObject; overload;
 
     procedure ToList(const AList:TObject); overload;
     function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
@@ -1007,6 +1008,11 @@ begin
   // else...
   else
     Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObject(Self, AObj);
+end;
+
+function TioWhere.ToObject(const AIntf: IInterface): TObject;
+begin
+  ToObject(AIntf as TObject);
 end;
 
 function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;

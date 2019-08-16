@@ -84,7 +84,8 @@ type
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
 
     function _ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
-    function ToObject(const AObj:TObject=nil): TObject;
+    function ToObject(const AObj:TObject=nil): TObject; overload;
+    function ToObject(const AIntf:IInterface): TObject; overload;
 
     procedure ToList(const AList:TObject); overload;
     function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
