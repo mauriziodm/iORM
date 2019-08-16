@@ -58,8 +58,9 @@ type
     procedure Add(const AName:String; const ACommandItem:IioCommandsContainerItem);
     procedure AddOrUpdate(const AName:String; const ACommandItem:IioCommandsContainerItem);
     procedure LoadCommands(const AOwner:TComponent);
-    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer);
-    procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer);
+    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+    procedure Delete(AName: String);
     // NB: DI questi metodì è stata lasciata, per il momento, anche l'implementazione commentata
 //    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
 //    procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
@@ -70,7 +71,7 @@ type
     procedure BindView(const AView:TComponent);
     procedure BindViewControl(const AControl:TObject; const ACommandName:String);
     procedure UniBindViewCommands(const AView:TComponent; const AViewType:TRttiInstanceType);
-    function Exist(const AName:String): Boolean;
+    function Exists(const AName:String): Boolean;
     function Get(const AName:String; const ANoException:Boolean=False): IioCommandsContainerItem;
   end;
 
@@ -599,7 +600,7 @@ end;
 procedure TioCommandsContainer.AddOrUpdate(const AName: String;
   const ACommandItem: IioCommandsContainerItem);
 begin
-  if Self.Exist(AName) then
+  if Self.Exists(AName) then
     FContainer.Items[AName] := ACommandItem
   else
     Self.Add(AName, ACommandItem);
@@ -644,22 +645,22 @@ begin
       end;
 end;
 
-procedure TioCommandsContainer.CopyCommand(const ACommandName: String;
-  const ADestinationCommandsContainer: IioCommandsContainer);
+procedure TioCommandsContainer.CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
 var
   LCommandContainerItem: IioCommandsContainerItem;
 begin
+  if AUpdateIfExists and Exists(ACommandName) then
+    Delete(ACommandName);
   LCommandContainerItem := Self.Get(ACommandName);
   ADestinationCommandsContainer.Add(ACommandName, LCommandContainerItem);
 end;
 
-procedure TioCommandsContainer.CopyCommands(
-  const ADestinationCommandsContainer: IioCommandsContainer);
+procedure TioCommandsContainer.CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
 var
   LCommandName: String;
 begin
   for LCommandName in FContainer.Keys do
-    Self.CopyCommand(LCommandName, ADestinationCommandsContainer);
+    Self.CopyCommand(LCommandName, ADestinationCommandsContainer, AUpdateIfExists);
 end;
 
 constructor TioCommandsContainer.Create(const AOwner:TComponent);
@@ -671,13 +672,21 @@ begin
   LoadCommands(AOwner);
 end;
 
+procedure TioCommandsContainer.Delete(AName: String);
+begin
+  AName := Uppercase(AName);
+  if not Exists(AName) then
+    raise EioException.Create(Self.ClassName + ': "' + AName + '" Command/Action not found.');
+  FContainer.Remove(AName);
+end;
+
 destructor TioCommandsContainer.Destroy;
 begin
   FContainer.Free;
   inherited;
 end;
 
-function TioCommandsContainer.Exist(const AName: String): Boolean;
+function TioCommandsContainer.Exists(const AName: String): Boolean;
 begin
   Result := FContainer.ContainsKey(   UpperCase(AName)  );
 end;
@@ -693,7 +702,7 @@ end;
 function TioCommandsContainer.GetOrCreate(
   const AName: String; const ACommandType:TioCommandType): IioCommandsContainerItem;
 begin
-  if not Self.Exist(AName) then
+  if not Self.Exists(AName) then
     Self.Add(   AName, TioMVVMFactory.NewCommandsContainerItem(AName, ACommandType)   );
   Result := Self.Get(AName);
 end;
