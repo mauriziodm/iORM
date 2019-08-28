@@ -8,7 +8,7 @@ object MainForm: TMainForm
   FormFactor.Height = 900
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
-  DesignerMasterStyle = 3
+  DesignerMasterStyle = 0
   object TabControl2: TTabControl
     Align = Client
     FullSize = True
@@ -79,7 +79,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           StyleLookup = 'nexttoolbutton'
           TabOrder = 0
-          Visible = True
         end
         object RBSQLite: TRadioButton
           IsChecked = True
@@ -144,6 +143,7 @@ object MainForm: TMainForm
         TextSettings.Font.StyleExt = {04070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Phone Numbers'
+        TabOrder = 5
       end
       object DetailListView: TListView
         ItemAppearanceClassName = 'TListItemRightDetailAppearance'
@@ -187,7 +187,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           StyleLookup = 'priortoolbutton'
           TabOrder = 0
-          Visible = True
         end
       end
       object Panel1: TPanel
@@ -381,7 +380,7 @@ object MainForm: TMainForm
         object EditDateOfBirth: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 6
-          Text = '01/11/2018'
+          Text = '01/11/2019'
           Position.X = 120.000000000000000000
           Position.Y = 162.000000000000000000
           Size.Width = 249.000000000000000000
@@ -397,6 +396,7 @@ object MainForm: TMainForm
         Size.PlatformDefault = False
         TextSettings.HorzAlign = Center
         Text = 'Phones'
+        TabOrder = 8
       end
       object DetailBindNavigator: TBindNavigator
         Align = Bottom
@@ -421,8 +421,8 @@ object MainForm: TMainForm
         TabOrder = 6
         RowHeight = 21.000000000000000000
         RowCount = 200
-        Viewport.Width = 379.000000000000000000
-        Viewport.Height = 170.000000000000000000
+        Viewport.Width = 364.000000000000000000
+        Viewport.Height = 177.000000000000000000
       end
     end
   end
@@ -601,6 +601,7 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntf.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

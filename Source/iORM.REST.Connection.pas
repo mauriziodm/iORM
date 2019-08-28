@@ -61,6 +61,7 @@ type
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
     function AsRESTConnection: IioConnectionREST; override;
+    function InTransaction: Boolean; override;
     // ioRequestBody property
     function GetRequestBody:IioRESTRequestBody;
     // ioResponseBody property
@@ -150,5 +151,11 @@ begin
   Result := FRESTResponseBody;
 end;
 
+
+function TioConnectionREST.InTransaction: Boolean;
+begin
+  inherited;
+  Result := False;
+end;
 
 end.

@@ -86,6 +86,7 @@ type
     class procedure StartTransaction(const AConnectionName:String='');
     class procedure CommitTransaction(const AConnectionName:String='');
     class procedure RollbackTransaction(const AConnectionName:String='');
+    class function InTransaction(const AConnectionName:String=''): boolean;
     class procedure AutoCreateDatabase(const AConnectionName:String=''; const RaiseExceptionIfNotAvailable:Boolean=True); overload;
     class procedure AutoCreateDatabase(const RaiseExceptionIfNotAvailable:Boolean); overload;   // Default connection only
     class function Connections: TioConnectionManagerRef;
@@ -732,6 +733,11 @@ end;
 class procedure io.HideWait;
 begin
   TioConnectionManager.HideWaitProc;
+end;
+
+class function io.InTransaction(const AConnectionName: String): boolean;
+begin
+  Result := TioStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
 end;
 
 class function io.Load(const AClassRef:TioClassRef; const ATypeAlias:String): IioWhere;

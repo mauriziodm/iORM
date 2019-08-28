@@ -312,6 +312,7 @@ type
     class procedure StartTransaction(const AConnectionName:String); virtual; abstract;
     class procedure CommitTransaction(const AConnectionName:String); virtual; abstract;
     class procedure RollbackTransaction(const AConnectionName:String); virtual; abstract;
+    class function InTransaction(const AConnectionName:String): boolean; virtual; abstract;
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
     class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
     class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); virtual; abstract;

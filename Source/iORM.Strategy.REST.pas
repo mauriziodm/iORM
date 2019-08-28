@@ -55,6 +55,7 @@ type
     class procedure StartTransaction(const AConnectionName:String); override;
     class procedure CommitTransaction(const AConnectionName:String); override;
     class procedure RollbackTransaction(const AConnectionName:String); override;
+    class function InTransaction(const AConnectionName:String): boolean; override;
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); override;
     class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); override;
     class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); override;
@@ -135,6 +136,12 @@ begin
     // Rollback
     LConnection.Rollback;
   end;
+end;
+
+class function TioStrategyREST.InTransaction(const AConnectionName: String): boolean;
+begin
+  inherited;
+  Result := TioDBFactory.Connection(AConnectionName).InTransaction;
 end;
 
 //class function TioStrategyREST.GetTransactionGUID: String;
