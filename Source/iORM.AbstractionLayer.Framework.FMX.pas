@@ -52,6 +52,7 @@ type
   TioApplicationFMX = class(TioApplication)
   protected
     class procedure _HandleException(const Sender: TObject); override;
+    class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
   end;
 
@@ -117,7 +118,7 @@ type
 implementation
 
 uses
-  FMX.Forms, iORM.Exceptions, FMX.Controls;
+  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls;
 
 { TioTimerFMX }
 
@@ -178,6 +179,11 @@ end;
 class procedure TioApplicationFMX._HandleException(const Sender: TObject);
 begin
   Application.HandleException(Sender);
+end;
+
+class procedure TioApplicationFMX._ShowMessage(const AMessage: string);
+begin
+  FMX.Dialogs.ShowMessage(AMessage);
 end;
 
 class function TioApplicationFMX._Terminate: Boolean;

@@ -52,6 +52,7 @@ type
   TioApplicationVCL = class(TioApplication)
   protected
     class procedure _HandleException(const Sender: TObject); override;
+    class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
   end;
 
@@ -117,13 +118,18 @@ type
 implementation
 
 uses
-  Vcl.Forms, Vcl.Controls, iORM.Exceptions;
+  Vcl.Forms, Vcl.Dialogs, Vcl.Controls, iORM.Exceptions;
 
 { TioApplicationVCL }
 
 class procedure TioApplicationVCL._HandleException(const Sender: TObject);
 begin
   Application.HandleException(Sender);
+end;
+
+class procedure TioApplicationVCL._ShowMessage(const AMessage: string);
+begin
+  Vcl.Dialogs.ShowMessage(AMessage);
 end;
 
 class function TioApplicationVCL._Terminate: Boolean;

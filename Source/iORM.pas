@@ -100,8 +100,9 @@ type
     class procedure SetWaitProc(const AShowWaitProc:TProc=nil; const AHideWaitProc:TProc=nil);
     class procedure ShowWait;
     class procedure HideWait;
-    class function TerminateApplication: Boolean;
     class procedure HandleException(Sender: TObject);
+    class procedure ShowMessage(const AMessage: String);
+    class function TerminateApplication: Boolean;
 
     // Create instance
     class function Create<T:IInterface>(const ATypeAlias:String=''; const AParams: TioConstructorParams=nil): T; overload;
@@ -411,6 +412,11 @@ class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVie
 begin
   if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
+end;
+
+class procedure io.ShowMessage(const AMessage: String);
+begin
+  TioApplication.ShowMessage(AMessage);
 end;
 
 class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AVVMAlias, AVCProviderName: String);
