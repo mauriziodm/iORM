@@ -377,6 +377,13 @@ end;
 class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;
   AQuery: IioQuery; AProperty: IioContextProperty): TObject;
 begin
+  // Prima di tutto verifica se esiste un oggetto di dettaglio sul DB
+  //  per farlo, al momento, non ho trovato altro modo che farlo caricare
+  //  in una variabile e poi verificare se il risulytato è nil o meno
+  if io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
+    ._Where  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
+    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+    .ToObject = nil then Exit(nil);
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
   //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
@@ -393,18 +400,26 @@ end;
 
 class function TioObjectMakerIntf.LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery;
   AProperty: IioContextProperty): TObject;
+var
+  LChildID: Integer;
 begin
+  Result := nil;  // NB: Altrimenti non veniva inizializzato a nil
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
   //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
   //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
   //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
   //       la ChildProperty destinazione.
+  //  NB: Se l'ID dell'oggetto dettaglio = 0 significa che quando è stato
+  //       persistito tale propriet in realtà era a nil (problema assenza nullable)
+  //       quindi in questo caso è meglio non caricare nulla
+  LChildID := AQuery.GetValue(AProperty).AsInteger;
+  if LChildID = 0 then
+    Exit;
+  // Create the instance if not assigned
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // Load the relation child object
-  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-    .ByOID(   AQuery.GetValue(AProperty).AsInteger   )
-    .ToObject(Result);
+  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByOID(LChildID).ToObject(Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
@@ -473,15 +488,18 @@ var
   LJSONObject: TJSONObject;
   LJSONObjectString: String;
 begin
+  Result := nil;  // NB: Altrimenti non veniva inizializzato a nil
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
   //  NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
   //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
   //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
   //       la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
+    Exit;
+  // Create the instance if not assigned
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // Get the JSONObject
   LJSONObjectString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   LJSONObject := TJSONObject.ParseJSONValue(LJSONObjectString) as TJSONObject;

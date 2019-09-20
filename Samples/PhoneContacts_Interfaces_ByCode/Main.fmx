@@ -7,7 +7,7 @@ object MainForm: TMainForm
   FormFactor.Width = 1440
   FormFactor.Height = 900
   FormFactor.Devices = [Desktop]
-  DesignerMasterStyle = 3
+  DesignerMasterStyle = 0
   object TabControl1: TTabControl
     Touch.GestureManager = GestureManager1
     OnGesture = TabControl1Gesture
@@ -32,7 +32,7 @@ object MainForm: TMainForm
         item
         end>
       IsSelected = True
-      Size.Width = 128.000000000000000000
+      Size.Width = 127.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'tabitemfavorites'
@@ -197,7 +197,7 @@ object MainForm: TMainForm
         item
         end>
       IsSelected = False
-      Size.Width = 128.000000000000000000
+      Size.Width = 127.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'tabitemcontacts'
