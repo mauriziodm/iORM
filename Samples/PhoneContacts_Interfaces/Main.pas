@@ -58,6 +58,7 @@ type
     LinkGridToDataSourceBSDetail: TLinkGridToDataSource;
     SQLiteConn: TioSQLiteConnectionDef;
     ioFMX1: TioFMX;
+    BindExpression1: TBindExpression;
     procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }

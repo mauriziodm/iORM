@@ -423,7 +423,7 @@ end;
 procedure TioModelPresenter.DoSelection(var ASelected: TObject;
   var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
-  if Assigned(FonAfterSelectionObject) then
+  if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
 end;
 

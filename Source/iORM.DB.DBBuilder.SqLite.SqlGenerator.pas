@@ -669,7 +669,7 @@ begin
 
   Result := LQueryDrop.SQL.Text;
 
-  LQueryDrop.SQL.SaveToFile('c:\temp\sql.txt');
+//  LQueryDrop.SQL.SaveToFile('c:\temp\sql.txt');
 end;
 
 function TioDBBuilderSqLiteSqlGenerator.TableExists(const ADbName: String; const ATableName:String): Boolean;
