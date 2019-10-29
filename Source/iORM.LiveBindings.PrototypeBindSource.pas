@@ -162,7 +162,7 @@ type
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
-    procedure SelectCurrent<T>(ASelectionType: TioSelectionType);
+    procedure SelectCurrent<T>(ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;

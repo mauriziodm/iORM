@@ -682,7 +682,10 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
 begin
-  raise EioException.Create(Self.ClassName, 'ReceiveSelection', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+  // Questo ActiveBindSourceAdapter funziona solo con gli oggetti (no interfacce)
+  //  quindi chiama l'altra versione di metodo più adatta. IN questo modo
+  //  è possibile gestire la selezione anche se il selettore non è concorde
+  ReceiveSelection(ASelected as TObject, ASelectionType);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.Refresh(ReloadData: Boolean);

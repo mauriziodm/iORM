@@ -675,19 +675,16 @@ begin
   inherited;
 end;
 
-procedure TioModelPresenter.Select<T>(AInstance: T;
-  ASelectionType: TioSelectionType);
+procedure TioModelPresenter.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
 begin
   // Some checks
   if not Assigned(FSelectorFor) then
-    raise EioException.Create(Self.ClassName, 'MakeSelection',
-      '"SelectorFor" property not assigned.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
   if not FSelectorFor.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection',
-      'Selection destination ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.BindSourceAdapter;
   // Encapsulate the SelectedInstance into a TValue then assign it
@@ -700,16 +697,14 @@ begin
   else if LValue.Kind = TTypeKind.tkClass then
     LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
   else
-    raise EioException.Create(Self.ClassName, 'Select<T>',
-      'Wrong LValue kind.');
+    raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
 procedure TioModelPresenter.SelectCurrent<T>(ASelectionType: TioSelectionType);
 begin
   // Some checks
   if not CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection',
-      'ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
   // Make the selection of current
   Select<T>(CurrentAs<T>, ASelectionType);
 end;

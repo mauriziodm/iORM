@@ -198,10 +198,8 @@ type
     procedure DeleteListViewItem(const AItemIndex: Integer;
       const ADelayMilliseconds: Integer = 100);
     function AsTBindSourceAdapter: TBindSourceAdapter;
-    procedure ReceiveSelection(ASelected: TObject;
-      ASelectionType: TioSelectionType); overload;
-    procedure ReceiveSelection(ASelected: IInterface;
-      ASelectionType: TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
 
     property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
@@ -775,9 +773,16 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.ReceiveSelection
   (ASelected: TObject; ASelectionType: TioSelectionType);
+var
+  LSelectedAsIntf: IInterface;
 begin
-  raise EioException.Create(Self.ClassName, 'ReceiveSelection',
-    'This ActiveBindSourceAdapter is for interface referenced instances only.');
+  // Questo ActiveBindSourceAdapter funziona solo con gli oggetti (no interfacce)
+  //  quindi chiama l'altra versione di metodo più adatta. IN questo modo
+  //  è possibile gestire la selezione anche se il selettore non è concorde
+  if Supports(ASelected, IInterface, LSelectedAsIntf) then
+    ReceiveSelection(LSelectedAsIntf, ASelectionType)
+  else
+    raise EioException.Create(Self.ClassName, 'ReceiveSelection', 'Selected instance does not support any interface.');
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.ReceiveSelection
