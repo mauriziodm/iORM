@@ -162,7 +162,7 @@ type
     function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
     procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
-    procedure SelectCurrent<T>(ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    procedure SelectCurrent(ASelectionType:TioSelectionType=TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
     property ioWhere:IioWhere read GetWhere write SetWhere;
@@ -660,13 +660,20 @@ begin
     raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
-procedure TioPrototypeBindSource.SelectCurrent<T>(ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.SelectCurrent(ASelectionType: TioSelectionType);
+var
+  LDestBSA: IioActiveBindSourceAdapter;
 begin
   // Some checks
   if not CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, not present.');
+  // Get the selection destination BindSourceAdapter
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Make the selection of current
-  Select<T>(CurrentAs<T>, ASelectionType);
+  if LDestBSA.IsInterfaceBSA then
+    Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
+  else
+    Select<TObject>(Current, ASelectionType);
 end;
 
 procedure TioPrototypeBindSource.SetAsync(const Value: Boolean);

@@ -188,7 +188,7 @@ type
     function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
-    procedure SelectCurrent<T>(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
     procedure ShowCurrent(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
@@ -700,13 +700,20 @@ begin
     raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
-procedure TioModelPresenter.SelectCurrent<T>(ASelectionType: TioSelectionType);
+procedure TioModelPresenter.SelectCurrent(ASelectionType: TioSelectionType);
+var
+  LDestBSA: IioActiveBindSourceAdapter;
 begin
   // Some checks
   if not CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, not present.');
+  // Get the selection destination BindSourceAdapter
+  LDestBSA := FSelectorFor.BindSourceAdapter;
   // Make the selection of current
-  Select<T>(CurrentAs<T>, ASelectionType);
+  if LDestBSA.IsInterfaceBSA then
+    Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
+  else
+    Select<TObject>(Current, ASelectionType);
 end;
 
 function TioModelPresenter.CurrentMasterObject: TObject;
