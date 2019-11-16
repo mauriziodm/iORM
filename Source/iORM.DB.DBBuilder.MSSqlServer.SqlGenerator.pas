@@ -61,6 +61,7 @@ type
     FAlterTableScript: String;
     function GetColumnType(const AProperty: IioContextProperty): String;
     function ConversionTypeAdmitted(AColumnType: string; AModelColumnType: string): Boolean;
+    function ReplaceSpecialWords(ASql: string): string;
   protected
   public
     function DatabaseExists(const ADbName: string): Boolean;
@@ -253,7 +254,8 @@ var
 begin
   AContext.SetConnectionDefName(GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
-  Result := LQuery.SQL.Text;
+  // M.M. 16/11/19 - Sistemazione parole riservate SQL SERVER
+  Result := ReplaceSpecialWords(LQuery.SQL.Text);
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
@@ -706,6 +708,17 @@ begin
     Result := '-- '
   else
     Result := '';
+end;
+
+function TioDBBuilderMSSqlServerSqlGenerator.ReplaceSpecialWords(
+  ASql: string): string;
+begin
+  ASql := ASql.ToUpper.Replace('GROUP ASC','[GROUP] ASC',[rfReplaceAll]);
+  ASql := ASql.ToUpper.Replace('USER ASC','[USER] ASC',[rfReplaceAll]);
+  ASql := ASql.ToUpper.Replace('GROUP DESC','[GROUP] DESC',[rfReplaceAll]);
+  ASql := ASql.ToUpper.Replace('USER DESC','[USER] DESC',[rfReplaceAll]);
+
+  Result := ASql;
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.RestructureTable(

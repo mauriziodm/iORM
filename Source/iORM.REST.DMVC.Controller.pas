@@ -39,7 +39,10 @@ unit iORM.REST.DMVC.Controller;
 
 interface
 
-uses MVCFramework;
+uses 
+  MVCFramework,
+  // M.M. 16/11/19 Aggiunta unit per nuova versione di DMVC Framework
+  MVCFramework.Commons;
 
 type
 
