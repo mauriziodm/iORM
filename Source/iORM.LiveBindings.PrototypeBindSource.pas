@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.LiveBindings.PrototypeBindSource;
 
@@ -48,7 +46,7 @@ type
 
   TioMasterBindSource = TioPrototypeBindSource;
 
-  TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
+  TioPrototypeBindSource = class(TPrototypeBindSource, IioNotifiableBindSource)
   private
     FioTypeName: String;
     FioTypeAlias: String;
@@ -64,9 +62,17 @@ type
     FioAutoRefreshOnNotification: TioAutoRefreshType;
     FonNotify: TioBSANotificationEvent;
     FAutoPost: Boolean;
+    // Selectors
     FSelectorFor: TioPrototypeBindSource;
+    FOnReceiveSelectionAutoEdit: Boolean;
+    FOnReceiveSelectionAutoPost: Boolean;
+    FOnReceiveSelectionAutoPersist: Boolean;
+    // Edit/Insert/Post/Cancel propagation
+    FPropagateEdit: Boolean;
+    FPropagatePost: Boolean;
+    FPropagatePersist: Boolean;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
-    //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
+    // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
     // Selection related events
     FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
@@ -77,8 +83,9 @@ type
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
-    //  because is not implementing IInterface (NB: RefCount DISABLED)
-    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
+    // because is not implementing IInterface (NB: RefCount DISABLED)
+    function QueryInterface(const IID: TGUID; out Obj): HResult;
+      reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 {$IFDEF AUTOREFCOUNT}
@@ -88,8 +95,8 @@ type
     // =========================================================================
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Loaded; override;
-    procedure DoNotify(ANotification:IioBSANotification);
-    procedure WhereOnChangeEventHandler(Sender:TObject);
+    procedure DoNotify(ANotification: IioBSANotification);
+    procedure WhereOnChangeEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const Value: String);
     // TypeAlias
@@ -123,77 +130,97 @@ type
   protected
     function CheckActiveAdapter: Boolean;
     // Selectors related event for TObject selection
-    procedure DoBeforeSelection(var ASelected:TObject; var ASelectionType:TioSelectionType); overload;
-    procedure DoSelection(var ASelected:TObject; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
-    procedure DoAfterSelection(var ASelected:TObject; var ASelectionType:TioSelectionType); overload;
+    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
+    procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
+    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     // Selectors related event for IInterface selection
-    procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
-    procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
-    procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
+    procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
+    procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
-    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
+    procedure Notify(const Sender: TObject;
+      const ANotification: IioBSANotification);
+    procedure DeleteListViewItem(const AItemIndex: Integer;
+      const ADelayMilliseconds: Integer = 100);
+    procedure Edit; override;
+    procedure Post; override;
     procedure PostIfEditing;
+    procedure Cancel; override;
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
+    // Propagation
+    procedure _ReceivePropagateEdit(const ASenderBindSource: TioPrototypeBindSource);
+    procedure _ReceivePropagatePost(const ASenderBindSource: TioPrototypeBindSource);
+    procedure _ReceivePropagateCancel(const ASenderBindSource: TioPrototypeBindSource);
+    procedure _ReceivePropagatePersistCurrent(const ASenderBindSource: TioPrototypeBindSource);
+    procedure _ReceivePropagatePersistAll(const ASenderBindSource: TioPrototypeBindSource);
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(ReloadData:Boolean); reintroduce; overload;
+    procedure Refresh(ReloadData: Boolean); reintroduce; overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
-    procedure Append(AObject:TObject); overload;
-    procedure Append(AObject:IInterface); overload;
-    procedure Insert(AObject:TObject); reintroduce; overload;
-    procedure Insert(AObject:IInterface); reintroduce; overload;
+    procedure Append(AObject: TObject); overload;
+    procedure Append(AObject: IInterface); overload;
+    procedure Insert(AObject: TObject); reintroduce; overload;
+    procedure Insert(AObject: IInterface); reintroduce; overload;
     function DataObjectAssigned: Boolean;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
-    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
-    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
+    procedure SetDataObject(const ADataObject: TObject;
+      const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure ClearDataObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function GetDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere: IioWhere = nil): TBindSourceAdapter;
-    function GetNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
-    procedure Select<T>(AInstance:T; ASelectionType:TioSelectionType=TioSelectionType.stAppend);
-    procedure SelectCurrent(ASelectionType:TioSelectionType=TioSelectionType.stAppend);
+    function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): TBindSourceAdapter;
+    function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
+    procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    procedure SelectCurrent(ASelectionType : TioSelectionType = TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
-    property ioWhere:IioWhere read GetWhere write SetWhere;
+    property ioWhere: IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
     property ItemCount: Integer read GetCount;
-    property IsDetail:Boolean read GetIsDetail;
-    property IsInterfacePresenting:Boolean read GetIsInterfacePresenting;
+    property IsDetail: Boolean read GetIsDetail;
+    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting;
   published
     // Events
-    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
-    property ioOnBeforeSelectionObject:TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
-    property ioOnSelectionObject:TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
-    property ioOnAfterSelectionObject:TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
-    property ioOnBeforeSelectionInterface:TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
-    property ioOnSelectionInterface:TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
-    property ioOnAfterSelectionInterface:TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
+    property ioOnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
+    property ioOnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property ioOnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
+    property ioOnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
+    property ioOnBeforeSelectionInterface : TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property ioOnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
+    property ioOnAfterSelectionInterface : TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
     // Properties
-    property ioTypeName:String read FioTypeName write SetTypeName;
-    property ioTypeAlias:String read FioTypeAlias write SetTypeAlias;
-    property ioAsync:Boolean read FioAsync write SetAsync;
-    property ioAutoLoadData:Boolean read FioAutoLoadData write SetAutoLoadData;
-    property ioAutoPersist:Boolean read FioAutoPersist write SetAutoPersist;
-    property ioViewDataType:TioViewDataType read FioViewDataType write FioViewDataType;
-    property ioWhereStr:TStrings read FioWhereStr write SetWhereStr;
+    property ioTypeName: String read FioTypeName write SetTypeName;
+    property ioTypeAlias: String read FioTypeAlias write SetTypeAlias;
+    property ioAsync: Boolean read FioAsync write SetAsync;
+    property ioAutoLoadData: Boolean read FioAutoLoadData write SetAutoLoadData;
+    property ioAutoPersist: Boolean read FioAutoPersist write SetAutoPersist;
+    property ioViewDataType: TioViewDataType read FioViewDataType write FioViewDataType;
+    property ioWhereStr: TStrings read FioWhereStr write SetWhereStr;
     property ioWhereDetailsFromDetailAdapters: Boolean read FioWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
-    property ioOrderBy:String read FioOrderBy Write SetOrderBy;
-    property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
-    property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
-    property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
+    property ioOrderBy: String read FioOrderBy Write SetOrderBy;
+    property ioMasterBindSource: TioMasterBindSource read FioMasterBindSource write FioMasterBindSource;
+    property ioMasterPropertyName: String read FioMasterPropertyName write FioMasterPropertyName;
+    property ioAutoRefreshOnNotification: TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
     property AutoPost: Boolean read GetAutoPost write SetAutoPost;
+    // Selectors
     property ioSelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor;
+    property ioOnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit;
+    property ioOnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost;
+    property ioOnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist;
+    // Edit/Insert/Post/Cancel propagation
+    property ioPropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
+    property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
+    property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
   end;
 
 implementation
@@ -205,10 +232,12 @@ uses
 { TioPrototypeBindSource }
 
 {$IFDEF AUTOREFCOUNT}
+
 function TioPrototypeBindSource.__ObjAddRef: Integer;
 begin
   // Nothing (event the "inherited")
 end;
+
 function TioPrototypeBindSource.__ObjRelease: Integer;
 begin
   // Nothing (event the "inherited")
@@ -218,7 +247,10 @@ end;
 procedure TioPrototypeBindSource.Append;
 begin
   if CheckAdapter then
+  begin
     GetInternalAdapter.Append;
+    _ReceivePropagateEdit(Self);
+  end;
 end;
 
 procedure TioPrototypeBindSource.Append(AObject: TObject);
@@ -228,13 +260,15 @@ begin
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Append(AObject);
-// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-//      invocato un Post in seguito al Refresh stesso.
-//    AnActiveBSA.Refresh(False);
+    _ReceivePropagateEdit(Self);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+    raise EioException.Create(Self.ClassName +
+      ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 procedure TioPrototypeBindSource.Append(AObject: IInterface);
@@ -244,13 +278,21 @@ begin
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Append(AObject);
-// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-//      invocato un Post in seguito al Refresh stesso.
-//    AnActiveBSA.Refresh(False);
+    _ReceivePropagateEdit(Self);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+    raise EioException.Create(Self.ClassName +
+      ': Internal adapter is not an ActiveBindSourceAdapter!');
+end;
+
+procedure TioPrototypeBindSource.Cancel;
+begin
+  inherited;
+  _ReceivePropagateCancel(Self);
 end;
 
 procedure TioPrototypeBindSource.CancelIfEditing;
@@ -261,10 +303,11 @@ end;
 
 function TioPrototypeBindSource.CheckActiveAdapter: Boolean;
 begin
-//  Result := (not (csDesigning in ComponentState))
-//    and CheckAdapter
-//    and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
-  Result := CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  // Result := (not (csDesigning in ComponentState))
+  // and CheckAdapter
+  // and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  Result := CheckAdapter and Supports(GetInternalAdapter,
+    IioActiveBindSourceAdapter);
 end;
 
 procedure TioPrototypeBindSource.ClearDataObject;
@@ -282,15 +325,23 @@ begin
   FioAutoLoadData := True;
   FioAutoPersist := True;
   FioViewDataType := dtList;
+  // Selectors
   FSelectorFor := nil;
+  FOnReceiveSelectionAutoEdit := False;
+  FOnReceiveSelectionAutoPost := False;
+  FOnReceiveSelectionAutoPersist := False;
+  // Edit/Insert/Post/Cancel propagation
+  FPropagateEdit := False;
+  FPropagatePost := False;
+  FPropagatePersist := False;
   // Set even an onChange event handler
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;
-  SetWhereStr(FioWhereStr);  // set TStringList.onChange event handler
+  SetWhereStr(FioWhereStr); // set TStringList.onChange event handler
 end;
 
 procedure TioPrototypeBindSource.DeleteListViewItem(const AItemIndex,
-  ADelayMilliseconds: integer);
+  ADelayMilliseconds: Integer);
 begin
   GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
@@ -301,32 +352,50 @@ begin
   inherited;
 end;
 
-procedure TioPrototypeBindSource.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.DoAfterSelection(var ASelected: IInterface;
+  var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
+  // SelectorAutoEdit/Post/Persist
+  if FOnReceiveSelectionAutoEdit then
+    Edit;
+  if FOnReceiveSelectionAutoPost then
+    PostIfEditing;
+  if FOnReceiveSelectionAutoPersist then
+    PersistCurrent;
 end;
 
-procedure TioPrototypeBindSource.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.DoAfterSelection(var ASelected: TObject;
+  var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
+  // SelectorAutoEdit/Post/Persist
+  if FOnReceiveSelectionAutoEdit then
+    Edit;
+  if FOnReceiveSelectionAutoPost then
+    PostIfEditing;
+  if FOnReceiveSelectionAutoPersist then
+    PersistCurrent;
 end;
 
-procedure TioPrototypeBindSource.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.DoBeforeSelection(var ASelected: IInterface;
+  var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionInterface) then
     FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioPrototypeBindSource.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.DoBeforeSelection(var ASelected: TObject;
+  var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioPrototypeBindSource.DoCreateAdapter(
-  var ADataObject: TBindSourceAdapter);
+procedure TioPrototypeBindSource.DoCreateAdapter(var ADataObject
+  : TBindSourceAdapter);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -334,60 +403,71 @@ begin
   inherited;
   // If in DesignTime then Exit
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
-  //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
-  if (csDesigning in ComponentState)
-  or (not FioLoaded)
-    then Exit;
+  // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
+  if (csDesigning in ComponentState) or (not FioLoaded) then
+    Exit;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If AdataObject is NOT already assigned (by onCreateAdapter event handler) then
-  //  retrieve a BindSourceAdapter automagically by iORM
+  // retrieve a BindSourceAdapter automagically by iORM
   if (not Assigned(ADataObject)) and not ioTypeName.IsEmpty then
   begin
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
-    //  else get the adapter directly from iORM
+    // else get the adapter directly from iORM
     if Assigned(Self.ioMasterBindSource) then
-      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy))
+      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self,
+        Self.FioMasterBindSource, Self.ioMasterPropertyName,
+        TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy))
     else
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FioTypeName, FioTypeAlias, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil, True) as TBindSourceAdapter;
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FioTypeName,
+        FioTypeAlias, TioWhereFactory.NewWhere.Add(ioWhereStr.Text)
+        ._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil, True)
+        as TBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
-  //  in the ActiveBindSourceAdapter
-  //  PS: Set ioAsync also (and other properties)
-  if  Assigned(ADataObject)
-  and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA)
-  and Supports(Self, IioNotifiableBindSource)
-  then
+  // in the ActiveBindSourceAdapter
+  // PS: Set ioAsync also (and other properties)
+  if Assigned(ADataObject) and Supports(ADataObject, IioActiveBindSourceAdapter,
+    LActiveBSA) and Supports(Self, IioNotifiableBindSource) then
   begin
     LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.ioAsync := FioAsync;
-    LActiveBSA.ioWhereDetailsFromDetailAdapters := FioWhereDetailsFromDetailAdapters;
+    LActiveBSA.ioWhereDetailsFromDetailAdapters :=
+      FioWhereDetailsFromDetailAdapters;
     LActiveBSA.ioAutoPersist := FioAutoPersist;
     LActiveBSA.SetBindSource(Self);
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioPrototypeBindSource.DoNotify(ANotification:IioBSANotification);
+procedure TioPrototypeBindSource.DoNotify(ANotification: IioBSANotification);
 begin
   // If assigned execute the event handler
-  if Assigned(FonNotify)
-    then ioOnNotify(Self, ANotification);
+  if Assigned(FonNotify) then
+    ioOnNotify(Self, ANotification);
   // If enabled perform an AutoRefresh operation
-  if Self.ioAutoRefreshOnNotification > arDisabled
-    then Self.Refresh(Self.ioAutoRefreshOnNotification = arEnabledReload);
+  if Self.ioAutoRefreshOnNotification > arDisabled then
+    Self.Refresh(Self.ioAutoRefreshOnNotification = arEnabledReload);
 end;
 
-procedure TioPrototypeBindSource.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioPrototypeBindSource.DoSelection(var ASelected: TObject;
+  var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
 end;
 
-procedure TioPrototypeBindSource.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioPrototypeBindSource.DoSelection(var ASelected: IInterface;
+  var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionInterface) then
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
+end;
+
+procedure TioPrototypeBindSource.Edit;
+begin
+  inherited;
+  _ReceivePropagateEdit(Self);
 end;
 
 procedure TioPrototypeBindSource.ForEach(const AForEachMethod: TProc);
@@ -425,7 +505,7 @@ end;
 function TioPrototypeBindSource.CurrentMasterObject: TObject;
 begin
   if CheckAdapter and IsDetail then
-    Result := Self.GetActivebindSourceAdapter.GetMasterBindSourceAdapter.Current
+    Result := Self.GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
 end;
@@ -438,7 +518,8 @@ begin
   Result := TioRttiUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
-function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+function TioPrototypeBindSource.GetActiveBindSourceAdapter
+  : IioActiveBindSourceAdapter;
 begin
   Result := nil;
   Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
@@ -481,22 +562,25 @@ begin
     Result := False;
 end;
 
-function TioPrototypeBindSource.GetDetailBindSourceAdapter(
-  const AOwner: TComponent; const AMasterPropertyName: String;
+function TioPrototypeBindSource.GetDetailBindSourceAdapter
+  (const AOwner: TComponent; const AMasterPropertyName: String;
   const AWhere: IioWhere): TBindSourceAdapter;
 var
   AContainedBSA: IioContainedBindSourceAdapter;
 begin
   Result := nil;
-  if Supports(Self.InternalAdapter, IioContainedBindSourceAdapter, AContainedBSA) then
-    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
+  if Supports(Self.InternalAdapter, IioContainedBindSourceAdapter, AContainedBSA)
+  then
+    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner,
+      AMasterPropertyName, AWhere);
 end;
 
 function TioPrototypeBindSource.GetWhere: IioWhere;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     Result := LActiveBSA.ioWhere
   else
     Result := nil;
@@ -509,13 +593,15 @@ begin
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Insert(AObject);
-// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-//      invocato un Post in seguito al Refresh stesso.
-//    AnActiveBSA.Refresh(False);
+    _ReceivePropagateEdit(Self);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+    raise EioException.Create(Self.ClassName +
+      ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 procedure TioPrototypeBindSource.Insert(AObject: TObject);
@@ -525,13 +611,15 @@ begin
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
   begin
     AnActiveBSA.Insert(AObject);
-// NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-//      il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-//      invocato un Post in seguito al Refresh stesso.
-//    AnActiveBSA.Refresh(False);
+    _ReceivePropagateEdit(Self);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
+    raise EioException.Create(Self.ClassName +
+      ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 function TioPrototypeBindSource.GetIsDetail: Boolean;
@@ -542,15 +630,16 @@ end;
 function TioPrototypeBindSource.GetIsInterfacePresenting: Boolean;
 begin
   if CheckAdapter then
-   Result := GetActiveBindSourceAdapter.IsInterfaceBSA
+    Result := GetActiveBindSourceAdapter.IsInterfaceBSA
   else
-   Result := TioRttiUtilities.IsAnInterfaceTypeName(ioTypeName);
+    Result := TioRttiUtilities.IsAnInterfaceTypeName(ioTypeName);
 end;
 
-function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(
-  const AOwner: TComponent): TBindSourceAdapter;
+function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter
+  (const AOwner: TComponent): TBindSourceAdapter;
 begin
-  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner);
+  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource)
+    .NewNaturalObjectBindSourceAdapter(AOwner);
 end;
 
 function TioPrototypeBindSource.GetState: TBindSourceAdapterState;
@@ -567,14 +656,14 @@ var
 begin
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
-  if not (csDesigning in ComponentState) then
+  if not(csDesigning in ComponentState) then
     TioComponentsCommon.RegisterConnectionDefComponents(Owner);
   // ===========================================================================
 
   // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
   // ===========================================================================
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
-  //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
+  // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
   // ---------------------------------------------------------------------------
   FioLoaded := True;
   if not Assigned(Self.OnCreateAdapter) then
@@ -597,14 +686,24 @@ end;
 
 procedure TioPrototypeBindSource.PersistAll;
 begin
-  if CheckActiveAdapter then
+  if IsDetail and FPropagatePersist then
+    _ReceivePropagatePersistAll(Self)
+  else if CheckActiveAdapter then
     GetActiveBindSourceAdapter.PersistAll;
 end;
 
 procedure TioPrototypeBindSource.PersistCurrent;
 begin
-  if CheckActiveAdapter then
+  if IsDetail and FPropagatePersist then
+    _ReceivePropagatePersistCurrent(Self)
+  else if CheckActiveAdapter then
     GetActiveBindSourceAdapter.PersistCurrent;
+end;
+
+procedure TioPrototypeBindSource.Post;
+begin
+  inherited;
+  _ReceivePropagatePost(Self);
 end;
 
 procedure TioPrototypeBindSource.PostIfEditing;
@@ -626,47 +725,55 @@ end;
 procedure TioPrototypeBindSource.Refresh(ReloadData: Boolean);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
+  LPrecAutoload: Boolean;
 begin
-  if not CheckAdapter then Exit;
-  if Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  if not CheckAdapter then
+    Exit;
+  if Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA)
+  then
     AnActiveBSA.Refresh(ReloadData)
   else
     GetInternalAdapter.Refresh;
 end;
 
-procedure TioPrototypeBindSource.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.Select<T>(AInstance: T;
+  ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
 begin
   // Some checks
   if not Assigned(FSelectorFor) then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection',
+      '"SelectorFor" property not assigned.');
   if not FSelectorFor.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection',
+      'Selection destination ActiveBindSourceAdapter, non present.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Encapsulate the SelectedInstance into a TValue then assign it
-  //  as selection in a proper way
-  //  NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
-  //       facendo cos' invece (cioè passando per un TValue) funziona correttamente.
+  // as selection in a proper way
+  // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
+  // facendo cos' invece (cioè passando per un TValue) funziona correttamente.
   LValue := TValue.From<T>(AInstance);
   if LValue.Kind = TTypeKind.tkInterface then
     LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
-  else
-  if LValue.Kind = TTypeKind.tkClass then
+  else if LValue.Kind = TTypeKind.tkClass then
     LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
   else
-    raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
+    raise EioException.Create(Self.ClassName, 'Select<T>',
+      'Wrong LValue kind.');
 end;
 
-procedure TioPrototypeBindSource.SelectCurrent(ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSource.SelectCurrent(ASelectionType
+  : TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
 begin
   // Some checks
   if not CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, not present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection',
+      'ActiveBindSourceAdapter, not present.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Make the selection of current
@@ -682,7 +789,8 @@ var
 begin
   FioAsync := Value;
   // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAsync := Value;
 end;
 
@@ -692,7 +800,8 @@ var
 begin
   FioAutoLoadData := Value;
   // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAutoLoadData := Value;
 end;
 
@@ -702,7 +811,8 @@ var
 begin
   FioAutoPersist := Value;
   // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAutoPersist := Value;
 end;
 
@@ -714,28 +824,30 @@ begin
     Self.InternalAdapter.AutoPost := Value;
 end;
 
-procedure TioPrototypeBindSource.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSource.SetDataObject(const ADataObject: IInterface;
+  const AOwnsObject: Boolean);
 begin
-// NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
-//      si faceva un SetDataObject dava un errore perchè la funzione
-//      CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
-//      assegnato (se prima avevo chiamato il  ClearDataObject
-//  if CheckActiveAdapter then
-    Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
-//  else
-//    raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+  // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
+  // si faceva un SetDataObject dava un errore perchè la funzione
+  // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
+  // assegnato (se prima avevo chiamato il  ClearDataObject
+  // if CheckActiveAdapter then
+  Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+  // else
+  // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
 
-procedure TioPrototypeBindSource.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSource.SetDataObject(const ADataObject: TObject;
+  const AOwnsObject: Boolean);
 begin
-// NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
-//      si faceva un SetDataObject dava un errore perchè la funzione
-//      CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
-//      assegnato (se prima avevo chiamato il  ClearDataObject
-//  if CheckActiveAdapter then
-    Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
-//  else
-//    raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+  // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
+  // si faceva un SetDataObject dava un errore perchè la funzione
+  // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
+  // assegnato (se prima avevo chiamato il  ClearDataObject
+  // if CheckActiveAdapter then
+  Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+  // else
+  // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
 
 procedure TioPrototypeBindSource.SetWhere(const Value: IioWhere);
@@ -743,7 +855,8 @@ var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Update the adapter where
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhere := Value;
 end;
 
@@ -751,10 +864,10 @@ procedure TioPrototypeBindSource.SetWhereStr(const Value: TStrings);
 begin
   FioWhereStr.Assign(Value);
   // If in DesignTime then Exit
-  //  NB: Mettendo questa linea di codice ho risolto il problema che i ioPBS
-  //       anche se erano con "AutoActivate=False" quando veniva aperta (caricata)
-  //       la form che li conteneva a design time apparivano cmq con i dati finti di
-  //       prova anzichè rimanere vuoti.
+  // NB: Mettendo questa linea di codice ho risolto il problema che i ioPBS
+  // anche se erano con "AutoActivate=False" quando veniva aperta (caricata)
+  // la form che li conteneva a design time apparivano cmq con i dati finti di
+  // prova anzichè rimanere vuoti.
   if (csDesigning in ComponentState) then
     Exit;
   // Set the onChange event handler
@@ -769,8 +882,9 @@ var
 begin
   FioOrderBy := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
-  //  update the where of the adapter also
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  // update the where of the adapter also
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhere.SetOrderBySql(Value);
 end;
 
@@ -778,7 +892,7 @@ procedure TioPrototypeBindSource.SetTypeAlias(const Value: String);
 begin
   FioTypeAlias := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
-  //  update the where of the adapter also
+  // update the where of the adapter also
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ioTypeAlias := Value;
 end;
@@ -787,19 +901,20 @@ procedure TioPrototypeBindSource.SetTypeName(const Value: String);
 begin
   FioTypeName := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
-  //  update the where of the adapter also
+  // update the where of the adapter also
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ioTypeName := Value;
 end;
 
-procedure TioPrototypeBindSource.SetWhereDetailsFromDetailAdapters(
-  const Value: Boolean);
+procedure TioPrototypeBindSource.SetWhereDetailsFromDetailAdapters
+  (const Value: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
   FioWhereDetailsFromDetailAdapters := Value;
   // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter and Supports(Self.GetInternalAdapter,
+    IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhereDetailsFromDetailAdapters := Value;
 end;
 
@@ -811,6 +926,51 @@ end;
 function TioPrototypeBindSource._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+end;
+
+procedure TioPrototypeBindSource._ReceivePropagateCancel(const ASenderBindSource
+  : TioPrototypeBindSource);
+begin
+  if IsDetail and FPropagatePost then
+    FioMasterBindSource._ReceivePropagateCancel(Self)
+  else if ASenderBindSource <> Self then
+    CancelIfEditing;
+end;
+
+procedure TioPrototypeBindSource._ReceivePropagateEdit(const ASenderBindSource
+  : TioPrototypeBindSource);
+begin
+  if IsDetail and FPropagateEdit then
+    FioMasterBindSource._ReceivePropagateEdit(Self)
+  else if ASenderBindSource <> Self then
+    Edit;
+end;
+
+procedure TioPrototypeBindSource._ReceivePropagatePersistAll(const ASenderBindSource
+      : TioPrototypeBindSource);
+begin
+  if IsDetail and FPropagatePersist then
+    FioMasterBindSource._ReceivePropagatePersistAll(Self)
+  else if ASenderBindSource <> Self then
+    PersistAll;
+end;
+
+procedure TioPrototypeBindSource._ReceivePropagatePersistCurrent
+  (const ASenderBindSource: TioPrototypeBindSource);
+begin
+  if IsDetail and FPropagatePersist then
+    FioMasterBindSource._ReceivePropagatePersistCurrent(Self)
+  else if ASenderBindSource <> Self then
+    PersistCurrent;
+end;
+
+procedure TioPrototypeBindSource._ReceivePropagatePost(const ASenderBindSource
+  : TioPrototypeBindSource);
+begin
+  if IsDetail and FPropagatePost then
+    FioMasterBindSource._ReceivePropagatePost(Self)
+  else if ASenderBindSource <> Self then
+    PostIfEditing;
 end;
 
 function TioPrototypeBindSource._Release: Integer;
