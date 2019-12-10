@@ -63,7 +63,15 @@ type
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
     FAutoPost: Boolean;
+    // Selectors
     FSelectorFor: TioModelPresenter;
+    FOnReceiveSelectionAutoEdit: Boolean;
+    FOnReceiveSelectionAutoPost: Boolean;
+    FOnReceiveSelectionAutoPersist: Boolean;
+    // Edit/Insert/Post/Cancel propagation
+    FPropagateEdit: Boolean;
+    FPropagatePost: Boolean;
+    FPropagatePersist: Boolean;
     // Questà è una collezione dove eventuali ModelPresenters di dettaglio
     // si registrano per rendere nota la loro esistenza al Master. Sarà poi
     // usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -197,6 +205,12 @@ type
     procedure ShowEach(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
     procedure ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
     procedure ShowEach(const AViewContext: TComponent; const AAlias: String = ''); overload;
+    // Propagation
+    procedure _ReceivePropagateEdit(const ASenderBindSource: TioModelPresenter);
+    procedure _ReceivePropagatePost(const ASenderBindSource: TioModelPresenter);
+    procedure _ReceivePropagateCancel(const ASenderBindSource: TioModelPresenter);
+    procedure _ReceivePropagatePersistCurrent(const ASenderBindSource: TioModelPresenter);
+    procedure _ReceivePropagatePersistAll(const ASenderBindSource: TioModelPresenter);
     // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
     procedure ClearDataObject;
@@ -242,7 +256,15 @@ type
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType;
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
     property WhereStr: TStrings read FWhereStr write SetWhereStr;
+    // Selectors
     property SelectorFor: TioModelPresenter read FSelectorFor write FSelectorFor;
+    property ioOnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit;
+    property ioOnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost;
+    property ioOnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist;
+    // Edit/Insert/Post/Cancel propagation
+    property ioPropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
+    property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
+    property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
   end;
 
 implementation
@@ -322,7 +344,15 @@ begin
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
+  // Selectors
   FSelectorFor := nil;
+  FOnReceiveSelectionAutoEdit := False;
+  FOnReceiveSelectionAutoPost := False;
+  FOnReceiveSelectionAutoPersist := False;
+  // Edit/Insert/Post/Cancel propagation
+  FPropagateEdit := False;
+  FPropagatePost := False;
+  FPropagatePersist := False;
   // Set even an onChange event handler
   FWhereStr := TStringList.Create;
   SetWhereStr(FWhereStr); // set TStringList.onChange event handler
@@ -387,6 +417,13 @@ procedure TioModelPresenter.DoAfterSelection(var ASelected: IInterface;
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
+  // SelectorAutoEdit/Post/Persist
+  if FOnReceiveSelectionAutoEdit then
+    Edit;
+  if FOnReceiveSelectionAutoPost then
+    PostIfEditing;
+  if FOnReceiveSelectionAutoPersist then
+    PersistCurrent;
 end;
 
 procedure TioModelPresenter.DoAfterSelection(var ASelected: TObject;
@@ -394,6 +431,13 @@ procedure TioModelPresenter.DoAfterSelection(var ASelected: TObject;
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
+  // SelectorAutoEdit/Post/Persist
+  if FOnReceiveSelectionAutoEdit then
+    Edit;
+  if FOnReceiveSelectionAutoPost then
+    PostIfEditing;
+  if FOnReceiveSelectionAutoPersist then
+    PersistCurrent;
 end;
 
 procedure TioModelPresenter.DoBeforeSelection(var ASelected: IInterface;
@@ -1066,6 +1110,46 @@ begin
   end;
   // Init the BSA
   FBindSourceAdapter.ioAutoPost := FAutoPost;
+end;
+
+procedure TioModelPresenter._ReceivePropagateCancel(const ASenderBindSource: TioModelPresenter);
+begin
+  if IsDetail and FPropagatePost then
+    FMasterPresenter._ReceivePropagateCancel(Self)
+  else if ASenderBindSource <> Self then
+    CancelIfEditing;
+end;
+
+procedure TioModelPresenter._ReceivePropagateEdit(const ASenderBindSource: TioModelPresenter);
+begin
+  if IsDetail and FPropagateEdit then
+    FMasterPresenter._ReceivePropagateEdit(Self)
+  else if ASenderBindSource <> Self then
+    Edit;
+end;
+
+procedure TioModelPresenter._ReceivePropagatePersistAll(const ASenderBindSource: TioModelPresenter);
+begin
+  if IsDetail and FPropagatePersist then
+    FMasterPresenter._ReceivePropagatePersistAll(Self)
+  else if ASenderBindSource <> Self then
+    PersistAll;
+end;
+
+procedure TioModelPresenter._ReceivePropagatePersistCurrent(const ASenderBindSource: TioModelPresenter);
+begin
+  if IsDetail and FPropagatePersist then
+    FMasterPresenter._ReceivePropagatePersistCurrent(Self)
+  else if ASenderBindSource <> Self then
+    PersistCurrent;
+end;
+
+procedure TioModelPresenter._ReceivePropagatePost(const ASenderBindSource: TioModelPresenter);
+begin
+  if IsDetail and FPropagatePost then
+    FMasterPresenter._ReceivePropagatePost(Self)
+  else if ASenderBindSource <> Self then
+    PostIfEditing;
 end;
 
 procedure TioModelPresenter.Insert(AObject: IInterface);
