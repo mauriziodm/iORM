@@ -447,6 +447,7 @@ begin
         PropRelationType := ioRTBelongsTo;
         PropRelationChildTypeName := ioBelongsTo(Attr).ChildTypeName;
         PropRelationChildTypeAlias := ioBelongsTo(Attr).ChildTypeAlias;
+        PropMetadata_FieldType := ioMdInteger;  // If is a BelongsTo relation then the field type on DB in integer
       end;
       if Attr is ioHasMany then
       begin
