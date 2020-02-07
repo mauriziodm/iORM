@@ -63,8 +63,7 @@ type
       const AMetadata_FieldNullable: Boolean;
       const AMetadata_FieldUnicode: Boolean;
       const AMetadata_CustomFieldType: string;
-      const AMetadata_FKCreate: Boolean;
-      const AMetadata_FieldSubType: string;
+      const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
       const AMetadata_FKDeleteCreate: Boolean;
       const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType;
@@ -141,10 +140,8 @@ class function TioContextFactory.GetProperty(const AMapMode: TioMapModeType;
   const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean;
   const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string;
-  const AMetadata_FKCreate: Boolean;
-  const AMetadata_FieldSubType: string;
-  const AMetadata_FKDeleteCreate: Boolean;
+  const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean;
+  const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
   const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
 begin
   case AMapMode of
@@ -156,8 +153,8 @@ begin
         ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
         AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
         AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_FKCreate,
-        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
+        AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
+        AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
     // Fields map mode
     ioFields:
       Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias,
@@ -166,8 +163,8 @@ begin
         ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
         AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
         AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_FKCreate,
-        AMetadata_FieldSubType, AMetadata_FKDeleteCreate,AMetadata_FKUpdateCreate);
+        AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
+        AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
   end;
 end;
 
@@ -347,6 +344,8 @@ begin
     // per poter stabilire il tipo di default da utilizzare per la
     // creazione del campo nel builder se non viene specificato un
     // attributo specifico
+    // Mauri: Non si potrebbe evitare di ciclare per tutti gli attributi qui visto che lo facciamo già
+    //         più sotto? Potremmo unire i due cicli facendone uno solo?
     for Attr in Prop.GetAttributes do
     begin
       // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
@@ -367,8 +366,8 @@ begin
     PropMetadata_CustomFieldType := '';
     PropMetadata_FKCreate := False;
     PropMetadata_FieldSubType := '';
-    PropMetadata_FKCascadeUpdate := false;
-    PropMetadata_FKCascadeDelete := false;
+    PropMetadata_FKCascadeUpdate := False;
+    PropMetadata_FKCascadeDelete := False;
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
