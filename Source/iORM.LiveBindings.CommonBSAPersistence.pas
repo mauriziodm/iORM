@@ -99,9 +99,12 @@ var
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
   LResultValue: TObject;
 begin
-  // Init
-{ TODO : Abort da eliminare??? }
+// NB: Abort da eliminare???
 //  AAbort := False;
+
+  // If current is nil then exit
+  if not Assigned(AActiveBindSourceAdapter.Current) then
+    Exit;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
   LResultValue := nil;
@@ -139,7 +142,7 @@ begin
   else
   begin
     LOnTerminate(LResultValue);
-{ TODO : Abort da eliminare??? }
+// NB: Abort da eliminare???
 //    AAbort := True;
   end;
 end;

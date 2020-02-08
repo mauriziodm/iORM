@@ -977,8 +977,7 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus
   (AObjStatus: TioObjectStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current)
-    .ObjectStatus := AObjStatus;
+  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.UseObjStatus: Boolean;
