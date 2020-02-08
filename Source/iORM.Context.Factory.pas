@@ -302,7 +302,7 @@ var
             Exit;
           end;
         end;
-      tkClass:
+      tkClass, tkInterface:
         begin
           Result := ioMdBinary;
           Exit;
@@ -313,12 +313,8 @@ var
 begin
   // Get members list (Properties or Fields)
   case ATable.GetMapMode of
-    ioProperties:
-      PropsFields := TArray<System.Rtti.TRttiMember>
-        (TObject(Typ.AsInstance.GetProperties));
-    ioFields:
-      PropsFields := TArray<System.Rtti.TRttiMember>
-        (TObject(Typ.AsInstance.GetFields));
+    ioProperties: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
+    ioFields: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetFields));
   end;
   // Create result Properties object
   Result := TioProperties.Create;
@@ -328,15 +324,12 @@ begin
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind
-        (LRttiProperty.PropertyType.TypeKind,
-        LRttiProperty.PropertyType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
     end
     else if Prop is TRttiField then
     begin
       LRttiField := Prop as TRttiField;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind
-        (LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end;
 
     // M.M. 08/10/18
