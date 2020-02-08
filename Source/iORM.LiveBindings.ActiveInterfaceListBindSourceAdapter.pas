@@ -183,20 +183,17 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     procedure Notify(Sender: TObject;
       ANotification: IioBSANotification); virtual;
-    procedure Refresh(ReloadData: Boolean); reintroduce; overload;
+    procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
     function DataObject: TObject;
-    procedure SetDataObject(const ADataObject: TObject;
-      const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface;
-      const AOwnsObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
     function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    procedure DeleteListViewItem(const AItemIndex: Integer;
-      const ADelayMilliseconds: Integer = 100);
+    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
@@ -204,12 +201,9 @@ type
     property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
-    property ioAutoPersist: Boolean read GetioAutoPersist
-      write SetioAutoPersist;
+    property ioAutoPersist: Boolean read GetioAutoPersist write SetioAutoPersist;
     property ioWhereStr: IioWhere read GetioWhere write SetIoWhere;
-    property ioWhereDetailsFromDetailAdapters: Boolean
-      read GetioWhereDetailsFromDetailAdapters
-      write SetioWhereDetailsFromDetailAdapters;
+    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
     property ioViewDataType: TioViewDataType read GetIoViewDataType;
     property ioOwnsObjects: Boolean read GetOwnsObjects;
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
@@ -803,21 +797,27 @@ begin
   DoAfterSelection(ASelected, ASelectionType);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.Refresh(ReloadData: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 var
   PrecReloadData: Boolean;
 begin
   // Se il BindSourceAdapter è un dettaglio allora propaga il Refresh al suo Master
   // questo perchè solo il master esegue realmente le query e quindi è quest'ultimo che
   // deve gestire il refresh con reload.
-  if IsDetail and Assigned(FMasterAdaptersContainer) and ReloadData then
-    FMasterAdaptersContainer.GetMasterBindSourceAdapter.Refresh(ReloadData)
+  if IsDetail and Assigned(FMasterAdaptersContainer) and AReloadData then
+    FMasterAdaptersContainer.GetMasterBindSourceAdapter.Refresh(AReloadData)
   else
   begin
     PrecReloadData := FReloadDataOnRefresh;
-    Self.FReloadDataOnRefresh := ReloadData;
-    inherited Refresh;
-    Self.FReloadDataOnRefresh := PrecReloadData;
+    Self.FReloadDataOnRefresh := AReloadData;
+    try
+      inherited Refresh;
+      // Send a notification to other ActiveBindSourceAdapters & BindSource
+      if ANotify then
+        Notify(Self, TioLiveBindingsFactory.Notification(Self, Current, ntAfterRefresh));
+    finally
+      Self.FReloadDataOnRefresh := PrecReloadData;
+    end;
   end;
 end;
 

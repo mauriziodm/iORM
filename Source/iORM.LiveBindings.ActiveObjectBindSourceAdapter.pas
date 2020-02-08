@@ -157,7 +157,7 @@ type
     procedure Insert(AObject:TObject); reintroduce; overload;
     procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
-    procedure Refresh(ReloadData:Boolean); reintroduce; overload;
+    procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
@@ -688,21 +688,27 @@ begin
   ReceiveSelection(ASelected as TObject, ASelectionType);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.Refresh(ReloadData: Boolean);
+procedure TioActiveObjectBindSourceAdapter.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 var
   PrecReloadData: Boolean;
 begin
   // Se il BindSourceAdapter è un dettaglio allora propaga il Refresh al suo Master
   //  questo perchè solo il master esegue realmente le query e quindi è quest'ultimo che
   //  deve gestire il refresh con reload.
-  if IsDetail and Assigned(FMasterAdaptersContainer) and ReloadData then
-    FMasterAdaptersContainer.GetMasterBindSourceAdapter.Refresh(ReloadData)
+  if IsDetail and Assigned(FMasterAdaptersContainer) and AReloadData then
+    FMasterAdaptersContainer.GetMasterBindSourceAdapter.Refresh(AReloadData)
   else
   begin
     PrecReloadData := FReloadDataOnRefresh;
-    Self.FReloadDataOnRefresh := ReloadData;
-    inherited Refresh;
-    Self.FReloadDataOnRefresh := PrecReloadData;
+    Self.FReloadDataOnRefresh := AReloadData;
+    try
+      inherited Refresh;
+      // Send a notification to other ActiveBindSourceAdapters & BindSource
+      if ANotify then
+        Notify(Self, TioLiveBindingsFactory.Notification(Self, Current, ntAfterRefresh));
+    finally
+      Self.FReloadDataOnRefresh := PrecReloadData;
+    end;
   end;
 end;
 
