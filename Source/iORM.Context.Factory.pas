@@ -321,6 +321,7 @@ begin
   // Loop all properties
   for Prop in PropsFields do
   begin
+    // Getting metedata FieldType from Prop TypeKind (DBBuilder)
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
@@ -332,23 +333,29 @@ begin
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end;
 
-    // M.M. 08/10/18
-    // Controlla gli attributi per capire se ci sono relazioni Embedded
-    // per poter stabilire il tipo di default da utilizzare per la
-    // creazione del campo nel builder se non viene specificato un
-    // attributo specifico
-    // Mauri: Non si potrebbe evitare di ciclare per tutti gli attributi qui visto che lo facciamo già
-    //         più sotto? Potremmo unire i due cicli facendone uno solo?
-    for Attr in Prop.GetAttributes do
-    begin
-      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
-      // viene impostato un campo di tipo binary
-      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
-      begin
-        PropMetadata_FieldType := ioMdBinary;
-        Break;
-      end;
-    end;
+// ====================================================================================================
+// Mauri 08/02/2020: Secondo me questo blocco di codice si può eliminare del tutto perchè tanto, arrivati qui
+//  il Metadata_FieldType è stato già determinato in modo corretto dalle righe precedenti
+//  anche nel caso di una proprietà contente un oggetto e con relazione EmbeddedHasOne/Many
+// ----------------------------------------------------------------------------------------------------
+//    // M.M. 08/10/18
+//    // Controlla gli attributi per capire se ci sono relazioni Embedded
+//    // per poter stabilire il tipo di default da utilizzare per la
+//    // creazione del campo nel builder se non viene specificato un
+//    // attributo specifico
+//    // Mauri: Non si potrebbe evitare di ciclare per tutti gli attributi qui visto che lo facciamo già
+//    //         più sotto? Potremmo unire i due cicli facendone uno solo?
+//    for Attr in Prop.GetAttributes do
+//    begin
+//      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
+//      // viene impostato un campo di tipo binary
+//      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
+//      begin
+//        PropMetadata_FieldType := ioMdBinary;
+//        Break;
+//      end;
+//    end;
+// ====================================================================================================
 
     PropMetadata_FieldLength := 50 { 255 };
     // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
