@@ -129,6 +129,7 @@ type
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoBeforeCancel; override;
     procedure DoAfterCancel; override;
+    procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -328,6 +329,13 @@ begin
     Self.GetDataSetLinkContainer.Refresh(True); // Altrimenti da un errore sull'Append
     Self.Delete;
   end;
+end;
+
+procedure TioActiveListBindSourceAdapter.DoAfterDelete;
+begin
+  inherited;
+  // Send AfterDelete notification
+  TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterPost;

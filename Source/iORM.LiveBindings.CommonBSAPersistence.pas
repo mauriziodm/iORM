@@ -52,6 +52,7 @@ type
   public
     class procedure Load(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
     class procedure Delete(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; out AAbort:Boolean); static;
+    class procedure AfterDelete(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
     class procedure Post(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; const AForce:Boolean=False); static;
     class procedure PersistCurrent(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
     class procedure PersistAll(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
@@ -84,6 +85,24 @@ type
 
 { TioCommonBSAPersistence }
 
+class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+begin
+  // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
+  //      in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
+  //      eliminato l'oggetto. Se lo metto qui invece va bene.
+
+  // DataSet synchro
+  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+  // Send a notification to other ActiveBindSourceAdapters & BindSource
+  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  //       if FAutoPersist is True then the notify is performed by
+  //       the "CommonBSAPersistence" else by this method
+  AActiveBindSourceAdapter.Notify(
+    AActiveBindSourceAdapter as TObject,
+    TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
+    );
+end;
+
 class procedure TioCommonBSAPersistence.AsyncExecute(
   AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
   AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate);
@@ -113,19 +132,21 @@ begin
     io.Delete(AActiveBindSourceAdapter.Current);
   end;
   // Set the OnTerminate anonimous method
-  LOnTerminate := procedure(AResultValue: TObject)
-  begin
-    // DataSet synchro
-    AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
-    // Send a notification to other ActiveBindSourceAdapters & BindSource
-    //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-    //       if FAutoPersist is True then the notify is performed by
-    //       the "CommonBSAPersistence" else by this method
-    AActiveBindSourceAdapter.Notify(
-      AActiveBindSourceAdapter as TObject,
-      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
-      );
-  end;
+  LOnTerminate := nil;
+// Mauri 09/02/2020: Spostato nel nuovo metodo AfterDelete per risolvere un problema di sequenza
+//  LOnTerminate := procedure(AResultValue: TObject)
+//  begin
+//    // DataSet synchro
+//    AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+//    // Send a notification to other ActiveBindSourceAdapters & BindSource
+//    //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+//    //       if FAutoPersist is True then the notify is performed by
+//    //       the "CommonBSAPersistence" else by this method
+//    AActiveBindSourceAdapter.Notify(
+//      AActiveBindSourceAdapter as TObject,
+//      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
+//      );
+//  end;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set the ObjectStatus
   AActiveBindSourceAdapter.SetObjStatus(osDeleted);

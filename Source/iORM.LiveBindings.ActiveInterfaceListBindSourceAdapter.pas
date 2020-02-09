@@ -127,6 +127,7 @@ type
       : TArray<TBindSourceAdapterField>); override;
     procedure DoBeforeCancel; override;
     procedure DoAfterCancel; override;
+    procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean;
       out AInstance: IInterface); override;
@@ -326,6 +327,13 @@ begin
     // Altrimenti da un errore sull'Append
     Self.Delete;
   end;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
+begin
+  inherited;
+  // Send AfterDelete notification
+  TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterPost;
