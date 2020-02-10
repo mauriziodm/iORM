@@ -119,7 +119,7 @@ var
   LResultValue: TObject;
 begin
 // NB: Abort da eliminare???
-//  AAbort := False;
+  AAbort := False;
 
   // If current is nil then exit
   if not Assigned(AActiveBindSourceAdapter.Current) then
@@ -152,6 +152,12 @@ begin
   AActiveBindSourceAdapter.SetObjStatus(osDeleted);
   // If AutoPersist or forced persist the delete from the DB else
   //  send a notification to other BSA.
+  if AActiveBindSourceAdapter.UseObjStatus then
+  begin
+    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
+    AAbort := True;
+  end
+  else
   if AActiveBindSourceAdapter.ioAutoPersist then
   begin
     // Execute synchronous or asynchronous
