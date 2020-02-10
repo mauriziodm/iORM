@@ -96,6 +96,11 @@ begin
   GlobalPerson := io.Load<IPerson>.Lazy.ByOID(1).ToObject;
 end;
 
+procedure TMainForm.btShowInfoClick(Sender: TObject);
+begin
+  ShowMessage(GlobalPerson.ID.ToString + ' - ' + GlobalPerson.FullName + ' (' + GlobalPerson.ClassNameProp + ') ' + GlobalPerson.Phones.Count.ToString + ' Numbers');
+end;
+
 procedure TMainForm.btPersonDemoClick(Sender: TObject);
 var
   LPerson: IPerson;
@@ -119,11 +124,6 @@ begin
   io.RefTo<IPhoneNumber>._Where._Property('PersonID')._EqualTo(LPerson.ID).Delete;
 
   io.Delete(LPerson);
-end;
-
-procedure TMainForm.btShowInfoClick(Sender: TObject);
-begin
-  ShowMessage(GlobalPerson.ID.ToString + ' - ' + GlobalPerson.FullName + ' (' + GlobalPerson.ClassNameProp + ') ' + GlobalPerson.Phones.Count.ToString + ' Numbers');
 end;
 
 procedure TMainForm.Button10Click(Sender: TObject);

@@ -162,7 +162,7 @@ begin
   end
   else
   begin
-    LOnTerminate(LResultValue);
+//    LOnTerminate(LResultValue);
 // NB: Abort da eliminare???
 //    AAbort := True;
   end;
