@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.LiveBindings.CommonBSAPersistence;
 
@@ -47,15 +45,17 @@ type
 
   TioCommonBSAPersistence = class
   private
-    class procedure SyncExecute(AExecuteFunc:TioCommonBSAPersistenceThreadExecute; AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); static;
-    class procedure AsyncExecute(AExecuteFunc:TioCommonBSAPersistenceThreadExecute; AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); static;
+    class procedure SyncExecute(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
+      AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate); static;
+    class procedure AsyncExecute(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
+      AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate); static;
   public
-    class procedure Load(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
-    class procedure Delete(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; out AAbort:Boolean); static;
-    class procedure AfterDelete(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
-    class procedure Post(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter; const AForce:Boolean=False); static;
-    class procedure PersistCurrent(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
-    class procedure PersistAll(const AActiveBindSourceAdapter:IioActiveBindSourceAdapter); static;
+    class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean); static;
+    class procedure AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean = False); static;
+    class procedure PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure PersistAll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
   end;
 
 implementation
@@ -78,33 +78,30 @@ type
     procedure Execute; override;
     procedure OnTerminateEventHandler(Sender: TObject);
   public
-    constructor Create(AExecuteFunc:TioCommonBSAPersistenceThreadExecute;
-      AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate); overload;
+    constructor Create(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
+      AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate); overload;
     function ResultValue: TObject;
   end;
 
-{ TioCommonBSAPersistence }
+  { TioCommonBSAPersistence }
 
 class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
   // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
-  //      in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
-  //      eliminato l'oggetto. Se lo metto qui invece va bene.
+  // in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
+  // eliminato l'oggetto. Se lo metto qui invece va bene.
 
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
   // Send a notification to other ActiveBindSourceAdapters & BindSource
-  //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-  //       if FAutoPersist is True then the notify is performed by
-  //       the "CommonBSAPersistence" else by this method
-  AActiveBindSourceAdapter.Notify(
-    AActiveBindSourceAdapter as TObject,
-    TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
-    );
+  // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  // if FAutoPersist is True then the notify is performed by
+  // the "CommonBSAPersistence" else by this method
+  AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+    TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete));
 end;
 
-class procedure TioCommonBSAPersistence.AsyncExecute(
-  AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
+class procedure TioCommonBSAPersistence.AsyncExecute(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
   AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   io.ShowWait;
@@ -112,13 +109,12 @@ begin
   TioCommonBSAPersistenceThread.Create(AExecuteFunc, AOnTerminateProc).Start;
 end;
 
-class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort:Boolean);
+class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean);
 var
   LExecute: TioCommonBSAPersistenceThreadExecute;
   LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
   LResultValue: TObject;
 begin
-// NB: Abort da eliminare???
   AAbort := False;
 
   // If current is nil then exit
@@ -128,36 +124,28 @@ begin
   // Set Execute anonimous methods
   LResultValue := nil;
   LExecute := function: TObject
-  begin
-    io.Delete(AActiveBindSourceAdapter.Current);
-  end;
+    begin
+      io.Delete(AActiveBindSourceAdapter.Current);
+    end;
   // Set the OnTerminate anonimous method
   LOnTerminate := nil;
-// Mauri 09/02/2020: Spostato nel nuovo metodo AfterDelete per risolvere un problema di sequenza
-//  LOnTerminate := procedure(AResultValue: TObject)
-//  begin
-//    // DataSet synchro
-//    AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
-//    // Send a notification to other ActiveBindSourceAdapters & BindSource
-//    //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-//    //       if FAutoPersist is True then the notify is performed by
-//    //       the "CommonBSAPersistence" else by this method
-//    AActiveBindSourceAdapter.Notify(
-//      AActiveBindSourceAdapter as TObject,
-//      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
-//      );
-//  end;
+  // Mauri 09/02/2020: Spostato nel nuovo metodo AfterDelete per risolvere un problema di sequenza
+  // LOnTerminate := procedure(AResultValue: TObject)
+  // begin
+  // // DataSet synchro
+  // AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+  // // Send a notification to other ActiveBindSourceAdapters & BindSource
+  // //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  // //       if FAutoPersist is True then the notify is performed by
+  // //       the "CommonBSAPersistence" else by this method
+  // AActiveBindSourceAdapter.Notify(
+  // AActiveBindSourceAdapter as TObject,
+  // TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete)
+  // );
+  // end;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
-  // Set the ObjectStatus
-  AActiveBindSourceAdapter.SetObjStatus(osDeleted);
   // If AutoPersist or forced persist the delete from the DB else
-  //  send a notification to other BSA.
-  if AActiveBindSourceAdapter.UseObjStatus then
-  begin
-    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
-    AAbort := True;
-  end
-  else
+  // send a notification to other BSA.
   if AActiveBindSourceAdapter.ioAutoPersist then
   begin
     // Execute synchronous or asynchronous
@@ -165,17 +153,18 @@ begin
       AsyncExecute(LExecute, LOnTerminate)
     else
       SyncExecute(LExecute, LOnTerminate);
+    AAbort := False;
   end
   else
+  if AActiveBindSourceAdapter.UseObjStatus then
   begin
-//    LOnTerminate(LResultValue);
-// NB: Abort da eliminare???
-//    AAbort := True;
+    // Set the ObjectStatus
+    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
+    AAbort := True;
   end;
 end;
 
-class procedure TioCommonBSAPersistence.Load(
-  const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
   LTypeName, LTypeAlias: String;
   LWhere: IioWhere;
@@ -194,34 +183,35 @@ begin
   if Assigned(AActiveBindSourceAdapter.DataObject) then
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
 
-
   LWhere := AActiveBindSourceAdapter.ioWhere;
   LOwnsObjects := AActiveBindSourceAdapter.ioOwnsObjects;
   // Set Execute anonimous methods
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingle:
-      LExecute := function: TObject
-      begin
-        Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToObject;
-      end;
+      LExecute :=
+              function: TObject
+    begin
+      Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToObject;
+    end;
     TioViewDataType.dtList:
-      LExecute := function: TObject
-      begin
-        Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToList(LTargetClass);
-      end;
+      LExecute :=
+              function: TObject
+    begin
+      Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToList(LTargetClass);
+    end;
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
   end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
-  var
-    LIntf: IInterface;
-  begin
-    if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
-      AActiveBindSourceAdapter.InternalSetDataObject(LIntf, LOwnsObjects)
-    else
-      AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, LOwnsObjects);
-  end;
+    var
+      LIntf: IInterface;
+    begin
+      if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
+        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, LOwnsObjects)
+      else
+        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, LOwnsObjects);
+    end;
   // Execute synchronous or asynchronous
   if AActiveBindSourceAdapter.ioAsync then
     AsyncExecute(LExecute, LOnTerminate)
@@ -254,10 +244,8 @@ begin
   if AActiveBindSourceAdapter.IsDetail then
   begin
     // Get the MasterProperty of the current object
-    LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(
-      AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType,
-      AActiveBindSourceAdapter.GetMasterPropertyName
-      );
+    LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName
+      (AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
     // Get a local reference of some values
     LRelationChildPropertyName := LMasterProperty.GetRelationChildPropertyName;
     LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;
@@ -265,26 +253,21 @@ begin
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
   LExecute := function: TObject
-  begin
-    io.PersistCollection(AActiveBindSourceAdapter.DataObject,
-      LRelationChildPropertyName,
-      LMasterOID,
-      False, // BlindInsert
-      ''     // Connection name
-      );
-  end;
+    begin
+      io.PersistCollection(AActiveBindSourceAdapter.DataObject, LRelationChildPropertyName, LMasterOID, False, // BlindInsert
+        '' // Connection name
+        );
+    end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
-  begin
-    // Send a notification to other ActiveBindSourceAdapters & BindSource
-    //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-    //       if FAutoPersist is True then the notify is performed by
-    //       the "CommonBSAPersistence" else by this method
-    AActiveBindSourceAdapter.Notify(
-      AActiveBindSourceAdapter as TObject,
-      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost)
-      );
-  end;
+    begin
+      // Send a notification to other ActiveBindSourceAdapters & BindSource
+      // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+      // if FAutoPersist is True then the notify is performed by
+      // the "CommonBSAPersistence" else by this method
+      AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+        TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost));
+    end;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Execute synchronous or asynchronous
   if AActiveBindSourceAdapter.ioAsync then
@@ -296,8 +279,8 @@ end;
 class procedure TioCommonBSAPersistence.PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
   // If in editing then post
-  //  NB: Se AutoPersist = True allora il Post già causa la persistenza dell'oggetto sul DB
-  //       quindi esce subito perchè altrimenti si avrebbe una doppia persistenza
+  // NB: Se AutoPersist = True allora il Post già causa la persistenza dell'oggetto sul DB
+  // quindi esce subito perchè altrimenti si avrebbe una doppia persistenza
   if AActiveBindSourceAdapter.State in seEditModes then
   begin
     AActiveBindSourceAdapter.Post;
@@ -308,7 +291,7 @@ begin
   Post(AActiveBindSourceAdapter, True);
 end;
 
-class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce:Boolean);
+class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean);
 var
   LMasterProperty: IioContextProperty;
   LRelationChildPropertyName: String;
@@ -326,10 +309,8 @@ begin
   if AActiveBindSourceAdapter.IsDetail then
   begin
     // Get the MasterProperty of the current object
-    LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(
-      AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType,
-      AActiveBindSourceAdapter.GetMasterPropertyName
-      );
+    LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName
+      (AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
     // Get a local reference of some values
     LRelationChildPropertyName := LMasterProperty.GetRelationChildPropertyName;
     LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;
@@ -337,31 +318,26 @@ begin
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
   LExecute := function: TObject
-  begin
-    io.Persist(AActiveBindSourceAdapter.Current,
-      LRelationChildPropertyName,
-      LMasterOID,
-      False, // BlindInsert
-      ''     // Connection name
-      );
-  end;
+    begin
+      io.Persist(AActiveBindSourceAdapter.Current, LRelationChildPropertyName, LMasterOID, False, // BlindInsert
+        '' // Connection name
+        );
+    end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
-  begin
-    // Send a notification to other ActiveBindSourceAdapters & BindSource
-    //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-    //       if FAutoPersist is True then the notify is performed by
-    //       the "CommonBSAPersistence" else by this method
-    AActiveBindSourceAdapter.Notify(
-      AActiveBindSourceAdapter as TObject,
-      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost)
-      );
-  end;
+    begin
+      // Send a notification to other ActiveBindSourceAdapters & BindSource
+      // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+      // if FAutoPersist is True then the notify is performed by
+      // the "CommonBSAPersistence" else by this method
+      AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+        TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost));
+    end;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set the ObjectStatus
   AActiveBindSourceAdapter.SetObjStatus(osDirty);
   // If AutoPersist or forced persist the persist to the DB else
-  //  send a notification to other BSA.
+  // send a notification to other BSA.
   if AActiveBindSourceAdapter.ioAutoPersist or AForce then
   begin
     // Execute synchronous or asynchronous
@@ -374,8 +350,7 @@ begin
     LOnTerminate(LResultValue);
 end;
 
-class procedure TioCommonBSAPersistence.SyncExecute(
-  AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
+class procedure TioCommonBSAPersistence.SyncExecute(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
   AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate);
 var
   LResultValue: TObject;
@@ -394,8 +369,8 @@ end;
 
 { TioCommonBSAPersistenceThread }
 
-constructor TioCommonBSAPersistenceThread.Create(AExecuteFunc:TioCommonBSAPersistenceThreadExecute;
-  AOnTerminateProc:TioCommonBSAPersistenceThreadOnTerminate);
+constructor TioCommonBSAPersistenceThread.Create(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
+  AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   inherited Create(True);
   FExecuteFunc := AExecuteFunc;
@@ -412,15 +387,15 @@ begin
   try
     FResultValue := FExecuteFunc;
   except
-    on E:Exception do FExceptionText := E.Message;
+    on E: Exception do
+      FExceptionText := E.Message;
   end;
 end;
 
-procedure TioCommonBSAPersistenceThread.OnTerminateEventHandler(
-  Sender: TObject);
+procedure TioCommonBSAPersistenceThread.OnTerminateEventHandler(Sender: TObject);
 begin
   try
-    if FExceptionText.IsEmpty and Assigned(FOnTerminateProc)then
+    if FExceptionText.IsEmpty and Assigned(FOnTerminateProc) then
       FOnTerminateProc(FResultValue)
     else
     begin
