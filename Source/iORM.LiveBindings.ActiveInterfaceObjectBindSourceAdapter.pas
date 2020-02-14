@@ -685,7 +685,8 @@ begin
     try
       inherited Refresh;
       // Send a notification to other ActiveBindSourceAdapters & BindSource
-      Notify(Self, TioLiveBindingsFactory.Notification(Self, Current, ntAfterRefresh));
+      if ANotify then
+        Notify(Self, TioLiveBindingsFactory.Notification(Self, Current, ntAfterRefresh));
     finally
       Self.FReloadDataOnRefresh := PrecReloadData;
     end;
