@@ -22,7 +22,8 @@ uses
   dxSkinTheAsphaltWorld, dxSkinsDefaultPainters, dxSkinValentine,
   dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
   dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint,
-  dxSkinXmas2008Blue, cxGroupBox, cxRadioGroup, Vcl.ComCtrls, iORM.AbstractionLayer.Framework.VCL, Vcl.StdCtrls;
+  dxSkinXmas2008Blue, cxGroupBox, cxRadioGroup, Vcl.ComCtrls, iORM.AbstractionLayer.Framework.VCL, Vcl.StdCtrls,
+  dxSkinOffice2019Colorful, dxSkinTheBezier;
 
 type
 
