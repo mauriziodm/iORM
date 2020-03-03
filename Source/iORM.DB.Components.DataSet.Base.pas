@@ -499,6 +499,9 @@ end;
 
 procedure TioBSADataSet.InternalCancel;
 begin
+  // If destroying then exit
+  if csDestroying in ComponentState then
+    Exit;
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
