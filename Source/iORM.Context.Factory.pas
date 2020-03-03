@@ -63,8 +63,7 @@ type
       const AMetadata_FieldNullable: Boolean;
       const AMetadata_FieldUnicode: Boolean;
       const AMetadata_CustomFieldType: string;
-      const AMetadata_FKCreate: Boolean;
-      const AMetadata_FieldSubType: string;
+      const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
       const AMetadata_FKDeleteCreate: Boolean;
       const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType;
@@ -141,10 +140,8 @@ class function TioContextFactory.GetProperty(const AMapMode: TioMapModeType;
   const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean;
   const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string;
-  const AMetadata_FKCreate: Boolean;
-  const AMetadata_FieldSubType: string;
-  const AMetadata_FKDeleteCreate: Boolean;
+  const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean;
+  const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
   const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
 begin
   case AMapMode of
@@ -156,8 +153,8 @@ begin
         ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
         AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
         AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_FKCreate,
-        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
+        AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
+        AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
     // Fields map mode
     ioFields:
       Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias,
@@ -166,8 +163,8 @@ begin
         ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
         AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
         AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_FKCreate,
-        AMetadata_FieldSubType, AMetadata_FKDeleteCreate,AMetadata_FKUpdateCreate);
+        AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
+        AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
   end;
 end;
 
@@ -305,7 +302,7 @@ var
             Exit;
           end;
         end;
-      tkClass:
+      tkClass, tkInterface:
         begin
           Result := ioMdBinary;
           Exit;
@@ -316,47 +313,49 @@ var
 begin
   // Get members list (Properties or Fields)
   case ATable.GetMapMode of
-    ioProperties:
-      PropsFields := TArray<System.Rtti.TRttiMember>
-        (TObject(Typ.AsInstance.GetProperties));
-    ioFields:
-      PropsFields := TArray<System.Rtti.TRttiMember>
-        (TObject(Typ.AsInstance.GetFields));
+    ioProperties: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
+    ioFields: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetFields));
   end;
   // Create result Properties object
   Result := TioProperties.Create;
   // Loop all properties
   for Prop in PropsFields do
   begin
+    // Getting metedata FieldType from Prop TypeKind (DBBuilder)
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind
-        (LRttiProperty.PropertyType.TypeKind,
-        LRttiProperty.PropertyType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
     end
     else if Prop is TRttiField then
     begin
       LRttiField := Prop as TRttiField;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind
-        (LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end;
 
-    // M.M. 08/10/18
-    // Controlla gli attributi per capire se ci sono relazioni Embedded
-    // per poter stabilire il tipo di default da utilizzare per la
-    // creazione del campo nel builder se non viene specificato un
-    // attributo specifico
-    for Attr in Prop.GetAttributes do
-    begin
-      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
-      // viene impostato un campo di tipo binary
-      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
-      begin
-        PropMetadata_FieldType := ioMdBinary;
-        Break;
-      end;
-    end;
+// ====================================================================================================
+// Mauri 08/02/2020: Secondo me questo blocco di codice si può eliminare del tutto perchè tanto, arrivati qui
+//  il Metadata_FieldType è stato già determinato in modo corretto dalle righe precedenti
+//  anche nel caso di una proprietà contente un oggetto e con relazione EmbeddedHasOne/Many
+// ----------------------------------------------------------------------------------------------------
+//    // M.M. 08/10/18
+//    // Controlla gli attributi per capire se ci sono relazioni Embedded
+//    // per poter stabilire il tipo di default da utilizzare per la
+//    // creazione del campo nel builder se non viene specificato un
+//    // attributo specifico
+//    // Mauri: Non si potrebbe evitare di ciclare per tutti gli attributi qui visto che lo facciamo già
+//    //         più sotto? Potremmo unire i due cicli facendone uno solo?
+//    for Attr in Prop.GetAttributes do
+//    begin
+//      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
+//      // viene impostato un campo di tipo binary
+//      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
+//      begin
+//        PropMetadata_FieldType := ioMdBinary;
+//        Break;
+//      end;
+//    end;
+// ====================================================================================================
 
     PropMetadata_FieldLength := 50 { 255 };
     // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
@@ -367,8 +366,8 @@ begin
     PropMetadata_CustomFieldType := '';
     PropMetadata_FKCreate := False;
     PropMetadata_FieldSubType := '';
-    PropMetadata_FKCascadeUpdate := false;
-    PropMetadata_FKCascadeDelete := false;
+    PropMetadata_FKCascadeUpdate := False;
+    PropMetadata_FKCascadeDelete := False;
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
@@ -448,6 +447,7 @@ begin
         PropRelationType := ioRTBelongsTo;
         PropRelationChildTypeName := ioBelongsTo(Attr).ChildTypeName;
         PropRelationChildTypeAlias := ioBelongsTo(Attr).ChildTypeAlias;
+        PropMetadata_FieldType := ioMdInteger;  // If is a BelongsTo relation then the field type on DB in integer
       end;
       if Attr is ioHasMany then
       begin

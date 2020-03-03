@@ -180,7 +180,7 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(const AReloadData: Boolean); overload;
+    procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
@@ -461,7 +461,7 @@ begin
     OnNotify(Self, ANotification);
   // If enabled perform an AutoRefresh operation
   if (Self.AutoRefreshOnNotification > arDisabled) and (Self.State <> TBindSourceAdapterState.seInactive) then
-    Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload);
+    Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
 end;
 
 procedure TioModelPresenter.DoSelection(var ASelected: TObject;
@@ -818,10 +818,10 @@ begin
     BindSourceAdapter.Prior;
 end;
 
-procedure TioModelPresenter.Refresh(const AReloadData: Boolean);
+procedure TioModelPresenter.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 begin
   if CheckAdapter then
-    FBindSourceAdapter.Refresh(AReloadData);
+    FBindSourceAdapter.Refresh(AReloadData, ANotify);
 end;
 
 procedure TioModelPresenter.RegisterDetailPresenter(const ADetailPresenter
