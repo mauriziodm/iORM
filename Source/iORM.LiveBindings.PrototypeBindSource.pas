@@ -140,10 +140,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Notify(const Sender: TObject;
-      const ANotification: IioBSANotification);
-    procedure DeleteListViewItem(const AItemIndex: Integer;
-      const ADelayMilliseconds: Integer = 100);
+    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure Edit; override;
     procedure Post; override;
     procedure PostIfEditing;
@@ -162,7 +160,7 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(ReloadData: Boolean); reintroduce; overload;
+    procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
@@ -447,7 +445,7 @@ begin
     ioOnNotify(Self, ANotification);
   // If enabled perform an AutoRefresh operation
   if Self.ioAutoRefreshOnNotification > arDisabled then
-    Self.Refresh(Self.ioAutoRefreshOnNotification = arEnabledReload);
+    Self.Refresh(Self.ioAutoRefreshOnNotification = arEnabledReload, False);
 end;
 
 procedure TioPrototypeBindSource.DoSelection(var ASelected: TObject;
@@ -722,7 +720,7 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioPrototypeBindSource.Refresh(ReloadData: Boolean);
+procedure TioPrototypeBindSource.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
   LPrecAutoload: Boolean;
@@ -731,7 +729,7 @@ begin
     Exit;
   if Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA)
   then
-    AnActiveBSA.Refresh(ReloadData)
+    AnActiveBSA.Refresh(AReloadData, ANotify)
   else
     GetInternalAdapter.Refresh;
 end;
