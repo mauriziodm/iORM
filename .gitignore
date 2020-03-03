@@ -149,3 +149,4 @@ Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/Win32/Debug/cache/phonec
 Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/Win32/
 *.DB-journal
 Source/__recovery/
+*.~2~
