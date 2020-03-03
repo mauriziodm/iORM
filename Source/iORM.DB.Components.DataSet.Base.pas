@@ -685,6 +685,12 @@ begin
   LProperty.SetValue(FBindSourceAdapter.Current, LValue);
   // Set modified
   SetModified(True);
+  // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
+  //      in ActiveBindSourceAdapter.DoAfterPost e ActiveBindSourceAdapter.DoAfterPostFields,
+  //      sono riuscito a dare un comportamente corretto anche al DataSet in caso AutoPost=true
+  //      (precedentemente invece in pratica con faceva mai il post)
+  if InternalActiveAdapter.ioAutoPost then
+    InternalActiveAdapter.Post;
 end;
 
 procedure TioBSADataSet.SetInternalAdapter(

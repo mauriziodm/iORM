@@ -11,6 +11,12 @@ inherited ArticleListVM: TArticleListVM
     TypeName = 'IBase'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 96
     Top = 32
   end
@@ -24,6 +30,12 @@ inherited ArticleListVM: TArticleListVM
     TypeName = 'TArticleListFilter'
     ViewDataType = dtSingle
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 96
     Top = 104
   end
