@@ -626,8 +626,7 @@ end;
 function TioModelPresenter.GetNaturalObjectBindSourceAdapter
   (const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
-  if not Supports(GetBindSourceAdapter.NewNaturalObjectBindSourceAdapter
-    (AOwner), IioActiveBindSourceAdapter, Result) then
+  if not Supports(GetBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
     Result := nil;
 end;
 
