@@ -1225,6 +1225,9 @@ end;
 function TioDependencyInjectionLocator.ShowCurrent: TComponent;
 begin
   result := nil;
+  // Check if FForEachModelPresenter is assigned
+  if not Assigned(FForEachModelPresenter) then
+    raise EioException.Create(Self.ClassName, 'ShowCurrent', '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Check for BindSourceAdapter and not empty
   FForEachModelPresenter.CheckAdapter(True);
   if FForEachModelPresenter.ItemCount = 0 then
@@ -1237,6 +1240,9 @@ procedure TioDependencyInjectionLocator.ShowEach;
 var
   I: Integer;
 begin
+  // Check if FForEachModelPresenter is assigned
+  if not Assigned(FForEachModelPresenter) then
+    raise EioException.Create(Self.ClassName, 'ShowCurrent', '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Check for BindSourceAdapter and not empty
   FForEachModelPresenter.CheckAdapter(True);
   if FForEachModelPresenter.ItemCount = 0 then
@@ -1402,6 +1408,9 @@ function TioDependencyInjectionLocator._ShowCurrent: TComponent;
 var
   LLocator: TioDependencyInjectionLocator;
 begin
+  // Check if FForEachModelPresenter is assigned
+  if not Assigned(FForEachModelPresenter) then
+    raise EioException.Create(Self.ClassName, 'ShowCurrent', '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Retrieve the correct locator
   if FForEachLocateViewModel then
     LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, FAlias, True) as TioDependencyInjectionLocator
@@ -1457,11 +1466,13 @@ begin
   TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a locator for MP.Current instance
   if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist then
-    Result := io.di.LocateViewFor(ATargetMP.Current, AAlias)
+//    Result := io.di.LocateViewFor(ATargetMP.Current, AAlias) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
+    Result := io.di.LocateViewFor(ATargetMP.Current.ClassName, AAlias)
   else
   // Try to retrieve a locator for MP.TypeName
   if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist then
-    Result := io.di.LocateViewFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current)
+//    Result := io.di.LocateViewFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
+    Result := io.di.LocateViewFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP)
   else
     raise EioException.Create(Self.ClassName, 'GetViewLocatorFor',
       Format('There are no Views registered for "%s" or "%s" alias "%s".',
@@ -1507,7 +1518,8 @@ begin
   if  io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist then
   begin
     if ACreateViewModel then
-      Result := io.di.LocateViewVMFor(ATargetMP.Current, AAlias)
+//      Result := io.di.LocateViewVMFor(ATargetMP.Current, AAlias) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
+      Result := io.di.LocateViewVMFor(ATargetMP.Current.ClassName, AAlias).SetPresenter(ATargetMP)
     else
       Result := io.di._InternalLocateViewVMfor(ATargetMP.Current.ClassName, AAlias);
   end
@@ -1516,7 +1528,8 @@ begin
   if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist and io.di.LocateVMfor(ATargetMP.TypeName, AAlias).Exist then
   begin
     if ACreateViewModel then
-      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current)
+//      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
+      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP)
     else
       Result := io.di._InternalLocateViewVMfor(ATargetMP.TypeName, AAlias);
   end

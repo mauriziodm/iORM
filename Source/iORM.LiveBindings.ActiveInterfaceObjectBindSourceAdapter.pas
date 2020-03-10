@@ -295,7 +295,13 @@ begin
   //      In pratica se ioAutoPost=true esegue l'auto persist (se abilitato) nel metodo
   //      DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
   //      ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
-  if not Self.ioAutoPost then
+  // NB: Mauri 03/03/2020 - Ho elininato la condizione perchè, come scritto anche sopra
+  //      non necessaria in quanto già di suo passava in questo evento (o nell'altro)
+  //      in maniera corretta. Inoltre facendo così e aggiungendo alla fine del metodo
+  //      TioBSADataSet.SetFieldData una chiamata a InternalActiveAdapter.Post (se AutoPost = True)
+  //      ho potuto dare anche un giusto comportamento del DataSet anche con Autopost = True
+  //      (precedentemente invece in pratica con faceva mai il post)
+//  if not Self.ioAutoPost then
     TioCommonBSAPersistence.Post(Self);
 end;
 
@@ -309,7 +315,13 @@ begin
   //      In pratica se ioAutoPost=true esegue l'auto persist (se abilitato) nel metodo
   //      DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
   //      ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
-  if Self.ioAutoPost then
+  // NB: Mauri 03/03/2020 - Ho elininato la condizione perchè, come scritto anche sopra
+  //      non necessaria in quanto già di suo passava in questo evento (o nell'altro)
+  //      in maniera corretta. Inoltre facendo così e aggiungendo alla fine del metodo
+  //      TioBSADataSet.SetFieldData una chiamata a InternalActiveAdapter.Post (se AutoPost = True)
+  //      ho potuto dare anche un giusto comportamento del DataSet anche con Autopost = True
+  //      (precedentemente invece in pratica con faceva mai il post.
+//  if Self.ioAutoPost then
     TioCommonBSAPersistence.Post(Self);
 end;
 

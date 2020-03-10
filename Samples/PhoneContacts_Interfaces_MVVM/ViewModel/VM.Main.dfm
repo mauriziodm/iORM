@@ -12,6 +12,12 @@ inherited ViewModelMain: TViewModelMain
     TypeName = 'IPerson'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 208
     Top = 24
   end
@@ -27,6 +33,12 @@ inherited ViewModelMain: TViewModelMain
     TypeName = 'IPhoneNumber'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 208
     Top = 88
   end

@@ -24,7 +24,7 @@ uses
   cxLabel, cxDBLabel, cxTextEdit, cxDBEdit, cxCurrencyEdit,
   iORM.MVVM.Components.ViewModelBridge, Data.DB, Model.Material,
   iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet,
-  iORM.Attributes, Vcl.DBCtrls;
+  iORM.Attributes, Vcl.DBCtrls, dxSkinOffice2019Colorful, dxSkinTheBezier;
 
 type
 
