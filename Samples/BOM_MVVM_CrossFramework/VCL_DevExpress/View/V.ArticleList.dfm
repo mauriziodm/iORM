@@ -298,6 +298,7 @@ object ArticleListView: TArticleListView
     object cxGrid1DBTableView1: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       OnCellDblClick = cxGrid1DBTableView1CellDblClick
+      DataController.DataModeController.GridMode = True
       DataController.DataSource = DSArticleList
       DataController.Summary.DefaultGroupSummaryItems = <>
       DataController.Summary.FooterSummaryItems = <>
@@ -368,6 +369,9 @@ object ArticleListView: TArticleListView
       FieldName = 'ArticleType'
       ReadOnly = True
       Size = 40
+    end
+    object MDSArticleListDummy: TIntegerField
+      FieldName = 'Dummy'
     end
   end
   object VMBridge: TioViewModelBridge

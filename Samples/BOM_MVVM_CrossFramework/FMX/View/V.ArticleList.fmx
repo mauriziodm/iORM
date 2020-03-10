@@ -148,7 +148,7 @@ object ArticleListView: TArticleListView
     object ButtonNewMaterial: TSpeedButton
       Align = Top
       StyledSettings = [Family, FontColor]
-      Size.Width = 198.000000000000000000
+      Size.Width = 199.000000000000000000
       Size.Height = 60.000000000000000000
       Size.PlatformDefault = False
       Text = 'New material'
@@ -159,7 +159,7 @@ object ArticleListView: TArticleListView
       Align = Top
       StyledSettings = [Family, FontColor]
       Position.Y = 120.000000000000000000
-      Size.Width = 198.000000000000000000
+      Size.Width = 199.000000000000000000
       Size.Height = 60.000000000000000000
       Size.PlatformDefault = False
       Text = 'New process'
@@ -170,7 +170,7 @@ object ArticleListView: TArticleListView
       Align = Top
       StyledSettings = [Family, FontColor]
       Position.Y = 60.000000000000000000
-      Size.Width = 198.000000000000000000
+      Size.Width = 199.000000000000000000
       Size.Height = 60.000000000000000000
       Size.PlatformDefault = False
       Text = 'New Process'
