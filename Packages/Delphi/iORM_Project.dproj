@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{EDA76E4A-4BD0-4BDC-A9E0-03FA00D3B650}</ProjectGuid>
         <MainSource>iORM_Project.dpk</MainSource>
-        <ProjectVersion>18.6</ProjectVersion>
+        <ProjectVersion>18.8</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>

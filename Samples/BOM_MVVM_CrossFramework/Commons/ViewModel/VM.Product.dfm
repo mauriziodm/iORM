@@ -11,6 +11,12 @@ inherited ProductViewModel: TProductViewModel
     TypeName = 'IBOMItem'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 192
     Top = 104
   end

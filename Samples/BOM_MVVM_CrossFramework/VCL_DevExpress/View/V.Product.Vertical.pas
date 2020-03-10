@@ -24,7 +24,7 @@ uses
   iORM.MVVM.Components.ViewModelBridge, iORM.DB.Components.DataSet.Base,
   iORM.DB.Components.DataSet.ModelDataSet, cxCurrencyEdit, cxDBEdit, cxLabel,
   cxTextEdit, cxButtons, Vcl.DBCtrls, Vcl.Buttons, Vcl.ExtCtrls,
-  iORM.MVVM.Components.ViewContextProvider, Vcl.StdCtrls, iORM.Attributes;
+  iORM.MVVM.Components.ViewContextProvider, Vcl.StdCtrls, iORM.Attributes, dxSkinOffice2019Colorful, dxSkinTheBezier;
 
 type
 

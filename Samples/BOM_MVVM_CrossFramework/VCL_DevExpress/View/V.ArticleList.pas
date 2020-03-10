@@ -27,7 +27,7 @@ uses
   cxGridCustomView, cxGridCustomTableView, cxGridTableView, cxGridDBTableView,
   cxGrid, Vcl.Buttons, Vcl.Menus, iORM.Attributes, Vcl.StdCtrls,
   Vcl.Mask, Vcl.DBCtrls, cxContainer, cxTextEdit, cxDBEdit, cxButtons,
-  cxRadioGroup, Model.Interfaces;
+  cxRadioGroup, Model.Interfaces, dxSkinOffice2019Colorful, dxSkinTheBezier, dxDateRanges;
 
 type
 
@@ -92,11 +92,13 @@ type
     cxGrid1DBTableView1ArticleType: TcxGridDBColumn;
     cxGrid1DBTableView1CreationDateTime: TcxGridDBColumn;
     cxGrid1Level1: TcxGridLevel;
+    MDSArticleListDummy: TIntegerField;
     procedure cxGrid1DBTableView1CellDblClick(Sender: TcxCustomGridTableView;
       ACellViewInfo: TcxGridTableDataCellViewInfo; AButton: TMouseButton;
       AShift: TShiftState; var AHandled: Boolean);
   private
     { Private declarations }
+    FBookmark: TBookmark;
   public
     { Public declarations }
     constructor Create(AOwner:TComponent); override;
