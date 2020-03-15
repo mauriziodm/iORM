@@ -315,7 +315,10 @@ begin
   case ATable.GetMapMode of
     ioProperties: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
     ioFields: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetFields));
+  else
+    PropsFields := [];
   end;
+  PropMetadata_FieldType := TioMetadataFieldType.ioNone;
   // Create result Properties object
   Result := TioProperties.Create;
   // Loop all properties
@@ -582,6 +585,7 @@ var
   LIndexList: TioIndexList;
   LAutoCreateDB: Boolean;
 begin
+  LIndexList := TioIndexList.Create(False);
   try
     // Prop Init
     LTableName := Typ.MetaclassType.ClassName.Substring(1);
@@ -591,7 +595,6 @@ begin
     LJoins := Self.Joins;
     LGroupBy := nil;
     LMapMode := ioProperties;
-    LIndexList := nil;
     LAutoCreateDB := True;
     // Check attributes
     for LAttr in Typ.GetAttributes do

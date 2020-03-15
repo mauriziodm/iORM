@@ -723,7 +723,6 @@ end;
 procedure TioPrototypeBindSource.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
-  LPrecAutoload: Boolean;
 begin
   if not CheckAdapter then
     Exit;
@@ -924,6 +923,7 @@ end;
 function TioPrototypeBindSource._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 procedure TioPrototypeBindSource._ReceivePropagateCancel(const ASenderBindSource
@@ -974,6 +974,7 @@ end;
 function TioPrototypeBindSource._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 end.

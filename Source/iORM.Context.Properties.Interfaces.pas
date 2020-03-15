@@ -54,7 +54,7 @@ type
   TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert, ioDelete, ioExist);
 
   // Options set for field metadata used in DBBuilder
-  TioMetadataFieldType = (ioMdVarchar,ioMdChar,ioMdInteger,ioMdFloat,ioMdDate,ioMdTime,ioMdDateTime,ioMdDecimal,ioMdNumeric,ioMdBoolean,ioMdBinary,ioMdCustomFieldType);
+  TioMetadataFieldType = (ioNone, ioMdVarchar,ioMdChar,ioMdInteger,ioMdFloat,ioMdDate,ioMdTime,ioMdDateTime,ioMdDecimal,ioMdNumeric,ioMdBoolean,ioMdBinary,ioMdCustomFieldType);
 
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']

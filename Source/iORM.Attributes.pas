@@ -247,7 +247,7 @@ type
     FLength: Integer;
   public
     constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
-    constructor Create(const ALength: Integer; const AIsNullable: Boolean = True; const AIsUnicode: Boolean = True); overload;
+    constructor Create(const ALength: Integer; const AIsNullable: Boolean = True; const AIsUnicode: Boolean = True);reintroduce; overload;
     property IsUnicode: Boolean read FIsUnicode;
     property Length: Integer read FLength;
   end;
@@ -261,7 +261,7 @@ type
   strict private
     FPrecision: Integer;
   public
-    constructor Create(const AIsNullable: Boolean = True); overload;
+    constructor Create(const AIsNullable: Boolean = True); overload;override;
     constructor Create(const APrecision: Integer = 10; const AIsNullable: Boolean = True); reintroduce; overload;
     property Precision: Integer read FPrecision;
   end;

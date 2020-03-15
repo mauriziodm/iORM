@@ -19,7 +19,6 @@ type
     procedure SetViewContext(const AViewContext:TComponent);
     procedure SetViewContextProvider(const AViewContextProvider:TioViewContextProvider);
     procedure CheckForLife;
-    function GetView: TComponent;
     function GetViewContext: TComponent;
     function GetViewContextProvider: TioViewContextProvider;
   protected
@@ -58,11 +57,6 @@ begin
   SetViewContext(AViewContext);
   SetViewContextProvider(AViewContextProvider);
   FViewContextFreeMethod := AViewContextFreeMethod;
-end;
-
-function TioViewContextRegisterItem.GetView: TComponent;
-begin
-  Result := FView;
 end;
 
 function TioViewContextRegisterItem.GetViewContext: TComponent;

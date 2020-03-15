@@ -257,6 +257,7 @@ begin
       io.PersistCollection(AActiveBindSourceAdapter.DataObject, LRelationChildPropertyName, LMasterOID, False, // BlindInsert
         '' // Connection name
         );
+      Result := Nil;
     end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
@@ -322,6 +323,7 @@ begin
       io.Persist(AActiveBindSourceAdapter.Current, LRelationChildPropertyName, LMasterOID, False, // BlindInsert
         '' // Connection name
         );
+      Result := nil;
     end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
