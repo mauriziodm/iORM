@@ -15,7 +15,7 @@ object MainForm: TMainForm
     Size.Height = 567.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     TabPosition = None
     Sizes = (
@@ -27,7 +27,7 @@ object MainForm: TMainForm
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 8.000000000000000000
       Size.Height = 8.000000000000000000
       Size.PlatformDefault = False
@@ -97,7 +97,7 @@ object MainForm: TMainForm
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 8.000000000000000000
       Size.Height = 8.000000000000000000
       Size.PlatformDefault = False
@@ -348,7 +348,7 @@ object MainForm: TMainForm
   end
   object BSMaster: TioPrototypeBindSource
     AutoActivate = True
-    AutoPost = False
+    AutoPost = True
     FieldDefs = <
       item
         Name = 'FirstName'
@@ -378,6 +378,12 @@ object MainForm: TMainForm
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 256
     Top = 184
   end
@@ -455,7 +461,7 @@ object MainForm: TMainForm
   end
   object BSDetail: TioPrototypeBindSource
     AutoActivate = True
-    AutoPost = False
+    AutoPost = True
     FieldDefs = <
       item
         Name = 'PhoneType'
@@ -478,6 +484,12 @@ object MainForm: TMainForm
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 256
     Top = 248
   end
@@ -494,10 +506,9 @@ object MainForm: TMainForm
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    OnAfterRegister = SQLiteConnAfterRegister
     Database = 'ContactsIntf.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
+    DefaultConnection = False
     Persistent = False
     Pooled = False
     Left = 256
@@ -506,5 +517,20 @@ object MainForm: TMainForm
   object ioFMX1: TioFMX
     Left = 256
     Top = 72
+  end
+  object FBConn: TioFirebirdConnectionDef
+    Database = 'ContactsIntf.fdb'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    OSAuthent = oaNo
+    Password = 'th3cla'
+    Persistent = False
+    Pooled = False
+    Port = 3050
+    Protocol = pTCPIP
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    Left = 152
+    Top = 128
   end
 end

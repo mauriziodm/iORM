@@ -11,6 +11,7 @@ type
 {$RTTI EXPLICIT METHODS([vcPublic, vcProtected])}
 
   [ioEntity('Phones')]
+  [ioConnectionDefName('SQLiteConn')]
   TPhoneNumber = class(TInterfacedObject, IPhoneNumber)
   private
     FPhoneNumber: String;

@@ -102,6 +102,7 @@ type
     class function GetConnectionDefByName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName:String): Boolean;
     class function GetDefaultConnectionName: String;
+    class function GetDefaultConnectionNameIfEmpty(const AConnectionDefName: String): String;
     class function GetConnectionInfo(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): TioConnectionInfo;
     class procedure SetDefaultConnectionName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
     class procedure SetShowHideWaitProc(const AShowWaitProc:TProc; const AHideWaitProc:TProc);
@@ -225,7 +226,8 @@ class function TioConnectionManager.GetConnectionDefByName(AConnectionName: Stri
 begin
   Result := nil;
   // If desired ConnectionName is empty then get then Default one.
-  if Self.IsEmptyConnectionName(AConnectionName) then Self.GetDefaultConnectionName;
+  if Self.IsEmptyConnectionName(AConnectionName) then
+    Self.GetDefaultConnectionName;
   // Get the ConnectionDef info's
   Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
   // Connection not found
@@ -245,6 +247,16 @@ end;
 class function TioConnectionManager.GetDefaultConnectionName: String;
 begin
   Result := Self.FDefaultConnectionName;
+end;
+
+class function TioConnectionManager.GetDefaultConnectionNameIfEmpty(const AConnectionDefName: String): String;
+begin
+  // If AConnectionName param is not specified (is empty) then
+  //  use the default connection def
+  if IsEmptyConnectionName(AConnectionDefName) then
+    Result := GetDefaultConnectionName
+  else
+    Result := AConnectionDefName;
 end;
 
 class procedure TioConnectionManager.HideWaitProc;

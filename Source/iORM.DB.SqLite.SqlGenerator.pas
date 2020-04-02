@@ -230,7 +230,7 @@ begin
   // From
   AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSql);
   // Join
-  AQuery.SQL.Add(AContext.GetJoin.GetSql(AContext.Map.GetTable.TableName));
+  AQuery.SQL.Add(AContext.GetJoin.GetSql(AContext.GetConnectionDefName, AContext.Map.GetTable.TableName));
   // If a Where exist then the query is an external query else
   //  is an internal query.
   if AContext.WhereExist then

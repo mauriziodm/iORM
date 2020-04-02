@@ -59,6 +59,7 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     ioFMX1: TioFMX;
     BindExpression1: TBindExpression;
+    FBConn: TioFirebirdConnectionDef;
     procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }

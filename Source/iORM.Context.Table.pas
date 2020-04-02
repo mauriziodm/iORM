@@ -69,7 +69,7 @@ type
     FJoinClassRef: TioClassRef;
   public
     constructor Create(const AJoinType:TioJoinType; AJoinClassRef:TioClassRef; AJoinCondition:String='');
-    function GetSql: String;
+    function GetSql(const AConnectionDefName: String): String;
     function GetJoinClassRef: TioClassRef;
     function GetJoinCondition: String;
     function GetJoinType: TioJoinType;
@@ -84,7 +84,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Add(AJoinItem:IioJoinItem);
-    function GetSql(const ASelfClassName: String): String;
+    function GetSql(const AConnectionDefName, ASelfClassName: String): String;
   end;
   // ---------------------------------------------------------------------------
   // END: JOIN
@@ -326,9 +326,9 @@ begin
   Result := Self.FJoinType;
 end;
 
-function TioJoinItem.GetSql: String;
+function TioJoinItem.GetSql(const AConnectionDefName: String): String;
 begin
-  Result := TioDBFactory.SqlGenerator.GenerateSqlJoinSectionItem(Self);
+  Result := TioDBFactory.SqlGenerator(AConnectionDefName).GenerateSqlJoinSectionItem(Self);
 end;
 
 { TioJoins }
@@ -349,13 +349,13 @@ begin
   inherited;
 end;
 
-function TioJoins.GetSql(const ASelfClassName: String): String;
+function TioJoins.GetSql(const AConnectionDefName, ASelfClassName: String): String;
 var
   aJoinItem: IioJoinItem;
 begin
   Result := '';
   for aJoinItem in FJoinList do
-    Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql, ASelfClassName);
+    Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql(AConnectionDefName), ASelfClassName);
 end;
 
 { TioGroupBy }

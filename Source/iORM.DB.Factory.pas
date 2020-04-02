@@ -57,12 +57,12 @@ type
     class function WhereItemPropertyOIDEqualsTo(AValue:TValue): IioSqlItemWhere;
     class function CompareOperator: TioCompareOperatorRef;
     class function LogicRelation: TioLogicRelationRef;
-    class function SqlGenerator: TioSqlGeneratorRef;
+    class function SqlGenerator(const AConnectionName:String): TioSqlGeneratorRef;
     class function SqlDataConverter: TioSqlDataConverterRef;
     class function Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
     class function NewConnection(const AConnectionName:String): IioConnection;
     class function TransactionCollection: IioTransactionCollection;
-    class function Query(AConnectionDefName:String; const AQueryIdentity:String=''): IioQuery;
+    class function Query(const AConnectionDefName:String; const AQueryIdentity:String=''): IioQuery;
     class function ConnectionContainer: TioConnectionContainerRef;
     class function ConnectionManager: TioConnectionManagerRef;
     class function QueryContainer: IioQueryContainer;
@@ -94,8 +94,7 @@ class function TioDbFactory.Connection(AConnectionName:String=IO_CONNECTIONDEF_D
 begin
   // If AConnectionName param is not specified (is empty) then
   //  use the default connection def
-  if Self.ConnectionManager.IsEmptyConnectionName(AConnectionName) then
-    AConnectionName := Self.ConnectionManager.GetDefaultConnectionName;
+  AConnectionName := Self.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionName);
   // If the connection already exists in the COnnectionContainer then return then else
   //  create a new connection, add it to the COnnectionContainer thne return the connection
   //  itself to the caller code
@@ -174,15 +173,11 @@ begin
   Result := TioQueryEngine;
 end;
 
-class function TioDbFactory.Query(AConnectionDefName:String; const AQueryIdentity:String): IioQuery;
+class function TioDbFactory.Query(const AConnectionDefName:String; const AQueryIdentity:String): IioQuery;
 var
   LConnection: IioConnection;
   LQuery: IioQuery;
 begin
-  // If AConnectionName param is not specified (is empty) then
-  //  use the default connection def
-  if Self.ConnectionManager.IsEmptyConnectionName(AConnectionDefName) then
-    AConnectionDefName := Self.ConnectionManager.GetDefaultConnectionName;
   // Get the proper connection
   LConnection := Self.Connection(AConnectionDefName);
   // Operation allowed only for DB connections
@@ -216,9 +211,9 @@ begin
   Result := TioSQLDestination.Create(ASQL);
 end;
 
-class function TioDbFactory.SqlGenerator: TioSqlGeneratorRef;
+class function TioDbFactory.SqlGenerator(const AConnectionName:String): TioSqlGeneratorRef;
 begin
-  case TioConnectionManager.GetConnectionInfo.ConnectionType of
+  case TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType of
     cdtFirebird: Result := TioSqlGeneratorFirebird;
     cdtSQLite:   Result := TioSqlGeneratorSqLite;
     cdtSQLServer:Result := TioSqlGeneratorMSSqlServer;

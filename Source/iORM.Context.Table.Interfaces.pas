@@ -48,8 +48,9 @@ type
     function GetSql(const ASelfClassName: String): String;
   end;
 
-  IioJoinItem = interface(IioSqlItem)
+  IioJoinItem = interface
     ['{93E0B456-6BD1-464C-BDA7-FF1F014F6B76}']
+    function GetSql(const AConnectionDefName: String): String;
     function GetJoinType: TioJoinType;
     function GetJoinClassRef: TioClassRef;
     function GetJoinCondition: String;
@@ -58,7 +59,7 @@ type
   IioJoins = interface
     ['{8BAACD49-D42C-4278-97AA-EAE00A5EEA52}']
     procedure Add(AJoinItem:IioJoinItem);
-    function GetSql(const ASelfClassName: String): String;
+    function GetSql(const AConnectionDefName, ASelfClassName: String): String;
   end;
 
   IioClassFromField = interface
