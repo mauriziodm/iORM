@@ -91,7 +91,7 @@ type
     procedure SetTable(ATable:IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
-    function IsSqlRequestCompliant(ASqlRequestType:TioSqlRequestType): Boolean;
+    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
     procedure SetIsID(AValue:Boolean);
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);

@@ -336,7 +336,7 @@ object MainForm: TMainForm
         TabOrder = 6
         RowHeight = 21.000000000000000000
         RowCount = 200
-        Viewport.Width = 380.000000000000000000
+        Viewport.Width = 364.000000000000000000
         Viewport.Height = 177.000000000000000000
       end
     end
@@ -348,7 +348,7 @@ object MainForm: TMainForm
   end
   object BSMaster: TioPrototypeBindSource
     AutoActivate = True
-    AutoPost = True
+    AutoPost = False
     FieldDefs = <
       item
         Name = 'FirstName'
@@ -368,6 +368,12 @@ object MainForm: TMainForm
       item
         Name = 'ClassNameProp'
         Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
         ReadOnly = False
       end>
     ScopeMappings = <>
@@ -458,10 +464,17 @@ object MainForm: TMainForm
       NotifyOutputs = False
       Direction = dirSourceToControl
     end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'ID'
+      Control = EditID
+      Track = False
+    end
   end
   object BSDetail: TioPrototypeBindSource
     AutoActivate = True
-    AutoPost = True
+    AutoPost = False
     FieldDefs = <
       item
         Name = 'PhoneType'
@@ -494,8 +507,8 @@ object MainForm: TMainForm
     Top = 248
   end
   object ActionList1: TActionList
-    Left = 216
-    Top = 312
+    Left = 144
+    Top = 216
     object NextTabAction1: TNextTabAction
       Category = 'Tab'
       TabControl = TabControl2
@@ -506,6 +519,7 @@ object MainForm: TMainForm
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntf.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = False
@@ -519,6 +533,8 @@ object MainForm: TMainForm
     Top = 72
   end
   object FBConn: TioFirebirdConnectionDef
+    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntf.fdb'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

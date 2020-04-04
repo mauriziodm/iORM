@@ -48,7 +48,7 @@ type
   public
     class function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBCreatorSqlGenerator; AIsClassFromField:Boolean): IioDBCreatorField;
     class function GetTable(const ATableName: String; const AIsClassFromField:Boolean; const ASqlGenerator:IioDBCreatorSqlGenerator; const AMap:IioMap): IioDBCreatorTable;
-    class function GetDBCreator: IioDBCreator;
+    class function GetDBCreator(const AConnectionDefName: String): IioDBCreator;
     class function GetSqlGenerator: IioDBCreatorSqlGenerator;
   end;
 
@@ -60,7 +60,7 @@ uses
 
 { TioDBCreatorFactory }
 
-class function TioDBCreatorFactory.GetDBCreator: IioDBCreator;
+class function TioDBCreatorFactory.GetDBCreator(const AConnectionDefName: String): IioDBCreator;
 begin
   Result := TioDBCreator.Create(Self.GetSqlGenerator);
 end;

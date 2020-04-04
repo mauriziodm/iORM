@@ -58,7 +58,7 @@ type
     class function CompareOperator: TioCompareOperatorRef;
     class function LogicRelation: TioLogicRelationRef;
     class function SqlGenerator(const AConnectionName:String): TioSqlGeneratorRef;
-    class function SqlDataConverter: TioSqlDataConverterRef;
+    class function SqlDataConverter(const AConnectionName:String): TioSqlDataConverterRef;
     class function Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
     class function NewConnection(const AConnectionName:String): IioConnection;
     class function TransactionCollection: IioTransactionCollection;
@@ -194,9 +194,9 @@ begin
     LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
 end;
 
-class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;
+class function TioDbFactory.SqlDataConverter(const AConnectionName:String): TioSqlDataConverterRef;
 begin
-  case TioConnectionManager.GetConnectionInfo.ConnectionType of
+  case TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType of
     cdtFirebird:  Result := TioSqlDataConverterFirebird;
     cdtSQLite:    Result := TioSqlDataConverterSqLite;
     cdtSQLServer: Result := TioSqlDataConverterMSSqlServer;

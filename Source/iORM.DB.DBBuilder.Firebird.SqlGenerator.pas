@@ -249,7 +249,7 @@ function TioDBBuilderFirebirdSqlGenerator.AddIndex(const AContext: IioContext; c
 var
   LQuery: IioQuery;
 begin
-  AContext.SetConnectionDefName(GetConnectionDefName);
+  AContext.SetConnectionDefName(Self.GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 end;
@@ -333,11 +333,11 @@ end;
 function TioDBBuilderFirebirdSqlGenerator.CreateDatabase(const ADbName: string): String;
 begin
   // N.B. Sfrutta un parametro di Firedac per autocreare il db se non esiste
-  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Values['CreateDatabase'] := BoolToStr(True,True);
+  TioDBFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName).Params.Values['CreateDatabase'] := BoolToStr(True,True);
   // N.B. Apriamo una connessione solo per fargli creare il db.
-  io.GlobalFactory.DBFactory.Connection();
+  TioDBFactory.Connection(Self.GetConnectionDefName);
   // N.B. Rimuoviamo il parametro di Firedac per autocreare il db se non esiste
-  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Values['CreateDatabase'] := BoolToStr(False,True);
+  TioDBFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName).Params.Values['CreateDatabase'] := BoolToStr(False,True);
 
   Result := '';
 end;
@@ -368,7 +368,6 @@ begin
   while not LQuery.Eof do
   begin
     LQueryDrop.SQL.Add(Format('ALTER TABLE %s DROP CONSTRAINT %s;',[LQuery.Fields.FieldByName('tname').AsString,LQuery.Fields.FieldByName('cname').AsString]));
-
     LQuery.Next;
   end;
 

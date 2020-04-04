@@ -489,7 +489,7 @@ class procedure io.AutoCreateDatabase(const AConnectionName:String; const RaiseE
 begin
   // The AutoCreateDatabase feature is available only for SQLite database
   if TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType = cdtSQLite then
-    TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase
+    TioDBCreatorFactory.GetDBCreator(AConnectionName).AutoCreateDatabase
   else if RaiseExceptionIfNotAvailable then
     raise EioException.Create(ClassName + ':  "AutoCreateDatabase" feature is available for SQLite RDBMS only.');
 end;

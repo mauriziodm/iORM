@@ -73,12 +73,12 @@ end;
 
 class function TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName: string): IioDBBuilderSqlGenerator;
 begin
-  case TioConnectionManager.GetConnectionInfo.ConnectionType of
+  case TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType of
     cdtFirebird:  Result := TioDBBuilderFirebirdSqlGenerator.Create(AConnectionDefName);
     cdtSQLite:    Result := TioDBBuilderSqLiteSqlGenerator.Create(AConnectionDefName);
     cdtSQLServer: Result := TioDBBuilderMSSqlServerSqlGenerator.Create(AConnectionDefName);
   else
-    raise EioException.Create(Self.ClassName, 'NewSqlService', 'Connection type not found.');
+    raise EioException.Create(Self.ClassName, 'NewSqlGenerator', 'Connection type not found.');
   end;
 end;
 

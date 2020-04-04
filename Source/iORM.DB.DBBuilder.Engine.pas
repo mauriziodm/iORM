@@ -139,6 +139,7 @@ type
     function FieldExists(AFieldName: String): Boolean;
     function IDField: IioDBBuilderField;
     function GetMap: IioMap;
+    function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
     property TableName: String read GetTableName write SetTableName;
     property Fields: TioDBBuilderFieldList read GetFields;
     property IndexList: TioIndexList read GetIndexList;
@@ -290,16 +291,14 @@ begin
     LSb := TStringBuilder.Create;
 
     try
-      LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator;
-      LDatabaseName := TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Database;
+      LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
+      LDatabaseName := TioDBFactory.ConnectionManager.GetConnectionDefByName(FConnectionDefName).Params.Database;
 
       // Verification of Database Existence
       LDbExists := LSqlGenerator.DatabaseExists(LDatabaseName);
 
       if not LDbExists then
-      begin
         LSqlGenerator.CreateDatabase(LDatabaseName);
-      end;
 
       // Move into Current Database
       if FCreateScriptOnly then
@@ -356,6 +355,10 @@ begin
       for LPairTable in FTables do
       begin
         LTableName := LPairTable.Value.TableName;
+
+        // If current table is specific for another database (not the current one) then skip it
+        if not LPairTable.Value.IsForThisConnection(FConnectionDefName) then
+          Continue;
 
         // Check Table Existence
         if (not LDbExists) or (not LSqlGenerator.TableExists(LDatabaseName, LTableName)) then
@@ -459,6 +462,11 @@ begin
         // Add Indexes After Generated All Tables
         for LPairTable in FTables do
         begin
+
+          // If current table is specific for another database (not the current one) then skip it
+          if not LPairTable.Value.IsForThisConnection(FConnectionDefName) then
+            Continue;
+
           for LIndex in LPairTable.Value.IndexList do
           begin
             LContext := TioContextFactory.Context(LPairTable.Value.GetMap.GetClassName);
@@ -484,6 +492,11 @@ begin
         // Add Foreign Key After Generated All Tables
         for LPairTable in FTables do
         begin
+
+          // If current table is specific for another database (not the current one) then skip it
+          if not LPairTable.Value.IsForThisConnection(FConnectionDefName) then
+            Continue;
+
           for LPairField in LPairTable.Value.Fields do
           begin
             LRel := LPairField.Value.GetProperty.GetRelationType;
@@ -522,10 +535,6 @@ begin
                   LDestinationTableName := LPairTable.Value.TableName;
                   LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
                 end;
-
-
-
-
 
                 LSb.AppendLine();
 
@@ -915,6 +924,11 @@ end;
 function TioDBBuilderTable.IsClassFromField: Boolean;
 begin
   Result := FIsClassFromField;
+end;
+
+function TioDBBuilderTable.IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
+begin
+  Result := GetMap.GetTable.GetConnectionDefName.IsEmpty or (GetMap.GetTable.GetConnectionDefName = AConnectionDefNameToCheck);
 end;
 
 procedure TioDBBuilderTable.SetTableName(AValue: String);

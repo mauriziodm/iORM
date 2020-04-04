@@ -219,7 +219,7 @@ function TioDBBuilderSqLiteSqlGenerator.AddIndex(const AContext: IioContext; con
 var
   LQuery: IioQuery;
 begin
-  AContext.SetConnectionDefName(GetConnectionDefName);
+  AContext.SetConnectionDefName(Self.GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 
@@ -453,11 +453,8 @@ end;
 function TioDBBuilderSqLiteSqlGenerator.FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
 var
   LQuery: IioQuery;
-  LConnectionDefName: string;
 begin
   Result := False;
-  LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
-  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
   LQuery := GetQuery;
   LQuery.SQL.Add('pragma table_info('+QuotedStr(ATableName)+')');
 
@@ -481,13 +478,9 @@ var
   LQuery: IioQuery;
   LColumnName: string;
   LColumnTyp: string;
-//  LColumnLength: Integer;
   LColumnNullable: Boolean;
 begin
-//  LColumnLength := 0;
-
   Result := False;
-  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
   LQuery := GetQuery;
   LQuery.SQL.Add('pragma table_info('+QuotedStr(ATableName)+')');
 
@@ -618,6 +611,11 @@ begin
 
   for LPairTable in ATableList do
   begin
+
+    // If current table is specific for another database (not the current one) then skip it
+    if not LPairTable.Value.IsForThisConnection(GetConnectionDefName) then
+      Continue;
+
     LQueryDrop.SQL.Add('PRAGMA foreign_keys=off;');
     LQueryDrop.SQL.Add('BEGIN TRANSACTION;');
     LQueryDrop.SQL.Add(Format('DROP TABLE IF EXISTS _%s_old;',[LPairTable.Value.TableName]));

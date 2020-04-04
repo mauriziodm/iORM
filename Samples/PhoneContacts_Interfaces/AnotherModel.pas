@@ -8,6 +8,7 @@ uses
 type
 
   [ioEntity('OtherPersons',  ioFields), ioTrueClass, ioKeyGenerator('PERSONS')]
+  [ioConnectionDefName('FBConn')]
   TAnotherPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;

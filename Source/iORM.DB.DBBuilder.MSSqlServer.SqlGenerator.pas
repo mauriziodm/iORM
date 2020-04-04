@@ -252,7 +252,7 @@ function TioDBBuilderMSSqlServerSqlGenerator.AddIndex(const AContext: IioContext
 var
   LQuery: IioQuery;
 begin
-  AContext.SetConnectionDefName(GetConnectionDefName);
+  AContext.SetConnectionDefName(Self.GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   // M.M. 16/11/19 - Sistemazione parole riservate SQL SERVER
   Result := ReplaceSpecialWords(LQuery.SQL.Text);
@@ -349,16 +349,19 @@ end;
 function TioDBBuilderMSSqlServerSqlGenerator.CreateDatabase(const ADbName: string): String;
 var
   LQuery: IioQuery;
+  LConnectionDef: IioConnectionDef;
 begin
+  // Get the ConnectionDef
+  LConnectionDef := TioDBFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName);
   // Create new connection in database master
   io.Connections.NewSQLServerConnectionDef(
-                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).AsString['Server'],
+                  LConnectionDef.AsString['Server'],
                   'master',
-                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.UserName,
-                  TioDBFactory.ConnectionManager.GetConnectionDefByName(TioDBFactory.ConnectionManager.GetDefaultConnectionName).Params.Password,False, False, False,
+                  LConnectionDef.Params.UserName,
+                  LConnectionDef.Params.Password,False, False, False,
                   ConnectionName_MSSQL_MASTER);
 
-  LQuery := io.GlobalFactory.DBFactory.Query(ConnectionName_MSSQL_MASTER);
+  LQuery := TioDBFactory.Query(ConnectionName_MSSQL_MASTER);
   LQuery.SQL.Add(Format('CREATE DATABASE [%s]',[ADbName]));
 
   // N.B. Il database viene sempre generato per evitare problemi di permessi

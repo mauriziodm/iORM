@@ -82,7 +82,7 @@ begin
       ioRTNone: begin
         // If it isn't related to a blob field then load as normal value
         if not CurrProp.IsBlob then
-          CurrProp.SetValue(Result, AQuery.GetValue(CurrProp))
+          CurrProp.SetValue(Result, AQuery.GetValue(CurrProp, AContext))
         // If it's related to a blob field and it is of TStream or descendant the load as stream
         else if CurrProp.IsStream then
           LoadPropertyStream(AContext, AQuery, CurrProp)

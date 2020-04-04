@@ -156,8 +156,8 @@ type
     procedure Next;
     procedure Prior;
     function Eof: Boolean;
-    function GetValue(AProperty:IioContextProperty): TValue;
-    function GetValueByFieldNameAsVariant(AFieldName:String): Variant;
+    function GetValue(const AProperty: IioContextProperty; const AContext: IioContext): TValue;
+    function GetValueByFieldNameAsVariant(const AFieldName:String): Variant;
     procedure Open;
     procedure Close;
     function IsEmpty: Boolean;
@@ -166,14 +166,14 @@ type
     function ExecSQL: Integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
-    function ParamByName(AParamName:String): TioParam;
-    function ParamByProp(AProp:IioContextProperty): TioParam;
-    procedure SetParamValueByContext(AProp:IioContextProperty; AContext:IioContext);
-    procedure SetParamValueToNull(AProp:IioContextProperty; AForceDataType:TFieldType=ftUnknown);
+    function ParamByName(const AParamName:String): TioParam;
+    function ParamByProp(const AProp:IioContextProperty): TioParam;
+    procedure SetParamValueByContext(const AProp:IioContextProperty; const AContext:IioContext);
+    procedure SetParamValueToNull(const AProp:IioContextProperty; const AForceDataType:TFieldType=ftUnknown);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
-    function CreateBlobStream(AProperty: IioContextProperty; Mode: TBlobStreamMode): TStream;
-    procedure SaveStreamObjectToSqlParam(AObj:TObject; AProperty: IioContextProperty);
+    function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
+    procedure SaveStreamObjectToSqlParam(const AObj:TObject; const AProperty: IioContextProperty);
     property SQL: TStrings read GetSQL;
   end;
 

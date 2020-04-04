@@ -60,6 +60,7 @@ type
     ioFMX1: TioFMX;
     BindExpression1: TBindExpression;
     FBConn: TioFirebirdConnectionDef;
+    LinkControlToField4: TLinkControlToField;
     procedure SQLiteConnAfterRegister(Sender: TObject);
   private
     { Private declarations }

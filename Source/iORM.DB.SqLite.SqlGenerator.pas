@@ -180,7 +180,7 @@ begin
   begin
     // If the current property is ReadOnly then skip it
     // If the current property RelationType is HasMany then skip it
-    if (not Prop.IsSqlRequestCompliant(ioInsert))
+    if (not Prop.IsSqlRequestCompliant(ioInsert, AContext.GetConnectionDefName))
     or (Prop.GetRelationType = ioRTHasMany)
     or (Prop.GetRelationType = ioRTHasOne)
     then Continue;
@@ -258,7 +258,7 @@ begin
   begin
     // If the current property is ReadOnly then skip it
     // If the current property RelationType is HasMany then skip it
-    if (not Prop.IsSqlRequestCompliant(ioInsert))
+    if (not Prop.IsSqlRequestCompliant(ioInsert, AContext.GetConnectionDefName))
     or (Prop.GetRelationType = ioRTHasMany)
     or (Prop.GetRelationType = ioRTHasOne)
     then Continue;
