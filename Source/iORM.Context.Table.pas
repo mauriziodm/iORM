@@ -55,7 +55,7 @@ type
     FSqlText: String;
   public
     constructor Create(const ASqlText:String);
-    function GetSql(const ASelfClassName: String): String;
+    function GetSql(const ASelfClassName, AConnectionDefName: String): String;
   end;
 
   // ===========================================================================
@@ -101,10 +101,10 @@ type
   public
     constructor Create(ASqlFieldName, AClassName, AQualifiedClassName, AAncestors: String);
     function GetFieldName: string;
-    function GetSqlFieldName: string;
+    function GetSqlFieldName(const AConnectionDefName: String): string;
     function GetSqlParamName: String;
     function GetValue: String;
-    function GetSqlValue: string;
+    function GetSqlValue(const AConnectionDefName: String): string;
     function GetClassName: String;
     function GetQualifiedClassName: String;
     function QualifiedClassNameFromClassInfoFieldValue(AValue:String): String;
@@ -127,7 +127,7 @@ type
     const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String;
     const AMapMode:TioMapModeType; const AAutoCreateDB:Boolean; const ARttiType:TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
-    function GetSql: String; override;
+    function GetSql(const AConnectionDefName: String): String;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
@@ -221,10 +221,9 @@ begin
   Result := FRttiType;
 end;
 
-function TioContextTable.GetSql: String;
+function TioContextTable.GetSql(const AConnectionDefName: String): String;
 begin
-  Result := inherited;
-  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(Result);
+  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(Result);
 end;
 
 function TioContextTable.IndexListExists: Boolean;
@@ -273,9 +272,9 @@ begin
   Result := FQualifiedClassName;
 end;
 
-function TioClassFromField.GetSqlFieldName: string;
+function TioClassFromField.GetSqlFieldName(const AConnectionDefName: String): string;
 begin
-  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioClassFromField.GetSqlParamName: String;
@@ -283,9 +282,9 @@ begin
   Result := 'P_' + FSqlFieldName;
 end;
 
-function TioClassFromField.GetSqlValue: string;
+function TioClassFromField.GetSqlValue(const AConnectionDefName: String): string;
 begin
-  Result := TioDbFactory.SqlDataConverter.StringToSQL(Self.GetValue);
+  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).StringToSQL(Self.GetValue);
 end;
 
 function TioClassFromField.GetValue: String;
@@ -355,7 +354,7 @@ var
 begin
   Result := '';
   for aJoinItem in FJoinList do
-    Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql(AConnectionDefName), ASelfClassName);
+    Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql(AConnectionDefName), ASelfClassName, AConnectionDefName);
 end;
 
 { TioGroupBy }
@@ -365,9 +364,9 @@ begin
   FSqlText := ASqlText;
 end;
 
-function TioGroupBy.GetSql(const ASelfClassName: String): String;
+function TioGroupBy.GetSql(const ASelfClassName, AConnectionDefName: String): String;
 begin
-  Result := TioSqlTranslator.Translate(FSqlText, ASelfClassName).Trim;
+  Result := TioSqlTranslator.Translate(FSqlText, ASelfClassName, AConnectionDefName).Trim;
   if Result <> '' then Result := 'GROUP BY ' + Result;
   
 end;

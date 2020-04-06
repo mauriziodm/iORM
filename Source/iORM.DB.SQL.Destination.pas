@@ -134,7 +134,7 @@ end;
 
 function TioSQLDestination.GetTranslatedSQL: String;
 begin
-  Result := TioSqlTranslator.Translate(FSQL, FSelfClassName, FQualifiedFieldName);
+  Result := TioSqlTranslator.Translate(FSQL, FSelfClassName, FConnectionName, FQualifiedFieldName);
 end;
 
 function TioSQLDestination.ToMemTable: TFDMemTable;

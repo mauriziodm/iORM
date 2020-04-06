@@ -171,7 +171,7 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
-    AutoCreateDatabase = True
+    AutoCreateDB.Enabled = True
     Database = '..\..\..\SamplesData\ContactsObjMemTable.db'
     DatabaseStdFolder = sfUndefined
     DefaultConnection = True

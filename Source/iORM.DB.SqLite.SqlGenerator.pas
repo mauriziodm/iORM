@@ -79,7 +79,7 @@ begin
   if AIndexName.IsEmpty then
     AIndexName := Self.BuildIndexName(AContext, ACommaSepFieldList, AIndexOrientation, AUnique)
   else
-    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
+    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetConnectionDefName, AContext.GetClassRef.ClassName, False);
   // Index orientation
   case AIndexOrientation of
     ioAscending: LIndexOrientationText := ' ASC';
@@ -114,7 +114,7 @@ begin
               + AIndexName + ' ON ' + AContext.GetTable.TableName
               + ' (' + LQueryText + ')';
   // Translate the query text
-  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, False);
+  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetConnectionDefName, AContext.GetClassRef.ClassName, False);
   // Assign the query text
   AQuery.SQL.Add(LQueryText);
   // -----------------------------------------------------------------
@@ -124,7 +124,7 @@ class procedure TioSqlGeneratorSqLite.GenerateSqlDelete(const AQuery:IioQuery; c
 begin
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
+  AQuery.SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql(AContext.GetConnectionDefName));
   // If a Where exist then the query is an external query else
   //  is an internal query.
   if AContext.WhereExist then
@@ -138,7 +138,7 @@ class procedure TioSqlGeneratorSqLite.GenerateSqlForDropIndex(
   const AQuery: IioQuery; const AContext:IioContext; AIndexName: String);
 begin
   // Index Name
-  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
+  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetConnectionDefName, AContext.GetClassRef.ClassName, False);
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('DROP INDEX IF EXISTS ' + AIndexName);
@@ -150,7 +150,7 @@ begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM '
-    + AContext.GetTable.GetSql
+    + AContext.GetTable.GetSql(AContext.GetConnectionDefName)
     + ' WHERE '
     + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
     + ')'
@@ -165,12 +165,12 @@ var
 begin
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
+  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql(AContext.GetConnectionDefName));
   AQuery.SQL.Add('(');
   AQuery.SQL.Add(AContext.GetProperties.GetSql(AContext.GetConnectionDefName, ioInsert));
   // Add the ClassFromField if enabled
-  if AContext.IsClassFromField
-    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  if AContext.IsClassFromField then
+    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName(AContext.GetConnectionDefName));
   // -----------------------------------------------------------------
   AQuery.SQL.Add(') VALUES (');
   // -----------------------------------------------------------------
@@ -226,9 +226,9 @@ begin
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT ' + AContext.GetProperties.GetSql(AContext.GetConnectionDefName, ioSelect));
   if AContext.IsClassFromField
-    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName(AContext.GetConnectionDefName));
   // From
-  AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSql);
+  AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSql(AContext.GetConnectionDefName));
   // Join
   AQuery.SQL.Add(AContext.GetJoin.GetSql(AContext.GetConnectionDefName, AContext.Map.GetTable.TableName));
   // If a Where exist then the query is an external query else
@@ -251,7 +251,7 @@ var
 begin
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSql + ' SET');
+  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSql(AContext.GetConnectionDefName) + ' SET');
   // Iterate for all properties
   Comma := ' ';
   for Prop in AContext.GetProperties do
@@ -268,7 +268,7 @@ begin
   end;
   // Add the ClassFromField if enabled
   if AContext.IsClassFromField
-  then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=:' + AContext.ClassFromField.GetSqlParamName);
+  then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName(AContext.GetConnectionDefName) + '=:' + AContext.ClassFromField.GetSqlParamName);
   // Where conditions
 //  AQuery.SQL.Add(AContext.Where.GetSql);
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);

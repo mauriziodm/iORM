@@ -151,7 +151,7 @@ begin
   Result := '';
   // Ritorna il GroupBy fisso (attribute nella dichiarazione della classe)
   if Assigned(Self.GetTable.GetGroupBy)
-    then Result := Self.GetTable.GetGroupBy.GetSql(FMap.GetClassName);
+    then Result := Self.GetTable.GetGroupBy.GetSql(FMap.GetClassName, Self.GetConnectionDefName);
   // Aggiungere qui l'eventuale futuro codice per aggiungere/sostituire
   //  l'eventuale GroupBy specificato nel ioWhere e che quindi è nel
   //  context e che sostituisce il GroupBy fisso

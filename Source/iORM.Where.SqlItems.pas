@@ -190,7 +190,7 @@ end;
 function TioSqlItemsWhereText.GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
 begin
   // NB: No inherited
-  Result := TioSqlTranslator.Translate(FSqlText, AMap.GetClassName);
+  Result := TioSqlTranslator.Translate(FSqlText, AMap.GetClassName, AConnectionDefName);
 end;
 
 function TioSqlItemsWhereText.HasParameter: Boolean;

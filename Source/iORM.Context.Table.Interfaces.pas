@@ -45,7 +45,7 @@ type
 
   IioGroupBy = interface
     ['{E57CDC09-3D2B-432B-9114-B7CCB1EDCCA3}']
-    function GetSql(const ASelfClassName: String): String;
+    function GetSql(const ASelfClassName, AConnectionDefName: String): String;
   end;
 
   IioJoinItem = interface
@@ -65,10 +65,10 @@ type
   IioClassFromField = interface
     ['{D15A9A28-FB90-4753-BE4A-7484A834CD2D}']
     function GetFieldName: string;
-    function GetSqlFieldName: string;
+    function GetSqlFieldName(const AConnectionDefName: String): string;
     function GetSqlParamName: String;
     function GetValue: String;
-    function GetSqlValue: string;
+    function GetSqlValue(const AConnectionDefName: String): string;
     function GetClassName: String;
     function GetQualifiedClassName: String;
     function QualifiedClassNameFromClassInfoFieldValue(AValue:String): String;
@@ -76,8 +76,10 @@ type
 
   TioIndexList = TObjectList<ioIndex>;
 
-  IioContextTable = interface(IioSqlItem)
+//  IioContextTable = interface(IioSqlItem) NB: Mauri 06/04/2020 - modificato metodo GetSql
+  IioContextTable = interface
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']
+    function GetSql(const AConnectionDefName: String): String;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
