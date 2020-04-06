@@ -115,7 +115,7 @@ var
   LPrecision: string;
   LScale: string;
 begin
-  LFieldName := AProperty.GetSqlFieldName;
+  LFieldName := AProperty.GetSqlFieldName(Self.GetConnectionDefName);
   LFieldLength := '';
   LKeyOptions := '';
 
@@ -262,7 +262,7 @@ function TioDBBuilderMSSqlServerSqlGenerator.AddPrimaryKey(const ATableName: str
 begin
   Result := 'ALTER TABLE ['+ATableName+'] '+
             'ADD CONSTRAINT '+'PK_'+ATableName+'_'+AIDProperty.GetName+' PRIMARY KEY CLUSTERED'+
-            '('+AIDProperty.GetSqlFieldName+')';
+            '('+AIDProperty.GetSqlFieldName(Self.GetConnectionDefName)+')';
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AlterField(const AProperty:IioContextProperty): String;

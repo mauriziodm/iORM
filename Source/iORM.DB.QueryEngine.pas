@@ -167,7 +167,7 @@ begin
   for AProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not AProp.IsSqlRequestCompliant(ioInsert) then
+    if not AProp.IsSqlRequestCompliant(ioInsert, AContext.GetConnectionDefName) then
       Continue;
     // If current property is the ID property and its value is null (0)
     // then skip its value (always NULL)
@@ -267,7 +267,7 @@ begin
   for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not LProp.IsSqlRequestCompliant(ioUpdate) then
+    if not LProp.IsSqlRequestCompliant(ioUpdate, AContext.GetConnectionDefName) then
       Continue;
     // Relation type
     case LProp.GetRelationType of

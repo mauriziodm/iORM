@@ -112,7 +112,7 @@ var
   LScale: string;
   LType: string;
 begin
-  LFieldName := AProperty.GetSqlFieldName;
+  LFieldName := AProperty.GetSqlFieldName(Self.GetConnectionDefName);
   LFieldLength := '';
   LKeyOptions := '';
   LNullable := '';
@@ -258,7 +258,7 @@ function TioDBBuilderFirebirdSqlGenerator.AddPrimaryKey(const ATableName: string
 begin
   Result := 'ALTER TABLE '+ATableName+' '+
             'ADD PRIMARY KEY '+
-            '('+AIDProperty.GetSqlFieldName+')';
+            '('+AIDProperty.GetSqlFieldName(Self.GetConnectionDefName)+')';
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.AlterField(const AProperty:IioContextProperty): String;

@@ -110,7 +110,7 @@ var
   LKeyOptions: string;
   LNullable: string;
 begin
-  LFieldName := AProperty.GetSqlFieldName;
+  LFieldName := AProperty.GetSqlFieldName(Self.GetConnectionDefName);
   LFieldLength := '';
   LKeyOptions := '';
 

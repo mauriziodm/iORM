@@ -130,7 +130,7 @@ begin
   if AContext.WhereExist then
     AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
   else
-    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
   // -----------------------------------------------------------------
 end;
 
@@ -152,7 +152,7 @@ begin
   AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM '
     + AContext.GetTable.GetSql
     + ' WHERE '
-    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
     + ')'
   );
   // -----------------------------------------------------------------
@@ -236,7 +236,7 @@ begin
   if AContext.WhereExist then
     AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
   else
-    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
   // GroupBy
   AQuery.SQL.Add(AContext.GetGroupBySql);
   // OrderBy
@@ -263,7 +263,7 @@ begin
     or (Prop.GetRelationType = ioRTHasOne)
     then Continue;
     // Add the field param
-    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
+    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName(AContext.GetConnectionDefName) + '=:' + Prop.GetSqlParamName);
     Comma := ',';
   end;
   // Add the ClassFromField if enabled
@@ -271,7 +271,7 @@ begin
   then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=:' + AContext.ClassFromField.GetSqlParamName);
   // Where conditions
 //  AQuery.SQL.Add(AContext.Where.GetSql);
-  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
   // -----------------------------------------------------------------
 end;
 

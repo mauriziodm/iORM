@@ -68,7 +68,7 @@ begin
   AQuery.SQL.Add('SELECT CAST(CASE WHEN EXISTS (SELECT * FROM '
     + AContext.GetTable.GetSql
     + ' WHERE '
-    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
     + ') THEN 1 ELSE 0 END AS INTEGER)'
   );
   // -----------------------------------------------------------------

@@ -102,19 +102,19 @@ type
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String; virtual;
-    function GetSqlQualifiedFieldName: String;
-    function GetSqlFullQualifiedFieldName: String;
+    function GetSqlQualifiedFieldName(const AConnectionDefName: String): String;
+    function GetSqlFullQualifiedFieldName(const AConnectionDefName: String): String;
     function GetSqlFieldTableName: String;
-    function GetSqlFieldName(AClearDelimiters: Boolean = False): String;
+    function GetSqlFieldName(const AConnectionDefName: String; const AClearDelimiters: Boolean = False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
     function IsStream: Boolean;
-    function GetValue(Instance: Pointer): TValue; virtual;
-    function GetValueAsObject(Instance: Pointer): TObject; virtual;
-    procedure SetValue(Instance: Pointer; AValue: TValue); virtual;
-    function GetSqlValue(ADataObject: TObject): String;
+    function GetValue(const Instance: Pointer): TValue; virtual;
+    function GetValueAsObject(const Instance: Pointer): TObject; virtual;
+    procedure SetValue(const Instance: Pointer; const AValue: TValue); virtual;
+    function GetSqlValue(const ADataObject: TObject; const AConnectionDefName: String): String;
     function GetRttiType: TRttiType; virtual;
     function GetTypeInfo: PTypeInfo; virtual;
     function GetTypeName: String;
@@ -127,14 +127,14 @@ type
     function RelationChildPropertyPathAssigned: Boolean;
     function GetRelationChildPropertyPath: TStrings;
     function GetRelationLoadType: TioLoadType;
-    function GetRelationChildObject(Instance: Pointer): TObject;
+    function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
-    procedure SetTable(ATable: IioContextTable);
+    procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
-    procedure SetIsID(AValue: Boolean);
+    procedure SetIsID(const AValue: Boolean);
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
@@ -182,10 +182,10 @@ type
       const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean;
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean;
       const AMetadata_FieldSubType: string; const AMetadata_FKCascadeDelete, AMetadata_FKCascadeUpdate: Boolean); overload;
-    class function Remove_F_FromName(AFieldName: String): String;
+    class function Remove_F_FromName(const AFieldName: String): String;
     function GetName: String; override;
-    function GetValue(Instance: Pointer): TValue; override;
-    procedure SetValue(Instance: Pointer; AValue: TValue); override;
+    function GetValue(const Instance: Pointer): TValue; override;
+    procedure SetValue(const Instance: Pointer; const AValue: TValue); override;
     function GetRttiType: TRttiType; override;
     function GetTypeInfo: PTypeInfo; override;
     function IsWritable: Boolean; override;
@@ -204,18 +204,18 @@ type
     function InternalGetSql(ASqlRequestType: TioSqlRequestType; AFunc: TioPropertiesGetSqlFunction): String;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
-    procedure SetObjStatusProperty(AValue: IioContextProperty);
+    procedure SetObjStatusProperty(const AValue: IioContextProperty);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
     function GetEnumerator: TEnumerator<IioContextProperty>;
     function GetSql: String; reintroduce; overload;
-    function GetSql(ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
-    procedure Add(AProperty: IioContextProperty; AIsId: Boolean = False; AIDSkipOnInsert: Boolean = True);
+    function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
+    procedure Add(const AProperty: IioContextProperty; const AIsId: Boolean = False; const AIDSkipOnInsert: Boolean = True);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioContextProperty;
-    function GetPropertyByName(APropertyName: String): IioContextProperty;
-    procedure SetTable(ATable: IioContextTable);
+    function GetPropertyByName(const APropertyName: String): IioContextProperty;
+    procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
     // Blob field present
@@ -395,9 +395,9 @@ begin
   Result := FMetadata_FKCascadeUpdate;
 end;
 
-function TioProperty.GetSqlFullQualifiedFieldName: String;
+function TioProperty.GetSqlFullQualifiedFieldName(const AConnectionDefName: String): String;
 begin
-  Result := GetSqlQualifiedFieldName + ' AS ' + FSqlFieldAlias;
+  Result := GetSqlQualifiedFieldName(AConnectionDefName) + ' AS ' + FSqlFieldAlias;
 end;
 
 function TioProperty.GetName: String;
@@ -420,7 +420,7 @@ begin
   Result := FRelationChildAutoIndex;
 end;
 
-function TioProperty.GetRelationChildObject(Instance: Pointer): TObject;
+function TioProperty.GetRelationChildObject(const Instance: Pointer): TObject;
 var
   AValue: TValue;
 begin
@@ -494,13 +494,13 @@ begin
   Result := FSqlFieldAlias;
 end;
 
-function TioProperty.GetSqlFieldName(AClearDelimiters: Boolean): String;
+function TioProperty.GetSqlFieldName(const AConnectionDefName: String; const AClearDelimiters: Boolean): String;
 begin
   // Result := FSqlFieldName;
   if AClearDelimiters then
     Result := FSqlFieldName
   else
-    Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
+    Result := TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;
@@ -508,11 +508,11 @@ begin
   Result := FSqlFieldTableName;
 end;
 
-function TioProperty.GetSqlQualifiedFieldName: String;
+function TioProperty.GetSqlQualifiedFieldName(const AConnectionDefName: String): String;
 begin
   // Result := FQualifiedSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
-    TioDbFactory.SqlDataConverter.FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
+    TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlParamName: String;
@@ -520,17 +520,17 @@ begin
   Result := 'P_' + Self.GetSqlFieldAlias;
 end;
 
-function TioProperty.GetSqlValue(ADataObject: TObject): String;
+function TioProperty.GetSqlValue(const ADataObject: TObject; const AConnectionDefName: String): String;
 begin
-  Result := TioDbFactory.SqlDataConverter.TValueToSql(Self.GetValue(ADataObject));
+  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).TValueToSql(Self.GetValue(ADataObject));
 end;
 
-function TioProperty.GetValue(Instance: Pointer): TValue;
+function TioProperty.GetValue(const Instance: Pointer): TValue;
 begin
   Result := FRttiProperty.GetValue(Instance);
 end;
 
-function TioProperty.GetValueAsObject(Instance: Pointer): TObject;
+function TioProperty.GetValueAsObject(const Instance: Pointer): TObject;
 var
   AValue: TValue;
 begin
@@ -650,7 +650,7 @@ begin
   FIDSkipOnInsert := AIDSkipOnInsert;
 end;
 
-procedure TioProperty.SetIsID(AValue: Boolean);
+procedure TioProperty.SetIsID(const AValue: Boolean);
 begin
   FIsID := AValue;
 end;
@@ -735,12 +735,12 @@ begin
     FreeAndNil(FRelationChildPropertyPath);
 end;
 
-procedure TioProperty.SetTable(ATable: IioContextTable);
+procedure TioProperty.SetTable(const ATable: IioContextTable);
 begin
   FTable := ATable;
 end;
 
-procedure TioProperty.SetValue(Instance: Pointer; AValue: TValue);
+procedure TioProperty.SetValue(const Instance: Pointer; const AValue: TValue);
 begin
   FRttiProperty.SetValue(Instance, AValue);
   // ***ChildPropertyPath***
@@ -748,7 +748,7 @@ end;
 
 { TioProperties }
 
-procedure TioProperties.Add(AProperty: IioContextProperty; AIsId, AIDSkipOnInsert: Boolean);
+procedure TioProperties.Add(const AProperty: IioContextProperty; const AIsId: Boolean; const AIDSkipOnInsert: Boolean);
 begin
   FPropertyItems.Add(AProperty);
   if AIsId then
@@ -802,7 +802,7 @@ begin
   Result := FObjStatusProperty;
 end;
 
-function TioProperties.GetPropertyByName(APropertyName: String): IioContextProperty;
+function TioProperties.GetPropertyByName(const APropertyName: String): IioContextProperty;
 var
   CurrProp: IioContextProperty;
 begin
@@ -822,7 +822,7 @@ begin
     end);
 end;
 
-function TioProperties.GetSql(ASqlRequestType: TioSqlRequestType): String;
+function TioProperties.GetSql(const ASqlRequestType: TioSqlRequestType): String;
 var
   AFunc: TioPropertiesGetSqlFunction;
 begin
@@ -888,12 +888,12 @@ begin
     AProperty.SetLoadSqlData;
 end;
 
-procedure TioProperties.SetObjStatusProperty(AValue: IioContextProperty);
+procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);
 begin
   FObjStatusProperty := AValue;
 end;
 
-procedure TioProperties.SetTable(ATable: IioContextTable);
+procedure TioProperties.SetTable(const ATable: IioContextTable);
 var
   AProperty: IioContextProperty;
 begin
@@ -939,7 +939,7 @@ begin
   Result := FRttiProperty.FieldType.Handle;
 end;
 
-function TioField.GetValue(Instance: Pointer): TValue;
+function TioField.GetValue(const Instance: Pointer): TValue;
 begin
   // No inherited
   Result := FRttiProperty.GetValue(Instance);
@@ -951,13 +951,13 @@ begin
   Result := True;
 end;
 
-class function TioField.Remove_F_FromName(AFieldName: String): String;
+class function TioField.Remove_F_FromName(const AFieldName: String): String;
 begin
   if Uppercase(AFieldName).StartsWith('F') then
     Result := AFieldName.Substring(1); // Elimina il primo carattere (di solito la F)
 end;
 
-procedure TioField.SetValue(Instance: Pointer; AValue: TValue);
+procedure TioField.SetValue(const Instance: Pointer; const AValue: TValue);
 begin
   // No inherited
   FRttiProperty.SetValue(Instance, AValue);

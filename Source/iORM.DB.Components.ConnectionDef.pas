@@ -1,39 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.DB.Components.ConnectionDef;
 
@@ -60,11 +56,23 @@ type
   published
     constructor Create;
     // Properties
-    //  NB: DBBuilder related events are on ConnectionDef component, not in this class
-    property Enabled: Boolean read FEnabled write FEnabled default False;
-    property Indexes: Boolean read FIndexes write FIndexes default True;
-    property ReferentialIntegrityConstraints: Boolean read FReferentialIntegrityConstraints write FReferentialIntegrityConstraints default True;
-    property ScriptOnly: Boolean read FScriptOnly write FScriptOnly default False;
+    // NB: DBBuilder related events are on ConnectionDef component, not in this class
+    property Enabled: Boolean
+      read FEnabled
+      write FEnabled
+      default False;
+    property Indexes: Boolean
+      read FIndexes
+      write FIndexes
+      default True;
+    property ReferentialIntegrityConstraints: Boolean
+      read FReferentialIntegrityConstraints
+      write FReferentialIntegrityConstraints
+      default True;
+    property ScriptOnly: Boolean
+      read FScriptOnly
+      write FScriptOnly
+      default False;
   end;
 
   // Base class for all ConnectionDef components
@@ -115,7 +123,7 @@ type
     property Pooled: Boolean read FPooled write FPooled;
     property Port: Integer read FPort write FPort;
     property Protocol: TioProtocol read FProtocol write FProtocol;
-    property Server:String read FServer write FServer;
+    property Server: String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
     // Events
@@ -126,7 +134,7 @@ type
     // Properties
     property ConnectionDef: IIoConnectionDef read FConnectionDef write FConnectionDef;
     property DefaultConnection: Boolean read FDefaultConnection write SetDefaultConnection;
-    property IsRegistered:Boolean read FIsRegistered;
+    property IsRegistered: Boolean read FIsRegistered;
     property Persistent: Boolean read FPersistent write FPersistent;
   published
     // Events
@@ -223,14 +231,16 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property Mode: TioMonitorMode read FMode write SetMode;
+    property Mode: TioMonitorMode
+      read FMode
+      write SetMode;
   end;
 
 implementation
 
 uses
   System.IOUtils, iORM.DB.ConnectionContainer, System.SysUtils,
-  iORM, iORM.DB.DBBuilder.Interfaces, iORM.Exceptions;
+  iORM;
 
 { TioCustomConnectionDef }
 
@@ -277,16 +287,11 @@ end;
 
 function TioCustomConnectionDef.GenerateDB: String;
 var
-  LDBBuilder: IioDBBuilder;
   LError: String;
 begin
-  LDBBuilder := io.GlobalFactory.DBBuilderFactory.NewBuilder(Self.Name);
-  LDBBuilder.CreateIndexes := FAutoCreateDB.Indexes;
-  LDBBuilder.CreateReferentialIntegrityConstraints := FAutoCreateDB.ReferentialIntegrityConstraints;
-  LDBBuilder.CreateScriptOnly := FAutoCreateDB.ScriptOnly;
   try
-    if not LDBBuilder.GenerateDB(Result, LError) then
-      raise EioException.Create(Self.ClassName, 'GenerateDB', LError);
+    io.GenerateDB(Self.Name, FAutoCreateDB.Indexes, FAutoCreateDB.ReferentialIntegrityConstraints, FAutoCreateDB.ScriptOnly,
+      Result, LError);
   finally
     if Assigned(FOnAfterCreateDBEvent) then
       FOnAfterCreateDBEvent(Self, Result, LError);
@@ -298,11 +303,16 @@ var
   LDBFolder: String;
 begin
   case FDatabaseStdFolder of
-    TioDBStdFolder.sfDocuments:       LDBFolder := TPath.GetDocumentsPath;
-    TioDBStdFolder.sfSharedDocuments: LDBFolder := TPath.GetSharedDocumentsPath;
-    TioDBStdFolder.sfHome:            LDBFolder := TPath.GetHomePath;
-    TioDBStdFolder.sfPublic:          LDBFolder := TPath.GetPublicPath;
-    TioDBStdFolder.sfTemp:            LDBFolder := TPath.GetTempPath;
+    TioDBStdFolder.sfDocuments:
+      LDBFolder := TPath.GetDocumentsPath;
+    TioDBStdFolder.sfSharedDocuments:
+      LDBFolder := TPath.GetSharedDocumentsPath;
+    TioDBStdFolder.sfHome:
+      LDBFolder := TPath.GetHomePath;
+    TioDBStdFolder.sfPublic:
+      LDBFolder := TPath.GetPublicPath;
+    TioDBStdFolder.sfTemp:
+      LDBFolder := TPath.GetTempPath;
   else
     LDBFolder := '';
   end;
@@ -343,7 +353,7 @@ begin
   if Value then
   begin
     // Uncheck previous default connection
-    for I := 0 to Owner.ComponentCount-1 do
+    for I := 0 to Owner.ComponentCount - 1 do
     begin
       if (Owner.Components[I] is TioCustomConnectionDef) and (Owner.Components[I] <> Self) then
       begin
@@ -352,8 +362,8 @@ begin
       end;
     end;
     // If not in design or load mode the
-    //  NB: Messo anche qui perchè venga impostata la connessione di default anche a runtime
-    if not (  (csDesigning in ComponentState) or (csLoading in ComponentState)   ) then
+    // NB: Messo anche qui perchè venga impostata la connessione di default anche a runtime
+    if not((csDesigning in ComponentState) or (csLoading in ComponentState)) then
       TioConnectionManager.SetDefaultConnectionName(Self.Name);
   end;
 end;
@@ -410,28 +420,36 @@ begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
   // Register the ConnectionDef
-  ConnectionDef := TioConnectionManager.NewFirebirdConnectionDef(Server,
-    GetFullPathDatabase, UserName, Password, CharSet, DefaultConnection,
-    Persistent, Pooled, Name);
+  ConnectionDef := TioConnectionManager.NewFirebirdConnectionDef(Server, GetFullPathDatabase, UserName, Password, CharSet,
+    DefaultConnection, Persistent, Pooled, Name);
   // OSAuthent
   case OSAuthent of
-    TioOSAuthent.oaNo:  ConnectionDef.Params.Values['OSAuthent'] := 'No';
-    TioOSAuthent.oaYes: ConnectionDef.Params.Values['OSAuthent'] := 'Yes';
+    TioOSAuthent.oaNo:
+      ConnectionDef.Params.Values['OSAuthent'] := 'No';
+    TioOSAuthent.oaYes:
+      ConnectionDef.Params.Values['OSAuthent'] := 'Yes';
   end;
   // Port
   ConnectionDef.Params.Values['Port'] := Port.ToString;
   // Protocol
   case Protocol of
-    TioProtocol.pTCPIP:   ConnectionDef.Params.Values['Protocol'] := 'TCPIP';
-    TioProtocol.pLocal:   ConnectionDef.Params.Values['Protocol'] := 'Local';
-    TioProtocol.pNetBEUI: ConnectionDef.Params.Values['Protocol'] := 'NetBEUI';
-    TioProtocol.pSPX:     ConnectionDef.Params.Values['Protocol'] := 'SPX';
+    TioProtocol.pTCPIP:
+      ConnectionDef.Params.Values['Protocol'] := 'TCPIP';
+    TioProtocol.pLocal:
+      ConnectionDef.Params.Values['Protocol'] := 'Local';
+    TioProtocol.pNetBEUI:
+      ConnectionDef.Params.Values['Protocol'] := 'NetBEUI';
+    TioProtocol.pSPX:
+      ConnectionDef.Params.Values['Protocol'] := 'SPX';
   end;
   // SQL dialect
   case SQLDialect of
-    TioSQLDialect.sqlDialect3: ConnectionDef.Params.Values['SQLDialect'] := '3';
-    TioSQLDialect.sqlDialect2: ConnectionDef.Params.Values['SQLDialect'] := '2';
-    TioSQLDialect.sqlDialect1: ConnectionDef.Params.Values['SQLDialect'] := '1';
+    TioSQLDialect.sqlDialect3:
+      ConnectionDef.Params.Values['SQLDialect'] := '3';
+    TioSQLDialect.sqlDialect2:
+      ConnectionDef.Params.Values['SQLDialect'] := '2';
+    TioSQLDialect.sqlDialect1:
+      ConnectionDef.Params.Values['SQLDialect'] := '1';
   end;
   // NB: Inherited must be the last line (set FIsRegistered)
   inherited;
@@ -450,9 +468,8 @@ begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
   // Register the ConnectionDef
-  ConnectionDef := TioConnectionManager.NewMySQLConnectionDef(Server,
-    GetFullPathDatabase, UserName, Password, CharSet, DefaultConnection,
-    Persistent, Pooled, Name);
+  ConnectionDef := TioConnectionManager.NewMySQLConnectionDef(Server, GetFullPathDatabase, UserName, Password, CharSet,
+    DefaultConnection, Persistent, Pooled, Name);
   // Port
   ConnectionDef.Params.Values['Port'] := Port.ToString;
   // NB: Inherited must be the last line (set FIsRegistered)
@@ -472,7 +489,7 @@ begin
   FMode := Value;
 {$IFDEF MSWINDOWS}
   // Set the monitor mode
-  if not (csDesigning in ComponentState) then
+  if not(csDesigning in ComponentState) then
     io.Connections.Monitor.Mode := FMode;
 {$ENDIF}
 end;

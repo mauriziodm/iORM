@@ -374,15 +374,14 @@ begin
   Result := Self.InternalFindMethod(ARttiType, AMethodName, AMarkerText, True, AParameters);
 end;
 
-class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;
-  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty): TObject;
 begin
   // Prima di tutto verifica se esiste un oggetto di dettaglio sul DB
   //  per farlo, al momento, non ho trovato altro modo che farlo caricare
   //  in una variabile e poi verificare se il risulytato è nil o meno
   if io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
     ._Where  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
-    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext))
     .ToObject = nil then Exit(nil);
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
@@ -394,7 +393,7 @@ begin
   // Load the relation child object
   io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
     ._Where  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
-    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext))
     .ToObject(Result);
 end;
 
@@ -413,7 +412,7 @@ begin
   //  NB: Se l'ID dell'oggetto dettaglio = 0 significa che quando è stato
   //       persistito tale propriet in realtà era a nil (problema assenza nullable)
   //       quindi in questo caso è meglio non caricare nulla
-  LChildID := AQuery.GetValue(AProperty).AsInteger;
+  LChildID := AQuery.GetValue(AProperty, AContext).AsInteger;
   if LChildID = 0 then
     Exit;
   // Create the instance if not assigned
@@ -441,14 +440,14 @@ begin
        AProperty.GetRelationChildTypeName
       ,AProperty.GetRelationChildTypeAlias
       ,AProperty.GetRelationChildPropertyName
-      ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
+      ,AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger
       ,LDetailWhere)  // Eventuale detail where
   // Else fill the list
   else
   begin
     // It set the first part of the load operation
     LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
-      ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty));
+      ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext));
     // If a Details Where conditions (for the details) is present then add it to the load operation
     if Assigned(LDetailWhere) then
       LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance);  // Eventuale DetailWhere & OrderBy

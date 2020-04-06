@@ -61,18 +61,18 @@ type
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: string;
-    function GetSqlQualifiedFieldName: String;
-    function GetSqlFullQualifiedFieldName: String;
-    function GetSqlFieldName(AClearDelimiters: Boolean=False): String;
+    function GetSqlQualifiedFieldName(const AConnectionDefName: String): String;
+    function GetSqlFullQualifiedFieldName(const AConnectionDefName: String): String;
+    function GetSqlFieldName(const AConnectionDefName: String; const AClearDelimiters: Boolean=False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
     function IsStream: Boolean;
-    function GetValue(Instance: Pointer): TValue;
-    function GetValueAsObject(Instance: Pointer): TObject;
-    procedure SetValue(Instance: Pointer; AValue: TValue);
-    function GetSqlValue(ADataObject: TObject): string;
+    function GetValue(const Instance: Pointer): TValue;
+    function GetValueAsObject(const Instance: Pointer): TObject;
+    procedure SetValue(const Instance: Pointer; const AValue: TValue);
+    function GetSqlValue(const ADataObject: TObject; const AConnectionDefName: String): String;
     function GetRttiType: TRttiType;
     function GetTypeInfo: PTypeInfo;
     function GetTypeName: String;
@@ -85,14 +85,14 @@ type
     function RelationChildPropertyPathAssigned: Boolean;
     function GetRelationChildPropertyPath: TStrings;
     function GetRelationLoadType: TioLoadType;
-    function GetRelationChildObject(Instance: Pointer): TObject;
+    function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
-    procedure SetTable(ATable:IioContextTable);
+    procedure SetTable(const ATable:IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
-    procedure SetIsID(AValue:Boolean);
+    procedure SetIsID(const AValue:Boolean);
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
@@ -130,12 +130,12 @@ type
   IioContextProperties = interface(IioSqlItem)
     ['{AB30A3A2-640C-4BEF-B301-2CB7C855037B}']
     function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioContextProperty>;
-    procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False; AIDSkipOnInsert:Boolean=True);
+    procedure Add(const AProperty:IioContextProperty; const AIsId:Boolean=False; const AIDSkipOnInsert:Boolean=True);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioContextProperty;
-    function GetPropertyByName(APropertyName:String): IioContextProperty;
-    procedure SetTable(ATable:IioContextTable);
-    function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
+    function GetPropertyByName(const APropertyName:String): IioContextProperty;
+    procedure SetTable(const ATable:IioContextTable);
+    function GetSql(const ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
     procedure SetFieldData;
     procedure SetLoadSqlData;
     // Blob field present
@@ -144,7 +144,7 @@ type
     function ObjStatusExist: Boolean;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
-    procedure SetObjStatusProperty(AValue: IioContextProperty);
+    procedure SetObjStatusProperty(const AValue: IioContextProperty);
     property ObjStatusProperty:IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
   end;
 

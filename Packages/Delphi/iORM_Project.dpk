@@ -65,9 +65,6 @@ contains
   iORM.Context.Table.Interfaces in '..\..\Source\iORM.Context.Table.Interfaces.pas',
   iORM.Context.Table in '..\..\Source\iORM.Context.Table.pas',
   iORM.DB.Connection in '..\..\Source\iORM.DB.Connection.pas',
-  iORM.DB.DBCreator.Factory in '..\..\Source\iORM.DB.DBCreator.Factory.pas',
-  iORM.DB.DBCreator.Interfaces in '..\..\Source\iORM.DB.DBCreator.Interfaces.pas',
-  iORM.DB.DBCreator in '..\..\Source\iORM.DB.DBCreator.pas',
   iORM.DB.Factory in '..\..\Source\iORM.DB.Factory.pas',
   iORM.DB.Interfaces in '..\..\Source\iORM.DB.Interfaces.pas',
   iORM.DB.Query in '..\..\Source\iORM.DB.Query.pas',
@@ -89,7 +86,6 @@ contains
   iORM.DB.SqLite.LogicRelations in '..\..\Source\iORM.DB.SqLite.LogicRelations.pas',
   iORM.DB.SqLite.SqlDataConverter in '..\..\Source\iORM.DB.SqLite.SqlDataConverter.pas',
   iORM.DB.SqLite.SqlGenerator in '..\..\Source\iORM.DB.SqLite.SqlGenerator.pas',
-  iORM.DB.DBCreator.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBCreator.SqLite.SqlGenerator.pas',
   iORM.DuckTyped.StreamObject in '..\..\Source\iORM.DuckTyped.StreamObject.pas',
   iORM.LiveBindings.ActiveListBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveListBindSourceAdapter.pas',
   iORM.LiveBindings.ActiveObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.ActiveObjectBindSourceAdapter.pas',
@@ -188,6 +184,7 @@ contains
   iORM.DB.DBBuilder.Interfaces in '..\..\Source\iORM.DB.DBBuilder.Interfaces.pas',
   iORM.DB.DBBuilder.Engine in '..\..\Source\iORM.DB.DBBuilder.Engine.pas',
   iORM.DB.DBBuilder.Firebird.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Firebird.SqlGenerator.pas',
-  iORM.DB.DBBuilder.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.SqLite.SqlGenerator.pas';
+  iORM.DB.DBBuilder.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.SqLite.SqlGenerator.pas',
+  iORM.DB.DBBuilder.Factory in '..\..\Source\iORM.DB.DBBuilder.Factory.pas';
 
 end.
