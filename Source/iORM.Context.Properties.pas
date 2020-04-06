@@ -201,7 +201,7 @@ type
     FObjStatusProperty: IioContextProperty;
     FBlobFieldExists: Boolean;
   strict protected
-    function InternalGetSql(ASqlRequestType: TioSqlRequestType; AFunc: TioPropertiesGetSqlFunction): String;
+    function InternalGetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(const AValue: IioContextProperty);
@@ -209,8 +209,8 @@ type
     constructor Create; reintroduce;
     destructor Destroy; override;
     function GetEnumerator: TEnumerator<IioContextProperty>;
-    function GetSql: String; reintroduce; overload;
-    function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
+    function GetSql(const AConnectionDefName: String): String; reintroduce; overload;
+    function GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
     procedure Add(const AProperty: IioContextProperty; const AIsId: Boolean = False; const AIDSkipOnInsert: Boolean = True);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioContextProperty;
@@ -585,7 +585,8 @@ begin
         // NB: Se la proprietà è l'ID e stiamo utilizzando una connessione a SQLServer
         // e il flag IDSkipOnInsert = True evita di inserire anche questa proprietà
         // nell'elenco (della query insert).
-        if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType = cdtSQLServer) then
+        if Self.IsID and Self.IDSkipOnInsert and
+          (TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType = cdtSQLServer) then
           Result := False;
       end;
     ioUpdate:
@@ -812,50 +813,48 @@ begin
   raise EioException.Create(Self.ClassName + ': Context property "' + APropertyName + '" not found');
 end;
 
-function TioProperties.GetSql: String;
+function TioProperties.GetSql(const AConnectionDefName: String): String;
 begin
   // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(ioAll,
+  Result := Self.InternalGetSql(AConnectionDefName, ioAll,
     function(AProp: IioContextProperty): String
     begin
-      Result := AProp.GetSqlFieldName;
+      Result := AProp.GetSqlFieldName(AConnectionDefName);
     end);
 end;
 
-function TioProperties.GetSql(const ASqlRequestType: TioSqlRequestType): String;
+function TioProperties.GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType): String;
 var
   AFunc: TioPropertiesGetSqlFunction;
 begin
   // Get the function by ASqlRequestType value
   case ASqlRequestType of
     ioSelect:
-      AFunc :=
-              function(AProp: IioContextProperty): String
-    begin
-      if AProp.LoadSqlExist then
-        Result := AProp.GetLoadSql
-      else
-        Result := AProp.GetSqlFullQualifiedFieldName;
-    end;
+      AFunc := function(AProp: IioContextProperty): String
+        begin
+          if AProp.LoadSqlExist then
+            Result := AProp.GetLoadSql
+          else
+            Result := AProp.GetSqlFullQualifiedFieldName(AConnectionDefName);
+        end;
   else
-    AFunc :=
-          function(AProp: IioContextProperty): String
-    begin
-      Result := AProp.GetSqlFieldName;
-    end;
+    AFunc := function(AProp: IioContextProperty): String
+      begin
+        Result := AProp.GetSqlFieldName(AConnectionDefName);
+      end;
   end;
   // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(ASqlRequestType, AFunc);
+  Result := Self.InternalGetSql(AConnectionDefName, ASqlRequestType, AFunc);
 end;
 
-function TioProperties.InternalGetSql(ASqlRequestType: TioSqlRequestType; AFunc: TioPropertiesGetSqlFunction): String;
+function TioProperties.InternalGetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
 var
   Prop: IioContextProperty;
 begin
   for Prop in FPropertyItems do
   begin
     // If the property is not compliant with the request then skip it
-    if not Prop.IsSqlRequestCompliant(ASqlRequestType) then
+    if not Prop.IsSqlRequestCompliant(ASqlRequestType, AConnectionDefName) then
       Continue;
     // If current prop is a list of HasMany or HasOne related objects skip this property
     if (Prop.GetRelationType = ioRTHasMany) or (Prop.GetRelationType = ioRTHasOne) then

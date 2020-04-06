@@ -167,7 +167,7 @@ begin
   // -----------------------------------------------------------------
   AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
   AQuery.SQL.Add('(');
-  AQuery.SQL.Add(AContext.GetProperties.GetSql(ioInsert));
+  AQuery.SQL.Add(AContext.GetProperties.GetSql(AContext.GetConnectionDefName, ioInsert));
   // Add the ClassFromField if enabled
   if AContext.IsClassFromField
     then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
@@ -224,7 +224,7 @@ class procedure TioSqlGeneratorSqLite.GenerateSqlSelect(const AQuery:IioQuery; c
 begin
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
+  AQuery.SQL.Add('SELECT ' + AContext.GetProperties.GetSql(AContext.GetConnectionDefName, ioSelect));
   if AContext.IsClassFromField
     then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
   // From

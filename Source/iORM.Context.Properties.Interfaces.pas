@@ -135,7 +135,7 @@ type
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName:String): IioContextProperty;
     procedure SetTable(const ATable:IioContextTable);
-    function GetSql(const ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
+    function GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType = ioAll): String; overload;
     procedure SetFieldData;
     procedure SetLoadSqlData;
     // Blob field present
