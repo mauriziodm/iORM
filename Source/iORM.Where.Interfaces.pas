@@ -72,7 +72,7 @@ type
     function GetWhereItems: IWhereItems;
     function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
     function GetSqlWithClassFromField(const AMap:IioMap; const AIsClassFromField:Boolean; const AClassFromField: IioClassFromField): String;
-    function GetOrderBySql(const AMap:IioMap): String;
+    function GetOrderBySql(const AMap:IioMap; AConnectionDefName: String): String;
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
     function GetDisableClassFromField: Boolean;

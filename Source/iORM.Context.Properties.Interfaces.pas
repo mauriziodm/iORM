@@ -89,8 +89,8 @@ type
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
     procedure SetTable(const ATable:IioContextTable);
-    procedure SetFieldData;
-    procedure SetLoadSqlData;
+    procedure SetFieldData(const AClassName, AConnectionDefName: String);
+    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
     procedure SetIsID(const AValue:Boolean);
     function IsID: Boolean;
@@ -136,8 +136,8 @@ type
     function GetPropertyByName(const APropertyName:String): IioContextProperty;
     procedure SetTable(const ATable:IioContextTable);
     function GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType = ioAll): String; overload;
-    procedure SetFieldData;
-    procedure SetLoadSqlData;
+    procedure SetFieldData(const AClassName, AConnectionDefName: String);
+    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist

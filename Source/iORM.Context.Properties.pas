@@ -131,8 +131,8 @@ type
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetFieldData;
-    procedure SetLoadSqlData;
+    procedure SetFieldData(const AClassName, AConnectionDefName: String);
+    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
     procedure SetIsID(const AValue: Boolean);
     function IsID: Boolean;
@@ -216,8 +216,8 @@ type
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName: String): IioContextProperty;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetFieldData;
-    procedure SetLoadSqlData;
+    procedure SetFieldData(const AClassName, AConnectionDefName: String);
+    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
@@ -621,27 +621,27 @@ begin
   Result := Assigned(FRelationChildPropertyPath);
 end;
 
-procedure TioProperty.SetFieldData;
+procedure TioProperty.SetFieldData(const AClassName, AConnectionDefName: String);
 var
-  DotPos, AsPos: Smallint;
-  AValue: String;
+  LDotPos, LAsPos: Smallint;
+  LValue: String;
 begin
-  AValue := FFieldDefinitionString;
+  LValue := FFieldDefinitionString;
   // Translate (if contains tags)
-  AValue := TioSqlTranslator.Translate(AValue, '');
+  LValue := TioSqlTranslator.Translate(LValue, AClassName, AConnectionDefName);
   // Retrieve the markers position
-  DotPos := Pos('.', AValue);
-  AsPos := Pos(' AS ', AValue, DotPos);
-  if AsPos = 0 then
-    AsPos := AValue.Length + 1;
+  LDotPos := Pos('.', LValue);
+  LAsPos := Pos(' AS ', LValue, LDotPos);
+  if LAsPos = 0 then
+    LAsPos := LValue.Length + 1;
   // Retrieve Table reference
-  FSqlFieldTableName := LeftStr(AValue, DotPos - 1);
+  FSqlFieldTableName := LeftStr(LValue, LDotPos - 1);
   if FSqlFieldTableName = '' then
     FSqlFieldTableName := FTable.TableName;
   // Retrieve FieldName
-  FSqlFieldName := MidStr(AValue, DotPos + 1, AsPos - DotPos - 1);
+  FSqlFieldName := MidStr(LValue, LDotPos + 1, LAsPos - LDotPos - 1);
   // Retrieve Field Alias
-  FSqlFieldAlias := MidStr(AValue, AsPos + 4, AValue.Length);
+  FSqlFieldAlias := MidStr(LValue, LAsPos + 4, LValue.Length);
   if FSqlFieldAlias = '' then
     FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
 end;
@@ -656,11 +656,11 @@ begin
   FIsID := AValue;
 end;
 
-procedure TioProperty.SetLoadSqlData;
+procedure TioProperty.SetLoadSqlData(const AClassName, AConnectionDefName: String);
 begin
   // Set LoadSql statement (if exist)
   if Self.FLoadSql <> '' then
-    FLoadSql := TioSqlTranslator.Translate(FLoadSql, '');
+    FLoadSql := TioSqlTranslator.Translate(FLoadSql, AClassName, AConnectionDefName);
 end;
 
 procedure TioProperty.SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
@@ -871,20 +871,20 @@ begin
   Result := Assigned(FObjStatusProperty);
 end;
 
-procedure TioProperties.SetFieldData;
+procedure TioProperties.SetFieldData(const AClassName, AConnectionDefName: String);
 var
   AProperty: IioContextProperty;
 begin
   for AProperty in FPropertyItems do
-    AProperty.SetFieldData;
+    AProperty.SetFieldData(AClassName, AConnectionDefName);
 end;
 
-procedure TioProperties.SetLoadSqlData;
+procedure TioProperties.SetLoadSqlData(const AClassName, AConnectionDefName: String);
 var
   AProperty: IioContextProperty;
 begin
   for AProperty in FPropertyItems do
-    AProperty.SetLoadSqlData;
+    AProperty.SetLoadSqlData(AClassName, AConnectionDefName);
 end;
 
 procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);

@@ -171,7 +171,7 @@ end;
 
 function TioContext.GetOrderBySql: String;
 begin
-  Result := Self.Where.GetOrderBySql(FMap);
+  Result := Self.Where.GetOrderBySql(FMap, Self.GetConnectionDefName);
 end;
 
 function TioContext.GetProperties: IioContextProperties;

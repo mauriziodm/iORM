@@ -91,7 +91,7 @@ type
     function GetSqlWithClassFromField(const AMap:IioMap; const AIsClassFromField:Boolean; const AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
-    function GetOrderBySql(const AMap:IioMap): String;
+    function GetOrderBySql(const AMap:IioMap; AConnectionDefName: String): String;
     procedure SetOrderBySql(const AOrderByText:String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -701,10 +701,10 @@ begin
   Result := FOrderBy;
 end;
 
-function TioWhere.GetOrderBySql(const AMap:IioMap): String;
+function TioWhere.GetOrderBySql(const AMap:IioMap; AConnectionDefName: String): String;
 begin
   if Assigned(FOrderBy) then
-    Result := FOrderBy.GetSql(AMap)
+    Result := FOrderBy.GetSql(AMap, AConnectionDefName)
   else
     Result := '';
 end;

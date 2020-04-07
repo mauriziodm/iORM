@@ -362,7 +362,7 @@ begin
   if AUnique then
     Result := Result + '_U';
   // Translate
-  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
+  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, AContext.GetConnectionDefName, False);
 end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);

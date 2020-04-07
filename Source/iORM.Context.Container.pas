@@ -258,7 +258,7 @@ var
 begin
   // Calculate field data for all properties in the container
   for AMapSlot in FInternalContainer.Values
-    do AMapSlot.GetMap.GetProperties.SetFieldData;
+    do AMapSlot.GetMap.GetProperties.SetFieldData(AMapSlot.GetMap.GetClassName, AMapSlot.GetMap.GetTable.GetConnectionDefName);
 end;
 
 class procedure TioMapContainer.SetPropertiesLoadSqlData;
@@ -267,7 +267,7 @@ var
 begin
   // Calculate field data for all properties in the container
   for AMapSlot in FInternalContainer.Values
-    do AMapSlot.GetMap.GetProperties.SetLoadSqlData;
+    do AMapSlot.GetMap.GetProperties.SetLoadSqlData(AMapSlot.GetMap.GetClassName, AMapSlot.GetMap.GetTable.GetConnectionDefName);
 end;
 
 class procedure TioMapContainer.SetRelationIndexes;
