@@ -49,7 +49,7 @@ type
   // Base class for specialized SqlItemWhere needing reference ContextProperties
   TioSqlItemsWhere = class(TioSqlItem, IioSqlItemWhere)
   public
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String; reintroduce; virtual; abstract;
+    function GetSql(const AMap:IioMap): String; reintroduce; virtual; abstract;
     function GetSqlParamName(const AMap:IioMap): String; virtual;
     function GetValue(const AMap:IioMap): TValue; virtual;
     function HasParameter: Boolean; virtual; abstract;
@@ -59,7 +59,7 @@ type
   //  NB: Property.Name is in FSqlText ancestor field
   TioSqlItemsWhereProperty = class(TioSqlItemsWhere)
   public
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String; override;
+    function GetSql(const AMap:IioMap): String; override;
     function HasParameter: Boolean; override;
   end;
 
@@ -68,7 +68,7 @@ type
   TioSqlItemsWherePropertyOID = class(TioSqlItemsWhereProperty)
   public
     constructor Create; reintroduce;overload;
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String; override;
+    function GetSql(const AMap:IioMap): String; override;
     function HasParameter: Boolean; override;
   end;
 
@@ -80,7 +80,7 @@ type
   public
     constructor Create(const ASqlText:String); reintroduce; overload;  // raise exception
     constructor Create(const AValue:TValue); reintroduce;overload;
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String; override;
+    function GetSql(const AMap:IioMap): String; override;
     function HasParameter: Boolean; override;
   end;
 
@@ -88,14 +88,14 @@ type
   //  property to fieldname
   TioSqlItemsWhereText  = class(TioSqlItemsWhere)
   public
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String; override;
+    function GetSql(const AMap:IioMap): String; override;
     function HasParameter: Boolean; override;
   end;
 
   // Specialized SqlItemWhere for ORDER BY with tags translating
   //  property to fieldname
   TioSqlItemsOrderBy  = class(TioSqlItemsWhereText)
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String; override;
+    function GetSql(const AMap:IioMap): String; override;
   end;
 
   // Specialized SqlItemWhere for property equals to for param (best for internal use)
@@ -142,10 +142,10 @@ begin
   raise EioException.Create('TioSqlItemsWhereValue wrong constructor called');
 end;
 
-function TioSqlItemsWhereTValue.GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
+function TioSqlItemsWhereTValue.GetSql(const AMap:IioMap): String;
 begin
   // NB: No inherited
-  Result := TioDBFactory.SqlDataConverter(AConnectionDefName).TValueToSql(FValue);
+  Result := TioDBFactory.SqlDataConverter(AMap.GetTable.GetConnectionDefName).TValueToSql(FValue);
 end;
 
 function TioSqlItemsWhereTValue.HasParameter: Boolean;
@@ -155,10 +155,10 @@ end;
 
 { TioSqlItemsWhereProperty }
 
-function TioSqlItemsWhereProperty.GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
+function TioSqlItemsWhereProperty.GetSql(const AMap:IioMap): String;
 begin
   // NB: No inherited
-  Result := AMap.GetProperties.GetPropertyByName(FSqlText).GetSqlQualifiedFieldName(AConnectionDefName);
+  Result := AMap.GetProperties.GetPropertyByName(FSqlText).GetSqlQualifiedFieldName;
 end;
 
 { TioSqlItemsWhere }
@@ -175,9 +175,9 @@ begin
   // Nothing
 end;
 
-function TioSqlItemsWherePropertyOID.GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
+function TioSqlItemsWherePropertyOID.GetSql(const AMap:IioMap): String;
 begin
-  Result := AMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName(AConnectionDefName);
+  Result := AMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName;
 end;
 
 function TioSqlItemsWherePropertyOID.HasParameter: Boolean;
@@ -187,10 +187,10 @@ end;
 
 { TioSqlItemsWhereText }
 
-function TioSqlItemsWhereText.GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
+function TioSqlItemsWhereText.GetSql(const AMap:IioMap): String;
 begin
   // NB: No inherited
-  Result := TioSqlTranslator.Translate(FSqlText, AMap.GetClassName, AConnectionDefName);
+  Result := TioSqlTranslator.Translate(FSqlText, AMap.GetClassName, AMap.GetTable.GetConnectionDefName);
 end;
 
 function TioSqlItemsWhereText.HasParameter: Boolean;
@@ -290,9 +290,9 @@ end;
 
 { TioSqlItemsOrderBy }
 
-function TioSqlItemsOrderBy.GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
+function TioSqlItemsOrderBy.GetSql(const AMap:IioMap): String;
 begin
-  Result := 'ORDER BY ' + inherited GetSql(AMap, AConnectionDefName);
+  Result := 'ORDER BY ' + inherited GetSql(AMap, AMap.GetTable.GetConnectionDefName);
 end;
 
 end.

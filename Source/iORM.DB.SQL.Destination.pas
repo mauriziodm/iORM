@@ -46,7 +46,6 @@ type
   TioSQLDestination = class(TInterfacedObject, IioSQLDestination)
   private
     FSQL: String;
-    FConnectionName: String;
     FSelfClassName: String;
     FQualifiedFieldName: Boolean;
     FIgnoreObjNotExists: Boolean;
@@ -57,7 +56,6 @@ type
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
     function Execute(const AIgnoreObjNotExists:Boolean=False): Integer;
     // Informations
-    function Connection(const AConnectionName:String): IioSQLDestination;
     function SelfClass(const ASelfClassName:String): IioSQLDestination; overload;
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
@@ -75,13 +73,6 @@ uses
   iORM.AbstractionLayer.Framework;
 
 { TioSQLDestination }
-
-function TioSQLDestination.Connection(
-  const AConnectionName: String): IioSQLDestination;
-begin
-  Result := Self;
-  FConnectionName := AConnectionName;
-end;
 
 constructor TioSQLDestination.Create(const ASQL: String);
 begin
@@ -134,7 +125,7 @@ end;
 
 function TioSQLDestination.GetTranslatedSQL: String;
 begin
-  Result := TioSqlTranslator.Translate(FSQL, FSelfClassName, FConnectionName, FQualifiedFieldName);
+  Result := TioSqlTranslator.Translate(FSQL, FSelfClassName, FQualifiedFieldName);
 end;
 
 function TioSQLDestination.ToMemTable: TFDMemTable;

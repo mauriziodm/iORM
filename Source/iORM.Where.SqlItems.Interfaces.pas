@@ -46,7 +46,7 @@ type
 
   IioSqlItemWhere = interface(IioSqlItem)
     ['{0916A6EC-167E-4CD2-8C0B-ADE755E5157B}']
-    function GetSql(const AMap:IioMap; const AConnectionDefName: String): String;
+    function GetSql(const AMap:IioMap): String;
     function GetSqlParamName(const AMap:IioMap): String;
     function GetValue(const AMap:IioMap): TValue;
     function HasParameter: Boolean;

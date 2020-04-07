@@ -43,9 +43,15 @@ uses
 
 type
 
-  IioGroupBy = interface
+  IioContextTable = interface;
+
+  IioBaseTableCompanion = interface(IioSqlItem)
+    ['{A0C3B8E0-CFA3-4957-A142-FA5E8C18C6B2}']
+    procedure SetTable(const ATable: IioContextTable);
+  end;
+
+  IioGroupBy = interface(IioBaseTableCompanion)
     ['{E57CDC09-3D2B-432B-9114-B7CCB1EDCCA3}']
-    function GetSql(const ASelfClassName, AConnectionDefName: String): String;
   end;
 
   IioJoinItem = interface
@@ -56,19 +62,18 @@ type
     function GetJoinCondition: String;
   end;
 
-  IioJoins = interface
+  IioJoins = interface(IioBaseTableCompanion)
     ['{8BAACD49-D42C-4278-97AA-EAE00A5EEA52}']
     procedure Add(AJoinItem:IioJoinItem);
-    function GetSql(const AConnectionDefName, ASelfClassName: String): String;
   end;
 
   IioClassFromField = interface
     ['{D15A9A28-FB90-4753-BE4A-7484A834CD2D}']
     function GetFieldName: string;
-    function GetSqlFieldName(const AConnectionDefName: String): string;
+    function GetSqlFieldName: string;
     function GetSqlParamName: String;
     function GetValue: String;
-    function GetSqlValue(const AConnectionDefName: String): string;
+    function GetSqlValue: string;
     function GetClassName: String;
     function GetQualifiedClassName: String;
     function QualifiedClassNameFromClassInfoFieldValue(AValue:String): String;
@@ -76,10 +81,8 @@ type
 
   TioIndexList = TObjectList<ioIndex>;
 
-//  IioContextTable = interface(IioSqlItem) NB: Mauri 06/04/2020 - modificato metodo GetSql
-  IioContextTable = interface
+  IioContextTable = interface(IioSqlItem)
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']
-    function GetSql(const AConnectionDefName: String): String;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
@@ -91,6 +94,7 @@ type
     function GetRttiType: TRttiInstanceType;
     function GetAutoCreateDB: Boolean;
     function GetClassName: String;
+    function GetQualifiedClassName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;

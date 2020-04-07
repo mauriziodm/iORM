@@ -46,7 +46,6 @@ type
 
   TioSqlTranslator = class
   protected
-    FConnectionDefName: String;
     FSelfClassName: String;
     FQualifiedFieldName: Boolean;
     function RemoveDelimiters(const AValue:string): String;
@@ -55,8 +54,8 @@ type
     function ReplaceEval(const Match: TMatch): string;
     function TranslateInternal(const AValue:String): String;
   public
-    constructor Create(const AConnectionDefName, ASelfClassName: String; const AQualifiedFieldName: Boolean);
-    class function Translate(const AValue, ASelfClassName, AConnectionDefName:String; const AQualifiedFieldName:Boolean=True): String;
+    constructor Create(const ASelfClassName: String; const AQualifiedFieldName: Boolean);
+    class function Translate(const AValue, ASelfClassName:String; const AQualifiedFieldName:Boolean=True): String;
 //    class function Translate(const AValue, ASelfClassName:String; const AQualifiedFieldName:Boolean=True): String; overload;
   end;
 
@@ -69,10 +68,9 @@ uses
 
 { TioSqlTranslator }
 
-constructor TioSqlTranslator.Create(const AConnectionDefName, ASelfClassName: String; const AQualifiedFieldName: Boolean);
+constructor TioSqlTranslator.Create(const ASelfClassName: String; const AQualifiedFieldName: Boolean);
 begin
   inherited Create;
-  FConnectionDefName := AConnectionDefName;
   FSelfClassName := ASelfClassName;
   FQualifiedFieldName := AQualifiedFieldName;
 end;
@@ -115,33 +113,28 @@ end;
 
 function TioSqlTranslator.ReplaceEval(const Match: TMatch): string;
 var
-  LSqlTag, LClassName, LPropName, LConnectionDefName: String;
+  LSqlTag, LClassName, LPropName: String;
   LMap: IioMap;
 begin
   LSqlTag := Self.RemoveDelimiters(Match.Value);
   LClassName := Self.GetClassName(LSqlTag);
   LPropName := Self.GetPropertyName(LSqlTag);
   LMap := TioMapContainer.GetMap(LClassName);
-
-  LConnectionDefName := LMap.GetTable.GetConnectionDefName;
-  if LConnectionDefName.IsEmpty then
-    LConnectionDefName := FConnectionDefName;
-
   Result := LMap.GetTable.TableName;
   if LPropName <> '' then
   begin
     if FQualifiedFieldName then
-      Result := Result + '.' + LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(LConnectionDefName, True)
+      Result := Result + '.' + LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(True)
     else
-      Result := LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(LConnectionDefName, True);
+      Result := LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(True);
   end;
 end;
 
-class function TioSqlTranslator.Translate(const AValue, ASelfClassName, AConnectionDefName:String; const AQualifiedFieldName:Boolean): String;
+class function TioSqlTranslator.Translate(const AValue, ASelfClassName:String; const AQualifiedFieldName:Boolean): String;
 var
   LSqlTranslator: TioSqlTranslator;
 begin
-  LSqlTranslator := Self.Create(AConnectionDefName, ASelfClassName, AQualifiedFieldName);
+  LSqlTranslator := Self.Create(ASelfClassName, AQualifiedFieldName);
   try
     Result := LSqlTranslator.TranslateInternal(AValue);
   finally

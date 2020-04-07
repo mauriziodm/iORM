@@ -62,7 +62,7 @@ type
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
   public
-    constructor Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String=''); overload;
+    constructor Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil); overload;
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
@@ -110,13 +110,12 @@ begin
   Result := Self.Map.GetTable.GetClassFromField;
 end;
 
-constructor TioContext.Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil; const AConnectionName:String='');
+constructor TioContext.Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil);
 begin
   inherited Create;
   FMap := AMap;
   FDataObject := ADataObject;
   FWhere := AWhere;
-  FConnectionName := AConnectionName;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
