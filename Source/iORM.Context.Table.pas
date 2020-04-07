@@ -186,7 +186,10 @@ end;
 
 function TioContextTable.GetConnectionDefName: String;
 begin
-  Result := FConnectionDefName;
+  if FConnectionDefName.IsEmpty then
+    Result := TioDBFActory.ConnectionManager.GetDefaultConnectionName
+  else
+    Result := FConnectionDefName;
 end;
 
 function TioContextTable.GetGroupBy: IioGroupBy;

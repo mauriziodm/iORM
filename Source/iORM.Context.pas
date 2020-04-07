@@ -51,7 +51,6 @@ type
     FMap: IioMap;
     FDataObject: TObject;
     FWhere: IioWhere;
-    FConnectionName: String;
   strict protected
     // DataObject
     function GetDataObject: TObject;
@@ -85,9 +84,6 @@ type
     function GetOrderBySql: String;
     // Join
     function GetJoin: IioJoins;
-    // ConnectionDefName
-    procedure SetConnectionDefName(const AConnectionName:String);
-    function GetConnectionDefName: String;
     // DataObject
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
@@ -126,19 +122,6 @@ end;
 function TioContext.GetClassRef: TioClassRef;
 begin
   Result := Self.Map.GetClassRef;
-end;
-
-function TioContext.GetConnectionDefName: String;
-begin
-  // Any connection name specified in the class/ioTable has precedence
-  //  if empty then take the name from ioWhere, else return empty.
-  //  L'ordine di precedenza è il seguente: ioTable, ioWhere, FConnectionName.
-  if not GetTable.GetConnectionDefName.isEmpty then
-    Result := GetTable.GetConnectionDefName
-  else if Assigned(FWhere) and not FWhere.GetConnectionName.IsEmpty then
-    Result := FWhere.GetConnectionName
-  else
-    Result := FConnectionName;
 end;
 
 function TioContext.GetDataObject: TObject;
@@ -187,11 +170,6 @@ end;
 function TioContext.RttiType: TRttiInstanceType;
 begin
   Result := Self.Map.RttiType;
-end;
-
-procedure TioContext.SetConnectionDefName(const AConnectionName: String);
-begin
-  FConnectionName := AConnectionName;
 end;
 
 procedure TioContext.SetDataObject(const AValue: TObject);

@@ -379,7 +379,7 @@ begin
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable.GetMapMode, Prop, '',
+      Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '',
         '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad,
         False, PropMetadata_FieldType, PropMetadata_FieldLength,
         PropMetadata_FieldPrecision, PropMetadata_FieldScale,
@@ -553,7 +553,7 @@ begin
 
     end;
     // Create and add property
-    Result.Add(Self.GetProperty(ATable.GetMapMode, Prop, PropTypeAlias,
+    Result.Add(Self.GetProperty(ATable, Prop, PropTypeAlias,
       PropFieldName, PropLoadSql, PropFieldType, PropSkip, PropReadWrite,
       PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias,
       PropRelationChildPropertyName, PropRelationChildLoadType,
