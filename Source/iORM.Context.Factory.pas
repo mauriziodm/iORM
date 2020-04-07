@@ -49,7 +49,7 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const AMapMode: TioMapModeType;
+    class function GetProperty(const ATable: IioContextTable;
       const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName,
       ALoadSql, AFieldType: String; const ASkipped: Boolean;
       const AReadWrite: TioReadWrite; const ARelationType: TioRelationType;
@@ -66,11 +66,8 @@ type
       const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
       const AMetadata_FKDeleteCreate: Boolean;
       const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
-    class function Properties(const Typ: TRttiInstanceType;
-      const ATable: IioContextTable): IioContextProperties;
-    class function ClassFromField(Typ: TRttiInstanceType;
-      const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME)
-      : IioClassFromField;
+    class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
+    class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
     class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
     class function GroupBy(const ASqlText: String): IioGroupBy;
@@ -130,7 +127,7 @@ begin
   Result := Self.Map(AClassRef).GetProperties.GetIdProperty;
 end;
 
-class function TioContextFactory.GetProperty(const AMapMode: TioMapModeType;
+class function TioContextFactory.GetProperty(const ATable: IioContextTable;
   const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
   AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
   const ARelationType: TioRelationType; const ARelationChildTypeName,
@@ -144,7 +141,7 @@ class function TioContextFactory.GetProperty(const AMapMode: TioMapModeType;
   const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
   const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
 begin
-  case AMapMode of
+  case ATable.GetMapMode of
     // Properties map mode
     ioProperties:
       Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATypeAlias,
