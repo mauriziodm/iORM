@@ -61,7 +61,6 @@ type
     FDisableClassFromField: Boolean;
     FLazyLoad: Boolean;
     FOrderBy: IioSqlItemWhere;
-    FConnectionName: String;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: IWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa

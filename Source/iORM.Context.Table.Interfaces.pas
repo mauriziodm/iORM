@@ -90,6 +90,7 @@ type
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
     function GetAutoCreateDB: Boolean;
+    function GetClassName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;

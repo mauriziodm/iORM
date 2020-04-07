@@ -102,10 +102,10 @@ type
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String; virtual;
-    function GetSqlQualifiedFieldName(const AConnectionDefName: String): String;
-    function GetSqlFullQualifiedFieldName(const AConnectionDefName: String): String;
+    function GetSqlQualifiedFieldName: String;
+    function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldTableName: String;
-    function GetSqlFieldName(const AConnectionDefName: String; const AClearDelimiters: Boolean = False): String;
+    function GetSqlFieldName(const AClearDelimiters: Boolean = False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
@@ -114,7 +114,7 @@ type
     function GetValue(const Instance: Pointer): TValue; virtual;
     function GetValueAsObject(const Instance: Pointer): TObject; virtual;
     procedure SetValue(const Instance: Pointer; const AValue: TValue); virtual;
-    function GetSqlValue(const ADataObject: TObject; const AConnectionDefName: String): String;
+    function GetSqlValue(const ADataObject: TObject): String;
     function GetRttiType: TRttiType; virtual;
     function GetTypeInfo: PTypeInfo; virtual;
     function GetTypeName: String;
@@ -130,9 +130,9 @@ type
     function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
-    procedure SetFieldData(const AClassName, AConnectionDefName: String);
-    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
-    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
+    procedure SetFieldData;
+    procedure SetLoadSqlData;
+    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
     procedure SetIsID(const AValue: Boolean);
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
@@ -200,7 +200,7 @@ type
     FObjStatusProperty: IioContextProperty;
     FBlobFieldExists: Boolean;
   strict protected
-    function InternalGetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
+    function InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(const AValue: IioContextProperty);
@@ -208,15 +208,15 @@ type
     constructor Create; reintroduce;
     destructor Destroy; override;
     function GetEnumerator: TEnumerator<IioContextProperty>;
-    function GetSql(const AConnectionDefName: String): String; reintroduce; overload;
-    function GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
+    function GetSql: String; reintroduce; overload;
+    function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
     procedure Add(const AProperty: IioContextProperty; const AIsId: Boolean = False; const AIDSkipOnInsert: Boolean = True);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName: String): IioContextProperty;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetFieldData(const AClassName, AConnectionDefName: String);
-    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
+    procedure SetFieldData;
+    procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
@@ -396,9 +396,9 @@ begin
   Result := FMetadata_FKCascadeUpdate;
 end;
 
-function TioProperty.GetSqlFullQualifiedFieldName(const AConnectionDefName: String): String;
+function TioProperty.GetSqlFullQualifiedFieldName: String;
 begin
-  Result := GetSqlQualifiedFieldName(AConnectionDefName) + ' AS ' + FSqlFieldAlias;
+  Result := GetSqlQualifiedFieldName + ' AS ' + FSqlFieldAlias;
 end;
 
 function TioProperty.GetName: String;
@@ -495,13 +495,13 @@ begin
   Result := FSqlFieldAlias;
 end;
 
-function TioProperty.GetSqlFieldName(const AConnectionDefName: String; const AClearDelimiters: Boolean): String;
+function TioProperty.GetSqlFieldName(const AClearDelimiters: Boolean): String;
 begin
   // Result := FSqlFieldName;
   if AClearDelimiters then
     Result := FSqlFieldName
   else
-    Result := TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
+    Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;
@@ -509,11 +509,11 @@ begin
   Result := FSqlFieldTableName;
 end;
 
-function TioProperty.GetSqlQualifiedFieldName(const AConnectionDefName: String): String;
+function TioProperty.GetSqlQualifiedFieldName: String;
 begin
   // Result := FQualifiedSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
-    TioDbFactory.SqlDataConverter(AConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
+    TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlParamName: String;
@@ -521,9 +521,9 @@ begin
   Result := 'P_' + Self.GetSqlFieldAlias;
 end;
 
-function TioProperty.GetSqlValue(const ADataObject: TObject; const AConnectionDefName: String): String;
+function TioProperty.GetSqlValue(const ADataObject: TObject): String;
 begin
-  Result := TioDbFactory.SqlDataConverter(AConnectionDefName).TValueToSql(Self.GetValue(ADataObject));
+  Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).TValueToSql(Self.GetValue(ADataObject));
 end;
 
 function TioProperty.GetValue(const Instance: Pointer): TValue;
@@ -575,7 +575,7 @@ begin
   Result := FSkipped;
 end;
 
-function TioProperty.IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
+function TioProperty.IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
 begin
   case ASqlRequestType of
     ioSelect:
@@ -587,7 +587,7 @@ begin
         // e il flag IDSkipOnInsert = True evita di inserire anche questa proprietà
         // nell'elenco (della query insert).
         if Self.IsID and Self.IDSkipOnInsert and
-          (TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType = cdtSQLServer) then
+          (TioConnectionManager.GetConnectionInfo(FTable.GetConnectionDefName).ConnectionType = cdtSQLServer) then
           Result := False;
       end;
     ioUpdate:
@@ -622,14 +622,14 @@ begin
   Result := Assigned(FRelationChildPropertyPath);
 end;
 
-procedure TioProperty.SetFieldData(const AClassName, AConnectionDefName: String);
+procedure TioProperty.SetFieldData;
 var
   LDotPos, LAsPos: Smallint;
   LValue: String;
 begin
   LValue := FFieldDefinitionString;
   // Translate (if contains tags)
-  LValue := TioSqlTranslator.Translate(LValue, AClassName, AConnectionDefName);
+  LValue := TioSqlTranslator.Translate(LValue, FTable.GetClassName, FTable.GetConnectionDefName);
   // Retrieve the markers position
   LDotPos := Pos('.', LValue);
   LAsPos := Pos(' AS ', LValue, LDotPos);
@@ -657,11 +657,11 @@ begin
   FIsID := AValue;
 end;
 
-procedure TioProperty.SetLoadSqlData(const AClassName, AConnectionDefName: String);
+procedure TioProperty.SetLoadSqlData;
 begin
   // Set LoadSql statement (if exist)
   if Self.FLoadSql <> '' then
-    FLoadSql := TioSqlTranslator.Translate(FLoadSql, AClassName, AConnectionDefName);
+    FLoadSql := TioSqlTranslator.Translate(FLoadSql, FTable.GetClassName, FTable.GetConnectionDefName);
 end;
 
 procedure TioProperty.SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
@@ -809,17 +809,17 @@ begin
   raise EioException.Create(Self.ClassName + ': Context property "' + APropertyName + '" not found');
 end;
 
-function TioProperties.GetSql(const AConnectionDefName: String): String;
+function TioProperties.GetSql: String;
 begin
   // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(AConnectionDefName, ioAll,
+  Result := Self.InternalGetSql(ioAll,
     function(AProp: IioContextProperty): String
     begin
-      Result := AProp.GetSqlFieldName(AConnectionDefName);
+      Result := AProp.GetSqlFieldName;
     end);
 end;
 
-function TioProperties.GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType): String;
+function TioProperties.GetSql(const ASqlRequestType: TioSqlRequestType): String;
 var
   AFunc: TioPropertiesGetSqlFunction;
 begin
@@ -831,26 +831,26 @@ begin
           if AProp.LoadSqlExist then
             Result := AProp.GetLoadSql
           else
-            Result := AProp.GetSqlFullQualifiedFieldName(AConnectionDefName);
+            Result := AProp.GetSqlFullQualifiedFieldName;
         end;
   else
     AFunc := function(AProp: IioContextProperty): String
       begin
-        Result := AProp.GetSqlFieldName(AConnectionDefName);
+        Result := AProp.GetSqlFieldName;
       end;
   end;
   // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(AConnectionDefName, ASqlRequestType, AFunc);
+  Result := Self.InternalGetSql(ASqlRequestType, AFunc);
 end;
 
-function TioProperties.InternalGetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
+function TioProperties.InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
 var
   Prop: IioContextProperty;
 begin
   for Prop in FPropertyItems do
   begin
     // If the property is not compliant with the request then skip it
-    if not Prop.IsSqlRequestCompliant(ASqlRequestType, AConnectionDefName) then
+    if not Prop.IsSqlRequestCompliant(ASqlRequestType) then
       Continue;
     // If current prop is a list of HasMany or HasOne related objects skip this property
     if (Prop.GetRelationType = ioRTHasMany) or (Prop.GetRelationType = ioRTHasOne) then
@@ -867,20 +867,20 @@ begin
   Result := Assigned(FObjStatusProperty);
 end;
 
-procedure TioProperties.SetFieldData(const AClassName, AConnectionDefName: String);
+procedure TioProperties.SetFieldData;
 var
   AProperty: IioContextProperty;
 begin
   for AProperty in FPropertyItems do
-    AProperty.SetFieldData(AClassName, AConnectionDefName);
+    AProperty.SetFieldData;
 end;
 
-procedure TioProperties.SetLoadSqlData(const AClassName, AConnectionDefName: String);
+procedure TioProperties.SetLoadSqlData;
 var
   AProperty: IioContextProperty;
 begin
   for AProperty in FPropertyItems do
-    AProperty.SetLoadSqlData(AClassName, AConnectionDefName);
+    AProperty.SetLoadSqlData;
 end;
 
 procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);

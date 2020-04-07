@@ -49,22 +49,13 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const ATable: IioContextTable;
-      const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName,
-      ALoadSql, AFieldType: String; const ASkipped: Boolean;
-      const AReadWrite: TioReadWrite; const ARelationType: TioRelationType;
-      const ARelationChildTypeName, ARelationChildTypeAlias,
-      ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
-      const ARelationChildAutoIndex: Boolean;
-      const AMetadata_FieldType: TioMetadataFieldType;
-      const AMetadata_FieldLength: Integer;
-      const AMetadata_FieldPrecision: Integer;
-      const AMetadata_FieldScale: Integer;
-      const AMetadata_FieldNullable: Boolean;
-      const AMetadata_FieldUnicode: Boolean;
-      const AMetadata_CustomFieldType: string;
-      const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
-      const AMetadata_FKDeleteCreate: Boolean;
+    class function GetProperty(const ATable: IioContextTable; const ARttiPropField: TRttiMember;
+      const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
+      const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
+      const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
+      const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer;
+      const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string;
+      const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
       const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
@@ -73,13 +64,10 @@ type
     class function GroupBy(const ASqlText: String): IioGroupBy;
     class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String;
-      const AioWhere: IioWhere = nil; const ADataObject: TObject = nil;
+    class function Context(const AClassName: String; const AioWhere: IioWhere = nil; const ADataObject: TObject = nil;
       const AConnectionName: String = ''): IioContext;
-    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef;
-      const APropertyName: String): IioContextProperty;
-    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef)
-      : IioContextProperty;
+    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioContextProperty;
+    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
   end;
 
 implementation
@@ -92,8 +80,7 @@ uses
 
 { TioBuilderProperties }
 
-class function TioContextFactory.ClassFromField(Typ: TRttiInstanceType;
-  const ASqlFieldName: String): IioClassFromField;
+class function TioContextFactory.ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String): IioClassFromField;
 var
   Ancestors, QualifiedClassName, ClassName: String;
 begin
@@ -108,65 +95,50 @@ begin
   end;
   until not Assigned(Typ);
   // Create
-  Result := TioClassFromField.Create(ASqlFieldName, ClassName,
-    QualifiedClassName, Ancestors);
+  Result := TioClassFromField.Create(ASqlFieldName, ClassName, QualifiedClassName, Ancestors);
 end;
 
-class function TioContextFactory.Context(const AClassName: String;
-  const AioWhere: IioWhere; const ADataObject: TObject;
+class function TioContextFactory.Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject;
   const AConnectionName: String): IioContext;
 begin
   // Get the Context from the ContextContainer
-  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName),
-    AioWhere, ADataObject, AConnectionName);
+  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AioWhere, ADataObject, AConnectionName);
 end;
 
-class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef
-  : TioClassRef): IioContextProperty;
+class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
 begin
   Result := Self.Map(AClassRef).GetProperties.GetIdProperty;
 end;
 
-class function TioContextFactory.GetProperty(const ATable: IioContextTable;
-  const ARttiPropField: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql,
-  AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
-  const ARelationType: TioRelationType; const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String;
-  const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean;
-  const AMetadata_FieldType: TioMetadataFieldType;
-  const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
-  const AMetadata_FieldScale: Integer; const AMetadata_FieldNullable: Boolean;
-  const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean;
-  const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
+class function TioContextFactory.GetProperty(const ATable: IioContextTable; const ARttiPropField: TRttiMember;
+  const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
+  const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
+  const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
+  const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer;
+  const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string;
+  const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
   const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
 begin
   case ATable.GetMapMode of
     // Properties map mode
     ioProperties:
-      Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATypeAlias,
-        ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
-        ARelationType, ARelationChildTypeName, ARelationChildTypeAlias,
-        ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
-        AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
-        AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
+      Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
+        AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
+        ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
+        AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
         AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
     // Fields map mode
     ioFields:
-      Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias,
-        ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
-        ARelationType, ARelationChildTypeName, ARelationChildTypeAlias,
-        ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex,
-        AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
-        AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
-        AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
+      Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
+        ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
+        ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
+        AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
         AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
   end;
 end;
 
-class function TioContextFactory.GetPropertyByClassRefAndName(const AClassRef
-  : TioClassRef; const APropertyName: String): IioContextProperty;
+class function TioContextFactory.GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String)
+  : IioContextProperty;
 begin
   Result := Self.Map(AClassRef).GetProperties.GetPropertyByName(APropertyName);
 end;
@@ -176,11 +148,9 @@ begin
   Result := TioGroupBy.Create(ASqlText);
 end;
 
-class function TioContextFactory.JoinItem(const AJoinAttribute: ioJoin)
-  : IioJoinItem;
+class function TioContextFactory.JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
 begin
-  Result := TioJoinItem.Create(AJoinAttribute.JoinType,
-    AJoinAttribute.JoinClassRef, AJoinAttribute.JoinCondition);
+  Result := TioJoinItem.Create(AJoinAttribute.JoinType, AJoinAttribute.JoinClassRef, AJoinAttribute.JoinCondition);
 end;
 
 class function TioContextFactory.Joins: IioJoins;
@@ -200,12 +170,10 @@ begin
   // Get the table
   ATable := Self.Table(ARttiType);
   // Create the context
-  Result := TioMap.Create(AClassRef, ARttiContext, ARttiType, ATable,
-    Self.Properties(ARttiType, ATable));
+  Result := TioMap.Create(AClassRef, ARttiContext, ARttiType, ATable, Self.Properties(ARttiType, ATable));
 end;
 
-class function TioContextFactory.Properties(const Typ: TRttiInstanceType;
-  const ATable: IioContextTable): IioContextProperties;
+class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
 var
   Prop: System.Rtti.TRttiMember;
   PropsFields: TArray<System.Rtti.TRttiMember>;
@@ -240,8 +208,7 @@ var
   LRttiProperty: TRttiProperty;
   LRttiField: TRttiField;
 
-  function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind;
-    const AQualifiedName: string): TioMetadataFieldType;
+  function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
   begin
     Result := ioMdInteger;
     case ATypeKind of
@@ -310,8 +277,10 @@ var
 begin
   // Get members list (Properties or Fields)
   case ATable.GetMapMode of
-    ioProperties: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
-    ioFields: PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetFields));
+    ioProperties:
+      PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
+    ioFields:
+      PropsFields := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetFields));
   end;
   // Create result Properties object
   Result := TioProperties.Create;
@@ -322,7 +291,8 @@ begin
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind,
+        LRttiProperty.PropertyType.QualifiedName);
     end
     else if Prop is TRttiField then
     begin
@@ -330,29 +300,29 @@ begin
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end;
 
-// ====================================================================================================
-// Mauri 08/02/2020: Secondo me questo blocco di codice si può eliminare del tutto perchè tanto, arrivati qui
-//  il Metadata_FieldType è stato già determinato in modo corretto dalle righe precedenti
-//  anche nel caso di una proprietà contente un oggetto e con relazione EmbeddedHasOne/Many
-// ----------------------------------------------------------------------------------------------------
-//    // M.M. 08/10/18
-//    // Controlla gli attributi per capire se ci sono relazioni Embedded
-//    // per poter stabilire il tipo di default da utilizzare per la
-//    // creazione del campo nel builder se non viene specificato un
-//    // attributo specifico
-//    // Mauri: Non si potrebbe evitare di ciclare per tutti gli attributi qui visto che lo facciamo già
-//    //         più sotto? Potremmo unire i due cicli facendone uno solo?
-//    for Attr in Prop.GetAttributes do
-//    begin
-//      // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
-//      // viene impostato un campo di tipo binary
-//      if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
-//      begin
-//        PropMetadata_FieldType := ioMdBinary;
-//        Break;
-//      end;
-//    end;
-// ====================================================================================================
+    // ====================================================================================================
+    // Mauri 08/02/2020: Secondo me questo blocco di codice si può eliminare del tutto perchè tanto, arrivati qui
+    // il Metadata_FieldType è stato già determinato in modo corretto dalle righe precedenti
+    // anche nel caso di una proprietà contente un oggetto e con relazione EmbeddedHasOne/Many
+    // ----------------------------------------------------------------------------------------------------
+    // // M.M. 08/10/18
+    // // Controlla gli attributi per capire se ci sono relazioni Embedded
+    // // per poter stabilire il tipo di default da utilizzare per la
+    // // creazione del campo nel builder se non viene specificato un
+    // // attributo specifico
+    // // Mauri: Non si potrebbe evitare di ciclare per tutti gli attributi qui visto che lo facciamo già
+    // //         più sotto? Potremmo unire i due cicli facendone uno solo?
+    // for Attr in Prop.GetAttributes do
+    // begin
+    // // M.M. 27/09/18 Nel caso di relazioni ioRTEmbeddedHasOne, ioRTEmbeddedHasMany
+    // // viene impostato un campo di tipo binary
+    // if (Attr is ioEmbeddedHasOne) or (Attr is ioEmbeddedHasMany) then
+    // begin
+    // PropMetadata_FieldType := ioMdBinary;
+    // Break;
+    // end;
+    // end;
+    // ====================================================================================================
 
     PropMetadata_FieldLength := 50 { 255 };
     // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
@@ -373,20 +343,15 @@ begin
     // Elimina il primo carattere (di solito la F)
     // Skip RefCount property from TInterfacedObject
     // Se la proprietà esiste già nella mappa (può accadere quando si fa property override)
-    if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or
-      Result.PropertyExists(PropFieldName) then
+    if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or Result.PropertyExists(PropFieldName) then
       Continue;
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '',
-        '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad,
-        False, PropMetadata_FieldType, PropMetadata_FieldLength,
-        PropMetadata_FieldPrecision, PropMetadata_FieldScale,
-        PropMetadata_FieldNullable, PropMetadata_FieldUnicode,
-        PropMetadata_CustomFieldType, PropMetadata_FKCreate,
-        PropMetadata_FieldSubType, PropMetadata_FKCascadeUpdate,
-        PropMetadata_FKCascadeDelete);
+      Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '',
+        ioImmediateLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FKCreate,
+        PropMetadata_FieldSubType, PropMetadata_FKCascadeUpdate, PropMetadata_FKCascadeDelete);
       Continue;
     end;
     // Prop Init
@@ -444,7 +409,7 @@ begin
         PropRelationType := ioRTBelongsTo;
         PropRelationChildTypeName := ioBelongsTo(Attr).ChildTypeName;
         PropRelationChildTypeAlias := ioBelongsTo(Attr).ChildTypeAlias;
-        PropMetadata_FieldType := ioMdInteger;  // If is a BelongsTo relation then the field type on DB in integer
+        PropMetadata_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
       end;
       if Attr is ioHasMany then
       begin
@@ -553,22 +518,16 @@ begin
 
     end;
     // Create and add property
-    Result.Add(Self.GetProperty(ATable, Prop, PropTypeAlias,
-      PropFieldName, PropLoadSql, PropFieldType, PropSkip, PropReadWrite,
-      PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias,
-      PropRelationChildPropertyName, PropRelationChildLoadType,
-      PropRelationChildAutoIndex, PropMetadata_FieldType,
-      PropMetadata_FieldLength, PropMetadata_FieldPrecision,
-      PropMetadata_FieldScale, PropMetadata_FieldNullable,
-      PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
-      PropMetadata_FKCreate, PropMetadata_FieldSubType,
-      PropMetadata_FKCascadeDelete, PropMetadata_FKCascadeUpdate), PropID,
+    Result.Add(Self.GetProperty(ATable, Prop, PropTypeAlias, PropFieldName, PropLoadSql, PropFieldType, PropSkip, PropReadWrite,
+      PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias, PropRelationChildPropertyName, PropRelationChildLoadType,
+      PropRelationChildAutoIndex, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision,
+      PropMetadata_FieldScale, PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
+      PropMetadata_FKCreate, PropMetadata_FieldSubType, PropMetadata_FKCascadeDelete, PropMetadata_FKCascadeUpdate), PropID,
       PropIDSkipOnInsert);
   end;
 end;
 
-class function TioContextFactory.Table(const Typ: TRttiInstanceType)
-  : IioContextTable;
+class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioContextTable;
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionDefName, LKeyGenerator: String;
@@ -623,8 +582,8 @@ begin
     if LKeyGenerator.IsEmpty then
       LKeyGenerator := LTableName;
     // Create result Properties object
-    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField,
-      LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
+    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode,
+      LAutoCreateDB, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

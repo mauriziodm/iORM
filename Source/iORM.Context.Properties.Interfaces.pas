@@ -61,9 +61,9 @@ type
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: string;
-    function GetSqlQualifiedFieldName(const AConnectionDefName: String): String;
-    function GetSqlFullQualifiedFieldName(const AConnectionDefName: String): String;
-    function GetSqlFieldName(const AConnectionDefName: String; const AClearDelimiters: Boolean=False): String;
+    function GetSqlQualifiedFieldName: String;
+    function GetSqlFullQualifiedFieldName: String;
+    function GetSqlFieldName(const AClearDelimiters: Boolean=False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
@@ -72,7 +72,7 @@ type
     function GetValue(const Instance: Pointer): TValue;
     function GetValueAsObject(const Instance: Pointer): TObject;
     procedure SetValue(const Instance: Pointer; const AValue: TValue);
-    function GetSqlValue(const ADataObject: TObject; const AConnectionDefName: String): String;
+    function GetSqlValue(const ADataObject: TObject): String;
     function GetRttiType: TRttiType;
     function GetTypeInfo: PTypeInfo;
     function GetTypeName: String;
@@ -88,9 +88,9 @@ type
     function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
-    procedure SetFieldData(const AClassName, AConnectionDefName: String);
-    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
-    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
+    procedure SetFieldData;
+    procedure SetLoadSqlData;
+    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
     procedure SetIsID(const AValue:Boolean);
     function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
@@ -134,9 +134,9 @@ type
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName:String): IioContextProperty;
     procedure SetTable(const ATable:IioContextTable);
-    function GetSql(const AConnectionDefName: String; const ASqlRequestType: TioSqlRequestType = ioAll): String; overload;
-    procedure SetFieldData(const AClassName, AConnectionDefName: String);
-    procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
+    function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; overload;
+    procedure SetFieldData;
+    procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
