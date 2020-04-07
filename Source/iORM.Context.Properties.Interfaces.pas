@@ -88,7 +88,6 @@ type
     function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
-    procedure SetTable(const ATable:IioContextTable);
     procedure SetFieldData(const AClassName, AConnectionDefName: String);
     procedure SetLoadSqlData(const AClassName, AConnectionDefName: String);
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType; const AConnectionDefName: String): Boolean;
