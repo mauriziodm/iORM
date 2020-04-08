@@ -238,8 +238,7 @@ class function TioConnectionManager.GetConnectionInfo(
   AConnectionName: String): TioConnectionInfo;
 begin
   // If desired ConnectionName is empty then get then Default one.
-  if Self.IsEmptyConnectionName(AConnectionName) then
-    AConnectionName := Self.GetDefaultConnectionName;
+  AConnectionName := GetDefaultConnectionNameIfEmpty(AConnectionName);
   // Return the desired connection type
   Result := FConnectionManagerContainer.Items[AConnectionName];
 end;

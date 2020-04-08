@@ -90,7 +90,7 @@ type
     function GetSqlWithClassFromField(const AMap:IioMap; const AIsClassFromField:Boolean; const AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
-    function GetOrderBySql(const AMap:IioMap; AConnectionDefName: String): String;
+    function GetOrderBySql(const AMap:IioMap): String;
     procedure SetOrderBySql(const AOrderByText:String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -129,8 +129,6 @@ type
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
     function IsLazy: Boolean;
-    function ConnectionName(const AConnectionName:String): IioWhere;
-    function GetConnectionName: String;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -339,7 +337,7 @@ uses
   iORM.LiveBindings.ActiveObjectBindSourceAdapter, iORM.Where.Factory,
   iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
   iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
-  iORM.MVVM.Interfaces, iORM.AbstractionLayer.Framework;
+  iORM.MVVM.Interfaces, iORM.AbstractionLayer.Framework, iORM.Context.Container;
 
 { TioWhere }
 
@@ -556,14 +554,6 @@ begin
   Self._PropertyOIDEqualsTo(AOID);
 end;
 
-function TioWhere.ConnectionName(const AConnectionName: String): IioWhere;
-begin
-  Result := Self;
-  Self.FConnectionName := AConnectionName;
-  // Set the connection name in the deails where container even (for details propagation)
-  Self.Details.SetConnectionName(AConnectionName);
-end;
-
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
@@ -573,7 +563,6 @@ begin
   FWhereItems := TioWhereFactory.NewWhereItems;
   FDetailsContainer := TioWhereFactory.NewDetailsContainer;
   FOrderBy := nil;
-  FConnectionName := '';
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String;
@@ -611,7 +600,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, Self);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedCreateIndex;
     end;
@@ -626,7 +615,7 @@ end;
 
 procedure TioWhere.Delete;
 begin
-  TioStrategyFactory.GetStrategy(FConnectionName).Delete(Self);
+  TioStrategyFactory.GetStrategy(TioMapContainer.GetConnectionDefName(FTypeName)).Delete(Self);
 end;
 
 function TioWhere.DisableClassFromField: IioWhere;
@@ -662,7 +651,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, Self);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedDropIndex;
     end;
@@ -673,11 +662,6 @@ begin
     ATransactionCollection.RollbackAll;
     raise;
   end;
-end;
-
-function TioWhere.GetConnectionName: String;
-begin
-  Result := FConnectionName;
 end;
 
 function TioWhere.GetDetails: IioWhereDetailsContainer;
@@ -700,10 +684,10 @@ begin
   Result := FOrderBy;
 end;
 
-function TioWhere.GetOrderBySql(const AMap:IioMap; AConnectionDefName: String): String;
+function TioWhere.GetOrderBySql(const AMap:IioMap): String;
 begin
   if Assigned(FOrderBy) then
-    Result := FOrderBy.GetSql(AMap, AConnectionDefName)
+    Result := FOrderBy.GetSql(AMap)
   else
     Result := '';
 end;
