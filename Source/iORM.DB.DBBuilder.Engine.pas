@@ -562,8 +562,7 @@ begin
                 else
                 begin
                   LSourceTableName := LChildContext.GetTable.TableName;
-                  LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName)
-                    .GetSqlFieldName(FConnectionDefName, True);
+                  LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetSqlFieldName(True);
                   LDestinationTableName := LPairTable.Value.TableName;
                   LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
                 end;
@@ -707,8 +706,7 @@ begin
         else
         begin
           LSourceTableName := LChildContext.GetTable.TableName;
-          LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName)
-            .GetSqlFieldName(FConnectionDefName, True);
+          LSourceFieldName := LChildContext.GetProperties.GetPropertyByName(LChildPropertyName).GetSqlFieldName(True);
           LDestinationTableName := LPairTable.Value.TableName;
           LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
         end;
@@ -771,7 +769,7 @@ begin
     // fosse già stato inserito come skipped e la proprietà che stiamo
     // trattando è presente più volte nel modello andiamo a modificare
     // il flag IsSqlField per consentire la creazione del campo nel DB.AProperty.GetSqlFieldName
-    if ATable.Fields.TryGetValue(AProperty.GetSqlFieldName(FConnectionDefName), lField) then
+    if ATable.Fields.TryGetValue(AProperty.GetSqlFieldName, lField) then
     begin
       if (AProperty.GetRelationType = ioRTHasMany) or (AProperty.GetRelationType = ioRTHasOne) then
         lField.IsSqlField := False
@@ -783,10 +781,10 @@ begin
     end;
 
     // If not already exixts create and add it to the list
-    if ATable.FieldExists(AProperty.GetSqlFieldName(FConnectionDefName)) then
+    if ATable.FieldExists(AProperty.GetSqlFieldName) then
       Continue;
 
-    AField := Self.GetField(AProperty.GetSqlFieldName(FConnectionDefName), (AProperty = AMap.GetProperties.GetIDProperty), AProperty,
+    AField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty,
       FSqlGenerator, False, LIsSqlField);
     ATable.Fields.Add(AField.FieldName, AField);
   end;

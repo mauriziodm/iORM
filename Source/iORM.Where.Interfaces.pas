@@ -72,7 +72,7 @@ type
     function GetWhereItems: IWhereItems;
     function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
     function GetSqlWithClassFromField(const AMap:IioMap; const AIsClassFromField:Boolean; const AClassFromField: IioClassFromField): String;
-    function GetOrderBySql(const AMap:IioMap; AConnectionDefName: String): String;
+    function GetOrderBySql(const AMap:IioMap): String;
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
     function GetDisableClassFromField: Boolean;
@@ -113,8 +113,6 @@ type
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
     function IsLazy: Boolean;
-    function ConnectionName(const AConnectionName:String): IioWhere;
-    function GetConnectionName: String;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -229,7 +227,6 @@ type
     function DisableClassFromField: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
-    function ConnectionName(const AConnectionName:String): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;

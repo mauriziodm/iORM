@@ -250,13 +250,11 @@ type
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
     function Execute(const AIgnoreObjNotExists:Boolean=False): Integer; overload;
     // Informations
-    function Connection(const AConnectionName:String): IioSQLDestination;
     function SelfClass(const ASelfClassName:String): IioSQLDestination; overload;
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     // Getters
     function GetTranslatedSQL: String; overload;
-    function GetConnectionName: String;
     function GetIgnoreObjNotExists: Boolean;
   end;
 
@@ -313,9 +311,9 @@ type
     class procedure CommitTransaction(const AConnectionName:String); virtual; abstract;
     class procedure RollbackTransaction(const AConnectionName:String); virtual; abstract;
     class function InTransaction(const AConnectionName:String): boolean; virtual; abstract;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
-    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); virtual; abstract;
-    class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); virtual; abstract;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); virtual; abstract;
+    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); virtual; abstract;
+    class procedure DeleteObject(const AObj: TObject); virtual; abstract;
     class procedure Delete(const AWhere: IioWhere); virtual; abstract;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); virtual; abstract;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
@@ -362,7 +360,7 @@ begin
   if AUnique then
     Result := Result + '_U';
   // Translate
-  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, AContext.GetConnectionDefName, False);
+  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
 end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);

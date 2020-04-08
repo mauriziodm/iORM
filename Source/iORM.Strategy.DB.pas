@@ -59,10 +59,10 @@ type
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: Boolean; const AConnectionName: String); override;
+      const ABlindInsert: Boolean); override;
     class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: Boolean; const AConnectionName: String); override;
-    class procedure DeleteObject(const AObj: TObject; const AConnectionName: String); override;
+      const ABlindInsert: Boolean); override;
+    class procedure DeleteObject(const AObj: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
@@ -119,7 +119,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, AWhere);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedDelete;
     end;
@@ -132,7 +132,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.DeleteObject(const AObj: TObject; const AConnectionName: String);
+class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
 var
   AContext: IioContext;
 begin
@@ -141,7 +141,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AConnectionName);
+  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
   // Execute
   Self.DeleteObject_Internal(AContext);
 end;
@@ -163,7 +163,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetConnectionDefName).ConnectionType = cdtFirebird) and
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtFirebird) and
     AContext.IDIsNull then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -183,8 +183,8 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
-  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionInfo(AContext.GetConnectionDefName).ConnectionType = cdtSQLite) or
-    (TioConnectionManager.GetConnectionInfo(AContext.GetConnectionDefName).ConnectionType = cdtSQLServer)) and AContext.IDIsNull then
+  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtSQLite) or
+    (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtSQLServer)) and AContext.IDIsNull then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -246,7 +246,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, AObj);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class object is founded
       Result := NestedLoadToObject;
       // If there is a result (an object) then exit;
@@ -301,7 +301,7 @@ begin
 end;
 
 class procedure TioStrategyDB.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const ABlindInsert: Boolean; const AConnectionName: String);
+  const ARelationOID: Integer; const ABlindInsert: Boolean);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -324,7 +324,7 @@ begin
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
   // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
   // che operano su Database diversi contemporaneamente.
-  Self.StartTransaction(AConnectionName);
+  Self.StartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
     ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
@@ -332,18 +332,18 @@ begin
     for AObj in ADuckTypedList do
     begin
       // Persist object
-      Self.PersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert, AConnectionName);
+      Self.PersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert);
     end;
 
-    Self.CommitTransaction(AConnectionName);
+    Self.CommitTransaction('');
   except
-    Self.RollbackTransaction(AConnectionName);
+    Self.RollbackTransaction('');
     raise;
   end;
 end;
 
 class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean; const AConnectionName: String);
+  const ABlindInsert: Boolean);
 var
   LContext: IioContext;
 begin
@@ -352,9 +352,9 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AConnectionName);
+  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
   // Start transaction
-  Self.StartTransaction(LContext.GetConnectionDefName);
+  Self.StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     if (ARelationPropertyName <> '') and (ARelationOID <> 0) and
@@ -392,10 +392,10 @@ begin
     // PostProcess (persist) relation childs (HasMany, HasOne)
     Self.PostProcessRelationChild(LContext);
     // Commit
-    Self.CommitTransaction(LContext.GetConnectionDefName);
+    Self.CommitTransaction(LContext.GetTable.GetConnectionDefName);
   except
     // Rollback
-    Self.RollbackTransaction(LContext.GetConnectionDefName);
+    Self.RollbackTransaction(LContext.GetTable.GetConnectionDefName);
     raise;
   end;
 end;
@@ -405,8 +405,7 @@ begin
   // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
   Self.PersistCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject),
     AMasterProperty.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject)
-    .AsInteger, False // Blind
-    , AMasterContext.GetConnectionDefName);
+    .AsInteger, False); // Blind
 end;
 
 class procedure TioStrategyDB.PersistRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
@@ -417,8 +416,7 @@ begin
   AObj := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   // Persist object
   Self.PersistObject(AObj, AMasterProperty.GetRelationChildPropertyName,
-    AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False // Blind
-    , AMasterContext.GetConnectionDefName);
+    AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False); // Blind
 end;
 
 class procedure TioStrategyDB.PostProcessRelationChild(const AContext: IioContext);
@@ -494,7 +492,7 @@ var
 begin
   inherited;
   // Get the connection
-  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsDBConnection;
+  LConnection := TioDBFactory.Connection('').AsDBConnection;
   // Start transaction
   LConnection.StartTransaction;
   try
@@ -515,10 +513,10 @@ var
 begin
   inherited;
   // Start transaction
-  io.StartTransaction(ASQLDestination.GetConnectionName);
+  io.StartTransaction('');
   try
     // Get the query object
-    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionName);
+    LQry := TioDBFactory.Query('');
     // Set the SQL command text
     LQry.SQL.Text := ASQLDestination.GetTranslatedSQL;
     LQry.GetQuery.FetchOptions.Unidirectional := False;
@@ -532,10 +530,10 @@ begin
       LQry.Close;
     end;
     // Commit
-    io.CommitTransaction(ASQLDestination.GetConnectionName);
+    io.CommitTransaction('');
   except
     // Rollback
-    io.RollbackTransaction(ASQLDestination.GetConnectionName);
+    io.RollbackTransaction('');
     raise;
   end;
 end;
@@ -595,7 +593,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, AWhere);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedLoadToMemTable;
     end;
@@ -658,7 +656,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, AWhere);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedLoadToList;
     end;

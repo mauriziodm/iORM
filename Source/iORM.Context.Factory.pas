@@ -64,8 +64,7 @@ type
     class function GroupBy(const ASqlText: String): IioGroupBy;
     class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AioWhere: IioWhere = nil; const ADataObject: TObject = nil;
-      const AConnectionName: String = ''): IioContext;
+    class function Context(const AClassName: String; const AioWhere: IioWhere = nil; const ADataObject: TObject = nil): IioContext;
     class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioContextProperty;
     class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
   end;
@@ -95,14 +94,13 @@ begin
   end;
   until not Assigned(Typ);
   // Create
-  Result := TioClassFromField.Create(ASqlFieldName, ClassName, QualifiedClassName, Ancestors);
+  Result := TioClassFromField.Create(ASqlFieldName);
 end;
 
-class function TioContextFactory.Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject;
-  const AConnectionName: String): IioContext;
+class function TioContextFactory.Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject): IioContext;
 begin
   // Get the Context from the ContextContainer
-  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AioWhere, ADataObject, AConnectionName);
+  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AioWhere, ADataObject);
 end;
 
 class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
@@ -122,14 +120,14 @@ begin
   case ATable.GetMapMode of
     // Properties map mode
     ioProperties:
-      Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
+      Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
         AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
         ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
         AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
         AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
     // Fields map mode
     ioFields:
-      Result := TioField.Create(ARttiPropField as TRttiField, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
+      Result := TioField.Create(ARttiPropField as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
         ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
         ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
         AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,

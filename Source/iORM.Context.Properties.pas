@@ -130,6 +130,7 @@ type
     function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     function GetRelationChildAutoIndex: Boolean;
+    procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
@@ -174,7 +175,7 @@ type
     FRttiProperty: TRttiField;
     FName: String;
   public
-    constructor Create(const ARttiField: TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+    constructor Create(const ARttiField: TRttiField; const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ASkipped: Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
       const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
@@ -629,7 +630,7 @@ var
 begin
   LValue := FFieldDefinitionString;
   // Translate (if contains tags)
-  LValue := TioSqlTranslator.Translate(LValue, FTable.GetClassName, FTable.GetConnectionDefName);
+  LValue := TioSqlTranslator.Translate(LValue, FTable.GetClassName);
   // Retrieve the markers position
   LDotPos := Pos('.', LValue);
   LAsPos := Pos(' AS ', LValue, LDotPos);
@@ -661,7 +662,7 @@ procedure TioProperty.SetLoadSqlData;
 begin
   // Set LoadSql statement (if exist)
   if Self.FLoadSql <> '' then
-    FLoadSql := TioSqlTranslator.Translate(FLoadSql, FTable.GetClassName, FTable.GetConnectionDefName);
+    FLoadSql := TioSqlTranslator.Translate(FLoadSql, FTable.GetClassName);
 end;
 
 procedure TioProperty.SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
@@ -735,6 +736,11 @@ begin
   // If the remaining list is empty then free it (optimization)
   if FRelationChildPropertyPath.Count = 0 then
     FreeAndNil(FRelationChildPropertyPath);
+end;
+
+procedure TioProperty.SetTable(const ATable: IioContextTable);
+begin
+  FTable := ATable;
 end;
 
 procedure TioProperty.SetValue(const Instance: Pointer; const AValue: TValue);
@@ -898,7 +904,7 @@ end;
 
 { TioField }
 
-constructor TioField.Create(const ARttiField: TRttiField; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+constructor TioField.Create(const ARttiField: TRttiField; const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
   const ASkipped: Boolean; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType;
   const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
   const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
@@ -907,7 +913,7 @@ constructor TioField.Create(const ARttiField: TRttiField; const ATypeAlias, AFie
   const AMetadata_FieldSubType: string; const AMetadata_FKCascadeDelete, AMetadata_FKCascadeUpdate: Boolean);
 begin
   // NB: No inherited here
-  Self.Create(ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, ASkipped, AReadWrite, ARelationType, ARelationChildTypeName,
+  Self.Create(ATable, ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType, ASkipped, AReadWrite, ARelationType, ARelationChildTypeName,
     ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ARelationChildAutoIndex, AMetadata_FieldType,
     AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNullable, AMetadata_FieldUnicode,
     AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType, AMetadata_FKCascadeDelete, AMetadata_FKCascadeUpdate);

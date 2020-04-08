@@ -180,7 +180,7 @@ begin
   // then Exit(TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty));
 
   // Else return the value for the field related to the AProperty as TValue
-  Result := TioDBFactory.SqlDataConverter(AContext.GetConnectionDefName).QueryToTValue(Self, AProperty);
+  Result := TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).QueryToTValue(Self, AProperty);
 end;
 
 function TioQuery.GetValueByFieldIndexAsVariant(Idx: Integer): Variant;
@@ -312,7 +312,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if not AProp.IsBlob then
   begin
-    TioDBFactory.SqlDataConverter(AContext.GetConnectionDefName).SetQueryParamByContext(Self, AProp, AContext);
+    TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).SetQueryParamByContext(Self, AProp, AContext);
     Exit;
   end;
   // At this point the property refer to a blob field (and to an Object) type then

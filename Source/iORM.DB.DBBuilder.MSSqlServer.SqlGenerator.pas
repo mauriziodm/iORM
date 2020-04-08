@@ -115,7 +115,7 @@ var
   LPrecision: string;
   LScale: string;
 begin
-  LFieldName := AProperty.GetSqlFieldName(Self.GetConnectionDefName);
+  LFieldName := AProperty.GetSqlFieldName;
   LFieldLength := '';
   LKeyOptions := '';
 
@@ -252,7 +252,6 @@ function TioDBBuilderMSSqlServerSqlGenerator.AddIndex(const AContext: IioContext
 var
   LQuery: IioQuery;
 begin
-  AContext.SetConnectionDefName(Self.GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   // M.M. 16/11/19 - Sistemazione parole riservate SQL SERVER
   Result := ReplaceSpecialWords(LQuery.SQL.Text);
@@ -262,7 +261,7 @@ function TioDBBuilderMSSqlServerSqlGenerator.AddPrimaryKey(const ATableName: str
 begin
   Result := 'ALTER TABLE ['+ATableName+'] '+
             'ADD CONSTRAINT '+'PK_'+ATableName+'_'+AIDProperty.GetName+' PRIMARY KEY CLUSTERED'+
-            '('+AIDProperty.GetSqlFieldName(Self.GetConnectionDefName)+')';
+            '('+AIDProperty.GetSqlFieldName+')';
 end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.AlterField(const AProperty:IioContextProperty): String;

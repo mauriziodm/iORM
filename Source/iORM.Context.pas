@@ -133,7 +133,7 @@ begin
   Result := '';
   // Ritorna il GroupBy fisso (attribute nella dichiarazione della classe)
   if Assigned(Self.GetTable.GetGroupBy)
-    then Result := Self.GetTable.GetGroupBy.GetSql(FMap.GetClassName, Self.GetConnectionDefName);
+    then Result := Self.GetTable.GetGroupBy.GetSql;
   // Aggiungere qui l'eventuale futuro codice per aggiungere/sostituire
   //  l'eventuale GroupBy specificato nel ioWhere e che quindi è nel
   //  context e che sostituisce il GroupBy fisso
@@ -153,7 +153,7 @@ end;
 
 function TioContext.GetOrderBySql: String;
 begin
-  Result := Self.Where.GetOrderBySql(FMap, Self.GetConnectionDefName);
+  Result := Self.Where.GetOrderBySql(FMap);
 end;
 
 function TioContext.GetProperties: IioContextProperties;

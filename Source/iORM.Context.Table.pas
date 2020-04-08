@@ -114,8 +114,8 @@ type
     function GetSqlParamName: String;
     function GetValue: String;
     function GetSqlValue: string;
-    function GetClassName: String;
-    function GetQualifiedClassName: String;
+    function GetClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
+    function GetQualifiedClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
     function QualifiedClassNameFromClassInfoFieldValue(AValue: String): String;
   end;
 
@@ -250,7 +250,7 @@ begin
   Result := FRttiType;
 end;
 
-function TioContextTable.GetSql(const AConnectionDefName: String): String;
+function TioContextTable.GetSql: String;
 begin
   Result := TioDBFActory.SqlDataConverter(GetConnectionDefName).FieldNameToSqlFieldName(Result);
 end;
@@ -285,7 +285,7 @@ end;
 
 function TioClassFromField.GetClassName: String;
 begin
-  Result := FClassName;
+  Result := Table.GetClassName;
 end;
 
 function TioClassFromField.GetFieldName: string;
@@ -295,7 +295,7 @@ end;
 
 function TioClassFromField.GetQualifiedClassName: String;
 begin
-  Result := FQualifiedClassName;
+  Result := Table.GetQualifiedClassName;
 end;
 
 function TioClassFromField.GetSqlFieldName: string;
@@ -308,7 +308,7 @@ begin
   Result := 'P_' + FSqlFieldName;
 end;
 
-function TioClassFromField.GetSqlValue(const AConnectionDefName: String): string;
+function TioClassFromField.GetSqlValue: string;
 begin
   Result := TioDBFActory.SqlDataConverter(Table.GetConnectionDefName).StringToSQL(Self.GetValue);
 end;
@@ -386,13 +386,13 @@ begin
   inherited;
 end;
 
-function TioJoins.GetSql(const AConnectionDefName, ASelfClassName: String): String;
+function TioJoins.GetSql: String;
 var
   AJoinItem: IioJoinItem;
 begin
   Result := '';
   for AJoinItem in FJoinList do
-    Result := Result + #13 + TioSqlTranslator.Translate(FTable.GetClassName, FTable.GetClassName);
+    Result := Result + #13 + TioSqlTranslator.Translate(Table.GetClassName, Table.GetClassName);
 end;
 
 { TioGroupBy }
@@ -402,7 +402,7 @@ begin
   FSqlText := ASqlText;
 end;
 
-function TioGroupBy.GetSql(const ASelfClassName: String): String;
+function TioGroupBy.GetSql: String;
 begin
   Result := TioSqlTranslator.Translate(FSqlText, Table.GetClassName).Trim;
   if Result <> '' then

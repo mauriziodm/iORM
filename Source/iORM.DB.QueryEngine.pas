@@ -86,10 +86,10 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'DEL'));
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'DEL'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlDelete(AQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
@@ -119,10 +119,10 @@ var
   AQuery: IioQuery;
 begin
   // Get the query object, the query is always empty because without query identity
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName);
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlForCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlForCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
 class function TioQueryEngine.GetQueryForDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
@@ -130,10 +130,10 @@ var
   AQuery: IioQuery;
 begin
   // Get the query object, the query is always empty because without query identity
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName);
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlForDropIndex(AQuery, AContext, AIndexName);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlForDropIndex(AQuery, AContext, AIndexName);
 end;
 
 class function TioQueryEngine.GetQueryForExists(const AContext: IioContext): IioQuery;
@@ -142,10 +142,10 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlForExists(AQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlForExists(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
@@ -159,15 +159,15 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlInsert(AQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlInsert(AQuery, AContext);
   // Iterate for all properties
   for AProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not AProp.IsSqlRequestCompliant(ioInsert, AContext.GetConnectionDefName) then
+    if not AProp.IsSqlRequestCompliant(ioInsert) then
       Continue;
     // If current property is the ID property and its value is null (0)
     // then skip its value (always NULL)
@@ -209,9 +209,9 @@ begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
   // Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'LID'));
-  Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, '')); // NoQueryIdentity
+  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, '')); // NoQueryIdentity
   if Result.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlNextID(Result, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlNextID(Result, AContext);
 end;
 
 class function TioQueryEngine.GetQuerySelectForList(const AContext: IioContext): IioQuery;
@@ -220,10 +220,10 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELLST'));
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELLST'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlSelect(AQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelect(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
@@ -239,10 +239,10 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELOBJ'));
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELOBJ'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlSelect(AQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelect(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
@@ -259,15 +259,15 @@ var
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'UPD'));
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'UPD'));
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionDefName).GenerateSqlUpdate(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlUpdate(LQuery, AContext);
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not LProp.IsSqlRequestCompliant(ioUpdate, AContext.GetConnectionDefName) then
+    if not LProp.IsSqlRequestCompliant(ioUpdate) then
       Continue;
     // Relation type
     case LProp.GetRelationType of

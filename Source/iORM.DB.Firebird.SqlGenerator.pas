@@ -98,7 +98,7 @@ begin
   if AUnique then
     Result := Result + '_U';
   // Translate
-  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, AContext.GetConnectionDefName, False);
+  Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
 end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(
@@ -113,7 +113,7 @@ begin
   if AIndexName.IsEmpty then
     AIndexName := Self.BuildIndexName(AContext, ACommaSepFieldList, AIndexOrientation, AUnique)
   else
-    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, AContext.GetConnectionDefName, False);
+    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
   // Index orientation
   case AIndexOrientation of
     ioAscending: LIndexOrientationText := ' ASCENDING ';
@@ -149,7 +149,7 @@ begin
               + AIndexName + ' ON ' + AContext.GetTable.TableName
               + ' (' + LQueryText + ')';
   // Translate the query text
-  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, AContext.GetConnectionDefName, False);
+  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, False);
   // Assign the query text
   AQuery.SQL.Add(LQueryText);
   // -----------------------------------------------------------------
@@ -159,7 +159,7 @@ class procedure TioSqlGeneratorFirebird.GenerateSqlForDropIndex(
   const AQuery: IioQuery; const AContext:IioContext; AIndexName: String);
 begin
   // Index Name
-  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, AContext.GetConnectionDefName, False);
+  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('DROP INDEX ' + AIndexName);
@@ -172,8 +172,8 @@ begin
 //  inherited;
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql(AContext.GetConnectionDefName)
-    + ' WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName(AContext.GetConnectionDefName) + '=:'
+  AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql
+    + ' WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:'
     + AContext.GetProperties.GetIdProperty.GetSqlParamName
     + ')) THEN 1 ELSE 0 END FROM RDB$DATABASE');
   // -----------------------------------------------------------------

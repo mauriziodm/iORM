@@ -110,7 +110,7 @@ var
   LKeyOptions: string;
   LNullable: string;
 begin
-  LFieldName := AProperty.GetSqlFieldName(Self.GetConnectionDefName);
+  LFieldName := AProperty.GetSqlFieldName;
   LFieldLength := '';
   LKeyOptions := '';
 
@@ -219,7 +219,6 @@ function TioDBBuilderSqLiteSqlGenerator.AddIndex(const AContext: IioContext; con
 var
   LQuery: IioQuery;
 begin
-  AContext.SetConnectionDefName(Self.GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 

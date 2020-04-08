@@ -239,7 +239,6 @@ type
     function DisableClassFromField: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
-    function ConnectionName(const AConnectionName:String): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;
@@ -615,7 +614,7 @@ end;
 
 procedure TioWhere.Delete;
 begin
-  TioStrategyFactory.GetStrategy(TioMapContainer.GetConnectionDefName(FTypeName)).Delete(Self);
+  TioStrategyFactory.GetStrategy('').Delete(Self);
 end;
 
 function TioWhere.DisableClassFromField: IioWhere;
@@ -917,7 +916,7 @@ end;
 
 procedure TioWhere.ToList(const AList: TObject);
 begin
-  TioStrategyFactory.GetStrategy(FConnectionName).LoadList(Self, AList);
+  TioStrategyFactory.GetStrategy('').LoadList(Self, AList);
 end;
 
 
@@ -980,7 +979,7 @@ end;
 
 procedure TioWhere.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioStrategyFactory.GetStrategy(FConnectionName).LoadDataSet(Self, AMemTable);
+  TioStrategyFactory.GetStrategy('').LoadDataSet(Self, AMemTable);
 end;
 
 function TioWhere.ToObject(const AObj:TObject): TObject;
@@ -990,7 +989,7 @@ begin
     Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject
   // else...
   else
-    Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObject(Self, AObj);
+    Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj);
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1196,7 +1195,7 @@ end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
 begin
-  Result := TioStrategyFactory.GetStrategy(FConnectionName).LoadObjectByClassOnly(Self, AObj);
+  Result := TioStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj);
 end;
 
 function TioWhere._Value(AValue: Integer): IioWhere;
@@ -1235,7 +1234,6 @@ begin
   Self.Add(AWhere);
   Self.FDetailsContainer := AWhere.Details;
   Self.FOrderBy := AWhere.GetOrderByInstance;
-  Self.FConnectionName := AWhere.GetConnectionName;
 end;
 
 function TioWhere._Where(ATextCondition: String): IioWhere;
@@ -1316,12 +1314,6 @@ function TioWhere<T>.ByOID(const AOID: Integer): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).ByOID(AOID);
-end;
-
-function TioWhere<T>.ConnectionName(const AConnectionName: String): IioWhere<T>;
-begin
-  Result := Self;
-  TioWhere(Self).ConnectionName(AConnectionName);
 end;
 
 function TioWhere<T>.DisableClassFromField: IioWhere<T>;

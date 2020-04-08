@@ -117,8 +117,7 @@ begin
   Result := FInternalObj;
 end;
 
-procedure TioLazyObject.SetRelationInfo(const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String;
+procedure TioLazyObject.SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
   const ARelationChildID: Integer; const ARelationChildWhere: IioWhere);
 begin
   FRelationChildTypeName := ARelationChildTypeName;

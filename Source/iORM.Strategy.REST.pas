@@ -56,9 +56,9 @@ type
     class procedure CommitTransaction(const AConnectionName:String); override;
     class procedure RollbackTransaction(const AConnectionName:String); override;
     class function InTransaction(const AConnectionName:String): boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); override;
-    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean; const AConnectionName:String); override;
-    class procedure DeleteObject(const AObj: TObject; const AConnectionName:String); override;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
+    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
+    class procedure DeleteObject(const AObj: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
@@ -76,7 +76,8 @@ uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
   iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
-  iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON;
+  iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
+  iORM.Context.Container;
 
 { TioStrategyREST }
 
@@ -93,7 +94,7 @@ var
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -111,16 +112,17 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.DeleteObject(const AObj: TObject;
-  const AConnectionName: String);
+class procedure TioStrategyREST.DeleteObject(const AObj: TObject);
 var
+  LConnectionDefName: String;
   LConnection: IioConnectionREST;
 begin
   inherited;
   // Check
   if not Assigned(AObj) then Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
+  LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
+  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -160,7 +162,7 @@ var
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -187,7 +189,7 @@ var
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -207,15 +209,14 @@ begin
   end;
 end;
 
-class function TioStrategyREST.LoadObject(const AWhere: IioWhere;
-  const AObj: TObject): TObject;
+class function TioStrategyREST.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
   LConnection: IioConnectionREST;
 begin
   inherited;
   result := nil;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AWhere.GetConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -254,9 +255,8 @@ begin
   Result := GUIDToString(LGUID);
 end;
 
-class procedure TioStrategyREST.PersistCollection(const ACollection: TObject;
-  const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean; const AConnectionName: String);
+class procedure TioStrategyREST.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String;
+  const ARelationOID: Integer; const ABlindInsert: Boolean);
 var
   LConnection: IioConnectionREST;
 begin
@@ -264,7 +264,7 @@ begin
   // Check
   if not Assigned(ACollection) then Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -288,17 +288,18 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.PersistObject(const AObj: TObject;
-  const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean; const AConnectionName: String);
+class procedure TioStrategyREST.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+  const ABlindInsert: Boolean);
 var
+  LConnectionDefName: String;
   LConnection: IioConnectionREST;
 begin
   inherited;
   // Check
   if not Assigned(AObj) then Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionName).AsRESTConnection;
+  LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
+  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -337,7 +338,7 @@ var
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -369,7 +370,7 @@ var
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not

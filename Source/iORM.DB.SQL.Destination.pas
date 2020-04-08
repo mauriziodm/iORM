@@ -60,7 +60,6 @@ type
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     // Getters
-    function GetConnectionName: String;
     function GetIgnoreObjNotExists: Boolean;
   public
     constructor Create(const ASQL:String); overload;
@@ -80,7 +79,6 @@ begin
 
   TioApplication.CheckIfAbstractionLayerComponentExists;
 
-  FConnectionName := '';
   FSelfClassName := '';
   FQualifiedFieldName := False;
   FIgnoreObjNotExists := False;
@@ -97,12 +95,7 @@ end;
 function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
-  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_Execute(Self);
-end;
-
-function TioSQLDestination.GetConnectionName: String;
-begin
-  Result := FConnectionName;
+  TioStrategyFactory.GetStrategy('').SQLDest_Execute(Self);
 end;
 
 function TioSQLDestination.GetIgnoreObjNotExists: Boolean;
@@ -136,7 +129,7 @@ end;
 
 procedure TioSQLDestination.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioStrategyFactory.GetStrategy(FConnectionName).SQLDest_LoadDataSet(Self, AMemTable);
+  TioStrategyFactory.GetStrategy('').SQLDest_LoadDataSet(Self, AMemTable);
 end;
 
 end.

@@ -254,9 +254,7 @@ begin
   // Set Execute anonimous methods
   LExecute := function: TObject
     begin
-      io.PersistCollection(AActiveBindSourceAdapter.DataObject, LRelationChildPropertyName, LMasterOID, False, // BlindInsert
-        '' // Connection name
-        );
+      io.PersistCollection(AActiveBindSourceAdapter.DataObject, LRelationChildPropertyName, LMasterOID, False); // BlindInsert
     end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)
@@ -319,9 +317,7 @@ begin
   // Set Execute anonimous methods
   LExecute := function: TObject
     begin
-      io.Persist(AActiveBindSourceAdapter.Current, LRelationChildPropertyName, LMasterOID, False, // BlindInsert
-        '' // Connection name
-        );
+      io.Persist(AActiveBindSourceAdapter.Current, LRelationChildPropertyName, LMasterOID, False); // BlindInsert
     end;
   // Set the OnTerminate anonimous method
   LOnTerminate := procedure(AResultValue: TObject)

@@ -66,9 +66,9 @@ begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT CAST(CASE WHEN EXISTS (SELECT * FROM '
-    + AContext.GetTable.GetSql(AContext.GetConnectionDefName)
+    + AContext.GetTable.GetSql
     + ' WHERE '
-    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName(AContext.GetConnectionDefName) + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
     + ') THEN 1 ELSE 0 END AS INTEGER)'
   );
   // -----------------------------------------------------------------
@@ -90,7 +90,7 @@ begin
   if AIndexName.IsEmpty then
     AIndexName := Self.BuildIndexName(AContext, ACommaSepFieldList, AIndexOrientation, AUnique)
   else
-    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetConnectionDefName, AContext.GetClassRef.ClassName, False);
+    AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
   // Index orientation
   case AIndexOrientation of
     ioAscending: LIndexOrientationText := ' ASC';
@@ -145,7 +145,7 @@ begin
               + ' (' + LQueryText + ')';
 
   // Translate the query text
-  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetConnectionDefName, AContext.GetClassRef.ClassName, False);
+  LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, False);
   // Assign the query text
   AQuery.SQL.Add(LQueryText);
   // -----------------------------------------------------------------

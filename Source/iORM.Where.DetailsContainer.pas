@@ -84,9 +84,6 @@ begin
   or not (Supports(FInternalContainer_NoDirectAccess.Items[AMasterPropertyName], IioWhere, Result))
   then
     Exit(nil);
-  // If the connection name of the detail where is empty then return the master where connection name
-  if Result.GetConnectionName.IsEmpty then
-    Result.ConnectionName(FConnectionName);
 end;
 
 function TioWhereDetailsContainer.GetInternalContainerCreateIfNoAssigned: TioWhereDetailsContainerInternalInstance;

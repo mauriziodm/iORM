@@ -112,7 +112,7 @@ var
   LScale: string;
   LType: string;
 begin
-  LFieldName := AProperty.GetSqlFieldName(Self.GetConnectionDefName);
+  LFieldName := AProperty.GetSqlFieldName;
   LFieldLength := '';
   LKeyOptions := '';
   LNullable := '';
@@ -249,7 +249,6 @@ function TioDBBuilderFirebirdSqlGenerator.AddIndex(const AContext: IioContext; c
 var
   LQuery: IioQuery;
 begin
-  AContext.SetConnectionDefName(Self.GetConnectionDefName);
   LQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
   Result := LQuery.SQL.Text;
 end;
@@ -258,7 +257,7 @@ function TioDBBuilderFirebirdSqlGenerator.AddPrimaryKey(const ATableName: string
 begin
   Result := 'ALTER TABLE '+ATableName+' '+
             'ADD PRIMARY KEY '+
-            '('+AIDProperty.GetSqlFieldName(Self.GetConnectionDefName)+')';
+            '('+AIDProperty.GetSqlFieldName+')';
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.AlterField(const AProperty:IioContextProperty): String;
