@@ -150,3 +150,8 @@ Samples/PhoneContacts_MVVM_CrossFramework/uniGUI_mobile/Win32/
 *.DB-journal
 Source/__recovery/
 *.~2~
+Test/__history/
+Test/Model_PhoneContacts/__history/AnotherModel.pas.~3~
+Test/Model_PhoneContacts/__history/Model.pas.~3~
+Test/Model_PhoneContacts/__history/SampleData.pas.~3~
+Test/Win32/Debug/dunitx-results.xml

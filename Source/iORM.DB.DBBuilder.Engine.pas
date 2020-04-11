@@ -960,8 +960,13 @@ begin
 end;
 
 function TioDBBuilderTable.IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
+var
+  LCurrentConnectionDefName: String;
 begin
-  Result := GetMap.GetTable.GetConnectionDefName.IsEmpty or (GetMap.GetTable.GetConnectionDefName = AConnectionDefNameToCheck);
+  LCurrentConnectionDefName := GetMap.GetTable.GetConnectionDefName;
+  Result := LCurrentConnectionDefName.IsEmpty
+    or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME)
+    or (GetMap.GetTable.GetConnectionDefName = AConnectionDefNameToCheck);
 end;
 
 procedure TioDBBuilderTable.SetTableName(AValue: String);

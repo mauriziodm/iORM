@@ -69,6 +69,7 @@ type
 
   IioClassFromField = interface
     ['{D15A9A28-FB90-4753-BE4A-7484A834CD2D}']
+    procedure SetTable(const ATable: IioContextTable);
     function GetFieldName: string;
     function GetSqlFieldName: string;
     function GetSqlParamName: String;

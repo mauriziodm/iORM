@@ -543,6 +543,7 @@ begin
     LConnectionDefName := '';
     LKeyGenerator := '';
     LJoins := Self.Joins;
+    LClassFromField := nil;
     LGroupBy := nil;
     LMapMode := ioProperties;
     LIndexList := nil;

@@ -136,7 +136,7 @@ type
       const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType; const AAutoCreateDB: Boolean;
       const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
-    function GetSql: String;
+    function GetSql: String; override;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
@@ -168,12 +168,15 @@ constructor TioContextTable.Create(const ASqlText, AKeyGenerator: String; const 
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
-  FClassFromField := AClassFromField;
   FConnectionDefName_DoNotCallDirectly := AConnectionDefName;
   FMapMode := AMapMode;
   FRttiType := ARttiType;
   FIndexList := nil;
   FAutoCreateDB := AAutoCreateDB;
+  // Set ClassFromField
+  FClassFromField := AClassFromField;
+  if Assigned(FClassFromField) then
+    FClassFromField.SetTable(Self);
   // Set Joins
   FJoins := AJoins;
   FJoins.SetTable(Self);
@@ -252,6 +255,7 @@ end;
 
 function TioContextTable.GetSql: String;
 begin
+  Result := inherited;
   Result := TioDBFActory.SqlDataConverter(GetConnectionDefName).FieldNameToSqlFieldName(Result);
 end;
 

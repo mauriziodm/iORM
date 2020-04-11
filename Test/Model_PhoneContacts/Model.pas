@@ -10,7 +10,7 @@ type
 //{$RTTI EXPLICIT METHODS([vcPublic, vcProtected, vcPrivate])}
 {$RTTI EXPLICIT METHODS([vcPublic, vcProtected])}
 
-  [ioEntity('Phones')]
+  [ioEntity('Phones'), diImplements(IPhoneNumber)]
 //  [ioConnectionDefName('SQLiteConn')]
   TPhoneNumber = class(TInterfacedObject, IPhoneNumber)
   private
@@ -36,7 +36,7 @@ type
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
   end;
 
-  [ioEntity('Persons', ioFields), ioTrueClass]
+  [ioEntity('Persons', ioFields), ioTrueClass, diImplements(IPerson)]
 //  [ioConnectionDefName('FBConn')]
   TPerson = class(TInterfacedObject, IPerson)
   private
@@ -66,7 +66,7 @@ type
     property ClassNameProp:String read GetClassNameProp;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioEntity('Persons',  ioFields), ioTrueClass, diImplements(IEmployee)]
 //  [ioConnectionDefName('FBConn')]
   TEmployee = class(TPerson, IEmployee)
   private
@@ -79,7 +79,7 @@ type
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioEntity('Persons',  ioFields), ioTrueClass, diImplements(ICustomer)]
 //  [ioConnectionDefName('FBConn')]
   TCustomer = class(TPerson, ICustomer)
   private
@@ -94,7 +94,7 @@ type
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioEntity('Persons',  ioFields), ioTrueClass, diImplements(IVipCustomer)]
 //  [ioConnectionDefName('FBConn')]
   TVipCustomer = class(TCustomer, IVipCustomer)
   private

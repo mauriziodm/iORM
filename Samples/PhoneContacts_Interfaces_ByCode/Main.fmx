@@ -309,6 +309,7 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntf.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
