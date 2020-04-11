@@ -59,8 +59,9 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     ioFMX1: TioFMX;
     BindExpression1: TBindExpression;
+    FBConn: TioFirebirdConnectionDef;
     LinkControlToField4: TLinkControlToField;
-    procedure SQLiteConnAfterRegister(Sender: TObject);
+    procedure FBConnAfterRegister(Sender: TObject);
   private
     { Private declarations }
   public
@@ -77,7 +78,7 @@ uses
 
 {$R *.fmx}
 
-procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
+procedure TMainForm.FBConnAfterRegister(Sender: TObject);
 begin
   // Check for sample data creation
   TSampleData.CheckForSampleDataCreation;

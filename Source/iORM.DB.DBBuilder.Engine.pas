@@ -711,6 +711,11 @@ begin
           LDestinationFieldName := LChildContext.GetProperties.GetIDProperty.GetName;
         end;
 
+        // If current foreign is between two classes mapped to two different ConnectionDefNames
+        //  then skip it
+        if LPairTable.Value.GetMap.GetTable.GetConnectionDefName <> LChildContext.GetTable.GetConnectionDefName then
+          Continue;
+
         // Create FK and add it to foreign key dictionary
         LFkName := LSourceFieldName + '_' + LDestinationTableName;
 
@@ -740,8 +745,8 @@ end;
 procedure TioDBBuilder.LoadTableStructure(AMap: IioMap);
 var
   AProperty: IioContextProperty;
-  ATable: IioDBBuilderTable;
-  AField: IioDBBuilderField;
+  ABuilderTable: IioDBBuilderTable;
+  ABuilderField: IioDBBuilderField;
   LIndex: ioIndex;
   ATableName: String;
   LIsSqlField: Boolean;
@@ -753,7 +758,10 @@ begin
   // get the table name
   ATableName := AMap.GetTable.TableName;
   // Find or Create Table
-  ATable := Self.FindOrCreateTable(AMap.GetTable.TableName, AMap.GetTable.IsClassFromField, AMap);
+  ABuilderTable := Self.FindOrCreateTable(AMap.GetTable.TableName, AMap.GetTable.IsClassFromField, AMap);
+  // If current table is specific for another database (not the current one) then skip it
+  if not ABuilderTable.IsForThisConnection(FConnectionDefName) then
+    Exit;
   // Loop for properties
   for AProperty in AMap.GetProperties do
   begin
@@ -769,7 +777,7 @@ begin
     // fosse già stato inserito come skipped e la proprietà che stiamo
     // trattando è presente più volte nel modello andiamo a modificare
     // il flag IsSqlField per consentire la creazione del campo nel DB.AProperty.GetSqlFieldName
-    if ATable.Fields.TryGetValue(AProperty.GetSqlFieldName, lField) then
+    if ABuilderTable.Fields.TryGetValue(AProperty.GetSqlFieldName, lField) then
     begin
       if (AProperty.GetRelationType = ioRTHasMany) or (AProperty.GetRelationType = ioRTHasOne) then
         lField.IsSqlField := False
@@ -781,19 +789,19 @@ begin
     end;
 
     // If not already exixts create and add it to the list
-    if ATable.FieldExists(AProperty.GetSqlFieldName) then
+    if ABuilderTable.FieldExists(AProperty.GetSqlFieldName) then
       Continue;
 
-    AField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty,
+    ABuilderField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty,
       FSqlGenerator, False, LIsSqlField);
-    ATable.Fields.Add(AField.FieldName, AField);
+    ABuilderTable.Fields.Add(ABuilderField.FieldName, ABuilderField);
   end;
   // If some explicit index is present then add it to the list
   if AMap.GetTable.IndexListExists then
     for LIndex in AMap.GetTable.GetIndexList(False) do
     begin
-      if ATable.IndexList.IndexOf(LIndex) = -1 then
-        ATable.IndexList.Add(LIndex);
+      if ABuilderTable.IndexList.IndexOf(LIndex) = -1 then
+        ABuilderTable.IndexList.Add(LIndex);
     end;
 end;
 

@@ -519,12 +519,11 @@ object MainForm: TMainForm
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    OnAfterRegister = SQLiteConnAfterRegister
     AutoCreateDB.Enabled = True
     AutoCreateDB.ReferentialIntegrityConstraints = False
-    Database = 'ContactsIntf.db'
+    Database = 'ContactsIntf_TwoConections.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
+    DefaultConnection = False
     Persistent = False
     Pooled = False
     Left = 256
@@ -533,5 +532,23 @@ object MainForm: TMainForm
   object ioFMX1: TioFMX
     Left = 256
     Top = 72
+  end
+  object FBConn: TioFirebirdConnectionDef
+    OnAfterRegister = FBConnAfterRegister
+    AutoCreateDB.Enabled = True
+    AutoCreateDB.ReferentialIntegrityConstraints = False
+    Database = 'ContactsIntf_TwoConections.fdb'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    OSAuthent = oaNo
+    Password = 'th3cla'
+    Persistent = False
+    Pooled = False
+    Port = 3050
+    Protocol = pTCPIP
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    Left = 152
+    Top = 128
   end
 end

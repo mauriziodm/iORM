@@ -11,6 +11,7 @@ type
 {$RTTI EXPLICIT METHODS([vcPublic, vcProtected])}
 
   [ioEntity('Phones')]
+  [ioConnectionDefName('SQLiteConn')]
   TPhoneNumber = class(TInterfacedObject, IPhoneNumber)
   private
     FPhoneNumber: String;
@@ -36,6 +37,7 @@ type
   end;
 
   [ioEntity('Persons', ioFields), ioTrueClass]
+  [ioConnectionDefName('FBConn')]
   TPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;
@@ -65,6 +67,7 @@ type
   end;
 
   [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioConnectionDefName('FBConn')]
   TEmployee = class(TPerson, IEmployee)
   private
     FBranchOffice: String;
@@ -77,6 +80,7 @@ type
   end;
 
   [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioConnectionDefName('FBConn')]
   TCustomer = class(TPerson, ICustomer)
   private
     [ioIndex]
@@ -91,6 +95,7 @@ type
   end;
 
   [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioConnectionDefName('FBConn')]
   TVipCustomer = class(TCustomer, IVipCustomer)
   private
     FVipCardCode: String;
