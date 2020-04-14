@@ -9,7 +9,7 @@ type
   [TestFixture]
   TioTest1 = class(TObject)
   private
-    FDatabaseFullPathName: String;
+    FSQLiteDatabaseFullPathName, FFirebirdDatabaseFullPathName: String;
   public
     [Setup]
     procedure Setup;
@@ -20,7 +20,11 @@ type
     procedure GenerateDB;
     [Test]
     procedure CreateSampleData;
-
+    [Test]
+    [TestCase('Setting Firebird connection as default',               ',NO_NAME,FirebirdConnection,FirebirdConnection')]
+    [TestCase('Setting SQLite (the unnamed) connection as default',   'FirebirdConnection,FirebirdConnection,,NO_NAME')]
+    procedure ConnectionManager_SetConnectionAsDefault(ASetFromConnectionName, AExpectedFromConnectionName, ASetToConnectionName,
+      AExpectedToConnectionName: String);
     // Test with TestCase Attribute to supply parameters.
 //    [Test]
 //    [TestCase('TestA','1,2')]
@@ -38,17 +42,33 @@ begin
   // ============ iORM initialization ====================
   // Register some classes into the Dependency Injection Container (other classes are registered by attribute [diImplements(IImplementedInteerface)]
   TDIClassRegister.RegisterClasses;
-  // Get the database FullPathName
-  FDatabaseFullPathName := TPath.Combine(TPath.GetDocumentsPath, 'Test_ContactsObj.db');
   // Set connection for SQLite (under the Documents folder better for mobile use)
-  io.Connections.NewSQLiteConnectionDef(FDatabaseFullPathName).Apply;
+  FSQLiteDatabaseFullPathName := TPath.Combine(TPath.GetDocumentsPath, 'Test_ContactsObj.db');
+  io.Connections.NewSQLiteConnectionDef(FSQLiteDatabaseFullPathName).Apply;
   // Set connection for Firebird SQL
-//  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.FDB'), 'SYSDBA', 'masterkey', '').Apply;
+  FFirebirdDatabaseFullPathName := TPath.Combine(TPath.GetDocumentsPath, 'Test_ContactsObj.fdb');
+  io.Connections.NewFirebirdConnectionDef('localhost', FFirebirdDatabaseFullPathName, 'SYSDBA', 'masterkey', '', False, False, False,
+    'FirebirdConnection').Apply;
   // ============ iORM initialization ====================
 end;
 
 procedure TioTest1.TearDown;
 begin
+end;
+
+procedure TioTest1.ConnectionManager_SetConnectionAsDefault(ASetFromConnectionName, AExpectedFromConnectionName, ASetToConnectionName,
+      AExpectedToConnectionName: String);
+var
+  LCurrentConnectionName: String;
+begin
+  // First set the FROM connection name
+  io.Connections.SetDefaultConnectionName(ASetFromConnectionName);
+  LCurrentConnectionName := io.Connections.GetDefaultConnectionName;
+  Assert.AreEqual(AExpectedFromConnectionName, LCurrentConnectionName, '(Failed setting the "FROM" connection name)');
+  // Then test the TO connection name
+  io.Connections.SetDefaultConnectionName(ASetToConnectionName);
+  LCurrentConnectionName := io.Connections.GetDefaultConnectionName;
+  Assert.AreEqual(AExpectedToConnectionName, LCurrentConnectionName, '(Failed setting the "TO" connection name)');
 end;
 
 procedure TioTest1.CreateSampleData;
@@ -58,10 +78,11 @@ end;
 
 procedure TioTest1.GenerateDB;
 begin
-  if FileExists(FDatabaseFullPathName) then
-    DeleteFile(FDatabaseFullPathName);
+  if FileExists(FSQLiteDatabaseFullPathName) then
+    DeleteFile(FSQLiteDatabaseFullPathName);
+  if FileExists(FFirebirdDatabaseFullPathName) then
+    DeleteFile(FFirebirdDatabaseFullPathName);
   io.GenerateDB(True, True, False);
-//  Assert.Pass('Generate DB test passed');
 end;
 
 initialization

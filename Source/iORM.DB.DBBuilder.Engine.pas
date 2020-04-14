@@ -191,20 +191,15 @@ type
     function GetCreateIndexes: Boolean;
     function GetCreateReferentialIntegrityConstraints: Boolean;
     function GetCreateScriptOnly: Boolean;
+    function InternalGenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
   public
     constructor Create(const AConnectionDefName: string; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
       AScriptOnly: Boolean);
     destructor Destroy; override;
     function GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
-    property CreateScriptOnly: Boolean
-      read GetCreateScriptOnly
-      write SetCreateScriptOnly;
-    property CreateReferentialIntegrityConstraints: Boolean
-      read GetCreateReferentialIntegrityConstraints
-      write SetCreateReferentialIntegrityConstraints;
-    property CreateIndexes: Boolean
-      read GetCreateIndexes
-      write SetCreateIndexes;
+    property CreateScriptOnly: Boolean read GetCreateScriptOnly write SetCreateScriptOnly;
+    property CreateReferentialIntegrityConstraints: Boolean read GetCreateReferentialIntegrityConstraints write SetCreateReferentialIntegrityConstraints;
+    property CreateIndexes: Boolean read GetCreateIndexes write SetCreateIndexes;
   end;
 
 implementation
@@ -254,7 +249,7 @@ begin
   Self.FTables.Add(ATableName, Result);
 end;
 
-function TioDBBuilder.GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
+function TioDBBuilder.InternalGenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
 var
   LSb: TStringBuilder;
   LSqlGenerator: IioDBBuilderSqlGenerator;
@@ -602,6 +597,19 @@ begin
       OErrorMessage := E.Message;
       // OOutputScript := '';
     end;
+  end;
+end;
+
+function TioDBBuilder.GenerateDB(out OOutputScript, OErrorMessage: String): Boolean;
+var
+  LPreviousDefaultConnectionDefName: String;
+begin
+  LPreviousDefaultConnectionDefName := TioConnectionManager.GetDefaultConnectionName;
+  try
+    TioConnectionManager.SetDefaultConnectionName(FConnectionDefName);
+    Result := InternalGenerateDB(OOutputScript, OErrorMessage);
+  finally
+    TioConnectionManager.SetDefaultConnectionName(LPreviousDefaultConnectionDefName);
   end;
 end;
 

@@ -321,7 +321,7 @@ object MainForm: TMainForm
         Size.PlatformDefault = False
         TabOrder = 5
         DataSource = BSDetail
-        VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
+        VisibleButtons = [nbDelete, nbPost, nbCancel]
         xRadius = 4.000000000000000000
         yRadius = 4.000000000000000000
       end
@@ -541,7 +541,7 @@ object MainForm: TMainForm
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     OSAuthent = oaNo
-    Password = 'th3cla'
+    Password = 'masterkey'
     Persistent = False
     Pooled = False
     Port = 3050

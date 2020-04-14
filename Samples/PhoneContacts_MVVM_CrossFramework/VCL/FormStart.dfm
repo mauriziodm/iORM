@@ -28,6 +28,7 @@ object StartForm: TStartForm
   end
   object ioSQLiteConnectionDef1: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntfMVVM.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

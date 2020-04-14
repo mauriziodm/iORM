@@ -45,7 +45,9 @@ type
   TioSQLDialect = (sqlDialect1, sqlDialect2, sqlDialect3);
   TioProtocol = (pLocal, pNetBEUI, pSPX, pTCPIP);
 
-  TioDBBuilderAfterCreateDBEvent = procedure(Sender: TObject; AScript, AError: String) of object;
+  TioCustomConnectionDef = class;
+
+  TioDBBuilderAfterCreateDBEvent = procedure(Sender: TioCustomConnectionDef; AScript, AError: String) of object;
 
   TioDBBuilderProperty = class(TPersistent)
   strict private

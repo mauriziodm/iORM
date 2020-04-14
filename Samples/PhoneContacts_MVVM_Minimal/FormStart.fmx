@@ -11,7 +11,7 @@ object StartForm: TStartForm
   DesignerMasterStyle = 0
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
-    AutoCreateDB.ReferentialIntegrityConstraints = False
+    AutoCreateDB.Enabled = True
     Database = 'ContactsIntfMVVM_Minimal.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

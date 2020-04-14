@@ -2,36 +2,36 @@ object MainForml: TMainForml
   Left = 0
   Top = 0
   Caption = 'Pizzas'
-  ClientHeight = 460
-  ClientWidth = 320
+  ClientHeight = 474
+  ClientWidth = 378
   FormFactor.Width = 1440
   FormFactor.Height = 900
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   OnKeyUp = FormKeyUp
-  DesignerMasterStyle = 2
+  DesignerMasterStyle = 0
   object TabControl1: TTabControl
     Align = Client
     FullSize = True
-    Size.Width = 320.000000000000000000
-    Size.Height = 460.000000000000000000
+    Size.Width = 378.000000000000000000
+    Size.Height = 474.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
     TabIndex = 0
     TabOrder = 0
     TabPosition = None
     Sizes = (
-      320s
-      460s
-      320s
-      460s)
+      378s
+      474s
+      378s
+      474s)
     object TabItem1: TTabItem
       CustomIcon = <
         item
         end>
       IsSelected = True
-      Size.Width = 11.000000000000000000
-      Size.Height = 11.000000000000000000
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
@@ -39,7 +39,7 @@ object MainForml: TMainForml
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 50.000000000000000000
       object MasterToolbar: TToolBar
-        Size.Width = 320.000000000000000000
+        Size.Width = 378.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
@@ -62,7 +62,6 @@ object MainForml: TMainForml
           Size.PlatformDefault = False
           StyleLookup = 'refreshtoolbutton'
           TabOrder = 2
-          Visible = True
         end
         object btNew: TButton
           Action = acNew
@@ -75,7 +74,6 @@ object MainForml: TMainForml
           Size.PlatformDefault = False
           StyleLookup = 'additembutton'
           TabOrder = 4
-          Visible = True
         end
       end
       object ListView1: TListView
@@ -86,8 +84,8 @@ object MainForml: TMainForml
         ItemIndex = 0
         Align = Client
         CanParentFocus = True
-        Size.Width = 320.000000000000000000
-        Size.Height = 416.000000000000000000
+        Size.Width = 378.000000000000000000
+        Size.Height = 430.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         CanSwipeDelete = False
@@ -100,8 +98,8 @@ object MainForml: TMainForml
         item
         end>
       IsSelected = False
-      Size.Width = 11.000000000000000000
-      Size.Height = 11.000000000000000000
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
@@ -109,13 +107,13 @@ object MainForml: TMainForml
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 50.000000000000000000
       object DetailToolbar: TToolBar
-        Size.Width = 320.000000000000000000
+        Size.Width = 378.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object DetailLabel: TLabel
           Align = Contents
-          Size.Width = 320.000000000000000000
+          Size.Width = 378.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'toollabel'
@@ -133,7 +131,6 @@ object MainForml: TMainForml
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'backtoolbutton'
-          Visible = True
         end
         object btDelete: TButton
           Action = acDelete
@@ -146,7 +143,6 @@ object MainForml: TMainForml
           Size.PlatformDefault = False
           StyleLookup = 'trashtoolbutton'
           TabOrder = 5
-          Visible = True
         end
       end
       object lblName: TLabel
@@ -160,6 +156,7 @@ object MainForml: TMainForml
         TextSettings.Font.Size = 14.000000000000000000
         TextSettings.FontColor = claGray
         Text = 'Pizza'
+        TabOrder = 1
       end
       object imgContact: TImage
         MultiResBitmap = <
@@ -279,6 +276,7 @@ object MainForml: TMainForml
         TextSettings.Font.Size = 18.000000000000000000
         TextSettings.FontColor = claGray
         Text = 'Bitmap28'
+        TabOrder = 3
       end
       object edName: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]

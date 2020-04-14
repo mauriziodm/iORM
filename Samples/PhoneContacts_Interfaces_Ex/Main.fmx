@@ -380,7 +380,7 @@ object MainForm: TMainForm
         object EditDateOfBirth: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 6
-          Text = '01/11/2019'
+          Text = '31/10/2020'
           Position.X = 120.000000000000000000
           Position.Y = 162.000000000000000000
           Size.Width = 249.000000000000000000
@@ -406,7 +406,7 @@ object MainForm: TMainForm
         Size.PlatformDefault = False
         TabOrder = 5
         DataSource = BSDetail
-        VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
+        VisibleButtons = [nbDelete, nbPost, nbCancel]
         xRadius = 4.000000000000000000
         yRadius = 4.000000000000000000
       end
@@ -475,6 +475,12 @@ object MainForm: TMainForm
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 272
     Top = 240
   end
@@ -584,6 +590,12 @@ object MainForm: TMainForm
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 272
     Top = 296
   end
@@ -600,20 +612,20 @@ object MainForm: TMainForm
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    OnAfterRegister = SQLiteConnAfterRegister
     AutoCreateDB.Enabled = True
     Database = 'ContactsIntf.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     Persistent = False
     Pooled = False
+    OnAfterCreateDB = SQLiteConnAfterCreateDB
     Left = 272
     Top = 136
   end
   object FirebirdConn: TioFirebirdConnectionDef
-    OnAfterRegister = SQLiteConnAfterRegister
-    Database = '..\..\..\SamplesData\ContactsIntf.FDB'
-    DatabaseStdFolder = sfUndefined
+    AutoCreateDB.Enabled = True
+    Database = 'ContactsIntf.FDB'
+    DatabaseStdFolder = sfDocuments
     DefaultConnection = False
     OSAuthent = oaNo
     Password = 'masterkey'
@@ -624,6 +636,7 @@ object MainForm: TMainForm
     Server = 'localhost'
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
+    OnAfterCreateDB = SQLiteConnAfterCreateDB
     Left = 272
     Top = 188
   end

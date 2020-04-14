@@ -21,7 +21,7 @@ begin
   // Set connection for Firebird SQL
 //  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\ContactsObj.FDB'), 'SYSDBA', 'masterkey', '').Apply;
   // AutoCreation and AutoUpdate of the database
-  io.AutoCreateDatabase(False);
+  io.GenerateDB(True, True, False);
   // Check for sample data creation
   TSampleData.CheckForSampleDataCreation;
   // ============ IupOrm initialization ====================

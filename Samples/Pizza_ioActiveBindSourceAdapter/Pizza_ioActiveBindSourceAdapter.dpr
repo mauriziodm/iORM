@@ -21,7 +21,7 @@ begin
   // Set connection for Firebird SQL
 //  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\Pizza.FDB'), 'SYSDBA', 'masterkey', '').Apply;
   // AutoCreation and AutoUpdate of the database
-  io.AutoCreateDatabase(False);
+//  io.GenerateDB(True, True, False);
   // ============ IupOrm initialization ====================
 
   Application.Initialize;
