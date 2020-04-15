@@ -374,7 +374,7 @@ end;
 
 function TioModelPresenter.Current: TObject;
 begin
-  if CheckAdapter then
+  if CheckAdapter(True) then
     Result := BindSourceAdapter.Current
   else
     Result := nil;

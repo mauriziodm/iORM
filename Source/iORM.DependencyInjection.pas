@@ -286,6 +286,9 @@ type
   // Main Dependency Injection Class (and relative class reference)
   TioDependencyInjectionRef = class of TioDependencyInjection;
   TioDependencyInjection = class(TioDependencyInjectionBase)
+  private
+    class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP:TioModelPresenter; const ATargetTypeName:String; const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
   public
     class function Singletons: TioSingletonsFacadeRef;
     class function RegisterClass<T: class>: TioDependencyInjectionRegister; overload;
@@ -311,13 +314,12 @@ type
     class function LocateVMfor(const ATargetObj:TObject; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateVMfor(const ATargetIntf:IInterface; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     // LocateFor View & ViewModel
-    class function _InternalLocateViewVMfor(const ATargetTypeName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetTypeName:String; const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const AClassRef:TioClassRef; const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor<T>(const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetObj:TObject; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetIntf:IInterface; const AAlias:String=''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMFor(const ATargetMP:TioModelPresenter; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMFor(const ASourceMP:TioModelPresenter; const AAlias:String=''): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -404,14 +406,14 @@ end;
 class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias).SetPresenter(ATargetObj);
+  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(
   const ATargetIntf: IInterface;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias).SetPresenter(ATargetIntf);
+  Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor<T>(
@@ -528,7 +530,7 @@ begin
   Result := TioSingletonsFacade;
 end;
 
-class function TioDependencyInjection._InternalLocateViewVMfor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
 var
   LDIContainerKey: String;
  begin
@@ -547,12 +549,23 @@ begin
   Result := LocateViewFor((ATargetIntf as TObject).ClassName, AAlias);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(
-  const ATargetMP: TioModelPresenter;
+class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: TioModelPresenter;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
-  Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ATargetMP, AAlias, False);
+  Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AAlias, False);
+end;
+
+class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: TioModelPresenter; const ATargetTypeName, AAlias,
+  AViewModelMarker: String): IioDependencyInjectionLocator;
+var
+  LViewModel: IioViewModel;
+ begin
+  // Get the ViewLocator
+  Result := LocateViewFor(ATargetTypeName, AAlias);
+  // Get & set the ViewModel instance into the ViewLocator
+  LViewModel := io.di.LocateVMfor(ATargetTypeName, AAlias).SetPresenter(ASourceMP).GetAsGeneric.OfType<IioViewModel>;
+  Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(const ATargetTypeName, AAlias,
@@ -561,7 +574,7 @@ var
   LViewModel: IioViewModel;
  begin
   // Get the ViewLocator
-  Result := _InternalLocateViewVMfor(ATargetTypeName, AAlias);
+  Result := LocateViewFor(ATargetTypeName, AAlias);
   // Get & set the ViewModel instance into the ViewLocator
   LViewModel := io.di.LocateVMfor(ATargetTypeName, AAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
@@ -1518,20 +1531,18 @@ begin
   if  io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist then
   begin
     if ACreateViewModel then
-//      Result := io.di.LocateViewVMFor(ATargetMP.Current, AAlias) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
-      Result := io.di.LocateViewVMFor(ATargetMP.Current.ClassName, AAlias).SetPresenter(ATargetMP)
+      Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.Current.ClassName, AAlias)
     else
-      Result := io.di._InternalLocateViewVMfor(ATargetMP.Current.ClassName, AAlias);
+      Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.Current.ClassName, AAlias);
   end
   else
   // Try to retrieve a locator for MP.TypeName
   if io.di.LocateViewFor(ATargetMP.TypeName, AAlias).Exist and io.di.LocateVMfor(ATargetMP.TypeName, AAlias).Exist then
   begin
     if ACreateViewModel then
-//      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP.Current) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
-      Result := io.di.LocateViewVMFor(ATargetMP.TypeName, AAlias).SetPresenter(ATargetMP)
+      Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.TypeName, AAlias)
     else
-      Result := io.di._InternalLocateViewVMfor(ATargetMP.TypeName, AAlias);
+      Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.TypeName, AAlias);
   end
   else
     raise EioException.Create(Self.ClassName, 'GetViewVMLocatorFor',
