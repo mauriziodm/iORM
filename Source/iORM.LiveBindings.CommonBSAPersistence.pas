@@ -303,39 +303,37 @@ begin
   LMasterProperty := nil;
   LRelationChildPropertyName := '';
   LMasterOID := 0;
-  // If it is a detail adapter...
-  if AActiveBindSourceAdapter.IsDetail then
-  begin
-    // Get the MasterProperty of the current object
-    LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName
-      (AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
-    // Get a local reference of some values
-    LRelationChildPropertyName := LMasterProperty.GetRelationChildPropertyName;
-    LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;
-  end;
-  // ----------------------- SET ANONIMOUS METHODS -----------------------------
-  // Set Execute anonimous methods
-  LExecute := function: TObject
-    begin
-      io.Persist(AActiveBindSourceAdapter.Current, LRelationChildPropertyName, LMasterOID, False); // BlindInsert
-    end;
-  // Set the OnTerminate anonimous method
-  LOnTerminate := procedure(AResultValue: TObject)
-    begin
-      // Send a notification to other ActiveBindSourceAdapters & BindSource
-      // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-      // if FAutoPersist is True then the notify is performed by
-      // the "CommonBSAPersistence" else by this method
-      AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-        TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost));
-    end;
-  // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set the ObjectStatus
   AActiveBindSourceAdapter.SetObjStatus(osDirty);
+  // Set the OnTerminate anonimous method
+  LOnTerminate := procedure(AResultValue: TObject)
+  begin
+    // Send a notification to other ActiveBindSourceAdapters & BindSource
+    // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+    // if FAutoPersist is True then the notify is performed by
+    // the "CommonBSAPersistence" else by this method
+    AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost));
+  end;
   // If AutoPersist or forced persist the persist to the DB else
   // send a notification to other BSA.
   if AActiveBindSourceAdapter.ioAutoPersist or AForce then
   begin
+    // If it is a detail adapter...
+    if AActiveBindSourceAdapter.IsDetail then
+    begin
+      // Get the MasterProperty of the current object
+      LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName
+        (AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
+      // Get a local reference of some values
+      LRelationChildPropertyName := LMasterProperty.GetRelationChildPropertyName;
+      LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;
+    end;
+    // Set Execute anonimous methods to persist
+    LExecute := function: TObject
+    begin
+      io.Persist(AActiveBindSourceAdapter.Current, LRelationChildPropertyName, LMasterOID, False);
+    end;
     // Execute synchronous or asynchronous
     if AActiveBindSourceAdapter.ioAsync then
       AsyncExecute(LExecute, LOnTerminate)
