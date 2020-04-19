@@ -933,7 +933,14 @@ begin
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
-    FBindSourceAdapter.Post;
+    // Mauri 19/04/2020: Ho aggiunto questa condizione perchè mi capitava che quando
+    //  il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
+    //  che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
+    //   invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
+    //   in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
+    //   sembra non dare problemi.
+    if FBindSourceAdapter.State in seEditModes then
+      FBindSourceAdapter.Post;
   finally
     FBindSourceAdapter.GetDataSetLinkContainer.Enable;
   end;
