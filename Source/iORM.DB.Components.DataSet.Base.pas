@@ -743,7 +743,13 @@ begin
   //      in ActiveBindSourceAdapter.DoAfterPost e ActiveBindSourceAdapter.DoAfterPostFields,
   //      sono riuscito a dare un comportamente corretto anche al DataSet in caso AutoPost=true
   //      (precedentemente invece in pratica con faceva mai il post)
-  if InternalActiveAdapter.ioAutoPost then
+  // Mauri 19/04/2020: Ho aggiunto questa condizione perchè mi capitava che quando
+  //  il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
+  //  che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
+  //   invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
+  //   in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
+  //   sembra non dare problemi.
+  if InternalActiveAdapter.ioAutoPost and (FBindSourceAdapter.State in seEditModes) then
     InternalActiveAdapter.Post;
 end;
 
