@@ -385,7 +385,12 @@ begin
       osDeleted:
         begin
           Self.DeleteObject_Internal(LContext);
-          LContext.ObjectStatus := osClean;
+          // Mauri 23/04/2020: Ho eliminato la riga sotto perchè non c'è alcun motivo per il quale lo status
+          //  debba tornare clean, non è come nel persist, in più mi creava anche qualche problema (LDE)
+          //  perchè in alcuni casi dovevo poi ciclare tra tutti gli elementi di una relazione HasMany
+          //  facendo cose diverse in base al fatto che l'oggetto fosse Deleted oppure no (e se lui
+          //  me lo rimette clean...)
+//          LContext.ObjectStatus := osClean;
         end;
     end;
     // --------------------------
