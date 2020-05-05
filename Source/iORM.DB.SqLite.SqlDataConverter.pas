@@ -140,15 +140,38 @@ begin
   inherited;
   // If the property is of type TDateTime or TDate or TTime and the value is equal to
   //  zero then set che ParamValue to NULL
-  if(   (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))   )
-  and (AProp.GetValue(AContext.DataObject).AsExtended = 0)
-  then
+  if(   (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))   ) then
   begin
-    AQuery.ParamByProp(AProp).Clear;
-    AQuery.ParamByProp(AProp).DataType := TFieldType.ftFloat;
+    if AProp.GetValue(AContext.DataObject).AsExtended = 0 then
+    begin
+      AQuery.ParamByProp(AProp).Clear;
+      AQuery.ParamByProp(AProp).DataType := TFieldType.ftFloat;
+    end
+    else
+      AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsType<TDate>;
   end
   else
     AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
+
+
+// ATTENZIONE!!! - Ho modificato il codice come sopra, in pratica facendo in modo che le proprietà di
+//  tipo TDateTime, TDate e TTime vengano sempre impostate nel parametro della query sempre come TDate
+//  perchè nel progetto Marpimar di Omar e Thomas soccedeva che una propriet di tipo DateTime non veniva
+//  persistita bene, in pratica persisteva sempre uno zero. Facendo così invece va bene.
+//  Non abbiamo capito il perchè.
+// ==================== OLD CODE =================================
+//  // If the property is of type TDateTime or TDate or TTime and the value is equal to
+//  //  zero then set che ParamValue to NULL
+//  if(   (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))   )
+//  and (AProp.GetValue(AContext.DataObject).AsExtended = 0)
+//  then
+//  begin
+//    AQuery.ParamByProp(AProp).Clear;
+//    AQuery.ParamByProp(AProp).DataType := TFieldType.ftFloat;
+//  end
+//  else
+//    AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
+// ==================== OLD CODE =================================
 end;
 
 class function TioSqlDataConverterSqLite.StringToSQL(const AString: String): String;
