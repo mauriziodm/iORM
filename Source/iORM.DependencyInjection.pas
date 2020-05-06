@@ -405,15 +405,35 @@ end;
 
 class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject;
   const AAlias: String): IioDependencyInjectionLocator;
-begin
-  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias);
+var
+  LViewModel: IioViewModel;
+ begin
+  // Get the ViewLocator
+  Result := LocateViewFor(ATargetObj.ClassName, AAlias);
+  // Get & set the ViewModel instance into the ViewLocator
+  LViewModel := io.di.LocateVMfor(ATargetObj, AAlias).GetAsGeneric.OfType<IioViewModel>;
+  Result.SetViewModel(LViewModel);
+
+// ===== OLD CODE =====
+//  Result := LocateViewVMfor(ATargetObj.ClassName, AAlias);
+// ===== OLD CODE =====
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(
   const ATargetIntf: IInterface;
   const AAlias: String): IioDependencyInjectionLocator;
-begin
-  Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias);
+var
+  LViewModel: IioViewModel;
+ begin
+  // Get the ViewLocator
+  Result := LocateViewFor(ATargetIntf, AAlias);
+  // Get & set the ViewModel instance into the ViewLocator
+  LViewModel := io.di.LocateVMfor(ATargetIntf, AAlias).GetAsGeneric.OfType<IioViewModel>;
+  Result.SetViewModel(LViewModel);
+
+// ===== OLD CODE =====
+//  Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias);
+// ===== OLD CODE =====
 end;
 
 class function TioDependencyInjection.LocateViewVMfor<T>(
