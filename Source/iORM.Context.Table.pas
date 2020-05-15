@@ -396,7 +396,7 @@ var
 begin
   Result := '';
   for AJoinItem in FJoinList do
-    Result := Result + #13 + TioSqlTranslator.Translate(Table.GetClassName, Table.GetClassName);
+    Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql(Self.Table.GetConnectionDefName), Table.GetClassName);
 end;
 
 { TioGroupBy }
