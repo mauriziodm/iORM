@@ -128,7 +128,8 @@ begin
   // If a Where exist then the query is an external query else
   //  is an internal query.
   if AContext.WhereExist then
-    AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
+//    AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
   else
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
   // -----------------------------------------------------------------
