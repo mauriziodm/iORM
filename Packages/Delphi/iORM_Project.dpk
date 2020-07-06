@@ -51,7 +51,8 @@ requires
   vcl,
   vclFireDAC,
   FireDACCommonODBC,
-  FireDACMSSQLDriver;
+  FireDACMSSQLDriver,
+  FireDACSqliteDriver;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',
@@ -185,6 +186,7 @@ contains
   iORM.DB.DBBuilder.Engine in '..\..\Source\iORM.DB.DBBuilder.Engine.pas',
   iORM.DB.DBBuilder.Firebird.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Firebird.SqlGenerator.pas',
   iORM.DB.DBBuilder.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.SqLite.SqlGenerator.pas',
-  iORM.DB.DBBuilder.Factory in '..\..\Source\iORM.DB.DBBuilder.Factory.pas';
+  iORM.DB.DBBuilder.Factory in '..\..\Source\iORM.DB.DBBuilder.Factory.pas',
+  iORM.DB.DBBuilder.Custom.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Custom.SqlGenerator.pas';
 
 end.

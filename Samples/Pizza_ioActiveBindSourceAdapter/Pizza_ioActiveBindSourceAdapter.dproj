@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{168A0C0F-FD58-4686-895E-1FA65D5B7C79}</ProjectGuid>
-        <ProjectVersion>18.6</ProjectVersion>
+        <ProjectVersion>19.0</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>Pizza_ioActiveBindSourceAdapter.dpr</MainSource>
         <Base>True</Base>

@@ -4,7 +4,7 @@ inherited ViewModelMain: TViewModelMain
   Width = 193
   object PersonsModelPresenter: TioModelPresenter
     AsDefault = True
-    Async = False
+    Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoPost = False
@@ -12,12 +12,18 @@ inherited ViewModelMain: TViewModelMain
     TypeName = 'IPerson'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 72
     Top = 24
   end
   object PhonesModelPresenter: TioModelPresenter
     AsDefault = False
-    Async = False
+    Async = True
     AutoLoadData = True
     AutoPersist = True
     AutoPost = False
@@ -27,6 +33,12 @@ inherited ViewModelMain: TViewModelMain
     TypeName = 'IPhoneNumber'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
     Left = 72
     Top = 80
   end

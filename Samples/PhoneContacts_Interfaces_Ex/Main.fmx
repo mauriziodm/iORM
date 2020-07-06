@@ -469,7 +469,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPerson'
-    ioAsync = False
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -581,7 +581,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPhoneNumber'
-    ioAsync = False
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -613,7 +613,7 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     AutoCreateDB.Enabled = True
-    Database = 'ContactsIntf.DB'
+    Database = 'ContactsIntfEx.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     Persistent = False
@@ -624,7 +624,7 @@ object MainForm: TMainForm
   end
   object FirebirdConn: TioFirebirdConnectionDef
     AutoCreateDB.Enabled = True
-    Database = 'ContactsIntf.FDB'
+    Database = 'ContactsIntfEx.FDB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = False
     OSAuthent = oaNo

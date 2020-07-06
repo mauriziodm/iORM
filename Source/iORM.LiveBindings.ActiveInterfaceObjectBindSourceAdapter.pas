@@ -58,7 +58,7 @@ type
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
     FAutoPersist: Boolean;
-    FReloadDataOnRefresh: Boolean;
+    FRefreshing: Boolean;
     FMasterPropertyName: String;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -99,6 +99,9 @@ type
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
+    // Refreshing
+    function GetRefreshing: boolean;
+    procedure SetRefreshing(const Value: boolean);
   protected
     function GetCanActivate: Boolean; override;
     // =========================================================================
@@ -113,7 +116,6 @@ type
 {$ENDIF}
     // =========================================================================
     procedure DoBeforeOpen; override;
-    procedure DoBeforeRefresh; override;
     procedure DoBeforeDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
@@ -134,7 +136,7 @@ type
   public
     constructor Create(const ATypeName, ATypeAlias: String; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AutoLoadData: Boolean); overload;
     destructor Destroy; override;
-    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
+    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
@@ -175,6 +177,7 @@ type
     property ioViewDataType:TioViewDataType read GetIoViewDataType;
     property ioOwnsObjects:Boolean read GetOwnsObjects;
     property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
+    property Refreshing: boolean read GetRefreshing write SetRefreshing;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
@@ -229,7 +232,7 @@ begin
   FAutoLoadData := AutoLoadData;
   FAsync := False;
   FAutoPersist := True;
-  FReloadDataOnRefresh := True;
+  FRefreshing := False;
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
   FLocalOwnsObject := False;  // Always false because it's a BSA for an interface (AutoRefCount)
   FWhere := AWhere;
@@ -380,23 +383,9 @@ begin
   TioCommonBSAPersistence.Load(Self);
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeRefresh;
-var
-  PrevDataObject: TObject;
+procedure TioActiveInterfaceObjectBindSourceAdapter.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 begin
-  inherited;
-  if FReloadDataOnRefresh then
-  begin
-    // Deactivate the adapter
-    Self.Active := False;
-    // Get actual DataObject
-    PrevDataObject := Self.DataObject as TObject;
-    // If ActualDataObject is assigned and OwnsObject = True then destroy the object
-    if Assigned(PrevDataObject) and Self.FLocalOwnsObject then PrevDataObject.Free;
-    // Activate the Adapter (after the adapter fire the onBeforeOpen event that Load
-    //  the NewObject
-    Self.Active := True;
-  end;
+  TioCommonBSAPersistence.Refresh(Self, AReloadData, ANotify);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -591,6 +580,11 @@ begin
   Result := FLocalOwnsObject;
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetRefreshing: boolean;
+begin
+  Result := FRefreshing;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.GetState: TBindSourceAdapterState;
 begin
   Result := Self.State;
@@ -679,30 +673,6 @@ begin
   if not LDone then
     SetDataObject(ASelected);
   DoAfterSelection(ASelected, ASelectionType);
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
-var
-  PrecReloadData: Boolean;
-begin
-  // Se il BindSourceAdapter è un dettaglio allora propaga il Refresh al suo Master
-  //  questo perchè solo il master esegue realmente le query e quindi è quest'ultimo che
-  //  deve gestire il refresh con reload.
-  if IsDetail and Assigned(FMasterAdaptersContainer) and AReloadData then
-    FMasterAdaptersContainer.GetMasterBindSourceAdapter.Refresh(AReloadData)
-  else
-  begin
-    PrecReloadData := FReloadDataOnRefresh;
-    Self.FReloadDataOnRefresh := AReloadData;
-    try
-      inherited Refresh;
-      // Send a notification to other ActiveBindSourceAdapters & BindSource
-      if ANotify then
-        Notify(Self, TioLiveBindingsFactory.Notification(Self, Current, ntAfterRefresh));
-    finally
-      Self.FReloadDataOnRefresh := PrecReloadData;
-    end;
-  end;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetAutoLoadData(
@@ -807,10 +777,10 @@ begin
   InternalSetDataObject(Value);
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetMasterAdapterContainer(
-  AMasterAdapterContainer: IioDetailBindSourceAdaptersContainer);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetMasterAdaptersContainer(
+  AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
 begin
-  FMasterAdaptersContainer := AMasterAdapterContainer;
+  FMasterAdaptersContainer := AMasterAdaptersContainer;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetMasterProperty(AMasterProperty: IioContextProperty);
@@ -821,6 +791,11 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetRefreshing(const Value: boolean);
+begin
+  FRefreshing := Value;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.UseObjStatus: Boolean;

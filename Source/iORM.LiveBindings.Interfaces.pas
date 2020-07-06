@@ -147,7 +147,7 @@ type
     function GetCurrentOID: Integer;
     function IsDetail: Boolean;
     function IsInterfaceBSA: Boolean;
-//    function AsTBindSourceAdapter: TBindSourceAdapter;
+    function AsTBindSourceAdapter: TBindSourceAdapter;
 //    function TypeName: String;       // Added TypeName property
 //    function TypeAlias: String;      // Added TypeAlias property
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
@@ -222,6 +222,10 @@ type
     procedure SetActive(Value: Boolean);
     function GetActive: Boolean;
     property Active: Boolean read GetActive write SetActive;
+    // Refreshing
+    function GetRefreshing: boolean;
+    procedure SetRefreshing(const Value: boolean);
+    property Refreshing: boolean read GetRefreshing write SetRefreshing;
   end;
 
   // Bind source adapter container
@@ -240,7 +244,7 @@ type
   IioContainedBindSourceAdapter = interface
     ['{66AF6AD7-9093-4526-A18C-54447FB220A3}']
     procedure Free;
-    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
+    procedure SetMasterAdaptersContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;

@@ -147,8 +147,9 @@ end;
 
 destructor TInterfaceObjectBindSourceAdapter<T>.Destroy;
 begin
-  if FOwnsObject then
-    FreeAndNil(FDataObject);
+{ TODO : Per Delphi 10.4 ho dovuto commentare le righe qui sotto, verificare che non portino problami o memory leaks }
+//  if FOwnsObject then
+//    FreeAndNil(FDataObject);
   inherited;
 end;
 
@@ -256,8 +257,9 @@ begin
   if FDataObject <> nil then
   begin
     ClearFields;
-    if FOwnsObject then
-      FreeAndNil(FDataObject);
+{ TODO : Per Delphi 10.4 ho dovuto commentare le righe qui sotto, verificare che non portino problami o memory leaks }
+//    if FOwnsObject then
+//      FreeAndNil(FDataObject);
   end;
   FOwnsObject := AOwnsObject;
   FDataObject := ADataObject;
