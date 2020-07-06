@@ -91,22 +91,6 @@ type
 
   { TioCommonBSAPersistence }
 
-class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-begin
-  // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
-  // in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
-  // eliminato l'oggetto. Se lo metto qui invece va bene.
-
-  // DataSet synchro
-  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
-  // Send a notification to other ActiveBindSourceAdapters & BindSource
-  // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-  // if FAutoPersist is True then the notify is performed by
-  // the "CommonBSAPersistence" else by this method
-  AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-    TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete));
-end;
-
 class procedure TioCommonBSAPersistence._AsyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
   ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
@@ -176,6 +160,22 @@ begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
     AAbort := True;
   end;
+end;
+
+class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+begin
+  // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
+  // in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
+  // eliminato l'oggetto. Se lo metto qui invece va bene.
+
+  // DataSet synchro
+  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+  // Send a notification to other ActiveBindSourceAdapters & BindSource
+  // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+  // if FAutoPersist is True then the notify is performed by
+  // the "CommonBSAPersistence" else by this method
+  AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+    TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete));
 end;
 
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -505,13 +505,15 @@ end;
 procedure TioCommonBSAPersistenceThread.OnTerminateEventHandler(Sender: TObject);
 begin
   try
-    if FExceptionText.IsEmpty and Assigned(FOnTerminateProc) then
-      FOnTerminateProc(FResultValue)
-    else
+    // Se durante l'esecuzione del thread c'è stata una eccezione...
+    if not FExceptionText.IsEmpty then
     begin
       io.HideWait;
       raise EioException.Create('(' + Self.ClassName + ') - ' + FExceptionText);
-    end;
+    end
+    else
+    if Assigned(FOnTerminateProc) then
+      FOnTerminateProc(FResultValue);
   finally
     io.HideWait;
   end;
