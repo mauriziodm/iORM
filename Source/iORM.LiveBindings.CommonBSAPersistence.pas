@@ -125,7 +125,18 @@ begin
   // If current is nil then exit
   if not Assigned(AActiveBindSourceAdapter.Current) then
     Exit;
-  // Extract the OID and the TypeName (class)
+  // If not AutoPersist then exit
+  if not AActiveBindSourceAdapter.ioAutoPersist then
+  begin
+    // If UseObjStatus is true and not AutoPersist then set ObjStatus propriety and exit
+    if AActiveBindSourceAdapter.UseObjStatus then
+    begin
+      AActiveBindSourceAdapter.SetObjStatus(osDeleted);
+      AAbort := True;
+    end;
+    Exit;
+  end;
+  // Extract the OID and the TypeName (class) for multithread execution
   LOID := io.ExtractOID(AActiveBindSourceAdapter.Current);
   LTypeName := AActiveBindSourceAdapter.Current.ClassName;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
@@ -145,21 +156,8 @@ begin
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // If AutoPersist or forced persist the delete from the DB else
   // send a notification to other BSA.
-  if AActiveBindSourceAdapter.ioAutoPersist then
-  begin
-    // Execute synchronous or asynchronous
-    if AActiveBindSourceAdapter.ioAsync then
-      _AsyncExecute(LExecute, LOnTerminate)
-    else
-      _SyncExecute(LExecute, LOnTerminate);
-    AAbort := False;
-  end
-  else if AActiveBindSourceAdapter.UseObjStatus then
-  begin
-    // Set the ObjectStatus
-    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
-    AAbort := True;
-  end;
+  // Execute synchronous or asynchronous
+  _Execute(AActiveBindSourceAdapter.ioAsync, LExecute, LOnTerminate);
 end;
 
 class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
