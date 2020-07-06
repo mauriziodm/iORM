@@ -71,6 +71,7 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
+    function GetID: Integer;
     function IDIsNull: Boolean;
     // Map
     function Map: IioMap;
@@ -96,7 +97,7 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
-  iORM.Context.Container, System.SysUtils;
+  iORM.Context.Container, System.SysUtils, iORM.Exceptions;
 
 { TioContext }
 
@@ -137,6 +138,13 @@ begin
   // Aggiungere qui l'eventuale futuro codice per aggiungere/sostituire
   //  l'eventuale GroupBy specificato nel ioWhere e che quindi è nel
   //  context e che sostituisce il GroupBy fisso
+end;
+
+function TioContext.GetID: Integer;
+begin
+  if not Assigned(FDataObject) then
+    raise EioException.Create(Self.ClassName + '.GetID: DataObject not assigned');
+  Result := GetProperties.GetIdProperty.GetValue(FDataObject).AsInteger;
 end;
 
 function TioContext.GetJoin: IioJoins;
@@ -209,8 +217,7 @@ end;
 
 function TioContext.IDIsNull: Boolean;
 begin
-  Result := (not Assigned(FDataObject))
-    or (Self.GetProperties.GetIdProperty.GetValue(FDataObject).AsInteger = IO_INTEGER_NULL_VALUE);
+  Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
 end;
 
 function TioContext.IsClassFromField: Boolean;

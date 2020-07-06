@@ -55,6 +55,7 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
+    function GetID: Integer;
     function IDIsNull: Boolean;
     // Map
     function Map: IioMap;

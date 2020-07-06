@@ -101,6 +101,8 @@ type
     class procedure HandleException(Sender: TObject);
     class procedure ShowMessage(const AMessage: String);
     class function TerminateApplication: Boolean;
+    class function ExtractOID(const AObj: TObject): Integer; overload;
+    class function ExtractOID(const AIntfObj: IInterface): Integer; overload;
 
     // Create instance
     class function Create<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
@@ -759,6 +761,25 @@ end;
 class function io.di: TioDependencyInjectionRef;
 begin
   Result := TioDependencyInjection;
+end;
+
+class function io.ExtractOID(const AIntfObj: IInterface): Integer;
+begin
+  Self.ExtractOID(AIntfObj as TObject);
+end;
+
+class function io.ExtractOID(const AObj: TObject): Integer;
+var
+  AContext: IioContext;
+begin
+  inherited;
+  // Check
+  if not Assigned(AObj) then
+    raise EioException.Create(Self.ClassName + '.ExtractOID: DataObject not assigned');
+  // Create Context
+  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+  // Extract the OID
+  Result := AContext.GetID;
 end;
 
 class function io.GlobalFactory: TioGlobalFactoryRef;

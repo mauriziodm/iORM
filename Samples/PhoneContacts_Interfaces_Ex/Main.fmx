@@ -581,7 +581,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     ioTypeName = 'IPhoneNumber'
-    ioAsync = True
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
