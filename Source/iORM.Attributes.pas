@@ -50,7 +50,7 @@ type
   TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne);
 
   // LazyLoad
-  TioLoadType = (ioImmediateLoad = 0, ioLazyLoad);
+  TioLoadType = (ioEagerLoad = 0, ioLazyLoad);
 
   // Join types
   TioJoinType = (ioInner, ioCross, ioLeftOuter, ioRightOuter, ioFullOuter);
@@ -355,15 +355,15 @@ type
     FLoadType: TioLoadType;
     FAutoIndex: Boolean;
   public
-    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
       const AAutoIndex: Boolean = True); overload;
-    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
       const AAutoIndex: Boolean = True); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
       const AAutoIndex: Boolean = True); overload;
-    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
       const AAutoIndex: Boolean = True); overload;
-    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
       const AAutoIndex: Boolean = True); overload;
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
@@ -582,7 +582,7 @@ end;
 
 { ioHasMany }
 
-constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioImmediateLoad;
+constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
   const AAutoIndex: Boolean = True);
 begin
   inherited Create(AChildClassRef);

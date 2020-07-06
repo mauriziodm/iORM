@@ -347,7 +347,7 @@ begin
     if PropFieldName = 'ObjStatus' then
     begin
       Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '',
-        ioImmediateLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        ioEagerLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
         PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FKCreate,
         PropMetadata_FieldSubType, PropMetadata_FKCascadeUpdate, PropMetadata_FKCascadeDelete);
       Continue;
@@ -365,7 +365,7 @@ begin
     PropRelationChildTypeName := '';
     PropRelationChildTypeAlias := '';
     PropRelationChildPropertyName := '';
-    PropRelationChildLoadType := ioImmediateLoad;
+    PropRelationChildLoadType := ioEagerLoad;
     PropRelationChildAutoIndex := False;
     // Check attributes
     for Attr in Prop.GetAttributes do

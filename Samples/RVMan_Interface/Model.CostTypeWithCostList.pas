@@ -34,7 +34,7 @@ type
   public
     [ioField('[TCostGeneric].TravelID')]
     property TravelID:Integer read GetTRavelID write SetTravelID;
-    [ioHasMany(ICostGeneric, 'CostType', ioImmediateLoad)]
+    [ioHasMany(ICostGeneric, 'CostType', ioEagerLoad)]
     property CostList:IioList<ICostGeneric> read GetCostList write SetCostList;
     [ioSkip]
     property CostTotalAmount: Currency read GetCostTotalAmount;
