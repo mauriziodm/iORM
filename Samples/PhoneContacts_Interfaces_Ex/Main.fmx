@@ -81,7 +81,6 @@ object MainForm: TMainForm
           TabOrder = 0
         end
         object RBSQLite: TRadioButton
-          IsChecked = True
           Position.X = 256.000000000000000000
           Position.Y = 2.000000000000000000
           Size.Width = 87.000000000000000000
@@ -92,6 +91,7 @@ object MainForm: TMainForm
           OnChange = RBSQLiteChange
         end
         object RBFirebird: TRadioButton
+          IsChecked = True
           Position.X = 256.000000000000000000
           Position.Y = 24.000000000000000000
           Size.Width = 87.000000000000000000

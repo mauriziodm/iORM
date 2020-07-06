@@ -185,58 +185,39 @@ end;
 
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
-  LTypeName, LTypeAlias: String;
-  LWhere: IioWhere;
   LTargetClass: TioClassRef;
-  LOwnsObjects: Boolean;
-  LExecute: TioCommonBSAPersistenceThreadExecute;
-  LOnTerminate: TioCommonBSAPersistenceThreadOnTerminate;
+  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // If AutoLoadData is disabled then exit
   // Prevent AutoLoadData when refreshing
   if AActiveBindSourceAdapter.Refreshing or not AActiveBindSourceAdapter.ioAutoLoadData then
     Exit;
-  // Copy values into local variables
-  LTypeName := AActiveBindSourceAdapter.ioTypeName;
-  LTypeAlias := AActiveBindSourceAdapter.ioTypeAlias;
-
+  // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
 
-  LWhere := AActiveBindSourceAdapter.ioWhere;
-  LOwnsObjects := AActiveBindSourceAdapter.ioOwnsObjects;
-  // Set Execute anonimous methods
+  // Set the OnTerminate method
+  LTerminateMethod := procedure(AResultValue: TObject)
+  var
+    LIntf: IInterface;
+  begin
+    if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
+      AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+    else
+      AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
+  end;
+
+  // Load
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingle:
-      LExecute :=
-              function: TObject
-    begin
-      Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToObject;
-    end;
+      _LoadSingle(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
+        AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
     TioViewDataType.dtList:
-      LExecute :=
-              function: TObject
-    begin
-      Result := io.Load(LTypeName, LTypeAlias)._Where(LWhere).ToList(LTargetClass);
-    end;
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
+        AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
   end;
-  // Set the OnTerminate anonimous method
-  LOnTerminate := procedure(AResultValue: TObject)
-    var
-      LIntf: IInterface;
-    begin
-      if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
-        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, LOwnsObjects)
-      else
-        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, LOwnsObjects);
-    end;
-  // Execute synchronous or asynchronous
-  if AActiveBindSourceAdapter.ioAsync then
-    _AsyncExecute(LExecute, LOnTerminate)
-  else
-    _SyncExecute(LExecute, LOnTerminate);
 end;
 
 class procedure TioCommonBSAPersistence.Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AReloadData, ANotify: Boolean);
@@ -302,7 +283,7 @@ begin
       _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
         AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
-    raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
+    raise EioException.Create('TioCommonBSAPersistence._RefreshReload: wrong ViewDataType.');
   end;
 end;
 
