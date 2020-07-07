@@ -201,11 +201,13 @@ end;
 function TioDetailAdaptersContainer._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 function TioDetailAdaptersContainer._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 end.

@@ -75,7 +75,7 @@ uses
   iORM.Context, iORM.Context.Properties,
   System.SysUtils, iORM.Context.Table,
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
-  System.StrUtils;
+  System.StrUtils, iORM.Exceptions;
 
 { TioBuilderProperties }
 
@@ -296,7 +296,9 @@ begin
     begin
       LRttiField := Prop as TRttiField;
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
-    end;
+    end
+    else
+      raise EioException.Create(Self.ClassName + '.Properties: Invalid property/field type.');
 
     // ====================================================================================================
     // Mauri 08/02/2020: Secondo me questo blocco di codice si può eliminare del tutto perchè tanto, arrivati qui
@@ -589,7 +591,7 @@ begin
   finally
     // Free the IndexList if necessary
     if Assigned(LIndexList) and (LIndexList.Count = 0) then
-      LIndexList.Free;
+      FreeAndNil(LIndexList);
   end;
 end;
 

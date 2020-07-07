@@ -806,11 +806,13 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 end.

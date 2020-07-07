@@ -765,7 +765,7 @@ end;
 
 class function io.ExtractOID(const AIntfObj: IInterface): Integer;
 begin
-  Self.ExtractOID(AIntfObj as TObject);
+  Result := ExtractOID(AIntfObj as TObject);
 end;
 
 class function io.ExtractOID(const AObj: TObject): Integer;

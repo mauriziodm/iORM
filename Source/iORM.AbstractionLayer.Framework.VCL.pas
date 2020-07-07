@@ -109,8 +109,8 @@ type
     procedure SetOnHint(const Value: THintEvent); override;
     procedure SetOnUpdate(const Value: TNotifyEvent); override;
   public
-    constructor Create(AOwner: TComponent); overload;
-    constructor Create(AOwner: TComponent; const AAction: TObject); overload;
+    constructor Create(AOwner: TComponent); reintroduce; overload;
+    constructor Create(AOwner: TComponent; const AAction: TObject); reintroduce; overload;
     function Execute: Boolean; override;
     function AsTValue: TValue; override;
   end;

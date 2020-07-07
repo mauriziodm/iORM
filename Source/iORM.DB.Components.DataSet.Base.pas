@@ -215,7 +215,8 @@ begin
 
   // if there are no persistent field objects,
   // create the fields dynamically
-  if DefaultFields then
+//  if DefaultFields then NB: Deprecated
+  if not (lcPersistent in Fields.LifeCycles) then
     CreateFields;
   // connect the TField objects with the actual fields
   BindFields (True);
@@ -238,7 +239,8 @@ begin
   // disconnet field objects
   BindFields (False);
   // destroy field object (if not persistent)
-  if DefaultFields then
+//  if DefaultFields then NB: Deprecated
+  if not (lcPersistent in Fields.LifeCycles) then
     DestroyFields;
 
   // close the file
@@ -289,7 +291,7 @@ var
   ReqBookmark: Integer;
 begin
   ReqBookmark := PioRecInfo(Buffer + FRecordSize).Bookmark;
-  InternalGotoBookmark (@ReqBookmark);
+  InternalGotoBookmark (@ReqBookmark);  // NB: Deprecated
 end;
 
 procedure TioCustomDataSet.InternalSetToRecord(Buffer: TRecBuf);
@@ -297,7 +299,7 @@ var
   ReqBookmark: Integer;
 begin
   ReqBookmark := PioRecInfo(Buffer + FRecordSize)^.Bookmark;
-  InternalGotoBookmark (@ReqBookmark);
+  InternalGotoBookmark (@ReqBookmark);  // NB: Deprecated
 end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -505,6 +507,7 @@ function TioBSADataSet.CreateBlobStream(Field: TField;
 var
   LProperty: IioContextProperty;
 begin
+  Result := nil;
   // Get Property, Object, Value
   LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
   // Create the right blob stream by DataType
@@ -516,6 +519,8 @@ begin
       Result := TioStreamableObjBlobStream.Create(Field as TGraphicField, Mode);
     TFieldType.ftBlob:
       Result := TioStreamableObjBlobStream.Create(Field as TBlobField, Mode);
+  else
+    raise EioException.Create(Self.ClassName, '.CreateBlobStream: Invalid FieldType (blob)');
   end;
 end;
 
@@ -906,7 +911,8 @@ begin
       if Length(Buffer) < (Field.DataSize) then // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
         SetLength(Buffer, Field.DataSize);
       FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-      DataConvert(Field, PAnsiChar(AnsiString(LValue.AsString)), Buffer, NativeFormat);
+//      DataConvert(Field, PAnsiChar(AnsiString(LValue.AsString)), Buffer, NativeFormat);
+      DataConvert(Field, TValueBuffer(WideString(LValue.AsString)), Buffer, NativeFormat);
 //      StrLCopy(PAnsiChar(Buffer), PAnsiChar(AnsiString(LValue.AsString)), Field.Size+1);
     end;
     // WideString/Unicode

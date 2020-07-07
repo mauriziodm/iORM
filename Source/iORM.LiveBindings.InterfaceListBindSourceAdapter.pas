@@ -59,7 +59,7 @@ type
     procedure CheckList;
     function GetObjectType: TRttiType; override;
     function CreateItemInstance: T; virtual;
-    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); reintroduce; virtual; abstract;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); reintroduce; virtual;
     procedure InitItemInstance(AInstance: T); virtual;
     function GetCurrent: TObject; override;
     function GetCount: Integer; override;
@@ -226,6 +226,11 @@ begin
     FreeAndNil(FList);
   FInstanceFactory.Free;
   inherited;
+end;
+
+procedure TInterfaceListBindSourceAdapter<T>.DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface);
+begin
+  // Do nothing (only to prevent a warning)
 end;
 
 procedure TInterfaceListBindSourceAdapter<T>.DoOnAfterSetList;

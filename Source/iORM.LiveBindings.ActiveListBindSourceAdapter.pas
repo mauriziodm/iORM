@@ -883,6 +883,7 @@ end;
 function TioActiveListBindSourceAdapter._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 procedure TioActiveListBindSourceAdapter._InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
@@ -936,6 +937,7 @@ end;
 function TioActiveListBindSourceAdapter._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 end.

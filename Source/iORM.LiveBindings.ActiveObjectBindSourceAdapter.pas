@@ -113,7 +113,7 @@ type
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
-    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 {$IFDEF AUTOREFCOUNT}
@@ -841,11 +841,13 @@ end;
 function TioActiveObjectBindSourceAdapter._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 function TioActiveObjectBindSourceAdapter._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
+  Result := -1;
 end;
 
 end.

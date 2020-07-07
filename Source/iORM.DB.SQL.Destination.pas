@@ -95,7 +95,7 @@ end;
 function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
-  TioStrategyFactory.GetStrategy('').SQLDest_Execute(Self);
+  Result := TioStrategyFactory.GetStrategy('').SQLDest_Execute(Self);
 end;
 
 function TioSQLDestination.GetIgnoreObjNotExists: Boolean;

@@ -182,6 +182,7 @@ var
   LTargetClass: TioClassRef;
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
+  LTargetClass := nil;
   // If AutoLoadData is disabled then exit
   // Prevent AutoLoadData when refreshing
   if AActiveBindSourceAdapter.Refreshing or not AActiveBindSourceAdapter.ioAutoLoadData then
@@ -189,7 +190,6 @@ begin
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
-
   // Set the OnTerminate method
   LTerminateMethod := procedure(AResultValue: TObject)
   var
@@ -244,6 +244,7 @@ var
   LTargetClass: TioClassRef;
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
+  LTargetClass := nil;
   // Prevent AutoLoadData when activating the BSA
   AActiveBindSourceAdapter.Refreshing := True;
   // If it's a ListBindSourceAdapter then retrieve the list target class
@@ -463,6 +464,7 @@ class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const 
 begin
   Result := function: TObject
     begin
+      Result := nil;
       io.RefTo(ATypeName).ByOID(AOID).Delete;
     end;
 end;
@@ -498,6 +500,7 @@ class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(co
 begin
   Result := function: TObject
     begin
+      Result := nil;
       io.PersistCollection(ADataObj, ARelationChildPropertyName, AMasterOID, False);
     end;
 end;
@@ -507,6 +510,7 @@ class function TioCommonBSAAnonymousMethodsFactory.GetPostExecuteMethod(const AD
 begin
   Result := function: TObject
     begin
+      Result := nil;
       io.Persist(ADataObj, ARelationChildPropertyName, AMasterOID, False);
     end;
 end;

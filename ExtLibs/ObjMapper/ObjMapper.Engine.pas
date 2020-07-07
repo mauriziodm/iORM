@@ -663,7 +663,7 @@ begin
   // Loop
   for I := 0 to LJSONArray.Count - 1 do
   begin
-    LJObj := LJSONArray.Get(I) as TJSONObject;
+    LJObj := LJSONArray.Items[I] as TJSONObject;
     // Get the key anche value JSONValue
     case AParams.SerializationMode of
       smJavaScript:
@@ -851,7 +851,7 @@ begin
   for I := 0 to LJSONArray.Count - 1 do
   begin
     // Extract the current element
-    LValueJSONValue := LJSONArray.Get(I);
+    LValueJSONValue := LJSONArray.Items[I];
     // Deserialize the current element
     LValue := DeserializePropField(LValueJSONValue, LValueRttiType, APropField, nil, AParams);
     // Add to the list
@@ -2066,7 +2066,8 @@ end;
 class function TomCustomSerializer.Serialize(const AValue: TValue;
   const AParams: IomParams; var ADone: Boolean): TJSONValue;
 begin
-  // None
+  // Prevent warning
+  Result := nil;
 end;
 
 initialization

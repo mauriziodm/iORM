@@ -81,17 +81,17 @@ type
   protected
     class function GetConcreteClass: TioTimerRef;
     class procedure SetConcreteClass(const AClass: TioTimerRef);
-    function GetEnabled: Boolean; virtual; abstract;
-    function GetInterval: Cardinal; virtual; abstract;
-    function GetOnTimer: TNotifyEvent; virtual; abstract;
-    function GetTag: Integer; virtual; abstract;
-    procedure SetEnabled(const Value: Boolean); virtual; abstract;
-    procedure SetInterval(const Value: Cardinal); virtual; abstract;
-    procedure SetOnTimer(const Value: TNotifyEvent); virtual; abstract;
-    procedure SetTag(const Value: Integer); virtual; abstract;
+    function GetEnabled: Boolean; virtual;
+    function GetInterval: Cardinal; virtual;
+    function GetOnTimer: TNotifyEvent; virtual;
+    function GetTag: Integer; virtual;
+    procedure SetEnabled(const Value: Boolean); virtual;
+    procedure SetInterval(const Value: Cardinal); virtual;
+    procedure SetOnTimer(const Value: TNotifyEvent); virtual;
+    procedure SetTag(const Value: Integer); virtual;
   public
     class function CreateNewTimer: TioTimer;
-    constructor Create; virtual; abstract;
+    constructor Create; virtual;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
     property Interval: Cardinal read GetInterval write SetInterval default 1000;
     property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
@@ -156,6 +156,11 @@ uses
 
 { TioTimer }
 
+constructor TioTimer.Create;
+begin
+  // Do nothing (prevent warning)
+end;
+
 class function TioTimer.CreateNewTimer: TioTimer;
 begin
   Result := GetConcreteClass.Create;
@@ -168,9 +173,52 @@ begin
   Result := FConcreteClass_NoDirectCall;
 end;
 
+function TioTimer.GetEnabled: Boolean;
+begin
+  // Do nothing (prevent warning)
+  Result := False;
+end;
+
+function TioTimer.GetInterval: Cardinal;
+begin
+  // Do nothing (prevent warning)
+  Result := 0;
+end;
+
+function TioTimer.GetOnTimer: TNotifyEvent;
+begin
+  // Do nothing (prevent warning)
+end;
+
+function TioTimer.GetTag: Integer;
+begin
+  // Do nothing (prevent warning)
+  Result := 0;
+end;
+
 class procedure TioTimer.SetConcreteClass(const AClass: TioTimerRef);
 begin
   FConcreteClass_NoDirectCall := AClass;
+end;
+
+procedure TioTimer.SetEnabled(const Value: Boolean);
+begin
+  // Do nothing (prevent warning)
+end;
+
+procedure TioTimer.SetInterval(const Value: Cardinal);
+begin
+  // Do nothing (prevent warning)
+end;
+
+procedure TioTimer.SetOnTimer(const Value: TNotifyEvent);
+begin
+  // Do nothing (prevent warning)
+end;
+
+procedure TioTimer.SetTag(const Value: Integer);
+begin
+  // Do nothing (prevent warning)
 end;
 
 { TioApplication }

@@ -994,7 +994,7 @@ end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
 begin
-  ToObject(AIntf as TObject);
+  Result := ToObject(AIntf as TObject);
 end;
 
 function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
