@@ -132,14 +132,17 @@ object ViewPerson: TViewPerson
       ColWidths = (
         120
         300)
+      ColAligments = (
+        0
+        0)
     end
     object BindNavigator1: TBindNavigator
       Left = 326
       Top = 56
-      Width = 112
+      Width = 110
       Height = 25
       DataSource = PhonesModelBindSource
-      VisibleButtons = [nbPrior, nbNext, nbPost, nbCancel]
+      VisibleButtons = [nbPrior, nbNext, nbDelete, nbPost, nbCancel]
       Anchors = [akRight, akBottom]
       Orientation = orHorizontal
       TabOrder = 1

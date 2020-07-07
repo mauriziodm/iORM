@@ -106,7 +106,7 @@ end;
 
 procedure TMainForml.acRefreshExecute(Sender: TObject);
 begin
-  PrototypeBindSource1.Refresh;
+  PrototypeBindSource1.Refresh(True);
 end;
 
 procedure TMainForml.Button6Click(Sender: TObject);

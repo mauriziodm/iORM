@@ -4,7 +4,7 @@ inherited PersonViewModel: TPersonViewModel
   Width = 189
   object PersonModelPresenter: TioModelPresenter
     AsDefault = True
-    Async = True
+    Async = False
     AutoLoadData = True
     AutoPersist = True
     AutoPost = False
@@ -23,7 +23,7 @@ inherited PersonViewModel: TPersonViewModel
   end
   object PhonesModelPresenter: TioModelPresenter
     AsDefault = False
-    Async = True
+    Async = False
     AutoLoadData = True
     AutoPersist = True
     AutoPost = False

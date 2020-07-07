@@ -2,8 +2,8 @@ object MainForml: TMainForml
   Left = 0
   Top = 0
   Caption = 'Pizzas'
-  ClientHeight = 460
-  ClientWidth = 320
+  ClientHeight = 485
+  ClientWidth = 367
   FormFactor.Width = 1440
   FormFactor.Height = 900
   FormFactor.Devices = [Desktop]
@@ -14,18 +14,18 @@ object MainForml: TMainForml
   object TabControl1: TTabControl
     Align = Client
     FullSize = True
-    Size.Width = 320.000000000000000000
-    Size.Height = 460.000000000000000000
+    Size.Width = 367.000000000000000000
+    Size.Height = 485.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
     TabIndex = 0
     TabOrder = 0
     TabPosition = None
     Sizes = (
-      320s
-      460s
-      320s
-      460s)
+      367s
+      485s
+      367s
+      485s)
     object TabItem1: TTabItem
       CustomIcon = <
         item
@@ -40,7 +40,7 @@ object MainForml: TMainForml
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 50.000000000000000000
       object MasterToolbar: TToolBar
-        Size.Width = 320.000000000000000000
+        Size.Width = 367.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
@@ -95,8 +95,8 @@ object MainForml: TMainForml
         FooterAppearanceClassName = 'TListHeaderObjects'
         ItemIndex = 0
         Align = Client
-        Size.Width = 320.000000000000000000
-        Size.Height = 416.000000000000000000
+        Size.Width = 367.000000000000000000
+        Size.Height = 441.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         CanSwipeDelete = False
@@ -118,13 +118,13 @@ object MainForml: TMainForml
       ExplicitSize.cx = 50.000000000000000000
       ExplicitSize.cy = 50.000000000000000000
       object DetailToolbar: TToolBar
-        Size.Width = 320.000000000000000000
+        Size.Width = 367.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object DetailLabel: TLabel
           Align = Contents
-          Size.Width = 320.000000000000000000
+          Size.Width = 367.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'toollabel'

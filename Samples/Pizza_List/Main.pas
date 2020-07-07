@@ -96,9 +96,9 @@ begin
   // ============ IupOrm initialization ====================
   // Set connection for SQLite (under the Documents folder better for mobile use)
 //  io.Connections.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'Pizza.db')).Apply;
-//  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\Pizza.db')).Apply;
+  io.Connections.NewSQLiteConnectionDef(TPath.GetFullPath('..\..\..\SamplesData\Pizza.db')).Apply;
   // Set connection for Firebird SQL
-  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\Pizza.fdb'), 'SYSDBA', 'th3cla', '').Apply;
+//  io.Connections.NewFirebirdConnectionDef('localhost', TPath.GetFullPath('..\..\..\SamplesData\Pizza.fdb'), 'SYSDBA', 'th3cla', '').Apply;
   // AutoCreation and AutoUpdate of the database
 //  io.GenerateDB(True, True, False);
   // ============ IupOrm initialization ====================
