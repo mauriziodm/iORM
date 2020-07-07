@@ -48,8 +48,8 @@ type
   // Strategy class for database
   TioStrategyREST = class(TioStrategyIntf)
   private
-    class var FTransactionGUID: String;
-    class function NewGUIDAsString: String;
+//    class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
+//    class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
 //    class function GetTransactionGUID: String;
   public
     class procedure StartTransaction(const AConnectionName:String); override;
@@ -247,13 +247,13 @@ begin
   raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
-class function TioStrategyREST.NewGUIDAsString: String;
-var
-  LGUID: TGUID;
-begin
-  CreateGUID(LGUID);
-  Result := GUIDToString(LGUID);
-end;
+//class function TioStrategyREST.NewGUIDAsString: String;
+//var
+//  LGUID: TGUID;
+//begin
+//  CreateGUID(LGUID);
+//  Result := GUIDToString(LGUID);
+//end;
 
 class procedure TioStrategyREST.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String;
   const ARelationOID: Integer; const ABlindInsert: Boolean);

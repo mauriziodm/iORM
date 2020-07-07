@@ -19,8 +19,8 @@ type
     procedure SetViewContext(const AViewContext:TComponent);
     procedure SetViewContextProvider(const AViewContextProvider:TioViewContextProvider);
     procedure CheckForLife;
-    function GetViewContext: TComponent;
-    function GetViewContextProvider: TioViewContextProvider;
+//    function GetViewContext: TComponent; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
+//    function GetViewContextProvider: TioViewContextProvider; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -59,15 +59,15 @@ begin
   FViewContextFreeMethod := AViewContextFreeMethod;
 end;
 
-function TioViewContextRegisterItem.GetViewContext: TComponent;
-begin
-  Result := FViewContext;
-end;
+//function TioViewContextRegisterItem.GetViewContext: TComponent;
+//begin
+//  Result := FViewContext;
+//end;
 
-function TioViewContextRegisterItem.GetViewContextProvider: TioViewContextProvider;
-begin
-  Result := FViewContextProvider;
-end;
+//function TioViewContextRegisterItem.GetViewContextProvider: TioViewContextProvider;
+//begin
+//  Result := FViewContextProvider;
+//end;
 
 procedure TioViewContextRegisterItem.HideViewContext;
 begin

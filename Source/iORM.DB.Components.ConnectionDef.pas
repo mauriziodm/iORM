@@ -107,8 +107,6 @@ type
     procedure SetDefaultConnection(const Value: Boolean);
     procedure DoAfterRegister;
   protected
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure Loaded; override;
     function GetFullPathDatabase: String;
     procedure DoBeforeRegister;
@@ -131,6 +129,8 @@ type
     // Events
     property OnAfterCreateDB: TioDBBuilderAfterCreateDBEvent read FOnAfterCreateDBEvent write FOnAfterCreateDBEvent;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function GenerateDB: String; virtual;
     procedure RegisterConnectionDef; virtual;
     // Properties

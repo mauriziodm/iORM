@@ -325,7 +325,7 @@ type
   // Dependency Injection Factory
   TioDependencyInjectionFactory = class abstract(TioDependencyInjectionBase)
   strict private
-    class procedure _CheckModelPresenter(const ATargetMP:TioModelPresenter);
+//    class procedure _CheckModelPresenter(const ATargetMP:TioModelPresenter); NB: Hint prevention "symbol declared but never used" (codice resente sotto)
   public
     class function GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName:String; const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator; overload;
@@ -1475,18 +1475,18 @@ end;
 
 { TioDependencyInjectionFactory }
 
-class procedure TioDependencyInjectionFactory._CheckModelPresenter(const ATargetMP: TioModelPresenter);
-begin
-  // Check the ModelPresenter
-  if not Assigned(ATargetMP) then
-    raise EioException.Create(Self.ClassName, 'CheckModelPresenter', 'Parameter "AModelPresenter" not assigned.');
-  // Check the bind source adapter
-  if not ATargetMP.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'CheckModelPresenter', 'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
-  // Check the ModelPresenter.Current object
-  if (ATargetMP.Current = nil) then
-    raise EioException.Create(Self.ClassName, 'CheckModelPresenter', '"Current" object of the ModelPresenter not assigned.');
-end;
+//class procedure TioDependencyInjectionFactory._CheckModelPresenter(const ATargetMP: TioModelPresenter);
+//begin
+//  // Check the ModelPresenter
+//  if not Assigned(ATargetMP) then
+//    raise EioException.Create(Self.ClassName, 'CheckModelPresenter', 'Parameter "AModelPresenter" not assigned.');
+//  // Check the bind source adapter
+//  if not ATargetMP.CheckAdapter then
+//    raise EioException.Create(Self.ClassName, 'CheckModelPresenter', 'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
+//  // Check the ModelPresenter.Current object
+//  if (ATargetMP.Current = nil) then
+//    raise EioException.Create(Self.ClassName, 'CheckModelPresenter', '"Current" object of the ModelPresenter not assigned.');
+//end;
 
 class function TioDependencyInjectionFactory.GetLocator(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator;
 begin

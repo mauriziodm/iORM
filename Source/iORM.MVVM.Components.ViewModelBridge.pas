@@ -20,7 +20,6 @@ type
     // Events
     FOnNeedViewModel: TioNeedViewModelEvent;
     procedure AutoSetClientComponentsOnCreate;
-    procedure Loaded; override;
     procedure DoNeedViewModel;
     // Commands
     function GetCommands: IioCommandsContainer;
@@ -33,6 +32,8 @@ type
     function GetPresenter(const AName: String): TioModelPresenter;
     // ViewModel
     function GetViewModel: IioViewModel;
+  protected
+    procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;

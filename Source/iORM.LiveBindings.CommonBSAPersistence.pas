@@ -380,14 +380,8 @@ begin
   end;
 end;
 
-class procedure TioCommonBSAPersistence._LoadList(
-
-  const AASync: Boolean;
-
-  const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-var
-  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
+class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+  ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -397,11 +391,8 @@ begin
     ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence._LoadSingle(
-
-  const AASync: Boolean;
-
-const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadSingle(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject

@@ -506,7 +506,6 @@ class function io.GenerateDB(const AConnectionName: String; const ACreateIndexes
   AScriptOnly: Boolean; out OOutputScript, OErrorMessage: String): Boolean;
 var
   LDBBuilder: IioDBBuilder;
-  LError: String;
 begin
   LDBBuilder := TioDBBuilderFactory.NewBuilder(AConnectionName, ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly);
   Result := LDBBuilder.GenerateDB(OOutputScript, OErrorMessage);
@@ -515,7 +514,6 @@ end;
 class function io.GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
   AScriptOnly: Boolean; const ARaiseExceptionIfNotAvailable: Boolean): string;
 var
-  LDBBuilder: IioDBBuilder;
   LError: String;
 begin
   if (not GenerateDB(AConnectionName, ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly, Result, LError))

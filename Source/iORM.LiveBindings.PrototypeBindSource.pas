@@ -93,8 +93,6 @@ type
     function __ObjRelease: Integer; override;
 {$ENDIF}
     // =========================================================================
-    procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
-    procedure Loaded; override;
     procedure DoNotify(ANotification: IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     // TypeName
@@ -128,6 +126,8 @@ type
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
   protected
+    procedure Loaded; override;
+    procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
@@ -723,7 +723,6 @@ end;
 procedure TioPrototypeBindSource.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
-  LPrecAutoload: Boolean;
 begin
   if not CheckAdapter then
     Exit;

@@ -84,7 +84,7 @@ type
     FDetailPresentersContainer: TList<TioModelPresenter>;
     // Questo è un riferimento di tipo interfaccia e serve solo per
     // mantenere in vita l'oggetto
-    FDummyInterfaceRef: IInterface;
+//    FDummyInterfaceRef: IInterface; NB: Hint prevention "symbol declared but never used"
     // Selection related events
     FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
     FonSelectionObject: TioBSASelectionObjectEvent;
