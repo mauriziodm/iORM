@@ -48,10 +48,13 @@ type
     class procedure InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
     class procedure UpdateObject(const AContext: IioContext);
     class procedure DeleteObject_Internal(const AContext: IioContext);
-    class procedure PreProcessRelationChild(const AContext: IioContext);
-    class procedure PostProcessRelationChild(const AContext: IioContext);
+    class procedure PreProcessRelationChildOnDelete(const AContext: IioContext);
+    class procedure PreProcessRelationChildOnPersist(const AContext: IioContext);
+    class procedure PostProcessRelationChildOnPersist(const AContext: IioContext);
     class procedure PersistRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
     class procedure PersistRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
+    class procedure DeleteRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
+    class procedure DeleteRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
     class function ObjectExists(const AContext: IioContext): Boolean;
   public
     class procedure StartTransaction(const AConnectionName: String); override;
@@ -63,6 +66,7 @@ type
     class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); override;
     class procedure DeleteObject(const AObj: TObject); override;
+    class procedure DeleteCollection(const ACollection: TObject);
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
@@ -132,18 +136,85 @@ begin
   end;
 end;
 
+class procedure TioStrategyDB.DeleteCollection(const ACollection: TObject);
+var
+  ADuckTypedList: IioDuckTypedList;
+  AObj: TObject;
+begin
+  inherited;
+  // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
+  // nella collection vengano persistiti o annullati ma poi ogni chiamata a PersistObject riavvia
+  // una transazione per l'oggetto singolo (che non avrà praticamente effetto perchè inglobata
+  // da quella avviata qua sotto.
+  // Nel caso particolare in cui uno o più singoli oggetti contenuti dela collection siano di una
+  // qualche classe che opera su una ConnectionDef diversa da quella di default verrà avviata (all'interno
+  // della chiamata a "PersistObject" una transazione sulla Connection diversa da quella di default e quindi
+  // al di fuori della transazione principale sulla connessione di default avviata qui sotto e in pratica
+  // per questi oggetti ogni chiamata a "PersistObject" verrà eseguita nel contesto di una singola transazione
+  // slegata dalle altre e quindi è possibile che (solo in questo specifico e particolare caso) alcune operazioni
+  // vadano a buon fine mentre altre no.
+  // AL momento non ho una soluzione al problema.
+  // NB: Qui non posso conoscere con certezza il tipo di oggetti realmente contenuto nella collection
+  // in quanto il tipo reale dell'oggetto potrebbe essere diverso dal genericType della lista stessa
+  // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
+  // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
+  // che operano su Database diversi contemporaneamente.
+  Self.StartTransaction('');
+  try
+    // Wrap the DestList into a DuckTypedList
+    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
+    // Loop the list and delete objects
+    for AObj in ADuckTypedList do
+    begin
+      // Persist object
+      Self.DeleteObject(AObj);
+    end;
+
+    Self.CommitTransaction('');
+  except
+    Self.RollbackTransaction('');
+    raise;
+  end;
+end;
+
+//class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
+//var
+//  AContext: IioContext;
+//begin
+//  inherited;
+//  // Check
+//  if not Assigned(AObj) then
+//    Exit;
+//  // Create Context
+//  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+//  // Execute
+//  Self.DeleteObject_Internal(AContext);
+//end;
+
 class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
 var
-  AContext: IioContext;
+  LContext: IioContext;
 begin
   inherited;
   // Check
   if not Assigned(AObj) then
     Exit;
-  // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-  // Execute
-  Self.DeleteObject_Internal(AContext);
+  // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
+  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+  // Start transaction
+  Self.StartTransaction(LContext.GetTable.GetConnectionDefName);
+  try
+    // PreProcess (delete) relation childs (HasMany, HasOne)
+    Self.PreProcessRelationChildOnDelete(LContext);
+    // Delete the object
+    Self.DeleteObject_Internal(LContext);
+    // Commit
+    Self.CommitTransaction(LContext.GetTable.GetConnectionDefName);
+  except
+    // Rollback
+    Self.RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+    raise;
+  end;
 end;
 
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
@@ -153,6 +224,22 @@ begin
   if not AContext.IDIsNull then
     // Create and execute query
     TioDBFactory.QueryEngine.GetQueryDelete(AContext).ExecSQL;
+end;
+
+class procedure TioStrategyDB.DeleteRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
+begin
+  // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
+  Self.DeleteCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject));
+end;
+
+class procedure TioStrategyDB.DeleteRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
+var
+  AObj: TObject;
+begin
+  // Get the child object
+  AObj := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
+  // Persist object
+  Self.DeleteObject(AObj);
 end;
 
 class procedure TioStrategyDB.InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
@@ -363,7 +450,7 @@ begin
     then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
     // PreProcess (persist) relation childs (BelongsTo)
-    Self.PreProcessRelationChild(LContext);
+    Self.PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
     case LContext.ObjectStatus of
@@ -395,7 +482,7 @@ begin
     end;
     // --------------------------
     // PostProcess (persist) relation childs (HasMany, HasOne)
-    Self.PostProcessRelationChild(LContext);
+    Self.PostProcessRelationChildOnPersist(LContext);
     // Commit
     Self.CommitTransaction(LContext.GetTable.GetConnectionDefName);
   except
@@ -424,7 +511,32 @@ begin
     AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False); // Blind
 end;
 
-class procedure TioStrategyDB.PostProcessRelationChild(const AContext: IioContext);
+class procedure TioStrategyDB.PreProcessRelationChildOnDelete(const AContext: IioContext);
+var
+  Prop: IioContextProperty;
+begin
+  inherited;
+  // Loop for all properties
+  for Prop in AContext.GetProperties do
+  begin
+    // If the property is not WriteEnabled then skip it
+    if not Prop.IsDBWriteEnabled then
+      Continue;
+    case Prop.GetRelationType of
+      // If relation HasBelongsToOne
+      ioRTBelongsTo: { Nothing }
+        ;
+      // If relation HasMany
+      ioRTHasMany:
+        DeleteRelationChildList(AContext, Prop);
+      // If relation HasOne
+      ioRTHasOne:
+        DeleteRelationChildObject(AContext, Prop);
+    end;
+  end;
+end;
+
+class procedure TioStrategyDB.PostProcessRelationChildOnPersist(const AContext: IioContext);
 var
   Prop: IioContextProperty;
 begin
@@ -449,7 +561,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PreProcessRelationChild(const AContext: IioContext);
+class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AContext: IioContext);
 var
   Prop: IioContextProperty;
 begin
