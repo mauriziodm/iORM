@@ -83,7 +83,7 @@ type
     class function GetPostExecuteMethod(const ADataObj: TObject; const ARelationChildPropertyName: String; const AMasterOID: Integer):
       TioCommonBSAPersistenceThreadExecute;
     // Delete
-    class function GetDeleteExecuteMethod(const ATypeName: String; const AOID: Integer): TioCommonBSAPersistenceThreadExecute;
+    class function GetDeleteExecuteMethod(const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
     class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
     // Refresh
     class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean):
@@ -148,8 +148,7 @@ begin
   end;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
   // Set Execute anonimous methods
-  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(AActiveBindSourceAdapter.Current.ClassName,
-    io.ExtractOID(AActiveBindSourceAdapter.Current));
+  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(AActiveBindSourceAdapter.Current);
   // Set the OnTerminate anonymous method when in Async mode
   // If not in Async mode then execute this code in the "AfterDelete" method called by the BSA
   //  from the OnAfterDelete event handler.
@@ -451,12 +450,12 @@ end;
 
 { TioCommonBSAAnonymousMethodsFactory }
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const ATypeName: String; const AOID: Integer): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
 begin
   Result := function: TObject
     begin
       Result := nil;
-      io.RefTo(ATypeName).ByOID(AOID).Delete;
+      io.Delete(ADataObj);
     end;
 end;
 
