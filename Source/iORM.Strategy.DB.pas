@@ -169,7 +169,6 @@ begin
       // Persist object
       Self.DeleteObject(AObj);
     end;
-
     Self.CommitTransaction('');
   except
     Self.RollbackTransaction('');
@@ -421,7 +420,6 @@ begin
       // Persist object
       Self.PersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert);
     end;
-
     Self.CommitTransaction('');
   except
     Self.RollbackTransaction('');

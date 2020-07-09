@@ -69,6 +69,8 @@ type
     class function Load(const AWhere: IioWhere): IioWhere; overload;
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
+    class procedure DeleteCollection(const ACollection: TObject); overload;
+    class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
     class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); overload;
     class procedure Persist(const AObj: TObject; const ABlindInsert: Boolean = False); overload;
@@ -754,6 +756,19 @@ end;
 class procedure io.Delete(const AIntfObj: IInterface);
 begin
   Self.Delete(AIntfObj as TObject);
+end;
+
+class procedure io.DeleteCollection(const AIntfCollection: IInterface);
+begin
+  Self.DeleteCollection(AIntfCollection as TObject);
+end;
+
+class procedure io.DeleteCollection(const ACollection: TObject);
+var
+  LConnectionDefName: String;
+begin
+  LConnectionDefName := TioConnectionManager.GetDefaultConnectionName;
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteCollection(ACollection);
 end;
 
 class function io.di: TioDependencyInjectionRef;

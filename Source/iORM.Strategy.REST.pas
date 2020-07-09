@@ -59,6 +59,7 @@ type
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
     class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
     class procedure DeleteObject(const AObj: TObject); override;
+    class procedure DeleteCollection(const ACollection: TObject);
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
@@ -104,6 +105,32 @@ begin
     LConnection.RequestBody.Clear;
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('Delete');
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
+end;
+
+class procedure TioStrategyREST.DeleteCollection(const ACollection: TObject);
+var
+  LConnection: IioConnectionREST;
+begin
+  inherited;
+  // Check
+  if not Assigned(ACollection) then Exit;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  // Start transaction
+  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  //       perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Clear;
+    LConnection.RequestBody.DataObject := ACollection;
+    LConnection.Execute('PersistCollection');
     // Commit
     LConnection.Commit;
   except

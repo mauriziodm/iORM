@@ -122,6 +122,11 @@ object ViewMain: TViewMain
       180
       180
       200)
+    ColAligments = (
+      1
+      0
+      0
+      0)
   end
   object StringGrid1: TStringGrid
     Tag = 2
@@ -137,6 +142,9 @@ object ViewMain: TViewMain
     ColWidths = (
       100
       300)
+    ColAligments = (
+      0
+      0)
   end
   object VMBridge: TioViewModelBridge
     DI_VMInterface = 'IPersonsViewModel'
