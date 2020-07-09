@@ -59,7 +59,7 @@ type
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
     class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
     class procedure DeleteObject(const AObj: TObject); override;
-    class procedure DeleteCollection(const ACollection: TObject);
+    class procedure DeleteCollection(const ACollection: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;

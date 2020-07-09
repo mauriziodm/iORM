@@ -19,6 +19,7 @@ type
     procedure FormsVCProviderRelease(const Sender: TObject; const AView,
       AViewContext: TComponent);
     procedure SQLiteConnAfterRegister(Sender: TObject);
+    procedure ioSQLiteConnectionDef1AfterCreateDB(Sender: TioCustomConnectionDef; AScript, AError: string);
   private
     { Private declarations }
   public
@@ -31,7 +32,7 @@ var
 implementation
 
 uses
-  iORM, V.Interfaces, VM.Interfaces, FormViewContext, SampleData;
+  iORM, V.Interfaces, VM.Interfaces, FormViewContext, SampleData, System.IOUtils;
 
 {$R *.dfm}
 
@@ -51,6 +52,19 @@ procedure TStartForm.FormsVCProviderRelease(const Sender: TObject; const AView,
   AViewContext: TComponent);
 begin
   AViewContext.Free;
+end;
+
+procedure TStartForm.ioSQLiteConnectionDef1AfterCreateDB(Sender: TioCustomConnectionDef; AScript, AError: string);
+var
+  LScript: TStringList;
+begin
+  LScript := TStringList.Create;
+  try
+    LScript.Text := AScript;
+    LScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'script.txt'));
+  finally
+    LScript.Free;
+  end;
 end;
 
 procedure TStartForm.SQLiteConnAfterRegister(Sender: TObject);

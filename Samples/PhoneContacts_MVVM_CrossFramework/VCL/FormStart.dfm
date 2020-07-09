@@ -34,6 +34,7 @@ object StartForm: TStartForm
     DefaultConnection = True
     Persistent = False
     Pooled = False
+    OnAfterCreateDB = ioSQLiteConnectionDef1AfterCreateDB
     Left = 112
     Top = 112
   end
