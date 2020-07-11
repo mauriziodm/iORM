@@ -80,7 +80,7 @@ type
     function QualifiedClassNameFromClassInfoFieldValue(AValue:String): String;
   end;
 
-  TioIndexList = TObjectList<ioIndex>;
+  TioIndexList = TList<ioIndex>;
 
   IioContextTable = interface(IioSqlItem)
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']

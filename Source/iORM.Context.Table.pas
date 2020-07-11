@@ -224,7 +224,7 @@ end;
 function TioContextTable.GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
 begin
   if AAutoCreateIfUnassigned and (not Self.IndexListExists) then
-    FIndexList := TioIndexList.Create(False);
+    FIndexList := TioIndexList.Create;
   Result := FIndexList;
 end;
 

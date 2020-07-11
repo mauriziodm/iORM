@@ -223,9 +223,7 @@ type
     // ObjectStatus Exist
     function ObjStatusExist: Boolean;
     // ObjectStatus property
-    property ObjStatusProperty: IioContextProperty
-      read GetObjStatusProperty
-      write SetObjStatusProperty;
+    property ObjStatusProperty: IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
   end;
 
 implementation

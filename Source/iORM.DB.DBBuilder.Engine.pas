@@ -61,16 +61,11 @@ type
   public
     constructor Create(ASourceTableName: string; ASourceFieldName: string; ADestinationTableName: string; ADestinationFieldName: string;
       ARelationType: TioRelationType);
-    property SourceTableName: string
-      read GetSourceTableName;
-    property SourceFieldName: string
-      read GetSourceFieldName;
-    property DestinationTableName: string
-      read GetDestinationTableName;
-    property DestinationFieldName: string
-      read GetDestinationFieldName;
-    property RelationType: TioRelationType
-      read GetRelationType;
+    property SourceTableName: string read GetSourceTableName;
+    property SourceFieldName: string read GetSourceFieldName;
+    property DestinationTableName: string read GetDestinationTableName;
+    property DestinationFieldName: string read GetDestinationFieldName;
+    property RelationType: TioRelationType read GetRelationType;
   end;
 
   TioDBBuilderField = class(TInterfacedObject, IioDBBuilderField)
@@ -101,26 +96,16 @@ type
     function GetDBFieldSameType: Boolean;
     // IsClassFromFIeld
     function GetIsClassFromField: Boolean;
-    property IsClassFromField: Boolean
-      read GetIsClassFromField;
+    property IsClassFromField: Boolean read GetIsClassFromField;
   public
     constructor Create(AFieldName: String; AIsKeyField: Boolean; AProperty: IioContextProperty; ASqlGenerator: IioDBBuilderSqlGenerator;
       AIsClassFromField: Boolean; AIsSqlField: Boolean);
-    property FieldName: String
-      read GetFieldName;
-    property FieldType: String
-      read GetFieldType;
-    property IsKeyField: Boolean
-      read GetIsKeyField;
-    property IsSqlField: Boolean
-      read GetIsSqlField
-      write SetIsSqlField;
-    property DBFieldExist: Boolean
-      read GetDBFieldExist
-      write SetDBFieldExist;
-    property DBFieldSameType: Boolean
-      read GetDBFieldSameType
-      write SetDBFieldSameType;
+    property FieldName: String read GetFieldName;
+    property FieldType: String read GetFieldType;
+    property IsKeyField: Boolean read GetIsKeyField;
+    property IsSqlField: Boolean read GetIsSqlField write SetIsSqlField;
+    property DBFieldExist: Boolean read GetDBFieldExist write SetDBFieldExist;
+    property DBFieldSameType: Boolean read GetDBFieldSameType write SetDBFieldSameType;
     // Rtti property reference
     function GetProperty: IioContextProperty;
   end;
@@ -156,15 +141,10 @@ type
     function IDField: IioDBBuilderField;
     function GetMap: IioMap;
     function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
-    property TableName: String
-      read GetTableName
-      write SetTableName;
-    property Fields: TioDBBuilderFieldList
-      read GetFields;
-    property IndexList: TioIndexList
-      read GetIndexList;
-    property ForeignKeyList: TioDBBuilderFKList
-      read GetForeignKeyList;
+    property TableName: String read GetTableName write SetTableName;
+    property Fields: TioDBBuilderFieldList read GetFields;
+    property IndexList: TioIndexList read GetIndexList;
+    property ForeignKeyList: TioDBBuilderFKList read GetForeignKeyList;
   end;
 
   TioDBBuilder = class(TInterfacedObject, IioDBBuilder)
@@ -198,7 +178,8 @@ type
     destructor Destroy; override;
     function GenerateDB(out OOutputScript: String; out OErrorMessage: String): Boolean;
     property CreateScriptOnly: Boolean read GetCreateScriptOnly write SetCreateScriptOnly;
-    property CreateReferentialIntegrityConstraints: Boolean read GetCreateReferentialIntegrityConstraints write SetCreateReferentialIntegrityConstraints;
+    property CreateReferentialIntegrityConstraints: Boolean read GetCreateReferentialIntegrityConstraints
+      write SetCreateReferentialIntegrityConstraints;
     property CreateIndexes: Boolean read GetCreateIndexes write SetCreateIndexes;
   end;
 
@@ -720,7 +701,7 @@ begin
         end;
 
         // If current foreign is between two classes mapped to two different ConnectionDefNames
-        //  then skip it
+        // then skip it
         if LPairTable.Value.GetMap.GetTable.GetConnectionDefName <> LChildContext.GetTable.GetConnectionDefName then
           Continue;
 
@@ -800,8 +781,8 @@ begin
     if ABuilderTable.FieldExists(AProperty.GetSqlFieldName) then
       Continue;
 
-    ABuilderField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty,
-      FSqlGenerator, False, LIsSqlField);
+    ABuilderField := Self.GetField(AProperty.GetSqlFieldName, (AProperty = AMap.GetProperties.GetIDProperty), AProperty, FSqlGenerator,
+      False, LIsSqlField);
     ABuilderTable.Fields.Add(ABuilderField.FieldName, ABuilderField);
   end;
   // If some explicit index is present then add it to the list
@@ -915,7 +896,7 @@ begin
   FIsClassFromField := AIsClassFromField;
   FFields := TioDBBuilderFieldList.Create;
   FMap := AMap;
-  FIndexList := TioIndexList.Create(False);
+  FIndexList := TioIndexList.Create;
   FForeignKeyList := TioDBBuilderFKList.Create();
 end;
 
@@ -980,9 +961,8 @@ var
   LCurrentConnectionDefName: String;
 begin
   LCurrentConnectionDefName := GetMap.GetTable.GetConnectionDefName;
-  Result := LCurrentConnectionDefName.IsEmpty
-    or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME)
-    or (GetMap.GetTable.GetConnectionDefName = AConnectionDefNameToCheck);
+  Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
+    (GetMap.GetTable.GetConnectionDefName = AConnectionDefNameToCheck);
 end;
 
 procedure TioDBBuilderTable.SetTableName(AValue: String);

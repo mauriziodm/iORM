@@ -575,7 +575,7 @@ begin
       if LAttr is ioIndex then
       begin
         if not Assigned(LIndexList) then
-          LIndexList := TioIndexList.Create(False);
+          LIndexList := TioIndexList.Create;
         LIndexList.Add(ioIndex(LAttr));
       end;
     end;

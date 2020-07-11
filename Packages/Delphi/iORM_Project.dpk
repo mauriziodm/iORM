@@ -187,6 +187,12 @@ contains
   iORM.DB.DBBuilder.Firebird.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Firebird.SqlGenerator.pas',
   iORM.DB.DBBuilder.SqLite.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.SqLite.SqlGenerator.pas',
   iORM.DB.DBBuilder.Factory in '..\..\Source\iORM.DB.DBBuilder.Factory.pas',
-  iORM.DB.DBBuilder.Custom.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Custom.SqlGenerator.pas';
+  iORM.DB.DBBuilder.Custom.SqlGenerator in '..\..\Source\iORM.DB.DBBuilder.Custom.SqlGenerator.pas',
+  iORM.DBBuilder.Interfaces in '..\..\Source\iORM.DBBuilder.Interfaces.pas',
+  iORM.DBBuilder.Schema.Field in '..\..\Source\iORM.DBBuilder.Schema.Field.pas',
+  iORM.DBBuilder.Schema.Table in '..\..\Source\iORM.DBBuilder.Schema.Table.pas',
+  iORM.DBBuilder.Schema.FK in '..\..\Source\iORM.DBBuilder.Schema.FK.pas',
+  iORM.DBBuilder.Schema in '..\..\Source\iORM.DBBuilder.Schema.pas',
+  iORM.DBBuilder.Schema.Builder in '..\..\Source\iORM.DBBuilder.Schema.Builder.pas';
 
 end.
