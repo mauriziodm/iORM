@@ -9,8 +9,9 @@ type
 
   TioDBBuilderSchemaBuilder = class
   private
-    class procedure BuildSchemaTable(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+    class procedure BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     class procedure BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+    class procedure BuildSchemaTable(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
   public
     class procedure BuildSchema(const ASchema: IioDBBuilderSchema);
   end;
@@ -59,9 +60,9 @@ begin
       if AMap.GetTable.GetConnectionDefName <> LResolvedTypeMap.GetTable.GetConnectionDefName then
         Continue;
       if LProperty.GetRelationType in [ioRTBelongsTo] then
-        ASchema.FindTable(AMap.GetTable.TableName).AddOrUpdateFK(LResolvedTypeMap, AMap, LProperty)
+        ASchema.FindTable(AMap.GetTable.TableName).AddFK(LResolvedTypeMap, AMap, LProperty)
       else
-        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddOrUpdateFK(AMap, LResolvedTypeMap,
+        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddFK(AMap, LResolvedTypeMap,
           LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName));
     end;
   end;
@@ -82,6 +83,17 @@ begin
       Continue;
     LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   end;
+  BuildIndexList(LSchemaTable, AMap);
+end;
+
+class procedure TioDBBuilderSchemaBuilder.BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
+var
+  LIndexAttr: ioIndex;
+begin
+  // If some explicit index is present then add it to the list
+  if AMap.GetTable.IndexListExists then
+    for LIndexAttr in AMap.GetTable.GetIndexList(False) do
+        ASchemaTable.AddIndex(LIndexAttr);
 end;
 
 end.

@@ -3,7 +3,8 @@ unit iORM.DBBuilder.Schema.Table;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces;
+  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces,
+  iORM.Attributes;
 
 type
 
@@ -11,6 +12,7 @@ type
   private
     FFieldList: TioDBBuilderSchemaFieldList;
     FFKList: TioDBBuilderSchemaFKList;
+    FIndexList: TioDBBuilderSchemaIndexList;
     FIsClassFromField: Boolean;
     FContextTable: IioContextTable;
     // IsClassFromField
@@ -20,13 +22,13 @@ type
     constructor Create(const AContextTable: IioContextTable);
     destructor Destroy; override;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddOrUpdateFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddIndex(const AIndexAttr: ioIndex);
     function FieldExists(AFieldName: String): Boolean;
     function FieldList: TioDBBuilderSchemaFieldList;
     function FKList: TioDBBuilderSchemaFKList;
     // function IDField: IioDBBuilderSchemaField;
     function IndexList: TioDBBuilderSchemaIndexList;
-    function IndexListExists: Boolean;
     function TableName: String;
 
     property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
@@ -50,6 +52,7 @@ begin
   FIsClassFromField := AContextTable.IsClassFromField;
   FFieldList := TioDBBuilderSchemaFieldList.Create;
   FFKList := TioDBBuilderSchemaFKList.Create;
+  FIndexList := TioDBBuilderSchemaIndexList.Create;
 end;
 
 destructor TioDBBuilderSchemaTable.Destroy;
@@ -69,8 +72,14 @@ begin
   Result := FFieldList;
 end;
 
-procedure TioDBBuilderSchemaTable.AddOrUpdateFK(const AReferenceMap, ADependentMap: IioMap;
-  const ADependentProperty: IioContextProperty);
+procedure TioDBBuilderSchemaTable.AddIndex(const AIndexAttr: ioIndex);
+begin
+  // Add index if not already exists
+  if FIndexList.IndexOf(AIndexAttr) = -1 then
+    FIndexList.Add(AIndexAttr);
+end;
+
+procedure TioDBBuilderSchemaTable.AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
 var
   LFKName: String;
 begin
@@ -86,12 +95,7 @@ end;
 
 function TioDBBuilderSchemaTable.IndexList: TioDBBuilderSchemaIndexList;
 begin
-  Result := FContextTable.GetIndexList(False);
-end;
-
-function TioDBBuilderSchemaTable.IndexListExists: Boolean;
-begin
-  Result := FContextTable.IndexListExists
+  Result := FIndexList;
 end;
 
 function TioDBBuilderSchemaTable.TableName: String;

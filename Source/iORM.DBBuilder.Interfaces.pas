@@ -4,7 +4,7 @@ interface
 
 uses
   System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
-  iORM.Context.Map.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.Attributes;
 
 type
 
@@ -34,13 +34,13 @@ type
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddOrUpdateFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddIndex(const AIndexAttr: ioIndex);
     function FieldExists(AFieldName: String): Boolean;
     function FieldList: TioDBBuilderSchemaFieldList;
     function FKList: TioDBBuilderSchemaFKList;
 //    function IDField: IioDBBuilderSchemaField;
     function IndexList: TioDBBuilderSchemaIndexList;
-    function IndexListExists: Boolean;
     function TableName: String;
     // IsClassFromField
     procedure SetIsClassFromField(const AValue: Boolean);
