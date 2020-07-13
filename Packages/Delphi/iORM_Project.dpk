@@ -193,6 +193,7 @@ contains
   iORM.DBBuilder.Schema.Table in '..\..\Source\iORM.DBBuilder.Schema.Table.pas',
   iORM.DBBuilder.Schema.FK in '..\..\Source\iORM.DBBuilder.Schema.FK.pas',
   iORM.DBBuilder.Schema in '..\..\Source\iORM.DBBuilder.Schema.pas',
-  iORM.DBBuilder.Schema.Builder in '..\..\Source\iORM.DBBuilder.Schema.Builder.pas';
+  iORM.DBBuilder.Schema.Builder in '..\..\Source\iORM.DBBuilder.Schema.Builder.pas',
+  iORM.DBBuilder.Factory in '..\..\Source\iORM.DBBuilder.Factory.pas';
 
 end.

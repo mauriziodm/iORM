@@ -3,12 +3,14 @@ unit iORM.DBBuilder.Interfaces;
 interface
 
 uses
-  System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces;
+  System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
+  iORM.Context.Map.Interfaces;
 
 type
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
+    function Name: String;
     function ReferenceTableName: String;
     function ReferenceFieldName: String;
     function DependentTableName: String;
@@ -20,32 +22,40 @@ type
     function FieldName: String;
     function GetProperty: IioContextProperty;
     // IsSqlField
-    function GetIsConcreteField: Boolean;
-    procedure SetIsConcreteField(AValue: Boolean);
-    property IsConcreteField: Boolean read GetIsConcreteField write SetIsConcreteField;
+//    function GetIsConcreteField: Boolean;
+//    procedure SetIsConcreteField(AValue: Boolean);
+//    property IsConcreteField: Boolean read GetIsConcreteField write SetIsConcreteField;
   end;
 
-  TioDBBuilderSchemaFieldList = TList<IioDBBuilderSchemaField>;
+  TioDBBuilderSchemaFieldList = TDictionary<String, IioDBBuilderSchemaField>;
   TioDBBuilderSchemaIndexList = TioIndexList;
-  TioDBBuilderSchemaFKList = TList<IioDBBuilderSchemaFK>;
+  TioDBBuilderSchemaFKList = TDictionary<String, IioDBBuilderSchemaFK>;
 
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
+    procedure AddField(ASchemaField: IioDBBuilderSchemaField);
+    procedure AddOrUpdateFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
     function FieldExists(AFieldName: String): Boolean;
     function FieldList: TioDBBuilderSchemaFieldList;
     function FKList: TioDBBuilderSchemaFKList;
-    function IDField: IioDBBuilderSchemaField;
-    function IndexList: TioDBBuilderSchemaFieldList;
+//    function IDField: IioDBBuilderSchemaField;
+    function IndexList: TioDBBuilderSchemaIndexList;
     function IndexListExists: Boolean;
-    function IsClassFromField: Boolean;
-    function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
     function TableName: String;
+    // IsClassFromField
+    procedure SetIsClassFromField(const AValue: Boolean);
+    function GetIsClassFromField: Boolean;
+    property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
   end;
 
-  TioDBBuilderSchemaTableList = TList<IioDBBuilderSchemaTable>;
+  TioDBBuilderSchemaTableList = TDictionary<String, IioDBBuilderSchemaTable>;
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
+    function ConnectionDefName: String;
+    function ErrorList: TStringList;
+    function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
+    function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function SqlScript: TStringList;
     function TableList: TioDBBuilderSchemaTableList;
   end;

@@ -144,6 +144,7 @@ type
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;
     function GetConnectionDefName: String;
+    function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
     function GetAutoCreateDB: Boolean;
@@ -267,6 +268,15 @@ end;
 function TioContextTable.IsClassFromField: Boolean;
 begin
   Result := Assigned(FClassFromField);
+end;
+
+function TioContextTable.IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
+var
+  LCurrentConnectionDefName: String;
+begin
+  LCurrentConnectionDefName := GetConnectionDefName;
+  Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
+    (LCurrentConnectionDefName = AConnectionDefNameToCheck);
 end;
 
 procedure TioContextTable.SetIndexList(AIndexList: TioIndexList);

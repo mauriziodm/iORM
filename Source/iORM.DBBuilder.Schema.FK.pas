@@ -3,21 +3,23 @@ unit iORM.DBBuilder.Schema.FK;
 interface
 
 uses
-  iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces;
 
 type
 
-  TioDBBuilderSchemaFK = class(TInterfacedObject)
+  TioDBBuilderSchemaFK = class(TInterfacedObject, IioDBBuilderSchemaFK)
   private
-    FReferenceMap: IioMap;
     FDependentMap: IioMap;
     FDependentProperty: IioContextProperty;
+    FName: String;
+    FReferenceMap: IioMap;
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
-    function ReferenceTableName: String;
-    function ReferenceFieldName: String;
     function DependentTableName: String;
     function DependentFieldName: String;
+    function Name: String;
+    function ReferenceTableName: String;
+    function ReferenceFieldName: String;
   end;
 
 implementation
@@ -32,6 +34,11 @@ end;
 function TioDBBuilderSchemaFK.DependentTableName: String;
 begin
   Result := FDependentMap.GetTable.TableName;
+end;
+
+function TioDBBuilderSchemaFK.Name: String;
+begin
+  Result := FName;
 end;
 
 constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);

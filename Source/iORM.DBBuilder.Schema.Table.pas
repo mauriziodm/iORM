@@ -3,38 +3,51 @@ unit iORM.DBBuilder.Schema.Table;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces;
+  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces;
 
 type
 
-  TioDBBuilderSchemaTable = class(TInterfacedObject)
-  strict private
+  TioDBBuilderSchemaTable = class(TInterfacedObject, IioDBBuilderSchemaTable)
+  private
     FFieldList: TioDBBuilderSchemaFieldList;
     FFKList: TioDBBuilderSchemaFKList;
-    FTable: IioContextTable;
+    FIsClassFromField: Boolean;
+    FContextTable: IioContextTable;
+    // IsClassFromField
+    procedure SetIsClassFromField(const AValue: Boolean);
+    function GetIsClassFromField: Boolean;
   public
-    constructor Create(const ATable: IioContextTable);
+    constructor Create(const AContextTable: IioContextTable);
     destructor Destroy; override;
+    procedure AddField(ASchemaField: IioDBBuilderSchemaField);
+    procedure AddOrUpdateFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    function FieldExists(AFieldName: String): Boolean;
     function FieldList: TioDBBuilderSchemaFieldList;
     function FKList: TioDBBuilderSchemaFKList;
-//    function IDField: IioDBBuilderSchemaField;
+    // function IDField: IioDBBuilderSchemaField;
     function IndexList: TioDBBuilderSchemaIndexList;
     function IndexListExists: Boolean;
-    function IsClassFromField: Boolean;
-    function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
     function TableName: String;
+
+    property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
   end;
 
 implementation
 
 uses
-  iORM.CommonTypes, System.SysUtils;
+  iORM.CommonTypes, System.SysUtils, iORM.DBBuilder.Factory;
 
 { TioDBBuilderSchemaTable }
 
-constructor TioDBBuilderSchemaTable.Create(const ATable: IioContextTable);
+procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
-  FTable := ATable;
+  FFieldList.Add(ASchemaField.FieldName, ASchemaField);
+end;
+
+constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable);
+begin
+  FContextTable := AContextTable;
+  FIsClassFromField := AContextTable.IsClassFromField;
   FFieldList := TioDBBuilderSchemaFieldList.Create;
   FFKList := TioDBBuilderSchemaFKList.Create;
 end;
@@ -46,9 +59,24 @@ begin
   inherited;
 end;
 
+function TioDBBuilderSchemaTable.FieldExists(AFieldName: String): Boolean;
+begin
+  Result := FFieldList.ContainsKey(AFieldName);
+end;
+
 function TioDBBuilderSchemaTable.FieldList: TioDBBuilderSchemaFieldList;
 begin
   Result := FFieldList;
+end;
+
+procedure TioDBBuilderSchemaTable.AddOrUpdateFK(const AReferenceMap, ADependentMap: IioMap;
+  const ADependentProperty: IioContextProperty);
+var
+  LFKName: String;
+begin
+  LFKName := ADependentProperty.GetName + '_' + AReferenceMap.GetTable.TableName;
+  if not FFKList.ContainsKey(LFKName) then
+    FFKList.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty));
 end;
 
 function TioDBBuilderSchemaTable.FKList: TioDBBuilderSchemaFKList;
@@ -58,41 +86,38 @@ end;
 
 function TioDBBuilderSchemaTable.IndexList: TioDBBuilderSchemaIndexList;
 begin
-  Result := FTable.GetIndexList(False);
+  Result := FContextTable.GetIndexList(False);
 end;
 
 function TioDBBuilderSchemaTable.IndexListExists: Boolean;
 begin
-  Result := FTable.IndexListExists
+  Result := FContextTable.IndexListExists
 end;
 
 function TioDBBuilderSchemaTable.TableName: String;
 begin
-  Result := FTable.TableName;
+  Result := FContextTable.TableName;
 end;
 
-//function TioDBBuilderSchemaTable.IDField: IioDBBuilderSchemaField;
-//var
-//  AField: IioDBBuilderSchemaField;
-//begin
-//  Result := nil;
-//  for AField in FFieldList.Values do
-//    if AField.IsKeyField then
-//      Exit(AField);
-//end;
+// function TioDBBuilderSchemaTable.IDField: IioDBBuilderSchemaField;
+// var
+// AField: IioDBBuilderSchemaField;
+// begin
+// Result := nil;
+// for AField in FFieldList.Values do
+// if AField.IsKeyField then
+// Exit(AField);
+// end;
 
-function TioDBBuilderSchemaTable.IsClassFromField: Boolean;
+function TioDBBuilderSchemaTable.GetIsClassFromField: Boolean;
 begin
-  Result := FTable.IsClassFromField;
+  Result := FIsClassFromField;
 end;
 
-function TioDBBuilderSchemaTable.IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
-var
-  LCurrentConnectionDefName: String;
+procedure TioDBBuilderSchemaTable.SetIsClassFromField(const AValue: Boolean);
 begin
-  LCurrentConnectionDefName := FTable.GetConnectionDefName;
-  Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
-    (LCurrentConnectionDefName = AConnectionDefNameToCheck);
+  // Una volta a true rimane sempre a true
+  FIsClassFromField := AValue or FIsClassFromField;
 end;
 
 end.
