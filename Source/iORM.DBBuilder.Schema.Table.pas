@@ -24,7 +24,6 @@ type
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function FieldExists(AFieldName: String): Boolean;
     function FieldList: TioDBBuilderSchemaFieldList;
     function FKList: TioDBBuilderSchemaFKList;
     // function IDField: IioDBBuilderSchemaField;
@@ -43,7 +42,9 @@ uses
 
 procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
-  FFieldList.Add(ASchemaField.FieldName, ASchemaField);
+  // Add field if not already exists
+  if not FFieldList.ContainsKey(ASchemaField.FieldName) then
+    FFieldList.Add(ASchemaField.FieldName, ASchemaField);
 end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable);
@@ -62,11 +63,6 @@ begin
   inherited;
 end;
 
-function TioDBBuilderSchemaTable.FieldExists(AFieldName: String): Boolean;
-begin
-  Result := FFieldList.ContainsKey(AFieldName);
-end;
-
 function TioDBBuilderSchemaTable.FieldList: TioDBBuilderSchemaFieldList;
 begin
   Result := FFieldList;
@@ -83,6 +79,7 @@ procedure TioDBBuilderSchemaTable.AddFK(const AReferenceMap, ADependentMap: IioM
 var
   LFKName: String;
 begin
+  // Add tne FK if not already exists
   LFKName := ADependentProperty.GetName + '_' + AReferenceMap.GetTable.TableName;
   if not FFKList.ContainsKey(LFKName) then
     FFKList.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty));

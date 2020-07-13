@@ -77,12 +77,8 @@ begin
     Exit;
   LSchemaTable := ASchema.FindOrCreateTable(AMap);
   for LProperty in AMap.GetProperties do
-  begin
-    if LProperty.IsSkipped or (LProperty.GetRelationType = ioRTHasMany) or (LProperty.GetRelationType = ioRTHasOne) or
-      LSchemaTable.FieldExists(LProperty.GetSqlFieldName) then
-      Continue;
-    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
-  end;
+    if not (LProperty.IsSkipped and (LProperty.GetRelationType = ioRTHasMany) and (LProperty.GetRelationType = ioRTHasOne)) then
+      LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   BuildIndexList(LSchemaTable, AMap);
 end;
 

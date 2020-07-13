@@ -36,7 +36,6 @@ type
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function FieldExists(AFieldName: String): Boolean;
     function FieldList: TioDBBuilderSchemaFieldList;
     function FKList: TioDBBuilderSchemaFKList;
 //    function IDField: IioDBBuilderSchemaField;
