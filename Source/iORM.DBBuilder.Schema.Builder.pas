@@ -60,9 +60,9 @@ begin
       if AMap.GetTable.GetConnectionDefName <> LResolvedTypeMap.GetTable.GetConnectionDefName then
         Continue;
       if LProperty.GetRelationType in [ioRTBelongsTo] then
-        ASchema.FindTable(AMap.GetTable.TableName).AddFK(LResolvedTypeMap, AMap, LProperty)
+        ASchema.FindTable(AMap.GetTable.TableName).AddForeignKey(LResolvedTypeMap, AMap, LProperty)
       else
-        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddFK(AMap, LResolvedTypeMap,
+        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddForeignKey(AMap, LResolvedTypeMap,
           LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName));
     end;
   end;

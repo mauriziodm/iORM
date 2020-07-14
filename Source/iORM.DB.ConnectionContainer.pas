@@ -103,6 +103,7 @@ type
     class function IsEmptyConnectionName(const AConnectionName:String): Boolean;
     class function GetDefaultConnectionName: String;
     class function GetDefaultConnectionNameIfEmpty(const AConnectionDefName: String): String;
+    class function GetDatabaseFileName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): String;
     class function GetConnectionInfo(AConnectionName:String): TioConnectionInfo;
     class procedure SetDefaultConnectionName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
     class procedure SetShowHideWaitProc(const AShowWaitProc:TProc; const AHideWaitProc:TProc);
@@ -241,6 +242,11 @@ begin
   AConnectionName := GetDefaultConnectionNameIfEmpty(AConnectionName);
   // Return the desired connection type
   Result := FConnectionManagerContainer.Items[AConnectionName];
+end;
+
+class function TioConnectionManager.GetDatabaseFileName(const AConnectionName: String): String;
+begin
+  Result := Self.GetConnectionDefByName(AConnectionName).Params.Database;
 end;
 
 class function TioConnectionManager.GetDefaultConnectionName: String;

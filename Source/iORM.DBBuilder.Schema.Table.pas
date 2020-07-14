@@ -10,27 +10,32 @@ type
 
   TioDBBuilderSchemaTable = class(TInterfacedObject, IioDBBuilderSchemaTable)
   private
-    FFieldList: TioDBBuilderSchemaFieldList;
-    FFKList: TioDBBuilderSchemaFKList;
-    FIndexList: TioDBBuilderSchemaIndexList;
-    FIsClassFromField: Boolean;
     FContextTable: IioContextTable;
+    FFields: TioDBBuilderSchemaFields;
+    FForeignKeys: TioDBBuilderSchemaForeignKeys;
+    FIndexes: TioDBBuilderSchemaIndexes;
+    FIsClassFromField: Boolean;
+    FStatus: TioDBBuilderStatus;
     // IsClassFromField
-    procedure SetIsClassFromField(const AValue: Boolean);
     function GetIsClassFromField: Boolean;
+    procedure SetIsClassFromField(const AValue: Boolean);
+    // Status
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AContextTable: IioContextTable);
     destructor Destroy; override;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function FieldList: TioDBBuilderSchemaFieldList;
-    function FKList: TioDBBuilderSchemaFKList;
+    function FieldList: TioDBBuilderSchemaFields;
+    function ForeignKeys: TioDBBuilderSchemaForeignKeys;
     // function IDField: IioDBBuilderSchemaField;
-    function IndexList: TioDBBuilderSchemaIndexList;
+    function Indexes: TioDBBuilderSchemaIndexes;
     function TableName: String;
 
     property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -43,56 +48,57 @@ uses
 procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
   // Add field if not already exists
-  if not FFieldList.ContainsKey(ASchemaField.FieldName) then
-    FFieldList.Add(ASchemaField.FieldName, ASchemaField);
+  if not FFields.ContainsKey(ASchemaField.FieldName) then
+    FFields.Add(ASchemaField.FieldName, ASchemaField);
 end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable);
 begin
+  FStatus := dbsClean;
   FContextTable := AContextTable;
   FIsClassFromField := AContextTable.IsClassFromField;
-  FFieldList := TioDBBuilderSchemaFieldList.Create;
-  FFKList := TioDBBuilderSchemaFKList.Create;
-  FIndexList := TioDBBuilderSchemaIndexList.Create;
+  FFields := TioDBBuilderSchemaFields.Create;
+  FForeignKeys := TioDBBuilderSchemaForeignKeys.Create;
+  FIndexes := TioDBBuilderSchemaIndexes.Create;
 end;
 
 destructor TioDBBuilderSchemaTable.Destroy;
 begin
-  FFieldList.Free;
-  FFKList.Free;
+  FFields.Free;
+  FForeignKeys.Free;
   inherited;
 end;
 
-function TioDBBuilderSchemaTable.FieldList: TioDBBuilderSchemaFieldList;
+function TioDBBuilderSchemaTable.FieldList: TioDBBuilderSchemaFields;
 begin
-  Result := FFieldList;
+  Result := FFields;
 end;
 
 procedure TioDBBuilderSchemaTable.AddIndex(const AIndexAttr: ioIndex);
 begin
   // Add index if not already exists
-  if FIndexList.IndexOf(AIndexAttr) = -1 then
-    FIndexList.Add(AIndexAttr);
+  if FIndexes.IndexOf(AIndexAttr) = -1 then
+    FIndexes.Add(AIndexAttr);
 end;
 
-procedure TioDBBuilderSchemaTable.AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
 var
   LFKName: String;
 begin
   // Add tne FK if not already exists
   LFKName := ADependentProperty.GetName + '_' + AReferenceMap.GetTable.TableName;
-  if not FFKList.ContainsKey(LFKName) then
-    FFKList.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty));
+  if not FForeignKeys.ContainsKey(LFKName) then
+    FForeignKeys.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty));
 end;
 
-function TioDBBuilderSchemaTable.FKList: TioDBBuilderSchemaFKList;
+function TioDBBuilderSchemaTable.ForeignKeys: TioDBBuilderSchemaForeignKeys;
 begin
-  Result := FFKList;
+  Result := FForeignKeys;
 end;
 
-function TioDBBuilderSchemaTable.IndexList: TioDBBuilderSchemaIndexList;
+function TioDBBuilderSchemaTable.Indexes: TioDBBuilderSchemaIndexes;
 begin
-  Result := FIndexList;
+  Result := FIndexes;
 end;
 
 function TioDBBuilderSchemaTable.TableName: String;
@@ -115,10 +121,20 @@ begin
   Result := FIsClassFromField;
 end;
 
+function TioDBBuilderSchemaTable.GetStatus: TioDBBuilderStatus;
+begin
+  Result := FStatus;
+end;
+
 procedure TioDBBuilderSchemaTable.SetIsClassFromField(const AValue: Boolean);
 begin
   // Una volta a true rimane sempre a true
   FIsClassFromField := AValue or FIsClassFromField;
+end;
+
+procedure TioDBBuilderSchemaTable.SetStatus(const Value: TioDBBuilderStatus);
+begin
+  FStatus := Value;
 end;
 
 end.

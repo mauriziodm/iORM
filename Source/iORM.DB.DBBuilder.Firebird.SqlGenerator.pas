@@ -1,36 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.DB.DBBuilder.Firebird.SqlGenerator;
 
@@ -64,25 +63,28 @@ type
     function CreateDatabase(const ADbName: string): String;
     function UseDatabase(const ADbName: string): String;
 
-    function TableExists(const ADbName: String; const ATableName:String): Boolean;
-    function BeginCreateTable(const ATableName:String): String;
+    function TableExists(const ADbName: String; const ATableName: String): Boolean;
+    function BeginCreateTable(const ATableName: String): String;
     function EndCreateTable: String;
-    function BeginAlterTable(const ARemark: String; const ATableName:String): String;
+    function BeginAlterTable(const ARemark: String; const ATableName: String): String;
     function EndAlterTable(const APropertyIsID: Boolean): String;
     function GetRemark(const AWarnings: Boolean): String;
 
     function FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
-    function FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out AWarnings: Boolean): Boolean;
-    function CreateField(const AProperty:IioContextProperty; const AAddNullableSyntax: boolean = True; const AAddType: boolean = False): String;
+    function FieldModified(const ADbName: String; const ATableName: String; const AProperty: IioContextProperty;
+      out AWarnings: Boolean): Boolean;
+    function CreateField(const AProperty: IioContextProperty; const AAddNullableSyntax: Boolean = True;
+      const AAddType: Boolean = False): String;
     function CreateClassInfoField(ATable: IioDBBuilderTable): String;
-    function AddField(const AProperty:IioContextProperty): String;
-    function AlterField(const AProperty:IioContextProperty): String;
+    function AddField(const AProperty: IioContextProperty): String;
+    function AlterField(const AProperty: IioContextProperty): String;
 
     function AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
-    function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String;
-              const ACascadeOnDelete: Boolean; ACascadeOnUpdate : Boolean): String;
+    function AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String;
+      const ADestinationFieldName: String; const ACascadeOnDelete: Boolean; ACascadeOnUpdate: Boolean): String;
     function AddSequences(const ATableName: String; const AIDProperty: IioContextProperty): String;
-    function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
+    function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
+      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 
     function DropAllForeignKey(const ATableList: TioDBBuilderTableList): String;
     function DropAllIndex: String;
@@ -90,7 +92,7 @@ type
     function AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
     function RestructureTable(const ATableList: TioDBBuilderTableList): String;
 
-    procedure ExecuteSql(const ASql: string; const AMultipleSQL: boolean = False);
+    procedure ExecuteSql(const ASql: string; const AMultipleSQL: Boolean = False);
   end;
 
 implementation
@@ -101,7 +103,8 @@ uses
 
 { TioDBBuilderFirebirdSqlGenerator }
 
-function TioDBBuilderFirebirdSqlGenerator.CreateField(const AProperty:IioContextProperty; const AAddNullableSyntax: boolean = True; const AAddType: boolean = False): String;
+function TioDBBuilderFirebirdSqlGenerator.CreateField(const AProperty: IioContextProperty; const AAddNullableSyntax: Boolean = True;
+  const AAddType: Boolean = False): String;
 var
   LFieldName: string;
   LFieldType: string;
@@ -121,12 +124,12 @@ begin
   case AProperty.GetMetadata_FieldType of
     ioMdVarchar:
       begin
-        LFieldLength := Format('(%s)',[AProperty.GetMetadata_FieldLength.ToString]);
+        LFieldLength := Format('(%s)', [AProperty.GetMetadata_FieldLength.ToString]);
         LFieldType := 'VARCHAR'
       end;
     ioMdChar:
       begin
-        LFieldLength := Format('(%s)',[AProperty.GetMetadata_FieldLength.ToString]);
+        LFieldLength := Format('(%s)', [AProperty.GetMetadata_FieldLength.ToString]);
         LFieldType := 'CHAR'
       end;
     ioMdInteger:
@@ -134,26 +137,26 @@ begin
         LFieldType := 'INTEGER';
       end;
     ioMdFloat:
-        LFieldType := 'FLOAT';
+      LFieldType := 'FLOAT';
     ioMdDate:
-        LFieldType := 'DATE';
+      LFieldType := 'DATE';
     ioMdTime:
-        LFieldType := 'TIME';
+      LFieldType := 'TIME';
     ioMdDateTime:
-        LFieldType := 'TIMESTAMP';
+      LFieldType := 'TIMESTAMP';
     ioMdDecimal:
       begin
         LFieldType := 'DECIMAL';
         LPrecision := AProperty.GetMetadata_FieldPrecision.ToString;
         LScale := AProperty.GetMetadata_FieldScale.ToString;
-        LFieldLength := Format('(%s)',[LPrecision+','+LScale]);
+        LFieldLength := Format('(%s)', [LPrecision + ',' + LScale]);
       end;
     ioMdNumeric:
       begin
         LFieldType := 'NUMERIC';
         LPrecision := AProperty.GetMetadata_FieldPrecision.ToString;
         LScale := AProperty.GetMetadata_FieldScale.ToString;
-        LFieldLength := Format('(%s)',[LPrecision+','+LScale]);
+        LFieldLength := Format('(%s)', [LPrecision + ',' + LScale]);
       end;
     ioMdBoolean:
       begin
@@ -161,7 +164,7 @@ begin
       end;
     ioMdBinary:
       begin
-        if AProperty.GetMetadata_FieldSubType<>'' then
+        if AProperty.GetMetadata_FieldSubType <> '' then
           LFieldType := AProperty.GetMetadata_FieldSubType
         else
           LFieldType := 'BLOB'
@@ -191,37 +194,35 @@ begin
     LNullable := 'NOT NULL';
   end;
 
-  Result := ' ' +  LFieldName + ' ' +' '+ LType+' ' + ' ' + LFieldType + ' ' + ' ' + LKeyOptions + ' '+LFieldLength+' '+LNullable + ',';
+  Result := ' ' + LFieldName + ' ' + ' ' + LType + ' ' + ' ' + LFieldType + ' ' + ' ' + LKeyOptions + ' ' + LFieldLength + ' ' +
+    LNullable + ',';
 
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddField(const AProperty:IioContextProperty): String;
+function TioDBBuilderFirebirdSqlGenerator.AddField(const AProperty: IioContextProperty): String;
 var
   LRow: string;
 begin
-  LRow := Format('ADD %s ',[Self.CreateField(AProperty, False)]).Trim;
-  Result := LRow.Substring(0, LRow.Length-1);
+  LRow := Format('ADD %s ', [Self.CreateField(AProperty, False)]).Trim;
+  Result := LRow.Substring(0, LRow.Length - 1);
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String; const ADestinationTableName: String; const ADestinationFieldName: String;
-              const ACascadeOnDelete: Boolean; ACascadeOnUpdate : Boolean): String;
+function TioDBBuilderFirebirdSqlGenerator.AddForeignKey(const ASourceTableName: String; const ASourceFieldName: String;
+  const ADestinationTableName: String; const ADestinationFieldName: String; const ACascadeOnDelete: Boolean;
+  ACascadeOnUpdate: Boolean): String;
 var
   LGuid: TGuid;
   LFKName: string;
 begin
   // N.B. Viene calcolato un nome random perchè in FB c'e' un limite a 31 caratteri di lunghezza per i nomi dei constraint
   CreateGUID(LGuid);
-  LFKName := LGuid.ToString.Replace('-','',[rfReplaceAll]).Replace('}','',[rfReplaceAll]).Substring(24);
+  LFKName := LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
 
-  Result:='ALTER TABLE '+ASourceTableName+' '+
-          'ADD CONSTRAINT '+
-          'FK_'+LFKName+  //ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
-          ' FOREIGN KEY'+
-          '('+ASourceFieldName+')'+
-          ' REFERENCES '+ADestinationTableName+
-          '('+ADestinationFieldName+')';
+  Result := 'ALTER TABLE ' + ASourceTableName + ' ' + 'ADD CONSTRAINT ' + 'FK_' + LFKName +
+  // ASourceTableName+'_'+ASourceFieldName+'_'+ADestinationTableName+
+    ' FOREIGN KEY' + '(' + ASourceFieldName + ')' + ' REFERENCES ' + ADestinationTableName + '(' + ADestinationFieldName + ')';
 
   if ACascadeOnDelete then
     Result := Result + ' ON DELETE CASCADE';
@@ -230,22 +231,19 @@ begin
     Result := Result + ' ON UPDATE CASCADE';
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddForeignKeyInCreate(
-  const ABuilderTable: IioDBBuilderTable): String;
+function TioDBBuilderFirebirdSqlGenerator.AddForeignKeyInCreate(const ABuilderTable: IioDBBuilderTable): String;
 begin
   // Do Nothing
   Result := '';
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddSequences(
-  const ATableName: String; const AIDProperty: IioContextProperty): String;
+function TioDBBuilderFirebirdSqlGenerator.AddSequences(const ATableName: String; const AIDProperty: IioContextProperty): String;
 begin
-  Result := Format('CREATE SEQUENCE %s',[ATableName]);
+  Result := Format('CREATE SEQUENCE %s', [ATableName]);
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AddIndex(const AContext: IioContext; const AIndexName,
-  ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean): String;
+function TioDBBuilderFirebirdSqlGenerator.AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
+  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 var
   LQuery: IioQuery;
 begin
@@ -255,41 +253,37 @@ end;
 
 function TioDBBuilderFirebirdSqlGenerator.AddPrimaryKey(const ATableName: string; const AIDProperty: IioContextProperty): String;
 begin
-  Result := 'ALTER TABLE '+ATableName+' '+
-            'ADD PRIMARY KEY '+
-            '('+AIDProperty.GetSqlFieldName+')';
+  Result := 'ALTER TABLE ' + ATableName + ' ' + 'ADD PRIMARY KEY ' + '(' + AIDProperty.GetSqlFieldName + ')';
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.AlterField(const AProperty:IioContextProperty): String;
+function TioDBBuilderFirebirdSqlGenerator.AlterField(const AProperty: IioContextProperty): String;
 var
   LRow: String;
 begin
-  LRow := Format('ALTER %s ',[Self.CreateField(AProperty, False, True)]).Trim;
-  Result := LRow.Substring(0, LRow.Length-1);
+  LRow := Format('ALTER %s ', [Self.CreateField(AProperty, False, True)]).Trim;
+  Result := LRow.Substring(0, LRow.Length - 1);
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.BeginAlterTable(const ARemark: String; const ATableName:String): String;
+function TioDBBuilderFirebirdSqlGenerator.BeginAlterTable(const ARemark: String; const ATableName: String): String;
 begin
   FAlterTableScript := '';
-  Result := Format('%s ALTER TABLE %s',[ARemark, ATableName]);
+  Result := Format('%s ALTER TABLE %s', [ARemark, ATableName]);
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.BeginCreateTable(
-  const ATableName: String): String;
+function TioDBBuilderFirebirdSqlGenerator.BeginCreateTable(const ATableName: String): String;
 begin
   FCreateTableScript := '';
   Result := Format('CREATE TABLE %s (', [ATableName]);
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.ConversionTypeAdmitted(AColumnType,
-  AModelColumnType: string): Boolean;
+function TioDBBuilderFirebirdSqlGenerator.ConversionTypeAdmitted(AColumnType, AModelColumnType: string): Boolean;
 var
   LInvalidConversions: TStringList;
 begin
-  LInvalidConversions:=TStringList.Create;
+  LInvalidConversions := TStringList.Create;
 
   try
     // TODO: Potrebbero esserci altre conversioni da gestire
@@ -315,8 +309,9 @@ begin
     LInvalidConversions.Add('char->time');
     LInvalidConversions.Add('char->datetime');
 
-    Result:=True;
-    If LInvalidConversions.IndexOf(AColumnType+'->'+AModelColumnType)>0 then Result:=False;
+    Result := True;
+    If LInvalidConversions.IndexOf(AColumnType + '->' + AModelColumnType) > 0 then
+      Result := False;
 
   finally
     LInvalidConversions.Free;
@@ -325,18 +320,21 @@ end;
 
 function TioDBBuilderFirebirdSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
-  Result := ' ' + IO_CLASSFROMFIELD_FIELDNAME +' ' + ' ' + 'VARCHAR' + ' ' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+' ' + ',';
+  Result := ' ' + IO_CLASSFROMFIELD_FIELDNAME + ' ' + ' ' + 'VARCHAR' + ' ' + ' ' + '(' + IO_CLASSFROMFIELD_FIELDLENGTH + ')' + ' ' +
+    ' ' + ',';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.CreateDatabase(const ADbName: string): String;
 begin
   // N.B. Sfrutta un parametro di Firedac per autocreare il db se non esiste
-  TioDBFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName).Params.Values['CreateDatabase'] := BoolToStr(True,True);
+  TioDbFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName).Params.Values['CreateDatabase'] :=
+    BoolToStr(True, True);
   // N.B. Apriamo una connessione solo per fargli creare il db.
-  TioDBFactory.Connection(Self.GetConnectionDefName);
+  TioDbFactory.Connection(Self.GetConnectionDefName);
   // N.B. Rimuoviamo il parametro di Firedac per autocreare il db se non esiste
-  TioDBFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName).Params.Values['CreateDatabase'] := BoolToStr(False,True);
+  TioDbFactory.ConnectionManager.GetConnectionDefByName(Self.GetConnectionDefName).Params.Values['CreateDatabase'] :=
+    BoolToStr(False, True);
 
   Result := '';
 end;
@@ -351,11 +349,11 @@ var
   LQuery: IioQuery;
   LQueryDrop: IioQuery;
 begin
-  //LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  // LQueryDrop := io.GlobalFactory.DBFactory.Query('');
   LQueryDrop := GetQuery;
 
   // Retrieve All Foreign Key
-  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  // LQuery := io.GlobalFactory.DBFactory.Query('');
   LQuery := GetQuery;
 
   LQuery.SQL.Add('select r.rdb$relation_name as tname, r.rdb$constraint_name as cname');
@@ -366,7 +364,8 @@ begin
 
   while not LQuery.Eof do
   begin
-    LQueryDrop.SQL.Add(Format('ALTER TABLE %s DROP CONSTRAINT %s;',[LQuery.Fields.FieldByName('tname').AsString,LQuery.Fields.FieldByName('cname').AsString]));
+    LQueryDrop.SQL.Add(Format('ALTER TABLE %s DROP CONSTRAINT %s;', [LQuery.Fields.FieldByName('tname').AsString,
+      LQuery.Fields.FieldByName('cname').AsString]));
     LQuery.Next;
   end;
 
@@ -379,11 +378,11 @@ var
   LQuery: IioQuery;
   LQueryDrop: IioQuery;
 begin
-  //LQueryDrop := io.GlobalFactory.DBFactory.Query('');
+  // LQueryDrop := io.GlobalFactory.DBFactory.Query('');
   LQueryDrop := GetQuery;
 
   // Retrieve All Foreign Key
-  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  // LQuery := io.GlobalFactory.DBFactory.Query('');
   LQuery := GetQuery;
 
   LQuery.SQL.Add('select RDB$INDEX_NAME as iname, RDB$RELATION_NAME as tname');
@@ -395,7 +394,7 @@ begin
 
   while not LQuery.Eof do
   begin
-    LQueryDrop.SQL.Add(Format('DROP INDEX %s',[LQuery.Fields.FieldByName('iname').AsString]));
+    LQueryDrop.SQL.Add(Format('DROP INDEX %s', [LQuery.Fields.FieldByName('iname').AsString]));
 
     LQuery.Next;
   end;
@@ -411,7 +410,8 @@ begin
   FAlterTableScript := FAlterTableScript + ' ' + Result;
 
   // Skip ID Property
-  if APropertyIsID then FAlterTableScript := '';
+  if APropertyIsID then
+    FAlterTableScript := '';
 end;
 
 function TioDBBuilderFirebirdSqlGenerator.EndCreateTable: String;
@@ -420,15 +420,16 @@ begin
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 
-procedure TioDBBuilderFirebirdSqlGenerator.ExecuteSql(const ASql: string; const AMultipleSQL: boolean);
+procedure TioDBBuilderFirebirdSqlGenerator.ExecuteSql(const ASql: string; const AMultipleSQL: Boolean);
 var
   LQuery: IioQuery;
   LSlTemp: TStringList;
   I: Integer;
 begin
-  if ASql.IsEmpty then Exit;
+  if ASql.IsEmpty then
+    Exit;
 
-  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  // LQuery := io.GlobalFactory.DBFactory.Query('');
   LQuery := GetQuery;
 
   if AMultipleSQL then
@@ -437,7 +438,7 @@ begin
     try
       LSlTemp.Text := ASql;
 
-      for I := 0 to LSlTemp.Count-1 do
+      for I := 0 to LSlTemp.Count - 1 do
       begin
         LQuery.SQL.Clear;
         LQuery.SQL.Add(LSlTemp.Strings[I]);
@@ -455,14 +456,15 @@ begin
   end;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.FieldExists(const ADbName: String; const ATableName: String; const AFieldName: String): Boolean;
+function TioDBBuilderFirebirdSqlGenerator.FieldExists(const ADbName: String; const ATableName: String;
+  const AFieldName: String): Boolean;
 var
   LQuery: IioQuery;
   LConnectionDefName: string;
 begin
   Result := False;
   LConnectionDefName := io.GlobalFactory.DBFactory.ConnectionManager.GetDefaultConnectionName;
-  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  // LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
   LQuery := GetQuery;
 
   LQuery.SQL.Add('select f.rdb$relation_name as tablename, f.rdb$field_name as fieldname');
@@ -470,8 +472,8 @@ begin
   LQuery.SQL.Add('join rdb$relations r on f.rdb$relation_name = r.rdb$relation_name');
   LQuery.SQL.Add('and r.rdb$view_blr is null');
   LQuery.SQL.Add('and (r.rdb$system_flag is null or r.rdb$system_flag = 0)');
-  LQuery.SQL.Add('where f.rdb$relation_name = '+QuotedStr(ATableName.ToUpper));
-  LQuery.SQL.Add('and f.rdb$field_name = '+QuotedStr(AFieldName.ToUpper));
+  LQuery.SQL.Add('where f.rdb$relation_name = ' + QuotedStr(ATableName.ToUpper));
+  LQuery.SQL.Add('and f.rdb$field_name = ' + QuotedStr(AFieldName.ToUpper));
   LQuery.SQL.Add('order by 1, f.rdb$field_position');
 
   LQuery.Open;
@@ -482,7 +484,8 @@ begin
   LQuery.Close;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.FieldModified(const ADbName: String; const ATableName: String; const AProperty:IioContextProperty; out AWarnings: Boolean): Boolean;
+function TioDBBuilderFirebirdSqlGenerator.FieldModified(const ADbName: String; const ATableName: String;
+  const AProperty: IioContextProperty; out AWarnings: Boolean): Boolean;
 var
   LQuery: IioQuery;
   LColumnName: string;
@@ -491,10 +494,10 @@ var
   LColumnDecimals: Integer;
   LColumnNullable: Boolean;
 begin
-//  LColumnLength := 0;
+  // LColumnLength := 0;
 
   Result := False;
-  //LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
+  // LQuery := io.GlobalFactory.DBFactory.Query(LConnectionDefName);
   LQuery := GetQuery;
 
   LQuery.SQL.Add('SELECT r.RDB$FIELD_NAME AS column_name,');
@@ -511,7 +514,7 @@ begin
   LQuery.SQL.Add('WHEN 14 THEN ''CHAR''');
   LQuery.SQL.Add('WHEN 8 THEN ''INTEGER''');
   LQuery.SQL.Add('WHEN 7 THEN ''SMALLINT''');
-  LQuery.SQL.Add('WHEN 16 THEN ''INT64''');  // --> DECIMAL field_subtype 2, NUMERIC field_subtype 1, BIGINT field_subtype 0
+  LQuery.SQL.Add('WHEN 16 THEN ''INT64'''); // --> DECIMAL field_subtype 2, NUMERIC field_subtype 1, BIGINT field_subtype 0
   LQuery.SQL.Add('WHEN 27 THEN ''DOUBLE''');
   LQuery.SQL.Add('WHEN 10 THEN ''FLOAT''');
   LQuery.SQL.Add('WHEN 12 THEN ''DATE''');
@@ -526,30 +529,31 @@ begin
   LQuery.SQL.Add('LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME');
   LQuery.SQL.Add('LEFT JOIN RDB$COLLATIONS coll ON f.RDB$COLLATION_ID = coll.RDB$COLLATION_ID');
   LQuery.SQL.Add('LEFT JOIN RDB$CHARACTER_SETS cset ON f.RDB$CHARACTER_SET_ID = cset.RDB$CHARACTER_SET_ID');
-  LQuery.SQL.Add('WHERE r.RDB$RELATION_NAME='+QuotedStr(ATableName.ToUpper)+' ');
-  LQuery.SQL.Add('AND r.RDB$FIELD_NAME='+QuotedStr(AProperty.GetName.ToUpper)+' ');
+  LQuery.SQL.Add('WHERE r.RDB$RELATION_NAME=' + QuotedStr(ATableName.ToUpper) + ' ');
+  LQuery.SQL.Add('AND r.RDB$FIELD_NAME=' + QuotedStr(AProperty.GetName.ToUpper) + ' ');
   LQuery.SQL.Add('ORDER BY r.RDB$FIELD_POSITION');
 
   LQuery.Open;
 
   if not LQuery.Eof then
   begin
-    LColumnName:=LQuery.Fields.FieldByName('column_name').AsString;
-    LColumnTyp:=LQuery.Fields.FieldByName('type_name').AsString.Replace('identity','',[rfReplaceAll]).Trim;
+    LColumnName := LQuery.Fields.FieldByName('column_name').AsString;
+    LColumnTyp := LQuery.Fields.FieldByName('type_name').AsString.Replace('identity', '', [rfReplaceAll]).Trim;
 
-    if ((LQuery.Fields.FieldByName('type_name').AsString='INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString='2')) or  // decimal
-       ((LQuery.Fields.FieldByName('type_name').AsString='INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString='1')) then
-      LColumnLength:=LQuery.Fields.FieldByName('fprecision').AsInteger
+    if ((LQuery.Fields.FieldByName('type_name').AsString = 'INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString = '2')) or
+    // decimal
+      ((LQuery.Fields.FieldByName('type_name').AsString = 'INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString = '1')) then
+      LColumnLength := LQuery.Fields.FieldByName('fprecision').AsInteger
     else
-      LColumnLength:=LQuery.Fields.FieldByName('flength').AsInteger;
-    if LQuery.Fields.FieldByName('fscale').Isnull then
-      LColumnDecimals:=0
+      LColumnLength := LQuery.Fields.FieldByName('flength').AsInteger;
+    if LQuery.Fields.FieldByName('fscale').IsNull then
+      LColumnDecimals := 0
     else
-      LColumnDecimals:=Abs(LQuery.Fields.FieldByName('fscale').AsInteger);
-    LColumnNullable:=(LQuery.Fields.FieldByName('is_Nullable').IsNull);
+      LColumnDecimals := Abs(LQuery.Fields.FieldByName('fscale').AsInteger);
+    LColumnNullable := (LQuery.Fields.FieldByName('is_Nullable').IsNull);
 
     // Verify if something has been changed in FieldType
-    if LColumnTyp.ToLower<>GetColumnType(AProperty).ToLower then
+    if LColumnTyp.ToLower <> GetColumnType(AProperty).ToLower then
     begin
       if ConversionTypeAdmitted(LColumnTyp.ToLower, GetColumnType(AProperty).ToLower) then
       begin
@@ -565,11 +569,10 @@ begin
     end;
 
     // Verify if something has been changed in FieldLength
-    if (LQuery.Fields.FieldByName('type_name').AsString='VARCHAR') or
-       (LQuery.Fields.FieldByName('type_name').AsString='CHAR') then
+    if (LQuery.Fields.FieldByName('type_name').AsString = 'VARCHAR') or (LQuery.Fields.FieldByName('type_name').AsString = 'CHAR') then
     begin
       // Verify if model length is >= db column otherwise warnings and statement not execute
-      if AProperty.GetMetadata_FieldLength<LColumnLength then
+      if AProperty.GetMetadata_FieldLength < LColumnLength then
       begin
         AWarnings := True;
         Result := True;
@@ -577,7 +580,7 @@ begin
       end
       else
       begin
-        if LColumnLength<>AProperty.GetMetadata_FieldLength then
+        if LColumnLength <> AProperty.GetMetadata_FieldLength then
         begin
           Result := True;
           Exit;
@@ -586,10 +589,11 @@ begin
     end;
 
     // Verify if something has been changed in FieldPrecision
-    if ((LQuery.Fields.FieldByName('type_name').AsString='INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString='2')) or  // decimal
-       ((LQuery.Fields.FieldByName('type_name').AsString='INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString='1')) then
+    if ((LQuery.Fields.FieldByName('type_name').AsString = 'INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString = '2')) or
+    // decimal
+      ((LQuery.Fields.FieldByName('type_name').AsString = 'INT64') and (LQuery.Fields.FieldByName('field_subtype').AsString = '1')) then
     begin
-      if AProperty.GetMetadata_FieldPrecision<LColumnLength then
+      if AProperty.GetMetadata_FieldPrecision < LColumnLength then
       begin
         AWarnings := True;
         Result := True;
@@ -597,7 +601,7 @@ begin
       end
       else
       begin
-        if LColumnLength<>AProperty.GetMetadata_FieldPrecision then
+        if LColumnLength <> AProperty.GetMetadata_FieldPrecision then
         begin
           Result := True;
           Exit;
@@ -605,8 +609,8 @@ begin
       end;
 
       // Verify if something has been changed in FieldScale
-      if not LQuery.Fields.FieldByName('fscale').Isnull then
-        if LColumnDecimals<AProperty.GetMetadata_FieldScale then
+      if not LQuery.Fields.FieldByName('fscale').IsNull then
+        if LColumnDecimals < AProperty.GetMetadata_FieldScale then
         begin
           AWarnings := True;
           Result := True;
@@ -614,7 +618,7 @@ begin
         end
         else
         begin
-          if LColumnDecimals<>AProperty.GetMetadata_FieldScale then
+          if LColumnDecimals <> AProperty.GetMetadata_FieldScale then
           begin
             Result := True;
             Exit;
@@ -623,7 +627,7 @@ begin
     end;
 
     // Verify if something has been changed in FieldNullable. Skip ID field
-    if (not AProperty.IsID) and (LColumnNullable<>AProperty.GetMetadata_FieldNullable) then
+    if (not AProperty.IsID) and (LColumnNullable <> AProperty.GetMetadata_FieldNullable) then
     begin
       if AProperty.GetMetadata_FieldNullable and (not LColumnNullable) then
       begin
@@ -658,20 +662,20 @@ begin
         Result := 'INTEGER';
       end;
     ioMdFloat:
-        Result := 'FLOAT';
+      Result := 'FLOAT';
     ioMdDate:
-        Result := 'DATE';
+      Result := 'DATE';
     ioMdTime:
-        Result := 'TIME';
+      Result := 'TIME';
     ioMdDateTime:
-        Result := 'TIMESTAMP';
+      Result := 'TIMESTAMP';
     ioMdDecimal:
       begin
-        Result := 'INT64';  // Firebird use subtype
+        Result := 'INT64'; // Firebird use subtype
       end;
     ioMdNumeric:
       begin
-        Result := 'INT64';  // Firebird use subtype
+        Result := 'INT64'; // Firebird use subtype
       end;
     ioMdBoolean:
       begin
@@ -679,7 +683,7 @@ begin
       end;
     ioMdBinary:
       begin
-        if AProperty.GetMetadata_FieldSubType<>'' then
+        if AProperty.GetMetadata_FieldSubType <> '' then
           Result := AProperty.GetMetadata_FieldSubType
         else
           Result := 'BLOB'
@@ -689,8 +693,7 @@ begin
   end;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.GetRemark(
-  const AWarnings: Boolean): String;
+function TioDBBuilderFirebirdSqlGenerator.GetRemark(const AWarnings: Boolean): String;
 begin
   if AWarnings then
     Result := '-- '
@@ -698,23 +701,22 @@ begin
     Result := '';
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.RestructureTable(
-  const ATableList: TioDBBuilderTableList): String;
+function TioDBBuilderFirebirdSqlGenerator.RestructureTable(const ATableList: TioDBBuilderTableList): String;
 begin
   // Do Nothing
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.TableExists(const ADbName: String; const ATableName:String): Boolean;
+function TioDBBuilderFirebirdSqlGenerator.TableExists(const ADbName: String; const ATableName: String): Boolean;
 var
   LQuery: IioQuery;
 begin
-  //LQuery := io.GlobalFactory.DBFactory.Query('');
+  // LQuery := io.GlobalFactory.DBFactory.Query('');
   LQuery := GetQuery;
   LQuery.SQL.Add('select rdb$relation_name as TableName');
   LQuery.SQL.Add('from rdb$relations');
   LQuery.SQL.Add('where rdb$view_blr is null');
   LQuery.SQL.Add('and (rdb$system_flag is null or rdb$system_flag = 0)');
-  LQuery.SQL.Add('and rdb$relation_name='+QuotedStr(ATableName.ToUpper));
+  LQuery.SQL.Add('and rdb$relation_name=' + QuotedStr(ATableName.ToUpper));
   LQuery.Open;
 
   if LQuery.Eof or LQuery.Fields.FieldByName('TableName').IsNull then
@@ -725,13 +727,9 @@ begin
   LQuery.Close;
 end;
 
-function TioDBBuilderFirebirdSqlGenerator.UseDatabase(
-  const ADbName: string): String;
+function TioDBBuilderFirebirdSqlGenerator.UseDatabase(const ADbName: string): String;
 begin
   Result := '';
 end;
 
 end.
-
-
-

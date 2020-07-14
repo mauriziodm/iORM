@@ -10,15 +10,16 @@ type
   TioDBBuilderSchemaField = class(TInterfacedObject, IioDBBuilderSchemaField)
   private
     FContextProperty: IioContextProperty;
-//    FIsConcreteField: Boolean;
-    // IsSqlField
-//    function GetIsConcreteField: Boolean;
-//    procedure SetIsConcreteField(AValue: Boolean);
+    FStatus: TioDBBuilderStatus;
+    // Status
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AContextProperty: IioContextProperty);
     function FieldName: String;
     function GetProperty: IioContextProperty;
-//    property IsConcreteField: Boolean read GetIsConcreteField write SetIsConcreteField;
+    function IsPrimaryKey: Boolean;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -27,6 +28,7 @@ implementation
 
 constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioContextProperty);
 begin
+  FStatus := dbsClean;
   FContextProperty := AContextProperty;
 end;
 
@@ -35,19 +37,24 @@ begin
   Result := FContextProperty.GetSqlFieldName;
 end;
 
-//function TioDBBuilderSchemaField.GetIsConcreteField: Boolean;
-//begin
-//  Result := FIsConcreteField;
-//end;
-
 function TioDBBuilderSchemaField.GetProperty: IioContextProperty;
 begin
   Result := FContextProperty;
 end;
 
-//procedure TioDBBuilderSchemaField.SetIsConcreteField(AValue: Boolean);
-//begin
-//  FIsConcreteField := AValue;
-//end;
+function TioDBBuilderSchemaField.GetStatus: TioDBBuilderStatus;
+begin
+  Result := FStatus;
+end;
+
+function TioDBBuilderSchemaField.IsPrimaryKey: Boolean;
+begin
+  Result := FContextProperty.IsID;
+end;
+
+procedure TioDBBuilderSchemaField.SetStatus(const Value: TioDBBuilderStatus);
+begin
+  FStatus := Value;
+end;
 
 end.

@@ -10,24 +10,32 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FConnectionDefName: String;
-    FErrorList: TStringList;
+    FErrorMsg: String;
+    FDBExists: Boolean;
     FSqlScript: TStringList;
     FTableList: TioDBBuilderSchemaTableList;
+    // DBExists
+    function GetDBExists: Boolean;
+    procedure SetDBExists(const Value: Boolean);
   public
     constructor Create(const AConnectionDefName: String);
     destructor Destroy; override;
     function ConnectionDefName: String;
-    function ErrorList: TStringList;
+    function DatabaseFileName: String;
+    function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function SqlScript: TStringList;
+    function SqlScriptEmpty: Boolean;
     function TableList: TioDBBuilderSchemaTableList;
+
+    property DBExists: Boolean read GetDBExists write SetDBExists;
   end;
 
 implementation
 
 uses
-  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils;
+  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer;
 
 { TioDBBuilderSchema }
 
@@ -39,22 +47,25 @@ end;
 constructor TioDBBuilderSchema.Create(const AConnectionDefName: String);
 begin
   FConnectionDefName := AConnectionDefName;
-  FErrorList := TStringList.Create;
   FSqlScript := TStringList.Create;
   FTableList := TioDBBuilderSchemaTableList.Create;
+end;
+
+function TioDBBuilderSchema.DatabaseFileName: String;
+begin
+  Result := TioConnectionManager.GetDatabaseFileName(FConnectionDefName);
 end;
 
 destructor TioDBBuilderSchema.Destroy;
 begin
   FSqlScript.Free;
-  FErrorList.Free;
   FTableList.Free;
   inherited;
 end;
 
-function TioDBBuilderSchema.ErrorList: TStringList;
+function TioDBBuilderSchema.ErrorMsg: String;
 begin
-  Result := FErrorList;
+  Result := FErrorMsg;
 end;
 
 function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
@@ -78,9 +89,24 @@ begin
   Result := FTableList.Items[ATableName];
 end;
 
+function TioDBBuilderSchema.GetDBExists: Boolean;
+begin
+  Result := FDBExists;
+end;
+
+procedure TioDBBuilderSchema.SetDBExists(const Value: Boolean);
+begin
+  FDBExists := Value;
+end;
+
 function TioDBBuilderSchema.SqlScript: TStringList;
 begin
   Result := FSqlScript;
+end;
+
+function TioDBBuilderSchema.SqlScriptEmpty: Boolean;
+begin
+  Result := FSqlScript.Count = 0;
 end;
 
 function TioDBBuilderSchema.TableList: TioDBBuilderSchemaTableList;

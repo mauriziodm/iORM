@@ -194,6 +194,8 @@ contains
   iORM.DBBuilder.Schema.FK in '..\..\Source\iORM.DBBuilder.Schema.FK.pas',
   iORM.DBBuilder.Schema in '..\..\Source\iORM.DBBuilder.Schema.pas',
   iORM.DBBuilder.Schema.Builder in '..\..\Source\iORM.DBBuilder.Schema.Builder.pas',
-  iORM.DBBuilder.Factory in '..\..\Source\iORM.DBBuilder.Factory.pas';
+  iORM.DBBuilder.Factory in '..\..\Source\iORM.DBBuilder.Factory.pas',
+  iORM.DBBuilder.SqlGenerator.SqLite in '..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas',
+  iORM.DBBuilder.SqlGenerator.Base in '..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas';
 
 end.

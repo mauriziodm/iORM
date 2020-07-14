@@ -8,6 +8,8 @@ uses
 
 type
 
+  TioDBBuilderStatus = (dbsClean, dbsAlter, dbsAdd);
+
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
     function Name: String;
@@ -20,31 +22,36 @@ type
   IioDBBuilderSchemaField = interface
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
     function FieldName: String;
-    function GetProperty: IioContextProperty;
-    // IsSqlField
-//    function GetIsConcreteField: Boolean;
-//    procedure SetIsConcreteField(AValue: Boolean);
-//    property IsConcreteField: Boolean read GetIsConcreteField write SetIsConcreteField;
+//    function GetProperty: IioContextProperty;
+    function IsPrimaryKey: Boolean;
+    // Status
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
-  TioDBBuilderSchemaFieldList = TDictionary<String, IioDBBuilderSchemaField>;
-  TioDBBuilderSchemaIndexList = TioIndexList;
-  TioDBBuilderSchemaFKList = TDictionary<String, IioDBBuilderSchemaFK>;
+  TioDBBuilderSchemaFields = TDictionary<String, IioDBBuilderSchemaField>;
+  TioDBBuilderSchemaIndexes = TioIndexList;
+  TioDBBuilderSchemaForeignKeys = TDictionary<String, IioDBBuilderSchemaFK>;
 
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function FieldList: TioDBBuilderSchemaFieldList;
-    function FKList: TioDBBuilderSchemaFKList;
+    function FieldList: TioDBBuilderSchemaFields;
+    function ForeignKeys: TioDBBuilderSchemaForeignKeys;
 //    function IDField: IioDBBuilderSchemaField;
-    function IndexList: TioDBBuilderSchemaIndexList;
+    function Indexes: TioDBBuilderSchemaIndexes;
     function TableName: String;
     // IsClassFromField
     procedure SetIsClassFromField(const AValue: Boolean);
     function GetIsClassFromField: Boolean;
     property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
+    // Status
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
   TioDBBuilderSchemaTableList = TDictionary<String, IioDBBuilderSchemaTable>;
@@ -52,11 +59,17 @@ type
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     function ConnectionDefName: String;
-    function ErrorList: TStringList;
+    function DatabaseFileName: String;
+    function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function SqlScript: TStringList;
+    function SqlScriptEmpty: Boolean;
     function TableList: TioDBBuilderSchemaTableList;
+    // DBExists
+    function GetDBExists: Boolean;
+    procedure SetDBExists(const Value: Boolean);
+    property DBExists: Boolean read GetDBExists write SetDBExists;
   end;
 
   IioDBBuilderStrategyIndex = interface
