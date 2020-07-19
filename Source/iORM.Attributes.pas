@@ -36,7 +36,7 @@ unit iORM.Attributes;
 interface
 
 uses
-  iORM.CommonTypes, System.UITypes, ObjMapper.Attributes;
+  iORM.CommonTypes, System.UITypes, ObjMapper.Attributes, System.Rtti;
 
 type
 
@@ -88,6 +88,15 @@ type
   public
     constructor Create(const AValue: Boolean);
     property Value: Boolean read FValue;
+  end;
+
+  // Base TValue attribute
+  TioCustomTValueAttribute = class(TCustomAttribute)
+  strict private
+    FValue: TValue;
+  public
+    constructor Create(const AValue: TValue);
+    property Value: TValue read FValue;
   end;
 
   // Base class for relation attribute
@@ -234,87 +243,92 @@ type
   // Define Base Type
   ioFTBase = class(TioCustomAttribute)
   strict private
-    FIsNullable: Boolean;
+    FNotNull: Boolean;
   public
-    constructor Create(const AIsNullable: Boolean = True); virtual;
-    property IsNullable: Boolean read FIsNullable;
+    constructor Create(const ANotNull: Boolean = False); virtual;
+    property NotNull: Boolean read FNotNull;
   end;
 
   // Define VarChar Type
-  ioVarchar = class(ioFTBase)
+  ioFTVarchar = class(ioFTBase)
   strict private
     FIsUnicode: Boolean;
     FLength: Integer;
   public
-    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
-    constructor Create(const ALength: Integer; const AIsNullable: Boolean = True; const AIsUnicode: Boolean = True); reintroduce; overload;
+    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const ALength: Integer; const ANotNull: Boolean = False; const AIsUnicode: Boolean = True); reintroduce; overload;
     property IsUnicode: Boolean read FIsUnicode;
     property Length: Integer read FLength;
   end;
 
   // Define Char Type
-  ioChar = class(ioVarchar)
+  ioFTChar = class(ioFTVarchar)
   end;
 
   // Define Integer Type (SmallInt, Integer, BigInt)
-  ioInteger = class(ioFTBase)
+  ioFTInteger = class(ioFTBase)
   strict private
     FPrecision: Integer;
   public
-    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
-    constructor Create(const APrecision: Integer = 10; const AIsNullable: Boolean = True); reintroduce; overload;
+    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const APrecision: Integer = 10; const ANotNull: Boolean = False); reintroduce; overload;
     property Precision: Integer read FPrecision;
   end;
 
   // Define Float Type (Float)
-  ioFloat = class(ioFTBase)
+  ioFTFloat = class(ioFTBase)
   end;
 
   // Define Date Type (Date)
-  ioDate = class(ioFTBase)
+  ioFTDate = class(ioFTBase)
   end;
 
   // Define Date Type (Time)
-  ioTime = class(ioFTBase)
+  ioFTTime = class(ioFTBase)
   end;
 
   // Define DateTime Type (DateTime)
-  ioDateTime = class(ioFTBase)
+  ioFTDateTime = class(ioFTBase)
   end;
 
   // Define Boolean Type (Boolean)
-  ioBoolean = class(ioFTBase)
+  ioFTBoolean = class(ioFTBase)
   end;
 
   // Define Decimal Or Numeric Type
   // DECIMAL(p,s) --> DECIMAL(13,2) 11 Digits Before the decimal and 2 Digits after decimal
   // NUMERIC(p,s) --> NUMERIC(13,2) Treated in the same way of Decimal
-  ioDecimal = class(ioFTBase)
+  ioFTDecimal = class(ioFTBase)
   strict private
     FPrecision: Integer;
     FScale: Integer;
   public
-    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
-    constructor Create(const APrecision: Integer; const AScale: Integer; const AIsNullable: Boolean = True); reintroduce; overload;
+    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const APrecision: Integer; const AScale: Integer; const ANotNull: Boolean = False); reintroduce; overload;
     property Precision: Integer read FPrecision;
     property Scale: Integer read FScale;
   end;
 
-  ioNumeric = class(ioDecimal)
+  ioFTNumeric = class(ioFTDecimal)
   end;
 
   // Define Binary Type (Binary Data)
-  ioBinary = class(ioFTBase)
+  ioFTBinary = class(ioFTBase)
   strict private
     FBinarySubType: string;
   public
-    constructor Create(const AIsNullable: Boolean = True); reintroduce; overload;
-    constructor Create(const ABinarySubType: string; const AIsNullable: Boolean = True); reintroduce; overload;
+    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const ABinarySubType: string; const ANotNull: Boolean = False); reintroduce; overload;
     property BinarySubType: string read FBinarySubType;
   end;
 
   // Custom FieldType attribute
-  ioCustomFieldType = class(TioCustomStringAttribute)
+  ioFTCustom = class(TioCustomStringAttribute)
+  end;
+
+  // Default value for the DB field (Mauri: 18/07/2020)
+  ioFTDefault = class(TioCustomTValueAttribute)
+
   end;
 
   // Define Disable Create FK
@@ -412,6 +426,7 @@ type
   // KeyGeneratorName attribute
   ioKeyGenerator = class(TioCustomStringAttribute)
   end;
+  ioKeySequence = ioKeyGenerator;
 
   // ConnectionDefName attribute
   ioConnectionDefName = class(TioCustomStringAttribute)
@@ -758,14 +773,14 @@ end;
 
 { ioVarchar }
 
-constructor ioVarchar.Create(const ALength: Integer; const AIsNullable: Boolean; const AIsUnicode: Boolean);
+constructor ioFTVarchar.Create(const ALength: Integer; const ANotNull: Boolean; const AIsUnicode: Boolean);
 begin
-  inherited Create(AIsNullable);
+  inherited Create(ANotNull);
   FLength := ALength;
   FIsUnicode := AIsUnicode;
 end;
 
-constructor ioVarchar.Create(const AIsNullable: Boolean);
+constructor ioFTVarchar.Create(const ANotNull: Boolean);
 begin
   inherited;
   FLength := 255;
@@ -773,13 +788,13 @@ end;
 
 { ioInteger }
 
-constructor ioInteger.Create(const APrecision: Integer; const AIsNullable: Boolean);
+constructor ioFTInteger.Create(const APrecision: Integer; const ANotNull: Boolean);
 begin
-  inherited Create(AIsNullable);
+  inherited Create(ANotNull);
   FPrecision := APrecision;
 end;
 
-constructor ioInteger.Create(const AIsNullable: Boolean);
+constructor ioFTInteger.Create(const ANotNull: Boolean);
 begin
   inherited;
   FPrecision := 10;
@@ -787,14 +802,14 @@ end;
 
 { ioDecimalOrNumeric }
 
-constructor ioDecimal.Create(const APrecision, AScale: Integer; const AIsNullable: Boolean);
+constructor ioFTDecimal.Create(const APrecision, AScale: Integer; const ANotNull: Boolean);
 begin
-  inherited Create(AIsNullable);
+  inherited Create(ANotNull);
   FPrecision := APrecision;
   FScale := AScale;
 end;
 
-constructor ioDecimal.Create(const AIsNullable: Boolean);
+constructor ioFTDecimal.Create(const ANotNull: Boolean);
 begin
   inherited;
   FPrecision := 13;
@@ -803,13 +818,13 @@ end;
 
 { ioBinary }
 
-constructor ioBinary.Create(const ABinarySubType: string; const AIsNullable: Boolean);
+constructor ioFTBinary.Create(const ABinarySubType: string; const ANotNull: Boolean);
 begin
-  inherited Create(AIsNullable);
+  inherited Create(ANotNull);
   FBinarySubType := ABinarySubType;
 end;
 
-constructor ioBinary.Create(const AIsNullable: Boolean);
+constructor ioFTBinary.Create(const ANotNull: Boolean);
 begin
   inherited;
   FBinarySubType := '';
@@ -833,15 +848,22 @@ end;
 
 { ioFTBase }
 
-constructor ioFTBase.Create(const AIsNullable: Boolean);
+constructor ioFTBase.Create(const ANotNull: Boolean);
 begin
-  FIsNullable := AIsNullable;
+  FNotNull := ANotNull;
 end;
 
 constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
 begin
   FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
   FTargetTypeAlias := AAlias;
+end;
+
+{ TioCustomTValueAttribute }
+
+constructor TioCustomTValueAttribute.Create(const AValue: TValue);
+begin
+  FValue := AValue;
 end;
 
 end.

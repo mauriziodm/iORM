@@ -54,7 +54,8 @@ type
   TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert, ioDelete, ioExist);
 
   // Options set for field metadata used in DBBuilder
-  TioMetadataFieldType = (ioMdVarchar,ioMdChar,ioMdInteger,ioMdFloat,ioMdDate,ioMdTime,ioMdDateTime,ioMdDecimal,ioMdNumeric,ioMdBoolean,ioMdBinary,ioMdCustomFieldType);
+  TioMetadataFieldType = (ioMdVarchar, ioMdChar, ioMdInteger, ioMdFloat, ioMdDate, ioMdTime, ioMdDateTime, ioMdDecimal, ioMdNumeric,
+    ioMdBoolean, ioMdBinary, ioMdCustomFieldType);
 
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
@@ -106,7 +107,7 @@ type
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
     procedure SetMetadata_FieldPrecision(const AMetadata_FieldPrecision: Integer);
     procedure SetMetadata_FieldScale(const AMetadata_FieldScale: Integer);
-    procedure SetMetadata_FieldNullable(const AMetadata_FieldNullable: Boolean);
+    procedure SetMetadata_FieldNotNull(const AMetadata_FieldNotNull: Boolean);
     procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
     procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
     procedure SetMetadata_FKCreate(const AMetadata_FKCreate: boolean);
@@ -115,7 +116,7 @@ type
     function GetMetadata_FieldLength: Integer;
     function GetMetadata_FieldPrecision: Integer;
     function GetMetadata_FieldScale: Integer;
-    function GetMetadata_FieldNullable: Boolean;
+    function GetMetadata_FieldNotNull: Boolean;
     function GetMetadata_FieldUnicode: Boolean;
     function GetMetadata_CustomFieldType: string;
     function GetMetadata_FKCreate: boolean;
@@ -125,6 +126,9 @@ type
     function GetMetadata_FKCascadeDelete: boolean;
     procedure SetMetadata_FKCascadeUpdate(const AMetadata_FKCascadeUpdate: boolean);
     function GetMetadata_FKCascadeUpdate: boolean;
+    // Mauri 18/07/2020
+    procedure SetMetadata_Default(const AMetadata_Default: TValue);
+    function GetMetadata_Default: TValue;
   end;
 
   IioContextProperties = interface(IioSqlItem)

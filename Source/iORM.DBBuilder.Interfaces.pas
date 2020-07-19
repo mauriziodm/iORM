@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioDBBuilderStatus = (dbsClean, dbsAlter, dbsAdd);
+  TioDBBuilderStatus = (dbsClean, dbsAlter, dbsCreate);
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
@@ -22,8 +22,9 @@ type
   IioDBBuilderSchemaField = interface
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
     function FieldName: String;
-//    function GetProperty: IioContextProperty;
-    function IsPrimaryKey: Boolean;
+    function GetProperty: IioContextProperty;
+    function PrimaryKey: Boolean;
+    function NotNull: Boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
@@ -43,6 +44,7 @@ type
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
 //    function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;
+    function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
     // IsClassFromField
     procedure SetIsClassFromField(const AValue: Boolean);
@@ -54,7 +56,7 @@ type
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
-  TioDBBuilderSchemaTableList = TDictionary<String, IioDBBuilderSchemaTable>;
+  TioDBBuilderSchemaTables = TDictionary<String, IioDBBuilderSchemaTable>;
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
@@ -65,7 +67,9 @@ type
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function SqlScript: TStringList;
     function SqlScriptEmpty: Boolean;
-    function TableList: TioDBBuilderSchemaTableList;
+    function Warnings: TStringList;
+    function WarningsEmpty: Boolean;
+    function Tables: TioDBBuilderSchemaTables;
     // DBExists
     function GetDBExists: Boolean;
     procedure SetDBExists(const Value: Boolean);

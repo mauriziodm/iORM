@@ -188,7 +188,7 @@ begin
       LFieldType := AProperty.GetMetadata_CustomFieldType;
   end;
 
-  if AProperty.GetMetadata_FieldNullable then
+  if AProperty.GetMetadata_FieldNotNull then
     LNullable := 'NULL'
   else
     LNullable := 'NOT NULL';
@@ -621,9 +621,9 @@ begin
       end;
 
       // Verify if something has been changed in FieldNullable. Skip ID field
-      if (not AProperty.IsID) and (LColumnNullable<>AProperty.GetMetadata_FieldNullable) then
+      if (not AProperty.IsID) and (LColumnNullable<>AProperty.GetMetadata_FieldNotNull) then
       begin
-        if AProperty.GetMetadata_FieldNullable and (not LColumnNullable) then
+        if AProperty.GetMetadata_FieldNotNull and (not LColumnNullable) then
         begin
           AWarnings := True;
           Result := True;

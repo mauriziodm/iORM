@@ -15,6 +15,7 @@ type
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
     FIndexes: TioDBBuilderSchemaIndexes;
     FIsClassFromField: Boolean;
+    FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
     // IsClassFromField
     function GetIsClassFromField: Boolean;
@@ -32,6 +33,7 @@ type
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
     // function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;
+    function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
 
     property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
@@ -50,6 +52,9 @@ begin
   // Add field if not already exists
   if not FFields.ContainsKey(ASchemaField.FieldName) then
     FFields.Add(ASchemaField.FieldName, ASchemaField);
+  // If this field is the primary key field
+  if ASchemaField.PrimaryKey then
+    FPrimaryKeyField := ASchemaField;
 end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable);
@@ -99,6 +104,11 @@ end;
 function TioDBBuilderSchemaTable.Indexes: TioDBBuilderSchemaIndexes;
 begin
   Result := FIndexes;
+end;
+
+function TioDBBuilderSchemaTable.PrimaryKeyField: IioDBBuilderSchemaField;
+begin
+  Result := FPrimaryKeyField;
 end;
 
 function TioDBBuilderSchemaTable.TableName: String;

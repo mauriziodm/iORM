@@ -54,9 +54,9 @@ type
       const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
       const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
       const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer;
-      const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string;
-      const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
-      const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
+      const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
+      const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
+      const AMetadata_FKDeleteCreate: Boolean; const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -113,9 +113,9 @@ class function TioContextFactory.GetProperty(const ATable: IioContextTable; cons
   const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
   const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
   const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer;
-  const AMetadata_FieldNullable: Boolean; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string;
-  const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string; const AMetadata_FKDeleteCreate: Boolean;
-  const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
+  const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
+  const AMetadata_FKDeleteCreate: Boolean; const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
 begin
   case ATable.GetMapMode of
     // Properties map mode
@@ -123,15 +123,15 @@ begin
       Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
         AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
         ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
-        AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
-        AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
+        AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate,
+        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
     // Fields map mode
     ioFields:
-      Result := TioField.Create(ARttiPropField as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped, AReadWrite,
-        ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
+      Result := TioField.Create(ARttiPropField as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
+        AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
         ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
-        AMetadata_FieldNullable, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate, AMetadata_FieldSubType,
-        AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
+        AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate,
+        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
   end;
 end;
 
@@ -196,7 +196,7 @@ var
   PropMetadata_FieldLength: Integer;
   PropMetadata_FieldPrecision: Integer;
   PropMetadata_FieldScale: Integer;
-  PropMetadata_FieldNullable: Boolean;
+  PropMetadata_FieldNotNull: Boolean;
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
   PropMetadata_FKCreate: Boolean;
@@ -205,70 +205,36 @@ var
   PropMetadata_FKCascadeDelete: Boolean;
   LRttiProperty: TRttiProperty;
   LRttiField: TRttiField;
+  // Mauri 18/07/2020
+  PropMetadata_Default: TValue;
 
   function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
   begin
     Result := ioMdInteger;
     case ATypeKind of
       tkEnumeration:
-        begin
-          if AQualifiedName = 'System.Boolean' then
-          begin
-            Result := ioMdBoolean;
-            Exit;
-          end
-          else // it is an enumerated value but it's not a boolean.
-          begin
-            Result := ioMdInteger;
-            Exit;
-          end;
-        end;
+        if AQualifiedName = 'System.Boolean' then
+          Exit(ioMdBoolean)
+        else
+          Exit(ioMdInteger);
       tkInteger, tkInt64:
-        begin
-          Result := ioMdInteger;
-          Exit;
-        end;
+        Exit(ioMdInteger);
       tkFloat:
-        begin
-          if AQualifiedName = 'System.TDate' then
-          begin
-            Result := ioMdDate;
-            Exit;
-          end
-          else if AQualifiedName = 'System.TDateTime' then
-          begin
-            Result := ioMdDateTime;
-            Exit;
-          end
-          else if AQualifiedName = 'System.TTime' then
-          begin
-            Result := ioMdTime;
-            Exit;
-          end
-          else
-          begin
-            Result := ioMdDecimal;
-            Exit;
-          end
-        end;
+        if AQualifiedName = 'System.TDate' then
+          Exit(ioMdDate)
+        else if AQualifiedName = 'System.TDateTime' then
+          Exit(ioMdDateTime)
+        else if AQualifiedName = 'System.TTime' then
+          Exit(ioMdTime)
+        else
+          Exit(ioMdDecimal);
       tkString, tkLString, tkWString, tkUString:
-        begin
-          Result := ioMdVarchar;
-          Exit;
-        end;
+        Exit(ioMdVarchar);
       tkRecord:
-        begin
-          if AQualifiedName = 'System.SysUtils.TTimeStamp' then
-          begin
-            Result := ioMdDateTime;
-            Exit;
-          end;
-        end;
+        if AQualifiedName = 'System.SysUtils.TTimeStamp' then
+          Exit(ioMdDateTime);
       tkClass, tkInterface:
-        begin
-          Result := ioMdBinary;
-          Exit;
-        end;
+        Exit(ioMdBinary);
     end;
   end;
 
@@ -328,13 +294,14 @@ begin
     // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
     PropMetadata_FieldPrecision := 10;
     PropMetadata_FieldScale := 3;
-    PropMetadata_FieldNullable := True;
+    PropMetadata_FieldNotNull := True;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';
     PropMetadata_FKCreate := False;
     PropMetadata_FieldSubType := '';
     PropMetadata_FKCascadeUpdate := False;
     PropMetadata_FKCascadeDelete := False;
+    PropMetadata_Default := nil;
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;
@@ -348,9 +315,9 @@ begin
     // ObjStatus property
     if PropFieldName = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '',
-        ioEagerLoad, False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
-        PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FKCreate,
+      Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioEagerLoad,
+        False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FKCreate,
         PropMetadata_FieldSubType, PropMetadata_FKCascadeUpdate, PropMetadata_FKCascadeDelete);
       Continue;
     end;
@@ -439,76 +406,78 @@ begin
         ATable.GetIndexList(True).Add(ioIndex(Attr));
       end;
       // M.M. 01/08/18 - Metadata Used by DBBuilder
-      if Attr is ioVarchar then
+      if Attr is ioFTVarchar then
       begin
         PropMetadata_FieldType := ioMdVarchar;
-        PropMetadata_FieldLength := ioVarchar(Attr).Length;
-        PropMetadata_FieldNullable := ioVarchar(Attr).IsNullable;
-        PropMetadata_FieldUnicode := ioVarchar(Attr).IsUnicode;
+        PropMetadata_FieldLength := ioFTVarchar(Attr).Length;
+        PropMetadata_FieldNotNull := ioFTVarchar(Attr).NotNull;
+        PropMetadata_FieldUnicode := ioFTVarchar(Attr).IsUnicode;
       end;
-      if Attr is ioChar then
+      if Attr is ioFTChar then
       begin
         PropMetadata_FieldType := ioMdChar;
-        PropMetadata_FieldLength := ioChar(Attr).Length;
-        PropMetadata_FieldNullable := ioChar(Attr).IsNullable;
-        PropMetadata_FieldUnicode := ioChar(Attr).IsUnicode;
+        PropMetadata_FieldLength := ioFTChar(Attr).Length;
+        PropMetadata_FieldNotNull := ioFTChar(Attr).NotNull;
+        PropMetadata_FieldUnicode := ioFTChar(Attr).IsUnicode;
       end;
-      if Attr is ioInteger then
+      if Attr is ioFTInteger then
       begin
         PropMetadata_FieldType := ioMdInteger;
-        PropMetadata_FieldPrecision := ioInteger(Attr).Precision;
-        PropMetadata_FieldNullable := ioChar(Attr).IsNullable;
+        PropMetadata_FieldPrecision := ioFTInteger(Attr).Precision;
+        PropMetadata_FieldNotNull := ioFTChar(Attr).NotNull;
       end;
-      if Attr is ioFloat then
+      if Attr is ioFTFloat then
       begin
         PropMetadata_FieldType := ioMdFloat;
-        PropMetadata_FieldNullable := ioFloat(Attr).IsNullable;
+        PropMetadata_FieldNotNull := ioFTFloat(Attr).NotNull;
       end;
-      if Attr is ioDate then
+      if Attr is ioFTDate then
       begin
         PropMetadata_FieldType := ioMdDate;
-        PropMetadata_FieldNullable := ioDate(Attr).IsNullable;
+        PropMetadata_FieldNotNull := ioFTDate(Attr).NotNull;
       end;
-      if Attr is ioTime then
+      if Attr is ioFTTime then
       begin
         PropMetadata_FieldType := ioMdTime;
-        PropMetadata_FieldNullable := ioTime(Attr).IsNullable;
+        PropMetadata_FieldNotNull := ioFTTime(Attr).NotNull;
       end;
-      if Attr is ioDateTime then
+      if Attr is ioFTDateTime then
       begin
         PropMetadata_FieldType := ioMdDateTime;
-        PropMetadata_FieldNullable := ioDateTime(Attr).IsNullable;
+        PropMetadata_FieldNotNull := ioFTDateTime(Attr).NotNull;
       end;
-      if Attr is ioDecimal then
+      if Attr is ioFTDecimal then
       begin
         PropMetadata_FieldType := ioMdDecimal;
-        PropMetadata_FieldPrecision := ioDecimal(Attr).Precision;
-        PropMetadata_FieldScale := ioDecimal(Attr).Scale;
-        PropMetadata_FieldNullable := ioDecimal(Attr).IsNullable;
+        PropMetadata_FieldPrecision := ioFTDecimal(Attr).Precision;
+        PropMetadata_FieldScale := ioFTDecimal(Attr).Scale;
+        PropMetadata_FieldNotNull := ioFTDecimal(Attr).NotNull;
       end;
-      if Attr is ioNumeric then
+      if Attr is ioFTNumeric then
       begin
         PropMetadata_FieldType := ioMdNumeric;
-        PropMetadata_FieldPrecision := ioNumeric(Attr).Precision;
-        PropMetadata_FieldScale := ioNumeric(Attr).Scale;
-        PropMetadata_FieldNullable := ioNumeric(Attr).IsNullable;
+        PropMetadata_FieldPrecision := ioFTNumeric(Attr).Precision;
+        PropMetadata_FieldScale := ioFTNumeric(Attr).Scale;
+        PropMetadata_FieldNotNull := ioFTNumeric(Attr).NotNull;
       end;
-      if Attr is ioBoolean then
+      if Attr is ioFTBoolean then
       begin
         PropMetadata_FieldType := ioMdBoolean;
-        PropMetadata_FieldNullable := ioBoolean(Attr).IsNullable;
+        PropMetadata_FieldNotNull := ioFTBoolean(Attr).NotNull;
       end;
-      if Attr is ioBinary then
+      if Attr is ioFTBinary then
       begin
         PropMetadata_FieldType := ioMdBinary;
-        PropMetadata_FieldSubType := ioBinary(Attr).BinarySubType;
-        PropMetadata_FieldNullable := ioBinary(Attr).IsNullable;
+        PropMetadata_FieldSubType := ioFTBinary(Attr).BinarySubType;
+        PropMetadata_FieldNotNull := ioFTBinary(Attr).NotNull;
       end;
-      if Attr is ioCustomFieldType then
+      if Attr is ioFTCustom then
       begin
         PropMetadata_FieldType := ioMdCustomFieldType;
-        PropMetadata_CustomFieldType := ioCustomFieldType(Attr).Value;
+        PropMetadata_CustomFieldType := ioFTCustom(Attr).Value;
       end;
+      if Attr is ioFTDefault then
+        PropMetadata_Default := ioFTDefault(Attr).Value;
       if Attr is ioForeignKey then
       begin
         PropMetadata_FKCreate := ioForeignKey(Attr).FKCreate;
@@ -521,7 +490,7 @@ begin
     Result.Add(Self.GetProperty(ATable, Prop, PropTypeAlias, PropFieldName, PropLoadSql, PropFieldType, PropSkip, PropReadWrite,
       PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias, PropRelationChildPropertyName, PropRelationChildLoadType,
       PropRelationChildAutoIndex, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision,
-      PropMetadata_FieldScale, PropMetadata_FieldNullable, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
+      PropMetadata_FieldScale, PropMetadata_FieldNotNull, PropMetadata_Default, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
       PropMetadata_FKCreate, PropMetadata_FieldSubType, PropMetadata_FKCascadeDelete, PropMetadata_FKCascadeUpdate), PropID,
       PropIDSkipOnInsert);
   end;

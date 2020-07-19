@@ -13,7 +13,8 @@ type
     FErrorMsg: String;
     FDBExists: Boolean;
     FSqlScript: TStringList;
-    FTableList: TioDBBuilderSchemaTableList;
+    FWarnings: TStringList;
+    FTables: TioDBBuilderSchemaTables;
     // DBExists
     function GetDBExists: Boolean;
     procedure SetDBExists(const Value: Boolean);
@@ -27,7 +28,9 @@ type
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function SqlScript: TStringList;
     function SqlScriptEmpty: Boolean;
-    function TableList: TioDBBuilderSchemaTableList;
+    function Warnings: TStringList;
+    function WarningsEmpty: Boolean;
+    function Tables: TioDBBuilderSchemaTables;
 
     property DBExists: Boolean read GetDBExists write SetDBExists;
   end;
@@ -48,7 +51,8 @@ constructor TioDBBuilderSchema.Create(const AConnectionDefName: String);
 begin
   FConnectionDefName := AConnectionDefName;
   FSqlScript := TStringList.Create;
-  FTableList := TioDBBuilderSchemaTableList.Create;
+  FWarnings := TStringList.Create;
+  FTables := TioDBBuilderSchemaTables.Create;
 end;
 
 function TioDBBuilderSchema.DatabaseFileName: String;
@@ -59,7 +63,8 @@ end;
 destructor TioDBBuilderSchema.Destroy;
 begin
   FSqlScript.Free;
-  FTableList.Free;
+  FWarnings.Free;
+  FTables.Free;
   inherited;
 end;
 
@@ -73,9 +78,9 @@ var
   LTableName: String;
 begin
   LTableName := AMap.GetTable.TableName;
-  if not FTableList.ContainsKey(LTableName) then
-    FTableList.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable));
-  Result := FTableList.Items[LTableName];
+  if not FTables.ContainsKey(LTableName) then
+    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable));
+  Result := FTables.Items[LTableName];
   // NB: Se anche una sola classe mappata su questa tabella è ClassFromField allora IsClassFromField deve essere true
   // (vedi setter nella classe)
   Result.IsClassFromField := AMap.GetTable.IsClassFromField;
@@ -83,10 +88,10 @@ end;
 
 function TioDBBuilderSchema.FindTable(const ATableName: String): IioDBBuilderSchemaTable;
 begin
-  if not FTableList.ContainsKey(ATableName) then
+  if not FTables.ContainsKey(ATableName) then
     raise EioException.Create(ClassName, 'FindTable', Format('Table "%s" not found on "%s" connection def.',
       [ATableName, FConnectionDefName]));
-  Result := FTableList.Items[ATableName];
+  Result := FTables.Items[ATableName];
 end;
 
 function TioDBBuilderSchema.GetDBExists: Boolean;
@@ -109,9 +114,19 @@ begin
   Result := FSqlScript.Count = 0;
 end;
 
-function TioDBBuilderSchema.TableList: TioDBBuilderSchemaTableList;
+function TioDBBuilderSchema.Tables: TioDBBuilderSchemaTables;
 begin
-  Result := FTableList;
+  Result := FTables;
+end;
+
+function TioDBBuilderSchema.Warnings: TStringList;
+begin
+  Result := FWarnings;
+end;
+
+function TioDBBuilderSchema.WarningsEmpty: Boolean;
+begin
+  Result := FWarnings.Count = 0;
 end;
 
 end.

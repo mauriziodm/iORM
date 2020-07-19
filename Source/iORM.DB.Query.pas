@@ -131,6 +131,8 @@ end;
 
 destructor TioQuery.Destroy;
 begin
+  if FSqlQuery.Active then
+    FSqlQuery.Close;
   FSqlQuery.Free;
   inherited;
 end;

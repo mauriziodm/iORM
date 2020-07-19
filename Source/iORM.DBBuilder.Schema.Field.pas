@@ -18,7 +18,8 @@ type
     constructor Create(const AContextProperty: IioContextProperty);
     function FieldName: String;
     function GetProperty: IioContextProperty;
-    function IsPrimaryKey: Boolean;
+    function PrimaryKey: Boolean;
+    function NotNull: Boolean;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -47,9 +48,14 @@ begin
   Result := FStatus;
 end;
 
-function TioDBBuilderSchemaField.IsPrimaryKey: Boolean;
+function TioDBBuilderSchemaField.PrimaryKey: Boolean;
 begin
   Result := FContextProperty.IsID;
+end;
+
+function TioDBBuilderSchemaField.NotNull: Boolean;
+begin
+  Result := FContextProperty.GetMetadata_FieldNotNull;
 end;
 
 procedure TioDBBuilderSchemaField.SetStatus(const Value: TioDBBuilderStatus);
