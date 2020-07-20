@@ -3,15 +3,16 @@ unit iORM.DBBuilder.Factory;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, iORM.Context.Map.Interfaces;
+  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, iORM.Context.Map.Interfaces,
+  iORM.Attributes;
 
 type
 
   TioDBBuilderFactory = class
   public
     class function NewSchemaField(const AContextProperty: IioContextProperty): IioDBBuilderSchemaField;
-    class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty)
-      : IioDBBuilderSchemaFK;
+    class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+      const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaTable(const AContextTable: IioContextTable): IioDBBuilderSchemaTable;
   end;
 
@@ -27,10 +28,10 @@ begin
   Result := TioDBBuilderSchemaField.Create(AContextProperty);
 end;
 
-class function TioDBBuilderFactory.NewSchemaFK(const AReferenceMap, ADependentMap: IioMap;
-  const ADependentProperty: IioContextProperty): IioDBBuilderSchemaFK;
+class function TioDBBuilderFactory.NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+  const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
 begin
-  Result := TioDBBuilderSchemaFK.Create(AReferenceMap, ADependentMap, ADependentProperty);
+  Result := TioDBBuilderSchemaFK.Create(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
 end;
 
 class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioContextTable): IioDBBuilderSchemaTable;

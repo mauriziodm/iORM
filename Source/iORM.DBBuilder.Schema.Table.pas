@@ -27,7 +27,8 @@ type
     constructor Create(const AContextTable: IioContextTable);
     destructor Destroy; override;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+      const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     function FieldList: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
@@ -86,14 +87,16 @@ begin
     FIndexes.Add(AIndexAttr);
 end;
 
-procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;
+  const ADependentProperty: IioContextProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 var
   LFKName: String;
 begin
   // Add tne FK if not already exists
   LFKName := ADependentProperty.GetName + '_' + AReferenceMap.GetTable.TableName;
   if not FForeignKeys.ContainsKey(LFKName) then
-    FForeignKeys.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty));
+    FForeignKeys.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction,
+      AOnUpdateAction));
 end;
 
 function TioDBBuilderSchemaTable.ForeignKeys: TioDBBuilderSchemaForeignKeys;

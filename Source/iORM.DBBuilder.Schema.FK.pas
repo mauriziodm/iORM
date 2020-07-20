@@ -3,7 +3,7 @@ unit iORM.DBBuilder.Schema.FK;
 interface
 
 uses
-  iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces, iORM.Attributes;
 
 type
 
@@ -12,12 +12,17 @@ type
     FDependentMap: IioMap;
     FDependentProperty: IioContextProperty;
     FName: String;
+    FOnDeleteAction: TioFKAction;
+    FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;
   public
-    constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+    constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+      const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     function DependentTableName: String;
     function DependentFieldName: String;
     function Name: String;
+    function OnDeleteAction: TioFKAction;
+    function OnUpdateAction: TioFKAction;
     function ReferenceTableName: String;
     function ReferenceFieldName: String;
   end;
@@ -41,11 +46,24 @@ begin
   Result := FName;
 end;
 
-constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty);
+function TioDBBuilderSchemaFK.OnDeleteAction: TioFKAction;
+begin
+  Result := FOnDeleteAction;
+end;
+
+function TioDBBuilderSchemaFK.OnUpdateAction: TioFKAction;
+begin
+  Result := FOnUpdateAction;
+end;
+
+constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+      const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
   FReferenceMap := AReferenceMap;
   FDependentMap := ADependentMap;
   FDependentProperty := ADependentProperty;
+  FOnDeleteAction := AOnDeleteAction;
+  FOnUpdateAction := AOnUpdateAction;
 end;
 
 function TioDBBuilderSchemaFK.ReferenceFieldName: String;

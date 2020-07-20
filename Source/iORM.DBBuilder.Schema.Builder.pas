@@ -40,13 +40,15 @@ class procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const ASchema: IioDBBuil
 var
   // LSchemaTable: IioDBBuilderSchemaTable;
   LProperty: IioContextProperty;
+  LDependentProperty: IioContextProperty;
   LResolvedTypeList: IioList<string>;
   LResolvedTypeName: String;
   LResolvedTypeMap: IioMap;
 begin
   for LProperty in AMap.GetProperties do
   begin
-    if LProperty.GetRelationType in [ioRTNone, ioRTEmbeddedHasOne, ioRTEmbeddedHasMany] then
+    if (LProperty.GetRelationType in [ioRTNone, ioRTEmbeddedHasOne, ioRTEmbeddedHasMany]) or
+      (LProperty.GetMetadata_FKCreate = fkDoNotCreate) then
       Continue;
     // Resolve the type and alias for the relation child type
     LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LProperty.GetRelationChildTypeName,
@@ -60,10 +62,17 @@ begin
       if AMap.GetTable.GetConnectionDefName <> LResolvedTypeMap.GetTable.GetConnectionDefName then
         Continue;
       if LProperty.GetRelationType in [ioRTBelongsTo] then
-        ASchema.FindTable(AMap.GetTable.TableName).AddForeignKey(LResolvedTypeMap, AMap, LProperty)
+      begin
+        LDependentProperty := LProperty;
+        ASchema.FindTable(AMap.GetTable.TableName).AddForeignKey(LResolvedTypeMap, AMap, LProperty,
+          LDependentProperty.GetMetadata_FKOnDeleteAction, LDependentProperty.GetMetadata_FKOnUpdateAction)
+      end
       else
-        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddForeignKey(AMap, LResolvedTypeMap,
-          LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName));
+      begin
+        LDependentProperty := LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
+        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddForeignKey(AMap, LResolvedTypeMap, LDependentProperty,
+          LDependentProperty.GetMetadata_FKOnDeleteAction, LDependentProperty.GetMetadata_FKOnUpdateAction);
+      end;
     end;
   end;
 end;
@@ -77,7 +86,7 @@ begin
     Exit;
   LSchemaTable := ASchema.FindOrCreateTable(AMap);
   for LProperty in AMap.GetProperties do
-    if not (LProperty.IsSkipped and (LProperty.GetRelationType = ioRTHasMany) and (LProperty.GetRelationType = ioRTHasOne)) then
+    if not(LProperty.IsSkipped and (LProperty.GetRelationType = ioRTHasMany) and (LProperty.GetRelationType = ioRTHasOne)) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   BuildIndexList(LSchemaTable, AMap);
 end;
@@ -89,7 +98,7 @@ begin
   // If some explicit index is present then add it to the list
   if AMap.GetTable.IndexListExists then
     for LIndexAttr in AMap.GetTable.GetIndexList(False) do
-        ASchemaTable.AddIndex(LIndexAttr);
+      ASchemaTable.AddIndex(LIndexAttr);
 end;
 
 end.
