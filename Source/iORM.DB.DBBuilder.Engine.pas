@@ -510,8 +510,9 @@ begin
             if LRel = ioRTNone then
               Continue;
 
-            if not LPairField.Value.GetProperty.GetMetadata_FKCreate then
-              Continue;
+// --- Considera
+//            if not LPairField.Value.GetProperty.GetMetadata_FKCreate then
+//              Continue;
 
             if (LRel in [ioRTHasOne, ioRTHasMany, ioRTBelongsTo]) then
             begin
@@ -546,9 +547,10 @@ begin
                 LSb.AppendLine();
 
                 // Create Sql x FK
-                LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName,
-                  LDestinationFieldName, LPairField.Value.GetProperty.GetMetadata_FKCascadeDelete,
-                  LPairField.Value.GetProperty.GetMetadata_FKCascadeUpdate);
+// --- Considera
+//                LAddFKSql := LSqlGenerator.AddForeignKey(LSourceTableName, LSourceFieldName, LDestinationTableName,
+//                  LDestinationFieldName, LPairField.Value.GetProperty.GetMetadata_FKOnDeleteAction,
+//                  LPairField.Value.GetProperty.GetMetadata_FKOnUpdateAction);
 
                 if not LAddFKSql.Trim.IsEmpty then
                   LSb.AppendLine(LAddFKSql);

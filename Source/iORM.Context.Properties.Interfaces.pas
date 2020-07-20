@@ -88,7 +88,6 @@ type
     function GetRelationLoadType: TioLoadType;
     function GetRelationChildObject(const Instance: Pointer): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
-    function GetRelationChildAutoIndex: Boolean;
     procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
@@ -102,7 +101,6 @@ type
     function IsInstance: Boolean;
     function IsWritable: Boolean;
     function IsSkipped: Boolean;
-    // M.M. 01/08/18 - DBBuilder
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
     procedure SetMetadata_FieldPrecision(const AMetadata_FieldPrecision: Integer);
@@ -110,8 +108,11 @@ type
     procedure SetMetadata_FieldNotNull(const AMetadata_FieldNotNull: Boolean);
     procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
     procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
-    procedure SetMetadata_FKCreate(const AMetadata_FKCreate: boolean);
     procedure SetMetadata_FieldSubType(const AMetadata_FieldSubType: string);
+    procedure SetMetadata_Default(const AMetadata_Default: TValue);
+    procedure SetMetadata_FKCreate(const AMetadata_FKCreate: TioFKCreate);
+    procedure SetMetadata_FKOnDeleteAction(const AOnDeleteAction: TioFKAction);
+    procedure SetMetadata_FKOnUpdateAction(const AUpdateAction: TioFKAction);
     function GetMetadata_FieldType: TioMetadataFieldType;
     function GetMetadata_FieldLength: Integer;
     function GetMetadata_FieldPrecision: Integer;
@@ -119,16 +120,12 @@ type
     function GetMetadata_FieldNotNull: Boolean;
     function GetMetadata_FieldUnicode: Boolean;
     function GetMetadata_CustomFieldType: string;
-    function GetMetadata_FKCreate: boolean;
     function GetMetadata_FieldSubType: string;
-    // O.B. 19/06/19 - DBBuilder
-    procedure SetMetadata_FKCascadeDelete(const AMetadata_FKCascadeDelete: boolean);
-    function GetMetadata_FKCascadeDelete: boolean;
-    procedure SetMetadata_FKCascadeUpdate(const AMetadata_FKCascadeUpdate: boolean);
-    function GetMetadata_FKCascadeUpdate: boolean;
-    // Mauri 18/07/2020
-    procedure SetMetadata_Default(const AMetadata_Default: TValue);
     function GetMetadata_Default: TValue;
+    function GetMetadata_FKCreate: TioFKCreate;
+    function GetMetadata_FKOnDeleteAction: TioFKAction;
+    function GetMetadata_FKOnUpdateAction: TioFKAction;
+
   end;
 
   IioContextProperties = interface(IioSqlItem)

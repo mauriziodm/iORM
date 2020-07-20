@@ -52,11 +52,11 @@ type
     class function GetProperty(const ATable: IioContextTable; const ARttiPropField: TRttiMember;
       const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
       const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
-      const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
-      const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer;
-      const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
-      const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
-      const AMetadata_FKDeleteCreate: Boolean; const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
+      const ARelationLoadType: TioLoadType; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
+      const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean;
+      const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string;
+      const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction;
+      const AMetadata_FKOnUpdateAction: TioFKAction): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -111,27 +111,27 @@ end;
 class function TioContextFactory.GetProperty(const ATable: IioContextTable; const ARttiPropField: TRttiMember;
   const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String; const ASkipped: Boolean; const AReadWrite: TioReadWrite;
   const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
-  const ARelationLoadType: TioLoadType; const ARelationChildAutoIndex: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
-  const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer;
-  const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_FKCreate: Boolean; const AMetadata_FieldSubType: string;
-  const AMetadata_FKDeleteCreate: Boolean; const AMetadata_FKUpdateCreate: Boolean): IioContextProperty;
+  const ARelationLoadType: TioLoadType; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
+  const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean;
+  const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string;
+  const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction;
+  const AMetadata_FKOnUpdateAction: TioFKAction): IioContextProperty;
 begin
   case ATable.GetMapMode of
     // Properties map mode
     ioProperties:
       Result := TioProperty.Create(ARttiPropField as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
         AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
-        ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
-        AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate,
-        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
+        AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull,
+        AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate,
+        AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
     // Fields map mode
     ioFields:
       Result := TioField.Create(ARttiPropField as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ASkipped,
         AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType,
-        ARelationChildAutoIndex, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale,
-        AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FKCreate,
-        AMetadata_FieldSubType, AMetadata_FKDeleteCreate, AMetadata_FKUpdateCreate);
+        AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull,
+        AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate,
+        AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end;
 end;
 
@@ -189,8 +189,7 @@ var
   PropRelationChildTypeAlias: String;
   PropRelationChildPropertyName: String;
   PropRelationChildLoadType: TioLoadType;
-  PropRelationChildAutoIndex: Boolean;
-  // M.M. 01/08/18 - Used by DBBuilder
+  // FIeld metadata
   PropMetadata_FieldType: TioMetadataFieldType;
   PropMetadata_FieldSubType: string;
   PropMetadata_FieldLength: Integer;
@@ -199,14 +198,13 @@ var
   PropMetadata_FieldNotNull: Boolean;
   PropMetadata_FieldUnicode: Boolean;
   PropMetadata_CustomFieldType: string;
-  PropMetadata_FKCreate: Boolean;
+  PropMetadata_Default: TValue;
+  PropMetadata_FKAutoCreate: TioFKCreate;
+  PropMetadata_FKOnDeleteAction: TioFKAction;
+  PropMetadata_FKOnUpdateAction: TioFKAction;
   // O.B. 26/06/18 - Used by DBBuilder
-  PropMetadata_FKCascadeUpdate: Boolean;
-  PropMetadata_FKCascadeDelete: Boolean;
   LRttiProperty: TRttiProperty;
   LRttiField: TRttiField;
-  // Mauri 18/07/2020
-  PropMetadata_Default: TValue;
 
   function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
   begin
@@ -297,10 +295,10 @@ begin
     PropMetadata_FieldNotNull := True;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';
-    PropMetadata_FKCreate := False;
     PropMetadata_FieldSubType := '';
-    PropMetadata_FKCascadeUpdate := False;
-    PropMetadata_FKCascadeDelete := False;
+    PropMetadata_FKAutoCreate := fkCreate;
+    PropMetadata_FKOnDeleteAction := fkUnspecified;
+    PropMetadata_FKOnUpdateAction := fkUnspecified;
     PropMetadata_Default := nil;
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
@@ -316,9 +314,9 @@ begin
     if PropFieldName = 'ObjStatus' then
     begin
       Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioEagerLoad,
-        False, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
-        PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FKCreate,
-        PropMetadata_FieldSubType, PropMetadata_FKCascadeUpdate, PropMetadata_FKCascadeDelete);
+        PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType,
+        PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction, PropMetadata_FKOnDeleteAction);
       Continue;
     end;
     // Prop Init
@@ -335,7 +333,6 @@ begin
     PropRelationChildTypeAlias := '';
     PropRelationChildPropertyName := '';
     PropRelationChildLoadType := ioEagerLoad;
-    PropRelationChildAutoIndex := False;
     // Check attributes
     for Attr in Prop.GetAttributes do
     begin
@@ -385,7 +382,6 @@ begin
         PropRelationChildTypeAlias := ioHasMany(Attr).ChildTypeAlias;
         PropRelationChildPropertyName := ioHasMany(Attr).ChildPropertyName;
         PropRelationChildLoadType := ioHasMany(Attr).LoadType;
-        PropRelationChildAutoIndex := ioHasMany(Attr).AutoIndex;
       end;
       if Attr is ioHasOne then
       begin
@@ -393,7 +389,6 @@ begin
         PropRelationChildTypeName := ioHasOne(Attr).ChildTypeName;
         PropRelationChildTypeAlias := ioHasOne(Attr).ChildTypeAlias;
         PropRelationChildPropertyName := ioHasOne(Attr).ChildPropertyName;
-        PropRelationChildAutoIndex := ioHasMany(Attr).AutoIndex;
       end;
 
       // Indexes
@@ -480,19 +475,18 @@ begin
         PropMetadata_Default := ioFTDefault(Attr).Value;
       if Attr is ioForeignKey then
       begin
-        PropMetadata_FKCreate := ioForeignKey(Attr).FKCreate;
-        PropMetadata_FKCascadeDelete := ioForeignKey(Attr).FKCascadeDelete;
-        PropMetadata_FKCascadeUpdate := ioForeignKey(Attr).FKCascadeUpdate;
+        PropMetadata_FKAutoCreate := ioForeignKey(Attr).AutoCreate;
+        PropMetadata_FKOnDeleteAction := ioForeignKey(Attr).OnDeleteAction;
+        PropMetadata_FKOnUpdateAction := ioForeignKey(Attr).OnUpdateAction;
       end;
 
     end;
     // Create and add property
     Result.Add(Self.GetProperty(ATable, Prop, PropTypeAlias, PropFieldName, PropLoadSql, PropFieldType, PropSkip, PropReadWrite,
       PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias, PropRelationChildPropertyName, PropRelationChildLoadType,
-      PropRelationChildAutoIndex, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision,
-      PropMetadata_FieldScale, PropMetadata_FieldNotNull, PropMetadata_Default, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType,
-      PropMetadata_FKCreate, PropMetadata_FieldSubType, PropMetadata_FKCascadeDelete, PropMetadata_FKCascadeUpdate), PropID,
-      PropIDSkipOnInsert);
+      PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNotNull,
+      PropMetadata_Default, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType,
+      PropMetadata_FKAutoCreate, PropMetadata_FKOnDeleteAction, PropMetadata_FKOnUpdateAction), PropID, PropIDSkipOnInsert);
   end;
 end;
 

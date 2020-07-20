@@ -49,6 +49,10 @@ type
   // Relation types
   TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne);
 
+  // ForeignKey types
+  TioFKAction = (fkUnspecified, fkNoAction, fkRestrict, fkSetNull, fkSetDefault, fkCascade);
+  TioFKCreate = (fkCreate, fkDoNotCreate);
+
   // LazyLoad
   TioLoadType = (ioEagerLoad = 0, ioLazyLoad);
 
@@ -238,9 +242,7 @@ type
   ioFieldType = class(TioCustomStringAttribute)
   end;
 
-  // M.M. 31/07/18 New Attributes to define Specific Data Type
-
-  // Define Base Type
+  // Base class for all DB field type definitions
   ioFTBase = class(TioCustomAttribute)
   strict private
     FNotNull: Boolean;
@@ -256,7 +258,8 @@ type
     FLength: Integer;
   public
     constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
-    constructor Create(const ALength: Integer; const ANotNull: Boolean = False; const AIsUnicode: Boolean = True); reintroduce; overload;
+    constructor Create(const ALength: Integer; const ANotNull: Boolean = False; const AIsUnicode: Boolean = True); reintroduce;
+      overload;
     property IsUnicode: Boolean read FIsUnicode;
     property Length: Integer read FLength;
   end;
@@ -326,37 +329,24 @@ type
   ioFTCustom = class(TioCustomStringAttribute)
   end;
 
-  // Default value for the DB field (Mauri: 18/07/2020)
+  // Default value for the DB field (SQL DEFAULT)
   ioFTDefault = class(TioCustomTValueAttribute)
-
   end;
 
-  // Define Disable Create FK
-  // ioDisableCreateFK = class(TioCustomAttribute)  // la togliamo????
-  // strict private
-  // FDisableCreateFK: Boolean;
-  // public
-  // constructor Create(const ADisableCreateFK:Boolean=True);
-  // property DisableCreateFK:Boolean read FDisableCreateFK;
-  // end;
-
-  // M.M. 31/07/18 END - New Attributes to define Specific Data Type
-
-  // O.B. 19/06/19 START - New Attributes to define Specific Forein Key
-
+  // ForeignKey enable/disable and actions
   ioForeignKey = class(TioCustomAttribute)
   strict private
-    FFKCascadeDelete: Boolean;
-    FFKCascadeUpdate: Boolean;
-    FFKCreate: Boolean;
+    FAutoCreate: TioFKCreate;
+    FOnDeleteAction: TioFKAction;
+    FOnUpdateAction: TioFKAction;
   public
-    constructor Create(const AFKCascadeDelete: Boolean = True; const AFKCascadeUpdate: Boolean = True);
-    property FKCreate: Boolean read FFKCreate;
-    property FKCascadeDelete: Boolean read FFKCascadeDelete;
-    property FKCascadeUpdate: Boolean read FFKCascadeUpdate;
+    constructor Create(const AOnDeleteAction: TioFKAction = fkNoAction; const AOnUpdateAction: TioFKAction = fkNoAction); overload;
+    constructor Create(const AAutoCreate: TioFKCreate; const AOnDeleteAction: TioFKAction = fkNoAction;
+      const AOnUpdateAction: TioFKAction = fkNoAction); overload;
+    property AutoCreate: TioFKCreate read FAutoCreate;
+    property OnDeleteAction: TioFKAction read FOnDeleteAction;
+    property OnUpdateAction: TioFKAction read FOnUpdateAction;
   end;
-
-  // O.B. 19/06/19 END - New Attributes to define Specific Forein Key
 
   // Relation BelongsTo attribute
   ioBelongsTo = class(TioCustomRelationAttribute)
@@ -367,21 +357,17 @@ type
   strict private
     FChildPropertyName: String;
     FLoadType: TioLoadType;
-    FAutoIndex: Boolean;
   public
-    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
-      const AAutoIndex: Boolean = True); overload;
-    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
-      const AAutoIndex: Boolean = True); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
-      const AAutoIndex: Boolean = True); overload;
-    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
-      const AAutoIndex: Boolean = True); overload;
-    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
-      const AAutoIndex: Boolean = True); overload;
+    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String;
+      const ALoadType: TioLoadType = ioEagerLoad); overload;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String;
+      const ALoadType: TioLoadType = ioEagerLoad); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad); overload;
+    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String;
+      const ALoadType: TioLoadType = ioEagerLoad); overload;
+    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad); overload;
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
-    property AutoIndex: Boolean read FAutoIndex;
   end;
 
   // Relation BelongsTo attribute
@@ -426,6 +412,7 @@ type
   // KeyGeneratorName attribute
   ioKeyGenerator = class(TioCustomStringAttribute)
   end;
+
   ioKeySequence = ioKeyGenerator;
 
   // ConnectionDefName attribute
@@ -597,37 +584,34 @@ end;
 
 { ioHasMany }
 
-constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad;
-  const AAutoIndex: Boolean = True);
+constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String;
+  const ALoadType: TioLoadType = ioEagerLoad);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;
   FLoadType := ALoadType;
-  FAutoIndex := AAutoIndex;
 end;
 
-constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType;
-  const AAutoIndex: Boolean);
+constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType);
 begin
   inherited Create(AChildTypeName, AChildTypeAlias);
   FChildPropertyName := AChildPropertyName;
   FLoadType := ALoadType;
-  FAutoIndex := AAutoIndex;
 end;
 
-constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
+constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType);
 begin
-  Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType, AAutoIndex);
+  Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType);
 end;
 
-constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
+constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType);
 begin
-  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType, AAutoIndex);
+  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType);
 end;
 
-constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType; const AAutoIndex: Boolean);
+constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType);
 begin
-  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType, AAutoIndex);
+  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType);
 end;
 
 { ioJoin }
@@ -830,22 +814,6 @@ begin
   FBinarySubType := '';
 end;
 
-// { ioDisableCreateFK }
-//
-// constructor ioDisableCreateFK.Create(const ADisableCreateFK: Boolean);
-// begin
-// FDisableCreateFK := ADisableCreateFK;
-// end;
-
-{ ioFKRoles }
-
-constructor ioForeignKey.Create(const AFKCascadeDelete: Boolean; const AFKCascadeUpdate: Boolean);
-begin
-  FFKCreate := True;
-  FFKCascadeDelete := AFKCascadeDelete;
-  FFKCascadeUpdate := AFKCascadeUpdate;
-end;
-
 { ioFTBase }
 
 constructor ioFTBase.Create(const ANotNull: Boolean);
@@ -864,6 +832,20 @@ end;
 constructor TioCustomTValueAttribute.Create(const AValue: TValue);
 begin
   FValue := AValue;
+end;
+
+{ ioForeignKey }
+
+constructor ioForeignKey.Create(const AAutoCreate: TioFKCreate; const AOnDeleteAction, AOnUpdateAction: TioFKAction);
+begin
+  FAutoCreate := AAutoCreate;
+  FOnDeleteAction := AOnDeleteAction;
+  FOnUpdateAction := AOnUpdateAction;
+end;
+
+constructor ioForeignKey.Create(const AOnDeleteAction, AOnUpdateAction: TioFKAction);
+begin
+  Self.Create(fkCreate, AOnDeleteAction, AOnUpdateAction);
 end;
 
 end.
