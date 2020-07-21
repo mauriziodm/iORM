@@ -3,11 +3,12 @@ unit iORM.DBBuilder.SqlGenerator.Base;
 interface
 
 uses
-  System.Classes, iORM.DBBuilder.Interfaces, iORM.DB.Interfaces;
+  System.Classes, iORM.DBBuilder.Interfaces, iORM.DB.Interfaces, iORM.Attributes;
 
 const
   SCRIPT_SEPARATOR_LENGTH = 40;
   SCRIPT_INDENTATION_WIDTH = 2;
+  MSG_METHOD_NOT_IMPLEMENTED = 'Method not implemented by this class.';
 
 type
 
@@ -38,9 +39,19 @@ type
     procedure InitializeScript(const AInitialization: TStrings); virtual;
     procedure FinalizeScript(const AFinalization: TStrings); virtual;
 
-    procedure CheckTypeAffinity(const AOldFieldType, ANewFieldType, ANewFieldName, ANewTableName, AInvalidTypeConversions: string); virtual;
-    procedure CheckIfNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
+    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType, AFieldName, ATableName, AInvalidTypeConversions: string); virtual;
+    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
       const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
+      const AFieldName, ATableName: String); virtual;
+    procedure WarningValueChanged(const AValueName, AOldValue, ANewValue, AFieldName, ATableName: String); virtual;
+
+    function BuildIndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String; virtual;
+    function BuildIndexUnique(const AIndex: ioIndex): String; virtual;
+    function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String)
+      : String; virtual;
+    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String)
+      : String; virtual;
   public
     constructor Create(const ASchema: IioDBBuilderSchema);
 
@@ -52,7 +63,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, iORM.DB.ConnectionContainer, System.SysUtils, System.StrUtils;
+  iORM.DB.Factory, iORM.DB.ConnectionContainer, System.SysUtils, System.StrUtils, iORM.CommonTypes, iORM.SqlTranslator, iORM.Exceptions;
 
 { TioDBBuilderSqlGenBase }
 
@@ -81,7 +92,7 @@ end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAddWarning(const AText: String);
 begin
-  FSchema.SqlScript.Add('-- Warning: ' + AText);
+  FSchema.SqlScript.Add('-- WARNING:  ' + AText);
 end;
 
 procedure TioDBBuilderSqlGenBase.AddWarning(const AText: String);
@@ -89,23 +100,119 @@ begin
   FSchema.Warnings.Add(GetIndentation + AText);
 end;
 
-procedure TioDBBuilderSqlGenBase.CheckIfNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable);
+function TioDBBuilderSqlGenBase.BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex;
+  const AIndexName: String): String;
+var
+  LFieldList: TStrings;
+  LField: String;
+  LComma: String;
+  LIndexOrientation: String;
 begin
-  if AField.NotNull and (not AOldFieldNotNull) and (not AField.PrimaryKey) then
-    AddWarning
-      (Format('The "NotNull" flag changes from false to true and a default value has not been specified (field ''%s'', table ''%s'')',
-      [AField.FieldName, ATable.TableName]));
+  LIndexOrientation := BuildIndexOrientation(ATable, AIndex, AIndexName);
+  LFieldList := TStringList.Create;
+  try
+    LComma := '';
+    LFieldList.Delimiter := ',';
+    LFieldList.DelimitedText := AIndex.CommaSepFieldList;
+    for LField in LFieldList do
+    begin
+      Result := Format('%s%s %s %s', [Result, LComma, LField, LIndexOrientation]);
+      LComma := ', ';
+    end;
+  finally
+    LFieldList.Free;
+  end;
 end;
 
-procedure TioDBBuilderSqlGenBase.CheckTypeAffinity(const AOldFieldType, ANewFieldType, ANewFieldName, ANewTableName, AInvalidTypeConversions: string);
+function TioDBBuilderSqlGenBase.BuildIndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String;
+var
+  LFieldList: TStrings;
+  LField: String;
+begin
+  // If the index name is already specified then use it and exit
+  if not AIndex.IndexName.IsEmpty then
+    Exit(TioSqlTranslator.Translate(AIndex.IndexName, ATable.GetContextTable.GetClassName, False));
+  // Build the indexname
+  Result := 'IDX_' + ATable.TableName;
+  // Field list
+  LFieldList := TStringList.Create;
+  try
+    LFieldList.Delimiter := ',';
+    LFieldList.DelimitedText := AIndex.CommaSepFieldList;
+    for LField in LFieldList do
+      Result := Result + '_' + LField;
+  finally
+    LFieldList.Free;
+  end;
+  // Index orientation
+  case AIndex.IndexOrientation of
+    ioAscending:
+      Result := Result + '_A';
+    ioDescending:
+      Result := Result + '_D';
+  end;
+  // Unique
+  if AIndex.Unique then
+    Result := Result + '_U';
+  // Translate
+  Result := TioSqlTranslator.Translate(Result, ATable.GetContextTable.GetClassName, False);
+end;
+
+function TioDBBuilderSqlGenBase.BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex;
+  const AIndexName: String): String;
+begin
+  case AIndex.IndexOrientation of
+    ioAscending:
+      Exit('ASC');
+    ioDescending:
+      Exit('DESC');
+  else
+    raise EioException.Create(ClassName, 'BuildIndexOrientation', Format('Invalid index orientation (index ''%s'', table ''%s'')',
+      [AIndexName, ATable.TableName]));
+  end;
+end;
+
+function TioDBBuilderSqlGenBase.BuildIndexUnique(const AIndex: ioIndex): String;
+begin
+  if AIndex.Unique then
+    Exit('UNIQUE')
+  else
+    Exit('');
+end;
+
+procedure TioDBBuilderSqlGenBase.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
+  const AFieldName, ATableName: String);
+begin
+  if ANewValue < AOldValue then
+    AddWarning(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = $d, new = %d)',
+      [ATableName, AFieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderSqlGenBase.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
+  const ATable: IioDBBuilderSchemaTable);
+begin
+  if AField.NotNull and not AOldFieldNotNull then
+    AddWarning
+      (Format('Table ''%s'' field ''%s'' --> The "NotNull" flag changes from false to true and a default value has not been specified',
+      [ATable.TableName, AField.FieldName]));
+end;
+
+procedure TioDBBuilderSqlGenBase.WarningTypeAffinity(const AOldFieldType, ANewFieldType, AFieldName, ATableName,
+  AInvalidTypeConversions: string);
 var
   LRequiredConversion: String;
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
   if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    AddWarning(Format('Invalid conversion ''%s'' to ''%s'' (field ''%s'', table ''%s'')', [AOldFieldType, ANewFieldType, ANewFieldName,
-      ANewTableName]));
+    AddWarning(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATableName, AFieldName, AOldFieldType,
+      ANewFieldType]));
+end;
+
+procedure TioDBBuilderSqlGenBase.WarningValueChanged(const AValueName, AOldValue, ANewValue, AFieldName, ATableName: String);
+begin
+  if ANewValue <> AOldValue then
+    AddWarning(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''$s'', new = ''%s'')',
+      [ATableName, AFieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 constructor TioDBBuilderSqlGenBase.Create(const ASchema: IioDBBuilderSchema);

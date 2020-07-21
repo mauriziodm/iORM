@@ -138,7 +138,7 @@ begin
 //              + AIndexName + ' ON ' + AContext.GetTable.TableName
 //              + ' (' + LQueryText + ')';
 
-  LQueryText := '  CREATE '
+  LQueryText := ' CREATE '
               + LUniqueText
               + 'INDEX '
               + AIndexName + ' ON ' + AContext.GetTable.TableName

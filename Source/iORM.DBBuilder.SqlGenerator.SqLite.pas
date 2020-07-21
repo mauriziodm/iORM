@@ -3,16 +3,15 @@ unit iORM.DBBuilder.SqlGenerator.SqLite;
 interface
 
 uses
-  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces;
+  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes;
 
 const
   INVALID_FIELDTYPE_CONVERSIONS = '[text->integer]' + '[text->real]' + '[text->numeric]' + '[text->blob]' + '[real->integer]' +
     '[real->blob]' + '[numeric->integer]' + '[numeric->blob]' + '[blob->real]' + '[blob->numeric]' + '[blob->integer]' + '[blob->text]';
-  MSG_METHOD_NOT_IMPLEMENTED = 'Method not implemented by this class.';
 
 type
 
-  TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
+  TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   private
     function TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
@@ -34,20 +33,21 @@ type
     procedure AddField(const AField: IioDBBuilderSchemaField); // Not implented
     procedure AlterField(const AField: IioDBBuilderSchemaField); // Not implented
     // PrimaryKey & other indexes
-    procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
-//    function AddIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
-//      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
+    procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable); // Not implented
+    procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
+    procedure DropAllIndex;
     // Foreign keys
-    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
+    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK); // Not implented
+    procedure DropAllForeignKeys; // Not implented
     // Sequences
-    procedure AddSequence(const ATable: IioDBBuilderSchemaTable);
-
+    procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.DB.Interfaces, iORM.Context.Properties.Interfaces, iORM.Exceptions, System.StrUtils, iORM.CommonTypes;
+  System.SysUtils, iORM.DB.Interfaces, iORM.Context.Properties.Interfaces, iORM.Exceptions, System.StrUtils, iORM.CommonTypes,
+  System.Classes, iORM.SqlTranslator;
 
 { TioDBBuilderSqlGenSQLite }
 
@@ -64,6 +64,19 @@ end;
 procedure TioDBBuilderSqlGenSQLite.CreateField(const AField: IioDBBuilderSchemaField);
 begin
   ScriptAdd(InternalCreateField(AField));
+end;
+
+procedure TioDBBuilderSqlGenSQLite.AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
+var
+  LQuery, LIndexName, LFieldList, LUnique, LComma: String;
+begin
+  LIndexName := BuildIndexName(ATable, AIndex);
+  LUnique := BuildIndexUnique(AIndex);
+  LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName);
+  // Compose the create index query text
+  LQuery := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
+  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
+  ScriptAdd(LQuery);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.EndAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -113,14 +126,17 @@ begin
       LOldFieldType := LQuery.Fields.FieldByName('type').AsString;
       LOldFieldNotNull := (LQuery.Fields.FieldByName('notnull').AsInteger <> 0);
       LNewFieldType := TranslateFieldType(AField);
+
       // Verify if fieldType has been changed and check type affinity
       Result := (not SameText(LOldFieldType, LNewFieldType));
-      CheckTypeAffinity(LOldFieldType, LNewFieldType, LNewFieldName, ATable.TableName, INVALID_FIELDTYPE_CONVERSIONS);
+      WarningTypeAffinity(LOldFieldType, LNewFieldType, LNewFieldName, ATable.TableName, INVALID_FIELDTYPE_CONVERSIONS);
+
       // Verify if NotNull is changed
       Result := Result or (LOldFieldNotNull <> AField.NotNull);
-      CheckIfNullBecomesNotNull(LOldFieldNotNull, AField, ATable);
+      WarningNullBecomesNotNull(LOldFieldNotNull, AField, ATable);
+
       // Exit
-      Exit(True);
+      Exit;
     end;
     LQuery.Next;
   end;
@@ -140,7 +156,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
 begin
-  case AField.GetProperty.GetMetadata_FieldType of
+  case AField.GetContextProperty.GetMetadata_FieldType of
     ioMdVarchar:
       Result := 'TEXT';
     ioMdChar:
@@ -164,9 +180,9 @@ begin
     ioMdBinary:
       Result := 'BLOB';
     ioMdCustomFieldType:
-      Result := AField.GetProperty.GetMetadata_CustomFieldType;
+      Result := AField.GetContextProperty.GetMetadata_CustomFieldType;
   else
-    raise EioException.Create(ClassName, 'SchemaFieldToDBFieldType', 'Wrong Metadata_FieldType');
+    raise EioException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
 end;
 
@@ -225,6 +241,24 @@ end;
 function TioDBBuilderSqlGenSQLite.DatabaseExists: Boolean;
 begin
   Result := FileExists(FSchema.DatabaseFileName);
+end;
+
+procedure TioDBBuilderSqlGenSQLite.DropAllForeignKeys;
+begin
+  // Nothing to do
+  raise EioException.Create(ClassName, 'DropAllForeignKeys', MSG_METHOD_NOT_IMPLEMENTED);
+end;
+
+procedure TioDBBuilderSqlGenSQLite.DropAllIndex;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := OpenQuery('SELECT * FROM sqlite_master WHERE type = ''index''');
+  while not LQuery.Eof do
+  begin
+    ScriptAdd(Format('DROP INDEX %s;', [LQuery.Fields.FieldByName('name').AsString]));
+    LQuery.Next;
+  end;
 end;
 
 end.

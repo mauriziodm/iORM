@@ -17,7 +17,7 @@ type
   public
     constructor Create(const AContextProperty: IioContextProperty);
     function FieldName: String;
-    function GetProperty: IioContextProperty;
+    function GetContextProperty: IioContextProperty;
     function PrimaryKey: Boolean;
     function NotNull: Boolean;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -38,7 +38,7 @@ begin
   Result := FContextProperty.GetSqlFieldName;
 end;
 
-function TioDBBuilderSchemaField.GetProperty: IioContextProperty;
+function TioDBBuilderSchemaField.GetContextProperty: IioContextProperty;
 begin
   Result := FContextProperty;
 end;

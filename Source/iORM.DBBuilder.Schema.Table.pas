@@ -32,6 +32,7 @@ type
     procedure AddIndex(const AIndexAttr: ioIndex);
     function FieldList: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
+    function GetContextTable: IioCOntextTable;
     // function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
@@ -128,6 +129,11 @@ end;
 // if AField.IsKeyField then
 // Exit(AField);
 // end;
+
+function TioDBBuilderSchemaTable.GetContextTable: IioCOntextTable;
+begin
+  Result := FContextTable;
+end;
 
 function TioDBBuilderSchemaTable.GetIsClassFromField: Boolean;
 begin
