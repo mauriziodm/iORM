@@ -9,6 +9,8 @@ uses
 type
 
   TioDBBuilderStatus = (dbsClean, dbsAlter, dbsCreate);
+  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull);
+  TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
@@ -21,6 +23,8 @@ type
 
   IioDBBuilderSchemaField = interface
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
+    procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+    function Altered: TioDBBuilderFieldAlter;
     function FieldName: String;
     function GetContextProperty: IioContextProperty;
     function PrimaryKey: Boolean;
@@ -112,10 +116,10 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField);
+    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
     procedure CreateClassInfoField;
-    procedure AddField(const AField: IioDBBuilderSchemaField);
-    procedure AlterField(const AField: IioDBBuilderSchemaField);
+    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
+    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);

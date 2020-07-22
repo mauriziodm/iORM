@@ -11,21 +11,35 @@ type
   private
     FContextProperty: IioContextProperty;
     FStatus: TioDBBuilderStatus;
+    FAltered: TioDBBuilderFieldAlter;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AContextProperty: IioContextProperty);
+    procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+    function Altered: TioDBBuilderFieldAlter;
     function FieldName: String;
     function GetContextProperty: IioContextProperty;
     function PrimaryKey: Boolean;
     function NotNull: Boolean;
+
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
 
 { TioDBBuilderSchemaField }
+
+procedure TioDBBuilderSchemaField.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+begin
+  Include(FAltered, AAltered);
+end;
+
+function TioDBBuilderSchemaField.Altered: TioDBBuilderFieldAlter;
+begin
+  Result := FAltered;
+end;
 
 constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioContextProperty);
 begin

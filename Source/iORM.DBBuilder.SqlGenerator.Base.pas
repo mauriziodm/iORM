@@ -3,7 +3,7 @@ unit iORM.DBBuilder.SqlGenerator.Base;
 interface
 
 uses
-  System.Classes, iORM.DBBuilder.Interfaces, iORM.DB.Interfaces, iORM.Attributes;
+  System.Classes, iORM.DBBuilder.Interfaces, iORM.DB.Interfaces, iORM.Attributes, System.Rtti;
 
 const
   SCRIPT_SEPARATOR_LENGTH = 40;
@@ -18,6 +18,8 @@ type
     FIndentationLevel: Byte;
   protected
     function FSchema: IioDBBuilderSchema;
+    function TValueToSql(const AValue: TValue): string;
+    function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
 
     function NewQuery: IioQuery;
     function OpenQuery(const ASQL: String): IioQuery;
@@ -39,12 +41,29 @@ type
     procedure InitializeScript(const AInitialization: TStrings); virtual;
     procedure FinalizeScript(const AFinalization: TStrings); virtual;
 
-    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType, AFieldName, ATableName, AInvalidTypeConversions: string); virtual;
+    function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string): Boolean; virtual;
+    function IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+
+    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
+    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable); virtual;
     procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
       const ATable: IioDBBuilderSchemaTable); virtual;
     procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
-      const AFieldName, ATableName: String); virtual;
-    procedure WarningValueChanged(const AValueName, AOldValue, ANewValue, AFieldName, ATableName: String); virtual;
+      const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable); virtual;
 
     function BuildIndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String; virtual;
     function BuildIndexUnique(const AIndex: ioIndex): String; virtual;
@@ -93,6 +112,11 @@ end;
 procedure TioDBBuilderSqlGenBase.ScriptAddWarning(const AText: String);
 begin
   FSchema.SqlScript.Add('-- WARNING:  ' + AText);
+end;
+
+function TioDBBuilderSqlGenBase.TValueToSql(const AValue: TValue): string;
+begin
+  Result := TioDBFactory.SqlDataConverter(FSchema.ConnectionDefName).TValueToSql(AValue);
 end;
 
 procedure TioDBBuilderSqlGenBase.AddWarning(const AText: String);
@@ -181,11 +205,19 @@ begin
 end;
 
 procedure TioDBBuilderSqlGenBase.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
-  const AFieldName, ATableName: String);
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
     AddWarning(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = $d, new = %d)',
-      [ATableName, AFieldName, AValueName, AOldValue, ANewValue]));
+      [ATable.TableName, AField.FieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderSqlGenBase.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
+  const ATable: IioDBBuilderSchemaTable);
+begin
+  if AField.NotNull <> AOldFieldNotNull then
+    AddWarning(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
+      [ATable.TableName, AField.FieldName]));
 end;
 
 procedure TioDBBuilderSqlGenBase.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
@@ -193,26 +225,27 @@ procedure TioDBBuilderSqlGenBase.WarningNullBecomesNotNull(const AOldFieldNotNul
 begin
   if AField.NotNull and not AOldFieldNotNull then
     AddWarning
-      (Format('Table ''%s'' field ''%s'' --> The "NotNull" flag changes from false to true and a default value has not been specified',
+      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
       [ATable.TableName, AField.FieldName]));
 end;
 
-procedure TioDBBuilderSqlGenBase.WarningTypeAffinity(const AOldFieldType, ANewFieldType, AFieldName, ATableName,
-  AInvalidTypeConversions: string);
+procedure TioDBBuilderSqlGenBase.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
+  const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string);
 var
   LRequiredConversion: String;
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
   if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    AddWarning(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATableName, AFieldName, AOldFieldType,
-      ANewFieldType]));
+    AddWarning(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.TableName, AField.FieldName,
+      AOldFieldType, ANewFieldType]));
 end;
 
-procedure TioDBBuilderSqlGenBase.WarningValueChanged(const AValueName, AOldValue, ANewValue, AFieldName, ATableName: String);
+procedure TioDBBuilderSqlGenBase.WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField;
+      const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue <> AOldValue then
     AddWarning(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''$s'', new = ''%s'')',
-      [ATableName, AFieldName, AValueName, AOldValue, ANewValue]));
+      [ATable.TableName, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 constructor TioDBBuilderSqlGenBase.Create(const ASchema: IioDBBuilderSchema);
@@ -280,6 +313,17 @@ begin
   LQuery.ExecSQL;
 end;
 
+function TioDBBuilderSqlGenBase.ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
+var
+  LFieldDefaultValue: TValue;
+begin
+  LFieldDefaultValue := AField.GetContextProperty.GetMetadata_Default;
+  if LFieldDefaultValue.IsEmpty then
+    Result := ''
+  else
+    Result := TioDBFactory.SqlDataConverter(FSchema.ConnectionDefName).TValueToSql(LFieldDefaultValue);
+end;
+
 procedure TioDBBuilderSqlGenBase.FinalizeScript(const AFinalization: TStrings);
 begin
   ScriptAddEmpty;
@@ -313,6 +357,76 @@ begin
   ScriptAddComment('Database file..: ' + FSchema.DatabaseFileName);
   ScriptAddComment('DBMS...........: ' + TioConnectionManager.GetConnectionDefByName(FSchema.ConnectionDefName).Params.DriverID);
   ScriptAddSeparator;
+end;
+
+function TioDBBuilderSqlGenBase.IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
+begin
+  Result := AOldBlobSubType <> ANewBlobSubType;
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    if not AIsPermitted then
+      WarningValueChanged('blob sub-type', AOldBlobSubType, ANewBlobSubType, AField, ATable);
+  end;
+end;
+
+function TioDBBuilderSqlGenBase.IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
+begin
+  Result := AOldFieldDecimals <> ANewFieldDecimals;
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    WarningNewValueLessThanTheOldOne('field decimals', AOldFieldDecimals, ANewFieldDecimals, AField, ATable);
+  end;
+end;
+
+function TioDBBuilderSqlGenBase.IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
+begin
+  Result := ANewFieldLength <> AOldFieldLength;
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    WarningNewValueLessThanTheOldOne('field length', AOldFieldLength, ANewFieldLength, AField, ATable);
+  end;
+end;
+
+function TioDBBuilderSqlGenBase.IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
+begin
+  Result := AOldFieldNotNull <> ANewFieldNotNull;
+  if Result then
+  begin
+    AField.AddAltered(alFieldNotNull);
+    if AIsPermitted then
+      WarningNullBecomesNotNull(AOldFieldNotNull, AField, ATable)
+    else
+      WarningNotNullCannotBeChanged(AOldFieldNotNull, AField, ATable);
+  end;
+end;
+
+function TioDBBuilderSqlGenBase.IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
+begin
+  Result := AOldFieldPrecision <> ANewFieldPrecision;
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    WarningNewValueLessThanTheOldOne('field precision', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
+  end;
+end;
+
+function TioDBBuilderSqlGenBase.IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
+  const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string): Boolean;
+begin
+  Result := not SameText(AOldFieldType, ANewFieldType);
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, AInvalidTypeConversions);
+  end;
 end;
 
 end.

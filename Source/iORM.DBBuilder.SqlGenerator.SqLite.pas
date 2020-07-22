@@ -28,10 +28,10 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField);
+    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
     procedure CreateClassInfoField;
-    procedure AddField(const AField: IioDBBuilderSchemaField); // Not implented
-    procedure AlterField(const AField: IioDBBuilderSchemaField); // Not implented
+    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
+    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable); // Not implented
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
@@ -53,7 +53,7 @@ uses
 
 procedure TioDBBuilderSqlGenSQLite.CreateClassInfoField;
 begin
-  ScriptAdd(Format('"%s" TEXT NULL', [IO_CLASSFROMFIELD_FIELDNAME]));
+  ScriptAdd(Format(',%s TEXT NULL', [IO_CLASSFROMFIELD_FIELDNAME]));
 end;
 
 procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
@@ -61,7 +61,7 @@ begin
   OpenQuery('SELECT 1=1');
 end;
 
-procedure TioDBBuilderSqlGenSQLite.CreateField(const AField: IioDBBuilderSchemaField);
+procedure TioDBBuilderSqlGenSQLite.CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
 begin
   ScriptAdd(InternalCreateField(AField));
 end;
@@ -128,8 +128,7 @@ begin
       LNewFieldType := TranslateFieldType(AField);
 
       // Verify if fieldType has been changed and check type affinity
-      Result := (not SameText(LOldFieldType, LNewFieldType));
-      WarningTypeAffinity(LOldFieldType, LNewFieldType, LNewFieldName, ATable.TableName, INVALID_FIELDTYPE_CONVERSIONS);
+      Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
 
       // Verify if NotNull is changed
       Result := Result or (LOldFieldNotNull <> AField.NotNull);
@@ -194,7 +193,7 @@ begin
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
-procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField);
+procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
 begin
   // Nothing to do
   raise EioException.Create(ClassName, 'AddField', MSG_METHOD_NOT_IMPLEMENTED);
@@ -218,7 +217,7 @@ begin
   raise EioException.Create(ClassName, 'AddSequence', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
-procedure TioDBBuilderSqlGenSQLite.AlterField(const AField: IioDBBuilderSchemaField);
+procedure TioDBBuilderSqlGenSQLite.AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
 begin
   // Nothing to do
   raise EioException.Create(ClassName, 'AlterField', MSG_METHOD_NOT_IMPLEMENTED);

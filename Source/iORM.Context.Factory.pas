@@ -299,7 +299,6 @@ begin
     PropMetadata_FKAutoCreate := fkCreate;
     PropMetadata_FKOnDeleteAction := fkUnspecified;
     PropMetadata_FKOnUpdateAction := fkUnspecified;
-    PropMetadata_Default := nil;
 
     // PropFieldName: if the MapMpde is ioFields then remove the first character ("F" usually)
     PropFieldName := Prop.Name;

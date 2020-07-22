@@ -31,10 +31,10 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField);
+    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
     procedure CreateClassInfoField;
-    procedure AddField(const AField: IioDBBuilderSchemaField); // Not implented
-    procedure AlterField(const AField: IioDBBuilderSchemaField); // Not implented
+    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
+    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable); // Not implented
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
@@ -49,13 +49,14 @@ type
 implementation
 
 uses
-  iORM.Context.Properties.Interfaces, iORM.Exceptions, System.SysUtils, iORM.DB.Factory, iORM.DB.Interfaces, System.StrUtils;
+  iORM.Context.Properties.Interfaces, iORM.Exceptions, System.SysUtils, iORM.DB.Factory, iORM.DB.Interfaces, System.StrUtils,
+  iORM.CommonTypes;
 
 { TioDBBuilderSqlGenFirebird }
 
-procedure TioDBBuilderSqlGenFirebird.AddField(const AField: IioDBBuilderSchemaField);
+procedure TioDBBuilderSqlGenFirebird.AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
 begin
-
+  ScriptAdd(Format('%sADD %s', [AComma, InternalCreateField(AField)]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
@@ -78,9 +79,33 @@ begin
 
 end;
 
-procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField);
+procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+var
+  LDefault: string;
 begin
-
+  // Type
+  if alFieldType in AField.Altered then
+  begin
+    ScriptAdd(Format('%sALTER COLUMN %s TYPE %s', [AComma, AField.FieldName, TranslateFieldTypeForCreate(AField)]));
+    AComma := ',';
+  end;
+  // Default
+  if alFieldDefault in AField.Altered then
+  begin
+    LDefault := ExtractFieldDefaultValue(AField);
+    if LDefault.IsEmpty then
+      ScriptAdd(Format('%sALTER COLUMN %s DROP DEFAULT', [AComma, AField.FieldName]))
+    else
+      ScriptAdd(Format('%sALTER COLUMN %s SET DEFAULT %s', [AComma, AField.FieldName, LDefault]));
+    AComma := ',';
+  end;
+  // NotNull
+  // Note: SET NOT NUL & DROP BOT NULL available only from firebird 3
+  if alFieldNotNull in AField.Altered then
+  begin
+    ScriptAdd(Format('%sALTER COLUMN %s %s NOT NULL', [AComma, AField.FieldName, IfThen(AField.NotNull, 'SET', 'DROP')]));
+    AComma := ',';
+  end;
 end;
 
 procedure TioDBBuilderSqlGenFirebird.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -97,7 +122,7 @@ end;
 
 procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField;
 begin
-
+  ScriptAdd(Format('%s VARCHAR(%s)', [IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.CreateDatabase;
@@ -112,9 +137,9 @@ begin
     BoolToStr(False, True);
 end;
 
-procedure TioDBBuilderSqlGenFirebird.CreateField(const AField: IioDBBuilderSchemaField);
+procedure TioDBBuilderSqlGenFirebird.CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
 begin
-  ScriptAdd(InternalCreateField(AField));
+  ScriptAdd(Format('%s%s', [AComma, InternalCreateField(AField)]));
 end;
 
 function TioDBBuilderSqlGenFirebird.DatabaseExists: Boolean;
@@ -159,11 +184,13 @@ var
   LQuery: IioQuery;
   LTableName: string;
   LFieldName: string;
+
   LNewFieldType: string;
   LNewFieldSubType: string;
   LNewFieldLength: Smallint;
   LNewFieldPrecision: Smallint;
   LNewFieldDecimals: Smallint;
+
   LOldFieldName: string;
   LOldFieldType: string;
   LOldFieldSubType: string;
@@ -171,12 +198,14 @@ var
   LOldFieldPrecision: Smallint;
   LOldFieldDecimals: Smallint;
   LOldFieldNotNull: Boolean;
+
   function IsDecimalOrNumeric: Boolean;
   begin
     Result := (LOldFieldType = 'INT64') and ((LOldFieldSubType = '1') or (LOldFieldSubType = '2'));
   end;
 
 begin
+  Result := False;
   // Load some new field informations
   LTableName := ATable.TableName;
   LFieldName := AField.FieldName;
@@ -229,49 +258,48 @@ begin
   LOldFieldPrecision := LQuery.Fields.FieldByName('field_precision').AsInteger;
 
   // Verify if fieldType has been changed and check type affinity
-  Result := (not SameText(LOldFieldType, LNewFieldType));
-  WarningTypeAffinity(LOldFieldType, LNewFieldType, LFieldName, LTableName, INVALID_FIELDTYPE_CONVERSIONS);
+  Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
 
   // Verify if FieldLength is changed
   if 'VARCHAR,CHAR'.Contains(LNewFieldType) or 'VARCHAR,CHAR'.Contains(LOldFieldType) then
-  begin
-    Result := Result or (LNewFieldLength <> LOldFieldLength);
-    WarningNewValueLessThanTheOldOne('field length', LOldFieldLength, LNewFieldLength, LFieldName, LTableName);
-  end;
+    Result := Result or IsFieldLengthChanged(LOldFieldLength, LNewFieldLength, AField, ATable);
 
   if IsDecimalOrNumeric then
   begin
     // Verify if something has been changed in FieldPrecision
-    Result := Result or (LNewFieldPrecision <> LOldFieldPrecision);
-    WarningNewValueLessThanTheOldOne('field precision', LOldFieldPrecision, LNewFieldPrecision, LFieldName, LTableName);
-
+    Result := Result or IsFieldPrecisionChanged(LOldFieldPrecision, LNewFieldPrecision, AField, ATable);
     // Verify if something has been changed in FieldDecimals (scale)
-    Result := Result or (LNewFieldDecimals <> LOldFieldDecimals);
-    WarningNewValueLessThanTheOldOne('field decimals', LOldFieldDecimals, LNewFieldDecimals, LFieldName, LTableName);
+    Result := Result or IsFieldDecimalsChanged(LOldFieldDecimals, LNewFieldDecimals, AField, ATable);
   end;
 
-  // Verify if NotNull is changed
-  Result := Result or (LOldFieldNotNull <> AField.NotNull);
-  WarningNullBecomesNotNull(LOldFieldNotNull, AField, ATable);
+  // Verify if DEFAULT setting of the field is changed
+  // NOTE: I have not found a way to retrieve the current DEFAULT
+  // setting from the DB (it is encoded in a binary representation called BLR)
+  // so it is not possible to verify if it has changed.
+
+  // Verify if NotNull is changed (warning cannot change not null value with firebird)
+  // Note: The last parameter set the NotNull change as permitted (firebird's alter table
+  //       with SET NOT NULL or DROP NOT NULL is supported from version 3)
+  Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
 
   // Verify if blob subtype is changed
+  // Note: The last parameter set the blob sub-type change as NOT permitted in firebrd RDBMS
   if LNewFieldType = 'BLOB' then
-  begin
-    Result := Result or (LNewFieldSubType <> LOldFieldSubType);
-    WarningValueChanged('blob subtype', LOldFieldSubType, LNewFieldSubType, LFieldName, LTableName);
-  end;
+    Result := Result or IsBlobSubTypeChanged(LOldFieldSubType, LNewFieldSubType, AField, ATable, False);
 end;
 
 function TioDBBuilderSqlGenFirebird.InternalCreateField(const AField: IioDBBuilderSchemaField): String;
 var
+  LDefault: string;
   LNotNull: string;
 begin
   // If primary key...
   if AField.PrimaryKey then
-    Exit(Format('"%s" INTEGER NOT NULL', [AField.FieldName]));
+    Exit(Format('%s INTEGER NOT NULL', [AField.FieldName]));
   // ...then continue
+  LDefault := ExtractFieldDefaultValue(AField);
   LNotNull := IfThen(AField.NotNull, 'NOT NULL', '');
-  Result := Format('"%s" %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LNotNull]).Trim;
+  Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
 end;
 
 function TioDBBuilderSqlGenFirebird.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
@@ -308,7 +336,7 @@ begin
     ioMdBoolean:
       Result := 'INTEGER';
     ioMdBinary:
-      Result := Format('BLOB SUB_TYPE %s', [ifthen(AField.GetContextProperty.GetMetadata_FieldSubType.IsEmpty, '0',
+      Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.GetContextProperty.GetMetadata_FieldSubType.IsEmpty, '0',
         AField.GetContextProperty.GetMetadata_FieldSubType)]);
     ioMdCustomFieldType:
       Result := AField.GetContextProperty.GetMetadata_CustomFieldType;
