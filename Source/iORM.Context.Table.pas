@@ -159,7 +159,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator;
+  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils;
 
 { TioContextTable }
 
@@ -236,7 +236,7 @@ end;
 
 function TioContextTable.GetKeyGenerator: String;
 begin
-  Result := FKeyGenerator;
+  Result := IfThen(FKeyGenerator.IsEmpty, TableName, FKeyGenerator);
 end;
 
 function TioContextTable.GetMapMode: TioMapModeType;

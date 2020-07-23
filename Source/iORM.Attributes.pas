@@ -50,7 +50,7 @@ type
   TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne);
 
   // ForeignKey types
-  TioFKAction = (fkUnspecified, fkNoAction, fkRestrict, fkSetNull, fkSetDefault, fkCascade);
+  TioFKAction = (fkUnspecified, fkNoAction, fkSetNull, fkSetDefault, fkCascade);
   TioFKCreate = (fkCreate, fkDoNotCreate);
 
   // LazyLoad

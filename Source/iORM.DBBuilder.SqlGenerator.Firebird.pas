@@ -18,25 +18,26 @@ type
     function TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
     function TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
+    function SequenceExists(const ATable: IioDBBuilderSchemaTable): boolean;
   public
     // Database related methods
-    function DatabaseExists: Boolean;
+    function DatabaseExists: boolean;
     procedure CreateDatabase;
     // Tables related methods
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): boolean;
     procedure BeginCreateTable(const ATable: IioDBBuilderSchemaTable);
     procedure EndCreateTable(const ATable: IioDBBuilderSchemaTable);
     procedure BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
     procedure EndAlterTable(const ATable: IioDBBuilderSchemaTable);
     // Fields related methods
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
+    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
     procedure CreateClassInfoField;
-    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
-    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
+    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
+    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
     // PrimaryKey & other indexes
-    procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable); // Not implented
+    procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
     procedure DropAllIndex;
     // Foreign keys
@@ -50,7 +51,7 @@ implementation
 
 uses
   iORM.Context.Properties.Interfaces, iORM.Exceptions, System.SysUtils, iORM.DB.Factory, iORM.DB.Interfaces, System.StrUtils,
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.SqlTranslator;
 
 { TioDBBuilderSqlGenFirebird }
 
@@ -60,23 +61,56 @@ begin
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
+var
+  LGuid: TGuid;
+  LFKName: string;
 begin
+  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
+  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+  CreateGUID(LGuid);
+  LFKName := LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
+  LFKName := IfThen(Length(AForeignKey.Name) <= 30, AForeignKey.Name, LFKName);
 
+  ScriptAdd(Format('ALTER TABLE %s', [AForeignKey.DependentTableName]));
+  IncIndentationLevel;
+  ScriptAdd(Format(' ADD CONSTRAINT %s', [LFKName]));
+  IncIndentationLevel;
+  ScriptAdd(Format('FOREIGN KEY (%s)', [AForeignKey.DependentFieldName]));
+  IncIndentationLevel;
+  ScriptAdd(Format('REFERENCES  %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+  if AForeignKey.OnUpdateAction > fkUnspecified then
+    ScriptAdd(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
+  if AForeignKey.OnDeleteAction > fkUnspecified then
+    ScriptAdd(Format('ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
+  DecIndentationLevel;
+  DecIndentationLevel;
+  DecIndentationLevel;
+  ScriptAdd(';');
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
+var
+  LQuery, LIndexName, LFieldList, LUnique, LIndexOrientation, LComma: String;
 begin
-
+  LIndexName := BuildIndexName(ATable, AIndex);
+  LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
+  LUnique := BuildIndexUnique(AIndex);
+  LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, False);
+  // Compose the create index query text
+  LQuery := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.TableName, LFieldList]);
+  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
+  ScriptAdd(LQuery);
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
 begin
-
+  ScriptAdd(Format('ALTER TABLE %s ADD PRIMARY KEY (%s);', [ATable.TableName, ATable.PrimaryKeyField.FieldName]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddSequence(const ATable: IioDBBuilderSchemaTable);
 begin
-
+  if not SequenceExists(ATable) then
+    ScriptAdd(Format('CREATE SEQUENCE %s;', [ATable.GetContextTable.GetKeyGenerator]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
@@ -142,19 +176,39 @@ begin
   ScriptAdd(Format('%s%s', [AComma, InternalCreateField(AField)]));
 end;
 
-function TioDBBuilderSqlGenFirebird.DatabaseExists: Boolean;
+function TioDBBuilderSqlGenFirebird.DatabaseExists: boolean;
 begin
   Result := FileExists(FSchema.DatabaseFileName);
 end;
 
 procedure TioDBBuilderSqlGenFirebird.DropAllForeignKeys;
+var
+  LQuery: IioQuery;
 begin
-
+  LQuery.SQL.Add('select rdb$relation_name as table_name, rdb$constraint_name as constraint_name');
+  LQuery.SQL.Add('from rdb$relation_constraints');
+  LQuery.SQL.Add('where rdb$constraint_type = ''FOREIGN KEY''');
+  LQuery.SQL.Add('  and rdb$constraint_name like ''FK_%''');
+  LQuery.Open;
+  while not LQuery.Eof do
+  begin
+    ScriptAdd(Format('ALTER TABLE %s DROP CONSTRAINT %s;', [LQuery.Fields.FieldByName('table_name').AsString,
+      LQuery.Fields.FieldByName('constraint_name').AsString]));
+    LQuery.Next;
+  end;
 end;
 
 procedure TioDBBuilderSqlGenFirebird.DropAllIndex;
+var
+  LQuery: IioQuery;
 begin
-
+  LQuery := OpenQuery
+    ('select RDB$INDEX_NAME as index_name, RDB$RELATION_NAME as table_name from rdb$indices where RDB$INDEX_NAME like ''IDX_%''');
+  while not LQuery.Eof do
+  begin
+    ScriptAdd(Format('DROP INDEX %s;', [LQuery.Fields.FieldByName('name').AsString]));
+    LQuery.Next;
+  end;
 end;
 
 procedure TioDBBuilderSqlGenFirebird.EndAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -169,7 +223,7 @@ begin
   ScriptAdd(');');
 end;
 
-function TioDBBuilderSqlGenFirebird.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
+function TioDBBuilderSqlGenFirebird.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -179,7 +233,7 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField)
-  : Boolean;
+  : boolean;
 var
   LQuery: IioQuery;
   LTableName: string;
@@ -197,9 +251,9 @@ var
   LOldFieldLength: Smallint;
   LOldFieldPrecision: Smallint;
   LOldFieldDecimals: Smallint;
-  LOldFieldNotNull: Boolean;
+  LOldFieldNotNull: boolean;
 
-  function IsDecimalOrNumeric: Boolean;
+  function IsDecimalOrNumeric: boolean;
   begin
     Result := (LOldFieldType = 'INT64') and ((LOldFieldSubType = '1') or (LOldFieldSubType = '2'));
   end;
@@ -279,7 +333,7 @@ begin
 
   // Verify if NotNull is changed (warning cannot change not null value with firebird)
   // Note: The last parameter set the NotNull change as permitted (firebird's alter table
-  //       with SET NOT NULL or DROP NOT NULL is supported from version 3)
+  // with SET NOT NULL or DROP NOT NULL is supported from version 3)
   Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
 
   // Verify if blob subtype is changed
@@ -302,7 +356,16 @@ begin
   Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
 end;
 
-function TioDBBuilderSqlGenFirebird.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+function TioDBBuilderSqlGenFirebird.SequenceExists(const ATable: IioDBBuilderSchemaTable): boolean;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := OpenQuery(Format('select count(*) from rdb$generators where rdb$generator_name = ''%s''',
+    [ATable.GetContextTable.GetKeyGenerator]));
+  Result := LQuery.Fields[0].AsInteger > 0;
+end;
+
+function TioDBBuilderSqlGenFirebird.TableExists(const ATable: IioDBBuilderSchemaTable): boolean;
 var
   LQuery: IioQuery;
 begin

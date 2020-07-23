@@ -69,8 +69,9 @@ type
     function BuildIndexUnique(const AIndex: ioIndex): String; virtual;
     function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String)
       : String; virtual;
-    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String)
-      : String; virtual;
+    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String;
+      const AWithIndexOrientation: Boolean): String; virtual;
+    function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
   public
     constructor Create(const ASchema: IioDBBuilderSchema);
 
@@ -114,6 +115,23 @@ begin
   FSchema.SqlScript.Add('-- WARNING:  ' + AText);
 end;
 
+function TioDBBuilderSqlGenBase.TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+begin
+  case AFKAction of
+    fkNoAction:
+      Exit('NO ACTION');
+    fkSetNull:
+      Exit('SET NULL');
+    fkSetDefault:
+      Exit('SET DEFAULT');
+    fkCascade:
+      Exit('CASCADE');
+  else
+    AddWarning(Format('Table ''%s'' constraint ''%s'' --> Invalid foreign key action (field %s reference to %s.%s)', [AForeignKey.DependentTableName,
+      AForeignKey.Name, AForeignKey.DependentFieldName, AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+  end;
+end;
+
 function TioDBBuilderSqlGenBase.TValueToSql(const AValue: TValue): string;
 begin
   Result := TioDBFactory.SqlDataConverter(FSchema.ConnectionDefName).TValueToSql(AValue);
@@ -125,14 +143,17 @@ begin
 end;
 
 function TioDBBuilderSqlGenBase.BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex;
-  const AIndexName: String): String;
+  const AIndexName: String; const AWithIndexOrientation: Boolean): String;
 var
   LFieldList: TStrings;
   LField: String;
   LComma: String;
   LIndexOrientation: String;
 begin
-  LIndexOrientation := BuildIndexOrientation(ATable, AIndex, AIndexName);
+  if AWithIndexOrientation then
+    LIndexOrientation := BuildIndexOrientation(ATable, AIndex, AIndexName)
+  else
+    LIndexOrientation := '';
   LFieldList := TStringList.Create;
   try
     LComma := '';
@@ -140,7 +161,7 @@ begin
     LFieldList.DelimitedText := AIndex.CommaSepFieldList;
     for LField in LFieldList do
     begin
-      Result := Format('%s%s %s %s', [Result, LComma, LField, LIndexOrientation]);
+      Result := Format('%s%s %s %s', [Result, LComma, LField, LIndexOrientation]).Trim;
       LComma := ', ';
     end;
   finally
@@ -191,8 +212,7 @@ begin
     ioDescending:
       Exit('DESC');
   else
-    raise EioException.Create(ClassName, 'BuildIndexOrientation', Format('Invalid index orientation (index ''%s'', table ''%s'')',
-      [AIndexName, ATable.TableName]));
+    AddWarning(Format('Table ''%s'' index ''%s'' --> Invalid index orientation', [ATable.TableName, AIndexName]));
   end;
 end;
 
@@ -240,8 +260,8 @@ begin
       AOldFieldType, ANewFieldType]));
 end;
 
-procedure TioDBBuilderSqlGenBase.WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderSqlGenBase.WarningValueChanged(const AValueName, AOldValue, ANewValue: String;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue <> AOldValue then
     AddWarning(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''$s'', new = ''%s'')',
@@ -256,7 +276,7 @@ end;
 
 function TioDBBuilderSqlGenBase.NewQuery: IioQuery;
 begin
-  Result := TioDbFactory.Query(FSchema.ConnectionDefName);
+  Result := TioDBFactory.Query(FSchema.ConnectionDefName);
 end;
 
 function TioDBBuilderSqlGenBase.OpenQuery(const ASQL: String): IioQuery;

@@ -19,6 +19,8 @@ type
     function ReferenceFieldName: String;
     function DependentTableName: String;
     function DependentFieldName: String;
+    function OnDeleteAction: TioFKAction;
+    function OnUpdateAction: TioFKAction;
   end;
 
   IioDBBuilderSchemaField = interface

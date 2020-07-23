@@ -94,7 +94,7 @@ var
   LFKName: String;
 begin
   // Add tne FK if not already exists
-  LFKName := ADependentProperty.GetName + '_' + AReferenceMap.GetTable.TableName;
+  LFKName := Format('FK_%s_%s', [ADependentProperty.GetName, AReferenceMap.GetTable.TableName]);
   if not FForeignKeys.ContainsKey(LFKName) then
     FForeignKeys.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction,
       AOnUpdateAction));

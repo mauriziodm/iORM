@@ -37,7 +37,7 @@ type
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
     procedure DropAllIndex;
     // Foreign keys
-    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK); // Not implented
+    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
     procedure DropAllForeignKeys; // Not implented
     // Sequences
     procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
@@ -72,7 +72,7 @@ var
 begin
   LIndexName := BuildIndexName(ATable, AIndex);
   LUnique := BuildIndexUnique(AIndex);
-  LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName);
+  LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, True);
   // Compose the create index query text
   LQuery := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
   LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
@@ -201,8 +201,18 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  // Nothing to do
-  raise EioException.Create(ClassName, 'AddForeignKey', MSG_METHOD_NOT_IMPLEMENTED);
+  ScriptAdd(Format(',CONSTRAINT "%s"', [AForeignKey.Name]));
+  IncIndentationLevel;
+  IncIndentationLevel;
+  ScriptAdd(Format('FOREIGN KEY ("%s")', [AForeignKey.DependentFieldName]));
+  ScriptAdd(Format('REFERENCES  "%s" ("%s")', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+  if AForeignKey.OnUpdateAction > fkUnspecified then
+    ScriptAdd(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
+  if AForeignKey.OnDeleteAction > fkUnspecified then
+    ScriptAdd(Format('ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
+  ScriptAdd('DEFERRABLE INITIALLY DEFERRED');
+  DecIndentationLevel;
+  DecIndentationLevel;
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
