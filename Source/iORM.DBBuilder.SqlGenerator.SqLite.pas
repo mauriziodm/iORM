@@ -15,6 +15,8 @@ type
   private
     function TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
+    function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
+    procedure CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
   public
     // Database related methods
     function DatabaseExists: Boolean;
@@ -81,8 +83,8 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.EndAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  DecIndentationLevel;
-  ScriptAdd(');');
+  EndCreateTable(ATable);
+  CopyDataFromOldToNewTable(ATable);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.EndCreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -131,8 +133,7 @@ begin
       Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
 
       // Verify if NotNull is changed
-      Result := Result or (LOldFieldNotNull <> AField.NotNull);
-      WarningNullBecomesNotNull(LOldFieldNotNull, AField, ATable);
+      Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
 
       // Exit
       Exit;
@@ -151,6 +152,39 @@ begin
   // ...then continue
   LNotNull := IfThen(AField.NotNull, 'NOT NULL', 'NULL');
   Result := Format('"%s" %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull]).Trim;
+end;
+
+procedure TioDBBuilderSqlGenSQLite.CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
+var
+  LField: IioDBBuilderSchemaField;
+  LComma: Char;
+begin
+  // Insert into
+  ScriptAdd(Format('INSERT INTO %s (', [ATable.TableName]));
+  IncIndentationLevel;
+  LComma := ' ';
+  for LField in ATable.FieldList.Values do
+  begin
+    ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
+    LComma := ',';
+  end;
+  if ATable.IsClassFromField then
+    ScriptAdd(Format('%s%s', [LComma, IO_CLASSFROMFIELD_FIELDNAME]));
+  // Select from
+  ScriptAdd(') SELECT');
+  IncIndentationLevel;
+  LComma := ' ';
+  for LField in ATable.FieldList.Values do
+  begin
+    ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
+    LComma := ',';
+  end;
+  if ATable.IsClassFromField then
+    ScriptAdd(Format('%s%s', [LComma, IO_CLASSFROMFIELD_FIELDNAME]));
+  DecIndentationLevel;
+  ScriptAdd(Format('FROM %s (', [Table2OldTableName(ATable)]));
+  DecIndentationLevel;
+  ScriptAdd(';');
 end;
 
 function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
@@ -191,6 +225,11 @@ var
 begin
   LQuery := OpenQuery(Format('SELECT count(*) FROM sqlite_master WHERE type=''table'' AND name=''%s''', [ATable.TableName]));
   Result := LQuery.Fields[0].AsInteger > 0;
+end;
+
+function TioDBBuilderSqlGenSQLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
+begin
+  Result := Format('_%s_old0', [ATable.TableName.ToLower]);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
@@ -235,10 +274,9 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('DROP TABLE IF EXISTS _%s_old;', [ATable.TableName]));
-  ScriptAdd(Format('ALTER TABLE %s RENAME TO _%s_old;', [ATable.TableName, ATable.TableName]));
-  ScriptAdd(Format('CREATE TABLE %s (', [ATable.TableName]));
-  IncIndentationLevel;
+  ScriptAdd(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(ATable)]));
+  ScriptAdd(Format('ALTER TABLE %s RENAME TO %s;', [ATable.TableName, Table2OldTableName(ATable)]));
+  BeginCreateTable(ATable);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.BeginCreateTable(const ATable: IioDBBuilderSchemaTable);
