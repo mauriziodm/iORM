@@ -6,10 +6,9 @@ uses
   iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes;
 
 const
-  INVALID_FIELDTYPE_CONVERSIONS = '[timestamp->decimal]' + '[timestamp->numeric]' + '[timestamp->integer]' + '[date->decimal]' +
-    '[date->numeric]' + '[date->integer]' + '[time->numeric]' + '[time->decimal]' + '[time->integer]' + '[varchar->decimal]' +
-    '[varchar->integer]' + '[varchar->date]' + '[varchar->time]' + '[varchar->datetime]' + '[char->decimal]' + '[char->integer]' +
-    '[char->date]' + '[char->time]' + '[char->datetime]';
+  INVALID_FIELDTYPE_CONVERSIONS = '[timestamp->decimal][timestamp->numeric][timestamp->integer][date->decimal][date - > numeric]' +
+    '[date->integer][time->numeric][time->decimal][time->integer][varchar->decimal][varchar->integer][varchar->date][varchar->time]' +
+    '[varchar->datetime][char->decimal][char->integer][char->date][char->time][char->datetime]';
 
 type
 
@@ -33,7 +32,7 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure CreateClassInfoField;
+    procedure CreateClassInfoField(AComma: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
     procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
     // PrimaryKey & other indexes
@@ -144,7 +143,7 @@ end;
 
 procedure TioDBBuilderSqlGenFirebird.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('ALTER TABLE %s (', [ATable.TableName]));
+  ScriptAdd(Format('ALTER TABLE %s', [ATable.TableName]));
   IncIndentationLevel;
 end;
 
@@ -154,9 +153,9 @@ begin
   IncIndentationLevel;
 end;
 
-procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField;
+procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField(AComma: Char);
 begin
-  ScriptAdd(Format('%s VARCHAR(%s)', [IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
+  ScriptAdd(Format('%s%s VARCHAR(%s)', [AComma, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.CreateDatabase;

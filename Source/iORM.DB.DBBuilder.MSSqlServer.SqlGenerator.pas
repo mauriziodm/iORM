@@ -62,7 +62,6 @@ type
     function GetColumnType(const AProperty: IioContextProperty): String;
     function ConversionTypeAdmitted(AColumnType: string; AModelColumnType: string): Boolean;
     function ReplaceSpecialWords(ASql: string): string;
-  protected
   public
     function DatabaseExists(const ADbName: string): Boolean;
     function CreateDatabase(const ADbName: string): String;

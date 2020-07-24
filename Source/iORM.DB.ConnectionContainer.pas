@@ -99,6 +99,7 @@ type
     class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class procedure NewRESTConnection(const ABaseURL:String; const AAsDefault:Boolean=True; const APersistent:Boolean=True; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
+    class function GetDefaultConnectionDef: IIoConnectionDef;
     class function GetConnectionDefByName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName:String): Boolean;
     class function GetDefaultConnectionName: String;
@@ -247,6 +248,11 @@ end;
 class function TioConnectionManager.GetDatabaseFileName(const AConnectionName: String): String;
 begin
   Result := Self.GetConnectionDefByName(AConnectionName).Params.Database;
+end;
+
+class function TioConnectionManager.GetDefaultConnectionDef: IIoConnectionDef;
+begin
+  GetConnectionDefByName(GetDefaultConnectionName);
 end;
 
 class function TioConnectionManager.GetDefaultConnectionName: String;

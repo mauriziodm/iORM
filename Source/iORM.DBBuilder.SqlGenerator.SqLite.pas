@@ -6,8 +6,8 @@ uses
   iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes;
 
 const
-  INVALID_FIELDTYPE_CONVERSIONS = '[text->integer]' + '[text->real]' + '[text->numeric]' + '[text->blob]' + '[real->integer]' +
-    '[real->blob]' + '[numeric->integer]' + '[numeric->blob]' + '[blob->real]' + '[blob->numeric]' + '[blob->integer]' + '[blob->text]';
+  INVALID_FIELDTYPE_CONVERSIONS = '[text->integer][text->real][text->numeric][text->blob][real->integer][real->blob]' +
+    '[numeric->integer][numeric->blob][blob->real][blob->numeric][blob->integer][blob->text]';
 
 type
 
@@ -31,7 +31,7 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure CreateClassInfoField;
+    procedure CreateClassInfoField(AComma: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
     procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
     // PrimaryKey & other indexes
@@ -53,9 +53,9 @@ uses
 
 { TioDBBuilderSqlGenSQLite }
 
-procedure TioDBBuilderSqlGenSQLite.CreateClassInfoField;
+procedure TioDBBuilderSqlGenSQLite.CreateClassInfoField(AComma: Char);
 begin
-  ScriptAdd(Format(',%s TEXT NULL', [IO_CLASSFROMFIELD_FIELDNAME]));
+  ScriptAdd(Format('%s%s TEXT NULL', [AComma, IO_CLASSFROMFIELD_FIELDNAME]));
 end;
 
 procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
