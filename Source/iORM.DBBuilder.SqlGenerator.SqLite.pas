@@ -13,10 +13,10 @@ type
 
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   private
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
+    procedure CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
-    procedure CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
   public
     // Database related methods
     function DatabaseExists: Boolean;
@@ -30,10 +30,10 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure CreateClassInfoField(AComma: Char);
-    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
-    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char); // Not implented
+    procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure CreateClassInfoField(ACommaBefore: Char);
+    procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char); // Not implented
+    procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char); // Not implented
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable); // Not implented
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
@@ -53,9 +53,9 @@ uses
 
 { TioDBBuilderSqlGenSQLite }
 
-procedure TioDBBuilderSqlGenSQLite.CreateClassInfoField(AComma: Char);
+procedure TioDBBuilderSqlGenSQLite.CreateClassInfoField(ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%s%s TEXT NULL', [AComma, IO_CLASSFROMFIELD_FIELDNAME]));
+  ScriptAdd(Format('%s%s TEXT NULL', [ACommaBefore, IO_CLASSFROMFIELD_FIELDNAME]));
 end;
 
 procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
@@ -63,14 +63,14 @@ begin
   OpenQuery('SELECT 1=1');
 end;
 
-procedure TioDBBuilderSqlGenSQLite.CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenSQLite.CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-  ScriptAdd(InternalCreateField(AField));
+  ScriptAdd(Format('%s%s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
 var
-  LQuery, LIndexName, LFieldList, LUnique, LComma: String;
+  LQuery, LIndexName, LFieldList, LUnique: String;
 begin
   LIndexName := BuildIndexName(ATable, AIndex);
   LUnique := BuildIndexUnique(AIndex);
@@ -148,7 +148,7 @@ var
 begin
   // If primary key...
   if AField.PrimaryKey then
-    Exit(Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName]));
+    Exit(Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])); // Add AUTOINCREMENT keyword???
   // ...then continue
   LNotNull := IfThen(AField.NotNull, 'NOT NULL', 'NULL');
   Result := Format('"%s" %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull]).Trim;
@@ -232,7 +232,7 @@ begin
   Result := Format('_%s_old0', [ATable.TableName.ToLower]);
 end;
 
-procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
   // Nothing to do
   raise EioException.Create(ClassName, 'AddField', MSG_METHOD_NOT_IMPLEMENTED);
@@ -266,7 +266,7 @@ begin
   raise EioException.Create(ClassName, 'AddSequence', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
-procedure TioDBBuilderSqlGenSQLite.AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenSQLite.AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
   // Nothing to do
   raise EioException.Create(ClassName, 'AlterField', MSG_METHOD_NOT_IMPLEMENTED);

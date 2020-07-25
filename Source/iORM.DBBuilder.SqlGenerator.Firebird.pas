@@ -14,10 +14,10 @@ type
 
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   private
-    function TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
-    function TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
     function SequenceExists(const ATable: IioDBBuilderSchemaTable): boolean;
+    function TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
+    function TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
   public
     // Database related methods
     function DatabaseExists: boolean;
@@ -31,10 +31,10 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure CreateClassInfoField(AComma: Char);
-    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+    procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure CreateClassInfoField(ACommaBefore: Char);
+    procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
@@ -54,9 +54,9 @@ uses
 
 { TioDBBuilderSqlGenFirebird }
 
-procedure TioDBBuilderSqlGenFirebird.AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%sADD %s', [AComma, InternalCreateField(AField)]));
+  ScriptAdd(Format('%sADD %s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
@@ -89,7 +89,7 @@ end;
 
 procedure TioDBBuilderSqlGenFirebird.AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
 var
-  LQuery, LIndexName, LFieldList, LUnique, LIndexOrientation, LComma: String;
+  LQuery, LIndexName, LFieldList, LUnique, LIndexOrientation: String;
 begin
   LIndexName := BuildIndexName(ATable, AIndex);
   LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
@@ -103,7 +103,7 @@ end;
 
 procedure TioDBBuilderSqlGenFirebird.AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('ALTER TABLE %s ADD PRIMARY KEY (%s);', [ATable.TableName, ATable.PrimaryKeyField.FieldName]));
+  ScriptAdd(Format('ALTER TABLE %s ADD PRIMARY KEY (PK_%s);', [ATable.TableName, ATable.PrimaryKeyField.FieldName]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddSequence(const ATable: IioDBBuilderSchemaTable);
@@ -112,32 +112,32 @@ begin
     ScriptAdd(Format('CREATE SEQUENCE %s;', [ATable.GetContextTable.GetKeyGenerator]));
 end;
 
-procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 var
   LDefault: string;
 begin
   // Type
   if alFieldType in AField.Altered then
   begin
-    ScriptAdd(Format('%sALTER COLUMN %s TYPE %s', [AComma, AField.FieldName, TranslateFieldTypeForCreate(AField)]));
-    AComma := ',';
+    ScriptAdd(Format('%sALTER COLUMN %s TYPE %s', [ACommaBefore, AField.FieldName, TranslateFieldTypeForCreate(AField)]));
+    ACommaBefore := ',';
   end;
   // Default
   if alFieldDefault in AField.Altered then
   begin
     LDefault := ExtractFieldDefaultValue(AField);
     if LDefault.IsEmpty then
-      ScriptAdd(Format('%sALTER COLUMN %s DROP DEFAULT', [AComma, AField.FieldName]))
+      ScriptAdd(Format('%sALTER COLUMN %s DROP DEFAULT', [ACommaBefore, AField.FieldName]))
     else
-      ScriptAdd(Format('%sALTER COLUMN %s SET DEFAULT %s', [AComma, AField.FieldName, LDefault]));
-    AComma := ',';
+      ScriptAdd(Format('%sALTER COLUMN %s SET DEFAULT %s', [ACommaBefore, AField.FieldName, LDefault]));
+    ACommaBefore := ',';
   end;
   // NotNull
   // Note: SET NOT NUL & DROP BOT NULL available only from firebird 3
   if alFieldNotNull in AField.Altered then
   begin
-    ScriptAdd(Format('%sALTER COLUMN %s %s NOT NULL', [AComma, AField.FieldName, IfThen(AField.NotNull, 'SET', 'DROP')]));
-    AComma := ',';
+    ScriptAdd(Format('%sALTER COLUMN %s %s NOT NULL', [ACommaBefore, AField.FieldName, IfThen(AField.NotNull, 'SET', 'DROP')]));
+    ACommaBefore := ',';
   end;
 end;
 
@@ -153,9 +153,9 @@ begin
   IncIndentationLevel;
 end;
 
-procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField(AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField(ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%s%s VARCHAR(%s)', [AComma, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
+  ScriptAdd(Format('%s%s VARCHAR(%s)', [ACommaBefore, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.CreateDatabase;
@@ -170,9 +170,9 @@ begin
     BoolToStr(False, True);
 end;
 
-procedure TioDBBuilderSqlGenFirebird.CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%s%s', [AComma, InternalCreateField(AField)]));
+  ScriptAdd(Format('%s%s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 function TioDBBuilderSqlGenFirebird.DatabaseExists: boolean;
@@ -184,6 +184,7 @@ procedure TioDBBuilderSqlGenFirebird.DropAllForeignKeys;
 var
   LQuery: IioQuery;
 begin
+  LQuery := NewQuery;
   LQuery.SQL.Add('select rdb$relation_name as table_name, rdb$constraint_name as constraint_name');
   LQuery.SQL.Add('from rdb$relation_constraints');
   LQuery.SQL.Add('where rdb$constraint_type = ''FOREIGN KEY''');

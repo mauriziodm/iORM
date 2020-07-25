@@ -32,7 +32,7 @@ type
     procedure AddIndex(const AIndexAttr: ioIndex);
     function FieldList: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
-    function GetContextTable: IioCOntextTable;
+    function GetContextTable: IioContextTable;
     // function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
@@ -91,13 +91,12 @@ end;
 procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;
   const ADependentProperty: IioContextProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 var
-  LFKName: String;
+  LForeignKey: IioDBBuilderSchemaFK;
 begin
   // Add tne FK if not already exists
-  LFKName := Format('FK_%s_%s', [ADependentProperty.GetName, AReferenceMap.GetTable.TableName]);
-  if not FForeignKeys.ContainsKey(LFKName) then
-    FForeignKeys.Add(LFKName, TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction,
-      AOnUpdateAction));
+  LForeignKey := TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
+  if not FForeignKeys.ContainsKey(LForeignKey.Name) then
+    FForeignKeys.Add(LForeignKey.Name, LForeignKey);
 end;
 
 function TioDBBuilderSchemaTable.ForeignKeys: TioDBBuilderSchemaForeignKeys;
@@ -130,7 +129,7 @@ end;
 // Exit(AField);
 // end;
 
-function TioDBBuilderSchemaTable.GetContextTable: IioCOntextTable;
+function TioDBBuilderSchemaTable.GetContextTable: IioContextTable;
 begin
   Result := FContextTable;
 end;

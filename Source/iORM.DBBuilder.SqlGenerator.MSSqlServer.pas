@@ -17,9 +17,10 @@ type
 
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   private
+    function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
+    function ReplaceSpecialWords(const ASql: string): string;
     function TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
     function TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
-    function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
   protected
     procedure InitializeScript; override;
   public
@@ -35,17 +36,17 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure CreateClassInfoField(AComma: Char);
-    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+    procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure CreateClassInfoField(ACommaBefore: Char);
+    procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
     procedure DropAllIndex;
     // Foreign keys
-    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK); // Not implented
-    procedure DropAllForeignKeys; // Not implented
+    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
+    procedure DropAllForeignKeys;
     // Sequences
     procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
   end;
@@ -53,38 +54,74 @@ type
 implementation
 
 uses
-  iORM, iORM.Context.Properties.Interfaces, System.SysUtils, System.StrUtils, iORM.DB.Interfaces, iORM.CommonTypes;
+  iORM, iORM.Context.Properties.Interfaces, System.SysUtils, System.StrUtils, iORM.DB.Interfaces, iORM.CommonTypes, iORM.SqlTranslator,
+  iORM.Exceptions;
 
 { TioDBBuilderSqlGenFirebird }
 
-procedure TioDBBuilderSqlGenFirebird.AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-
+  ScriptAdd(Format('%sADD %s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
+var
+  LGuid: TGuid;
+  LFKName: string;
 begin
+  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
+  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+  CreateGUID(LGuid);
+  LFKName := LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
+  LFKName := IfThen(Length(AForeignKey.Name) <= 30, AForeignKey.Name, LFKName);
 
+  ScriptAdd(Format('ALTER TABLE [%s]', [AForeignKey.DependentTableName]));
+  IncIndentationLevel;
+  ScriptAdd(Format(' ADD CONSTRAINT %s', [AForeignKey.Name]));
+  IncIndentationLevel;
+  ScriptAdd(Format('FOREIGN KEY ([%s])', [AForeignKey.DependentFieldName]));
+  IncIndentationLevel;
+  ScriptAdd(Format('REFERENCES  %s ([%s])', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+  if AForeignKey.OnUpdateAction > fkUnspecified then
+    ScriptAdd(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
+  if AForeignKey.OnDeleteAction > fkUnspecified then
+    ScriptAdd(Format('ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
+  DecIndentationLevel;
+  DecIndentationLevel;
+  DecIndentationLevel;
+  ScriptAdd(';');
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
+var
+  LQuery, LIndexName, LFieldList, LUnique: String;
 begin
-
+  LIndexName := BuildIndexName(ATable, AIndex);
+  LUnique := BuildIndexUnique(AIndex);
+  LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, True);
+  // Compose the create index query text
+  LQuery := Format('CREATE %s INDEX %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
+  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
+  // Sistemazione parole riservate SQL SERVER
+  LQuery := ReplaceSpecialWords(LQuery);
+  ScriptAdd(LQuery);
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
 begin
-
+  ScriptAdd(Format('ALTER TABLE %s ADD CONSTRAINT PK_%s_%s PRIMARY KEY CLUSTERED(%s);', [ATable.TableName, ATable.TableName,
+    ATable.PrimaryKeyField.FieldName, ATable.PrimaryKeyField.FieldName]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.AddSequence(const ATable: IioDBBuilderSchemaTable);
 begin
-
+  // Nothing to do
+  raise EioException.Create(ClassName, 'AddSequence', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
-procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-
+  ScriptAdd(Format('%sALTER COLUMN %s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -99,9 +136,9 @@ begin
   IncIndentationLevel;
 end;
 
-procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField(AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField(ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%s[%s] [VARCHAR] (%s) NULL', [AComma, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
+  ScriptAdd(Format('%s[%s] [VARCHAR] (%s) NULL', [ACommaBefore, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.CreateDatabase;
@@ -109,9 +146,9 @@ begin
   ExecuteQuery(CONNECTION_NAME_MSSQL_MASTER, Format('CREATE DATABASE [%s]', [FSchema.DatabaseFileName]));
 end;
 
-procedure TioDBBuilderSqlGenFirebird.CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
+procedure TioDBBuilderSqlGenFirebird.CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%s%s', [AComma, InternalCreateField(AField)]));
+  ScriptAdd(Format('%s%s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 function TioDBBuilderSqlGenFirebird.DatabaseExists: boolean;
@@ -129,13 +166,39 @@ begin
 end;
 
 procedure TioDBBuilderSqlGenFirebird.DropAllForeignKeys;
+var
+  LQuery: IioQuery;
 begin
-
+  LQuery := NewQuery;
+  LQuery.SQL.Add('select t.name as table_name, i.name as constraint_name');
+  LQuery.SQL.Add('from sys.tables t');
+  LQuery.SQL.Add('inner join sys.foreign_keys i on t.object_id=i.parent_object_id');
+  LQuery.SQL.Add('where i.name like ''FK_%''');
+  LQuery.Open;
+  while not LQuery.Eof do
+  begin
+    ScriptAdd(Format('ALTER TABLE %s DROP CONSTRAINT %s;', [LQuery.Fields.FieldByName('table_name').AsString,
+      LQuery.Fields.FieldByName('constraint_name').AsString]));
+    LQuery.Next;
+  end;
 end;
 
 procedure TioDBBuilderSqlGenFirebird.DropAllIndex;
+var
+  LQuery: IioQuery;
 begin
-
+  LQuery := NewQuery;
+  LQuery.SQL.Add('select i.name as index_name, t.name as table_name');
+  LQuery.SQL.Add('from sys.tables t');
+  LQuery.SQL.Add('inner join sys.indexes i on t.object_id = i.object_id');
+  LQuery.SQL.Add('where i.name like ''IDX_%''');
+  LQuery.Open;
+  while not LQuery.Eof do
+  begin
+    ScriptAdd(Format('DROP INDEX %s ON [%s];', [LQuery.Fields.FieldByName('index_name').AsString,
+      LQuery.Fields.FieldByName('table_name').AsString]));
+    LQuery.Next;
+  end;
 end;
 
 procedure TioDBBuilderSqlGenFirebird.EndAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -227,6 +290,10 @@ begin
       // Verify if NotNull is changed
       Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
 
+      // Verify if blob subtype is changed
+      // NOTE: I have not found a way to retrieve the current blob subtype
+      // so it is not possible to verify if it has changed.
+
       // Exit
       Exit;
     end;
@@ -255,6 +322,18 @@ begin
   LDefault := ExtractFieldDefaultValue(AField);
   LNotNull := IfThen(AField.NotNull, 'NOT NULL', 'NULL');
   Result := Format('%s [%s] %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
+end;
+
+function TioDBBuilderSqlGenFirebird.ReplaceSpecialWords(const ASql: string): string;
+const
+  FROM_WORDS: array [0 .. 3] of string = ('GROUP ASC', 'USER ASC', 'GROUP DESC', 'USER DESC');
+  TO_WORDS: array [0 .. 3] of string = ('[GROUP] ASC', '[USER] ASC', '[GROUP] DESC', '[USER] DESC');
+var
+  I: Byte;
+begin
+  Result := ASql.ToUpper;
+  for I := 0 to Length(FROM_WORDS) - 1 do
+    Result := Result.Replace(FROM_WORDS[I], TO_WORDS[I], [rfReplaceAll]);
 end;
 
 function TioDBBuilderSqlGenFirebird.TableExists(const ATable: IioDBBuilderSchemaTable): boolean;

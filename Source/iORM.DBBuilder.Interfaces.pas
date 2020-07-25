@@ -118,10 +118,10 @@ type
     // Fields related methods
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure CreateClassInfoField(AComma: Char);
-    procedure AddField(const AField: IioDBBuilderSchemaField; AComma: Char);
-    procedure AlterField(const AField: IioDBBuilderSchemaField; AComma: Char);
+    procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure CreateClassInfoField(ACommaBefore: Char);
+    procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
+    procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);

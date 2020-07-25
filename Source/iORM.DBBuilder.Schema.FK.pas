@@ -29,6 +29,9 @@ type
 
 implementation
 
+uses
+  System.SysUtils;
+
 { TioDBBuilderSchemaFK }
 
 function TioDBBuilderSchemaFK.DependentFieldName: String;
@@ -43,7 +46,7 @@ end;
 
 function TioDBBuilderSchemaFK.Name: String;
 begin
-  Result := FName;
+  Result := Format('FK_%s_%s', [DependentFieldName, ReferenceTableName]);
 end;
 
 function TioDBBuilderSchemaFK.OnDeleteAction: TioFKAction;
