@@ -4,7 +4,7 @@ interface
 
 uses
   System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
-  iORM.Context.Map.Interfaces, iORM.Attributes;
+  iORM.Context.Map.Interfaces, iORM.Attributes, iORM.CommonTypes;
 
 type
 
@@ -47,7 +47,7 @@ type
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function FieldList: TioDBBuilderSchemaFields;
+    function Fields: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioCOntextTable;
     // function IDField: IioDBBuilderSchemaField;
@@ -73,39 +73,32 @@ type
     function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
-    function SqlScript: TStringList;
+    function ForeignKeysEnabled: Boolean;
+    function IndexesEnabled: Boolean;
+    function SqlScript: TStrings;
     function SqlScriptEmpty: Boolean;
-    function Warnings: TStringList;
-    function WarningsEmpty: Boolean;
+    function Warnings: TStrings;
+    function WarningExists: Boolean;
     function Tables: TioDBBuilderSchemaTables;
-    // DBExists
-    function GetDBExists: Boolean;
-    procedure SetDBExists(const Value: Boolean);
-    property DBExists: Boolean read GetDBExists write SetDBExists;
+    // Status
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
-  IioDBBuilderStrategyIndex = interface
-    ['{F72823BF-2611-439B-A8A3-D0427E017133}']
-  end;
-
-  IioDBBuilderStrategyFK = interface
-    ['{936AFB28-FAFE-4A8C-AD97-3A9994D3A598}']
-  end;
-
-  IioDBBuilderStrategyField = interface
-    ['{FBD4F76B-FF89-4CE3-A673-E6963E08257B}']
-  end;
-
-  IioDBBuilderStrategyTable = interface
-    ['{7F5DEC8D-F22B-4F53-8C6F-2A829FDB6ED4}']
-  end;
-
-  IioDBBuilderStrategyDB = interface
-    ['{EA9C37F2-705C-4C9D-969B-75D2E97605B5}']
+  // DBBuilder reference
+  TioDBBuilderSchemaBuilderRef = class of TioDBBuilderSchemaBuilderIntf;
+  TioDBBuilderSchemaBuilderIntf = class abstract
+  public
+    class procedure BuildSchema(const ASchema: IioDBBuilderSchema); virtual; abstract;
   end;
 
   IioDBBuilderSqlGenerator = interface
     ['{9B5DE886-BE08-4422-9D6C-A92ABF948CD9}']
+    // Script repated methods
+    procedure ScriptAddTitle(const AText: String);
+    procedure ScriptBegin;
+    procedure ScriptEnd;
     // Database related methods
     function DatabaseExists: Boolean;
     procedure CreateDatabase;
@@ -125,13 +118,43 @@ type
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
-    procedure DropAllIndex;
+    procedure DropAllIndexes;
     // Foreign keys
     procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
     procedure DropAllForeignKeys; // Not implented
     // Sequences
     procedure AddSequence(const ATable: IioDBBuilderSchemaTable);
   end;
+
+  IioDBBuilderDBAnalyzer = interface
+    ['{8F82C20B-5D51-42FE-80D2-96F818F3B555}']
+    procedure Analyze;
+  end;
+
+  IioDBBuilderStrategy = interface
+    ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
+    procedure GenerateScript;
+  end;
+
+  TioDBBuilderEngineRef = class of TioDBBuilderEngineIntf;
+  TioDBBuilderEngineIntf = class abstract
+  public
+    class function DBExists(const AConnectionDefName: String): Boolean; virtual; abstract;
+    class function DBNeedUpdate(const AConnectionDefName: String): Boolean; virtual; abstract;
+    // Generate script
+    class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean = True; AAddForeignKeys: Boolean = True)
+      : TioDBBuilderEngineResult; overload; virtual; abstract;
+    class function GenerateScript(const ASqlScriptToFill: TStrings; const AConnectionDefName: String; const AAddIndexes: Boolean = True;
+      AAddForeignKeys: Boolean = True): TioDBBuilderEngineResult; overload; virtual; abstract;
+    // Generate DB
+    class procedure GenerateDB(const AConnectionDefName: String; const AAddIndexes: Boolean = True;
+      const AAddForeignKeys: Boolean = True; const AForce: Boolean = False); overload; virtual; abstract;
+    class procedure GenerateDB(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True;
+      const AForce: Boolean = False); overload; virtual; abstract;
+    class procedure GenerateDB(const AConnectionDefName: String; const AScript: TStrings); overload; virtual; abstract;
+    class procedure GenerateDB(const AScript: TStrings);  overload; virtual; abstract;
+  end;
+
 
 implementation
 

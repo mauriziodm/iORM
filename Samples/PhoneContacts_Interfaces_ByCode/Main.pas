@@ -44,6 +44,7 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     ioSQLMonitor1: TioSQLMonitor;
     ioFMX1: TioFMX;
+    ButtonGenerateScript: TButton;
     procedure TabControl1Gesture(Sender: TObject;
       const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);
@@ -65,6 +66,7 @@ type
     procedure btLazyLoadClick(Sender: TObject);
     procedure btShowInfoClick(Sender: TObject);
     procedure SQLiteConnAfterRegister(Sender: TObject);
+    procedure ButtonGenerateScriptClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -222,12 +224,25 @@ end;
 
 procedure TMainForm.ButtonAddIndexClick(Sender: TObject);
 begin
-  io.RefTo<IPerson>.CreateIndex('[IPerson]_MyIndex', '[IPerson.FirstName]');
+  io.RefTo<IPerson>.CreateIndex('MyIndex', '[IPerson.FirstName]');
 end;
 
 procedure TMainForm.ButtonDropIndexClick(Sender: TObject);
 begin
-  io.RefTo('IPerson').DropIndex('[IPerson]_MyIndex');
+  io.RefTo('IPerson').DropIndex('MyIndex');
+end;
+
+procedure TMainForm.ButtonGenerateScriptClick(Sender: TObject);
+var
+  LScript: TStrings;
+begin
+  LScript := TStringList.Create;
+  try
+    io.DBBuilder.GenerateScript(LScript);
+    ShowMessage(LScript.Text);
+  finally
+    LScript.Free;
+  end;
 end;
 
 procedure TMainForm.ButtonSQLDestinationClick(Sender: TObject);

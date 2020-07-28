@@ -59,22 +59,11 @@ type
     constructor Create;
     // Properties
     // NB: DBBuilder related events are on ConnectionDef component, not in this class
-    property Enabled: Boolean
-      read FEnabled
-      write FEnabled
-      default False;
-    property Indexes: Boolean
-      read FIndexes
-      write FIndexes
+    property Enabled: Boolean read FEnabled write FEnabled default False;
+    property Indexes: Boolean read FIndexes write FIndexes default True;
+    property ReferentialIntegrityConstraints: Boolean read FReferentialIntegrityConstraints write FReferentialIntegrityConstraints
       default True;
-    property ReferentialIntegrityConstraints: Boolean
-      read FReferentialIntegrityConstraints
-      write FReferentialIntegrityConstraints
-      default True;
-    property ScriptOnly: Boolean
-      read FScriptOnly
-      write FScriptOnly
-      default False;
+    property ScriptOnly: Boolean read FScriptOnly write FScriptOnly default False;
   end;
 
   // Base class for all ConnectionDef components
@@ -233,9 +222,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property Mode: TioMonitorMode
-      read FMode
-      write SetMode;
+    property Mode: TioMonitorMode read FMode write SetMode;
   end;
 
 implementation

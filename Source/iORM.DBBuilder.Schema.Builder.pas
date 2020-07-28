@@ -7,13 +7,13 @@ uses
 
 type
 
-  TioDBBuilderSchemaBuilder = class
+  TioDBBuilderSchemaBuilder = class(TioDBBuilderSchemaBuilderIntf)
   private
     class procedure BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     class procedure BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
     class procedure BuildSchemaTable(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
   public
-    class procedure BuildSchema(const ASchema: IioDBBuilderSchema);
+    class procedure BuildSchema(const ASchema: IioDBBuilderSchema); override;
   end;
 
 implementation
@@ -28,6 +28,7 @@ class procedure TioDBBuilderSchemaBuilder.BuildSchema(const ASchema: IioDBBuilde
 var
   AContextSlot: TioMapSlot;
 begin
+  inherited;
   // Loop for all entities and build table list
   for AContextSlot in TioMapContainer.GetContainer.Values do
     BuildSchemaTable(ASchema, AContextSlot.GetMap);

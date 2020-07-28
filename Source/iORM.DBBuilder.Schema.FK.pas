@@ -11,7 +11,6 @@ type
   private
     FDependentMap: IioMap;
     FDependentProperty: IioContextProperty;
-    FName: String;
     FOnDeleteAction: TioFKAction;
     FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;

@@ -10,29 +10,33 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FConnectionDefName: String;
+    FIndexesEnabled, FForeignKeysEnabled: Boolean;
     FErrorMsg: String;
-    FDBExists: Boolean;
-    FSqlScript: TStringList;
-    FWarnings: TStringList;
+    FStatus: TioDBBuilderStatus;
+    FSqlScript: TStrings;
+    FWarnings: TStrings;
     FTables: TioDBBuilderSchemaTables;
     // DBExists
-    function GetDBExists: Boolean;
-    procedure SetDBExists(const Value: Boolean);
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create(const AConnectionDefName: String);
+    constructor Create(const ASqlScriptToFill: TStrings; const AConnectionDefName: String;
+      const AIndexesEnabled, AForeignKeysEnabled: Boolean);
     destructor Destroy; override;
     function ConnectionDefName: String;
     function DatabaseFileName: String;
     function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
-    function SqlScript: TStringList;
+    function ForeignKeysEnabled: Boolean;
+    function IndexesEnabled: Boolean;
+    function SqlScript: TStrings;
     function SqlScriptEmpty: Boolean;
-    function Warnings: TStringList;
-    function WarningsEmpty: Boolean;
+    function Warnings: TStrings;
+    function WarningExists: Boolean;
     function Tables: TioDBBuilderSchemaTables;
 
-    property DBExists: Boolean read GetDBExists write SetDBExists;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -47,10 +51,14 @@ begin
   Result := FConnectionDefName;
 end;
 
-constructor TioDBBuilderSchema.Create(const AConnectionDefName: String);
+constructor TioDBBuilderSchema.Create(const ASqlScriptToFill: TStrings; const AConnectionDefName: String;
+  const AIndexesEnabled, AForeignKeysEnabled: Boolean);
 begin
+  FSqlScript := ASqlScriptToFill;
+  FIndexesEnabled := AIndexesEnabled;
+  FForeignKeysEnabled := AForeignKeysEnabled;
+  FStatus := dbsClean;
   FConnectionDefName := AConnectionDefName;
-  FSqlScript := TStringList.Create;
   FWarnings := TStringList.Create;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
@@ -62,7 +70,6 @@ end;
 
 destructor TioDBBuilderSchema.Destroy;
 begin
-  FSqlScript.Free;
   FWarnings.Free;
   FTables.Free;
   inherited;
@@ -94,17 +101,27 @@ begin
   Result := FTables.Items[ATableName];
 end;
 
-function TioDBBuilderSchema.GetDBExists: Boolean;
+function TioDBBuilderSchema.ForeignKeysEnabled: Boolean;
 begin
-  Result := FDBExists;
+  Result := FForeignKeysEnabled;
 end;
 
-procedure TioDBBuilderSchema.SetDBExists(const Value: Boolean);
+function TioDBBuilderSchema.GetStatus: TioDBBuilderStatus;
 begin
-  FDBExists := Value;
+  Result := FStatus;
 end;
 
-function TioDBBuilderSchema.SqlScript: TStringList;
+function TioDBBuilderSchema.IndexesEnabled: Boolean;
+begin
+  Result := FIndexesEnabled;
+end;
+
+procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
+begin
+  FStatus := AValue;
+end;
+
+function TioDBBuilderSchema.SqlScript: TStrings;
 begin
   Result := FSqlScript;
 end;
@@ -119,12 +136,12 @@ begin
   Result := FTables;
 end;
 
-function TioDBBuilderSchema.Warnings: TStringList;
+function TioDBBuilderSchema.Warnings: TStrings;
 begin
   Result := FWarnings;
 end;
 
-function TioDBBuilderSchema.WarningsEmpty: Boolean;
+function TioDBBuilderSchema.WarningExists: Boolean;
 begin
   Result := FWarnings.Count = 0;
 end;

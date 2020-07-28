@@ -38,7 +38,7 @@ type
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
-    procedure DropAllIndex;
+    procedure DropAllIndexes;
     // Foreign keys
     procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK); // Not implented
     procedure DropAllForeignKeys; // Not implented
@@ -135,10 +135,7 @@ begin
   // NotNull
   // Note: SET NOT NUL & DROP BOT NULL available only from firebird 3
   if alFieldNotNull in AField.Altered then
-  begin
     ScriptAdd(Format('%sALTER COLUMN %s %s NOT NULL', [ACommaBefore, AField.FieldName, IfThen(AField.NotNull, 'SET', 'DROP')]));
-    ACommaBefore := ',';
-  end;
 end;
 
 procedure TioDBBuilderSqlGenFirebird.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -198,7 +195,7 @@ begin
   end;
 end;
 
-procedure TioDBBuilderSqlGenFirebird.DropAllIndex;
+procedure TioDBBuilderSqlGenFirebird.DropAllIndexes;
 var
   LQuery: IioQuery;
 begin
@@ -245,7 +242,6 @@ var
   LNewFieldPrecision: Smallint;
   LNewFieldDecimals: Smallint;
 
-  LOldFieldName: string;
   LOldFieldType: string;
   LOldFieldSubType: string;
   LOldFieldLength: Smallint;

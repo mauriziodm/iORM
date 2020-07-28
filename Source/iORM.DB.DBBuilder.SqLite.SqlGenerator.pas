@@ -60,6 +60,7 @@ type
     function GetInsertXCopyDataRows(ADestTable: IioDBBuilderTable; SourceTableName: String): string;
   protected
   public
+
     function DatabaseExists(const ADbName: string): Boolean;
     function CreateDatabase(const ADbName: string): String;
     function UseDatabase(const ADbName: string): String;

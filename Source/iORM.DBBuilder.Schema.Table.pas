@@ -30,10 +30,9 @@ type
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function FieldList: TioDBBuilderSchemaFields;
+    function Fields: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioContextTable;
-    // function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
@@ -76,7 +75,7 @@ begin
   inherited;
 end;
 
-function TioDBBuilderSchemaTable.FieldList: TioDBBuilderSchemaFields;
+function TioDBBuilderSchemaTable.Fields: TioDBBuilderSchemaFields;
 begin
   Result := FFields;
 end;
@@ -118,16 +117,6 @@ function TioDBBuilderSchemaTable.TableName: String;
 begin
   Result := FContextTable.TableName;
 end;
-
-// function TioDBBuilderSchemaTable.IDField: IioDBBuilderSchemaField;
-// var
-// AField: IioDBBuilderSchemaField;
-// begin
-// Result := nil;
-// for AField in FFieldList.Values do
-// if AField.IsKeyField then
-// Exit(AField);
-// end;
 
 function TioDBBuilderSchemaTable.GetContextTable: IioContextTable;
 begin

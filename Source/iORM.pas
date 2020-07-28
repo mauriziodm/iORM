@@ -48,7 +48,7 @@ uses
   System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper,
   System.SysUtils, iORM.DependencyInjection.Interfaces,
   iORM.MVVM.Components.ViewContextProvider, iORM.MVVM.Interfaces,
-  iORM.MVVM.Components.ModelPresenter;
+  iORM.MVVM.Components.ModelPresenter, iORM.DBBuilder.Interfaces;
 
 type
 
@@ -83,6 +83,7 @@ type
     class procedure CommitTransaction(const AConnectionName: String = '');
     class procedure RollbackTransaction(const AConnectionName: String = '');
     class function InTransaction(const AConnectionName: String = ''): Boolean;
+    class function DBBuilder: TioDBBuilderEngineRef;
     class function GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
       AScriptOnly: Boolean; out OOutputScript, OErrorMessage: String): Boolean; overload;
     class function GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
@@ -247,8 +248,8 @@ uses
   iORM.Rtti.Utilities,
   iORM.Strategy.Factory,
   iORM.Context.Container,
-  iORM.AbstractionLayer.Framework, iORM.DB.DBBuilder.Factory,
-  iORM.DB.DBBuilder.Interfaces;
+  iORM.AbstractionLayer.Framework,
+  iORM.DBBuilder.Factory;
 
 { io }
 
@@ -506,11 +507,11 @@ end;
 
 class function io.GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
   AScriptOnly: Boolean; out OOutputScript, OErrorMessage: String): Boolean;
-var
-  LDBBuilder: IioDBBuilder;
+//var
+//  LDBBuilder: IioDBBuilder;
 begin
-  LDBBuilder := TioDBBuilderFactory.NewBuilder(AConnectionName, ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly);
-  Result := LDBBuilder.GenerateDB(OOutputScript, OErrorMessage);
+//  LDBBuilder := TioDBBuilderFactory.NewBuilder(AConnectionName, ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly);
+//  Result := LDBBuilder.GenerateDB(OOutputScript, OErrorMessage);
 end;
 
 class function io.GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
@@ -751,6 +752,11 @@ var
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj);
+end;
+
+class function io.DBBuilder: TioDBBuilderEngineRef;
+begin
+  Result := TioDBBuilderFactory.NewEngine;
 end;
 
 class procedure io.Delete(const AIntfObj: IInterface);

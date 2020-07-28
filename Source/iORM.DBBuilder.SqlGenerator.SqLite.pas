@@ -18,6 +18,8 @@ type
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
   public
+    procedure ScriptBegin; override;
+    procedure ScriptEnd; override;
     // Database related methods
     function DatabaseExists: Boolean;
     procedure CreateDatabase;
@@ -37,10 +39,10 @@ type
     // PrimaryKey & other indexes
     procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable); // Not implented
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
-    procedure DropAllIndex;
+    procedure DropAllIndexes;
     // Foreign keys
     procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
-    procedure DropAllForeignKeys; // Not implented
+    procedure DropAllForeignKeys;
     // Sequences
     procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
   end;
@@ -154,6 +156,20 @@ begin
   Result := Format('"%s" %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull]).Trim;
 end;
 
+procedure TioDBBuilderSqlGenSQLite.ScriptBegin;
+begin
+  inherited;
+  ScriptAdd('PRAGMA defer_foreign_keys=off;');
+//  ScriptAdd('BEGIN TRANSACTION;');
+end;
+
+procedure TioDBBuilderSqlGenSQLite.ScriptEnd;
+begin
+//  ScriptAdd('COMMIT;');
+  ScriptAdd('PRAGMA defer_foreign_keys=on;');
+  inherited;
+end;
+
 procedure TioDBBuilderSqlGenSQLite.CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
 var
   LField: IioDBBuilderSchemaField;
@@ -163,7 +179,7 @@ begin
   ScriptAdd(Format('INSERT INTO %s (', [ATable.TableName]));
   IncIndentationLevel;
   LComma := ' ';
-  for LField in ATable.FieldList.Values do
+  for LField in ATable.Fields.Values do
   begin
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
@@ -174,7 +190,7 @@ begin
   ScriptAdd(') SELECT');
   IncIndentationLevel;
   LComma := ' ';
-  for LField in ATable.FieldList.Values do
+  for LField in ATable.Fields.Values do
   begin
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
@@ -292,11 +308,10 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.DropAllForeignKeys;
 begin
-  // Nothing to do
-  raise EioException.Create(ClassName, 'DropAllForeignKeys', MSG_METHOD_NOT_IMPLEMENTED);
+    ScriptAddComment('Not implemented by this SqlGenerator');
 end;
 
-procedure TioDBBuilderSqlGenSQLite.DropAllIndex;
+procedure TioDBBuilderSqlGenSQLite.DropAllIndexes;
 var
   LQuery: IioQuery;
 begin
