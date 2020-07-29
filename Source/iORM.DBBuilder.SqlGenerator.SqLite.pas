@@ -159,14 +159,19 @@ end;
 procedure TioDBBuilderSqlGenSQLite.ScriptBegin;
 begin
   inherited;
+  ScriptAddEmpty;
+  ScriptAddComment('Before we start...');
   ScriptAdd('PRAGMA defer_foreign_keys=off;');
 //  ScriptAdd('BEGIN TRANSACTION;');
 end;
 
 procedure TioDBBuilderSqlGenSQLite.ScriptEnd;
 begin
+  ScriptAddEmpty;
+  ScriptAddComment('At the end...');
 //  ScriptAdd('COMMIT;');
   ScriptAdd('PRAGMA defer_foreign_keys=on;');
+  ScriptAddEmpty;
   inherited;
 end;
 
@@ -258,7 +263,6 @@ procedure TioDBBuilderSqlGenSQLite.AddForeignKey(const AForeignKey: IioDBBuilder
 begin
   ScriptAdd(Format(',CONSTRAINT "%s"', [AForeignKey.Name]));
   IncIndentationLevel;
-  IncIndentationLevel;
   ScriptAdd(Format('FOREIGN KEY ("%s")', [AForeignKey.DependentFieldName]));
   ScriptAdd(Format('REFERENCES  "%s" ("%s")', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
   if AForeignKey.OnUpdateAction > fkUnspecified then
@@ -266,7 +270,6 @@ begin
   if AForeignKey.OnDeleteAction > fkUnspecified then
     ScriptAdd(Format('ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
   ScriptAdd('DEFERRABLE INITIALLY DEFERRED');
-  DecIndentationLevel;
   DecIndentationLevel;
 end;
 

@@ -5,9 +5,9 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Graphics, FMX.Forms, FMX.Dialogs, FMX.TabControl, FMX.StdCtrls,
-  System.Actions, FMX.ActnList, FMX.Gestures, FMX.Edit, FMX.ListView.Types, Data.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
-  iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
+  System.Actions, FMX.ActnList, FMX.Gestures, FMX.Edit, FMX.ListView.Types, Data.Bind.GenData, Data.Bind.EngExt, FMX.Bind.DBEngExt,
+  System.Rtti, System.Bindings.Outputs, FMX.Bind.Editors, Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
+  iORM.LiveBindings.PrototypeBindSource, FMX.ListView, FMX.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, Interfaces, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
 
@@ -45,8 +45,8 @@ type
     ioSQLMonitor1: TioSQLMonitor;
     ioFMX1: TioFMX;
     ButtonGenerateScript: TButton;
-    procedure TabControl1Gesture(Sender: TObject;
-      const EventInfo: TGestureEventInfo; var Handled: Boolean);
+    ButtonAnalyze: TButton;
+    procedure TabControl1Gesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -67,6 +67,7 @@ type
     procedure btShowInfoClick(Sender: TObject);
     procedure SQLiteConnAfterRegister(Sender: TObject);
     procedure ButtonGenerateScriptClick(Sender: TObject);
+    procedure ButtonAnalyzeClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -84,7 +85,7 @@ uses
   iORM.Containers.Interfaces, iORM.LiveBindings.InterfaceListBindSourceAdapter,
   iORM.Rtti.Utilities, iORM.LiveBindings.Interfaces,
   iORM.Where.Interfaces, iORM.Where, FireDAC.Comp.Client,
-  iORM.DB.Interfaces, SampleData;
+  iORM.DB.Interfaces, SampleData, System.IOUtils, iORM.CommonTypes;
 
 {$R *.fmx}
 
@@ -107,14 +108,13 @@ begin
   LCustomer.FirstName := 'Paolo';
   LCustomer.LastName := 'Rossi';
   LCustomer.FidelityCardCode := '1234567890';
-  LCustomer.Phones.Add(   TPhoneNumber.Create('Home', '02/1234567', LCustomer.ID)   );
-  LCustomer.Phones.Add(   TPhoneNumber.Create('Mobile', '333/28176876', LCustomer.ID)   );
+  LCustomer.Phones.Add(TPhoneNumber.Create('Home', '02/1234567', LCustomer.ID));
+  LCustomer.Phones.Add(TPhoneNumber.Create('Mobile', '333/28176876', LCustomer.ID));
   io.Persist(LCustomer);
 
   LCustomer := nil;
 
-  LPerson := io.Load<IPerson>._Where._Property('FirstName')._EqualTo('Paolo').
-    _And._Property('LastName')._EqualTo('Rossi').ToObject;
+  LPerson := io.Load<IPerson>._Where._Property('FirstName')._EqualTo('Paolo')._And._Property('LastName')._EqualTo('Rossi').ToObject;
   LPerson.FirstName := 'Paolone';
   io.Persist(LPerson);
 
@@ -125,7 +125,8 @@ end;
 
 procedure TMainForm.btShowInfoClick(Sender: TObject);
 begin
-  ShowMessage(GlobalPerson.ID.ToString + ' - ' + GlobalPerson.FullName + ' (' + GlobalPerson.ClassNameProp + ') ' + GlobalPerson.Phones.Count.ToString + ' Numbers');
+  ShowMessage(GlobalPerson.ID.ToString + ' - ' + GlobalPerson.FullName + ' (' + GlobalPerson.ClassNameProp + ') ' +
+    GlobalPerson.Phones.Count.ToString + ' Numbers');
 end;
 
 procedure TMainForm.Button10Click(Sender: TObject);
@@ -133,9 +134,7 @@ var
   AList: IioList<IPerson>;
 begin
 
-  AList := io.Load<IPerson>._Where('[.ID] > 10')
-    .AddDetail('Phones', '[.PhoneType] = ''Home''')
-    .ToInterfacedList;
+  AList := io.Load<IPerson>._Where('[.ID] > 10').AddDetail('Phones', '[.PhoneType] = ''Home''').ToInterfacedList;
 
   ShowMessage(AList.Count.ToString + ' IPerson');
 end;
@@ -164,7 +163,8 @@ var
   APerson: TPerson;
 begin
   APerson := io.Load<TPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
-  ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString + ' Numbers');
+  ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString +
+    ' Numbers');
   APerson.Free;
 end;
 
@@ -173,17 +173,15 @@ var
   LPerson: IPerson;
 begin
   LPerson := io.Load<IPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
-  ShowMessage(LPerson.ID.ToString + ' - ' + LPerson.FullName + ' (' + LPerson.ClassNameProp + ') ' + LPerson.Phones.Count.ToString + ' Numbers');
+  ShowMessage(LPerson.ID.ToString + ' - ' + LPerson.FullName + ' (' + LPerson.ClassNameProp + ') ' + LPerson.Phones.Count.ToString +
+    ' Numbers');
 end;
 
 procedure TMainForm.Button3Click(Sender: TObject);
 var
   AList: TObjectList<TPerson>;
 begin
-  AList := io.Load<TPerson>
-    ._Where
-    ._Property('ID')._GreaterThan(10)
-    .ToGenericList.OfType<TObjectList<TPerson>>;
+  AList := io.Load<TPerson>._Where._Property('ID')._GreaterThan(10).ToGenericList.OfType<TObjectList<TPerson>>;
   ShowMessage(AList.Count.ToString + ' IPerson');
   AList.Free;
 end;
@@ -227,6 +225,25 @@ begin
   io.RefTo<IPerson>.CreateIndex('MyIndex', '[IPerson.FirstName]');
 end;
 
+procedure TMainForm.ButtonAnalyzeClick(Sender: TObject);
+var
+  LDBStatus: TioDBBuilderEngineResult;
+  LMessage: String;
+begin
+  LDBStatus := io.DBBuilder.GetDBStatus;
+  case LDBStatus of
+    dbUptodate:
+      LMessage := 'The database is uptodate.';
+    dbNotExists:
+      LMessage := 'The database need to created.';
+    dbUpdatesNeeded:
+      LMessage := 'The database need updates.';
+    dbWarningExists:
+      LMessage := 'The database need updates but WARNINGS exists.';
+  end;
+  ShowMessage(LMessage);
+end;
+
 procedure TMainForm.ButtonDropIndexClick(Sender: TObject);
 begin
   io.RefTo('IPerson').DropIndex('MyIndex');
@@ -240,6 +257,7 @@ begin
   try
     io.DBBuilder.GenerateScript(LScript);
     ShowMessage(LScript.Text);
+    LScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_script.sql'));
   finally
     LScript.Free;
   end;
@@ -263,7 +281,8 @@ var
   APerson: IPerson;
 begin
   APerson := io.Load<TPerson>._Where._PropertyEqualsTo('FirstName', 'Maurizio').ToObject;
-  ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString + ' Numbers');
+  ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString +
+    ' Numbers');
 end;
 
 procedure TMainForm.SQLDestination2Click(Sender: TObject);
@@ -281,27 +300,26 @@ end;
 procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
 begin
   // Check for sample data creation
-  TSampleData.CheckForSampleDataCreation;
+  // TSampleData.CheckForSampleDataCreation;
 end;
 
-procedure TMainForm.TabControl1Gesture(Sender: TObject;
-  const EventInfo: TGestureEventInfo; var Handled: Boolean);
+procedure TMainForm.TabControl1Gesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
 begin
 {$IFDEF ANDROID}
   case EventInfo.GestureID of
     sgiLeft:
-    begin
-      if TabControl1.ActiveTab <> TabControl1.Tabs[TabControl1.TabCount-1] then
-        TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex+1];
-      Handled := True;
-    end;
+      begin
+        if TabControl1.ActiveTab <> TabControl1.Tabs[TabControl1.TabCount - 1] then
+          TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex + 1];
+        Handled := True;
+      end;
 
     sgiRight:
-    begin
-      if TabControl1.ActiveTab <> TabControl1.Tabs[0] then
-        TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex-1];
-      Handled := True;
-    end;
+      begin
+        if TabControl1.ActiveTab <> TabControl1.Tabs[0] then
+          TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex - 1];
+        Handled := True;
+      end;
   end;
 {$ENDIF}
 end;

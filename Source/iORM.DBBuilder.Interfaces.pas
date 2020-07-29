@@ -88,6 +88,7 @@ type
 
   // DBBuilder reference
   TioDBBuilderSchemaBuilderRef = class of TioDBBuilderSchemaBuilderIntf;
+
   TioDBBuilderSchemaBuilderIntf = class abstract
   public
     class procedure BuildSchema(const ASchema: IioDBBuilderSchema); virtual; abstract;
@@ -137,10 +138,11 @@ type
   end;
 
   TioDBBuilderEngineRef = class of TioDBBuilderEngineIntf;
+
   TioDBBuilderEngineIntf = class abstract
   public
-    class function DBExists(const AConnectionDefName: String): Boolean; virtual; abstract;
-    class function DBNeedUpdate(const AConnectionDefName: String): Boolean; virtual; abstract;
+    class function GetDBStatus(const AConnectionDefName: String = IO_CONNECTIONDEF_DEFAULTNAME): TioDBBuilderEngineResult;
+      virtual; abstract;
     // Generate script
     class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean = True; AAddForeignKeys: Boolean = True)
       : TioDBBuilderEngineResult; overload; virtual; abstract;
@@ -149,12 +151,11 @@ type
     // Generate DB
     class procedure GenerateDB(const AConnectionDefName: String; const AAddIndexes: Boolean = True;
       const AAddForeignKeys: Boolean = True; const AForce: Boolean = False); overload; virtual; abstract;
-    class procedure GenerateDB(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True;
-      const AForce: Boolean = False); overload; virtual; abstract;
+    class procedure GenerateDB(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True; const AForce: Boolean = False);
+      overload; virtual; abstract;
     class procedure GenerateDB(const AConnectionDefName: String; const AScript: TStrings); overload; virtual; abstract;
-    class procedure GenerateDB(const AScript: TStrings);  overload; virtual; abstract;
+    class procedure GenerateDB(const AScript: TStrings); overload; virtual; abstract;
   end;
-
 
 implementation
 

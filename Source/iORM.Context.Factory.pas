@@ -292,7 +292,7 @@ begin
     // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
     PropMetadata_FieldPrecision := 10;
     PropMetadata_FieldScale := 3;
-    PropMetadata_FieldNotNull := True;
+    PropMetadata_FieldNotNull := False;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';
     PropMetadata_FieldSubType := '';

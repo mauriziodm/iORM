@@ -91,7 +91,7 @@ type
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;
     function GetConnectionDefName: String;
-    function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
+    function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
     function GetAutoCreateDB: Boolean;

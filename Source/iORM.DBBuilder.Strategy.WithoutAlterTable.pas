@@ -119,15 +119,12 @@ procedure TioDBBuilderStrategyWithoutAlter.GenerateScript;
 begin
   FSqlGenerator.ScriptBegin;
   // Drop all foreing keys & indexes
-  FSqlGenerator.ScriptAddTitle('Dropping all foreign keys');
-  FSqlGenerator.DropAllForeignKeys;
   FSqlGenerator.ScriptAddTitle('Dropping all indexes');
   FSqlGenerator.DropAllIndexes;
   // Create or alter tables
   CreateOrAlterTables;
-  // Add all indexes & foreign keys
+  // Add all indexes
   AddAllIndexes;
-  AddAllForeignKeys;
   FSqlGenerator.ScriptEnd;;
 end;
 

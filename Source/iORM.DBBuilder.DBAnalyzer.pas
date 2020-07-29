@@ -43,6 +43,9 @@ begin
       LTable.Status := dbsCreate
     else
       AnalyzeFields(LTable);
+    // If the table status is not dbsClean then schema status became dbsAlter
+    if LTable.Status > dbsClean then
+      FSchema.Status := dbsAlter;
   end;
 end;
 

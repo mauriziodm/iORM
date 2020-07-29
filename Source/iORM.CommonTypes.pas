@@ -73,7 +73,7 @@ type
   PValue = ^TValue;
 
   // DBBuilder engine result type
-  TioDBBuilderEngineResult = (dbUptodate, dbUpdatesNeeded, dbWarningExists);
+  TioDBBuilderEngineResult = (dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
 
   // Nullables
   TioNullable<T> = record

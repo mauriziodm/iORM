@@ -144,7 +144,7 @@ type
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;
     function GetConnectionDefName: String;
-    function IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
+    function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
     function GetAutoCreateDB: Boolean;
@@ -211,10 +211,7 @@ end;
 
 function TioContextTable.GetConnectionDefName: String;
 begin
-  if FConnectionDefName_DoNotCallDirectly.IsEmpty then
-    Result := TioDBFActory.ConnectionManager.GetDefaultConnectionName
-  else
-    Result := FConnectionDefName_DoNotCallDirectly;
+  Result := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
 end;
 
 function TioContextTable.GetGroupBy: IioGroupBy;
@@ -270,11 +267,17 @@ begin
   Result := Assigned(FClassFromField);
 end;
 
-function TioContextTable.IsForThisConnection(const AConnectionDefNameToCheck: String): Boolean;
+function TioContextTable.IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
 var
   LCurrentConnectionDefName: String;
 begin
+  // Defaultize the connection def name to check (default connection name if empty)
+  AConnectionDefNameToCheck := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionDefNameToCheck);
+  // Extract the curret connection def of the context table (ask it to the table itself obviously)
   LCurrentConnectionDefName := GetConnectionDefName;
+  // The table is for this connection if the current connection name of the table: is empty (no connection name is
+  //  specified for this table so this mean it is for all connections), or it's a default connection, or it's
+  //  specifically setted for the connection name received to check (AConnectionDefNameToCheck).
   Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
     (LCurrentConnectionDefName = AConnectionDefNameToCheck);
 end;

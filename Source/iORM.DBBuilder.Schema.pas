@@ -42,7 +42,7 @@ type
 implementation
 
 uses
-  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer;
+  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory;
 
 { TioDBBuilderSchema }
 
@@ -58,7 +58,7 @@ begin
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
   FStatus := dbsClean;
-  FConnectionDefName := AConnectionDefName;
+  FConnectionDefName := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionDefName);
   FWarnings := TStringList.Create;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
@@ -143,7 +143,7 @@ end;
 
 function TioDBBuilderSchema.WarningExists: Boolean;
 begin
-  Result := FWarnings.Count = 0;
+  Result := FWarnings.Count > 0;
 end;
 
 end.

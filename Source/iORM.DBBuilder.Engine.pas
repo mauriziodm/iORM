@@ -9,11 +9,9 @@ type
 
   TioDBBuilderEngine = class(TioDBBuilderEngineIntf)
   private
-    class procedure InternalGenerateScript(const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
     class function SchemaToEngineResult(const ASchema: IioDBBuilderSchema): TioDBBuilderEngineResult;
   public
-    class function DBExists(const AConnectionDefName: String): Boolean; override;
-    class function DBNeedUpdate(const AConnectionDefName: String): Boolean; override;
+    class function GetDBStatus(const AConnectionDefName: String = IO_CONNECTIONDEF_DEFAULTNAME): TioDBBuilderEngineResult; override;
 
     class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean = True; AAddForeignKeys: Boolean = True)
       : TioDBBuilderEngineResult; override;
@@ -31,19 +29,9 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.DBBuilder.Factory, iORM.DBBuilder.Schema;
+  System.SysUtils, iORM.DBBuilder.Factory, iORM.DBBuilder.Schema, iORM;
 
 { TioDBBuilderEngine }
-
-class function TioDBBuilderEngine.DBExists(const AConnectionDefName: String): Boolean;
-begin
-
-end;
-
-class function TioDBBuilderEngine.DBNeedUpdate(const AConnectionDefName: String): Boolean;
-begin
-
-end;
 
 class procedure TioDBBuilderEngine.GenerateDB(const AConnectionDefName: String; const AAddIndexes: Boolean;
   const AAddForeignKeys: Boolean; const AForce: Boolean);
@@ -58,7 +46,11 @@ end;
 
 class procedure TioDBBuilderEngine.GenerateDB(const AConnectionDefName: String; const AScript: TStrings);
 begin
-
+  io.StartTransaction(AConnectionDefName);
+  try
+  except
+    io.RollbackTransaction(AConnectionDefName);
+  end;
 end;
 
 class procedure TioDBBuilderEngine.GenerateDB(const AScript: TStrings);
@@ -74,19 +66,20 @@ var
 begin
   LSchema := TioDBBuilderFactory.NewSchema(ASqlScriptToFill, AConnectionDefName, AAddIndexes, AAddForeignKeys);
   LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(LSchema);
-  InternalGenerateScript(LSchema, LSqlGenerator);
+  TioDBBuilderFactory.NewDBAnalyzer(LSchema, LSqlGenerator).Analyze;
+  TioDBBuilderFactory.NewStrategy(LSchema, LSqlGenerator).GenerateScript;
   Result := SchemaToEngineResult(LSchema);
 end;
 
-class procedure TioDBBuilderEngine.InternalGenerateScript(const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator);
+class function TioDBBuilderEngine.GetDBStatus(const AConnectionDefName: String): TioDBBuilderEngineResult;
+var
+  LSchema: IioDBBuilderSchema;
+  LSqlGenerator: IioDBBuilderSqlGenerator;
 begin
-  // Get the DB analizer and analyze database, if need updates then
-  // get the right strategy (dependent from the current RDBMS) and
-  // generate the script
-  TioDBBuilderFactory.NewDBAnalyzer(ASchema, ASqlGenerator).Analyze;
-  if ASchema.Status > dbsClean then
-    TioDBBuilderFactory.NewStrategy(ASchema, ASqlGenerator).GenerateScript;
+  LSchema := TioDBBuilderFactory.NewSchema(nil, AConnectionDefName, False, False);
+  LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(LSchema);
+  TioDBBuilderFactory.NewDBAnalyzer(LSchema, LSqlGenerator).Analyze;
+  Result := SchemaToEngineResult(LSchema);
 end;
 
 class function TioDBBuilderEngine.GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean; AAddForeignKeys: Boolean)
@@ -98,11 +91,15 @@ end;
 class function TioDBBuilderEngine.SchemaToEngineResult(const ASchema: IioDBBuilderSchema): TioDBBuilderEngineResult;
 begin
   if ASchema.WarningExists then
-    Exit(dbWarningExists)
-  else if ASchema.Status > dbsClean then
-    Exit(dbUpdatesNeeded)
+    Exit(dbWarningExists);
+  case ASchema.Status of
+    dbsAlter:
+      Exit(dbUpdatesNeeded);
+    dbsCreate:
+      Exit(dbNotExists);
   else
     Exit(dbUptodate);
+  end;
 end;
 
 end.
