@@ -48,6 +48,7 @@ class procedure TioDBBuilderEngine.GenerateDB(const AConnectionDefName: String; 
 begin
   io.StartTransaction(AConnectionDefName);
   try
+
   except
     io.RollbackTransaction(AConnectionDefName);
   end;

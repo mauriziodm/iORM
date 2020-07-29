@@ -45,24 +45,31 @@ type
 
   TioSQLDestination = class(TInterfacedObject, IioSQLDestination)
   private
-    FSQL: String;
-    FSelfClassName: String;
-    FQualifiedFieldName: Boolean;
+    FConnectionDefName: String;
     FIgnoreObjNotExists: Boolean;
+    FOwns: Boolean;
+    FQualifiedFieldName: Boolean;
+    FSQL: TStrings;
+    FSelfClassName: String;
+    FTranslate: Boolean;
     // Destinations
-    {TODO 5 -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
-    function GetTranslatedSQL: String;
+    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer;
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
-    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer;
     // Informations
+    function Connection(const AConnectionDefName: String): IioSQLDestination;
+    function DoNotTranslate: IioSQLDestination;
     function SelfClass(const ASelfClassName:String): IioSQLDestination; overload;
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
     function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     // Getters
+    function GetConnectionDefName: String;
     function GetIgnoreObjNotExists: Boolean;
+    function GetSQL: String;
   public
-    constructor Create(const ASQL:String); overload;
+    constructor Create(const ASQL: String); overload;
+    constructor Create(const ASQL: TStrings; const AOwns: Boolean = False); overload;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -74,15 +81,12 @@ uses
 { TioSQLDestination }
 
 constructor TioSQLDestination.Create(const ASQL: String);
+var
+  LSQL: TStrings;
 begin
-  inherited Create;
-
-  TioApplication.CheckIfAbstractionLayerComponentExists;
-
-  FSelfClassName := '';
-  FQualifiedFieldName := False;
-  FIgnoreObjNotExists := False;
-  FSQL := ASQL;
+  LSQL := TStringList.Create;
+  LSQL.Text := ASQL;
+  Create(LSQL, True);
 end;
 
 function TioSQLDestination.QualifiedFieldName(
@@ -92,15 +96,63 @@ begin
   Self.FQualifiedFieldName := AQualifiedFieldName;
 end;
 
+function TioSQLDestination.Connection(const AConnectionDefName: String): IioSQLDestination;
+begin
+  Result := Self;
+  FConnectionDefName := AConnectionDefName;
+end;
+
+constructor TioSQLDestination.Create(const ASQL: TStrings; const AOwns: Boolean);
+begin
+  inherited Create;
+
+  TioApplication.CheckIfAbstractionLayerComponentExists;
+
+  FConnectionDefName := '';
+  FSelfClassName := '';
+  FQualifiedFieldName := False;
+  FIgnoreObjNotExists := False;
+  FTranslate := True;
+
+  FSQL := ASQL;
+  FOwns := AOwns;
+end;
+
+destructor TioSQLDestination.Destroy;
+begin
+  if FOwns then
+    FSQL.Free;
+  inherited;
+end;
+
+function TioSQLDestination.DoNotTranslate: IioSQLDestination;
+begin
+  Result := Self;
+  FTranslate := False;
+end;
+
 function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
   Result := TioStrategyFactory.GetStrategy('').SQLDest_Execute(Self);
 end;
 
+function TioSQLDestination.GetConnectionDefName: String;
+begin
+  Result := FConnectionDefName;
+end;
+
 function TioSQLDestination.GetIgnoreObjNotExists: Boolean;
 begin
   Result := FIgnoreObjNotExists;
+end;
+
+function TioSQLDestination.GetSQL: String;
+begin
+  if FTranslate then
+    Result := TioSqlTranslator.Translate(FSQL.Text, FSelfClassName, FQualifiedFieldName)
+  else
+    Result := FSQL.Text;
 end;
 
 function TioSQLDestination.SelfClass(
@@ -114,11 +166,6 @@ function TioSQLDestination.SelfClass(
   const ASelfClassRef: TioClassRef): IioSQLDestination;
 begin
   Result := Self.SelfClass(ASelfClassRef.ClassName);
-end;
-
-function TioSQLDestination.GetTranslatedSQL: String;
-begin
-  Result := TioSqlTranslator.Translate(FSQL, FSelfClassName, FQualifiedFieldName);
 end;
 
 function TioSQLDestination.ToMemTable: TFDMemTable;

@@ -67,7 +67,8 @@ type
     class function ConnectionManager: TioConnectionManagerRef;
     class function QueryContainer: IioQueryContainer;
     class function QueryEngine: TioQueryEngineRef;
-    class function SQLDestination(const ASQL:String): IioSQLDestination;
+    class function SQLDestination(const ASQL:String): IioSQLDestination; overload;
+    class function SQLDestination(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
   end;
 
 
@@ -203,6 +204,11 @@ begin
   else
     raise EioException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
   end;
+end;
+
+class function TioDbFactory.SQLDestination(const ASQL: TStrings; const AOwns: Boolean): IioSQLDestination;
+begin
+  Result := TioSQLDestination.Create(ASQL, AOwns);
 end;
 
 class function TioDbFactory.SQLDestination(

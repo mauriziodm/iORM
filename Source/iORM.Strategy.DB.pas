@@ -604,15 +604,34 @@ end;
 class function TioStrategyDB.SQLDest_Execute(const ASQLDestination: IioSQLDestination): Integer;
 var
   LConnection: IioConnectionDB;
+  LQry: IioQuery;
 begin
   inherited;
+  // Start transaction
+  io.StartTransaction(ASQLDestination.GetConnectionDefName);
+  try
+    // Get the query object
+    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionDefName);
+    // Set the SQL command text
+    LQry.SQL.Text := ASQLDestination.GetSQL;
+    LQry.ExecSQL;
+    // Commit
+    io.CommitTransaction(ASQLDestination.GetConnectionDefName);
+  except
+    // Rollback
+    io.RollbackTransaction(ASQLDestination.GetConnectionDefName);
+    raise;
+  end;
+
+
+
   // Get the connection
-  LConnection := TioDBFactory.Connection('').AsDBConnection;
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsDBConnection;
   // Start transaction
   LConnection.StartTransaction;
   try
     // Execute the SQL command
-    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(ASQLDestination.GetTranslatedSQL, ASQLDestination.GetIgnoreObjNotExists);
+    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(ASQLDestination.GetSQL, ASQLDestination.GetIgnoreObjNotExists);
     // Commit
     LConnection.Commit;
   except
@@ -628,12 +647,12 @@ var
 begin
   inherited;
   // Start transaction
-  io.StartTransaction('');
+  io.StartTransaction(ASQLDestination.GetConnectionDefName);
   try
     // Get the query object
-    LQry := TioDBFactory.Query('');
+    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionDefName);
     // Set the SQL command text
-    LQry.SQL.Text := ASQLDestination.GetTranslatedSQL;
+    LQry.SQL.Text := ASQLDestination.GetSQL;
     LQry.GetQuery.FetchOptions.Unidirectional := False;
     LQry.Open;
     try
@@ -645,10 +664,10 @@ begin
       LQry.Close;
     end;
     // Commit
-    io.CommitTransaction('');
+    io.CommitTransaction(ASQLDestination.GetConnectionDefName);
   except
     // Rollback
-    io.RollbackTransaction('');
+    io.RollbackTransaction(ASQLDestination.GetConnectionDefName);
     raise;
   end;
 end;

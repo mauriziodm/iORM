@@ -96,6 +96,7 @@ type
     class function Where(const ATextCondition: String): IioWhere; overload;
     class function Where<T>(const ATextCondition: String): IioWhere<T>; overload;
     class function SQL(const ASQL: String): IioSQLDestination; overload;
+    class function SQL(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
     class function Mapper: omRef;
     class procedure SetWaitProc(const AShowWaitProc: TProc = nil; const AHideWaitProc: TProc = nil);
@@ -498,6 +499,11 @@ end;
 class function io.SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination;
 begin
   Result := ASQLDestination;
+end;
+
+class function io.SQL(const ASQL: TStrings; const AOwns: Boolean): IioSQLDestination;
+begin
+  Result := TioDBFactory.SQLDestination(ASQL, AOwns);
 end;
 
 class procedure io.StartTransaction(const AConnectionName: String);

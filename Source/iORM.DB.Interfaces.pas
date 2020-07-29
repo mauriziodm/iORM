@@ -246,16 +246,19 @@ type
     ['{B96F4E95-5609-4577-9C0D-E01013EE0093}']
     // Destinations
     {TO 5DO -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
+    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer; overload;
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
-    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer; overload;
     // Informations
+    function Connection(const AConnectionDefName: String): IioSQLDestination;
+    function DoNotTranslate: IioSQLDestination;
+    function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     function SelfClass(const ASelfClassName:String): IioSQLDestination; overload;
     function SelfClass(const ASelfClassRef: TioClassRef): IioSQLDestination; overload;
-    function QualifiedFieldName(const AQualifiedFieldName:Boolean=True): IioSQLDestination;
     // Getters
-    function GetTranslatedSQL: String; overload;
+    function GetConnectionDefName: String;
     function GetIgnoreObjNotExists: Boolean;
+    function GetSQL: String;
   end;
 
   IioRESTRequestBody = interface
