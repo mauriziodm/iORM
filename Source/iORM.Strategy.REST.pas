@@ -365,7 +365,7 @@ var
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsRESTConnection;
   // Start transaction
   //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not

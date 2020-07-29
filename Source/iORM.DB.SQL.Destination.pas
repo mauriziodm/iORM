@@ -134,7 +134,7 @@ end;
 function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
-  Result := TioStrategyFactory.GetStrategy('').SQLDest_Execute(Self);
+  Result := TioStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_Execute(Self);
 end;
 
 function TioSQLDestination.GetConnectionDefName: String;
@@ -176,7 +176,7 @@ end;
 
 procedure TioSQLDestination.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioStrategyFactory.GetStrategy('').SQLDest_LoadDataSet(Self, AMemTable);
+  TioStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_LoadDataSet(Self, AMemTable);
 end;
 
 end.

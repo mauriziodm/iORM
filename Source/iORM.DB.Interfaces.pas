@@ -163,7 +163,7 @@ type
     function IsEmpty: Boolean;
     function IsSqlEmpty: Boolean;
     function IsActive: Boolean;
-    function ExecSQL: Integer;
+    procedure ExecSQL;
     function GetSQL: TStrings;
     function Fields: TioFields;
     function ParamByName(const AParamName:String): TioParam;

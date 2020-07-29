@@ -46,6 +46,7 @@ type
     ioFMX1: TioFMX;
     ButtonGenerateScript: TButton;
     ButtonAnalyze: TButton;
+    ButtonGenerateDB: TButton;
     procedure TabControl1Gesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -68,6 +69,7 @@ type
     procedure SQLiteConnAfterRegister(Sender: TObject);
     procedure ButtonGenerateScriptClick(Sender: TObject);
     procedure ButtonAnalyzeClick(Sender: TObject);
+    procedure ButtonGenerateDBClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -247,6 +249,12 @@ end;
 procedure TMainForm.ButtonDropIndexClick(Sender: TObject);
 begin
   io.RefTo('IPerson').DropIndex('MyIndex');
+end;
+
+procedure TMainForm.ButtonGenerateDBClick(Sender: TObject);
+begin
+  io.DBBuilder.GenerateDB(True, True, False);
+  ShowMessage('Operazione completata');
 end;
 
 procedure TMainForm.ButtonGenerateScriptClick(Sender: TObject);

@@ -622,23 +622,6 @@ begin
     io.RollbackTransaction(ASQLDestination.GetConnectionDefName);
     raise;
   end;
-
-
-
-  // Get the connection
-  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsDBConnection;
-  // Start transaction
-  LConnection.StartTransaction;
-  try
-    // Execute the SQL command
-    Result := LConnection.AsDBConnection.GetConnection.ExecSQL(ASQLDestination.GetSQL, ASQLDestination.GetIgnoreObjNotExists);
-    // Commit
-    LConnection.Commit;
-  except
-    // Rollback
-    LConnection.Rollback;
-    raise;
-  end;
 end;
 
 class procedure TioStrategyDB.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);

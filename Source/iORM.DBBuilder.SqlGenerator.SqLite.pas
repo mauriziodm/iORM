@@ -86,6 +86,7 @@ end;
 procedure TioDBBuilderSqlGenSQLite.EndAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
   EndCreateTable(ATable);
+  ScriptAddEmpty;
   CopyDataFromOldToNewTable(ATable);
 end;
 
@@ -186,6 +187,8 @@ begin
   LComma := ' ';
   for LField in ATable.Fields.Values do
   begin
+    if LField.Status = dbsCreate then
+      Continue;
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
   end;
@@ -197,13 +200,15 @@ begin
   LComma := ' ';
   for LField in ATable.Fields.Values do
   begin
+    if LField.Status = dbsCreate then
+      Continue;
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
   end;
   if ATable.IsClassFromField then
     ScriptAdd(Format('%s%s', [LComma, IO_CLASSFROMFIELD_FIELDNAME]));
+  ScriptAdd(Format('FROM %s', [Table2OldTableName(ATable)]));
   DecIndentationLevel;
-  ScriptAdd(Format('FROM %s (', [Table2OldTableName(ATable)]));
   DecIndentationLevel;
   ScriptAdd(';');
 end;
@@ -250,7 +255,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
 begin
-  Result := Format('_%s_old0', [ATable.TableName.ToLower]);
+  Result := Format('_%s_old', [ATable.TableName.ToLower]);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
@@ -294,7 +299,9 @@ end;
 procedure TioDBBuilderSqlGenSQLite.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
   ScriptAdd(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(ATable)]));
+  ScriptAddEmpty;
   ScriptAdd(Format('ALTER TABLE %s RENAME TO %s;', [ATable.TableName, Table2OldTableName(ATable)]));
+  ScriptAddEmpty;
   BeginCreateTable(ATable);
 end;
 

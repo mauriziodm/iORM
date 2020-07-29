@@ -144,10 +144,12 @@ type
     class function GetDBStatus(const AConnectionDefName: String = IO_CONNECTIONDEF_DEFAULTNAME): TioDBBuilderEngineResult;
       virtual; abstract;
     // Generate script
-    class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean = True; AAddForeignKeys: Boolean = True)
-      : TioDBBuilderEngineResult; overload; virtual; abstract;
+    class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean = True;
+      const AAddForeignKeys: Boolean = True; const ARaiseIfWarningsExists: Boolean = False): TioDBBuilderEngineResult; overload;
+      virtual; abstract;
     class function GenerateScript(const ASqlScriptToFill: TStrings; const AConnectionDefName: String; const AAddIndexes: Boolean = True;
-      AAddForeignKeys: Boolean = True): TioDBBuilderEngineResult; overload; virtual; abstract;
+      const AAddForeignKeys: Boolean = True; const ARaiseIfWarningsExists: Boolean = False): TioDBBuilderEngineResult; overload;
+      virtual; abstract;
     // Generate DB
     class procedure GenerateDB(const AConnectionDefName: String; const AAddIndexes: Boolean = True;
       const AAddForeignKeys: Boolean = True; const AForce: Boolean = False); overload; virtual; abstract;
