@@ -41,8 +41,15 @@ uses
   System.Rtti, System.Generics.Collections, System.SysUtils;
 
 const
+  // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
+  // Mauri 04/08/20: Vero ma con un PageSize = 4096 (il più diffuso) il limite massimo sarebbe 253
+  IO_DEFAULT_FIELD_LENGTH = 250;
+  IO_DEFAULT_FIELD_PRECISION = 10;
+  IO_DEFAULT_FIELD_SCALE = 3;
+
   IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
-  IO_CLASSFROMFIELD_FIELDLENGTH = '255';
+  IO_CLASSFROMFIELD_FIELDLENGTH = 250;
+
   IO_CONNECTIONDEF_DEFAULTNAME = 'NO_NAME';
   IO_INTEGER_NULL_VALUE = 0;
 

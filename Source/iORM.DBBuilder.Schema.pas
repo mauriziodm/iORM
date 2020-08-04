@@ -118,7 +118,8 @@ end;
 
 procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
 begin
-  FStatus := AValue;
+  if AValue > FStatus then
+    FStatus := AValue;
 end;
 
 function TioDBBuilderSchema.SqlScript: TStrings;

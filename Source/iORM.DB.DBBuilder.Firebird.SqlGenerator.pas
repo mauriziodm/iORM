@@ -320,7 +320,7 @@ end;
 
 function TioDBBuilderFirebirdSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
-  Result := ' ' + IO_CLASSFROMFIELD_FIELDNAME + ' ' + ' ' + 'VARCHAR' + ' ' + ' ' + '(' + IO_CLASSFROMFIELD_FIELDLENGTH + ')' + ' ' +
+  Result := ' ' + IO_CLASSFROMFIELD_FIELDNAME + ' ' + ' ' + 'VARCHAR' + ' ' + ' ' + '(' + IntToStr(IO_CLASSFROMFIELD_FIELDLENGTH) + ')' + ' ' +
     ' ' + ',';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;

@@ -3,7 +3,7 @@ unit iORM.DBBuilder.Schema.Field;
 interface
 
 uses
-  iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces;
+  iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces, System.Rtti;
 
 type
 
@@ -19,10 +19,17 @@ type
     constructor Create(const AContextProperty: IioContextProperty);
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
     function Altered: TioDBBuilderFieldAlter;
+    function FieldCustomType: string;
+    function FieldDefault: TValue;
+    function FieldLength: integer;
     function FieldName: String;
-    function GetContextProperty: IioContextProperty;
+    function FieldPrecision: integer;
+    function FieldScale: integer;
+    function FieldSubType: string;
+    function FieldType: TioMetadataFieldType;
+    function FieldUnicode: boolean;
+    function FieldNotNull: Boolean;
     function PrimaryKey: Boolean;
-    function NotNull: Boolean;
 
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
@@ -47,14 +54,49 @@ begin
   FContextProperty := AContextProperty;
 end;
 
+function TioDBBuilderSchemaField.FieldCustomType: string;
+begin
+  Result := FContextProperty.GetMetadata_CustomFieldType;
+end;
+
+function TioDBBuilderSchemaField.FieldDefault: TValue;
+begin
+  Result := FContextProperty.GetMetadata_Default;
+end;
+
+function TioDBBuilderSchemaField.FieldLength: integer;
+begin
+  Result := FContextProperty.GetMetadata_FieldLength;
+end;
+
 function TioDBBuilderSchemaField.FieldName: String;
 begin
   Result := FContextProperty.GetSqlFieldName;
 end;
 
-function TioDBBuilderSchemaField.GetContextProperty: IioContextProperty;
+function TioDBBuilderSchemaField.FieldPrecision: integer;
 begin
-  Result := FContextProperty;
+  Result := FContextProperty.GetMetadata_FieldPrecision;
+end;
+
+function TioDBBuilderSchemaField.FieldScale: integer;
+begin
+  Result := FContextProperty.GetMetadata_FieldScale;
+end;
+
+function TioDBBuilderSchemaField.FieldSubType: string;
+begin
+  Result := FContextProperty.GetMetadata_FieldSubType;
+end;
+
+function TioDBBuilderSchemaField.FieldType: TioMetadataFieldType;
+begin
+  Result := FContextProperty.GetMetadata_FieldType;
+end;
+
+function TioDBBuilderSchemaField.FieldUnicode: boolean;
+begin
+  Result := FContextProperty.GetMetadata_FieldUnicode;
 end;
 
 function TioDBBuilderSchemaField.GetStatus: TioDBBuilderStatus;
@@ -67,7 +109,7 @@ begin
   Result := FContextProperty.IsID;
 end;
 
-function TioDBBuilderSchemaField.NotNull: Boolean;
+function TioDBBuilderSchemaField.FieldNotNull: Boolean;
 begin
   Result := FContextProperty.GetMetadata_FieldNotNull;
 end;

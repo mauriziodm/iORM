@@ -4,7 +4,7 @@ interface
 
 uses
   System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
-  iORM.Context.Map.Interfaces, iORM.Attributes, iORM.CommonTypes;
+  iORM.Context.Map.Interfaces, iORM.Attributes, iORM.CommonTypes, System.Rtti;
 
 type
 
@@ -27,10 +27,17 @@ type
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
     function Altered: TioDBBuilderFieldAlter;
+    function FieldCustomType: string;
+    function FieldDefault: TValue;
+    function FieldLength: integer;
     function FieldName: String;
-    function GetContextProperty: IioContextProperty;
+    function FieldPrecision: integer;
+    function FieldScale: integer;
+    function FieldSubType: string;
+    function FieldType: TioMetadataFieldType;
+    function FieldUnicode: boolean;
+    function FieldNotNull: Boolean;
     function PrimaryKey: Boolean;
-    function NotNull: Boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
@@ -60,7 +67,7 @@ type
     property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
     // Status
     function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -113,7 +120,6 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    procedure CreateClassInfoField(ACommaBefore: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     // PrimaryKey & other indexes

@@ -358,4 +358,21 @@ object MainForm: TMainForm
     Left = 208
     Top = 8
   end
+  object FirebirdConn: TioFirebirdConnectionDef
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ReferentialIntegrityConstraints = False
+    Database = 'ContactsIntf.FDB'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    OSAuthent = oaNo
+    Password = 'th3cla'
+    Persistent = False
+    Pooled = False
+    Port = 3050
+    Protocol = pLocal
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    Left = 304
+    Top = 8
+  end
 end

@@ -32,7 +32,6 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    procedure CreateClassInfoField(ACommaBefore: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     // PrimaryKey & other indexes
@@ -135,7 +134,7 @@ begin
   // NotNull
   // Note: SET NOT NUL & DROP BOT NULL available only from firebird 3
   if alFieldNotNull in AField.Altered then
-    ScriptAdd(Format('%sALTER COLUMN %s %s NOT NULL', [ACommaBefore, AField.FieldName, IfThen(AField.NotNull, 'SET', 'DROP')]));
+    ScriptAdd(Format('%sALTER COLUMN %s %s NOT NULL', [ACommaBefore, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -148,11 +147,6 @@ procedure TioDBBuilderSqlGenFirebird.BeginCreateTable(const ATable: IioDBBuilder
 begin
   ScriptAdd(Format('CREATE TABLE %s (', [ATable.TableName]));
   IncIndentationLevel;
-end;
-
-procedure TioDBBuilderSqlGenFirebird.CreateClassInfoField(ACommaBefore: Char);
-begin
-  ScriptAdd(Format('%s%s VARCHAR(%s)', [ACommaBefore, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
 end;
 
 procedure TioDBBuilderSqlGenFirebird.CreateDatabase;
@@ -260,10 +254,10 @@ begin
   LTableName := ATable.TableName;
   LFieldName := AField.FieldName;
   LNewFieldType := TranslateFieldTypeForModified(AField);
-  LNewFieldSubType := AField.GetContextProperty.GetMetadata_FieldSubType;
-  LNewFieldLength := AField.GetContextProperty.GetMetadata_FieldLength;
-  LNewFieldPrecision := AField.GetContextProperty.GetMetadata_FieldPrecision;
-  LNewFieldDecimals := AField.GetContextProperty.GetMetadata_FieldScale;
+  LNewFieldSubType := AField.FieldSubType;
+  LNewFieldLength := AField.FieldLength;
+  LNewFieldPrecision := AField.FieldPrecision;
+  LNewFieldDecimals := AField.FieldScale;
 
   // Create and open the query for old field informations
   LQuery := NewQuery;
@@ -330,7 +324,7 @@ begin
   // Verify if NotNull is changed (warning cannot change not null value with firebird)
   // Note: The last parameter set the NotNull change as permitted (firebird's alter table
   // with SET NOT NULL or DROP NOT NULL is supported from version 3)
-  Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
+  Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, True);
 
   // Verify if blob subtype is changed
   // Note: The last parameter set the blob sub-type change as NOT permitted in firebrd RDBMS
@@ -348,7 +342,7 @@ begin
     Exit(Format('%s INTEGER NOT NULL', [AField.FieldName]));
   // ...then continue
   LDefault := ExtractFieldDefaultValue(AField);
-  LNotNull := IfThen(AField.NotNull, 'NOT NULL', '');
+  LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', '');
   Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
 end;
 
@@ -371,11 +365,11 @@ end;
 
 function TioDBBuilderSqlGenFirebird.TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
 begin
-  case AField.GetContextProperty.GetMetadata_FieldType of
+  case AField.FieldType of
     ioMdVarchar:
-      Result := Format('VARCHAR(%d)', [AField.GetContextProperty.GetMetadata_FieldLength]);
+      Result := Format('VARCHAR(%d)', [AField.FieldLength]);
     ioMdChar:
-      Result := Format('CHAR(%d)', [AField.GetContextProperty.GetMetadata_FieldLength]);
+      Result := Format('CHAR(%d)', [AField.FieldLength]);
     ioMdInteger:
       Result := 'INTEGER';
     ioMdFloat:
@@ -387,24 +381,24 @@ begin
     ioMdDateTime:
       Result := 'TIMESTAMP';
     ioMdDecimal:
-      Result := Format('DECIMAL(%d,%d)', [AField.GetContextProperty.GetMetadata_FieldPrecision,
-        AField.GetContextProperty.GetMetadata_FieldScale]);
+      Result := Format('DECIMAL(%d,%d)', [AField.FieldPrecision,
+        AField.FieldScale]);
     ioMdNumeric:
-      Result := Format('NUMERIC(%d,%d)', [AField.GetContextProperty.GetMetadata_FieldPrecision,
-        AField.GetContextProperty.GetMetadata_FieldScale]);
+      Result := Format('NUMERIC(%d,%d)', [AField.FieldPrecision,
+        AField.FieldScale]);
     ioMdBoolean:
       Result := 'INTEGER';
     ioMdBinary:
-      Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.GetContextProperty.GetMetadata_FieldSubType.IsEmpty, '0',
-        AField.GetContextProperty.GetMetadata_FieldSubType)]);
+      Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0',
+        AField.FieldSubType)]);
     ioMdCustomFieldType:
-      Result := AField.GetContextProperty.GetMetadata_CustomFieldType;
+      Result := AField.FieldCustomType;
   end;
 end;
 
 function TioDBBuilderSqlGenFirebird.TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
 begin
-  case AField.GetContextProperty.GetMetadata_FieldType of
+  case AField.FieldType of
     ioMdVarchar:
       Result := 'VARCHAR';
     ioMdChar:
@@ -428,7 +422,7 @@ begin
     ioMdBinary:
       Result := 'BLOB';
     ioMdCustomFieldType:
-      Result := AField.GetContextProperty.GetMetadata_CustomFieldType;
+      Result := AField.FieldCustomType;
   else
     raise EioException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;

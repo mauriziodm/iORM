@@ -47,6 +47,7 @@ type
     ButtonGenerateScript: TButton;
     ButtonAnalyze: TButton;
     ButtonGenerateDB: TButton;
+    FirebirdConn: TioFirebirdConnectionDef;
     procedure TabControl1Gesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);

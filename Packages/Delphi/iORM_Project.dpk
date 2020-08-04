@@ -202,6 +202,8 @@ contains
   iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
   iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.DBAnalyzer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.pas',
-  iORM.DBBuilder.Engine in '..\..\Source\iORM.DBBuilder.Engine.pas';
+  iORM.DBBuilder.Engine in '..\..\Source\iORM.DBBuilder.Engine.pas',
+  iORM.DBBuilder.Schema.Field.ClassInfo in '..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas',
+  iORM.DBBuilder.Strategy.Base in '..\..\Source\iORM.DBBuilder.Strategy.Base.pas';
 
 end.

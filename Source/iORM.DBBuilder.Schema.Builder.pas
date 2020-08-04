@@ -83,12 +83,19 @@ var
   LSchemaTable: IioDBBuilderSchemaTable;
   LProperty: IioContextProperty;
 begin
+  // Check if the class/table must be skipped or not
   if not(AMap.GetTable.GetAutoCreateDB and AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName)) then
     Exit;
+  // Build or get the SchemaTable
   LSchemaTable := ASchema.FindOrCreateTable(AMap);
+  // Add fields
   for LProperty in AMap.GetProperties do
     if not(LProperty.IsSkipped and (LProperty.GetRelationType = ioRTHasMany) and (LProperty.GetRelationType = ioRTHasOne)) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
+  // Add the ClassInfo field if necessary
+  if LSchemaTable.IsClassFromField then
+    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo);
+  // Add indexes
   BuildIndexList(LSchemaTable, AMap);
 end;
 

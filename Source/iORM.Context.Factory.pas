@@ -288,10 +288,9 @@ begin
     // end;
     // ====================================================================================================
 
-    PropMetadata_FieldLength := 50 { 255 };
-    // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
-    PropMetadata_FieldPrecision := 10;
-    PropMetadata_FieldScale := 3;
+    PropMetadata_FieldLength := IO_DEFAULT_FIELD_LENGTH;
+    PropMetadata_FieldPrecision := IO_DEFAULT_FIELD_PRECISION;
+    PropMetadata_FieldScale := IO_DEFAULT_FIELD_SCALE;
     PropMetadata_FieldNotNull := False;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';

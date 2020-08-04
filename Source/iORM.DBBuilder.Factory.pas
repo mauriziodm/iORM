@@ -17,6 +17,7 @@ type
       const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioContextProperty): IioDBBuilderSchemaField;
+    class function NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaTable(const AContextTable: IioContextTable): IioDBBuilderSchemaTable;
@@ -30,7 +31,8 @@ uses
   iORM.DBBuilder.Schema, iORM.DBBuilder.Schema.Table, iORM.DBBuilder.Schema.Field, iORM.DBBuilder.Schema.FK,
   iORM.DBBuilder.Schema.Builder, iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.SqlGenerator.Firebird,
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.SqlGenerator.MSSqlServer, iORM.DBBuilder.Strategy.WithoutAlterTable,
-  iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine;
+  iORM.DBBuilder.Strategy.WithAlterTable, iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine,
+  iORM.DBBuilder.Schema.Field.ClassInfo;
 
 { TioDBBuilderFactory }
 
@@ -62,6 +64,11 @@ begin
   Result := TioDBBuilderSchemaField.Create(AContextProperty);
 end;
 
+class function TioDBBuilderFactory.NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
+begin
+  Result := TioDBBuilderSchemaFieldClassInfo.Create;
+end;
+
 class function TioDBBuilderFactory.NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
   const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
 begin
@@ -91,12 +98,10 @@ class function TioDBBuilderFactory.NewStrategy(const ASchema: IioDBBuilderSchema
   : IioDBBuilderStrategy;
 begin
   case TioConnectionManager.GetConnectionInfo(ASchema.ConnectionDefName).ConnectionType of
-    // cdtFirebird:
-    // Result := TioDBBuilderSqlGenFirebird.Create(ASchema);
+    cdtFirebird, cdtSQLServer:
+      Result := TioDBBuilderStrategyWithAlter.Create(ASchema, ASqlGenerator);
     cdtSQLite:
       Result := TioDBBuilderStrategyWithoutAlter.Create(ASchema, ASqlGenerator);
-    // cdtSQLServer:
-    // Result := TioDBBuilderSqlGenMSSqlServer.Create(ASchema);
   else
     raise EioException.Create(ClassName, 'NewStrategy', 'Connection type not found');
   end;

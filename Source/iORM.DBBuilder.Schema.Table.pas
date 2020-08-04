@@ -22,7 +22,7 @@ type
     procedure SetIsClassFromField(const AValue: Boolean);
     // Status
     function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
     constructor Create(const AContextTable: IioContextTable);
     destructor Destroy; override;
@@ -139,9 +139,10 @@ begin
   FIsClassFromField := AValue or FIsClassFromField;
 end;
 
-procedure TioDBBuilderSchemaTable.SetStatus(const Value: TioDBBuilderStatus);
+procedure TioDBBuilderSchemaTable.SetStatus(const AValue: TioDBBuilderStatus);
 begin
-  FStatus := Value;
+  if AValue > FStatus then
+    FStatus := AValue;
 end;
 
 end.

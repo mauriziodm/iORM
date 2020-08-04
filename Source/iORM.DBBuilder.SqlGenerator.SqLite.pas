@@ -33,7 +33,6 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    procedure CreateClassInfoField(ACommaBefore: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char); // Not implented
     procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char); // Not implented
     // PrimaryKey & other indexes
@@ -54,11 +53,6 @@ uses
   System.Classes, iORM.SqlTranslator;
 
 { TioDBBuilderSqlGenSQLite }
-
-procedure TioDBBuilderSqlGenSQLite.CreateClassInfoField(ACommaBefore: Char);
-begin
-  ScriptAdd(Format('%s%s TEXT NULL', [ACommaBefore, IO_CLASSFROMFIELD_FIELDNAME]));
-end;
 
 procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
 begin
@@ -136,7 +130,7 @@ begin
       Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
 
       // Verify if NotNull is changed
-      Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
+      Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, True);
 
       // Exit
       Exit;
@@ -153,7 +147,7 @@ begin
   if AField.PrimaryKey then
     Exit(Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])); // Add AUTOINCREMENT keyword???
   // ...then continue
-  LNotNull := IfThen(AField.NotNull, 'NOT NULL', 'NULL');
+  LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
   Result := Format('"%s" %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull]).Trim;
 end;
 
@@ -192,8 +186,6 @@ begin
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
   end;
-  if ATable.IsClassFromField then
-    ScriptAdd(Format('%s%s', [LComma, IO_CLASSFROMFIELD_FIELDNAME]));
   // Select from
   ScriptAdd(') SELECT');
   IncIndentationLevel;
@@ -205,8 +197,6 @@ begin
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
   end;
-  if ATable.IsClassFromField then
-    ScriptAdd(Format('%s%s', [LComma, IO_CLASSFROMFIELD_FIELDNAME]));
   ScriptAdd(Format('FROM %s', [Table2OldTableName(ATable)]));
   DecIndentationLevel;
   DecIndentationLevel;
@@ -215,7 +205,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
 begin
-  case AField.GetContextProperty.GetMetadata_FieldType of
+  case AField.FieldType of
     ioMdVarchar:
       Result := 'TEXT';
     ioMdChar:
@@ -239,7 +229,7 @@ begin
     ioMdBinary:
       Result := 'BLOB';
     ioMdCustomFieldType:
-      Result := AField.GetContextProperty.GetMetadata_CustomFieldType;
+      Result := AField.FieldCustomType;
   else
     raise EioException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;

@@ -126,8 +126,9 @@ begin
     fkCascade:
       Exit('CASCADE');
   else
-    AddWarning(Format('Table ''%s'' constraint ''%s'' --> Invalid foreign key action (field %s reference to %s.%s)', [AForeignKey.DependentTableName,
-      AForeignKey.Name, AForeignKey.DependentFieldName, AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+    AddWarning(Format('Table ''%s'' constraint ''%s'' --> Invalid foreign key action (field %s reference to %s.%s)',
+      [AForeignKey.DependentTableName, AForeignKey.Name, AForeignKey.DependentFieldName, AForeignKey.ReferenceTableName,
+      AForeignKey.ReferenceFieldName]));
   end;
 end;
 
@@ -234,7 +235,7 @@ end;
 procedure TioDBBuilderSqlGenBase.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
   const ATable: IioDBBuilderSchemaTable);
 begin
-  if AField.NotNull <> AOldFieldNotNull then
+  if AField.FieldNotNull <> AOldFieldNotNull then
     AddWarning(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
       [ATable.TableName, AField.FieldName]));
 end;
@@ -242,7 +243,7 @@ end;
 procedure TioDBBuilderSqlGenBase.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
   const ATable: IioDBBuilderSchemaTable);
 begin
-  if AField.NotNull and not AOldFieldNotNull then
+  if AField.FieldNotNull and not AOldFieldNotNull then
     AddWarning
       (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
       [ATable.TableName, AField.FieldName]));
@@ -328,7 +329,7 @@ function TioDBBuilderSqlGenBase.ExtractFieldDefaultValue(const AField: IioDBBuil
 var
   LFieldDefaultValue: TValue;
 begin
-  LFieldDefaultValue := AField.GetContextProperty.GetMetadata_Default;
+  LFieldDefaultValue := AField.FieldDefault;
   if LFieldDefaultValue.IsEmpty then
     Result := ''
   else

@@ -340,7 +340,7 @@ end;
 
 function TioDBBuilderMSSqlServerSqlGenerator.CreateClassInfoField(ATable: IioDBBuilderTable): String;
 begin
-  Result := '[' + IO_CLASSFROMFIELD_FIELDNAME +']' + '[' + 'VARCHAR' + ']' + ' ' + '('+ IO_CLASSFROMFIELD_FIELDLENGTH +')'+' '+'NULL' + ',';
+  Result := '[' + IO_CLASSFROMFIELD_FIELDNAME +']' + '[' + 'VARCHAR' + ']' + ' ' + '('+ IntToStr(IO_CLASSFROMFIELD_FIELDLENGTH) +')'+' '+'NULL' + ',';
   FCreateTableScript := FCreateTableScript + ' ' + Result;
 end;
 

@@ -36,7 +36,6 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    procedure CreateClassInfoField(ACommaBefore: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     // PrimaryKey & other indexes
@@ -133,11 +132,6 @@ procedure TioDBBuilderSqlGenMSSqlServer.BeginCreateTable(const ATable: IioDBBuil
 begin
   ScriptAdd(Format('CREATE TABLE %s (', [ATable.TableName]));
   IncIndentationLevel;
-end;
-
-procedure TioDBBuilderSqlGenMSSqlServer.CreateClassInfoField(ACommaBefore: Char);
-begin
-  ScriptAdd(Format('%s[%s] [VARCHAR] (%s) NULL', [ACommaBefore, IO_CLASSFROMFIELD_FIELDNAME, IO_CLASSFROMFIELD_FIELDLENGTH]));
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.CreateDatabase;
@@ -254,9 +248,9 @@ begin
     begin
       // Load some new field informations
       LNewFieldType := TranslateFieldTypeForModified(AField);
-      LNewFieldLength := AField.GetContextProperty.GetMetadata_FieldLength;
-      LNewFieldPrecision := AField.GetContextProperty.GetMetadata_FieldPrecision;
-      LNewFieldDecimals := AField.GetContextProperty.GetMetadata_FieldScale;
+      LNewFieldLength := AField.FieldLength;
+      LNewFieldPrecision := AField.FieldPrecision;
+      LNewFieldDecimals := AField.FieldScale;
 
       // Load some old field informations
       LOldFieldType := LQuery.Fields.FieldByName('type_name').AsString.Replace('identity', '', [rfReplaceAll]).Trim;
@@ -287,7 +281,7 @@ begin
       // so it is not possible to verify if it has changed.
 
       // Verify if NotNull is changed
-      Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.NotNull, AField, ATable, True);
+      Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, True);
 
       // Verify if blob subtype is changed
       // NOTE: I have not found a way to retrieve the current blob subtype
@@ -319,7 +313,7 @@ begin
     Exit(Format('%s [INT] IDENTITY(1,1) NOT NULL', [AField.FieldName]));
   // ...then continue
   LDefault := ExtractFieldDefaultValue(AField);
-  LNotNull := IfThen(AField.NotNull, 'NOT NULL', 'NULL');
+  LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
   Result := Format('%s [%s] %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
 end;
 
@@ -346,25 +340,25 @@ end;
 function TioDBBuilderSqlGenMSSqlServer.TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
 begin
   Result := TranslateFieldTypeForModified(AField);
-  case AField.GetContextProperty.GetMetadata_FieldType of
+  case AField.FieldType of
     ioMdVarchar, ioMdChar:
-      Result := Format('%s(%d)', [Result, AField.GetContextProperty.GetMetadata_FieldLength]);
+      Result := Format('%s(%d)', [Result, AField.FieldLength]);
     ioMdDecimal, ioMdNumeric:
-      Result := Format('%s(%d,%d)', [Result, AField.GetContextProperty.GetMetadata_FieldPrecision,
-        AField.GetContextProperty.GetMetadata_FieldScale]);
+      Result := Format('%s(%d,%d)', [Result, AField.FieldPrecision,
+        AField.FieldScale]);
   end;
 end;
 
 function TioDBBuilderSqlGenMSSqlServer.TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
 begin
-  case AField.GetContextProperty.GetMetadata_FieldType of
+  case AField.FieldType of
     ioMdVarchar:
-      if AField.GetContextProperty.GetMetadata_FieldUnicode then
+      if AField.FieldUnicode then
         Result := 'VARCHAR'
       else
         Result := 'NVARCHAR';
     ioMdChar:
-      if AField.GetContextProperty.GetMetadata_FieldUnicode then
+      if AField.FieldUnicode then
         Result := 'CHAR'
       else
         Result := 'NCHAR';
@@ -386,18 +380,18 @@ begin
       Result := 'BIT';
     ioMdBinary: // ##### Sentire con Marco, per me bisogna rivedere anche qui il discorso subtype (già modificato il Firebird e SQLite)
       begin
-        if AField.GetContextProperty.GetMetadata_FieldSubType.IsEmpty then
+        if AField.FieldSubType.IsEmpty then
         begin
-          if AField.GetContextProperty.GetMetadata_FieldUnicode then
+          if AField.FieldUnicode then
             Result := 'BINARY'
           else
             Result := 'NBINARY';
         end
         else
-          Result := AField.GetContextProperty.GetMetadata_FieldSubType;
+          Result := AField.FieldSubType;
       end;
     ioMdCustomFieldType:
-      Result := AField.GetContextProperty.GetMetadata_CustomFieldType;
+      Result := AField.FieldCustomType;
   end;
 end;
 
