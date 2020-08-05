@@ -114,7 +114,6 @@ end;
 procedure TioDBBuilderSqlGenMSSqlServer.AddSequence(const ATable: IioDBBuilderSchemaTable);
 begin
   // Nothing to do
-  raise EioException.Create(ClassName, 'AddSequence', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);

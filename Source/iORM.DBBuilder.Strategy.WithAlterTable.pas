@@ -24,6 +24,7 @@ begin
   SqlGenerator.BeginAlterTable(ATable);
   CreateFields(ATable);
   SqlGenerator.EndAlterTable(ATable);
+  CreateSequence(ATable);
 end;
 
 procedure TioDBBuilderStrategyWithAlter.CreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -31,6 +32,7 @@ begin
   SqlGenerator.BeginCreateTable(ATable);
   CreateFields(ATable);
   SqlGenerator.EndCreateTable(ATable);
+  CreateSequence(ATable);
 end;
 
 procedure TioDBBuilderStrategyWithAlter.GenerateScript;

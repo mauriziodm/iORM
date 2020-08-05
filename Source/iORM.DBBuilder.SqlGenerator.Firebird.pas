@@ -39,10 +39,10 @@ type
     procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
     procedure DropAllIndexes;
     // Foreign keys
-    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK); // Not implented
-    procedure DropAllForeignKeys; // Not implented
+    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
+    procedure DropAllForeignKeys;
     // Sequences
-    procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
+    procedure AddSequence(const ATable: IioDBBuilderSchemaTable);
   end;
 
 implementation
@@ -107,7 +107,7 @@ end;
 
 procedure TioDBBuilderSqlGenFirebird.AddSequence(const ATable: IioDBBuilderSchemaTable);
 begin
-  if not SequenceExists(ATable) then
+  if (ATable.Status = dbsCreate) or not SequenceExists(ATable) then
     ScriptAdd(Format('CREATE SEQUENCE %s;', [ATable.GetContextTable.GetKeyGenerator]));
 end;
 

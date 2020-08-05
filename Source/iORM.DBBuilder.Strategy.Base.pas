@@ -19,6 +19,8 @@ type
     procedure CreateIndexes; overload; virtual;
     procedure CreateIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure CreateOrAlterTables; virtual;
+    procedure CreateSequences; virtual;
+    procedure CreateSequence(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure DropForeignKeys; virtual;
     procedure DropIndexes; virtual;
@@ -107,6 +109,20 @@ begin
         AlterTable(LTable);
     end;
   end;
+end;
+
+procedure TioDBBuilderStrategyBase.CreateSequence(const ATable: IioDBBuilderSchemaTable);
+begin
+  FSqlGenerator.AddSequence(ATable);
+end;
+
+procedure TioDBBuilderStrategyBase.CreateSequences;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  SqlGenerator.ScriptAddTitle('Creating all sequences');
+  for LTable in FSchema.Tables.Values do
+    CreateSequence(LTable);
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);

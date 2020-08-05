@@ -90,7 +90,7 @@ begin
   LSchemaTable := ASchema.FindOrCreateTable(AMap);
   // Add fields
   for LProperty in AMap.GetProperties do
-    if not(LProperty.IsSkipped and (LProperty.GetRelationType = ioRTHasMany) and (LProperty.GetRelationType = ioRTHasOne)) then
+    if not (LProperty.IsSkipped or (LProperty.GetRelationType = ioRTHasMany) or (LProperty.GetRelationType = ioRTHasOne)) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   // Add the ClassInfo field if necessary
   if LSchemaTable.IsClassFromField then
