@@ -177,6 +177,12 @@ type
     property SQL: TStrings read GetSQL;
   end;
 
+  // Interfaccia per la classe che esegue script sul DB (usato dal DBBuilder)
+  IioScript = interface
+    ['{DF0FA3CE-233A-454E-A501-4FFDAE0CD713}']
+    procedure Execute;
+  end;
+
   // Interfaccia per le classi che si occupano di convertire i dati in
   //  rappresentazioni degli stessi da inserire nel testo delle query,
   TioSqlDataConverter = class abstract
@@ -246,7 +252,7 @@ type
     ['{B96F4E95-5609-4577-9C0D-E01013EE0093}']
     // Destinations
     {TO 5DO -oOwner -cGeneral : Un altro overload di Trabslate che accetta un'interfaccia e che genera automaticamente una query che fa l'UNION ALL di tutte le classi che implementano l'interfaccia stessa}
-    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer; overload;
+    procedure Execute(const AIgnoreObjNotExists:Boolean=False); overload;
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
     // Informations
@@ -325,7 +331,7 @@ type
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); virtual; abstract;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); virtual; abstract;
-    class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; virtual; abstract;
+    class procedure SQLDest_Execute(const ASQLDestination:IioSQLDestination); virtual; abstract;
   end;
 
 implementation

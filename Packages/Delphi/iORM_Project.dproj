@@ -258,6 +258,7 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Engine.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Base.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Script.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

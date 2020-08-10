@@ -44,9 +44,6 @@ uses
 
 type
 
-  // A class reference to a query (used in the DB.Factory)
-  TioQueryRef = class of TioQuery;
-
   // Classe che incapsula una query
   TioQuery = class(TInterfacedObject, IioQuery)
   strict private

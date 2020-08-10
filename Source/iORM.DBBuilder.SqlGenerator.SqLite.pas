@@ -43,7 +43,7 @@ type
     procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
     procedure DropAllForeignKeys;
     // Sequences
-    procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
+    procedure AddSequence(const ASequenceName: String; const ACreatingNewDatabase: Boolean); // Not implented
   end;
 
 implementation
@@ -274,10 +274,9 @@ begin
   raise EioException.Create(ClassName, 'AddPrimaryKey', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
-procedure TioDBBuilderSqlGenSQLite.AddSequence(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderSqlGenSQLite.AddSequence(const ASequenceName: String; const ACreatingNewDatabase: Boolean);
 begin
   // Nothing to do
-  raise EioException.Create(ClassName, 'AddSequence', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);

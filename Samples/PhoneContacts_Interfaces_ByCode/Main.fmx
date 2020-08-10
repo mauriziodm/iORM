@@ -343,7 +343,7 @@ object MainForm: TMainForm
     AutoCreateDB.ReferentialIntegrityConstraints = False
     Database = 'ContactsIntf.DB'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
+    DefaultConnection = False
     Persistent = False
     Pooled = False
     Left = 40
@@ -363,7 +363,7 @@ object MainForm: TMainForm
     AutoCreateDB.ReferentialIntegrityConstraints = False
     Database = 'ContactsIntf.FDB'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = False
+    DefaultConnection = True
     OSAuthent = oaNo
     Password = 'th3cla'
     Persistent = False

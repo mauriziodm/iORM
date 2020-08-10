@@ -228,7 +228,7 @@ procedure TioDBBuilderSqlGenBase.WarningNewValueLessThanTheOldOne(const AValueNa
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
-    AddWarning(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = $d, new = %d)',
+    AddWarning(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = %d, new = %d)',
       [ATable.TableName, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
@@ -264,7 +264,7 @@ procedure TioDBBuilderSqlGenBase.WarningValueChanged(const AValueName, AOldValue
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue <> AOldValue then
-    AddWarning(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''$s'', new = ''%s'')',
+    AddWarning(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
       [ATable.TableName, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 

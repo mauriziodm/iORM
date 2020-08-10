@@ -264,7 +264,7 @@ var
 begin
   LScript := TStringList.Create;
   try
-    io.DBBuilder.GenerateScript(LScript);
+    io.DBBuilder.GenerateScript(LScript, True, True);
     ShowMessage(LScript.Text);
     LScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_script.sql'));
   finally

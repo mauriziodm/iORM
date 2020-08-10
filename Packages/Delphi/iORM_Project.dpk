@@ -204,6 +204,7 @@ contains
   iORM.DBBuilder.DBAnalyzer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.pas',
   iORM.DBBuilder.Engine in '..\..\Source\iORM.DBBuilder.Engine.pas',
   iORM.DBBuilder.Schema.Field.ClassInfo in '..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas',
-  iORM.DBBuilder.Strategy.Base in '..\..\Source\iORM.DBBuilder.Strategy.Base.pas';
+  iORM.DBBuilder.Strategy.Base in '..\..\Source\iORM.DBBuilder.Strategy.Base.pas',
+  iORM.DB.Script in '..\..\Source\iORM.DB.Script.pas';
 
 end.

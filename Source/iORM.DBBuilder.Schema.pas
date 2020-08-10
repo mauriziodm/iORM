@@ -10,12 +10,13 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FConnectionDefName: String;
-    FIndexesEnabled, FForeignKeysEnabled: Boolean;
     FErrorMsg: String;
-    FStatus: TioDBBuilderStatus;
+    FIndexesEnabled, FForeignKeysEnabled: Boolean;
+    FSequences: TioDBBuilderSchemaSequences;
     FSqlScript: TStrings;
-    FWarnings: TStrings;
+    FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
+    FWarnings: TStrings;
     // DBExists
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
@@ -30,6 +31,8 @@ type
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function ForeignKeysEnabled: Boolean;
     function IndexesEnabled: Boolean;
+    procedure SequenceAddIfNotExists(const ASequenceName: String);
+    function Sequences: TioDBBuilderSchemaSequences;
     function SqlScript: TStrings;
     function SqlScriptEmpty: Boolean;
     function Warnings: TStrings;
@@ -55,6 +58,7 @@ constructor TioDBBuilderSchema.Create(const ASqlScriptToFill: TStrings; const AC
   const AIndexesEnabled, AForeignKeysEnabled: Boolean);
 begin
   FSqlScript := ASqlScriptToFill;
+  FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
   FStatus := dbsClean;
@@ -72,6 +76,7 @@ destructor TioDBBuilderSchema.Destroy;
 begin
   FWarnings.Free;
   FTables.Free;
+  FSequences.Free;
   inherited;
 end;
 
@@ -114,6 +119,19 @@ end;
 function TioDBBuilderSchema.IndexesEnabled: Boolean;
 begin
   Result := FIndexesEnabled;
+end;
+
+procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
+begin
+  if ASequenceName.Trim.IsEmpty then
+    raise EioException.Create(ClassName, 'SequenceAddIfNotExists', Format('Invalid sequence name "%s"', [ASequenceName]));
+  if FSequences.IndexOf(ASequenceName) = -1 then
+    FSequences.Add(ASequenceName);
+end;
+
+function TioDBBuilderSchema.Sequences: TioDBBuilderSchemaSequences;
+begin
+  Result := FSequences;
 end;
 
 procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);

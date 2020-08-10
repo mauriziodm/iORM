@@ -53,7 +53,7 @@ type
     FSelfClassName: String;
     FTranslate: Boolean;
     // Destinations
-    function Execute(const AIgnoreObjNotExists:Boolean=False): Integer;
+    procedure Execute(const AIgnoreObjNotExists:Boolean=False);
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
     // Informations
@@ -131,10 +131,10 @@ begin
   FTranslate := False;
 end;
 
-function TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean): Integer;
+procedure TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean);
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
-  Result := TioStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_Execute(Self);
+  TioStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_Execute(Self);
 end;
 
 function TioSQLDestination.GetConnectionDefName: String;

@@ -74,7 +74,7 @@ type
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
-    class function SQLDest_Execute(const ASQLDestination: IioSQLDestination): Integer; override;
+    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
   end;
 
 implementation
@@ -601,9 +601,8 @@ begin
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class function TioStrategyDB.SQLDest_Execute(const ASQLDestination: IioSQLDestination): Integer;
+class procedure TioStrategyDB.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
-  LConnection: IioConnectionDB;
   LQry: IioQuery;
 begin
   inherited;

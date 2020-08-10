@@ -24,7 +24,8 @@ begin
   inherited;
   SqlGenerator.BeginAlterTable(ATable);
   CreateFields(ATable);
-  CreateForeignKeys(ATable);
+  if Schema.ForeignKeysEnabled then
+    CreateForeignKeys(ATable);
   SqlGenerator.EndAlterTable(ATable);
 end;
 
@@ -33,7 +34,8 @@ begin
   inherited;
   SqlGenerator.BeginCreateTable(ATable);
   CreateFields(ATable);
-  CreateForeignKeys(ATable);
+  if Schema.ForeignKeysEnabled then
+    CreateForeignKeys(ATable);
   SqlGenerator.EndCreateTable(ATable);
 end;
 
@@ -43,7 +45,8 @@ begin
   SqlGenerator.ScriptBegin;
   DropIndexes;
   CreateOrAlterTables;
-  CreateIndexes;
+  if Schema.IndexesEnabled then
+    CreateIndexes;
   SqlGenerator.ScriptEnd;;
 end;
 

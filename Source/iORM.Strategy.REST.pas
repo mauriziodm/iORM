@@ -1,39 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.Strategy.REST;
 
@@ -48,28 +44,29 @@ type
   // Strategy class for database
   TioStrategyREST = class(TioStrategyIntf)
   private
-//    class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
-//    class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
-//    class function GetTransactionGUID: String;
+    // class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
+    // class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
+    // class function GetTransactionGUID: String;
   public
-    class procedure StartTransaction(const AConnectionName:String); override;
-    class procedure CommitTransaction(const AConnectionName:String); override;
-    class procedure RollbackTransaction(const AConnectionName:String); override;
-    class function InTransaction(const AConnectionName:String): boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
-    class procedure PersistCollection(const ACollection:TObject; const ARelationPropertyName:String; const ARelationOID:Integer; const ABlindInsert:Boolean); override;
+    class procedure StartTransaction(const AConnectionName: String); override;
+    class procedure CommitTransaction(const AConnectionName: String); override;
+    class procedure RollbackTransaction(const AConnectionName: String); override;
+    class function InTransaction(const AConnectionName: String): boolean; override;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const ABlindInsert: boolean); override;
+    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const ABlindInsert: boolean); override;
     class procedure DeleteObject(const AObj: TObject); override;
     class procedure DeleteCollection(const ACollection: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class procedure LoadList(const AWhere: IioWhere; const AList:TObject); override;
-    class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; override;
-    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); override;
+    class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
+    class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     // SQLDestinations
-    class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); override;
-    class function SQLDest_Execute(const ASQLDestination:IioSQLDestination): Integer; override;
+    class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
+    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
   end;
-
 
 implementation
 
@@ -82,8 +79,7 @@ uses
 
 { TioStrategyREST }
 
-class procedure TioStrategyREST.CommitTransaction(
-  const AConnectionName: String);
+class procedure TioStrategyREST.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
@@ -97,9 +93,9 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -119,13 +115,14 @@ var
 begin
   inherited;
   // Check
-  if not Assigned(ACollection) then Exit;
+  if not Assigned(ACollection) then
+    Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -146,14 +143,15 @@ var
 begin
   inherited;
   // Check
-  if not Assigned(AObj) then Exit;
+  if not Assigned(AObj) then
+    Exit;
   // Get the connection, set the request and execute it
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   LConnection := TioDBFactory.Connection(LConnectionDefName).AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -173,17 +171,16 @@ begin
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
 end;
 
-//class function TioStrategyREST.GetTransactionGUID: String;
-//begin
-//  // Set the fixed part of the TransactionGUID if empty
-//  if FTransactionGUID.IsEmpty then
-//    FTransactionGUID := Self.NewGUIDAsString;
-//  // Generate a TransactionGUID (Fixed GUID + Current thread ID
-//  Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
-//end;
+// class function TioStrategyREST.GetTransactionGUID: String;
+// begin
+// // Set the fixed part of the TransactionGUID if empty
+// if FTransactionGUID.IsEmpty then
+// FTransactionGUID := Self.NewGUIDAsString;
+// // Generate a TransactionGUID (Fixed GUID + Current thread ID
+// Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
+// end;
 
-class procedure TioStrategyREST.LoadDataSet(const AWhere: IioWhere;
-  const ADestDataSet: TFDDataSet);
+class procedure TioStrategyREST.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
   LConnection: IioConnectionREST;
 begin
@@ -191,16 +188,16 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('LoadDataSet');
     // Load the dataset
-    ADestDataset.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
+    ADestDataSet.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
     LConnection.Commit;
   except
@@ -209,8 +206,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.LoadList(const AWhere: IioWhere;
-  const AList: TObject);
+class procedure TioStrategyREST.LoadList(const AWhere: IioWhere; const AList: TObject);
 var
   LConnection: IioConnectionREST;
 begin
@@ -218,9 +214,9 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -241,13 +237,13 @@ var
   LConnection: IioConnectionREST;
 begin
   inherited;
-  result := nil;
+  Result := nil;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -266,36 +262,36 @@ begin
   end;
 end;
 
-class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere;
-  const AObj: TObject): TObject;
+class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
 begin
   // This method is only used internally by the Object Maker,
-  //  and then you do not need to implement it in RESTStrategy.
+  // and then you do not need to implement it in RESTStrategy.
   raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
-//class function TioStrategyREST.NewGUIDAsString: String;
-//var
-//  LGUID: TGUID;
-//begin
-//  CreateGUID(LGUID);
-//  Result := GUIDToString(LGUID);
-//end;
+// class function TioStrategyREST.NewGUIDAsString: String;
+// var
+// LGUID: TGUID;
+// begin
+// CreateGUID(LGUID);
+// Result := GUIDToString(LGUID);
+// end;
 
 class procedure TioStrategyREST.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const ABlindInsert: Boolean);
+  const ARelationOID: Integer; const ABlindInsert: boolean);
 var
   LConnection: IioConnectionREST;
 begin
   inherited;
   // Check
-  if not Assigned(ACollection) then Exit;
+  if not Assigned(ACollection) then
+    Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -316,21 +312,22 @@ begin
 end;
 
 class procedure TioStrategyREST.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean);
+  const ABlindInsert: boolean);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionREST;
 begin
   inherited;
   // Check
-  if not Assigned(AObj) then Exit;
+  if not Assigned(AObj) then
+    Exit;
   // Get the connection, set the request and execute it
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   LConnection := TioDBFactory.Connection(LConnectionDefName).AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -350,15 +347,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.RollbackTransaction(
-  const AConnectionName: String);
+class procedure TioStrategyREST.RollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class function TioStrategyREST.SQLDest_Execute(
-  const ASQLDestination: IioSQLDestination): Integer;
+class procedure TioStrategyREST.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
   LConnection: IioConnectionREST;
   LJSONValue: TJSONValue;
@@ -367,9 +362,9 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -378,7 +373,7 @@ begin
     // Get the number of records affected by the SQL command
     LJSONValue := LConnection.ResponseBody.JSONDataValue;
     if Assigned(LJSONValue) and (LJSONValue is TJSONNumber) then
-      Result := TJSONNumber(LJSONValue).AsInt
+//      Result := TJSONNumber(LJSONValue).AsInt
     else
       raise EioException.Create(Self.ClassName + ': wrong JSONValue (SQLDest_Execute).');
     // Commit
@@ -390,8 +385,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.SQLDest_LoadDataSet(
-  const ASQLDestination: IioSQLDestination; const ADestDataset: TFDDataSet);
+class procedure TioStrategyREST.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
   LConnection: IioConnectionREST;
 begin
@@ -399,16 +393,16 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction
-  //  NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  //       nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  //       perform any remote call to the server at this point.
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
     LConnection.RequestBody.SQLDestination := ASQLDestination;
     LConnection.Execute('SQLDestLoadDataSet');
     // Load the dataset
-    ADestDataset.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
+    ADestDataSet.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
     LConnection.Commit;
   except

@@ -36,8 +36,8 @@ type
     function FieldSubType: string;
     function FieldType: TioMetadataFieldType;
     function FieldUnicode: boolean;
-    function FieldNotNull: Boolean;
-    function PrimaryKey: Boolean;
+    function FieldNotNull: boolean;
+    function PrimaryKey: boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
@@ -57,14 +57,15 @@ type
     function Fields: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioCOntextTable;
+    function GetSequenceName: String;
     // function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
     // IsClassFromField
-    procedure SetIsClassFromField(const AValue: Boolean);
-    function GetIsClassFromField: Boolean;
-    property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
+    procedure SetIsClassFromField(const AValue: boolean);
+    function GetIsClassFromField: boolean;
+    property IsClassFromField: boolean read GetIsClassFromField write SetIsClassFromField;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
@@ -72,6 +73,7 @@ type
   end;
 
   TioDBBuilderSchemaTables = TDictionary<String, IioDBBuilderSchemaTable>;
+  TioDBBuilderSchemaSequences = TStringList;
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
@@ -80,12 +82,14 @@ type
     function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
-    function ForeignKeysEnabled: Boolean;
-    function IndexesEnabled: Boolean;
+    function ForeignKeysEnabled: boolean;
+    function IndexesEnabled: boolean;
+    procedure SequenceAddIfNotExists(const ASequenceName: String);
+    function Sequences: TioDBBuilderSchemaSequences;
     function SqlScript: TStrings;
-    function SqlScriptEmpty: Boolean;
+    function SqlScriptEmpty: boolean;
     function Warnings: TStrings;
-    function WarningExists: Boolean;
+    function WarningExists: boolean;
     function Tables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
@@ -104,21 +108,22 @@ type
   IioDBBuilderSqlGenerator = interface
     ['{9B5DE886-BE08-4422-9D6C-A92ABF948CD9}']
     // Script repated methods
+    procedure ScriptAddEmpty;
     procedure ScriptAddTitle(const AText: String);
     procedure ScriptBegin;
     procedure ScriptEnd;
     // Database related methods
-    function DatabaseExists: Boolean;
+    function DatabaseExists: boolean;
     procedure CreateDatabase;
     // Tables related methods
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): boolean;
     procedure BeginCreateTable(const ATable: IioDBBuilderSchemaTable);
     procedure EndCreateTable(const ATable: IioDBBuilderSchemaTable);
     procedure BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
     procedure EndAlterTable(const ATable: IioDBBuilderSchemaTable);
     // Fields related methods
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
+    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
     procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
@@ -130,7 +135,7 @@ type
     procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
     procedure DropAllForeignKeys; // Not implented
     // Sequences
-    procedure AddSequence(const ATable: IioDBBuilderSchemaTable);
+    procedure AddSequence(const ASequenceName: String; const ACreatingNewDatabase: boolean);
   end;
 
   IioDBBuilderDBAnalyzer = interface
@@ -150,16 +155,14 @@ type
     class function GetDBStatus(const AConnectionDefName: String = IO_CONNECTIONDEF_DEFAULTNAME): TioDBBuilderEngineResult;
       virtual; abstract;
     // Generate script
-    class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: Boolean = True;
-      const AAddForeignKeys: Boolean = True; const ARaiseIfWarningsExists: Boolean = False): TioDBBuilderEngineResult; overload;
-      virtual; abstract;
-    class function GenerateScript(const ASqlScriptToFill: TStrings; const AConnectionDefName: String; const AAddIndexes: Boolean = True;
-      const AAddForeignKeys: Boolean = True; const ARaiseIfWarningsExists: Boolean = False): TioDBBuilderEngineResult; overload;
-      virtual; abstract;
+    class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: boolean = True;
+      const AAddForeignKeys: boolean = True): TioDBBuilderEngineResult; overload; virtual; abstract;
+    class function GenerateScript(const ASqlScriptToFill: TStrings; const AConnectionDefName: String; const AAddIndexes: boolean = True;
+      const AAddForeignKeys: boolean = True): TioDBBuilderEngineResult; overload; virtual; abstract;
     // Generate DB
-    class procedure GenerateDB(const AConnectionDefName: String; const AAddIndexes: Boolean = True;
-      const AAddForeignKeys: Boolean = True; const AForce: Boolean = False); overload; virtual; abstract;
-    class procedure GenerateDB(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True; const AForce: Boolean = False);
+    class procedure GenerateDB(const AConnectionDefName: String; const AAddIndexes: boolean = True;
+      const AAddForeignKeys: boolean = True; const AForce: boolean = False); overload; virtual; abstract;
+    class procedure GenerateDB(const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True; const AForce: boolean = False);
       overload; virtual; abstract;
     class procedure GenerateDB(const AConnectionDefName: String; const AScript: TStrings); overload; virtual; abstract;
     class procedure GenerateDB(const AScript: TStrings); overload; virtual; abstract;

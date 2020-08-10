@@ -21,18 +21,20 @@ implementation
 
 procedure TioDBBuilderStrategyWithAlter.AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
+  inherited;
   SqlGenerator.BeginAlterTable(ATable);
-  CreateFields(ATable);
+  AddOrAlterFields(ATable);
   SqlGenerator.EndAlterTable(ATable);
-  CreateSequence(ATable);
 end;
 
 procedure TioDBBuilderStrategyWithAlter.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
+  inherited;
   SqlGenerator.BeginCreateTable(ATable);
   CreateFields(ATable);
   SqlGenerator.EndCreateTable(ATable);
-  CreateSequence(ATable);
+  SqlGenerator.ScriptAddEmpty;
+  SqlGenerator.AddPrimaryKey(ATable);
 end;
 
 procedure TioDBBuilderStrategyWithAlter.GenerateScript;
@@ -42,8 +44,11 @@ begin
   DropForeignKeys;
   DropIndexes;
   CreateOrAlterTables;
-  CreateIndexes;
-  CreateForeignKeys;
+  CreateSequences;
+  if Schema.IndexesEnabled then
+    CreateIndexes;
+  if Schema.ForeignKeysEnabled then
+    CreateForeignKeys;
   SqlGenerator.ScriptEnd;;
 end;
 

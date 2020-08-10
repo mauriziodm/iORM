@@ -46,7 +46,7 @@ type
     procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
     procedure DropAllForeignKeys;
     // Sequences
-    procedure AddSequence(const ATable: IioDBBuilderSchemaTable); // Not implented
+    procedure AddSequence(const ASequenceName: String; const ACreatingNewDatabase: Boolean); // Not implented
   end;
 
 implementation
@@ -63,28 +63,17 @@ begin
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
-var
-  LGuid: TGuid;
-  LFKName: string;
 begin
-  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-  CreateGUID(LGuid);
-  LFKName := LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
-  LFKName := IfThen(Length(AForeignKey.Name) <= 30, AForeignKey.Name, LFKName);
-
   ScriptAdd(Format('ALTER TABLE [%s]', [AForeignKey.DependentTableName]));
   IncIndentationLevel;
   ScriptAdd(Format(' ADD CONSTRAINT %s', [AForeignKey.Name]));
   IncIndentationLevel;
   ScriptAdd(Format('FOREIGN KEY ([%s])', [AForeignKey.DependentFieldName]));
-  IncIndentationLevel;
   ScriptAdd(Format('REFERENCES  %s ([%s])', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
   if AForeignKey.OnUpdateAction > fkUnspecified then
     ScriptAdd(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
   if AForeignKey.OnDeleteAction > fkUnspecified then
     ScriptAdd(Format('ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
-  DecIndentationLevel;
   DecIndentationLevel;
   DecIndentationLevel;
   ScriptAdd(';');
@@ -111,7 +100,7 @@ begin
     ATable.PrimaryKeyField.FieldName, ATable.PrimaryKeyField.FieldName]));
 end;
 
-procedure TioDBBuilderSqlGenMSSqlServer.AddSequence(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderSqlGenMSSqlServer.AddSequence(const ASequenceName: String; const ACreatingNewDatabase: Boolean);
 begin
   // Nothing to do
 end;
@@ -332,7 +321,7 @@ function TioDBBuilderSqlGenMSSqlServer.TableExists(const ATable: IioDBBuilderSch
 var
   LQuery: IioQuery;
 begin
-  LQuery := OpenQuery(Format('select object_id(%s)', [ATable.TableName]));
+  LQuery := OpenQuery(Format('select object_id(''%s'')', [ATable.TableName]));
   Result := not(LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 

@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.DB.Factory;
 
@@ -50,27 +48,27 @@ type
 
   TioDbFactory = class
   public
-    class function WhereItemProperty(APropertyName:String): IioSqlItemWhere;
+    class function WhereItemProperty(APropertyName: String): IioSqlItemWhere;
     class function WhereItemPropertyOID: IioSqlItemWhere;
-    class function WhereItemTValue(AValue:TValue): IioSqlItemWhere;
-    class function WhereItemPropertyEqualsTo(APropertyName:String; AValue:TValue): IioSqlItemWhere;
-    class function WhereItemPropertyOIDEqualsTo(AValue:TValue): IioSqlItemWhere;
+    class function WhereItemTValue(AValue: TValue): IioSqlItemWhere;
+    class function WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
+    class function WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
     class function CompareOperator: TioCompareOperatorRef;
     class function LogicRelation: TioLogicRelationRef;
-    class function SqlGenerator(const AConnectionName:String): TioSqlGeneratorRef;
-    class function SqlDataConverter(const AConnectionName:String): TioSqlDataConverterRef;
-    class function Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
-    class function NewConnection(const AConnectionName:String): IioConnection;
+    class function SqlGenerator(const AConnectionName: String): TioSqlGeneratorRef;
+    class function SqlDataConverter(const AConnectionName: String): TioSqlDataConverterRef;
+    class function Connection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
+    class function NewConnection(const AConnectionName: String): IioConnection;
     class function TransactionCollection: IioTransactionCollection;
-    class function Query(const AConnectionDefName:String; const AQueryIdentity:String=''): IioQuery;
+    class function Query(const AConnectionDefName: String; const AQueryIdentity: String = ''): IioQuery;
+    class function Script(const AConnectionDefName: String; const AScript: TStrings): IioScript;
     class function ConnectionContainer: TioConnectionContainerRef;
     class function ConnectionManager: TioConnectionManagerRef;
     class function QueryContainer: IioQueryContainer;
     class function QueryEngine: TioQueryEngineRef;
-    class function SQLDestination(const ASQL:String): IioSQLDestination; overload;
+    class function SQLDestination(const ASQL: String): IioSQLDestination; overload;
     class function SQLDestination(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
   end;
-
 
 implementation
 
@@ -82,7 +80,7 @@ uses
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
   iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
   iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
-  iORM.REST.Connection, iORM.DB.MSSqlServer.SqlDataConverter;
+  iORM.REST.Connection, iORM.DB.MSSqlServer.SqlDataConverter, iORM.DB.Script;
 
 { TioDbBuilder }
 
@@ -91,14 +89,14 @@ begin
   Result := TioCompareOperatorSqLite;
 end;
 
-class function TioDbFactory.Connection(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
+class function TioDbFactory.Connection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
 begin
   // If AConnectionName param is not specified (is empty) then
-  //  use the default connection def
+  // use the default connection def
   AConnectionName := Self.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionName);
   // If the connection already exists in the COnnectionContainer then return then else
-  //  create a new connection, add it to the COnnectionContainer thne return the connection
-  //  itself to the caller code
+  // create a new connection, add it to the COnnectionContainer thne return the connection
+  // itself to the caller code
   if not Self.ConnectionContainer.ConnectionExist(AConnectionName) then
     Self.ConnectionContainer.AddConnection(Self.NewConnection(AConnectionName));
   Result := Self.ConnectionContainer.GetConnection(AConnectionName);
@@ -119,13 +117,13 @@ begin
   Result := TioLogicRelationSqLite;
 end;
 
-class function TioDbFactory.NewConnection(const AConnectionName:String): IioConnection;
+class function TioDbFactory.NewConnection(const AConnectionName: String): IioConnection;
 var
   LConnectionInfo: TioConnectionInfo;
   function NewConnectionDB: IioConnectionDB;
   var
     LConnection: TioInternalSqlConnection;
-//    DBPath: String;
+    // DBPath: String;
   begin
     // Create the internal connection
     LConnection := TioInternalSqlConnection.Create(nil);
@@ -134,18 +132,21 @@ var
     // Disable Firedac MACRO
     LConnection.ResourceOptions.MacroCreate := False;
     LConnection.ResourceOptions.MacroExpand := False;
-    //LConnection.ResourceOptions.PreprocessCmdText := False;
+    // LConnection.ResourceOptions.PreprocessCmdText := False;
     // Set the monitor mode for the connection
-  {$IFDEF MSWINDOWS}
+{$IFDEF MSWINDOWS}
     case TioConnectionMonitor.mode of
-      mmDisabled: LConnection.Params.MonitorBy := mbNone;
-      mmRemote:   LConnection.Params.MonitorBy := mbRemote;
-      mmFlatFile: LConnection.Params.MonitorBy := mbFlatFile;
+      mmDisabled:
+        LConnection.Params.MonitorBy := mbNone;
+      mmRemote:
+        LConnection.Params.MonitorBy := mbRemote;
+      mmFlatFile:
+        LConnection.Params.MonitorBy := mbFlatFile;
     end;
-  {$ENDIF}
+{$ENDIF}
     // Extract the file path anche create the directory if not exists
-    //DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
-    //if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
+    // DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
+    // if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
     // Open the connection
     LConnection.Open;
     // Create the ioConnection and his QueryContainer and return it
@@ -155,6 +156,7 @@ var
   begin
     Result := TioConnectionREST.Create(LConnectionInfo);
   end;
+
 begin
   // Get connection info
   LConnectionInfo := TioConnectionManager.GetConnectionInfo(AConnectionName);
@@ -174,7 +176,7 @@ begin
   Result := TioQueryEngine;
 end;
 
-class function TioDbFactory.Query(const AConnectionDefName:String; const AQueryIdentity:String): IioQuery;
+class function TioDbFactory.Query(const AConnectionDefName: String; const AQueryIdentity: String): IioQuery;
 var
   LConnection: IioConnection;
   LQuery: IioQuery;
@@ -185,22 +187,38 @@ begin
   if not LConnection.IsDBConnection then
     raise EioException.Create(Self.ClassName + ': "Query" method: Operation not allowed by this type of connection.');
   // Else if the query is already present in the QueryContainer of the connection then
-  //  get it and return
+  // get it and return
   if LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, LQuery) then
     Exit(LQuery);
   // Else create a new query and insert it in the QueryContainer of the connection
-  //  for future use if AConnectionDefName is valid (used by DBCreator)
+  // for future use if AConnectionDefName is valid (used by DBCreator)
   Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
   if not AQueryIdentity.IsEmpty then
     LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
 end;
 
-class function TioDbFactory.SqlDataConverter(const AConnectionName:String): TioSqlDataConverterRef;
+class function TioDbFactory.Script(const AConnectionDefName: String; const AScript: TStrings): IioScript;
+var
+  LConnection: IioConnection;
+begin
+  // Get the proper connection
+  LConnection := Self.Connection(AConnectionDefName);
+  // Operation allowed only for DB connections
+  if not LConnection.IsDBConnection then
+    raise EioException.Create(Self.ClassName, 'Script' + 'Operation not allowed by this type of connection');
+  // Create the script component instance
+  Result := TioScript.Create(LConnection, AScript);
+end;
+
+class function TioDbFactory.SqlDataConverter(const AConnectionName: String): TioSqlDataConverterRef;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType of
-    cdtFirebird:  Result := TioSqlDataConverterFirebird;
-    cdtSQLite:    Result := TioSqlDataConverterSqLite;
-    cdtSQLServer: Result := TioSqlDataConverterMSSqlServer;
+    cdtFirebird:
+      Result := TioSqlDataConverterFirebird;
+    cdtSQLite:
+      Result := TioSqlDataConverterSqLite;
+    cdtSQLServer:
+      Result := TioSqlDataConverterMSSqlServer;
   else
     raise EioException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
   end;
@@ -211,18 +229,20 @@ begin
   Result := TioSQLDestination.Create(ASQL, AOwns);
 end;
 
-class function TioDbFactory.SQLDestination(
-  const ASQL: String): IioSQLDestination;
+class function TioDbFactory.SQLDestination(const ASQL: String): IioSQLDestination;
 begin
   Result := TioSQLDestination.Create(ASQL);
 end;
 
-class function TioDbFactory.SqlGenerator(const AConnectionName:String): TioSqlGeneratorRef;
+class function TioDbFactory.SqlGenerator(const AConnectionName: String): TioSqlGeneratorRef;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType of
-    cdtFirebird: Result := TioSqlGeneratorFirebird;
-    cdtSQLite:   Result := TioSqlGeneratorSqLite;
-    cdtSQLServer:Result := TioSqlGeneratorMSSqlServer;
+    cdtFirebird:
+      Result := TioSqlGeneratorFirebird;
+    cdtSQLite:
+      Result := TioSqlGeneratorSqLite;
+    cdtSQLServer:
+      Result := TioSqlGeneratorMSSqlServer;
   else
     raise EioException.Create(ClassName + ': Connection type not found (SqlGenerator).');
   end;
@@ -233,7 +253,7 @@ begin
   Result := TioTransactionCollection.Create;
 end;
 
-class function TioDbFactory.WhereItemProperty(APropertyName:String): IioSqlItemWhere;
+class function TioDbFactory.WhereItemProperty(APropertyName: String): IioSqlItemWhere;
 begin
   Result := TioSqlItemsWhereProperty.Create(APropertyName);
 end;
@@ -258,6 +278,4 @@ begin
   Result := TioSqlItemsWhereTValue.Create(AValue);
 end;
 
-
 end.
-

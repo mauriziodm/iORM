@@ -33,6 +33,7 @@ type
     function Fields: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioContextTable;
+    function GetSequenceName: String;
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
@@ -72,6 +73,7 @@ destructor TioDBBuilderSchemaTable.Destroy;
 begin
   FFields.Free;
   FForeignKeys.Free;
+  FIndexes.Free;
   inherited;
 end;
 
@@ -126,6 +128,11 @@ end;
 function TioDBBuilderSchemaTable.GetIsClassFromField: Boolean;
 begin
   Result := FIsClassFromField;
+end;
+
+function TioDBBuilderSchemaTable.GetSequenceName: String;
+begin
+  Result := FContextTable.GetKeyGenerator;
 end;
 
 function TioDBBuilderSchemaTable.GetStatus: TioDBBuilderStatus;

@@ -97,6 +97,8 @@ begin
     LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo);
   // Add indexes
   BuildIndexList(LSchemaTable, AMap);
+  // Add sequence
+  ASchema.SequenceAddIfNotExists(LSchemaTable.GetSequenceName);
 end;
 
 class procedure TioDBBuilderSchemaBuilder.BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);

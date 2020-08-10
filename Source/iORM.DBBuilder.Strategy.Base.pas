@@ -12,6 +12,7 @@ type
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
   protected
+    procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateFields(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateForeignKeys; overload; virtual;
@@ -20,7 +21,6 @@ type
     procedure CreateIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure CreateOrAlterTables; virtual;
     procedure CreateSequences; virtual;
-    procedure CreateSequence(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure DropForeignKeys; virtual;
     procedure DropIndexes; virtual;
@@ -66,7 +66,7 @@ procedure TioDBBuilderStrategyBase.CreateForeignKeys;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  SqlGenerator.ScriptAddTitle('Creating all foreign keys');
+  SqlGenerator.ScriptAddTitle('Creating foreign keys');
   for LTable in FSchema.Tables.Values do
     CreateForeignKeys(LTable);
 end;
@@ -83,7 +83,7 @@ procedure TioDBBuilderStrategyBase.CreateIndexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  SqlGenerator.ScriptAddTitle('Creating all indexes');
+  SqlGenerator.ScriptAddTitle('Creating indexes');
   for LTable in FSchema.Tables.Values do
     CreateIndexes(LTable);
 end;
@@ -94,6 +94,29 @@ var
 begin
   for LIndex in ATable.Indexes do
     FSqlGenerator.AddIndex(ATable, LIndex);
+end;
+
+procedure TioDBBuilderStrategyBase.AddOrAlterFields(const ATable: IioDBBuilderSchemaTable);
+var
+  LComma: Char;
+  LField: IioDBBuilderSchemaField;
+begin
+  LComma := ' ';
+  for LField in ATable.Fields.Values do
+  begin
+    case LField.Status of
+      dbsCreate:
+        begin
+          FSqlGenerator.AddField(LField, LComma);
+          LComma := ',';
+        end;
+      dbsAlter:
+        begin
+          FSqlGenerator.AlterField(LField, LComma);
+          LComma := ',';
+        end;
+    end;
+  end;
 end;
 
 procedure TioDBBuilderStrategyBase.CreateOrAlterTables;
@@ -111,18 +134,15 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateSequence(const ATable: IioDBBuilderSchemaTable);
-begin
-  FSqlGenerator.AddSequence(ATable);
-end;
-
 procedure TioDBBuilderStrategyBase.CreateSequences;
 var
-  LTable: IioDBBuilderSchemaTable;
+  LSequence: String;
 begin
-  SqlGenerator.ScriptAddTitle('Creating all sequences');
-  for LTable in FSchema.Tables.Values do
-    CreateSequence(LTable);
+  if FSchema.Sequences.Count = 0 then
+    Exit;
+  SqlGenerator.ScriptAddTitle('Creating sequences (if empty, no sequence needs to be created)');
+  for LSequence in FSchema.Sequences do
+    SqlGenerator.AddSequence(LSequence, FSchema.Status = dbsCreate);
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -134,7 +154,7 @@ procedure TioDBBuilderStrategyBase.DropForeignKeys;
 begin
   if FSchema.Status = dbsCreate then
     Exit;
-  FSqlGenerator.ScriptAddTitle('Dropping all foreign keys');
+  FSqlGenerator.ScriptAddTitle('Dropping foreign keys');
   FSqlGenerator.DropAllForeignKeys;
 end;
 
@@ -142,7 +162,7 @@ procedure TioDBBuilderStrategyBase.DropIndexes;
 begin
   if FSchema.Status = dbsCreate then
     Exit;
-  SqlGenerator.ScriptAddTitle('Dropping all indexes');
+  SqlGenerator.ScriptAddTitle('Dropping indexes');
   SqlGenerator.DropAllIndexes;
 end;
 

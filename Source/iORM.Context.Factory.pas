@@ -540,9 +540,6 @@ begin
         LIndexList.Add(ioIndex(LAttr));
       end;
     end;
-    // KeyGenerator
-    if LKeyGenerator.IsEmpty then
-      LKeyGenerator := LTableName;
     // Create result Properties object
     Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode,
       LAutoCreateDB, Typ);
