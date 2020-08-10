@@ -19,6 +19,9 @@ type
 
 implementation
 
+uses
+  iORM;
+
 { TioDBBuilderDBAnalyzer }
 
 constructor TioDBBuilderDBAnalyzer.Create(const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
@@ -34,18 +37,30 @@ begin
   // Analyze if the database exists and set  it's status
   if not FSqlGenerator.DatabaseExists then
     FSchema.Status := dbsCreate;
-  // Loop for all tables
-  for LTable in FSchema.Tables.Values do
-  begin
-    // Analyze the table and set it's status
-    // Note: If the schema status is dbsCreate then all the tables must be dbsCreate (obviously)
-    if (FSchema.Status = dbsCreate) or not FSqlGenerator.TableExists(LTable) then
-      LTable.Status := dbsCreate
-    else
-      AnalyzeFields(LTable);
-    // If the table status is not dbsClean then schema status became dbsAlter
-    if LTable.Status > dbsClean then
-      FSchema.Status := dbsAlter;
+  // Start the transaction (if the DB already exists otherwise an error would occur)
+  if FSchema.Status <> dbsCreate then
+    io.StartTransaction(FSchema.ConnectionDefName);
+  try
+    // Loop for all tables
+    for LTable in FSchema.Tables.Values do
+    begin
+      // Analyze the table and set it's status
+      // Note: If the schema status is dbsCreate then all the tables must be dbsCreate (obviously)
+      if (FSchema.Status = dbsCreate) or not FSqlGenerator.TableExists(LTable) then
+        LTable.Status := dbsCreate
+      else
+        AnalyzeFields(LTable);
+      // If the table status is not dbsClean then schema status became dbsAlter
+      if LTable.Status > dbsClean then
+        FSchema.Status := dbsAlter;
+    end;
+    // Commit or rollback the transaction (if in transaction)
+    if FSchema.Status <> dbsCreate then
+      io.CommitTransaction(FSchema.ConnectionDefName);
+  except
+    // Commit or rollback the transaction (if in transaction)
+    if FSchema.Status <> dbsCreate then
+      io.RollbackTransaction(FSchema.ConnectionDefName);
   end;
 end;
 

@@ -50,7 +50,13 @@ end;
 
 procedure TioScript.Execute;
 begin
-  FScriptComponent.ExecuteScript(FScript);
+  FConnectionComponent.StartTransaction;
+  try
+    FScriptComponent.ExecuteScript(FScript);
+    FConnectionComponent.Commit;
+  except
+    FConnectionComponent.Rollback;
+  end;
 end;
 
 procedure TioScript.LoadScriptAndCleanFromComments(const ASourceScript: TStrings);
