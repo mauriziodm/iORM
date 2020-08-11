@@ -84,12 +84,6 @@ type
     class procedure RollbackTransaction(const AConnectionName: String = '');
     class function InTransaction(const AConnectionName: String = ''): Boolean;
     class function DBBuilder: TioDBBuilderEngineRef;
-    class function GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
-      AScriptOnly: Boolean; out OOutputScript, OErrorMessage: String): Boolean; overload;
-    class function GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
-      AScriptOnly: Boolean; const ARaiseExceptionIfNotAvailable: Boolean = True): string; overload;
-    class function GenerateDB(const ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly: Boolean;
-      const ARaiseExceptionIfNotAvailable: Boolean = True): string; overload; // Default connection only
     class function Connections: TioConnectionManagerRef;
     class function Where: IioWhere; overload;
     class function Where<T>: IioWhere<T>; overload;
@@ -509,32 +503,6 @@ end;
 class procedure io.StartTransaction(const AConnectionName: String);
 begin
   TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
-end;
-
-class function io.GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
-  AScriptOnly: Boolean; out OOutputScript, OErrorMessage: String): Boolean;
-//var
-//  LDBBuilder: IioDBBuilder;
-begin
-//  LDBBuilder := TioDBBuilderFactory.NewBuilder(AConnectionName, ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly);
-//  Result := LDBBuilder.GenerateDB(OOutputScript, OErrorMessage);
-end;
-
-class function io.GenerateDB(const AConnectionName: String; const ACreateIndexes, ACreateReferentialIntegrityConstraints,
-  AScriptOnly: Boolean; const ARaiseExceptionIfNotAvailable: Boolean): string;
-var
-  LError: String;
-begin
-  if (not GenerateDB(AConnectionName, ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly, Result, LError))
-    and ARaiseExceptionIfNotAvailable
-  then
-    raise EioException.Create(Self.ClassName, 'GenerateDB', LError);
-end;
-
-class function io.GenerateDB(const ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly: Boolean;
-  const ARaiseExceptionIfNotAvailable: Boolean): String;
-begin
-  Result := GenerateDB('', ACreateIndexes, ACreateReferentialIntegrityConstraints, AScriptOnly, ARaiseExceptionIfNotAvailable);
 end;
 
 class procedure io.CommitTransaction(const AConnectionName: String);

@@ -10,7 +10,6 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FConnectionDefName: String;
-    FErrorMsg: String;
     FIndexesEnabled, FForeignKeysEnabled: Boolean;
     FSequences: TioDBBuilderSchemaSequences;
     FSqlScript: TStrings;
@@ -26,7 +25,6 @@ type
     destructor Destroy; override;
     function ConnectionDefName: String;
     function DatabaseFileName: String;
-    function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function ForeignKeysEnabled: Boolean;
@@ -78,11 +76,6 @@ begin
   FTables.Free;
   FSequences.Free;
   inherited;
-end;
-
-function TioDBBuilderSchema.ErrorMsg: String;
-begin
-  Result := FErrorMsg;
 end;
 
 function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;

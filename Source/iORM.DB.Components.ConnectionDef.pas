@@ -279,8 +279,8 @@ var
   LError: String;
 begin
   try
-    io.GenerateDB(Self.Name, FAutoCreateDB.Indexes, FAutoCreateDB.ReferentialIntegrityConstraints, FAutoCreateDB.ScriptOnly,
-      Result, LError);
+//    io.GenerateDB(Self.Name, FAutoCreateDB.Indexes, FAutoCreateDB.ReferentialIntegrityConstraints, FAutoCreateDB.ScriptOnly,
+//      Result, LError);
   finally
     if Assigned(FOnAfterCreateDBEvent) then
       FOnAfterCreateDBEvent(Self, Result, LError);

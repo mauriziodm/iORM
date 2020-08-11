@@ -79,7 +79,6 @@ type
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     function ConnectionDefName: String;
     function DatabaseFileName: String;
-    function ErrorMsg: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function ForeignKeysEnabled: boolean;
