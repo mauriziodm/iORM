@@ -742,12 +742,12 @@ end;
 
 class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
 begin
-  GlobalFactory.DBBuilderFactory.NewEngine(AConnectionDefName, AAddIndexes, AAddForeignKeys);
+  Result := GlobalFactory.DBBuilderFactory.NewEngine(AConnectionDefName, AAddIndexes, AAddForeignKeys);
 end;
 
 class function io.DBBuilder(const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
 begin
-  GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
+  Result := GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
 end;
 
 class procedure io.Delete(const AIntfObj: IInterface);

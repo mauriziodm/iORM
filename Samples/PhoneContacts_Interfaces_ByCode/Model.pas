@@ -30,7 +30,7 @@ type
     constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer; NewID: Integer = 0); overload;
     destructor Destroy; override;
     property ID: Integer read GetID write SetID;
-//    [ioForeignKey(fkCascade, fkcascade)]
+    [ioForeignKey(fkCascade, fkcascade)]
     property PersonID:Integer read GetPersonID write SetPersonID;
     property PhoneType:String read FPhoneType write FPhoneType;
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
@@ -41,7 +41,9 @@ type
   TPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;
+//    [ioFTVarChar(50)]
     FLastName: String;
+//    [ioFTVarChar(50)]
     FFirstName: String;
     [ioHasMany(IPhoneNumber, 'PersonID')]
     FPhones: IioList<IPhoneNumber>;
