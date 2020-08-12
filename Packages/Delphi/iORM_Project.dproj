@@ -234,13 +234,6 @@
         <DCCReference Include="..\..\Source\iORM.DB.Components.ConnectionDef.MSSQLServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.MSSqlServer.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.Engine.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.Firebird.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.SqLite.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DBBuilder.Custom.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Table.pas"/>

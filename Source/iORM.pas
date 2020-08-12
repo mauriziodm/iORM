@@ -55,22 +55,23 @@ type
   // iORM
   io = class
   public
-    class function di: TioDependencyInjectionRef;
-    class function GlobalFactory: TioGlobalFactoryRef;
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
     class function RefTo(const AWhere: IioWhere): IioWhere; overload;
+
     class function Load(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const ATypeInfo: PTypeInfo; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AIID: TGUID; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
     class function Load(const AWhere: IioWhere): IioWhere; overload;
+
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
     class procedure DeleteCollection(const ACollection: TObject); overload;
     class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
+
     class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); overload;
     class procedure Persist(const AObj: TObject; const ABlindInsert: Boolean = False); overload;
@@ -79,28 +80,39 @@ type
       const ABlindInsert: Boolean); overload;
     class procedure PersistCollection(const ACollection: TObject; const ABlindInsert: Boolean = False); overload;
     class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: Boolean = False); overload;
+
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
     class procedure RollbackTransaction(const AConnectionName: String = '');
     class function InTransaction(const AConnectionName: String = ''): Boolean;
-    class function DBBuilder: TioDBBuilderEngineRef;
+
     class function Connections: TioConnectionManagerRef;
+
     class function Where: IioWhere; overload;
     class function Where<T>: IioWhere<T>; overload;
     class function Where(const ATextCondition: String): IioWhere; overload;
     class function Where<T>(const ATextCondition: String): IioWhere<T>; overload;
+
     class function SQL(const ASQL: String): IioSQLDestination; overload;
     class function SQL(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
-    class function Mapper: omRef;
+
     class procedure SetWaitProc(const AShowWaitProc: TProc = nil; const AHideWaitProc: TProc = nil);
     class procedure ShowWait;
     class procedure HideWait;
-    class procedure HandleException(Sender: TObject);
-    class procedure ShowMessage(const AMessage: String);
-    class function TerminateApplication: Boolean;
+
+    class function DBBuilder(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine; overload;
+    class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True)
+      : IioDBBuilderEngine; overload;
+
+    class function di: TioDependencyInjectionRef;
     class function ExtractOID(const AObj: TObject): Integer; overload;
     class function ExtractOID(const AIntfObj: IInterface): Integer; overload;
+    class function GlobalFactory: TioGlobalFactoryRef;
+    class procedure HandleException(Sender: TObject);
+    class function Mapper: omRef;
+    class procedure ShowMessage(const AMessage: String);
+    class function TerminateApplication: Boolean;
 
     // Create instance
     class function Create<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
@@ -728,9 +740,14 @@ begin
   TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj);
 end;
 
-class function io.DBBuilder: TioDBBuilderEngineRef;
+class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
 begin
-  Result := TioDBBuilderFactory.NewEngine;
+  GlobalFactory.DBBuilderFactory.NewEngine(AConnectionDefName, AAddIndexes, AAddForeignKeys);
+end;
+
+class function io.DBBuilder(const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
+begin
+  GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
 end;
 
 class procedure io.Delete(const AIntfObj: IInterface);

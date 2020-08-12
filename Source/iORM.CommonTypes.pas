@@ -79,9 +79,6 @@ type
   // Some pointers to TValue
   PValue = ^TValue;
 
-  // DBBuilder engine result type
-  TioDBBuilderEngineResult = (dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
-
   // Nullables
   TioNullable<T> = record
   const

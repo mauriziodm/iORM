@@ -36,9 +36,9 @@ var
 begin
   // Analyze if the database exists and set  it's status
   if not FSqlGenerator.DatabaseExists then
-    FSchema.Status := dbsCreate;
+    FSchema.Status := stCreate;
   // Start the transaction (if the DB already exists otherwise an error would occur)
-  if FSchema.Status <> dbsCreate then
+  if FSchema.Status <> stCreate then
     io.StartTransaction(FSchema.ConnectionDefName);
   try
     // Loop for all tables
@@ -46,20 +46,20 @@ begin
     begin
       // Analyze the table and set it's status
       // Note: If the schema status is dbsCreate then all the tables must be dbsCreate (obviously)
-      if (FSchema.Status = dbsCreate) or not FSqlGenerator.TableExists(LTable) then
-        LTable.Status := dbsCreate
+      if (FSchema.Status = stCreate) or not FSqlGenerator.TableExists(LTable) then
+        LTable.Status := stCreate
       else
         AnalyzeFields(LTable);
       // If the table status is not dbsClean then schema status became dbsAlter
-      if LTable.Status > dbsClean then
-        FSchema.Status := dbsAlter;
+      if LTable.Status > stClean then
+        FSchema.Status := stAlter;
     end;
     // Commit or rollback the transaction (if in transaction)
-    if FSchema.Status <> dbsCreate then
+    if FSchema.Status <> stCreate then
       io.CommitTransaction(FSchema.ConnectionDefName);
   except
     // Commit or rollback the transaction (if in transaction)
-    if FSchema.Status <> dbsCreate then
+    if FSchema.Status <> stCreate then
       io.RollbackTransaction(FSchema.ConnectionDefName);
   end;
 end;
@@ -73,14 +73,14 @@ begin
   begin
     // Analyze the field and set it's status
     if not FSqlGenerator.FieldExists(ATable, LField) then
-      LField.Status := dbsCreate
+      LField.Status := stCreate
     else
     if FSqlGenerator.FieldModified(ATable, LField) then
-      LField.Status := dbsAlter;
+      LField.Status := stAlter;
     // If the field status is not dbsClean (field modified) then
     //  table status became dbsAlter
-    if LField.Status > dbsClean then
-      ATable.Status := dbsAlter;
+    if LField.Status > stClean then
+      ATable.Status := stAlter;
   end;
 end;
 

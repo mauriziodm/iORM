@@ -10,11 +10,12 @@ type
 
   TioDBBuilderFactory = class
   public
-    class function NewEngine: TioDBBuilderEngineRef;
+    class function NewEngine(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine; overload;
+    class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True)
+      : IioDBBuilderEngine; overload;
     class function NewDBAnalyzer(const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator)
       : IioDBBuilderDBAnalyzer;
-    class function NewSchema(const ASqlScriptToFill: TStrings; const AConnectionDefName: String;
-      const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
+    class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioContextProperty): IioDBBuilderSchemaField;
     class function NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
@@ -42,15 +43,21 @@ begin
   Result := TioDBBuilderDBAnalyzer.Create(ASchema, ASqlGenerator);
 end;
 
-class function TioDBBuilderFactory.NewEngine: TioDBBuilderEngineRef;
+class function TioDBBuilderFactory.NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean;
+  const AAddForeignKeys: Boolean): IioDBBuilderEngine;
 begin
-  Result := TioDBBuilderEngine;
+  Result := TioDBBuilderEngine.Create(AConnectionDefName, AAddIndexes, AAddForeignKeys);
 end;
 
-class function TioDBBuilderFactory.NewSchema(const ASqlScriptToFill: TStrings; const AConnectionDefName: String;
-  const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
+class function TioDBBuilderFactory.NewEngine(const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
 begin
-  Result := TioDBBuilderSchema.Create(ASqlScriptToFill, AConnectionDefName, AIndexesEnabled, AForeignKeysEnabled);
+  Result := NewEngine('', AAddIndexes, AAddForeignKeys);
+end;
+
+class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean)
+  : IioDBBuilderSchema;
+begin
+  Result := TioDBBuilderSchema.Create(AConnectionDefName, AIndexesEnabled, AForeignKeysEnabled);
   NewSchemaBuilder.BuildSchema(Result);
 end;
 

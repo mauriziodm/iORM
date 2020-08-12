@@ -87,17 +87,17 @@ uses
 
 procedure TioDBBuilderSqlGenBase.ScriptAddComment(const AText: String);
 begin
-  FSchema.SqlScript.Add('-- ' + AText);
+  FSchema.Script.Add('-- ' + AText);
 end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAddEmpty;
 begin
-  FSchema.SqlScript.Add('');
+  FSchema.Script.Add('');
 end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAddSeparator;
 begin
-  FSchema.SqlScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
+  FSchema.Script.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
 end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAddTitle(const AText: String);
@@ -111,7 +111,7 @@ end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAddWarning(const AText: String);
 begin
-  FSchema.SqlScript.Add('-- WARNING:  ' + AText);
+  FSchema.Script.Add('-- WARNING:  ' + AText);
 end;
 
 function TioDBBuilderSqlGenBase.TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
@@ -294,7 +294,7 @@ end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAdd(const AText: String);
 begin
-  FSchema.SqlScript.Add(GetIndentation + AText);
+  FSchema.Script.Add(GetIndentation + AText);
 end;
 
 procedure TioDBBuilderSqlGenBase.ScriptAddAllWarnings;

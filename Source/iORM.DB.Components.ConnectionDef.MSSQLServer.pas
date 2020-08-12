@@ -41,7 +41,7 @@ interface
 
 uses
   FireDAC.Phys.MSSQL,  // For compatibility with FireDAC without need to put then Phys driver in the project
-  iORM.DB.Components.ConnectionDef, System.SysUtils;
+  iORM.DB.Components.ConnectionDef, System.SysUtils, iORM.DBBuilder.Interfaces;
 
 type
 
@@ -49,9 +49,12 @@ type
   TioSQLServerConnectionDef = class(TioCustomConnectionDef)
   public
     procedure RegisterConnectionDef; override;
+    function DBBuilder: IioDBBuilderEngine; override;
+    // Properties
     property ConnectionDef;
   published
     // Properties
+    property AutoCreateDB;
     property Database;
     property DatabaseStdFolder;
     property DefaultConnection;
@@ -62,6 +65,9 @@ type
     property Pooled;
     property Server;
     property UserName;
+    // Events
+    property OnAfterCreateOrAlterDB;
+    property OnBeforeCreateOrAlterDB;
   end;
 
 implementation
@@ -70,6 +76,12 @@ uses
   iORM.DB.ConnectionContainer;
 
 { TioSQLServerConnectionDef }
+
+function TioSQLServerConnectionDef.DBBuilder: IioDBBuilderEngine;
+begin
+  inherited;
+  // Only to elevate the method visibility
+end;
 
 procedure TioSQLServerConnectionDef.RegisterConnectionDef;
 begin

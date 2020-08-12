@@ -43,7 +43,7 @@ uses
   iORM.LiveBindings.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM.MVVM.Factory, iORM.Containers.Factory,
   iORM.Where.Factory, iORM.Strategy.Interfaces, iORM.Strategy.Factory,
-  iORM.DB.DBBuilder.Factory;
+  iORM.DBBuilder.Factory;
 
 Type
 
@@ -73,7 +73,7 @@ Type
     class function MVVMFactory: TioMVVMFactoryRef;
     class function ContainersFactory: TioContainersFactoryRef;
     class function WhereFactory: TioWhereFactoryRef;
-    class function Strategy: TioStrategyFactoryRef;
+    class function StrategyFactory: TioStrategyFactoryRef;
   end;
 
   TioGlobalFactoryRef = class of TioGlobalFactory;
@@ -132,7 +132,7 @@ begin
   Result := TioRttiContextFactory;
 end;
 
-class function TioGlobalFactory.Strategy: TioStrategyFactoryRef;
+class function TioGlobalFactory.StrategyFactory: TioStrategyFactoryRef;
 begin
   Result := TioStrategyFactory;
 end;

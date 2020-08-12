@@ -105,12 +105,12 @@ begin
   for LField in ATable.Fields.Values do
   begin
     case LField.Status of
-      dbsCreate:
+      stCreate:
         begin
           FSqlGenerator.AddField(LField, LComma);
           LComma := ',';
         end;
-      dbsAlter:
+      stAlter:
         begin
           FSqlGenerator.AlterField(LField, LComma);
           LComma := ',';
@@ -126,9 +126,9 @@ begin
   for LTable in FSchema.Tables.Values do
   begin
     case LTable.Status of
-      dbsCreate:
+      stCreate:
         CreateTable(LTable);
-      dbsAlter:
+      stAlter:
         AlterTable(LTable);
     end;
   end;
@@ -142,7 +142,7 @@ begin
     Exit;
   SqlGenerator.ScriptAddTitle('Creating sequences (if empty, no sequence needs to be created)');
   for LSequence in FSchema.Sequences do
-    SqlGenerator.AddSequence(LSequence, FSchema.Status = dbsCreate);
+    SqlGenerator.AddSequence(LSequence, FSchema.Status = stCreate);
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -152,7 +152,7 @@ end;
 
 procedure TioDBBuilderStrategyBase.DropForeignKeys;
 begin
-  if FSchema.Status = dbsCreate then
+  if FSchema.Status = stCreate then
     Exit;
   FSqlGenerator.ScriptAddTitle('Dropping foreign keys');
   FSqlGenerator.DropAllForeignKeys;
@@ -160,7 +160,7 @@ end;
 
 procedure TioDBBuilderStrategyBase.DropIndexes;
 begin
-  if FSchema.Status = dbsCreate then
+  if FSchema.Status = stCreate then
     Exit;
   SqlGenerator.ScriptAddTitle('Dropping indexes');
   SqlGenerator.DropAllIndexes;

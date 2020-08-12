@@ -181,7 +181,7 @@ begin
   LComma := ' ';
   for LField in ATable.Fields.Values do
   begin
-    if LField.Status = dbsCreate then
+    if LField.Status = stCreate then
       Continue;
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';
@@ -192,7 +192,7 @@ begin
   LComma := ' ';
   for LField in ATable.Fields.Values do
   begin
-    if LField.Status = dbsCreate then
+    if LField.Status = stCreate then
       Continue;
     ScriptAdd(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ',';

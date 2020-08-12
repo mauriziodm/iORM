@@ -9,7 +9,8 @@ uses
   System.Rtti, System.Bindings.Outputs, FMX.Bind.Editors, Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, FMX.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
-  FMX.Controls.Presentation, Interfaces, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
+  FMX.Controls.Presentation, Interfaces, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX,
+  iORM.DBBuilder.Interfaces;
 
 type
   TMainForm = class(TForm)
@@ -48,6 +49,7 @@ type
     ButtonAnalyze: TButton;
     ButtonGenerateDB: TButton;
     FirebirdConn: TioFirebirdConnectionDef;
+    ButtonDBBuilderReset: TButton;
     procedure TabControl1Gesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -71,8 +73,12 @@ type
     procedure ButtonGenerateScriptClick(Sender: TObject);
     procedure ButtonAnalyzeClick(Sender: TObject);
     procedure ButtonGenerateDBClick(Sender: TObject);
+    procedure ButtonDBBuilderResetClick(Sender: TObject);
+    procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+      const AScript, AWarnings: TStrings; var AAbort: Boolean);
   private
     { Private declarations }
+    FDBBuilderEngine: IioDBBuilderEngine;
   public
     { Public declarations }
   end;
@@ -229,22 +235,13 @@ begin
 end;
 
 procedure TMainForm.ButtonAnalyzeClick(Sender: TObject);
-var
-  LDBStatus: TioDBBuilderEngineResult;
-  LMessage: String;
 begin
-  LDBStatus := io.DBBuilder.GetDBStatus;
-  case LDBStatus of
-    dbUptodate:
-      LMessage := 'The database is uptodate.';
-    dbNotExists:
-      LMessage := 'The database need to created.';
-    dbUpdatesNeeded:
-      LMessage := 'The database need updates.';
-    dbWarningExists:
-      LMessage := 'The database need updates but WARNINGS exists.';
-  end;
-  ShowMessage(LMessage);
+  ShowMessage(FDBBuilderEngine.StatusDescription);
+end;
+
+procedure TMainForm.ButtonDBBuilderResetClick(Sender: TObject);
+begin
+  FDBBuilderEngine := io.DBBuilder;
 end;
 
 procedure TMainForm.ButtonDropIndexClick(Sender: TObject);
@@ -254,7 +251,7 @@ end;
 
 procedure TMainForm.ButtonGenerateDBClick(Sender: TObject);
 begin
-  io.DBBuilder.GenerateDB(True, True, False);
+  FDBBuilderEngine.CreateOrAlterDB(False);
   ShowMessage('Operazione completata');
 end;
 
@@ -262,14 +259,8 @@ procedure TMainForm.ButtonGenerateScriptClick(Sender: TObject);
 var
   LScript: TStrings;
 begin
-  LScript := TStringList.Create;
-  try
-    io.DBBuilder.GenerateScript(LScript, True, True);
-    ShowMessage(LScript.Text);
-    LScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_script.sql'));
-  finally
-    LScript.Free;
-  end;
+  FDBBuilderEngine.Script.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_script.sql'));
+  ShowMessage(FDBBuilderEngine.Script.Text);
 end;
 
 procedure TMainForm.ButtonSQLDestinationClick(Sender: TObject);
@@ -283,6 +274,13 @@ begin
   finally
     LQry.Free;
   end;
+end;
+
+procedure TMainForm.FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  const AScript, AWarnings: TStrings; var AAbort: Boolean);
+begin
+  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_script.sql'));
+  ShowMessage('Database status = ' + AScript.Text);
 end;
 
 procedure TMainForm.LoadSingleByPropertyClick(Sender: TObject);

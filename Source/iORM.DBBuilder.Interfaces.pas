@@ -4,11 +4,12 @@ interface
 
 uses
   System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
-  iORM.Context.Map.Interfaces, iORM.Attributes, iORM.CommonTypes, System.Rtti;
+  iORM.Context.Map.Interfaces, iORM.Attributes, System.Rtti, iORM.CommonTypes;
 
 type
 
-  TioDBBuilderStatus = (dbsClean, dbsAlter, dbsCreate);
+  TioDBBuilderEngineResult = (dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
+  TioDBBuilderStatus = (stClean, stAlter, stCreate);
   TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
 
@@ -85,8 +86,8 @@ type
     function IndexesEnabled: boolean;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     function Sequences: TioDBBuilderSchemaSequences;
-    function SqlScript: TStrings;
-    function SqlScriptEmpty: boolean;
+    function Script: TStrings;
+    function ScriptIsEmpty: boolean;
     function Warnings: TStrings;
     function WarningExists: boolean;
     function Tables: TioDBBuilderSchemaTables;
@@ -147,24 +148,16 @@ type
     procedure GenerateScript;
   end;
 
-  TioDBBuilderEngineRef = class of TioDBBuilderEngineIntf;
-
-  TioDBBuilderEngineIntf = class abstract
-  public
-    class function GetDBStatus(const AConnectionDefName: String = IO_CONNECTIONDEF_DEFAULTNAME): TioDBBuilderEngineResult;
-      virtual; abstract;
-    // Generate script
-    class function GenerateScript(const ASqlScriptToFill: TStrings; const AAddIndexes: boolean = True;
-      const AAddForeignKeys: boolean = True): TioDBBuilderEngineResult; overload; virtual; abstract;
-    class function GenerateScript(const ASqlScriptToFill: TStrings; const AConnectionDefName: String; const AAddIndexes: boolean = True;
-      const AAddForeignKeys: boolean = True): TioDBBuilderEngineResult; overload; virtual; abstract;
-    // Generate DB
-    class procedure GenerateDB(const AConnectionDefName: String; const AAddIndexes: boolean = True;
-      const AAddForeignKeys: boolean = True; const AForce: boolean = False); overload; virtual; abstract;
-    class procedure GenerateDB(const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True; const AForce: boolean = False);
-      overload; virtual; abstract;
-    class procedure GenerateDB(const AConnectionDefName: String; const AScript: TStrings); overload; virtual; abstract;
-    class procedure GenerateDB(const AScript: TStrings); overload; virtual; abstract;
+  IioDBBuilderEngine = interface
+    ['{E7BC9176-4C71-48CA-A92F-37DE99E0AC3A}']
+    procedure Analyze;
+    function Schema: IioDBBuilderSchema;
+    function Script: TStrings;
+    function Status: TioDBBuilderEngineResult;
+    function StatusAsString: String;
+    function StatusDescription: String;
+    function Warnings: TStrings;
+    procedure CreateOrAlterDB(const AForce: Boolean = False);
   end;
 
 implementation

@@ -191,7 +191,7 @@ begin
   if LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, LQuery) then
     Exit(LQuery);
   // Else create a new query and insert it in the QueryContainer of the connection
-  // for future use if AConnectionDefName is valid (used by DBCreator)
+  // for future use if AConnectionDefName is valid
   Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
   if not AQueryIdentity.IsEmpty then
     LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);

@@ -61,7 +61,7 @@ end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable);
 begin
-  FStatus := dbsClean;
+  FStatus := stClean;
   FContextTable := AContextTable;
   FIsClassFromField := AContextTable.IsClassFromField;
   FFields := TioDBBuilderSchemaFields.Create;

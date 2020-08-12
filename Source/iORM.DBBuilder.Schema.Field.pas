@@ -50,7 +50,7 @@ end;
 
 constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioContextProperty);
 begin
-  FStatus := dbsClean;
+  FStatus := stClean;
   FContextProperty := AContextProperty;
 end;
 

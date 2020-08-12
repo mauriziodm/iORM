@@ -12,7 +12,7 @@ type
     FConnectionDefName: String;
     FIndexesEnabled, FForeignKeysEnabled: Boolean;
     FSequences: TioDBBuilderSchemaSequences;
-    FSqlScript: TStrings;
+    FScript: TStrings;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     FWarnings: TStrings;
@@ -20,8 +20,7 @@ type
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create(const ASqlScriptToFill: TStrings; const AConnectionDefName: String;
-      const AIndexesEnabled, AForeignKeysEnabled: Boolean);
+    constructor Create(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean);
     destructor Destroy; override;
     function ConnectionDefName: String;
     function DatabaseFileName: String;
@@ -31,8 +30,8 @@ type
     function IndexesEnabled: Boolean;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     function Sequences: TioDBBuilderSchemaSequences;
-    function SqlScript: TStrings;
-    function SqlScriptEmpty: Boolean;
+    function Script: TStrings;
+    function ScriptIsEmpty: Boolean;
     function Warnings: TStrings;
     function WarningExists: Boolean;
     function Tables: TioDBBuilderSchemaTables;
@@ -52,14 +51,13 @@ begin
   Result := FConnectionDefName;
 end;
 
-constructor TioDBBuilderSchema.Create(const ASqlScriptToFill: TStrings; const AConnectionDefName: String;
-  const AIndexesEnabled, AForeignKeysEnabled: Boolean);
+constructor TioDBBuilderSchema.Create(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean);
 begin
-  FSqlScript := ASqlScriptToFill;
+  FScript := TStringList.Create;
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
-  FStatus := dbsClean;
+  FStatus := stClean;
   FConnectionDefName := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionDefName);
   FWarnings := TStringList.Create;
   FTables := TioDBBuilderSchemaTables.Create;
@@ -75,6 +73,7 @@ begin
   FWarnings.Free;
   FTables.Free;
   FSequences.Free;
+  FScript.Free;
   inherited;
 end;
 
@@ -133,14 +132,14 @@ begin
     FStatus := AValue;
 end;
 
-function TioDBBuilderSchema.SqlScript: TStrings;
+function TioDBBuilderSchema.Script: TStrings;
 begin
-  Result := FSqlScript;
+  Result := FScript;
 end;
 
-function TioDBBuilderSchema.SqlScriptEmpty: Boolean;
+function TioDBBuilderSchema.ScriptIsEmpty: Boolean;
 begin
-  Result := FSqlScript.Count = 0;
+  Result := FScript.Count = 0;
 end;
 
 function TioDBBuilderSchema.Tables: TioDBBuilderSchemaTables;

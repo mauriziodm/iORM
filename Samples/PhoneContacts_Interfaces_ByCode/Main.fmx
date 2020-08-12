@@ -42,7 +42,7 @@ object MainForm: TMainForm
       ExplicitSize.cy = 49.000000000000000000
       object Edit1: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 18
+        TabOrder = 19
         Text = '1'
         TextSettings.HorzAlign = Center
         Position.X = 8.000000000000000000
@@ -57,7 +57,7 @@ object MainForm: TMainForm
         Size.Width = 137.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 17
+        TabOrder = 18
         Text = 'by Class'
         OnClick = Button1Click
       end
@@ -67,7 +67,7 @@ object MainForm: TMainForm
         Size.Width = 137.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 16
+        TabOrder = 17
         Text = 'by Interface'
         OnClick = Button2Click
       end
@@ -77,7 +77,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 15
+        TabOrder = 16
         Text = 'TObjectList<TPerson>'
         OnClick = Button3Click
       end
@@ -87,7 +87,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 14
+        TabOrder = 15
         Text = 'TioInterfacedList<IPerson>'
         OnClick = Button4Click
       end
@@ -97,7 +97,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 13
+        TabOrder = 14
         Text = 'IioList<IPerson>'
         OnClick = Button5Click
       end
@@ -107,7 +107,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 12
+        TabOrder = 13
         Text = 'IioList<ICustomer>'
         OnClick = Button6Click
       end
@@ -117,7 +117,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 11
+        TabOrder = 12
         Text = 'IioList<IPerson> alias Customer'
         OnClick = Button7Click
       end
@@ -127,7 +127,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 10
+        TabOrder = 11
         Text = 'IioList<IPerson> details where'
         OnClick = Button10Click
       end
@@ -137,7 +137,7 @@ object MainForm: TMainForm
         Size.Width = 353.000000000000000000
         Size.Height = 44.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 9
+        TabOrder = 10
         Text = 'Where Instance'
         OnClick = Button11Click
       end
@@ -147,7 +147,7 @@ object MainForm: TMainForm
         Size.Width = 81.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 8
+        TabOrder = 9
         Text = 'SQL1'
         OnClick = ButtonSQLDestinationClick
       end
@@ -157,7 +157,7 @@ object MainForm: TMainForm
         Size.Width = 81.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 7
+        TabOrder = 8
         Text = 'SQL2'
         OnClick = SQLDestination2Click
       end
@@ -167,7 +167,7 @@ object MainForm: TMainForm
         Size.Width = 193.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 6
+        TabOrder = 7
         Text = 'Load single by prop.'
         OnClick = LoadSingleByPropertyClick
       end
@@ -177,7 +177,7 @@ object MainForm: TMainForm
         Size.Width = 177.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 5
+        TabOrder = 6
         Text = 'Add Index'
         OnClick = ButtonAddIndexClick
       end
@@ -192,34 +192,44 @@ object MainForm: TMainForm
         OnClick = ButtonDropIndexClick
       end
       object ButtonGenerateScript: TButton
-        Position.X = 128.000000000000000000
+        Position.X = 184.000000000000000000
         Position.Y = 461.000000000000000000
-        Size.Width = 113.000000000000000000
+        Size.Width = 97.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 4
+        TabOrder = 5
         Text = 'Generate script'
         OnClick = ButtonGenerateScriptClick
       end
       object ButtonAnalyze: TButton
-        Position.X = 16.000000000000000000
+        Position.X = 104.000000000000000000
         Position.Y = 461.000000000000000000
-        Size.Width = 105.000000000000000000
+        Size.Width = 73.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
+        TabOrder = 3
         Text = 'DB Status'
         OnClick = ButtonAnalyzeClick
       end
       object ButtonGenerateDB: TButton
-        Position.X = 256.000000000000000000
+        Position.X = 288.000000000000000000
         Position.Y = 461.000000000000000000
-        Size.Width = 113.000000000000000000
+        Size.Width = 81.000000000000000000
         Size.Height = 31.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 3
+        TabOrder = 4
         Text = 'Generate DB'
         OnClick = ButtonGenerateDBClick
+      end
+      object ButtonDBBuilderReset: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 461.000000000000000000
+        Size.Width = 73.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = 'Reset'
+        OnClick = ButtonDBBuilderResetClick
       end
     end
     object TabItem2: TTabItem
@@ -339,8 +349,6 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
-    AutoCreateDB.Indexes = False
-    AutoCreateDB.ReferentialIntegrityConstraints = False
     Database = 'ContactsIntf.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = False
@@ -359,8 +367,6 @@ object MainForm: TMainForm
     Top = 8
   end
   object FirebirdConn: TioFirebirdConnectionDef
-    AutoCreateDB.Indexes = False
-    AutoCreateDB.ReferentialIntegrityConstraints = False
     Database = 'ContactsIntf.FDB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
@@ -372,6 +378,7 @@ object MainForm: TMainForm
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
+    OnBeforeCreateOrAlterDB = FirebirdConnBeforeCreateOrAlterDB
     Left = 304
     Top = 8
   end
