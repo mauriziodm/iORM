@@ -11,7 +11,7 @@ uses
   FMX.ActnList, FMX.TabControl, System.Actions, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource, FMX.ScrollBox, FMX.Memo, FMX.ListView,
   FMX.Controls.Presentation, iORM.Attributes, M.Interfaces,
-  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource, FMX.Edit;
+  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.ModelBindSource, FMX.Edit, FMX.Memo.Types;
 
 type
 

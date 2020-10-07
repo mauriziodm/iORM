@@ -7,7 +7,6 @@ object ViewMain: TViewMain
     Size.Width = 366.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 0
     object lblTitle1: TLabel
       Align = Contents
       StyledSettings = [FontColor]
@@ -76,7 +75,6 @@ object ViewMain: TViewMain
     Size.Width = 366.000000000000000000
     Size.Height = 44.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
     object ButtonLoadFromDB: TButton
       Cursor = crHandPoint
       StyledSettings = [FontColor]
@@ -85,7 +83,6 @@ object ViewMain: TViewMain
       Size.Width = 163.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 3
       Text = 'Load from DB by code'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -98,7 +95,6 @@ object ViewMain: TViewMain
       Size.Width = 81.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 2
       Text = 'Clear data'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -111,7 +107,6 @@ object ViewMain: TViewMain
       Size.Width = 48.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
       Text = 'New'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -124,7 +119,6 @@ object ViewMain: TViewMain
       Size.Width = 43.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 0
       Text = 'Del'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -135,7 +129,6 @@ object ViewMain: TViewMain
     Size.Width = 366.000000000000000000
     Size.Height = 352.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 8
     object Label2: TLabel
       Align = Top
       StyledSettings = [FontColor]
@@ -158,7 +151,6 @@ object ViewMain: TViewMain
       Size.Width = 366.000000000000000000
       Size.Height = 335.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
       ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
     end
   end
@@ -168,7 +160,6 @@ object ViewMain: TViewMain
     Size.Width = 366.000000000000000000
     Size.Height = 137.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 9
     object Label3: TLabel
       Align = Top
       StyledSettings = [FontColor]
@@ -191,7 +182,6 @@ object ViewMain: TViewMain
       Size.Width = 366.000000000000000000
       Size.Height = 120.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
       ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
     end
   end
@@ -282,7 +272,6 @@ object ViewMain: TViewMain
     Top = 272
   end
   object VMBridge: TioViewModelBridge
-    DI_VMInterface = 'IPersonsViewModel'
     Left = 128
     Top = 160
   end

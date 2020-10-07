@@ -6,7 +6,6 @@ object ViewMain: TViewMain
     Size.Width = 1002.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 0
     object lblTitle1: TLabel
       Align = Contents
       StyledSettings = [FontColor]
@@ -75,7 +74,6 @@ object ViewMain: TViewMain
     Size.Width = 1002.000000000000000000
     Size.Height = 44.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 5
     object ButtonLoadFromDB: TButton
       Cursor = crHandPoint
       StyledSettings = [FontColor]
@@ -84,7 +82,6 @@ object ViewMain: TViewMain
       Size.Width = 169.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 3
       Text = 'Load from DB by code'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -97,7 +94,6 @@ object ViewMain: TViewMain
       Size.Width = 81.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 0
       Text = 'Clear data'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -110,7 +106,6 @@ object ViewMain: TViewMain
       Size.Width = 137.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 2
       Text = 'Serialize to JSON'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -123,7 +118,6 @@ object ViewMain: TViewMain
       Size.Width = 169.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 1
       Text = 'Deserialize from JSON'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -136,7 +130,6 @@ object ViewMain: TViewMain
       Size.Width = 97.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 4
       Text = 'Clear JSON'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -149,7 +142,6 @@ object ViewMain: TViewMain
       Size.Width = 129.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 6
       Text = 'Save JSON to file'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -162,7 +154,6 @@ object ViewMain: TViewMain
       Size.Width = 153.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 5
       Text = 'Load JSON from file'
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -189,7 +180,6 @@ object ViewMain: TViewMain
     Size.Width = 337.000000000000000000
     Size.Height = 412.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
     ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
   end
   object Label3: TLabel
@@ -213,7 +203,6 @@ object ViewMain: TViewMain
     Size.Width = 337.000000000000000000
     Size.Height = 135.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 4
     ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
   end
   object Label1: TLabel
@@ -236,13 +225,11 @@ object ViewMain: TViewMain
     Size.Width = 635.000000000000000000
     Size.Height = 571.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 6
-    Viewport.Width = 631.000000000000000000
-    Viewport.Height = 567.000000000000000000
+    Viewport.Width = 635.000000000000000000
+    Viewport.Height = 571.000000000000000000
   end
   object Edit1: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 12
     Text = 'Mark Anderson'
     Position.X = 368.000000000000000000
     Position.Y = 88.000000000000000000

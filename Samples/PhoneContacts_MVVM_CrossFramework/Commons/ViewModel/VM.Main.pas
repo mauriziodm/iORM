@@ -4,11 +4,11 @@ interface
 
 uses
   iORM.MVVM.ViewModelBase, System.Classes, iORM.MVVM.Components.ModelPresenter,
-  VM.Interfaces, iORM.Attributes;
+  iORM.Attributes, M.Interfaces;
 
 type
-  [diImplements(IPersonsViewModel)]
-  TViewModelMain = class(TioViewModel, IPersonsViewModel)
+  [diViewModelFor(IPerson, 'List')]
+  TViewModelMain = class(TioViewModel)
     PersonsModelPresenter: TioModelPresenter;
     PhonesModelPresenter: TioModelPresenter;
   private
@@ -60,7 +60,7 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
-  System.Actions, iORM, RegisterClassesUnit, V.Interfaces, M.Interfaces;
+  System.Actions, iORM, RegisterClassesUnit;
 
 {$R *.dfm}
 

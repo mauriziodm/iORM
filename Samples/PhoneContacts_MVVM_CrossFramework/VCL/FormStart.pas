@@ -12,7 +12,7 @@ type
   TStartForm = class(TForm)
     ioVCL1: TioVCL;
     FormsVCProvider: TioViewContextProvider;
-    ioSQLiteConnectionDef1: TioSQLiteConnectionDef;
+    SQLiteConn: TioSQLiteConnectionDef;
     procedure FormCreate(Sender: TObject);
     procedure FormsVCProviderioOnRequest(const Sender: TObject;
       out ResultViewContext: TComponent);
@@ -32,14 +32,14 @@ var
 implementation
 
 uses
-  iORM, V.Interfaces, VM.Interfaces, FormViewContext, SampleData, System.IOUtils;
+  iORM, FormViewContext, SampleData, System.IOUtils, M.Interfaces;
 
 {$R *.dfm}
 
 procedure TStartForm.FormCreate(Sender: TObject);
 begin
   // Get the main view
-  io.di.LocateView<IMainView>.SetViewContext(Self).Show;
+  io.Show<IPerson>(Self, 'List');
 end;
 
 procedure TStartForm.FormsVCProviderioOnRequest(const Sender: TObject;

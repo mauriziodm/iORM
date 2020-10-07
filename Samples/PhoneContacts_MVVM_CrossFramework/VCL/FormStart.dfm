@@ -26,7 +26,7 @@ object StartForm: TStartForm
     Left = 112
     Top = 176
   end
-  object ioSQLiteConnectionDef1: TioSQLiteConnectionDef
+  object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
     AutoCreateDB.Enabled = True
     Database = 'ContactsIntfMVVM.db'
@@ -34,7 +34,6 @@ object StartForm: TStartForm
     DefaultConnection = True
     Persistent = False
     Pooled = False
-    OnAfterCreateDB = ioSQLiteConnectionDef1AfterCreateDB
     Left = 112
     Top = 112
   end

@@ -105,7 +105,6 @@
         <DCCReference Include="..\Commons\Model\M.AnotherModel.pas"/>
         <DCCReference Include="..\Commons\Model\M.Interfaces.pas"/>
         <DCCReference Include="..\Commons\Model\M.Model.pas"/>
-        <DCCReference Include="..\Commons\ViewModel\VM.Interfaces.pas"/>
         <DCCReference Include="..\Commons\ViewModel\VM.Main.pas">
             <Form>ViewModelMain</Form>
             <FormType>dfm</FormType>
@@ -121,7 +120,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\Commons\View\V.Interfaces.pas"/>
         <DCCReference Include="FormViewContext.pas">
             <Form>ViewContextForm</Form>
             <FormType>dfm</FormType>

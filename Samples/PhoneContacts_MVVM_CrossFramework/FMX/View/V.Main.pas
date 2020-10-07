@@ -9,13 +9,13 @@ uses
   Fmx.Bind.GenData, FMX.Layouts, iORM.MVVM.Components.ViewModelBridge,
   Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.ModelBindSource, FMX.ListView, FMX.StdCtrls, System.Classes,
-  FMX.Types, FMX.Controls, FMX.Controls.Presentation, V.Interfaces,
+  FMX.Types, FMX.Controls, FMX.Controls.Presentation, M.Interfaces,
   iORM.Attributes;
 
 type
 
-  [diImplements(IMainView)]
-  TViewMain = class(TFrame, IMainView)
+  [diViewFor(IPerson, 'List')]
+  TViewMain = class(TFrame)
 
     [ioBindAction('acEditPerson')]
     ButtonNext: TSpeedButton;

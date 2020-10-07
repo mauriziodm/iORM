@@ -4,19 +4,19 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, V.Interfaces, Vcl.ToolWin,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ToolWin,
   Vcl.ComCtrls, Vcl.Menus, iORM.Attributes, iORM.MVVM.Components.ViewModelBridge,
   Vcl.ExtCtrls, Vcl.Buttons, Data.Bind.GenData, Vcl.Bind.GenData,
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.ModelBindSource,
   Vcl.Grids, Data.Bind.EngExt, Vcl.Bind.DBEngExt, Vcl.Bind.Grid, System.Rtti,
   System.Bindings.Outputs, Vcl.Bind.Editors, Data.Bind.Grid, Vcl.StdCtrls,
-  Data.DB, Vcl.DBGrids, iORM.DB.Components.DataSet.Base,
+  Data.DB, Vcl.DBGrids, iORM.DB.Components.DataSet.Base, M.Interfaces,
   iORM.DB.Components.DataSet.ModelDataSet, Vcl.Mask, Vcl.DBCtrls;
 
 type
 
-  [diImplements(IMainView)]
-  TViewMain = class(TFrame, IMainView)
+  [diViewFor(IPerson, 'List')]
+  TViewMain = class(TFrame)
 
     [ioBindAction('acClearData')]
     ButtonClearData: TSpeedButton;
