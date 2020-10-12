@@ -27,9 +27,9 @@ type
     ScrollBox1: TScrollBox;
     DBImage1: TDBImage;
     ModelMasterDataSetID: TIntegerField;
-    ModelMasterDataSetDescrizione: TStringField;
     ModelMasterDataSetPropDateTime: TDateTimeField;
     ModelMasterDataSetPropBitMap: TGraphicField;
+    ModelMasterDataSetDescrizione: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private

@@ -178,7 +178,16 @@ end;
 
 function TioDBBuilderSqlGenFirebird.DatabaseExists: boolean;
 begin
-  Result := FileExists(FSchema.DatabaseFileName);
+  // Create the query to retrieve if DB exists
+  //  NB: This code also works with ALIAS, the old one doesnt
+  try
+    OpenQuery('SELECT * FROM RDB$DATABASE');
+    Result := True;
+  except
+    Result := False;
+  end;
+  // OLD_CODE
+  // Result := FileExists(FSchema.DatabaseFileName);
 end;
 
 procedure TioDBBuilderSqlGenFirebird.DropAllForeignKeys;
