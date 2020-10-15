@@ -181,8 +181,7 @@ begin
 {$IF CompilerVersion >= 23}
     and
     (FCTX.GetType(AObjectAsDuck.ClassInfo)
-    .GetIndexedProperty('Items')
-    .ReadMethod <> nil)
+    .GetIndexedProperty('Items') <> nil)
 
 {$IFEND}
     and
