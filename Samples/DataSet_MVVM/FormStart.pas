@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM.MVVM.Components.ViewContextProvider,
-  Vcl.StdCtrls, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.VCL;
+  Vcl.StdCtrls, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.VCL, iORM.DBBuilder.Interfaces;
 
 type
   TStartForm = class(TForm)
@@ -20,6 +20,8 @@ type
       AViewContext: TComponent);
     procedure VCProviderioOnRequest(const Sender: TObject;
       out ResultViewContext: TComponent);
+    procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+      const AScript, AWarnings: TStrings; var AAbort: Boolean);
   private
     { Private declarations }
   public
@@ -33,7 +35,7 @@ implementation
 
 uses
   FormViewContext, UViewLiveBindings, iORM, System.Rtti, iORM.MVVM.Interfaces,
-  UViewDataSet;
+  UViewDataSet, System.IOUtils;
 
 {$R *.dfm}
 
@@ -45,6 +47,12 @@ end;
 procedure TStartForm.Button2Click(Sender: TObject);
 begin
   io.di.LocateViewVM<TDataSetView, IioViewModel>.Get;
+end;
+
+procedure TStartForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  const AScript, AWarnings: TStrings; var AAbort: Boolean);
+begin
+  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'DBBuilderScript.txt'));
 end;
 
 procedure TStartForm.VCProviderioOnRelease(const Sender: TObject; const AView,

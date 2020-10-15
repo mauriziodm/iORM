@@ -9,20 +9,21 @@ uses
 
 const
 
-  NULL_RECORD_BUFFER: TRecordBuffer = nil;//0; // Before XE4 use "NullBuffer := nil"
+  NULL_RECORD_BUFFER: TRecordBuffer = nil; // 0; // Before XE4 use "NullBuffer := nil"
 
 type
 
   TSqlTimeStampUtils = class
   public
-    class function DateTimeToSqlTimeStamp(const ADateTime:TDateTime): TSqlTimeStamp; static;
-    class function SqlTimeStampToTValue(const ASqlTimeStamp:TSqlTimeStamp): TValue; static;
+    class function DateTimeToSqlTimeStamp(const ADateTime: TDateTime): TSqlTimeStamp; static;
+    class function SqlTimeStampToTValue(const ASqlTimeStamp: TSqlTimeStamp): TValue; static;
   end;
 
   TioRecInfo = record
     Bookmark: Longint;
     BookmarkFlag: TBookmarkFlag;
   end;
+
   PioRecInfo = ^TioRecInfo;
 
   PValueBuffer = ^TValueBuffer;
@@ -57,8 +58,7 @@ type
     function GetRecordSize: Word; override;
 
     // movement and optional navigation (used by grids)
-    function GetRecord(Buffer: TRecordBuffer; GetMode: TGetMode;
-      DoCheck: Boolean): TGetResult; override;
+    function GetRecord(Buffer: TRecordBuffer; GetMode: TGetMode; DoCheck: Boolean): TGetResult; override;
     procedure InternalFirst; override;
     procedure InternalLast; override;
     function GetRecNo: Longint; override;
@@ -66,14 +66,14 @@ type
     procedure SetRecNo(Value: Integer); override;
 
     // bookmarks
-    procedure InternalGotoBookmark(Bookmark: Pointer); override;  deprecated 'Use overloaded method instead';
+    procedure InternalGotoBookmark(Bookmark: Pointer); override; deprecated 'Use overloaded method instead';
     procedure InternalGotoBookmark(Bookmark: TBookmark); override;
-    procedure InternalSetToRecord(Buffer: TRecordBuffer); override;  deprecated 'Use overloaded method instead';
+    procedure InternalSetToRecord(Buffer: TRecordBuffer); override; deprecated 'Use overloaded method instead';
     procedure InternalSetToRecord(Buffer: TRecBuf); override;
     procedure SetBookmarkData(Buffer: TRecBuf; Data: TBookmark); override;
-    procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override;  deprecated 'Use overloaded method instead';
+    procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override; deprecated 'Use overloaded method instead';
     procedure GetBookmarkData(Buffer: TRecBuf; Data: TBookmark); override;
-    procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override;  deprecated 'Use overloaded method instead';
+    procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override; deprecated 'Use overloaded method instead';
     procedure SetBookmarkFlag(Buffer: TRecordBuffer; Value: TBookmarkFlag); override; deprecated 'Use overloaded method instead';
     procedure SetBookmarkFlag(Buffer: TRecBuf; AValue: TBookmarkFlag); override;
     function GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag; override; deprecated 'Use overloaded method instead';
@@ -114,7 +114,7 @@ type
     property OnPostError;
   end;
 
-  TioBSADataSet = class (TioCustomDataSet)
+  TioBSADataSet = class(TioCustomDataSet)
   private
     // Map of the base class
     FMap: IioMap;
@@ -125,17 +125,18 @@ type
     // Methods
     procedure SaveBeforeEditValues;
     procedure RestoreBeforeEditValues;
-    procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
+    procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>;
+      const ANativeFormat: Boolean);
   protected
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
     function GetInternalAdapter: TBindSourceAdapter;
-    procedure SetInternalAdapter(const AActiveBindSourceAdpter:IioActiveBindSourceAdapter);
+    procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
     // dataset virtual methods
     procedure InternalPreOpen; override;
     // custom dataset virtual methods
     function InternalRecordCount: Integer; override;
-    procedure InternalLoadCurrentRecord (Buffer: TRecordBuffer); override;
+    procedure InternalLoadCurrentRecord(Buffer: TRecordBuffer); override;
     // Others
     procedure InternalInitFieldDefs; override;
     procedure InternalPost; override;
@@ -150,9 +151,9 @@ type
   public
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
-    property InternalAdapter: TBindSourceAdapter read GetInternalAdapter;  // Must be ReadOnly
-    property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter;  // Must be ReadOnly
-    property Map:IioMap read FMap;
+    property InternalAdapter: TBindSourceAdapter read GetInternalAdapter; // Must be ReadOnly
+    property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter; // Must be ReadOnly
+    property Map: IioMap read FMap;
   end;
 
   TioAbstractBlobStream = class(TMemoryStream)
@@ -164,9 +165,7 @@ type
     procedure ReadBlobData; virtual; abstract;
     procedure WriteBlobData; virtual; abstract;
   public
-    constructor Create(
-      const AField: TBlobField;
-      const AMode: TBlobStreamMode);
+    constructor Create(const AField: TBlobField; const AMode: TBlobStreamMode);
     destructor Destroy; override;
     function Write(const Buffer; Count: Longint): Longint; override;
     procedure Truncate;
@@ -177,9 +176,7 @@ type
     procedure ReadBlobData; override;
     procedure WriteBlobData; override;
   public
-    constructor Create(
-      const AField: TWideMemoField;
-      const AMode: TBlobStreamMode);
+    constructor Create(const AField: TWideMemoField; const AMode: TBlobStreamMode);
   end;
 
   TioStreamableObjBlobStream = class(TioAbstractBlobStream)
@@ -187,9 +184,7 @@ type
     procedure ReadBlobData; override;
     procedure WriteBlobData; override;
   public
-    constructor Create(
-      const AField: TBlobField;
-      const AMode: TBlobStreamMode);
+    constructor Create(const AField: TBlobField; const AMode: TBlobStreamMode);
   end;
 
 implementation
@@ -199,10 +194,10 @@ uses
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper;
 
-/////////////////////////////////////////////////
-////// Part I:
-////// Initialization, opening, and closing
-/////////////////////////////////////////////////
+/// //////////////////////////////////////////////
+/// /// Part I:
+/// /// Initialization, opening, and closing
+/// //////////////////////////////////////////////
 
 // I: open the dataset
 procedure TioCustomDataSet.InternalOpen;
@@ -215,11 +210,11 @@ begin
 
   // if there are no persistent field objects,
   // create the fields dynamically
-//  if DefaultFields then NB: Deprecated
-  if not (lcPersistent in Fields.LifeCycles) then
+  // if DefaultFields then NB: Deprecated
+  if not(lcPersistent in Fields.LifeCycles) then
     CreateFields;
   // connect the TField objects with the actual fields
-  BindFields (True);
+  BindFields(True);
 
   InternalAfterOpen; // custom method for subclasses
 
@@ -227,8 +222,8 @@ begin
   BofCrack := -1;
   EofCrack := InternalRecordCount;
   FCurrentRecord := BofCrack;
-  FRecordBufferSize := FRecordSize + sizeof (TioRecInfo);
-  BookmarkSize := sizeOf (Integer);
+  FRecordBufferSize := FRecordSize + sizeof(TioRecInfo);
+  BookmarkSize := sizeof(Integer);
 
   // everything OK: table is now open
   FIsTableOpen := True;
@@ -237,10 +232,10 @@ end;
 procedure TioCustomDataSet.InternalClose;
 begin
   // disconnet field objects
-  BindFields (False);
+  BindFields(False);
   // destroy field object (if not persistent)
-//  if DefaultFields then NB: Deprecated
-  if not (lcPersistent in Fields.LifeCycles) then
+  // if DefaultFields then NB: Deprecated
+  if not(lcPersistent in Fields.LifeCycles) then
     DestroyFields;
 
   // close the file
@@ -253,15 +248,15 @@ begin
   Result := FIsTableOpen;
 end;
 
-////////////////////////////////////////
-////// Part II:
-////// Bookmarks management and movement
-////////////////////////////////////////
+/// /////////////////////////////////////
+/// /// Part II:
+/// /// Bookmarks management and movement
+/// /////////////////////////////////////
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: set the requested bookmark as current record
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.InternalGotoBookmark (Bookmark: Pointer);
+procedure TioCustomDataSet.InternalGotoBookmark(Bookmark: Pointer);
 var
   ReqBookmark: Integer;
 begin
@@ -286,12 +281,12 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: same as above (but passes a buffer)
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.InternalSetToRecord (Buffer: TRecordBuffer);
+procedure TioCustomDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
 var
   ReqBookmark: Integer;
 begin
   ReqBookmark := PioRecInfo(Buffer + FRecordSize).Bookmark;
-  InternalGotoBookmark (@ReqBookmark);  // NB: Deprecated
+  InternalGotoBookmark(@ReqBookmark); // NB: Deprecated
 end;
 
 procedure TioCustomDataSet.InternalSetToRecord(Buffer: TRecBuf);
@@ -299,13 +294,12 @@ var
   ReqBookmark: Integer;
 begin
   ReqBookmark := PioRecInfo(Buffer + FRecordSize)^.Bookmark;
-  InternalGotoBookmark (@ReqBookmark);  // NB: Deprecated
+  InternalGotoBookmark(@ReqBookmark); // NB: Deprecated
 end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-function TioCustomDataSet.GetBookmarkFlag (
-  Buffer: TRecordBuffer): TBookmarkFlag;
+function TioCustomDataSet.GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag;
 begin
   Result := PioRecInfo(Buffer + FRecordSize).BookmarkFlag;
 end;
@@ -317,8 +311,7 @@ end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.SetBookmarkFlag (Buffer: TRecordBuffer;
-  Value: TBookmarkFlag);
+procedure TioCustomDataSet.SetBookmarkFlag(Buffer: TRecordBuffer; Value: TBookmarkFlag);
 begin
   PioRecInfo(Buffer + FRecordSize).BookmarkFlag := Value;
 end;
@@ -344,8 +337,7 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: read the bookmark data from record buffer
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.GetBookmarkData (
-  Buffer: TRecordBuffer; Data: Pointer);
+procedure TioCustomDataSet.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
   Integer(Data^) := PioRecInfo(Buffer + FRecordSize).Bookmark;
 end;
@@ -359,7 +351,7 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: set the bookmark data in the buffer
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.SetBookmarkData (Buffer: TRecordBuffer; Data: Pointer);
+procedure TioCustomDataSet.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
   PioRecInfo(Buffer + FRecordSize).Bookmark := Integer(Data^);
 end;
@@ -403,39 +395,36 @@ begin
   end;
 end;
 
-//////////////////////////////////////////
-////// Part III:
-////// Record buffers and field management
-//////////////////////////////////////////
+/// ///////////////////////////////////////
+/// /// Part III:
+/// /// Record buffers and field management
+/// ///////////////////////////////////////
 
 // III: Retrieve data for current, previous, or next record
 // (eventually moving to it) and return the status
-function TioCustomDataSet.GetRecord(Buffer: TRecordBuffer;
-  GetMode: TGetMode; DoCheck: Boolean): TGetResult;
+function TioCustomDataSet.GetRecord(Buffer: TRecordBuffer; GetMode: TGetMode; DoCheck: Boolean): TGetResult;
 begin
   Result := grOK; // default
   case GetMode of
     gmNext: // move on
       if FCurrentRecord < InternalRecordCount - 1 then
-        Inc (FCurrentRecord)
+        Inc(FCurrentRecord)
       else
         Result := grEOF; // end of file
     gmPrior: // move back
       if FCurrentRecord > 0 then
-        Dec (FCurrentRecord)
+        Dec(FCurrentRecord)
       else
         Result := grBOF; // begin of file
     gmCurrent: // check if empty
-      if (FCurrentRecord >= InternalRecordCount) or
-          (FCurrentRecord < 0) then
+      if (FCurrentRecord >= InternalRecordCount) or (FCurrentRecord < 0) then
         Result := grError;
   end;
   // load the data
   if Result = grOK then
     InternalLoadCurrentRecord(Buffer)
-  else
-    if (Result = grError) and DoCheck then
-      raise EioException.Create (Self.ClassName, 'GetRecord', 'Invalid record');
+  else if (Result = grError) and DoCheck then
+    raise EioException.Create(Self.ClassName, 'GetRecord', 'Invalid record');
 end;
 
 // III: Initialize the record (set to 0)
@@ -445,9 +434,9 @@ begin
 end;
 
 // III: Free the buffer
-procedure TioCustomDataSet.FreeRecordBuffer (var Buffer: TRecordBuffer);
+procedure TioCustomDataSet.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
-  FreeMem (Buffer);
+  FreeMem(Buffer);
 end;
 
 /// III: Determine the size of each record buffer in memory
@@ -459,7 +448,7 @@ end;
 /// III: Allocate a buffer for the record
 function TioCustomDataSet.AllocRecordBuffer: TRecordBuffer;
 begin
-  GetMem (Result, FRecordBufferSize);
+  GetMem(Result, FRecordBufferSize);
 end;
 
 // III: Delete the current record
@@ -477,8 +466,7 @@ begin
   // do nothing
 end;
 
-procedure TioCustomDataSet.InternalAddRecord(Buffer: TRecBuf;
-  Append: Boolean);
+procedure TioCustomDataSet.InternalAddRecord(Buffer: TRecBuf; Append: Boolean);
 begin
   // not supported in this generic version
   raise EioException.Create(Self.ClassName, 'InternalAddRecord', 'Operation not supported');
@@ -502,8 +490,7 @@ end;
 
 { TMdListDataSet }
 
-function TioBSADataSet.CreateBlobStream(Field: TField;
-  Mode: TBlobStreamMode): TStream;
+function TioBSADataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 var
   LProperty: IioContextProperty;
 begin
@@ -512,7 +499,8 @@ begin
   LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
   // Create the right blob stream by DataType
   case Field.DataType of
-    TFieldType.ftMemo:;
+    TFieldType.ftMemo:
+      ;
     TFieldType.ftWideMemo:
       Result := TioWideMemoBlobStream.Create(Field as TWideMemoField, Mode);
     TFieldType.ftGraphic:
@@ -596,7 +584,7 @@ end;
 
 // -----------------------------------------------------------------------------
 procedure TioBSADataSet.InternalInitFieldDefs;
-  // InitFieldDefsByProperties
+// InitFieldDefsByProperties
   procedure InitFieldDefsByProperties;
   var
     LProperty: IioContextProperty;
@@ -619,13 +607,14 @@ procedure TioBSADataSet.InternalInitFieldDefs;
       end;
     end;
   end;
+
 begin
   if not Assigned(FMap) then
     raise EioException.Create(Self.ClassName, 'InternalInitFieldDefs', 'Unassigned class map.');
   // Clear field definitions
   FieldDefs.Clear;
   // If some field is specified in the FieldsEditor then create che InternalFieldDefs
-  //  from their's definitions else from the class properties in the IioMap
+  // from their's definitions else from the class properties in the IioMap
   if Fields.Count > 0 then
     InitFieldDefsFromFields
   else
@@ -635,19 +624,19 @@ end;
 procedure TioBSADataSet.InternalInsert;
 begin
   // Disable all the DataSetLinks on the BindSourceAdapter
-  //  NB: DataSetLink is used to propagate the operation (insert, post,
-  //       delete, next etc.) from the BindSourceAdapter to all datasets linked
-  //       to BSA itself).
+  // NB: DataSetLink is used to propagate the operation (insert, post,
+  // delete, next etc.) from the BindSourceAdapter to all datasets linked
+  // to BSA itself).
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     // Strange behavior if not present with empty and just opened dataset
-    //  (displays the new record twice)
+    // (displays the new record twice)
     if FCurrentRecord = -1 then
       Self.First;
     // If EOF then performs an append on the linked BindSourceAdapter else
-    //  an insert.
-    //  (If EOF it means that the user has requested ad append, key down
-    //   pressed when on the last row)
+    // an insert.
+    // (If EOF it means that the user has requested ad append, key down
+    // pressed when on the last row)
     if Self.Eof then
       FBindSourceAdapter.Append
     else
@@ -678,7 +667,7 @@ var
   LProperty: IioContextProperty;
   LDateTime: TDateTime;
   LDateTimeRec: TDateTimeRec;
-  LTimeStamp: TSQLTimeStamp;
+  LTimeStamp: TSqlTimeStamp;
   LTempValueBuffer: TValueBuffer;
 begin
   // If empty then exit
@@ -687,57 +676,72 @@ begin
   // Move the buffer to the value
   case Field.DataType of
     // Integer
-    TFieldType.ftInteger:   LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
-    TFieldType.ftAutoInc:   LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
-    TFieldType.ftShortint:  LValue := TBitConverter.UnsafeInTo<ShortInt>(Buffer);
-    TFieldType.ftByte:      LValue := TBitConverter.UnsafeInTo<Byte>(Buffer);
-    TFieldType.ftSmallint:  LValue := TBitConverter.UnsafeInTo<SmallInt>(Buffer);
-    TFieldType.ftLargeint:  LValue := TBitConverter.UnsafeInTo<Largeint>(Buffer);
-    TFieldType.ftWord:      LValue := TBitConverter.UnsafeInTo<Word>(Buffer);
-    TFieldType.ftLongWord:  LValue := TBitConverter.UnsafeInTo<LongWord>(Buffer);
+    TFieldType.ftInteger:
+      LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
+    TFieldType.ftAutoInc:
+      LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
+    TFieldType.ftShortint:
+      LValue := TBitConverter.UnsafeInTo<ShortInt>(Buffer);
+    TFieldType.ftByte:
+      LValue := TBitConverter.UnsafeInTo<Byte>(Buffer);
+    TFieldType.ftSmallint:
+      LValue := TBitConverter.UnsafeInTo<SmallInt>(Buffer);
+    TFieldType.ftLargeint:
+      LValue := TBitConverter.UnsafeInTo<Largeint>(Buffer);
+    TFieldType.ftWord:
+      LValue := TBitConverter.UnsafeInTo<Word>(Buffer);
+    TFieldType.ftLongWord:
+      LValue := TBitConverter.UnsafeInTo<LongWord>(Buffer);
     // Float
-    TFieldType.ftFloat:     LValue := TBitConverter.UnsafeInTo<Double>(Buffer);
-    TFieldType.ftCurrency:  LValue := TBitConverter.UnsafeInTo<Double>(Buffer);
-    TFieldType.ftBCD:       LValue := TBitConverter.UnsafeInTo<Currency>(Buffer);
-    TFieldType.ftFMTBcd:    LValue := TValue.From<TBCD>(   TBitConverter.UnsafeInTo<TBCD>(Buffer)   );
-    TFieldType.ftSingle:    LValue := TBitConverter.UnsafeInTo<Single>(Buffer);
-    TFieldType.ftExtended:  LValue := TBitConverter.UnsafeInTo<Extended>(Buffer);
+    TFieldType.ftFloat:
+      LValue := TBitConverter.UnsafeInTo<Double>(Buffer);
+    TFieldType.ftCurrency:
+      LValue := TBitConverter.UnsafeInTo<Double>(Buffer);
+    TFieldType.ftBCD:
+      LValue := TBitConverter.UnsafeInTo<Currency>(Buffer);
+    TFieldType.ftFMTBcd:
+      LValue := TValue.From<TBCD>(TBitConverter.UnsafeInTo<TBCD>(Buffer));
+    TFieldType.ftSingle:
+      LValue := TBitConverter.UnsafeInTo<Single>(Buffer);
+    TFieldType.ftExtended:
+      LValue := TBitConverter.UnsafeInTo<Extended>(Buffer);
     // Boolean
-    TFieldType.ftBoolean:   LValue := TBitConverter.UnsafeInTo<WordBool>(Buffer);
+    TFieldType.ftBoolean:
+      LValue := TBitConverter.UnsafeInTo<WordBool>(Buffer);
     // Date & Time
     TFieldType.ftDateTime, TFieldType.ftDate, TFieldType.ftTime:
-    begin
-      // If the buffer is not assigned then the value is NULL
-      if not Assigned(Buffer) then
-        LValue := TValue.From<TDateTime>(0)
-      else
       begin
-        SetLength(LTempValueBuffer, SizeOf(TDateTimeRec));
-        DataConvert(Field, Buffer, LTempValueBuffer, False);
-        LDateTimeRec := TBitConverter.UnsafeInTo<TDateTimeRec>(LTempValueBuffer);
-        LDateTime := LDateTimeRec.DateTime;
-        LValue := TValue.From<TDateTime>(LDateTime);
+        // If the buffer is not assigned then the value is NULL
+        if not Assigned(Buffer) then
+          LValue := TValue.From<TDateTime>(0)
+        else
+        begin
+          SetLength(LTempValueBuffer, sizeof(TDateTimeRec));
+          DataConvert(Field, Buffer, LTempValueBuffer, False);
+          LDateTimeRec := TBitConverter.UnsafeInTo<TDateTimeRec>(LTempValueBuffer);
+          LDateTime := LDateTimeRec.DateTime;
+          LValue := TValue.From<TDateTime>(LDateTime);
+        end;
       end;
-    end;
     TFieldType.ftTimeStamp:
-    begin
-      // If the buffer is not assigned then the value is NULL
-      if not Assigned(Buffer) then
-        LValue := TValue.From<TDateTime>(0)
-      else
       begin
-        LTimeStamp := TBitConverter.UnsafeInTo<TSQLTimeStamp>(Buffer);
-        LValue := TSqlTimeStampUtils.SqlTimeStampToTValue(LTimeStamp);
+        // If the buffer is not assigned then the value is NULL
+        if not Assigned(Buffer) then
+          LValue := TValue.From<TDateTime>(0)
+        else
+        begin
+          LTimeStamp := TBitConverter.UnsafeInTo<TSqlTimeStamp>(Buffer);
+          LValue := TSqlTimeStampUtils.SqlTimeStampToTValue(LTimeStamp);
+        end;
       end;
-    end;
     // AnsiString è GUID
     TFieldType.ftString, TFieldType.ftFixedChar, TFieldType.ftGuid:
       LValue := PChar(TEncoding.ANSI.GetString(Buffer).TrimRight);
-//      LValue := AnsiString(PAnsiChar(Buffer));
+    // LValue := AnsiString(PAnsiChar(Buffer));
     // WideString/Unicode
     TFieldType.ftWideString, TFieldType.ftFixedWideChar:
       LValue := TEncoding.Unicode.GetString(Buffer).TrimRight;
-//      LValue := WideString(pWideChar(Buffer));
+    // LValue := WideString(pWideChar(Buffer));
   end;
   // Set the value into the object
   LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
@@ -745,32 +749,31 @@ begin
   // Set modified
   SetModified(True);
   // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
-  //      in ActiveBindSourceAdapter.DoAfterPost e ActiveBindSourceAdapter.DoAfterPostFields,
-  //      sono riuscito a dare un comportamente corretto anche al DataSet in caso AutoPost=true
-  //      (precedentemente invece in pratica con faceva mai il post)
+  // in ActiveBindSourceAdapter.DoAfterPost e ActiveBindSourceAdapter.DoAfterPostFields,
+  // sono riuscito a dare un comportamente corretto anche al DataSet in caso AutoPost=true
+  // (precedentemente invece in pratica con faceva mai il post)
   // Mauri 19/04/2020: Ho aggiunto questa condizione perchè mi capitava che quando
-  //  il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
-  //  che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
-  //   invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
-  //   in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
-  //   sembra non dare problemi.
+  // il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
+  // che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
+  // invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
+  // in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
+  // sembra non dare problemi.
   if InternalActiveAdapter.ioAutoPost and (FBindSourceAdapter.State in seEditModes) then
     InternalActiveAdapter.Post;
 end;
 
-procedure TioBSADataSet.SetInternalAdapter(
-  const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+procedure TioBSADataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   if not Assigned(AActiveBindSourceAdpter) then
     raise EioException.Create(Self.ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
   // Set the Map of the BaseObject of the ActiveBindSourceAdapter
   FMap := TioMapContainer.GetMap(AActiveBindSourceAdpter.GetBaseObjectClassName);
-  //  Set the BindSourceAdapter
+  // Set the BindSourceAdapter
   FBindSourceAdapter := AActiveBindSourceAdpter;
   // Register itself (the DataSet) into the DataSetLinkContainer of the BindSourceAdapter
-  //  NB: DataSetLink is used to propagate the operation (insert, post,
-  //       delete, next etc.) from the BindSourceAdapter to all datasets linked
-  //       to BSA itself).
+  // NB: DataSetLink is used to propagate the operation (insert, post,
+  // delete, next etc.) from the BindSourceAdapter to all datasets linked
+  // to BSA itself).
   FBindSourceAdapter.GetDataSetLinkContainer.RegisterDataSet(Self);
 end;
 
@@ -784,35 +787,35 @@ begin
   // Get the bookmark flag for current record
   LBookmarkFlag := GetBookmarkFlag(ActiveBuffer);
   // Increments the index in some specific cases.
-  //  (If we are in an insert operation it adds one to all of the subsequent records
-  //   indices to what has just been inserted)
-  //  NB: Not for append
+  // (If we are in an insert operation it adds one to all of the subsequent records
+  // indices to what has just been inserted)
+  // NB: Not for append
   // -------------------------------------------
-  if  (State = dsInsert)
+  if (State = dsInsert)
   // ... when a new record is inserted (not appended) the relative BookmarkFlag is set to bfInserted
-  and (LBookmarkFlag <> TBookmarkFlag.bfInserted)
+    and (LBookmarkFlag <> TBookmarkFlag.bfInserted)
   // ... when a new record is appended (not inserted) the relative BookmarkFlag is set to bfEOF
-  and (LBookmarkFlag <> TBookmarkFlag.bfEOF)
+    and (LBookmarkFlag <> TBookmarkFlag.bfEOF)
   // ... when a new record is inserted (not appended) only records after the inserted record
-  //      must be incremented by one (the index is contained in the ActiveBuffer)
-  and (Result >= FBindSourceAdapter.ItemIndex)
+  // must be incremented by one (the index is contained in the ActiveBuffer)
+    and (Result >= FBindSourceAdapter.ItemIndex)
   // ... when a new record is inserted/appended in empty DataSet then BOF and EOF properties is both setted to True
-  and not (BOF and EOF)
-  then
+    and not(BOF and Eof) then
     Inc(Result);
   // -------------------------------------------
 end;
 
 // Convert and load Data into the buffer (GetFieldData)
-procedure TioBSADataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
+procedure TioBSADataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>;
+  const ANativeFormat: Boolean);
 var
   LTempValueBuffer: TValueBuffer;
 begin
   // Set the length of the temporary value buffer
-  SetLength(LTempValueBuffer, SizeOf(T));
+  SetLength(LTempValueBuffer, sizeof(T));
   // If the buffer size is less than the size of the data type then set it to the correct size
-  if Length(ABuffer) < SizeOf(T) then
-    SetLength(ABuffer, SizeOf(T));
+  if Length(ABuffer) < sizeof(T) then
+    SetLength(ABuffer, sizeof(T));
   // Bit conversion into the temporary value buffer
   TBitConverter.UnsafeFrom<T>(AValue.AsType<T>, LTempValueBuffer);
   DataConvert(AField, LTempValueBuffer, ABuffer, ANativeFormat);
@@ -834,19 +837,19 @@ var
   begin
     // Get the bookmark flag for current record
     LBookmarkFlag := GetBookmarkFlag(ActiveBuffer);
-    Result := (State = dsInsert)
-      and ((LBookmarkFlag = TBookmarkFlag.bfInserted) or (LBookmarkFlag = TBookmarkFlag.bfEOF));
+    Result := (State = dsInsert) and ((LBookmarkFlag = TBookmarkFlag.bfInserted) or (LBookmarkFlag = TBookmarkFlag.bfEOF));
   end;
+
 begin
   Result := False;
   // If empty then exit
-//  if (FBindSourceAdapter.ItemCount = 0) or IsInsertingRecord then
+  // if (FBindSourceAdapter.ItemCount = 0) or IsInsertingRecord then
   if FBindSourceAdapter.ItemCount = 0 then
     Exit;
   // Get the current record index (corrected by the situations)
   LRecordIndex := GetRecordIdx;
   Result := (LRecordIndex >= -1) and (LRecordIndex <= FBindSourceAdapter.ItemCount - 1);
-//  Result := Result and (Length(Buffer) > 0);
+  // Result := Result and (Length(Buffer) > 0);
   if not Result then
     Exit;
   // Get Property, Object, Value
@@ -857,86 +860,101 @@ begin
   // Move the value to the buffer
   case Field.DataType of
     // Integer
-//    TFieldType.ftInteger:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
-    TFieldType.ftInteger:   ValueToBuffer<Integer>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftAutoInc:   ValueToBuffer<Integer>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftShortint:  ValueToBuffer<Shortint>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftByte:      ValueToBuffer<Byte>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftSmallint:  ValueToBuffer<Smallint>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftLargeint:  ValueToBuffer<Largeint>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftWord:      ValueToBuffer<Word>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftLongWord:  ValueToBuffer<LongWord>(LValue, Field, Buffer, NativeFormat);
+    // TFieldType.ftInteger:   TBitConverter.UnsafeFrom<Integer>(LValue.AsType<Integer>, Buffer);
+    TFieldType.ftInteger:
+      ValueToBuffer<Integer>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftAutoInc:
+      ValueToBuffer<Integer>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftShortint:
+      ValueToBuffer<ShortInt>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftByte:
+      ValueToBuffer<Byte>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftSmallint:
+      ValueToBuffer<SmallInt>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftLargeint:
+      ValueToBuffer<Largeint>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftWord:
+      ValueToBuffer<Word>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftLongWord:
+      ValueToBuffer<LongWord>(LValue, Field, Buffer, NativeFormat);
     // Float
-    TFieldType.ftFloat:     ValueToBuffer<Double>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftCurrency:  ValueToBuffer<Double>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftBCD:       ValueToBuffer<Currency>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftFMTBcd:    ValueToBuffer<TBCD>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftSingle:    ValueToBuffer<Single>(LValue, Field, Buffer, NativeFormat);
-    TFieldType.ftExtended:  ValueToBuffer<Extended>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftFloat:
+      ValueToBuffer<Double>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftCurrency:
+      ValueToBuffer<Double>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftBCD:
+      ValueToBuffer<Currency>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftFMTBcd:
+      ValueToBuffer<TBCD>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftSingle:
+      ValueToBuffer<Single>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftExtended:
+      ValueToBuffer<Extended>(LValue, Field, Buffer, NativeFormat);
     // Boolean
-    TFieldType.ftBoolean:   ValueToBuffer<WordBool>(LValue, Field, Buffer, NativeFormat);
+    TFieldType.ftBoolean:
+      ValueToBuffer<WordBool>(LValue, Field, Buffer, NativeFormat);
     // Date & Time
     TFieldType.ftDateTime, TFieldType.ftDate, TFieldType.ftTime:
-    begin
-      LDateTime := LValue.AsType<TDateTime>;
-      Result := (LDateTime > 0);
-      if Result then
       begin
-        if NativeFormat then
+        LDateTime := LValue.AsType<TDateTime>;
+        Result := (LDateTime > 0);
+        if Result then
         begin
-          SetLength(LTempValueBuffer, SizeOf(TDatetime));
-          TBitConverter.UnsafeFrom<TDatetime>(LDateTime, LTempValueBuffer);
-          DataConvert(Field, LTempValueBuffer, Buffer, NativeFormat);
-        end
-        else
-        begin
-          LDateTimeRec.DateTime := LDateTime;
-          TBitConverter.UnsafeFrom<TDateTimeRec>(LDateTimeRec, Buffer);
+          if NativeFormat then
+          begin
+            SetLength(LTempValueBuffer, sizeof(TDateTime));
+            TBitConverter.UnsafeFrom<TDateTime>(LDateTime, LTempValueBuffer);
+            DataConvert(Field, LTempValueBuffer, Buffer, NativeFormat);
+          end
+          else
+          begin
+            LDateTimeRec.DateTime := LDateTime;
+            TBitConverter.UnsafeFrom<TDateTimeRec>(LDateTimeRec, Buffer);
+          end;
         end;
       end;
-    end;
-    TFieldType.ftTimeStamp:  // NB: Per questo tipo non ho verificato la compatibilità con DevExpress (NativeFormat = True e Buffer con dimensione zero)
-    begin
-      LDateTime := LValue.AsType<TDateTime>;
-      Result := (LDateTime > 0);
-      if Result then
+    TFieldType.ftTimeStamp:
+    // NB: Per questo tipo non ho verificato la compatibilità con DevExpress (NativeFormat = True e Buffer con dimensione zero)
       begin
-        SetLength(Buffer, SizeOf(TSQLTimeStamp));
-        TBitConverter.From<TSQLTimeStamp>(TSqlTimeStampUtils.DateTimeToSqlTimeStamp(LDateTime), Buffer);
+        LDateTime := LValue.AsType<TDateTime>;
+        Result := (LDateTime > 0);
+        if Result then
+        begin
+          SetLength(Buffer, sizeof(TSqlTimeStamp));
+          TBitConverter.From<TSqlTimeStamp>(TSqlTimeStampUtils.DateTimeToSqlTimeStamp(LDateTime), Buffer);
+        end;
       end;
-    end;
     // AnsiString + GUID
     TFieldType.ftString, TFieldType.ftFixedChar, TFieldType.ftGuid:
-    begin
-      if Length(Buffer) < (Field.DataSize) then // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
-        SetLength(Buffer, Field.DataSize);
-      FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-//      DataConvert(Field, PAnsiChar(AnsiString(LValue.AsString)), Buffer, NativeFormat);
-      DataConvert(Field, TValueBuffer(WideString(LValue.AsString)), Buffer, NativeFormat);
-//      StrLCopy(PAnsiChar(Buffer), PAnsiChar(AnsiString(LValue.AsString)), Field.Size+1);
-    end;
+      begin
+        if Length(Buffer) < (Field.DataSize) then
+        // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
+          SetLength(Buffer, Field.DataSize);
+        FillChar(Buffer[0], Field.DataSize, 0); // Clean the buffer (previous record value presents)
+        TEncoding.ANSI.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
+      end;
     // WideString/Unicode
     TFieldType.ftWideString, TFieldType.ftFixedWideChar:
-    begin
-      if Length(Buffer) < (Field.DataSize) then // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
-        SetLength(Buffer, Field.DataSize);
-      FillChar(Buffer[0], Field.DataSize, 0);  // Clean the buffer (previous record value presents)
-      TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
-//      StrLCopy(PChar(Buffer), PChar(LValue.AsString), Field.Size+1);
-    end;
+      begin
+        if Length(Buffer) < (Field.DataSize) then
+        // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
+          SetLength(Buffer, Field.DataSize);
+        FillChar(Buffer[0], Field.DataSize, 0); // Clean the buffer (previous record value presents)
+        TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
+      end;
   end;
 end;
 
 procedure TioBSADataSet.InternalLoadCurrentRecord(Buffer: TRecordBuffer);
-//var
-//  LBookmarkFlag: TBookmarkFlag;
+// var
+// LBookmarkFlag: TBookmarkFlag;
 begin
   // Put the current record index in the record buffer
-  PInteger(Buffer)^ := fCurrentRecord;
+  PInteger(Buffer)^ := FCurrentRecord;
   with PioRecInfo(Buffer + FRecordSize)^ do
   begin
     BookmarkFlag := bfCurrent;
-    Bookmark := fCurrentRecord;
+    Bookmark := FCurrentRecord;
   end;
 end;
 
@@ -946,11 +964,11 @@ begin
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     // Mauri 19/04/2020: Ho aggiunto questa condizione perchè mi capitava che quando
-    //  il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
-    //  che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
-    //   invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
-    //   in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
-    //   sembra non dare problemi.
+    // il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
+    // che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
+    // invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
+    // in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
+    // sembra non dare problemi.
     if FBindSourceAdapter.State in seEditModes then
       FBindSourceAdapter.Post;
   finally
@@ -961,8 +979,8 @@ end;
 procedure TioBSADataSet.InternalPreOpen;
 begin
   // The buffer of the record contains the index of the current
-  //  record/object on the BindSourceAdapter
-  FRecordSize := SizeOf(Integer); // Integer size (4 or 8?)
+  // record/object on the BindSourceAdapter
+  FRecordSize := sizeof(Integer); // Integer size (4 or 8?)
 end;
 
 function TioBSADataSet.InternalRecordCount: Integer;
@@ -983,8 +1001,7 @@ end;
 
 { TSqlTimeStampUtils }
 
-class function TSqlTimeStampUtils.DateTimeToSqlTimeStamp(
-  const ADateTime:TDateTime): TSqlTimeStamp;
+class function TSqlTimeStampUtils.DateTimeToSqlTimeStamp(const ADateTime: TDateTime): TSqlTimeStamp;
 var
   LYY, LMM, LDD, LHH, LNN, LSS, LMS: Word;
 begin
@@ -998,21 +1015,18 @@ begin
   Result.Fractions := LMS;
 end;
 
-class function TSqlTimeStampUtils.SqlTimeStampToTValue(
-  const ASqlTimeStamp:TSqlTimeStamp): TValue;
+class function TSqlTimeStampUtils.SqlTimeStampToTValue(const ASqlTimeStamp: TSqlTimeStamp): TValue;
 var
   LDateTime: TDateTime;
 begin
-  LDateTime := EncodeDateTime(ASqlTimeStamp.Year, ASqlTimeStamp.Month,
-    ASqlTimeStamp.Day, ASqlTimeStamp.Hour, ASqlTimeStamp.Minute,
+  LDateTime := EncodeDateTime(ASqlTimeStamp.Year, ASqlTimeStamp.Month, ASqlTimeStamp.Day, ASqlTimeStamp.Hour, ASqlTimeStamp.Minute,
     ASqlTimeStamp.Second, ASqlTimeStamp.Fractions);
   Result := TValue.From<TDateTime>(LDateTime);
 end;
 
 { TioAbstractMemoryStream }
 
-constructor TioAbstractBlobStream.Create(const AField: TBlobField;
-  const AMode: TBlobStreamMode);
+constructor TioAbstractBlobStream.Create(const AField: TBlobField; const AMode: TBlobStreamMode);
 begin
   inherited Create;
   FIsReadingBlobData := False;
@@ -1023,7 +1037,7 @@ begin
   begin
     if AField.ReadOnly or not AField.DataSet.CanModify then
       DatabaseErrorFmt(SFieldReadOnly, [AField.DisplayName], AField.DataSet);
-    if not (AField.DataSet.State in [dsEdit, dsInsert, dsNewValue]) then
+    if not(AField.DataSet.State in [dsEdit, dsInsert, dsNewValue]) then
       DatabaseError(SNotEditing, AField.DataSet);
   end;
   if AMode = bmWrite then
@@ -1035,14 +1049,14 @@ end;
 destructor TioAbstractBlobStream.Destroy;
 begin
   if FModified then
-  try
+    try
       WriteBlobData;
       FField.Modified := True;
       FDataset.DataEvent(deFieldChange, IntPtr(FField));
-  except
+    except
       if Assigned(System.Classes.ApplicationHandleException) then
-          ApplicationHandleException(Self);
-  end;
+        ApplicationHandleException(Self);
+    end;
   inherited Destroy;
 end;
 
@@ -1050,10 +1064,10 @@ procedure TioAbstractBlobStream.Truncate;
 begin
   Clear;
   // Se non siamo in fase di lettura dei dati del blob allora
-  //  imposta il flag MOdified = True, ho aggiunto il flag IsreadingBlobData
-  //  perchè altrimenti nel caso dei BLOB grafici (o cmq non i Memo) durante
-  //  il caricaemtneo dello stream veniva eseguito anche questo metodo e quindi
-  //  si ritrovava in un loop infinito.
+  // imposta il flag MOdified = True, ho aggiunto il flag IsreadingBlobData
+  // perchè altrimenti nel caso dei BLOB grafici (o cmq non i Memo) durante
+  // il caricaemtneo dello stream veniva eseguito anche questo metodo e quindi
+  // si ritrovava in un loop infinito.
   FModified := not FIsReadingBlobData;
 end;
 
@@ -1061,17 +1075,16 @@ function TioAbstractBlobStream.Write(const Buffer; Count: Integer): Longint;
 begin
   Result := inherited Write(Buffer, Count);
   // Se non siamo in fase di lettura dei dati del blob allora
-  //  imposta il flag MOdified = True, ho aggiunto il flag IsreadingBlobData
-  //  perchè altrimenti nel caso dei BLOB grafici (o cmq non i Memo) durante
-  //  il caricaemtneo dello stream veniva eseguito anche questo metodo e quindi
-  //  si ritrovava in un loop infinito.
+  // imposta il flag MOdified = True, ho aggiunto il flag IsreadingBlobData
+  // perchè altrimenti nel caso dei BLOB grafici (o cmq non i Memo) durante
+  // il caricaemtneo dello stream veniva eseguito anche questo metodo e quindi
+  // si ritrovava in un loop infinito.
   FModified := not FIsReadingBlobData;
 end;
 
 { TioWideMemoBlobStream }
 
-constructor TioWideMemoBlobStream.Create(const AField: TWideMemoField;
-  const AMode: TBlobStreamMode);
+constructor TioWideMemoBlobStream.Create(const AField: TWideMemoField; const AMode: TBlobStreamMode);
 begin
   inherited Create(AField, AMode);
 end;
@@ -1135,8 +1148,7 @@ end;
 
 { TioStreamableObjBlobStream }
 
-constructor TioStreamableObjBlobStream.Create(const AField: TBlobField;
-  const AMode: TBlobStreamMode);
+constructor TioStreamableObjBlobStream.Create(const AField: TBlobField; const AMode: TBlobStreamMode);
 begin
   inherited Create(AField, AMode);
 end;
@@ -1156,15 +1168,15 @@ begin
     LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
     LCurrRecObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
     // At this point the property refer to a blob field (and to an Object) type then
-    //  check if the Object is assigned and if it isn't clear
-    //  the parameter
+    // check if the Object is assigned and if it isn't clear
+    // the parameter
     LStreamableObj := LProperty.GetValueAsObject(LCurrRecObj);
     if Assigned(LStreamableObj) then
     begin
       // Wrap the object into a DuckTypedStreamObject
       ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LStreamableObj);
       // If the wrapped object IsEmpty then clear the BlobDataStream also
-      //  else load data from the object to the stream
+      // else load data from the object to the stream
       if ADuckTypedStreamObject.IsEmpty then
         Self.Clear
       else
@@ -1195,8 +1207,8 @@ begin
   LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
   LCurrRecObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
   // At this point the property refer to a blob field (and to an Object) type then
-  //  check if the Object is assigned and if it isn't clear
-  //  the parameter
+  // check if the Object is assigned and if it isn't clear
+  // the parameter
   LStreamableObj := LProperty.GetValueAsObject(LCurrRecObj);
   if Assigned(LStreamableObj) then
   begin

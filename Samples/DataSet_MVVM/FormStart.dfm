@@ -39,11 +39,13 @@ object StartForm: TStartForm
     Top = 88
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AutoCreateDB.Enabled = True
     Database = '..\..\..\SamplesData\DataSetTest.DB'
     DatabaseStdFolder = sfUndefined
     DefaultConnection = True
     Persistent = False
     Pooled = False
+    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 152
     Top = 16
   end

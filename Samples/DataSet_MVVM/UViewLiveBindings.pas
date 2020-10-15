@@ -10,7 +10,7 @@ uses
   Vcl.Bind.DBEngExt, Vcl.Bind.Grid, System.Rtti, System.Bindings.Outputs,
   Vcl.Bind.Editors, Data.Bind.Grid, Data.Bind.GenData, Data.Bind.Controls,
   Vcl.ExtCtrls, Vcl.Buttons, Vcl.Bind.Navigator, Vcl.StdCtrls, Vcl.Mask,
-  Vcl.DBCtrls, Vcl.Bind.GenData;
+  Vcl.DBCtrls, Vcl.Bind.GenData, Vcl.Imaging.pngimage;
 
 type
 

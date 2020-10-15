@@ -88,6 +88,12 @@ object DataSetView: TDataSetView
         FieldName = 'PropBitMap'
         Width = 100
         Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'PropBoolean'
+        Width = 79
+        Visible = True
       end>
   end
   object DBGrid2: TDBGrid
@@ -107,7 +113,7 @@ object DataSetView: TDataSetView
   object DBNavigator1: TDBNavigator
     Left = 366
     Top = 6
-    Width = 240
+    Width = 230
     Height = 25
     DataSource = MasterDataSource
     Anchors = [akTop, akRight]
@@ -124,13 +130,20 @@ object DataSetView: TDataSetView
   end
   object ScrollBox1: TScrollBox
     Left = 8
-    Top = 311
+    Top = 314
     Width = 597
     Height = 135
     Anchors = [akLeft, akRight, akBottom]
     Ctl3D = False
     ParentCtl3D = False
     TabOrder = 4
+    object Label3: TLabel
+      Left = 15
+      Top = 16
+      Width = 54
+      Height = 13
+      Caption = 'Descrizione'
+    end
     object DBImage1: TDBImage
       Left = 464
       Top = 6
@@ -140,6 +153,25 @@ object DataSetView: TDataSetView
       DataSource = MasterDataSource
       Stretch = True
       TabOrder = 0
+    end
+    object DBCheckBox1: TDBCheckBox
+      Left = 328
+      Top = 15
+      Width = 97
+      Height = 17
+      Caption = 'PropBoolean'
+      DataField = 'PropBoolean'
+      DataSource = MasterDataSource
+      TabOrder = 1
+    end
+    object DBEdit1: TDBEdit
+      Left = 76
+      Top = 14
+      Width = 121
+      Height = 19
+      DataField = 'Descrizione'
+      DataSource = MasterDataSource
+      TabOrder = 2
     end
   end
   object ioViewModelBridge1: TioViewModelBridge
@@ -164,6 +196,9 @@ object DataSetView: TDataSetView
     object ModelMasterDataSetPropBitMap: TGraphicField
       FieldName = 'PropBitMap'
       BlobType = ftGraphic
+    end
+    object ModelMasterDataSetPropBoolean: TBooleanField
+      FieldName = 'PropBoolean'
     end
   end
   object MasterDataSource: TDataSource

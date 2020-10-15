@@ -12,12 +12,14 @@ type
   TModelDetail = class
   private
     FID: Integer;
+    FAttivo: boolean;
     FDescrizione: String;
     FMasterID: Integer;
   public
     property ID: Integer read FID write FID;
     property MasterID: Integer read FMasterID write FMasterID;
     property Descrizione: String read FDescrizione write FDescrizione;
+    property Attivo: boolean read FAttivo write FAttivo;
   end;
 
   [ioEntity]
@@ -46,6 +48,7 @@ type
     FPropDateTime: TDateTime;
     FPropDate: TDate;
     FPropWideString: WideString;
+    FPropBoolean: boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -81,6 +84,9 @@ type
     // String & Char
     property Descrizione: String read FDescrizione write FDescrizione;
     property PropWideString: WideString read FPropWideString write FPropWideString;
+
+    // Boolean
+    property PropBoolean: boolean read FPropBoolean write FPropBoolean;
 
     [ioHasMany(TModelDetail, 'MasterID')]
     property Details: TObjectList<TModelDetail> read FDetails; // write FDetails;
