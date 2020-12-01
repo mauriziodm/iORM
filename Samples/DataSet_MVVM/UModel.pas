@@ -23,12 +23,23 @@ type
   end;
 
   [ioEntity]
+  TBelongsToModelDetail = class
+  private
+    FID: Integer;
+    FDescrizione: String;
+  public
+    property ID: Integer read FID write FID;
+    property Descrizione: String read FDescrizione write FDescrizione;
+  end;
+
+  [ioEntity]
   TModelMaster = class
   private
     FPropWideMemo: TStrings;
     FPropBitMap: TBitMap;
     FID: Integer;
     FDescrizione: String;
+    FBelongsToDetail: TBelongsToModelDetail;
     FDetails: TObjectList<TModelDetail>;
     FPropShortint: Shortint;
     FPropSmallint: SmallInt;
@@ -88,6 +99,11 @@ type
     // Boolean
     property PropBoolean: boolean read FPropBoolean write FPropBoolean;
 
+    // BelongsTo relation
+    [ioBelongsTo(TBelongsToModelDetail)]
+    property BelongsToDetail: TBelongsToModelDetail read FBelongsToDetail write FBelongsToDetail;
+
+    // HasMany relation
     [ioHasMany(TModelDetail, 'MasterID')]
     property Details: TObjectList<TModelDetail> read FDetails; // write FDetails;
   end;

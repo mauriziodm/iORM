@@ -40,6 +40,8 @@ object StartForm: TStartForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     AutoCreateDB.Enabled = True
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ForeignKeys = False
     Database = '..\..\..\SamplesData\DataSetTest.DB'
     DatabaseStdFolder = sfUndefined
     DefaultConnection = True
