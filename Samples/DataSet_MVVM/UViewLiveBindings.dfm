@@ -54,13 +54,12 @@ object LiveBindingsView: TLiveBindingsView
     ExplicitTop = 422
   end
   object StringGrid1: TStringGrid
-    Tag = 4
+    Tag = 5
     Left = 8
     Top = 32
     Width = 550
     Height = 233
     Anchors = [akLeft, akTop, akRight, akBottom]
-    ColCount = 4
     DefaultColWidth = 100
     FixedCols = 0
     RowCount = 201
@@ -69,7 +68,8 @@ object LiveBindingsView: TLiveBindingsView
       50
       160
       120
-      82)
+      64
+      150)
     RowHeights = (
       24
       24
@@ -274,6 +274,7 @@ object LiveBindingsView: TLiveBindingsView
       24)
     ColAligments = (
       1
+      0
       0
       0
       0)
@@ -625,6 +626,11 @@ object LiveBindingsView: TLiveBindingsView
         FieldType = ftBoolean
         Generator = 'Booleans'
         ReadOnly = False
+      end
+      item
+        Name = 'BelongsToDetail.Descrizione'
+        Generator = 'ContactNames'
+        ReadOnly = False
       end>
     ScopeMappings = <>
     ViewModelBridge = ioViewModelBridge1
@@ -656,6 +662,10 @@ object LiveBindingsView: TLiveBindingsView
         end
         item
           MemberName = 'PropBoolean'
+        end
+        item
+          MemberName = 'BelongsToDetail.Descrizione'
+          Width = 150
         end>
     end
     object LinkControlToField2: TLinkControlToField

@@ -94,7 +94,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj">
-            <Dependencies/>
+            <Dependencies>iORM_Project_DesignTime.dproj;iORM_Project.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\BOM_MVVM_CrossFramework\VCL_DevExpress\BOM_MVVM_VCL_DevExpress.dproj">
             <Dependencies/>
@@ -386,13 +386,13 @@
     <Target Name="MapperPizzaImageExample:Make">
         <MSBuild Projects="..\..\ExtLibs\ObjMapper\Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj" Targets="Make"/>
     </Target>
-    <Target Name="DataSet_MVVM">
+    <Target Name="DataSet_MVVM" DependsOnTargets="iORM_Project_DesignTime;iORM_Project">
         <MSBuild Projects="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj"/>
     </Target>
-    <Target Name="DataSet_MVVM:Clean">
+    <Target Name="DataSet_MVVM:Clean" DependsOnTargets="iORM_Project_DesignTime:Clean;iORM_Project:Clean">
         <MSBuild Projects="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="DataSet_MVVM:Make">
+    <Target Name="DataSet_MVVM:Make" DependsOnTargets="iORM_Project_DesignTime:Make;iORM_Project:Make">
         <MSBuild Projects="..\..\Samples\DataSet_MVVM\DataSet_MVVM.dproj" Targets="Make"/>
     </Target>
     <Target Name="BOM_MVVM_VCL_DevExpress">
