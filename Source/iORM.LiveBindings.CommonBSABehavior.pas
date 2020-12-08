@@ -41,7 +41,7 @@ uses
 
 type
 
-  TBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
+  TioBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
   private
     class var FIndexOffset: Integer;
   public
@@ -58,6 +58,12 @@ type
     constructor Create(const AMasterGetMemberObject: IGetMemberObject; const AMasterProperty: IioContextProperty);
     function GetMemberObject: TObject;
   end;
+
+  // Use RTTI to read the value of a property
+//  TPropertyValueReader<T> = class(TValueReader<T>)
+//  public
+//    function GetValue: T; override;
+//  end;
 
   // Methods and functionalities common to all ActiveBindSouceAdapters
   TioCommonBSABehavior = class
@@ -319,14 +325,14 @@ end;
 
 { TBindSourceAdapterFieldHelper }
 
-class constructor TBindSourceAdapterFieldHelper.Create;
+class constructor TioBindSourceAdapterFieldHelper.Create;
 var
   Ctx: TRTTIContext;
 begin
   FIndexOffset := Ctx.GetType(TBindSourceAdapterField).GetField('FIndex').Offset;
 end;
 
-procedure TBindSourceAdapterFieldHelper.SetIndex(const Value: Integer);
+procedure TioBindSourceAdapterFieldHelper.SetIndex(const Value: Integer);
 begin
   PInteger(Pointer(NativeInt(Self) + FIndexOffset))^ := Value;
 end;

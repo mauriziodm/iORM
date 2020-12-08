@@ -240,9 +240,9 @@ begin
   // inherited; // NB: Don't inherit from ancestor
   LType := GetObjectType;
   LIntf := TBindSourceAdapterGetMemberObject.Create(Self);
-  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
-  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
-//  TioCommonBSABehavior.AddFields(LType, Self, LIntf, '');
+//  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
+//  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
+  TioCommonBSABehavior.AddFields(LType, Self, LIntf, '');
 end;
 
 procedure TioActiveListBindSourceAdapter.Append(AObject: IInterface);
