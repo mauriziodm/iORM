@@ -65,6 +65,12 @@ type
     function GetValue: T; override;
   end;
 
+  // Use RTTI to write the value into a property
+  TioPropertyValueWriter<T> = class(TPropertyValueWriter<T>)
+  public
+    procedure SetValue(const AValue: T); override;
+  end;
+
   // Methods and functionalities common to all ActiveBindSouceAdapters
   TioCommonBSABehavior = class
   public
@@ -301,7 +307,7 @@ begin
     if AProperty.IsWritable then
       Result := TBindSourceAdapterReadWriteField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject,
-        TioPropertyValueReader<T>.Create, TPropertyValueWriter<T>.Create, AMemberType)
+        TioPropertyValueReader<T>.Create, TioPropertyValueWriter<T>.Create, AMemberType)
     else
       Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject,
@@ -364,6 +370,7 @@ var
   LRttiField: TRttiProperty;
 
 begin
+// Do not inherit
 //  LObject := FField.GetMemberObject; // original code
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
   if LObject <> nil then
@@ -379,6 +386,30 @@ begin
   end
   else
     Result := TValue.Empty.AsType<T>;
+end;
+
+{ TioPropertyValueWriter<T> }
+
+procedure TioPropertyValueWriter<T>.SetValue(const AValue: T);
+var
+  LObject: TObject;
+  LCtxt: TRttiContext;
+  LRttiType: TRttiType;
+  LRttiField: TRttiProperty;
+begin
+// Do not inherit
+  LObject := FField.GetMemberObjectIntf.GetMemberObject;
+  if LObject <> nil then
+  begin
+    LRttiType := LCtxt.GetType(LObject.ClassType);
+    LRttiField := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+    if LRttiField <> nil then
+    begin
+      LRttiField.SetValue(LObject, TValue.From<T>(AValue));
+      //RecordChanged;
+    end;
+
+  end;
 end;
 
 end.

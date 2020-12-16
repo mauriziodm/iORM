@@ -34,6 +34,7 @@ type
     DBCheckBox1: TDBCheckBox;
     DBEdit1: TDBEdit;
     Label3: TLabel;
+    ModelMasterDataSetBelongsToDetailDescrizione: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private

@@ -94,6 +94,12 @@ object DataSetView: TDataSetView
         FieldName = 'PropBoolean'
         Width = 79
         Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'BelongsToDetail.Descrizione'
+        Width = 150
+        Visible = True
       end>
   end
   object DBGrid2: TDBGrid
@@ -199,6 +205,10 @@ object DataSetView: TDataSetView
     end
     object ModelMasterDataSetPropBoolean: TBooleanField
       FieldName = 'PropBoolean'
+    end
+    object ModelMasterDataSetBelongsToDetailDescrizione: TStringField
+      FieldName = 'BelongsToDetail.Descrizione'
+      Size = 100
     end
   end
   object MasterDataSource: TDataSource

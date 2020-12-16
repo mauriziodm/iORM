@@ -5,7 +5,7 @@ inherited ViewModel: TViewModel
     Async = False
     AutoLoadData = True
     AutoPersist = True
-    AutoPost = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     TypeName = 'TModelMaster'
     ViewDataType = dtList
@@ -23,8 +23,8 @@ inherited ViewModel: TViewModel
     AsDefault = False
     Async = False
     AutoLoadData = True
-    AutoPersist = True
-    AutoPost = False
+    AutoPersist = False
+    AutoPost = True
     AutoRefreshOnNotification = arEnabledNoReload
     MasterPresenter = ModelMasterPresenter
     MasterPropertyName = 'Details'

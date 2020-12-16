@@ -576,12 +576,12 @@ begin
         begin
           // ---------- M.M. 17/08/18 ----------
           // Marco ha aggiunto questa riga che persiste anche l'oggetto child di una relazione BelongTo
-          // ma io ritengo che non vada persistito (non serve persistere un dettaglio di una BelongsTi).
+          // ma io ritengo che non vada persistito (non serve persistere un dettaglio di una BelongsTo).
           // Ho parlato con lui questa mattina (17/09/2019) e anche lui è d'accordo.
-          // Nel caso dovesse servire, in futuro, si potrebbe aggiungere un parametri all'attributo
+          // Nel caso dovesse servire, in futuro, si potrebbe aggiungere un parametro all'attributo
           // [ioBelongsTo] per poter forare o meno il persist anche del dettaglio della BelongsTo
           // che di default preferisco rimanga disabilitata.
-          // io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
+          //io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
           // ---------- M.M. 17/08/18 ----------
           { Nothing }  // Non persiste più nulla in caso di relazione BelongsTo
         end;

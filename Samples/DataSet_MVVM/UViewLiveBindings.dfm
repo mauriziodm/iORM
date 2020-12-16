@@ -611,7 +611,7 @@ object LiveBindingsView: TLiveBindingsView
   end
   object MasterModelBindSource: TioModelBindSource
     AutoActivate = True
-    AutoPost = False
+    AutoPost = True
     FieldDefs = <
       item
         Name = 'ID'
@@ -720,7 +720,7 @@ object LiveBindingsView: TLiveBindingsView
   end
   object DetailModelBindSource: TioModelBindSource
     AutoActivate = True
-    AutoPost = False
+    AutoPost = True
     FieldDefs = <
       item
         Name = 'Descrizione'

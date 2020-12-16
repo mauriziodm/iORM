@@ -125,6 +125,8 @@ begin
   FDetails.Free;
   FPropWideMemo.Free;
   FPropBitMap.Free;
+  if Assigned(FBelongsToDetail) then
+    FBelongsToDetail.Free;
   inherited;
 end;
 
