@@ -84,7 +84,7 @@ uses
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, System.Classes,
   Data.DB, iORM.LazyLoad.Interfaces, System.SysUtils, iORM.Attributes,
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
-  iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Rtti.Utilities,
+  iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Utilities,
   iORM.LiveBindings.Interfaces, iORM.MVVM.Components.ModelPresenter,
   iORM.Where.Interfaces, iORM.MVVM.Components.ViewModelBridge, iORM.MVVM.ViewModelBase;
 
@@ -104,7 +104,7 @@ begin
     // Create the child object/list if it isn't not already created by the master class constructor
     if not Assigned(Result) then
       Result := io.di.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
-    TioRttiUtilities.ObjectAsIInterface(Result)._AddRef;
+    TioUtilities.ObjectAsIInterface(Result)._AddRef;
   end
   else
   // If the AProperty is of instance (class) type...

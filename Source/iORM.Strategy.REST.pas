@@ -72,7 +72,7 @@ implementation
 
 uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
-  iORM.DB.Factory, System.Generics.Collections, iORM.Rtti.Utilities,
+  iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
   iORM.Context.Container;

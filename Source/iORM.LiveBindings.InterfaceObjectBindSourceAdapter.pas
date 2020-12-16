@@ -97,7 +97,7 @@ type
 implementation
 
 
-uses SysUtils, iORM.Rtti.Utilities, iORM, iORM.Exceptions,
+uses SysUtils, iORM.Utilities, iORM, iORM.Exceptions,
   iORM.Resolver.Factory, iORM.Resolver.Interfaces;
 
 { TInterfaceObjectBindSourceAdapter<T> }
@@ -124,13 +124,13 @@ begin
   // Set the BaseObjectType
   FTypeName := ATypeName;
   if FTypeName.IsEmpty then
-    FTypeName := TioRttiUtilities.GenericToString<T>;
+    FTypeName := TioUtilities.GenericToString<T>;
   FTypeAlias := ATypeAlias;
 
   // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
   //  AObject is always an interface by generic constraint
   if Assigned(AObject) then
-    FBaseObjectRttiType := TioRttiUtilities.ClassRefToRttiType((AObject as TObject).ClassType)
+    FBaseObjectRttiType := TioUtilities.ClassRefToRttiType((AObject as TObject).ClassType)
   else
     FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
 

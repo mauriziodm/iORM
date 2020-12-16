@@ -225,7 +225,7 @@ implementation
 
 uses
   iORM.Exceptions, iORM.LiveBindings.Factory,
-  iORM.Where.Factory, iORM.Rtti.Utilities, iORM.Components.Common, System.Rtti;
+  iORM.Where.Factory, iORM.Utilities, iORM.Components.Common, System.Rtti;
 
 { TioPrototypeBindSource }
 
@@ -497,7 +497,7 @@ var
   LCurrent: TObject;
 begin
   LCurrent := Self.Current;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LCurrent);
+  Result := TioUtilities.CastObjectToGeneric<T>(LCurrent);
 end;
 
 function TioPrototypeBindSource.CurrentMasterObject: TObject;
@@ -513,7 +513,7 @@ var
   LMasterObject: TObject;
 begin
   LMasterObject := Self.CurrentMasterObject;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LMasterObject);
+  Result := TioUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
 function TioPrototypeBindSource.GetActiveBindSourceAdapter
@@ -549,7 +549,7 @@ var
   LObj: TObject;
 begin
   LObj := Self.DataObject;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LObj);
+  Result := TioUtilities.CastObjectToGeneric<T>(LObj);
 end;
 
 function TioPrototypeBindSource.DataObjectAssigned: Boolean;
@@ -630,7 +630,7 @@ begin
   if CheckAdapter then
     Result := GetActiveBindSourceAdapter.IsInterfaceBSA
   else
-    Result := TioRttiUtilities.IsAnInterfaceTypeName(ioTypeName);
+    Result := TioUtilities.IsAnInterfaceTypeName(ioTypeName);
 end;
 
 function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter

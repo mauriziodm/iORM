@@ -87,7 +87,7 @@ uses
   System.TypInfo, iORM.Exceptions, iORM.Attributes, FireDAC.Stan.Param,
   iORM.ObjectsForge.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, System.JSON,
-  iORM.Rtti.Utilities;
+  iORM.Utilities;
 
 { TioQuerySqLite }
 
@@ -319,7 +319,7 @@ begin
   // If a RelationChildPropertyPath is assigned then resolve it
   AObj := AProp.GetValueAsObject(AContext.DataObject);
   if AProp.RelationChildPropertyPathAssigned then
-    AObj := TioRttiUtilities.ResolveChildPropertyPath(AObj, AProp.GetRelationChildPropertyPath);
+    AObj := TioUtilities.ResolveChildPropertyPath(AObj, AProp.GetRelationChildPropertyPath);
   if not Assigned(AObj) then
   begin
     Self.SetParamValueToNull(AProp);

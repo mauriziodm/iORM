@@ -188,7 +188,7 @@ implementation
 uses
   iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory, iORM.Context.Map.Interfaces, iORM.Where.Factory,
   iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.LiveBindings.CommonBSABehavior, iORM.Rtti.Utilities;
+  iORM.LiveBindings.CommonBSABehavior, iORM.Utilities;
 
 { TioActiveInterfaceObjectBindSourceAdapter }
 

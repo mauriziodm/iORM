@@ -35,6 +35,9 @@ type
     LinkControlToField1: TLinkControlToField;
     Image1: TImage;
     LinkControlToField3: TLinkControlToField;
+    EditBelongsToDescription: TEdit;
+    Label3: TLabel;
+    LinkControlToField4: TLinkControlToField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }

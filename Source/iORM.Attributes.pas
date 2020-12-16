@@ -552,7 +552,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Rtti.Utilities;
+  System.SysUtils, iORM.Utilities;
 
 { TioStringAttribute }
 
@@ -578,7 +578,7 @@ end;
 
 constructor TioCustomRelationAttribute.Create(AIID: TGUID; const AChildTypeAlias: String);
 begin
-  FChildTypeName := TioRttiUtilities.GUIDtoInterfaceName(AIID);
+  FChildTypeName := TioUtilities.GUIDtoInterfaceName(AIID);
   FChildTypeAlias := AChildTypeAlias;
 end;
 
@@ -606,12 +606,12 @@ end;
 
 constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType);
 begin
-  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType);
+  Self.Create(TioUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType);
 end;
 
 constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType);
 begin
-  Self.Create(TioRttiUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType);
+  Self.Create(TioUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType);
 end;
 
 { ioJoin }
@@ -823,7 +823,7 @@ end;
 
 constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
 begin
-  FTargetTypeName := TioRttiUtilities.GUIDtoInterfaceName(ATargetIID);
+  FTargetTypeName := TioUtilities.GUIDtoInterfaceName(ATargetIID);
   FTargetTypeAlias := AAlias;
 end;
 

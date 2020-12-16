@@ -271,7 +271,7 @@ implementation
 
 uses
   iORM.Where.Factory, iORM.LiveBindings.Factory,
-  iORM.Exceptions, iORM.Rtti.Utilities, iORM, iORM.Components.Common;
+  iORM.Exceptions, iORM.Utilities, iORM, iORM.Components.Common;
 
 { TioModelProvider }
 
@@ -385,7 +385,7 @@ var
   LCurrent: TObject;
 begin
   LCurrent := Self.Current;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LCurrent);
+  Result := TioUtilities.CastObjectToGeneric<T>(LCurrent);
 end;
 
 procedure TioModelPresenter.Delete;
@@ -563,7 +563,7 @@ var
   LObj: TObject;
 begin
   LObj := Self.DataObject;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LObj);
+  Result := TioUtilities.CastObjectToGeneric<T>(LObj);
 end;
 
 function TioModelPresenter.DataObjectAssigned: Boolean;
@@ -612,7 +612,7 @@ begin
   if CheckAdapter then
     Result := BindSourceAdapter.IsInterfaceBSA
   else
-    Result := TioRttiUtilities.IsAnInterfaceTypeName(TypeName);
+    Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
 function TioModelPresenter.GetItemIndex: Integer;
@@ -772,7 +772,7 @@ var
   LMasterObject: TObject;
 begin
   LMasterObject := Self.CurrentMasterObject;
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(LMasterObject);
+  Result := TioUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
 procedure TioModelPresenter.Next;

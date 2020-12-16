@@ -340,7 +340,7 @@ implementation
 
 uses
   iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker,
-  iORM.Rtti.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
+  iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
   iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces,
@@ -439,7 +439,7 @@ end;
 class function TioDependencyInjection.LocateViewVMfor<T>(
   const AAlias, AViewModelMarker:String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor(TioRttiUtilities.GenericToString<T>, AAlias, AViewModelMarker);
+  Result := LocateViewVMfor(TioUtilities.GenericToString<T>, AAlias, AViewModelMarker);
 end;
 
 class function TioDependencyInjection.LocateView<T>(
@@ -461,7 +461,7 @@ end;
 
 class function TioDependencyInjection.LocateViewFor<T>(const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewFor(TioRttiUtilities.GenericToString<T>, AAlias);
+  Result := LocateViewFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 class function TioDependencyInjection.LocateViewFor(
@@ -524,7 +524,7 @@ end;
 class function TioDependencyInjection.LocateVMfor<T>(
   const AAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMfor(TioRttiUtilities.GenericToString<T>, AAlias);
+  Result := LocateVMfor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 class function TioDependencyInjection.RegisterClass(
@@ -542,7 +542,7 @@ end;
 
 class function TioDependencyInjection.RegisterClass<T>: TioDependencyInjectionRegister;
 begin
-  Result := RegisterClass(   TioRttiUtilities.ClassRefToRttiType(T)   );
+  Result := RegisterClass(   TioUtilities.ClassRefToRttiType(T)   );
 end;
 
 class function TioDependencyInjection.Singletons: TioSingletonsFacadeRef;
@@ -664,7 +664,7 @@ function TioDependencyInjectionRegister.Implements(const IID:TGUID;
   const AAlias: String): TioDependencyInjectionRegister;
 begin
   // Set the InterfaceName
-  Self.FInterfaceName := TioRttiUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
+  Self.FInterfaceName := TioUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
   // Set the interface GUID
   FContainerValue.InterfaceGUID := IID;
   // Set the Alias
@@ -677,9 +677,9 @@ end;
 function TioDependencyInjectionRegister.Implements<T>(const AAlias:String): TioDependencyInjectionRegister;
 begin
   // Set the InterfaceName
-  Self.FInterfaceName := TioRttiUtilities.GenericToString<T>;
+  Self.FInterfaceName := TioUtilities.GenericToString<T>;
   // Set the interface GUID
-  FContainerValue.InterfaceGUID := TioRttiUtilities.TypeInfoToGUID(TypeInfo(T));
+  FContainerValue.InterfaceGUID := TioUtilities.TypeInfoToGUID(TypeInfo(T));
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -902,14 +902,14 @@ end;
 
 function TioDependencyInjectionRegister.AsViewFor(const ATargetIID: TGUID; const AAlias: String): TioDependencyInjectionRegister;
 begin
-  Result := Self.AsViewFor(TioRttiUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
+  Result := Self.AsViewFor(TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
 end;
 
 function TioDependencyInjectionRegister.AsViewFor<T>(
   const AAlias: String): TioDependencyInjectionRegister;
 begin
 //  Result := Self.AsViewFor(T.ClassName, AAlias);
-  Result := Self.AsViewFor(TioRttiUtilities.GenericToString<T>, AAlias);
+  Result := Self.AsViewFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 function TioDependencyInjectionRegister.AsViewModelFor(
@@ -933,13 +933,13 @@ end;
 
 function TioDependencyInjectionRegister.AsViewModelFor(const ATargetIID: TGUID; const AAlias: String): TioDependencyInjectionRegister;
 begin
-  Result := Self.AsViewModelFor(TioRttiUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
+  Result := Self.AsViewModelFor(TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
 end;
 
 function TioDependencyInjectionRegister.AsViewModelFor<T>(
   const AAlias: String): TioDependencyInjectionRegister;
 begin
-  Result := Self.AsViewModelFor(TioRttiUtilities.GenericToString<T>, AAlias);
+  Result := Self.AsViewModelFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 { TioDependencyInjectionContainer }
@@ -1620,7 +1620,7 @@ end;
 
 class function TioDependencyInjectionFactory.GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>;
 begin
-  Result := TioDependencyInjectionLocator<TI>.Create(TioRttiUtilities.GenericToString<TI>, AAlias, AOwnerRequested, AVCProviderEnabled);
+  Result := TioDependencyInjectionLocator<TI>.Create(TioUtilities.GenericToString<TI>, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
 class function TioDependencyInjectionFactory.GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;
@@ -1659,7 +1659,7 @@ var
   ContainerItem: TioDIContainerImplementersItem;
 begin
   ContainerItem := Self.Container.Get(_InterfaceName, _Alias);
-  Result := TioRttiUtilities.CastObjectToGeneric<TI>(
+  Result := TioUtilities.CastObjectToGeneric<TI>(
     _Get(ContainerItem),
     ContainerItem.InterfaceGUID
     );
@@ -1748,7 +1748,7 @@ begin
   Result := TioResolverFactory.GetResolvedTypeList;
   // If ATypeName is not an interface (is a class) then
   //  return it and exit;
-  if not TioRttiUtilities.IsAnInterfaceTypeName(ATypeName) then
+  if not TioUtilities.IsAnInterfaceTypeName(ATypeName) then
   begin
     Result.Add(ATypeName);
     Exit;

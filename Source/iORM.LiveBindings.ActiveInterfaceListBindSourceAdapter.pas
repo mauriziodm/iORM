@@ -41,7 +41,7 @@ uses
   iORM.CommonTypes, iORM.Context.Properties.Interfaces,
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.Where.Interfaces,
-  iORM.MVVM.Interfaces, iORM.Rtti.Utilities, System.Rtti;
+  iORM.MVVM.Interfaces, iORM.Utilities, System.Rtti;
 
 const
   VIEW_DATA_TYPE = TioViewDataType.dtList;
@@ -803,7 +803,7 @@ begin
     Self.SetList(TList<IInterface>(ADataObject), AOwnsObject);
     // If the DataObject (List) is an interface referenced object then
     // set the FInterfacedList field to it to keep alive the list itself
-    if TioRttiUtilities.IsAnInterface<T> then
+    if TioUtilities.IsAnInterface<T> then
       Supports(ADataObject, IInterface, Self.FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     // then restore the original value of the "AutoLoadData" property.

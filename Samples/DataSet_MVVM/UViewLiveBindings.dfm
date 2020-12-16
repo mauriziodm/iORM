@@ -345,6 +345,13 @@ object LiveBindingsView: TLiveBindingsView
       Stretch = True
       ExplicitLeft = 415
     end
+    object Label3: TLabel
+      Left = 103
+      Top = 96
+      Width = 106
+      Height = 13
+      Caption = 'BelongsTo.Description'
+    end
     object EditDescrizione: TEdit
       Left = 15
       Top = 44
@@ -360,6 +367,14 @@ object LiveBindingsView: TLiveBindingsView
       Height = 19
       TabOrder = 1
       Text = '-33'
+    end
+    object EditBelongsToDescription: TEdit
+      Left = 215
+      Top = 92
+      Width = 121
+      Height = 19
+      TabOrder = 2
+      Text = 'Mark Anderson'
     end
   end
   object StringGrid2: TStringGrid
@@ -694,6 +709,13 @@ object LiveBindingsView: TLiveBindingsView
       FieldName = 'PropBitMap'
       Control = Image1
       Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MasterModelBindSource
+      FieldName = 'BelongsToDetail.Descrizione'
+      Control = EditBelongsToDescription
+      Track = True
     end
   end
   object DetailModelBindSource: TioModelBindSource

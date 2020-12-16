@@ -231,7 +231,7 @@ implementation
 uses
   iORM.Context.Interfaces,
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
-  System.StrUtils, iORM.Context.Map.Interfaces, iORM.Rtti.Utilities,
+  System.StrUtils, iORM.Context.Map.Interfaces, iORM.Utilities,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container;
 
 { TioProperty }
@@ -427,10 +427,10 @@ var
 begin
   // Extract the child related object
   AValue := Self.GetValue(Instance);
-  Result := TioRttiUtilities.TValueToObject(AValue, True);
+  Result := TioUtilities.TValueToObject(AValue, True);
   // If a RelationChildPropertyPath is assigned then resolve it
   if Self.RelationChildPropertyPathAssigned then
-    Result := TioRttiUtilities.ResolveChildPropertyPath(Result, FRelationChildPropertyPath);
+    Result := TioUtilities.ResolveChildPropertyPath(Result, FRelationChildPropertyPath);
 end;
 
 function TioProperty.GetRelationChildObjectID(const Instance: Pointer): Integer;
@@ -536,7 +536,7 @@ var
   AValue: TValue;
 begin
   AValue := Self.GetValue(Instance);
-  Result := TioRttiUtilities.TValueToObject(AValue, False)
+  Result := TioUtilities.TValueToObject(AValue, False)
 end;
 
 function TioProperty.IDSkipOnInsert: Boolean;

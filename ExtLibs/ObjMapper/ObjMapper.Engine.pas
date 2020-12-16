@@ -198,7 +198,7 @@ uses
 {$ENDIF}
   ObjMapper.DuckList, System.Classes, Soap.EncdDecd, System.NetEncoding,
   ObjMapper.RTTIUtils, ObjMapper.Attributes, System.DateUtils, ObjMapper.DuckDictionary,
-  iORM.Rtti.Utilities;
+  iORM.Utilities;
 
 
 type
@@ -356,7 +356,7 @@ begin
   //  master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
     if TDuckPropField.IsValidPropField(APropField) then
-      LChildObj := TioRttiUtilities.TValueToObject(   TDuckPropField.GetValue(AMasterObj, APropField)   )
+      LChildObj := TioUtilities.TValueToObject(   TDuckPropField.GetValue(AMasterObj, APropField)   )
     else
       LChildObj := AMasterObj;
   // If the LChildObj is not assigned and the AValueType is assigned then

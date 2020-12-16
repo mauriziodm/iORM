@@ -54,7 +54,7 @@ implementation
 
 uses
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Attributes, iORM,
-  iORM.CommonTypes, iORM.Rtti.Utilities;
+  iORM.CommonTypes, iORM.Utilities;
 
 { TObjectMaker }
 
@@ -104,7 +104,7 @@ begin
     begin
       // If is an Interface property then adjust the RefCount to prevent an access violation
       if CurrProp.IsInterface then
-        TioRttiUtilities.ObjectAsIInterface(AObj)._Release;
+        TioUtilities.ObjectAsIInterface(AObj)._Release;
       // Assign the related object/s to the property   (***ChildPropertyPath***)
       if CurrProp.IsWritable then
         CurrProp.SetValue(Result, AObj);

@@ -174,7 +174,7 @@
         <DCCReference Include="..\..\Source\iORM.Containers.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.Containers.ObjectList.pas"/>
         <DCCReference Include="..\..\Source\iORM.Resolver.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Rtti.Utilities.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Utilities.pas"/>
         <DCCReference Include="..\..\Source\iORM.Resolver.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.Resolver.ByDependencyInjection.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.TransactionCollection.pas"/>

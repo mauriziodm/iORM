@@ -52,7 +52,7 @@ type
 implementation
 
 uses
-  iORM.LazyLoad.LazyLoadObject, iORM.Rtti.Utilities, iORM.Exceptions;
+  iORM.LazyLoad.LazyLoadObject, iORM.Utilities, iORM.Exceptions;
 
 { TioLazyLoadFactory }
 

@@ -252,7 +252,7 @@ uses
   iORM.Attributes,
   iORM.Exceptions,
   iORM.DB.Factory,
-  iORM.Rtti.Utilities,
+  iORM.Utilities,
   iORM.Strategy.Factory,
   iORM.Context.Container,
   iORM.AbstractionLayer.Framework,
@@ -275,13 +275,13 @@ end;
 
 class function io.Load(const AIID: TGUID; const ATypeAlias: String): IioWhere;
 begin
-  Result := Self.Load(TioRttiUtilities.GUIDtoTypeInfo(AIID), ATypeAlias);
+  Result := Self.Load(TioUtilities.GUIDtoTypeInfo(AIID), ATypeAlias);
 end;
 
 class function io.Load<T>(const ATypeAlias: String): IioWhere<T>;
 begin
   Result := TioWhereFactory.NewWhere<T>;
-  Result.TypeName := TioRttiUtilities.GenericToString<T>;
+  Result.TypeName := TioUtilities.GenericToString<T>;
   Result.TypeAlias := ATypeAlias;
   Result.TypeInfo := TypeInfo(T);
 end;
@@ -820,7 +820,7 @@ end;
 class function io.Load(const ATypeInfo: PTypeInfo; const ATypeAlias: String): IioWhere;
 begin
   Result := TioWhereFactory.NewWhere;
-  Result.TypeName := TioRttiUtilities.TypeInfoToTypeName(ATypeInfo);
+  Result.TypeName := TioUtilities.TypeInfoToTypeName(ATypeInfo);
   Result.TypeAlias := ATypeAlias;
   Result.TypeInfo := ATypeInfo;
 end;

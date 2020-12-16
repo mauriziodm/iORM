@@ -50,7 +50,7 @@ type
   end;
 
   // Implementation of IGetMemberObject to get the child object
-  TBindSourceAdapterGetChildMemberObject = class(TInterfacedObject, IGetMemberObject)
+  TioBindSourceAdapterGetChildMemberObject = class(TInterfacedObject, IGetMemberObject)
   private
     FMasterMemberObject: IGetMemberObject;
     FMasterProperty: IioContextProperty;
@@ -60,10 +60,10 @@ type
   end;
 
   // Use RTTI to read the value of a property
-//  TPropertyValueReader<T> = class(TValueReader<T>)
-//  public
-//    function GetValue: T; override;
-//  end;
+  TioPropertyValueReader<T> = class(TPropertyValueReader<T>)
+  public
+    function GetValue: T; override;
+  end;
 
   // Methods and functionalities common to all ActiveBindSouceAdapters
   TioCommonBSABehavior = class
@@ -87,7 +87,7 @@ type
 implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Context.Factory, iORM.Attributes,
-  System.TypInfo, System.SysUtils;
+  System.TypInfo, System.SysUtils, iORM.Utilities;
 
 { TioCommonBSABehavior }
 
@@ -262,7 +262,7 @@ begin
           begin
             // LCollectionEditorField.FGetMemberObject := AGetMemberObject; // Original
             LCollectionEditorField.GetMemberObjectIntf := AGetMemberObject;
-            // LCollectionEditorField.FIndex := AFieldsList.Add(LCollectionEditorField);  // Original
+            //LCollectionEditorField.FIndex := AFieldsList.Add(LCollectionEditorField);  // Original
             LCollectionEditorField.SetIndex(AFieldsList.Add(LCollectionEditorField));
             // Using class helper hack to access FIndex private field in the original class
           end;
@@ -286,8 +286,8 @@ begin
   begin
     if LProperty.GetRelationType in [ioRtBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne] then
     begin
-      LChildPath := AMasterPath + LProperty.GetName; // + '.';
-      LChildGetMemberObject := TBindSourceAdapterGetChildMemberObject.Create(AMasterGetMemberObject, LProperty);
+      LChildPath := AMasterPath + LProperty.GetName + '.';
+      LChildGetMemberObject := TioBindSourceAdapterGetChildMemberObject.Create(AMasterGetMemberObject, LProperty);
       AddFields(LProperty.GetRttiType, ABindSourceAdapter, LChildGetMemberObject, LChildPath);
     end;
   end;
@@ -301,11 +301,11 @@ begin
     if AProperty.IsWritable then
       Result := TBindSourceAdapterReadWriteField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject,
-        TPropertyValueReader<T>.Create, TPropertyValueWriter<T>.Create, AMemberType)
+        TioPropertyValueReader<T>.Create, TPropertyValueWriter<T>.Create, AMemberType)
     else
       Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject,
-        TPropertyValueReader<T>.Create, AMemberType);
+        TioPropertyValueReader<T>.Create, AMemberType);
 end;
 
 class function TioCommonBSABehavior.CreateRttiObjectPropertyField<T>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter;
@@ -339,19 +339,46 @@ end;
 
 { TBindSourceAdapterGetChildMemberObject }
 
-constructor TBindSourceAdapterGetChildMemberObject.Create(const AMasterGetMemberObject: IGetMemberObject;
+constructor TioBindSourceAdapterGetChildMemberObject.Create(const AMasterGetMemberObject: IGetMemberObject;
   const AMasterProperty: IioContextProperty);
 begin
   FMasterMemberObject := AMasterGetMemberObject;
   FMasterProperty := AMasterProperty;
 end;
 
-function TBindSourceAdapterGetChildMemberObject.GetMemberObject: TObject;
+function TioBindSourceAdapterGetChildMemberObject.GetMemberObject: TObject;
 var
   LMasterObj: TObject;
 begin
   LMasterObj := FMasterMemberObject.GetMemberObject;
   Result := FMasterProperty.GetRelationChildObject(LMasterObj);
+end;
+
+{ TioPropertyValueReader<T> }
+
+function TioPropertyValueReader<T>.GetValue: T;
+var
+  LObject: TObject;
+  LCtxt: TRttiContext;
+  LRttiType: TRttiType;
+  LRttiField: TRttiProperty;
+
+begin
+//  LObject := FField.GetMemberObject; // original code
+  LObject := FField.GetMemberObjectIntf.GetMemberObject;
+  if LObject <> nil then
+  begin
+    LRttiType := LCtxt.GetType(LObject.ClassType);
+    LRttiField := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+    if LRttiField <> nil then
+    begin
+      Result := LRttiField.GetValue(LObject).AsType<T>;
+    end
+    else
+      Result := TValue.Empty.AsType<T>;
+  end
+  else
+    Result := TValue.Empty.AsType<T>;
 end;
 
 end.

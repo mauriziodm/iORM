@@ -59,7 +59,7 @@ type
 implementation
 
 uses
-  iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Rtti.Utilities,
+  iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Utilities,
   System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces, iORM;
 
 
@@ -196,7 +196,7 @@ var
   LIID: TGUID;
 begin
   Result := nil;
-  LIID := TioRttiUtilities.TypeInfoToGUID(TypeInfo(T));
+  LIID := TioUtilities.TypeInfoToGUID(TypeInfo(T));
   if not Supports(FViewModel, LIID, Result) then
     raise EioException.Create(Self.ClassName + ': Interface not implemented by the ViewModel.');
 end;

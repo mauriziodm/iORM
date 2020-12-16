@@ -100,7 +100,7 @@ implementation
 
 uses
   iORM.Exceptions,
-  iORM.MVVM.ViewContextProviderContainer, iORM.Rtti.Utilities;
+  iORM.MVVM.ViewContextProviderContainer, iORM.Utilities;
 
 { TioViewContextProvider }
 
@@ -171,7 +171,7 @@ end;
 
 function TioViewContextProvider.IsDefault: Boolean;
 begin
-  Result := TioRttiUtilities.SameObject(Self, TioViewContextProviderContainer.GetProvider);
+  Result := TioUtilities.SameObject(Self, TioViewContextProviderContainer.GetProvider);
 end;
 
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;

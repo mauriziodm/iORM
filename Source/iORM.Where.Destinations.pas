@@ -52,7 +52,7 @@ type
 implementation
 
 uses
-  iORM.Rtti.Utilities, iORM.RttiContext.Factory, System.TypInfo,
+  iORM.Utilities, iORM.RttiContext.Factory, System.TypInfo,
   iORM.Where;
 
 { TioWhereGenericListDestination }
@@ -67,16 +67,16 @@ function TioWhereGenericListDestination.OfType<TRESULT>(const AAlias: String;
   const AOwnsObjects: Boolean): TRESULT;
 begin
   try
-    if TioRttiUtilities.IsAnInterface<TRESULT> then
-      Result := TioRttiUtilities.CastObjectToGeneric<TRESULT>(
+    if TioUtilities.IsAnInterface<TRESULT> then
+      Result := TioUtilities.CastObjectToGeneric<TRESULT>(
                   (FWhere as TioWhere).ToList(    // TObject and Cast to avoid circular receference
-                    TioRttiUtilities.GenericToString<TRESULT>,
+                    TioUtilities.GenericToString<TRESULT>,
                     AAlias,
                     AOwnsObjects
                   )
                 )
     else
-      Result := TioRttiUtilities.CastObjectToGeneric<TRESULT>(
+      Result := TioUtilities.CastObjectToGeneric<TRESULT>(
                   (FWhere as TioWhere).ToList(   // TObject and Cast to avoid circular receference
                     TioRttiContextFactory.RttiContext.GetType(PTypeInfo(TypeInfo(TRESULT))),
                     AOwnsObjects

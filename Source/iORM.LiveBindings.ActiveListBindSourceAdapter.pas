@@ -114,6 +114,7 @@ type
     function GetRefreshing: boolean;
     procedure SetRefreshing(const Value: boolean);
   protected
+    function SupportsNestedFields: Boolean; override;
     procedure AddFields; override;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -205,7 +206,7 @@ implementation
 uses
   iORM, iORM.LiveBindings.Factory, iORM.Context.Factory,
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
-  iORM.Exceptions, iORM.Rtti.Utilities,
+  iORM.Exceptions, iORM.Utilities,
   iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
   iORM.AbstractionLayer.Framework, iORM.Containers.Interfaces,
   iORM.LiveBindings.CommonBSABehavior;
@@ -889,6 +890,13 @@ begin
   FTypeName := AValue;
 end;
 
+function TioActiveListBindSourceAdapter.SupportsNestedFields: Boolean;
+begin
+  // Disable support for NestedFields because iORM implements its own way of managing them
+  //  in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
+  Result := False;
+end;
+
 function TioActiveListBindSourceAdapter.UseObjStatus: Boolean;
 begin
   Result := TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatusExist;
@@ -918,7 +926,7 @@ begin
     Self.SetList(TList<TObject>(ADataObject), AOwnsObject);
     // If the DataObject (List) is an interface referenced object then
     //  set the FInterfacedList field to it to keep alive the list itself
-    if TioRttiUtilities.IsAnInterface<T> then
+    if TioUtilities.IsAnInterface<T> then
       Supports(ADataObject, IInterface, Self.FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.

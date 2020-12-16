@@ -41,7 +41,7 @@ uses
   iORM.LiveBindings.Interfaces, iORM.CommonTypes, System.Classes,
   System.Generics.Collections, iORM.Context.Properties.Interfaces,
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource,
-  iORM.Rtti.Utilities, iORM.MVVM.Interfaces, iORM.Where,
+  iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
   iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter;
 
 type
@@ -87,7 +87,7 @@ var
   AContext: IioContext;
 begin
   // If the master property type is an interface...
-  if TioRttiUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
     Result := TioActiveInterfaceListBindSourceAdapter.Create(
       AMasterProperty.GetRelationChildTypeName,
       AMasterProperty.GetRelationChildTypeAlias,
@@ -115,7 +115,7 @@ var
   AContext: IioContext;
 begin
   // If the master property type is an interface...
-  if TioRttiUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
     Result := TioActiveInterfaceObjectBindSourceAdapter.Create(
       AMasterProperty.GetRelationChildTypeName,
       AMasterProperty.GetRelationChildTypeAlias,
@@ -156,7 +156,7 @@ begin
     // LIST
     TioViewDataType.dtList: begin
       // Interfaced
-      if TioRttiUtilities.IsAnInterfaceTypeName(ATypeName) then
+      if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
       begin
         if Assigned(ADataObject) then
           LDataObject := ADataObject
@@ -192,7 +192,7 @@ begin
     // SINGLE OBJECT
     TioViewDataType.dtSingle: begin
       // Interfaced
-      if TioRttiUtilities.IsAnInterfaceTypeName(ATypeName) then
+      if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
       begin
         if Assigned(ADataObject) and not Supports(ADataObject, IInterface, LIntfDataObject) then
           raise EioException.Create(Self.ClassName, 'GetBSA', 'TypeName is an interface but ADataObject does not implement any interface.');

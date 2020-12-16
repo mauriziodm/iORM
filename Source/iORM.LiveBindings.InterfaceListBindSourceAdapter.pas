@@ -106,7 +106,7 @@ type
 
 implementation
 
-uses Data.Bind.Consts, System.SysUtils, iORM.Rtti.Utilities, System.TypInfo, iORM,
+uses Data.Bind.Consts, System.SysUtils, iORM.Utilities, System.TypInfo, iORM,
   iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions;
 
 { TListBindSourceAdapter<T> }
@@ -162,7 +162,7 @@ begin
   // Set the BaseObjectType
   FTypeName := ATypeName;
   if FTypeName.IsEmpty then
-    FTypeName := TioRttiUtilities.GenericToString<T>;
+    FTypeName := TioUtilities.GenericToString<T>;
   FTypeAlias := ATypeAlias;
 
 //  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;

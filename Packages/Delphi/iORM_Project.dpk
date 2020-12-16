@@ -121,7 +121,7 @@ contains
   iORM.Containers.Factory in '..\..\Source\iORM.Containers.Factory.pas',
   iORM.Containers.ObjectList in '..\..\Source\iORM.Containers.ObjectList.pas',
   iORM.Resolver.Interfaces in '..\..\Source\iORM.Resolver.Interfaces.pas',
-  iORM.Rtti.Utilities in '..\..\Source\iORM.Rtti.Utilities.pas',
+  iORM.Utilities in '..\..\Source\iORM.Utilities.pas',
   iORM.Resolver.Factory in '..\..\Source\iORM.Resolver.Factory.pas',
   iORM.Resolver.ByDependencyInjection in '..\..\Source\iORM.Resolver.ByDependencyInjection.pas',
   iORM.DB.TransactionCollection in '..\..\Source\iORM.DB.TransactionCollection.pas',

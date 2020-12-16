@@ -136,7 +136,7 @@ type
 implementation
 
 uses
-  iORM.Rtti.Utilities;
+  iORM.Utilities;
 
 { TioDILocatorDestination }
 
@@ -154,7 +154,7 @@ begin
     // Get the rest as TObject
     LObj := FLocator.Get;
     // Cast the obtained object to the desired type
-    Result := TioRttiUtilities.CastObjectToGeneric<TRESULT>(LObj);
+    Result := TioUtilities.CastObjectToGeneric<TRESULT>(LObj);
   finally
     Self.Free;
   end;

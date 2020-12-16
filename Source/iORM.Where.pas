@@ -45,7 +45,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
-  iORM.Rtti.Utilities;
+  iORM.Utilities;
 
 type
 
@@ -801,7 +801,7 @@ var
   LClassInstance: TObject;
 begin
   LClassInstance := Self.ToObject;
-  if TioRttiUtilities.IsAnInterfaceTypeName(TypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(TypeName) then
   begin
     Supports(LClassInstance, IInterface, LIntfInstance);
     _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
@@ -817,7 +817,7 @@ var
   LIntfList: TList<IInterface>;
   LIntfInstance: IInterface;
 begin
-  if TioRttiUtilities.IsAnInterfaceTypeName(TypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(TypeName) then
   begin
     LIntfList := Self.ToGenericList.OfType<TList<IInterface>>;
     try
@@ -843,7 +843,7 @@ procedure TioWhere.ShowList(const AVVMAlias: String);
 var
   LList: TObject;
 begin
-  if TioRttiUtilities.IsAnInterfaceTypeName(TypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(TypeName) then
     LList := Self.ToList(TList<IInterface>)
   else
     LList := Self.ToList(TList<TObject>);
@@ -856,7 +856,7 @@ var
   AContext: IioContext;
 begin
   // If the master property type is an interface...
-  if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
   begin
     // Create the BSA
     Result := TioActiveInterfaceListBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, // Where
@@ -879,7 +879,7 @@ var
   AContext: IioContext;
 begin
   // If the master property type is an interface...
-  if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
   begin
     // Create the BSA
     Result := TioActiveInterfaceObjectBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, // Where
@@ -919,7 +919,7 @@ end;
 
 function TioWhere.ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject;
 begin
-  Result := Self.ToList(TioRttiUtilities.ClassRefToRttiType(AListClassRef), AOwnsObjects);
+  Result := Self.ToList(TioUtilities.ClassRefToRttiType(AListClassRef), AOwnsObjects);
 end;
 
 function TioWhere.ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
@@ -927,7 +927,7 @@ var
   AContext: IioContext;
 begin
   // If the master property type is an interface...
-  if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
     Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName,
       AOwnsObject)
     // else if the master property type is a class...
@@ -970,7 +970,7 @@ var
   LIntfObj: IInterface;
 begin
   // If the master property type is an interface...
-  if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
   begin
     if not Supports(Self.ToObject, IInterface, LIntfObj) then
       raise EioException.Create(Self.ClassName, 'ToObjectBindSourceAdapter', 'Object does not implement IInterface.');
@@ -1329,7 +1329,7 @@ end;
 
 function TioWhere<T>.ToObject(const AObj: TObject): T;
 begin
-  Result := TioRttiUtilities.CastObjectToGeneric<T>(TioWhere(Self).ToObject(AObj));
+  Result := TioUtilities.CastObjectToGeneric<T>(TioWhere(Self).ToObject(AObj));
 end;
 
 // function TioWhere<T>.ToObjectList(const AOwnsObjects: Boolean): TObjectList<TObject>;
