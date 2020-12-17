@@ -35,6 +35,8 @@ type
     DBEdit1: TDBEdit;
     Label3: TLabel;
     ModelMasterDataSetBelongsToDetailDescrizione: TStringField;
+    Label4: TLabel;
+    DBEdit2: TDBEdit;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private

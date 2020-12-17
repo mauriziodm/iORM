@@ -203,13 +203,15 @@ begin
   // Init
   Result := ARootObj;
   // If the AChildPropertyPath is not assigned then Exit
-  if not Assigned(AChildPropertyPath) then Exit;
+  if not Assigned(AChildPropertyPath) then
+    Exit;
   // Get the RttiContext
   Ctx := TioRttiContextFactory.RttiContext;
   // Loop for properties on the path
   for ACurrPropName in AChildPropertyPath do
   begin
-    if not Assigned(Result) then Exit;
+    if not Assigned(Result) then
+      Exit;
     Result := GetChildObject(Result, ACurrPropName);
   end;
 end;

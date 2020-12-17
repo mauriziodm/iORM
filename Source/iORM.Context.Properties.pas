@@ -127,7 +127,7 @@ type
     function RelationChildPropertyPathAssigned: Boolean;
     function GetRelationChildPropertyPath: TStrings;
     function GetRelationLoadType: TioLoadType;
-    function GetRelationChildObject(const Instance: Pointer): TObject;
+    function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
@@ -421,7 +421,7 @@ begin
   Result := FRelationChildTypeName;
 end;
 
-function TioProperty.GetRelationChildObject(const Instance: Pointer): TObject;
+function TioProperty.GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean): TObject;
 var
   AValue: TValue;
 begin
@@ -429,7 +429,7 @@ begin
   AValue := Self.GetValue(Instance);
   Result := TioUtilities.TValueToObject(AValue, True);
   // If a RelationChildPropertyPath is assigned then resolve it
-  if Self.RelationChildPropertyPathAssigned then
+  if Self.RelationChildPropertyPathAssigned and AResolvePropertyPath then
     Result := TioUtilities.ResolveChildPropertyPath(Result, FRelationChildPropertyPath);
 end;
 

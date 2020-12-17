@@ -41,6 +41,8 @@ uses
 
 type
 
+  // This class helper is a hack because I absolutely needed to be able to access the private "FIndex" field
+  //  of the "TBindSourceAdapterField" class.
   TioBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
   private
     class var FIndexOffset: Integer;
@@ -50,6 +52,13 @@ type
   end;
 
   // Implementation of IGetMemberObject to get the child object
+  //  In the architecture of the BindSourceAdapters, the classes that implement the "IGetMemberObject" interface have
+  //  the task of returning the instance of the object on which to carry out the read / write operations (GetValue / SetValue).
+  //  This specific implementation is used to make it possible to obtain the object even if the field is related to a property
+  //  of a child object of the current master object (master-detail of a BelongsTo, HasOne or EmbeddedHasOne relation)
+  //  Ex: Customer.Payment.Description in a TOrder class.
+  //  In practice, various implementations are created in cascade for how many are the relationship levels that must be crossed
+  //  to reach the target object on which to perform the GetValue / SetValue operations.
   TioBindSourceAdapterGetChildMemberObject = class(TInterfacedObject, IGetMemberObject)
   private
     FMasterMemberObject: IGetMemberObject;
@@ -60,12 +69,20 @@ type
   end;
 
   // Use RTTI to read the value of a property
+  //  The ValueReader classes are used to read the value of a property relating to a field of a BindSourceAdapter
+  //  from the current object of the adapter itself. This particular implementation in iORM is used to access the
+  //  properties of also child objects of the current master object (the current object of the BindSourceAdapter);
+  //  eg: "Customer.Address" field name.
   TioPropertyValueReader<T> = class(TPropertyValueReader<T>)
   public
     function GetValue: T; override;
   end;
 
   // Use RTTI to write the value into a property
+  //  The ValueReader classes are used to write a value into a property relating to a field of a BindSourceAdapter
+  //  in the current object of the adapter itself. This particular implementation in iORM is used to access the
+  //  properties of also child objects of the current master object (the current object of the BindSourceAdapter);
+  //  eg: "Customer.Address" field name.
   TioPropertyValueWriter<T> = class(TPropertyValueWriter<T>)
   public
     procedure SetValue(const AValue: T); override;
@@ -77,7 +94,10 @@ type
     // NB: Generic type for this methods must be only TObject or IInterface
     class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
       const ADataObject: T); overload;
-
+    // ==========================================================================================================================
+    // Changes to the BindSourceAdapters to make it possible to create fields that access nested properties/fields
+    //  (eg: "Customer.Payment.Description")
+    // --------------------------------------------------------------------------------------------------------------------------
     class procedure AddFields(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;
       const APath: String);
     class procedure AddPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter;
@@ -88,6 +108,7 @@ type
       const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const APath: String): TBindSourceAdapterField;
     class function CreateRttiObjectPropertyField<T: class>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter;
       const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const APath: String): TBindSourceAdapterField;
+    // ==========================================================================================================================
   end;
 
 implementation
@@ -268,7 +289,7 @@ begin
           begin
             // LCollectionEditorField.FGetMemberObject := AGetMemberObject; // Original
             LCollectionEditorField.GetMemberObjectIntf := AGetMemberObject;
-            //LCollectionEditorField.FIndex := AFieldsList.Add(LCollectionEditorField);  // Original
+            // LCollectionEditorField.FIndex := AFieldsList.Add(LCollectionEditorField);  // Original
             LCollectionEditorField.SetIndex(AFieldsList.Add(LCollectionEditorField));
             // Using class helper hack to access FIndex private field in the original class
           end;
@@ -280,7 +301,7 @@ begin
 end;
 
 class procedure TioCommonBSABehavior.AddChildPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter;
-      AFieldsList: TList<TBindSourceAdapterField>; const AMasterGetMemberObject: IGetMemberObject; const AMasterPath: String);
+  AFieldsList: TList<TBindSourceAdapterField>; const AMasterGetMemberObject: IGetMemberObject; const AMasterPath: String);
 var
   LMap: IioMap;
   LProperty: IioContextProperty;
@@ -335,11 +356,13 @@ class constructor TioBindSourceAdapterFieldHelper.Create;
 var
   Ctx: TRTTIContext;
 begin
+  // Obtain the offset of the private field "FIndex"
   FIndexOffset := Ctx.GetType(TBindSourceAdapterField).GetField('FIndex').Offset;
 end;
 
 procedure TioBindSourceAdapterFieldHelper.SetIndex(const Value: Integer);
 begin
+  // Use the offset obtained above to access the value of the private field "FIndex"
   PInteger(Pointer(NativeInt(Self) + FIndexOffset))^ := Value;
 end;
 
@@ -365,13 +388,13 @@ end;
 function TioPropertyValueReader<T>.GetValue: T;
 var
   LObject: TObject;
-  LCtxt: TRttiContext;
+  LCtxt: TRTTIContext;
   LRttiType: TRttiType;
   LRttiField: TRttiProperty;
 
 begin
-// Do not inherit
-//  LObject := FField.GetMemberObject; // original code
+  // Do not inherit
+  // LObject := FField.GetMemberObject; // original code
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
   if LObject <> nil then
   begin
@@ -393,11 +416,11 @@ end;
 procedure TioPropertyValueWriter<T>.SetValue(const AValue: T);
 var
   LObject: TObject;
-  LCtxt: TRttiContext;
+  LCtxt: TRTTIContext;
   LRttiType: TRttiType;
   LRttiField: TRttiProperty;
 begin
-// Do not inherit
+  // Do not inherit
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
   if LObject <> nil then
   begin
@@ -406,7 +429,7 @@ begin
     if LRttiField <> nil then
     begin
       LRttiField.SetValue(LObject, TValue.From<T>(AValue));
-      //RecordChanged;
+      // RecordChanged;
     end;
 
   end;

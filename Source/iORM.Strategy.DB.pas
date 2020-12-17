@@ -575,7 +575,7 @@ begin
       ioRTBelongsTo:
         begin
           // ---------- M.M. 17/08/18 ----------
-          // Marco ha aggiunto questa riga che persiste anche l'oggetto child di una relazione BelongTo
+          // Marco ha aggiunto questa riga che persiste anche l'oggetto child di una relazione BelongsTo
           // ma io ritengo che non vada persistito (non serve persistere un dettaglio di una BelongsTo).
           // Ho parlato con lui questa mattina (17/09/2019) e anche lui è d'accordo.
           // Nel caso dovesse servire, in futuro, si potrebbe aggiungere un parametro all'attributo

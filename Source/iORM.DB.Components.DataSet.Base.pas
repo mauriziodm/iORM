@@ -5,7 +5,7 @@ interface
 uses
   Data.DB, iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope,
   iORM.Context.Map.Interfaces, System.Classes, System.Rtti, Data.SqlTimSt,
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.Context.Properties.Interfaces;
 
 const
 
@@ -187,12 +187,21 @@ type
     constructor Create(const AField: TBlobField; const AMode: TBlobStreamMode);
   end;
 
+  TioFullPathPropertyReadWrite = class
+  strict private
+    class function _ExtractPropName(var AFullPathPropName: String): String;
+    class function _ResolvePath(var AOutObj: TObject; var AOutProperty: IioContextProperty; AFullPathPropName: String): Boolean;
+  public
+    class function GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
+    class procedure SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+  end;
+
 implementation
 
 uses
-  iORM.Exceptions, System.SysUtils, iORM.Context.Properties.Interfaces,
+  iORM.Exceptions, System.SysUtils, iORM.Context.Factory, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
-  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper;
+  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper, iORM.Utilities, System.StrUtils;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -664,7 +673,6 @@ end;
 procedure TioBSADataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
 var
   LValue: TValue;
-  LProperty: IioContextProperty;
   LDateTime: TDateTime;
   LDateTimeRec: TDateTimeRec;
   LTimeStamp: TSqlTimeStamp;
@@ -743,15 +751,15 @@ begin
       LValue := TEncoding.Unicode.GetString(Buffer).TrimRight;
     // LValue := WideString(pWideChar(Buffer));
   end;
-  // Set the value into the object
-  LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
-  LProperty.SetValue(FBindSourceAdapter.Current, LValue);
+  // Set Property, Object, Value:
+  // Even if the property is of a child object, even multilevel, it resolves the path and set the value
+  TioFullPathPropertyReadWrite.SetValue(FBindSourceAdapter.Current, Field.FieldName, LValue);
   // Set modified
   SetModified(True);
   // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
   // in ActiveBindSourceAdapter.DoAfterPost e ActiveBindSourceAdapter.DoAfterPostFields,
   // sono riuscito a dare un comportamente corretto anche al DataSet in caso AutoPost=true
-  // (precedentemente invece in pratica con faceva mai il post)
+  // (precedentemente invece in pratica non faceva mai il post)
   // Mauri 19/04/2020: Ho aggiunto questa condizione perchè mi capitava che quando
   // il Dataset si muoveva su un altro record e quindi faceva il post (se era in editing)
   // che il dataset faceva il post perchè era ancora in editing/insert mentre il BindSourceAdapter
@@ -825,8 +833,6 @@ function TioBSADataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; Nat
 var
   LValue: TValue;
   LRecordIndex: Integer;
-  LObj: TObject;
-  LProperty: IioContextProperty;
   LDateTime: TDateTime;
   LDateTimeRec: TDateTimeRec;
   LTempValueBuffer: TValueBuffer;
@@ -852,10 +858,9 @@ begin
   // Result := Result and (Length(Buffer) > 0);
   if not Result then
     Exit;
-  // Get Property, Object, Value
-  LProperty := FMap.GetProperties.GetPropertyByName(Field.FieldName);
-  LObj := FBindSourceAdapter.Items[LRecordIndex];
-  LValue := LProperty.GetValue(LObj);
+  // Get Property, Object, Value:
+  // Even if the property is of a child object, even multilevel, it resolves the path and returns the value
+  LValue := TioFullPathPropertyReadWrite.GetValue(FBindSourceAdapter.Items[LRecordIndex], Field.FieldName);
   // ---------- DATA FROM THE OBJECTS ----------
   // Move the value to the buffer
   case Field.DataType of
@@ -914,7 +919,7 @@ begin
         end;
       end;
     TFieldType.ftTimeStamp:
-    // NB: Per questo tipo non ho verificato la compatibilità con DevExpress (NativeFormat = True e Buffer con dimensione zero)
+      // NB: Per questo tipo non ho verificato la compatibilità con DevExpress (NativeFormat = True e Buffer con dimensione zero)
       begin
         LDateTime := LValue.AsType<TDateTime>;
         Result := (LDateTime > 0);
@@ -928,7 +933,7 @@ begin
     TFieldType.ftString, TFieldType.ftFixedChar, TFieldType.ftGuid:
       begin
         if Length(Buffer) < (Field.DataSize) then
-        // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
+          // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
           SetLength(Buffer, Field.DataSize);
         FillChar(Buffer[0], Field.DataSize, 0); // Clean the buffer (previous record value presents)
         TEncoding.ANSI.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
@@ -937,7 +942,7 @@ begin
     TFieldType.ftWideString, TFieldType.ftFixedWideChar:
       begin
         if Length(Buffer) < (Field.DataSize) then
-        // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
+          // If the buffer size is less than the size of the data type then set it to the correct size (for DevExpress compatibility (NativeFormat=True and buffer size equals to zero)
           SetLength(Buffer, Field.DataSize);
         FillChar(Buffer[0], Field.DataSize, 0); // Clean the buffer (previous record value presents)
         TEncoding.Unicode.GetBytes(LValue.AsString, 1, LValue.AsString.Length, Buffer, 0);
@@ -1221,6 +1226,67 @@ begin
   end
   else
     raise EioException.Create(Self.ClassName, 'WriteBlobData', 'Streamable object not assigned.');
+end;
+
+{ TioFullPathPropertyReadWrite }
+
+class function TioFullPathPropertyReadWrite._ExtractPropName(var AFullPathPropName: String): String;
+var
+  LPos: Integer;
+begin
+  LPos := Pos('.', AFullPathPropName);
+  if LPos = 0 then
+  begin
+    Result := AFullPathPropName;
+    AFullPathPropName := '';
+  end
+  else
+  begin
+    Result := LeftStr(AFullPathPropName, LPos - 1);
+    AFullPathPropName := AFullPathPropName.Remove(0, LPos);
+  end;
+end;
+
+class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioContextProperty;
+  AFullPathPropName: String): Boolean;
+var
+  LPropName: String;
+begin
+  Result := False;
+  LPropName := _ExtractPropName(AFullPathPropName);
+  AOutProperty := TioContextFactory.GetPropertyByClassRefAndName(AOutObj.ClassType, LPropName);
+  if not AFullPathPropName.IsEmpty then
+  begin
+    // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
+    if not(AOutProperty.GetRelationType in [ioRtBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne]) then
+      EioException.Create(ClassName, '_ResolvePath',
+        Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.', [AOutObj.ClassName, LPropName]));
+    AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
+    // Recursion: If the child object is not assigned, the recursion stops and the function returns false
+    if Assigned(AOutObj) then
+      Result := _ResolvePath(AOutObj, AOutProperty, AFullPathPropName); // Recursion
+  end
+  else
+    Result := True;
+end;
+
+class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
+var
+  LProperty: IioContextProperty;
+begin
+  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
+    Result := LProperty.GetValue(AObj)
+  else
+    Result := TValue.Empty;
+end;
+
+class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+var
+  LProperty: IioContextProperty;
+begin
+  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
+    LProperty.SetValue(AObj, AValue);
+  // Se non riesce a risolvere il percorso???
 end;
 
 end.

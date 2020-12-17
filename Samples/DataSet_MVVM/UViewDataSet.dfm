@@ -150,6 +150,13 @@ object DataSetView: TDataSetView
       Height = 13
       Caption = 'Descrizione'
     end
+    object Label4: TLabel
+      Left = 175
+      Top = 88
+      Width = 134
+      Height = 13
+      Caption = 'BelongsToDetail.Descrizione'
+    end
     object DBImage1: TDBImage
       Left = 464
       Top = 6
@@ -178,6 +185,15 @@ object DataSetView: TDataSetView
       DataField = 'Descrizione'
       DataSource = MasterDataSource
       TabOrder = 2
+    end
+    object DBEdit2: TDBEdit
+      Left = 320
+      Top = 86
+      Width = 121
+      Height = 19
+      DataField = 'BelongsToDetail.Descrizione'
+      DataSource = MasterDataSource
+      TabOrder = 3
     end
   end
   object ioViewModelBridge1: TioViewModelBridge

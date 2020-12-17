@@ -86,7 +86,7 @@ type
     function RelationChildPropertyPathAssigned: Boolean;
     function GetRelationChildPropertyPath: TStrings;
     function GetRelationLoadType: TioLoadType;
-    function GetRelationChildObject(const Instance: Pointer): TObject;
+    function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
