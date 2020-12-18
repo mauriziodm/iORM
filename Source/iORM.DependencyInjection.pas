@@ -971,7 +971,7 @@ end;
 class function TioDependencyInjectionContainer.Get(const AKey: TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey): TioDIContainerImplementersItem;
 begin
   if not Self.Exists(AKey, ASubKey) then
-    raise EioException.Create(Self.ClassName, 'Get', 'Implementer for "' + AKey + '" alias "' + ASubKey + '" not found.');
+    raise EioException.Create(Self.ClassName, 'Get', Format('Implementer for "%s" alias "%s" not found.', [AKey, ASubKey]));
   Result := Self.FContainer.Items[AKey].GetItem(ASubKey);
 end;
 

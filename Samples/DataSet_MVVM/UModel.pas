@@ -22,11 +22,27 @@ type
     property Attivo: boolean read FAttivo write FAttivo;
   end;
 
-  [ioEntity]
-  TBelongsToModelDetail = class
+  IBelongsToModelDetail = interface
+    ['{633D77B2-43E0-4F45-B6F7-B88B050EA1CC}']
+    // ID
+    procedure SetID(const Value: Integer);
+    function GetID: Integer;
+    property ID: Integer read GetID write SetID;
+    // Descrizione
+    procedure SetDescrizione(const Value: String);
+    function GetDescrizione: String;
+    property Descrizione: String read GetDescrizione write SetDescrizione;
+  end;
+
+  [ioEntity, diImplements(IBelongsToModelDetail)]
+  TBelongsToModelDetail = class(TInterfacedObject, IBelongsToModelDetail)
   private
     FID: Integer;
     FDescrizione: String;
+    function GetID: Integer;
+    function GetDescrizione: String;
+    procedure SetID(const Value: Integer);
+    procedure SetDescrizione(const Value: String);
   public
     property ID: Integer read FID write FID;
     property Descrizione: String read FDescrizione write FDescrizione;
@@ -39,7 +55,7 @@ type
     FPropBitMap: TBitMap;
     FID: Integer;
     FDescrizione: String;
-    FBelongsToDetail: TBelongsToModelDetail;
+    FBelongsToDetail: IBelongsToModelDetail;
     FDetails: TObjectList<TModelDetail>;
     FPropShortint: Shortint;
     FPropSmallint: SmallInt;
@@ -100,8 +116,8 @@ type
     property PropBoolean: boolean read FPropBoolean write FPropBoolean;
 
     // BelongsTo relation
-    [ioBelongsTo(TBelongsToModelDetail)]
-    property BelongsToDetail: TBelongsToModelDetail read FBelongsToDetail write FBelongsToDetail;
+    [ioBelongsTo(IBelongsToModelDetail)]
+    property BelongsToDetail: IBelongsToModelDetail read FBelongsToDetail write FBelongsToDetail;
 
     // HasMany relation
     [ioHasMany(TModelDetail, 'MasterID')]
@@ -125,9 +141,31 @@ begin
   FDetails.Free;
   FPropWideMemo.Free;
   FPropBitMap.Free;
-  if Assigned(FBelongsToDetail) then
-    FBelongsToDetail.Free;
+//  if Assigned(FBelongsToDetail) then
+//    FBelongsToDetail.Free;
   inherited;
+end;
+
+{ TBelongsToModelDetail }
+
+function TBelongsToModelDetail.GetDescrizione: String;
+begin
+  Result := FDescrizione;
+end;
+
+function TBelongsToModelDetail.GetID: Integer;
+begin
+  Result := FID;
+end;
+
+procedure TBelongsToModelDetail.SetDescrizione(const Value: String);
+begin
+  FDescrizione := Value;
+end;
+
+procedure TBelongsToModelDetail.SetID(const Value: Integer);
+begin
+  FID := Value;
 end;
 
 end.

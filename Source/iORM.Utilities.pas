@@ -66,12 +66,14 @@ type
     class function GUIDtoInterfaceName(const IID:TGUID): String; static;
     class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
     class function ExtractPropertyName(const AFullPathPropertyName: String): String;
+    class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass;
+    class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils;
+  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers;
 
 { TioRttiUtilities }
 
@@ -214,6 +216,30 @@ begin
       Exit;
     Result := GetChildObject(Result, ACurrPropName);
   end;
+end;
+
+class function TioUtilities.ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass;
+var
+  LResolvedRttiType: TRttiType;
+begin
+  LResolvedRttiType := ResolveRttiTypeToRttiType(ARttiType);
+  Result := LResolvedRttiType.AsInstance.MetaclassType; // Note: the resolved type is always a TRttiInstamceType
+end;
+
+class function TioUtilities.ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
+var
+  LContainerImplementersItem: TioDIContainerImplementersItem;
+begin
+  if ARttiType.IsInstance then
+    Exit(ARttiType)
+  else
+  if ARttiType is TRttiInterfaceType then
+  begin
+    LContainerImplementersItem := io.di.Locate(ARttiType.Name).GetItem;
+    Exit(LContainerImplementersItem.RttiType);
+  end
+  else
+    raise eioException.Create(Self.ClassName, 'RttiTypeToClassRef', '"ARttiType" parameter must be a TRttiInstanceType or TRttiInterfaceType.');
 end;
 
 class function TioUtilities.SameObject(const AObj1,

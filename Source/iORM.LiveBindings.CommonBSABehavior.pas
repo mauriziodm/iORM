@@ -157,7 +157,8 @@ var
   LInstance: TRttiInstanceType;
   LAncestor: string;
 begin
-  LType := AType;
+  //LType := AType; // Original code
+  LType := TioUtilities.ResolveRttiTypeToRttiType(AType);
   LProperties := LType.GetProperties;
   for LProperty in LProperties do
   begin
@@ -308,7 +309,7 @@ var
   LChildPath: String;
   LChildGetMemberObject: IGetMemberObject;
 begin
-  LMap := TioContextFactory.Map(AType.AsInstance.MetaclassType);
+  LMap := TioContextFactory.Map(TioUtilities.ResolveRttiTypeToClassRef(AType));
   for LProperty in LMap.GetProperties do
   begin
     if LProperty.GetRelationType in [ioRtBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne] then
