@@ -114,7 +114,7 @@ type
 implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Context.Factory, iORM.Attributes,
-  System.TypInfo, System.SysUtils, iORM.Utilities;
+  System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions;
 
 { TioCommonBSABehavior }
 
@@ -432,8 +432,11 @@ begin
       LRttiField.SetValue(LObject, TValue.From<T>(AValue));
       // RecordChanged;
     end;
-
-  end;
+  end
+  else
+    raise EioException.Create(Self.ClassName, 'SetValue',
+      Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.',
+      [FField.MemberName]));
 end;
 
 end.

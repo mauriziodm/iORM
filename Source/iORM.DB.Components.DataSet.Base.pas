@@ -1285,8 +1285,11 @@ var
   LProperty: IioContextProperty;
 begin
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-    LProperty.SetValue(AObj, AValue);
-  // Se non riesce a risolvere il percorso???
+    LProperty.SetValue(AObj, AValue)
+  else
+    raise EioException.Create(Self.ClassName, 'SetValue',
+      Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.',
+      [AFullPathPropName]));
 end;
 
 end.

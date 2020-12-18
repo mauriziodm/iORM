@@ -54,12 +54,12 @@ implementation
 
 constructor EioException.Create(const AClassName, AMethodName, AMsg: string);
 begin
-  Self.Message := Format('%s.%s: %s', [AClassName, AMethodName, AMsg]);
+  Self.Message := Format('iORM exception on "%s.%s":'#13#13'%s', [AClassName, AMethodName, AMsg]);
 end;
 
 constructor EioException.Create(const AClassName, AMsg: string);
 begin
-  Self.Message := Format('%s: %s', [AClassName, AMsg]);
+  Self.Message := Format('iORM exception on "%s":'#13#13'%s', [AClassName, AMsg]);
 end;
 
 end.
