@@ -108,8 +108,9 @@ type
     function GetRefreshing: Boolean;
     procedure SetRefreshing(const Value: Boolean);
   protected
-    function GetCanActivate: Boolean; override;
+    function SupportsNestedFields: Boolean; override;
     procedure AddFields; override;
+    function GetCanActivate: Boolean; override;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -232,7 +233,7 @@ begin
   LIntf := TBindSourceAdapterGetMemberObject.Create(Self);
 //  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
 //  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
-  TioCommonBSABehavior.AddFields(LType, Self, LIntf, '');
+  TioCommonBSABehavior.AddFields(LType, Self, LIntf, ''); // To support iORM nested fields on child objects
 end;
 
 procedure TioActiveObjectBindSourceAdapter.Append(AObject: IInterface);
@@ -839,6 +840,13 @@ end;
 procedure TioActiveObjectBindSourceAdapter.SetTypeName(const AValue: String);
 begin
   FTypeName := AValue;
+end;
+
+function TioActiveObjectBindSourceAdapter.SupportsNestedFields: Boolean;
+begin
+  // Disable support for NestedFields because iORM implements its own way of managing them
+  //  in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
+  Result := False;
 end;
 
 function TioActiveObjectBindSourceAdapter.UseObjStatus: Boolean;

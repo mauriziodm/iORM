@@ -98,7 +98,7 @@ implementation
 
 
 uses SysUtils, iORM.Utilities, iORM, iORM.Exceptions,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces;
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.LiveBindings.CommonBSABehavior;
 
 { TInterfaceObjectBindSourceAdapter<T> }
 
@@ -107,10 +107,12 @@ var
   LType: TRttiType;
   LIntf: IGetMemberObject;
 begin
+  // inherited; // NB: Don't inherit from ancestor
   LType := GetObjectType;
   LIntf := TBindSourceAdapterGetMemberObject.Create(Self);
-  AddFieldsToList(LType, Self, Self.Fields, LIntf);
-  AddPropertiesToList(LType, Self, Self.Fields, LIntf);
+//  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
+//  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
+  TioCommonBSABehavior.AddFields(LType, Self, LIntf, ''); // To support iORM nested fields on child objects
 end;
 
 function TInterfaceObjectBindSourceAdapter<T>.AppendAt: Integer;
@@ -282,7 +284,9 @@ end;
 
 function TInterfaceObjectBindSourceAdapter<T>.SupportsNestedFields: Boolean;
 begin
-  Result := True;
+  // Disable support for NestedFields because iORM implements its own way of managing them
+  //  in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
+  Result := False;
 end;
 
 { TObjectBindSourceAdapter }

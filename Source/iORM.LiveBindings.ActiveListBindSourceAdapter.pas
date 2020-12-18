@@ -243,7 +243,7 @@ begin
   LIntf := TBindSourceAdapterGetMemberObject.Create(Self);
 //  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
 //  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
-  TioCommonBSABehavior.AddFields(LType, Self, LIntf, '');
+  TioCommonBSABehavior.AddFields(LType, Self, LIntf, ''); // To support iORM nested fields on child objects
 end;
 
 procedure TioActiveListBindSourceAdapter.Append(AObject: IInterface);
