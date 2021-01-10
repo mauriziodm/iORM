@@ -348,12 +348,14 @@ object MainForm: TMainForm
       end>
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    OnAfterRegister = SQLiteConnAfterRegister
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ForeignKeys = False
     Database = 'ContactsIntf.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = False
     Persistent = False
     Pooled = False
+    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 40
     Top = 8
   end
@@ -367,17 +369,21 @@ object MainForm: TMainForm
     Top = 8
   end
   object FirebirdConn: TioFirebirdConnectionDef
+    AutoCreateDB.Enabled = True
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ForeignKeys = False
     Database = 'ContactsIntf.FDB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     OSAuthent = oaNo
-    Password = 'th3cla'
+    Password = 'masterkey'
     Persistent = False
     Pooled = False
     Port = 3050
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
+    OnAfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
     OnBeforeCreateOrAlterDB = FirebirdConnBeforeCreateOrAlterDB
     Left = 304
     Top = 8

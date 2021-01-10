@@ -76,6 +76,8 @@ type
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
     function GetDisableClassFromField: Boolean;
+    function GetLimitRows: Integer;
+    function GetLimitOffset: Integer;
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
@@ -113,6 +115,8 @@ type
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
     function IsLazy: Boolean;
+    function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
+    function LimitExists: Boolean;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -227,6 +231,7 @@ type
     function DisableClassFromField: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
+    function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;

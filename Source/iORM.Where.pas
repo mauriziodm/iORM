@@ -56,6 +56,7 @@ type
     FTypeInfo: PTypeInfo;
     FDisableClassFromField: Boolean;
     FLazyLoad: Boolean;
+    FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: IWhereItems;
@@ -88,6 +89,8 @@ type
     function GetDisableClassFromField: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap: IioMap): String;
+    function GetLimitRows: Integer;
+    function GetLimitOffset: Integer;
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -129,6 +132,8 @@ type
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
     function IsLazy: Boolean;
+    function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
+    function LimitExists: Boolean;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -213,11 +218,11 @@ type
       const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
     procedure DropIndex(const AIndexName: String);
     // ----- Properties -----
-    property TypeName: String read GetTypeName write SetTypeName;
-    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
-    property TypeInfo: PTypeInfo read GetTypeInfo write SetTypeInfo;
     property Details: IioWhereDetailsContainer read GetDetails;
     property Items: IWhereItems read GetItems;
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
+    property TypeInfo: PTypeInfo read GetTypeInfo write SetTypeInfo;
+    property TypeName: String read GetTypeName write SetTypeName;
   end;
 
   // Where conditions (generic version)
@@ -241,6 +246,7 @@ type
     function DisableClassFromField: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
+    function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;
@@ -563,6 +569,8 @@ begin
   FWhereItems := TioWhereFactory.NewWhereItems;
   FDetailsContainer := TioWhereFactory.NewDetailsContainer;
   FOrderBy := nil;
+  FLimitRows := 0;
+  FLimitOffset := 0;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -679,6 +687,16 @@ begin
   Result := FWhereItems;
 end;
 
+function TioWhere.GetLimitOffset: Integer;
+begin
+  Result := FLimitOffset;
+end;
+
+function TioWhere.GetLimitRows: Integer;
+begin
+  Result := FLimitRows;
+end;
+
 function TioWhere.GetOrderByInstance: IioSqlItemWhere;
 begin
   Result := FOrderBy;
@@ -762,6 +780,18 @@ function TioWhere.Lazy(const ALazyEnabled: Boolean): IioWhere;
 begin
   Result := Self;
   Self.FLazyLoad := ALazyEnabled;
+end;
+
+function TioWhere._Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
+begin
+  Result := Self;
+  FLimitRows := ARows;
+  FLimitOffset := AOffset;
+end;
+
+function TioWhere.LimitExists: Boolean;
+begin
+  Result := FLimitRows > 0;
 end;
 
 function TioWhere.SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
@@ -1286,6 +1316,12 @@ function TioWhere<T>.Lazy(const ALazyEnabled: Boolean): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).Lazy(ALazyEnabled);
+end;
+
+function TioWhere<T>._Limit(const ARows, AOffset: Integer): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Limit(ARows, AOffset);
 end;
 
 function TioWhere<T>.SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;

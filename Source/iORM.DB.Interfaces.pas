@@ -205,13 +205,13 @@ type
   protected
     class function BuildIndexName(const AContext:IioContext; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean): String; virtual;
   public
-    class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
-    class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); virtual;
+    class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); virtual;
     class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
-    class procedure GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
-    class procedure GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlUpdate(const AQuery:IioQuery; const AContext:IioContext); virtual;
+    class procedure GenerateSqlDelete(const AQuery:IioQuery; const AContext:IioContext); virtual;
     class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
-    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual; abstract;
+    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
     class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); virtual; abstract;
     class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); virtual; abstract;
 
@@ -337,7 +337,8 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.Strategy.Factory;
+  iORM.SqlTranslator, iORM.Strategy.Factory, System.SysUtils, iORM.Attributes,
+  iORM.Exceptions;
 
 
 { TioSqlGenerator }
@@ -371,6 +372,140 @@ begin
     Result := Result + '_U';
   // Translate
   Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
+end;
+
+class procedure TioSqlGenerator.GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
+  // If a Where exist then the query is an external query else
+  // is an internal query.
+  if AContext.WhereExist then
+    // AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+  else
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' +
+      AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
+var
+  Comma: Char;
+  Prop: IioContextProperty;
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
+  AQuery.SQL.Add('(');
+  AQuery.SQL.Add(AContext.GetProperties.GetSql(ioInsert));
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField then
+    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add(') VALUES (');
+  // -----------------------------------------------------------------
+  // Iterate for all properties
+  Comma := ' ';
+  for Prop in AContext.GetProperties do
+  begin
+    // If the current property is ReadOnly then skip it
+    // If the current property RelationType is HasMany then skip it
+    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = ioRTHasMany) or (Prop.GetRelationType = ioRTHasOne)
+    then
+      Continue;
+    // Add the field param
+    AQuery.SQL.Add(Comma + ':' + Prop.GetSqlParamName);
+    Comma := ',';
+  end;
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField then
+    AQuery.SQL.Add(',:' + AContext.ClassFromField.GetSqlParamName);
+  AQuery.SQL.Add(')');
+  // -----------------------------------------------------------------
+end;
+
+class function TioSqlGenerator.GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String;
+begin
+  // Join
+  case AJoinItem.GetJoinType of
+    ioCross:
+      Result := 'CROSS JOIN ';
+    ioInner:
+      Result := 'INNER JOIN ';
+    ioLeftOuter:
+      Result := 'LEFT OUTER JOIN ';
+    ioRightOuter:
+      Result := 'RIGHT OUTER JOIN ';
+    ioFullOuter:
+      Result := 'FULL OUTER JOIN ';
+  else
+    raise EioException.Create(Self.ClassName + ': Join type not valid.');
+  end;
+  // Joined table name
+  Result := Result + '[' + AJoinItem.GetJoinClassRef.ClassName + ']';
+  // Conditions
+  if AJoinItem.GetJoinType <> ioCross then
+    Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
+end;
+
+class procedure TioSqlGenerator.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  // Select
+  AQuery.SQL.Add('SELECT');
+  // Field list
+  AQuery.SQL.Add(  AContext.GetProperties.GetSql(ioSelect)  );
+  if AContext.IsClassFromField then
+    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // From
+  AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSql);
+  // Join
+  AQuery.SQL.Add(AContext.GetJoin.GetSql);
+  // If a Where exist then the query is an external query else
+  // is an internal query.
+  if AContext.WhereExist then
+    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+  else
+    AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName,
+      AContext.GetProperties.GetIdProperty.GetSqlParamName]));
+  // GroupBy
+  AQuery.SQL.Add(AContext.GetGroupBySql);
+  // OrderBy
+  AQuery.SQL.Add(AContext.GetOrderBySql);
+end;
+
+class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext);
+var
+  Comma: Char;
+  Prop: IioContextProperty;
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSql + ' SET');
+  // Iterate for all properties
+  Comma := ' ';
+  for Prop in AContext.GetProperties do
+  begin
+    // If the current property is ReadOnly then skip it
+    // If the current property RelationType is HasMany then skip it
+    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = ioRTHasMany) or (Prop.GetRelationType = ioRTHasOne)
+    then
+      Continue;
+    // Add the field param
+    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
+    Comma := ',';
+  end;
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField then
+    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=:' + AContext.ClassFromField.GetSqlParamName);
+  // Where conditions
+  // AQuery.SQL.Add(AContext.Where.GetSql);
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' +
+    AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);

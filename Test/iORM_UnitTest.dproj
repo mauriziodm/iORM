@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{493DE56E-D1A7-4EEB-A56E-E879156A598E}</ProjectGuid>
-        <ProjectVersion>19.0</ProjectVersion>
+        <ProjectVersion>19.2</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <MainSource>iORM_UnitTest.dpr</MainSource>
         <Base>True</Base>
@@ -23,8 +23,23 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Base)'=='true') or '$(Base_iOSDevice64)'!=''">
+        <Base_iOSDevice64>true</Base_iOSDevice64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSSimulator' and '$(Base)'=='true') or '$(Base_iOSSimulator)'!=''">
+        <Base_iOSSimulator>true</Base_iOSSimulator>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
         <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -66,6 +81,7 @@
         <Android_NotificationIcon48>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png</Android_NotificationIcon48>
         <Android_NotificationIcon72>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png</Android_NotificationIcon72>
         <Android_NotificationIcon96>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png</Android_NotificationIcon96>
+        <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
@@ -75,6 +91,20 @@
         <Base>true</Base>
         <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;fmx;FireDACIBDriver;dbexpress;IndyCore;dsnap;emsclient;DataSnapCommon;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
         <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services-ads-7.0.0.dex.jar;google-play-services-analytics-7.0.0.dex.jar;google-play-services-base-7.0.0.dex.jar;google-play-services-gcm-7.0.0.dex.jar;google-play-services-identity-7.0.0.dex.jar;google-play-services-maps-7.0.0.dex.jar;google-play-services-panorama-7.0.0.dex.jar;google-play-services-plus-7.0.0.dex.jar;google-play-services-wallet-7.0.0.dex.jar</EnabledSysJars>
+        <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
+        <iOS_AppStore1024>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png</iOS_AppStore1024>
+        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers</VerInfo_Keys>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_iOSSimulator)'!=''">
+        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers</VerInfo_Keys>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;dxFlowChartRS26;dxPSdxMapControlLnkRS26;DBXDb2Driver;vclactnband;dxBarRS26;vclFireDAC;dxFireDACEMFRS26;tethering;dxSpreadSheetInplaceRichEditRS26;FireDACADSDriver;JvPluginSystem;dxRichEditCoreRS26;dxPSdxSpreadSheetLnkRS26;FireDACMSSQLDriver;vcltouch;JvBands;vcldb;svn;JvJans;dxGDIPlusRS26;JvDotNetCtrls;dxPSdxFCLnkRS26;dxCloudServiceLibraryRS26;iORM_Project;dxPSLnksRS26;FireDACDBXDriver;cxGridRS26;dxPDFViewerRS26;dxPsPrVwAdvRS26;vclx;dxPScxTLLnkRS26;RESTBackendComponents;VCLRESTComponents;vclie;bindengine;CloudService;dxmdsRS26;JvHMI;FireDACMySQLDriver;dxdborRS26;DataSnapClient;dxFireDACServerModeRS26;bindcompdbx;IndyIPServer;DBXSybaseASEDriver;cxPivotGridRS26;IndySystem;cxTreeListdxBarPopupMenuRS26;dsnapcon;cxTreeListRS26;dxPScxPivotGridLnkRS26;cxSchedulerRibbonStyleEventEditorRS26;dxPSCoreRS26;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;dxSpreadSheetRS26;dxBarExtItemsRS26;dxPSdxGaugeControlLnkRS26;Jcl;emshosting;DBXOdbcDriver;FireDACTDataDriver;dxdbtrRS26;dxRichEditControlCoreRS26;soaprtl;DbxCommonDriver;dxFlowChartAdvancedCustomizeFormRS26;dComponents;JvManagedThreads;dxDockingRS26;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;cxLibraryRS26;JvTimeFramework;rtl;emsserverresource;DbxClientDriver;DBXSybaseASADriver;dxPScxSchedulerLnkRS26;dxSpreadSheetConditionalFormattingDialogsRS26;JvSystem;JvStdCtrls;appanalytics;dxRibbonCustomizationFormRS26;cxSchedulerGridRS26;IndyIPClient;bindcompvcl;dxADOEMFRS26;JvDocking;JvPascalInterpreter;VclSmp;FireDACODBCDriver;dxRibbonRS26;DataSnapIndy10ServerTransport;dxPScxCommonRS26;JclVcl;dxRichEditDocumentModelRS26;DataSnapProviderClient;FireDACMongoDBDriver;dxFlowChartDesignerRS26;JvControls;dxPScxGridLnkRS26;JvPrintPreview;dxSpreadSheetCoreRS26;DataSnapServerMidas;RESTComponents;DBXInterBaseDriver;dxPScxExtCommonRS26;emsclientfiredac;DataSnapFireDAC;svnui;JvGlobus;DBXMSSQLDriver;JvMM;dxRichEditControlRS26;DatasnapConnectorsFreePascal;dxGaugeControlRS26;dxorgcRS26;dxPScxVGridLnkRS26;bindcompfmx;JvNet;DBXOracleDriver;inetdb;JvAppFrm;dxBarDBNavRS26;dxDBXServerModeRS26;emsedge;fmx;FireDACIBDriver;fmxdae;dxServerModeRS26;dxWizardControlRS26;JvWizards;dxTabbedMDIRS26;dxEMFRS26;dbexpress;IndyCore;dxComnRS26;JvPageComps;dsnap;emsclient;DataSnapCommon;FireDACCommon;JvDB;DataSnapConnectors;cxSchedulerTreeBrowserRS26;dxADOServerModeRS26;soapserver;cxPivotGridOLAPRS26;JclDeveloperTools;cxVerticalGridRS26;dxtrmdRS26;FireDACOracleDriver;DBXMySQLDriver;cxSchedulerRS26;cxSchedulerWebServiceStorageRS26;dxPSdxLCLnkRS26;DBXFirebirdDriver;JvCmp;FireDACCommonODBC;FireDACCommonDriver;dxMapControlRS26;inet;dxSpellCheckerRS26;IndyIPCommon;JvCustom;dxSpreadSheetCoreConditionalFormattingDialogsRS26;vcl;dxPSdxDBOCLnkRS26;JvXPCtrls;FireDACDb2Driver;dxSpreadSheetReportDesignerRS26;dxPScxPCProdRS26;dxNavBarRS26;dxCoreRS26;cxExportRS26;FireDAC;dxHttpIndyRequestRS26;dxPSPrVwRibbonRS26;gtPDFkitD103ProP;JvCore;JvCrypt;FireDACSqliteDriver;FireDACPgDriver;dxPSRichEditControlLnkRS26;FireDACASADriver;cxPivotGridChartRS26;JvDlgs;JvRuntimeDesign;DataSnapServer;dxPSdxDBTVLnkRS26;vclwinx;FireDACDSDriver;dxTileControlRS26;dxSkinsCoreRS26;CustomIPTransport;vcldsnap;bindcomp;dxPSdxOCLnkRS26;DBXInformixDriver;dbxcds;adortl;dxSpreadSheetCoreDialogsRS26;dxBarExtDBItemsRS26;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;dxPSdxPDFViewerLnkRS26;dxRichEditInplaceRS26;JclContainers;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -82,6 +112,14 @@
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -296,6 +334,16 @@
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon192">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -529,6 +577,32 @@
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="iOS_AppStore1024">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon152">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon167">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="iPad_Launch1024">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
@@ -590,6 +664,56 @@
                     </Platform>
                     <Platform Name="iOSSimulator">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_SpotLight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon180">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -663,6 +787,66 @@
                     </Platform>
                     <Platform Name="iOSSimulator">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Notification60">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting87">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -791,7 +975,11 @@
             <Platforms>
                 <Platform value="Android">False</Platform>
                 <Platform value="Android64">False</Platform>
+                <Platform value="iOSDevice64">False</Platform>
+                <Platform value="iOSSimulator">False</Platform>
+                <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

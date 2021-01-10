@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.DB.Firebird.SqlGenerator;
 
@@ -44,14 +42,17 @@ uses
 type
 
   // Classe che si occupa di generare il codice SQL delle varie query
-  TioSqlGeneratorFirebird = class(TioSqlGeneratorSqLite)
+  TioSqlGeneratorFirebird = class(TioSqlGenerator)
   protected
-    class function BuildIndexName(const AContext:IioContext; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean): String; override;
+    class function BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String;
+      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String; override;
   public
-    class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlForExists(const AQuery:IioQuery; const AContext:IioContext); override;
-    class procedure GenerateSqlForCreateIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery:IioQuery; const AContext:IioContext; AIndexName:String); override;
+    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
+      const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
+    class procedure GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
   end;
 
 implementation
@@ -61,38 +62,39 @@ uses
 
 { TioSqlGeneratorFirebird }
 
-class function TioSqlGeneratorFirebird.BuildIndexName(
-  const AContext: IioContext; const ACommaSepFieldList: String;
+class function TioSqlGeneratorFirebird.BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String;
   const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 var
-//  LFieldList: TStrings;
-//  LField: String;
+  // LFieldList: TStrings;
+  // LField: String;
   LGuid: TGUID;
 begin
   // M.M. 11/08/18 Non chiama la funzione ereditata perchè per FIREBIRD i nome degli indici hanno lunghezza massima 31 char
 
   // Build the indexname
-//  Result := 'IDX_' + AContext.GetTable.TableName;
+  // Result := 'IDX_' + AContext.GetTable.TableName;
   // Field list
-//  LFieldList := TStringList.Create;
-//  try
-//    LFieldList.Delimiter := ',';
-//    LFieldList.DelimitedText := ACommaSepFieldList;
-//    for LField in LFieldList do
-//      Result := Result + '_' + LField.Substring(0,5).Trim;   // TODO: si può pensare anche ad un progressivo
-//  finally
-//    LFieldList.Free;
-//  end;
+  // LFieldList := TStringList.Create;
+  // try
+  // LFieldList.Delimiter := ',';
+  // LFieldList.DelimitedText := ACommaSepFieldList;
+  // for LField in LFieldList do
+  // Result := Result + '_' + LField.Substring(0,5).Trim;   // TODO: si può pensare anche ad un progressivo
+  // finally
+  // LFieldList.Free;
+  // end;
 
   Result := 'IDX';
   // Prende gli ultimi 10 caratteri di un GUID
   CreateGUID(LGuid);
-  Result := Result + '_' + LGuid.ToString.Replace('-','',[rfReplaceAll]).Replace('}','',[rfReplaceAll]).Substring(24);
+  Result := Result + '_' + LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
 
   // Index orientation
   case AIndexOrientation of
-    ioAscending: Result := Result + '_A';
-    ioDescending: Result := Result + '_D';
+    ioAscending:
+      Result := Result + '_A';
+    ioDescending:
+      Result := Result + '_D';
   end;
   // Unique
   if AUnique then
@@ -101,10 +103,8 @@ begin
   Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(
-  const AQuery: IioQuery; const AContext:IioContext; AIndexName:String;
-  const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean);
+class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
+  AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
   LQueryText, LIndexOrientationText, LField, LUniqueText: String;
@@ -116,8 +116,10 @@ begin
     AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
   // Index orientation
   case AIndexOrientation of
-    ioAscending: LIndexOrientationText := ' ASCENDING ';
-    ioDescending:  LIndexOrientationText := ' DESCENDING ';
+    ioAscending:
+      LIndexOrientationText := ' ASCENDING ';
+    ioDescending:
+      LIndexOrientationText := ' DESCENDING ';
   end;
   // Unique
   if AUnique then
@@ -142,12 +144,8 @@ begin
   // Build the query text
   // -----------------------------------------------------------------
   // compose the query text
-  LQueryText := 'CREATE '
-              + LUniqueText
-              + LIndexOrientationText
-              + 'INDEX '
-              + AIndexName + ' ON ' + AContext.GetTable.TableName
-              + ' (' + LQueryText + ')';
+  LQueryText := 'CREATE ' + LUniqueText + LIndexOrientationText + 'INDEX ' + AIndexName + ' ON ' + AContext.GetTable.TableName +
+    ' (' + LQueryText + ')';
   // Translate the query text
   LQueryText := TioSqlTranslator.Translate(LQueryText, AContext.GetClassRef.ClassName, False);
   // Assign the query text
@@ -155,8 +153,8 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForDropIndex(
-  const AQuery: IioQuery; const AContext:IioContext; AIndexName: String);
+class procedure TioSqlGeneratorFirebird.GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext;
+  AIndexName: String);
 begin
   // Index Name
   AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
@@ -168,24 +166,32 @@ end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext);
 begin
-// No inherited
-//  inherited;
+  // No inherited
+  // inherited;
   // Build the query text
   // -----------------------------------------------------------------
-  AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql
-    + ' WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:'
-    + AContext.GetProperties.GetIdProperty.GetSqlParamName
-    + ')) THEN 1 ELSE 0 END FROM RDB$DATABASE');
+  AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
+    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName +
+    ')) THEN 1 ELSE 0 END FROM RDB$DATABASE');
   // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);
 begin
-// No inherited
-//  inherited;
+  // No inherited
+  // inherited;
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT GEN_ID(' + AContext.GetTable.GetKeyGenerator + ',1) FROM RDB$DATABASE');
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorFirebird.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  inherited;
+  // Limit
+  if AContext.WhereExist and AContext.Where.LimitExists then
+    AQuery.SQL[0] := Format('SELECT FIRST %d SKIP %d', [AContext.Where.GetLimitRows, AContext.Where.GetLimitOffset]);
   // -----------------------------------------------------------------
 end;
 

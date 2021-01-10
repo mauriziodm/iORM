@@ -69,13 +69,20 @@ type
     procedure btImmediateLoadClick(Sender: TObject);
     procedure btLazyLoadClick(Sender: TObject);
     procedure btShowInfoClick(Sender: TObject);
-    procedure SQLiteConnAfterRegister(Sender: TObject);
     procedure ButtonGenerateScriptClick(Sender: TObject);
     procedure ButtonAnalyzeClick(Sender: TObject);
     procedure ButtonGenerateDBClick(Sender: TObject);
     procedure ButtonDBBuilderResetClick(Sender: TObject);
     procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
       const AScript, AWarnings: TStrings; var AAbort: Boolean);
+    procedure SQLiteConnAfterCreateOrAlterDB(
+      const Sender: TioCustomConnectionDef;
+      const ADBStatus: TioDBBuilderEngineResult; const AScript,
+      AWarnings: TStrings);
+    procedure FirebirdConnAfterCreateOrAlterDB(
+      const Sender: TioCustomConnectionDef;
+      const ADBStatus: TioDBBuilderEngineResult; const AScript,
+      AWarnings: TStrings);
   private
     { Private declarations }
     FDBBuilderEngine: IioDBBuilderEngine;
@@ -92,7 +99,7 @@ implementation
 uses
   Model, iORM, System.Generics.Collections, iORM.Containers.List,
   iORM.Containers.Interfaces, iORM.LiveBindings.InterfaceListBindSourceAdapter,
-  iORM.Rtti.Utilities, iORM.LiveBindings.Interfaces,
+  iORM.Utilities, iORM.LiveBindings.Interfaces,
   iORM.Where.Interfaces, iORM.Where, FireDAC.Comp.Client,
   iORM.DB.Interfaces, SampleData, System.IOUtils, iORM.CommonTypes;
 
@@ -190,7 +197,7 @@ procedure TMainForm.Button3Click(Sender: TObject);
 var
   AList: TObjectList<TPerson>;
 begin
-  AList := io.Load<TPerson>._Where._Property('ID')._GreaterThan(10).ToGenericList.OfType<TObjectList<TPerson>>;
+  AList := io.Load<TPerson>._Limit(10, 10).ToGenericList.OfType<TObjectList<TPerson>>;
   ShowMessage(AList.Count.ToString + ' IPerson');
   AList.Free;
 end;
@@ -276,6 +283,15 @@ begin
   end;
 end;
 
+procedure TMainForm.FirebirdConnAfterCreateOrAlterDB(
+  const Sender: TioCustomConnectionDef;
+  const ADBStatus: TioDBBuilderEngineResult; const AScript,
+  AWarnings: TStrings);
+begin
+  // Check for sample data creation
+  TSampleData.CheckForSampleDataCreation;
+end;
+
 procedure TMainForm.FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
   const AScript, AWarnings: TStrings; var AAbort: Boolean);
 begin
@@ -304,10 +320,13 @@ begin
   end;
 end;
 
-procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
+procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(
+  const Sender: TioCustomConnectionDef;
+  const ADBStatus: TioDBBuilderEngineResult; const AScript,
+  AWarnings: TStrings);
 begin
   // Check for sample data creation
-  // TSampleData.CheckForSampleDataCreation;
+  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TMainForm.TabControl1Gesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
