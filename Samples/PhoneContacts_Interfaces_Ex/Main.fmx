@@ -81,6 +81,7 @@ object MainForm: TMainForm
           TabOrder = 0
         end
         object RBSQLite: TRadioButton
+          IsChecked = True
           Position.X = 256.000000000000000000
           Position.Y = 2.000000000000000000
           Size.Width = 87.000000000000000000
@@ -91,7 +92,6 @@ object MainForm: TMainForm
           OnChange = RBSQLiteChange
         end
         object RBFirebird: TRadioButton
-          IsChecked = True
           Position.X = 256.000000000000000000
           Position.Y = 24.000000000000000000
           Size.Width = 87.000000000000000000
@@ -124,7 +124,7 @@ object MainForm: TMainForm
         ItemEditAppearanceClassName = 'TImageListItemDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
-        ItemIndex = 1
+        ItemIndex = 0
         Align = Client
         CanParentFocus = True
         Size.Width = 384.000000000000000000
@@ -380,7 +380,7 @@ object MainForm: TMainForm
         object EditDateOfBirth: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 6
-          Text = '31/10/2020'
+          Text = '01/11/2021'
           Position.X = 120.000000000000000000
           Position.Y = 162.000000000000000000
           Size.Width = 249.000000000000000000
@@ -496,8 +496,6 @@ object MainForm: TMainForm
       Control = MasterListView
       FillExpressions = <>
       FillHeaderExpressions = <>
-      FillBreakFieldName = 'ClassNameProp'
-      FillHeaderFieldName = 'ClassNameProp'
       FillBreakGroups = <>
     end
     object LinkListControlToField4: TLinkListControlToField
@@ -613,17 +611,20 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     AutoCreateDB.Enabled = True
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ForeignKeys = False
     Database = 'ContactsIntfEx.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     Persistent = False
     Pooled = False
-    OnAfterCreateDB = SQLiteConnAfterCreateDB
+    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 272
     Top = 136
   end
   object FirebirdConn: TioFirebirdConnectionDef
-    AutoCreateDB.Enabled = True
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ForeignKeys = False
     Database = 'ContactsIntfEx.FDB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = False
@@ -636,7 +637,7 @@ object MainForm: TMainForm
     Server = 'localhost'
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
-    OnAfterCreateDB = SQLiteConnAfterCreateDB
+    OnAfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
     Left = 272
     Top = 188
   end

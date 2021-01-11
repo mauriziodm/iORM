@@ -53,13 +53,14 @@ type
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
     class procedure _LoadSingle(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-    class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
-      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+      ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     class procedure _RefreshNoReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
     class procedure _RefreshReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
   public
     class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
-    class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;const AReloadData, ANotify: Boolean); static;
+    class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+      const AReloadData, ANotify: Boolean); static;
     class procedure Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean); static;
     class procedure AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean = False); static;
@@ -80,16 +81,18 @@ type
     class function GetPersistAllExecuteMethod(const ADataObj: TObject; const ARelationChildPropertyName: String;
       const AMasterOID: Integer): TioCommonBSAPersistenceThreadExecute;
     // Post
-    class function GetPostExecuteMethod(const ADataObj: TObject; const ARelationChildPropertyName: String; const AMasterOID: Integer):
-      TioCommonBSAPersistenceThreadExecute;
+    class function GetPostExecuteMethod(const ADataObj: TObject; const ARelationChildPropertyName: String;
+      const AMasterOID: Integer): TioCommonBSAPersistenceThreadExecute;
     // Delete
     class function GetDeleteExecuteMethod(const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
-    class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+    class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+      : TioCommonBSAPersistenceThreadOnTerminate;
     // Refresh
-    class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean):
-      TioCommonBSAPersistenceThreadOnTerminate;
+    class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
+      : TioCommonBSAPersistenceThreadOnTerminate;
     // Other
-    class function GetNotifyTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+    class function GetNotifyTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+      : TioCommonBSAPersistenceThreadOnTerminate;
   end;
 
   TioCommonBSAPersistenceThread = class(TThread)
@@ -151,7 +154,7 @@ begin
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(AActiveBindSourceAdapter.Current);
   // Set the OnTerminate anonymous method when in Async mode
   // If not in Async mode then execute this code in the "AfterDelete" method called by the BSA
-  //  from the OnAfterDelete event handler.
+  // from the OnAfterDelete event handler.
   if AActiveBindSourceAdapter.ioAsync then
     LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(AActiveBindSourceAdapter)
   else
@@ -171,7 +174,7 @@ begin
 
   // Set the OnTerminate anonymous method when in Async mode
   // If not in Async mode then execute this code in the "AfterDelete" method called by the BSA
-  //  from the OnAfterDelete event handler.
+  // from the OnAfterDelete event handler.
   if not AActiveBindSourceAdapter.ioAsync then
     TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(AActiveBindSourceAdapter);
 end;
@@ -191,14 +194,14 @@ begin
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
   // Set the OnTerminate method
   LTerminateMethod := procedure(AResultValue: TObject)
-  var
-    LIntf: IInterface;
-  begin
-    if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
-      AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
-    else
-      AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
-  end;
+    var
+      LIntf: IInterface;
+    begin
+      if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
+        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+      else
+        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
+    end;
 
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
@@ -213,15 +216,15 @@ begin
   end;
 end;
 
-class procedure TioCommonBSAPersistence.Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AReloadData, ANotify: Boolean);
+class procedure TioCommonBSAPersistence.Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+  const AReloadData, ANotify: Boolean);
 begin
   // Se il BindSourceAdapter è un dettaglio allora propaga il Refresh al suo Master
   // questo perchè solo il master esegue realmente le query e quindi è quest'ultimo che
   // deve gestire il refresh con reload.
   if AActiveBindSourceAdapter.IsDetail and Assigned(AActiveBindSourceAdapter.GetMasterBindSourceAdapter) and AReloadData then
     AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Refresh(AReloadData)
-  else
-  if AReloadData and AActiveBindSourceAdapter.ioAutoLoadData then
+  else if AReloadData and AActiveBindSourceAdapter.ioAutoLoadData then
     _RefreshReload(AActiveBindSourceAdapter, ANotify)
   else
     _RefreshNoReload(AActiveBindSourceAdapter, ANotify);
@@ -233,8 +236,8 @@ begin
   AActiveBindSourceAdapter.AsTBindSourceAdapter.Refresh;
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   if ANotify then
-    AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioLiveBindingsFactory.Notification(
-      AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterRefresh));
+    AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterRefresh));
 end;
 
 class procedure TioCommonBSAPersistence._RefreshReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -321,8 +324,7 @@ begin
   Post(AActiveBindSourceAdapter, True);
 end;
 
-class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-  const AForce: Boolean);
+class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean);
 var
   LMasterProperty: IioContextProperty;
   LRelationChildPropertyName: String;
@@ -353,8 +355,8 @@ begin
       LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;
     end;
     // Set Execute anonimous methods to persist
-    LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPostExecuteMethod(AActiveBindSourceAdapter.Current, LRelationChildPropertyName,
-      LMasterOID);
+    LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPostExecuteMethod(AActiveBindSourceAdapter.Current,
+      LRelationChildPropertyName, LMasterOID);
     // Execute synchronous or asynchronous
     _Execute(AActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
   end
@@ -386,19 +388,17 @@ begin
     function: TObject
     begin
       result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetClass);
-    end,
-    ATerminateMethod);
+    end, ATerminateMethod);
 end;
 
 class procedure TioCommonBSAPersistence._LoadSingle(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
     begin
-      Result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToObject;
-    end,
-    ATerminateMethod);
+      result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToObject;
+    end, ATerminateMethod);
 end;
 
 { TioCommonBSAPersistenceThread }
@@ -435,8 +435,7 @@ begin
       io.HideWait;
       raise EioException.Create('(' + Self.ClassName + ') - ' + FExceptionText);
     end
-    else
-    if Assigned(FOnTerminateProc) then
+    else if Assigned(FOnTerminateProc) then
       FOnTerminateProc(FResultValue);
   finally
     io.HideWait;
@@ -445,39 +444,41 @@ end;
 
 function TioCommonBSAPersistenceThread.ResultValue: TObject;
 begin
-  Result := FResultValue;
+  result := FResultValue;
 end;
 
 { TioCommonBSAAnonymousMethodsFactory }
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const ADataObj: TObject)
+  : TioCommonBSAPersistenceThreadExecute;
 begin
-  Result := function: TObject
+  result := function: TObject
     begin
-      Result := nil;
+      result := nil;
       io.Delete(ADataObj);
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(const AActiveBindSourceAdapter
+  : IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
 begin
-  Result := procedure(AResultValue: TObject)
+  result := procedure(AResultValue: TObject)
     begin
       // DataSet synchro
       AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
       // Send a notification to other ActiveBindSourceAdapters & BindSource
-      //  NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
-      //       if FAutoPersist is True then the notify is performed by
-      //       the "CommonBSAPersistence" else by this method
+      // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
+      // if FAutoPersist is True then the notify is performed by
+      // the "CommonBSAPersistence" else by this method
       AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete));
+        TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete));
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(
-  const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(const AActiveBindSourceAdapter
+  : IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
 begin
-  Result := procedure(AResultValue: TObject)
+  result := procedure(AResultValue: TObject)
     begin
       // Send a notification to other ActiveBindSourceAdapters & BindSource
       AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
@@ -486,44 +487,45 @@ begin
 end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(const ADataObj: TObject;
-  const ARelationChildPropertyName: String; const AMasterOID: Integer): TioCommonBSAPersistenceThreadExecute;
+const ARelationChildPropertyName: String; const AMasterOID: Integer): TioCommonBSAPersistenceThreadExecute;
 begin
-  Result := function: TObject
+  result := function: TObject
     begin
-      Result := nil;
+      result := nil;
       io.PersistCollection(ADataObj, ARelationChildPropertyName, AMasterOID, False);
     end;
 end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetPostExecuteMethod(const ADataObj: TObject;
-  const ARelationChildPropertyName: String; const AMasterOID: Integer): TioCommonBSAPersistenceThreadExecute;
+const ARelationChildPropertyName: String; const AMasterOID: Integer): TioCommonBSAPersistenceThreadExecute;
 begin
-  Result := function: TObject
+  result := function: TObject
     begin
-      Result := nil;
+      result := nil;
       io.Persist(ADataObj, ARelationChildPropertyName, AMasterOID, False);
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetRefreshTerminateMethod(
-  const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean): TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetRefreshTerminateMethod(const AActiveBindSourceAdapter
+  : IioActiveBindSourceAdapter; const ANotify: Boolean): TioCommonBSAPersistenceThreadOnTerminate;
 begin
-  Result := procedure(AResultValue: TObject)
-  var
-    LIntf: IInterface;
-  begin
-    // Close the BSA, substitute the DataObject then reopen
-    if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
-      AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
-    else
-      AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
-    // Prevent AutoLoadData when activating the BSA
-    AActiveBindSourceAdapter.Refreshing := False;
-    // Send a notification to other ActiveBindSourceAdapters & BindSource
-    if ANotify then
-      AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioLiveBindingsFactory.Notification(
-        AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterRefresh));
-  end;
+  result := procedure(AResultValue: TObject)
+    var
+      LIntf: IInterface;
+    begin
+      // Close the BSA, substitute the DataObject then reopen
+      if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
+        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+      else
+        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
+      // Prevent AutoLoadData when activating the BSA
+      AActiveBindSourceAdapter.Refreshing := False;
+      // Send a notification to other ActiveBindSourceAdapters & BindSource
+      if ANotify then
+        AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
+          TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current,
+          ntAfterRefresh));
+    end;
 end;
 
 end.

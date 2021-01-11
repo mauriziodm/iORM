@@ -11,7 +11,8 @@ uses
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, System.Classes, Data.Bind.Controls, FMX.Grid.Style,
   FMX.ScrollBox, FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid,
-  iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
+  iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX,
+  iORM.DBBuilder.Interfaces;
 
 type
   TMainForm = class(TForm)
@@ -79,7 +80,10 @@ type
     procedure RBSQLiteChange(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
-    procedure SQLiteConnAfterCreateDB(Sender: TioCustomConnectionDef; AScript, AError: string);
+    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+      const AScript, AWarnings: TStrings);
+    procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+      const AScript, AWarnings: TStrings);
   private
     { Private declarations }
   public
@@ -114,10 +118,18 @@ end;
 procedure TMainForm.Button4Click(Sender: TObject);
 var
   LPerson: IPerson;
+  LList: TList<IInterface>;
 begin
-  LPerson := io.Create<ICustomer>;
-  BSMaster.Append(LPerson);
-  NextTabAction1.Execute;
+  LPerson := io.Create<IPerson>;
+//  BSMaster.Append(LPerson);
+//  NextTabAction1.Execute;
+
+
+  LPerson.FirstName := 'XXXXXXXXXX';
+  LPerson.LastName := 'OOOOOOOOOO';
+  LList := BSMaster.DataObjectAs<TList<IInterface>>;
+  LList.Add(LPerson);
+  BSMaster.GetActiveBindSourceAdapter.Refresh(False);
 end;
 
 procedure TMainForm.Button8Click(Sender: TObject);
@@ -131,6 +143,12 @@ var
 begin
   AList := io.Load<IPerson>.ToList;
   BSMaster.SetDataObject(AList);
+end;
+
+procedure TMainForm.FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef;
+  const ADBStatus: TioDBBuilderEngineResult; const AScript, AWarnings: TStrings);
+begin
+//  TSampleData.CheckForSampleDataCreation(Sender.Name);
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -147,7 +165,8 @@ begin
     FirebirdConn.DefaultConnection := True;
 end;
 
-procedure TMainForm.SQLiteConnAfterCreateDB(Sender: TioCustomConnectionDef; AScript, AError: string);
+procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation(Sender.Name);
 end;
