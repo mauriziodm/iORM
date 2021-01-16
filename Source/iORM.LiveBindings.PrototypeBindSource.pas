@@ -38,7 +38,7 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
   System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces,
-  System.SysUtils;
+  System.SysUtils, iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -62,6 +62,7 @@ type
     FioAutoRefreshOnNotification: TioAutoRefreshType;
     FonNotify: TioBSANotificationEvent;
     FAutoPost: Boolean;
+    FPaging: TioCommonBSAPageManager;
     // Selectors
     FSelectorFor: TioPrototypeBindSource;
     FOnReceiveSelectionAutoEdit: Boolean;
@@ -219,6 +220,8 @@ type
     property ioPropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
     property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
+    // Paging
+    property ioPaging: TioCommonBSAPageManager read FPaging;
   end;
 
 implementation
@@ -332,6 +335,8 @@ begin
   FPropagateEdit := False;
   FPropagatePost := False;
   FPropagatePersist := False;
+  // Page manager
+  FPaging := TioCommonBSAPageManager.Create;
   // Set even an onChange event handler
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;
@@ -347,6 +352,7 @@ end;
 destructor TioPrototypeBindSource.Destroy;
 begin
   FioWhereStr.Free;
+  FPaging.Free;
   inherited;
 end;
 

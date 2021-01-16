@@ -66,8 +66,7 @@ type
       const AViewDataType: TioViewDataType; const AAutoLoadData: Boolean; const ADataObject: TObject; const AOwnsObject: Boolean)
       : IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    class function GetCommonBSAPaging: IioCommonBSAPaging;
-    class function GetSqlLimitStrategy(const APagingType: TioBSAPagingType): IioSqlLimitStrategy;
+    class function GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
   end;
 
 implementation
@@ -243,18 +242,13 @@ begin
     Result := AMasterModelPresenter.GetNaturalObjectBindSourceAdapter(AOwner);
 end;
 
-class function TioLiveBindingsFactory.GetCommonBSAPaging: IioCommonBSAPaging;
-begin
-  Result := TioCommonBSAPaging.Create;
-end;
-
-class function TioLiveBindingsFactory.GetSqlLimitStrategy(const APagingType: TioBSAPagingType): IioSqlLimitStrategy;
+class function TioLiveBindingsFactory.GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
 begin
   case APagingType of
     ptHardPaging:
-      Result := TioSqlLimitStrategy_HardPaging.Create;
+      Result := TioCommonBSAPageManagerStrategy_HardPaging.Create;
     ptProgressiveManual:
-      Result := TioSqlLimitStrategy_ProgressiveManual.Create;
+      Result := TioCommonBSAPageManagerStrategy_ProgressiveManual.Create;
   else
     Result := nil;
   end;

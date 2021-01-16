@@ -3,7 +3,7 @@ unit iORM.LiveBindings.CommonBSAPaging;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, System.Classes;
 
 const
   PAGING_TYPE_DEFAULT = ptDisabled;
@@ -14,23 +14,16 @@ const
 type
 
 {$TYPEINFO ON}
-  TioCommonBSAPaging = class(TInterfacedObject, IioCommonBSAPaging)
-  strict private[Weak]
-    FActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+  TioCommonBSAPageManager = class(TPersistent)
+  strict private
     FCurrentPage: Integer;
     FNextPageStartOffset: Integer;
     FPageSize: Integer;
     FPagingType: TioBSAPagingType;
-    FStrategy: IioSqlLimitStrategy;
+    FStrategy: IioBSAPageManagerStrategy;
   strict protected
     procedure SetCurrentPage(const Value: Integer);
-    procedure SetNextPageStartOffset(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
-    procedure SetPageSize(const Value: Integer);
-    function GetCurrentPage: Integer;
-    function GetNextPageStartOffset: Integer;
-    function GetPagingType: TioBSAPagingType;
-    function GetPageSize: Integer;
     function GetSqlLimit: Integer; // Lascio o tolgo?
     function GetSqlLimitOffset: Integer; // Lascio o tolgo?
     procedure CheckStrategy;
@@ -38,17 +31,17 @@ type
   public
     procedure NextPage;
     procedure PrevPage;
-    property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
+    property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
   published
-//    constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+    // constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
     constructor Create;
-    property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
-    property PageSize: Integer read GetPageSize write SetPageSize default PAGE_SIZE_DEFAULT;
-    property PagingType: TioBSAPagingType read GetPagingType write SetPagingType default PAGING_TYPE_DEFAULT;
+    property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset default NEXT_PAGE_START_OFFSET;
+    property PageSize: Integer read FPageSize write FPageSize default PAGE_SIZE_DEFAULT;
+    property PagingType: TioBSAPagingType read FPagingType write SetPagingType default PAGING_TYPE_DEFAULT;
   end;
 
   // Base class for all SQL limit strategy classes
-  TioSqlLimitStrategy_Base = class abstract(TInterfacedObject, IioSqlLimitStrategy)
+  TioCommonBSAPageManagerStrategy = class abstract(TInterfacedObject, IioBSAPageManagerStrategy)
   strict private
     FSqlLimit: Integer;
     FSqlLimitOffset: Integer;
@@ -61,7 +54,7 @@ type
     function GetSqlLimitOffset: Integer;
   end;
 
-  TioSqlLimitStrategy_HardPaging = class(TioSqlLimitStrategy_Base)
+  TioCommonBSAPageManagerStrategy_HardPaging = class(TioCommonBSAPageManagerStrategy)
   public
     procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
   end;
@@ -69,7 +62,7 @@ type
   // NB: Un eventuale altro LimitStrategy progressivo ma con avanzamento pagina automatico
   // calcolerà la soglia che innescherà il caricamento della pagina successiva (ex NextPageAutoThreshold)
   // ponendolo clla metà della PageSize
-  TioSqlLimitStrategy_ProgressiveManual = class(TioSqlLimitStrategy_Base)
+  TioCommonBSAPageManagerStrategy_ProgressiveManual = class(TioCommonBSAPageManagerStrategy)
   strict private
     FHigherSqlLimitOffset: Integer;
   public
@@ -83,68 +76,48 @@ uses
 
 { TioCommonBSAPaging }
 
-procedure TioCommonBSAPaging.CheckStrategy;
+procedure TioCommonBSAPageManager.CheckStrategy;
 begin
   if not Assigned(FStrategy) then
     EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
-constructor TioCommonBSAPaging.Create;
+constructor TioCommonBSAPageManager.Create;
 begin
+  FPagingType := PAGING_TYPE_DEFAULT;
+  FPageSize := PAGE_SIZE_DEFAULT;
+  FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
   Reset;
 end;
 
-function TioCommonBSAPaging.GetCurrentPage: Integer;
-begin
-  Result := FCurrentPage;
-end;
-
-function TioCommonBSAPaging.GetNextPageStartOffset: Integer;
-begin
-  Result := FNextPageStartOffset;
-end;
-
-function TioCommonBSAPaging.GetPageSize: Integer;
-begin
-  Result := FPageSize;
-end;
-
-function TioCommonBSAPaging.GetPagingType: TioBSAPagingType;
-begin
-  Result := FPagingType;
-end;
-
-function TioCommonBSAPaging.GetSqlLimit: Integer;
+function TioCommonBSAPageManager.GetSqlLimit: Integer;
 begin
   CheckStrategy;
   Result := FStrategy.GetSqlLimit;
 end;
 
-function TioCommonBSAPaging.GetSqlLimitOffset: Integer;
+function TioCommonBSAPageManager.GetSqlLimitOffset: Integer;
 begin
   CheckStrategy;
   Result := FStrategy.GetSqlLimitOffset;
 end;
 
-procedure TioCommonBSAPaging.NextPage;
+procedure TioCommonBSAPageManager.NextPage;
 begin
   SetCurrentPage(FCurrentPage + 1);
 end;
 
-procedure TioCommonBSAPaging.PrevPage;
+procedure TioCommonBSAPageManager.PrevPage;
 begin
   SetCurrentPage(FCurrentPage - 1);
 end;
 
-procedure TioCommonBSAPaging.Reset;
+procedure TioCommonBSAPageManager.Reset;
 begin
-  FPagingType := PAGING_TYPE_DEFAULT;
   FCurrentPage := CURRENT_PAGE_DEFAULT;
-  FPageSize := PAGE_SIZE_DEFAULT;
-  FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
 end;
 
-procedure TioCommonBSAPaging.SetCurrentPage(const Value: Integer);
+procedure TioCommonBSAPageManager.SetCurrentPage(const Value: Integer);
 begin
   if (Value = FCurrentPage) or (Value < 1) then
     Exit;
@@ -153,52 +126,39 @@ begin
   FCurrentPage := Value;
 end;
 
-procedure TioCommonBSAPaging.SetNextPageStartOffset(const Value: Integer);
-begin
-  FNextPageStartOffset := Value;
-end;
-
-procedure TioCommonBSAPaging.SetPageSize(const Value: Integer);
-begin
-  FPageSize := Value;
-end;
-
-procedure TioCommonBSAPaging.SetPagingType(const Value: TioBSAPagingType);
+procedure TioCommonBSAPageManager.SetPagingType(const Value: TioBSAPagingType);
 begin
   if Value = FPagingType then
     Exit;
-  FStrategy := TioLiveBindingsFactory.GetSqlLimitStrategy(Value);
+  FStrategy := TioLiveBindingsFactory.GetBSAPageManagerStrategy(Value);
   FPagingType := Value;
-  Reset;
-  if FActiveBindSourceAdapter.Active then
-    FActiveBindSourceAdapter.Refresh(True);
 end;
 
 { TioSqlLimitStrategy_Base }
 
-function TioSqlLimitStrategy_Base.GetSqlLimitOffset: Integer;
+function TioCommonBSAPageManagerStrategy.GetSqlLimitOffset: Integer;
 begin
   Result := FSqlLimitOffset;
 end;
 
-function TioSqlLimitStrategy_Base.GetSqlLimit: Integer;
+function TioCommonBSAPageManagerStrategy.GetSqlLimit: Integer;
 begin
   Result := FSqlLimit;
 end;
 
-procedure TioSqlLimitStrategy_Base.SetSqlLimit(const AValue: Integer);
+procedure TioCommonBSAPageManagerStrategy.SetSqlLimit(const AValue: Integer);
 begin
   FSqlLimit := Max(AValue, 0);
 end;
 
-procedure TioSqlLimitStrategy_Base.SetSqlLimitOffset(const AValue: Integer);
+procedure TioCommonBSAPageManagerStrategy.SetSqlLimitOffset(const AValue: Integer);
 begin
   FSqlLimitOffset := Max(AValue, 0);
 end;
 
 { TioSqlLimitStrategy_HardPaging }
 
-procedure TioSqlLimitStrategy_HardPaging.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
+procedure TioCommonBSAPageManagerStrategy_HardPaging.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
 begin
   SetSqlLimit(APageSize + ANextPageStartOffset);
   SetSqlLimitOffset((APageSize * (ADestPage - 1)) - ANextPageStartOffset);
@@ -206,7 +166,7 @@ end;
 
 { TioSqlLimitStrategy_ProgressiveManual }
 
-procedure TioSqlLimitStrategy_ProgressiveManual.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
+procedure TioCommonBSAPageManagerStrategy_ProgressiveManual.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
 begin
   SetSqlLimit((APageSize * ADestPage) - FHigherSqlLimitOffset);
   SetSqlLimitOffset(FHigherSqlLimitOffset);
