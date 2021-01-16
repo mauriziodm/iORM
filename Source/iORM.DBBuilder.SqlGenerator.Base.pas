@@ -73,7 +73,7 @@ type
       const AWithIndexOrientation: Boolean): String; virtual;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
   public
-    constructor Create(const ASchema: IioDBBuilderSchema);
+    constructor Create(const ASchema: IioDBBuilderSchema); virtual;
     procedure ScriptBegin; virtual;
     procedure ScriptEnd; virtual;
   end;
@@ -333,7 +333,7 @@ begin
   if LFieldDefaultValue.IsEmpty then
     Result := ''
   else
-    Result := TioDBFactory.SqlDataConverter(FSchema.ConnectionDefName).TValueToSql(LFieldDefaultValue);
+    Result := 'DEFAULT ' + TioDBFactory.SqlDataConverter(FSchema.ConnectionDefName).TValueToSql(LFieldDefaultValue);
 end;
 
 procedure TioDBBuilderSqlGenBase.ScriptEnd;

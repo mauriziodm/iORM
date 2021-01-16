@@ -84,6 +84,8 @@ type
       const AScript, AWarnings: TStrings);
     procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
       const AScript, AWarnings: TStrings);
+    procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+      const AScript, AWarnings: TStrings; var AAbort: Boolean);
   private
     { Private declarations }
   public
@@ -96,7 +98,7 @@ var
 implementation
 
 uses
-  System.Generics.Collections, iORM, Interfaces, SampleData;
+  System.Generics.Collections, iORM, Interfaces, SampleData, System.IOUtils;
 
 
 
@@ -169,6 +171,12 @@ procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnec
   const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation(Sender.Name);
+end;
+
+procedure TMainForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  const AScript, AWarnings: TStrings; var AAbort: Boolean);
+begin
+  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_Script.txt'));
 end;
 
 end.

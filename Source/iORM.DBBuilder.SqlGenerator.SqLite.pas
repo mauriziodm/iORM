@@ -13,8 +13,10 @@ type
 
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   private
+    procedure CopyDataFromOldToNewTables;
     procedure CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
+    procedure RenameAllTablesToOld; // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
   public
@@ -80,8 +82,6 @@ end;
 procedure TioDBBuilderSqlGenSQLite.EndAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
   EndCreateTable(ATable);
-  ScriptAddEmpty;
-  CopyDataFromOldToNewTable(ATable);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.EndCreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -90,7 +90,8 @@ begin
   ScriptAdd(');');
 end;
 
-function TioDBBuilderSqlGenSQLite.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
+function TioDBBuilderSqlGenSQLite.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField)
+  : Boolean;
 var
   LQuery: IioQuery;
 begin
@@ -104,7 +105,8 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): Boolean;
+function TioDBBuilderSqlGenSQLite.FieldModified(const ATable: IioDBBuilderSchemaTable;
+  const AField: IioDBBuilderSchemaField): Boolean;
 var
   LQuery: IioQuery;
   LNewFieldName: string;
@@ -141,14 +143,32 @@ end;
 
 function TioDBBuilderSqlGenSQLite.InternalCreateField(const AField: IioDBBuilderSchemaField): String;
 var
+  LDefault: string;
   LNotNull: string;
 begin
   // If primary key...
   if AField.PrimaryKey then
     Exit(Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])); // Add AUTOINCREMENT keyword???
   // ...then continue
+  LDefault := ExtractFieldDefaultValue(AField);
   LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-  Result := Format('"%s" %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull]).Trim;
+  Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull, LDefault]).Trim;
+end;
+
+procedure TioDBBuilderSqlGenSQLite.RenameAllTablesToOld;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  ScriptAddTitle('Renaming table names to "_old"');
+  for LTable in FSchema.Tables.Values do
+  begin
+    if LTable.Status <> stAlter then
+      Continue;
+    ScriptAddComment(Format('Renaming from "%s" to "%s"', [LTable.TableName, Table2OldTableName(LTable)]));
+    ScriptAdd(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
+    ScriptAdd(Format('ALTER TABLE %s RENAME TO %s;', [LTable.TableName, Table2OldTableName(LTable)]));
+    ScriptAddEmpty;
+  end;
 end;
 
 procedure TioDBBuilderSqlGenSQLite.ScriptBegin;
@@ -162,6 +182,8 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.ScriptEnd;
 begin
+  if FSchema.Status = tioDBBuilderStatus.stAlter then
+    CopyDataFromOldToNewTables;
   ScriptAddEmpty;
   ScriptAddComment('At the end...');
 //  ScriptAdd('COMMIT;');
@@ -175,6 +197,7 @@ var
   LField: IioDBBuilderSchemaField;
   LComma: Char;
 begin
+  ScriptAddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.TableName]));
   // Insert into
   ScriptAdd(Format('INSERT INTO %s (', [ATable.TableName]));
   IncIndentationLevel;
@@ -201,6 +224,20 @@ begin
   DecIndentationLevel;
   DecIndentationLevel;
   ScriptAdd(';');
+  ScriptAddEmpty;
+end;
+
+procedure TioDBBuilderSqlGenSQLite.CopyDataFromOldToNewTables;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  ScriptAddTitle('Copying data from "_old" tables.');
+  for LTable in FSchema.Tables.Values do
+  begin
+    if LTable.Status <> stAlter then
+      Continue;
+    CopyDataFromOldToNewTable(LTable);
+  end;
 end;
 
 function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField): String;
@@ -243,6 +280,7 @@ begin
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
+// For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
 function TioDBBuilderSqlGenSQLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
 begin
   Result := Format('_%s_old', [ATable.TableName.ToLower]);
@@ -287,10 +325,6 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(ATable)]));
-  ScriptAddEmpty;
-  ScriptAdd(Format('ALTER TABLE %s RENAME TO %s;', [ATable.TableName, Table2OldTableName(ATable)]));
-  ScriptAddEmpty;
   BeginCreateTable(ATable);
 end;
 
@@ -307,19 +341,23 @@ end;
 
 procedure TioDBBuilderSqlGenSQLite.DropAllForeignKeys;
 begin
-    ScriptAddComment('Not implemented by this SqlGenerator');
+  ScriptAddComment('Not implemented by this SqlGenerator');
 end;
 
 procedure TioDBBuilderSqlGenSQLite.DropAllIndexes;
 var
   LQuery: IioQuery;
 begin
+  // Drop all indexes part
   LQuery := OpenQuery('SELECT * FROM sqlite_master WHERE type = ''index''');
   while not LQuery.Eof do
   begin
     ScriptAdd(Format('DROP INDEX %s;', [LQuery.Fields.FieldByName('name').AsString]));
     LQuery.Next;
   end;
+  // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
+  if FSchema.Status = stAlter then
+    RenameAllTablesToOld;
 end;
 
 end.

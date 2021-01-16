@@ -262,7 +262,7 @@ begin
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end
     else
-      raise EioException.Create(Self.ClassName + '.Properties: Invalid property/field type.');
+      raise EioException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');
 
     // ====================================================================================================
     // Mauri 08/02/2020: Secondo me questo blocco di codice si può eliminare del tutto perchè tanto, arrivati qui
@@ -292,6 +292,7 @@ begin
     PropMetadata_FieldPrecision := IO_DEFAULT_FIELD_PRECISION;
     PropMetadata_FieldScale := IO_DEFAULT_FIELD_SCALE;
     PropMetadata_FieldNotNull := False;
+    PropMetadata_Default := nil;
     PropMetadata_FieldUnicode := True;
     PropMetadata_CustomFieldType := '';
     PropMetadata_FieldSubType := '';
@@ -340,19 +341,33 @@ begin
         PropIDSkipOnInsert := ioOID(Attr).SkipOnInsert;
       end;
       if Attr is ioTypeAlias then
+      begin
         PropTypeAlias := ioTypeAlias(Attr).Value;
+      end;
       if Attr is ioField then
+      begin
         PropFieldName := ioField(Attr).Value;
+      end;
       if Attr is ioFieldType then
+      begin
         PropFieldType := ioFieldType(Attr).Value;
+      end;
       if Attr is ioLoadSql then
+      begin
         PropLoadSql := ioLoadSql(Attr).Value;
+      end;
       if Attr is ioSkip then
+      begin
         PropSkip := True;
+      end;
       if Attr is ioLoadOnly then
+      begin
         PropReadWrite := iorwReadOnly;
+      end;
       if Attr is ioPersistOnly then
+      begin
         PropReadWrite := iorwWriteOnly;
+      end;
       // Relations
       if Attr is ioEmbeddedHasMany then
       begin
@@ -470,7 +485,9 @@ begin
         PropMetadata_CustomFieldType := ioFTCustom(Attr).Value;
       end;
       if Attr is ioFTDefault then
+      begin
         PropMetadata_Default := ioFTDefault(Attr).Value;
+      end;
       if Attr is ioForeignKey then
       begin
         PropMetadata_FKAutoCreate := ioForeignKey(Attr).AutoCreate;

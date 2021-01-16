@@ -611,14 +611,13 @@ object MainForm: TMainForm
   end
   object SQLiteConn: TioSQLiteConnectionDef
     AutoCreateDB.Enabled = True
-    AutoCreateDB.Indexes = False
-    AutoCreateDB.ForeignKeys = False
     Database = 'ContactsIntfEx.DB'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 272
     Top = 136
   end

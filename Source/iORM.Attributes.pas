@@ -99,7 +99,9 @@ type
   strict private
     FValue: TValue;
   public
-    constructor Create(const AValue: TValue);
+    constructor Create(const AValue: String); overload;
+    constructor Create(const AValue: Integer); overload;
+    constructor Create(const AValue: TDateTime); overload;
     property Value: TValue read FValue;
   end;
 
@@ -829,7 +831,17 @@ end;
 
 { TioCustomTValueAttribute }
 
-constructor TioCustomTValueAttribute.Create(const AValue: TValue);
+constructor TioCustomTValueAttribute.Create(const AValue: String);
+begin
+  FValue := AValue;
+end;
+
+constructor TioCustomTValueAttribute.Create(const AValue: TDateTime);
+begin
+  FValue := TValue.From<TDateTime>(AValue);
+end;
+
+constructor TioCustomTValueAttribute.Create(const AValue: Integer);
 begin
   FValue := AValue;
 end;

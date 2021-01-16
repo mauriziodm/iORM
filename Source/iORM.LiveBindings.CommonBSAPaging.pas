@@ -6,37 +6,57 @@ uses
   iORM.LiveBindings.Interfaces;
 
 const
-  ENABLED_DEFAULT = False;
+  PAGING_TYPE_DEFAULT = ptDisabled;
   CURRENT_PAGE_DEFAULT = 1;
-  PAGE_ADJUSTMENT_FACTOR_DEFAULT = 0;
-  PAGE_SIZE_DEFAULT = 50;
+  NEXT_PAGE_AUTO_THRESHOLD_DEFAULT = 50;
+  NEXT_PAGE_START_OFFSET = 0;
+  PAGE_SIZE_DEFAULT = 100;
 
 type
 
-  TioCommonBSAPaging = class
+{$TYPEINFO ON}
+  TioCommonBSAPaging = class(TInterfacedObject)
   private
     [Weak]
     FActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     FCurrentPage: Integer;
-    FEnabled: boolean;
-    FPageAdjustmentFactor: Integer;
+    FCurrentPageFirstRecNo: Integer;
+    FCurrentPageLastRecNo: Integer;
+    FNextPageAutoThreshold: Integer;
+    FNextPageStartOffset: Integer;
     FPageSize: Integer;
+    FPagingType: TioBSAPagingType;
+    FHigherLoadedRecNo: Integer;
   protected
     procedure SetCurrentPage(const Value: Integer);
-    procedure SetEnabled(const Value: boolean);
-    procedure SetPageAdjustmentFactor(const Value: Integer);
+    procedure SetNextPageAutoThreshold(const Value: Integer);
+    procedure SetNextPageStartOffset(const Value: Integer);
+    procedure SetPagingType(const Value: TioBSAPagingType);
     procedure SetPageSize(const Value: Integer);
     function GetCurrentPage: Integer;
-    function GetEnabled: boolean;
-    function GetPageAdjustmentFactor: Integer;
+    function GetCurrentPageFirstRecNo: Integer;
+    function GetCurrentPageLastRecNo: Integer;
+    function GetHigherLoadedRecNo: Integer;
+    function GetNextPageAutoThreshold: Integer;
+    function GetNextPageStartOffset: Integer;
+    function GetPagingType: TioBSAPagingType;
     function GetPageSize: Integer;
   public
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
+    property CurrentPageFirstRecNo: Integer read GetCurrentPageLastRecNo;
+    property CurrentPageLastRecNo: Integer read GetCurrentPageFirstRecNo;
+    property HigherLoadedRecNo: Integer read GetHigherLoadedRecNo;
+    // procedure GoToPage
+    // procedure NextPage
+    // procedure PrevPage
   published
     constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-    property Enabled: boolean read GetEnabled write SetEnabled default ENABLED_DEFAULT;
-    property PageAdjustmentFactor: Integer read GetPageAdjustmentFactor write SetPageAdjustmentFactor default PAGE_ADJUSTMENT_FACTOR_DEFAULT;
+    property NextPageAutoThreshold: Integer read GetNextPageAutoThreshold write SetNextPageAutoThreshold
+      default NEXT_PAGE_AUTO_THRESHOLD_DEFAULT;
+    property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset
+      default NEXT_PAGE_START_OFFSET;
     property PageSize: Integer read GetPageSize write SetPageSize default PAGE_SIZE_DEFAULT;
+    property PagingType: TioBSAPagingType read GetPagingType write SetPagingType default PAGING_TYPE_DEFAULT;
   end;
 
 implementation
@@ -45,11 +65,17 @@ implementation
 
 constructor TioCommonBSAPaging.Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
-  FEnabled := ENABLED_DEFAULT;
+  FPagingType := PAGING_TYPE_DEFAULT;
   FCurrentPage := CURRENT_PAGE_DEFAULT;
   FPageSize := PAGE_SIZE_DEFAULT;
-  FPageAdjustmentFactor := PAGE_ADJUSTMENT_FACTOR_DEFAULT;
+  FNextPageAutoThreshold := NEXT_PAGE_AUTO_THRESHOLD_DEFAULT;
+  FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
   FActiveBindSourceAdapter := AActiveBindSourceAdapter;
+end;
+
+function TioCommonBSAPaging.GetCurrentPageFirstRecNo: Integer;
+begin
+  Result := FCurrentPageLastRecNo;
 end;
 
 function TioCommonBSAPaging.GetCurrentPage: Integer;
@@ -57,14 +83,24 @@ begin
   result := FCurrentPage;
 end;
 
-function TioCommonBSAPaging.GetEnabled: boolean;
+function TioCommonBSAPaging.GetCurrentPageLastRecNo: Integer;
 begin
-  result := FEnabled;
+  Result := FCurrentPageFirstRecNo;
 end;
 
-function TioCommonBSAPaging.GetPageAdjustmentFactor: Integer;
+function TioCommonBSAPaging.GetHigherLoadedRecNo: Integer;
 begin
-  result := FPageAdjustmentFactor;
+  Result := FHigherLoadedRecNo;
+end;
+
+function TioCommonBSAPaging.GetNextPageAutoThreshold: Integer;
+begin
+  result := FNextPageAutoThreshold;
+end;
+
+function TioCommonBSAPaging.GetNextPageStartOffset: Integer;
+begin
+  result := FNextPageStartOffset;
 end;
 
 function TioCommonBSAPaging.GetPageSize: Integer;
@@ -72,24 +108,34 @@ begin
   result := FPageSize;
 end;
 
+function TioCommonBSAPaging.GetPagingType: TioBSAPagingType;
+begin
+  Result := FPagingType;
+end;
+
 procedure TioCommonBSAPaging.SetCurrentPage(const Value: Integer);
 begin
   FCurrentPage := Value;
 end;
 
-procedure TioCommonBSAPaging.SetEnabled(const Value: boolean);
+procedure TioCommonBSAPaging.SetNextPageAutoThreshold(const Value: Integer);
 begin
-  FEnabled := Value;
+  FNextPageAutoThreshold := Value;
 end;
 
-procedure TioCommonBSAPaging.SetPageAdjustmentFactor(const Value: Integer);
+procedure TioCommonBSAPaging.SetNextPageStartOffset(const Value: Integer);
 begin
-  FPageAdjustmentFactor := Value;
+  FNextPageStartOffset := Value;
 end;
 
 procedure TioCommonBSAPaging.SetPageSize(const Value: Integer);
 begin
   FPageSize := Value;
+end;
+
+procedure TioCommonBSAPaging.SetPagingType(const Value: TioBSAPagingType);
+begin
+  FPagingType := Value;
 end;
 
 end.

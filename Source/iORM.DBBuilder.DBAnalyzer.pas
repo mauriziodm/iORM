@@ -12,6 +12,10 @@ type
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable);
+    // If even one table is to be altered then all of them are to be altered
+    //  (even those that have not actually changed). Instead those that are new
+    //  (to be created) obviously remain to be created.
+    procedure SQLite_AllOrNothingPostProcess;
   public
     constructor Create(const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
     procedure Analyze;
@@ -28,6 +32,19 @@ constructor TioDBBuilderDBAnalyzer.Create(const ASchema: IioDBBuilderSchema; con
 begin
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
+end;
+
+procedure TioDBBuilderDBAnalyzer.SQLite_AllOrNothingPostProcess;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  // If even one table is to be altered then all of them are to be altered
+  //  (even those that have not actually changed). Instead those that are new
+  //  (to be created) obviously remain to be created.
+  if FSchema.Status = stAlter then
+    for LTable in FSchema.Tables.Values do
+      if LTable.Status = stClean then
+        LTable.Status := stAlter;
 end;
 
 procedure TioDBBuilderDBAnalyzer.Analyze;
@@ -54,6 +71,10 @@ begin
       if LTable.Status > stClean then
         FSchema.Status := stAlter;
     end;
+    // If even one table is to be altered then all of them are to be altered
+    //  (even those that have not actually changed). Instead those that are new
+    //  (to be created) obviously remain to be created.
+    SQLite_AllOrNothingPostProcess;
     // Commit or rollback the transaction (if in transaction)
     if FSchema.Status <> stCreate then
       io.CommitTransaction(FSchema.ConnectionDefName);

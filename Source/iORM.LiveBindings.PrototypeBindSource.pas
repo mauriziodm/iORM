@@ -664,9 +664,9 @@ begin
   // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
   // ---------------------------------------------------------------------------
   FioLoaded := True;
-  if not Assigned(Self.OnCreateAdapter) then
+  if not Assigned(OnCreateAdapter) then
   begin
-    Self.DoCreateAdapter(LAdapter);
+    DoCreateAdapter(LAdapter);
     if LAdapter <> nil then
       SetRuntimeAdapter(LAdapter);
   end;

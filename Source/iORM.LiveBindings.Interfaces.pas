@@ -266,6 +266,9 @@ type
   // BindSourceAdapter List
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
 
+  // Paging
+  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual, ptProgressiveAuto);
+
 implementation
 
 end.

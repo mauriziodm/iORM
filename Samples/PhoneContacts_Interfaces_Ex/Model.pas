@@ -3,7 +3,7 @@ unit Model;
 interface
 
 uses iORM.Attributes, System.Generics.Collections, Interfaces,
-  iORM.Containers.Interfaces, iORM.CommonTypes;
+  iORM.Containers.Interfaces, iORM.CommonTypes, System.Rtti;
 
 type
 
@@ -41,6 +41,7 @@ type
   private
     FID: Integer;
     FLastName: String;
+    [ioFTDefault('prova_default')]
     FFirstName: String;
     FDateOfBirth: TDate;
     [ioHasMany(IPhoneNumber, 'PersonID', ioLazyLoad)]
