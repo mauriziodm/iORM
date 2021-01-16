@@ -8,104 +8,105 @@ uses
 const
   PAGING_TYPE_DEFAULT = ptDisabled;
   CURRENT_PAGE_DEFAULT = 1;
-  NEXT_PAGE_AUTO_THRESHOLD_DEFAULT = 50;
   NEXT_PAGE_START_OFFSET = 0;
   PAGE_SIZE_DEFAULT = 100;
 
 type
 
 {$TYPEINFO ON}
-  TioCommonBSAPaging = class(TInterfacedObject)
-  private
-    [Weak]
+  TioCommonBSAPaging = class(TInterfacedObject, IioCommonBSAPaging)
+  strict private[Weak]
     FActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     FCurrentPage: Integer;
-    FCurrentPageFirstRecNo: Integer;
-    FCurrentPageLastRecNo: Integer;
-    FNextPageAutoThreshold: Integer;
     FNextPageStartOffset: Integer;
     FPageSize: Integer;
     FPagingType: TioBSAPagingType;
-    FHigherLoadedRecNo: Integer;
-  protected
+    FStrategy: IioSqlLimitStrategy;
+  strict protected
     procedure SetCurrentPage(const Value: Integer);
-    procedure SetNextPageAutoThreshold(const Value: Integer);
     procedure SetNextPageStartOffset(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
     procedure SetPageSize(const Value: Integer);
     function GetCurrentPage: Integer;
-    function GetCurrentPageFirstRecNo: Integer;
-    function GetCurrentPageLastRecNo: Integer;
-    function GetHigherLoadedRecNo: Integer;
-    function GetNextPageAutoThreshold: Integer;
     function GetNextPageStartOffset: Integer;
     function GetPagingType: TioBSAPagingType;
     function GetPageSize: Integer;
+    function GetSqlLimit: Integer; // Lascio o tolgo?
+    function GetSqlLimitOffset: Integer; // Lascio o tolgo?
+    procedure CheckStrategy;
+    procedure Reset;
   public
+    procedure NextPage;
+    procedure PrevPage;
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
-    property CurrentPageFirstRecNo: Integer read GetCurrentPageLastRecNo;
-    property CurrentPageLastRecNo: Integer read GetCurrentPageFirstRecNo;
-    property HigherLoadedRecNo: Integer read GetHigherLoadedRecNo;
-    // procedure GoToPage
-    // procedure NextPage
-    // procedure PrevPage
   published
-    constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-    property NextPageAutoThreshold: Integer read GetNextPageAutoThreshold write SetNextPageAutoThreshold
-      default NEXT_PAGE_AUTO_THRESHOLD_DEFAULT;
-    property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset
-      default NEXT_PAGE_START_OFFSET;
+//    constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+    constructor Create;
+    property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
     property PageSize: Integer read GetPageSize write SetPageSize default PAGE_SIZE_DEFAULT;
     property PagingType: TioBSAPagingType read GetPagingType write SetPagingType default PAGING_TYPE_DEFAULT;
   end;
 
+  // Base class for all SQL limit strategy classes
+  TioSqlLimitStrategy_Base = class abstract(TInterfacedObject, IioSqlLimitStrategy)
+  strict private
+    FSqlLimit: Integer;
+    FSqlLimitOffset: Integer;
+  strict protected
+    procedure SetSqlLimit(const AValue: Integer);
+    procedure SetSqlLimitOffset(const AValue: Integer);
+  public
+    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); virtual; abstract;
+    function GetSqlLimit: Integer;
+    function GetSqlLimitOffset: Integer;
+  end;
+
+  TioSqlLimitStrategy_HardPaging = class(TioSqlLimitStrategy_Base)
+  public
+    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
+  end;
+
+  // NB: Un eventuale altro LimitStrategy progressivo ma con avanzamento pagina automatico
+  // calcolerà la soglia che innescherà il caricamento della pagina successiva (ex NextPageAutoThreshold)
+  // ponendolo clla metà della PageSize
+  TioSqlLimitStrategy_ProgressiveManual = class(TioSqlLimitStrategy_Base)
+  strict private
+    FHigherSqlLimitOffset: Integer;
+  public
+    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
+  end;
+
 implementation
+
+uses
+  System.Math, iORM.LiveBindings.Factory, iORM.Exceptions;
 
 { TioCommonBSAPaging }
 
-constructor TioCommonBSAPaging.Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+procedure TioCommonBSAPaging.CheckStrategy;
 begin
-  FPagingType := PAGING_TYPE_DEFAULT;
-  FCurrentPage := CURRENT_PAGE_DEFAULT;
-  FPageSize := PAGE_SIZE_DEFAULT;
-  FNextPageAutoThreshold := NEXT_PAGE_AUTO_THRESHOLD_DEFAULT;
-  FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
-  FActiveBindSourceAdapter := AActiveBindSourceAdapter;
+  if not Assigned(FStrategy) then
+    EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
-function TioCommonBSAPaging.GetCurrentPageFirstRecNo: Integer;
+constructor TioCommonBSAPaging.Create;
 begin
-  Result := FCurrentPageLastRecNo;
+  Reset;
 end;
 
 function TioCommonBSAPaging.GetCurrentPage: Integer;
 begin
-  result := FCurrentPage;
-end;
-
-function TioCommonBSAPaging.GetCurrentPageLastRecNo: Integer;
-begin
-  Result := FCurrentPageFirstRecNo;
-end;
-
-function TioCommonBSAPaging.GetHigherLoadedRecNo: Integer;
-begin
-  Result := FHigherLoadedRecNo;
-end;
-
-function TioCommonBSAPaging.GetNextPageAutoThreshold: Integer;
-begin
-  result := FNextPageAutoThreshold;
+  Result := FCurrentPage;
 end;
 
 function TioCommonBSAPaging.GetNextPageStartOffset: Integer;
 begin
-  result := FNextPageStartOffset;
+  Result := FNextPageStartOffset;
 end;
 
 function TioCommonBSAPaging.GetPageSize: Integer;
 begin
-  result := FPageSize;
+  Result := FPageSize;
 end;
 
 function TioCommonBSAPaging.GetPagingType: TioBSAPagingType;
@@ -113,14 +114,43 @@ begin
   Result := FPagingType;
 end;
 
-procedure TioCommonBSAPaging.SetCurrentPage(const Value: Integer);
+function TioCommonBSAPaging.GetSqlLimit: Integer;
 begin
-  FCurrentPage := Value;
+  CheckStrategy;
+  Result := FStrategy.GetSqlLimit;
 end;
 
-procedure TioCommonBSAPaging.SetNextPageAutoThreshold(const Value: Integer);
+function TioCommonBSAPaging.GetSqlLimitOffset: Integer;
 begin
-  FNextPageAutoThreshold := Value;
+  CheckStrategy;
+  Result := FStrategy.GetSqlLimitOffset;
+end;
+
+procedure TioCommonBSAPaging.NextPage;
+begin
+  SetCurrentPage(FCurrentPage + 1);
+end;
+
+procedure TioCommonBSAPaging.PrevPage;
+begin
+  SetCurrentPage(FCurrentPage - 1);
+end;
+
+procedure TioCommonBSAPaging.Reset;
+begin
+  FPagingType := PAGING_TYPE_DEFAULT;
+  FCurrentPage := CURRENT_PAGE_DEFAULT;
+  FPageSize := PAGE_SIZE_DEFAULT;
+  FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
+end;
+
+procedure TioCommonBSAPaging.SetCurrentPage(const Value: Integer);
+begin
+  if (Value = FCurrentPage) or (Value < 1) then
+    Exit;
+  CheckStrategy;
+  FStrategy.CalcSqlLimit(Value, FPageSize, FNextPageStartOffset);
+  FCurrentPage := Value;
 end;
 
 procedure TioCommonBSAPaging.SetNextPageStartOffset(const Value: Integer);
@@ -135,7 +165,52 @@ end;
 
 procedure TioCommonBSAPaging.SetPagingType(const Value: TioBSAPagingType);
 begin
+  if Value = FPagingType then
+    Exit;
+  FStrategy := TioLiveBindingsFactory.GetSqlLimitStrategy(Value);
   FPagingType := Value;
+  Reset;
+  if FActiveBindSourceAdapter.Active then
+    FActiveBindSourceAdapter.Refresh(True);
+end;
+
+{ TioSqlLimitStrategy_Base }
+
+function TioSqlLimitStrategy_Base.GetSqlLimitOffset: Integer;
+begin
+  Result := FSqlLimitOffset;
+end;
+
+function TioSqlLimitStrategy_Base.GetSqlLimit: Integer;
+begin
+  Result := FSqlLimit;
+end;
+
+procedure TioSqlLimitStrategy_Base.SetSqlLimit(const AValue: Integer);
+begin
+  FSqlLimit := Max(AValue, 0);
+end;
+
+procedure TioSqlLimitStrategy_Base.SetSqlLimitOffset(const AValue: Integer);
+begin
+  FSqlLimitOffset := Max(AValue, 0);
+end;
+
+{ TioSqlLimitStrategy_HardPaging }
+
+procedure TioSqlLimitStrategy_HardPaging.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
+begin
+  SetSqlLimit(APageSize + ANextPageStartOffset);
+  SetSqlLimitOffset((APageSize * (ADestPage - 1)) - ANextPageStartOffset);
+end;
+
+{ TioSqlLimitStrategy_ProgressiveManual }
+
+procedure TioSqlLimitStrategy_ProgressiveManual.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
+begin
+  SetSqlLimit((APageSize * ADestPage) - FHigherSqlLimitOffset);
+  SetSqlLimitOffset(FHigherSqlLimitOffset);
+  FHigherSqlLimitOffset := GetSqlLimitOffset + GetSqlLimit;
 end;
 
 end.

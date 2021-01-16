@@ -266,8 +266,39 @@ type
   // BindSourceAdapter List
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
 
-  // Paging
-  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual, ptProgressiveAuto);
+  // Paging type
+  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual); //, ptProgressiveAuto);
+
+  // Paging: Common BindSourceAdapter Paging
+  IioCommonBSAPaging = interface
+    ['{9FB7E37D-170E-4B70-A9DA-1CEACCFB5A88}']
+    procedure NextPage;
+    procedure PrevPage;
+    // CurrentPage
+    procedure SetCurrentPage(const Value: Integer);
+    function GetCurrentPage: Integer;
+    property CurrentPage: Integer read GetCurrentPage write SetCurrentPage;
+    // NextPageStartOffset
+    procedure SetNextPageStartOffset(const Value: Integer);
+    function GetNextPageStartOffset: Integer;
+    property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset;
+    // PageSize
+    procedure SetPageSize(const Value: Integer);
+    function GetPageSize: Integer;
+    property PageSize: Integer read GetPageSize write SetPageSize;
+    // PagingType
+    procedure SetPagingType(const Value: TioBSAPagingType);
+    function GetPagingType: TioBSAPagingType;
+    property PagingType: TioBSAPagingType read GetPagingType write SetPagingType;
+  end;
+
+  // Paging: SQL limit strategy
+  IioSqlLimitStrategy = interface
+    ['{65896A9F-5B1A-407B-AB2E-C486D7B19ABF}']
+    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
+    function GetSqlLimit: Integer;
+    function GetSqlLimitOffset: Integer;
+  end;
 
 implementation
 

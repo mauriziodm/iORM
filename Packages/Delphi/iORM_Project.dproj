@@ -310,7 +310,6 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Script.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPaging.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPaging.PageManager.HardPaging.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
