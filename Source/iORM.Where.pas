@@ -45,7 +45,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
-  iORM.Utilities;
+  iORM.Utilities, iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -63,6 +63,9 @@ type
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
     // e contiene il nome della MasterPropertyName
     FDetailsContainer: IioWhereDetailsContainer;
+    // Riferimento al BSACommonPageManager che potrebbe essere usato per la gestione
+    //  del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
+    FPagingObj: TioCommonBSAPageManager;
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
@@ -91,6 +94,7 @@ type
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
+    procedure InjectPagingObj(const APagingObj: TObject);
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -571,6 +575,7 @@ begin
   FOrderBy := nil;
   FLimitRows := 0;
   FLimitOffset := 0;
+  FPagingObj := nil;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -690,11 +695,21 @@ end;
 function TioWhere.GetLimitOffset: Integer;
 begin
   Result := FLimitOffset;
+  // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
+  //  se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
+  //  attivo allora chiede a lui
+  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
+    Result := FPagingObj.GetSqlLimitOffset;
 end;
 
 function TioWhere.GetLimitRows: Integer;
 begin
   Result := FLimitRows;
+  // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
+  //  se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
+  //  attivo allora chiede a lui
+  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
+    Result := FPagingObj.GetSqlLimit;
 end;
 
 function TioWhere.GetOrderByInstance: IioSqlItemWhere;
@@ -769,6 +784,11 @@ end;
 function TioWhere.WhereConditionExists: Boolean;
 begin
   Result := (FWhereItems.Count = 0);
+end;
+
+procedure TioWhere.InjectPagingObj(const APagingObj: TObject);
+begin
+  FPagingObj := APagingObj as TioCommonBSAPageManager;
 end;
 
 function TioWhere.IsLazy: Boolean;

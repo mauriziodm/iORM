@@ -40,7 +40,7 @@ unit iORM.Where.Factory;
 interface
 
 uses
-  iORM.Where.Interfaces, iORM.Where;
+  iORM.Where.Interfaces, iORM.Where, iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -48,6 +48,7 @@ type
   public
     class function NewWhere: IioWhere; overload;
     class function NewWhere<T>: IioWhere<T>; overload;
+    class function NewWhereWithPaging(const APaging: TioCommonBSAPageManager): IioWhere; overload;
     class function NewWhereItems: IWhereItems;
     class function NewDetailsContainer: IioWhereDetailsContainer;
   end;
@@ -77,6 +78,12 @@ end;
 class function TioWhereFactory.NewWhereItems: IWhereItems;
 begin
   Result := TioInterfacedList<IioSqlItem>.Create;
+end;
+
+class function TioWhereFactory.NewWhereWithPaging(const APaging: TioCommonBSAPageManager): IioWhere;
+begin
+  Result := TioWhere.Create;
+  Result.InjectPagingObj(APaging);
 end;
 
 end.

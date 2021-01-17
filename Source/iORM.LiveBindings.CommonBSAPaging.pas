@@ -1,35 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.LiveBindings.CommonBSAPaging;
 
@@ -55,13 +55,14 @@ type
     FPagingType: TioBSAPagingType;
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
+    procedure CheckStrategy;
     procedure SetCurrentPage(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
-    function GetSqlLimit: Integer; // Lascio o tolgo?
-    function GetSqlLimitOffset: Integer; // Lascio o tolgo?
-    procedure CheckStrategy;
     procedure Reset;
   public
+    function IsEnabled: Boolean;
+    function GetSqlLimit: Integer;
+    function GetSqlLimitOffset: Integer;
     procedure NextPage;
     procedure PrevPage;
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
@@ -123,6 +124,11 @@ begin
   Reset;
 end;
 
+function TioCommonBSAPageManager.IsEnabled: Boolean;
+begin
+  Result := FPagingType > ptDisabled;
+end;
+
 function TioCommonBSAPageManager.GetSqlLimit: Integer;
 begin
   CheckStrategy;
@@ -147,16 +153,16 @@ end;
 
 procedure TioCommonBSAPageManager.Reset;
 begin
-  FCurrentPage := CURRENT_PAGE_DEFAULT;
+  SetCurrentPage(CURRENT_PAGE_DEFAULT);
 end;
 
 procedure TioCommonBSAPageManager.SetCurrentPage(const Value: Integer);
 begin
   if (Value = FCurrentPage) or (Value < 1) then
     Exit;
-  CheckStrategy;
-  FStrategy.CalcSqlLimit(Value, FPageSize, FNextPageStartOffset);
   FCurrentPage := Value;
+  if IsEnabled then
+    FStrategy.CalcSqlLimit(Value, FPageSize, FNextPageStartOffset);
 end;
 
 procedure TioCommonBSAPageManager.SetPagingType(const Value: TioBSAPagingType);

@@ -78,6 +78,7 @@ type
     function GetDisableClassFromField: Boolean;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
+    procedure InjectPagingObj(const APagingObj: TObject);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
