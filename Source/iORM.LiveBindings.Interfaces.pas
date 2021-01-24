@@ -275,6 +275,7 @@ type
     procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
+    function IsProgressive: Boolean;
   end;
 
 implementation

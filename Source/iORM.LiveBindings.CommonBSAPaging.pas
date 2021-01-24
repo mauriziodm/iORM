@@ -60,9 +60,10 @@ type
     procedure SetPagingType(const Value: TioBSAPagingType);
     procedure Reset;
   public
-    function IsEnabled: Boolean;
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
+    function IsEnabled: Boolean;
+    function IsProgressive: Boolean;
     procedure NextPage;
     procedure PrevPage;
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
@@ -84,15 +85,15 @@ type
     procedure SetSqlLimitOffset(const AValue: Integer);
   public
     procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); virtual; abstract;
-    function IsProgressive
+    function IsProgressive: Boolean; virtual; abstract;
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function IsProgressive: Boolean;
   end;
 
   TioCommonBSAPageManagerStrategy_HardPaging = class(TioCommonBSAPageManagerStrategy)
   public
     procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
+    function IsProgressive: Boolean; override;
   end;
 
   // NB: Un eventuale altro LimitStrategy progressivo ma con avanzamento pagina automatico
@@ -103,6 +104,7 @@ type
     FHigherSqlLimitOffset: Integer;
   public
     procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
+    function IsProgressive: Boolean; override;
   end;
 
 implementation
@@ -129,6 +131,11 @@ end;
 function TioCommonBSAPageManager.IsEnabled: Boolean;
 begin
   Result := FPagingType > ptDisabled;
+end;
+
+function TioCommonBSAPageManager.IsProgressive: Boolean;
+begin
+  Result := Assigned(FStrategy) and FStrategy.IsProgressive;
 end;
 
 function TioCommonBSAPageManager.GetSqlLimit: Integer;
@@ -207,6 +214,11 @@ begin
   SetSqlLimitOffset((APageSize * (ADestPage - 1)) - ANextPageStartOffset);
 end;
 
+function TioCommonBSAPageManagerStrategy_HardPaging.IsProgressive: Boolean;
+begin
+  Result := False;
+end;
+
 { TioSqlLimitStrategy_ProgressiveManual }
 
 procedure TioCommonBSAPageManagerStrategy_ProgressiveManual.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
@@ -214,6 +226,11 @@ begin
   SetSqlLimit((APageSize * ADestPage) - FHigherSqlLimitOffset);
   SetSqlLimitOffset(FHigherSqlLimitOffset);
   FHigherSqlLimitOffset := GetSqlLimitOffset + GetSqlLimit;
+end;
+
+function TioCommonBSAPageManagerStrategy_ProgressiveManual.IsProgressive: Boolean;
+begin
+  Result := True;
 end;
 
 end.
