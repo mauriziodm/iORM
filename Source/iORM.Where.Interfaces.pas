@@ -78,8 +78,8 @@ type
     function GetDisableClassFromField: Boolean;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
-    function GetPagingObj: TObject;
-    procedure SetPagingObj(const APagingObj: TObject);
+    function GetPagingObj: TObject;  // TObject to avoid circular reference
+    procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;

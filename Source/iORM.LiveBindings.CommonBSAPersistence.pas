@@ -55,10 +55,13 @@ type
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
       ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    class procedure _LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetList: TObject;
+      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     class procedure _RefreshNoReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
     class procedure _RefreshReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
   public
     class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
       const AReloadData, ANotify: Boolean); static;
     class procedure Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean); static;
@@ -71,7 +74,8 @@ type
 implementation
 
 uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
-  iORM.Context.Properties.Interfaces, iORM.Context.Factory, Data.Bind.ObjectScope, System.Generics.Collections;
+  iORM.Context.Properties.Interfaces, iORM.Context.Factory, Data.Bind.ObjectScope, System.Generics.Collections,
+  iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -89,6 +93,9 @@ type
       : TioCommonBSAPersistenceThreadOnTerminate;
     // Refresh
     class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
+      : TioCommonBSAPersistenceThreadOnTerminate;
+    // LoadPage (progressive)
+    class function GetProgressiveLoadPageTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
       : TioCommonBSAPersistenceThreadOnTerminate;
     // Other
     class function GetNotifyTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
@@ -214,6 +221,32 @@ begin
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
   end;
+end;
+
+class procedure TioCommonBSAPersistence.LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LPagingObj: TioCommonBSAPageManager;
+  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+begin
+  // If the adapter is a detail adapter or AutuLoadData is not active then do not execute
+  if AActiveBindSourceAdapter.IsDetail or (AActiveBindSourceAdapter.ioViewDataType <> dtList) or not AActiveBindSourceAdapter.ioAutoLoadData
+  then
+    Exit;
+  // Extract the paging obj from the where obj
+  LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
+  // Load next page
+  if LPagingObj.IsProgressive then
+  begin
+    // If the pagination is progressive then it loads the next page and adds it to the
+    //  internal list of the BSA and then does a Refresh(False)
+    LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(AActiveBindSourceAdapter);
+    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
+      AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
+  end
+  else
+    // If, on the other hand, the pagination is not progressive then it performs a normal Refresh(True)
+    //  which in practice causes a normal loading in a new list which is then set as a new DataObject
+    _RefreshReload(AActiveBindSourceAdapter, False);
 end;
 
 class procedure TioCommonBSAPersistence.Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -401,6 +434,17 @@ begin
     end, ATerminateMethod);
 end;
 
+class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+begin
+  _Execute(AASync,
+    function: TObject
+    begin
+      result := nil;
+      io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetList);
+    end, ATerminateMethod);
+end;
+
 { TioCommonBSAPersistenceThread }
 
 constructor TioCommonBSAPersistenceThread.Create(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
@@ -503,6 +547,16 @@ begin
     begin
       result := nil;
       io.Persist(ADataObj, ARelationChildPropertyName, AMasterOID, False);
+    end;
+end;
+
+class function TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(const AActiveBindSourceAdapter
+  : IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+begin
+  result := procedure(AResultValue: TObject)
+    begin
+      // Perform a RefreshNoReload without nofications
+      TioCommonBSAPersistence._RefreshNoReload(AActiveBindSourceAdapter, False);
     end;
 end;
 

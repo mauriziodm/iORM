@@ -94,8 +94,8 @@ type
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
-    function GetPagingObj: TObject;
-    procedure SetPagingObj(const APagingObj: TObject);
+    function GetPagingObj: TObject;  // TObject to avoid circular reference
+    procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
