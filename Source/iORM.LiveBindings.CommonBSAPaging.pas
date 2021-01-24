@@ -84,8 +84,10 @@ type
     procedure SetSqlLimitOffset(const AValue: Integer);
   public
     procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); virtual; abstract;
+    function IsProgressive
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
+    function IsProgressive: Boolean;
   end;
 
   TioCommonBSAPageManagerStrategy_HardPaging = class(TioCommonBSAPageManagerStrategy)
@@ -153,6 +155,7 @@ end;
 
 procedure TioCommonBSAPageManager.Reset;
 begin
+  FCurrentPage := 0; // To force the recalculation of limits even if the page was already the first
   SetCurrentPage(CURRENT_PAGE_DEFAULT);
 end;
 
@@ -171,6 +174,7 @@ begin
     Exit;
   FStrategy := TioLiveBindingsFactory.GetBSAPageManagerStrategy(Value);
   FPagingType := Value;
+  Reset;
 end;
 
 { TioSqlLimitStrategy_Base }

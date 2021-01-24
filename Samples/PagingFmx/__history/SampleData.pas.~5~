@@ -1,0 +1,24 @@
+unit SampleData;
+
+interface
+
+type
+
+  TSampleData = class
+  public
+    class procedure CreateSampleData(const AHowMany: Integer);
+  end;
+
+implementation
+
+uses
+  Model, iORM;
+
+{ TSampleData }
+
+class procedure TSampleData.CreateSampleData(const AHowMany: Integer);
+begin
+
+end;
+
+end.

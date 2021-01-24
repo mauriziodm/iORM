@@ -225,7 +225,7 @@ type
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
     property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
     // Paging
-    property ioPaging: TioCommonBSAPageManager read FPaging;
+    property ioPaging: TioCommonBSAPageManager read FPaging write FPaging;
   end;
 
 implementation
@@ -826,7 +826,7 @@ begin
   // Update the adapter where
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
-    AWhere.InjectPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
+    AWhere.SetPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
     LActiveBSA.ioWhere := AWhere;
   end;
 end;

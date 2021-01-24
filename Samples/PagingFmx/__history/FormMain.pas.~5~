@@ -1,0 +1,39 @@
+unit FormMain;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, iORM.DB.Components.ConnectionDef,
+  iORM.AbstractionLayer.Framework.FMX, FMX.StdCtrls, FMX.Edit, FMX.Controls.Presentation;
+
+type
+  TMainForm = class(TForm)
+    ioFMX1: TioFMX;
+    SQLiteConn: TioSQLiteConnectionDef;
+    Button1: TButton;
+    Edit1: TEdit;
+    Label1: TLabel;
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  MainForm: TMainForm;
+
+implementation
+
+uses
+  SampleData;
+
+{$R *.fmx}
+
+procedure TMainForm.Button1Click(Sender: TObject);
+begin
+  TSampleData.CreateSampleData(Edit1.Text.ToInteger);
+end;
+
+end.

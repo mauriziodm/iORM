@@ -83,7 +83,7 @@ end;
 class function TioWhereFactory.NewWhereWithPaging(const APaging: TioCommonBSAPageManager): IioWhere;
 begin
   Result := TioWhere.Create;
-  Result.InjectPagingObj(APaging);
+  Result.SetPagingObj(APaging);
 end;
 
 end.

@@ -64,7 +64,7 @@ type
     // e contiene il nome della MasterPropertyName
     FDetailsContainer: IioWhereDetailsContainer;
     // Riferimento al BSACommonPageManager che potrebbe essere usato per la gestione
-    //  del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
+    // del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
     FPagingObj: TioCommonBSAPageManager;
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
@@ -94,7 +94,8 @@ type
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
-    procedure InjectPagingObj(const APagingObj: TObject);
+    function GetPagingObj: TObject;
+    procedure SetPagingObj(const APagingObj: TObject);
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -696,8 +697,8 @@ function TioWhere.GetLimitOffset: Integer;
 begin
   Result := FLimitOffset;
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
-  //  se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
-  //  attivo allora chiede a lui
+  // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
+  // attivo allora chiede a lui
   if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
     Result := FPagingObj.GetSqlLimitOffset;
 end;
@@ -706,8 +707,8 @@ function TioWhere.GetLimitRows: Integer;
 begin
   Result := FLimitRows;
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
-  //  se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
-  //  attivo allora chiede a lui
+  // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
+  // attivo allora chiede a lui
   if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
     Result := FPagingObj.GetSqlLimit;
 end;
@@ -723,6 +724,11 @@ begin
     Result := FOrderBy.GetSql(AMap)
   else
     Result := '';
+end;
+
+function TioWhere.GetPagingObj: TObject;
+begin
+  Result := FPagingObj;
 end;
 
 function TioWhere.GetSql(const AMap: IioMap; const AddWhere: Boolean): String;
@@ -786,7 +792,7 @@ begin
   Result := (FWhereItems.Count = 0);
 end;
 
-procedure TioWhere.InjectPagingObj(const APagingObj: TObject);
+procedure TioWhere.SetPagingObj(const APagingObj: TObject);
 begin
   FPagingObj := APagingObj as TioCommonBSAPageManager;
 end;
@@ -811,7 +817,7 @@ end;
 
 function TioWhere.LimitExists: Boolean;
 begin
-  Result := FLimitRows > 0;
+  Result := GetLimitRows > 0;
 end;
 
 function TioWhere.SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
@@ -1239,13 +1245,14 @@ end;
 function TioWhere._Where(AWhere: IioWhere): IioWhere;
 begin
   // Clear all previous items
-  Result := Self._Where;
+  Result := _Where;
   // Add the source items and details
   if not Assigned(AWhere) then
     Exit;
-  Self.Add(AWhere);
-  Self.FDetailsContainer := AWhere.Details;
-  Self.FOrderBy := AWhere.GetOrderByInstance;
+  Add(AWhere);
+  FPagingObj := AWhere.GetPagingObj as TioCommonBSAPageManager;
+  FDetailsContainer := AWhere.Details;
+  FOrderBy := AWhere.GetOrderByInstance;
 end;
 
 function TioWhere._Where(ATextCondition: String): IioWhere;

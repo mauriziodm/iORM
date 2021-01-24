@@ -1,0 +1,39 @@
+unit SampleData;
+
+interface
+
+type
+
+  TSampleData = class
+  public
+    class procedure CreateSampleData(const AHowMany: Integer);
+  end;
+
+implementation
+
+uses
+  Model, iORM;
+
+{ TSampleData }
+
+class procedure TSampleData.CreateSampleData(const AHowMany: Integer);
+var
+  I: Integer;
+  LArticle: TArticle;
+begin
+  LArticle := TArticle.Create;
+  io.StartTransaction;
+  try try
+    for I := 1 to AHowMany do
+    begin
+      LArticle
+    end;
+  finally
+    LArticle.Free;
+  end;
+  except
+    io.RollbackTransaction;
+  end;
+end;
+
+end.
