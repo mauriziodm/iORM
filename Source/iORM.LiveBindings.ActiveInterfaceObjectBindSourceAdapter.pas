@@ -154,6 +154,7 @@ type
     procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
+    procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
@@ -613,6 +614,11 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.IsInterfaceBSA: Boolean;
 begin
   Result := True;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.LoadPage;
+begin
+  raise EioException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);

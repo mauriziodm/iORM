@@ -116,6 +116,7 @@ type
     procedure PersistAll;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
+    procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
     procedure Insert; overload;

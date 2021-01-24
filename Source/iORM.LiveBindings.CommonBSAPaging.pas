@@ -46,20 +46,26 @@ const
 
 type
 
-{$TYPEINFO ON}
+  // LoadPage anonymous method type
+  TioBSAPagingLoadMethod = reference to procedure;
+
+ {$TYPEINFO ON}
   TioCommonBSAPageManager = class(TPersistent)
   strict private
     FCurrentPage: Integer;
+    FLoadPageMethod: TioBSAPagingLoadMethod;
     FNextPageStartOffset: Integer;
     FPageSize: Integer;
     FPagingType: TioBSAPagingType;
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
+    procedure _InternalSetCurrentPage(const Value: Integer);
     procedure CheckStrategy;
     procedure SetCurrentPage(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
     procedure Reset;
   public
+    constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
     function IsEnabled: Boolean;
@@ -68,8 +74,6 @@ type
     procedure PrevPage;
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
   published
-    // constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-    constructor Create;
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset default NEXT_PAGE_START_OFFSET;
     property PageSize: Integer read FPageSize write FPageSize default PAGE_SIZE_DEFAULT;
     property PagingType: TioBSAPagingType read FPagingType write SetPagingType default PAGING_TYPE_DEFAULT;
@@ -120,11 +124,12 @@ begin
     EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
-constructor TioCommonBSAPageManager.Create;
+constructor TioCommonBSAPageManager.Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
 begin
   FPagingType := PAGING_TYPE_DEFAULT;
   FPageSize := PAGE_SIZE_DEFAULT;
   FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
+  FLoadPageMethod := ALoadPageMethod;
   Reset;
 end;
 
@@ -160,19 +165,24 @@ begin
   SetCurrentPage(FCurrentPage - 1);
 end;
 
-procedure TioCommonBSAPageManager.Reset;
+procedure TioCommonBSAPageManager._InternalSetCurrentPage(const Value: Integer);
 begin
-  FCurrentPage := 0; // To force the recalculation of limits even if the page was already the first
-  SetCurrentPage(CURRENT_PAGE_DEFAULT);
+  FCurrentPage := Value;
+  if IsEnabled then
+    FStrategy.CalcSqlLimit(Value, FPageSize, FNextPageStartOffset);
 end;
 
 procedure TioCommonBSAPageManager.SetCurrentPage(const Value: Integer);
 begin
   if (Value = FCurrentPage) or (Value < 1) then
     Exit;
-  FCurrentPage := Value;
-  if IsEnabled then
-    FStrategy.CalcSqlLimit(Value, FPageSize, FNextPageStartOffset);
+  _InternalSetCurrentPage(Value);
+  FLoadPageMethod; // Invoke the LoadPage anonymous method
+end;
+
+procedure TioCommonBSAPageManager.Reset;
+begin
+  _InternalSetCurrentPage(CURRENT_PAGE_DEFAULT);
 end;
 
 procedure TioCommonBSAPageManager.SetPagingType(const Value: TioBSAPagingType);

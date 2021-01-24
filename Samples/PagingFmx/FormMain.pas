@@ -21,14 +21,14 @@ type
     BindingsList1: TBindingsList;
     LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
     Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
     Button5: TButton;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -55,21 +55,19 @@ begin
   PBSArticles.Refresh(True);
 end;
 
-procedure TMainForm.Button3Click(Sender: TObject);
-begin
-  PBSArticles.ioPaging.NextPage;
-  PBSArticles.Refresh(True);
-end;
-
-procedure TMainForm.Button4Click(Sender: TObject);
-begin
-  PBSArticles.ioPaging.PrevPage;
-  PBSArticles.Refresh(True);
-end;
-
 procedure TMainForm.Button5Click(Sender: TObject);
 begin
   PBSArticles.Refresh(False);
+end;
+
+procedure TMainForm.SpeedButton1Click(Sender: TObject);
+begin
+  PBSArticles.ioPaging.NextPage;
+end;
+
+procedure TMainForm.SpeedButton2Click(Sender: TObject);
+begin
+  PBSArticles.ioPaging.PrevPage;
 end;
 
 end.

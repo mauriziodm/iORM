@@ -171,6 +171,7 @@ type
     procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
+    procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
@@ -722,6 +723,11 @@ begin
     ItemIndex := CurrItemIndex;
     Sender.Free;
   end;
+end;
+
+procedure TioActiveListBindSourceAdapter.LoadPage;
+begin
+  TioCommonBSAPersistence.LoadPage(Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;

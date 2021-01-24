@@ -337,7 +337,13 @@ begin
   FPropagatePost := False;
   FPropagatePersist := False;
   // Page manager
-  FPaging := TioCommonBSAPageManager.Create;
+  FPaging := TioCommonBSAPageManager.Create(
+    procedure
+    begin
+      if CheckAdapter then
+        GetActiveBindSourceAdapter.LoadPage;
+    end
+  );
   // Set even an onChange event handler
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;

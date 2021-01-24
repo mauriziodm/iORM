@@ -56,29 +56,9 @@ object MainForm: TMainForm
     Size.Width = 81.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 14
+    TabOrder = 12
     Text = 'Hard refresh'
     OnClick = Button2Click
-  end
-  object Button3: TButton
-    Position.X = 480.000000000000000000
-    Position.Y = 13.000000000000000000
-    Size.Width = 65.000000000000000000
-    Size.Height = 22.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 12
-    Text = 'Next page'
-    OnClick = Button3Click
-  end
-  object Button4: TButton
-    Position.X = 416.000000000000000000
-    Position.Y = 13.000000000000000000
-    Size.Width = 65.000000000000000000
-    Size.Height = 22.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 11
-    Text = 'Prev page'
-    OnClick = Button4Click
   end
   object Button5: TButton
     Position.X = 536.000000000000000000
@@ -86,9 +66,28 @@ object MainForm: TMainForm
     Size.Width = 81.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 13
+    TabOrder = 11
     Text = 'Soft refresh'
     OnClick = Button5Click
+  end
+  object SpeedButton1: TSpeedButton
+    StaysPressed = True
+    Position.X = 540.000000000000000000
+    Position.Y = 14.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Next page'
+    OnClick = SpeedButton1Click
+  end
+  object SpeedButton2: TSpeedButton
+    Position.X = 452.000000000000000000
+    Position.Y = 14.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Prev page'
+    OnClick = SpeedButton2Click
   end
   object ioFMX1: TioFMX
     Left = 160
@@ -142,7 +141,7 @@ object MainForm: TMainForm
     ioPropagatePost = False
     ioPropagatePersist = False
     ioPaging.PageSize = 10
-    ioPaging.PagingType = ptHardPaging
+    ioPaging.PagingType = ptProgressiveManual
     Left = 160
     Top = 240
   end
