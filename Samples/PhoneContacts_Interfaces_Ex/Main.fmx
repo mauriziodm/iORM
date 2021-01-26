@@ -637,6 +637,7 @@ object MainForm: TMainForm
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
     OnAfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
+    OnBeforeCreateOrAlterDB = FirebirdConnBeforeCreateOrAlterDB
     Left = 272
     Top = 188
   end
