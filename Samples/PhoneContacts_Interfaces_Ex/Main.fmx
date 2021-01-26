@@ -421,8 +421,8 @@ object MainForm: TMainForm
         TabOrder = 6
         RowHeight = 21.000000000000000000
         RowCount = 200
-        Viewport.Width = 364.000000000000000000
-        Viewport.Height = 177.000000000000000000
+        Viewport.Width = 384.000000000000000000
+        Viewport.Height = 202.000000000000000000
       end
     end
   end

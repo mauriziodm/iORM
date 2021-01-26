@@ -19,6 +19,7 @@ type
     function Altered: TioDBBuilderFieldAlter;
     function FieldCustomType: string;
     function FieldDefault: TValue;
+    function FieldDefaultExists: Boolean;
     function FieldLength: integer;
     function FieldName: String;
     function FieldPrecision: integer;
@@ -57,6 +58,11 @@ end;
 function TioDBBuilderSchemaFieldClassInfo.FieldDefault: TValue;
 begin
   Result := nil;
+end;
+
+function TioDBBuilderSchemaFieldClassInfo.FieldDefaultExists: Boolean;
+begin
+  Result := not FieldDefault.IsEmpty;
 end;
 
 function TioDBBuilderSchemaFieldClassInfo.FieldLength: integer;

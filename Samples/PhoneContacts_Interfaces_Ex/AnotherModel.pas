@@ -10,6 +10,7 @@ type
   [ioEntity('OtherPersons',  ioFields), ioTrueClass, ioKeyGenerator('PERSONS')]
   TAnotherPerson = class(TInterfacedObject, IPerson)
   private
+    [ioFTDefault(0)]
     FID: Integer;
     FLastName: String;
     FFirstName: String;
