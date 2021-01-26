@@ -174,8 +174,8 @@ end;
 
 procedure TioCommonBSAPageManager.SetCurrentPage(const Value: Integer);
 begin
-  if (Value = FCurrentPage) or (Value < 1) then
-    Exit;
+  if (Value = FCurrentPage) or (Value < 1) or not IsEnabled then
+    Exit;                 
   _InternalSetCurrentPage(Value);
   FLoadPageMethod; // Invoke the LoadPage anonymous method
 end;

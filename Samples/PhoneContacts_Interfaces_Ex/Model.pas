@@ -39,6 +39,7 @@ type
   [ioIndex('[.LastName], [.FirstName]')]
   TPerson = class(TInterfacedObject, IPerson)
   private
+    [ioFTDefault(0)]
     FID: Integer;
     FLastName: String;
     [ioFTDefault('prova_default')]
