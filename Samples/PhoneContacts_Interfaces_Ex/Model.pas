@@ -29,6 +29,7 @@ type
   public
     constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer; NewID: Integer = 0); overload;
     destructor Destroy; override;
+    [ioFTDefault(0)]
     property ID: Integer read GetID write SetID;
     property PersonID:Integer read GetPersonID write SetPersonID;
     property PhoneType:String read FPhoneType write FPhoneType;

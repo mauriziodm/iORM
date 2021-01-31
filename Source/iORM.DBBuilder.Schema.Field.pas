@@ -21,6 +21,7 @@ type
     function Altered: TioDBBuilderFieldAlter;
     function FieldCustomType: string;
     function FieldDefault: TValue;
+    function FieldDefaultExists: Boolean;
     function FieldLength: integer;
     function FieldName: String;
     function FieldPrecision: integer;
@@ -62,6 +63,11 @@ end;
 function TioDBBuilderSchemaField.FieldDefault: TValue;
 begin
   Result := FContextProperty.GetMetadata_Default;
+end;
+
+function TioDBBuilderSchemaField.FieldDefaultExists: Boolean;
+begin
+  Result := not FieldDefault.IsEmpty;
 end;
 
 function TioDBBuilderSchemaField.FieldLength: integer;

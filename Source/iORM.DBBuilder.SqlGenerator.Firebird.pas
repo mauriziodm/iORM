@@ -355,11 +355,12 @@ var
   LDefault: string;
   LNotNull: string;
 begin
+  // Extract the default value if exists
+  LDefault := ExtractFieldDefaultValue(AField);
   // If primary key...
   if AField.PrimaryKey then
-    Exit(Format('%s INTEGER NOT NULL', [AField.FieldName]));
+    Exit(Format('%s INTEGER %s NOT NULL', [AField.FieldName, LDefault]));
   // ...then continue
-  LDefault := ExtractFieldDefaultValue(AField);
   LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', '');
   Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
 end;

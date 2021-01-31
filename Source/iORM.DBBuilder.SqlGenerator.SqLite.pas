@@ -146,11 +146,12 @@ var
   LDefault: string;
   LNotNull: string;
 begin
+  // Extract the default value if extsts
+  LDefault := ExtractFieldDefaultValue(AField);
   // If primary key...
   if AField.PrimaryKey then
-    Exit(Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])); // Add AUTOINCREMENT keyword???
+    Exit(Format('"%s" INTEGER %s PRIMARY KEY NOT NULL', [AField.FieldName, LDefault])); // Add AUTOINCREMENT keyword???
   // ...then continue
-  LDefault := ExtractFieldDefaultValue(AField);
   LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
   Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull, LDefault]).Trim;
 end;

@@ -86,6 +86,8 @@ type
       const AScript, AWarnings: TStrings);
     procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
       const AScript, AWarnings: TStrings; var AAbort: Boolean);
+    procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+      const AScript, AWarnings: TStrings; var AAbort: Boolean);
   private
     { Private declarations }
   public
@@ -151,6 +153,12 @@ procedure TMainForm.FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConn
   const ADBStatus: TioDBBuilderEngineResult; const AScript, AWarnings: TStrings);
 begin
 //  TSampleData.CheckForSampleDataCreation(Sender.Name);
+end;
+
+procedure TMainForm.FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef;
+  const ADBStatus: TioDBBuilderEngineResult; const AScript, AWarnings: TStrings; var AAbort: Boolean);
+begin
+//  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_Script.txt'));
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);

@@ -243,7 +243,7 @@ end;
 procedure TioDBBuilderSqlGenBase.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
   const ATable: IioDBBuilderSchemaTable);
 begin
-  if AField.FieldNotNull and not AOldFieldNotNull then
+  if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
     AddWarning
       (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
       [ATable.TableName, AField.FieldName]));
