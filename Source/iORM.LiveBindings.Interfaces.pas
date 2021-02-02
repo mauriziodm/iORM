@@ -273,10 +273,10 @@ type
   // Paging: SQL limit strategy
   IioBSAPageManagerStrategy = interface
     ['{65896A9F-5B1A-407B-AB2E-C486D7B19ABF}']
-    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function IsProgressive: Boolean;
+    function RefreshWithReload: Boolean;
+    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
   end;
 
 implementation

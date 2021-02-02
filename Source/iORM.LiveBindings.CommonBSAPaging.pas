@@ -57,19 +57,20 @@ type
     FNextPageStartOffset: Integer;
     FPageSize: Integer;
     FPagingType: TioBSAPagingType;
+    FOwner: TCOmponent;
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
-    procedure _InternalSetCurrentPage(const Value: Integer);
     procedure CheckStrategy;
+    procedure InvokeLoadPageMethod;
     procedure SetCurrentPage(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
     procedure Reset;
   public
-    constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
+    constructor Create(const AOwner: TComponent; const ALoadPageMethod: TioBSAPagingLoadMethod);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
     function IsEnabled: Boolean;
-    function IsProgressive: Boolean;
+    function RefreshWithReload: Boolean;
     procedure NextPage;
     procedure PrevPage;
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
@@ -88,27 +89,25 @@ type
     procedure SetSqlLimit(const AValue: Integer);
     procedure SetSqlLimitOffset(const AValue: Integer);
   public
-    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); virtual; abstract;
-    function IsProgressive: Boolean; virtual; abstract;
+    function RefreshWithReload: Boolean; virtual; abstract;
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
+    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; virtual; abstract;
   end;
 
   TioCommonBSAPageManagerStrategy_HardPaging = class(TioCommonBSAPageManagerStrategy)
   public
-    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
-    function IsProgressive: Boolean; override;
+    function RefreshWithReload: Boolean; override;
+    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; override;
   end;
 
   // NB: Un eventuale altro LimitStrategy progressivo ma con avanzamento pagina automatico
   // calcolerà la soglia che innescherà il caricamento della pagina successiva (ex NextPageAutoThreshold)
   // ponendolo clla metà della PageSize
   TioCommonBSAPageManagerStrategy_ProgressiveManual = class(TioCommonBSAPageManagerStrategy)
-  strict private
-    FHigherSqlLimitOffset: Integer;
   public
-    procedure CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer); override;
-    function IsProgressive: Boolean; override;
+    function RefreshWithReload: Boolean; override;
+    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; override;
   end;
 
 implementation
@@ -124,8 +123,9 @@ begin
     EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
-constructor TioCommonBSAPageManager.Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
+constructor TioCommonBSAPageManager.Create(const AOwner: TComponent; const ALoadPageMethod: TioBSAPagingLoadMethod);
 begin
+  FOwner := AOwner;
   FPagingType := PAGING_TYPE_DEFAULT;
   FPageSize := PAGE_SIZE_DEFAULT;
   FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
@@ -133,14 +133,20 @@ begin
   Reset;
 end;
 
+procedure TioCommonBSAPageManager.InvokeLoadPageMethod;
+begin
+  if Assigned(FLoadPageMethod) then
+    FLoadPageMethod;
+end;
+
 function TioCommonBSAPageManager.IsEnabled: Boolean;
 begin
   Result := FPagingType > ptDisabled;
 end;
 
-function TioCommonBSAPageManager.IsProgressive: Boolean;
+function TioCommonBSAPageManager.RefreshWithReload: Boolean;
 begin
-  Result := Assigned(FStrategy) and FStrategy.IsProgressive;
+  Result := Assigned(FStrategy) and FStrategy.RefreshWithReload;
 end;
 
 function TioCommonBSAPageManager.GetSqlLimit: Integer;
@@ -165,24 +171,20 @@ begin
   SetCurrentPage(FCurrentPage - 1);
 end;
 
-procedure TioCommonBSAPageManager._InternalSetCurrentPage(const Value: Integer);
-begin
-  FCurrentPage := Value;
-  if IsEnabled then
-    FStrategy.CalcSqlLimit(Value, FPageSize, FNextPageStartOffset);
-end;
-
 procedure TioCommonBSAPageManager.SetCurrentPage(const Value: Integer);
 begin
-  if (Value = FCurrentPage) or (Value < 1) or not IsEnabled then
-    Exit;                 
-  _InternalSetCurrentPage(Value);
-  FLoadPageMethod; // Invoke the LoadPage anonymous method
+  if IsEnabled and FStrategy.MoveToPage(FCurrentPage, Value, FPageSize, FNextPageStartOffset) then
+  begin
+    FCurrentPage := Value;
+    InvokeLoadPageMethod;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.Reset;
 begin
-  _InternalSetCurrentPage(CURRENT_PAGE_DEFAULT);
+  FCurrentPage := CURRENT_PAGE_DEFAULT;
+  if IsEnabled then
+    FStrategy.MoveToPage(0, CURRENT_PAGE_DEFAULT, FPageSize, FNextPageStartOffset);
 end;
 
 procedure TioCommonBSAPageManager.SetPagingType(const Value: TioBSAPagingType);
@@ -218,29 +220,41 @@ end;
 
 { TioSqlLimitStrategy_HardPaging }
 
-procedure TioCommonBSAPageManagerStrategy_HardPaging.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
-begin
-  SetSqlLimit(APageSize + ANextPageStartOffset);
-  SetSqlLimitOffset((APageSize * (ADestPage - 1)) - ANextPageStartOffset);
-end;
-
-function TioCommonBSAPageManagerStrategy_HardPaging.IsProgressive: Boolean;
+function TioCommonBSAPageManagerStrategy_HardPaging.RefreshWithReload: Boolean;
 begin
   Result := False;
 end;
 
-{ TioSqlLimitStrategy_ProgressiveManual }
-
-procedure TioCommonBSAPageManagerStrategy_ProgressiveManual.CalcSqlLimit(const ADestPage, APageSize, ANextPageStartOffset: Integer);
+function TioCommonBSAPageManagerStrategy_HardPaging.MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
 begin
-  SetSqlLimit((APageSize * ADestPage) - FHigherSqlLimitOffset);
-  SetSqlLimitOffset(FHigherSqlLimitOffset);
-  FHigherSqlLimitOffset := GetSqlLimitOffset + GetSqlLimit;
+  if(AToPage <> AFromPage) and (AToPage > 0) then
+  begin
+    SetSqlLimit(APageSize + ANextPageStartOffset);
+    SetSqlLimitOffset((APageSize * (AToPage - 1)) - ANextPageStartOffset);
+    Result := True;
+  end
+  else
+    Result := False;
 end;
 
-function TioCommonBSAPageManagerStrategy_ProgressiveManual.IsProgressive: Boolean;
+{ TioSqlLimitStrategy_ProgressiveManual }
+
+function TioCommonBSAPageManagerStrategy_ProgressiveManual.RefreshWithReload: Boolean;
 begin
   Result := True;
+end;
+
+function TioCommonBSAPageManagerStrategy_ProgressiveManual.MoveToPage(const AFromPage, AToPage, APageSize,
+  ANextPageStartOffset: Integer): Boolean;
+begin
+  if(AToPage > AFromPage) and (AToPage > 0) then
+  begin
+    SetSqlLimitOffset(APageSize * AFromPage);
+    SetSqlLimit(APageSize * AToPage - GetSqlLimitOffset);
+    Result := True;
+  end
+  else
+    Result := False;
 end;
 
 end.

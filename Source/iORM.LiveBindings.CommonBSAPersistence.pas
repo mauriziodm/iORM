@@ -235,7 +235,7 @@ begin
   // Extract the paging obj from the where obj
   LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
   // Load next page
-  if LPagingObj.IsProgressive then
+  if LPagingObj.RefreshWithReload then
   begin
     // If the pagination is progressive then it loads the next page and adds it to the
     //  internal list of the BSA and then does a Refresh(False)

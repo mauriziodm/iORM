@@ -320,6 +320,15 @@ end;
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
 begin
   inherited;
+  // Page manager
+  FPaging := TioCommonBSAPageManager.Create(Self,
+    procedure
+    begin
+      if CheckAdapter then
+        GetActiveBindSourceAdapter.LoadPage;
+    end
+  );
+
   FAutoPost := False;
   FioLoaded := False;
   FioAutoRefreshOnNotification := arEnabledNoReload;
@@ -336,14 +345,6 @@ begin
   FPropagateEdit := False;
   FPropagatePost := False;
   FPropagatePersist := False;
-  // Page manager
-  FPaging := TioCommonBSAPageManager.Create(
-    procedure
-    begin
-      if CheckAdapter then
-        GetActiveBindSourceAdapter.LoadPage;
-    end
-  );
   // Set even an onChange event handler
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;
