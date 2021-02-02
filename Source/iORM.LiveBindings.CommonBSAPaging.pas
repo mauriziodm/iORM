@@ -49,7 +49,8 @@ type
   // LoadPage anonymous method type
   TioBSAPagingLoadMethod = reference to procedure;
 
- {$TYPEINFO ON}
+{$TYPEINFO ON}
+
   TioCommonBSAPageManager = class(TPersistent)
   strict private
     FCurrentPage: Integer;
@@ -57,7 +58,6 @@ type
     FNextPageStartOffset: Integer;
     FPageSize: Integer;
     FPagingType: TioBSAPagingType;
-    FOwner: TCOmponent;
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
     procedure CheckStrategy;
@@ -66,11 +66,12 @@ type
     procedure SetPagingType(const Value: TioBSAPagingType);
     procedure Reset;
   public
-    constructor Create(const AOwner: TComponent; const ALoadPageMethod: TioBSAPagingLoadMethod);
+    constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
     function IsEnabled: Boolean;
     function RefreshWithReload: Boolean;
+    procedure NotifyItemIndexChanged(const ANewItemIndex: Integer);
     procedure NextPage;
     procedure PrevPage;
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
@@ -93,21 +94,26 @@ type
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; virtual; abstract;
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; virtual; abstract;
   end;
 
   TioCommonBSAPageManagerStrategy_HardPaging = class(TioCommonBSAPageManagerStrategy)
   public
     function RefreshWithReload: Boolean; override;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; override;
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; override;
   end;
 
-  // NB: Un eventuale altro LimitStrategy progressivo ma con avanzamento pagina automatico
-  // calcolerà la soglia che innescherà il caricamento della pagina successiva (ex NextPageAutoThreshold)
-  // ponendolo clla metà della PageSize
   TioCommonBSAPageManagerStrategy_ProgressiveManual = class(TioCommonBSAPageManagerStrategy)
   public
     function RefreshWithReload: Boolean; override;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; override;
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; override;
+  end;
+
+  TioCommonBSAPageManagerStrategy_ProgressiveAuto = class(TioCommonBSAPageManagerStrategy_ProgressiveManual)
+  public
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; override;
   end;
 
 implementation
@@ -123,9 +129,8 @@ begin
     EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
-constructor TioCommonBSAPageManager.Create(const AOwner: TComponent; const ALoadPageMethod: TioBSAPagingLoadMethod);
+constructor TioCommonBSAPageManager.Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
 begin
-  FOwner := AOwner;
   FPagingType := PAGING_TYPE_DEFAULT;
   FPageSize := PAGE_SIZE_DEFAULT;
   FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
@@ -164,6 +169,12 @@ end;
 procedure TioCommonBSAPageManager.NextPage;
 begin
   SetCurrentPage(FCurrentPage + 1);
+end;
+
+procedure TioCommonBSAPageManager.NotifyItemIndexChanged(const ANewItemIndex: Integer);
+begin
+  if IsEnabled and FStrategy.NextPageAfterItemIndexChanged(ANewItemIndex, FCurrentPage, FPageSize) then
+    NextPage;
 end;
 
 procedure TioCommonBSAPageManager.PrevPage;
@@ -220,14 +231,21 @@ end;
 
 { TioSqlLimitStrategy_HardPaging }
 
+function TioCommonBSAPageManagerStrategy_HardPaging.NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage,
+  APageSize: Integer): Boolean;
+begin
+  Result := False;
+end;
+
 function TioCommonBSAPageManagerStrategy_HardPaging.RefreshWithReload: Boolean;
 begin
   Result := False;
 end;
 
-function TioCommonBSAPageManagerStrategy_HardPaging.MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
+function TioCommonBSAPageManagerStrategy_HardPaging.MoveToPage(const AFromPage, AToPage, APageSize,
+  ANextPageStartOffset: Integer): Boolean;
 begin
-  if(AToPage <> AFromPage) and (AToPage > 0) then
+  if (AToPage <> AFromPage) and (AToPage > 0) then
   begin
     SetSqlLimit(APageSize + ANextPageStartOffset);
     SetSqlLimitOffset((APageSize * (AToPage - 1)) - ANextPageStartOffset);
@@ -239,6 +257,12 @@ end;
 
 { TioSqlLimitStrategy_ProgressiveManual }
 
+function TioCommonBSAPageManagerStrategy_ProgressiveManual.NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage,
+  APageSize: Integer): Boolean;
+begin
+  Result := False;
+end;
+
 function TioCommonBSAPageManagerStrategy_ProgressiveManual.RefreshWithReload: Boolean;
 begin
   Result := True;
@@ -247,7 +271,7 @@ end;
 function TioCommonBSAPageManagerStrategy_ProgressiveManual.MoveToPage(const AFromPage, AToPage, APageSize,
   ANextPageStartOffset: Integer): Boolean;
 begin
-  if(AToPage > AFromPage) and (AToPage > 0) then
+  if (AToPage > AFromPage) and (AToPage > 0) then
   begin
     SetSqlLimitOffset(APageSize * AFromPage);
     SetSqlLimit(APageSize * AToPage - GetSqlLimitOffset);
@@ -255,6 +279,14 @@ begin
   end
   else
     Result := False;
+end;
+
+{ TioCommonBSAPageManagerStrategy_ProgressiveAuto }
+
+function TioCommonBSAPageManagerStrategy_ProgressiveAuto.NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage,
+  APageSize: Integer): Boolean;
+begin
+  Result := ANewItemIndex >= (ACurrentPage * APageSize) - (APageSize div 2);
 end;
 
 end.

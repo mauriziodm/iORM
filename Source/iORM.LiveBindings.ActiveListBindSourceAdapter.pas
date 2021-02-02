@@ -400,9 +400,11 @@ end;
 procedure TioActiveListBindSourceAdapter.DoAfterScroll;
 begin
   inherited;
-  Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
+  FDetailAdaptersContainer.SetMasterObject(Current);
   // DataSet synchro
-  Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
+  GetDataSetLinkContainer.SetRecNo(ItemIndex);
+  // Paging notification
+  FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);

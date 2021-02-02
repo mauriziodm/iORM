@@ -129,6 +129,8 @@ type
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
+    // Paging
+    procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -320,15 +322,6 @@ end;
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
 begin
   inherited;
-  // Page manager
-  FPaging := TioCommonBSAPageManager.Create(Self,
-    procedure
-    begin
-      if CheckAdapter then
-        GetActiveBindSourceAdapter.LoadPage;
-    end
-  );
-
   FAutoPost := False;
   FioLoaded := False;
   FioAutoRefreshOnNotification := arEnabledNoReload;
@@ -349,6 +342,14 @@ begin
   FioWhereDetailsFromDetailAdapters := False;
   FioWhereStr := TStringList.Create;
   SetWhereStr(FioWhereStr); // set TStringList.onChange event handler
+  // Page manager
+  FPaging := TioCommonBSAPageManager.Create(
+    procedure
+    begin
+      if CheckAdapter then
+        GetActiveBindSourceAdapter.LoadPage;
+    end
+  );
 end;
 
 procedure TioPrototypeBindSource.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
@@ -672,6 +673,11 @@ end;
 procedure TioPrototypeBindSource.Notify(const Sender: TObject; const ANotification: IioBSANotification);
 begin
   Self.DoNotify(ANotification);
+end;
+
+procedure TioPrototypeBindSource.Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
+begin
+  FPaging.NotifyItemIndexChanged(ANewItemIndex);
 end;
 
 procedure TioPrototypeBindSource.PersistAll;

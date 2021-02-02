@@ -87,6 +87,8 @@ type
     procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
     procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
     procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
+    // Paging
+    procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
   end;
 
   // The common ancestor for all PrototypeBindSource components
@@ -268,7 +270,7 @@ type
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
 
   // Paging type
-  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual); //, ptProgressiveAuto);
+  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual, ptProgressiveAuto);
 
   // Paging: SQL limit strategy
   IioBSAPageManagerStrategy = interface
@@ -277,6 +279,7 @@ type
     function GetSqlLimitOffset: Integer;
     function RefreshWithReload: Boolean;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean;
   end;
 
 implementation

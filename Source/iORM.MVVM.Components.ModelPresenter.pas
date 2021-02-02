@@ -99,6 +99,8 @@ type
     procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
+    // Paging
+    procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -785,6 +787,11 @@ procedure TioModelPresenter.Notify(const Sender: TObject;
   const ANotification: IioBSANotification);
 begin
   DoNotify(ANotification);
+end;
+
+procedure TioModelPresenter.Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
+begin
+  // Da implementare
 end;
 
 procedure TioModelPresenter.PersistAll;

@@ -249,6 +249,8 @@ begin
       Result := TioCommonBSAPageManagerStrategy_HardPaging.Create;
     ptProgressiveManual:
       Result := TioCommonBSAPageManagerStrategy_ProgressiveManual.Create;
+    ptProgressiveAuto:
+      Result := TioCommonBSAPageManagerStrategy_ProgressiveAuto.Create;
   else
     Result := nil;
   end;

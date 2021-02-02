@@ -350,6 +350,8 @@ begin
   Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
   // DataSet synchro
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
+  // Paging notification
+  FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
