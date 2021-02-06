@@ -205,6 +205,7 @@ type
   protected
     class function BuildIndexName(const AContext:IioContext; const ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation; const AUnique:Boolean): String; virtual;
   public
+    class procedure GenerateSqlCount(const AQuery:IioQuery; const AContext:IioContext); virtual;
     class procedure GenerateSqlSelect(const AQuery:IioQuery; const AContext:IioContext); virtual;
     class procedure GenerateSqlInsert(const AQuery:IioQuery; const AContext:IioContext); virtual;
     class procedure GenerateSqlNextID(const AQuery:IioQuery; const AContext:IioContext); virtual; abstract;
@@ -372,6 +373,25 @@ begin
     Result := Result + '_U';
   // Translate
   Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
+end;
+
+class procedure TioSqlGenerator.GenerateSqlCount(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  // Select Count From
+  AQuery.SQL.Add('SELECT COUNT(*) FROM ' + AContext.GetTable.GetSql);
+  // Join
+  AQuery.SQL.Add(AContext.GetJoin.GetSql);
+  // If a Where exist then the query is an external query else
+  // is an internal query.
+  if AContext.WhereExist then
+    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+  else
+    AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName,
+      AContext.GetProperties.GetIdProperty.GetSqlParamName]));
+  // GroupBy
+  AQuery.SQL.Add(AContext.GetGroupBySql);
 end;
 
 class procedure TioSqlGenerator.GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext);
