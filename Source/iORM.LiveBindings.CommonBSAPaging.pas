@@ -51,11 +51,13 @@ type
 
 {$TYPEINFO ON}
 
+{ TODO : Il page manager DEVE ESSERE THREADSAFE, potrei fare un wrapper esterno che regola l'accesso all'oggetto reale interno? }
   TioCommonBSAPageManager = class(TPersistent)
   strict private
     FCurrentPage: Integer;
     FLoadPageMethod: TioBSAPagingLoadMethod;
     FNextPageStartOffset: Integer;
+    FPageCount: Integer;
     FPageSize: Integer;
     FPagingType: TioBSAPagingType;
     FStrategy: IioBSAPageManagerStrategy;
@@ -74,7 +76,9 @@ type
     procedure NotifyItemIndexChanged(const ANewItemIndex: Integer);
     procedure NextPage;
     procedure PrevPage;
+    procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
+    property PageCount: Integer read FPageCount;
   published
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset default NEXT_PAGE_START_OFFSET;
     property PageSize: Integer read FPageSize write FPageSize default PAGE_SIZE_DEFAULT;
@@ -189,6 +193,11 @@ begin
     FCurrentPage := Value;
     InvokeLoadPageMethod;
   end;
+end;
+
+procedure TioCommonBSAPageManager.SetItemCount(const AItemCount: Integer);
+begin
+  FPageCount := (AItemCount div FPageSize) + 1;
 end;
 
 procedure TioCommonBSAPageManager.Reset;

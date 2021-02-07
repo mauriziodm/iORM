@@ -699,6 +699,7 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
+{ TODO : Probabile punto sensibile multithreading }
   if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
     Result := FPagingObj.GetSqlLimitOffset;
 end;
@@ -709,6 +710,7 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
+{ TODO : Probabile punto sensibile multithreading }
   if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
     Result := FPagingObj.GetSqlLimit;
 end;

@@ -421,6 +421,7 @@ begin
     function: TObject
     begin
       result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetClass);
+      { TODO : Qui potrei estrarre il PageManager dal where e poi impostare la sua proprietà o metodo "SetItemCount" che poi calcola il numero totale di pagine, ovvio che deve essere threadsafe}
     end, ATerminateMethod);
 end;
 
