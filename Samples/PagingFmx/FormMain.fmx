@@ -48,7 +48,7 @@ object MainForm: TMainForm
     Size.PlatformDefault = False
     TabOrder = 7
     RowCount = 200
-    Viewport.Width = 589.000000000000000000
+    Viewport.Width = 605.000000000000000000
     Viewport.Height = 368.000000000000000000
   end
   object Button2: TButton
@@ -90,43 +90,35 @@ object MainForm: TMainForm
     Text = 'Prev page'
     OnClick = SpeedButton2Click
   end
-  object ioFMX1: TioFMX
-    Left = 160
-    Top = 104
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkGridToDataSourcePBSArticles: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = PBSArticles
+      GridControl = Grid1
+      Columns = <>
+    end
   end
-  object SQLiteConn: TioSQLiteConnectionDef
-    AutoCreateDB.Enabled = True
-    AutoCreateDB.Indexes = False
-    AutoCreateDB.ForeignKeys = False
+  object ioFMX1: TioFMX
+    Left = 256
+    Top = 88
+  end
+  object SQLIteConn: TioSQLiteConnectionDef
     Database = 'PagingArticles.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
     Persistent = False
     Pooled = False
-    Left = 160
-    Top = 168
+    Left = 256
+    Top = 152
   end
   object PBSArticles: TioPrototypeBindSource
     AutoActivate = True
     AutoPost = False
-    FieldDefs = <
-      item
-        Name = 'ID'
-        FieldType = ftInteger
-        Generator = 'Integers'
-        ReadOnly = False
-      end
-      item
-        Name = 'Description'
-        Generator = 'BitmapNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'Price'
-        FieldType = ftCurrency
-        Generator = 'Currency'
-        ReadOnly = False
-      end>
+    FieldDefs = <>
     ScopeMappings = <>
     ioTypeName = 'TArticle'
     ioAsync = False
@@ -143,19 +135,7 @@ object MainForm: TMainForm
     ioPropagatePersist = False
     ioPaging.PageSize = 10
     ioPaging.PagingType = ptProgressiveAuto
-    Left = 160
-    Top = 240
-  end
-  object BindingsList1: TBindingsList
-    Methods = <>
-    OutputConverters = <>
-    Left = 20
-    Top = 5
-    object LinkGridToDataSourcePBSArticles: TLinkGridToDataSource
-      Category = 'Quick Bindings'
-      DataSource = PBSArticles
-      GridControl = Grid1
-      Columns = <>
-    end
+    Left = 256
+    Top = 216
   end
 end

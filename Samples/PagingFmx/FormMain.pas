@@ -11,19 +11,19 @@ uses
 
 type
   TMainForm = class(TForm)
-    ioFMX1: TioFMX;
-    SQLiteConn: TioSQLiteConnectionDef;
     Button1: TButton;
     Edit1: TEdit;
     Label1: TLabel;
     Grid1: TGrid;
-    PBSArticles: TioPrototypeBindSource;
     BindingsList1: TBindingsList;
-    LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
     Button2: TButton;
     Button5: TButton;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
+    ioFMX1: TioFMX;
+    SQLIteConn: TioSQLiteConnectionDef;
+    PBSArticles: TioPrototypeBindSource;
+    LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
