@@ -55,6 +55,7 @@ type
   public
     class function GetQuerySelectForObject(const AContext: IioContext): IioQuery;
     class function GetQuerySelectForList(const AContext: IioContext): IioQuery;
+    class function GetQuerySelectForCount(const AContext: IioContext): IioQuery;
     class function GetQueryInsert(const AContext: IioContext): IioQuery;
     class function GetQueryNextID(const AContext: IioContext): IioQuery;
     class function GetQueryUpdate(const AContext: IioContext): IioQuery;
@@ -212,6 +213,25 @@ begin
   Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, '')); // NoQueryIdentity
   if Result.IsSqlEmpty then
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlNextID(Result, AContext);
+end;
+
+class function TioQueryEngine.GetQuerySelectForCount(const AContext: IioContext): IioQuery;
+var
+  AQuery: IioQuery;
+begin
+  // Get the query object and if does not contain an SQL text (come from QueryContainer)
+  // then call the sql query generator
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELCNT'));
+  Result := AQuery;
+  if AQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCount(AQuery, AContext);
+  // If a Where exist then the query is an external query else
+  // is an internal query.
+  if AContext.WhereExist then
+    Self.FillQueryWhereParams(AContext, AQuery)
+  else
+    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
+      .AsVariant;
 end;
 
 class function TioQueryEngine.GetQuerySelectForList(const AContext: IioContext): IioQuery;

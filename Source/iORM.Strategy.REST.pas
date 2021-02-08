@@ -63,6 +63,7 @@ type
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function Count(const AWhere: IioWhere): Integer; override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
@@ -83,6 +84,33 @@ class procedure TioStrategyREST.CommitTransaction(const AConnectionName: String)
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
+end;
+
+class function TioStrategyREST.Count(const AWhere: IioWhere): Integer;
+var
+  LConnection: IioConnectionREST;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  // Start transaction
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Clear;
+    LConnection.RequestBody.Where := AWhere;
+    LConnection.Execute('Count');
+    // Deserialize  the JSONDataValue to the result object
+{ TODO : Da sistemare }
+//    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AList);
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+  end;
 end;
 
 class procedure TioStrategyREST.Delete(const AWhere: IioWhere);

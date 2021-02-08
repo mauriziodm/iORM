@@ -53,7 +53,6 @@ type
 
 {$TYPEINFO ON}
 
-  { TODO : Il page manager DEVE ESSERE THREADSAFE, potrei fare un wrapper esterno che regola l'accesso all'oggetto reale interno? }
   TioCommonBSAPageManager = class(TPersistent)
   private
     FConcretePageManager: TioCommonBSAPageManagerConcrete;
@@ -384,14 +383,9 @@ end;
 function TioCommonBSAPageManagerStrategy_HardPaging.MoveToPage(const AFromPage, AToPage, APageSize,
   ANextPageStartOffset: Integer): Boolean;
 begin
-  if (AToPage <> AFromPage) and (AToPage > 0) then
-  begin
-    SetSqlLimit(APageSize + ANextPageStartOffset);
-    SetSqlLimitOffset((APageSize * (AToPage - 1)) - ANextPageStartOffset);
-    Result := True;
-  end
-  else
-    Result := False;
+  SetSqlLimit(APageSize + ANextPageStartOffset);
+  SetSqlLimitOffset((APageSize * (AToPage - 1)) - ANextPageStartOffset);
+  Result := True;
 end;
 
 { TioSqlLimitStrategy_ProgressiveManual }
@@ -410,7 +404,7 @@ end;
 function TioCommonBSAPageManagerStrategy_ProgressiveManual.MoveToPage(const AFromPage, AToPage, APageSize,
   ANextPageStartOffset: Integer): Boolean;
 begin
-  if (AToPage > AFromPage) and (AToPage > 0) then
+  if (AToPage > AFromPage) then
   begin
     SetSqlLimitOffset(APageSize * AFromPage);
     SetSqlLimit(APageSize * AToPage - GetSqlLimitOffset);
@@ -498,7 +492,8 @@ end;
 
 procedure TioCommonBSAPageManagerConcrete.SetCurrentPage(const Value: Integer);
 begin
-  if IsEnabled and FStrategy.MoveToPage(FCurrentPage, Value, FPageSize, FNextPageStartOffset) then
+  if IsEnabled and (Value <> FCurrentPage) and (Value > 0) and (Value < FPageCount) and
+    FStrategy.MoveToPage(FCurrentPage, Value, FPageSize, FNextPageStartOffset) then
   begin
     FCurrentPage := Value;
     InvokeLoadPageMethod;

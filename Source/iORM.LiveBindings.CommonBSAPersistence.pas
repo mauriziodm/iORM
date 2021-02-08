@@ -59,6 +59,7 @@ type
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     class procedure _RefreshNoReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
     class procedure _RefreshReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
+    class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
   public
     class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -397,6 +398,16 @@ begin
     LTerminateMethod(nil);
 end;
 
+class procedure TioCommonBSAPersistence._SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
+var
+  LCount: Integer;
+  LPagingObj: TioCommonBSAPageManager;
+begin
+  LCount := io.Load(ATypeName, ATypeAlias)._Where(AWhere).GetCount;
+  LPagingObj := AWhere.GetPagingObj as TioCommonBSAPageManager;
+  LPagingObj.SetItemCount(LCount);
+end;
+
 class procedure TioCommonBSAPersistence._SyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
   ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 var
@@ -420,8 +431,38 @@ begin
   _Execute(AASync,
     function: TObject
     begin
-      result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetClass);
-      { TODO : Qui potrei estrarre il PageManager dal where e poi impostare la sua proprietà o metodo "SetItemCount" che poi calcola il numero totale di pagine, ovvio che deve essere threadsafe}
+      io.StartTransaction;
+      try
+        // Load list
+        Result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetClass);
+        // Load count
+        _SetItemCountToPageManager(ATypeName, ATypeAlias, AWhere);
+        io.CommitTransaction;
+      except
+        io.RollbackTransaction;
+        raise;
+      end;
+    end, ATerminateMethod);
+end;
+
+class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+begin
+  _Execute(AASync,
+    function: TObject
+    begin
+      io.StartTransaction;
+      try
+        // Load to list
+        result := nil;
+        io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetList);
+        // Load count
+        _SetItemCountToPageManager(ATypeName, ATypeAlias, AWhere);
+        io.CommitTransaction;
+      except
+        io.RollbackTransaction;
+        raise;
+      end;
     end, ATerminateMethod);
 end;
 
@@ -432,17 +473,6 @@ begin
     function: TObject
     begin
       result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToObject;
-    end, ATerminateMethod);
-end;
-
-class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
-ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-begin
-  _Execute(AASync,
-    function: TObject
-    begin
-      result := nil;
-      io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetList);
     end, ATerminateMethod);
 end;
 

@@ -107,6 +107,7 @@ object MainForm: TMainForm
     Top = 88
   end
   object SQLIteConn: TioSQLiteConnectionDef
+    AutoCreateDB.Enabled = True
     Database = 'PagingArticles.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

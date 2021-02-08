@@ -387,7 +387,6 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
 var
-  { TODO : Abort da eliminare??? }
   LAbort: Boolean;
 begin
   inherited;

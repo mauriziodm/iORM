@@ -330,6 +330,7 @@ type
     class function LoadObject(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj:TObject): TObject; virtual; abstract;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet:TFDDataSet); virtual; abstract;
+    class function Count(const AWhere: IioWhere): Integer; virtual; abstract;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination:IioSQLDestination; const ADestDataset:TFDDataSet); virtual; abstract;
     class procedure SQLDest_Execute(const ASQLDestination:IioSQLDestination); virtual; abstract;

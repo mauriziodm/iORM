@@ -72,6 +72,7 @@ type
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function Count(const AWhere: IioWhere): Integer; override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
@@ -92,6 +93,53 @@ class procedure TioStrategyDB.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
+end;
+
+class function TioStrategyDB.Count(const AWhere: IioWhere): Integer;
+var
+  AResolvedTypeList: IioResolvedTypeList;
+  AResolvedTypeName: String;
+  AContext: IioContext;
+  ATransactionCollection: IioTransactionCollection;
+  ADuckTypedList: IioDuckTypedList;
+  // Nested
+  procedure NestedCount;
+  var
+    AQuery: IioQuery;
+  begin
+    AQuery := TioDBFactory.QueryEngine.GetQuerySelectForCount(AContext);
+    AQuery.Open;
+    try
+      Result := Result + AQuery.Fields[0].AsInteger;
+    finally
+      AQuery.Close;
+    end;
+  end;
+
+begin
+  inherited;
+  // Resolve the type and alias
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  // Get the transaction collection
+  ATransactionCollection := TioDBFactory.TransactionCollection;
+  try
+    // Loop for all classes in the sesolved type list
+    for AResolvedTypeName in AResolvedTypeList do
+    begin
+      // Get the Context for the current ResolverTypeName
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere);
+      // Start transaction
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      // Get the count value for the current resolved type
+      NestedCount;
+    end;
+    // Commit ALL transactions
+    ATransactionCollection.CommitAll;
+  except
+    // Rollback ALL transactions
+    ATransactionCollection.RollbackAll;
+    raise;
+  end;
 end;
 
 class procedure TioStrategyDB.Delete(const AWhere: IioWhere);

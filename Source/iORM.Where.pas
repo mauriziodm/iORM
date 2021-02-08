@@ -113,6 +113,7 @@ type
     function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True)
       : TObject; overload;
     function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
+    function GetCount: Integer;
 
     procedure Delete;
 
@@ -678,6 +679,11 @@ begin
   end;
 end;
 
+function TioWhere.GetCount: Integer;
+begin
+  Result := TioStrategyFactory.GetStrategy('').Count(Self);
+end;
+
 function TioWhere.GetDetails: IioWhereDetailsContainer;
 begin
   Result := FDetailsContainer;
@@ -699,7 +705,6 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
-{ TODO : Probabile punto sensibile multithreading }
   if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
     Result := FPagingObj.GetSqlLimitOffset;
 end;
@@ -710,7 +715,6 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
-{ TODO : Probabile punto sensibile multithreading }
   if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
     Result := FPagingObj.GetSqlLimit;
 end;
