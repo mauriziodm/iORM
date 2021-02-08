@@ -36,7 +36,7 @@ unit iORM.LiveBindings.CommonBSAPaging;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces, System.Classes;
+  iORM.LiveBindings.Interfaces, System.Classes, System.SysUtils;
 
 const
   PAGING_TYPE_DEFAULT = ptDisabled;
@@ -53,10 +53,12 @@ type
 
 {$TYPEINFO ON}
 
-{ TODO : Il page manager DEVE ESSERE THREADSAFE, potrei fare un wrapper esterno che regola l'accesso all'oggetto reale interno? }
+  { TODO : Il page manager DEVE ESSERE THREADSAFE, potrei fare un wrapper esterno che regola l'accesso all'oggetto reale interno? }
   TioCommonBSAPageManager = class(TPersistent)
   private
     FConcretePageManager: TioCommonBSAPageManagerConcrete;
+    procedure _Lock;
+    procedure _Unlock;
   protected
     function GetCurrentPage: Integer;
     function GetNextPageStartOffset: Integer;
@@ -166,87 +168,182 @@ end;
 
 function TioCommonBSAPageManager.IsEnabled: Boolean;
 begin
-  Result := FConcretePageManager.IsEnabled;
+  _Lock;
+  try
+    Result := FConcretePageManager.IsEnabled;
+  finally
+    _Unlock;
+  end;
+end;
+
+procedure TioCommonBSAPageManager._Lock;
+begin
+  TMonitor.Enter(Self);
 end;
 
 function TioCommonBSAPageManager.RefreshWithReload: Boolean;
 begin
-  Result := FConcretePageManager.RefreshWithReload;
+  _Lock;
+  try
+    Result := FConcretePageManager.RefreshWithReload;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetSqlLimit: Integer;
 begin
-  Result := FConcretePageManager.GetSqlLimit;
+  _Lock;
+  try
+    Result := FConcretePageManager.GetSqlLimit;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetSqlLimitOffset: Integer;
 begin
-  Result := FConcretePageManager.GetSqlLimitOffset;
+  _Lock;
+  try
+    Result := FConcretePageManager.GetSqlLimitOffset;
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.NextPage;
 begin
-  FConcretePageManager.NextPage;
+  _Lock;
+  try
+    FConcretePageManager.NextPage;
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.NotifyItemIndexChanged(const ANewItemIndex: Integer);
 begin
-  FConcretePageManager.NotifyItemIndexChanged(ANewItemIndex);
+  _Lock;
+  try
+    FConcretePageManager.NotifyItemIndexChanged(ANewItemIndex);
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.PrevPage;
 begin
-  FConcretePageManager.PrevPage;
+  _Lock;
+  try
+    FConcretePageManager.PrevPage;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetPageCount: Integer;
 begin
-  Result := FConcretePageManager.PageCount;
+  _Lock;
+  try
+    Result := FConcretePageManager.PageCount;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetPageSize: Integer;
 begin
-  Result := FConcretePageManager.PageSize;
+  _Lock;
+  try
+    Result := FConcretePageManager.PageSize;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetPagingType: TioBSAPagingType;
 begin
-  Result := FConcretePageManager.PagingType;
+  _Lock;
+  try
+    Result := FConcretePageManager.PagingType;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetCurrentPage: Integer;
 begin
-  Result := FConcretePageManager.CurrentPage;
+  _Lock;
+  try
+    Result := FConcretePageManager.CurrentPage;
+  finally
+    _Unlock;
+  end;
 end;
 
 function TioCommonBSAPageManager.GetNextPageStartOffset: Integer;
 begin
-  Result := FConcretePageManager.NextPageStartOffset;
+  _Lock;
+  try
+    Result := FConcretePageManager.NextPageStartOffset;
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.SetCurrentPage(const Value: Integer);
 begin
-  FConcretePageManager.CurrentPage := Value;
+  _Lock;
+  try
+    FConcretePageManager.CurrentPage := Value;
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.SetItemCount(const AItemCount: Integer);
 begin
-  FConcretePageManager.SetItemCount(AItemCount);
+  _Lock;
+  try
+    FConcretePageManager.SetItemCount(AItemCount);
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.SetNextPageStartOffset(const Value: Integer);
 begin
-  FConcretePageManager.NextPageStartOffset := Value;
+  _Lock;
+  try
+    FConcretePageManager.NextPageStartOffset := Value;
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.SetPageSize(const Value: Integer);
 begin
-  FConcretePageManager.PageSize := Value;
+  _Lock;
+  try
+    FConcretePageManager.PageSize := Value;
+  finally
+    _Unlock;
+  end;
 end;
 
 procedure TioCommonBSAPageManager.SetPagingType(const Value: TioBSAPagingType);
 begin
-  FConcretePageManager.PagingType := Value;
+  _Lock;
+  try
+    FConcretePageManager.PagingType := Value;
+  finally
+    _Unlock;
+  end;
+end;
+
+procedure TioCommonBSAPageManager._Unlock;
+begin
+  TMonitor.Exit(Self);
 end;
 
 { TioSqlLimitStrategy_Base }
