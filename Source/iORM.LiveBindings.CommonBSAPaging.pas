@@ -532,7 +532,7 @@ end;
 
 procedure TioCommonBSAPageManagerConcrete.SetCurrentPage(const Value: Integer);
 begin
-  if Enabled and (Value <> FCurrentPage) and (Value > 0) and (Value < FPageCount) and
+  if Enabled and (Value <> FCurrentPage) and (Value > 0) and (Value <= FPageCount) and
     FStrategy.MoveToPage(FCurrentPage, Value, FPageSize, FNextPageStartOffset) then
   begin
     FCurrentPage := Value;
@@ -542,7 +542,7 @@ end;
 
 procedure TioCommonBSAPageManagerConcrete.SetItemCount(const AItemCount: Integer);
 begin
-  FPageCount := (AItemCount div FPageSize) + 1;
+  FPageCount := (AItemCount div FPageSize);
 end;
 
 procedure TioCommonBSAPageManagerConcrete.SetPagingType(const Value: TioBSAPagingType);

@@ -24,11 +24,14 @@ type
     SQLIteConn: TioSQLiteConnectionDef;
     PBSArticles: TioPrototypeBindSource;
     LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
+    LabelPageCount: TLabel;
+    TimerPageCount: TTimer;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
+    procedure TimerPageCountTimer(Sender: TObject);
   private
     { Private declarations }
   public
@@ -68,6 +71,11 @@ end;
 procedure TMainForm.SpeedButton2Click(Sender: TObject);
 begin
   PBSArticles.ioPaging.PrevPage;
+end;
+
+procedure TMainForm.TimerPageCountTimer(Sender: TObject);
+begin
+  LabelPageCount.Text := Format('Page %d of %d', [PBSArticles.ioPaging.CurrentPage, PBSArticles.ioPaging.PageCount]);
 end;
 
 end.
