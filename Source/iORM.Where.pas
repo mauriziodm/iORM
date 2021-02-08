@@ -705,7 +705,7 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
-  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
+  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.Enabled then
     Result := FPagingObj.GetSqlLimitOffset;
 end;
 
@@ -715,7 +715,7 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
-  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.IsEnabled then
+  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.Enabled then
     Result := FPagingObj.GetSqlLimit;
 end;
 

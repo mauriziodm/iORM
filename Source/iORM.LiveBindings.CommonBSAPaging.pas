@@ -54,12 +54,15 @@ type
 {$TYPEINFO ON}
 
   TioCommonBSAPageManager = class(TPersistent)
-  private
+  strict private
     FConcretePageManager: TioCommonBSAPageManagerConcrete;
     procedure _Lock;
     procedure _Unlock;
-  protected
+  strict protected
     function GetCurrentPage: Integer;
+    function GetEnabled: Boolean;
+    function GetFirstPage: Boolean;
+    function GetLastPage: Boolean;
     function GetNextPageStartOffset: Integer;
     function GetPageCount: Integer;
     function GetPageSize: Integer;
@@ -72,13 +75,15 @@ type
     constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function IsEnabled: Boolean;
     function RefreshWithReload: Boolean;
     procedure NotifyItemIndexChanged(const ANewItemIndex: Integer);
     procedure NextPage;
     procedure PrevPage;
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
+    property Enabled: Boolean read GetEnabled;
+    property FirstPage: Boolean read GetFirstPage;
+    property LastPage: Boolean read GetFirstPage;
     property PageCount: Integer read GetPageCount;
   published
     property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
@@ -96,6 +101,9 @@ type
     FPagingType: TioBSAPagingType;
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
+    function GetEnabled: Boolean;
+    function GetFirstPage: Boolean;
+    function GetLastPage: Boolean;
     procedure CheckStrategy;
     procedure InvokeLoadPageMethod;
     procedure SetCurrentPage(const Value: Integer);
@@ -105,15 +113,17 @@ type
     constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function IsEnabled: Boolean;
     function RefreshWithReload: Boolean;
     procedure NotifyItemIndexChanged(const ANewItemIndex: Integer);
     procedure NextPage;
     procedure PrevPage;
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
-    property PageCount: Integer read FPageCount;
+    property Enabled: Boolean read GetEnabled;
+    property FirstPage: Boolean read GetFirstPage;
+    property LastPage: Boolean read GetFirstPage;
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset;
+    property PageCount: Integer read FPageCount;
     property PageSize: Integer read FPageSize write FPageSize;
     property PagingType: TioBSAPagingType read FPagingType write SetPagingType;
   end;
@@ -165,11 +175,31 @@ begin
   FConcretePageManager := TioCommonBSAPageManagerConcrete.Create(ALoadPageMethod);
 end;
 
-function TioCommonBSAPageManager.IsEnabled: Boolean;
+function TioCommonBSAPageManager.GetEnabled: Boolean;
 begin
   _Lock;
   try
-    Result := FConcretePageManager.IsEnabled;
+    Result := FConcretePageManager.Enabled;
+  finally
+    _Unlock;
+  end;
+end;
+
+function TioCommonBSAPageManager.GetFirstPage: Boolean;
+begin
+  _Lock;
+  try
+    Result := FConcretePageManager.FirstPage;
+  finally
+    _Unlock;
+  end;
+end;
+
+function TioCommonBSAPageManager.GetLastPage: Boolean;
+begin
+  _Lock;
+  try
+    Result := FConcretePageManager.LastPage;
   finally
     _Unlock;
   end;
@@ -457,9 +487,19 @@ begin
     FLoadPageMethod;
 end;
 
-function TioCommonBSAPageManagerConcrete.IsEnabled: Boolean;
+function TioCommonBSAPageManagerConcrete.GetEnabled: Boolean;
 begin
   Result := FPagingType > ptDisabled;
+end;
+
+function TioCommonBSAPageManagerConcrete.GetFirstPage: Boolean;
+begin
+  Result := FCurrentPage = 1;
+end;
+
+function TioCommonBSAPageManagerConcrete.GetLastPage: Boolean;
+begin
+  Result := FCurrentPage = FPageCount;
 end;
 
 procedure TioCommonBSAPageManagerConcrete.NextPage;
@@ -469,7 +509,7 @@ end;
 
 procedure TioCommonBSAPageManagerConcrete.NotifyItemIndexChanged(const ANewItemIndex: Integer);
 begin
-  if IsEnabled and FStrategy.NextPageAfterItemIndexChanged(ANewItemIndex, FCurrentPage, FPageSize) then
+  if Enabled and FStrategy.NextPageAfterItemIndexChanged(ANewItemIndex, FCurrentPage, FPageSize) then
     NextPage;
 end;
 
@@ -486,13 +526,13 @@ end;
 procedure TioCommonBSAPageManagerConcrete.Reset;
 begin
   FCurrentPage := CURRENT_PAGE_DEFAULT;
-  if IsEnabled then
+  if Enabled then
     FStrategy.MoveToPage(0, CURRENT_PAGE_DEFAULT, FPageSize, FNextPageStartOffset);
 end;
 
 procedure TioCommonBSAPageManagerConcrete.SetCurrentPage(const Value: Integer);
 begin
-  if IsEnabled and (Value <> FCurrentPage) and (Value > 0) and (Value < FPageCount) and
+  if Enabled and (Value <> FCurrentPage) and (Value > 0) and (Value < FPageCount) and
     FStrategy.MoveToPage(FCurrentPage, Value, FPageSize, FNextPageStartOffset) then
   begin
     FCurrentPage := Value;
