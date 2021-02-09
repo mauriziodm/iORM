@@ -7,7 +7,8 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, iORM.DB.Components.ConnectionDef,
   iORM.AbstractionLayer.Framework.FMX, FMX.StdCtrls, FMX.Edit, FMX.Controls.Presentation, System.Rtti, FMX.Grid.Style,
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource, FMX.ScrollBox, FMX.Grid, Data.Bind.GenData,
-  Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Grid;
+  Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Grid,
+  System.Actions, FMX.ActnList, Fmx.Bind.Navigator;
 
 type
   TMainForm = class(TForm)
@@ -26,6 +27,8 @@ type
     LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
     LabelPageCount: TLabel;
     TimerPageCount: TTimer;
+    ActionList1: TActionList;
+    LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);

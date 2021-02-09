@@ -41,7 +41,7 @@ uses
   System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
   System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
-  System.Rtti, System.SysUtils;
+  System.Rtti, System.SysUtils, iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -63,6 +63,7 @@ type
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
     FAutoPost: Boolean;
+    FPaging: TioCommonBSAPageManager;
     // Selectors
     FSelectorFor: TioModelPresenter;
     FOnReceiveSelectionAutoEdit: Boolean;
@@ -123,7 +124,7 @@ type
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Where
-    procedure SetWhere(const Value: IioWhere);
+    procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
     // WhereDetailsFromDetailAdapters
     procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
@@ -267,6 +268,8 @@ type
     property ioPropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
     property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
+    // Paging
+    property ioPaging: TioCommonBSAPageManager read FPaging write FPaging;
   end;
 
 implementation
@@ -372,6 +375,14 @@ begin
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
   InitAsDefaultOnCreate;
+  // Page manager
+  FPaging := TioCommonBSAPageManager.Create(
+    procedure
+    begin
+      if CheckAdapter then
+        BindSourceAdapter.LoadPage;
+    end
+  );
 end;
 
 function TioModelPresenter.Current: TObject;
@@ -411,6 +422,8 @@ begin
   // If the DetailPresenterContainer was created then destroy it
   if Assigned(FDetailPresentersContainer) then
     FDetailPresentersContainer.Free;
+  // Destroy paging object
+  FPaging.Free;
   inherited;
 end;
 
@@ -642,7 +655,7 @@ end;
 
 function TioModelPresenter.GetWhere: IioWhere;
 begin
-  // If the adapter exist the return the property of the adapter
+  // If the adapter exists the return the property of the adapter
   // else return the Self.FWhere
   if CheckAdapter then
   begin
@@ -652,7 +665,7 @@ begin
   // if not already assigned then create it (così lo crea solo se serve
   // davvero altrimenti no)
   if not Assigned(FWhere) then
-    FWhere := TioWhereFactory.NewWhere;
+    FWhere := TioWhereFactory.NewWhereWithPaging(FPaging);
   // Return the Where instance
   Result := FWhere;
 end;
@@ -791,7 +804,7 @@ end;
 
 procedure TioModelPresenter.Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
 begin
-  // Da implementare
+  FPaging.NotifyItemIndexChanged(ANewItemIndex);
 end;
 
 procedure TioModelPresenter.PersistAll;
@@ -1007,12 +1020,13 @@ begin
     Self.BindSourceAdapter.ioAutoPost := Value;
 end;
 
-procedure TioModelPresenter.SetWhere(const Value: IioWhere);
+procedure TioModelPresenter.SetWhere(const AWhere: IioWhere);
 begin
-  FWhere := Value;
+  AWhere.SetPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
+  FWhere := AWhere;
   // Update the adapter where in the BSAdapter if exist
   if CheckAdapter then
-    FBindSourceAdapter.ioWhere := Value;
+    FBindSourceAdapter.ioWhere := AWhere;
 end;
 
 procedure TioModelPresenter.SetWhereDetailsFromDetailAdapters

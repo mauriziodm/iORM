@@ -134,7 +134,7 @@ object MainForm: TMainForm
     FieldDefs = <>
     ScopeMappings = <>
     ioTypeName = 'TArticle'
-    ioAsync = False
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -149,5 +149,13 @@ object MainForm: TMainForm
     ioPaging.PageSize = 10
     Left = 256
     Top = 216
+  end
+  object ActionList1: TActionList
+    Left = 384
+    Top = 192
+    object LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior
+      Category = 'LiveBindings'
+      Text = 'Prior'
+    end
   end
 end
