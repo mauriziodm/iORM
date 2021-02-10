@@ -16,7 +16,6 @@ inherited VM: TVM
     ioPropagateEdit = False
     ioPropagatePost = False
     ioPropagatePersist = False
-    ioPaging.PageSize = 10
     ioPaging.PagingType = ptProgressiveAuto
     Left = 56
     Top = 32
