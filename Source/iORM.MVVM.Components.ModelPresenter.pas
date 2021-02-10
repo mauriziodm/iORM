@@ -358,9 +358,6 @@ begin
   FPropagateEdit := False;
   FPropagatePost := False;
   FPropagatePersist := False;
-  // Set even an onChange event handler
-  FWhereStr := TStringList.Create;
-  SetWhereStr(FWhereStr); // set TStringList.onChange event handler
   // Questà è una collezione dove eventuali ModelPresenters di dettaglio
   // si registrano per rendere nota la loro esistenza al Master. Sarà poi
   // usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -383,6 +380,9 @@ begin
         BindSourceAdapter.LoadPage;
     end
   );
+  // Set even an onChange event handler (always after the creation of the PageManager)
+  FWhereStr := TStringList.Create;
+  SetWhereStr(FWhereStr); // set TStringList.onChange event handler
 end;
 
 function TioModelPresenter.Current: TObject;

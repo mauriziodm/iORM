@@ -162,3 +162,6 @@ Samples/PhoneContacts_Interfaces_TwoConnections/Win32/
 Samples/SamplesData/DataSetTest_original.DB
 Samples/DataSet_MVVM/__recovery/
 Samples/PagingFmx/__history/
+Samples/Paging_MVVM/Common/__history/
+Samples/Paging_MVVM/VCL/__history/
+Samples/PagingFmx/__recovery/

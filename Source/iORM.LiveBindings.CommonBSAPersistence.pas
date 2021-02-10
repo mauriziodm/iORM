@@ -268,6 +268,8 @@ class procedure TioCommonBSAPersistence._RefreshNoReload(const AActiveBindSource
   const ANotify: Boolean);
 begin
   AActiveBindSourceAdapter.AsTBindSourceAdapter.Refresh;
+  // Also refresh any DataSets
+  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh(True); // Force
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   if ANotify then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
