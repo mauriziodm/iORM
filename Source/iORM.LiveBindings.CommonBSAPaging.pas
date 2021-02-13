@@ -73,6 +73,7 @@ type
     procedure SetPagingType(const Value: TioBSAPagingType);
   public
     constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
+    destructor Destroy; override;
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
     function RefreshWithReload: Boolean;
@@ -298,6 +299,17 @@ begin
   finally
     _Unlock;
   end;
+end;
+
+destructor TioCommonBSAPageManager.Destroy;
+begin
+  _Lock;
+  try
+    FConcretePageManager.Free;
+  finally
+    _Unlock;
+  end;
+  inherited;
 end;
 
 function TioCommonBSAPageManager.GetCurrentPage: Integer;

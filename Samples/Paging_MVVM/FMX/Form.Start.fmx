@@ -21,6 +21,8 @@ object StartForm: TStartForm
       388s
       534s
       388s
+      534s
+      388s
       534s)
     object TabItemGrid: TTabItem
       CustomIcon = <
@@ -33,6 +35,8 @@ object StartForm: TStartForm
       StyleLookup = ''
       TabOrder = 0
       Text = 'Grid'
+      ExplicitSize.cx = 43.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
     end
     object TabItemListView: TTabItem
       CustomIcon = <
@@ -45,6 +49,20 @@ object StartForm: TStartForm
       StyleLookup = ''
       TabOrder = 0
       Text = 'ListView'
+      ExplicitSize.cx = 64.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+    end
+    object TabItemListBox: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 58.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'ListBox'
     end
   end
   object ioFMX1: TioFMX

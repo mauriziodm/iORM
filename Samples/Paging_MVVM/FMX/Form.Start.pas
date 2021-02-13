@@ -14,6 +14,7 @@ type
     TabControl1: TTabControl;
     TabItemGrid: TTabItem;
     TabItemListView: TTabItem;
+    TabItemListBox: TTabItem;
     procedure FormShow(Sender: TObject);
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
       const AScript, AWarnings: TStrings);
@@ -38,8 +39,9 @@ var
   LViewModel: IioViewModel;
 begin
   LViewModel := io.CreateViewModelFor<TArticle>;
-//  io.CreateViewFor<TArticle>('DatasetGrid', LViewModel);
   io.CreateViewFor<TArticle>('BindSourceGrid', TabItemGrid, LViewModel);
+  io.CreateViewFor<TArticle>('BindSourceListView', TabItemListView, LViewModel);
+  io.CreateViewFor<TArticle>('BindSourceListBox', TabItemListBox, LViewModel);
 end;
 
 procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;

@@ -352,16 +352,16 @@ begin
   );
 end;
 
-procedure TioPrototypeBindSource.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
-begin
-  GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
-end;
-
 destructor TioPrototypeBindSource.Destroy;
 begin
   FioWhereStr.Free;
   FPaging.Free;
   inherited;
+end;
+
+procedure TioPrototypeBindSource.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
+begin
+  GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
 procedure TioPrototypeBindSource.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
