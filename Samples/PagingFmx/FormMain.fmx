@@ -134,7 +134,7 @@ object MainForm: TMainForm
     FieldDefs = <>
     ScopeMappings = <>
     ioTypeName = 'TArticle'
-    ioAsync = True
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
@@ -146,7 +146,6 @@ object MainForm: TMainForm
     ioPropagateEdit = False
     ioPropagatePost = False
     ioPropagatePersist = False
-    ioPaging.PagingType = ptHardPaging
     Left = 256
     Top = 216
   end

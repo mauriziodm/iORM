@@ -6,6 +6,7 @@ type
 
   TSampleData = class
   public
+    class procedure CheckSampleData;
     class procedure CreateSampleData(const AHowMany: Integer);
   end;
 
@@ -15,6 +16,15 @@ uses
   Model, iORM, System.SysUtils;
 
 { TSampleData }
+
+class procedure TSampleData.CheckSampleData;
+var
+  LHowManyExists: Integer;
+begin
+  LHowManyExists := io.RefTo<TArticle>.GetCount;
+  if LHowManyExists = 0 then
+    CreateSampleData(1000);
+end;
 
 class procedure TSampleData.CreateSampleData(const AHowMany: Integer);
 var

@@ -10,7 +10,7 @@ uses
 type
   TStartForm = class(TForm)
     ioVCL1: TioVCL;
-    ioSQLiteConnectionDef1: TioSQLiteConnectionDef;
+    SQLiteConn: TioSQLiteConnectionDef;
     PanelTop: TPanel;
     EditItemsToBeCreated: TLabeledEdit;
     ButtonCreateItems: TSpeedButton;

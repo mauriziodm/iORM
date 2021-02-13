@@ -69,7 +69,7 @@ object StartForm: TStartForm
     Left = 120
     Top = 64
   end
-  object ioSQLiteConnectionDef1: TioSQLiteConnectionDef
+  object SQLiteConn: TioSQLiteConnectionDef
     AutoCreateDB.Enabled = True
     Database = 'PagingArticles.db'
     DatabaseStdFolder = sfDocuments
