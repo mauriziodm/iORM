@@ -29,7 +29,7 @@ uses
 
 constructor TArticle.Create;
 begin
-//  Sleep(10);
+  Sleep(10);
 end;
 
 end.

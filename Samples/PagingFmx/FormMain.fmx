@@ -51,28 +51,7 @@ object MainForm: TMainForm
     Viewport.Width = 605.000000000000000000
     Viewport.Height = 368.000000000000000000
   end
-  object Button2: TButton
-    Position.X = 448.000000000000000000
-    Position.Y = 45.000000000000000000
-    Size.Width = 81.000000000000000000
-    Size.Height = 22.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 12
-    Text = 'Hard refresh'
-    OnClick = Button2Click
-  end
-  object Button5: TButton
-    Position.X = 536.000000000000000000
-    Position.Y = 45.000000000000000000
-    Size.Width = 81.000000000000000000
-    Size.Height = 22.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 11
-    Text = 'Soft refresh'
-    OnClick = Button5Click
-  end
   object SpeedButton1: TSpeedButton
-    StaysPressed = True
     Position.X = 540.000000000000000000
     Position.Y = 14.000000000000000000
     Size.Width = 69.000000000000000000
@@ -94,13 +73,31 @@ object MainForm: TMainForm
     Position.X = 192.000000000000000000
     Position.Y = 40.000000000000000000
     Text = 'LabelPageCount'
-    TabOrder = 18
+    TabOrder = 16
   end
   object TimerPageCount: TTimer
     Interval = 250
     OnTimer = TimerPageCountTimer
     Left = 352
     Top = 104
+  end
+  object SpeedButton3: TSpeedButton
+    Position.X = 452.000000000000000000
+    Position.Y = 46.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Hard refresh'
+    OnClick = SpeedButton3Click
+  end
+  object SpeedButton4: TSpeedButton
+    Position.X = 540.000000000000000000
+    Position.Y = 46.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Soft refresh'
+    OnClick = SpeedButton4Click
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -134,7 +131,7 @@ object MainForm: TMainForm
     FieldDefs = <>
     ScopeMappings = <>
     ioTypeName = 'TArticle'
-    ioAsync = False
+    ioAsync = True
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList

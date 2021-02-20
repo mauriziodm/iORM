@@ -17,8 +17,6 @@ type
     Label1: TLabel;
     Grid1: TGrid;
     BindingsList1: TBindingsList;
-    Button2: TButton;
-    Button5: TButton;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
     ioFMX1: TioFMX;
@@ -29,12 +27,14 @@ type
     TimerPageCount: TTimer;
     ActionList1: TActionList;
     LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
     procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure TimerPageCountTimer(Sender: TObject);
+    procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -56,16 +56,6 @@ begin
   TSampleData.CreateSampleData(Edit1.Text.ToInteger);
 end;
 
-procedure TMainForm.Button2Click(Sender: TObject);
-begin
-  PBSArticles.Refresh(True);
-end;
-
-procedure TMainForm.Button5Click(Sender: TObject);
-begin
-  PBSArticles.Refresh(False);
-end;
-
 procedure TMainForm.SpeedButton1Click(Sender: TObject);
 begin
   PBSArticles.ioPaging.NextPage;
@@ -74,6 +64,16 @@ end;
 procedure TMainForm.SpeedButton2Click(Sender: TObject);
 begin
   PBSArticles.ioPaging.PrevPage;
+end;
+
+procedure TMainForm.SpeedButton3Click(Sender: TObject);
+begin
+  PBSArticles.Refresh(True);
+end;
+
+procedure TMainForm.SpeedButton4Click(Sender: TObject);
+begin
+  PBSArticles.Refresh(False);
 end;
 
 procedure TMainForm.TimerPageCountTimer(Sender: TObject);

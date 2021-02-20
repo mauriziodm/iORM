@@ -236,7 +236,7 @@ begin
   // Extract the paging obj from the where obj
   LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
   // Load next page
-  if LPagingObj.RefreshWithReload then
+  if LPagingObj.IsProgressive then
   begin
     // If the pagination is progressive then it loads the next page and adds it to the
     //  internal list of the BSA and then does a Refresh(False)
@@ -279,6 +279,7 @@ end;
 class procedure TioCommonBSAPersistence._RefreshReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
   const ANotify: Boolean);
 var
+  LPagingObj: TioCommonBSAPageManager;
   LTargetClass: TioClassRef;
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
@@ -290,6 +291,9 @@ begin
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
   // Set the OnTerminate method
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetRefreshTerminateMethod(AActiveBindSourceAdapter, ANotify);
+  // Extract the paging obj from the where obj and prepare it for an HardRefresh
+  LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
+  LPagingObj.PrepareForRefresh;
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingle:

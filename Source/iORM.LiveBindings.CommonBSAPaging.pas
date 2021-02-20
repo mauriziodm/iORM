@@ -76,10 +76,11 @@ type
     destructor Destroy; override;
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function RefreshWithReload: Boolean;
+    function IsProgressive: Boolean;
     procedure NotifyItemIndexChanged(const ANewItemIndex: Integer);
     procedure NextPage;
     procedure PrevPage;
+    procedure PrepareForRefresh;
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
     property Enabled: Boolean read GetEnabled;
@@ -114,10 +115,11 @@ type
     constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function RefreshWithReload: Boolean;
+    function IsProgressive: Boolean;
     procedure NotifyItemIndexChanged(const ANewItemIndex: Integer);
     procedure NextPage;
     procedure PrevPage;
+    procedure PrepareForRefresh;
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
     property Enabled: Boolean read GetEnabled;
@@ -138,25 +140,28 @@ type
     procedure SetSqlLimit(const AValue: Integer);
     procedure SetSqlLimitOffset(const AValue: Integer);
   public
-    function RefreshWithReload: Boolean; virtual; abstract;
+    function IsProgressive: Boolean; virtual; abstract;
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; virtual; abstract;
     function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; virtual; abstract;
+    procedure PrepareForRefresh; virtual; abstract;
   end;
 
   TioCommonBSAPageManagerStrategy_HardPaging = class(TioCommonBSAPageManagerStrategy)
   public
-    function RefreshWithReload: Boolean; override;
+    function IsProgressive: Boolean; override;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; override;
     function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; override;
+    procedure PrepareForRefresh; override;
   end;
 
   TioCommonBSAPageManagerStrategy_ProgressiveManual = class(TioCommonBSAPageManagerStrategy)
   public
-    function RefreshWithReload: Boolean; override;
+    function IsProgressive: Boolean; override;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean; override;
     function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean; override;
+    procedure PrepareForRefresh; override;
   end;
 
   TioCommonBSAPageManagerStrategy_ProgressiveAuto = class(TioCommonBSAPageManagerStrategy_ProgressiveManual)
@@ -211,11 +216,11 @@ begin
   TMonitor.Enter(Self);
 end;
 
-function TioCommonBSAPageManager.RefreshWithReload: Boolean;
+function TioCommonBSAPageManager.IsProgressive: Boolean;
 begin
   _Lock;
   try
-    Result := FConcretePageManager.RefreshWithReload;
+    Result := FConcretePageManager.IsProgressive;
   finally
     _Unlock;
   end;
@@ -256,6 +261,16 @@ begin
   _Lock;
   try
     FConcretePageManager.NotifyItemIndexChanged(ANewItemIndex);
+  finally
+    _Unlock;
+  end;
+end;
+
+procedure TioCommonBSAPageManager.PrepareForRefresh;
+begin
+  _Lock;
+  try
+    FConcretePageManager.PrepareForRefresh;
   finally
     _Unlock;
   end;
@@ -417,7 +432,12 @@ begin
   Result := False;
 end;
 
-function TioCommonBSAPageManagerStrategy_HardPaging.RefreshWithReload: Boolean;
+procedure TioCommonBSAPageManagerStrategy_HardPaging.PrepareForRefresh;
+begin
+  // Nothing to do
+end;
+
+function TioCommonBSAPageManagerStrategy_HardPaging.IsProgressive: Boolean;
 begin
   Result := False;
 end;
@@ -438,7 +458,13 @@ begin
   Result := False;
 end;
 
-function TioCommonBSAPageManagerStrategy_ProgressiveManual.RefreshWithReload: Boolean;
+procedure TioCommonBSAPageManagerStrategy_ProgressiveManual.PrepareForRefresh;
+begin
+  SetSqlLimit(GetSqlLimit + GetSqlLimitOffset);
+  SetSqlLimitOffset(0);
+end;
+
+function TioCommonBSAPageManagerStrategy_ProgressiveManual.IsProgressive: Boolean;
 begin
   Result := True;
 end;
@@ -525,14 +551,20 @@ begin
     NextPage;
 end;
 
+procedure TioCommonBSAPageManagerConcrete.PrepareForRefresh;
+begin
+  if Enabled then
+    FStrategy.PrepareForRefresh;
+end;
+
 procedure TioCommonBSAPageManagerConcrete.PrevPage;
 begin
   SetCurrentPage(FCurrentPage - 1);
 end;
 
-function TioCommonBSAPageManagerConcrete.RefreshWithReload: Boolean;
+function TioCommonBSAPageManagerConcrete.IsProgressive: Boolean;
 begin
-  Result := Assigned(FStrategy) and FStrategy.RefreshWithReload;
+  Result := Assigned(FStrategy) and FStrategy.IsProgressive;
 end;
 
 procedure TioCommonBSAPageManagerConcrete.Reset;

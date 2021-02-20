@@ -277,9 +277,10 @@ type
     ['{65896A9F-5B1A-407B-AB2E-C486D7B19ABF}']
     function GetSqlLimit: Integer;
     function GetSqlLimitOffset: Integer;
-    function RefreshWithReload: Boolean;
+    function IsProgressive: Boolean;
     function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
     function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean;
+    procedure PrepareForRefresh;
   end;
 
 implementation
