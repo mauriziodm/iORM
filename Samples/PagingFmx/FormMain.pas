@@ -29,6 +29,9 @@ type
     LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
+    ActionList2: TActionList;
+    Action1: TAction;
+    LiveBindingsBindNavigateNext1: TFMXBindNavigateNext;
     procedure Button1Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);

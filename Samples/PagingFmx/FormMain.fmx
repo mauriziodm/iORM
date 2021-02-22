@@ -156,4 +156,15 @@ object MainForm: TMainForm
       Text = 'Prior'
     end
   end
+  object ActionList2: TActionList
+    Left = 448
+    Top = 312
+    object Action1: TAction
+      Text = 'Action1'
+    end
+    object LiveBindingsBindNavigateNext1: TFMXBindNavigateNext
+      Category = 'LiveBindings'
+      Text = 'Next'
+    end
+  end
 end
