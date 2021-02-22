@@ -308,10 +308,20 @@ end;
 
 function TioPrototypeBindSource.CheckActiveAdapter: Boolean;
 begin
+  // ------------- prima era così -------------
   // Result := (not (csDesigning in ComponentState))
   // and CheckAdapter
   // and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
-  Result := CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  // ------------- prima era così -------------
+
+  // ------------- poi era così ma avevo un problema a design time -------------
+//  Result := (not (csDesigning in ComponentState)) and CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  // ------------- poi era così ma avevo un problema a design time -------------
+
+
+  // ------------- ora 22/02/2021 provo a rimetterlo come era per vedere se risolvo -------------
+  Result := (not (csDesigning in ComponentState)) and CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  // ------------- ora 22/02/2021 provo a rimetterlo come era per vedere se risolvo -------------
 end;
 
 procedure TioPrototypeBindSource.ClearDataObject;
