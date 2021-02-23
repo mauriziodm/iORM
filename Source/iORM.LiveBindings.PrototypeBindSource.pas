@@ -313,20 +313,13 @@ begin
   // and CheckAdapter
   // and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
   // ------------- prima era così -------------
-
-  // ------------- poi era così ma avevo un problema a design time -------------
-//  Result := (not (csDesigning in ComponentState)) and CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
-  // ------------- poi era così ma avevo un problema a design time -------------
-
-
-  // ------------- ora 22/02/2021 provo a rimetterlo come era per vedere se risolvo -------------
-  Result := (not (csDesigning in ComponentState)) and CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
-  // ------------- ora 22/02/2021 provo a rimetterlo come era per vedere se risolvo -------------
+  Result := CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
 end;
 
 procedure TioPrototypeBindSource.ClearDataObject;
 begin
-  Self.GetActiveBindSourceAdapter.ClearDataObject;
+  if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.ClearDataObject;
 end;
 
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
@@ -356,7 +349,7 @@ begin
   FPaging := TioCommonBSAPageManager.Create(
     procedure
     begin
-      if CheckAdapter then
+      if CheckActiveAdapter then
         GetActiveBindSourceAdapter.LoadPage;
     end
   );
@@ -371,7 +364,8 @@ end;
 
 procedure TioPrototypeBindSource.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
-  GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
+  if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
 procedure TioPrototypeBindSource.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -516,7 +510,7 @@ end;
 function TioPrototypeBindSource.CurrentMasterObject: TObject;
 begin
   if CheckAdapter and IsDetail then
-    Result := Self.GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
+    Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
 end;
@@ -532,7 +526,8 @@ end;
 function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := nil;
-  Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result);
+  if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
+    raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter', Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSource.GetAutoPost: Boolean;
@@ -553,7 +548,8 @@ end;
 
 function TioPrototypeBindSource.DataObject: TObject;
 begin
-  Result := Self.GetActiveBindSourceAdapter.DataObject;
+  if CheckActiveAdapter then
+    Result := GetActiveBindSourceAdapter.DataObject;
 end;
 
 function TioPrototypeBindSource.DataObjectAs<T>: T;
@@ -567,7 +563,7 @@ end;
 function TioPrototypeBindSource.DataObjectAssigned: Boolean;
 begin
   if CheckActiveAdapter then
-    Result := Assigned(Self.GetActiveBindSourceAdapter.DataObject)
+    Result := Assigned(GetActiveBindSourceAdapter.DataObject)
   else
     Result := False;
 end;
@@ -633,7 +629,7 @@ end;
 
 function TioPrototypeBindSource.GetIsInterfacePresenting: Boolean;
 begin
-  if CheckAdapter then
+  if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.IsInterfaceBSA
   else
     Result := TioUtilities.IsAnInterfaceTypeName(ioTypeName);
@@ -825,7 +821,7 @@ begin
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
   // assegnato (se prima avevo chiamato il  ClearDataObject
   // if CheckActiveAdapter then
-  Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+  GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
   // else
   // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
@@ -837,7 +833,7 @@ begin
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
   // assegnato (se prima avevo chiamato il  ClearDataObject
   // if CheckActiveAdapter then
-  Self.GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+  GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
   // else
   // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
