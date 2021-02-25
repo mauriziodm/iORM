@@ -46,8 +46,8 @@ type
   TioBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
   private
     class var FIndexOffset: Integer;
+    procedure GetIndexOffset;
   public
-    class constructor Create; // Executed automatically at program start
     procedure SetIndex(const Value: Integer);
   end;
 
@@ -353,7 +353,7 @@ end;
 
 { TBindSourceAdapterFieldHelper }
 
-class constructor TioBindSourceAdapterFieldHelper.Create;
+procedure TioBindSourceAdapterFieldHelper.GetIndexOffset;
 var
   Ctx: TRTTIContext;
 begin
@@ -363,8 +363,11 @@ end;
 
 procedure TioBindSourceAdapterFieldHelper.SetIndex(const Value: Integer);
 begin
+  if FIndexOffset = 0 then
+    GetIndexOffset;
   // Use the offset obtained above to access the value of the private field "FIndex"
-  PInteger(Pointer(NativeInt(Self) + FIndexOffset))^ := Value;
+  if FIndexOffset <> 0 then
+    PInteger(Pointer(NativeInt(Self) + FIndexOffset))^ := Value;
 end;
 
 { TBindSourceAdapterGetChildMemberObject }
