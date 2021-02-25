@@ -224,7 +224,7 @@ var
           Exit(ioMdDateTime)
         else if AQualifiedName = 'System.TTime' then
           Exit(ioMdTime)
-        else if AQualifiedName = 'System.Real' then // Luca Mandello 22/02/2021: altrimenti iORM con SQLite converte i float in numeric
+        else if (AQualifiedName = 'System.Real') or (AQualifiedName = 'System.Double') or (AQualifiedName = 'System.Single') or (AQualifiedName = 'System.Currency') then // Luca Mandello 22/02/2021: altrimenti iORM con SQLite converte i float in numeric
           Exit(ioMdFloat) // Luca Mandello 22/02/2021: altrimenti iORM con SQLite converte i float in numeric
         else
           Exit(ioMdDecimal);
