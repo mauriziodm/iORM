@@ -46,7 +46,7 @@ type
   TioBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
   private
     class var FIndexOffset: Integer;
-    procedure GetIndexOffset;
+    function TryGetIndexOffset: Boolean;
   public
     procedure SetIndex(const Value: Integer);
   end;
@@ -353,20 +353,30 @@ end;
 
 { TBindSourceAdapterFieldHelper }
 
-procedure TioBindSourceAdapterFieldHelper.GetIndexOffset;
-var
-  Ctx: TRTTIContext;
+function TioBindSourceAdapterFieldHelper.TryGetIndexOffset: Boolean;
+  function _TryGetIndexOffsetByRtti: Boolean;
+  var
+    LRttiContext: TRTTIContext;
+    LRttiType: TRttiType;
+  begin
+    LRttiType := LRttiContext.GetType(TBindSourceAdapterField);
+    if LRttiType <> nil then
+    begin
+      // Obtain the offset of the private field "FIndex"
+      FIndexOffset := LRttiType.GetField('FIndex').Offset;
+      Result := True;
+    end
+    else
+      Result := False;
+  end;
 begin
-  // Obtain the offset of the private field "FIndex"
-  FIndexOffset := Ctx.GetType(TBindSourceAdapterField).GetField('FIndex').Offset;
+  Result := (FIndexOffset > 0) or _TryGetIndexOffsetByRtti;
 end;
 
 procedure TioBindSourceAdapterFieldHelper.SetIndex(const Value: Integer);
 begin
-  if FIndexOffset = 0 then
-    GetIndexOffset;
   // Use the offset obtained above to access the value of the private field "FIndex"
-  if FIndexOffset <> 0 then
+  if TryGetIndexOffset then
     PInteger(Pointer(NativeInt(Self) + FIndexOffset))^ := Value;
 end;
 

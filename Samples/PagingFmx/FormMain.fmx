@@ -131,7 +131,7 @@ object MainForm: TMainForm
     FieldDefs = <>
     ScopeMappings = <>
     ioTypeName = 'TArticle'
-    ioAsync = True
+    ioAsync = False
     ioAutoLoadData = True
     ioAutoPersist = True
     ioViewDataType = dtList
