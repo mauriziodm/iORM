@@ -404,7 +404,8 @@ begin
   // DataSet synchro
   GetDataSetLinkContainer.SetRecNo(ItemIndex);
   // Paging notification
-  FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
+  if Assigned(FBindSource) then
+    FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);

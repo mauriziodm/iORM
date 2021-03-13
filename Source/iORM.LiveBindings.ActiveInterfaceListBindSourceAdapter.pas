@@ -351,7 +351,8 @@ begin
   // DataSet synchro
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
   // Paging notification
-  FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
+  if Assigned(FBindSource) then
+    FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
