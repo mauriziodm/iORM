@@ -1,0 +1,70 @@
+[MacroList]
+
+[Params]
+AsciiFile=C:\WinProject\LevanteDev\Download\AnagArt.txt
+AsciiDecimalSeparat=,
+DBDecimalSeparat=.
+AsciiThousandsSeparat=.
+DBThousandsSeparat=
+AsciiDateFormat=AMG
+DBDateFormat=MGA
+AsciiDateSeparat=
+DBDateSeparat=/
+Separator=59
+FixedWidth=0
+Destination=ARTICOLI
+NotifyCount=37
+SQLSection1=SQL_Articoli_Default_ScontoAcquisto_1
+SQLSection2=NONE
+ExceptionProtected_SQLSection1=SQL_Articoli_Default_ScontoAcquisto_2
+ExceptionProtected_SQLSection2=SQL_Articoli_Default_ScontoAcquisto_3
+ExceptionProtected_SQLSection3=NONE
+
+[AsciiFieldList]
+A_CodiceArticolo=FieldType:STRING;	FieldLength:25;
+A_Descrizione=FieldType:STRING;	FieldLength:1000;
+A_CodiceArticoloForn=FieldType:STRING;	FieldLength:25;
+A_UM=FieldType:STRING;	FieldLength:2;
+A_CodiceAnagForn=FieldType:STRING;	FieldLength:25;
+A_RagSocForn=FieldType:STRING;	FieldLength:20;
+A_Settore=FieldType:STRING;	FieldLength:20;
+A_Gruppo=FieldType:STRING;	FieldLength:20;
+A_MacroFamiglia=FieldType:STRING;	FieldLength:20;
+A_Famiglia=FieldType:STRING;	FieldLength:20;
+A_SubFamiglia=FieldType:STRING;	FieldLength:20;
+A_Prezzo=FieldType:NUMBER;
+A_Sconto1=FieldType:NUMBER;
+A_Sconto2=FieldType:NUMBER;
+A_Sconto3=FieldType:NUMBER;
+A_Sconto4=FieldType:NUMBER;
+A_PrezzoNetto=FieldType:NUMBER;
+
+[DbFieldList]
+CODICEARTICOLO=Value:<A_CodiceArticolo>;		IsKeyField:YES;
+DESCRIZIONE=Value:<A_Descrizione>;
+MARCA=Value:<A_RagSocForn>;
+UNITADIMISURA=Value:<A_UM>;
+CODICEIVA=Value:1;
+ABILITAMOVMAG=Value:'T';
+SINCHRO=Value:'U';
+JOLLY10=Value:'CIICAI_BO';
+CODICEFORNITORE=Value:<A_CodiceArticoloForn>;
+FLAGAPPENAIMPORTATO=Value:'A';
+PREZZODILISTINO=Value:<A_Prezzo>;
+PREZZODILISTINOIVACOMP=Value:<A_Prezzo> * (((SELECT ALIQUOTAIVA FROM ALIQIVA WHERE CODICEIVA = 1) / 100) + 1);
+SCONTODIACQUISTO=Value:0;
+SCONTODIACQUISTO2=Value:0;
+SCONTODIACQUISTO3=Value:0;
+
+[SQL_Articoli_Default_ScontoAcquisto_1]
+01=UPDATE ARTICOLI SET SCONTODIACQUISTO=(SELECT FIRST 1 SCONTOBASEACQ FROM PROGRESS)
+02=WHERE JOLLY10='CIICAI_BO' AND FLAGAPPENAIMPORTATO = 'A' AND (SCONTODIACQUISTO IS NULL OR SCONTODIACQUISTO=0)
+
+[SQL_Articoli_Default_ScontoAcquisto_2]
+01=UPDATE ARTICOLI SET SCONTODIACQUISTO2=(SELECT FIRST 1 SCONTOBASEACQ2 FROM PROGRESS)
+02=WHERE JOLLY10='CIICAI_BO' AND FLAGAPPENAIMPORTATO = 'A' AND (SCONTODIACQUISTO2 IS NULL OR SCONTODIACQUISTO2=0)
+
+[SQL_Articoli_Default_ScontoAcquisto_3]
+01=UPDATE ARTICOLI SET SCONTODIACQUISTO3=(SELECT FIRST 1 SCONTOBASEACQ3 FROM PROGRESS)
+02=WHERE JOLLY10='CIICAI_BO' AND FLAGAPPENAIMPORTATO = 'A' AND (SCONTODIACQUISTO3 IS NULL OR SCONTODIACQUISTO3=0)
+

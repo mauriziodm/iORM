@@ -1,0 +1,3028 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{A12E7864-CC30-4D3C-9E81-9BDC417C2A34}</ProjectGuid>
+        <MainSource>levante.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <ProjectVersion>19.2</ProjectVersion>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Warnings>false</DCC_Warnings>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+        <DCC_UNSAFE_CAST>true</DCC_UNSAFE_CAST>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;Bde;System.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_WriteableConstants>true</DCC_WriteableConstants>
+        <DCC_UNSAFE_CODE>true</DCC_UNSAFE_CODE>
+        <DCC_UNSAFE_TYPE>true</DCC_UNSAFE_TYPE>
+        <DCC_UsePackage>Vcl50;Vclx50;VclSmp50;Qrpt50;Vcldb50;Vclbde50;ibevnt50;vcldbx50;TeeUI50;TeeDB50;Tee50;TeeQR50;VCLIB50;vclie50;Inetdb50;Inet50;NMFast50;dclocx50;dclaxserver50;PLABEL50;RxCtl5;RxDB5;RxBDE5;ZCommon5;ZDbware5;ZMySql5;ZPgSql5;ZIbSql5;magras50;A401_R50;TNetMeet;voipdelphi5;rtl;dbrtl;vcldb;cxLibraryVCLD7;dxThemeD7;cxEditorsVCLD7;cxDataD7;cxGridVCLD7;dxPSCoreD7;dxPScxCommonD7;dxPScxGridLnkD7;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_K>false</DCC_K>
+        <DCC_F>false</DCC_F>
+        <DCC_S>false</DCC_S>
+        <DCC_N>true</DCC_N>
+        <DCC_E>false</DCC_E>
+        <DebugSourcePath>C:\ComponentiDelphi\Delphi5\IBO_Objects\IBO IB Objects v4.2.Hi\;C:\ComponentiDelphi\Delphi5\jbmppanel\;C:\Programmi\Borland\Delphi7\quickrpt\;$(DebugSourcePath)</DebugSourcePath>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1040</VerInfo_Locale>
+        <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+        <SanitizedProjectName>levante</SanitizedProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <Icon_MainIcon>levante_Icon.ico</Icon_MainIcon>
+        <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <Icon_MainIcon>levante_Icon.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Manifest_File>None</Manifest_File>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <BT_BuildType>Debug</BT_BuildType>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="main.pas">
+            <Form>mainForm</Form>
+        </DCCReference>
+        <DCCReference Include="DataModule1.pas">
+            <Form>DM1</Form>
+            <DesignClass>TDataModule1</DesignClass>
+        </DCCReference>
+        <DCCReference Include="SchedaArticoli1.pas">
+            <Form>ArticoliForm</Form>
+        </DCCReference>
+        <DCCReference Include="SchedaClienti.pas">
+            <Form>ClientiForm</Form>
+        </DCCReference>
+        <DCCReference Include="SchedaProgressivi.pas">
+            <Form>ProgressiviForm</Form>
+        </DCCReference>
+        <DCCReference Include="SchedaPreventiviOrdini.pas">
+            <Form>PreventiviOrdiniForm</Form>
+        </DCCReference>
+        <DCCReference Include="PreventiviOrdiniReport.pas">
+            <Form>QReportPreventiviOrdini</Form>
+        </DCCReference>
+        <DCCReference Include="SchedaIntestazioneDocumenti.pas">
+            <Form>IntestazioneDocumentiForm</Form>
+        </DCCReference>
+        <DCCReference Include="SchedaDatiAzienda.pas">
+            <Form>DatiAziendaForm</Form>
+        </DCCReference>
+        <DCCReference Include="SchedaTesti.pas">
+            <Form>TestiForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRTesti.pas">
+            <Form>TestiQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormScadenziario.pas">
+            <Form>ScadenzeForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPagamenti.pas">
+            <Form>PagamentiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormBanche.pas">
+            <Form>BancheForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormContatti.pas">
+            <Form>ContattiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormExtPrg.pas">
+            <Form>ExtPrgForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormExtFile.pas">
+            <Form>ExtFileForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAnagCli.pas">
+            <Form>AnagCliForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAnagArt.pas">
+            <Form>AnagArtForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormNetDir.pas">
+            <Form>NetDirForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAziende.pas">
+            <Form>AziendeForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSplash.pas">
+            <Form>SplashForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormConformita.pas">
+            <Form>ConformitaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAbout.pas">
+            <Form>AboutForm</Form>
+        </DCCReference>
+        <DCCReference Include="Smartkey.pas"/>
+        <DCCReference Include="FormSelezioneStato.pas">
+            <Form>SelezioneStatoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormStatiOggetti.pas">
+            <Form>StatiOggettiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSelezioneCliente.pas">
+            <Form>SelezioneClienteForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAliquoteIVA.pas">
+            <Form>AliquoteIVAForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRRicevuteFiscali.pas">
+            <Form>QReportRicevuteFiscali</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRSchedaCliente.pas">
+            <Form>SchedaClienteQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormCategoria1.pas">
+            <Form>Categoria1Form</Form>
+        </DCCReference>
+        <DCCReference Include="QRBusta.pas">
+            <Form>BustaQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRCartIn.pas">
+            <Form>CartaIntestataQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormWait.pas">
+            <Form>WaitForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormImportazione.pas">
+            <Form>ImportazioneForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPrimanota.pas">
+            <Form>PrimanotaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSecurity.pas">
+            <Form>SecurityForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormBackup.pas">
+            <Form>BackupForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSettaStampante.pas">
+            <Form>SettaStampanteForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormHelp.pas">
+            <Form>HelpForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSubSogg.pas">
+            <Form>SubSoggForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRElencoMateriale.pas">
+            <Form>ElencoMaterialeQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRAutodichiarazione.pas">
+            <Form>AutodichiarazioneQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRDichiarazioneGas.pas">
+            <Form>DichiarazioneGasQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRRichiestaPrimaAccensione.pas">
+            <Form>RichiestaPrimaAccensioneQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormCausali.pas">
+            <Form>CausaliForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAnagMaga.pas">
+            <Form>AnagMagaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormGruppi.pas">
+            <Form>GruppiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormFattDifferita.pas">
+            <Form>FattDifferitaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormCondVend.pas">
+            <Form>CondVendForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSynchro.pas">
+            <Form>SynchroForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormArchivioBanche.pas">
+            <Form>ArchivioBancheForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormHints.pas">
+            <Form>HintsForm</Form>
+        </DCCReference>
+        <DCCReference Include="ThreadLev.pas"/>
+        <DCCReference Include="FormHint.pas">
+            <Form>HintForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPagamRisc.pas">
+            <Form>PagamRiscForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPratica.pas">
+            <Form>PraticaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FrameStart.pas">
+            <Form>StartFrame</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormMessage.pas">
+            <Form>MessageForm</Form>
+        </DCCReference>
+        <DCCReference Include="UnitRistruttura.pas"/>
+        <DCCReference Include="FormMultiregistro.pas">
+            <Form>MultiregistroForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSostArt.pas">
+            <Form>SostArtForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormRiattivazione.pas">
+            <Form>RiattivazioneForm</Form>
+        </DCCReference>
+        <DCCReference Include="XMLDocumento.pas"/>
+        <DCCReference Include="UnitSaveXMLDocument.pas"/>
+        <DCCReference Include="FormScambioDoc.pas">
+            <Form>ScambioDocForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormCheckIn.pas">
+            <Form>ChekInForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRAppuntamento.pas">
+            <Form>AppuntamentoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRAllegatoH.pas">
+            <Form>AllegatoHQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRRetroAllegatoH.pas">
+            <Form>RetroAllegatoHQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormTecnici.pas">
+            <Form>TecniciForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPhotoArt.pas">
+            <Form>PhotoArtForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRListino.pas">
+            <Form>ListinoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormLevante.pas">
+            <Form>LevanteForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormLevanteListAnag.pas">
+            <Form>LevanteListAnagForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormApparecchi.pas">
+            <Form>ApparecchiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormLeftSide.pas">
+            <Form>LeftSideForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelBase.pas">
+            <Form>ModelBaseForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelAnagrafica.pas">
+            <Form>ModelAnagraficaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelLista.pas">
+            <Form>ModelListaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelAnagraficaLista.pas">
+            <Form>ModelAnagraficaListaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelPannelliWizard.pas">
+            <Form>ModelPannelliWizardForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAumentoListini.pas">
+            <Form>AumentoListiniForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPuzzleTools.pas">
+            <Form>PuzzleToolsForm</Form>
+        </DCCReference>
+        <DCCReference Include="Bancolini_B31WIN32.pas"/>
+        <DCCReference Include="FormListaModelliConf.pas">
+            <Form>ListaModelliConfForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelWizard.pas">
+            <Form>ModelWizardForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormConformWizard.pas">
+            <Form>ConformWizardForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormImportaArcBase.pas">
+            <Form>ImportaArcBaseForm</Form>
+        </DCCReference>
+        <DCCReference Include="ARAll4690S2QB.pas">
+            <Form>All4690S2QBQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRAll4690Pag3.pas">
+            <Form>All4690Pag3QR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRAll4690Pag1.pas">
+            <Form>All4690Pag1QR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormSocGas.pas">
+            <Form>SocGasForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormStampaDichiarazione.pas">
+            <Form>StampaDichiarazioneForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModificaMargini.pas">
+            <Form>ModificaMarginiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormQtaArticolo.pas">
+            <Form>QtaArticoloForm</Form>
+        </DCCReference>
+        <DCCReference Include="UnitCambiaDefaultPrinter.pas"/>
+        <DCCReference Include="unExportRiba.pas">
+            <Form>FormExportRIBA</Form>
+        </DCCReference>
+        <DCCReference Include="UnitSystemDirs.pas"/>
+        <DCCReference Include="FormPuzzleToolsGas.pas">
+            <Form>PuzzleToolsGasForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPuzzleToolsTermo.pas">
+            <Form>PuzzleToolsTermoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPuzzleToolsIdro.pas">
+            <Form>PuzzleToolsIdroForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRGasDisegno.pas">
+            <Form>GasDisegnoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRRelazioneTopologicaGas.pas">
+            <Form>RelazioneTopologicaGasQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRRelazioneTopologicaTermo.pas">
+            <Form>RelazioneTopologicaTermoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRRelazioneTopologicaIdro.pas">
+            <Form>RelazioneTopologicaIdroQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormDipendenti.pas">
+            <Form>DipendentiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAutomezzi.pas">
+            <Form>AutomezziForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTipiOreDipendenti.pas">
+            <Form>TipiOreDipendentiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTipiAltreSpese.pas">
+            <Form>TipiAltreSpeseForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormRappGiorn.pas">
+            <Form>RappGiornForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelPivotDetail.pas">
+            <Form>ModelPivotDetailForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormGosOrePivotDetail.pas">
+            <Form>GosOrePivotDetailForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormGosSpesePivot.pas">
+            <Form>GosSpesePivotForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormStampeCantieri.pas">
+            <Form>StampeCantieriForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRNoteDichiarazioneConformita.pas">
+            <Form>NoteDichiarazioneConformitaQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRElencoMateriale_DM37.pas">
+            <Form>ElencoMaterialeQR_DM37</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRUltimiInterventiImpianto.pas">
+            <Form>UltimiInterventiImpiantoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormChiusuraMagazzino.pas">
+            <Form>ChiusuraMagazzinoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormDatiRigo.pas">
+            <Form>DatiRigoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormQtaOpera.pas">
+            <Form>QtaOperaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormBeforeNewDoc.pas">
+            <Form>BeforeNewDocForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSelezionaImpianto.pas">
+            <Form>SelezionaImpiantoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSelezionaPraticheImpianti.pas">
+            <Form>SelezionaPraticheImpiantiForm</Form>
+        </DCCReference>
+        <DCCReference Include="ExtTerm_Zebex_Z2031.pas"/>
+        <DCCReference Include="FormVendBancoSeleCant.pas">
+            <Form>VendBancoSeleCantForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormConfermaDocExpressMag.pas">
+            <Form>ConfermaDocExpressMagForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormPassword.pas">
+            <Form>PasswordForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAgenti.pas">
+            <Form>AgentiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTipiRighi.pas">
+            <Form>TipiRighiForm</Form>
+        </DCCReference>
+        <DCCReference Include="UnitFileRepository.pas"/>
+        <DCCReference Include="FormRepository.pas">
+            <Form>RepositoryForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelPerTabPageControlPrincipale.pas">
+            <Form>ModelPerTabPageControlPrincipaleForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTabPartitario.pas">
+            <Form>TabPartitarioForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTabGC.pas">
+            <Form>TabGCForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRIndiceCategorie.pas">
+            <Form>IndiceCategorieQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRIndiceAlfabetico.pas">
+            <Form>IndiceAlfabeticoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRIndiceFornitori.pas">
+            <Form>IndiceFornitoriQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRListinoNoBarCode.pas">
+            <Form>ListinoNoBarCodeQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormGC_CreaFattura.pas">
+            <Form>GC_CreaFatturaForm</Form>
+        </DCCReference>
+        <DCCReference Include="UnitRepositoryIniFile.pas"/>
+        <DCCReference Include="FormTabResOrd.pas">
+            <Form>TagResOrdForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormQtaArticoloGC.pas">
+            <Form>QtaArticoloGCForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormExport.pas">
+            <Form>ExportForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormVariazioneOre.pas">
+            <Form>VariazioneOreForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormOperazioniPianificate.pas">
+            <Form>OperazioniPianificateForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormForzaGiacenzeMagazzino.pas">
+            <Form>ForzaGiacenzeMagazzinoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAzzeramentoMagazzino.pas">
+            <Form>AzzeramentoMagazzinoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAllegati.pas">
+            <Form>AllegatiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormFileAllegatoModificato.pas">
+            <Form>FileAllegatoModificatoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormModelBaseAllegati.pas">
+            <Form>ModelBaseAllegatiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAllegatiAlarm.pas">
+            <Form>AllegatiAlarmForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAggiornaOp.pas">
+            <Form>AggiornaOpForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAllegatiFG.pas">
+            <Form>AllegatiFGForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormConfermaAppuntamento.pas">
+            <Form>ConfermaAppuntamentoForm</Form>
+        </DCCReference>
+        <DCCReference Include="DataModuleStyles.pas">
+            <Form>DMStyles</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormGMap.pas">
+            <Form>GmapForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRAllegatoGVanz.pas">
+            <Form>AllegatoGVanzQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRModelAllegatiVanzo.pas">
+            <Form>ModelAllegatiVanzoQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRAllegatoFVanz.pas">
+            <Form>AllegatoFVanzQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="DataModule2.pas">
+            <Form>DM2</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormConfermaPrescrizFatta.pas">
+            <Form>ConfermaPrescrizFattaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTabImpianti.pas">
+            <Form>TabImpiantiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormSelezioneStradario.pas">
+            <Form>SelezioneStradarioForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormLevanteFilterListAnag.pas">
+            <Form>LevanteFilterListAnagForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormEnti.pas">
+            <Form>EntiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormExportAllegatiManut.pas">
+            <Form>ExportAllegatiManutForm</Form>
+        </DCCReference>
+        <DCCReference Include="ModelFormBandListFilterAnag.pas">
+            <Form>BandListFilterAnagFormModel</Form>
+        </DCCReference>
+        <DCCReference Include="FormComunicazione.pas">
+            <Form>ComunicazioneForm</Form>
+        </DCCReference>
+        <DCCReference Include="QRLettera.pas">
+            <Form>LetteraQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormTabComunicazioni.pas">
+            <Form>TabComunicazioniForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormTedoldi.pas">
+            <Form>TedoldiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormComModelli.pas">
+            <Form>ComModelliForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormComSegnaposto.pas">
+            <Form>ComSegnapostoForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormComRapportoFinale.pas">
+            <Form>ComRapportoFinaleForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormMenuAggiungi.pas">
+            <Form>MenuAggiungiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormUpdateRepDownload.pas">
+            <Form>UpdateRepDownloadForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormAgendaSlide.pas">
+            <Form>AgendaSlideForm</Form>
+        </DCCReference>
+        <DCCReference Include="LevGoogle.pas"/>
+        <DCCReference Include="UnitGoogleTasks.pas"/>
+        <DCCReference Include="FormGTask.pas">
+            <Form>GTaskForm</Form>
+        </DCCReference>
+        <DCCReference Include="UnitGoogleCal.pas"/>
+        <DCCReference Include="FormGEvent.pas">
+            <Form>GEventForm</Form>
+        </DCCReference>
+        <DCCReference Include="DComCrypto.pas"/>
+        <DCCReference Include="FormEtichetteFastReport.pas">
+            <Form>EtichetteFastReportForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormEtichetteBase.pas">
+            <Form>EtichetteBaseForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormEtichetteListImpostazioni.pas">
+            <Form>EtichetteListImpostazioniForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormEtichetteListStampa.pas">
+            <Form>EtichetteListStampaForm</Form>
+        </DCCReference>
+        <DCCReference Include="eCommerceImport_Savers.pas"/>
+        <DCCReference Include="eCommerceImport_Items.pas"/>
+        <DCCReference Include="eCommerceImport_Loaders.pas"/>
+        <DCCReference Include="eCommerceImport_Common.pas"/>
+        <DCCReference Include="fatturapa_v11.pas"/>
+        <DCCReference Include="FatturaPA_DM.pas">
+            <Form>FatturaPA</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRDichiarazioneConformita.pas">
+            <Form>DichiarazioneConformitaQR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="QRDIchiarazioneConformita4690.pas">
+            <Form>DIchiarazioneConformita4690QR</Form>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormEtichettaEnergetica.pas">
+            <Form>EtichettaEnergeticaForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormConversioneSoggetti.pas">
+            <Form>ConversioneSoggettiForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormBaseSetup.pas">
+            <Form>BaseSetupForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormGMPivotDetail.pas">
+            <Form>GMPivotDetailForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormDocPivotDetail.pas">
+            <Form>DocPivotDetailForm</Form>
+        </DCCReference>
+        <DCCReference Include="FrameChart.pas">
+            <Form>ChartFrame</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UnitTotaleACorpo.pas"/>
+        <DCCReference Include="UnitTotaleACorpo.Interfaces.pas"/>
+        <DCCReference Include="UnitTotaleACorpo.Factory.pas"/>
+        <DCCReference Include="USNCONTROLLO_CF_PI.PAS"/>
+        <DCCReference Include="UnitLevanteEInvoice.pas"/>
+        <DCCReference Include="DDT.DocTypeItem.pas"/>
+        <DCCReference Include="DDT.MenuAddLink.pas"/>
+        <DCCReference Include="DDT.MenuAddLink.LDE.pas"/>
+        <DCCReference Include="DDT.Interfaces.pas"/>
+        <DCCReference Include="DDT.FilterLink.pas"/>
+        <DCCReference Include="DDT.FilterLink.LDE.pas"/>
+        <DCCReference Include="DDT.Factory.pas"/>
+        <DCCReference Include="DDT.WhereGenerator.pas"/>
+        <DCCReference Include="DDT.WhereGenerator.LDE.pas"/>
+        <DCCReference Include="DDT.DynamicDocTypes.pas"/>
+        <DCCReference Include="FormAssistenzeMobileMain.pas">
+            <Form>AssistenzeMobileMainForm</Form>
+        </DCCReference>
+        <DCCReference Include="LevanteVersionCheck\Levante.Version.LevGen.pas"/>
+        <DCCReference Include="LevanteVersionCheck\Levante.Version.InterfacesAndFactory.pas"/>
+        <DCCReference Include="FormConfirm.pas">
+            <Form>ConfirmForm</Form>
+        </DCCReference>
+        <DCCReference Include="FormConfirmNumReg.pas">
+            <Form>ConfirmNumRegFE</Form>
+        </DCCReference>
+        <DCCReference Include="UnitCompression.pas"/>
+        <DCCReference Include="FormImpegni.pas">
+            <Form>ImpegnoForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="FormFatturaImpegni.pas">
+            <Form>FatturaImpegniForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <None Include="levante.todo"/>
+        <None Include="ModelSupport_levante\default.txaPackage"/>
+        <None Include="ModelSupport_levante\default.txvpck"/>
+        <None Include="ModelSupport_levante\ARAll4690S2QB\default.txvpck"/>
+        <None Include="ModelSupport_levante\levante\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormEtichetteFastReport\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormEtichetteBase\default.txvpck"/>
+        <None Include="ModelSupport_levante\ExtTerm_Zebex_Z2031\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAllegati\default.txvpck"/>
+        <None Include="ModelSupport_levante\XMLDocumento\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormBeforeNewDoc\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRElencoMateriale\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSelezioneStato\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRCartIn\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaProgressivi\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRListinoNoBarCode\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormComModelli\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormLeftSide\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModificaMargini\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRElencoMateriale_DM37\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTipiOreDipendenti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormLevante\default.txvpck"/>
+        <None Include="ModelSupport_levante\FrameStart\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTabResOrd\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTipiAltreSpese\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAllegatiFG\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormRepository\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormConformWizard\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRRelazioneTopologicaIdro\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormBackup\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTabGC\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormFileAllegatoModificato\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAgenti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelLista\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormImpegni\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormScambioDoc\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPassword\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormLevanteFilterListAnag\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRTesti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAnagArt\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPratica\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormEtichetteListImpostazioni\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAnagMaga\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAgendaSlide\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAziende\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelPerTabPageControlPrincipale\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRDIchiarazioneConformita4690\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelWizard\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAppuntamento\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRLettera\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormExtPrg\default.txvpck"/>
+        <None Include="ModelSupport_levante\ModelFormBandListFilterAnag\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSubSogg\default.txvpck"/>
+        <None Include="ModelSupport_levante\SACS\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormNetDir\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRRelazioneTopologicaTermo\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPagamRisc\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormStatiOggetti\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRIndiceAlfabetico\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormFattDifferita\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitGoogleCal\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitDemoProtection\default.txvpck"/>
+        <None Include="ModelSupport_levante\Bancolini_B31WIN32\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormBanche\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelPannelliWizard\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormScadenziario\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAll4690Pag1\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormImportazione\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSocGas\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGTask\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRIndiceFornitori\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormComSegnaposto\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormQtaArticolo\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormRiattivazione\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormHelp\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGMap\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitRistruttura\default.txvpck"/>
+        <None Include="ModelSupport_levante\unExportRiba\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormForzaGiacenzeMagazzino\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAnagCli\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormVendBancoSeleCant\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAllegatoGVanz\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAllegatoFVanz\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormContatti\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitFileRepository\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormListaModelliConf\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormLevanteListAnag\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTabPartitario\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormHints\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaClienti\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAutodichiarazione\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSelezioneStradario\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormUpdateRepDownload\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSettaStampante\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPrimanota\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTecnici\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormExportAllegatiManut\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRRichiestaPrimaAccensione\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAllegatoH\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormConfermaAppuntamento\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitSaveXMLDocument\default.txvpck"/>
+        <None Include="ModelSupport_levante\LevGoogle\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormCondVend\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAbout\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPhotoArt\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelPivotDetail\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaTesti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPuzzleToolsGas\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormVariazioneOre\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaIntestazioneDocumenti\default.txvpck"/>
+        <None Include="ModelSupport_levante\main\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormConfermaPrescrizFatta\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormDipendenti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormExport\default.txvpck"/>
+        <None Include="ModelSupport_levante\PreventiviOrdiniReport\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaPreventiviOrdini\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRAll4690Pag3\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormStampeCantieri\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitSystemDirs\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTipiRighi\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormArchivioBanche\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormImportaArcBase\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormEtichetteListStampa\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelBaseAllegati\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormEnti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormRappGiorn\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRRelazioneTopologicaGas\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitRepositoryIniFile\default.txvpck"/>
+        <None Include="ModelSupport_levante\DComCrypto\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRBusta\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGC_CreaFattura\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAllegatiAlarm\default.txvpck"/>
+        <None Include="ModelSupport_levante\SmartKey\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAliquoteIVA\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormCausali\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitGoogleTasks\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaArticoli1\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRNoteDichiarazioneConformita\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAzzeramentoMagazzino\default.txvpck"/>
+        <None Include="ModelSupport_levante\UnitCambiaDefaultPrinter\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSelezionaImpianto\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGEvent\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTabComunicazioni\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormQtaOpera\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormCheckIn\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRRicevuteFiscali\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSecurity\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormDatiRigo\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSplash\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelAnagrafica\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSelezionaPraticheImpianti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormChiusuraMagazzino\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAutomezzi\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormQtaArticoloGC\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPuzzleTools\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRSchedaCliente\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRModelAllegatiVanzo\default.txvpck"/>
+        <None Include="ModelSupport_levante\ThreadLev\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPagamenti\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRDichiarazioneGas\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormExtFile\default.txvpck"/>
+        <None Include="ModelSupport_levante\DataModule2\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelBase\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormConformita\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPuzzleToolsIdro\default.txvpck"/>
+        <None Include="ModelSupport_levante\DataModule1\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRRetroAllegatoH\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRIndiceCategorie\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormStampaDichiarazione\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormMessage\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormWait\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAggiornaOp\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSelezioneCliente\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormHint\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormDatiDichiaraz\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTedoldi\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormConfermaDocExpressMag\default.txvpck"/>
+        <None Include="ModelSupport_levante\SchedaDatiAzienda\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGruppi\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormTabImpianti\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormPuzzleToolsTermo\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormApparecchi\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormComRapportoFinale\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormMenuAggiungi\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRUltimiInterventiImpianto\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormOperazioniPianificate\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSynchro\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormModelAnagraficaLista\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGosOrePivotDetail\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormCategoria1\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRListino\default.txvpck"/>
+        <None Include="ModelSupport_levante\DataModuleStyles\default.txvpck"/>
+        <None Include="ModelSupport_levante\QRGasDisegno\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormSostArt\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormGosSpesePivot\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormMultiregistro\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormComunicazione\default.txvpck"/>
+        <None Include="ModelSupport_levante\FormAumentoListini\default.txvpck"/>
+        <None Include="ModelSupport_levante\eCommerceImport_Items\default.txaPackage"/>
+        <None Include="ModelSupport_levante\eCommerceImport_Items\default.txvpck"/>
+        <None Include="ModelSupport_levante\eCommerceImport_Loaders\default.txaPackage"/>
+        <None Include="ModelSupport_levante\eCommerceImport_Savers\default.txaPackage"/>
+        <None Include="ModelSupport_levante\eCommerceImport_Savers\default.txvpck"/>
+        <None Include="ModelSupport_levante\eCommerceImport_Loaders\default.txvpck"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">levante.dpr</Source>
+                </Source>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1040</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k270.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp270.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\FastReport 6 VCL Standard\LibD27\dclfrxIntIO27.bpl">FastReport 6.0 Internet transports</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\FastReport 6 VCL Standard\LibD27\dclfrxIntIOIndy27.bpl">FastReport 6.0 Internet transports</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\FastReport 6 VCL Standard\LibD27\dclfrxTee27.bpl">FastReport 6.0 Tee Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\FastReport 6 VCL Standard\LibD27\dclfsTee27.bpl">FastScript 1.9 Tee Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\FastReport 6 VCL Standard\LibD27\dclfrxIBX27.bpl">FastReport 6.0 IBX Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\FastReport 6 VCL Standard\LibD27\dclfsIBX27.bpl">FastScript 1.9 IBX Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+            <ModelSupport>True</ModelSupport>
+            <Deployment Version="3">
+                <DeployFile LocalName="ModelSupport_levante\FormRiattivazione\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaTesti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSelezioneStradario\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRNoteDichiarazioneConformita\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FrameStart\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSelezioneCliente\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRElencoMateriale_DM37\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAll4690Pag3\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\DataModule1\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitSystemDirs\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSelezionaImpianto\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormEtichetteListImpostazioni\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRRelazioneTopologicaIdro\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAziende\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSostArt\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaIntestazioneDocumenti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\PreventiviOrdiniReport\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SACS\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitFileRepository\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGruppi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormConformWizard\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelWizard\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPuzzleToolsGas\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPuzzleToolsIdro\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\eCommerceImport_Loaders\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\eCommerceImport_Items\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRTesti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormStampeCantieri\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelPivotDetail\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRListino\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTipiOreDipendenti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormDatiDichiaraz\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRGasDisegno\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormConfermaAppuntamento\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormMultiregistro\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSecurity\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormBackup\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelBaseAllegati\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAzzeramentoMagazzino\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAgenti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormScambioDoc\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormArchivioBanche\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAllegatoFVanz\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormRappGiorn\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormHint\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitRepositoryIniFile\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\ARAll4690S2QB\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRRicevuteFiscali\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormNetDir\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTabComunicazioni\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormLeftSide\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelLista\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGTask\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormDipendenti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSelezionaPraticheImpianti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormExtPrg\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormBeforeNewDoc\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormMenuAggiungi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelAnagrafica\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSubSogg\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTabResOrd\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\XMLDocumento\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormHints\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTecnici\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRElencoMateriale\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormFileAllegatoModificato\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormChiusuraMagazzino\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormConformita\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitDemoProtection\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormForzaGiacenzeMagazzino\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormExportAllegatiManut\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormLevanteFilterListAnag\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaArticoli1\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\DataModuleStyles\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPratica\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAllegati\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormRepository\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormQtaArticoloGC\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitGoogleTasks\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRDichiarazioneGas\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelPannelliWizard\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormVendBancoSeleCant\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelAnagraficaLista\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormCondVend\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAll4690Pag1\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAllegatiAlarm\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitGoogleCal\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAggiornaOp\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormMessage\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormImportazione\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormLevanteListAnag\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormVariazioneOre\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAliquoteIVA\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\ThreadLev\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaDatiAzienda\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRUltimiInterventiImpianto\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPassword\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\DComCrypto\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPuzzleToolsTermo\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="levante.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>levante.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormComSegnaposto\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRBusta\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormBanche\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\eCommerceImport_Savers\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormHelp\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="levante.todo" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRCartIn\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPrimanota\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormOperazioniPianificate\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAllegatiFG\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRIndiceAlfabetico\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormConfermaDocExpressMag\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormApparecchi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGosSpesePivot\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTabImpianti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\eCommerceImport_Loaders\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormImportaArcBase\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPagamenti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\DataModule2\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormScadenziario\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSocGas\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAllegatoGVanz\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAutomezzi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRLettera\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormComModelli\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormEtichetteBase\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormCausali\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelPerTabPageControlPrincipale\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAnagCli\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormCategoria1\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPhotoArt\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAbout\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSelezioneStato\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAnagMaga\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormStatiOggetti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormEtichetteFastReport\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTipiRighi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTedoldi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormLevante\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormExport\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\main\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormListaModelliConf\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAppuntamento\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaClienti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\levante\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRRetroAllegatoH\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SmartKey\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormExtFile\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGMap\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaProgressivi\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\ModelFormBandListFilterAnag\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormComRapportoFinale\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormComunicazione\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRIndiceCategorie\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormEtichetteListStampa\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\eCommerceImport_Savers\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModificaMargini\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormWait\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGC_CreaFattura\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\unExportRiba\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\Bancolini_B31WIN32\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormQtaOpera\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTipiAltreSpese\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormImpegni\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRListinoNoBarCode\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAnagArt\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGEvent\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAgendaSlide\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSynchro\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormModelBase\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\ExtTerm_Zebex_Z2031\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormConfermaPrescrizFatta\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\eCommerceImport_Items\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormDatiRigo\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSplash\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitSaveXMLDocument\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTabPartitario\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAllegatoH\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRModelAllegatiVanzo\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPuzzleTools\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormContatti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormFattDifferita\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormPagamRisc\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRRichiestaPrimaAccensione\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormSettaStampante\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRDIchiarazioneConformita4690\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormGosOrePivotDetail\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitCambiaDefaultPrinter\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRSchedaCliente\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormCheckIn\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormTabGC\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRAutodichiarazione\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormStampaDichiarazione\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRIndiceFornitori\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormAumentoListini\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormQtaArticolo\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormUpdateRepDownload\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\FormEnti\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRRelazioneTopologicaTermo\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\SchedaPreventiviOrdini\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\LevGoogle\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\UnitRistruttura\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\default.txaPackage" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="ModelSupport_levante\QRRelazioneTopologicaGas\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidFileProvider">
+                    <Platform Name="Android">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiv7aFile">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput_Android32">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_Colors">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon192">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon24">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_Strings">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iOS_AppStore1024">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon152">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon167">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_LaunchDark2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_SpotLight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon180">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_LaunchDark2x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_LaunchDark3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Notification60">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting87">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSEntitlements">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSInfoPList">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSLaunchScreen">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXDebug">
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements">
+                    <Platform Name="OSX32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXInfoPList">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOutput_Android32">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+            </Deployment>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>

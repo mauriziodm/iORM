@@ -1,0 +1,39 @@
+SET TERM ^ ;
+
+CREATE PROCEDURE IMPAPPSEL_SETAPPSEL (IN_IDIMPEGNO INTEGER, IN_IDAPPARECCHIOPRAT INTEGER, IN_SELECTED CHAR(1))
+  RETURNS (OUTVAR CHAR(1))
+AS
+BEGIN
+  /* Inizializzazione */
+  OUTVAR = 'T';
+
+  /* Verifica dei parametri */
+  IF (COALESCE(:IN_IDIMPEGNO,0) = 0 OR COALESCE(:IN_IDAPPARECCHIOPRAT,0) = 0) THEN BEGIN
+    OUTVAR = 'F';
+    EXCEPTION EX_GEN_PARAMETRO_NON_VALIDO 'Procedure GC_IMPAPPSEL_SETAPPSEL: Parametro non valido.';
+    SUSPEND;
+    EXIT;
+  END
+
+  /* Se l'apparecchio viene selezionato */
+  IF (:IN_SELECTED = 'T') THEN BEGIN
+    DELETE FROM IMPEGNI_APPSEL IAS WHERE IAS.IDIMPEGNO=:IN_IDIMPEGNO AND IAS.IDAPPARECCHIOPRAT=:IN_IDAPPARECCHIOPRAT;
+    EXIT;
+  END
+
+  /* Altrimenti se viene deselezionato bisogna che venga inserito un record */
+  /* Quindi se il record esiste già esce subito perchè non c'è bisogno di altro altirmenti lo crea */
+  IF (EXISTS(SELECT IAS.IDIMPEGNO FROM IMPEGNI_APPSEL IAS WHERE  IAS.IDIMPEGNO=:IN_IDIMPEGNO AND IAS.IDAPPARECCHIOPRAT=:IN_IDAPPARECCHIOPRAT)) THEN BEGIN
+    SUSPEND;
+    EXIT;
+  END
+
+  /* Se arriva qui quindi crea l'apposito record */
+  INSERT INTO IMPEGNI_APPSEL (IDIMPEGNO, IDAPPARECCHIOPRAT) VALUES (:IN_IDIMPEGNO, :IN_IDAPPARECCHIOPRAT);
+
+  SUSPEND;
+  EXIT;
+
+END^
+
+SET TERM ; ^

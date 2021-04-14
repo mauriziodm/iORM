@@ -1,0 +1,35 @@
+SET TERM ^ ;
+
+/* Questa SP ritorna True se c'è almeno una chiamata/appuntamento urgente per l'impianto specificato */
+
+CREATE PROCEDURE IMPIANTI_CHIAMATE_EXISTS (IN_CODICEPRATICA INTEGER, IN_DATAPRATICA TIMESTAMP)
+  RETURNS (OUTVAL CHAR(1))
+AS
+BEGIN
+
+  /* Appuntamento preso */
+  IF (EXISTS(SELECT I.ID FROM IMPEGNI I WHERE I.PRATICA=:IN_CODICEPRATICA AND I.DATAPRATICA1=:IN_DATAPRATICA AND I.TIPOIMPEGNO='Appuntamento')) THEN
+  BEGIN
+    OUTVAL = 'A';
+    SUSPEND;
+    EXIT;
+  END
+
+  /* Chiamata ricevuta */
+  IF (EXISTS(SELECT I.ID FROM IMPEGNI I WHERE I.PRATICA=:IN_CODICEPRATICA AND I.DATAPRATICA1=:IN_DATAPRATICA AND I.TIPOIMPEGNO='Chiamata')) THEN
+  BEGIN
+    OUTVAL = 'T';
+    SUSPEND;
+    EXIT;
+  END
+
+  /* Altrimenti */
+  OUTVAL = 'F';
+  SUSPEND;
+  EXIT;
+
+END^
+
+SET TERM ; ^
+
+

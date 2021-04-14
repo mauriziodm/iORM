@@ -1,0 +1,25 @@
+CREATE TRIGGER PRATAPP_BEFOREINSERTUPDATE FOR PRATAPPARECCHI
+ACTIVE BEFORE INSERT OR UPDATE
+AS
+  DECLARE LOC_MESI SMALLINT;
+  DECLARE LOC_DATAPARTENZA TIMESTAMP;
+  DECLARE LOC_DATASCADENZA TIMESTAMP;
+BEGIN
+
+  /* Calcola i mesi totali di garanzia */
+  LOC_MESI = COALESCE(NEW.GARANZIA_MESI,0) + COALESCE(NEW.GARANZIA_MESI_ESTENSIONE,0);
+
+  /* Ricava la data di partenza della garanzia */
+  IF (NEW.GARANZIA_APARTIREDA = 'Installazione') THEN LOC_DATAPARTENZA = NEW.DATAINSTALLAZIONE;
+  ELSE  LOC_DATAPARTENZA = NEW.DATACOLLAUDO;
+
+  /* Se la data di partenza ottenuto è nulla esce subito e anche se i mesi non sono indicati e anche se on è indicato da quale data far iniziare il tutto*/
+  IF (LOC_DATAPARTENZA IS NULL OR LOC_MESI = 0 OR NEW.GARANZIA_APARTIREDA IS NULL) THEN EXIT;
+
+  /* Se arriva fin qui calcola la data di scadenza della garanzia */
+  SELECT OUTVAR FROM PRATAPP_GETSCADENZAGARANZIA (NEW.ID, :LOC_MESI, :LOC_DATAPARTENZA) INTO :LOC_DATASCADENZA;
+
+  /* Se non è nulla la assegna all'apposito campo */
+  IF (LOC_DATASCADENZA IS NOT NULL) THEN NEW.GARANZIA_SCADENZA = LOC_DATASCADENZA;
+
+END

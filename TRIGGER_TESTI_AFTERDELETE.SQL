@@ -1,0 +1,16 @@
+SET TERM ^ ;
+
+CREATE TRIGGER TESTI_AFTERDELETE FOR TESTI
+ACTIVE AFTER DELETE POSITION 0
+AS
+BEGIN
+
+  /* Elimina gli allegati relativi al documento eliminato */
+  DELETE FROM ALLEGATI A  
+  WHERE A.TIPODOC = 'Lettera'
+    AND A.NUMDOC  = OLD.CODICE
+    AND A.DATADOC = OLD.DATA;
+
+END^
+
+SET TERM ; ^

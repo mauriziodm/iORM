@@ -1,0 +1,42 @@
+[Params]
+TipoFileDestinazione=txt
+NomeFileDestinazione=esportazione_contatti_levante
+txt_Separator=;
+txt_StartDelimiter=
+txt_EndDelimiter=
+
+[SQL]
+SELECT
+ '' as id
+,'centralino' as owner_id
+,'public' as type
+,EMAIL as homemail
+,PEC as workmail
+,TELEFONO as homephone
+,'' as workphone
+,CELLULARE as cellphone
+,FAX as fax
+,TITOLO as title
+,RAGIONESOCIALE as company
+,CLIENTEFORNITORE as notes
+,'' as name
+,TRIM(INDIRIZZO || ' ' || NUMCIVICO) as homestreet
+,'' as homepob
+,CITTA as homecity
+,PROVINCIA as homeprovince
+,CAP as homepostalcode
+,NAZIONESIGLA as homecountry
+,'' as workstreet
+,'' as workpob
+,'' as workcity
+,'' as workprovince
+,'' as workpostalcode
+,'' as workcoountry
+,'' as url
+,'' as extension
+,'' as speeddial_num
+FROM CLIENTI
+WHERE CODICE > 0
+
+
+

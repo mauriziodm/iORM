@@ -1,0 +1,2813 @@
+unit main;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ExtCtrls, RXCtrls, StdCtrls, Buttons, Animate, RXClock, IBODataset,
+  MPlayer, ComCtrls, OleCtrls, isp3, IniFiles, DBGrids, RXDBCtrl, ImgList,                                          
+  Menus, RxGrdCpt, RxMenus, RxLogin, Mask, RxCalc, QuickRpt,
+  ToolEdit, CurrEdit, DBCtrls, DB, Grids, BaseGrid, AdvGrid, AdvCGrid,
+  IB_Components, IB_Process, IB_DataScan, IB_Export, IB_Dialogs, IB_Import,
+  bmpPanel, IB_Grid, FrameStart, MAURI_SB, cxGridLevel,
+  cxGridCustomTableView, cxGridTableView, cxGridDBTableView, cxClasses,
+  cxControls, cxGridCustomView, cxGrid, UnitDemoProtection,
+  IdAntiFreezeBase, IdAntiFreeze, IdBaseComponent, IdComponent,
+  IdTCPConnection, IdTCPClient, IdFTP, PLab, SACS, cxStyles, cxGraphics,
+  cxSchedulerStorage, cxSchedulerCustomControls, cxSchedulerDateNavigator,
+  cxContainer, cxDateNavigator, cxLookAndFeels, StrUtils, FormModelBase;
+
+const
+  // ===========================================================================
+  // COSTANTI PER IL MENU' PRINCIPALE
+  MM_ITEM_INVISIBLE     = -1;
+  MM_ITEM_DISABLED      = 0;
+  MM_ITEM_ENABLED       = 1;
+  MM_ITEM_SELECTED      = 2;
+
+  MM_SEPARATOR_HEIGHT   = 5;
+  // ---------------------------------------------------------------------------
+
+  // ===========================================================================
+  // COSTANTI PER IL MENU UTILITA' E IMPOSTAZIONI (Le costanti contengono il codice di ogni voce per la sua identificazione)
+  // ---------------------------------------------------------------------------
+  I_GRUPPI              = 01;
+  I_CATEG1              = 02;
+  I_CATEG2              = 03;
+  I_CATEG3              = 04;
+  I_CATEG4              = 05;
+  I_CATEG5              = 06;
+  I_CATEG6              = 07;
+  I_CATEG7              = 08;
+  I_CATEG8              = 09;
+  I_BANCHE              = 10;
+  I_PAGAM               = 11;
+  I_DATIAZIENDA         = 12;
+  I_IVA                 = 13;
+  I_CAUSALI             = 14;
+  I_MAGAZZINI           = 15;
+  I_PROGRESSIVI         = 16;
+  I_FAX                 = 17;
+  I_INTERNET            = 18;
+  I_EXTPRG              = 19;
+  I_STATI               = 20;
+  I_LOGHI               = 21;
+  I_TWAIN               = 22;
+  I_ETICHETTE           = 23;
+  I_MULTIREGISTRO       = 24;
+  I_TECNICI             = 25;
+  I_PHOTOART            = 26;
+  I_CAUSALICANTIERI     = 27;
+  I_APPARECCHI          = 28;
+
+  U_BANCO               = 51;
+  U_FATTDIFF            = 52;
+  U_AGGLIST             = 53;
+  U_IMPORTAZIONE        = 54;
+  U_SINCHRO             = 55;
+  U_BACKUP              = 56;
+  U_ABOUT               = 57;
+  U_TELETRASPORTO       = 58;
+  U_AUMENTOLISTINI      = 59;
+  // ===========================================================================
+
+  // ===========================================================================
+  // COSTANTI RELATIVI ALLE DIMENSIONI E POSIZIONI DELLE FORM
+  // ---------------------------------------------------------------------------
+  MAINFORM_WIDTH                = 1024;
+  MAINFORM_HEIGHT               = 734;
+
+  CLIENTFORM_LEFT               = 211;
+  CLIENTFORM_TOP                = 0;
+  CLIENTFORM_WIDTH              = 710;
+  CLIENTFORM_HEIGHT             = 678;   // Prima era 659
+  CLIENTFORM_BG_COLOR           = clWhite;
+
+  CLIENT_LEFT_BORDER            = 15;
+  CLIENT_RIGHT_BORDER           = 9;
+  CLIENT_TOP_BORDER             = 83;
+  CLIENT_BOTTOM_BORDER          = 6;
+
+  // Costanti per il posizionamento dei menu popup rispetto ai componenti che li richiamano
+  POPUP_X_OFFSET                = 10;
+  POPUP_Y_OFFSET                = 50;
+
+  // Questo parametro server per calcolare l'altezza del pannello principale quando
+  //  ci sono bande (pannelli) formati da più sottobande come ad esempio nella banda
+  //  pagamento dei documenti:
+  //    Banda principale := Modalità di pagamento
+  //    Sottobande       := Banca + Scadenze
+  //  In questo caso L'altezza del pannello principale Viene calcolato così:
+  //    H := SubPanel.Top + SubPanel.Height + SUBPANEL_FATTORE_CORREZIONE
+  // NB: Se la banda principale non è visibile, nessuna delle sottobande può essere visibile
+  // NB: Si usa un procedimento simile anche per calcolare la posizione della linea in basso del pannello principale
+  SUBPANEL_TOP                  = 16;
+  SUBPANEL_FATTORE_CORREZIONE   = 4;
+
+  // Colori da utilizzare nei campi delle form (Quando sono in modifica, quando non lo sono, quando ricevono il focus ecc)
+  COLOR_NORMALE                 = $00F7F7F7;
+  COLOR_MODIFICA                = $00D9FFFF;
+  COLOR_FOCUS                   = clYellow;
+
+  // Colori da utilizzare nei pannelli delle form divise in operazioni (Modalità di pagamento, fatturaz. differita, Gruppi ecc)
+  COLOR_SUBPANEL_BG                    = $00E9E9E9;
+  COLOR_SUBPANEL_STEP_BG               = clBlack;
+  COLOR_SUBPANEL_STEP_FONT             = clWhite;
+
+  COLOR_SUBPANEL_BG_SELECTED           = $00F7F7F7;
+  COLOR_SUBPANEL_LABEL_FONT_SELECTED   = $00E9E9E9;
+  COLOR_SUBPANEL_STEP_BG_SELECTED      = $00E9E9E9;
+  COLOR_SUBPANEL_STEP_FONT_SELECTED    = $00F7F7F7;
+
+  // COlore di visualizzazione dei pannelli della schermata di Login
+  COLOR_LOGIN_OPZIONI                  = $00DC7E5A;
+  // ===========================================================================
+
+type
+
+  // Struttura che conterrà lo stack delle ImgDocTipo (icone in alto a sx che indicano
+  //  il tipo di schermata
+  ItemDocTipoPointer = ^ItemDocTipoRecord;
+  ItemDocTipoRecord = record
+     ImgDocTipo:TBitmap;
+     LabelTipoDocumentoVisible:Boolean;
+     SBTipoDocumentoVisible:Boolean;
+     Caption1, Caption2, Caption3:String;
+     Caption1Top, Caption2Top, Caption3Top:Integer;
+     Caption1Left, Caption2Left, Caption3Left:Integer;
+     Caption1FontName, Caption2FontName, Caption3FontName:String;
+     Caption1FontSize, Caption2FontSize, Caption3FontSize:Byte;
+     Caption1FontStyleBold, Caption2FontStyleBold, Caption3FontStyleBold:Boolean; 
+  end;
+
+  // ### TRASPARENZA###
+  TSetLayeredWindowAttributes = function (
+     hwnd : HWND;         // handle to the layered window
+     crKey : TColor;      // specifies the color key
+     bAlpha : byte;       // value for the blend function
+     dwFlags : DWORD      // action
+     ): BOOL; stdcall;
+
+  TmainForm = class(TForm)
+    ImageListExpDocLargeImages: TImageList;
+    MainLeftPanel: TbmpPanel;
+    MainRightPanel: TbmpPanel;
+    ListViewExpDoc: TListView;
+    MainBottomPanel: TbmpPanel;
+    LabelDataOdierna: TLabel;
+    Label7: TLabel;
+    LabelAziendaCorrente: TLabel;
+    Label13: TLabel;
+    LabelStatus: TLabel;
+    SBStopFax: TSpeedButton;
+    SBTipoDocumento: TSpeedButtonRollOver;
+    LabelTipoDocumento: TLabel;
+    PanelNomiDoc: TPanel;
+    ListBoxNomeDoc: TListBox;
+    PanelUtilita: TbmpPanel;
+    PanelMenuUtilita: TPanel;
+    MenuUtilita: TListBox;
+    SBUtilita: TSpeedButtonRollOver;
+    SU: TShape;
+    SBImpostazioni: TSpeedButtonRollOver;
+    UtilitaTitolo: TImage;
+    UtilitaBarra: TImage;
+    StartFrame: TStartFrame;
+    TimerStartStop: TTimer;
+    MainTopPanel: TbmpPanel;
+    RxSpeedButtonUscita: TRxSpeedButton;
+    RxSpeedButtonHelp: TRxSpeedButton;
+    RxSpeedModifica: TRxSpeedButton;
+    RxSpeedButtonNuovo: TRxSpeedButton;
+    RxSpeedButtonElimina: TRxSpeedButton;
+    RxSpeedButtonTrova: TRxSpeedButton;
+    RxSpeedButtonResetQuery: TRxSpeedButton;
+    RxSpeedButtonStampa: TRxSpeedButton;
+    RxSpeedButtonFax: TRxSpeedButton;
+    RxSpeedButtonMail: TRxSpeedButton;
+    RxSpeedButtonVisualizza: TRxSpeedButton;
+    MediaPlayer1: TMediaPlayer;
+    Label1: TLabel;
+    LabelOperatoreCorrente: TLabel;
+    Attendere: TImage;
+    ImgDocTipo: TImage;
+    SBRubrica: TPaintBox;
+    SBDocumenti: TPaintBox;
+    SBGM: TPaintBox;
+    SBCV: TPaintBox;
+    SBArticoli: TPaintBox;
+    SBPratiche: TPaintBox;
+    SBScadenze: TPaintBox;
+    SBPrimanota: TPaintBox;
+    SBSoggetto: TPaintBox;
+    SBPratica: TPaintBox;
+    PSChiudi: TSpeedButtonRollOver;
+    SSChiudi: TSpeedButtonRollOver;
+    SBAssistenze: TPaintBox;
+    SBAssistenza: TPaintBox;
+    SBImpegni: TPaintBox;
+    AvviaLevanteBiometrico: TButton;
+    MenuBacheca: TPopupMenu;
+    SvuotaBacheca: TMenuItem;
+    SBAgenda: TPaintBox;
+    MMSeparatore1: TPaintBox;
+    MMSeparatore2: TPaintBox;
+    MMSeparatore3: TPaintBox;
+    SBGC: TPaintBox;
+    Caption1: TLabel;
+    Caption2: TLabel;
+    Caption3: TLabel;
+    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ListViewExpDocDragOver(Sender, Source: TObject; X,
+      Y: Integer; State: TDragState; var Accept: Boolean);     // Personale;
+    procedure AggiornaDocumentiEsportati;
+    procedure ListViewExpDocKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure ListViewExpDocMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure ListViewExpDocEndDrag(Sender, Target: TObject; X,
+      Y: Integer);
+    procedure SpeedButton1Click(Sender: TObject);
+    function  CheckIfNewVersion:Boolean;
+    procedure SBStopFaxClick(Sender: TObject);
+    procedure Importazionearchividibase1Click(Sender: TObject);
+    procedure CaricaLayout;
+    procedure CaricaTemaClientForm(F:TForm; TopPanel:TBmpPanel; ESC,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10:TRxSpeedButton);
+    procedure FormResize(Sender: TObject);
+    procedure SBRubricaClick(Sender: TObject);
+    procedure CheckMainMenu;
+    procedure SSChiudiClick(Sender: TObject);
+    procedure PSChiudiClick(Sender: TObject);
+    procedure PanelNomiDocExit(Sender: TObject);
+    procedure SBTipoDocumentoClick(Sender: TObject);
+    procedure ListBoxNomeDocClick(Sender: TObject);
+    procedure AbilitaMainMenu;
+    procedure DisabilitaMainMenu(AllDisable:Boolean);
+    procedure SBUtilitaClick(Sender: TObject);
+    procedure RiempiMenuUtilita;
+    procedure MenuUtilitaMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure MenuUtilitaClick(Sender: TObject);
+    procedure VisualizzaUtilita;
+    procedure ChiudiUtilita;
+    procedure SBImpostazioniClick(Sender: TObject);
+    procedure SalvaIconaDocTipo;
+    procedure RipristinaIconaDocTipo;
+    procedure CaricaIconaDocTipo(Titolo:String);
+    procedure VisualizzaAvvio(LoadBitmap:Boolean);
+    procedure CaricaElencoAziende;
+    procedure TimerStartStopTimer(Sender: TObject);
+    procedure OpenStartFrame;
+    procedure CloseStartFrame;
+    procedure ListViewExpDocAdvancedCustomDraw(Sender: TCustomListView;
+      const ARect: TRect; Stage: TCustomDrawStage;
+      var DefaultDraw: Boolean);
+    function  TrayBarTop:Integer;
+    procedure LevanteException(Sender: TObject; E: Exception);
+    procedure SBRubricaPaint(Sender: TObject);
+    function  MMItemIsSelected(MMI:TPaintBox):Boolean;
+    procedure MMItemSetSelected(MMI:TPaintBox);
+    procedure MMItemSetUnselected(MMI:TPaintBox);
+    procedure MMItemSetEnabled(MMI:TPaintBox; Enabled:Boolean);
+    procedure MMItemSetVisible(MMI:TPaintBox; Visible:Boolean);
+    procedure MainMenuInvisibile;
+    procedure RefreshMainMenu;
+    function  IsMainMenuEnabled: Boolean;
+    procedure MainLeftPanelDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+    procedure SBSoggettoMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure LoadMainMenuImages;
+    procedure SBSoggettoEndDrag(Sender, Target: TObject; X, Y: Integer);
+    procedure SBPraticaEndDrag(Sender, Target: TObject; X, Y: Integer);
+    procedure BloccaIconaDocTipo(Blocca:Boolean; NomeFormChiamante:TComponentName);
+    function  IconaDocTipoBloccata:Integer;
+    procedure FormSetParentPlatformDependent(CF,PF:TForm);
+    procedure ChiudiLevante;
+    procedure SetTransparentForm(AHandle : THandle; AValue : byte = 0);
+    procedure SetInitialCompleteTransparent(F:TForm);
+    procedure FormFadeOut(F:TForm);
+    procedure FormFadeIn(F:TForm);
+    procedure ApriTeletrasporto;
+    procedure AvviaLevanteBiometricoClick(Sender: TObject);
+    procedure SvuotaBachecaClick(Sender: TObject);
+    procedure AgendaDateNavigatorSelectionChanged(Sender: TObject;
+      const AStart, AFinish: TDateTime);
+    procedure ApriCalendario;
+    procedure ChiudiCalendario;
+
+
+  private
+    { Private declarations }
+      // -------------------------------------------------------------
+      // Riferimenti alla prima e ultima voce del menu
+      //  NB: Servono per la visualizzazione dei segmenti dell'albero
+      //       in modo che il primo e l'ultimo chiudano il menù
+      MMFirst, MMLast: String;
+      // Flag che indica se il mainmenu è attivo oppure no
+      //  viene usato in alcune form per testare lo stato del MainMenu
+      //  senza dover controllare una per una le voci.
+      MainMenuEnabled:Boolean;
+      // Array che contiene il flag che indica lo stato di ciascun pulsante
+      MainMenuState: array [0..14] of Shortint;
+      // Lista che contiene un array di puntatori alle bitmap relative al main menu
+      MMImgList: TList;
+      // Flag che se a True blocca l'aggiornamento dell'Icona Doc Tipo
+      FlagBloccoIconaDocTipo:Integer;
+      // Lista che contiene lo stack delle IconeDocTipo (le immagini in alto a sx che
+      //  indicano che tipo di schermata è visualizzata.
+      StackIconaDocTipo:TList;
+      // Flag che indica se è in esecuzione una copia di sicurezza da parte
+      //  di Levante Guardian per gestire il ciclo di attesa.
+      SacsInProgress : Boolean;
+  public
+    { Public declarations }
+     // Array che contiene il testo dei pulsanti
+     MainMenuCaptions: array [0..14] of String;
+     // Costanti per l'identificazione e la versione del programma
+     //  queste costanti vengono usate per la visualizzazione delle caption
+     //  delle form e per il controllo della versione
+     // --------------------------------------------------------------------------
+     NomeApplicazione, VersioneApplicazione:String;
+     PrgVersion: Integer;
+     // Questo flag indica se si è in modalità 'Ristrutturazione tabelle' ed è il flag
+     //  con il quale viene chiamata la funzione 'AttivaTabelle' per dirgli in che modo
+     //  deve operare.
+     ModoRistrutturazioneTabelle: Boolean;
+     // Quest flag indica se l'ultimo DragDrop è stato avviato dalla bacheca cliccando
+     //  con il pulsante destro del mouse (Insert)
+     BachecaInsert:Boolean;
+     // ------------------------------------------------------------------------
+     // Override della funzione di gestione dei messaggi dell'applicazione, da questa funzione
+     //  poi elabora i messaggi agiuntivi per la gestione del Guardian
+//     procedure WndProc(var Msg : TMessage); override;
+     // ------------------------------------------------------------------------
+  end;
+
+var
+  mainForm: TmainForm;
+
+implementation
+
+uses SchedaArticoli1, DataModule1, SchedaClienti,
+  SchedaIntestazioneDocumenti, PreventiviOrdiniReport,
+  FormAnagArt, FormAnagCli,
+  FormAziende, FormBanche, FormContatti, FormExtFile, FormExtPrg, FormFax, FormNetDir, FormPagamenti,
+  SchedaDatiAzienda, SchedaPreventiviOrdini,
+  SchedaProgressivi, SchedaTesti, FormScadenziario, FormConformita,
+  FormSelezionePratica, FormStatiOggetti, FormAliquoteIVA,
+  FormSelezioneCliente, FormSelezioneStato, FormAbout, FormCategoria1, QRBusta,
+  QRCartIn, FormImportazione, FormPrimanota,
+  FormSecurity, FormBackup,
+  FormSubSogg, FormCausali, FormAnagMaga, FormGruppi,
+  FormFattDifferita, FormSplash, FormSynchro, FormArchivioBanche, FormHints,
+  FormHint, FormPagamRisc, FormPratica, FormHelp, FormWait, FormEtichette,
+  FormMultiregistro, FormScambioDoc, FormImpegni, FormMessage, FormTecnici, FormPhotoArt,
+  FormCausaliCantieri, FormApparecchi, FormAumentoListini;
+
+{$R *.DFM}
+
+
+//procedure TMainForm.WndProc(var Msg : TMessage);
+//begin
+   // Messagio di BACKUP ANNULLATO
+//   if Msg.Msg = MsgBackupPerformed then begin
+//      BackupCompleted;
+//   end;
+//   if BackupInProgress then begin
+//      Msg.Msg := WM_NULL;
+//   end;
+   // Elabora tutti gli altri messaggi cone la funzione originaria
+//   inherited;
+//end;
+
+
+// =================================================================================================================================
+//  FUNZIONI E PROCEDURE PER LA GESTIONE DEL MAIN MENU'
+// ---------------------------------------------------------------------------------------------------------------------------------
+procedure TMainForm.LoadMainMenuImages;
+var
+   B:TBitmap;   // B è un puntatore a Bitmap
+begin
+   // Crea la Lista che contiene i puntatori alle bitmap dei pulsanti del main menu
+   MMImgList := TList.Create;
+   // ===================================================================================================================================
+   // INIZIA IL CARICAMENTO DELLE BITMAPS NELLE TIMAGELIST
+   // -----------------------------------------------------------------------------------------------------------------------------------
+   // BITMAPS DEI PANNELLI TIPO SOGGETTO SELEZIONATO, PRATICA SELEZIONATA, IMPIANTO SELEZIONATO
+   B:=TBitmap.Create;   B.Transparent:=True;   B.LoadFromFile(DM1.TemaDir + 'mm_sel_dis.bmp');    B.Dormant;   B.FreeImage;   MMImgList.Add(B);
+   B:=TBitmap.Create;   B.Transparent:=True;   B.LoadFromFile(DM1.TemaDir + 'mm_sel_en.bmp');     B.Dormant;   B.FreeImage;   MMImgList.Add(B);
+   B:=TBitmap.Create;   B.Transparent:=True;   B.LoadFromFile(DM1.TemaDir + 'mm_sel_down.bmp');   B.Dormant;   B.FreeImage;   MMImgList.Add(B);
+   SBSoggetto.Height := B.Height;     // Dimensionamento automatico verticale
+   SBPratica.Height := B.Height;      // Dimensionamento automatico verticale
+   SBAssistenza.Height := B.Height;   // Dimensionamento automatico verticale
+
+   // BITMAPS DEGLI SFONDI DELLE ITEMS DEL MENU PRINCIPALE
+   B:=TBitmap.Create;   B.Transparent:=True;   B.LoadFromFile(DM1.TemaDir + 'mm_item_dis.bmp');     B.Dormant;   B.FreeImage;   MMImgList.Add(B);
+   B:=TBitmap.Create;   B.Transparent:=True;   B.LoadFromFile(DM1.TemaDir + 'mm_item_en.bmp');      B.Dormant;   B.FreeImage;   MMImgList.Add(B);
+   B:=TBitmap.Create;   B.Transparent:=True;   B.LoadFromFile(DM1.TemaDir + 'mm_item_down.bmp');    B.Dormant;   B.FreeImage;   MMImgList.Add(B);
+   SBRubrica.Height := B.Height;      // Dimensionamento automatico verticale
+   SBDocumenti.Height := B.Height;    // Dimensionamento automatico verticale
+   SBGM.Height := B.Height;           // Dimensionamento automatico verticale
+   SBCV.Height := B.Height;           // Dimensionamento automatico verticale
+   SBArticoli.Height := B.Height;     // Dimensionamento automatico verticale
+   SBPratiche.Height := B.Height;     // Dimensionamento automatico verticale
+   SBScadenze.Height := B.Height;     // Dimensionamento automatico verticale
+   SBPrimanota.Height := B.Height;    // Dimensionamento automatico verticale
+   SBAssistenze.Height := B.Height;   // Dimensionamento automatico verticale
+   SBImpegni.Height := B.Height;      // Dimensionamento automatico verticale
+   SBAgenda.Height := B.Height;       // Dimensionamento automatico verticale
+   SBGC.Height := B.Height;           // Dimensionamento automatico verticale
+
+   // IMposta l'altezza dei separatori
+   MMSeparatore1.Height := MM_SEPARATOR_HEIGHT;
+   MMSeparatore2.Height := MM_SEPARATOR_HEIGHT;
+   MMSeparatore3.Height := MM_SEPARATOR_HEIGHT;
+end;
+
+function TMainForm.IsMainMenuEnabled: Boolean;
+begin
+   Result := MainMenuEnabled;
+end;
+
+function TMainForm.MMItemIsSelected(MMI:TPaintBox):Boolean;
+begin
+   // Questa funzione ritorna True se la voce del menu ricevuta come parametro
+   //  è selezionato.
+   Result := MainMenuState[MMI.Tag] = MM_ITEM_SELECTED;
+end;
+
+procedure TMainForm.MMItemSetSelected(MMI:TPaintBox);
+begin
+   // Questa funzione Seleziona la voce del main menu ricevuta come parametro.
+   // ------------------------------------------------------------------------
+   // Prima però deve deselezionare quello precedente
+   if MMItemIsSelected(SBSoggetto)      then MMItemSetUnselected(SBSoggetto);
+   if MMItemIsSelected(SBPratica)       then MMItemSetUnselected(SBPratica);
+   if MMItemIsSelected(SBAssistenza)    then MMItemSetUnselected(SBAssistenza);
+   if MMItemIsSelected(SBAssistenze)    then MMItemSetUnselected(SBAssistenze);
+   if MMItemIsSelected(SBRubrica)       then MMItemSetUnselected(SBRubrica);
+   if MMItemIsSelected(SBDocumenti)     then MMItemSetUnselected(SBDocumenti);
+   if MMItemIsSelected(SBGM)            then MMItemSetUnselected(SBGM);
+   if MMItemIsSelected(SBCV)            then MMItemSetUnselected(SBCV);
+   if MMItemIsSelected(SBArticoli)      then MMItemSetUnselected(SBArticoli);
+   if MMItemIsSelected(SBPratiche)      then MMItemSetUnselected(SBPratiche);
+   if MMItemIsSelected(SBScadenze)      then MMItemSetUnselected(SBScadenze);
+   if MMItemIsSelected(SBImpegni)       then MMItemSetUnselected(SBImpegni);
+   if MMItemIsSelected(SBPrimanota)     then MMItemSetUnselected(SBPrimanota);
+   if MMItemIsSelected(SBAgenda)        then MMItemSetUnselected(SBAgenda);
+   if MMItemIsSelected(SBGC)            then MMItemSetUnselected(SBGC);
+   // Seleziona la voce
+   MainMenuState[MMI.Tag] := MM_ITEM_SELECTED;
+   MMI.OnPaint(MMI);
+end;
+
+procedure TMainForm.MMItemSetUnselected(MMI:TPaintBox);
+begin
+   // Questa funzione Deseleziona la voce del main menu ricevuta come parametro.
+   // ------------------------------------------------------------------------
+   // Seleziona la voce
+   MainMenuState[MMI.Tag] := MM_ITEM_ENABLED;
+   MMI.OnPaint(MMI);
+end;
+
+procedure TMainForm.MMItemSetEnabled(MMI:TPaintBox; Enabled:Boolean);
+begin
+   // Questa funzione Ablita/Disabilita la voce del main menu ricevuta come parametro.
+   // ------------------------------------------------------------------------
+   if Enabled then begin
+      // Setta il flag a Enabled, ma se è già selected non fà nulla altrimenti succedono casini
+      //  di visualizzazione
+      if MainMenuState[MMI.Tag] <> MM_ITEM_SELECTED then MainMenuState[MMI.Tag] := MM_ITEM_ENABLED;
+   end else MainMenuState[MMI.Tag] := MM_ITEM_DISABLED;
+   MMI.Enabled := Enabled;
+end;
+
+procedure TMainForm.MMItemSetVisible(MMI:TPaintBox; Visible:Boolean);
+begin
+   // Questa funzione AbIlita/Disabilita la voce del main menu ricevuta come parametro.
+   // ------------------------------------------------------------------------
+   if Visible then MainMenuState[MMI.Tag] := MM_ITEM_ENABLED else MainMenuState[MMI.Tag] := MM_ITEM_INVISIBLE;
+   MMI.Visible := Visible;
+end;
+
+procedure TMainForm.MainMenuInvisibile;
+begin
+   // Rende invisibili tutte le voci del mainmenu
+   MMItemSetVisible(SBSoggetto, False);
+   MMItemSetVisible(SBPratica, False);
+   MMItemSetVisible(SBAssistenza, False);
+   MMItemSetVisible(SBAssistenze, False);
+   MMItemSetVisible(SBRubrica, False);
+   MMItemSetVisible(SBPratiche, False);
+   MMItemSetVisible(SBDocumenti, False);
+   MMItemSetVisible(SBScadenze, False);
+   MMItemSetVisible(SBIMpegni, False);
+   MMItemSetVisible(SBArticoli, False);
+   MMItemSetVisible(SBGM, False);
+   MMItemSetVisible(SBCV, False);
+   MMItemSetVisible(SBPrimanota, False);
+   MMItemSetVisible(SBAgenda, False);
+   MMItemSetVisible(SBGC, False);
+end;
+
+procedure TMainForm.DisabilitaMainMenu(AllDisable:Boolean);
+begin
+   // Imposta il Flag che indica se il MainMenu è abilitato o meno
+   MainMenuEnabled := False;
+
+   // Variabile utilizzata per disabilitare o meno i pulsanti del mainmenu in modo
+   //  diverso in base a se è cliccato uno dei pulsanti Impostazioni o Utilità
+   AllDisable := SBImpostazioni.Down or SBUtilita.Down or AllDisable;
+   // Disabilita tutti i pulsanti del menù principale tranne quello selezionato
+   MMItemSetEnabled(SBSoggetto,  MMItemIsSelected(SBSoggetto)   and not AllDisable);
+   MMItemSetEnabled(SBPratica,   MMItemIsSelected(SBPratica)    and not AllDisable);
+   MMItemSetEnabled(SBAssistenza,MMItemIsSelected(SBAssistenza) and not AllDisable);
+   MMItemSetEnabled(SBAssistenze,MMItemIsSelected(SBAssistenze) and not AllDisable);
+   MMItemSetEnabled(SBRubrica,   MMItemIsSelected(SBRubrica)    and not AllDisable);
+   MMItemSetEnabled(SBPratiche,  MMItemIsSelected(SBPratiche)   and not AllDisable);
+   MMItemSetEnabled(SBDocumenti, MMItemIsSelected(SBDocumenti)  and not AllDisable);
+   MMItemSetEnabled(SBScadenze,  MMItemIsSelected(SBScadenze)   and not AllDisable);
+   MMItemSetEnabled(SBImpegni,   MMItemIsSelected(SBImpegni)    and not AllDisable);
+   MMItemSetEnabled(SBArticoli,  MMItemIsSelected(SBArticoli)   and not AllDisable);
+   MMItemSetEnabled(SBGM,        MMItemIsSelected(SBGM)         and not AllDisable);
+   MMItemSetEnabled(SBCV,        MMItemIsSelected(SBCV)         and not AllDisable);
+   MMItemSetEnabled(SBPrimanota, MMItemIsSelected(SBPrimanota)  and not AllDisable);
+   MMItemSetEnabled(SBAgenda,    MMItemIsSelected(SBAgenda)     and not AllDisable);
+   MMItemSetEnabled(SBGC,        MMItemIsSelected(SBGC)         and not AllDisable);
+
+   // Disabilita il calendario dell'agenda
+   if ClientiForm.PageControl2.ActivePage = ClientiForm.TabAgenda then ChiudiCalendario;
+
+   // Se la voce selezionata non è il soggetto selezionato e c'è un soggetto selezionato
+   //  disabilita il pulsante di chiusura del soggetto selezionato
+   if (not MMItemIsSelected(SBSoggetto))  and (SSChiudi.Visible) then SSChiudi.Enabled := False;
+   if (not MMItemIsSelected(SBPratica)) and (not MMItemIsSelected(SBAssistenza)) and (PSChiudi.Visible) then PSChiudi.Enabled := False;
+
+   // Utilità e Impostazioni
+   SBUtilita.Enabled := SBUtilita.Down;
+   SBImpostazioni.Enabled := SBImpostazioni.Down;
+end;
+
+procedure TMainForm.CheckMainMenu;
+begin
+   // Questa funzione visualizza e ridimensiona nel modo corretto il Menù principale
+   //  in base a quali moduli sono o meno attivati dalla chiave
+   // ------------------------------------------------------------------------------
+   // Soggetto selezionato e pratica selezionata sono invisibili all'inizio
+   MMItemSetVisible(SBSoggetto, False);
+   MMItemSetVisible(SBPratica, False);
+   MMItemSetVisible(SBAssistenza, False);
+
+   // Il pulsante RUBRICA è sempre attivo
+   MMItemSetVisible(SBRubrica, True);
+   MMFirst := SBRubrica.Name; 
+
+   // Se attivo visualizza il pulsante PRATICHE/CANTIERI
+   if DM1.ModCtrl(MOD_PRATICHE) > 0 then begin
+      MMItemSetVisible(SBPratiche, True);
+      MMLast := SBPratiche.Name;
+   end else MMItemSetVisible(SBPratiche, False);
+
+   // Il pulsante DOCUMENTI è sempre attivo
+   MMItemSetVisible(SBDocumenti, True);
+   MMLast := SBPratiche.Name;
+
+   // Se attivo visualizza il pulsante SCADENZE
+   if DM1.ModCtrl(MOD_SCADENZARIO) > 0 then begin
+      MMItemSetVisible(SBScadenze, True);
+      MMLast := SBScadenze.Name;
+   end else MMItemSetVisible(SBScadenze, False);
+
+   // Se attivo visualizza il pulsante PRIMANOTA
+   if DM1.ModCtrl(MOD_PRIMANOTA) > 0 then begin
+      MMItemSetVisible(SBPrimanota, True);
+      MMLast := SBPrimanota.Name;
+   end else MMItemSetVisible(SBPrimanota, False);
+
+   // Se attivo visualizza il pulsante AGENDA
+   if DM1.ModCtrl(MOD_AGENDA) > 0 then begin
+      MMItemSetVisible(SBAgenda, True);
+      MMLast := SBAgenda.Name;
+   end else MMItemSetVisible(SBAgenda, False);
+
+   // Se attivo visualizza il pulsante ASSISTENZE
+   if (DM1.ModCtrl(MOD_CONTATTI) > 0) and DM1.MainMenuVisualizzaImpianti then begin
+      MMItemSetVisible(SBAssistenze, True);
+      MMLast := SBAssistenze.Name;
+   end else MMItemSetVisible(SBAssistenze, False);
+
+   // Se attivo visualizza il pulsante IMPEGNI
+   if DM1.ModCtrl(MOD_CONTATTI) > 0 then begin
+      MMItemSetVisible(SBIMpegni, True);
+      MMLast := SBIMpegni.Name;
+   end else MMItemSetVisible(SBIMpegni, False);
+
+   // Se attivo visualizza il pulsante ARTICOLI
+   if DM1.ModCtrl(MOD_ARTICOLI) > 0 then begin
+      MMItemSetVisible(SBArticoli, True);
+      MMLast := SBArticoli.Name;
+   end else MMItemSetVisible(SBArticoli, False);
+
+   // Se attivo visualizza il pulsante GIORNALE DI MAGAZZINO
+   if DM1.ModCtrl(MOD_GIORNALE_MAGAZZINO) > 0 then begin
+      MMItemSetVisible(SBGM, True);
+      MMLast := SBGM.Name;
+   end else MMItemSetVisible(SBGM, False);
+
+   // Se attivo visualizza il pulsante GIORNALE DI CANTIERE
+//   if DM1.ModCtrl(MOD_GIORNALE_CANTIERE) > 0 then begin
+//      MMItemSetVisible(SBGC, True);
+//      MMLast := SBGC.Name;
+//   end else MMItemSetVisible(SBGC, False);
+   MMItemSetVisible(SBGC, False);
+   MMLast := SBGC.Name;
+
+   // Se attivo visualizza il pulsante CONDIZIONI DI VENDITA
+   if DM1.ModCtrl(MOD_CONDIZIONI_VENDITA) > 0 then begin
+      MMItemSetVisible(SBCV, True);
+      MMLast := SBCV.Name;
+   end else MMItemSetVisible(SBCV, False);
+
+   // Effettua il posizionamento delle voci del MainMenu
+   RefreshMainMenu;
+end;
+
+
+procedure TMainForm.RefreshMainMenu;
+var
+   YY:Integer;
+begin
+   // Inizializzazione
+   YY := 100;
+   // Posizione verticalmente le varie voci
+   if SBSoggetto.Visible        then begin SBSoggetto.Top := YY;        Inc(YY, SBSoggetto.Height);     end;
+   if SBPratica.Visible         then begin SBPratica.Top := YY;         Inc(YY, SBPratica.Height);      end;
+   if SBAssistenza.Visible      then begin SBAssistenza.Top := YY;      Inc(YY, SBAssistenza.Height);   end;
+   if SBRubrica.Visible         then begin SBRubrica.Top := YY;         Inc(YY, SBRubrica.Height);      end;
+   if SBPratiche.Visible        then begin SBPratiche.Top := YY;        Inc(YY, SBPratiche.Height);     end;
+
+   MMSeparatore1.Top := YY;
+   Inc(YY, MMSeparatore1.Height);
+
+   if SBDocumenti.Visible       then begin SBDocumenti.Top := YY;       Inc(YY, SBDocumenti.Height);    end;
+   if SBScadenze.Visible        then begin SBScadenze.Top := YY;        Inc(YY, SBScadenze.Height);     end;
+   if SBPrimanota.Visible       then begin SBPrimanota.Top := YY;       Inc(YY, SBPrimanota.Height);    end;
+
+   MMSeparatore2.Top := YY;
+   Inc(YY, MMSeparatore2.Height);
+
+   if SBAgenda.Visible          then begin SBAgenda.Top := YY;          Inc(YY, SBAgenda.Height);       end;
+   if SBAssistenze.Visible      then begin SBAssistenze.Top := YY;      Inc(YY, SBAssistenze.Height);   end;
+   if SBImpegni.Visible         then begin SBImpegni.Top := YY;         Inc(YY, SBImpegni.Height);      end;
+
+   MMSeparatore3.Top := YY;
+   Inc(YY, MMSeparatore3.Height);
+
+   if SBArticoli.Visible        then begin SBArticoli.Top := YY;        Inc(YY, SBArticoli.Height);     end;
+   if SBGM.Visible              then begin SBGM.Top := YY;              Inc(YY, SBGM.Height);           end;
+   if SBGC.Visible              then begin SBGC.Top := YY;              Inc(YY, SBGC.Height);           end;
+   if SBCV.Visible              then begin SBCV.Top := YY;              Inc(YY, SBCV.Height);           end;
+end;
+
+
+procedure TMainForm.AbilitaMainMenu;
+begin
+   // Imposta il Flag che indica se il MainMenu è abilitato o meno
+   MainMenuEnabled := True;
+   
+   // Abilita tutti i pulsanti del menù principale
+   MMItemSetEnabled(SBSoggetto, True);
+   MMItemSetEnabled(SBPratica, True);
+   MMItemSetEnabled(SBAssistenza, True);
+   MMItemSetEnabled(SBAssistenze, True);
+   MMItemSetEnabled(SBRubrica, True);
+   MMItemSetEnabled(SBPratiche, True);
+   MMItemSetEnabled(SBDocumenti, True);
+   MMItemSetEnabled(SBScadenze, True);
+   MMItemSetEnabled(SBImpegni, True);
+   MMItemSetEnabled(SBArticoli, True);
+   MMItemSetEnabled(SBGM, True);
+   MMItemSetEnabled(SBCV, True);
+   MMItemSetEnabled(SBPrimanota, True);
+   MMItemSetEnabled(SBAgenda, True);
+   MMItemSetEnabled(SBGC, True);
+
+   // Disabilita il calendario dell'agenda
+   if ClientiForm.PageControl2.ActivePage = ClientiForm.TabAgenda then ApriCalendario;
+
+   // Se la voce selezionata è il soggetto selezionato o similari, attiva il pulsante di chiusura del
+   //  soggetto selezionato o similare
+   if (not MMItemIsSelected(SBSoggetto)) and (SSChiudi.Visible) then SSChiudi.Enabled := True;
+   if (not MMItemIsSelected(SBPratica)) and (not MMItemIsSelected(SBAssistenza)) and (PSChiudi.Visible) then PSChiudi.Enabled := True;
+
+   // Utilità e Impostazioni
+   SBUtilita.Enabled := True;
+   SBImpostazioni.Enabled := True;
+end;
+
+// =================================================================================================================================
+
+
+
+procedure TMainForm.LevanteException(Sender: TObject; E: Exception);
+begin
+   // Visualizza l'errore
+   Application.ShowException(E);
+end;
+
+
+function  TMainForm.TrayBarTop:Integer;
+var
+  r: TRect;
+begin
+  GetWindowRect(FindWindow('Shell_TrayWnd', nil), r);
+  Result := r.Top;
+end;
+
+
+procedure TMainForm.FormSetParentPlatformDependent(CF,PF:TForm);
+begin
+   // Questa procedura imposta la proprietà Parent della CF(ClientForm) in modo che punti
+   //  alla PF (ParentForm). E' stata creata per risolvere un problema che apariva quando
+   //  il programma girava su Win95/98/ME e solo quando assegnavo la proprietà Parent
+   //  della form AnagArtForm := MainFOrm (AnagArtForm.Parent := MainForm).
+   //  Se invece di fare la suddetta assegnazione uso l'API Windows.SetParent non mi dà
+   //  l'errore. Però per evitare possibili problemi uso questo modo solo se il programma stà girando
+   //  su Win95/98/ME. I problemi possono nascere perchè usando l'API direttamente Delhi non ha modo di
+   //  aggiornare alcune sue strutture e altre cose, quindi devo fare attenzione. Cmq per il momento
+   //  sembra funzionare correttamente.
+   // --------------------------------------------------------------------------
+   // Se il programma stà girando su Win95/98/Me usa l'API di Windows direttamente
+   if Win32Platform = VER_PLATFORM_WIN32_WINDOWS then begin
+      Windows.SetParent(CF.Handle, PF.Handle);
+   // Altrimenti fà l'assegnazione normale delle proprietà
+   end else begin
+      CF.Parent := PF;
+   end;
+end;
+
+
+procedure TMainForm.BloccaIconaDocTipo(Blocca:Boolean; NomeFormChiamante:TComponentName);
+var
+   SogliaPerDisabilitaMainMenu:Byte;
+begin
+   // IMposta la soglia oltre la quale deve disabilitare il MainMenu a 1 se le form
+   //  chiamanti sono fra quelle elencate, a 0 in tutti gli altri casi
+   SogliaPerDisabilitaMainMenu := 0;
+   if (NomeFormChiamante = 'AnagCliForm')or(NomeFormChiamante = 'PraticaForm') then SogliaPerDisabilitaMainMenu := 1;
+
+   // Se il parametro = True  incrementa il flag altrimenti lo decrementa
+   //  Bloccato > 1  -  Sbloccato = 0
+   if Blocca then begin
+      // Incrementa il livello del flag
+      Inc(FlagBloccoIconaDocTipo, 1);
+      // Se il flag > Soglia Disabilita il MainMenu
+      if FlagBloccoIconaDocTipo > SogliaPerDisabilitaMainMenu then begin
+         DisabilitaMainMenu(False);
+      end;
+   end else begin
+      // Decrementa il livello del flag
+      Dec(FlagBloccoIconaDocTipo, 1);
+      // Se il flag del blocco <= soglia allora riabilita anche il MainMenu
+      if FlagBloccoIconaDocTipo <= SogliaPerDisabilitaMainMenu then AbilitaMainMenu;
+   end;
+end;
+
+function TMainForm.IconaDocTipoBloccata:Integer;
+begin
+   // Ritorna True se l'aggiornamento dell'IconaDocTipo è bloccato
+   Result := FlagBloccoIconaDocTipo;
+end;
+
+procedure TMainForm.CaricaIconaDocTipo(Titolo:String);
+var
+   TestoRect:TRect;
+   P:TiniFile;
+   S:String;
+begin
+   // Prima di tutto controlla se l'IconaDocTipo è bloccata ed se si, esce subito sanza fare nulla
+   if FlagBloccoIconaDocTipo > 0 then Exit;
+   // Apre il file dei parametri del manu
+   P := TIniFile.Create(DM1.CurrDir + 'menu.ini');
+   try
+     // Carica e dimensiona la bitmap che indica il tipo di form visualizzata
+     S := P.ReadString(Titolo, 'Bitmap', '');
+     if (S <> '') and (FileExists(DM1.TemaDir + S)) then begin
+       ImgDocTipo.Picture.LoadFromFile(DM1.TemaDir + S);
+       ImgDocTipo.Height := ImgDocTipo.Picture.Height;
+       ImgDocTipo.Visible := True;
+     end else ImgDocTipo.Visible := False;
+     // Caption1
+     Caption1.Caption := P.ReadString(Titolo, 'Caption1', '');
+     Caption1.Top := P.ReadInteger(Titolo, 'Caption1Top', 0);
+     Caption1.Left := P.ReadInteger(Titolo, 'Caption1Left', 0);
+     Caption1.Font.Name := P.ReadString(Titolo, 'Caption1FontName', 'Verdana');
+     Caption1.Font.Size := P.ReadInteger(Titolo, 'Caption1FontSize', 10);
+     if P.ReadBool(Titolo, 'Caption1FontStyleBold', True) then Caption1.Font.Style := [fsBold] else Caption1.Font.Style := [];
+     // Caption2
+     Caption2.Caption := P.ReadString(Titolo, 'Caption2', '');
+     Caption2.Top := P.ReadInteger(Titolo, 'Caption2Top', 0);
+     Caption2.Left := P.ReadInteger(Titolo, 'Caption2Left', 0);
+     Caption2.Font.Name := P.ReadString(Titolo, 'Caption2FontName', 'Verdana');
+     Caption2.Font.Size := P.ReadInteger(Titolo, 'Caption2FontSize', 10);
+     if P.ReadBool(Titolo, 'Caption2FontStyleBold', True) then Caption2.Font.Style := [fsBold] else Caption2.Font.Style := [];
+     // Caption1
+     Caption3.Caption := P.ReadString(Titolo, 'Caption3', '');
+     Caption3.Top := P.ReadInteger(Titolo, 'Caption3Top', 0);
+     Caption3.Left := P.ReadInteger(Titolo, 'Caption3Left', 0);
+     Caption3.Font.Name := P.ReadString(Titolo, 'Caption3FontName', 'Verdana');
+     Caption3.Font.Size := P.ReadInteger(Titolo, 'Caption3FontSize', 10);
+     if P.ReadBool(Titolo, 'Caption3FontStyleBold', True) then Caption3.Font.Style := [fsBold] else Caption3.Font.Style := [];
+   finally
+     P.Free;
+     Update;
+   end;
+end;
+
+procedure TMainForm.SalvaIconaDocTipo;
+var
+   CurrIconaDocTipo: ItemDocTipoPointer;
+begin
+   // Prima di tutto controlla se l'IconaDocTipo è bloccata ed se si, esce subito sanza fare nulla
+   if FlagBloccoIconaDocTipo > 0 then Exit;
+   // Se non è già stata creata crea la TList che contiene lo stack delle IconeDocTipo
+   if not Assigned(StackIconaDocTipo) then StackIconaDocTipo := TList.Create;
+   // Crea il puntatore al record che conterrà i dati della IconaDocTipo corrente per essere inserita
+   //  nello stack
+   New(CurrIconaDocTipo);
+   // Inserisce i dati dell'IconaDocTipo da salvare nel record
+   if not ImgDocTipo.Picture.Graphic.Empty then begin
+      CurrIconaDocTipo^.ImgDocTipo := TBitmap.Create;
+      CurrIconaDocTipo^.ImgDocTipo.Assign(ImgDocTipo.Picture);
+   end;
+   CurrIconaDocTipo^.LabelTipoDocumentoVisible  := LabelTipoDocumento.Visible;
+   CurrIconaDocTipo^.SBTipoDocumentoVisible     := SBTipoDocumento.Visible;
+   CurrIconaDocTipo^.Caption1                   := Caption1.Caption;
+   CurrIconaDocTipo^.Caption1Top                := Caption1.Top;
+   CurrIconaDocTipo^.Caption1Left               := Caption1.Left;
+   CurrIconaDocTipo^.Caption1FontName           := Caption1.Font.Name;
+   CurrIconaDocTipo^.Caption1FontSize           := Caption1.Font.Size;
+   CurrIconaDocTipo^.Caption1FontStyleBold      := fsBold in Caption1.Font.Style;
+   CurrIconaDocTipo^.Caption2                   := Caption2.Caption;
+   CurrIconaDocTipo^.Caption2Top                := Caption2.Top;
+   CurrIconaDocTipo^.Caption2Left               := Caption2.Left;
+   CurrIconaDocTipo^.Caption2FontName           := Caption2.Font.Name;
+   CurrIconaDocTipo^.Caption2FontSize           := Caption2.Font.Size;
+   CurrIconaDocTipo^.Caption2FontStyleBold      := fsBold in Caption2.Font.Style;
+   CurrIconaDocTipo^.Caption3                   := Caption3.Caption;
+   CurrIconaDocTipo^.Caption3Top                := Caption3.Top;
+   CurrIconaDocTipo^.Caption3Left               := Caption3.Left;
+   CurrIconaDocTipo^.Caption3FontName           := Caption3.Font.Name;
+   CurrIconaDocTipo^.Caption3FontSize           := Caption3.Font.Size;
+   CurrIconaDocTipo^.Caption3FontStyleBold      := fsBold in Caption3.Font.Style;
+   // Esegue il metodo Dormant della Bitmap e poi FreeImage per liberare le risorse GDI occupate
+   //  dalla Bitmap stessa e quindi ottimizzarne l'utilizzo.
+   CurrIconaDocTipo^.ImgDocTipo.Dormant;
+   CurrIconaDocTipo^.ImgDocTipo.FreeImage;
+   // INserisce il record appena impostato nello stack
+   StackIconaDocTipo.Add(CurrIconaDocTipo);
+   StackIconaDocTipo.Capacity := StackIconaDocTipo.Count;
+   // Rende invisibile la label che indica il tipo documento e il button per la scelta del tipo documento
+   LabelTipoDocumento.Visible := False;
+   SBTipoDOcumento.Visible :=False;
+end;
+
+procedure TMainForm.RipristinaIconaDocTipo;
+var
+   CurrIconaDocTipo: ItemDocTipoPointer;
+begin
+   // Prima di tutto controlla se l'IconaDocTipo è bloccata ed se si, esce subito sanza fare nulla
+   if FlagBloccoIconaDocTipo > 0 then Exit;
+   // Carica sul record attuale i dati da riprstinare
+   CurrIconaDocTipo := StackIconaDocTipo.Items[StackIconaDocTipo.Count -1];
+   // Ora ripristina il tutto
+   if Assigned(CurrIconaDocTipo^.ImgDocTipo) then
+   begin
+     ImgDocTipo.Picture.Assign(CurrIconaDocTipo^.ImgDocTipo);
+     ImgDocTipo.Visible := True;
+   end;
+   LabelTipoDocumento.Visible := CurrIconaDocTipo^.LabelTipoDocumentoVisible;
+   SBTipoDocumento.Visible    := CurrIconaDocTipo^.SBTipoDocumentoVisible;
+   Caption1.Caption           := CurrIconaDocTipo^.Caption1;
+   Caption1.Top               := CurrIconaDocTipo^.Caption1Top;
+   Caption1.Left              := CurrIconaDocTipo^.Caption1Left;
+   Caption1.Font.Name         := CurrIconaDocTipo^.Caption1FontName;
+   Caption1.Font.Size         := CurrIconaDocTipo^.Caption1FontSize;
+   if CurrIconaDocTipo^.Caption1FontStyleBold then Caption1.Font.Style := [fsBold] else Caption1.Font.Style := [];
+   Caption2.Caption           := CurrIconaDocTipo^.Caption2;
+   Caption2.Top               := CurrIconaDocTipo^.Caption2Top;
+   Caption2.Left              := CurrIconaDocTipo^.Caption2Left;
+   Caption2.Font.Name         := CurrIconaDocTipo^.Caption2FontName;
+   Caption2.Font.Size         := CurrIconaDocTipo^.Caption2FontSize;
+   if CurrIconaDocTipo^.Caption2FontStyleBold then Caption2.Font.Style := [fsBold] else Caption2.Font.Style := [];
+   Caption3.Caption           := CurrIconaDocTipo^.Caption3;
+   Caption3.Top               := CurrIconaDocTipo^.Caption3Top;
+   Caption3.Left              := CurrIconaDocTipo^.Caption3Left;
+   Caption3.Font.Name         := CurrIconaDocTipo^.Caption3FontName;
+   Caption3.Font.Size         := CurrIconaDocTipo^.Caption3FontSize;
+   if CurrIconaDocTipo^.Caption3FontStyleBold then Caption3.Font.Style := [fsBold] else Caption3.Font.Style := [];
+   // Elimina l'elemento dalla TList
+   Dispose(CurrIconaDocTipo);
+   StackIconaDocTipo.Delete(StackIconaDocTipo.Count -1);
+   StackIconaDocTipo.Capacity := StackIconaDocTipo.Count;
+end;
+
+
+// TODO -oMauri: Questa procedura, una volta terminata la conversione al modello a oggetti delle form, dovrà essere eliminata in quanto sostituita dalla stessa procedura inserita nella capostipite di tutte le form del progetto
+procedure TMainForm.CaricaTemaClientForm(F:TForm; TopPanel:TBmpPanel; ESC,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10:TRxSpeedButton);
+begin
+   // IMposta le dimensioni e il posizionamento della form
+   F.Left               := CLIENTFORM_LEFT;
+   F.Top                := CLIENTFORM_TOP;
+   F.Width              := CLIENTFORM_WIDTH;
+   F.Height             := CLIENTFORM_HEIGHT;
+   F.Color              := CLIENTFORM_BG_COLOR;
+
+   // Carica l'immagine di sfondo del pannello dei pulsanti
+   TopPanel.BitMap := MainTopPanel.BitMap;
+
+   // Dimensiona i pulsanti in base a come sono dimensionati nella MainForm
+   // ---------------------------------------------------------------------
+   ESC.Left     := RxSpeedButtonUscita.Left;
+   ESC.Top      := RxSpeedButtonUscita.Top;
+   ESC.Width    := RxSpeedButtonUscita.Width;
+   ESC.Height   := RxSpeedButtonUscita.Height;
+   ESC.NumGlyphs:= RxSpeedButtonUscita.NumGlyphs;
+   ESC.Glyph    := RxSpeedButtonUscita.Glyph;
+   ESC.Cursor   := RXSpeedButtonUSCITA.Cursor;
+
+   F1.Left      := RxSpeedButtonHelp.Left;
+   F1.Top       := RxSpeedButtonHelp.Top;
+   F1.Width     := RxSpeedButtonHelp.Width;
+   F1.Height    := RxSpeedButtonHelp.Height;
+   F1.NumGlyphs := RxSpeedButtonHelp.NumGlyphs;
+   F1.Glyph     := RxSpeedButtonHelp.Glyph;
+   F1.Cursor    := RXSpeedButtonHelp.Cursor;
+
+   F2.Left      := RxSpeedModifica.Left;
+   F2.Top       := RxSpeedModifica.Top;
+   F2.Width     := RxSpeedModifica.Width;
+   F2.Height    := RxSpeedModifica.Height;
+   F2.NumGlyphs := RxSpeedModifica.NumGlyphs;
+   F2.Glyph     := RxSpeedModifica.Glyph;
+   F2.Cursor    := RXSpeedModifica.Cursor;
+
+   F3.Left      := RxSpeedButtonNuovo.Left;
+   F3.Top       := RxSpeedButtonNuovo.Top;
+   F3.Width     := RxSpeedButtonNuovo.Width;
+   F3.Height    := RxSpeedButtonNuovo.Height;
+   F3.NumGlyphs := RxSpeedButtonNuovo.NumGlyphs;
+   F3.Glyph     := RxSpeedButtonNuovo.Glyph;
+   F3.Cursor    := RXSpeedButtonNuovo.Cursor;
+
+   F4.Left      := RxSpeedButtonElimina.Left;
+   F4.Top       := RxSpeedButtonElimina.Top;
+   F4.Width     := RxSpeedButtonElimina.Width;
+   F4.Height    := RxSpeedButtonElimina.Height;
+   F4.NumGlyphs := RxSpeedButtonElimina.NumGlyphs;
+   F4.Glyph     := RxSpeedButtonElimina.Glyph;
+   F4.Cursor    := RXSpeedButtonElimina.Cursor;
+
+   F5.Left      := RxSpeedButtonTrova.Left;
+   F5.Top       := RxSpeedButtonTrova.Top;
+   F5.Width     := RxSpeedButtonTrova.Width;
+   F5.Height    := RxSpeedButtonTrova.Height;
+   F5.NumGlyphs := RxSpeedButtonTrova.NumGlyphs;
+   F5.Glyph     := RxSpeedButtonTrova.Glyph;
+   F5.Cursor    := RXSpeedButtonTrova.Cursor;
+
+   F6.Left      := RxSpeedButtonResetQuery.Left;
+   F6.Top       := RxSpeedButtonResetQuery.Top;
+   F6.Width     := RxSpeedButtonResetQuery.Width;
+   F6.Height    := RxSpeedButtonResetQuery.Height;
+   F6.NumGlyphs := RxSpeedButtonResetQuery.NumGlyphs;
+   F6.Glyph     := RxSpeedButtonResetQuery.Glyph;
+   F6.Cursor    := RXSpeedButtonResetQuery.Cursor;
+
+   F7.Left      := RxSpeedButtonStampa.Left;
+   F7.Top       := RxSpeedButtonStampa.Top;
+   F7.Width     := RxSpeedButtonStampa.Width;
+   F7.Height    := RxSpeedButtonStampa.Height;
+   F7.NumGlyphs := RxSpeedButtonStampa.NumGlyphs;
+   F7.Glyph     := RxSpeedButtonStampa.Glyph;
+   F7.Cursor    := RXSpeedButtonStampa.Cursor;
+
+   F8.Left      := RxSpeedButtonFax.Left;
+   F8.Top       := RxSpeedButtonFax.Top;
+   F8.Width     := RxSpeedButtonFax.Width;
+   F8.Height    := RxSpeedButtonFax.Height;
+   F8.NumGlyphs := RxSpeedButtonFax.NumGlyphs;
+   F8.Glyph     := RxSpeedButtonFax.Glyph;
+   F8.Cursor    := RXSpeedButtonFax.Cursor;
+
+   F9.Left      := RxSpeedButtonMail.Left;
+   F9.Top       := RxSpeedButtonMail.Top;
+   F9.Width     := RxSpeedButtonMail.Width;
+   F9.Height    := RxSpeedButtonMail.Height;
+   F9.NumGlyphs := RxSpeedButtonMail.NumGlyphs;
+   F9.Glyph     := RxSpeedButtonMail.Glyph;
+   F9.Cursor    := RXSpeedButtonMail.Cursor;
+
+   F10.Left     := RxSpeedButtonVisualizza.Left;
+   F10.Top      := RxSpeedButtonVisualizza.Top;
+   F10.Width    := RxSpeedButtonVisualizza.Width;
+   F10.Height   := RxSpeedButtonVisualizza.Height;
+   F10.NumGlyphs:= RxSpeedButtonVisualizza.NumGlyphs;
+   F10.Glyph    := RxSpeedButtonVisualizza.Glyph;
+   F10.Cursor   := RXSpeedButtonVisualizza.Cursor;
+   // ---------------------------------------------------------------------
+
+   F.Update;
+end;
+
+
+procedure TMainForm.CaricaLayout;
+begin
+   // Carica le bitmap dei pannelli della cornice della MainForm
+   MainTopPanel.BitMap.LoadFromFile(DM1.TemaDir + 'top_panel.bmp');
+   MainLeftPanel.BitMap.LoadFromFile(DM1.TemaDir + 'sx_panel.bmp');
+   MainBottomPanel.BitMap.LoadFromFile(DM1.TemaDir + 'bottom_panel.bmp');
+   MainRightPanel.BitMap.LoadFromFile(DM1.TemaDir + 'dx_panel.bmp');
+   // Carica le Bitmap relative alla menù principale
+   LoadMainMenuImages;
+   // Calcola le dimensioni e i posizionamento dei pannelli principali
+   //  (Li calcolo manualmente perchè altrimenti con gli allineamenti
+   //  automatici, mi dava alcuni problemi)
+   MainBottomPanel.Left         := 0;
+   MainBottomPanel.Top          := ClientHeight - MainBottomPanel.Height;
+   MainBottomPanel.Width        := ClientWidth;
+   MainLeftPanel.Left           := 0;
+   MainLeftPanel.Top            := 0;
+   MainLeftPanel.Height         := ClientHeight - MainBottomPanel.Height;
+   MainRightPanel.Left          := ClientWidth - MainRightPanel.Width;
+   MainRightPanel.Top           := 0;
+   MainRightPanel.Height        := MainLeftPanel.Height;
+   MainTopPanel.Left            := MainLeftPanel.Width;
+   MainTopPanel.Top             := 0;
+   MainTopPanel.Width           := ClientWidth - MainLeftPanel.Width - MainRightPanel.Width;
+   // Carica le bitmap di eventuali sottopannelli per simularne la trasparenza
+   PanelUtilita.Bitmap := TBitMap.Create;
+   PanelUtilita.Bitmap.Width := PanelUtilita.Width;
+   PanelUtilita.Bitmap.Height := PanelUtilita.Height;
+   PanelUtilita.BitMap.Canvas.Draw(0, -PanelUtilita.Top+1, MainLeftPanel.BitMap);
+   // Carica le bitmap dei pulsanti superiori
+   RxSpeedButtonUscita.Glyph.LoadFromFile(DM1.TemaDir           + 'btn_ESC.bmp');
+   RxSpeedButtonHelp.Glyph.LoadFromFile(DM1.TemaDir             + 'btn_F1.bmp');
+   RxSpeedModifica.Glyph.LoadFromFile(DM1.TemaDir               + 'btn_F2.bmp');
+   RxSpeedButtonNuovo.Glyph.LoadFromFile(DM1.TemaDir            + 'btn_F3.bmp');
+   RxSpeedButtonElimina.Glyph.LoadFromFile(DM1.TemaDir          + 'btn_F4.bmp');
+   RxSpeedButtonTrova.Glyph.LoadFromFile(DM1.TemaDir            + 'btn_F5.bmp');
+   RxSpeedButtonResetQuery.Glyph.LoadFromFile(DM1.TemaDir       + 'btn_F6.bmp');
+   RxSpeedButtonStampa.Glyph.LoadFromFile(DM1.TemaDir           + 'btn_F7.bmp');
+   RxSpeedButtonFax.Glyph.LoadFromFile(DM1.TemaDir              + 'btn_F8.bmp');
+   RxSpeedButtonMail.Glyph.LoadFromFile(DM1.TemaDir             + 'btn_F9.bmp');
+   RxSpeedButtonVisualizza.Glyph.LoadFromFile(DM1.TemaDir       + 'btn_F10.bmp');
+   // Carica le bitmap dei pulsanti del MainMenù
+   SBUtilita.Glyph.LoadFromFile(DM1.TemaDir                     + 'btn_mm_utilita.bmp');
+   SBImpostazioni.Glyph.LoadFromFile(DM1.TemaDir                + 'btn_mm_impostazioni.bmp');
+   // Carica le Bitmap dei pulsanti di Massimizzazione e di Chiusura dei pannelli del
+   //  soggetto e pratica selezionata.
+   SSChiudi.Glyph.LoadFromFile(DM1.TemaDir                      + 'sb_close.bmp');
+   PSChiudi.Glyph.LoadFromFile(DM1.TemaDir                      + 'sb_close.bmp');
+   // Carica la Bitmap del pulsante di selezione del tipo documento principale
+   //  che viene utilizzato dei documenti fiscali per selezionarne il tipo
+   SBTipoDocumento.Glyph.LoadFromFile(DM1.TemaDir               + 'sb_doc_tipo.bmp');
+   // Carica la Bitmap dell'attesa in alto a DX
+   Attendere.Picture.LoadFromFile(DM1.TemaDir + 'attendere.bmp');
+   // Forza l'aggiornamento dello schermo
+   Update;
+end;
+
+
+
+function TMainForm.CheckIfNewVersion:Boolean;
+var
+   FI: TIniFile;
+   Versione: Integer;
+begin
+   Result := False;
+   // Questa funzione controlla se il programma è stato lanciato per la prima volta dopo un aggiornamento e per fare questo
+   //  verifica che la versione indicata nel file DCPrgVer.ini è inferiore a quella dell'eseguibile stesso. Se è la prima volta
+   //  che viene lanciata questa versione significa ovviamente che c'è stato un aggiornamento e quindi apre il programma
+   //  in modalità di ristrutturazione totale di tutte le aziende.
+   //  NB: Controlla anche se esiste la tabella con l'elenco delle aziende e se non esiste significa che si è
+   //       al primo avvio dopo l'installazione (altrimenti si è al primo avvio dopo un aggiornamento) e quindi
+   //       ancora senza archivi creati. Quindi avvia il programma in modalità normale per creare le tabelle
+   //       e non  in modalità di ristrutturazione (altrimenti dà degli errori).
+   FI := TIniFile.Create(DM1.SystemDir + 'DCPrgVer.ini');
+   Versione := FI.ReadInteger('Levante', 'Versione', 0);
+   if (PrgVersion > Versione)and(Versione >= 200) then begin
+      ModoRistrutturazioneTabelle := True;
+      Result := True;
+   end;
+   FI.Free;
+end;
+
+
+
+Procedure TMainForm.AggiornaDocumentiEsportati;
+var
+   QueryExpDoc : TIB_Cursor;
+   ListItem : TListItem;
+begin
+   // Crea il componente TIBOQuery lo imposta ed esegue la query risultante
+   QueryExpDoc := TIB_Cursor.Create(Self);
+   QueryExpDoc.DatabaseName := DM1.GenDBFile;
+   QueryExpDoc.IB_Connection := DM1.DBGenerale;
+   QueryExpDoc.SQL.Add('SELECT DISTINCT TipoDocumento, Registro, NumOrdPrev, DataDocumento, CodiceCliente, CAST(NULL AS VARCHAR(25)) AS CodiceArticolo,  CAST(NULL AS VARCHAR(1000)) AS Descrizione');
+   QueryExpDoc.SQL.Add('FROM TmpRighi');
+   QueryExpDoc.SQL.Add('WHERE STATION_ID = ' + DM1.CodiceUtente + ' AND TIPODOCUMENTO <> ''ARTICOLO'' AND TIPODOCUMENTO <> ''Chiamata''');
+
+   QueryExpDoc.SQL.Add('UNION ALL');
+
+   QueryExpDoc.SQL.Add('SELECT TIPODOCUMENTO, CAST(NULL AS VARCHAR(5)) AS REGISTRO, CAST(NULL AS INTEGER) AS NUMORDPREV, CAST(NULL AS TIMESTAMP) AS DATADOCUMENTO, CAST(NULL AS INTEGER) AS CODICECLIENTE, CODICEARTICOLO, DESCRIZIONE');
+   QueryExpDoc.SQL.Add('FROM TmpRighi');
+   QueryExpDoc.SQL.Add('WHERE STATION_ID = ' + DM1.CodiceUtente + ' AND TIPODOCUMENTO = ''ARTICOLO''');
+
+   QueryExpDoc.SQL.Add('UNION ALL');
+
+   QueryExpDoc.SQL.Add('SELECT DISTINCT TipoDocumento, Registro, NumOrdPrev, DataDocumento, CodiceCliente, CAST(NULL AS VARCHAR(25)) AS CodiceArticolo,  Descrizione');
+   QueryExpDoc.SQL.Add('FROM TmpRighi');
+   QueryExpDoc.SQL.Add('WHERE STATION_ID = ' + DM1.CodiceUtente + ' AND TIPODOCUMENTO = ''Chiamata''');
+
+   QueryExpDoc.Open;
+   // Cicla per tutta la query e carica le item nella ListView
+   QueryExpDoc.First;
+   ListViewExpDoc.Items.Clear;
+   while not QueryExpDoc.EOF do begin
+      // Se è un articolo
+      if QueryExpDoc.FieldByName('TIPODOCUMENTO').AsString = 'ARTICOLO' then begin
+         ListItem                  := ListViewExpDoc.Items.Add;
+         ListItem.ImageIndex       := 1;
+         ListItem.Caption          := QueryExpDoc.FieldByName('DESCRIZIONE').AsString + ' ' +
+                                      '{' + QueryExpDoc.FieldByName('CODICEARTICOLO').AsString + '}';
+      // Se è una chiamata
+      end else if QueryExpDoc.FieldByName('TIPODOCUMENTO').AsString = 'Chiamata' then begin
+         ListItem                  := ListViewExpDoc.Items.Add;
+         ListItem.ImageIndex       := 2;
+         ListItem.Caption          := 'Chiamata ' +
+                                      QueryExpDoc.FieldByName('DESCRIZIONE').AsString + ' ' +
+                                      '{' + QueryExpDoc.FieldByName('NUMORDPREV').AsString + '}';
+      // Se invece è un rigo documento
+      end else begin
+         ListItem                  := ListViewExpDoc.Items.Add;
+         ListItem.ImageIndex       := 0;
+         ListItem.Caption          := QueryExpDoc.FieldByName('TipoDocumento').AsString + ' ' +
+                                      IntToStr(QueryExpDoc.FieldByName('NumOrdPrev').AsInteger) + ' ' +
+                                      QueryExpDoc.FieldByName('Registro').AsString + ' ' +
+                                      DateToStr(QueryExpDoc.FieldByName('DataDocumento').AsDateTime);
+      end;
+      // Và al prossimo record
+      QueryExpDoc.Next;
+   end;
+   // Distrugge la query e libera le risorse
+   QueryExpDoc.Free;
+end;
+
+
+procedure TMainForm.ApriCalendario;
+const
+   PASSO = 20;
+   DELAY = 3;
+   FINAL_TOP  = 490;
+var
+   FINAL_LEFT : Integer;
+begin
+   FINAL_LEFT := Trunc((MainLeftPanel.Width - AgendaDateNavigator.Width) / 2) + 3;
+   AgendaDateNavigator.Top := FINAL_TOP;
+   AgendaDateNavigator.Left := AgendaDateNavigator.Width * (-1);
+   AgendaDateNavigator.Visible := True;
+   while AgendaDateNavigator.Left < FINAL_LEFT do begin
+      AgendaDateNavigator.Left := AgendaDateNavigator.Left + PASSO;
+      AgendaDateNavigator.Update;
+      Sleep(DELAY);
+      Application.ProcessMessages;
+   end;
+   AgendaDateNavigator.Left := FINAL_LEFT;
+   AgendaDateNavigator.Update;
+end;
+
+
+procedure TMainForm.ChiudiCalendario;
+const
+   PASSO = 20;
+   DELAY = 3;
+begin
+   while AgendaDateNavigator.Left > AgendaDateNavigator.Width * (-1) do begin
+      AgendaDateNavigator.Left := AgendaDateNavigator.Left - PASSO;
+      MainLeftPanel.Update;
+      Application.ProcessMessages;
+      Sleep(DELAY);
+   end;
+   AgendaDateNavigator.Visible := False;
+   MainLeftPanel.Update;
+end;
+
+
+procedure TmainForm.FormShow(Sender: TObject);
+var
+   P:TIniFile;
+   MR : TModalResult;
+begin
+  // Carica il Tema per l'Hint e imposta le dimensioni orizzontali
+  HintForm.CaricaTema;
+  HintForm.CalcolaDimensioniOrizzontali;
+
+  // Esegue le operazioni di apertura solo alla partenza
+  if not DM1.DBGenerale.Connected then begin
+       // Se al lancio del programma è stato specificato il parametro 'R' oppure 'r' che stà per Ristruttura
+       //  oppure è la prima volta che l'eseguibile viene eseguito dopo un aggiornamento...
+       //  NB: Controlla anche se esiste la tabella con l'elenco delle aziende e se non esiste significa che si è
+       //       al primo avvio dopo l'installazione (altrimenti si è al primo avvio dopo un aggiornamento) e quindi
+       //       ancora senza archivi creati. Quindi avvia il programma in modalità normale per creare le tabelle
+       //       e non  in modalità di ristrutturazione (altrimenti dà degli errori).
+       //  NB: Entra in modo ristrutturazione solo se la stazione è il server.
+       if ((MainForm.ModoRistrutturazioneTabelle)or(CheckIfNewVersion)) and (DM1.IsServer) then begin
+          DM1.AttivaTabelle(True, MainForm.ModoRistrutturazioneTabelle, False);
+          // ----------------------------------------------------------------------------------------------------------
+          // Se è il primo avvio dopo un aggiornamento...
+          if MainForm.CheckIfNewVersion then begin
+             // Visualizza un messaggio per avvisare l'utente di quello che succederà
+             MessageBeep(0);
+             if DM1.Messaggi('Lev@nte - Aggiornamento', 'A T T E N Z I O N E !!!'#13#13'E'' la prima volta che si avvia Lev@nte dopo un aggiornamento.'#13#13'E'' necessaria una ristrutturazione degli archivi, il programma eseguirà questa operazione automaticamente.'#13#13#13'Continuare?', 'NB: L''operazione potrebbe durare alcune decine di minuti.', [mbYes, mbNo], 0, nil) = mrYes then begin
+                // Avvia la form della copia di sicurezza
+                MessageBeep(0);
+                if DM1.Messaggi('Lev@nte - Aggiornamento', 'Prima di procedere con l''operazione è NECESSARIO effettuare una copia di sicurezza di tutti i dati.'#13#13#13'Effettuare la copia di sicurezza adesso?', 'NB: La copia di sicurezza è caldamente consigliata per prevenire eventuali perdite di dati in caso di problemi durante l''operazione.', [mbYes, mbNo], 0, nil) = mrYes then begin
+                   // Invia la richiesta di backup
+                   MR := SendBackupRequest;
+                   if MR = mrOk then begin
+                      // Dopo la copia di sicurezza propone di continuare l'operazione
+                      MessageBeep(0);
+                      if DM1.Messaggi('Lev@nte - Aggiornamento', 'Lev@nte è pronto per avviare la procedura di ristrutturazione automatica degli archivi.'#13#13#13'Confermi di voler continuare?', 'NB: Assicurarsi di aver effettuato una copia di sicurezza degli archivi prima di continuare', [mbYes, mbNo], 0, nil) = mrYes then begin
+                         // Visualizza la schermata di avvio
+                         VisualizzaAvvio(True);
+                         // Non fà nulla procede semplicemente al richiamo della form delle aziende
+                         Application.CreateForm(TAziendeForm, AziendeForm);
+                         AziendeForm.Parent := MainForm;
+                         AziendeForm.Mode := AZIENDE_AGGIORNATO;
+                         AziendeForm.Show;
+                      end else begin
+                         Application.Terminate;
+                         Exit;
+                      end;
+                   end else begin
+                      Application.Terminate;
+                      Exit;
+                   end;
+                end else begin
+                   Application.Terminate;
+                   Exit;
+                end;
+             end else begin
+                Application.Terminate;
+                Exit;
+             end;
+          // ----------------------------------------------------------------------------------------------------------
+          // Se invece è stato specificato il parametro R e non si è al primo avvio dopo un aggiornamento
+          //  visualizza la form delle aziende per fare o meno la ristrutturazione manuale.
+          end else begin
+             // Visualizza la schermata di avvio
+             VisualizzaAvvio(True);
+             // Visualizza la form delle aziende
+             Application.CreateForm(TAziendeForm, AziendeForm);
+             AziendeForm.Parent := MainForm;
+             AziendeForm.Mode := AZIENDE_RISTRUTTURA;
+             AziendeForm.Show;
+          end;
+          // ----------------------------------------------------------------------------------------------------------
+
+       // Se invece è un avvio normale...
+       end else begin
+
+          // Forza il flag a False perchè se la stazione è client e si stà avviando Levante dopo un aggiornamento il programma passa di quà
+          //  anche se sarebbe in modalità di ristrutturazione e dopo succede un casino, così rimette tutto a posto.
+          ModoRistrutturazioneTabelle := False;
+
+          DM1.InitCopyProtection(False);
+          DM1.ReadSmartKey;
+
+          // Annota nel file DCPrgVer.ini che si trova nella directory System di Windows la versione e la path
+          //  del programma che si stà eseguendo, viene usato dal programma che scarica gli aggiornamenti per verificare
+          //  la versione in uso e il percorso di installazione.
+          P := TIniFile.Create(DM1.SystemDir + 'DCPrgVer.ini');
+          P.WriteString('Levante', 'Path', DM1.CurrDir);
+          P.WriteInteger('Levante', 'Versione', PrgVersion);
+          P.UpdateFile;
+          P.Free;
+          // Visualizza la schermata di avvio
+          VisualizzaAvvio(True);
+       end;
+  end;
+end;
+
+
+procedure TMainForm.CaricaElencoAziende;
+var
+   Qry:TIB_Cursor;
+begin
+   // Questa funzione carica nella ComboBox di selezione dell'azienda da aprire
+   //  l'elenco di tutte le aziende presenti nel sistema.
+   // -------------------------------------------------------------------------
+   StartFrame.CBAzienda.Items.Clear;
+   Qry := TIB_Cursor.Create(Self);
+   try
+      Qry.DatabaseName := DM1.GenDBFile;
+      Qry.IB_Connection := DM1.DBGenerale;
+      Qry.SQL.Add('SELECT AZIENDA FROM AZIENDE');
+      Qry.Open;
+      while not Qry.Eof do begin
+         StartFrame.CBAzienda.Items.Add(Qry.FieldByName('AZIENDA').AsString);
+         Qry.Next;
+      end;
+   finally
+      Qry.Free;
+   end;
+end;
+
+procedure TmainForm.FormCreate(Sender: TObject);
+begin
+   // Fa sparire dalla vista il pulsante agiunto per l'avvio con il sensore biometrico
+   AvviaLevanteBiometrico.Top := 1;
+   AvviaLevanteBiometrico.Left := 1;
+   AvviaLevanteBiometrico.Width := 2;
+   AvviaLevanteBiometrico.Height := 2;
+   // Assegna il gestore dell'evento OnException dell'applicazione per una gestione centralizzata
+   //  degli errori.
+   Application.OnException := LevanteException;
+   // Disabilita gli hints altrimenti mi si vedono gli hints veggchi dove sono rimasti
+   Application.ShowHint := False;
+   // Inizializza il flag di blocco dell'aggiornamento dell'IconaDocTipo
+   FlagBloccoIconaDocTipo := 0;
+   // Imposta la Variabile ModoRistrutturazioneTabelle in base al parametro ricevuto
+   //  all'avvio del programma.
+   ModoRistrutturazioneTabelle := False;
+   if (ParamStr(1) = 'R')or(ParamStr(1) = 'r') then ModoRistrutturazioneTabelle := True;
+   // Altrimenti non la disegna nella posizione giusta
+//   Left   := DM1.GetLeftPosition;
+//   Top    := DM1.GetTopPosition;
+   Width  := MAINFORM_WIDTH;
+   Height := MAINFORM_HEIGHT;
+   // IMposta quanti millisecondi devono rimanere visibili gli Hints
+   //  perchè l'impostazione di default è troppo breve
+   Application.HintHidePause := 10000;
+
+   // IMposta il nome del'applicazion e la versione per l'identificazione e le caption delle form
+   // ===========================================================================================
+   NomeApplicazione     := '';
+   NomeApplicazione := NomeApplicazione + 'L';
+   NomeApplicazione := NomeApplicazione + 'e';
+   NomeApplicazione := NomeApplicazione + 'v';
+   NomeApplicazione := NomeApplicazione + '@';
+   NomeApplicazione := NomeApplicazione + 'n';
+   NomeApplicazione := NomeApplicazione + 't';
+   NomeApplicazione := NomeApplicazione + 'e';
+   VersioneApplicazione := '3.32';
+   // Versione abilitata (3.32)
+   PrgVersion := 300;
+   PrgVersion := PrgVersion + 30;
+   PrgVersion := PrgVersion + 2;
+   // ===========================================================================================
+
+   // IMposta la caption della form in base al nome del programma impostato nella variabile 'NomeApplicazione'
+   // NB: IMposta anche altre variabili globali per la versione ecc.
+   if D_MODE then Caption := MainForm.NomeApplicazione + ' ' + VersioneApplicazione + ' - (Versione Demo)' else Caption := MainForm.NomeApplicazione + ' ' + VersioneApplicazione;
+
+   // Registra gli identificativi dei WindowsMessages relativi al Backup (SACS)
+   RegistraMessaggi;
+end;
+
+procedure TmainForm.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+   N:String;
+begin
+   N := Controls[ControlCount-1].Name;
+
+   // Se viene premuto CTRL+ALT+H richiama form di impostazione del messaggio
+   //  Hint relativo al componente sul quale si trova il cursore
+   if (Key = 72) and (ssCtrl in Shift) and (ssAlt in Shift) then begin
+      Application.CreateForm(THintsForm, HintsForm);
+      HintsForm.Parent := MainForm;
+      HintsForm.LocalComponentOwner := FindDragTarget(Mouse.CursorPos, True).Owner.Name;
+      HintsForm.LocalComponentName  := FindDragTarget(Mouse.CursorPos, True).Name;
+      HintsForm.Show;
+   end;
+
+   // Smista la chiamata alla form appropriata
+   if      (Key = 65)and(ssCtrl in Shift)    then DM1.Calcolatrice.Execute
+   else if N = 'AnagArtForm'                 then AnagArtForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ClientiForm'                 then ClientiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'AnagCliForm'                 then AnagCliForm.FormKeyUp(Self, Key, Shift)
+//   else if N = 'AziendeForm'                 then AziendeForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'BancheForm'                  then BancheForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ContattiForm'                then ContattiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ExtFileForm'                 then ExtFileForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ExtPrgForm'                  then ExtPrgForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'FaxForm'                     then FaxForm.FormKeyUp(Self, Key, Shift)
+//   else if N = 'NetDirForm'                  then NetDirForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'PagamentiForm'               then PagamentiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ScadenzeForm'                then ScadenzeForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ArticoliForm'                then ArticoliForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'DatiAziendaForm'             then DatiAziendaForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'IntestazioneDocumentiForm'   then IntestazioneDocumentiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'PreventiviOrdiniForm'        then PreventiviOrdiniForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ProgressiviForm'             then ProgressiviForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'TestiForm'                   then TestiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ConformitaForm'              then ConformitaForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'SelezionePraticaForm'        then SelezionePraticaForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'SelezioneClienteForm'        then SelezioneClienteForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'StatiOggettiForm'            then StatiOggettiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'AliquoteIVAForm'             then AliquoteIVAForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'Categoria1Form'              then Categoria1Form.FormKeyUp(Self, Key, Shift)
+//   else if N = 'TracciatiForm'               then TracciatiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'PrimanotaForm'               then PrimanotaForm.FormKeyUp(Self, Key, Shift)
+//   else if N = 'SecurityForm'                then SecurityForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'SubSoggForm'                 then SubSoggForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'CausaliForm'                 then CausaliForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'AnagMagaForm'                then AnagMagaForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'GruppiForm'                  then GruppiForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'FattDifferitaForm'           then FattDifferitaForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ArchivioBancheForm'          then ArchivioBancheForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'PagamRiscForm'               then PagamRiscForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'MultiregistroForm'           then MultiregistroForm.FormKeyUp(Self, Key, Shift)
+   else if N = 'ImpegnoForm'                 then ImpegnoForm.FormKeyUp(Self, Key, Shift)
+   ;
+end;
+
+procedure TmainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  // Chiede prima conferma
+  Action := caNone;
+  if DM1.Messaggi('Chiusura Levante', 'Vuoi veramente chiudere Levante?', '', [mbYes,mbNo], 0, nil) = mrYes then begin
+     // Richiama la procedura per l'uscita dal programma
+     ChiudiLevante;
+  end;
+end;
+
+procedure TmainForm.ChiudiLevante;
+begin
+     // Prima di uscire dal programma Ferma il fax
+     DM1.ShowWait('CHIUSURA LEVANTE', 'Stop fax server');
+     DM1.FermaFax;
+     // Chiusura dei databases
+     DM1.ShowWait('', 'Stop database generale');
+     DM1.DBGenerale.Disconnect;
+     while DM1.DBGenerale.Connected do Application.ProcessMessages; // Attende l'effettiva disconnessione dal database
+     DM1.ShowWait('', 'Stop database dell''azienda');
+     DM1.DBAzienda.Disconnect;
+     while DM1.DBAzienda.Connected do Application.ProcessMessages; // Attende l'effettiva disconnessione dal database
+     // Chiude il messaggio sullo schermo
+     DM1.CloseWait;
+     // Visualizza la splashform
+     SplashForm := TSplashForm.Create(Application);
+     SplashForm.Show;
+     SplashForm.Update;
+     // Attiva il timer che avvierà la procedura per uscire dal programma
+     TimerStartStop.Interval := 1000;
+     TimerStartStop.Tag := 9;
+     TimerStartStop.Enabled := True;
+end;
+
+procedure TmainForm.ListViewExpDocDragOver(Sender, Source: TObject; X,
+  Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+   Accept := False;
+   // Cerca di riconoscere il mittente per accettare o meno l'operazione
+   // ------------------------------------------------------------------
+   // Se il mittente proviene da una TcxGrid o TcxView...
+   //  Controlla se il mittente è di tipo TcxDragControlObject che è il tipo di oggetto
+   //  che le griglie DevExpress passano surante il DragAndDrop.
+   if Source is TcxDragControlObject then begin
+      // Se il mittente è una vista (che è sempre contenuta in un GridSite)...
+      if TcxDragControlObject(Source).Control is TcxGridSite then begin
+         // La vista diventa il controllo predefinito per comodità
+         with TcxGridSite(TcxDragControlObject(Source).Control).GridView do begin
+            // Controlla se la vista è tra quelle da riconoscere
+            if (Name = 'tvDoc')
+            or (Name = 'tvArt')
+            or (Name = 'tvCorpo')
+            or (Name = 'tvImpegni')
+            then accept := True;
+         end;
+      end;
+   end;
+end;
+
+procedure TmainForm.ListViewExpDocKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   // Se è stato premuto il tasto 'Canc' elimina i documenti esportati selezionati
+   if Key = 46 then begin
+      while ListViewExpDoc.SelCount > 0 do begin
+         // Se si tratta di righi di documento
+         if ListViewExpDoc.Selected.ImageIndex = 0 then begin
+            DM1.EliminaExpDoc(DM1.ExpDocToDocType(ListViewExpDoc.Selected.Caption),
+                              DM1.ExpDocToDocReg(ListViewExpDoc.Selected.Caption),
+                              DM1.ExpDocToDocNum(ListViewExpDoc.Selected.Caption),
+                              DM1.ExpDocToDocDate(ListViewExpDoc.Selected.Caption));
+         // Se invece si tratta di articoli esportati
+         end else if ListViewExpDoc.Selected.ImageIndex = 1 then begin
+            DM1.EliminaExpArt(DM1.ExpArtToCodice(ListViewExpDoc.Selected.Caption));
+         // Se invece si tratta di impegni esportati
+         end else if ListViewExpDoc.Selected.ImageIndex = 2 then begin
+            DM1.EliminaExpImpegno(DM1.ExpImpegnoToID(ListViewExpDoc.Selected.Caption));
+         end;
+         // Elimina la voce
+         ListViewExpDoc.Selected.Delete;
+      end;
+      AggiornaDocumentiEsportati;
+   end;
+end;
+
+procedure TmainForm.ListViewExpDocMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+   // Se si è cliccato con pulsante sx del mouse inizia il DragDrop
+   //  mettendo il flag BachecaInsert := False per indicare che il
+   //  destinatario deve fare l'append di quanto riceve
+   if (Button = mbLeft) then begin
+      BachecaInsert := False;
+      ListViewExpDoc.BeginDrag(False);
+   // Se invece si è cliccato con pulsante dx del mouse inizia il DragDrop
+   //  mettendo il flag BachecaInsert := True per indicare che il
+   //  destinatario deve fare l'Insert di quanto riceve
+   end else if (Button = mbRight) then begin
+      BachecaInsert := True;
+      ListViewExpDoc.BeginDrag(False);
+   end;
+end;
+
+procedure TmainForm.ListViewExpDocEndDrag(Sender, Target: TObject; X,
+  Y: Integer);
+begin
+   // Altrimenti dà un errore
+   if Target <> nil then begin
+      // Se il target è la TAdvStringGrid dei righi dell'elenco del materiale della conformità
+      //  esegue l'importazione dei righi
+      if Target is TAdvStringGrid then begin
+         if (Target as TAdvStringGrid).Name = 'GridElencoMateriale' then begin
+            ConformitaForm.ImportaDocumentiEsportati;
+         end;
+      end;
+   end;
+end;
+
+procedure TmainForm.SpeedButton1Click(Sender: TObject);
+begin
+   DM1.Calcolatrice.Execute;
+end;
+
+procedure TmainForm.SBStopFaxClick(Sender: TObject);
+begin
+   // Annulla la trasmissione/ricezione Fax
+   DM1.ApdFaxServer1.CancelFax;
+end;
+
+procedure TmainForm.Importazionearchividibase1Click(Sender: TObject);
+begin
+     DM1.Attendere;
+     Application.CreateForm(TSynchroForm, SynchroForm);
+     SynchroForm.Parent         := MainForm;
+     SynchroForm.FormMode       := SYNCHRO_MODE_ARCBASE;
+     SynchroForm.Show;
+     DM1.ChiudiAttendere;
+end;
+
+procedure TmainForm.FormResize(Sender: TObject);
+begin
+   // NOn si posssono modificare le dimensioni della form, quindi rimette tutto a posto
+   Width  := MAINFORM_WIDTH;
+   Height := MAINFORM_HEIGHT;
+   // Fà in modo che non sia sopra o sotto la traybar
+   if (Top+Height) > TrayBarTop then Top := Top - (Top+Height-TrayBarTop);
+   // Ma che non sia nemmeno più in sù del bordo superiore della finestra,
+   if Top < 0 then Top := 0;
+end;
+
+procedure TmainForm.SBRubricaClick(Sender: TObject);
+var
+   AllowChange:Boolean;
+   CurrTab:TTabSheet;
+begin
+   // Se non uso una variabile non funziona e dà errore
+   AllowChange := True;
+   // Se non è già la voce selezionata
+   if not MMItemIsSelected(Sender as TPaintBox) then begin
+      // Seleziona la voce del menu
+      MMItemSetSelected(Sender as TPaintBox);
+      with (Sender as TPaintBox) do begin
+         // Se è stata cliccata una voce normale (non il soggetto selezionato oppure la pratica)
+         if (Name <> 'SBSoggetto') and (Name <> 'SBPratica') and (Name <> 'SBAssistenza') then begin
+
+            // CurrTab contiene il riferimento al TabSheet da attivare
+            if      Name = 'SBRubrica'        then CurrTab := ClientiForm.TabClienti
+            else if Name = 'SBDocumenti'      then CurrTab := ClientiForm.TabDocumenti
+            else if Name = 'SBGM'             then CurrTab := ClientiForm.TabMagazzino
+            else if Name = 'SBCV'             then CurrTab := ClientiForm.TabCondVend
+            else if Name = 'SBArticoli'       then CurrTab := ClientiForm.TabArticoli
+            else if Name = 'SBPratiche'       then CurrTab := ClientiForm.TabPratiche
+            else if Name = 'SBAssistenze'     then CurrTab := ClientiForm.TabAssistenze
+            else if Name = 'SBScadenze'       then CurrTab := ClientiForm.TabScadenze
+            else if Name = 'SBImpegni'        then CurrTab := ClientiForm.TabImpegni
+            else if Name = 'SBPrimanota'      then CurrTab := ClientiForm.TabPrimanota
+            else if Name = 'SBAgenda'         then CurrTab := ClientiForm.TabAgenda
+            else if Name = 'SBGC'             then CurrTab := ClientiForm.TabGC;
+//            ClientiForm.RxSpeedButtonResetQueryClick(Self);   // Azzera i filtri
+            ClientiForm.PageControl2Changing(Self, AllowChange);
+            ClientiForm.PageControl2.ActivePage := CurrTab;
+            ClientiForm.PageControl2Change(Self);
+
+         // Se invece si tratta proprio del Soggetto selezionato oppure la pratica selezionata
+         end else begin
+
+            // Se è stato cliccato sul soggetto selezionato...
+            if Name = 'SBSoggetto' then begin
+               ClientiForm.PageControl2Changing(Self, AllowChange);
+               DM1.VisualizzaCliente(StrToInt(ClientiForm.ClienteCorrente));
+            // Se invece è stato cliccato sulla pratica sslezionata...
+            end else if Name = 'SBPratica' then begin
+               ClientiForm.PageControl2Changing(Self, AllowChange);
+               DM1.VisualizzaPratica(StrToInt(ClientiForm.PraticaCorrente), StrToDate(ClientiForm.DataPraticaCorrente));
+            // Se invece è stato cliccato sull'assistenze impianto selezionato...
+            end else if Name = 'SBAssistenza' then begin
+               ClientiForm.PageControl2Changing(Self, AllowChange);
+               DM1.VisualizzaAssistenza(StrToInt(ClientiForm.PraticaCorrente), StrToDate(ClientiForm.DataPraticaCorrente));
+            end;
+
+         end;
+      end;
+   end;
+end;
+
+procedure TmainForm.SSChiudiClick(Sender: TObject);
+begin
+   // Se c'è una pratica selezionata, prima deseleziona la pratica,  altrimenti è un casino
+   if ClientiForm.PraticaCorrente <> '' then begin
+      PSChiudiClick(Self);
+   // Se invece non c'è nessuna pratica sslezionata, provvede a desezionare il soggetto
+   end else begin
+      // Deseleziona il soggetto selezionato
+      ClientiForm.SelezionaCliente(-1);
+      // Forza la selezione della pagina della rubrica
+      SBRubricaClick(SBRubrica);
+   end;
+end;
+
+procedure TmainForm.PSChiudiClick(Sender: TObject);
+var
+   PrecTipoPraticaCorrente : String;
+begin
+   if ClientiForm.TipoPraticaCorrente = 'P' then begin
+      // Deseleziona la pratica
+      ClientiForm.SelezionaPraticaCorrente('', 0, Date);
+      // Forza la selezione della pagina delle Pratiche
+      SBRubricaClick(SBPratiche);
+   end else if ClientiForm.TipoPraticaCorrente = 'A' then begin
+      // Deseleziona la pratica
+      ClientiForm.SelezionaPraticaCorrente('', 0, Date);
+      // Forza la selezione della pagina delle Pratiche
+      SBRubricaClick(SBAssistenze);
+   end;
+end;
+
+procedure TmainForm.PanelNomiDocExit(Sender: TObject);
+begin
+   // Impedisce di uscire dal pannello se non si è premuto il pulsante OK
+   if PanelNomiDoc.Tag = 0 then begin
+      MessageBeep(0);
+      ListBoxNomeDoc.SetFocus;
+   end;
+end;
+
+procedure TmainForm.SBTipoDocumentoClick(Sender: TObject);
+begin
+   if SBTipoDocumento.Down then begin
+      // In base ai permessi rende o meno visibili i tipo di documento nella comboboox di selezione
+      ListBoxNomeDoc.Items.Clear;
+      if DM1.ModCtrl(MOD_BUONO_CONSEGNA) > 1   then ListBoxNomeDoc.Items.Add('Buono_cons');
+      if DM1.ModCtrl(MOD_DDT) > 1              then ListBoxNomeDoc.Items.Add('D.D.T.');
+      if DM1.ModCtrl(MOD_FATTURE) > 1          then ListBoxNomeDoc.Items.Add('Fattura');
+      if DM1.ModCtrl(MOD_FATTURE_RF) > 1       then ListBoxNomeDoc.Items.Add('Fatt.R.F.');
+      if DM1.ModCtrl(MOD_NOTE_ACCREDITO) > 1   then ListBoxNomeDoc.Items.Add('Nota_accre');
+      if DM1.ModCtrl(MOD_ORDINI) > 1           then ListBoxNomeDoc.Items.Add('Ordine');
+      if DM1.ModCtrl(MOD_PREVENTIVI) > 1       then ListBoxNomeDoc.Items.Add('Preventivo');
+      if DM1.ModCtrl(MOD_RICEVUTE_FISCALI) > 1 then ListBoxNomeDoc.Items.Add('Ricev.fisc');
+      if DM1.ModCtrl(MOD_SAL) > 1              then ListBoxNomeDoc.Items.Add('S.A.L.');
+
+      if DM1.ModCtrl(MOD_BOLLE_ENTRATA) > 1    then ListBoxNomeDoc.Items.Add('Bolla_entr');
+      if DM1.ModCtrl(MOD_FATTURE_ACQUISTO) > 1 then ListBoxNomeDoc.Items.Add('Fatt.acqui');
+      if DM1.ModCtrl(MOD_ORDINI_FORNITORI) > 1 then ListBoxNomeDoc.Items.Add('Ord.fornit');
+      if DM1.ModCtrl(MOD_NOTE_ACCREDITO) > 1   then ListBoxNomeDoc.Items.Add('N.C.fornit');
+      // POsiziona il pannello e lo visualizza
+      PanelNomiDoc.Left := SBTipoDocumento.Left + SBTipoDocumento.Width - PanelNomiDoc.Width;
+      PanelNomiDoc.Top := LabelTipoDocumento.Top + LabelTipoDocumento.Height;
+      PanelNomiDoc.Tag := 0;
+      PanelNomiDoc.Visible := True;
+      ListBoxNomeDoc.SetFocus;
+      PanelNomiDoc.Update;
+   end else begin
+      // Pone Tag a 1 per indicare al gestore dell'evento OnExit che non deve impedire l'uscita.
+      PanelNomiDoc.Tag := 1;
+      PanelNomiDoc.Visible := False;
+      Update;
+   end;
+end;
+
+procedure TmainForm.ListBoxNomeDocClick(Sender: TObject);
+begin
+   SBTipoDocumento.Down := False;
+   // Imposta il nuovo tipo documento
+   PreventiviOrdiniForm.TipoDoc := ListBoxNomeDoc.Items[ListBoxNomeDoc.ItemIndex];
+   PreventiviOrdiniForm.QryDocumentoTipoDocumento.Value := PreventiviOrdiniForm.TipoDoc;
+   PreventiviOrdiniForm.CambiaTipoDocumento;
+   // Pone Tag a 1 per indicare al gestore dell'evento OnExit che non deve impedire l'uscita.
+   PanelNomiDoc.Tag := 1;
+   PanelNomiDoc.Visible := False;
+   Update;
+end;
+
+procedure TmainForm.SBUtilitaClick(Sender: TObject);
+begin
+   // Se il pulsante è premuto deve visualizzare il relativo menù
+   if SBUtilita.Down then begin
+      // Se l'altro pulsante è Down lo rialza
+      if SBImpostazioni.Down then begin
+         SBImpostazioni.Down := False;
+         SBIMpostazioniClick(Self);
+      end;
+      // IMposta il Tag del menu per indicare che si vuole il menu delle UTILITA
+      MenuUtilita.Tag := 0;
+      // Popola il menu e lo visualizza
+      RiempiMenuUtilita;
+      VisualizzaUtilita;
+      // Focus sul menu
+      MenuUtilita.SetFocus;
+   // Se il pulsante è alzato deve sparire il relativo menù
+   end else begin
+      // Se il menù è aperto chiude il menù
+      if PanelMenuUtilita.Visible then ChiudiUtilita else SBUtilita.Down := True;
+   end;
+end;
+
+
+procedure TmainForm.VisualizzaUtilita;
+const
+   Speed = 3;
+   Passo = 30;
+var
+   FinalTop: Integer;
+begin
+   // Calcola la posizione finale
+   FinalTop := PanelUtilita.Top - PanelMenuUtilita.Height;
+   // ANIMAZIONE
+   // ------------------------------------------------------------------------------------------------
+   // Finchè l'altezza del pannello non è quella voluta (Altezza)
+   while PanelMenuUtilita.Top > FinalTop do begin
+      // INcrementa l'altezza del mannello in base al passo
+      PanelMenuUtilita.Top := PanelMenuUtilita.Top - Passo;
+      if PanelMenuUtilita.Top < FinalTop then PanelMenuUtilita.Top := FinalTop;
+      PanelMenuUtilita.Update;
+      // Attesa per il prossimo passo
+      Sleep(Speed);
+   end;
+   // ------------------------------------------------------------------------------------------------
+end;
+
+procedure TmainForm.ChiudiUtilita;
+const
+   Speed = 3;
+   Passo = 30;
+var
+   FinalTop: Integer;
+begin
+   // Calcola la posizione finale
+   FinalTop := PanelMenuUtilita.Top + PanelMenuUtilita.Height;
+   // ANIMAZIONE
+   // ------------------------------------------------------------------------------------------------
+   // Finchè l'altezza del pannello non è quella voluta (Altezza)
+   while PanelMenuUtilita.Top < FinalTop do begin
+      // INcrementa l'altezza del mannello in base al passo
+      PanelMenuUtilita.Top := PanelMenuUtilita.Top + Passo;
+      MainLeftPanel.Update;
+      // Attesa per il prossimo passo
+      Sleep(Speed);
+   end;
+   // Pannello invisbile
+   PanelMenuUtilita.Visible := False;
+   MainLeftPanel.Update;
+   // ------------------------------------------------------------------------------------------------
+end;
+
+procedure TmainForm.RiempiMenuUtilita;
+const
+   SEP = '                                                               ';
+var
+   LO, AL:TIniFile;
+begin
+   LO := TIniFile.Create(DM1.CurrDir + 'layouts.ini');
+   AL := TIniFile.Create(DM1.CurrDir + 'agglist.ini');
+   try
+      // Svuota tutto
+      MenuUtilita.Items.Clear;
+      // INIZIO INSERIMENTO VOCI
+      // -----------------------------------------------------------------------------------
+      // Se la proprietà MenuUtilita.Tag = 0 significa che deve essere caricato il menù Utilità
+      case MenuUtilita.Tag of
+         // UTILITA'
+         0: begin
+            MenuUtilita.Items.Add('Vendita al banco' + SEP + IntToStr(U_BANCO));
+            if (DM1.ModCtrl(MOD_FATT_RIEPILOGATIVA) > 1) then MenuUtilita.Items.Add('Fatturazione differita in 4 passi' + SEP + IntToStr(U_FATTDIFF));
+            if AL.ReadString('LISTINO1', 'MenuLabel', 'NONE') <> 'NONE' then MenuUtilita.Items.Add(StringReplace(AL.ReadString('LISTINO1', 'MenuLabel', 'NONE'), '_', ' ', [rfReplaceAll]) + SEP + IntToStr(U_AGGLIST));
+            if (DM1.ModCtrl(MOD_IMPORTAZIONE_ARCHIVI) > 0)and(DM1.IsServer) then MenuUtilita.Items.Add('Importazione archivi' + SEP + IntToStr(U_IMPORTAZIONE));
+            if DM1.AbilitaSincronizzazione then MenuUtilita.Items.Add('Sincronizzazione' + SEP + IntToStr(U_SINCHRO));
+            MenuUtilita.Items.Add('Copia di sicurezza azienda' + SEP + IntToStr(U_BACKUP));
+            MenuUtilita.Items.Add('Informazioni sul programma' + SEP + IntToStr(U_ABOUT));
+            MenuUtilita.Items.Add('Teletrasporto' + SEP + IntToStr(U_TELETRASPORTO));
+            if (DM1.ModCtrl(MOD_ARTICOLI) > 1) then MenuUtilita.Items.Add('Aumento comulativo listini' + SEP + IntToStr(U_AUMENTOLISTINI));
+            // Carica le Bitmap
+            UtilitaTitolo.Picture.LoadFromFile(DM1.TemaDir + 'title_utilita.bmp');
+            UtilitaBarra.Picture.LoadFromFile(DM1.TemaDir + 'title_bar.bmp');
+         end;
+         // IMPOSTAZIONI
+         1: begin
+            MenuUtilita.Items.Add('Gruppi, sottogruppi...' + SEP + IntToStr(I_GRUPPI));
+            if LO.ReadString('Categoria1', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria1', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG1));
+            if LO.ReadString('Categoria2', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria2', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG2));
+            if LO.ReadString('Categoria3', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria3', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG3));
+            if LO.ReadString('Categoria4', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria4', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG4));
+            if LO.ReadString('Categoria5', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria5', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG5));
+            if LO.ReadString('Categoria6', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria6', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG6));
+            if LO.ReadString('Categoria7', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria7', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG7));
+            if LO.ReadString('Categoria8', 'MenuCaption', '0') <> '0' then MenuUtilita.Items.Add(LO.ReadString('Categoria8', 'MenuCaption', '0') + SEP + IntToStr(I_CATEG8));
+            MenuUtilita.Items.Add('Banche' + SEP + IntToStr(I_BANCHE));
+            MenuUtilita.Items.Add('Modalità di pagamento' + SEP + IntToStr(I_PAGAM));
+            MenuUtilita.Items.Add('Dati azienda' + SEP + IntToStr(I_DATIAZIENDA));
+            MenuUtilita.Items.Add('Aliquote IVA' + SEP + IntToStr(I_IVA));
+            MenuUtilita.Items.Add('Causali cantieri' + SEP + IntToStr(I_CAUSALICANTIERI));
+            MenuUtilita.Items.Add('Causali documenti' + SEP + IntToStr(I_CAUSALI));
+            MenuUtilita.Items.Add('Magazzini' + SEP + IntToStr(I_MAGAZZINI));
+            MenuUtilita.Items.Add('Parametri e progressivi' + SEP + IntToStr(I_PROGRESSIVI));
+//            MenuUtilita.Items.Add('Fax' + SEP + IntToStr(I_FAX));
+            MenuUtilita.Items.Add('Internet' + SEP + IntToStr(I_INTERNET));
+            MenuUtilita.Items.Add('Colleg. a progr. esterni' + SEP + IntToStr(I_EXTPRG));
+            MenuUtilita.Items.Add('Stati documenti' + SEP + IntToStr(I_STATI));
+            MenuUtilita.Items.Add('Intestazioni documenti' + SEP + IntToStr(I_LOGHI));
+//            MenuUtilita.Items.Add('Selezione scanner' + SEP + IntToStr(I_TWAIN));
+            MenuUtilita.Items.Add('Etichette' + SEP + IntToStr(I_ETICHETTE));
+            MenuUtilita.Items.Add('Multiregistro' + SEP + IntToStr(I_MULTIREGISTRO));
+            if (DM1.ModCtrl(MOD_CONTATTI) > 1) then MenuUtilita.Items.Add(DM1.TecniciMenuCaption + SEP + IntToStr(I_TECNICI));
+            if (DM1.ModCtrl(MOD_CONFORMITA) > 1) then MenuUtilita.Items.Add('Apparecchi / Materiali' + SEP + IntToStr(I_APPARECCHI));
+//            MenuUtilita.Items.Add('Photo album articoli' + SEP + IntToStr(I_PHOTOART));
+            // Carica le Bitmap
+            UtilitaTitolo.Picture.LoadFromFile(DM1.TemaDir + 'title_impostazioni.bmp');
+            UtilitaBarra.Picture.LoadFromFile(DM1.TemaDir + 'title_bar.bmp');
+         end;
+      end;
+      // -----------------------------------------------------------------------------------
+      // Calcola l'altezza della ListBox
+      MenuUtilita.Top := 5;
+      MenuUtilita.Height := MenuUtilita.Items.Count * MenuUtilita.ItemHeight;
+      PanelMenuUtilita.Height := MenuUtilita.Height + 10;
+      // Posizionamento e dimensionamento Bitmap del titolo
+      UtilitaTitolo.Height := UtilitaTitolo.Picture.Bitmap.Height;
+      UtilitaBarra.Top := UtilitaTitolo.Top + UtilitaTitolo.Height;
+      UtilitaBarra.Height := PanelMenuUtilita.Height - UtilitaBarra.Top;
+      // Posizione iniziale pannello chiuso
+      PanelMenuUtilita.Top := PanelUtilita.Top;
+      PanelMenuUtilita.Visible := True;
+      PanelMenuUtilita.Update;
+   finally
+      LO.Free;
+      AL.Free;
+   end;
+end;
+
+procedure TmainForm.MenuUtilitaMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+begin
+   // Simula un Hot Track
+   MenuUtilita.ItemIndex := MenuUtilita.ItemAtPos(Point(X, Y), True);
+end;
+
+procedure TmainForm.MenuUtilitaClick(Sender: TObject);
+var
+   Sel:Byte;
+   SelStr:String;
+begin
+   // Pone in Sel il codice (Ultimi 2 caratteri a DX del titolo della voce)
+   SelStr := MenuUtilita.Items[MenuUtilita.Itemindex];
+   Sel := StrToInt(DM1.StrRight(SelStr, 2));
+   // ============================================================================
+   //  VISUALIZZA LA FORM RELATIVA ALLA VOCE SELEZIONATA
+   // ----------------------------------------------------------------------------
+   case Sel of
+      I_GRUPPI: begin
+         if GruppiForm = nil then begin
+            Application.CreateForm(TGruppiForm, GruppiForm);
+            GruppiForm.Parent := MainForm;
+            GruppiForm.Show;
+         end;
+      end;
+
+      I_CATEG1: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG1';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG2: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG2';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG3: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG3';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG4: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG4';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG5: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG5';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG6: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG6';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG7: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG7';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_CATEG8: begin
+         if Categoria1Form = nil then begin
+            Application.CreateForm(TCategoria1Form, Categoria1Form);
+            Categoria1Form.Parent := MainForm;
+            Categoria1Form.Tabella := 'CATEG8';
+            Categoria1Form.Show;
+         end;
+      end;
+
+      I_BANCHE: begin
+         if ArchivioBancheForm = nil then begin
+            Application.CreateForm(TArchivioBancheForm, ArchivioBancheForm);
+            ArchivioBancheForm.Parent := MainForm;
+            ArchivioBancheForm.Show;
+         end;
+      end;
+
+      I_PAGAM: begin
+         if PagamentiForm = nil then begin
+            Application.CreateForm(TPagamentiForm, PagamentiForm);
+            PagamentiForm.Parent := MainForm;
+            PagamentiForm.Show;
+         end;
+      end;
+
+      I_DATIAZIENDA: begin
+         if DatiAziendaForm = nil then begin
+            Application.CreateForm(TDatiAziendaForm, DatiAziendaForm);
+            DatiAziendaForm.Parent := MainForm;
+            DatiAziendaForm.Show;
+         end;
+      end;
+
+      I_IVA: begin
+         if AliquoteIVAForm = nil then begin
+           Application.CreateForm(TAliquoteIVAForm, AliquoteIVAForm);
+           AliquoteIVAForm.Parent := MainForm;
+           AliquoteIVAForm.Show;
+         end;
+      end;
+
+      I_CAUSALI: begin
+         if CausaliForm = nil then begin
+           Application.CreateForm(TCausaliForm, CausaliForm);
+           CausaliForm.Parent := MainForm;
+           CausaliForm.Show;
+         end;
+      end;
+
+      I_CAUSALICANTIERI: begin
+         if CausaliCantieriForm = nil then begin
+           Application.CreateForm(TCausaliCantieriForm, CausaliCantieriForm);
+           CausaliCantieriForm.Parent := MainForm;
+           CausaliCantieriForm.Show;
+         end;
+      end;
+
+      I_MAGAZZINI: begin
+         if AnagMagaForm = nil then begin
+           Application.CreateForm(TAnagMagaForm, AnagMagaForm);
+           AnagMagaForm.Parent := MainForm;
+           AnagMagaForm.Show;
+         end;
+      end;
+
+      I_PROGRESSIVI: begin
+         if ProgressiviForm = nil then begin
+           Application.CreateForm(TProgressiviForm, ProgressiviForm);
+           ProgressiviForm.Parent := MainForm;
+           ProgressiviForm.PageControl1.ActivePage := ProgressiviForm.TabProgressivi;
+           ProgressiviForm.Show;
+         end;
+      end;
+
+{
+      I_FAX: begin
+         if ProgressiviForm = nil then begin
+           Application.CreateForm(TProgressiviForm, ProgressiviForm);
+           ProgressiviForm.Parent := MainForm;
+           ProgressiviForm.PageControl1.ActivePage := ProgressiviForm.TabFax;
+           ProgressiviForm.Show;
+         end;
+      end;
+}
+
+      I_INTERNET: begin
+         if ProgressiviForm = nil then begin
+           Application.CreateForm(TProgressiviForm, ProgressiviForm);
+           ProgressiviForm.Parent := MainForm;
+           ProgressiviForm.PageControl1.ActivePage := ProgressiviForm.TabInternet;
+           ProgressiviForm.Show;
+         end;
+      end;
+
+      I_EXTPRG: begin
+         if ExtPrgForm = nil then begin
+           Application.CreateForm(TExtPrgForm, ExtPrgForm);
+           ExtPrgForm.Parent := MainForm;
+           ExtPrgForm.Show;
+         end;
+      end;
+
+      I_STATI: begin
+         if StatiOggettiForm = nil then begin
+           Application.CreateForm(TStatiOggettiForm, StatiOggettiForm);
+           StatiOggettiForm.Parent := MainForm;
+           StatiOggettiForm.Show;
+         end;
+      end;
+
+      I_LOGHI: begin
+         if IntestazioneDocumentiForm = nil then begin
+           Application.CreateForm(TIntestazioneDocumentiForm, IntestazioneDocumentiForm);
+           IntestazioneDOcumentiForm.Parent := MainForm;
+           // Imposta alcune variabili pubbliche della form
+           IntestazioneDocumentiForm.FileBmp := 'Intestaz.bmp';
+           IntestazioneDocumentiForm.Sezione := 'TestataDocumenti';
+           IntestazioneDocumentiForm.Show;
+         end;
+      end;
+
+      I_ETICHETTE: begin
+         if EtichetteForm = nil then begin
+           Application.CreateForm(TEtichetteForm, EtichetteForm);
+           EtichetteForm.Parent := MainForm;
+           EtichetteForm.Show;
+         end;
+      end;
+
+      I_MULTIREGISTRO: begin
+         if MultiregistroForm = nil then begin
+           Application.CreateForm(TMultiregistroForm, MultiregistroForm);
+           MultiregistroForm.Parent := MainForm;
+           MultiregistroForm.Show;
+         end;
+      end;
+
+      I_TECNICI: begin
+         if TecniciForm = nil then begin
+           Application.CreateForm(TTecniciForm, TecniciForm);
+           TecniciForm.Parent := MainForm;
+           TecniciForm.Show;
+         end;
+      end;
+
+      I_APPARECCHI: begin
+         if ApparecchiForm = nil then begin
+           Application.CreateForm(TApparecchiForm, ApparecchiForm);
+           ApparecchiForm.Parent := MainForm;
+           ApparecchiForm.Show;
+         end;
+      end;
+
+      I_PHOTOART: begin
+         if PhotoArtForm = nil then begin
+           Application.CreateForm(TPhotoArtForm, PhotoArtForm);
+           PhotoArtForm.Parent := MainForm;
+           PhotoArtForm.Show;
+         end;
+      end;
+
+      U_BANCO: begin
+         if PreventiviOrdiniForm = nil then begin
+           Application.CreateForm(TPreventiviOrdiniForm, PreventiviOrdiniForm);
+           PreventiviOrdiniForm.Parent := MainForm;
+           // Chiama la fuunzione NUovoDocFisc per iniziare la sessione  di vendita al banco
+           DM1.NuovoDocFisc(DM1.KioskTipoDocDefault, '', 0, 0,'', 4, 0, False, False);
+         end;
+      end;
+
+      U_FATTDIFF: begin
+         if FattDifferitaForm = nil then begin
+           Application.CreateForm(TFattDifferitaForm, FattDifferitaForm);
+           FattDifferitaForm.Parent := MainForm;
+           FattDifferitaForm.Show;
+         end;
+      end;
+
+      U_AGGLIST: begin
+         if FattDifferitaForm = nil then begin
+           Application.CreateForm(TSynchroForm, SynchroForm);
+           SynchroForm.Parent         := MainForm;
+           SynchroForm.FormMode       := SYNCHRO_MODE_AGGLIST;
+           SynchroForm.Show;
+         end;
+      end;
+
+      U_IMPORTAZIONE: begin
+         if ImportazioneForm = nil then begin
+           Application.CreateForm(TImportazioneForm, ImportazioneForm);
+           ImportazioneForm.ShowModal;
+         end;
+      end;
+
+      U_SINCHRO: begin
+         if SynchroForm = nil then begin
+           Application.CreateForm(TSynchroForm, SynchroForm);
+           SynchroForm.Parent         := MainForm;
+           SynchroForm.FormMode       := SYNCHRO_MODE_NORMAL;
+           SynchroForm.Show;
+         end;
+      end;
+
+      U_BACKUP: begin
+         if BackupForm = nil then begin
+            // Invia la richiesta di backup e poi in base all'esito...
+            SendBackupRequest;
+         end;
+      end;
+
+      U_ABOUT: begin
+         if AboutForm = nil then begin
+           Application.CreateForm(TAboutForm, AboutForm);
+           AboutForm.ShowModal;
+         end;
+      end;
+
+      U_TELETRASPORTO: begin
+         ApriTeletrasporto;
+      end;
+
+      U_AUMENTOLISTINI: begin
+         if AumentoListiniForm = nil then begin
+           AumentoListiniForm := TAumentoListiniForm.Create(Application, TIPOFORM_UTILITA, 0);
+           AumentoListiniForm.Show;
+         end;
+      end;
+   end;
+
+   // ============================================================================
+   // Chiude il menu
+   ChiudiUtilita;
+end;
+
+procedure TmainForm.SBImpostazioniClick(Sender: TObject);
+begin
+   // Se il pulsante è premuto deve visualizzare il relativo menù
+   if SBImpostazioni.Down then begin
+      // Se l'altro pulsante è Down lo rialza
+      if SBUtilita.Down then begin
+         SBUtilita.Down := False;
+         SBUtilitaClick(Self);
+      end;
+      // IMposta il Tag del menu per indicare che si vuole il menu delle UTILITA
+      MenuUtilita.Tag := 1;
+      // Popola il menu e lo visualizza
+      RiempiMenuUtilita;
+      VisualizzaUtilita;
+      // Focus sul menu
+      MenuUtilita.SetFocus;
+   // Se il pulsante è alzato deve sparire il relativo menù
+   end else begin
+      // Se il menù è aperto chiude il menù
+      if PanelMenuUtilita.Visible then ChiudiUtilita else SBImpostazioni.Down := True;
+   end;
+end;
+
+procedure TMainForm.VisualizzaAvvio(LoadBitmap:Boolean);
+begin
+   // Rende visibile anche il pulsante di avvio per il dispositivo biometrico
+   AvviaLevanteBiometrico.Visible := True;
+   // Azzera l'IDOperatore corrente
+   DM1.IDOperatoreCorrente := '';
+   // Dimensiona e visualizza il Frame
+   StartFrame.Color             := COLOR_LOGIN_OPZIONI;
+   StartFrame.Left              := 0;
+   StartFrame.Top               := 0;
+   StartFrame.Width             := ClientWidth;
+   StartFrame.Height            := ClientHeight;
+
+   StartFrame.STop.Top          := 0;
+   StartFrame.STop.Left         := 0;
+   StartFrame.STop.Width        := ClientWidth;
+   StartFrame.STop.Height       := 100;
+
+   StartFrame.SBottom.Height    := 110;
+   StartFrame.SBottom.Top       := ClientHeight - StartFrame.SBottom.Height;
+   StartFrame.SBottom.Left      := 0;
+   StartFrame.SBottom.Width     := ClientWidth;
+
+   StartFrame.VLine.Top         := StartFrame.STop.Height;
+   StartFrame.VLine.Left        := Round(ClientWidth/2) - Round(StartFrame.VLine.Width/2);
+   StartFrame.VLine.Height      := StartFrame.SBottom.Top - StartFrame.VLine.Top;
+
+   StartFrame.Logo.Top          := Round(StartFrame.STop.Height/2) - Round(StartFrame.Logo.Height/2);
+   StartFrame.Logo.Left         := Round(ClientWidth/2) - Round(StartFrame.Logo.Width/2);
+
+   StartFrame.Show;
+   StartFrame.Update;
+   // Messaggio da non visualizzare al primo avvio del programma
+   if SplashForm = nil then DM1.ShowWait('', 'Caricamento elenco aziende');
+   // Apre solo il database generale per prelevare l'elenco delle aziende
+   //  selezionabili. (NB: Secondo parametro = False per fare in modo che
+   //  non si colleghi al database dei dati dell'azienda selezionata,
+   //  soprattutto perchè a questo punto ancora non c'è un'azienda
+   //  selezionata)
+   DM1.AttivaTabelle(True, MainForm.ModoRistrutturazioneTabelle, False);
+   // Precarica le aziende presenti nella ComboBox di selezione
+   CaricaElencoAziende;
+   // La ComboBox di selezione dell'azienda contiene il nome dell'ultime azienda corrente
+   StartFrame.CBAzienda.ItemIndex := StartFrame.CBAzienda.Items.IndexOf(DM1.AziendaCorrente);
+   // Azzera Nome utente e password
+   StartFrame.EditUID.Text := '';
+   StartFrame.EditPassword.Text := '';
+   // Se il modulo password è attivo
+   if StrToInt(DM1.SKeyData[MOD_PASSWORD]) > 0 then begin
+      StartFrame.LabelUID.Font.Color := clBlack;
+      StartFrame.LabelPassword.Font.Color := clBlack;
+      StartFrame.EditUID.Color := COLOR_MODIFICA;
+      StartFrame.EditUID.Enabled := True;
+      StartFrame.EditPassword.Color := COLOR_MODIFICA;
+      StartFrame.EditPassword.Enabled := True;
+      StartFrame.CBAzienda.Color := COLOR_MODIFICA;
+      StartFrame.CBAzienda.Enabled := True;
+      StartFrame.EditUID.SetFocus;
+   end else begin
+      StartFrame.LabelUID.Font.Color := $00CCCCCC;
+      StartFrame.LabelPassword.Font.Color := $00CCCCCC;
+      StartFrame.EditUID.Color := COLOR_NORMALE;
+      StartFrame.EditUID.Enabled := False;
+      StartFrame.EditPassword.Color := COLOR_NORMALE;
+      StartFrame.EditPassword.Enabled := False;
+      StartFrame.CBAzienda.Color := COLOR_MODIFICA;
+      StartFrame.CBAzienda.Enabled := True;
+      StartFrame.CBAzienda.SetFocus;
+   end;
+   // A questo punto se è apertala splash form la chiude
+   if SplashForm <> nil then begin
+      TimerStartStop.Interval := 300;
+      TimerStartStop.Tag := 1;
+      TimerStartStop.Enabled := True;
+   end;
+   // CHiude la finestra dei messaggi
+   DM1.CloseWait;
+end;
+
+procedure TmainForm.TimerStartStopTimer(Sender: TObject);
+begin
+   TimerStartStop.Enabled := False;
+   case TimerStartStop.Tag of
+      // Se viene chiamato all'avvio dell'applicazione effettua il FadeOut
+      //  della splash form, che viene fatto quì perchè altrimenti non
+      //  si vede la dissolvenza.
+      1: begin
+         // Se è una versione DEMO ed se non è già stata visualizzata, visualizza
+         //  la form con  le informazioni sul periodo demo
+         if D_MODE and not DM1.DemoFlags.InfoDemoShowed then begin
+            // Messaggio informativo
+            DM1.Messaggi('Informazioni Versione Dimostrativa',
+                         'Lev@nte è in esecuzione in versione dimostrativa.'#13#13#13'Mancano ' + IntToStr(DM1.DemoFlags.GiorniMancantiFineDemo) + ' giorni alla fine del periodo demo.',
+                         'NB: Per ulteriori informazioni o aiuto sull''utilizzo del programma chiamare il CENTRO SERVIZI: 0541/475704'#13#13'NB: Nella versione dimostrativa alcune funzionalità NON sono attive.',
+                         [mbOK], 0, nil);
+            // IMposta la caption della form in base al nome del programma impostato nella variabile 'NomeApplicazione'
+            // NB: IMposta anche altre variabili globali per la versione ecc.
+            MainForm.Caption := MainForm.NomeApplicazione + ' ' + VersioneApplicazione + ' - (Versione Demo: ' + IntToStr(DM1.DemoFlags.GiorniMancantiFineDemo) + ' giorni alla scadenza)';
+            // IMposta il flag
+            DM1.DemoFlags.InfoDemoShowed := True;
+         end;
+         // Ovviamente solo se è aperta
+         if SplashForm <> nil then SplashForm.SplashFormFadeOut;
+         // Esegue il controllo di backup
+         //  NB: Solo se non è in modalità di Ristrutturazione altrimenti rompe
+         if not ModoRistrutturazioneTabelle then DM1.BackupCheck;
+         // Carica la cover
+         StartFrame.ShowCover(True);
+      end;
+      // Se viene chiamato all'uscita dall'azienda per ritornare alla schermata di Login
+      2: begin
+         // Si disconnette dal database dell'azienda
+         //  e poi quando è sicuro che la disconnessione
+         //  è stata effettuata, rivisualizza il Login.
+         //  NB: Tutto questo per evitare ritardi di visualizzazione
+         //       quando si esce per ritornare al Login.
+         //  NB: Tutto questo perchè altrimenti quando si usciva veniva visualizzata
+         //  la schermata di Login con nella parte centrale ancora la schermata sotto
+         //  e questo era piuttosto brutto. Visto che il problema era dovuto
+         //  all'attesa della disconnessione dai databases ho escogitato questo sistema
+         //  per risolverlo.
+         DM1.ShowWait('', 'Disconnessione database generale');
+         DM1.DBGenerale.Disconnect;
+         while DM1.DBGenerale.Connected do Application.ProcessMessages; // Attende l'effettiva disconnessione dal database
+         DM1.ShowWait('', 'Disconnessione database dell''azienda');
+         DM1.DBAzienda.Disconnect;
+         while DM1.DBAzienda.Connected do Application.ProcessMessages; // Attende l'effettiva disconnessione dal database
+         // Apre la schermata Di Login
+         OpenStartFrame;
+      end;
+      // Se viene chiamato all'uscita dell'applicazione effettua il FadeOut
+      //  della splash form.
+      9: begin
+         // Chiude la form principale
+         MainForm.Hide;
+         Sleep(1000);
+         // Ovviamente solo se è aperta
+         if SplashForm <> nil then SplashForm.SplashFormFadeOut;
+         // Chiude l'applicazione
+         Application.Terminate;
+      end;
+   end;
+   // Reset del Tag
+   TimerStartStop.Tag := 0;
+end;
+
+procedure TMainForm.OpenStartFrame;
+const
+   C_PASSO = 30;
+   C_DELAY = 3;
+begin
+   DM1.ShowWait('', 'Inizializzazione Login');
+   // Apre lo startFrame con una animazione
+//   StartFrame.Sfondo.Picture.LoadFromFile(DM1.CurrDir + 'start_bmp.bmp');
+   StartFrame.Top := StartFrame.Height * (-1);
+   StartFrame.Visible := True;
+   while StartFrame.Top < 0 do begin
+      StartFrame.Top := StartFrame.Top + C_PASSO;
+      StartFrame.Update;
+      Sleep(C_DELAY);
+   end;
+   StartFrame.Top := 0;
+   // Chiamata per reimpostare la schermata di login
+   VisualizzaAvvio(False);
+   // Carica la cover
+   StartFrame.ShowCover(True);
+end;
+
+procedure TMainForm.CloseStartFrame;
+ const
+   C_PASSO = 60;
+   C_DELAY = 3;
+ begin
+   // Fà sparire la cover
+   StartFrame.ShowCover(False);
+   // Chiude lo Startframe con una animazione
+   while StartFrame.Top > StartFrame.Height * (-1) do begin
+      StartFrame.Top := StartFrame.Top - C_PASSO;
+      MainForm.Update;
+      Sleep(C_DELAY);
+   end;
+   // Libera la spazio occupato dalla Bitmap (è grossa)
+//   StartFrame.Sfondo.Picture := nil;
+   // StartFrame invisibile
+   StartFrame.Visible := False;
+   // Rende invisibile anche il pulsante di avvio per il dispositivo biometrico
+   AvviaLevanteBiometrico.Visible := False;
+end;
+
+procedure TmainForm.ListViewExpDocAdvancedCustomDraw(
+  Sender: TCustomListView; const ARect: TRect; Stage: TCustomDrawStage;
+  var DefaultDraw: Boolean);
+begin
+   // Rende la bacheca trasparente caricando sulla sua superficie la stessa bitmap che c'è sotto di essa
+   ListViewExpDoc.Canvas.Draw(-2,-102,MainRightPanel.Bitmap);
+end;
+
+procedure TmainForm.SBRubricaPaint(Sender: TObject);
+const
+   // Costanti contenenti i parametri di visualizzazione del MainMenu
+   MM_INDENT_LEFT_MARGIN        = 7;
+
+   MM_ITEM_LEFT_MARGIN          = 25;
+   MM_ITEM_CAPTION_LEFT_MARGIN  = 18;
+   MM_ITEM_CAPTION_LEFT_MARGIN_SELECTED = 28;
+   MM_ITEM_CAPTION_TOP_MARGIN   = 2;
+   MM_ITEM_CAPTION_TOP_MARGIN_SELECTED  = 3;
+   MM_ITEM_CAPTION_RIGHT_MARGIN = 20;
+
+   MM_SELECTED_CAPTION_LEFT_MARGIN  = 6;
+   MM_SELECTED_CAPTION_TOP_MARGIN   = 3;
+   MM_SELECTED_CAPTION_RIGHT_MARGIN = 30;
+
+   MM_DATA_LEFT_MARGIN          = 6;
+   MM_DATA_RIGHT_MARGIN         = 20;
+   MM_DATA_TOP_MARGIN           = 24;
+   MM_DATA_VERT_SEPARATION      = 15;
+
+   MM_SELECTED_START_INDEX      = 0;
+   MM_ITEM_START_INDEX          = 3;
+var
+   TestoRect:TRect;
+   CT, XX, YY: Integer;
+begin
+   // CT COntiene il valore di Tag della TPAintBox del pulsante attuale
+   CT := (Sender as TPaintBox).Tag;
+   // Per comodità...
+   with Sender as TPaintBox do begin
+      // Se l'oggetto è visibile continua altrimenti è inutile
+      if Visible then begin
+         // IMposta il colore delle righe a SX di unione delle voci
+         Canvas.Pen.Width := 1;
+         Canvas.Pen.Style := psSolid;
+         Canvas.Pen.Color := $00D4A08B;
+
+         // Se si stà visualizzando un separatore...
+         if LeftStr(Name, 12) = 'MMSeparatore' then begin
+               Canvas.MoveTo(MM_INDENT_LEFT_MARGIN,0);
+               Canvas.LineTo(MM_INDENT_LEFT_MARGIN, Height);
+
+         // Se si stà visualizzando un pulsante normale...
+         end else if (Name <> 'SBSoggetto') and (Name <> 'SBPratica') and (Name <> 'SBAssistenza') then begin
+            // Riga verticale superiore
+            if Name <> MMFirst then begin
+               Canvas.MoveTo(MM_INDENT_LEFT_MARGIN,0);
+               Canvas.LineTo(MM_INDENT_LEFT_MARGIN, Height div 2);
+            end;
+            // Riga orizzontale
+            Canvas.MoveTo(MM_INDENT_LEFT_MARGIN, Height div 2);
+            Canvas.LineTo(MM_ITEM_LEFT_MARGIN,   Height div 2);
+            // Riga verticale inferiore
+            if Name <> MMLast then begin
+               Canvas.MoveTo(MM_INDENT_LEFT_MARGIN, Height div 2);
+               Canvas.LineTo(MM_INDENT_LEFT_MARGIN, Height);
+            end;
+
+            // Visualizza la bitmap relativa al pulsante e al suo stato
+            Canvas.Draw(0, 0, MMImgList.Items[MM_ITEM_START_INDEX + MainMenuState[CT]]);
+
+            // Imposta il font per i titolo da del pannello
+            Canvas.Font.Name   := 'Verdana';
+            Canvas.Font.Size   := 8;
+            Canvas.Font.Color  := clBlack;
+            Canvas.Brush.Style := bsClear;   // NB: Testo trasparente
+            case MainMenuState[CT] of
+               MM_ITEM_DISABLED: Canvas.Font.Color := $00D4A08B;
+               MM_ITEM_ENABLED:  Canvas.Font.Color := $0074331D;
+               MM_ITEM_SELECTED: Canvas.Font.Color := clWhite;
+            end;
+            // IMposta il TRect per fare in modo che il testo stesso appaia nella posizione voluta senza sconfinare
+            TestoRect := Canvas.ClipRect;
+            Inc(TestoRect.Left, MM_ITEM_CAPTION_LEFT_MARGIN);
+            Inc(TestoRect.Top, MM_ITEM_CAPTION_TOP_MARGIN);
+            Dec(TestoRect.Right, MM_ITEM_CAPTION_RIGHT_MARGIN);
+            if MainMenuState[CT] = MM_ITEM_SELECTED then
+              Canvas.TextRect(TestoRect, MM_ITEM_CAPTION_LEFT_MARGIN_SELECTED, MM_ITEM_CAPTION_TOP_MARGIN_SELECTED, MainMenuCaptions[CT])
+            else
+              Canvas.TextRect(TestoRect, MM_ITEM_CAPTION_LEFT_MARGIN, MM_ITEM_CAPTION_TOP_MARGIN, MainMenuCaptions[CT]);
+
+         // Se invece si stà visualizzando un pannello del soggetto selezionato oppure la pratica selezionata...
+         end else begin
+            // Riga inferiore
+            Canvas.MoveTo(MM_INDENT_LEFT_MARGIN, Height div 2);
+            Canvas.LineTo(MM_INDENT_LEFT_MARGIN, Height);
+            // Visualizza la bitmap relativa al pannello e al suo stato
+            Canvas.Draw(0, 0, MMImgList.Items[MM_SELECTED_START_INDEX + MainMenuState[CT]]);
+
+            // Imposta il font per i titolo da del pannello
+            Canvas.Font.Name   := 'Verdana';
+            Canvas.Font.Size   := 7;
+            Canvas.Font.Color  := clBlack;
+            Canvas.Brush.Style := bsClear;   // NB: Testo trasparente
+            case MainMenuState[CT] of
+               MM_ITEM_DISABLED: Canvas.Font.Color := $00D4A08B;
+               MM_ITEM_ENABLED:  Canvas.Font.Color := $0074331D;
+               MM_ITEM_SELECTED: Canvas.Font.Color := $0074331D;
+            end;
+            // IMposta il TRect per fare in modo che il testo stesso appaia nella posizione voluta senza sconfinare
+            TestoRect := Canvas.ClipRect;
+            Inc(TestoRect.Left, MM_SELECTED_CAPTION_LEFT_MARGIN);
+            Inc(TestoRect.Top, MM_SELECTED_CAPTION_TOP_MARGIN);
+            Dec(TestoRect.Right, MM_SELECTED_CAPTION_RIGHT_MARGIN);
+            // Visualizza la caption del pannello
+            Canvas.TextRect(TestoRect, MM_SELECTED_CAPTION_LEFT_MARGIN, MM_SELECTED_CAPTION_TOP_MARGIN, MainMenuCaptions[CT]);
+
+            // Imposta il font per i dati da visualizzare dentro al pannello
+            Canvas.Font.Name   := 'Verdana';
+            Canvas.Font.Size   := 7;
+            Canvas.Font.Color  := clBlack;
+            Canvas.Brush.Style := bsClear;   // NB: Testo trasparente
+            case MainMenuState[CT] of
+               MM_ITEM_DISABLED: Canvas.Font.Color := $00D4A08B;
+               MM_ITEM_ENABLED:  Canvas.Font.Color := $0074331D;
+               MM_ITEM_SELECTED: Canvas.Font.Color := clWhite;
+            end;
+            // IMposta il TRect per fare in modo che il testo stesso appaia nella posizione voluta senza sconfinare
+            TestoRect := Canvas.ClipRect;
+            Inc(TestoRect.Left, MM_DATA_LEFT_MARGIN);
+            Inc(TestoRect.Top, MM_DATA_TOP_MARGIN);
+            Dec(TestoRect.Right, MM_DATA_RIGHT_MARGIN);
+            XX := MM_DATA_LEFT_MARGIN;
+            YY := MM_DATA_TOP_MARGIN;
+            // Se si tratta del soggetto selezionato...
+            if Name = 'SBSoggetto' then begin
+               // Visualizza i dati
+               Canvas.Font.Style := [fsBold];
+               Canvas.TextRect(TestoRect, XX, YY, ClientiForm.RagSocCS);
+               Canvas.Font.Style := [];
+               Inc(YY, MM_DATA_VERT_SEPARATION);
+               Canvas.TextRect(TestoRect, XX, YY, ClientiForm.CittaCS);
+               Inc(YY, MM_DATA_VERT_SEPARATION);
+               Canvas.TextRect(TestoRect, XX, YY, 'Tel:  '+ClientiForm.TelefonoCS);
+            // Se invece si tratta della pratica selezionata...
+            end else if Name = 'SBPratica' then begin
+               // Visualizza i dati
+               Canvas.Font.Style := [fsBold];
+               Canvas.TextRect(TestoRect, XX, YY, ClientiForm.DescPraticaCorrente);
+               Canvas.Font.Style := [];
+               Inc(YY, MM_DATA_VERT_SEPARATION);
+               Canvas.TextRect(TestoRect, XX, YY, 'Data di apertura:  '+ClientiForm.DataPraticaCorrente);
+               Inc(YY, MM_DATA_VERT_SEPARATION);
+               Canvas.TextRect(TestoRect, XX, YY, 'Note: '+ClientiForm.NotePraticaCorrente);
+            // Se invece si tratta della pratica selezionata...
+            end else if Name = 'SBAssistenza' then begin
+               // Visualizza i dati
+               Canvas.Font.Style := [fsBold];
+               Canvas.TextRect(TestoRect, XX, YY, ClientiForm.MarcaImpiantoCorrente + '-' + ClientiForm.ModelloImpiantoCorrente);
+               Canvas.Font.Style := [];
+               Inc(YY, MM_DATA_VERT_SEPARATION);
+               Canvas.TextRect(TestoRect, XX, YY, 'Ul.ma manutenzione:  '+ClientiForm.DataUltimaManutenzione);
+               Inc(YY, MM_DATA_VERT_SEPARATION);
+               Canvas.TextRect(TestoRect, XX, YY, 'Ul.ma prova combu:  '+ClientiForm.DataUltimaAnalisiCombustione);
+            end;
+         end;
+      end;
+   end;
+end;
+
+procedure TmainForm.MainLeftPanelDragOver(Sender, Source: TObject; X,
+  Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+   Accept := False;
+   // Cerca di riconoscere il mittente per accettare o meno l'operazione
+   // ------------------------------------------------------------------
+   // Se il mittente proviene da una TcxGrid o TcxView...
+   //  Controlla se il mittente è di tipo TcxDragControlObject che è il tipo di oggetto
+   //  che le griglie DevExpress passano surante il DragAndDrop.
+   if Source is TcxDragControlObject then begin
+      // Se il mittente è una vista (che è sempre contenuta in un GridSite)...
+      if TcxDragControlObject(Source).Control is TcxGridSite then begin
+         // La vista diventa il controllo predefinito per comodità
+         with TcxGridSite(TcxDragControlObject(Source).Control).GridView do begin
+            // Controlla se la vista è tra quelle da riconoscere
+            if (Name = 'tvRubrica')
+            or (Name = 'tvPrat')
+            or (Name = 'tvAssistenze')
+            then accept := True;
+         end;
+      end;
+   end;
+end;
+
+procedure TmainForm.SBSoggettoMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+begin
+   // Se l'utente stà muovendo il mouse con il pulsante SX premuto, attiva il Drag and drop
+   if ssLeft in Shift then (Sender as TPaintBox).BeginDrag(False);
+end;
+
+procedure TmainForm.SBSoggettoEndDrag(Sender, Target: TObject; X,
+  Y: Integer);
+begin
+   // Se il target è un controllo dell'anagrafica soggetti allora esce dal soggetto selezionato
+   if Target is TComponent then begin
+      if (Target as TComponent).Owner is TForm then begin
+         if ((Target as TComponent).Owner as TForm).Name = 'AnagCliForm' then SSChiudiClick(Self);
+      end;
+   end;
+end;
+
+procedure TmainForm.SBPraticaEndDrag(Sender, Target: TObject; X,
+  Y: Integer);
+begin
+   // Se il target è un controllo dell'anagrafica soggetti allora esce dal soggetto selezionato
+   if Target is TComponent then begin
+      if (Target as TComponent).Owner is TForm then begin
+         if ((Target as TComponent).Owner as TForm).Name = 'PraticaForm' then PSChiudiClick(Self);
+      end;
+   end;
+end;
+
+procedure TmainForm.ApriTeletrasporto;
+var
+   Qry : TIB_Cursor;
+begin
+   // Se il teletrasporto è già aperto esce
+   if ScambioDocForm <> nil then begin
+      // Il pulsante Impostazioni deve tornare NON PREMUTO
+      MainForm.SBUtilita.Down := False;
+      // Messaggio ed uscita
+      DM1.Messaggi('Informazione.', 'Il Teletrasporto è già attivo.', '', [mbOK], 0, nil);
+      Exit;
+   end;
+   // Preleva e memorizza in una apposita variabile globale la partita iva dell'azienda
+   //  per utilizzarlo come codice univoco per l'interscambio dei documenti
+   Qry := TIB_Cursor.Create(Self);
+   try
+      DM1.ShowWait(SHOW_WAIT_TITLE, 'Checking global code...');
+      // Imposta la query per prelevare la PIVA dell'azienda
+      Qry.DatabaseName := DM1.ArcDBFile;
+      Qry.IB_Connection := DM1.DBAzienda;
+      Qry.SQl.Add('SELECT P_IVA FROM DATIAZIE');
+      Qry.Open;
+      if not Qry.Eof then begin
+         // Se il codice utente per il sistema di interscambio dei documento è '' chiude
+         //  tutto perchè un codice valido deve esserci per forza, ovviamente
+         if Qry.Fields[0].AsString = '' then begin
+            // Solleva un'eccezione
+            raise Exception.Create('Codice globale azienda non valido');
+         end;
+         DM1.ShowWait(SHOW_WAIT_TITLE, 'System initialization...');
+         // Crea la form di interscambio dei documenti
+         Application.CreateForm(TScambioDocForm, ScambioDocForm);
+         ScambioDocForm.Parent := MainRightPanel.Parent;
+         // Inizializzazione codice azienda
+         ScambioDocForm.DXC_CodiceAzienda := Qry.Fields[0].AsString;
+         //  Visualizza la form
+         ScambioDocForm.Show;
+         // Chiude la query
+         Qry.Close;
+      end else begin
+         // Solleva un'eccezione
+         raise Exception.Create('Dati azienda non trovati.');
+      end;
+   finally
+      DM1.CloseWait;
+      Qry.Free;
+      // Il pulsante Impostazioni deve tornare NON PREMUTO
+      MainForm.SBUtilita.Down := False;
+   end;
+end;
+
+
+
+
+
+
+
+
+// =============================================================================
+// INIZIO - PARTE PER LA TRASPARENZA E L'EFFETTO FADE IN/OUT DELLE FORM
+// -----------------------------------------------------------------------------
+procedure TmainForm.SetTransparentForm(AHandle : THandle; AValue : byte = 0);
+var
+ Info: TOSVersionInfo;
+ SetLayeredWindowAttributes: TSetLayeredWindowAttributes;
+begin
+ //Check Windows version
+ Info.dwOSVersionInfoSize := SizeOf(Info);
+ GetVersionEx(Info);
+ if (Info.dwPlatformId = VER_PLATFORM_WIN32_NT) and
+ (Info.dwMajorVersion >= 5) then
+   begin
+     SetLayeredWindowAttributes := GetProcAddress(GetModulehandle(user32), 'SetLayeredWindowAttributes');
+      if Assigned(SetLayeredWindowAttributes) then
+       begin
+        SetWindowLong(AHandle, GWL_EXSTYLE, GetWindowLong(AHandle, GWL_EXSTYLE) or WS_EX_LAYERED);
+        //Make form transparent
+        SetLayeredWindowAttributes(AHandle, 0, AValue, LWA_ALPHA);
+      end;
+   end;
+end;
+
+procedure TmainForm.SetInitialCompleteTransparent(F:TForm);
+begin
+   SetTransparentForm(F.Handle, 255);
+end;
+
+procedure TmainForm.FormFadeOut(F:TForm);
+var
+   I:integer;
+begin
+   // Fà sparire la splash form con un FadeOut
+   i := 255;
+   while i > 0 do begin
+      SetTransparentForm(F.Handle,i);
+      Application.ProcessMessages;
+      Dec(i,1);
+   end;
+end;
+
+procedure TmainForm.FormFadeIn(F:TForm);
+var
+   I:integer;
+begin
+   // Fà comparire la form con un Fade-In
+   i := 0;
+   while i < 255 do begin
+      SetTransparentForm(F.Handle,i);
+      Application.ProcessMessages;
+      Inc(i,1);
+   end;
+end;
+// -----------------------------------------------------------------------------
+// FINE - PARTE PER LA TRASPARENZA E L'EFFETTO FADE IN/OUT DELLE FORM
+// =============================================================================
+
+
+
+procedure TmainForm.AvviaLevanteBiometricoClick(Sender: TObject);
+begin
+   StartFrame.ButtonAvvioClick(StartFrame.ButtonAvvio);
+end;
+
+procedure TmainForm.SvuotaBachecaClick(Sender: TObject);
+var
+   Qry : TIB_Cursor;
+begin
+   Qry := TIB_Cursor.Create(Self);
+   try
+      // Chiede conferma
+      if DM1.Messaggi('SvuotaBacheca', 'Svuotare la bacheca?', '', [mbYes,mbNo], 0, nil) = mrYes then begin
+         // Imposta la query che svuoterà la bacheca e la esegue
+         Qry.DatabaseName := DM1.GenDBFile;
+         Qry.IB_Connection := DM1.DBGenerale;
+         Qry.SQL.Add('DELETE FROM TMPRIGHI');
+         Qry.ExecSQL;
+         // Aggiorna la visualizzazione della bacheca
+         AggiornaDocumentiEsportati;
+      end;
+   finally
+      Qry.Free;
+   end;
+end;
+
+procedure TmainForm.AgendaDateNavigatorSelectionChanged(Sender: TObject;
+  const AStart, AFinish: TDateTime);
+begin
+  ClientiForm.Agenda.BeginUpdate;
+  try
+    ClientiForm.Agenda.SelectedDays.Assign(AgendaDateNavigator.SelectedDays);
+    if AgendaDateNavigator.SelectionIsWeeks then
+    begin
+      if AgendaDateNavigator.SelectedDays.Count >= 14 then
+        ClientiForm.Agenda.ViewWeeks.Active := True
+      else
+        ClientiForm.Agenda.ViewWeek.Active := True
+    end
+    else
+      ClientiForm.Agenda.ViewDay.Active := True;
+  finally
+    ClientiForm.Agenda.EndUpdate;
+    ClientiForm.Agenda.FullRefresh;
+  end;
+end;
+
+end.

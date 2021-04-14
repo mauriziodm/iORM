@@ -1,0 +1,21 @@
+SET TERM ^ ;
+
+/* Questa SP ritorna True se c'è almeno una chiamata/appuntamento urgente per l'impianto specificato */
+
+CREATE PROCEDURE SOGG_CORRISPNOPAG_EXISTS (IN_ID INTEGER)
+  RETURNS (OUTVAL CHAR(1))
+AS
+BEGIN
+
+  IF (EXISTS(SELECT NULL FROM PRVORDCL T WHERE T.CODICECLIENTE=:IN_ID AND T.RIFDOC_CORRISPNOPAG='T'))
+    THEN OUTVAL = 'T';
+    ELSE OUTVAL = 'F';
+
+  SUSPEND;
+  EXIT;
+
+END^
+
+SET TERM ; ^
+
+

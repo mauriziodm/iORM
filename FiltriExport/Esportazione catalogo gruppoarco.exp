@@ -1,0 +1,72 @@
+[Params]
+TipoFileDestinazione=XLS
+NomeFileDestinazione=
+txt_Separator=9
+txt_StartDelimiter=
+txt_EndDelimiter=
+
+[SQL]
+SELECT
+       A1.CODICEARTICOLO
+     , A1.DESCRIZIONE
+     , A1.MARCA
+     , A1.UNITADIMISURA
+     , A1.CODICEGRUPPO1
+     , A1.GRUPPO1
+     , A1.CODICEGRUPPO2
+     , A1.GRUPPO2
+     , A1.CODICEGRUPPO3
+     , A1.GRUPPO3
+     , A1.CODICEGRUPPO4
+     , A1.GRUPPO4
+     , A1.CODICEGRUPPO5
+     , A1.GRUPPO5
+     , A1.CODICEGRUPPO6
+     , A1.GRUPPO6
+     , A1.CODICEFORNITORE
+     , A1.CODICEPHOTOART
+
+FROM
+(
+  SELECT
+       A2.CODICEARTICOLO
+     , A2.DESCRIZIONE
+     , A2.CODICEPHOTOART
+     , A2.CODICEGRUPPO1
+     , A2.CODICEGRUPPO2
+     , A2.CODICEGRUPPO3
+     , A2.CODICEGRUPPO4
+     , A2.CODICEGRUPPO5
+     , A2.CODICEGRUPPO6
+     , A2.PREZZODILISTINO
+     , A2.CATEGORIA1
+     , A2.JOLLY1
+     , A2.CODICEFORNITORE
+     , A2.MARCA
+     , A2.UNITADIMISURA
+     , UPPER(CAST(' ' || (SELECT Descrizione FROM Gruppi WHERE Codice1=A2.CodiceGruppo1 AND Codice2=-1 AND Codice3=-1 AND Codice4=-1 AND Codice5=-1 AND Codice6=-1) AS VARCHAR(150))) AS GRUPPO1
+     , UPPER(CAST(' ' || (SELECT Descrizione FROM Gruppi WHERE Codice1=A2.CodiceGruppo1 AND Codice2=A2.CodiceGruppo2 AND Codice3=-1 AND Codice4=-1 AND Codice5=-1 AND Codice6=-1) AS VARCHAR(150))) AS GRUPPO2
+     , UPPER(CAST(' ' || (SELECT Descrizione FROM Gruppi WHERE Codice1=A2.CodiceGruppo1 AND Codice2=A2.CodiceGruppo2 AND Codice3=A2.CodiceGruppo3 AND Codice4=-1 AND Codice5=-1 AND Codice6=-1) AS VARCHAR(150))) AS GRUPPO3
+     , UPPER(CAST(' ' || (SELECT Descrizione FROM Gruppi WHERE Codice1=A2.CodiceGruppo1 AND Codice2=A2.CodiceGruppo2 AND Codice3=A2.CodiceGruppo3 AND Codice4=A2.CodiceGruppo4 AND Codice5=-1 AND Codice6=-1) AS VARCHAR(150))) AS GRUPPO4
+     , UPPER(CAST(' ' || (SELECT Descrizione FROM Gruppi WHERE Codice1=A2.CodiceGruppo1 AND Codice2=A2.CodiceGruppo2 AND Codice3=A2.CodiceGruppo3 AND Codice4=A2.CodiceGruppo4 AND Codice5=A2.CodiceGruppo5 AND Codice6=-1) AS VARCHAR(150))) AS GRUPPO5
+     , UPPER(CAST(' ' || (SELECT Descrizione FROM Gruppi WHERE Codice1=A2.CodiceGruppo1 AND Codice2=A2.CodiceGruppo2 AND Codice3=A2.CodiceGruppo3 AND Codice4=A2.CodiceGruppo4 AND Codice5=A2.CodiceGruppo5 AND Codice6=A2.CodiceGruppo6) AS VARCHAR(150))) AS GRUPPO6
+     , A2.BARCODE
+     , A2.PREFERITO
+  FROM ARTICOLI A2
+) AS A1
+
+WHERE CODICEARTICOLO <> '' AND DESCRIZIONE <> 'VARIE'
+
+ORDER BY
+ A1.GRUPPO1,
+ A1.GRUPPO2,
+ A1.GRUPPO3,
+ A1.GRUPPO4,
+ A1.GRUPPO5,
+ A1.GRUPPO6,
+ A1.CODICEPHOTOART,
+ A1.DESCRIZIONE
+
+
+
+

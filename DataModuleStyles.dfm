@@ -1,0 +1,43 @@
+object DMStyles: TDMStyles
+  OldCreateOrder = False
+  Height = 450
+  Width = 638
+  object cxEditStyleController_Filters: TcxEditStyleController
+    Style.BorderColor = clBlack
+    Style.BorderStyle = ebsNone
+    Style.Color = 15266815
+    Style.Edges = []
+    Style.Font.Charset = ANSI_CHARSET
+    Style.Font.Color = clWindowText
+    Style.Font.Height = -9
+    Style.Font.Name = 'Verdana'
+    Style.Font.Style = [fsBold]
+    Style.HotTrack = False
+    Style.TextColor = clBlack
+    Style.ButtonTransparency = ebtAlways
+    Style.PopupBorderStyle = epbsSingle
+    Style.IsFontAssigned = True
+    Left = 72
+    Top = 16
+    PixelsPerInch = 96
+  end
+  object cxEditStyleController_Filters_Date: TcxEditStyleController
+    Style.BorderColor = clBlack
+    Style.BorderStyle = ebsNone
+    Style.Color = 15266815
+    Style.Edges = []
+    Style.Font.Charset = ANSI_CHARSET
+    Style.Font.Color = clWindowText
+    Style.Font.Height = -9
+    Style.Font.Name = 'Arial'
+    Style.Font.Style = [fsBold]
+    Style.HotTrack = False
+    Style.TextColor = clBlack
+    Style.ButtonTransparency = ebtAlways
+    Style.PopupBorderStyle = epbsSingle
+    Style.IsFontAssigned = True
+    Left = 72
+    Top = 72
+    PixelsPerInch = 96
+  end
+end

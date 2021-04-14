@@ -1,0 +1,27 @@
+SET TERM ^ ;
+
+/* Questa SP ritorna True se c'è almeno una chiamata/appuntamento urgente per l'impianto specificato */
+
+CREATE PROCEDURE IMPIANTI_ALLEGATITOSEND_EXISTS (IN_CODICEPRATICA INTEGER, IN_DATAPRATICA TIMESTAMP)
+  RETURNS (OUTVAL CHAR(1))
+AS
+BEGIN
+
+  IF (EXISTS(SELECT AM.ID
+             FROM ALLEGATI_MANUT AM 
+             JOIN IMPEGNI I ON (I.MASTER_ID=AM.IDIMPEGNO)
+             WHERE 
+             I.PRATICA=:IN_CODICEPRATICA 
+             AND I.DATAPRATICA1=:IN_DATAPRATICA 
+             AND AM.STATOAVANZAMENTO=30))
+  THEN OUTVAL = 'T';
+  ELSE OUTVAL = 'F';
+
+  SUSPEND;
+  EXIT;
+
+END^
+
+SET TERM ; ^
+
+

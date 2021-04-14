@@ -1,0 +1,35 @@
+SET TERM ^ ;
+
+CREATE PROCEDURE MAG_CHECK_MOVMAG
+AS
+
+  /* Variabile appoggio */
+  DECLARE VARIABLE CurrTipoDoc VARCHAR(25);
+  DECLARE VARIABLE CurrRegDoc VARCHAR(5);
+  DECLARE VARIABLE CurrNumDoc INTEGER;
+  DECLARE VARIABLE CurrDataDoc TIMESTAMP;
+  DECLARE VARIABLE CurrMovMag CHAR(1);
+
+BEGIN
+
+  /* Cicla per tutti i documenti */
+  FOR SELECT DOC.TIPODOCUMENTO, DOC.REGISTRO, DOC.NUMORDPREV, DOC.DATADOCUMENTO, COALESCE(DOC.SEGNOOPERAZIONE, '=')
+  FROM PRVORDCL DOC
+  INTO :CurrTipoDoc, :CurrRegDoc, :CurrNumDoc, :CurrDataDoc, :CurrMovMag
+  DO BEGIN
+      
+    /* Appone ai righi del documento lo stesso segno della testata */
+    UPDATE RIGHIPRV
+    SET RIGHIPRV.MOVMAG = :CurrMovMag
+    WHERE RIGHIPRV.TIPODOCUMENTO = :CurrTipoDoc
+      AND RIGHIPRV.REGISTRO = :CurrRegDoc
+      AND RIGHIPRV.NUMORDPREV = :CurrNumDoc
+      AND RIGHIPRV.DATADOCUMENTO = :CurrDataDoc; 
+
+  END
+
+  EXIT;
+
+END^
+
+SET TERM ; ^

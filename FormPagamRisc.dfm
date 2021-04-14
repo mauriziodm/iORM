@@ -1,0 +1,777 @@
+object PagamRiscForm: TPagamRiscForm
+  Left = 473
+  Top = 277
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsNone
+  Caption = 'PagamRiscForm'
+  ClientHeight = 671
+  ClientWidth = 717
+  Color = clPurple
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ClientTopPanel: TbmpPanel
+    Left = 0
+    Top = 0
+    Width = 710
+    Height = 68
+    Alignment = taLeftJustify
+    BevelOuter = bvNone
+    Color = clGray
+    TabOrder = 0
+    object RxSpeedButtonResetQuery: TSpeedButton
+      Left = 312
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = []
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonVisualizza: TSpeedButton
+      Left = 512
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = []
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonUscita: TSpeedButton
+      Left = 2
+      Top = 2
+      Width = 49
+      Height = 42
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -27
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+      OnClick = RxSpeedButtonUscitaClick
+    end
+    object RxSpeedModifica: TSpeedButton
+      Left = 112
+      Top = 2
+      Width = 49
+      Height = 42
+      AllowAllUp = True
+      GroupIndex = 1
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -27
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonNuovo: TSpeedButton
+      Left = 162
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -27
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonElimina: TSpeedButton
+      Left = 212
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -27
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonTrova: TSpeedButton
+      Left = 262
+      Top = 2
+      Width = 49
+      Height = 42
+      AllowAllUp = True
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -27
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonStampa: TSpeedButton
+      Left = 362
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -27
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonHelp: TSpeedButton
+      Left = 62
+      Top = 2
+      Width = 49
+      Height = 42
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = []
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonFax: TSpeedButton
+      Left = 412
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = []
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+    object RxSpeedButtonMail: TSpeedButton
+      Left = 462
+      Top = 2
+      Width = 49
+      Height = 42
+      Enabled = False
+      Flat = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = []
+      Layout = blGlyphTop
+      NumGlyphs = 2
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      Spacing = 1
+    end
+  end
+  object ClientArea: TPanel
+    Left = 0
+    Top = 68
+    Width = 686
+    Height = 586
+    BevelOuter = bvNone
+    Color = clWhite
+    Ctl3D = False
+    ParentCtl3D = False
+    TabOrder = 1
+    object PanelGruppo1: TPanel
+      Left = 0
+      Top = 0
+      Width = 686
+      Height = 94
+      BevelOuter = bvNone
+      Color = 14737632
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object LabelGruppo1: TLabel
+        Left = 0
+        Top = 0
+        Width = 69
+        Height = 94
+        Align = alLeft
+        Alignment = taCenter
+        AutoSize = False
+        Caption = '1'
+        Color = clBlack
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -64
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+        Layout = tlCenter
+      end
+      object RichEdit1: TRichEdit
+        Tag = -1
+        Left = 83
+        Top = 16
+        Width = 602
+        Height = 107
+        TabStop = False
+        BorderStyle = bsNone
+        Ctl3D = False
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        Lines.Strings = (
+          
+            'Effettuato in data                           Pagamento della Fat' +
+            'tura N'#176' 156.342'
+          ''
+          'del  01/01/2003 della ditta POW Project On Web p.s.c.a.r.l.')
+        ParentColor = True
+        ParentCtl3D = False
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 1
+      end
+      object Panel1: TPanel
+        Left = 340
+        Top = 16
+        Width = 20
+        Height = 22
+        BevelOuter = bvNone
+        ParentColor = True
+        TabOrder = 2
+      end
+      object DEData: TcxDateEdit
+        Left = 236
+        Top = 14
+        ParentFont = False
+        Properties.ImmediatePost = True
+        Style.BorderStyle = ebsNone
+        Style.Color = 14286847
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -16
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = []
+        Style.HotTrack = False
+        Style.IsFontAssigned = True
+        TabOrder = 0
+        OnEnter = ENoteCassaEnter
+        OnExit = ENoteCassaExit
+        OnKeyPress = CECassaKeyPress
+        Width = 120
+      end
+    end
+    object PanelGruppo2: TPanel
+      Left = 0
+      Top = 115
+      Width = 686
+      Height = 194
+      BevelOuter = bvNone
+      Color = 14737632
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 1
+      object LabelGruppo2: TLabel
+        Left = 0
+        Top = 0
+        Width = 69
+        Height = 194
+        Align = alLeft
+        Alignment = taCenter
+        AutoSize = False
+        Caption = '2'
+        Color = clBlack
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -64
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+        Layout = tlCenter
+      end
+      object LabelCassa: TLabel
+        Left = 175
+        Top = 70
+        Width = 150
+        Height = 14
+        AutoSize = False
+        Caption = 'Importo ricevuto per CASSA'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -9
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object LabelFuoriCassa: TLabel
+        Left = 175
+        Top = 100
+        Width = 150
+        Height = 14
+        AutoSize = False
+        Caption = 'Importo ricevuto FUORI CASSA'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -9
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object LabelAbbuono: TLabel
+        Left = 175
+        Top = 130
+        Width = 150
+        Height = 14
+        AutoSize = False
+        Caption = 'Eventuale ABBUONO'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -9
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object Label21: TLabel
+        Left = 471
+        Top = 100
+        Width = 36
+        Height = 14
+        AutoSize = False
+        Caption = 'Banca'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -9
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object ShapeSaldo: TShape
+        Left = 260
+        Top = 159
+        Width = 202
+        Height = 1
+        Brush.Color = clBlack
+      end
+      object LabelSaldo: TLabel
+        Left = 144
+        Top = 165
+        Width = 177
+        Height = 14
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = 'A SALDO'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -9
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
+      object LabelImportoDaRiscuotere: TLabel
+        Left = 175
+        Top = 38
+        Width = 150
+        Height = 14
+        AutoSize = False
+        Caption = 'Importo da riscuotere'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -9
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object REPanel2: TRichEdit
+        Tag = -1
+        Left = 83
+        Top = 6
+        Width = 70
+        Height = 20
+        TabStop = False
+        BorderStyle = bsNone
+        Ctl3D = False
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        Lines.Strings = (
+          'Importi')
+        ParentColor = True
+        ParentCtl3D = False
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 1
+      end
+      object PanelRicevutaBancaria: TPanel
+        Left = 577
+        Top = 87
+        Width = 89
+        Height = 19
+        BevelOuter = bvNone
+        ParentColor = True
+        TabOrder = 2
+      end
+      object PanelBanca1: TPanel
+        Left = 510
+        Top = 96
+        Width = 166
+        Height = 21
+        BevelOuter = bvNone
+        Caption = 'Panel2'
+        TabOrder = 0
+        object CBBanca1: TComboBox
+          Tag = -1
+          Left = -2
+          Top = -3
+          Width = 170
+          Height = 26
+          Color = 16250871
+          Enabled = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Verdana'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnDropDown = CBBanca1DropDown
+          OnEnter = ENoteCassaEnter
+          OnExit = ENoteCassaExit
+          OnKeyPress = DEDataKeyPress
+        end
+      end
+      object CEImportoDaRiscuotere: TcxCurrencyEdit
+        Tag = -1
+        Left = 334
+        Top = 32
+        TabStop = False
+        EditValue = 0.000000000000000000
+        ParentColor = True
+        ParentFont = False
+        Properties.Alignment.Horz = taRightJustify
+        Properties.DisplayFormat = ' ,0.00;- ,0.00'
+        Properties.ReadOnly = True
+        Style.BorderStyle = ebsNone
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -16
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = []
+        Style.HotTrack = False
+        Style.TextColor = clBlack
+        Style.IsFontAssigned = True
+        TabOrder = 3
+        Width = 124
+      end
+      object CECassa: TcxCurrencyEdit
+        Left = 334
+        Top = 64
+        EditValue = 0.000000000000000000
+        ParentFont = False
+        Properties.Alignment.Horz = taRightJustify
+        Properties.DisplayFormat = ' ,0.00;- ,0.00'
+        Properties.OnChange = CECassaPropertiesChange
+        Style.BorderStyle = ebsNone
+        Style.Color = 14286847
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -16
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = []
+        Style.HotTrack = False
+        Style.TextColor = clBlack
+        Style.IsFontAssigned = True
+        TabOrder = 4
+        OnEnter = ENoteCassaEnter
+        OnExit = ENoteCassaEnter
+        OnKeyPress = CECassaKeyPress
+        Width = 124
+      end
+      object CEFuori1: TcxCurrencyEdit
+        Left = 334
+        Top = 94
+        EditValue = 0.000000000000000000
+        ParentFont = False
+        Properties.Alignment.Horz = taRightJustify
+        Properties.DisplayFormat = ' ,0.00;- ,0.00'
+        Properties.OnChange = CECassaPropertiesChange
+        Style.BorderStyle = ebsNone
+        Style.Color = 14286847
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -16
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = []
+        Style.HotTrack = False
+        Style.TextColor = clBlack
+        Style.IsFontAssigned = True
+        TabOrder = 5
+        OnEnter = ENoteCassaEnter
+        OnExit = ENoteCassaExit
+        OnKeyPress = CECassaKeyPress
+        Width = 124
+      end
+      object CEAbbuono: TcxCurrencyEdit
+        Left = 334
+        Top = 124
+        EditValue = 0.000000000000000000
+        ParentFont = False
+        Properties.Alignment.Horz = taRightJustify
+        Properties.DisplayFormat = ' ,0.00;- ,0.00'
+        Properties.OnChange = CECassaPropertiesChange
+        Style.BorderStyle = ebsNone
+        Style.Color = 14286847
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -16
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = []
+        Style.HotTrack = False
+        Style.TextColor = clBlack
+        Style.IsFontAssigned = True
+        TabOrder = 6
+        OnEnter = ENoteCassaEnter
+        OnExit = ENoteCassaExit
+        OnKeyPress = CECassaKeyPress
+        Width = 124
+      end
+      object CESaldo: TcxCurrencyEdit
+        Tag = -1
+        Left = 334
+        Top = 159
+        TabStop = False
+        EditValue = 0.000000000000000000
+        ParentColor = True
+        ParentFont = False
+        Properties.Alignment.Horz = taRightJustify
+        Properties.DisplayFormat = ' ,0.00;- ,0.00'
+        Properties.ReadOnly = True
+        Style.BorderStyle = ebsNone
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -16
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = [fsBold]
+        Style.HotTrack = False
+        Style.TextColor = clBlack
+        Style.IsFontAssigned = True
+        TabOrder = 7
+        Width = 124
+      end
+    end
+    object PanelGruppo3: TPanel
+      Left = 0
+      Top = 329
+      Width = 686
+      Height = 100
+      BevelOuter = bvNone
+      Color = 14737632
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 2
+      object LabelGruppo3: TLabel
+        Left = 0
+        Top = 0
+        Width = 69
+        Height = 100
+        Align = alLeft
+        Alignment = taCenter
+        AutoSize = False
+        Caption = '3'
+        Color = clBlack
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWhite
+        Font.Height = -64
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+        Layout = tlCenter
+      end
+      object RichEdit3: TRichEdit
+        Tag = -1
+        Left = 83
+        Top = 6
+        Width = 575
+        Height = 22
+        TabStop = False
+        BorderStyle = bsNone
+        Ctl3D = False
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        Lines.Strings = (
+          'Annotazioni')
+        ParentColor = True
+        ParentCtl3D = False
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 0
+      end
+      object ENoteCassa: TEdit
+        Left = 110
+        Top = 35
+        Width = 564
+        Height = 21
+        AutoSize = False
+        BorderStyle = bsNone
+        Color = 14286847
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Verdana'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        OnEnter = ENoteCassaEnter
+        OnExit = ENoteCassaExit
+        OnKeyPress = DEDataKeyPress
+      end
+      object PanelPagamentoRiscossione: TPanel
+        Left = 486
+        Top = 75
+        Width = 193
+        Height = 20
+        Cursor = crHandPoint
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clSilver
+        TabOrder = 2
+        object BitBtnConfermaPagamento: TSpeedButton
+          Left = 1
+          Top = 2
+          Width = 189
+          Height = 15
+          Caption = 'Conferma Pagamento/Riscossione'
+          Flat = True
+          OnClick = BitBtnConfermaPagamentoClick
+        end
+      end
+      object Panel11: TPanel
+        Left = 411
+        Top = 75
+        Width = 72
+        Height = 20
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clSilver
+        TabOrder = 3
+        object Annulla: TSpeedButton
+          Left = 1
+          Top = 2
+          Width = 68
+          Height = 15
+          Cursor = crHandPoint
+          Caption = 'Annulla'
+          Flat = True
+          OnClick = AnnullaClick
+        end
+      end
+      object PanelStartPagCumulativo: TPanel
+        Left = 149
+        Top = 75
+        Width = 193
+        Height = 20
+        Cursor = crHandPoint
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clSilver
+        TabOrder = 4
+        object BitBtnPagCumulativo: TSpeedButton
+          Left = 1
+          Top = 2
+          Width = 189
+          Height = 15
+          Caption = 'Conferma Pagamento/Riscossione'
+          Flat = True
+          OnClick = BitBtnPagCumulativoClick
+        end
+      end
+    end
+  end
+end

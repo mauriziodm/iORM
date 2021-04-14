@@ -1,0 +1,14 @@
+[Params]
+TipoFileDestinazione=XLS
+NomeFileDestinazione=
+txt_Separator=9
+txt_StartDelimiter=
+txt_EndDelimiter=
+
+[SQL]
+SELECT * FROM CLIENTI
+WHERE CLIENTEFORNITORE='Paziente'
+ORDER BY COGNOME, NOME, RAGIONESOCIALE
+
+
+

@@ -1,0 +1,16 @@
+SET TERM ^ ;
+
+CREATE TRIGGER CONFORM_AFTERDELETE FOR CONFORM
+ACTIVE AFTER DELETE POSITION 0
+AS
+BEGIN
+
+  /* Elimina gli allegati relativi al documento eliminato */
+  DELETE FROM ALLEGATI A  
+  WHERE A.TIPODOC = 'Conformita'
+    AND A.NUMDOC  = OLD.CODICE
+    AND A.DATADOC = OLD.DATA;
+
+END^
+
+SET TERM ; ^

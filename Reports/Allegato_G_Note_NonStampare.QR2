@@ -1,0 +1,261 @@
+object Header: TComponentFileHeader
+  UserData = {}
+end
+object RuntimeDatamodule: TRuntimeDatamodule
+  OldCreateOrder = False
+  Height = 0
+  Width = 0
+end
+object QuickReport: TDesignQuickReport
+  Frame.Color = clBlack
+  Frame.DrawTop = False
+  Frame.DrawBottom = False
+  Frame.DrawLeft = False
+  Frame.DrawRight = False
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -13
+  Font.Name = 'Arial'
+  Font.Style = []
+  Functions.Strings = (
+    'PAGENUMBER'
+    'COLUMNNUMBER'
+    'REPORTTITLE')
+  Functions.DATA = (
+    '0'
+    '0'
+    #39#39)
+  Options = [FirstPageHeader, LastPageFooter]
+  Page.Columns = 1
+  Page.Orientation = poPortrait
+  Page.PaperSize = A4
+  Page.Ruler = False
+  Page.Values = (
+    100.000000000000000000
+    2970.000000000000000000
+    100.000000000000000000
+    2100.000000000000000000
+    50.000000000000000000
+    85.000000000000000000
+    0.000000000000000000)
+  PrinterSettings.Copies = 1
+  PrinterSettings.OutputBin = First
+  PrinterSettings.Duplex = False
+  PrinterSettings.FirstPage = 0
+  PrinterSettings.LastPage = 0
+  PrinterSettings.ExtendedDuplex = 0
+  PrinterSettings.UseStandardprinter = False
+  PrinterSettings.UseCustomBinCode = False
+  PrinterSettings.CustomBinCode = 0
+  PrinterSettings.UseCustomPaperCode = False
+  PrinterSettings.CustomPaperCode = 0
+  PrinterSettings.PrintMetaFile = False
+  PrintIfEmpty = True
+  SnapToGrid = True
+  Units = Native
+  Zoom = 100
+  PrevFormStyle = fsNormal
+  PreviewInitialState = wsNormal
+  LabelSettings.FirstLabel = 0
+  LabelSettings.LabelCount = 0
+  PrepareAutomatically = False
+  DesignBackgroundDX = 0
+  DesignBackgroundDY = 0
+  RulerPanel = ReportDesignerForm.RulerPanel1
+  object QRBand1: TQRDesignBand
+    Left = 19
+    Top = 38
+    Width = 743
+    Height = 899
+    Frame.Color = clBlack
+    Frame.DrawTop = False
+    Frame.DrawBottom = False
+    Frame.DrawLeft = False
+    Frame.DrawRight = False
+    AlignToBottom = False
+    Color = clWhite
+    ForceNewColumn = False
+    ForceNewPage = False
+    Size.Values = (
+      2378.604166666667000000
+      1965.854166666667000000)
+    BandType = rbTitle
+    EditorEnabled = True
+    BandNum = 0
+    object QRShape37: TQRDesignShape
+      Tag = 31
+      Left = 28
+      Top = 175
+      Width = 687
+      Height = 632
+      Frame.Color = clBlue
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        1672.166666666667000000
+        74.083333333333340000
+        463.020833333333400000
+        1817.687500000000000000)
+      Pen.Color = 9737364
+      Shape = qrsRectangle
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object QRMemo1: TQRDesignMemo
+      Left = 49
+      Top = 256
+      Width = 643
+      Height = 476
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        1259.416666666667000000
+        129.645833333333300000
+        677.333333333333400000
+        1701.270833333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 9737364
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = []
+      Lines.Strings = (
+        
+          '1. Per tipo B o C si intende rispettivamente generatore a focola' +
+          're aperto o chiuso, indipendentemente dal tipo di combustibile u' +
+          'tilizzato.'
+        ''
+        
+          '2. Per N.C. si intende "Non controllabile", nel senso che per il' +
+          ' singolo aspetto non '#232' posibile effettuare tutti i necessari ris' +
+          'contri diretti senza ricorrere ad attrezzature speciali (ad esem' +
+          'pio per verificare l'#39'assenza di ostruzioni in un camino non rett' +
+          'ilineo), tuttavia le parti non controllabili sono in regola e no' +
+          'n si ha alcuna indicazione di anomalia nelle parti non controlla' +
+          'bili.'
+        ''
+        
+          '3. Nel caso di installazione all'#39'esterno al punto 2 deve essere ' +
+          'barrata solo la scritta ES.'
+        ''
+        
+          '4. Il dato relativo al tiraggio, espresso in Pa, '#232' necessario so' +
+          'lo per generatori di tipo B'
+        ''
+        
+          '5. Nello spazio OSSERVAZIONI deve essere indicata dal tecnico la' +
+          ' causa di ogni dato negativo riscontrato e gli eventuali interve' +
+          'nti manutentivi effettuati per risolvere il problema.'
+        ''
+        
+          '6. Nello spazio RACCOMANDAZIONI devono essere fornite dal tecnic' +
+          'o le raccomandazioni ritenute opportune in merito ad eventuali c' +
+          'arenze riscontrate e non eliminate, tali  comunque da non arreca' +
+          're un immediato pericolo alle le persone , agli animali domestic' +
+          'i e ai beni. Il tecnico indica le operazioni necessarie per il r' +
+          'ipristino delle normali condizioni dell'#39'impianto a cui il respon' +
+          'sabile dell'#39'impianto deve provvedere entro breve tempo.'
+        ''
+        
+          '7. Nello spazio PRESCRIZIONI il tecnico, avendo riscontrato e no' +
+          'n eliminato carenze tali da arrecare un immediato pericolo alle ' +
+          'persone, agli animali domestici e ai beni, dopo aver messo fuori' +
+          ' servizio l'#39'apparecchio e diffidato l'#39'occupante dal suo utilizzo' +
+          ', indica le operazioni necessarie per il ripristino delle condiz' +
+          'ioni di sicurezza.'
+        ''
+        
+          '8. Tutte le note riportate negli spazi OSSERVAZIONI, RACCOMANDAZ' +
+          'IONI, PRESCRIZIONI devono essere specificate dettagliatamente (a' +
+          'd esempio: NON foro di ventilazione  insufficiente, MA foro di v' +
+          'entilazione esistente da 100 cm2 da portare a 160 cm2).')
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 10
+    end
+    object QRLabel1: TQRDesignLabel
+      Left = 48
+      Top = 208
+      Width = 384
+      Height = 17
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        44.979166666666670000
+        127.000000000000000000
+        550.333333333333400000
+        1016.000000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'Avvertenze per il tecnico e per il responsabile di impianto'
+      Color = clWhite
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 9737364
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 10
+    end
+    object TQRDesignLabel
+      Left = 49
+      Top = 756
+      Width = 642
+      Height = 39
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        103.187500000000000000
+        129.645833333333300000
+        2000.250000000000000000
+        1698.625000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 
+        'Si rammenta che il controllo del rendimento di combustione, di c' +
+        'ui al punto H, deve essere effettuato con la periodicit'#224' stabili' +
+        'ta al comma 3 dell'#39'allegato L al presente decreto legislativo.'
+      Color = clWhite
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 9737364
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 10
+    end
+  end
+end
+object _1: TPropertyAddons
+end

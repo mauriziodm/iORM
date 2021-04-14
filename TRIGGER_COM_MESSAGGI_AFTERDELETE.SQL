@@ -1,0 +1,9 @@
+CREATE TRIGGER COM_MESSAGGI_AFTERDELETE FOR COM_MESSAGGI
+ACTIVE AFTER DELETE
+AS
+BEGIN
+
+  /* Elimina le operazioni pianificate dell'impianto e dell'apparecchio */
+  DELETE FROM COM_STORICO CS WHERE CS.ID_MSG = OLD.ID;
+
+END

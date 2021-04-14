@@ -1,0 +1,3150 @@
+object Header: TComponentFileHeader
+  UserData = {}
+end
+object RuntimeDatamodule: TRuntimeDatamodule
+  OldCreateOrder = False
+  Height = 0
+  Width = 0
+end
+object QuickReport: TDesignQuickReport
+  Frame.Color = clBlack
+  Frame.DrawTop = False
+  Frame.DrawBottom = False
+  Frame.DrawLeft = False
+  Frame.DrawRight = False
+  Frame.Width = 0
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -13
+  Font.Name = 'Arial'
+  Font.Style = []
+  Functions.Strings = (
+    'PAGENUMBER'
+    'COLUMNNUMBER'
+    'REPORTTITLE')
+  Functions.DATA = (
+    '0'
+    '0'
+    #39#39)
+  Options = [FirstPageHeader, LastPageFooter]
+  Page.Columns = 1
+  Page.Orientation = poPortrait
+  Page.PaperSize = A4
+  Page.Ruler = False
+  Page.Values = (
+    100.000000000000000000
+    2970.000000000000000000
+    100.000000000000000000
+    2100.000000000000000000
+    250.000000000000000000
+    250.000000000000000000
+    0.000000000000000000)
+  PrinterSettings.Copies = 1
+  PrinterSettings.OutputBin = First
+  PrinterSettings.Duplex = False
+  PrinterSettings.FirstPage = 0
+  PrinterSettings.LastPage = 0
+  PrinterSettings.ExtendedDuplex = 0
+  PrinterSettings.UseStandardprinter = False
+  PrinterSettings.UseCustomBinCode = False
+  PrinterSettings.CustomBinCode = 0
+  PrinterSettings.UseCustomPaperCode = False
+  PrinterSettings.CustomPaperCode = 0
+  PrinterSettings.PrintMetaFile = False
+  PrintIfEmpty = True
+  SnapToGrid = True
+  Units = MM
+  Zoom = 100
+  PrevFormStyle = fsNormal
+  PreviewInitialState = wsMaximized
+  LabelSettings.FirstLabel = 0
+  LabelSettings.LabelCount = 0
+  PrepareAutomatically = False
+  DesignBackgroundDX = 0
+  DesignBackgroundDY = 0
+  RulerPanel = ReportDesignerForm.RulerPanel1
+  Script.Strings = (
+    '[QuickReport.BeforePrint]'
+    'IF (STAMPAINTESTAZIONE = '#39'T'#39')'
+    '   SETBOOLPROP('#39'ImgIntestazione'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '   SETBOOLPROP('#39'ImgIntestazione'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    ''
+    '[Corpo.BeforePrint]'
+    'IF (TableDatiAzienda.REGREGISTRODITTEDI = '#39#39')'
+    '  SetBoolProp('#39'Check1'#39', '#39'Enabled'#39', False)'
+    'ELSE'
+    '  SetBoolProp('#39'Check1'#39', '#39'Enabled'#39', True)'
+    'ENDIF'
+    ''
+    'IF (TableDatiAzienda.REGALBOARTIGIANIDI = '#39#39')'
+    '  SetBoolProp('#39'Check2'#39', '#39'Enabled'#39', False)'
+    'ELSE'
+    '  SetBoolProp('#39'Check2'#39', '#39'Enabled'#39', True)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.NUOVOIMPIANTO = '#39'1'#39')'
+    '  SetBoolProp('#39'Check3'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check3'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.TRASFORMAZIONE = '#39'1'#39')'
+    '  SetBoolProp('#39'Check4'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check4'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.AMPLIAMENTO = '#39'1'#39')'
+    '  SetBoolProp('#39'Check5'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check5'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.MANUTSTRAORDINARIA = '#39'1'#39')'
+    '  SetBoolProp('#39'Check6'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check6'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.SOSTITUZAPPARECCHIOINSTALLATO = '#39'1'#39')'
+    '  SetBoolProp('#39'Check7'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check7'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.USOINDUSTRIALE = '#39'1'#39')'
+    '  SetBoolProp('#39'Check8'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check8'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.USOCIVILE = '#39'1'#39')'
+    '  SetBoolProp('#39'Check9'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check9'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.UsoCivile = '#39'1'#39')'
+    '  SetBoolProp('#39'Check10'#39', '#39'Enabled'#39', True)'
+    '  SetBoolProp('#39'Check11'#39', '#39'Enabled'#39', False)'
+    'ELSE'
+    '  SetBoolProp('#39'Check10'#39', '#39'Enabled'#39', False)'
+    '  SetBoolProp('#39'Check11'#39', '#39'Enabled'#39', True)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.RISPETTATOPROGETTO = '#39'1'#39')'
+    '  SetBoolProp('#39'Check12'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check12'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.SEGUITONORMATECNICA = '#39'1'#39')'
+    '  SetBoolProp('#39'Check13'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check13'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.INSTALLATOCOMPONENTI = '#39'1'#39')'
+    '  SetBoolProp('#39'Check14'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check14'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.ALLEGATOPROGETTO = '#39'1'#39')'
+    '  SetBoolProp('#39'Check15'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check15'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.ALLEGATORELAZIONE = '#39'1'#39')'
+    '  SetBoolProp('#39'Check16'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check16'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.ALLEGATOSCHEMA = '#39'1'#39')'
+    '  SetBoolProp('#39'Check17'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check17'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.ALLEGATORIFCONFORMITA = '#39'1'#39')'
+    '  SetBoolProp('#39'Check18'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check18'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.ALLEGATOCOPIACERTIFICATO = '#39'1'#39')'
+    '  SetBoolProp('#39'Check19'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check19'#39', '#39'Enabled'#39', False)'
+    'ENDIF'
+    ''
+    'IF (TableConformita.ALLEGATIFACOLTATIVI <> '#39#39')'
+    '  SetBoolProp('#39'Check20'#39', '#39'Enabled'#39', True)'
+    'ELSE'
+    '  SetBoolProp('#39'Check20'#39', '#39'Enabled'#39', False)'
+    'ENDIF')
+  object Intestazione: TQRDesignBand
+    Left = 94
+    Top = 38
+    Width = 605
+    Height = 173
+    Frame.Color = clBlack
+    Frame.DrawTop = False
+    Frame.DrawBottom = False
+    Frame.DrawLeft = False
+    Frame.DrawRight = False
+    AlignToBottom = False
+    Color = clWhite
+    ForceNewColumn = False
+    ForceNewPage = False
+    Size.Values = (
+      457.729166666666700000
+      1600.729166666667000000)
+    BandType = rbPageHeader
+    EditorEnabled = True
+    BandNum = 0
+    object ImgIntestazione: TQRDesignDBImage
+      Left = 1
+      Top = 1
+      Width = 603
+      Height = 171
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        452.437500000000000000
+        2.645833333333333000
+        2.645833333333333000
+        1595.437500000000000000)
+      Center = False
+      DataField = 'IMGINTESTAZIONE'
+      DataSet = DatabaseOwner.QrySocGas
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object Reportlabel1: TQRDesignLabel
+      Left = 524
+      Top = 128
+      Width = 81
+      Height = 23
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        60.854166666666680000
+        1386.416666666667000000
+        338.666666666666700000
+        214.312500000000000000)
+      Alignment = taRightJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'Allegato I'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -19
+      Font.Name = 'Times New Roman'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 14
+    end
+    object TQRDesignLabel
+      Left = 119
+      Top = 150
+      Width = 486
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        314.854166666666700000
+        396.875000000000000000
+        1285.875000000000000000)
+      Alignment = taRightJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        '(da compilarsi a cura dell'#39'installatore che ha realizzato l'#39'impi' +
+        'anto di utenza)'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -15
+      Font.Name = 'Times New Roman'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 11
+    end
+  end
+  object Corpo: TQRDesignBand
+    Left = 94
+    Top = 211
+    Width = 605
+    Height = 873
+    Frame.Color = clBlack
+    Frame.DrawTop = False
+    Frame.DrawBottom = False
+    Frame.DrawLeft = False
+    Frame.DrawRight = False
+    AlignToBottom = False
+    Color = clWhite
+    ForceNewColumn = False
+    ForceNewPage = False
+    Size.Values = (
+      2309.812500000000000000
+      1600.729166666667000000)
+    BandType = rbTitle
+    EditorEnabled = True
+    BandNum = 0
+    object TQRDesignLabel
+      Left = 146
+      Top = 238
+      Width = 193
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        386.291666666666700000
+        629.708333333333400000
+        510.645833333333300000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = '(tel. portatile _____________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 16
+      Width = 603
+      Height = 25
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        66.145833333333340000
+        0.000000000000000000
+        42.333333333333340000
+        1595.437500000000000000)
+      Alignment = taCenter
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'ATTESTAZIONE DI CORRETTA ESECUZIONE DELL'#39'IMPIANTO'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -19
+      Font.Name = 'Times New Roman'
+      Font.Style = [fsBold, fsUnderline]
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 14
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 48
+      Width = 603
+      Height = 25
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        66.145833333333340000
+        0.000000000000000000
+        127.000000000000000000
+        1595.437500000000000000)
+      Alignment = taCenter
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 
+        '(rilasciata ai sensi della Deliberazione n. 40/04 dell'#39'Autorit'#224' ' +
+        'per l'#39'Energia Elettrica e il Gas)'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -11
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 166
+      Width = 596
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        439.208333333333400000
+        1576.916666666667000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'Il sottoscritto ________________________________________________' +
+        '______________ titolare / legale rapppresentante'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 190
+      Width = 633
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        502.708333333333400000
+        1674.812500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = True
+      Caption = 
+        'dell'#39'impresa (ragione sociale) _________________________________' +
+        '_________________________________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 214
+      Width = 513
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        566.208333333333400000
+        1357.312500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'con sede nel comune di: ________________________________________' +
+        '__________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 519
+      Top = 215
+      Width = 83
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1373.187500000000000000
+        568.854166666666800000
+        219.604166666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = '(prov. _______),'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 238
+      Width = 145
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        629.708333333333400000
+        383.645833333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'tel. _____________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 262
+      Width = 504
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        693.208333333333400000
+        1333.500000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'via ____________________________________________________________' +
+        '_____________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 64
+      Top = 592
+      Width = 465
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        169.333333333333300000
+        1566.333333333333000000
+        1230.312500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = True
+      Caption = 
+        'Attesta sotto la propria personale responsabilit'#224' che l'#39'impianto' +
+        ' '#232' stato realizzato avendo:'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 510
+      Top = 263
+      Width = 121
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1349.375000000000000000
+        695.854166666666800000
+        320.145833333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'n. __________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 286
+      Width = 369
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        756.708333333333400000
+        976.312500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'Partita IVA: ___________________________________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Shape3: TQRDesignShape
+      Left = 0
+      Top = 327
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        865.187500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 327
+      Width = 647
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        865.187500000000000000
+        1711.854166666667000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'iscritta nel registro ditte (R.D. 20.9.1934, n. 2011) della CCIA' +
+        'A di ______________________________________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check1: TQRDesignLabel
+      Left = 4
+      Top = 328
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        867.833333333333500000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 0
+      Top = 351
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        928.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 351
+      Width = 473
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        928.687500000000000000
+        1251.479166666667000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'iscritta all'#39'albo imprese artigiane (L. 8.8.1985, n. 443) della ' +
+        'privincia di ______________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check2: TQRDesignLabel
+      Left = 4
+      Top = 352
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        931.333333333333500000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignLabel
+      Left = 495
+      Top = 351
+      Width = 229
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1309.687500000000000000
+        928.687500000000000000
+        605.895833333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'n. ____________________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 1
+      Top = 375
+      Width = 249
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        2.645833333333333000
+        992.187500000000000000
+        658.812500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'esecutrice dell'#39'impianto di utenza a gas inteso come:'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignShape
+      Left = 0
+      Top = 399
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        1055.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 399
+      Width = 77
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1055.687500000000000000
+        203.729166666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'nuovo impianto'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check3: TQRDesignLabel
+      Left = 4
+      Top = 400
+      Width = 10
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        1058.333333333333000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 148
+      Top = 399
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        391.583333333333400000
+        1055.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 170
+      Top = 399
+      Width = 73
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        449.791666666666700000
+        1055.687500000000000000
+        193.145833333333300000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'trasformazione'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check4: TQRDesignLabel
+      Left = 152
+      Top = 400
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        402.166666666666600000
+        1058.333333333333000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 292
+      Top = 399
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        772.583333333333400000
+        1055.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 312
+      Top = 399
+      Width = 63
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        825.500000000000000000
+        1055.687500000000000000
+        166.687500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'ampliamento'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check5: TQRDesignLabel
+      Left = 296
+      Top = 400
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        783.166666666666800000
+        1058.333333333333000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 420
+      Top = 399
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        1111.250000000000000000
+        1055.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 440
+      Top = 399
+      Width = 131
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1164.166666666667000000
+        1055.687500000000000000
+        346.604166666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'manutenzione straordinaria'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check6: TQRDesignLabel
+      Left = 424
+      Top = 400
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1121.833333333333000000
+        1058.333333333333000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 0
+      Top = 423
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        1119.187500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 423
+      Width = 248
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1119.187500000000000000
+        656.166666666666800000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'sostituzione di apparecchio installato in modo fisso'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check7: TQRDesignLabel
+      Left = 4
+      Top = 424
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        1121.833333333333000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 447
+      Width = 522
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        1182.687500000000000000
+        1381.125000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'installato nei locali siti nel comune di _______________________' +
+        '__________________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 520
+      Top = 449
+      Width = 83
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1375.833333333333000000
+        1187.979166666667000000
+        219.604166666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = '(prov. _______),'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 471
+      Width = 496
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        1246.187500000000000000
+        1312.333333333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'via ____________________________________________________________' +
+        '________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -13
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 10
+    end
+    object TQRDesignLabel
+      Left = 500
+      Top = 471
+      Width = 133
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1322.916666666667000000
+        1246.187500000000000000
+        351.895833333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'n. ____________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 495
+      Width = 325
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        1309.687500000000000000
+        859.895833333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'ricadente nell'#39'ambito di applicazione della legge 6 marzo 1990 n' +
+        '. 46:'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignShape
+      Left = 428
+      Top = 495
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        1132.416666666667000000
+        1309.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 448
+      Top = 495
+      Width = 26
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1185.333333333333000000
+        1309.687500000000000000
+        68.791666666666680000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'si (1)'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check10: TQRDesignLabel
+      Left = 432
+      Top = 496
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1143.000000000000000000
+        1312.333333333333000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 492
+      Top = 495
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        1301.750000000000000000
+        1309.687500000000000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 512
+      Top = 495
+      Width = 13
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        1354.666666666667000000
+        1309.687500000000000000
+        34.395833333333340000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'no'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check11: TQRDesignLabel
+      Left = 496
+      Top = 496
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.700000000000000000
+        1312.300000000000000000
+        1312.300000000000000000
+        26.500000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 0
+      Top = 616
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        1629.833333333333000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 616
+      Width = 288
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1629.833333333333000000
+        762.000000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'rispettato il progetto (per impianti con obbligo di progetto);'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check12: TQRDesignLabel
+      Left = 4
+      Top = 617
+      Width = 10
+      Height = 15
+      Enabled = False
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        1632.479166666667000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 0
+      Top = 640
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        1693.333333333333000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 640
+      Width = 619
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1693.333333333333000000
+        1637.770833333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'seguito la normativa applicabile all'#39'impiego (2): ______________' +
+        '___________________________________________________'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check13: TQRDesignLabel
+      Left = 4
+      Top = 641
+      Width = 10
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        1695.979166666667000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignShape
+      Left = 0
+      Top = 733
+      Width = 16
+      Height = 16
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        42.333333333333340000
+        0.000000000000000000
+        1939.395833333333000000
+        42.333333333333340000)
+      Brush.Color = 16773874
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 733
+      Width = 485
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1939.395833333333000000
+        1283.229166666667000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'installato componenti e materiali costruiti a regola d'#39'arte e ad' +
+        'atti al luogo di installazione;'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Check14: TQRDesignLabel
+      Left = 4
+      Top = 734
+      Width = 10
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        10.583333333333330000
+        1942.041666666667000000
+        26.458333333333330000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 'X'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object DBText1: TQRDesignDBText
+      Left = 84
+      Top = 165
+      Width = 342
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        222.250000000000000000
+        436.562499999999900000
+        904.875000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'ILSOTTOSCRITTO'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 158
+      Top = 189
+      Width = 436
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        418.041666666666700000
+        500.062500000000100000
+        1153.583333333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'RAGIONESOCIALE'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 135
+      Top = 213
+      Width = 372
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        357.187500000000000000
+        563.562500000000000000
+        984.249999999999900000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'CITTA'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 556
+      Top = 214
+      Width = 32
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1471.083333333333000000
+        566.208333333333400000
+        84.666666666666680000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'PROVINCIA'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 34
+      Top = 237
+      Width = 100
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        89.958333333333340000
+        627.062500000000000000
+        264.583333333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'TELEFONO'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 32
+      Top = 261
+      Width = 471
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        84.666666666666680000
+        690.562500000000000000
+        1246.187500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'INDIRIZZO'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 538
+      Top = 262
+      Width = 56
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1423.458333333333000000
+        693.208333333333400000
+        148.166666666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'NUMCIVICO'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 78
+      Top = 285
+      Width = 280
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        206.375000000000000000
+        754.062500000000000000
+        740.833333333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'P_IVA'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 363
+      Top = 326
+      Width = 239
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        960.437499999999900000
+        862.541666666666900000
+        632.354166666666800000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'REGREGISTRODITTEDI'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 374
+      Top = 350
+      Width = 119
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        989.541666666666800000
+        926.041666666666800000
+        314.854166666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'REGALBOARTIGIANIDI'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 519
+      Top = 350
+      Width = 82
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1373.187500000000000000
+        926.041666666666800000
+        216.958333333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'NUMREGALBOARTIGIANI'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 188
+      Top = 446
+      Width = 325
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        497.416666666666700000
+        1180.041666666667000000
+        859.895833333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'NELCOMUNEDI'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 561
+      Top = 448
+      Width = 32
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1484.312500000000000000
+        1185.333333333333000000
+        84.666666666666680000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'PROVINCIA'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 36
+      Top = 470
+      Width = 454
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        95.250000000000000000
+        1243.541666666667000000
+        1201.208333333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'VIA'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 523
+      Top = 470
+      Width = 80
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1383.770833333333000000
+        1243.541666666667000000
+        211.666666666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'NUMERO'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 268
+      Top = 639
+      Width = 263
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        709.083333333333400000
+        1690.687500000000000000
+        695.854166666666800000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'NORMATECNICA'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object Shape1: TQRDesignShape
+      Left = 0
+      Top = 72
+      Width = 209
+      Height = 54
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        142.875000000000000000
+        0.000000000000000000
+        190.500000000000000000
+        552.979166666666800000)
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignShape
+      Left = 208
+      Top = 72
+      Width = 395
+      Height = 54
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        142.875000000000000000
+        550.333333333333400000
+        190.500000000000000000
+        1045.104166666667000000)
+      Pen.Color = clBlue
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 4
+      Top = 76
+      Width = 202
+      Height = 47
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        124.354166666666700000
+        10.583333333333330000
+        201.083333333333300000
+        534.458333333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 
+        'Codice del Punto di Riconsegna o codice assegnato dal distributo' +
+        're alla richiesta di attivazione della fornitura: (*)'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignShape
+      Left = 211
+      Top = 110
+      Width = 388
+      Height = 11
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        29.104166666666670000
+        558.270833333333400000
+        291.041666666666700000
+        1026.583333333333000000)
+      Pen.Color = clBlue
+      Shape = qrsHorLine
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object TQRDesignLabel
+      Left = 2
+      Top = 128
+      Width = 601
+      Height = 20
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        52.916666666666660000
+        5.291666666666667000
+        338.666666666666700000
+        1590.145833333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Caption = 
+        '(*) Riportare il codice inserito dal venditore nella corrisponde' +
+        'nte casella dell'#39'allegato H.'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -11
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = True
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignDBText
+      Left = 228
+      Top = 237
+      Width = 100
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        603.250000000000000000
+        627.062500000000000000
+        264.583333333333400000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'CELLULARE'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignLabel
+      Left = 340
+      Top = 238
+      Width = 261
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        899.583333333333400000
+        629.708333333333400000
+        690.562500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'e_mail _____________________________________)'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignDBText
+      Left = 381
+      Top = 237
+      Width = 212
+      Height = 15
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        39.687500000000000000
+        1008.062500000000000000
+        627.062500000000000000
+        560.916666666666800000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableDatiAzienda
+      DataField = 'EMAIL'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 8
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 519
+      Width = 548
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        1373.187500000000000000
+        1449.916666666667000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'avente portata termica complessiva dell'#39'impianto (intesa come so' +
+        'mma delle portate termiche dei singoli apparecchi'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 0
+      Top = 543
+      Width = 297
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        0.000000000000000000
+        1436.687500000000000000
+        785.812500000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'installati e/o installabili) pari a _____________________ kW.'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 663
+      Width = 481
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1754.187500000000000000
+        1272.645833333333000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'in particolare verificando con esito positivo la tenuta dell'#39'imp' +
+        'ianto, la conformit'#224' della ventilazione e'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 686
+      Width = 515
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1815.041666666667000000
+        1362.604166666667000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 
+        'dell'#39'aerazione a quanto prescritto dalla normativa tecnica, l'#39'id' +
+        'oneit'#224' dei locali in cui sono installati l'#39'impianto'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object TQRDesignLabel
+      Left = 22
+      Top = 709
+      Width = 158
+      Height = 22
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        58.208333333333340000
+        58.208333333333340000
+        1875.895833333333000000
+        418.041666666666700000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'e gli apparecchi ad esso collegati;'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 9
+    end
+    object Shape2: TQRDesignShape
+      Left = 602
+      Top = 167
+      Width = 111
+      Height = 618
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        1635.125000000000000000
+        1592.791666666667000000
+        441.854166666666700000
+        293.687500000000000000)
+      Pen.Color = clWhite
+      Pen.Style = psClear
+      Shape = qrsRoundRect
+      VertAdjust = 0
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+    end
+    object LabelCopiaPer: TQRDesignLabel
+      Left = 0
+      Top = 861
+      Width = 90
+      Height = 12
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        31.750000000000000000
+        0.000000000000000000
+        2278.062500000000000000
+        238.125000000000000000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = True
+      AutoStretch = False
+      Caption = 'Copia per l'#39'impresa'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -9
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 7
+    end
+    object TQRDesignLabel
+      Left = 378
+      Top = 865
+      Width = 227
+      Height = 8
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        21.166666666666670000
+        1000.125000000000000000
+        2288.645833333333000000
+        600.604166666666800000)
+      Alignment = taLeftJustify
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = True
+      Caption = 
+        'Modulo stampatp con software gestionale Levante - (www.levantesw' +
+        '.it)'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlue
+      Font.Height = -7
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      Transparent = False
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 5
+    end
+    object TQRDesignDBText
+      Left = 215
+      Top = 90
+      Width = 380
+      Height = 20
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        52.916666666666660000
+        568.854166666666800000
+        238.125000000000000000
+        1005.416666666667000000)
+      Alignment = taCenter
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'CODFORNGAS'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 12
+    end
+    object TQRDesignDBText
+      Left = 168
+      Top = 540
+      Width = 92
+      Height = 17
+      Frame.Color = clBlack
+      Frame.DrawTop = False
+      Frame.DrawBottom = False
+      Frame.DrawLeft = False
+      Frame.DrawRight = False
+      Size.Values = (
+        44.979166666666670000
+        444.500000000000000000
+        1428.750000000000000000
+        243.416666666666700000)
+      Alignment = taCenter
+      AlignToBand = False
+      AutoSize = False
+      AutoStretch = False
+      Color = clWhite
+      DataSet = DM1.TableConformita
+      DataField = 'S2QAQN'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+      WordWrap = False
+      FixBottomPosition = False
+      StretchHeightWithBand = False
+      FontSize = 10
+    end
+  end
+end
+object _1: TPropertyAddons
+end

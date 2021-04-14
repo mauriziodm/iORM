@@ -1,0 +1,16 @@
+SET TERM ^ ;
+
+CREATE TRIGGER PRIMANOT_AFTERDELETE FOR PRIMANOT
+ACTIVE AFTER DELETE POSITION 0
+AS
+BEGIN
+
+  /* Elimina gli allegati relativi al documento eliminato */
+  DELETE FROM ALLEGATI A  
+  WHERE A.TIPODOC = 'Primanota'
+    AND A.NUMDOC  = OLD.CODICE
+    AND A.DATADOC = OLD.DATA;
+
+END^
+
+SET TERM ; ^

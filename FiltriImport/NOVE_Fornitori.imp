@@ -1,0 +1,80 @@
+[MacroList]
+
+[Params]
+AsciiFile=C:\Documents and Settings\Administrator\Desktop\SAITI NOVE\fileclientiefornitorinove\FORNITORI_import.csv
+AsciiDecimalSeparat=,
+DBDecimalSeparat=.
+AsciiThousandsSeparat=.
+DBThousandsSeparat=
+AsciiDateFormat=GMA
+DBDateFormat=MGA
+AsciiDateSeparat=/
+DBDateSeparat=/
+Separator=59
+FixedWidth=0
+Destination=CLIENTI
+NotifyCount=37
+SQLSection1=SQL_ConversioneCodiciPagamento
+
+[AsciiFieldList]
+A_Codice=FieldType:NUMBER;
+A_RagioneSociale=FieldType:STRING;	MAXLENGTH:60;
+A_Indirizzo=FieldType:STRING;	MAXLENGTH:40;
+A_Località=FieldType:STRING;	MAXLENGTH:25;
+A_Cap=FieldType:STRING;	MAXLENGTH:5;
+A_Provincia=FieldType:STRING;	MAXLENGTH:3;
+A_PartitaIva=FieldType:STRING;	MAXLENGTH:16;
+A_CodiceFiscale=FieldType:STRING;	MAXLENGTH:16;
+A_Pagamento=FieldType:STRING;	MAXLENGTH:40;
+A_Nazione=FieldType:STRING;	MAXLENGTH:2;
+
+[DbFieldList]
+CODICE=Value:<A_Codice>;	IsKeyField:YES;
+TIPOPERSONA=Value:'G';
+CLIENTEFORNITORE=Value:'Fornitore';
+RAGIONESOCIALE=Value:<A_RagioneSociale>;
+INDIRIZZO=Value:<A_Indirizzo>;
+CITTA=Value:<A_Località>;
+CAP=Value:<A_Cap>;
+PROVINCIA=Value:<A_Provincia>;
+CODICEFISCALE=Value:<A_CodiceFiscale>;
+PARTITAIVA=Value:<A_PartitaIva>;
+NAZIONESIGLA=Value:<A_Nazione>;
+JOLLY10=Value:<A_Pagamento>;
+
+[SQL_ConversioneCodiciPagamento]
+01=UPDATE CLIENTI SET
+02=PAGAMENTO = CASE
+03=WHEN (JOLLY10='1') THEN 500
+04=WHEN (JOLLY10='2') THEN 502
+05=WHEN (JOLLY10='12') THEN 503
+06=WHEN (JOLLY10='12') THEN 509
+07=WHEN (JOLLY10='18') THEN 504
+08=WHEN (JOLLY10='24') THEN 505
+09=WHEN (JOLLY10='30') THEN 513
+10=WHEN (JOLLY10='32') THEN 522
+11=WHEN (JOLLY10='33') THEN 512
+12=WHEN (JOLLY10='35') THEN 523
+13=WHEN (JOLLY10='36') THEN 524
+14=WHEN (JOLLY10='39') THEN 517
+15=WHEN (JOLLY10='40') THEN 525
+16=WHEN (JOLLY10='41') THEN 526
+17=WHEN (JOLLY10='47') THEN 513
+18=WHEN (JOLLY10='49') THEN 515
+19=WHEN (JOLLY10='50') THEN 527
+20=WHEN (JOLLY10='51') THEN 528
+21=WHEN (JOLLY10='52') THEN 529
+22=WHEN (JOLLY10='53') THEN 515
+23=WHEN (JOLLY10='57') THEN 523
+24=WHEN (JOLLY10='61') THEN 530
+25=WHEN (JOLLY10='70') THEN 503
+26=WHEN (JOLLY10='82') THEN 531
+27=WHEN (JOLLY10='34') THEN 515
+28=WHEN (JOLLY10='58') THEN 517
+29=WHEN (JOLLY10='73') THEN 502
+30=WHEN (JOLLY10='72') THEN 509
+31=WHEN (JOLLY10='63') THEN 522
+32=WHEN (JOLLY10='68') THEN 506
+33=WHEN (JOLLY10='71') THEN 504
+34=END
+
