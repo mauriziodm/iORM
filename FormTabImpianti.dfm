@@ -879,7 +879,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeDATAULTIMOINTERVENTO: TcxGridDBBandedColumn
-              Caption = 'Ultima'
+              Caption = 'Ultima vis.'
               DataBinding.FieldName = 'DATAULTIMOINTERVENTO'
               PropertiesClassName = 'TcxDateEditProperties'
               Properties.Alignment.Horz = taCenter
@@ -920,7 +920,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Options.FilteringPopupMultiSelect = False
               Width = 76
               Position.BandIndex = 3
-              Position.ColIndex = 2
+              Position.ColIndex = 3
               Position.RowIndex = 0
             end
             object btvAssistenzeDATAORAPROSSIMOAPPUNTAMENTO: TcxGridDBBandedColumn
@@ -1247,6 +1247,19 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.BandIndex = 9
               Position.ColIndex = 0
               Position.LineCount = 2
+              Position.RowIndex = 0
+            end
+            object btvAssistenzeDATAULTIMAMANUTENZIONE: TcxGridDBBandedColumn
+              Caption = 'Ultima manut.'
+              DataBinding.FieldName = 'DATAULTIMAMANUTENZIONE'
+              PropertiesClassName = 'TcxDateEditProperties'
+              Properties.Alignment.Horz = taCenter
+              Properties.ShowTime = False
+              Visible = False
+              MinWidth = 60
+              Width = 60
+              Position.BandIndex = 3
+              Position.ColIndex = 2
               Position.RowIndex = 0
             end
           end
@@ -2643,7 +2656,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
           TabOrder = 0
           OnResize = PanelAssFiltriResize
           object SubPanelAssFiltri: TPanel
-            Left = 0
+            Left = -1
             Top = 0
             Width = 686
             Height = 169
@@ -4190,9 +4203,6 @@ inherited TabImpiantiForm: TTabImpiantiForm
     object TabAssMappa: TcxTabSheet
       Caption = '   Mappa   '
       ImageIndex = 4
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
   end
   object QryAss: TIBOQuery
@@ -4410,6 +4420,9 @@ inherited TabImpiantiForm: TTabImpiantiForm
     object QryAssHIGHLIGHTS: TStringField
       FieldName = 'HIGHLIGHTS'
       Size = 1000
+    end
+    object QryAssDATAULTIMAMANUTENZIONE: TDateTimeField
+      FieldName = 'DATAULTIMAMANUTENZIONE'
     end
   end
   object SourceAss: TDataSource
@@ -5358,7 +5371,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
       PrinterPage.ScaleFactor = 80
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44300.498615381940000000
+      ReportDocument.CreationDate = 44300.683092233800000000
       ReportDocument.Creator = 'Mauri Fly'
       ReportTitle.Font.Charset = ANSI_CHARSET
       ReportTitle.Font.Color = clWindowText

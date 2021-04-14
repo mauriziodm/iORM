@@ -497,6 +497,8 @@ type
     EsportainformatoExcel1: TMenuItem;
     StaticText2: TStaticText;
     FilterTipoDataOP: TcxComboBox;
+    QryAssDATAULTIMAMANUTENZIONE: TDateTimeField;
+    btvAssistenzeDATAULTIMAMANUTENZIONE: TcxGridDBBandedColumn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure PanelAssFiltriResize(Sender: TObject);
@@ -857,6 +859,19 @@ begin
            //       c'è anche la parte tempo e se lo lasciavo come era e mettevo ad esempio di visualizzare tutto fino
            //       al 31/10 non mi visualizzava quelli del 31/10 perchè lui intendeva fino all'inizio del giorno 31/10.
            QryAss.SQL.Add('AND IV.DATAULTIMOINTERVENTO < ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssAl.EditText)+1)));
+        end;
+        // ----------
+      end else if FilterTipoData.Text = 'Ultima manutenzione' then begin
+        // ----------
+        // Date (Controllo sulla data dell'ultimo intervento DI MANUTENZIONE eseguito
+        if DM1.ControllaDataStr(AssDal.EditText) then begin
+           QryAss.SQL.Add('AND IV.DATAULTIMAMANUTENZIONE >= ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssDal.EditText))));
+        end;
+        if DM1.ControllaDataStr(AssAl.EditText)  then begin
+           //  NB: Nella DataAl ho messo il confronyo < invece che <= e con la data indicata dal filtro +1 perchè in questi campi
+           //       c'è anche la parte tempo e se lo lasciavo come era e mettevo ad esempio di visualizzare tutto fino
+           //       al 31/10 non mi visualizzava quelli del 31/10 perchè lui intendeva fino all'inizio del giorno 31/10.
+           QryAss.SQL.Add('AND IV.DATAULTIMAMANUTENZIONE < ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssAl.EditText)+1)));
         end;
         // ----------
       end else if (  (LeftStr(FilterTipoData.Text, 4) = 'op: ') or (FilterTipoData.Text = 'Operazioni Pianificate')  )
@@ -4347,6 +4362,7 @@ begin
   FilterTipoData.Properties.Items.Clear;
   FilterTipoData.Properties.Items.Add('Prossimo intervento');
   FilterTipoData.Properties.Items.Add('Ultimo intervento');
+  FilterTipoData.Properties.Items.Add('Ultima manutenzione');
   FilterTipoData.Properties.Items.Add('Operazioni Pianificate');
   // Oltre alle voci fisse aggiunge anche le Operazioni Pianificate
   DM2.StringList_AddOpForFilter(FilterTipoData.Properties.Items);
