@@ -333,6 +333,9 @@ object ImpegnoForm: TImpegnoForm
         Color = clWhite
         ImageIndex = 0
         ParentColor = False
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           715
           608)
@@ -14407,6 +14410,9 @@ object ImpegnoForm: TImpegnoForm
       object TabMappa: TcxTabSheet
         Caption = 'Mappa'
         ImageIndex = 4
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
     end
     object PanelAllegati: TPanel

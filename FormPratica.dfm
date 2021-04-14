@@ -77,7 +77,7 @@ object PraticaForm: TPraticaForm
       ParentColor = False
       ParentFont = False
       TabOrder = 0
-      Properties.ActivePage = TabParametri
+      Properties.ActivePage = TabInterventiPrecedenti
       Properties.CustomButtons.Buttons = <>
       Properties.NavigatorPosition = npLeftBottom
       Properties.Style = 9
@@ -30532,7 +30532,6 @@ object PraticaForm: TPraticaForm
       object TabParametri: TcxTabSheet
         Caption = 'Parametri'
         ImageIndex = 6
-        ExplicitTop = 23
         DesignSize = (
           710
           663)

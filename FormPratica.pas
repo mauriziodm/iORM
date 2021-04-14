@@ -6564,6 +6564,7 @@ begin
   TmpStr := DC.DisplayTexts[RI, btvPrescRISOLTO.Index];
   if TmpStr = 'True' then
   begin
+    DC.Cancel; // Altrimenti non mi salva poi la data di risoluzione del problema e mi da un errore
     DM2.ChiediConfermaPrescrizioneRisolta(DC, RI, btvPrescRISOLTO.Index, btvPrescFATTO_DATA.Index, btvPrescFATTO_NOTE.Index);
   end;
 end;

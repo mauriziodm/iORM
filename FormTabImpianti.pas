@@ -21,24 +21,12 @@ uses
   ImgList, cxDBLookupComboBox, dxPSGlbl, dxPSUtl, 
   dxBkgnd, dxWrap, dxPrnDev, dxPSFillPatterns,
   dxPSEdgePatterns, dxPSCore, dxPScxCommon, cxImageComboBox, DataModule2,
-  cxData, cxDataStorage, dxPSEngn, dxPrnPg, dxPSCompsProvider, dxSkinsCore,
-  dxSkinBlack, dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee,
-  dxSkinDarkRoom, dxSkinDarkSide, dxSkinDevExpressDarkStyle,
-  dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans, dxSkinHighContrast,
-  dxSkiniMaginary, dxSkinLilian, dxSkinLiquidSky, dxSkinLondonLiquidSky,
-  dxSkinMcSkin, dxSkinMoneyTwins, dxSkinOffice2007Black, dxSkinOffice2007Blue,
-  dxSkinOffice2007Green, dxSkinOffice2007Pink, dxSkinOffice2007Silver,
-  dxSkinOffice2010Black, dxSkinOffice2010Blue, dxSkinOffice2010Silver,
-  dxSkinPumpkin, dxSkinSeven, dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus,
-  dxSkinSilver, dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008,
-  dxSkinTheAsphaltWorld, dxSkinsDefaultPainters, dxSkinValentine, dxSkinVS2010,
-  dxSkinWhiteprint, dxSkinXmas2008Blue, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
+  cxData, cxDataStorage, dxPSEngn, dxPrnPg, dxPSCompsProvider, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
   cxLookAndFeels, cxNavigator, Vcl.ComCtrls, dxCore, cxDateUtils,
   dxPSPDFExportCore, dxPSPDFExport, cxDrawTextUtils, dxPSPrVwStd, dxPSPrVwAdv,
   dxPSPrVwRibbon, dxPScxPageControlProducer, dxPScxGridLnk,
   dxPScxGridLayoutViewLnk, dxPScxSchedulerLnk, dxPScxPivotGridLnk,
-  dxPScxEditorProducers, dxPScxExtEditorProducers, dxSkinsdxBarPainter,
-  dxSkinsdxRibbonPainter;
+  dxPScxEditorProducers, dxPScxExtEditorProducers, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations, System.ImageList;
 
 type
   TTabImpiantiForm = class(TModelPerTabPageControlPrincipaleForm)
@@ -2838,24 +2826,35 @@ begin
   DC := GridAssistenze.FocusedView.DataController;
   RI := DC.FocusedRecordIndex;
   // Se la prescrizione attuale è marcata come risolta...
-  if TcxCustomEdit(Sender).EditingValue then begin
+  if TcxCustomEdit(Sender).EditingValue then
+  begin
+    DC.Cancel; // Altrimenti non mi salva poi la data di risoluzione del problema e mi da un errore
     DM2.ChiediConfermaPrescrizioneRisolta(DC, RI, btvPrescRISOLTO.Index, btvPrescFATTO_DATA.Index, btvPrescFATTO_NOTE.Index);
     // Se la prescrizione/raccomandazione attuale è stata selesionata dall'utente
     //  come fatta/risolta provvede a marcarca altrimenti la salta
-    if (not VarIsNull(DC.Values[RI,btvPrescRISOLTO.Index])) and (DC.Values[RI,btvPrescRISOLTO.Index] = True) then begin
+    if (not VarIsNull(DC.Values[RI,btvPrescRISOLTO.Index])) and (DC.Values[RI,btvPrescRISOLTO.Index] = True) then
+    begin
       // Carica il Tipo record del record attuale
       TipoRecord := DC.Values[RI,btvPrescTIPORECORD.Index];
       // Se è una raccomandazione di un impegno
-      if      TipoRecord = '10-RACCOMANDAZIONI INT.'  then DM2.RaccomandazioniImpegno_MarcaComeFatta(DC.Values[RI,btvPrescIDIMPEGNO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index])
+      if      TipoRecord = '10-RACCOMANDAZIONI INT.' then
+        DM2.RaccomandazioniImpegno_MarcaComeFatta(DC.Values[RI,btvPrescIDIMPEGNO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index])
       // Se è una prescrizione di un impegno
-      else if TipoRecord = '20-PRESCRIZIONI INT.'     then DM2.PrescrizioniImpegno_MarcaComeFatta(DC.Values[RI,btvPrescIDIMPEGNO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index])
+      else if TipoRecord = '20-PRESCRIZIONI INT.' then
+        DM2.PrescrizioniImpegno_MarcaComeFatta(DC.Values[RI,btvPrescIDIMPEGNO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index])
       // Se è una raccomandazione di un allegato
-      else if TipoRecord = '30-RACCOMANDAZIONI ALL'   then DM2.RaccomandazioniAllegato_MarcaComeFatta(DC.Values[RI,btvPrescIDALLEGATO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index])
+      else if TipoRecord = '30-RACCOMANDAZIONI ALL' then
+        DM2.RaccomandazioniAllegato_MarcaComeFatta(DC.Values[RI,btvPrescIDALLEGATO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index])
       // Se è una prescrizione di un allegato
-      else if TipoRecord = '40-PRESCRIZIONI ALL'      then DM2.PrescrizioniAllegato_MarcaComeFatta(DC.Values[RI,btvPrescIDALLEGATO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index]);
+      else if TipoRecord = '40-PRESCRIZIONI ALL' then
+        DM2.PrescrizioniAllegato_MarcaComeFatta(DC.Values[RI,btvPrescIDALLEGATO.Index], DC.Values[RI,btvPrescFATTO_DATA.Index], DC.DisplayTexts[RI,btvPrescFATTO_NOTE.Index]);
       // Aggiorna il dataset di dettaglio
+      // NB: Lascio commentate le due righe sotto perchè altrimenti dava un AV perchè la chiamata a ClearDetails distruggeva
+      //      tutte le viste di dettaglio che invece alla griglia evidentemente servono ancora. Facendo così la visualizzazione
+      //      non si aggiorna finchè non si clicca su "Triva" cioè l'iconcina "P" continua a rimanere anche se si è marcata la
+      //      prescrizione/raccomandazione come fatta (ma sempre meglio dell'errore)
       DC.Refresh;
-      DC.GetMasterDataController.ClearDetails;
+//      DC.GetMasterDataController.ClearDetails;
     end;
   end;
 end;
