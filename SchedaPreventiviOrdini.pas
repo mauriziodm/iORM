@@ -2077,7 +2077,7 @@ type
     // Flag che decide se inserire o meno la ragione sociale dell'intestatario del documento origine
     // nei righi di riferimento quando si importa un docuemnto dalla bacheca.
     // NB: Ora anche per la descrizione della pratica/impianto
-    fAbilitaRagSocRiferimento, fRagSocRIferimentoSoloDocAcq, fAbilitaPraticaRiferimento: Boolean;
+    FAbilitaNumInterventoRiferimento, FAbilitaDataInterventoRiferimento, fAbilitaRagSocRiferimento, fRagSocRIferimentoSoloDocAcq, fAbilitaPraticaRiferimento: Boolean;
 
     // Flag che viene meso a True quando si modificano i dati di un rigo dal pannello laterale
     // in modo da disabilitare il ricalcolo automatico dei totali e altro quando si modifica
@@ -5465,7 +5465,7 @@ begin
       // NB: Se si sta importando un rigo principale VARIE proveniente dal
       // giornale di cantiere non inserisce mai il riferimento.
       // NB: Se c'è un riferimento ad altro documento (Ric.Fisc per gli interventi)
-      // non crea il riferimento all'intrvento
+      // non crea il riferimento all'intervento
       if (AbilitaRiferimento > 0) and (TipoDoc <> 'CANTIERE') and ((AbilitaRiferimento > 1) or not isRifDoc) and not IsSameDoc then
       begin
         with DC do
@@ -5485,22 +5485,26 @@ begin
           // NB: Se è un rif. a una Bolla_entr scrive DDT
           if Qry.FieldByName('TIPODOCUMENTO').AsString = 'Bolla_entr' then
             TipoDocRif := 'D.D.T.'
-          else if Qry.FieldByName('TIPODOCUMENTOESTESO').AsString <> '' then
+          else
+          if Qry.FieldByName('TIPODOCUMENTOESTESO').AsString <> '' then
             TipoDocRif := Qry.FieldByName('TIPODOCUMENTOESTESO').AsString
           else
             TipoDocRif := Qry.FieldByName('TIPODOCUMENTO').AsString;
           // Costruisce il testo del rigo di riferimento
-          TmpStr := '--- Rif. ' + TipoDocRif + ' n. ' + IntToStr(NumDoc) + Registro + ' del ' + DateToStr(DataDoc);
+          // NB: Se il documento a cui si fa riferimento (quelo importato) è un intervento allora mette o meno
+          //      il numero e/o la data dell'intervento stesso nel riferimento in base agli appositi parametri
+//          TmpStr := '--- Rif. ' + TipoDocRif + ' n. ' + IntToStr(NumDoc) + Registro + ' del ' + DateToStr(DataDoc);
+          TmpStr := '--- Rif. ' + TipoDocRif;
+          if (TipoDocRif <> 'Intervento') or FAbilitaNumInterventoRiferimento then
+            TmpStr := TmpStr + ' n. ' + IntToStr(NumDoc) + Registro;
+          if (TipoDocRif <> 'Intervento') or FAbilitaDataInterventoRiferimento then
+            TmpStr := TmpStr + ' del ' + DateToStr(DataDoc);
           // Se abilitato aggiunge anche la ragione sociale del documento origine
           if fAbilitaRagSocRiferimento and (DM1.IsDocumentoDiIngresso(Qry.FieldByName('TIPODOCUMENTO').AsString) or not fRagSocRIferimentoSoloDocAcq) then
-          begin
             TmpStr := TmpStr + ' ' + Trim(Qry.FieldByName('RAGSOCCLI').AsString);
-          end;
           // Se abilitato aggiunge anche la DESCRIZIONE PRATICA
           if fAbilitaPraticaRiferimento and (Trim(Qry.FieldByName('DESCPRATICA').AsString) <> '') then
-          begin
             TmpStr := TmpStr + ' (' + Trim(Qry.FieldByName('DESCPRATICA').AsString) + ')';
-          end;
           // Aggiunge anche l'eventuale extra-riferimento
           if Qry.FieldByName('EXTRA_RIFERIMENTO').AsString <> '' then
             TmpStr := TmpStr + ' ' + Trim(Qry.FieldByName('EXTRA_RIFERIMENTO').AsString);
@@ -5549,14 +5553,10 @@ begin
           // --------------------------------------------------------------------------------------------------------------
           // Se abilitato aggiunge anche la ragione sociale del documento origine
           if fAbilitaRagSocRiferimento and (DM1.IsDocumentoDiIngresso(Qry.FieldByName('TIPODOCUMENTO').AsString) or not fRagSocRIferimentoSoloDocAcq) then
-          begin
             TmpStr := TmpStr + ' ' + Trim(Qry.FieldByName('RAGSOCCLI').AsString);
-          end;
           // Se abilitato aggiunge anche la DESCRIZIONE PRATICA
           if fAbilitaPraticaRiferimento and (Trim(Qry.FieldByName('DESCPRATICA').AsString) <> '') then
-          begin
             TmpStr := TmpStr + ' (' + Trim(Qry.FieldByName('DESCPRATICA').AsString) + ')';
-          end;
           // ==============================================================================================================
           // Continua con l'inserimento del rigo del riferimento
           Values[Y, tvCorpoDESCRIZIONE.Index] := TmpStr;
@@ -9386,6 +9386,8 @@ begin
     DBEditProtocolloData.Properties.ReadOnly := LO.ReadBool(Sezione, 'ProtocolloReadOnly_Data', ProtocolloAutomatico_Data);
     // Caricva il parametro che abilita o meno la presenza daella ragione sociale negli
     // eventuali righi di riferimenti.
+    FAbilitaNumInterventoRiferimento := LO.ReadBool(Sezione, 'AbilitaNumInterventoRiferimento', True);
+    FAbilitaDataInterventoRiferimento := LO.ReadBool(Sezione, 'AbilitaDataInterventoRiferimento', True);
     fAbilitaRagSocRiferimento := LO.ReadBool(Sezione, 'AbilitaRagSocRiferimento', True);
     fRagSocRIferimentoSoloDocAcq := LO.ReadBool(Sezione, 'RagSocRiferimentoSoloDocAcq', True);
     fAbilitaPraticaRiferimento := LO.ReadBool(Sezione, 'AbilitaPraticaRiferimento', False);
