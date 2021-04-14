@@ -2846,6 +2846,8 @@ type
     QryDocDATIVETTORE: TStringField;
     tvDocDATIVETTORE: TcxGridDBColumn;
     Fatturachiamateappuntamentiinterventiselezionati2: TMenuItem;
+    QrySoggettiTIPOPERSONAEXT: TStringField;
+    tvRubricaTIPOPERSONAEXT: TcxGridDBColumn;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedButtonEliminaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
