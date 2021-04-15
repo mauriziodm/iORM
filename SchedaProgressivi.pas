@@ -1612,15 +1612,19 @@ begin
   // Se il focus è sul check che attiva/disattiva i ricarichi per fasce di prezzo,
   //  sposta il focus su un altro controllo in modo che una eventuale modifica a quel campo
   //  venga recepita dal sistema.
-  if eAbilitaRicarichiPerFascePrezzo.Focused then GridRicarichi.SetFocus;
+  if eAbilitaRicarichiPerFascePrezzo.Focused then
+    GridRicarichi.SetFocus;
   // Controlla che siano abilitati i ricarichi per gasce di prezzo
-  if not DM1.RicarichiPerFasceDiPrezzo then begin
+  if not DM1.RicarichiPerFasceDiPrezzo then
+  begin
     DM1.Messaggi('Levante', 'I ricarichi per fasce di prezzo sono DISABILITATI.', '', [mbOk], 0, nil);
     Exit;
   end;
   // Chiede prima conferma
-  if DM1.Messaggi('Levante', 'Confermi di voler applicare il parametro a tutti gli articoli dell''archivio?', '', [mbYes,mbNo], 0, nil) <> mrYes then Exit;
-  if DM1.Messaggi('Levante', 'Ultima conferma.'#13#13'Continuare con l''operazione?', '', [mbYes,mbNo], 0, nil) <> mrYes then Exit;
+  if DM1.Messaggi('Levante', 'Confermi di voler applicare il parametro a tutti gli articoli dell''archivio?', '', [mbYes,mbNo], 0, nil) <> mrYes then
+    Exit;
+  if DM1.Messaggi('Levante', 'Ultima conferma.'#13#13'Continuare con l''operazione?', '', [mbYes,mbNo], 0, nil) <> mrYes then
+    Exit;
   // Avvia l'operazione
   try
     DM1.EseguiQueryCalcolaListini;

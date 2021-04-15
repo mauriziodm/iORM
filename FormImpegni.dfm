@@ -2315,7 +2315,7 @@ object ImpegnoForm: TImpegnoForm
               end
               object dbeRifDoc_TipoDoc: TcxDBComboBox
                 Left = 53
-                Top = 9
+                Top = 10
                 AutoSize = False
                 DataBinding.DataField = 'RIFDOC_TIPO'
                 ParentFont = False
@@ -2326,6 +2326,7 @@ object ImpegnoForm: TImpegnoForm
                   'Estratto_conto'
                   'Fatt.R.F.'
                   'Fattura'
+                  'Garanzia'
                   'Intervento'
                   'Ordine di servizio'
                   'Ricev.fisc'

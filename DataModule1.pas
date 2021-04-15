@@ -3994,9 +3994,7 @@ begin
     // Se sono attivati i ricarichi per fasce di prezzo carica in memoria
     // le fasce di ricarico per prezzo di listino
     if DM1.RicarichiPerFasceDiPrezzo then
-    begin
       CaricaFasceRicarichi;
-    end;
 
     // Imposta la query che preleverà l'elenco degli articoli da aggiornare
     Qry.SQL.Add

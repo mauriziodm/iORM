@@ -1440,6 +1440,9 @@ type
     Label47: TLabel;
     eAbbbuono3: TDBEdit;
     Shape15: TShape;
+    AggiornairicarichiperfascedicostoTUTTIIRIGHI1: TMenuItem;
+    AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1: TMenuItem;
+    AggiornairicarichiperfascedicostoCOLORIGHISELEZIONATI2: TMenuItem;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedModificaClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -1493,6 +1496,7 @@ type
     procedure EsportaRigoDocFisc(TV: TcxGridTableView); // Personale
     procedure ImportaDocFisc(TipoDoc, Registro: String; NumDoc: Longint; DataDoc: TDate; AbilitaRiferimento: Integer; Inserisci: Boolean);
     procedure AggiornaPrezziDocumento(MDC: TcxCustomDataController; SoloRighiSelezionati: Boolean = False);
+    procedure AggiornaRicarichiPerFasceDiCosto(const DC: TcxCustomDataController; const ASoloRighiSelezionati: Boolean);
     procedure StampaDocFisc(TipoDoc, Registro: String; NumDoc: Longint; DataDoc: TDate; StmPrevFax, Copie: Shortint; Esploso: Boolean);
     procedure EseguiStampaTxt(NomeFile: String);
     function ConvertiLineaTxt(Linea: String; RowIdx: Integer): String;
@@ -1808,6 +1812,8 @@ type
     procedure DBEditStatoDocumentoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure RGAbbuonoPropertiesChange(Sender: TObject);
     procedure Nascondiscontopercentuale1Click(Sender: TObject);
+    procedure AggiornairicarichiperfascedicostoTUTTIIRIGHI1Click(Sender: TObject);
+    procedure AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1Click(Sender: TObject);
   private
     { Private declarations }
     fFirstCaricaLayoutDocumento: Boolean;
@@ -5173,6 +5179,69 @@ begin
   end;
 end;
 
+procedure TPreventiviOrdiniForm.AggiornaRicarichiPerFasceDiCosto(const DC: TcxCustomDataController; const ASoloRighiSelezionati: Boolean);
+var
+  i, LPrecPos: Integer;
+  LCodArt: String;
+  LCosto, LRicarico: Double;
+begin
+  // Solo per documenti di vendita
+  if DM1.IsDocumentoDiIngresso(QryDocumentoTIPODOCUMENTO.AsString) then
+    raise Exception.Create('"AggiornaRicarichiPerFasceDiCosto", questa funzionalità non può essere usata in documenti di acquisto.');
+  // Carica le fasce di ricarico in memoria
+  DM1.CaricaFasceRicarichi;
+  DC.BeginUpdate;
+  try
+    // Salva la posizione attuale
+    LPrecPos := DC.FocusedRecordIndex;
+    // Cicla per tutti i righi del documento
+    for i := 0 to DC.RecordCount - 1 do
+    begin
+      // Sposta il focus sul record in elaborazione
+      DC.FocusedRecordIndex := i;
+      // Se il rigo attuale è selezionato oppure se siamo in modalità "tutti i righi"...
+      if DC.IsRowSelected(i) or not ASoloRighiSelezionati then
+      begin
+        // Se il rigo attuale è un rigo composto, aggiorna i prezzi dei sottorighi dei rigo corrente
+        // NB: Fintantoche la DIBA non è multilivello non effettua il controllo ma assume automaticamente
+        // che il rigo è un rigo normale
+        if (not DC.IsDetailMode) and DM1.CheckIfExpandable(DC, i, False) then
+        begin
+          // Effettua l'aggiornamento dei prezzi dei sottorighi richiamando riscorsivamente la stessa funzione
+          AggiornaRicarichiPerFasceDiCosto(DC.GetDetailDataController(i, RELATION_IDX_SOTTORIGHI_NORMALI), False);
+          // RIcalcola i totali dei rigo principale
+          CalcolaTotaliSottorighi(DC, i);
+        end
+        // Se invece il rigo attuale è un rigo normale (Non composto)...
+        else
+        begin
+          // Estrae il codice articolo del rigo correte che non deve essere nullo e non deve essere manodopera
+          LCodArt := Trim(DM1.NoNullStringValue(DC, i, tvCorpoCODICEARTICOLO.Index));
+          if (not LCodArt.IsEmpty) and DM1.CodiceIsManodopera(LCodArt) then
+            Continue;
+          // Estrae il costo del rigo
+          //  NB: Se il costo unitario del rigo è zero lo salta
+          LCosto := DM1.NoNullFloatValue(DC, i, tvCorpoPREZZOACQUISTOARTICOLO.Index);
+          if LCosto = 0 then
+            Continue;
+          // Estrae il ricarico da assegnare al rigo in base alla fascia di costo
+          LRicarico := DM1.GetRicaricoPerPrezzo(LCosto, QryDocumentoLISTINO.AsInteger, False);
+          // Assegna i valori al rigo
+          DC.Values[i, tvCorpoMARGINE.Index] := LRicarico;
+          DC.Values[i, tvCorpoSCONTORIGO.Index] := 0;
+          DC.Values[i, tvCorpoSCONTORIGO2.Index] := 0;
+          DC.Values[i, tvCorpoSCONTORIGO3.Index] := 0;
+          CalcolaPerModificaMargine(i, DC);
+          CalcolaImportoRigo(DC, i);
+        end;
+      end;
+    end;
+  finally
+    DC.EndUpdate;
+    CalcolaTotali(True);
+  end;
+end;
+
 procedure TPreventiviOrdiniForm.AggiornaPrezziDocumento(MDC: TcxCustomDataController; SoloRighiSelezionati: Boolean = False);
 var
   Qry: TIB_Cursor;
@@ -5246,10 +5315,10 @@ begin
                   MDC.Values[i, tvCorpoMARGINE.Index] := 0;
                   CalcolaPerModificaPrezzoUnitario(i, MDC);
                 end;
-                // Se invece si tratta di un documento di vendita provvede a caricare il costo reale come costo del rigo
-                // e poi il prezzo di vendita del listino di vendita selezionato come prezzo unitario e poi ricalcola il
-                // margine.
               end
+              // Se invece si tratta di un documento di vendita provvede a caricare il costo reale come costo del rigo
+              // e poi il prezzo di vendita del listino di vendita selezionato come prezzo unitario e poi ricalcola il
+              // margine.
               else
               begin
                 // Se un rigo di manodopera carica il prezzo dalla manodopera
@@ -13805,7 +13874,6 @@ begin
       AggiornaPrezziDocumento(tvCorpo.DataController, False);
       // Se abilitato e necessario ricalcola i totali del documento
       CalcolaTotali(False);
-      CalcolaTotali(False);
     finally
       DM1.ChiudiAttendere;
     end;
@@ -13834,6 +13902,8 @@ begin
     MIIncollaRighiSelezionati.Enabled := True and not MainForm.IsLevanteLight;
     MIAggiornaPrezzi.Enabled := True and not MainForm.IsLevanteLight;
     Aggiornaiprezzideirighiselezionati1.Enabled := True and not MainForm.IsLevanteLight;
+    AggiornairicarichiperfascedicostoTUTTIIRIGHI1.Enabled := (not DM1.IsDocumentoDiIngresso(QryDocumentoTIPODOCUMENTO.AsString)) and (DM1.TableProgressiviRICARICHIPERFASCEPREZZO.AsString = 'T') and not MainForm.IsLevanteLight;
+    AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1.Enabled := (not DM1.IsDocumentoDiIngresso(QryDocumentoTIPODOCUMENTO.AsString)) and (DM1.TableProgressiviRICARICHIPERFASCEPREZZO.AsString = 'T') and not MainForm.IsLevanteLight;
     Convertinomearticoloinnomegruppo1.Enabled := True and not MainForm.IsLevanteLight;
     MICreaScadenze.Enabled := False;
     Azzeragliscontideirighiselezionati1.Enabled := True and not MainForm.IsLevanteLight;
@@ -13873,6 +13943,8 @@ begin
     MIIncollaRighiSelezionati.Enabled := False;
     MIAggiornaPrezzi.Enabled := False;
     Aggiornaiprezzideirighiselezionati1.Enabled := False;
+    AggiornairicarichiperfascedicostoTUTTIIRIGHI1.Enabled := False;
+    AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1.Enabled := False;
     Convertinomearticoloinnomegruppo1.Enabled := False;
     MICreaScadenze.Enabled := True and not MainForm.IsLevanteLight;
     Azzeragliscontideirighiselezionati1.Enabled := False;
@@ -19956,6 +20028,32 @@ begin
     finally
       DM1.ChiudiAttendere;
     end;
+  end;
+end;
+
+procedure TPreventiviOrdiniForm.AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1Click(Sender: TObject);
+begin
+  if DM1.Messaggi('Aggiorna ricarichi per fasce di costo', 'Proseguire con l''operazione?', '', [mbYes, mbNo], 0, nil) <> mrYes
+  then
+    Exit;
+  DM1.ShowWait('Aggiorna ricarichi per fasce di costo', 'Operazione in corso...');
+  try
+    AggiornaRicarichiPerFasceDiCosto(tvCorpo.DataController, True);
+  finally
+    DM1.CloseWait;
+  end;
+end;
+
+procedure TPreventiviOrdiniForm.AggiornairicarichiperfascedicostoTUTTIIRIGHI1Click(Sender: TObject);
+begin
+  if DM1.Messaggi('Aggiorna ricarichi per fasce di costo', 'Proseguire con l''operazione?', '', [mbYes, mbNo], 0, nil) <> mrYes
+  then
+    Exit;
+  DM1.ShowWait('Aggiorna ricarichi per fasce di costo', 'Operazione in corso...');
+  try
+    AggiornaRicarichiPerFasceDiCosto(tvCorpo.DataController, False);
+  finally
+    DM1.CloseWait;
   end;
 end;
 
