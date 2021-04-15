@@ -3931,7 +3931,8 @@ begin
     QryCli.DatabaseName := DM1.ArcDBFile;
     QryCli.IB_Connection := DM1.DBAzienda;
     QryCli.SQL.Add('SELECT RagioneSociale, Nome, Cognome, TipoPersona, Indirizzo, NumCivico, Citta, CAP, Provincia, PartitaIVA, CodiceFiscale, Telefono, Cellulare,');
-    QryCli.SQL.Add('CodiceDestinazMerci, RagSocDestinazMerci, IndirizzoDestinazMerci, NumCivicoDestinazMerci, CittaDestinazMerci, CapDestinazMerci, ProvinciaDestinazMerci');
+    QryCli.SQL.Add('CodiceDestinazMerci, RagSocDestinazMerci, IndirizzoDestinazMerci, NumCivicoDestinazMerci, CittaDestinazMerci, CapDestinazMerci, ProvinciaDestinazMerci,');
+    QryCli.SQL.Add('Palazzo, Scala, Piano, Interno');
     QryCli.SQL.Add('FROM Clienti WHERE Codice = ' + QryImpCliente.AsString);
     QryCli.Open;
     // Carica i dati l'indirizzo del cliente come destinazione merci del documento attuale
@@ -3983,6 +3984,10 @@ begin
         begin
           AddToEventLocation(QryCli.FieldByName('Indirizzo'), ', ', LEventLocation);
           AddToEventLocation(QryCli.FieldByName('NumCivico'), ' ', LEventLocation);
+          AddToEventLocation(QryCli.FieldByName('Palazzo'), ' pal.', LEventLocation);
+          AddToEventLocation(QryCli.FieldByName('Scala'), ' sc.', LEventLocation);
+          AddToEventLocation(QryCli.FieldByName('Piano'), ' p.', LEventLocation);
+          AddToEventLocation(QryCli.FieldByName('Interno'), ' int.', LEventLocation);
         end;
       end;
 
@@ -4265,9 +4270,9 @@ procedure TImpegnoForm.StampaFoglioDiLavoro(Preview, KitTecnico:Boolean; Copie:I
 var
   i: Integer;
 begin
-   // Se le copie impostate nei parametri e progressivi = -1 allora significa che
+   // Se le copie impostate nei parametri e progressivi = 0 allora significa che
    //  le stampe sono disabilitate
-   if Copie < 0 then
+   if Copie = 0 then
      Exit;
    // CArica gli interventi precedenti se non lo sono già
    if not QryIntPrec.Active then
@@ -4675,7 +4680,7 @@ begin
     Q.DatabaseName := DM1.ArcDBFile;
     Q.IB_Connection := DM1.DBAzienda;
     Q.SQL.Add('SELECT P.ID, P.TIPO, P.DESCRIZIONE, P.IMMOBCAP, P.IMMOBLOCALITA, P.IMMOBINDIRIZZO, P.IMMOBNUMCIVICO, P.IMMOBPROVINCIA, P.TELEFONORESPIMP, P.CELLULARERESPIMP, P.CODICEFISCALERESPIMP, P.PROPCODICEFISCALE,');
-    Q.SQL.Add(' P.CAPIMM, P.COMUNEIMM, P.PROVINCIAIMM, P.INDIRIZZOIMM, P.NUMCIVICOIMM');
+    Q.SQL.Add(' P.CAPIMM, P.COMUNEIMM, P.PROVINCIAIMM, P.INDIRIZZOIMM, P.NUMCIVICOIMM, P.SCALAIMM, P.PIANOIMM, P.INTERNOIMM, P.PALAZZOIMM');
     Q.SQL.Add('FROM PRATICHE P');
     Q.SQL.Add('WHERE P.CODICE = ' + QryImpPRATICA.AsString);
     Q.SQL.Add('  AND P.DATAAPERTURA = ''' + FormatDateTime('mm/dd/yyyy', QryImpDATAPRATICA1.AsDateTime) + '''');
@@ -4688,74 +4693,133 @@ begin
 //      if (QryImpLOCATION.IsNull) or (Trim(QryImpLOCATION.AsString)='') then begin
         TmpStr := '';
         // Se si tratta di un impianto carica i dati dell'impianto
-        if Q.FieldByName('TIPO').AsString = 'A' then begin
+        if Q.FieldByName('TIPO').AsString = 'A' then
+        begin
 
-          if fCopiaDescPraticaNelLuogoApp and (Trim(Q.FieldByName('DESCRIZIONE').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ', ';
+          if fCopiaDescPraticaNelLuogoApp and (Trim(Q.FieldByName('DESCRIZIONE').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ', ';
             TmpStr := TmpStr + Trim(Q.FieldByName('DESCRIZIONE').AsString);
           end;
-          if fCopiaCapNelLuogoApp and (Trim(Q.FieldByName('CAPIMM').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - ';
+          if fCopiaCapNelLuogoApp and (Trim(Q.FieldByName('CAPIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - ';
             TmpStr := TmpStr + Trim(Q.FieldByName('CAPIMM').AsString);
           end;
-          if fCopiaLocalitaNelLuogoApp and (Trim(Q.FieldByName('COMUNEIMM').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - ';
+          if fCopiaLocalitaNelLuogoApp and (Trim(Q.FieldByName('COMUNEIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - ';
             TmpStr := TmpStr + Trim(Q.FieldByName('COMUNEIMM').AsString);
           end;
-          if fCopiaProvinciaNelLuogoApp and (Trim(Q.FieldByName('PROVINCIAIMM').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ', ';
+          if fCopiaProvinciaNelLuogoApp and (Trim(Q.FieldByName('PROVINCIAIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ', ';
             TmpStr := TmpStr + Trim(Q.FieldByName('PROVINCIAIMM').AsString);
           end;
-          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('INDIRIZZOIMM').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ', ';
+          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('INDIRIZZOIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ', ';
             TmpStr := TmpStr + Trim(Q.FieldByName('INDIRIZZOIMM').AsString);
-            if (Trim(Q.FieldByName('NUMCIVICOIMM').AsString) <> '') then TmpStr := TmpStr + ' ' + Trim(Q.FieldByName('NUMCIVICOIMM').AsString);
+            if (Trim(Q.FieldByName('NUMCIVICOIMM').AsString) <> '') then
+              TmpStr := TmpStr + ' ' + Trim(Q.FieldByName('NUMCIVICOIMM').AsString);
           end;
-          if fCopiaTelefonoNelLuogoApp and (Trim(Q.FieldByName('TELEFONORESPIMP').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - ';
+          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('PALAZZOIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' pal.';
+            TmpStr := TmpStr + Trim(Q.FieldByName('PALAZZOIMM').AsString);
+          end;
+          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('SCALAIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' sc.';
+            TmpStr := TmpStr + Trim(Q.FieldByName('SCALAIMM').AsString);
+          end;
+          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('PIANOIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' p.';
+            TmpStr := TmpStr + Trim(Q.FieldByName('PIANOIMM').AsString);
+          end;
+          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('INTERNOIMM').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' int.';
+            TmpStr := TmpStr + Trim(Q.FieldByName('INTERNOIMM').AsString);
+          end;
+          if fCopiaTelefonoNelLuogoApp and (Trim(Q.FieldByName('TELEFONORESPIMP').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - ';
             TmpStr := TmpStr + Trim(Q.FieldByName('TELEFONORESPIMP').AsString);
           end;
-          if fCopiaCellulareNelLuogoApp and (Trim(Q.FieldByName('CELLULARERESPIMP').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - ';
+          if fCopiaCellulareNelLuogoApp and (Trim(Q.FieldByName('CELLULARERESPIMP').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - ';
             TmpStr := TmpStr + Trim(Q.FieldByName('CELLULARERESPIMP').AsString);
           end;
-          if fCopiaCodFiscNelLuogoApp and (Trim(Q.FieldByName('CODICEFISCALERESPIMP').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - CF:';
+          if fCopiaCodFiscNelLuogoApp and (Trim(Q.FieldByName('CODICEFISCALERESPIMP').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - CF:';
             TmpStr := TmpStr + Trim(Q.FieldByName('CODICEFISCALERESPIMP').AsString);
           end;
 
+        end
+        else
         // Se invece si tratta di un cantiere carica i dati del cantiere
-        end else if Q.FieldByName('TIPO').AsString = 'P' then begin
+        if Q.FieldByName('TIPO').AsString = 'P' then
+        begin
 
-          if fCopiaDescPraticaNelLuogoApp and (Trim(Q.FieldByName('DESCRIZIONE').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ', ';
+          if fCopiaDescPraticaNelLuogoApp and (Trim(Q.FieldByName('DESCRIZIONE').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ', ';
             TmpStr := TmpStr + Trim(Q.FieldByName('DESCRIZIONE').AsString);
           end;
-          if fCopiaCapNelLuogoApp and (Trim(Q.FieldByName('IMMOBCAP').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - ';
+          if fCopiaCapNelLuogoApp and (Trim(Q.FieldByName('IMMOBCAP').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - ';
             TmpStr := TmpStr + Trim(Q.FieldByName('IMMOBCAP').AsString);
           end;
-          if fCopiaLocalitaNelLuogoApp and (Trim(Q.FieldByName('IMMOBLOCALITA').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - ';
+          if fCopiaLocalitaNelLuogoApp and (Trim(Q.FieldByName('IMMOBLOCALITA').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - ';
             TmpStr := TmpStr + Trim(Q.FieldByName('IMMOBLOCALITA').AsString);
           end;
-          if fCopiaProvinciaNelLuogoApp and (Trim(Q.FieldByName('IMMOBPROVINCIA').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ', ';
+          if fCopiaProvinciaNelLuogoApp and (Trim(Q.FieldByName('IMMOBPROVINCIA').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ', ';
             TmpStr := TmpStr + Trim(Q.FieldByName('IMMOBPROVINCIA').AsString);
           end;
-          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('IMMOBINDIRIZZO').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ', ';
+          if fCopiaIndirizzoNelLuogoApp and (Trim(Q.FieldByName('IMMOBINDIRIZZO').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ', ';
             TmpStr := TmpStr + Trim(Q.FieldByName('IMMOBINDIRIZZO').AsString);
-            if (Trim(Q.FieldByName('IMMOBNUMCIVICO').AsString) <> '') then TmpStr := TmpStr + ' ' + Trim(Q.FieldByName('IMMOBNUMCIVICO').AsString);
+            if (Trim(Q.FieldByName('IMMOBNUMCIVICO').AsString) <> '') then
+              TmpStr := TmpStr + ' ' + Trim(Q.FieldByName('IMMOBNUMCIVICO').AsString);
           end;
-          if fCopiaCodFiscNelLuogoApp and (Trim(Q.FieldByName('PROPCODICEFISCALE').AsString) <> '') then begin
-            if TmpStr <> '' then TmpStr := TmpStr + ' - CF:';
+          if fCopiaCodFiscNelLuogoApp and (Trim(Q.FieldByName('PROPCODICEFISCALE').AsString) <> '') then
+          begin
+            if TmpStr <> '' then
+              TmpStr := TmpStr + ' - CF:';
             TmpStr := TmpStr + Trim(Q.FieldByName('PROPCODICEFISCALE').AsString);
           end;
 
         end;
         // Assegnazione valore costruito
-        if TmpStr <> '' then QryImpLOCATION.Value := TmpStr;
+        if TmpStr <> '' then
+          QryImpLOCATION.Value := TmpStr;
 //      end;
     end;
     Q.Close;
@@ -6063,6 +6127,9 @@ var
 begin
   // Stampa tutti gli eventuali allegati FG presenti nell'impegno
   // ------------------------------------------------------------
+  // Se la DataSet non è attivo significa che l'impegno è relativo solo a un cliente (non a un impegno) quindi salta
+  if not QryAllegati.Active then
+    Exit;
   // Disabilita l'aggiornamento dei controlli
   QryAllegati.DisableControls;
   // Salva la posizione corrente
@@ -7846,7 +7913,7 @@ begin
   // RIchiama la procedura di stampa
   //  NB: Le Copie le passa in negativo in modo che appaia sempre la Dialog per
   //       impostare le copie stesse con il valore di deafult.
-  StampaFoglioDiLavoro((MenuStampe.Tag = 0), False, (0 - DM1.TableProgressiviFL_COPIE.AsInteger));
+  StampaFoglioDiLavoro((MenuStampe.Tag = 0), False, (0 - Abs(DM1.TableProgressiviFL_COPIE.AsInteger)));
 end;
 
 procedure TImpegnoForm.SBEspandiRespImpClick(Sender: TObject);

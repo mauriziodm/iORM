@@ -365,7 +365,7 @@ object ClientiForm: TClientiForm
         Top = 0
         Width = 793
         Height = 581
-        ActivePage = TabClienti
+        ActivePage = TabMagazzino
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -29404,7 +29404,7 @@ object ClientiForm: TClientiForm
   end
   object cxCheckComboBox1: TcxCheckComboBox
     Left = 401
-    Top = 289
+    Top = 269
     Properties.Items = <
       item
         Description = '1'
@@ -32975,8 +32975,8 @@ object ClientiForm: TClientiForm
       '      CAST(P.INDIRIZZOIMM AS VARCHAR(60)) AS INDIRIZZOIMM'
       'FROM PRATICHE P'
       'LEFT JOIN CLIENTI C ON C.CODICE = P.CLIENTE')
-    Left = 389
-    Top = 268
+    Left = 405
+    Top = 324
     object QryAssTIPO: TStringField
       FieldName = 'TIPO'
       Size = 1
@@ -33069,13 +33069,13 @@ object ClientiForm: TClientiForm
   object SourceAss: TDataSource
     AutoEdit = False
     DataSet = QryAss
-    Left = 418
-    Top = 268
+    Left = 434
+    Top = 324
   end
   object MenuAssistenze: TPopupMenu
     OnPopup = MenuAssistenzePopup
-    Left = 447
-    Top = 268
+    Left = 463
+    Top = 324
     object Centraletermica1: TMenuItem
       Caption = 'Centrale termica   (Pot. >= 35 kW)'
       OnClick = Centraletermica1Click
@@ -33285,21 +33285,21 @@ object ClientiForm: TClientiForm
     FieldNames.ResourceID = 'RESOURCEID'
     FieldNames.Start = 'START_EVENT'
     FieldNames.State = 'STATE'
-    Left = 448
-    Top = 335
+    Left = 464
+    Top = 391
   end
   object SourceAgenda: TDataSource
-    Left = 414
-    Top = 306
+    Left = 430
+    Top = 362
   end
   object SourceTecnici: TDataSource
-    Left = 414
-    Top = 335
+    Left = 430
+    Top = 391
   end
   object MenuAgenda: TPopupMenu
     OnPopup = MenuAgendaPopup
-    Left = 474
-    Top = 306
+    Left = 490
+    Top = 362
     object Appuntamentonormale1: TMenuItem
       Caption = 'Appuntamento normale'
       OnClick = Appuntamentonormale1Click
@@ -33310,8 +33310,8 @@ object ClientiForm: TClientiForm
     end
   end
   object EventPopupMenuAgenda: TPopupMenu
-    Left = 444
-    Top = 306
+    Left = 460
+    Top = 362
     object Eliminaappuntamentoecreadocumento1: TMenuItem
       Caption = 'Elimina appuntamento e crea documento'
       OnClick = Eliminaappuntamentoecreadocumento1Click
@@ -34264,8 +34264,8 @@ object ClientiForm: TClientiForm
       ''
       'FROM PRIMANOT P'
       'LEFT JOIN CLIENTI C ON (C.CODICE = P.CLIENTE)')
-    Left = 384
-    Top = 378
+    Left = 400
+    Top = 434
     object QueryPrimanotaDATA: TDateTimeField
       FieldName = 'DATA'
       Required = True
@@ -34360,8 +34360,8 @@ object ClientiForm: TClientiForm
   object SourcePrimanota: TDataSource
     AutoEdit = False
     DataSet = QueryPrimanota
-    Left = 414
-    Top = 378
+    Left = 430
+    Top = 434
   end
   object QueryTotali: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34377,8 +34377,8 @@ object ClientiForm: TClientiForm
         'otFuoriUscite, (sum(FuoriEntrate)-sum(FuoriUscite)) as SaldoFuor' +
         'i'
       'FROM primanot')
-    Left = 384
-    Top = 407
+    Left = 400
+    Top = 463
     object QueryTotaliTotCassaEntrate: TCurrencyField
       FieldName = 'TotCassaEntrate'
     end
@@ -34401,8 +34401,8 @@ object ClientiForm: TClientiForm
   object SourceTotali: TDataSource
     AutoEdit = False
     DataSet = QueryTotali
-    Left = 414
-    Top = 407
+    Left = 430
+    Top = 463
   end
   object QueryRiporti: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34500,8 +34500,8 @@ object ClientiForm: TClientiForm
   end
   object MenuPrimanota: TPopupMenu
     OnPopup = MenuPrimanotaPopup
-    Left = 444
-    Top = 378
+    Left = 460
+    Top = 434
     object Movimentoprimanota1: TMenuItem
       Caption = 'Movimento primanota'
       OnClick = Movimentoprimanota1Click
@@ -34588,8 +34588,8 @@ object ClientiForm: TClientiForm
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 360
-    Top = 268
+    Left = 376
+    Top = 324
   end
   object TransImp: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34602,29 +34602,29 @@ object ClientiForm: TClientiForm
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 356
-    Top = 306
+    Left = 372
+    Top = 362
   end
   object TransTecnici: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 356
-    Top = 335
+    Left = 372
+    Top = 391
   end
   object TransPrimanota: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 354
-    Top = 378
+    Left = 370
+    Top = 434
   end
   object TransTotali: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 354
-    Top = 407
+    Left = 370
+    Top = 463
   end
   object TransRiporti: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34914,8 +34914,8 @@ object ClientiForm: TClientiForm
         'OCCLI, TIPOIMPEGNO,'
       'EXISTS_URGENTI, EXISTS_PRESCRIZIONI'
       'FROM AGENDA_LIST_VIEW')
-    Left = 385
-    Top = 306
+    Left = 401
+    Top = 362
   end
   object QryTecnici: TIBOQuery
     IB_Connection = DM1.DBAzienda
@@ -34923,7 +34923,7 @@ object ClientiForm: TClientiForm
     SQL.Strings = (
       'SELECT RESOURCEID, RESOURCENAME, RESOURCECOLOR'
       'FROM TECNICI')
-    Left = 385
-    Top = 335
+    Left = 401
+    Top = 391
   end
 end

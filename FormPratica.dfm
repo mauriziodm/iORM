@@ -77,7 +77,7 @@ object PraticaForm: TPraticaForm
       ParentColor = False
       ParentFont = False
       TabOrder = 0
-      Properties.ActivePage = TabApparecchi
+      Properties.ActivePage = TabImpianto
       Properties.CustomButtons.Buttons = <>
       Properties.NavigatorPosition = npLeftBottom
       Properties.Style = 9
@@ -9217,8 +9217,8 @@ object PraticaForm: TPraticaForm
               Width = 35
             end
             object dbeInternoImm: TcxDBTextEdit
-              Left = 468
-              Top = 55
+              Left = 465
+              Top = 54
               AutoSize = False
               DataBinding.DataField = 'INTERNOIMM'
               DataBinding.DataSource = SourcePrat

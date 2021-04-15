@@ -321,7 +321,7 @@ object ImpegnoForm: TImpegnoForm
       ParentBackground = False
       ParentColor = False
       TabOrder = 1
-      Properties.ActivePage = TabInterventiPrecedenti
+      Properties.ActivePage = TabAppuntamento
       Properties.CustomButtons.Buttons = <>
       LookAndFeel.NativeStyle = False
       OnChange = PageControlPagineDocumentoChange
@@ -333,9 +333,6 @@ object ImpegnoForm: TImpegnoForm
         Color = clWhite
         ImageIndex = 0
         ParentColor = False
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           715
           608)
@@ -14410,9 +14407,6 @@ object ImpegnoForm: TImpegnoForm
       object TabMappa: TcxTabSheet
         Caption = 'Mappa'
         ImageIndex = 4
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
     end
     object PanelAllegati: TPanel

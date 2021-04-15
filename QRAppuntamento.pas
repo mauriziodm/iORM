@@ -2342,15 +2342,20 @@ begin
   if (Value <> '') and (TmpStr <> '') then
     TmpStr := ' ' + TmpStr;
   Value := Value + TmpStr;
+  // Palazzo
+  TmpStr := Trim(ImpegnoForm.QryAssPALAZZOIMM.AsString);
+  if (Value <> '') and (TmpStr <> '') then
+    TmpStr := ' pal.' + TmpStr;
+  Value := Value + TmpStr;
   // Scala
   TmpStr := Trim(ImpegnoForm.QryAssSCALAIMM.AsString);
   if (Value <> '') and (TmpStr <> '') then
-    TmpStr := ' scala ' + TmpStr;
+    TmpStr := ' sc.' + TmpStr;
   Value := Value + TmpStr;
   // Piano
   TmpStr := Trim(ImpegnoForm.QryAssPIANOIMM.AsString);
   if (Value <> '') and (TmpStr <> '') then
-    TmpStr := ' piano ' + TmpStr + '°';
+    TmpStr := ' p.' + TmpStr + '°';
   Value := Value + TmpStr;
   // Interno
   TmpStr := Trim(ImpegnoForm.QryAssINTERNOIMM.AsString);
