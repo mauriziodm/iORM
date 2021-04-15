@@ -221,11 +221,6 @@ type
     QryGMPRATICA: TStringField;
     dxPrinter: TdxComponentPrinter;
     GridGMLink: TdxGridReportLink;
-    QryTotGM: TIBOQuery;
-    SourceTotGM: TDataSource;
-    QryTotGMPREZZOMEDIO: TIBOFloatField;
-    QryTotGMTOTQTA: TIBOFloatField;
-    QryTotGMTOTIMPORTORIGO: TIBOFloatField;
     GridSoggLink: TdxGridReportLink;
     N7: TMenuItem;
     Stampaelencoscadenze1: TMenuItem;
@@ -285,7 +280,6 @@ type
     Stampaetichettearticoli1: TMenuItem;
     QryGMPREZZOUNITARIOIVACOMPRESA: TIBOFloatField;
     QryGMIMPORTORIGOIVACOMPRESA: TIBOFloatField;
-    QryTotGMTOTIMPORTORIGOIVACOMPRESA: TIBOFloatField;
     Notadicreditofornitore1: TMenuItem;
     QryArticoliARTICOLOCOMPOSTO: TStringField;
     Sostituzionesottoarticolonegliarticoliselezionati1: TMenuItem;
@@ -643,7 +637,6 @@ type
     TransArticoli: TIB_Transaction;
     TransArtListForn: TIB_Transaction;
     TransGM: TIB_Transaction;
-    TransTotGM: TIB_Transaction;
     TransCV: TIB_Transaction;
     TransPratiche: TIB_Transaction;
     TransScad: TIB_Transaction;
@@ -2229,16 +2222,6 @@ type
     TabGMGrid: TcxTabSheet;
     TabGMADA: TcxTabSheet;
     PivotGridGM: TcxDBPivotGrid;
-    PanelTotaliGM: TPanel;
-    Label8: TLabel;
-    QtaTot: TLabel;
-    Label10: TLabel;
-    Shape11: TShape;
-    GMTotPrezzoMedio: TDBText;
-    GMTotQta: TDBText;
-    GMTotImporti: TDBText;
-    Label46: TLabel;
-    GMTotImportiIVACompresa: TDBText;
     GridGM: TcxGrid;
     tvGM: TcxGridDBTableView;
     tvGMCODICEMAGAZZINO: TcxGridDBColumn;
@@ -2848,6 +2831,14 @@ type
     Fatturachiamateappuntamentiinterventiselezionati2: TMenuItem;
     QrySoggettiTIPOPERSONAEXT: TStringField;
     tvRubricaTIPOPERSONAEXT: TcxGridDBColumn;
+    QryGMPREZZOACQUISTOARTICOLO: TCurrencyField;
+    QryGMIMPORTOCOSTO: TCurrencyField;
+    QryGMIMPORTOMARGINE: TCurrencyField;
+    QryGMMARGINE: TFloatField;
+    tvGMPREZZOACQUISTOARTICOLO: TcxGridDBColumn;
+    tvGMIMPORTOCOSTO: TcxGridDBColumn;
+    tvGMIMPORTOMARGINE: TcxGridDBColumn;
+    tvGMMARGINE: TcxGridDBColumn;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedButtonEliminaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -4995,6 +4986,7 @@ begin
   QryGM.SQL.Add(' CASE R.MOVMAG WHEN ''-'' THEN (COALESCE(R.QTA,0) * -1) ELSE COALESCE(R.QTA,0) END AS QTA,');
   QryGM.SQL.Add
     (' COALESCE(R.ScontoRigo,0) AS SCONTORIGO,COALESCE(R.ScontoRigo2,0) AS SCONTORIGO2,COALESCE(R.ScontoRigo3,0) AS SCONTORIGO3,COALESCE(R.ImportoRigo,0) AS IMPORTORIGO, T.StatoDescrizione,');
+  QryGM.SQL.Add(' COALESCE(R.PrezzoAcquistoArticolo,0) AS PrezzoAcquistoArticolo, COALESCE(R.ImportoCosto,0) AS ImportoCosto, COALESCE(R.Margine,0) AS Margine, COALESCE(R.ImportoMargine,0) AS ImportoMargine,');
   QryGM.SQL.Add
     (' CAST(T.TipoDocumento || '' '' || T.NumOrdPrev || T.Registro || '' del '' || T.DataDocumento || CASE WHEN (TRIM(COALESCE(I.RDA,''''))<>'''') THEN ('' (RDA ''||TRIM(I.RDA)||'')'') ELSE '''' END AS VARCHAR(100)) AS DOCUMENTO,');
   QryGM.SQL.Add(' CAST(T.RagSocCli || ''  ('' || T.CodiceCliente || '')'' AS VARCHAR(100) CHARACTER SET NONE) AS SOGGETTO,');
@@ -5256,19 +5248,6 @@ begin
   // QryGM.SQL.SaveToFile('c:\sql.sql');
   QryGM.Open;
 
-  // Imposta la query dei totali GM copiando le condizioni della clausa WHERE dalla QryGM
-  // e anche le JOIN altrimenti dà errori
-  QryTotGM.Close;
-  QryTotGM.SQL.Clear;
-  // QryTotGM.SQL.Add('SELECT AVG(R.IMPORTORIGO/QTA) AS PREZZOMEDIO, SUM(R.QTA) AS TOTQTA, SUM(R.IMPORTORIGO) AS TOTIMPORTORIGO, SUM(R.IMPORTORIGOIVACOMPRESA) AS TOTIMPORTORIGOIVACOMPRESA,');
-  QryTotGM.SQL.Add
-    ('SELECT AVG(R.IMPORTORIGO/QTA) AS PREZZOMEDIO, SUM(R.IMPORTORIGO) AS TOTIMPORTORIGO, SUM(R.IMPORTORIGOIVACOMPRESA) AS TOTIMPORTORIGOIVACOMPRESA,');
-  QryTotGM.SQL.Add(' SUM(   CASE R.MOVMAG WHEN ''-'' THEN (COALESCE(R.QTA,0) * -1) ELSE COALESCE(R.QTA,0) END   ) AS TOTQTA');
-  for I := 25 to QryGM.SQL.Count - 1 do
-    QryTotGM.SQL.Add(QryGM.SQL[I]); // NB: Copia anche i JOIN
-  QryTotGM.SQL.Add('AND (QTA <> 0) AND (NOT QTA IS NULL)');
-  // QryTotGM.SQL.SaveToFile('c:\sql.txt');
-  QryTotGM.Open;
   // RInfresca la tabella Pivot
   PivotGridGM.Refresh;
   // SUccedeva che la PivotGrid visualizzava sempre tutto espanso e a me non piaceva
@@ -11530,7 +11509,6 @@ begin
       if RxSpeedButtonResetQuery.Tag > 0 then
       begin
         QryGM.Close;
-        QryTotGM.Close;
       end;
     end;
     if (PageControl2.ActivePage = TabCondVend) or (RxSpeedButtonResetQuery.Tag > 0) then
@@ -15070,17 +15048,7 @@ begin
     DM1.ResetPrintTotals;
 
     // IN base al ReportLink attuale (alla stampa attuale) stampa i totali corretti.
-    if AReportLink.Name = 'GridGMLink' then
-    begin
-      DM1.AddPrintTotal(ACanvas, ARect, 'Tot.imp.IVA comp.', CurrToStrF(QryTotGMTOTIMPORTORIGOIVACOMPRESA.Value, ffCurrency, 2), False, 110, ANom, ADenom,
-        TP_PAGE_FOOTER);
-      DM1.AddPrintTotal(ACanvas, ARect, 'Totale importi', CurrToStrF(QryTotGMTOTIMPORTORIGO.Value, ffCurrency, 2), True, 110, ANom, ADenom, TP_PAGE_FOOTER);
-      DM1.AddPrintTotal(ACanvas, ARect, 'Totale Qtà', QryTotGMTOTQTA.AsString, False, 70, ANom, ADenom, TP_PAGE_FOOTER);
-      DM1.AddPrintTotal(ACanvas, ARect, 'Prezzo medio', CurrToStrF(QryTotGMPREZZOMEDIO.Value, ffCurrency, DM1.DecMicroPrz), False, 90, ANom, ADenom,
-        TP_PAGE_FOOTER);
-
-    end
-    else if AReportLink.Name = 'GridScadLink' then
+    if AReportLink.Name = 'GridScadLink' then
     begin
       DM1.AddPrintTotal(ACanvas, ARect, 'Saldo', CurrToStrF(QryTotScad.FieldByName('DARE').AsFloat - QryTotScad.FieldByName('AVERE').AsFloat, ffCurrency, 2),
         True, 100, ANom, ADenom, TP_PAGE_FOOTER);
@@ -20035,7 +20003,7 @@ end;
 procedure TClientiForm.QryGMCalcFields(DataSet: TDataSet);
 begin
   if (not QryGMQTA.IsNull) and (QryGMQTA.Value <> 0) then
-    QryGMPREZZOUNITARIONETTO.Value := DM1.Arrotonda((QryGMIMPORTORIGO.AsFloat / QryGMQTA.AsFloat), DM1.DecMicroPrz);
+    QryGMPREZZOUNITARIONETTO.Value := DM1.Arrotonda(Abs((QryGMIMPORTORIGO.AsFloat / QryGMQTA.AsFloat)), DM1.DecMicroPrz);
 
   QryGMANNO.Value := DateUtils.YearOf(QryGMDATADOCUMENTO.AsDateTime);
   QryGMSEMESTRE.AsString := DM2.DateTimeToSemestre(QryGMDATADOCUMENTO.AsDateTime);

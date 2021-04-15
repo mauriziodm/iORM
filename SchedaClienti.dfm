@@ -10082,182 +10082,15 @@ object ClientiForm: TClientiForm
                 DesignSize = (
                   785
                   232)
-                object PanelTotaliGM: TPanel
-                  Left = 0
-                  Top = 197
-                  Width = 785
-                  Height = 35
-                  Align = alBottom
-                  BevelOuter = bvNone
-                  Color = 15329769
-                  ParentBackground = False
-                  TabOrder = 0
-                  DesignSize = (
-                    785
-                    35)
-                  object Label8: TLabel
-                    Left = 420
-                    Top = 4
-                    Width = 90
-                    Height = 13
-                    Alignment = taCenter
-                    Anchors = [akTop, akRight]
-                    AutoSize = False
-                    Caption = ' Prezzo medio'
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentFont = False
-                    ExplicitLeft = 369
-                  end
-                  object QtaTot: TLabel
-                    Left = 516
-                    Top = 4
-                    Width = 54
-                    Height = 13
-                    Alignment = taCenter
-                    Anchors = [akTop, akRight]
-                    AutoSize = False
-                    Caption = 'Totale qt'#224
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentFont = False
-                    ExplicitLeft = 465
-                  end
-                  object Label10: TLabel
-                    Left = 576
-                    Top = 4
-                    Width = 95
-                    Height = 13
-                    Alignment = taCenter
-                    Anchors = [akTop, akRight]
-                    AutoSize = False
-                    Caption = 'Totale importi'
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentFont = False
-                    ExplicitLeft = 525
-                  end
-                  object Shape11: TShape
-                    Left = 0
-                    Top = 0
-                    Width = 785
-                    Height = 1
-                    Align = alTop
-                    Brush.Style = bsClear
-                    ExplicitWidth = 734
-                  end
-                  object GMTotPrezzoMedio: TDBText
-                    Left = 420
-                    Top = 17
-                    Width = 90
-                    Height = 14
-                    Alignment = taRightJustify
-                    Anchors = [akTop, akRight]
-                    Color = 16250871
-                    DataField = 'PREZZOMEDIO'
-                    DataSource = SourceTotGM
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentColor = False
-                    ParentFont = False
-                    ExplicitLeft = 369
-                  end
-                  object GMTotQta: TDBText
-                    Left = 516
-                    Top = 17
-                    Width = 54
-                    Height = 14
-                    Alignment = taRightJustify
-                    Anchors = [akTop, akRight]
-                    Color = 16250871
-                    DataField = 'TOTQTA'
-                    DataSource = SourceTotGM
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentColor = False
-                    ParentFont = False
-                    ExplicitLeft = 465
-                  end
-                  object GMTotImporti: TDBText
-                    Left = 576
-                    Top = 17
-                    Width = 95
-                    Height = 14
-                    Alignment = taRightJustify
-                    Anchors = [akTop, akRight]
-                    Color = 16250871
-                    DataField = 'TOTIMPORTORIGO'
-                    DataSource = SourceTotGM
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentColor = False
-                    ParentFont = False
-                    ExplicitLeft = 525
-                  end
-                  object Label46: TLabel
-                    Left = 684
-                    Top = 4
-                    Width = 95
-                    Height = 13
-                    Alignment = taCenter
-                    Anchors = [akTop, akRight]
-                    AutoSize = False
-                    Caption = 'Tot.imp.IVA comp.'
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentFont = False
-                    ExplicitLeft = 633
-                  end
-                  object GMTotImportiIVACompresa: TDBText
-                    Left = 684
-                    Top = 17
-                    Width = 95
-                    Height = 14
-                    Alignment = taRightJustify
-                    Anchors = [akTop, akRight]
-                    Color = 16250871
-                    DataField = 'TOTIMPORTORIGOIVACOMPRESA'
-                    DataSource = SourceTotGM
-                    Font.Charset = ANSI_CHARSET
-                    Font.Color = clBlack
-                    Font.Height = -9
-                    Font.Name = 'Verdana'
-                    Font.Style = []
-                    ParentColor = False
-                    ParentFont = False
-                    ExplicitLeft = 633
-                  end
-                end
                 object GridGM: TcxGrid
                   Left = 0
                   Top = 0
                   Width = 785
-                  Height = 197
+                  Height = 232
                   Align = alClient
                   BorderStyle = cxcbsNone
                   PopupMenu = MenuElencoClienti
-                  TabOrder = 1
+                  TabOrder = 0
                   LookAndFeel.Kind = lfUltraFlat
                   LookAndFeel.NativeStyle = False
                   RootLevelOptions.DetailFrameColor = clBlack
@@ -10275,7 +10108,7 @@ object ClientiForm: TClientiForm
                     DataController.Filter.Options = [fcoCaseInsensitive]
                     DataController.Summary.DefaultGroupSummaryItems = <
                       item
-                        Format = '#,0.00'
+                        Format = '(#,0.00)'
                         Kind = skAverage
                         Position = spFooter
                         FieldName = 'PREZZOUNITARIO'
@@ -10301,8 +10134,97 @@ object ClientiForm: TClientiForm
                         Position = spFooter
                         FieldName = 'IMPORTORIGOIVACOMPRESA'
                         Column = tvGMDBIMPORTORIGOIVACOMPRESA
+                      end
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        Position = spFooter
+                        FieldName = 'PREZZOUNITARIOIVACOMPRESA'
+                        Column = tvGMPREZZOUNITARIOIVACOMPRESA
+                      end
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        Position = spFooter
+                        FieldName = 'PREZZOUNITARIONETTO'
+                        Column = tvGMPREZZOUNITARIONETTO
+                      end
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        Position = spFooter
+                        FieldName = 'PREZZOACQUISTOARTICOLO'
+                        Column = tvGMPREZZOACQUISTOARTICOLO
+                      end
+                      item
+                        Format = '#,0.00'
+                        Kind = skSum
+                        Position = spFooter
+                        FieldName = 'IMPORTOCOSTO'
+                        Column = tvGMIMPORTOCOSTO
+                      end
+                      item
+                        Format = '#,0.00'
+                        Kind = skSum
+                        Position = spFooter
+                        FieldName = 'IMPORTOMARGINE'
+                        Column = tvGMIMPORTOMARGINE
                       end>
-                    DataController.Summary.FooterSummaryItems = <>
+                    DataController.Summary.FooterSummaryItems = <
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        FieldName = 'PREZZOUNITARIO'
+                        Column = tvGMPREZZOUNITARIO
+                      end
+                      item
+                        Format = '#,0.#'
+                        Kind = skSum
+                        FieldName = 'QTA'
+                        Column = tvGMQTA
+                      end
+                      item
+                        Format = '#,0.00'
+                        Kind = skSum
+                        FieldName = 'IMPORTORIGO'
+                        Column = tvGMIMPORTORIGO
+                      end
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        FieldName = 'PREZZOUNITARIOIVACOMPRESA'
+                        Column = tvGMPREZZOUNITARIOIVACOMPRESA
+                      end
+                      item
+                        Format = '#,0.00'
+                        Kind = skSum
+                        FieldName = 'IMPORTORIGOIVACOMPRESA'
+                        Column = tvGMDBIMPORTORIGOIVACOMPRESA
+                      end
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        FieldName = 'PREZZOUNITARIONETTO'
+                        Column = tvGMPREZZOUNITARIONETTO
+                      end
+                      item
+                        Format = '(#,0.00)'
+                        Kind = skAverage
+                        FieldName = 'PREZZOACQUISTOARTICOLO'
+                        Column = tvGMPREZZOACQUISTOARTICOLO
+                      end
+                      item
+                        Format = '#,0.00'
+                        Kind = skSum
+                        FieldName = 'IMPORTOCOSTO'
+                        Column = tvGMIMPORTOCOSTO
+                      end
+                      item
+                        Format = '#,0.00'
+                        Kind = skSum
+                        FieldName = 'IMPORTOMARGINE'
+                        Column = tvGMIMPORTOMARGINE
+                      end>
                     DataController.Summary.SummaryGroups = <>
                     DataController.OnGroupingChanged = tvGMDataControllerGroupingChanged
                     DataController.OnSortingChanged = tvGMDataControllerSortingChanged
@@ -10324,6 +10246,7 @@ object ClientiForm: TClientiForm
                     OptionsSelection.MultiSelect = True
                     OptionsSelection.InvertSelect = False
                     OptionsView.DataRowHeight = 19
+                    OptionsView.Footer = True
                     OptionsView.GridLines = glVertical
                     OptionsView.GroupFooters = gfAlwaysVisible
                     OptionsView.HeaderEndEllipsis = True
@@ -10451,6 +10374,7 @@ object ClientiForm: TClientiForm
                       Properties.Alignment.Horz = taCenter
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
                       FooterAlignmentHorz = taCenter
+                      GroupSummaryAlignment = taCenter
                       HeaderAlignmentHorz = taCenter
                       MinWidth = 2
                       Options.Editing = False
@@ -10520,6 +10444,7 @@ object ClientiForm: TClientiForm
                       PropertiesClassName = 'TcxTextEditProperties'
                       Properties.Alignment.Horz = taCenter
                       FooterAlignmentHorz = taCenter
+                      GroupSummaryAlignment = taCenter
                       HeaderAlignmentHorz = taCenter
                       MinWidth = 2
                       Options.Editing = False
@@ -10697,7 +10622,6 @@ object ClientiForm: TClientiForm
                       Properties.Alignment.Horz = taRightJustify
                       Properties.DisplayFormat = ',0.00;-,0.00'
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
-                      FooterAlignmentHorz = taCenter
                       HeaderAlignmentHorz = taCenter
                       Width = 75
                     end
@@ -10708,7 +10632,6 @@ object ClientiForm: TClientiForm
                       Properties.Alignment.Horz = taRightJustify
                       Properties.DisplayFormat = ',0.00;-,0.00'
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
-                      FooterAlignmentHorz = taCenter
                       HeaderAlignmentHorz = taCenter
                       Width = 75
                     end
@@ -10729,6 +10652,7 @@ object ClientiForm: TClientiForm
                       Properties.DisplayFormat = ',0.00;-,0.00'
                       Visible = False
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
+                      HeaderAlignmentHorz = taCenter
                       Options.Editing = False
                       Options.Filtering = False
                       Options.IncSearch = False
@@ -10996,6 +10920,44 @@ object ClientiForm: TClientiForm
                       HeaderAlignmentHorz = taCenter
                       Width = 100
                     end
+                    object tvGMPREZZOACQUISTOARTICOLO: TcxGridDBColumn
+                      AlternateCaption = 'Costo unitario'
+                      Caption = 'Costo un.'
+                      DataBinding.FieldName = 'PREZZOACQUISTOARTICOLO'
+                      RepositoryItem = DM1.EdPropImportoMicroPrz
+                      OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
+                      HeaderAlignmentHorz = taCenter
+                      Width = 60
+                    end
+                    object tvGMIMPORTOCOSTO: TcxGridDBColumn
+                      AlternateCaption = 'Costo totale'
+                      Caption = 'Costo tot.'
+                      DataBinding.FieldName = 'IMPORTOCOSTO'
+                      RepositoryItem = DM1.EdPropImportoMicroPrz
+                      OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
+                      HeaderAlignmentHorz = taCenter
+                      Width = 65
+                    end
+                    object tvGMIMPORTOMARGINE: TcxGridDBColumn
+                      AlternateCaption = 'Margine totale'
+                      Caption = 'Margine'
+                      DataBinding.FieldName = 'IMPORTOMARGINE'
+                      RepositoryItem = DM1.EdPropImportoMicroPrz
+                      OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
+                      HeaderAlignmentHorz = taCenter
+                      Width = 65
+                    end
+                    object tvGMMARGINE: TcxGridDBColumn
+                      AlternateCaption = 'Margine percentuale'
+                      Caption = 'M%'
+                      DataBinding.FieldName = 'MARGINE'
+                      RepositoryItem = DM1.EdPropMarginePerc
+                      OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
+                      FooterAlignmentHorz = taCenter
+                      GroupSummaryAlignment = taCenter
+                      HeaderAlignmentHorz = taCenter
+                      Width = 30
+                    end
                   end
                   object lvGM: TcxGridLevel
                     GridView = tvGM
@@ -11013,7 +10975,7 @@ object ClientiForm: TClientiForm
                   Ctl3D = False
                   ParentBackground = False
                   ParentCtl3D = False
-                  TabOrder = 2
+                  TabOrder = 1
                   object SpeedButton17: TSpeedButton
                     Left = 1
                     Top = 1
@@ -30414,6 +30376,18 @@ object ClientiForm: TClientiForm
     object QryGMRDA: TStringField
       FieldName = 'RDA'
     end
+    object QryGMPREZZOACQUISTOARTICOLO: TCurrencyField
+      FieldName = 'PREZZOACQUISTOARTICOLO'
+    end
+    object QryGMIMPORTOCOSTO: TCurrencyField
+      FieldName = 'IMPORTOCOSTO'
+    end
+    object QryGMIMPORTOMARGINE: TCurrencyField
+      FieldName = 'IMPORTOMARGINE'
+    end
+    object QryGMMARGINE: TFloatField
+      FieldName = 'MARGINE'
+    end
   end
   object SourcGM: TDataSource
     AutoEdit = False
@@ -30601,7 +30575,7 @@ object ClientiForm: TClientiForm
     SQL.Strings = (
       'SELECT * FROM DOC_LIST_VIEW')
     Left = 253
-    Top = 494
+    Top = 558
     object QryDocTIPODOC: TStringField
       FieldName = 'TIPODOC'
       Origin = 'DOC_LIST_VIEW.TIPODOC'
@@ -31028,7 +31002,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryDoc
     Left = 282
-    Top = 494
+    Top = 558
   end
   object QryCV: TIBOQuery
     DeleteSQL.Strings = (
@@ -31060,7 +31034,7 @@ object ClientiForm: TClientiForm
       'LEFT JOIN ARTICOLI A ON CV.CODICEARTICOLO = A.CODICEARTICOLO'
       'LEFT JOIN CLIENTI C ON CV.CODICESOGGETTO = C.CODICE')
     Left = 229
-    Top = 267
+    Top = 331
     object QryCVTIPO: TStringField
       FieldName = 'TIPO'
       Required = True
@@ -31131,7 +31105,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryCV
     Left = 258
-    Top = 267
+    Top = 331
   end
   object QryPratiche: TIBOQuery
     DeleteSQL.Strings = (
@@ -31145,7 +31119,7 @@ object ClientiForm: TClientiForm
     SQL.Strings = (
       'SELECT P.* FROM PRAT_LIST_VIEW P')
     Left = 229
-    Top = 302
+    Top = 366
     object QryPraticheCODICE: TIntegerField
       FieldName = 'CODICE'
     end
@@ -31331,7 +31305,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryPratiche
     Left = 258
-    Top = 302
+    Top = 366
   end
   object QryScad: TIBOQuery
     ColumnAttributes.Strings = (
@@ -31374,7 +31348,7 @@ object ClientiForm: TClientiForm
       'FROM SCAD_LIST_VIEW SLV'
       '')
     Left = 229
-    Top = 336
+    Top = 400
     object QryScadCODICE: TIntegerField
       FieldName = 'CODICE'
       Origin = 'SCAD_LIST_VIEW.CODICE'
@@ -31614,7 +31588,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryScad
     Left = 258
-    Top = 336
+    Top = 400
   end
   object QryArticoli: TIBOQuery
     DeleteSQL.Strings = (
@@ -32003,7 +31977,7 @@ object ClientiForm: TClientiForm
       PrinterPage.PageSize.Y = 297000
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44300.529910300920000000
+      ReportDocument.CreationDate = 44301.639274502310000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. giornale di magazzino'
       OptionsFormatting.SuppressContentColoration = True
@@ -32443,7 +32417,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Levante - Agenda'
-      ReportDocument.CreationDate = 44300.529910300920000000
+      ReportDocument.CreationDate = 44301.639274687500000000
       OptionsFormatting.UseNativeStyles = True
       PrintRange.TimePrintFrom = 0.291666666666666700
       PrintRange.TimePrintTo = 0.875000000000000000
@@ -32506,7 +32480,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Statistiche ore dipendenti'
-      ReportDocument.CreationDate = 44300.529910300920000000
+      ReportDocument.CreationDate = 44301.639274687500000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Rapporto ADA dipendenti'
       OptionsFormatting.SuppressContentColoration = True
@@ -32567,7 +32541,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Rapporto ADA spese varie'
-      ReportDocument.CreationDate = 44300.529910474540000000
+      ReportDocument.CreationDate = 44301.639274687500000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Rapporto ADA spese'
       OptionsFormatting.SuppressContentColoration = True
@@ -32643,7 +32617,7 @@ object ClientiForm: TClientiForm
       PrinterPage.PageSize.Y = 297000
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44300.529910474540000000
+      ReportDocument.CreationDate = 44301.639274687500000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. documenti'
       OptionsFormatting.SuppressContentColoration = True
@@ -32672,7 +32646,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'ADA scadenze '
-      ReportDocument.CreationDate = 44300.529910474540000000
+      ReportDocument.CreationDate = 44301.639274687500000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. scadenze'
       OptionsFormatting.SuppressContentColoration = True
@@ -32702,7 +32676,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Elenco documenti'
-      ReportDocument.CreationDate = 44300.529910474540000000
+      ReportDocument.CreationDate = 44301.639274861110000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Elenco documenti'
       TimeFormat = 0
@@ -32715,45 +32689,6 @@ object ClientiForm: TClientiForm
       PixelsPerInch = 96
       BuiltInReportLink = True
     end
-  end
-  object QryTotGM: TIBOQuery
-    IB_Connection = DM1.DBAzienda
-    IB_Transaction = TransTotGM
-    RecordCountAccurate = True
-    SQL.Strings = (
-      'SELECT AVG(IMPORTORIGO/QTA) AS PREZZOMEDIO'
-      '     , SUM(QTA) AS TOTQTA'
-      '     , SUM(IMPORTORIGO) AS TOTIMPORTORIGO '
-      '     , SUM(IMPORTORIGOIVACOMPRESA) AS TOTIMPORTORIGOIVACOMPRESA'
-      'FROM RIGHIPRV'
-      '')
-    Left = 93
-    Top = 534
-    object QryTotGMPREZZOMEDIO: TIBOFloatField
-      FieldName = 'PREZZOMEDIO'
-      ReadOnly = True
-      currency = True
-    end
-    object QryTotGMTOTQTA: TIBOFloatField
-      FieldName = 'TOTQTA'
-      ReadOnly = True
-    end
-    object QryTotGMTOTIMPORTORIGO: TIBOFloatField
-      FieldName = 'TOTIMPORTORIGO'
-      ReadOnly = True
-      currency = True
-    end
-    object QryTotGMTOTIMPORTORIGOIVACOMPRESA: TIBOFloatField
-      FieldName = 'TOTIMPORTORIGOIVACOMPRESA'
-      ReadOnly = True
-      currency = True
-    end
-  end
-  object SourceTotGM: TDataSource
-    AutoEdit = False
-    DataSet = QryTotGM
-    Left = 122
-    Top = 534
   end
   object MenuArticoli: TPopupMenu
     OnPopup = MenuArticoliPopup
@@ -32780,7 +32715,7 @@ object ClientiForm: TClientiForm
   object MenuPratiche: TPopupMenu
     OnPopup = MenuPratichePopup
     Left = 287
-    Top = 302
+    Top = 366
     object MIPratica: TMenuItem
       Caption = 'Cantiere'
       OnClick = MIPraticaClick
@@ -32789,7 +32724,7 @@ object ClientiForm: TClientiForm
   object MenuDocumenti: TPopupMenu
     OnPopup = MenuDocumentiPopup
     Left = 311
-    Top = 494
+    Top = 558
     object MIBuonoConsegna: TMenuItem
       Caption = 'Buono di consegna'
       OnClick = MIBuonoConsegnaClick
@@ -32899,7 +32834,7 @@ object ClientiForm: TClientiForm
   object MenuScadenzario: TPopupMenu
     OnPopup = MenuScadenzarioPopup
     Left = 287
-    Top = 336
+    Top = 400
     object MIScadenzaAttiva: TMenuItem
       Caption = 'Scadenza attiva   (da riscuotere)'
       OnClick = MIScadenzaAttivaClick
@@ -32912,7 +32847,7 @@ object ClientiForm: TClientiForm
   object MenuCondVend: TPopupMenu
     OnPopup = MenuCondVendPopup
     Left = 287
-    Top = 267
+    Top = 331
     object MICondVendGruppo: TMenuItem
       Caption = 'Condizione di vendita per GRUPPO'
       OnClick = MICondVendGruppoClick
@@ -33112,7 +33047,7 @@ object ClientiForm: TClientiForm
     SQL.Strings = (
       'SELECT * FROM IMPEGNI_LIST_VIEW')
     Left = 237
-    Top = 438
+    Top = 502
     object QryImpTIPOIMPEGNO: TStringField
       FieldName = 'TIPOIMPEGNO'
       Size = 10
@@ -33239,12 +33174,12 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryImp
     Left = 266
-    Top = 438
+    Top = 502
   end
   object MenuImpegni: TPopupMenu
     OnPopup = MenuImpegniPopup
     Left = 295
-    Top = 438
+    Top = 502
     object Appuntamentonormale2: TMenuItem
       Caption = 'Appuntamento normale'
       OnClick = Appuntamentonormale2Click
@@ -33440,7 +33375,7 @@ object ClientiForm: TClientiForm
       'FROM DOC_SEL'
       '')
     Left = 253
-    Top = 552
+    Top = 616
     object QryTotDocTOTNUMDOC: TIntegerField
       FieldName = 'TOTNUMDOC'
       ReadOnly = True
@@ -33479,7 +33414,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryTotDoc
     Left = 282
-    Top = 552
+    Top = 616
   end
   object QryGOSOre: TIBOQuery
     ColumnAttributes.Strings = (
@@ -34077,7 +34012,7 @@ object ClientiForm: TClientiForm
       'FROM DOCSEL DS'
       '')
     Left = 253
-    Top = 523
+    Top = 587
     object QryDocAltriSTATION_ID: TIntegerField
       FieldName = 'STATION_ID'
       Required = True
@@ -34218,7 +34153,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryDocAltri
     Left = 282
-    Top = 523
+    Top = 587
   end
   object QueryPrimanota: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34512,7 +34447,7 @@ object ClientiForm: TClientiForm
     AutoCommit = True
     Isolation = tiCommitted
     Left = 224
-    Top = 494
+    Top = 558
   end
   object TransSoggetti: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34526,14 +34461,14 @@ object ClientiForm: TClientiForm
     AutoCommit = True
     Isolation = tiCommitted
     Left = 224
-    Top = 523
+    Top = 587
   end
   object TransTotDoc: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
     Left = 224
-    Top = 552
+    Top = 616
   end
   object TransArticoli: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34556,33 +34491,26 @@ object ClientiForm: TClientiForm
     Left = 64
     Top = 505
   end
-  object TransTotGM: TIB_Transaction
-    IB_Connection = DM1.DBAzienda
-    AutoCommit = True
-    Isolation = tiCommitted
-    Left = 64
-    Top = 534
-  end
   object TransCV: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
     Left = 200
-    Top = 267
+    Top = 331
   end
   object TransPratiche: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
     Left = 200
-    Top = 302
+    Top = 366
   end
   object TransScad: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
     Left = 200
-    Top = 336
+    Top = 400
   end
   object TransAss: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34596,7 +34524,7 @@ object ClientiForm: TClientiForm
     AutoCommit = True
     Isolation = tiCommitted
     Left = 208
-    Top = 438
+    Top = 502
   end
   object TransAgenda: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34844,7 +34772,7 @@ object ClientiForm: TClientiForm
     AutoEdit = False
     DataSet = QryTotScad
     Left = 258
-    Top = 365
+    Top = 429
   end
   object QryTotScad: TIBOQuery
     DeleteSQL.Strings = (
@@ -34864,7 +34792,7 @@ object ClientiForm: TClientiForm
       'FROM SCAD_LIST_VIEW SLV'
       '')
     Left = 229
-    Top = 365
+    Top = 429
     object QryTotScadTOTIMPORTOPAGATO: TIBOFloatField
       FieldName = 'TOTIMPORTOPAGATO'
       ReadOnly = True
