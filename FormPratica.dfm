@@ -77,7 +77,7 @@ object PraticaForm: TPraticaForm
       ParentColor = False
       ParentFont = False
       TabOrder = 0
-      Properties.ActivePage = TabInterventiPrecedenti
+      Properties.ActivePage = TabApparecchi
       Properties.CustomButtons.Buttons = <>
       Properties.NavigatorPosition = npLeftBottom
       Properties.Style = 9
@@ -16510,7 +16510,7 @@ object PraticaForm: TPraticaForm
                 Left = 110
                 Top = 298
                 AutoSize = False
-                DataBinding.DataField = 'DISMESSO_DATA'
+                DataBinding.DataField = 'DATAINSTALLAZIONE'
                 DataBinding.DataSource = SourcePratApp
                 ParentFont = False
                 Properties.ImmediatePost = True
@@ -16537,7 +16537,7 @@ object PraticaForm: TPraticaForm
                 Left = 110
                 Top = 317
                 AutoSize = False
-                DataBinding.DataField = 'DISMESSO_DATA'
+                DataBinding.DataField = 'DATACOLLAUDO'
                 DataBinding.DataSource = SourcePratApp
                 ParentFont = False
                 Properties.ImmediatePost = True

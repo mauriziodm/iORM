@@ -499,6 +499,8 @@ type
     FilterTipoDataOP: TcxComboBox;
     QryAssDATAULTIMAMANUTENZIONE: TDateTimeField;
     btvAssistenzeDATAULTIMAMANUTENZIONE: TcxGridDBBandedColumn;
+    QryAssDATAINSTALLAZIONE: TDateTimeField;
+    btvAssistenzeDATAINSTALLAZIONE: TcxGridDBBandedColumn;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure PanelAssFiltriResize(Sender: TObject);
@@ -873,6 +875,30 @@ begin
            //       al 31/10 non mi visualizzava quelli del 31/10 perchè lui intendeva fino all'inizio del giorno 31/10.
            QryAss.SQL.Add('AND IV.DATAULTIMAMANUTENZIONE < ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssAl.EditText)+1)));
         end;
+        // ----------
+      end else if FilterTipoData.Text = 'Installazione impianto' then begin
+        // ----------
+        // Date (Controllo sulla data dell'ultimo intervento DI MANUTENZIONE eseguito
+        if DM1.ControllaDataStr(AssDal.EditText) then begin
+           QryAss.SQL.Add('AND IV.DATAINSTALLAZIONE >= ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssDal.EditText))));
+        end;
+        if DM1.ControllaDataStr(AssAl.EditText)  then begin
+           //  NB: Nella DataAl ho messo il confronyo < invece che <= e con la data indicata dal filtro +1 perchè in questi campi
+           //       c'è anche la parte tempo e se lo lasciavo come era e mettevo ad esempio di visualizzare tutto fino
+           //       al 31/10 non mi visualizzava quelli del 31/10 perchè lui intendeva fino all'inizio del giorno 31/10.
+           QryAss.SQL.Add('AND IV.DATAINSTALLAZIONE < ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssAl.EditText)+1)));
+        end;
+        // ----------
+      end else if (FilterTipoData.Text = 'Installazione apparecchio') and (DM1.ControllaDataStr(AssDal.EditText) or DM1.ControllaDataStr(AssDal.EditText)) then
+      begin
+        // ----------
+        QryAss.SQL.Add('AND EXISTS(');
+        QryAss.SQL.Add('  SELECT PA.ID FROM PRATAPPARECCHI PA WHERE PA.IDPRATICA=IV.ID AND COALESCE(PA.DISMESSO,'''') <> ''T''');
+        if DM1.ControllaDataStr(AssDal.EditText) then
+          QryAss.SQL.Add('  AND PA.DATAINSTALLAZIONE >= ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssDal.EditText))));
+        if DM1.ControllaDataStr(AssDal.EditText) then
+          QryAss.SQL.Add('  AND PA.DATAINSTALLAZIONE < ' + QuotedStr(FormatDateTime('mm/dd/yyyy',StrToDate(AssAl.EditText)+1)));
+        QryAss.SQL.Add(')');
         // ----------
       end else if (  (LeftStr(FilterTipoData.Text, 4) = 'op: ') or (FilterTipoData.Text = 'Operazioni Pianificate')  )
       and (DM1.ControllaDataStr(AssDal.EditText) or DM1.ControllaDataStr(AssAl.EditText))
@@ -4363,6 +4389,8 @@ begin
   FilterTipoData.Properties.Items.Add('Prossimo intervento');
   FilterTipoData.Properties.Items.Add('Ultimo intervento');
   FilterTipoData.Properties.Items.Add('Ultima manutenzione');
+  FilterTipoData.Properties.Items.Add('Installazione apparecchio');
+  FilterTipoData.Properties.Items.Add('Installazione impianto');
   FilterTipoData.Properties.Items.Add('Operazioni Pianificate');
   // Oltre alle voci fisse aggiunge anche le Operazioni Pianificate
   DM2.StringList_AddOpForFilter(FilterTipoData.Properties.Items);

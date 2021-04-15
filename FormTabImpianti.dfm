@@ -666,6 +666,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeDATAAPERTURA: TcxGridDBBandedColumn
+              AlternateCaption = 'Data apertura impianto'
               Caption = 'Data apert.'
               DataBinding.FieldName = 'DATAAPERTURA'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -847,6 +848,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzePROVINCIAIMM: TcxGridDBBandedColumn
+              AlternateCaption = 'Provincia'
               Caption = 'Prov'
               DataBinding.FieldName = 'PROVINCIAIMM'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -879,6 +881,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeDATAULTIMOINTERVENTO: TcxGridDBBandedColumn
+              AlternateCaption = 'Data ultima visita/intervento'
               Caption = 'Ultima vis.'
               DataBinding.FieldName = 'DATAULTIMOINTERVENTO'
               PropertiesClassName = 'TcxDateEditProperties'
@@ -894,6 +897,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzePERIODICITA: TcxGridDBBandedColumn
+              AlternateCaption = 'Periodicit'#224
               Caption = 'Per.'
               DataBinding.FieldName = 'PERIODICITA'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -910,6 +914,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzePROXVISITAENTRO: TcxGridDBBandedColumn
+              AlternateCaption = 'Prossima visita entro'
               Caption = 'Prox. entro'
               DataBinding.FieldName = 'PROXVISITAENTRO'
               PropertiesClassName = 'TcxDateEditProperties'
@@ -939,6 +944,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
             end
             object btvAssistenzeCOMPUTED_CONTRATTO_SCADUTO: TcxGridDBBandedColumn
               Tag = 4
+              AlternateCaption = 'Scaduto (contratto)'
               Caption = 'Sc'
               DataBinding.FieldName = 'COMPUTED_CONTRATTO_SCADUTO'
               PropertiesClassName = 'TcxImageComboBoxProperties'
@@ -968,6 +974,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
             end
             object btvAssistenzeCONTRATTO_DISDETTA_RICEVUTA: TcxGridDBBandedColumn
               Tag = 4
+              AlternateCaption = 'Disdetta ricevuta (contratto)'
               Caption = 'Ds'
               DataBinding.FieldName = 'CONTRATTO_DISDETTA_RICEVUTA'
               PropertiesClassName = 'TcxImageComboBoxProperties'
@@ -996,6 +1003,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCONTRATTO_STATO: TcxGridDBBandedColumn
+              AlternateCaption = 'Stato contratto'
               Caption = 'Stato'
               DataBinding.FieldName = 'CONTRATTO_STATO'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1011,6 +1019,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeCONTRATTO_TIPO: TcxGridDBBandedColumn
+              AlternateCaption = 'Tipo (contratto)'
               Caption = 'Tipo'
               DataBinding.FieldName = 'CONTRATTO_TIPO'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1025,6 +1034,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCONTRATTO_IMPORTO: TcxGridDBBandedColumn
+              AlternateCaption = 'Importo (contratto)'
               Caption = 'Importo (ic)'
               DataBinding.FieldName = 'CONTRATTO_IMPORTONETTOIVACOMP'
               PropertiesClassName = 'TcxCurrencyEditProperties'
@@ -1041,6 +1051,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCONTRATTO_VALIDITA_FINE: TcxGridDBBandedColumn
+              AlternateCaption = 'Fine validit'#224' (contratto)'
               Caption = 'Scadenza'
               DataBinding.FieldName = 'CONTRATTO_VALIDITA_FINE'
               PropertiesClassName = 'TcxDateEditProperties'
@@ -1057,6 +1068,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeRIFRESPIMP: TcxGridDBBandedColumn
+              AlternateCaption = 'Nome (resp. imp.)'
               Caption = 'Nome'
               DataBinding.FieldName = 'RIFRESPIMP'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1068,6 +1080,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeINQUALITADIRESPIMP: TcxGridDBBandedColumn
+              AlternateCaption = 'In qualit'#224' di (resp. imp.)'
               Caption = 'In qualit'#224' di'
               DataBinding.FieldName = 'INQUALITADIRESPIMP'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1082,6 +1095,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeTELEFONORESPIMP: TcxGridDBBandedColumn
+              AlternateCaption = 'Telefono (resp. imp.)'
               Caption = 'Telefono'
               DataBinding.FieldName = 'TELEFONORESPIMP'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1095,6 +1109,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCELLULARERESPIMP: TcxGridDBBandedColumn
+              AlternateCaption = 'Cellulare (resp. imp.)'
               Caption = 'Cellulare'
               DataBinding.FieldName = 'CELLULARERESPIMP'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1109,6 +1124,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeRIFPROP: TcxGridDBBandedColumn
+              AlternateCaption = 'Nome (proprietario)'
               Caption = 'Nome'
               DataBinding.FieldName = 'RIFPROP'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1120,6 +1136,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeTELEFONOPROP: TcxGridDBBandedColumn
+              AlternateCaption = 'Telefono (proprietario)'
               Caption = 'Telefono'
               DataBinding.FieldName = 'TELEFONOPROP'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1132,6 +1149,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCELLULAREPROP: TcxGridDBBandedColumn
+              AlternateCaption = 'Cellulare (proprietario)'
               Caption = 'Cellulare'
               DataBinding.FieldName = 'CELLULAREPROP'
               Visible = False
@@ -1144,6 +1162,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeRIFUT: TcxGridDBBandedColumn
+              AlternateCaption = 'Nome (utente/occupante)'
               Caption = 'Nome'
               DataBinding.FieldName = 'RIFUT'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1155,6 +1174,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeTELEFONOUT: TcxGridDBBandedColumn
+              AlternateCaption = 'Telefono (utente/occupante)'
               Caption = 'Telefono'
               DataBinding.FieldName = 'TELEFONOUT'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1167,6 +1187,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCELLULAREUT: TcxGridDBBandedColumn
+              AlternateCaption = 'Cellulare (utente/occupante)'
               Caption = 'Cellulare'
               DataBinding.FieldName = 'CELLULAREUT'
               Visible = False
@@ -1179,6 +1200,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeRIFINST: TcxGridDBBandedColumn
+              AlternateCaption = 'Nome (amministratore)'
               Caption = 'Nome'
               DataBinding.FieldName = 'RIFINST'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1190,6 +1212,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeTELEFONOINST: TcxGridDBBandedColumn
+              AlternateCaption = 'Telefono (amministratore)'
               Caption = 'Telefono'
               DataBinding.FieldName = 'TELEFONOINST'
               PropertiesClassName = 'TcxTextEditProperties'
@@ -1202,6 +1225,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 1
             end
             object btvAssistenzeCELLULAREINST: TcxGridDBBandedColumn
+              AlternateCaption = 'Cellulare (amministratore)'
               Caption = 'Cellulare'
               DataBinding.FieldName = 'CELLULAREINST'
               Visible = False
@@ -1250,6 +1274,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.RowIndex = 0
             end
             object btvAssistenzeDATAULTIMAMANUTENZIONE: TcxGridDBBandedColumn
+              AlternateCaption = 'Data ultima visita/intervento di manutenzione'
               Caption = 'Ultima manut.'
               DataBinding.FieldName = 'DATAULTIMAMANUTENZIONE'
               PropertiesClassName = 'TcxDateEditProperties'
@@ -1261,6 +1286,21 @@ inherited TabImpiantiForm: TTabImpiantiForm
               Position.BandIndex = 3
               Position.ColIndex = 2
               Position.RowIndex = 0
+            end
+            object btvAssistenzeDATAINSTALLAZIONE: TcxGridDBBandedColumn
+              AlternateCaption = 'Data installazione impianto'
+              Caption = 'Data inst.'
+              DataBinding.FieldName = 'DATAINSTALLAZIONE'
+              PropertiesClassName = 'TcxDateEditProperties'
+              Properties.Alignment.Horz = taCenter
+              Properties.ShowTime = False
+              Visible = False
+              HeaderAlignmentHorz = taCenter
+              MinWidth = 60
+              Width = 60
+              Position.BandIndex = 1
+              Position.ColIndex = 2
+              Position.RowIndex = 1
             end
           end
           object btvOP: TcxGridDBBandedTableView
@@ -4423,6 +4463,9 @@ inherited TabImpiantiForm: TTabImpiantiForm
     end
     object QryAssDATAULTIMAMANUTENZIONE: TDateTimeField
       FieldName = 'DATAULTIMAMANUTENZIONE'
+    end
+    object QryAssDATAINSTALLAZIONE: TDateTimeField
+      FieldName = 'DATAINSTALLAZIONE'
     end
   end
   object SourceAss: TDataSource
