@@ -97,8 +97,6 @@ object FattDifferitaForm: TFattDifferitaForm
         ParentFont = False
         TabOrder = 0
         TabStop = True
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object ModoDate: TRadioButton
         Left = 303
@@ -113,8 +111,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object ModoManuale: TRadioButton
         Left = 395
@@ -129,8 +125,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object Panel7: TPanel
         Left = 607
@@ -249,8 +243,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompFeb: TCheckBox
         Left = 194
@@ -265,8 +257,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 3
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompMar: TCheckBox
         Left = 274
@@ -281,8 +271,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 4
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompApr: TCheckBox
         Left = 274
@@ -297,8 +285,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 5
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompMag: TCheckBox
         Left = 354
@@ -313,8 +299,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 6
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompGiu: TCheckBox
         Left = 354
@@ -329,8 +313,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 7
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompLug: TCheckBox
         Left = 434
@@ -345,8 +327,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 8
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompAgo: TCheckBox
         Left = 434
@@ -361,8 +341,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 9
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompSet: TCheckBox
         Left = 514
@@ -377,8 +355,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 10
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompOtt: TCheckBox
         Left = 514
@@ -393,8 +369,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 11
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompNov: TCheckBox
         Left = 594
@@ -409,8 +383,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 12
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object CompDic: TCheckBox
         Left = 594
@@ -425,8 +397,6 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
         TabOrder = 13
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
     end
     object PanelDate: TPanel
@@ -629,6 +599,19 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentFont = False
       end
+      object Label4: TLabel
+        Left = 363
+        Top = 6
+        Width = 68
+        Height = 24
+        Caption = 'Causale'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -19
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
       object Copie: TEdit
         Left = 554
         Top = 48
@@ -644,10 +627,8 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Style = []
         ParentCtl3D = False
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 2
         Text = '2'
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object Panel5: TPanel
         Left = 578
@@ -657,7 +638,7 @@ object FattDifferitaForm: TFattDifferitaForm
         BevelOuter = bvNone
         BorderStyle = bsSingle
         Color = clSilver
-        TabOrder = 6
+        TabOrder = 7
       end
       object ScadSi: TRadioButton
         Left = 497
@@ -672,10 +653,8 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Name = 'Verdana'
         Font.Style = []
         ParentFont = False
-        TabOrder = 3
+        TabOrder = 4
         TabStop = True
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
       end
       object ScadNo: TRadioButton
         Left = 545
@@ -689,9 +668,7 @@ object FattDifferitaForm: TFattDifferitaForm
         Font.Name = 'Verdana'
         Font.Style = []
         ParentFont = False
-        TabOrder = 4
-        OnEnter = ModoCompetenzaEnter
-        OnExit = ModoCompetenzaExit
+        TabOrder = 5
       end
       object Panel9: TPanel
         Left = 607
@@ -702,7 +679,7 @@ object FattDifferitaForm: TFattDifferitaForm
         BorderStyle = bsSingle
         Color = clSilver
         ParentBackground = False
-        TabOrder = 5
+        TabOrder = 6
         object AvantiCopie: TSpeedButton
           Left = 1
           Top = 2
@@ -726,10 +703,10 @@ object FattDifferitaForm: TFattDifferitaForm
         Constraints.MinHeight = 24
         Constraints.MinWidth = 14
         Position = 2
-        TabOrder = 2
+        TabOrder = 3
       end
       object DataFatturazione: TcxDateEdit
-        Left = 256
+        Left = 244
         Top = 7
         ParentFont = False
         Properties.ImmediatePost = True
@@ -751,6 +728,33 @@ object FattDifferitaForm: TFattDifferitaForm
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 0
         Width = 110
+      end
+      object Causale: TcxButtonEdit
+        Left = 437
+        Top = 7
+        ParentFont = False
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.ReadOnly = True
+        Properties.OnButtonClick = CausalePropertiesButtonClick
+        Style.BorderColor = clBlack
+        Style.BorderStyle = ebsSingle
+        Style.Font.Charset = ANSI_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -13
+        Style.Font.Name = 'Verdana'
+        Style.Font.Style = []
+        Style.HotTrack = False
+        Style.LookAndFeel.NativeStyle = False
+        Style.IsFontAssigned = True
+        StyleDisabled.LookAndFeel.NativeStyle = False
+        StyleFocused.LookAndFeel.NativeStyle = False
+        StyleHot.LookAndFeel.NativeStyle = False
+        TabOrder = 1
+        Width = 242
       end
     end
     object PanelFine: TPanel

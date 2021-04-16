@@ -8,7 +8,7 @@ uses
   DBCtrls, ExtCtrls, ComCtrls, Buttons, bmpPanel,
   MAURI_SB, SACS, cxControls, cxContainer, cxEdit, cxTextEdit, cxMaskEdit,
   cxDropDownEdit, cxCalendar, cxGraphics, cxLookAndFeels, cxLookAndFeelPainters,
-  dxCore, cxDateUtils;
+  dxCore, cxDateUtils, cxButtonEdit;
 
 type
   TFattDifferitaForm = class(TForm)
@@ -83,6 +83,8 @@ type
     Label2: TLabel;
     DataFatturazione: TcxDateEdit;
     Label3: TLabel;
+    Label4: TLabel;
+    Causale: TcxButtonEdit;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word;
@@ -98,8 +100,7 @@ type
     procedure AvviaFatturazione;
     procedure NoCopiaClick(Sender: TObject);
     procedure SiCopiaClick(Sender: TObject);
-    procedure ModoCompetenzaEnter(Sender: TObject);
-    procedure ModoCompetenzaExit(Sender: TObject);
+    procedure CausalePropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
   private
     { Private declarations }
     // Contiene l'indicazione del livello attivo al momento
@@ -113,7 +114,7 @@ var
 
 implementation
 
-uses main, DataModule1, SchedaPreventiviOrdini;
+uses main, DataModule1, SchedaPreventiviOrdini, FormCausali;
 
 {$R *.DFM}
 
@@ -140,10 +141,13 @@ begin
       // Visualizza la form di attesa con messaggi
       DM1.ShowWait('Fatturazione Differita', 'Prelevamento primo documento da fatturare.');
       // Imposta la query che preleverà l'elenco dei documenti da fatturare
-      Qry.SQL.Add('SELECT DISTINCT TIPODOCUMENTO,REGISTRO,NUMORDPREV,DATADOCUMENTO,CODICECLIENTE FROM TMPRIGHI ORDER BY DATADOCUMENTO,REGISTRO,NUMORDPREV,TIPODOCUMENTO');
+      Qry.SQL.Add('SELECT DISTINCT TIPODOCUMENTO,REGISTRO,NUMORDPREV,DATADOCUMENTO,CODICECLIENTE FROM TMPRIGHI');
+      Qry.SQL.Add('WHERE STATION_ID = ' + DM1.CodiceUtente);
+      Qry.SQL.Add('ORDER BY DATADOCUMENTO,REGISTRO,NUMORDPREV,TIPODOCUMENTO');
       // Cicla fino a quando il file dei righi temporanei da importare è vuoto
       Qry.Open;
-      while not Qry.Eof do begin
+      while not Qry.Eof do
+      begin
 // PER IL MOMENTO NON SPUò FATTURARE SEPARATAMENTE PER PRATICA
 // ==============================================================================================================================================================================
          // In base alla selezione o meno della check box che indica se generare una fattura separata
@@ -166,10 +170,10 @@ begin
          //  la richiama con i parametri corretti.
          if ScadSi.Checked then begin
             // Genera anche le scadenze
-            DM1.NuovoDocFisc('Fattura', Qry.FieldByName('REGISTRO').AsString, Qry.FieldByName('CodiceCliente').Value, Pratica,DataPratica, 3, StrToInt(Copie.Text), True, SeparaPerPratica, DataFatturazione.Date);
+            DM1.NuovoDocFisc('Fattura', Qry.FieldByName('REGISTRO').AsString, Qry.FieldByName('CodiceCliente').Value, Pratica,DataPratica, 3, StrToInt(Copie.Text), True, SeparaPerPratica, DataFatturazione.Date, Causale.Text);
          end else begin
             // Non genera le scadenze
-            DM1.NuovoDocFisc('Fattura', Qry.FieldByName('REGISTRO').AsString, Qry.FieldByName('CodiceCliente').Value, Pratica,DataPratica, 2, StrToInt(Copie.Text), True, SeparaPerPratica, DataFatturazione.Date);
+            DM1.NuovoDocFisc('Fattura', Qry.FieldByName('REGISTRO').AsString, Qry.FieldByName('CodiceCliente').Value, Pratica,DataPratica, 2, StrToInt(Copie.Text), True, SeparaPerPratica, DataFatturazione.Date, Causale.Text);
          end;
          // Riavvia la query per aggiornarla
          Qry.Close;
@@ -188,6 +192,20 @@ begin
    end;
 end;
 
+
+procedure TFattDifferitaForm.CausalePropertiesButtonClick(Sender: TObject; AButtonIndex: Integer);
+begin
+  DM1.Attendere;
+  try
+    // Visualizza la form che permette di selezionare il magazzino da inserire nel documento
+    Application.CreateForm(TCausaliForm, CausaliForm);
+    MainForm.SetParentComponent(CausaliForm);
+    CausaliForm.Tag := 996; // Abilita la selezione
+    CausaliForm.Show;
+  finally
+    DM1.ChiudiAttendere;
+  end;
+end;
 
 procedure TFattDifferitaForm.EsportaDocumentiDaFatturarePerData;
 var
@@ -571,18 +589,6 @@ begin
    // Invia il messaggio di richiesta di esecuzione del backup al Guardian
    MR := SendBackupRequest;
    if MR = mrOk then NoCopiaClick(Self);
-end;
-
-procedure TFattDifferitaForm.ModoCompetenzaEnter(Sender: TObject);
-begin
-   // Se è in modalità di Modifica...
-   DM1.ControlEnter(Sender);
-end;
-
-procedure TFattDifferitaForm.ModoCompetenzaExit(Sender: TObject);
-begin
-   // Se è in modalità di Modifica...
-   DM1.ControlExit(Sender);
 end;
 
 end.

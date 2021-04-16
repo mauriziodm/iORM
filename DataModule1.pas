@@ -1327,7 +1327,7 @@ type
     function LockedDatabase: Boolean;
     function EliminaTagHtml(StrIn: String): String;
     procedure NuovoDocFisc(NextTipoDocumento, Registro: String; Cliente, Pratica: Longint; DataPratica: String; Mode, Copies: Integer;
-      SoloRighiDelCliente, SoloRighiDellaPratica: Boolean; DataNuovoDocumento: TDate = 0); // Personale
+  SoloRighiDelCliente, SoloRighiDellaPratica: Boolean; DataNuovoDocumento: TDate = 0; ACausale: String = ''); // Personale
     procedure ShowWait(Sezione, Messaggio: String);
     procedure CloseWait;
     procedure CodGruppoToDescrizione(Codice1, Codice2, Codice3, Codice4, Codice5, Codice6: String; EditComponent: TEdit);
@@ -8707,7 +8707,7 @@ end;
 // (Es: Fatturazione differita dove le bolle vengono riepilogate separatamente per cliente).
 // NB: Se si è in modalità KIOSK (Vendita al banco) il parametri NextTipoDocumento Viene IGNORATO.
 procedure TDM1.NuovoDocFisc(NextTipoDocumento, Registro: String; Cliente, Pratica: Longint; DataPratica: String; Mode, Copies: Integer;
-  SoloRighiDelCliente, SoloRighiDellaPratica: Boolean; DataNuovoDocumento: TDate = 0); // Personale
+  SoloRighiDelCliente, SoloRighiDellaPratica: Boolean; DataNuovoDocumento: TDate = 0; ACausale: String = ''); // Personale
 var
   QryTmp: TIB_Cursor;
   Messaggi: String;
@@ -8856,7 +8856,10 @@ begin
     PreventiviOrdiniForm.QryDocumentoSEGNOOPERAZIONE.AsString := Uppercase(LO.ReadString(NextTipoDocumento, 'AzioneMagazzino', '='));
     PreventiviOrdiniForm.QryDocumentoSEGNOOPERAZIONECANTIERE.AsString := Uppercase(LO.ReadString(NextTipoDocumento, 'AzioneCantiere', '='));
     // Carica la causale di default del documento
-    PreventiviOrdiniForm.QryDocumentoCausale.Value := Uppercase(LO.ReadString(NextTipoDocumento, 'CausaleDefault', ''));
+    if ACausale.IsEmpty then
+      PreventiviOrdiniForm.QryDocumentoCausale.Value := Uppercase(LO.ReadString(NextTipoDocumento, 'CausaleDefault', ''))
+    else
+      PreventiviOrdiniForm.QryDocumentoCausale.Value := ACausale;
     PreventiviOrdiniForm.QryDocumentoCausaleCantiere.Value := Uppercase(LO.ReadString(NextTipoDocumento, 'CausaleCantiereDefault', ''));
     // Imposta lo stato documento DopoCreazione se è stata specificato nel layouts.ini per il documento
     SetStatoNuovoDocumento(PreventiviOrdiniForm.QryDocumento, LO.ReadString(NextTipoDocumento, 'StatoDopoCreazione', ''));

@@ -271,7 +271,7 @@ var
 implementation
 
 uses main, DataModule1, FormHelp, SchedaPreventiviOrdini, SchedaClienti,
-  FormConfirm, dxCore;
+  FormConfirm, dxCore, FormFattDifferita;
 
 {$R *.DFM}
 
@@ -726,6 +726,12 @@ begin
               PreventiviOrdiniForm.QryDocumento.Post;
               Close;
 //              ChekInForm.EditCausale.SetFocus;
+           end;
+      996: begin
+              // Importa il dato
+              FattDifferitaForm.Causale.Text := QueryCausali.FieldByName('DESCRIZIONE').AsString;
+              Close;
+              FattDifferitaForm.Causale.SetFocus;
            end;
    else
       RxSpeedButtonVisualizzaClick(Self);
