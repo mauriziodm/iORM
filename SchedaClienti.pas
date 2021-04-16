@@ -2768,7 +2768,6 @@ type
     tvDocID: TcxGridDBColumn;
     QryDocIS_LDE: TStringField;
     tvDocIS_LDE: TcxGridDBColumn;
-    cxCheckComboBox1: TcxCheckComboBox;
     QryGMRIFDOC_TIPO: TStringField;
     QryGMRIFDOC_NUM: TIntegerField;
     QryGMRIFDOC_REG: TStringField;
@@ -2843,6 +2842,10 @@ type
     QryGMCODICIAGGIUNTIVI: TStringField;
     tvGMCODICEFORNITORE: TcxGridDBColumn;
     tvGMCODICIAGGIUNTIVI: TcxGridDBColumn;
+    QryImpRDA: TStringField;
+    tvImpegniRDA: TcxGridDBColumn;
+    StaticText50: TStaticText;
+    FilterImpRDA: TEdit;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedButtonEliminaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -8799,6 +8802,9 @@ begin
   // Tecnico
   if FilterCodiceTecnico.Text <> '' then
     QryImp.SQL.Add('AND I.RESOURCEID = ''' + FilterCodiceTecnico.Text + '''');
+  // Se specificato ricerca per RDA
+  if FilterImpRDA.Text <> '' then
+    DM1.AddSQL(QryImp, 'AND', 'UPPER(I.RDA) = UPPER(''' + Trim(FilterImpRDA.Text) + ''')');
   // Agente
   if ImpAgente.Text <> '' then
     QryImp.SQL.Add('AND I.AGENTE  = ''' + ImpAgente.Text + '''');
@@ -11643,6 +11649,7 @@ begin
       ImpOp1.Text := '';
       ImpOp2.Text := '';
       ImpOp3.Text := '';
+      FilterImpRDA.Text := '';
       // Chiude la FilterRow se aperta
       if tvImpegni.FilterRow.Visible then
       begin

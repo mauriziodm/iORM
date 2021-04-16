@@ -365,7 +365,7 @@ object ClientiForm: TClientiForm
         Top = 0
         Width = 793
         Height = 581
-        ActivePage = TabMagazzino
+        ActivePage = TabImpegni
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -21684,6 +21684,8 @@ object ClientiForm: TClientiForm
                   LookAndFeel.NativeStyle = False
                   RootLevelOptions.DetailFrameColor = clBlack
                   RootLevelOptions.DetailFrameWidth = 1
+                  ExplicitLeft = -238
+                  ExplicitTop = -169
                   object tvImpegni: TcxGridDBTableView
                     DragMode = dmAutomatic
                     OnDblClick = tvRubricaDblClick
@@ -22243,6 +22245,14 @@ object ClientiForm: TClientiForm
                       HeaderAlignmentHorz = taCenter
                       Width = 120
                     end
+                    object tvImpegniRDA: TcxGridDBColumn
+                      DataBinding.FieldName = 'RDA'
+                      PropertiesClassName = 'TcxTextEditProperties'
+                      Properties.Alignment.Horz = taCenter
+                      Visible = False
+                      HeaderAlignmentHorz = taCenter
+                      Width = 100
+                    end
                   end
                   object lvImpegni: TcxGridLevel
                     GridView = tvImpegni
@@ -22260,8 +22270,8 @@ object ClientiForm: TClientiForm
                   TabOrder = 2
                   OnResize = PanelFiltriSoggResize
                   object SubPanelImpFiltri: TPanel
-                    Left = 0
-                    Top = 0
+                    Left = -3
+                    Top = 2
                     Width = 687
                     Height = 162
                     BevelOuter = bvNone
@@ -23021,7 +23031,7 @@ object ClientiForm: TClientiForm
                       Font.Style = []
                       ParentColor = False
                       ParentFont = False
-                      TabOrder = 16
+                      TabOrder = 17
                       Transparent = False
                     end
                     object ImpAgente: TcxComboBox
@@ -23044,7 +23054,7 @@ object ClientiForm: TClientiForm
                       Style.StyleController = DMStyles.cxEditStyleController_Filters
                       Style.PopupBorderStyle = epbsSingle
                       Style.IsFontAssigned = True
-                      TabOrder = 12
+                      TabOrder = 13
                       OnKeyPress = EditClientiCodiceKeyPress
                       Height = 18
                       Width = 99
@@ -23064,7 +23074,7 @@ object ClientiForm: TClientiForm
                       Font.Style = []
                       ParentColor = False
                       ParentFont = False
-                      TabOrder = 17
+                      TabOrder = 18
                       Transparent = False
                     end
                     object ImpAgente2: TcxComboBox
@@ -23087,7 +23097,7 @@ object ClientiForm: TClientiForm
                       Style.StyleController = DMStyles.cxEditStyleController_Filters
                       Style.PopupBorderStyle = epbsSingle
                       Style.IsFontAssigned = True
-                      TabOrder = 13
+                      TabOrder = 14
                       OnKeyPress = EditClientiCodiceKeyPress
                       Height = 18
                       Width = 96
@@ -23107,7 +23117,7 @@ object ClientiForm: TClientiForm
                       Font.Style = []
                       ParentColor = False
                       ParentFont = False
-                      TabOrder = 18
+                      TabOrder = 19
                       Transparent = False
                     end
                     object ImpAgente3: TcxComboBox
@@ -23130,7 +23140,7 @@ object ClientiForm: TClientiForm
                       Style.StyleController = DMStyles.cxEditStyleController_Filters
                       Style.PopupBorderStyle = epbsSingle
                       Style.IsFontAssigned = True
-                      TabOrder = 14
+                      TabOrder = 15
                       OnKeyPress = EditClientiCodiceKeyPress
                       Height = 18
                       Width = 96
@@ -23150,7 +23160,7 @@ object ClientiForm: TClientiForm
                       Font.Style = []
                       ParentColor = False
                       ParentFont = False
-                      TabOrder = 19
+                      TabOrder = 20
                       Transparent = False
                     end
                     object ImpAgente4: TcxComboBox
@@ -23172,7 +23182,7 @@ object ClientiForm: TClientiForm
                       Style.StyleController = DMStyles.cxEditStyleController_Filters
                       Style.PopupBorderStyle = epbsSingle
                       Style.IsFontAssigned = True
-                      TabOrder = 15
+                      TabOrder = 16
                       OnKeyPress = EditClientiCodiceKeyPress
                       Height = 18
                       Width = 97
@@ -23192,54 +23202,11 @@ object ClientiForm: TClientiForm
                       Font.Style = []
                       ParentColor = False
                       ParentFont = False
-                      TabOrder = 23
+                      TabOrder = 24
                       Transparent = False
                     end
                     object ImpOp1: TcxComboBox
                       Left = 32
-                      Top = 145
-                      AutoSize = False
-                      ParentFont = False
-                      Properties.DropDownListStyle = lsEditFixedList
-                      Properties.ImmediateDropDownWhenKeyPressed = False
-                      Properties.Sorted = True
-                      Properties.OnInitPopup = FilterOp1PropertiesInitPopup
-                      Style.BorderStyle = ebsNone
-                      Style.Color = 15266815
-                      Style.Font.Charset = ANSI_CHARSET
-                      Style.Font.Color = clBlack
-                      Style.Font.Height = -9
-                      Style.Font.Name = 'Verdana'
-                      Style.Font.Style = [fsBold]
-                      Style.HotTrack = False
-                      Style.StyleController = DMStyles.cxEditStyleController_Filters
-                      Style.PopupBorderStyle = epbsSingle
-                      Style.IsFontAssigned = True
-                      TabOrder = 20
-                      OnKeyPress = EditClientiCodiceKeyPress
-                      Height = 18
-                      Width = 195
-                    end
-                    object StaticText28: TStaticText
-                      Left = 230
-                      Top = 146
-                      Width = 226
-                      Height = 16
-                      AutoSize = False
-                      Caption = ' OP 2'
-                      Color = 11064319
-                      Font.Charset = ANSI_CHARSET
-                      Font.Color = 25542
-                      Font.Height = -9
-                      Font.Name = 'Verdana'
-                      Font.Style = []
-                      ParentColor = False
-                      ParentFont = False
-                      TabOrder = 24
-                      Transparent = False
-                    end
-                    object ImpOp2: TcxComboBox
-                      Left = 262
                       Top = 145
                       AutoSize = False
                       ParentFont = False
@@ -23263,6 +23230,49 @@ object ClientiForm: TClientiForm
                       Height = 18
                       Width = 195
                     end
+                    object StaticText28: TStaticText
+                      Left = 230
+                      Top = 146
+                      Width = 226
+                      Height = 16
+                      AutoSize = False
+                      Caption = ' OP 2'
+                      Color = 11064319
+                      Font.Charset = ANSI_CHARSET
+                      Font.Color = 25542
+                      Font.Height = -9
+                      Font.Name = 'Verdana'
+                      Font.Style = []
+                      ParentColor = False
+                      ParentFont = False
+                      TabOrder = 25
+                      Transparent = False
+                    end
+                    object ImpOp2: TcxComboBox
+                      Left = 262
+                      Top = 145
+                      AutoSize = False
+                      ParentFont = False
+                      Properties.DropDownListStyle = lsEditFixedList
+                      Properties.ImmediateDropDownWhenKeyPressed = False
+                      Properties.Sorted = True
+                      Properties.OnInitPopup = FilterOp1PropertiesInitPopup
+                      Style.BorderStyle = ebsNone
+                      Style.Color = 15266815
+                      Style.Font.Charset = ANSI_CHARSET
+                      Style.Font.Color = clBlack
+                      Style.Font.Height = -9
+                      Style.Font.Name = 'Verdana'
+                      Style.Font.Style = [fsBold]
+                      Style.HotTrack = False
+                      Style.StyleController = DMStyles.cxEditStyleController_Filters
+                      Style.PopupBorderStyle = epbsSingle
+                      Style.IsFontAssigned = True
+                      TabOrder = 22
+                      OnKeyPress = EditClientiCodiceKeyPress
+                      Height = 18
+                      Width = 195
+                    end
                     object StaticText29: TStaticText
                       Left = 460
                       Top = 146
@@ -23278,7 +23288,7 @@ object ClientiForm: TClientiForm
                       Font.Style = []
                       ParentColor = False
                       ParentFont = False
-                      TabOrder = 25
+                      TabOrder = 26
                       Transparent = False
                     end
                     object ImpOp3: TcxComboBox
@@ -23301,7 +23311,7 @@ object ClientiForm: TClientiForm
                       Style.StyleController = DMStyles.cxEditStyleController_Filters
                       Style.PopupBorderStyle = epbsSingle
                       Style.IsFontAssigned = True
-                      TabOrder = 22
+                      TabOrder = 23
                       OnKeyPress = EditClientiCodiceKeyPress
                       Height = 18
                       Width = 193
@@ -23329,6 +23339,43 @@ object ClientiForm: TClientiForm
                       OnKeyPress = EditClientiCodiceKeyPress
                       Height = 18
                       Width = 72
+                    end
+                    object StaticText50: TStaticText
+                      Left = 150
+                      Top = 102
+                      Width = 131
+                      Height = 16
+                      AutoSize = False
+                      Caption = ' RDA'
+                      Color = 11064319
+                      Font.Charset = ANSI_CHARSET
+                      Font.Color = 25542
+                      Font.Height = -9
+                      Font.Name = 'Verdana'
+                      Font.Style = []
+                      ParentColor = False
+                      ParentFont = False
+                      TabOrder = 27
+                      Transparent = False
+                    end
+                    object FilterImpRDA: TEdit
+                      Left = 181
+                      Top = 103
+                      Width = 99
+                      Height = 14
+                      AutoSize = False
+                      BorderStyle = bsNone
+                      Color = 15266815
+                      Font.Charset = ANSI_CHARSET
+                      Font.Color = clBlack
+                      Font.Height = -9
+                      Font.Name = 'Verdana'
+                      Font.Style = [fsBold]
+                      ParentFont = False
+                      ParentShowHint = False
+                      ShowHint = True
+                      TabOrder = 12
+                      OnKeyPress = EditClientiCodiceKeyPress
                     end
                   end
                 end
@@ -29384,57 +29431,11 @@ object ClientiForm: TClientiForm
       ParentColor = False
     end
   end
-  object cxCheckComboBox1: TcxCheckComboBox
-    Left = 401
-    Top = 269
-    Properties.Items = <
-      item
-        Description = '1'
-      end
-      item
-        Description = '2'
-      end
-      item
-        Description = '3'
-      end
-      item
-        Description = '4'
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end
-      item
-      end>
-    TabOrder = 2
-    Visible = False
-    Width = 90
-  end
   object MenuStampe: TPopupMenu
     AutoHotkeys = maManual
     OnPopup = MenuStampePopup
-    Left = 488
-    Top = 168
+    Left = 568
+    Top = 112
     object Elencoclienti1: TMenuItem
       Caption = 'Stampa elenco clienti'
       OnClick = Elencoclienti1Click
@@ -30602,8 +30603,8 @@ object ClientiForm: TClientiForm
     OnCalcFields = QryDocCalcFields
     SQL.Strings = (
       'SELECT * FROM DOC_LIST_VIEW')
-    Left = 253
-    Top = 558
+    Left = 237
+    Top = 366
     object QryDocTIPODOC: TStringField
       FieldName = 'TIPODOC'
       Origin = 'DOC_LIST_VIEW.TIPODOC'
@@ -31029,8 +31030,8 @@ object ClientiForm: TClientiForm
   object SourceDoc: TDataSource
     AutoEdit = False
     DataSet = QryDoc
-    Left = 282
-    Top = 558
+    Left = 266
+    Top = 366
   end
   object QryCV: TIBOQuery
     DeleteSQL.Strings = (
@@ -31061,8 +31062,8 @@ object ClientiForm: TClientiForm
       'FROM CONDVEND CV'
       'LEFT JOIN ARTICOLI A ON CV.CODICEARTICOLO = A.CODICEARTICOLO'
       'LEFT JOIN CLIENTI C ON CV.CODICESOGGETTO = C.CODICE')
-    Left = 229
-    Top = 331
+    Left = 213
+    Top = 139
     object QryCVTIPO: TStringField
       FieldName = 'TIPO'
       Required = True
@@ -31132,8 +31133,8 @@ object ClientiForm: TClientiForm
   object SourceCV: TDataSource
     AutoEdit = False
     DataSet = QryCV
-    Left = 258
-    Top = 331
+    Left = 242
+    Top = 139
   end
   object QryPratiche: TIBOQuery
     DeleteSQL.Strings = (
@@ -31146,8 +31147,8 @@ object ClientiForm: TClientiForm
     BeforeDelete = QryPraticheBeforeDelete
     SQL.Strings = (
       'SELECT P.* FROM PRAT_LIST_VIEW P')
-    Left = 229
-    Top = 366
+    Left = 213
+    Top = 174
     object QryPraticheCODICE: TIntegerField
       FieldName = 'CODICE'
     end
@@ -31332,8 +31333,8 @@ object ClientiForm: TClientiForm
   object SourcePratiche: TDataSource
     AutoEdit = False
     DataSet = QryPratiche
-    Left = 258
-    Top = 366
+    Left = 242
+    Top = 174
   end
   object QryScad: TIBOQuery
     ColumnAttributes.Strings = (
@@ -31375,8 +31376,8 @@ object ClientiForm: TClientiForm
       ',SLV.TOTALEIMPONIBILE, SLV.IMPORTOPAGATO, SLV.ID'
       'FROM SCAD_LIST_VIEW SLV'
       '')
-    Left = 229
-    Top = 400
+    Left = 213
+    Top = 208
     object QryScadCODICE: TIntegerField
       FieldName = 'CODICE'
       Origin = 'SCAD_LIST_VIEW.CODICE'
@@ -31615,8 +31616,8 @@ object ClientiForm: TClientiForm
   object SourceScad: TDataSource
     AutoEdit = False
     DataSet = QryScad
-    Left = 258
-    Top = 400
+    Left = 242
+    Top = 208
   end
   object QryArticoli: TIBOQuery
     DeleteSQL.Strings = (
@@ -32005,7 +32006,7 @@ object ClientiForm: TClientiForm
       PrinterPage.PageSize.Y = 297000
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44301.639274502310000000
+      ReportDocument.CreationDate = 44302.529757291670000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. giornale di magazzino'
       OptionsFormatting.SuppressContentColoration = True
@@ -32445,7 +32446,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Levante - Agenda'
-      ReportDocument.CreationDate = 44301.639274687500000000
+      ReportDocument.CreationDate = 44302.529757581020000000
       OptionsFormatting.UseNativeStyles = True
       PrintRange.TimePrintFrom = 0.291666666666666700
       PrintRange.TimePrintTo = 0.875000000000000000
@@ -32508,7 +32509,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Statistiche ore dipendenti'
-      ReportDocument.CreationDate = 44301.639274687500000000
+      ReportDocument.CreationDate = 44302.529757592590000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Rapporto ADA dipendenti'
       OptionsFormatting.SuppressContentColoration = True
@@ -32569,7 +32570,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Rapporto ADA spese varie'
-      ReportDocument.CreationDate = 44301.639274687500000000
+      ReportDocument.CreationDate = 44302.529757604170000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Rapporto ADA spese'
       OptionsFormatting.SuppressContentColoration = True
@@ -32645,7 +32646,7 @@ object ClientiForm: TClientiForm
       PrinterPage.PageSize.Y = 297000
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44301.639274687500000000
+      ReportDocument.CreationDate = 44302.529757615740000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. documenti'
       OptionsFormatting.SuppressContentColoration = True
@@ -32674,7 +32675,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'ADA scadenze '
-      ReportDocument.CreationDate = 44301.639274687500000000
+      ReportDocument.CreationDate = 44302.529757615740000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. scadenze'
       OptionsFormatting.SuppressContentColoration = True
@@ -32704,7 +32705,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Elenco documenti'
-      ReportDocument.CreationDate = 44301.639274861110000000
+      ReportDocument.CreationDate = 44302.529757685190000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Elenco documenti'
       TimeFormat = 0
@@ -32742,8 +32743,8 @@ object ClientiForm: TClientiForm
   end
   object MenuPratiche: TPopupMenu
     OnPopup = MenuPratichePopup
-    Left = 287
-    Top = 366
+    Left = 271
+    Top = 174
     object MIPratica: TMenuItem
       Caption = 'Cantiere'
       OnClick = MIPraticaClick
@@ -32751,8 +32752,8 @@ object ClientiForm: TClientiForm
   end
   object MenuDocumenti: TPopupMenu
     OnPopup = MenuDocumentiPopup
-    Left = 311
-    Top = 558
+    Left = 295
+    Top = 366
     object MIBuonoConsegna: TMenuItem
       Caption = 'Buono di consegna'
       OnClick = MIBuonoConsegnaClick
@@ -32861,8 +32862,8 @@ object ClientiForm: TClientiForm
   end
   object MenuScadenzario: TPopupMenu
     OnPopup = MenuScadenzarioPopup
-    Left = 287
-    Top = 400
+    Left = 271
+    Top = 208
     object MIScadenzaAttiva: TMenuItem
       Caption = 'Scadenza attiva   (da riscuotere)'
       OnClick = MIScadenzaAttivaClick
@@ -32874,8 +32875,8 @@ object ClientiForm: TClientiForm
   end
   object MenuCondVend: TPopupMenu
     OnPopup = MenuCondVendPopup
-    Left = 287
-    Top = 331
+    Left = 271
+    Top = 139
     object MICondVendGruppo: TMenuItem
       Caption = 'Condizione di vendita per GRUPPO'
       OnClick = MICondVendGruppoClick
@@ -32938,8 +32939,8 @@ object ClientiForm: TClientiForm
       '      CAST(P.INDIRIZZOIMM AS VARCHAR(60)) AS INDIRIZZOIMM'
       'FROM PRATICHE P'
       'LEFT JOIN CLIENTI C ON C.CODICE = P.CLIENTE')
-    Left = 405
-    Top = 324
+    Left = 389
+    Top = 172
     object QryAssTIPO: TStringField
       FieldName = 'TIPO'
       Size = 1
@@ -33032,13 +33033,13 @@ object ClientiForm: TClientiForm
   object SourceAss: TDataSource
     AutoEdit = False
     DataSet = QryAss
-    Left = 434
-    Top = 324
+    Left = 418
+    Top = 172
   end
   object MenuAssistenze: TPopupMenu
     OnPopup = MenuAssistenzePopup
-    Left = 463
-    Top = 324
+    Left = 447
+    Top = 172
     object Centraletermica1: TMenuItem
       Caption = 'Centrale termica   (Pot. >= 35 kW)'
       OnClick = Centraletermica1Click
@@ -33074,8 +33075,8 @@ object ClientiForm: TClientiForm
     RecordCountAccurate = True
     SQL.Strings = (
       'SELECT * FROM IMPEGNI_LIST_VIEW')
-    Left = 237
-    Top = 502
+    Left = 221
+    Top = 310
     object QryImpTIPOIMPEGNO: TStringField
       FieldName = 'TIPOIMPEGNO'
       Size = 10
@@ -33197,17 +33198,20 @@ object ClientiForm: TClientiForm
       FieldName = 'RICHIEDENTE'
       Size = 30
     end
+    object QryImpRDA: TStringField
+      FieldName = 'RDA'
+    end
   end
   object SourceImp: TDataSource
     AutoEdit = False
     DataSet = QryImp
-    Left = 266
-    Top = 502
+    Left = 250
+    Top = 310
   end
   object MenuImpegni: TPopupMenu
     OnPopup = MenuImpegniPopup
-    Left = 295
-    Top = 502
+    Left = 279
+    Top = 310
     object Appuntamentonormale2: TMenuItem
       Caption = 'Appuntamento normale'
       OnClick = Appuntamentonormale2Click
@@ -33248,21 +33252,21 @@ object ClientiForm: TClientiForm
     FieldNames.ResourceID = 'RESOURCEID'
     FieldNames.Start = 'START_EVENT'
     FieldNames.State = 'STATE'
-    Left = 464
-    Top = 391
+    Left = 448
+    Top = 239
   end
   object SourceAgenda: TDataSource
-    Left = 430
-    Top = 362
+    Left = 414
+    Top = 210
   end
   object SourceTecnici: TDataSource
-    Left = 430
-    Top = 391
+    Left = 414
+    Top = 239
   end
   object MenuAgenda: TPopupMenu
     OnPopup = MenuAgendaPopup
-    Left = 490
-    Top = 362
+    Left = 474
+    Top = 210
     object Appuntamentonormale1: TMenuItem
       Caption = 'Appuntamento normale'
       OnClick = Appuntamentonormale1Click
@@ -33273,8 +33277,8 @@ object ClientiForm: TClientiForm
     end
   end
   object EventPopupMenuAgenda: TPopupMenu
-    Left = 460
-    Top = 362
+    Left = 444
+    Top = 210
     object Eliminaappuntamentoecreadocumento1: TMenuItem
       Caption = 'Elimina appuntamento e crea documento'
       OnClick = Eliminaappuntamentoecreadocumento1Click
@@ -33402,8 +33406,8 @@ object ClientiForm: TClientiForm
       '     , COALESCE( SUM(RITENUTAACCONTO), 0 ) AS TOTRITENUTAACCONTO'
       'FROM DOC_SEL'
       '')
-    Left = 253
-    Top = 616
+    Left = 237
+    Top = 424
     object QryTotDocTOTNUMDOC: TIntegerField
       FieldName = 'TOTNUMDOC'
       ReadOnly = True
@@ -33441,8 +33445,8 @@ object ClientiForm: TClientiForm
   object SourceTotDoc: TDataSource
     AutoEdit = False
     DataSet = QryTotDoc
-    Left = 282
-    Top = 616
+    Left = 266
+    Top = 424
   end
   object QryGOSOre: TIBOQuery
     ColumnAttributes.Strings = (
@@ -33457,8 +33461,8 @@ object ClientiForm: TClientiForm
     OnCalcFields = QryGOSOreCalcFields
     SQL.Strings = (
       'SELECT * FROM GOS_ORE')
-    Left = 408
-    Top = 590
+    Left = 392
+    Top = 438
     object QryGOSOreNUMDOC: TIntegerField
       FieldName = 'NUMDOC'
       Origin = 'GOS_ORE.NUMDOC'
@@ -33732,8 +33736,8 @@ object ClientiForm: TClientiForm
   object SourceGOS: TDataSource
     AutoEdit = False
     DataSet = QryGOSOre
-    Left = 438
-    Top = 590
+    Left = 422
+    Top = 438
   end
   object QryGOSSpese: TIBOQuery
     ColumnAttributes.Strings = (
@@ -34039,8 +34043,8 @@ object ClientiForm: TClientiForm
       '     , DS.OPERATORE'
       'FROM DOCSEL DS'
       '')
-    Left = 253
-    Top = 587
+    Left = 237
+    Top = 395
     object QryDocAltriSTATION_ID: TIntegerField
       FieldName = 'STATION_ID'
       Required = True
@@ -34180,8 +34184,8 @@ object ClientiForm: TClientiForm
   object SourceDocAltri: TDataSource
     AutoEdit = False
     DataSet = QryDocAltri
-    Left = 282
-    Top = 587
+    Left = 266
+    Top = 395
   end
   object QueryPrimanota: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34227,8 +34231,8 @@ object ClientiForm: TClientiForm
       ''
       'FROM PRIMANOT P'
       'LEFT JOIN CLIENTI C ON (C.CODICE = P.CLIENTE)')
-    Left = 400
-    Top = 434
+    Left = 384
+    Top = 282
     object QueryPrimanotaDATA: TDateTimeField
       FieldName = 'DATA'
       Required = True
@@ -34323,8 +34327,8 @@ object ClientiForm: TClientiForm
   object SourcePrimanota: TDataSource
     AutoEdit = False
     DataSet = QueryPrimanota
-    Left = 430
-    Top = 434
+    Left = 414
+    Top = 282
   end
   object QueryTotali: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34340,8 +34344,8 @@ object ClientiForm: TClientiForm
         'otFuoriUscite, (sum(FuoriEntrate)-sum(FuoriUscite)) as SaldoFuor' +
         'i'
       'FROM primanot')
-    Left = 400
-    Top = 463
+    Left = 384
+    Top = 311
     object QueryTotaliTotCassaEntrate: TCurrencyField
       FieldName = 'TotCassaEntrate'
     end
@@ -34364,8 +34368,8 @@ object ClientiForm: TClientiForm
   object SourceTotali: TDataSource
     AutoEdit = False
     DataSet = QueryTotali
-    Left = 430
-    Top = 463
+    Left = 414
+    Top = 311
   end
   object QueryRiporti: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34381,8 +34385,8 @@ object ClientiForm: TClientiForm
         'otFuoriUscite, (sum(FuoriEntrate)-sum(FuoriUscite)) as SaldoFuor' +
         'i'
       'FROM primanot')
-    Left = 408
-    Top = 532
+    Left = 392
+    Top = 380
     object QueryRiportiTotCassaEntrate: TCurrencyField
       FieldName = 'TotCassaEntrate'
     end
@@ -34405,8 +34409,8 @@ object ClientiForm: TClientiForm
   object SourceRiporti: TDataSource
     AutoEdit = False
     DataSet = QueryRiporti
-    Left = 438
-    Top = 532
+    Left = 422
+    Top = 380
   end
   object QryTotPeriodo: TIBOQuery
     BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
@@ -34422,8 +34426,8 @@ object ClientiForm: TClientiForm
         'otFuoriUscite, (sum(FuoriEntrate)-sum(FuoriUscite)) as SaldoFuor' +
         'i'
       'FROM primanot')
-    Left = 408
-    Top = 561
+    Left = 392
+    Top = 409
     object QryTotPeriodoTOTCASSAENTRATE: TIBOFloatField
       FieldName = 'TOTCASSAENTRATE'
       ReadOnly = True
@@ -34458,13 +34462,13 @@ object ClientiForm: TClientiForm
   object SourceTotPeriodo: TDataSource
     AutoEdit = False
     DataSet = QryTotPeriodo
-    Left = 438
-    Top = 561
+    Left = 422
+    Top = 409
   end
   object MenuPrimanota: TPopupMenu
     OnPopup = MenuPrimanotaPopup
-    Left = 460
-    Top = 434
+    Left = 444
+    Top = 282
     object Movimentoprimanota1: TMenuItem
       Caption = 'Movimento primanota'
       OnClick = Movimentoprimanota1Click
@@ -34474,8 +34478,8 @@ object ClientiForm: TClientiForm
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 224
-    Top = 558
+    Left = 208
+    Top = 366
   end
   object TransSoggetti: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34488,15 +34492,15 @@ object ClientiForm: TClientiForm
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 224
-    Top = 587
+    Left = 208
+    Top = 395
   end
   object TransTotDoc: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 224
-    Top = 616
+    Left = 208
+    Top = 424
   end
   object TransArticoli: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34523,85 +34527,85 @@ object ClientiForm: TClientiForm
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 200
-    Top = 331
+    Left = 184
+    Top = 139
   end
   object TransPratiche: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 200
-    Top = 366
+    Left = 184
+    Top = 174
   end
   object TransScad: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 200
-    Top = 400
+    Left = 184
+    Top = 208
   end
   object TransAss: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 376
-    Top = 324
+    Left = 360
+    Top = 172
   end
   object TransImp: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 208
-    Top = 502
+    Left = 192
+    Top = 310
   end
   object TransAgenda: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 372
-    Top = 362
+    Left = 356
+    Top = 210
   end
   object TransTecnici: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 372
-    Top = 391
+    Left = 356
+    Top = 239
   end
   object TransPrimanota: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 370
-    Top = 434
+    Left = 354
+    Top = 282
   end
   object TransTotali: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 370
-    Top = 463
+    Left = 354
+    Top = 311
   end
   object TransRiporti: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 378
-    Top = 532
+    Left = 362
+    Top = 380
   end
   object TransTotPeriodo: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 378
-    Top = 561
+    Left = 362
+    Top = 409
   end
   object TransGOSOre: TIB_Transaction
     IB_Connection = DM1.DBAzienda
     AutoCommit = True
     Isolation = tiCommitted
-    Left = 378
-    Top = 590
+    Left = 362
+    Top = 438
   end
   object TransGOSSpese: TIB_Transaction
     IB_Connection = DM1.DBAzienda
@@ -34799,8 +34803,8 @@ object ClientiForm: TClientiForm
   object SourceTotScad: TDataSource
     AutoEdit = False
     DataSet = QryTotScad
-    Left = 258
-    Top = 429
+    Left = 242
+    Top = 237
   end
   object QryTotScad: TIBOQuery
     DeleteSQL.Strings = (
@@ -34819,8 +34823,8 @@ object ClientiForm: TClientiForm
       ',SUM(SLV.AVERE_IMPORTO) AS AVERE'
       'FROM SCAD_LIST_VIEW SLV'
       '')
-    Left = 229
-    Top = 429
+    Left = 213
+    Top = 237
     object QryTotScadTOTIMPORTOPAGATO: TIBOFloatField
       FieldName = 'TOTIMPORTOPAGATO'
       ReadOnly = True
@@ -34870,8 +34874,8 @@ object ClientiForm: TClientiForm
         'OCCLI, TIPOIMPEGNO,'
       'EXISTS_URGENTI, EXISTS_PRESCRIZIONI'
       'FROM AGENDA_LIST_VIEW')
-    Left = 401
-    Top = 362
+    Left = 385
+    Top = 210
   end
   object QryTecnici: TIBOQuery
     IB_Connection = DM1.DBAzienda
@@ -34879,7 +34883,7 @@ object ClientiForm: TClientiForm
     SQL.Strings = (
       'SELECT RESOURCEID, RESOURCENAME, RESOURCECOLOR'
       'FROM TECNICI')
-    Left = 401
-    Top = 391
+    Left = 385
+    Top = 239
   end
 end
