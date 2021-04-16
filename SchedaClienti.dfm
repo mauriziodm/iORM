@@ -365,7 +365,7 @@ object ClientiForm: TClientiForm
         Top = 0
         Width = 793
         Height = 581
-        ActivePage = TabArticoli
+        ActivePage = TabMagazzino
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -10925,6 +10925,7 @@ object ClientiForm: TClientiForm
                       Caption = 'Costo un.'
                       DataBinding.FieldName = 'PREZZOACQUISTOARTICOLO'
                       RepositoryItem = DM1.EdPropImportoMicroPrz
+                      Visible = False
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
                       HeaderAlignmentHorz = taCenter
                       Width = 60
@@ -10934,6 +10935,7 @@ object ClientiForm: TClientiForm
                       Caption = 'Costo tot.'
                       DataBinding.FieldName = 'IMPORTOCOSTO'
                       RepositoryItem = DM1.EdPropImportoMicroPrz
+                      Visible = False
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
                       HeaderAlignmentHorz = taCenter
                       Width = 65
@@ -10943,6 +10945,7 @@ object ClientiForm: TClientiForm
                       Caption = 'Margine'
                       DataBinding.FieldName = 'IMPORTOMARGINE'
                       RepositoryItem = DM1.EdPropImportoMicroPrz
+                      Visible = False
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
                       HeaderAlignmentHorz = taCenter
                       Width = 65
@@ -10952,11 +10955,28 @@ object ClientiForm: TClientiForm
                       Caption = 'M%'
                       DataBinding.FieldName = 'MARGINE'
                       RepositoryItem = DM1.EdPropMarginePerc
+                      Visible = False
                       OnGetDisplayText = tvDocIMPONIBILEGetDisplayText
                       FooterAlignmentHorz = taCenter
                       GroupSummaryAlignment = taCenter
                       HeaderAlignmentHorz = taCenter
                       Width = 30
+                    end
+                    object tvGMCODICEFORNITORE: TcxGridDBColumn
+                      AlternateCaption = 'Codice articolo del fornitore'
+                      Caption = 'Cod.forn.'
+                      DataBinding.FieldName = 'CODICEFORNITORE'
+                      Visible = False
+                      HeaderAlignmentHorz = taCenter
+                      Width = 75
+                    end
+                    object tvGMCODICIAGGIUNTIVI: TcxGridDBColumn
+                      AlternateCaption = 'Codici aggiuntivi'
+                      Caption = 'Codici aggiuntivi'
+                      DataBinding.FieldName = 'CODICIAGGIUNTIVI'
+                      Visible = False
+                      HeaderAlignmentHorz = taCenter
+                      Width = 250
                     end
                   end
                   object lvGM: TcxGridLevel
@@ -30387,6 +30407,14 @@ object ClientiForm: TClientiForm
     end
     object QryGMMARGINE: TFloatField
       FieldName = 'MARGINE'
+    end
+    object QryGMCODICEFORNITORE: TStringField
+      FieldName = 'CODICEFORNITORE'
+      Size = 25
+    end
+    object QryGMCODICIAGGIUNTIVI: TStringField
+      FieldName = 'CODICIAGGIUNTIVI'
+      Size = 200
     end
   end
   object SourcGM: TDataSource
