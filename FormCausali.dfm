@@ -26,7 +26,8 @@ object CausaliForm: TCausaliForm
     Height = 68
     Alignment = taLeftJustify
     BevelOuter = bvNone
-    Color = clGray
+    Color = clSilver
+    ParentBackground = False
     TabOrder = 0
     object RxSpeedButtonUscita: TSpeedButton
       Left = 2
@@ -2391,6 +2392,7 @@ object CausaliForm: TCausaliForm
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
         DataController.Summary.SummaryGroups = <>
+        DataController.OnSortingChanged = tvListDataControllerSortingChanged
         OptionsCustomize.ColumnFiltering = False
         OptionsCustomize.ColumnMoving = False
         OptionsData.DeletingConfirmation = False
@@ -2405,6 +2407,7 @@ object CausaliForm: TCausaliForm
         OptionsView.GroupByBox = False
         OptionsView.HeaderAutoHeight = True
         Styles.StyleSheet = DM1.MasterTableViewStyleSheet
+        OnCustomDrawColumnHeader = tvListCustomDrawColumnHeader
         object tvListENABLED: TcxGridDBColumn
           DataBinding.FieldName = 'ENABLED'
           OnGetDisplayText = tvListENABLEDGetDisplayText

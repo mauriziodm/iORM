@@ -14,7 +14,7 @@ uses
   cxFilter, cxData, cxDataStorage, Buttons, cxLookAndFeels,
   cxLookAndFeelPainters, cxNavigator, dxPSGlbl, dxPSUtl, dxPSEngn, dxPrnPg, dxBkgnd, dxWrap, dxPrnDev, dxPSCompsProvider, dxPSFillPatterns, dxPSEdgePatterns, dxPSPDFExportCore, dxPSPDFExport,
   cxDrawTextUtils, dxPSPrVwStd, dxPSPrVwAdv, dxPSPrVwRibbon, dxPScxPageControlProducer, dxPScxGridLnk, dxPScxGridLayoutViewLnk, dxPScxEditorProducers, dxPScxExtEditorProducers, dxPSCore, dxPScxCommon,
-  dxPScxPivotGridLnk, dxPScxSchedulerLnk, cxCheckBox, Vcl.ImgList;
+  dxPScxPivotGridLnk, dxPScxSchedulerLnk, cxCheckBox, Vcl.ImgList, dxDateRanges, dxScrollbarAnnotations, System.ImageList;
 
 type
   TDipendentiForm = class(TLevanteListAnagForm)
@@ -161,6 +161,7 @@ type
     procedure dbeTipoOre1PropertiesInitPopup(Sender: TObject);
     procedure dbeTipoOre2PropertiesInitPopup(Sender: TObject);
     procedure dbeTipoOre3PropertiesInitPopup(Sender: TObject);
+    procedure tvListDataControllerSortingChanged(Sender: TObject);
   private
     fSoloManodoperaTipo: Integer;
     FSoloAttivi: Boolean;
@@ -180,7 +181,7 @@ var
 implementation
 
 uses DataModule1, FormRappGiorn, SchedaClienti, SchedaPreventiviOrdini,
-  FormTabGC, FormConfirm, IB_Components;
+  FormTabGC, FormConfirm, IB_Components, dxCore;
 
 {$R *.dfm}
 
@@ -244,6 +245,13 @@ begin
   else
     if not AViewInfo.EditViewInfo.IsSelected then
       ACanvas.Brush.Color := clWhite;
+end;
+
+procedure TDipendentiForm.tvListDataControllerSortingChanged(Sender: TObject);
+begin
+  inherited;
+  tvListENABLED.SortOrder := TdxSortOrder.soDescending;
+  tvListENABLED.SortIndex := 0;
 end;
 
 procedure TDipendentiForm.tvListDblClick(Sender: TObject);

@@ -205,6 +205,7 @@ inherited TipiRighiForm: TTipiRighiForm
       ExplicitTop = 312
       inherited GridList: TcxGrid
         inherited tvList: TcxGridDBTableView
+          DataController.OnSortingChanged = tvListDataControllerSortingChanged
           Styles.Background = nil
           Styles.Content = nil
           Styles.ContentEven = nil

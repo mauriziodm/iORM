@@ -12,7 +12,7 @@ uses
   cxClasses, cxControls, cxGridCustomView, cxGrid, DB, cxDBData, cxGridDBTableView,
   Buttons, cxStyles, cxGraphics, cxFilter, cxData, cxDataStorage,
   cxLookAndFeels, cxLookAndFeelPainters, cxNavigator, cxGridCustomLayoutView,
-  cxContainer, cxMaskEdit, cxLookupEdit, cxDBLookupEdit, cxDBEdit, Vcl.ImgList;
+  cxContainer, cxMaskEdit, cxLookupEdit, cxDBLookupEdit, cxDBEdit, Vcl.ImgList, dxDateRanges, dxScrollbarAnnotations, System.ImageList;
 
 type
   TAliquoteIVAForm = class(TForm)
@@ -194,6 +194,8 @@ type
       Shift: TShiftState);
     procedure tvListENABLEDGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
     procedure tvListCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
+    procedure tvListCustomDrawColumnHeader(Sender: TcxGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridColumnHeaderViewInfo; var ADone: Boolean);
+    procedure tvListDataControllerSortingChanged(Sender: TObject);
   private
     procedure FiltraSoloAttive;
   public
@@ -204,7 +206,7 @@ var
 
 implementation
 
-uses main, DataModule1, FormHelp, SchedaPreventiviOrdini, FormAnagCli, FormConfirm;
+uses main, DataModule1, FormHelp, SchedaPreventiviOrdini, FormAnagCli, FormConfirm, dxCore;
 
 {$R *.DFM}
 
@@ -500,6 +502,20 @@ begin
   else
     if not AViewInfo.EditViewInfo.IsSelected then
       ACanvas.Brush.Color := clWhite;
+end;
+
+procedure TAliquoteIVAForm.tvListCustomDrawColumnHeader(Sender: TcxGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridColumnHeaderViewInfo;
+  var ADone: Boolean);
+begin
+   // Richiama la gestione predefinita dell'evento
+   DM1.QGridCustomDrawColumnHeader(Sender, ACanvas, AViewInfo, ADone);
+end;
+
+procedure TAliquoteIVAForm.tvListDataControllerSortingChanged(Sender: TObject);
+begin
+  inherited;
+  tvListENABLED.SortOrder := TdxSortOrder.soDescending;
+  tvListENABLED.SortIndex := 0;
 end;
 
 procedure TAliquoteIVAForm.tvListDblClick(Sender: TObject);

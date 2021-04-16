@@ -256,6 +256,8 @@ type
     procedure tvListCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
     procedure tvListENABLEDGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
     procedure QueryCausaliBeforeDelete(DataSet: TDataSet);
+    procedure tvListDataControllerSortingChanged(Sender: TObject);
+    procedure tvListCustomDrawColumnHeader(Sender: TcxGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridColumnHeaderViewInfo; var ADone: Boolean);
   private
     { Private declarations }
     procedure SetScrollBoxRange(const AEditMode:Boolean);
@@ -269,7 +271,7 @@ var
 implementation
 
 uses main, DataModule1, FormHelp, SchedaPreventiviOrdini, SchedaClienti,
-  FormConfirm;
+  FormConfirm, dxCore;
 
 {$R *.DFM}
 
@@ -682,6 +684,19 @@ begin
   else
     if not AViewInfo.EditViewInfo.IsSelected then
       ACanvas.Brush.Color := clWhite;
+end;
+
+procedure TCausaliForm.tvListCustomDrawColumnHeader(Sender: TcxGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridColumnHeaderViewInfo; var ADone: Boolean);
+begin
+   // Richiama la gestione predefinita dell'evento
+   DM1.QGridCustomDrawColumnHeader(Sender, ACanvas, AViewInfo, ADone);
+end;
+
+procedure TCausaliForm.tvListDataControllerSortingChanged(Sender: TObject);
+begin
+  inherited;
+  tvListENABLED.SortOrder := TdxSortOrder.soDescending;
+  tvListENABLED.SortIndex := 0;
 end;
 
 procedure TCausaliForm.tvListDblClick(Sender: TObject);

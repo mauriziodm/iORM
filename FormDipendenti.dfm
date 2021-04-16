@@ -116,6 +116,7 @@ inherited DipendentiForm: TDipendentiForm
         ParentFont = False
         ReadOnly = True
         TabOrder = 0
+        Zoom = 100
       end
       object dbeTipoOre1: TcxDBComboBox
         Left = 246
@@ -223,6 +224,7 @@ inherited DipendentiForm: TDipendentiForm
         ParentFont = False
         ReadOnly = True
         TabOrder = 0
+        Zoom = 100
       end
       object DBMemo1: TDBMemo
         Left = 246
@@ -523,6 +525,7 @@ inherited DipendentiForm: TDipendentiForm
         ParentFont = False
         ReadOnly = True
         TabOrder = 1
+        Zoom = 100
       end
       object DBEdit12: TDBEdit
         Left = 246
@@ -809,8 +812,6 @@ inherited DipendentiForm: TDipendentiForm
         Style.LookAndFeel.NativeStyle = False
         Style.IsFontAssigned = True
         StyleDisabled.LookAndFeel.NativeStyle = False
-        StyleFocused.LookAndFeel.NativeStyle = False
-        StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 13
         Height = 73
         Width = 351
@@ -1055,6 +1056,7 @@ inherited DipendentiForm: TDipendentiForm
         ParentFont = False
         ReadOnly = True
         TabOrder = 1
+        Zoom = 100
       end
       object DBECognome: TDBEdit
         Left = 246
@@ -1274,7 +1276,6 @@ inherited DipendentiForm: TDipendentiForm
         Style.HotTrack = False
         Style.IsFontAssigned = True
         TabOrder = 11
-        Width = 65
       end
     end
     object PanelGruppo2: TPanel [4]
@@ -1377,6 +1378,7 @@ inherited DipendentiForm: TDipendentiForm
         ParentFont = False
         ReadOnly = True
         TabOrder = 1
+        Zoom = 100
       end
       object DBEdit8: TDBEdit
         Left = 246
@@ -1451,7 +1453,7 @@ inherited DipendentiForm: TDipendentiForm
         inherited tvList: TcxGridDBTableView
           DataController.DetailKeyFieldNames = 'CODICE'
           DataController.KeyFieldNames = 'CODICE'
-          OptionsCustomize.ColumnSorting = False
+          DataController.OnSortingChanged = tvListDataControllerSortingChanged
           OptionsData.DeletingConfirmation = False
           OptionsSelection.MultiSelect = False
           OptionsView.DataRowHeight = 25
@@ -1459,11 +1461,11 @@ inherited DipendentiForm: TDipendentiForm
           Styles.Content = nil
           Styles.ContentEven = nil
           Styles.ContentOdd = nil
-          Styles.Selection = nil
           Styles.Footer = nil
           Styles.Group = nil
           Styles.GroupByBox = nil
           Styles.Header = nil
+          Styles.Selection = nil
           object tvListENABLED: TcxGridDBColumn
             DataBinding.FieldName = 'ENABLED'
             OnGetDisplayText = tvListENABLEDGetDisplayText
@@ -1476,7 +1478,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Cod.'
             DataBinding.FieldName = 'CODICE'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
             Width = 50
@@ -1485,7 +1486,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Nome'
             DataBinding.FieldName = 'NOME'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             HeaderAlignmentHorz = taCenter
             SortIndex = 1
             SortOrder = soAscending
@@ -1494,7 +1494,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Cognome'
             DataBinding.FieldName = 'COGNOME'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             HeaderAlignmentHorz = taCenter
             SortIndex = 2
             SortOrder = soAscending
@@ -1503,14 +1502,12 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Citt'#224
             DataBinding.FieldName = 'CITTA'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             HeaderAlignmentHorz = taCenter
           end
           object tvListINDIRIZZO: TcxGridDBColumn
             Caption = 'Indirizzo'
             DataBinding.FieldName = 'INDIRIZZO'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             HeaderAlignmentHorz = taCenter
           end
           object tvListNUMCIVICO: TcxGridDBColumn
@@ -1518,13 +1515,11 @@ inherited DipendentiForm: TDipendentiForm
             DataBinding.FieldName = 'NUMCIVICO'
             PropertiesClassName = 'TcxTextEditProperties'
             Properties.Alignment.Horz = taCenter
-            Properties.Alignment.Vert = taVCenter
             HeaderAlignmentHorz = taCenter
           end
           object tvListCAP: TcxGridDBColumn
             DataBinding.FieldName = 'CAP'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1533,7 +1528,6 @@ inherited DipendentiForm: TDipendentiForm
             DataBinding.FieldName = 'PROVINCIA'
             PropertiesClassName = 'TcxTextEditProperties'
             Properties.Alignment.Horz = taCenter
-            Properties.Alignment.Vert = taVCenter
             HeaderAlignmentHorz = taCenter
             Width = 50
           end
@@ -1541,7 +1535,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Telefono'
             DataBinding.FieldName = 'TELEFONO'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1549,7 +1542,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Cellulare'
             DataBinding.FieldName = 'CELLULARE'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1557,7 +1549,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Codice Fiscale'
             DataBinding.FieldName = 'CODICEFISCALE'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1565,7 +1556,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Data nasc.'
             DataBinding.FieldName = 'DATANASCITA'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1573,7 +1563,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Luogo nasc.'
             DataBinding.FieldName = 'LUOGONASCITA'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1581,7 +1570,6 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'E-mail'
             DataBinding.FieldName = 'EMAIL'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
@@ -1589,13 +1577,16 @@ inherited DipendentiForm: TDipendentiForm
             Caption = 'Note'
             DataBinding.FieldName = 'NOTE'
             PropertiesClassName = 'TcxTextEditProperties'
-            Properties.Alignment.Vert = taVCenter
             Visible = False
             HeaderAlignmentHorz = taCenter
           end
         end
       end
     end
+  end
+  inherited ClientTopPanel: TbmpPanel
+    Color = clSilver
+    ParentBackground = False
   end
   inherited Q: TIBOQuery
     DeleteSQL.Strings = (
@@ -1774,9 +1765,10 @@ inherited DipendentiForm: TDipendentiForm
     end
   end
   inherited dxPrinter: TdxComponentPrinter
+    PixelsPerInch = 96
     inherited dxPrinterLink1: TdxGridReportLink
       ReportDocument.CreationDate = 43088.946112071760000000
-      AssignedFormatValues = []
+      PixelsPerInch = 96
       BuiltInReportLink = True
     end
   end

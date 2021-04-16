@@ -268,6 +268,8 @@ type
     procedure eOperatoreCorrelatoPropertiesInitPopup(Sender: TObject);
     procedure tvListCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
     procedure tvListABILITATOGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
+    procedure tvListDataControllerSortingChanged(Sender: TObject);
+    procedure tvListCustomDrawColumnHeader(Sender: TcxGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridColumnHeaderViewInfo; var ADone: Boolean);
   private
     { Private declarations }
     function OperatoreCorrelatoDuplicato(const AResourceID: Integer; const AIDOperatore: String): boolean;
@@ -280,7 +282,7 @@ var
 
 implementation
 
-uses main, DataModule1, FormHelp, SchedaClienti, FormAllegatiFG, UnitGoogleCal, FormConfirm;
+uses main, DataModule1, FormHelp, SchedaClienti, FormAllegatiFG, UnitGoogleCal, FormConfirm, dxCore;
 
 {$R *.dfm}
 
@@ -705,6 +707,13 @@ begin
   // ===========================================================================
 end;
 
+procedure TTecniciForm.tvListDataControllerSortingChanged(Sender: TObject);
+begin
+  inherited;
+  tvListABILITATO.SortOrder := TdxSortOrder.soDescending;
+  tvListABILITATO.SortIndex := 0;
+end;
+
 procedure TTecniciForm.tvListDblClick(Sender: TObject);
 begin
    // In base alla proprietà Tag della form viene individuata la form chiamante
@@ -788,6 +797,12 @@ begin
   else
     if not AViewInfo.EditViewInfo.IsSelected then
       ACanvas.Brush.Color := clWhite;
+end;
+
+procedure TTecniciForm.tvListCustomDrawColumnHeader(Sender: TcxGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridColumnHeaderViewInfo; var ADone: Boolean);
+begin
+   // Richiama la gestione predefinita dell'evento
+   DM1.QGridCustomDrawColumnHeader(Sender, ACanvas, AViewInfo, ADone);
 end;
 
 procedure TTecniciForm.tvListCustomDrawGroupCell(

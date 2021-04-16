@@ -43,6 +43,7 @@ type
     procedure RxSpeedButtonNuovoClick(Sender: TObject);
     procedure tvListABILITATOGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
     procedure tvListCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
+    procedure tvListDataControllerSortingChanged(Sender: TObject);
   private
     fLivello: Byte;
     procedure SetLivello(const Value: Byte);
@@ -58,7 +59,7 @@ var
 
 implementation
 
-uses IniFiles;
+uses IniFiles, dxCore;
 
 {$R *.dfm}
 
@@ -104,6 +105,13 @@ begin
   else
     if not AViewInfo.EditViewInfo.IsSelected then
       ACanvas.Brush.Color := clWhite;
+end;
+
+procedure TTipiRighiForm.tvListDataControllerSortingChanged(Sender: TObject);
+begin
+  inherited;
+  tvListABILITATO.SortOrder := TdxSortOrder.soDescending;
+  tvListABILITATO.SortIndex := 0;
 end;
 
 procedure TTipiRighiForm.QBeforePost(DataSet: TDataSet);

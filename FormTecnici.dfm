@@ -1150,7 +1150,7 @@ object TecniciForm: TTecniciForm
     end
     object GridList: TcxGrid
       Left = 0
-      Top = 604
+      Top = 606
       Width = 686
       Height = 58
       TabOrder = 5
@@ -2353,9 +2353,9 @@ object TecniciForm: TTecniciForm
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
         DataController.Summary.SummaryGroups = <>
+        DataController.OnSortingChanged = tvListDataControllerSortingChanged
         OptionsCustomize.ColumnFiltering = False
         OptionsCustomize.ColumnMoving = False
-        OptionsCustomize.ColumnSorting = False
         OptionsData.DeletingConfirmation = False
         OptionsData.Editing = False
         OptionsData.Inserting = False
@@ -2368,6 +2368,7 @@ object TecniciForm: TTecniciForm
         OptionsView.GridLines = glVertical
         OptionsView.GroupByBox = False
         Styles.StyleSheet = DM1.MasterTableViewStyleSheet
+        OnCustomDrawColumnHeader = tvListCustomDrawColumnHeader
         OnCustomDrawGroupCell = tvListCustomDrawGroupCell
         object tvListABILITATO: TcxGridDBColumn
           DataBinding.FieldName = 'ABILITATO'
