@@ -12491,7 +12491,8 @@ begin
     SKeyData[MOD_GIORNALE_CANTIERE] := '0';
   end;
   // Inizializza anche il codice utente che altrimenti rimane non assegnato
-  CodiceUtente := '-1';
+  if CodiceUtente = '' then
+    CodiceUtente := '-1';
   // Nel caso di modalità LEVARCO provvede ad informare l'utente se mancano
   // meno di 30 giorni alla scadenza assoluta
   if LEVARCO_MODE then
@@ -12574,8 +12575,8 @@ begin
       // Esce dal programma
       Application.Terminate;
     end;
-    // Se è in modalità LEVARCO c'è solo la LEVARCO_ABSOLUTE_LOCK_DATE
   end
+  // Se è in modalità LEVARCO c'è solo la LEVARCO_ABSOLUTE_LOCK_DATE
   else if LEVARCO_MODE then
   begin
     // NB: IL controllo se la data attuale ha superato il limite è già

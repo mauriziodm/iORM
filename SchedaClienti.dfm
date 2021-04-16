@@ -365,7 +365,7 @@ object ClientiForm: TClientiForm
         Top = 0
         Width = 793
         Height = 581
-        ActivePage = TabMagazzino
+        ActivePage = TabArticoli
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
