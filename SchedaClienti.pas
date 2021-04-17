@@ -2848,6 +2848,8 @@ type
     FilterImpRDA: TEdit;
     QryScadRITARDOPAG: TIntegerField;
     tvScadRITARDOPAG: TcxGridDBColumn;
+    QryGMDESCRIZIONESCHEDA: TStringField;
+    tvGMDESCRIZIONESCHEDA: TcxGridDBColumn;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedButtonEliminaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -4997,7 +4999,7 @@ begin
   QryGM.SQL.Add
     (' COALESCE(R.ScontoRigo,0) AS SCONTORIGO,COALESCE(R.ScontoRigo2,0) AS SCONTORIGO2,COALESCE(R.ScontoRigo3,0) AS SCONTORIGO3,COALESCE(R.ImportoRigo,0) AS IMPORTORIGO, T.StatoDescrizione,');
   QryGM.SQL.Add(' COALESCE(R.PrezzoAcquistoArticolo,0) AS PrezzoAcquistoArticolo, COALESCE(R.ImportoCosto,0) AS ImportoCosto, COALESCE(R.Margine,0) AS Margine, COALESCE(R.ImportoMargine,0) AS ImportoMargine,');
-  QryGM.SQL.Add(' A.CodiceFornitore, A.CodiciAggiuntivi,');
+  QryGM.SQL.Add(' A.CodiceFornitore, A.CodiciAggiuntivi, A.Descrizione as DescrizioneScheda,');
   QryGM.SQL.Add
     (' CAST(T.TipoDocumento || '' '' || T.NumOrdPrev || T.Registro || '' del '' || T.DataDocumento || CASE WHEN (TRIM(COALESCE(I.RDA,''''))<>'''') THEN ('' (RDA ''||TRIM(I.RDA)||'')'') ELSE '''' END AS VARCHAR(100)) AS DOCUMENTO,');
   QryGM.SQL.Add(' CAST(T.RagSocCli || ''  ('' || T.CodiceCliente || '')'' AS VARCHAR(100) CHARACTER SET NONE) AS SOGGETTO,');

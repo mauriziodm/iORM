@@ -365,7 +365,7 @@ object ClientiForm: TClientiForm
         Top = 0
         Width = 793
         Height = 581
-        ActivePage = TabScadenze
+        ActivePage = TabMagazzino
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -10977,6 +10977,14 @@ object ClientiForm: TClientiForm
                       Visible = False
                       HeaderAlignmentHorz = taCenter
                       Width = 250
+                    end
+                    object tvGMDESCRIZIONESCHEDA: TcxGridDBColumn
+                      Caption = 'Descrizione (scheda)'
+                      DataBinding.FieldName = 'DESCRIZIONESCHEDA'
+                      PropertiesClassName = 'TcxTextEditProperties'
+                      Visible = False
+                      HeaderAlignmentHorz = taCenter
+                      Width = 180
                     end
                   end
                   object lvGM: TcxGridLevel
@@ -30425,6 +30433,10 @@ object ClientiForm: TClientiForm
     object QryGMCODICIAGGIUNTIVI: TStringField
       FieldName = 'CODICIAGGIUNTIVI'
       Size = 200
+    end
+    object QryGMDESCRIZIONESCHEDA: TStringField
+      FieldName = 'DESCRIZIONESCHEDA'
+      Size = 255
     end
   end
   object SourcGM: TDataSource
