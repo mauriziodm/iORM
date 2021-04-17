@@ -2031,7 +2031,8 @@ end;
 procedure TTabImpiantiForm.CustomDraw_GetCellBackgroundColor(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo);
 begin
   // Se la riga è espansa la visualizza con il colore di sfondo opportuno
-  if AviewInfo.GridRecord.Expanded then begin
+  if AviewInfo.GridRecord.Expanded then
+  begin
     ACanvas.Brush.Color := lvAssistenze.Styles.TabsBackground.Color;
     Exit;
   end;
@@ -2041,9 +2042,18 @@ begin
     ACanvas.Brush.Color := btvAssistenze.Styles.FilterRowInfoText.Color;
     Exit;
   end;
+  // Se è già stato preso un appuntamento ma la data attuale è successiva all'appuntamento stesso
+  //  e l'intervento non è stato eseguito...
+  if (not VarIsNull(AViewInfo.GridRecord.Values[btvAssistenzeDATAORAPROSSIMOAPPUNTAMENTO.Index]))
+  and (AViewInfo.GridRecord.Values[btvAssistenzeDATAORAPROSSIMOAPPUNTAMENTO.Index] < Date)
+  and not AViewInfo.Selected then
+  begin
+    ACanvas.Brush.Color := $00C1BFFF;
+    Exit;
+  end;
   // Se è un impianto dismesso lo sfondo è più scuro
-  if (AViewInfo.GridRecord.DisplayTexts[btvAssistenzeCOMPUTED_STATO.Index] = 'Dismesso') and (not AviewInfo.Selected)
-  then ACanvas.Brush.Color := $00BFBFBF;
+  if (AViewInfo.GridRecord.DisplayTexts[btvAssistenzeCOMPUTED_STATO.Index] = 'Dismesso') and (not AviewInfo.Selected) then
+    ACanvas.Brush.Color := $00BFBFBF;
 end;
 
 // Funzione che ritorna il Font (Anche il colore) della cella da disegnare

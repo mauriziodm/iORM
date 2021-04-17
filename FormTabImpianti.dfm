@@ -2702,6 +2702,8 @@ inherited TabImpiantiForm: TTabImpiantiForm
             Height = 169
             BevelOuter = bvNone
             Color = clWhite
+            Enabled = False
+            ParentBackground = False
             TabOrder = 0
             object Label47: TLabel
               Left = 611
@@ -5414,7 +5416,7 @@ inherited TabImpiantiForm: TTabImpiantiForm
       PrinterPage.ScaleFactor = 80
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44300.683092233800000000
+      ReportDocument.CreationDate = 44303.860660034720000000
       ReportDocument.Creator = 'Mauri Fly'
       ReportTitle.Font.Charset = ANSI_CHARSET
       ReportTitle.Font.Color = clWindowText
