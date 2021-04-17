@@ -2702,7 +2702,6 @@ inherited TabImpiantiForm: TTabImpiantiForm
             Height = 169
             BevelOuter = bvNone
             Color = clWhite
-            Enabled = False
             ParentBackground = False
             TabOrder = 0
             object Label47: TLabel

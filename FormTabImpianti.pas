@@ -768,9 +768,10 @@ end;
 procedure TTabImpiantiForm.SBAssFilterOpenCloseClick(Sender: TObject);
 begin
   inherited;
-  if PanelAssFiltri.Tag = 1
-  then CloseFilterPanel(PanelAssFiltri, SBAssFilterOpenClose)
-  else OpenFilterPanel(PanelAssFiltri, SBAssFilterOpenClose);
+  if PanelAssFiltri.Tag = 1 then
+    CloseFilterPanel(PanelAssFiltri, SBAssFilterOpenClose)
+  else
+    OpenFilterPanel(PanelAssFiltri, SBAssFilterOpenClose);
 end;
 
 
