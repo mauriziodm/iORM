@@ -2846,6 +2846,8 @@ type
     tvImpegniRDA: TcxGridDBColumn;
     StaticText50: TStaticText;
     FilterImpRDA: TEdit;
+    QryScadRITARDOPAG: TIntegerField;
+    tvScadRITARDOPAG: TcxGridDBColumn;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedButtonEliminaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -3475,6 +3477,7 @@ type
     procedure SBFilterRowGOSspeseClick(Sender: TObject);
     procedure Fatturachiamateappuntamentiinterventiselezionati2Click(Sender: TObject);
     procedure RxSpeedButtonFaxClick(Sender: TObject);
+    procedure tvScadRITARDOPAGCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
 
   private
     // Mantiene il collegamento alla WindowsProcedure originale della
@@ -20059,6 +20062,17 @@ begin
   QryScadANNO.Value := DateUtils.YearOf(QryScadDATASCADENZA.AsDateTime);
   QryScadSEMESTRE.AsString := DM2.DateTimeToSemestre(QryScadDATASCADENZA.AsDateTime);
   QryScadTRIMESTRE.AsString := DM2.DateTimeToTrimestre(QryScadDATASCADENZA.AsDateTime);
+
+  // Calcolo del campo che indica i giorni di eventuale ritardo di pagamento rispetto alla scadenza naturale
+  if (not QryScadDATAPAGAMENTO.IsNull) and (QryScadDATAPAGAMENTO.AsDateTime > QryScadDATASCADENZA.AsDateTime) then
+    QryScadRITARDOPAG.Value := Trunc(QryScadDATAPAGAMENTO.AsDateTime - QryScadDATASCADENZA.AsDateTime)
+  else
+  // Se la scadenza non è stata ancora pagata e la data odierna è superiore alla scadenza visualizza
+  //  il ritardo attuale ad oggi (non quello dell'effettivo pagamento che non è ancora avvenuto)
+  if QryScadDATAPAGAMENTO.IsNull and (Date > QryScadDATASCADENZA.AsDateTime) then
+    QryScadRITARDOPAG.Value :=Trunc(Date - QryScadDATASCADENZA.AsDateTime)
+  else
+    QryScadRITARDOPAG.Clear;
 end;
 
 procedure TClientiForm.QrySoggettiBeforeDelete(DataSet: TDataSet);
@@ -22623,6 +22637,12 @@ procedure TClientiForm.tvScadRITACCPERCGetDisplayText(Sender: TcxCustomGridTable
 begin
   if Trim(AText) <> '' then
     AText := AText + '%';
+end;
+
+procedure TClientiForm.tvScadRITARDOPAGCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo;
+  var ADone: Boolean);
+begin
+  ACanvas.Font.Style := [fsBold];
 end;
 
 procedure TClientiForm.SpeedButton30Click(Sender: TObject);

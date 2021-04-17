@@ -365,7 +365,7 @@ object ClientiForm: TClientiForm
         Top = 0
         Width = 793
         Height = 581
-        ActivePage = TabImpegni
+        ActivePage = TabScadenze
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -16227,6 +16227,17 @@ object ClientiForm: TClientiForm
                       HeaderAlignmentHorz = taCenter
                       Width = 35
                     end
+                    object tvScadRITARDOPAG: TcxGridDBColumn
+                      AlternateCaption = 'Giorni di ritardo pagamento'
+                      Caption = 'Ritardo GG'
+                      DataBinding.FieldName = 'RITARDOPAG'
+                      PropertiesClassName = 'TcxTextEditProperties'
+                      Properties.Alignment.Horz = taCenter
+                      Visible = False
+                      OnCustomDrawCell = tvScadRITARDOPAGCustomDrawCell
+                      HeaderAlignmentHorz = taCenter
+                      Width = 80
+                    end
                   end
                   object lvScad: TcxGridLevel
                     GridView = tvScad
@@ -21684,8 +21695,6 @@ object ClientiForm: TClientiForm
                   LookAndFeel.NativeStyle = False
                   RootLevelOptions.DetailFrameColor = clBlack
                   RootLevelOptions.DetailFrameWidth = 1
-                  ExplicitLeft = -238
-                  ExplicitTop = -169
                   object tvImpegni: TcxGridDBTableView
                     DragMode = dmAutomatic
                     OnDblClick = tvRubricaDblClick
@@ -31612,6 +31621,11 @@ object ClientiForm: TClientiForm
     object QryScadID: TIntegerField
       FieldName = 'ID'
     end
+    object QryScadRITARDOPAG: TIntegerField
+      FieldKind = fkCalculated
+      FieldName = 'RITARDOPAG'
+      Calculated = True
+    end
   end
   object SourceScad: TDataSource
     AutoEdit = False
@@ -32006,7 +32020,7 @@ object ClientiForm: TClientiForm
       PrinterPage.PageSize.Y = 297000
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44302.529757291670000000
+      ReportDocument.CreationDate = 44303.695562662040000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. giornale di magazzino'
       OptionsFormatting.SuppressContentColoration = True
@@ -32446,7 +32460,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Levante - Agenda'
-      ReportDocument.CreationDate = 44302.529757581020000000
+      ReportDocument.CreationDate = 44303.695562847220000000
       OptionsFormatting.UseNativeStyles = True
       PrintRange.TimePrintFrom = 0.291666666666666700
       PrintRange.TimePrintTo = 0.875000000000000000
@@ -32509,7 +32523,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Statistiche ore dipendenti'
-      ReportDocument.CreationDate = 44302.529757592590000000
+      ReportDocument.CreationDate = 44303.695562847220000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Rapporto ADA dipendenti'
       OptionsFormatting.SuppressContentColoration = True
@@ -32570,7 +32584,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Rapporto ADA spese varie'
-      ReportDocument.CreationDate = 44302.529757604170000000
+      ReportDocument.CreationDate = 44303.695562847220000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Rapporto ADA spese'
       OptionsFormatting.SuppressContentColoration = True
@@ -32646,7 +32660,7 @@ object ClientiForm: TClientiForm
       PrinterPage.PageSize.Y = 297000
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
-      ReportDocument.CreationDate = 44302.529757615740000000
+      ReportDocument.CreationDate = 44303.695562847220000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. documenti'
       OptionsFormatting.SuppressContentColoration = True
@@ -32675,7 +32689,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'ADA scadenze '
-      ReportDocument.CreationDate = 44302.529757615740000000
+      ReportDocument.CreationDate = 44303.695563032410000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'A.D.A. scadenze'
       OptionsFormatting.SuppressContentColoration = True
@@ -32705,7 +32719,7 @@ object ClientiForm: TClientiForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Elenco documenti'
-      ReportDocument.CreationDate = 44302.529757685190000000
+      ReportDocument.CreationDate = 44303.695563032410000000
       ReportTitle.Mode = tmNone
       ReportTitle.Text = 'Elenco documenti'
       TimeFormat = 0
