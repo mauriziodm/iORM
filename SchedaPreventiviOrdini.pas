@@ -1443,6 +1443,8 @@ type
     AggiornairicarichiperfascedicostoTUTTIIRIGHI1: TMenuItem;
     AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1: TMenuItem;
     AggiornairicarichiperfascedicostoCOLORIGHISELEZIONATI2: TMenuItem;
+    dbeFETipoDocumento: TDBText;
+    QryDocumentoFE_TIPODOCUMENTO: TStringField;
     procedure RxSpeedButtonUscitaClick(Sender: TObject);
     procedure RxSpeedModificaClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -1814,6 +1816,7 @@ type
     procedure Nascondiscontopercentuale1Click(Sender: TObject);
     procedure AggiornairicarichiperfascedicostoTUTTIIRIGHI1Click(Sender: TObject);
     procedure AggiornairicarichiperfascedicostoSOLORIGHISELEZIONATI1Click(Sender: TObject);
+    procedure QryDocumentoFE_TIPODOCUMENTOGetText(Sender: TField; var Text: string; DisplayText: Boolean);
   private
     { Private declarations }
     fFirstCaricaLayoutDocumento: Boolean;
@@ -14664,6 +14667,8 @@ begin
   finally
     Qry.Close;
     Qry.Free;
+    dbeFETipoDocumento.DataField := '';
+    dbeFETipoDocumento.DataField := 'FE_TIPODOCUMENTO';
   end;
 end;
 
@@ -14869,6 +14874,21 @@ begin
         ' al ' + DateToStr(DM1.DemoFlags.DataScadenza) + '.');
     end;
   end;
+end;
+
+procedure TPreventiviOrdiniForm.QryDocumentoFE_TIPODOCUMENTOGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+begin
+  if (QryDocumentoTIPODOCUMENTO.AsString = 'Fattura') or (QryDocumentoTIPODOCUMENTO.AsString = 'Nota_accre') then
+    Text := Sender.AsString
+  else
+    Text := '';
+  if not Text.IsEmpty then
+    Exit;
+  if QryDocumentoTIPODOCUMENTO.AsString = 'Fattura' then
+    Text := 'TD01'
+  else
+  if QryDocumentoTIPODOCUMENTO.AsString = 'Nota_accre' then
+    Text := 'TD04';
 end;
 
 procedure TPreventiviOrdiniForm.QryDocumentoBeforePost(DataSet: TDataSet);

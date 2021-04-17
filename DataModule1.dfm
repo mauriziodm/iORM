@@ -2436,6 +2436,7 @@ object DM1: TDM1
     SavedPassword = '.JuMbLe.01.5A22462E0E2D'
   end
   object DBGenerale: TIBODatabase
+    AliasName = 'FE_TIPODOCUMENTO'
     CacheStatementHandles = False
     LoginPrompt = True
     SQLDialect = 1
@@ -5430,5 +5431,30 @@ object DM1: TDM1
   object ZLB1: TZLBArchive
     Left = 24
     Top = 8
+  end
+  object TableCausaliLookup: TIBOTable
+    BufferSynchroFlags = [bsBeforeEdit, bsAfterEdit, bsAfterInsert]
+    IB_Connection = DBAzienda
+    PessimisticLocking = True
+    RecordCountAccurate = True
+    TableName = 'CAUSALI'
+    Left = 251
+    Top = 64
+    object TableCausaliLookupDESCRIZIONE: TStringField
+      FieldName = 'DESCRIZIONE'
+      Required = True
+      Size = 40
+    end
+    object TableCausaliLookupPA_TIPODOCUMENTO: TStringField
+      FieldName = 'PA_TIPODOCUMENTO'
+      FixedChar = True
+      Size = 4
+    end
+  end
+  object SourceCausaliLookup: TDataSource
+    AutoEdit = False
+    DataSet = TableCausaliLookup
+    Left = 280
+    Top = 64
   end
 end

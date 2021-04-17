@@ -1222,6 +1222,10 @@ type
     TableProgressivi2PRM_AUTOCLOSE_SOLOMANUT: TStringField;
     TableProgressivi2PRM_AUTOCLOSE_FATTURA: TStringField;
     TableProgressivi2PRM_AUTOCLOSE_SCAD: TStringField;
+    TableCausaliLookup: TIBOTable;
+    SourceCausaliLookup: TDataSource;
+    TableCausaliLookupPA_TIPODOCUMENTO: TStringField;
+    TableCausaliLookupDESCRIZIONE: TStringField;
     procedure CaricaNuovoListinoPrePost(Sender: TObject; var ATable: TIBOTable; var OkToPost: Boolean); // Personale
     procedure AttivaTabelle(ApriSoloPercorsiAziende, NuovaAzienda: Boolean); // Personale
     procedure InizializzaArchiviVari;
@@ -18768,6 +18772,7 @@ begin
       ApriTabella(TablePratiche, ModoRistrutturazioneArchivi);
       ApriTabella(TableTesti, ModoRistrutturazioneArchivi);
       ApriTabella(TableConformita, ModoRistrutturazioneArchivi);
+      ApriTabella(TableCausaliLookup, False);  // La ristrutturazione avviene già altrove
       ApriTabella(DM2.TableLookupPA_RegimeFiscale, ModoRistrutturazioneArchivi);
       ApriTabella(DM2.TableLookupPA_SocioUnico, ModoRistrutturazioneArchivi);
       ApriTabella(DM2.TableLookupPA_StatoLiquidazione, ModoRistrutturazioneArchivi);
