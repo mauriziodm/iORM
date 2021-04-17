@@ -2436,7 +2436,10 @@ begin
   //  per la succesisva stampa
   //  NB: Mentre stampa la relazione disabilita il controllo se si tratta di un rigo di manodopera
   //       perchè potrebbe dare fastidio
-  if PreventiviOrdiniForm.IsImpegno and (ImpegnoForm <> nil) and (Trim(ImpegnoForm.QryImpRELAZIONEINTERVENTO.AsString) <> '') and not FRelazioneInterventoStampata then
+  //  NB: Oltre alla relazione di intervento stampa anche un riferimento al RifDoc se presente
+  if PreventiviOrdiniForm.IsImpegno and (ImpegnoForm <> nil)
+  and ((Trim(ImpegnoForm.QryImpRELAZIONEINTERVENTO.AsString) <> '') or (PreventiviOrdiniForm.QryDocumentoRIFDOC_NUM.AsInteger > 0))
+  and not FRelazioneInterventoStampata then
   begin
     FRelazioneInterventoDaStampare := True
   end
@@ -2521,7 +2524,18 @@ begin
        // Se stiamo stampando la relazione di un intervento allora carica questa, altrimenti
        //  carica il rigo normale
        if FRelazioneInterventoDaStampare and not FRelazioneInterventoStampata then
-         PreventiviOrdiniForm.RE.Text := ImpegnoForm.QryImpRELAZIONEINTERVENTO.AsString
+       begin
+         PreventiviOrdiniForm.RE.Text := ImpegnoForm.QryImpRELAZIONEINTERVENTO.AsString;
+         // Se c'è anche un RifDoc allora inserisce anche un riferimento a esso
+         if PreventiviOrdiniForm.QryDocumentoRIFDOC_NUM.AsInteger > 0 then
+         begin
+           var LRifDoc: String;
+           LRifDoc := Format('%s %s%s', [PreventiviOrdiniForm.QryDocumentoRIFDOC_TIPO.AsString, PreventiviOrdiniForm.QryDocumentoRIFDOC_NUM.AsString, PreventiviOrdiniForm.QryDocumentoRIFDOC_REG.AsString]);
+           if not PreventiviOrdiniForm.QryDocumentoRIFDOC_DATA.IsNull then
+             LRifDoc := Format('%s del %s', [LRifDoc, PreventiviOrdiniForm.QryDocumentoRIFDOC_DATA.AsString]);
+           PreventiviOrdiniForm.RE.Lines.Insert(0,LRifDoc.Trim);
+         end;
+       end
        else
          PreventiviOrdiniForm.RE.Text := MDC.DisplayTexts[RI, PreventiviOrdiniForm.tvCorpoDESCRIZIONE.Index];
      end;
