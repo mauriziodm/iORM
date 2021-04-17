@@ -77,7 +77,7 @@ object PraticaForm: TPraticaForm
       ParentColor = False
       ParentFont = False
       TabOrder = 0
-      Properties.ActivePage = TabImpianto
+      Properties.ActivePage = TabApparecchi
       Properties.CustomButtons.Buttons = <>
       Properties.NavigatorPosition = npLeftBottom
       Properties.Style = 9

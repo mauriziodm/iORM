@@ -576,8 +576,10 @@ inherited TagResOrdForm: TTagResOrdForm
         OptionsCustomize.ColumnHorzSizing = False
         OptionsCustomize.ColumnMoving = False
         OptionsCustomize.ColumnSorting = False
+        OptionsCustomize.ColumnsQuickCustomization = True
         OptionsCustomize.BandMoving = False
         OptionsCustomize.BandSizing = False
+        OptionsCustomize.BandsQuickCustomization = True
         OptionsCustomize.ColumnVertSizing = False
         OptionsCustomize.NestedBands = False
         OptionsData.Deleting = False
@@ -615,7 +617,6 @@ inherited TagResOrdForm: TTagResOrdForm
           item
             Caption = 'Importi'
             Visible = False
-            VisibleForCustomization = False
           end
           item
             Caption = 'Altro'
@@ -641,6 +642,7 @@ inherited TagResOrdForm: TTagResOrdForm
           Properties.Alignment.Horz = taCenter
           Visible = False
           OnGetDisplayText = btvResOrdNUMDOCGetDisplayText
+          BestFitMaxWidth = 80
           HeaderAlignmentHorz = taCenter
           VisibleForCustomization = False
           Width = 80
@@ -654,6 +656,7 @@ inherited TagResOrdForm: TTagResOrdForm
           PropertiesClassName = 'TcxTextEditProperties'
           Properties.Alignment.Horz = taCenter
           Visible = False
+          BestFitMaxWidth = 80
           HeaderAlignmentHorz = taCenter
           VisibleForCustomization = False
           Width = 80
@@ -685,6 +688,7 @@ inherited TagResOrdForm: TTagResOrdForm
           DataBinding.FieldName = 'UM'
           PropertiesClassName = 'TcxTextEditProperties'
           Properties.Alignment.Horz = taCenter
+          BestFitMaxWidth = 20
           HeaderAlignmentHorz = taCenter
           Width = 20
           Position.BandIndex = 0
@@ -697,6 +701,7 @@ inherited TagResOrdForm: TTagResOrdForm
           PropertiesClassName = 'TcxTextEditProperties'
           Properties.Alignment.Horz = taCenter
           OnGetDisplayText = btvResOrdQTAGetDisplayText
+          BestFitMaxWidth = 30
           HeaderAlignmentHorz = taCenter
           Width = 30
           Position.BandIndex = 1
@@ -709,6 +714,7 @@ inherited TagResOrdForm: TTagResOrdForm
           PropertiesClassName = 'TcxTextEditProperties'
           Properties.Alignment.Horz = taCenter
           OnGetDisplayText = btvResOrdQTAGetDisplayText
+          BestFitMaxWidth = 30
           HeaderAlignmentHorz = taCenter
           Width = 30
           Position.BandIndex = 1
@@ -722,6 +728,7 @@ inherited TagResOrdForm: TTagResOrdForm
           Properties.Alignment.Horz = taCenter
           OnCustomDrawCell = btvResOrdRESIDUOCustomDrawCell
           OnGetDisplayText = btvResOrdQTAGetDisplayText
+          BestFitMaxWidth = 30
           HeaderAlignmentHorz = taCenter
           Width = 30
           Position.BandIndex = 1
@@ -734,6 +741,7 @@ inherited TagResOrdForm: TTagResOrdForm
           PropertiesClassName = 'TcxTextEditProperties'
           Properties.Alignment.Horz = taCenter
           OnGetDisplayText = btvResOrdQTAGetDisplayText
+          BestFitMaxWidth = 30
           HeaderAlignmentHorz = taCenter
           Width = 30
           Position.BandIndex = 1
@@ -741,51 +749,63 @@ inherited TagResOrdForm: TTagResOrdForm
           Position.RowIndex = 0
         end
         object btvResOrdPREZZUUNITARIO: TcxGridDBBandedColumn
+          AlternateCaption = 'Prezzo unitario'
+          Caption = 'Prz.unit.'
           DataBinding.FieldName = 'PREZZUUNITARIO'
-          PropertiesClassName = 'TcxTextEditProperties'
-          Visible = False
+          RepositoryItem = DM1.EdPropImportoMicroPrz
+          OnGetDisplayText = btvResOrdQTAGetDisplayText
           HeaderAlignmentHorz = taCenter
-          VisibleForCustomization = False
+          Width = 70
           Position.BandIndex = 2
           Position.ColIndex = 0
           Position.RowIndex = 0
         end
         object btvResOrdSCONTORIGO1: TcxGridDBBandedColumn
+          AlternateCaption = 'Sconto 1'
+          Caption = 'S1'
           DataBinding.FieldName = 'SCONTORIGO1'
           PropertiesClassName = 'TcxTextEditProperties'
-          Visible = False
+          RepositoryItem = DM1.EdPropQta
+          OnGetDisplayText = btvResOrdQTAGetDisplayText
           HeaderAlignmentHorz = taCenter
-          VisibleForCustomization = False
+          Width = 30
           Position.BandIndex = 2
           Position.ColIndex = 1
           Position.RowIndex = 0
         end
         object btvResOrdSCONTORIGO2: TcxGridDBBandedColumn
+          AlternateCaption = 'Sconto 2'
+          Caption = 'S2'
           DataBinding.FieldName = 'SCONTORIGO2'
           PropertiesClassName = 'TcxTextEditProperties'
-          Visible = False
+          RepositoryItem = DM1.EdPropQta
+          OnGetDisplayText = btvResOrdQTAGetDisplayText
           HeaderAlignmentHorz = taCenter
-          VisibleForCustomization = False
+          Width = 30
           Position.BandIndex = 2
           Position.ColIndex = 2
           Position.RowIndex = 0
         end
         object btvResOrdSCONTORIGO3: TcxGridDBBandedColumn
+          AlternateCaption = 'Sconto 3'
+          Caption = 'S3'
           DataBinding.FieldName = 'SCONTORIGO3'
           PropertiesClassName = 'TcxTextEditProperties'
-          Visible = False
+          RepositoryItem = DM1.EdPropQta
+          OnGetDisplayText = btvResOrdQTAGetDisplayText
           HeaderAlignmentHorz = taCenter
-          VisibleForCustomization = False
+          Width = 30
           Position.BandIndex = 2
           Position.ColIndex = 3
           Position.RowIndex = 0
         end
         object btvResOrdIMPORTORIGO: TcxGridDBBandedColumn
+          Caption = 'Importo'
           DataBinding.FieldName = 'IMPORTORIGO'
-          PropertiesClassName = 'TcxTextEditProperties'
-          Visible = False
+          RepositoryItem = DM1.EdPropImportoMicroPrz
+          OnGetDisplayText = btvResOrdQTAGetDisplayText
           HeaderAlignmentHorz = taCenter
-          VisibleForCustomization = False
+          Width = 80
           Position.BandIndex = 2
           Position.ColIndex = 4
           Position.RowIndex = 0
@@ -1556,7 +1576,7 @@ inherited TagResOrdForm: TTagResOrdForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Giornale di Cantiere'
-      ReportDocument.CreationDate = 44263.738936388890000000
+      ReportDocument.CreationDate = 44303.723407268520000000
       ReportTitle.Font.Charset = ANSI_CHARSET
       ReportTitle.Font.Color = clBlack
       ReportTitle.Font.Height = -13
@@ -1589,11 +1609,23 @@ inherited TagResOrdForm: TTagResOrdForm
     end
   end
   object PopupMenu1: TPopupMenu
+    OnPopup = PopupMenu1Popup
     Left = 377
     Top = 216
     object Scaricalultimoaggiornamentodelresiduoordini1: TMenuItem
       Caption = 'Scarica l'#39'ultimo aggiornamento del residuo ordini'
       OnClick = Scaricalultimoaggiornamentodelresiduoordini1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Selezionavista1: TMenuItem
+      Caption = 'Seleziona vista'
+      OnClick = Selezionavista1Click
+    end
+    object Salvaimpostazionicolonne1: TMenuItem
+      Caption = 'Salva la vista attuale'
+      OnClick = Salvaimpostazionicolonne1Click
     end
   end
 end

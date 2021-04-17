@@ -150,6 +150,9 @@ type
     GridResOrdLink: TdxGridReportLink;
     PopupMenu1: TPopupMenu;
     Scaricalultimoaggiornamentodelresiduoordini1: TMenuItem;
+    N1: TMenuItem;
+    Selezionavista1: TMenuItem;
+    Salvaimpostazionicolonne1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure SBFilterOpenCloseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -201,6 +204,9 @@ type
       var ADefaultDrawText, ADefaultDrawBackground: Boolean);
     procedure Scaricalultimoaggiornamentodelresiduoordini1Click(
       Sender: TObject);
+    procedure PopupMenu1Popup(Sender: TObject);
+    procedure Selezionavista1Click(Sender: TObject);
+    procedure Salvaimpostazionicolonne1Click(Sender: TObject);
   private
     fDataOraResOrdVisualizzato: TDateTime;
     procedure DownloadFileResOrd;
@@ -415,6 +421,10 @@ begin
     if CdsResOrd.Active   then CdsResOrd.Close;
     if CdsDocDisp.Active  then CdsDocDisp.Close;
   end;
+
+  // Caricamento delle impostazioni di visualizzazione delle griglie
+  if not MainForm.IsLevanteLight then
+    DM1.RipristinaDevExpress(GridResOrd, '', False);
 
   // Se i Dataset sono chiusi provvede a scaricare dal database il residuo ordini
   // e a visualizzarlo.
@@ -645,6 +655,63 @@ begin
   ClientiForm.CalcolaLeftFiltriSubPanel(Sender as TPanel);
 end;
 
+procedure TTagResOrdForm.PopupMenu1Popup(Sender: TObject);
+var
+  CurrMenuItem: TMenuItem;
+  I: Integer;
+  ListaViste: TStrings;
+begin
+  inherited;
+  // Rende visibili le voci corrispondenti alle viste
+  Selezionavista1.Visible := (not MainForm.IsLevanteLight);
+  Salvaimpostazionicolonne1.Visible := (not MainForm.IsLevanteLight);
+  // Carica l'elenco delle viste disponibili per questa griglia
+  // in una StringList
+  ListaViste := TStringList.Create;
+  try
+    DM1.ListaVisteGriglia(GridResOrd.Name, ListaViste);
+    // Svuota l'elenco delle viste
+    Selezionavista1.Clear;
+    // Aggiunge la voce di selezione di nessuna vista
+    CurrMenuItem := TMenuItem.Create(Self);
+    CurrMenuItem.Caption := 'NESSUNA  (Avrà effetto al prossimo riavvio di Levante)';
+    CurrMenuItem.Name := 'NessunaVista';
+    CurrMenuItem.OnClick := Selezionavista1Click;
+    Selezionavista1.Add(CurrMenuItem);
+    // Aggiunge le altre eventuali viste presenti
+    for I := 0 to ListaViste.Count - 1 do
+    begin
+      CurrMenuItem := TMenuItem.Create(Self);
+      CurrMenuItem.Caption := ListaViste.Strings[I];
+      CurrMenuItem.OnClick := Selezionavista1Click;
+      Selezionavista1.Add(CurrMenuItem);
+    end;
+  finally
+    ListaViste.Free;
+  end;
+end;
+
+procedure TTagResOrdForm.Salvaimpostazionicolonne1Click(Sender: TObject);
+var
+  Vista: String;
+  CurrGrid: TcxControl;
+begin
+  // Chiede il nome della vista
+  if InputQuery('Salvataggio vista', 'Con quale nome devo salvare la vista?', Vista) then
+  begin
+    // Controlla che la vista non sia nullo
+    if Trim(Vista) = '' then
+      raise Exception.Create('Il nome della vista non può essere vuoto.');
+  end
+  else
+  begin
+    // Se l'utente ha cliccato su Cancel annulla l'operazione
+    Exit;
+  end;
+  // Salva la vista attuale
+  DM1.SalvaGriglieDevExpress(GridResOrd, Vista, False);
+end;
+
 procedure TTagResOrdForm.SBCollapseGroupsClick(Sender: TObject);
 begin
   inherited;
@@ -732,7 +799,13 @@ procedure TTagResOrdForm.btvResOrdQTAGetDisplayText(
   var AText: String);
 begin
   inherited;
-  if AText = '0' then AText := '';
+//  if AText = '0' then AText := '';
+  try
+    if AText.ToDouble = 0 then
+      AText := '';
+  except
+
+  end;
 end;
 
 procedure TTagResOrdForm.btvResOrdRESIDUOCustomDrawCell(
@@ -1274,6 +1347,22 @@ begin
   LabelResOrd.Caption := ' Residuo ordini del ' + FormatDateTime('dd/mm/yyyy', DataUltimoResOrd);
 end;
 
+
+procedure TTagResOrdForm.Selezionavista1Click(Sender: TObject);
+var
+  CurrItemCaption: String;
+begin
+  // Caption della voce selezionata
+  CurrItemCaption := (Sender as TMenuItem).Caption;
+  // Se la Caption della voce selezionata contiene il carattere & (incasina tutto)
+  // lo toglie.
+  CurrItemCaption := StringReplace(CurrItemCaption, '&', '', [rfReplaceAll]);
+  // Se la voce attuale è la radice del menu di selezione viste esce subito
+  if (Sender as TMenuItem).Name = 'Selezionavista1' then
+    Exit;
+  // Carica la vista attuale
+  DM1.RipristinaDevExpress(GridResOrd, CurrItemCaption, False);
+end;
 
 end.
 
