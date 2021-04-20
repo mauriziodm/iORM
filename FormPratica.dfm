@@ -77,7 +77,7 @@ object PraticaForm: TPraticaForm
       ParentColor = False
       ParentFont = False
       TabOrder = 0
-      Properties.ActivePage = TabImpianto
+      Properties.ActivePage = TabPratica
       Properties.CustomButtons.Buttons = <>
       Properties.NavigatorPosition = npLeftBottom
       Properties.Style = 9
@@ -11458,7 +11458,7 @@ object PraticaForm: TPraticaForm
             ParentBackground = False
             ParentColor = False
             TabOrder = 1
-            Properties.ActivePage = TabTermo_GeneratoreDiCalore
+            Properties.ActivePage = TabClima_UnitaEsterna
             Properties.CustomButtons.Buttons = <>
             Properties.NavigatorPosition = npLeftTop
             Properties.ShowFrame = True
@@ -30528,9 +30528,6 @@ object PraticaForm: TPraticaForm
       object TabMappa: TcxTabSheet
         Caption = 'Mappa'
         ImageIndex = 5
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabParametri: TcxTabSheet
         Caption = 'Parametri'

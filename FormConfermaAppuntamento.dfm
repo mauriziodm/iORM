@@ -14,7 +14,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
   OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
-  OnShow = FormShow
   DesignSize = (
     794
     475)
@@ -66,6 +65,7 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
     RootLevelOptions.DetailFrameColor = clBlack
     object btvAll: TcxGridBandedTableView
       Navigator.Buttons.CustomButtons = <>
+      ScrollbarAnnotations.CustomAnnotations = <>
       OnCustomDrawCell = btvAllCustomDrawCell
       OnEditing = btvAllEditing
       DataController.Summary.DefaultGroupSummaryItems = <>
@@ -95,8 +95,8 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
       OptionsView.FixedBandSeparatorColor = 16762566
       Styles.Background = cxStyle1
       Styles.Content = cxStyle2
-      Styles.Selection = cxStyle5
       Styles.Header = cxStyle3
+      Styles.Selection = cxStyle5
       OnCustomDrawColumnHeader = btvAllCustomDrawColumnHeader
       Bands = <
         item
@@ -119,7 +119,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         Caption = 'Apparecchio'
         PropertiesClassName = 'TcxTextEditProperties'
         Properties.Alignment.Horz = taLeftJustify
-        Properties.Alignment.Vert = taVCenter
         HeaderAlignmentHorz = taCenter
         Options.Editing = False
         Options.Focusing = False
@@ -132,7 +131,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         Caption = 'Ubicazione'
         PropertiesClassName = 'TcxTextEditProperties'
         Properties.Alignment.Horz = taCenter
-        Properties.Alignment.Vert = taVCenter
         HeaderAlignmentHorz = taCenter
         Options.Editing = False
         Options.Focusing = False
@@ -146,7 +144,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         DataBinding.ValueType = 'Float'
         PropertiesClassName = 'TcxTextEditProperties'
         Properties.Alignment.Horz = taCenter
-        Properties.Alignment.Vert = taVCenter
         HeaderAlignmentHorz = taCenter
         Options.Editing = False
         Options.Focusing = False
@@ -159,7 +156,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         Caption = 'Allegato'
         PropertiesClassName = 'TcxTextEditProperties'
         Properties.Alignment.Horz = taLeftJustify
-        Properties.Alignment.Vert = taVCenter
         HeaderAlignmentHorz = taCenter
         Options.Editing = False
         Options.Focusing = False
@@ -173,7 +169,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         DataBinding.ValueType = 'Smallint'
         PropertiesClassName = 'TcxSpinEditProperties'
         Properties.Alignment.Horz = taCenter
-        Properties.Alignment.Vert = taVCenter
         Properties.ImmediatePost = True
         Properties.UseLeftAlignmentOnEditing = False
         HeaderAlignmentHorz = taCenter
@@ -199,7 +194,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         DataBinding.ValueType = 'Integer'
         PropertiesClassName = 'TcxTextEditProperties'
         Properties.Alignment.Horz = taCenter
-        Properties.Alignment.Vert = taVCenter
         Visible = False
         VisibleForCustomization = False
         Position.BandIndex = 0
@@ -210,7 +204,6 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
         Caption = 'BRUC_ID'
         PropertiesClassName = 'TcxTextEditProperties'
         Properties.Alignment.Horz = taCenter
-        Properties.Alignment.Vert = taVCenter
         Visible = False
         VisibleForCustomization = False
         Position.BandIndex = 0
@@ -311,10 +304,8 @@ object ConfermaAppuntamentoForm: TConfermaAppuntamentoForm
     Style.TextColor = clBlue
     Style.IsFontAssigned = True
     TabOrder = 2
-    Width = 241
   end
   object Q: TIB_Cursor
-    DatabaseName = 'c:\winproject\levantedev\prova\prova.gdb'
     IB_Connection = DM1.DBAzienda
     IB_Transaction = T
     SetParamAttribs = True

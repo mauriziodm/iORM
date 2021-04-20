@@ -9,7 +9,7 @@ uses
   cxTextEdit, cxCalendar, cxGridLevel, cxGridCustomTableView,
   cxGridTableView, cxGridBandedTableView, cxClasses, cxGridCustomView,
   cxGrid, StdCtrls, Buttons, DB, IB_Components, ImgList, cxFilter, cxData,
-  cxDataStorage, cxLookAndFeels, cxLookAndFeelPainters, cxNavigator, cxSpinEdit;
+  cxDataStorage, cxLookAndFeels, cxLookAndFeelPainters, cxNavigator, cxSpinEdit, dxDateRanges, dxScrollbarAnnotations, System.ImageList;
 
 type
   TConfermaAppuntamentoForm = class(TForm)
@@ -45,7 +45,6 @@ type
     procedure btvAllCustomDrawCell(Sender: TcxCustomGridTableView;
       ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo;
       var ADone: Boolean);
-    procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure BtnNOClick(Sender: TObject);
     procedure btvAllCustomDrawColumnHeader(Sender: TcxGridTableView;
@@ -161,12 +160,6 @@ begin
       ADone := True;
     end;
   end;
-end;
-
-procedure TConfermaAppuntamentoForm.FormShow(Sender: TObject);
-begin
-  // Beep
-  MessageBeep(MB_ICONEXCLAMATION);
 end;
 
 procedure TConfermaAppuntamentoForm.FormClose(Sender: TObject;
