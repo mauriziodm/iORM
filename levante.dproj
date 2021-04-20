@@ -744,11 +744,9 @@
         <DCCReference Include="UnitCompression.pas"/>
         <DCCReference Include="FormImpegni.pas">
             <Form>ImpegnoForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="FormFatturaImpegni.pas">
             <Form>FatturaImpegniForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <None Include="levante.todo"/>
         <None Include="ModelSupport_levante\default.txaPackage"/>

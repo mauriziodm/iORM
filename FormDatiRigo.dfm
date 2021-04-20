@@ -37,8 +37,6 @@ inherited DatiRigoForm: TDatiRigoForm
       TabOrder = 0
       Visible = False
       LayoutLookAndFeel = LeftSideForm
-      ExplicitWidth = 296
-      ExplicitHeight = 808
       object eSottocant1: TcxComboBox
         Left = 64
         Top = 354
@@ -67,7 +65,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 16
-        Width = 123
+        Width = 144
       end
       object eSottocant2: TcxComboBox
         Left = 64
@@ -91,7 +89,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 17
-        Width = 121
+        Width = 144
       end
       object eSottocant3: TcxComboBox
         Left = 64
@@ -115,7 +113,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 18
-        Width = 121
+        Width = 144
       end
       object eSottocant4: TcxComboBox
         Left = 64
@@ -139,7 +137,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 19
-        Width = 121
+        Width = 144
       end
       object eSottocant5: TcxComboBox
         Left = 64
@@ -163,7 +161,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 20
-        Width = 121
+        Width = 144
       end
       object eSottocant6: TcxComboBox
         Left = 64
@@ -187,7 +185,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 21
-        Width = 178
+        Width = 144
       end
       object eCodiceArticolo: TcxTextEdit
         Left = 3
@@ -210,7 +208,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 0
-        Width = 121
+        Width = 205
       end
       object eCostoUNitario: TcxCurrencyEdit
         Left = 64
@@ -234,7 +232,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 13
         OnEditing = eCostoUNitarioEditing
-        Width = 123
+        Width = 144
       end
       object eRicarico: TcxCurrencyEdit
         Left = 64
@@ -282,7 +280,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 15
         OnEditing = eCostoUNitarioEditing
-        Width = 83
+        Width = 90
       end
       object eSconto1: TcxCurrencyEdit
         Left = 64
@@ -328,7 +326,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 3
-        Width = 123
+        Width = 144
       end
       object eSconto2: TcxCurrencyEdit
         Left = 102
@@ -398,7 +396,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 9
-        Width = 83
+        Width = 107
       end
       object eDescrizione: TcxMemo
         Left = 3
@@ -419,7 +417,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 1
-        Width = 197
+        Width = 205
       end
       object eDescrizioneIVA: TcxButtonEdit
         Left = 64
@@ -447,7 +445,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 12
-        Width = 123
+        Width = 144
       end
       object eImportoRigoIvaComp: TcxCurrencyEdit
         Left = 64
@@ -470,7 +468,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 11
-        Width = 123
+        Width = 144
       end
       object eImportoRigo: TcxCurrencyEdit
         Left = 64
@@ -493,7 +491,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 10
-        Width = 123
+        Width = 144
       end
       object ePrzUnitIvaComp: TcxCurrencyEdit
         Left = 64
@@ -516,7 +514,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 4
-        Width = 123
+        Width = 144
       end
       object eUM: TcxTextEdit
         Left = 64
@@ -562,7 +560,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 28
-        Width = 174
+        Width = 144
       end
       object eTipo1: TcxComboBox
         Left = 64
@@ -586,7 +584,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 22
-        Width = 123
+        Width = 144
       end
       object eTipo2: TcxComboBox
         Left = 64
@@ -610,7 +608,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 23
-        Width = 123
+        Width = 144
       end
       object eTipo3: TcxComboBox
         Left = 64
@@ -634,7 +632,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 24
-        Width = 123
+        Width = 144
       end
       object eTipo4: TcxComboBox
         Left = 64
@@ -658,7 +656,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 25
-        Width = 123
+        Width = 144
       end
       object eTipo5: TcxComboBox
         Left = 64
@@ -682,7 +680,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 26
-        Width = 123
+        Width = 144
       end
       object eTipo6: TcxComboBox
         Left = 64
@@ -706,7 +704,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 27
-        Width = 123
+        Width = 144
       end
       object eIDApparecchio: TcxLookupComboBox
         Left = 3
@@ -773,7 +771,7 @@ inherited DatiRigoForm: TDatiRigoForm
         StyleHot.LookAndFeel.Kind = lfUltraFlat
         StyleHot.LookAndFeel.NativeStyle = False
         TabOrder = 2
-        Width = 275
+        Width = 205
       end
       object eRowSection: TcxComboBox
         Left = 64
@@ -796,7 +794,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Style.PopupBorderStyle = epbsSingle
         Style.IsFontAssigned = True
         TabOrder = 29
-        Width = 150
+        Width = 144
       end
       object eRowType: TcxComboBox
         Left = 64
@@ -820,10 +818,10 @@ inherited DatiRigoForm: TDatiRigoForm
         Style.PopupBorderStyle = epbsSingle
         Style.IsFontAssigned = True
         TabOrder = 30
-        Width = 217
+        Width = 144
       end
       object ePrezzoUnitarioAutocalc: TcxCheckBox
-        Left = 94
+        Left = 122
         Top = 684
         ParentFont = False
         Properties.Alignment = taLeftJustify
@@ -837,7 +835,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Transparent = True
       end
       object eRowPrintPrices: TcxCheckBox
-        Left = 177
+        Left = 191
         Top = 684
         ParentFont = False
         Properties.OnEditValueChanged = ePrintPricesPropertiesEditValueChanged
@@ -868,7 +866,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Style.StyleController = EditStyleController
         Style.IsFontAssigned = True
         TabOrder = 33
-        Width = 172
+        Width = 144
       end
       object eADG_Riferimentotesto: TcxTextEdit
         Left = 64
@@ -889,7 +887,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Style.StyleController = EditStyleController
         Style.IsFontAssigned = True
         TabOrder = 34
-        Width = 231
+        Width = 144
       end
       object eADG_RiferimentoNumero: TcxCurrencyEdit
         Left = 64
@@ -910,7 +908,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Style.StyleController = EditStyleController
         Style.IsFontAssigned = True
         TabOrder = 35
-        Width = 121
+        Width = 144
       end
       object eADG_RiferimentoData: TcxDateEdit
         Left = 64
@@ -935,7 +933,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Style.PopupBorderStyle = epbsSingle
         Style.IsFontAssigned = True
         TabOrder = 36
-        Width = 121
+        Width = 144
       end
       object dxLayoutGroup1: TdxLayoutGroup
         AlignHorz = ahParentManaged
@@ -972,7 +970,7 @@ inherited DatiRigoForm: TDatiRigoForm
         CaptionOptions.Text = 'Codice'
         CaptionOptions.Layout = clTop
         Control = eCodiceArticolo
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 0
@@ -983,7 +981,7 @@ inherited DatiRigoForm: TDatiRigoForm
         CaptionOptions.Text = 'Descrizione'
         CaptionOptions.Layout = clTop
         Control = eDescrizione
-        ControlOptions.OriginalHeight = 89
+        ControlOptions.OriginalHeight = 44
         ControlOptions.OriginalWidth = 197
         ControlOptions.ShowBorder = False
         Index = 1
@@ -994,7 +992,7 @@ inherited DatiRigoForm: TDatiRigoForm
         CaptionOptions.Text = 'Apparecchio'
         CaptionOptions.Layout = clTop
         Control = eIDApparecchio
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 18
         ControlOptions.OriginalWidth = 275
         ControlOptions.ShowBorder = False
         Index = 2
@@ -1022,7 +1020,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahClient
         CaptionOptions.Text = 'Prezzo unit.'
         Control = ePrezzoUnitario
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1031,7 +1029,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = dxLayoutControl1Group3
         CaptionOptions.Text = 'Prezzo unit.*'
         Control = ePrzUnitIvaComp
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1054,7 +1052,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahLeft
         CaptionOptions.Text = 'Sconti'
         Control = eSconto1
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 25
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1064,7 +1062,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahLeft
         CaptionOptions.Text = ' + '
         Control = eSconto2
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 25
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1074,7 +1072,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahLeft
         CaptionOptions.Text = ' + '
         Control = eSconto3
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 25
         ControlOptions.ShowBorder = False
         Index = 2
@@ -1093,7 +1091,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gUMQta
         CaptionOptions.Text = 'U.M. - Qt'#224
         Control = eUM
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 30
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1103,7 +1101,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahClient
         CaptionOptions.Text = ' -'
         Control = eQta
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 83
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1112,7 +1110,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gVendita
         CaptionOptions.Text = 'Importo'
         Control = eImportoRigo
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 2
@@ -1121,7 +1119,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gVendita
         CaptionOptions.Text = 'Importo*'
         Control = eImportoRigoIvaComp
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 3
@@ -1139,7 +1137,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gIVA
         CaptionOptions.Text = 'Aliquota IVA'
         Control = eDescrizioneIVA
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1157,7 +1155,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gCosto
         CaptionOptions.Text = 'Costo unit.'
         Control = eCostoUNitario
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1177,7 +1175,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahLeft
         CaptionOptions.Text = 'Ricarico'
         Control = eRicarico
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 45
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1187,7 +1185,7 @@ inherited DatiRigoForm: TDatiRigoForm
         AlignHorz = ahClient
         CaptionOptions.Text = '%'
         Control = eRicaricoImporto
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 83
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1205,7 +1203,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gSottocantieri
         CaptionOptions.Text = 'Sottocant.1'
         Control = eSottocant1
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1214,7 +1212,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gSottocantieri
         CaptionOptions.Text = 'Sottocant.2'
         Control = eSottocant2
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1223,7 +1221,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gSottocantieri
         CaptionOptions.Text = 'Sottocant.3'
         Control = eSottocant3
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 2
@@ -1232,7 +1230,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gSottocantieri
         CaptionOptions.Text = 'Sottocant.4'
         Control = eSottocant4
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 3
@@ -1241,7 +1239,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gSottocantieri
         CaptionOptions.Text = 'Sottocant.5'
         Control = eSottocant5
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 4
@@ -1250,7 +1248,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gSottocantieri
         CaptionOptions.Text = 'Sottocant.6'
         Control = eSottocant6
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 178
         ControlOptions.ShowBorder = False
         Index = 5
@@ -1268,7 +1266,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gTipiRighi
         CaptionOptions.Text = 'Tipo rigo 1'
         Control = eTipo1
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1277,7 +1275,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gTipiRighi
         CaptionOptions.Text = 'Tipo rigo 2'
         Control = eTipo2
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1286,7 +1284,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gTipiRighi
         CaptionOptions.Text = 'Tipo rigo 3'
         Control = eTipo3
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 2
@@ -1295,7 +1293,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gTipiRighi
         CaptionOptions.Text = 'Tipo rigo 4'
         Control = eTipo4
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 3
@@ -1304,7 +1302,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gTipiRighi
         CaptionOptions.Text = 'Tipo rigo 5'
         Control = eTipo5
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 4
@@ -1313,7 +1311,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gTipiRighi
         CaptionOptions.Text = 'Tipo rigo 6'
         Control = eTipo6
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 123
         ControlOptions.ShowBorder = False
         Index = 5
@@ -1331,7 +1329,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gNoteRigo
         CaptionOptions.Text = 'Note'
         Control = eNoteRigo
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 174
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1340,7 +1338,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gRowInfo
         CaptionOptions.Text = 'Sezione'
         Control = eRowSection
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 150
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1349,7 +1347,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Parent = gRowInfo
         CaptionOptions.Text = 'Tipo rigo'
         Control = eRowType
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 217
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1361,7 +1359,7 @@ inherited DatiRigoForm: TDatiRigoForm
         CaptionOptions.Text = 'Prz.unit.auto'
         Control = ePrezzoUnitarioAutocalc
         ControlOptions.OriginalHeight = 21
-        ControlOptions.OriginalWidth = 31
+        ControlOptions.OriginalWidth = 17
         ControlOptions.ShowBorder = False
         Index = 0
       end
@@ -1380,7 +1378,7 @@ inherited DatiRigoForm: TDatiRigoForm
         CaptionOptions.Text = 'Stm.importi'
         Control = eRowPrintPrices
         ControlOptions.OriginalHeight = 21
-        ControlOptions.OriginalWidth = 31
+        ControlOptions.OriginalWidth = 17
         ControlOptions.ShowBorder = False
         Index = 1
       end
@@ -1408,7 +1406,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Padding.AssignedValues = [lpavLeft]
         CaptionOptions.Text = 'ADG tipo*'
         Control = eADG_TipoDato
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 172
         ControlOptions.ShowBorder = False
         Index = 0
@@ -1418,7 +1416,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Padding.AssignedValues = [lpavLeft]
         CaptionOptions.Text = 'ADG rif.testo'
         Control = eADG_Riferimentotesto
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 231
         ControlOptions.ShowBorder = False
         Index = 1
@@ -1432,7 +1430,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Padding.AssignedValues = [lpavLeft]
         CaptionOptions.Text = 'ADG rif.num'
         Control = eADG_RiferimentoNumero
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 2
@@ -1445,7 +1443,7 @@ inherited DatiRigoForm: TDatiRigoForm
         Padding.AssignedValues = [lpavLeft]
         CaptionOptions.Text = 'ADG rif.data'
         Control = eADG_RiferimentoData
-        ControlOptions.OriginalHeight = 21
+        ControlOptions.OriginalHeight = 20
         ControlOptions.OriginalWidth = 121
         ControlOptions.ShowBorder = False
         Index = 3

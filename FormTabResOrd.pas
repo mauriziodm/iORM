@@ -428,20 +428,25 @@ begin
 
   // Se i Dataset sono chiusi provvede a scaricare dal database il residuo ordini
   // e a visualizzarlo.
-  if (not CdsResOrd.Active) then begin
+  if (not CdsResOrd.Active) then
+  begin
     // Si assicura che anche l'altro Dataset sia chiuso
-    if CdsDocDisp.Active  then CdsDocDisp.Close;
+    if CdsDocDisp.Active  then
+      CdsDocDisp.Close;
     // Preleva il file del residuo ordini dal database
     fDataOraResOrdVisualizzato := DM1.ResOrd_GetFromDatabase;
     // Verifica
-    if fDataOraResOrdVisualizzato = StrToDate('01/01/1900') then raise Exception.Create('Errore durante l''apertura del residuo ordini.');
+    if fDataOraResOrdVisualizzato = StrToDate('01/01/1900') then
+      raise Exception.Create('Errore durante l''apertura del residuo ordini.');
     // Reset dei filtri
     ClientiForm.RxSpeedButtonResetQueryClick(ClientiForm.RxSpeedButtonResetQuery);
     // Apre l'archivio
     ClientiForm.RxSpeedButtonTrovaClick(ClientiForm.RxSpeedButtonTrova);
   end;
+
   // In ogni caso imposta la Label che riporta la data del residuo ordini attuale
   LabelResOrd.Caption := ' Residuo ordini del ' + FormatDateTime('dd/mm/yyyy', fDataOraResOrdVisualizzato);
+
   // Se il ResOrd è vecchio (non di oggi) avverte l'utente
 {
   if (fDataOraResOrdVisualizzato < StartOfTheDay(Now)) then begin
@@ -760,38 +765,38 @@ var
   TmpStr:String;
 begin
   inherited;
-  CdsDocDispCalcFields(DataSet);
-
-  // ===========================================================================
-  // Calcola la disponibilità o meno dell'intero documento del rigo
-  // ---------------------------------------------------------------------------
-  if not CdsDocDisp.Active then Exit;
-  CdsDocDisp.Filter := 'NUMDOC = ' + CdsResOrdNUMDOC.AsString + ' AND DATADOC = ''' + FormatDateTime('dd/mm/yyyy', CdsResOrdDATADOC.AsDateTime) + '''';
-  CdsDocDisp.Filtered := True;
-  DocDisp := False;
-  CdsDocDisp.First;
-  while (not DocDisp) and (not CdsDocDisp.Eof) do begin
-    if not CdsDocDisp.FieldByName('DISPONIBILE').IsNull then DocDisp := CdsDocDisp.FieldByName('DISPONIBILE').Value;
-    CdsDocDisp.Next;
-  end;
-  CdsResOrdDOCDISP.Value := DocDisp;
-  // ===========================================================================
-
-  // ===========================================================================
-  // Calcola il campo che sarà usato per il raggruppamento e per fare in modo
-  //  che gli ordini disponibili appaiano per primi
-  // ---------------------------------------------------------------------------
-  CdsResOrdFORGROUP.Clear;
-  if (not CdsResOrdNUMDOC.IsNull) and (not CdsResOrdDATADOC.IsNull) then begin
-    // Costruisce su una variabile il valore del campo mettento come primo carattere
-    //  'T' o 'F' in base alla disponibilità del documento e poi la data in formato
-    //  inverso in modo da essere giusto per l'ordinamento e infine il numero del documento
-    //  alineato a dx a 10 caratteri
-    if DocDisp then TmpStr := 'T-' else TmpStr := 'F-';
-    TmpStr := TmpStr + FormatDateTime('yyyymmdd', CdsResOrdDATADOC.AsDateTime) + '-' + DM1.PadR(CdsResOrdNUMDOC.AsString, '0', 10);
-    CdsResOrdFORGROUP.Value := TmpStr;
-  end;
-  // ===========================================================================
+//  CdsDocDispCalcFields(DataSet);
+//
+//  // ===========================================================================
+//  // Calcola la disponibilità o meno dell'intero documento del rigo
+//  // ---------------------------------------------------------------------------
+//  if not CdsDocDisp.Active then Exit;
+//  CdsDocDisp.Filter := 'NUMDOC = ' + CdsResOrdNUMDOC.AsString + ' AND DATADOC = ''' + FormatDateTime('dd/mm/yyyy', CdsResOrdDATADOC.AsDateTime) + '''';
+//  CdsDocDisp.Filtered := True;
+//  DocDisp := False;
+//  CdsDocDisp.First;
+//  while (not DocDisp) and (not CdsDocDisp.Eof) do begin
+//    if not CdsDocDisp.FieldByName('DISPONIBILE').IsNull then DocDisp := CdsDocDisp.FieldByName('DISPONIBILE').Value;
+//    CdsDocDisp.Next;
+//  end;
+//  CdsResOrdDOCDISP.Value := DocDisp;
+//  // ===========================================================================
+//
+//  // ===========================================================================
+//  // Calcola il campo che sarà usato per il raggruppamento e per fare in modo
+//  //  che gli ordini disponibili appaiano per primi
+//  // ---------------------------------------------------------------------------
+//  CdsResOrdFORGROUP.Clear;
+//  if (not CdsResOrdNUMDOC.IsNull) and (not CdsResOrdDATADOC.IsNull) then begin
+//    // Costruisce su una variabile il valore del campo mettento come primo carattere
+//    //  'T' o 'F' in base alla disponibilità del documento e poi la data in formato
+//    //  inverso in modo da essere giusto per l'ordinamento e infine il numero del documento
+//    //  alineato a dx a 10 caratteri
+//    if DocDisp then TmpStr := 'T-' else TmpStr := 'F-';
+//    TmpStr := TmpStr + FormatDateTime('yyyymmdd', CdsResOrdDATADOC.AsDateTime) + '-' + DM1.PadR(CdsResOrdNUMDOC.AsString, '0', 10);
+//    CdsResOrdFORGROUP.Value := TmpStr;
+//  end;
+//  // ===========================================================================
 end;
 
 procedure TTagResOrdForm.btvResOrdQTAGetDisplayText(
@@ -850,7 +855,7 @@ begin
   // Carica i valori di alcuni combo box dei filtri prima che il
   //  ClientDataSet venga filtrato
   CaricaItemsDestinazione;
-  CaricaItemsOperatore;
+  CaricaItemsOperatore;ShowMessage('6');
   // ===========================================================================
   // FILTRI
   // ---------------------------------------------------------------------------

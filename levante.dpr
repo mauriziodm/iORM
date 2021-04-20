@@ -4,6 +4,7 @@ program levante;
 
 uses
   ShareMem,
+  MidasLib, // Per evitare un AV nel caso ci fosse una DLL con versione non corretta (in questo modo linka anche la dll nell'eseguibile e va sempre bene)
   Forms,
   main in 'main.pas' {mainForm},
   DataModule1 in 'DataModule1.pas' {DM1: TDataModule1},

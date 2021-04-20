@@ -213,14 +213,14 @@ begin
         // Salva l'indice del focused record attuale
         PrecFocusedRecordIndex := TV.DataController.FocusedRecordIndex;
         // cicla per tutti i records selezionati
-        for i := 0 to TV.Controller.SelectedRecordCount -1 do begin
+        for i := 0 to TV.Controller.SelectedRecordCount -1 do
+        begin
           DM1.ShowWait('Levante', 'Variazione riga ' + IntTostr(i+1) + ' su ' + IntToStr(TV.Controller.SelectedRecordCount) + ' righe selezionate.');
           // Rende focused il record selezionato attuale
           TV.Controller.SelectedRecords[i].Focused := True;
           // Se è un rigo di riferimento lo salta
           if (   (DM1.NoNullIntValue(TV.DataController,TV.DataController.FocusedRecordIndex,PreventiviOrdiniForm.tvCorpoCODICEIVA.Index) <> -9)
-          and (DM1.StrLeft(DM1.NoNullStringValue(TV.DataController,TV.DataController.FocusedRecordIndex,PreventiviOrdiniForm.tvCorpoDESCRIZIONE.Index), 4) <> '--->')   )
-          then
+          and (DM1.StrLeft(DM1.NoNullStringValue(TV.DataController,TV.DataController.FocusedRecordIndex,PreventiviOrdiniForm.tvCorpoDESCRIZIONE.Index), 4) <> '--->')   ) then
           begin
             // Aggiorna il valore nel corpo del documento
             TV.Controller.FocusedRecord.Values[Col.Index] := NewValue;
@@ -487,9 +487,11 @@ var
 begin
   inherited;
   // Se l'esecuzione del gestore dell'evento non è autorizzata esce subito
-  if not OnChangeEventEnabled then Exit;
+  if not OnChangeEventEnabled then
+    Exit;
   // Continua solo se la View selezionata della GridCorpo è una TableView
-  if PreventiviOrdiniForm.GridCorpo.FocusedView is TcxGridTableView then begin
+  if PreventiviOrdiniForm.GridCorpo.FocusedView is TcxGridTableView then
+  begin
     // Per comodità TV punta alla TableView attualmente selezionata nel corpo documento
     TV := PreventiviOrdiniForm.GridCorpo.FocusedView as TcxGridTableView;
     // Richiama la procedura per la variazione del valore
