@@ -186,7 +186,7 @@ end;
 procedure TDatiRigoForm.ChangeValue(Col:TcxGridColumn; NewValue:Variant);
 var
   TV: TcxGridTableView;
-  i, PrecFocusedRecordIndex, NotifyCount: Integer;
+  i, FRI, PrecFocusedRecordIndex, NotifyCount: Integer;
 begin
   // inizializzazione
   NotifyCount := 0;
@@ -217,13 +217,16 @@ begin
         begin
           DM1.ShowWait('Levante', 'Variazione riga ' + IntTostr(i+1) + ' su ' + IntToStr(TV.Controller.SelectedRecordCount) + ' righe selezionate.');
           // Rende focused il record selezionato attuale
-          TV.Controller.SelectedRecords[i].Focused := True;
+//          TV.Controller.SelectedRecords[i].Focused := True;
+          FRI := TV.Controller.SelectedRecords[i].RecordIndex;
+          TV.DataController.FocusedRecordIndex := FRI;
           // Se è un rigo di riferimento lo salta
-          if (   (DM1.NoNullIntValue(TV.DataController,TV.DataController.FocusedRecordIndex,PreventiviOrdiniForm.tvCorpoCODICEIVA.Index) <> -9)
-          and (DM1.StrLeft(DM1.NoNullStringValue(TV.DataController,TV.DataController.FocusedRecordIndex,PreventiviOrdiniForm.tvCorpoDESCRIZIONE.Index), 4) <> '--->')   ) then
+          if (   (DM1.NoNullIntValue(TV.DataController, FRI, PreventiviOrdiniForm.tvCorpoCODICEIVA.Index) <> -9)
+          and (DM1.StrLeft(DM1.NoNullStringValue(TV.DataController, FRI, PreventiviOrdiniForm.tvCorpoDESCRIZIONE.Index), 4) <> '--->')   ) then
           begin
             // Aggiorna il valore nel corpo del documento
-            TV.Controller.FocusedRecord.Values[Col.Index] := NewValue;
+//            TV.Controller.FocusedRecord.Values[Col.Index] := NewValue;
+            TV.DataController.Values[FRI, Col.Index] := NewValue;
             // RIchiama il gestore di evento del corpo documento che gestisce cosa succede quando
             //  l'utente varia un valore di una colonna.
             PreventiviOrdiniForm.tvCorpoEditValueChanged(TV, Col);
