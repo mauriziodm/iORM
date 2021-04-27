@@ -4924,6 +4924,7 @@ begin
       GCTipo.Checked[2]           := True;
       GCCantieriApertiChiusi.Checked[0]        := True;
       GCCantieriApertiChiusi.Checked[1]        := False;
+      GCCantieriApertiChiusi.Checked[2]        := False;
       GCCheckListBoxSegnoOperazione.Checked[0] := True;
       GCCheckListBoxSegnoOperazione.Checked[1] := True;
       GCCheckListBoxSegnoOperazione.Checked[2] := True;
@@ -5403,7 +5404,7 @@ begin
    GCCheckListBoxSegnoOperazione.Checked[3] := True;
    GCCheckListBoxSegnoOperazione.Checked[4] := True;
  end;
- if (not GCCantieriApertiChiusi.Checked[0]) and (not GCCantieriApertiChiusi.Checked[1]) then begin
+ if (not GCCantieriApertiChiusi.Checked[0]) and (not GCCantieriApertiChiusi.Checked[1]) and (not GCCantieriApertiChiusi.Checked[2]) then begin
    GCCantieriApertiChiusi.Checked[0] := True;
    GCCantieriApertiChiusi.Checked[1] := False;
  end;
@@ -5768,13 +5769,15 @@ begin
 
     // Filtro per pratica aperta/chiusa
     //  NB: Questo filtro non deve fare nulla nel caso siamo dentro un cantiere selezionato
-//    if not GC_CantiereSelezionato then begin  //NB: Modificato per problema Sala Ivan
+    //  NB: Aggiunta possibilità di escludere o comprendere gli impiannti (non dismessi ovviamente) su richiesta Ceccarelli Impianti
     if (ClientiForm.PraticaCorrente = '') then
     begin
-      if GCCantieriApertiChiusi.Checked[0] and (not GCCantieriApertiChiusi.Checked[1])
-        then QryGC.SQL.Add('AND V.DATACHIUSURAPRATICA1 IS NULL')
-      else if (not GCCantieriApertiChiusi.Checked[0]) and GCCantieriApertiChiusi.Checked[1]
-        then QryGC.SQL.Add('AND V.DATACHIUSURAPRATICA1 IS NOT NULL');
+      if GCCantieriApertiChiusi.Checked[0] and (not GCCantieriApertiChiusi.Checked[1]) then
+        QryGC.SQL.Add('AND (V.DATACHIUSURAPRATICA1 IS NULL OR V.PRAT_TIPO = ''A'')')
+      else if (not GCCantieriApertiChiusi.Checked[0]) and GCCantieriApertiChiusi.Checked[1] then
+        QryGC.SQL.Add('AND (V.DATACHIUSURAPRATICA1 IS NOT NULL OR V.PRAT_TIPO = ''A'')');
+      if not GCCantieriApertiChiusi.Checked[2] then
+        QryGC.SQL.Add('AND V.PRAT_TIPO <> ''A''');
     end;
 
     // Se specificato ricerca per Agente

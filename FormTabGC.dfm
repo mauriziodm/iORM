@@ -26,21 +26,24 @@ inherited TabGCForm: TTabGCForm
     TabOrder = 0
     object PanelGCFiltri: TPanel
       Left = 0
-      Top = 357
+      Top = 340
       Width = 684
-      Height = 259
+      Height = 276
       Align = alBottom
       BevelOuter = bvNone
       Color = clWhite
+      ParentBackground = False
       TabOrder = 0
       OnResize = PanelGCFiltriResize
+      ExplicitTop = 346
       object SubPanelGCFiltri: TPanel
-        Left = -1
-        Top = 6
+        Left = 0
+        Top = 12
         Width = 685
-        Height = 253
+        Height = 264
         BevelOuter = bvNone
         Color = clWhite
+        ParentBackground = False
         TabOrder = 0
         object GCLab_CodiceArticolo: TLabel
           Left = 0
@@ -1647,9 +1650,9 @@ inherited TabGCForm: TTabGCForm
           OnKeyPress = FilterGCTrovaKeyPress
         end
         object GCLab_Stato: TStaticText
-          Left = 137
-          Top = 90
-          Width = 141
+          Left = 0
+          Top = 89
+          Width = 163
           Height = 16
           AutoSize = False
           Caption = ' Solo con stato'
@@ -1665,8 +1668,8 @@ inherited TabGCForm: TTabGCForm
           Transparent = False
         end
         object GCSoloStato: TcxComboBox
-          Left = 210
-          Top = 89
+          Left = 73
+          Top = 88
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -1685,13 +1688,13 @@ inherited TabGCForm: TTabGCForm
           Style.IsFontAssigned = True
           TabOrder = 6
           Height = 18
-          Width = 69
+          Width = 91
         end
         object GCLab_Tipo: TStaticText
           Left = 0
-          Top = 90
-          Width = 132
-          Height = 50
+          Top = 108
+          Width = 142
+          Height = 44
           Alignment = taCenter
           AutoSize = False
           Color = 11064319
@@ -1707,9 +1710,9 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo: TCheckListBox
           Left = 1
-          Top = 91
-          Width = 130
-          Height = 48
+          Top = 109
+          Width = 140
+          Height = 42
           Cursor = crHandPoint
           OnClickCheck = GCTipoClickCheck
           BorderStyle = bsNone
@@ -1819,10 +1822,10 @@ inherited TabGCForm: TTabGCForm
           OnKeyPress = FilterGCTrovaKeyPress
         end
         object GCLab_CantieriApertiChiusi: TStaticText
-          Left = 137
-          Top = 110
+          Left = 147
+          Top = 108
           Width = 102
-          Height = 30
+          Height = 44
           Alignment = taCenter
           AutoSize = False
           Color = 11064319
@@ -1837,10 +1840,10 @@ inherited TabGCForm: TTabGCForm
           Transparent = False
         end
         object GCCantieriApertiChiusi: TCheckListBox
-          Left = 138
-          Top = 111
+          Left = 148
+          Top = 109
           Width = 100
-          Height = 28
+          Height = 42
           Cursor = crHandPoint
           OnClickCheck = GCTipoClickCheck
           BorderStyle = bsNone
@@ -1854,7 +1857,8 @@ inherited TabGCForm: TTabGCForm
           ItemHeight = 14
           Items.Strings = (
             'Cantieri aperti'
-            'Cantieri chiusi')
+            'Cantieri chiusi'
+            'Impianti')
           ParentCtl3D = False
           ParentFont = False
           Style = lbOwnerDrawFixed
@@ -1864,7 +1868,7 @@ inherited TabGCForm: TTabGCForm
         end
         object PanelFiltersSottocantieri: TPanel
           Left = 0
-          Top = 160
+          Top = 171
           Width = 684
           Height = 19
           BevelOuter = bvNone
@@ -1999,7 +2003,7 @@ inherited TabGCForm: TTabGCForm
         end
         object PanelFilterCategorieCantieri: TPanel
           Left = 0
-          Top = 214
+          Top = 225
           Width = 684
           Height = 35
           BevelOuter = bvNone
@@ -2303,7 +2307,7 @@ inherited TabGCForm: TTabGCForm
         end
         object LabelGCAgente: TStaticText
           Left = -2
-          Top = 144
+          Top = 155
           Width = 169
           Height = 15
           AutoSize = False
@@ -2321,7 +2325,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCAgente: TcxComboBox
           Left = 70
-          Top = 143
+          Top = 154
           AutoSize = False
           ParentFont = False
           Properties.ImmediateDropDownWhenKeyPressed = False
@@ -2345,7 +2349,7 @@ inherited TabGCForm: TTabGCForm
         end
         object LabelGCAgente2: TStaticText
           Left = 172
-          Top = 144
+          Top = 155
           Width = 167
           Height = 15
           AutoSize = False
@@ -2363,7 +2367,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCAgente2: TcxComboBox
           Left = 244
-          Top = 143
+          Top = 154
           AutoSize = False
           ParentFont = False
           Properties.ImmediateDropDownWhenKeyPressed = False
@@ -2387,7 +2391,7 @@ inherited TabGCForm: TTabGCForm
         end
         object LabelGCAgente3: TStaticText
           Left = 344
-          Top = 144
+          Top = 155
           Width = 167
           Height = 15
           AutoSize = False
@@ -2405,7 +2409,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCAgente3: TcxComboBox
           Left = 416
-          Top = 143
+          Top = 154
           AutoSize = False
           ParentFont = False
           Properties.ImmediateDropDownWhenKeyPressed = False
@@ -2429,7 +2433,7 @@ inherited TabGCForm: TTabGCForm
         end
         object LabelGCAgente4: TStaticText
           Left = 517
-          Top = 144
+          Top = 155
           Width = 167
           Height = 15
           AutoSize = False
@@ -2447,7 +2451,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCAgente4: TcxComboBox
           Left = 589
-          Top = 143
+          Top = 154
           AutoSize = False
           ParentFont = False
           Properties.ImmediateDropDownWhenKeyPressed = False
@@ -2470,7 +2474,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCLabelTipo1: TStaticText
           Left = 0
-          Top = 180
+          Top = 191
           Width = 226
           Height = 15
           AutoSize = False
@@ -2488,7 +2492,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo1: TcxComboBox
           Left = 72
-          Top = 179
+          Top = 190
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -2512,7 +2516,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCLabelTipo2: TStaticText
           Left = 229
-          Top = 180
+          Top = 191
           Width = 226
           Height = 15
           AutoSize = False
@@ -2530,7 +2534,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo2: TcxComboBox
           Left = 301
-          Top = 179
+          Top = 190
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -2554,7 +2558,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCLabelTipo3: TStaticText
           Left = 458
-          Top = 180
+          Top = 191
           Width = 226
           Height = 15
           AutoSize = False
@@ -2572,7 +2576,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo3: TcxComboBox
           Left = 530
-          Top = 179
+          Top = 190
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -2595,7 +2599,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCLabelTipo4: TStaticText
           Left = 0
-          Top = 198
+          Top = 209
           Width = 226
           Height = 15
           AutoSize = False
@@ -2613,7 +2617,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo4: TcxComboBox
           Left = 72
-          Top = 197
+          Top = 208
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -2636,7 +2640,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCLabelTipo5: TStaticText
           Left = 229
-          Top = 198
+          Top = 209
           Width = 226
           Height = 15
           AutoSize = False
@@ -2654,7 +2658,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo5: TcxComboBox
           Left = 301
-          Top = 197
+          Top = 208
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -2677,7 +2681,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCLabelTipo6: TStaticText
           Left = 458
-          Top = 198
+          Top = 209
           Width = 226
           Height = 15
           AutoSize = False
@@ -2695,7 +2699,7 @@ inherited TabGCForm: TTabGCForm
         end
         object GCTipo6: TcxComboBox
           Left = 530
-          Top = 197
+          Top = 208
           AutoSize = False
           ParentFont = False
           Properties.DropDownListStyle = lsFixedList
@@ -2873,7 +2877,7 @@ inherited TabGCForm: TTabGCForm
       Left = 0
       Top = 0
       Width = 684
-      Height = 357
+      Height = 340
       Cursor = crHandPoint
       Align = alClient
       Color = clWhite
@@ -2893,7 +2897,8 @@ inherited TabGCForm: TTabGCForm
       Properties.TabPosition = tpBottom
       LookAndFeel.NativeStyle = True
       OnPageChanging = cxPageControlGCPageChanging
-      ClientRectBottom = 336
+      ExplicitHeight = 357
+      ClientRectBottom = 319
       ClientRectRight = 684
       ClientRectTop = 0
       object TabGCElenco: TcxTabSheet
@@ -2901,9 +2906,10 @@ inherited TabGCForm: TTabGCForm
         Color = clWhite
         ImageIndex = 1
         ParentColor = False
+        ExplicitHeight = 336
         DesignSize = (
           684
-          336)
+          319)
         object PanelSelezioneColonne: TPanel
           Left = 0
           Top = 0
@@ -4836,21 +4842,22 @@ inherited TabGCForm: TTabGCForm
           Left = 0
           Top = 217
           Width = 684
-          Height = 119
+          Height = 102
           Align = alClient
           BevelOuter = bvNone
           Caption = 'PanelGridGC'
           Color = clWhite
           ParentBackground = False
           TabOrder = 3
+          ExplicitHeight = 119
           DesignSize = (
             684
-            119)
+            102)
           object GridGC: TcxGrid
             Left = 0
             Top = 0
             Width = 684
-            Height = 119
+            Height = 102
             Align = alClient
             BorderStyle = cxcbsNone
             Font.Charset = DEFAULT_CHARSET
@@ -4865,6 +4872,7 @@ inherited TabGCForm: TTabGCForm
             LookAndFeel.NativeStyle = False
             RootLevelOptions.DetailFrameColor = clBlack
             RootLevelOptions.DetailFrameWidth = 1
+            ExplicitHeight = 119
             object btvGC: TcxGridDBBandedTableView
               DragMode = dmAutomatic
               OnDblClick = btvGCDblClick
@@ -8719,17 +8727,19 @@ inherited TabGCForm: TTabGCForm
         Caption = 'ADA'
         ImageIndex = 2
         TabVisible = False
+        ExplicitHeight = 336
         object PivotGridGC: TcxDBPivotGrid
           Left = 0
           Top = 0
           Width = 684
-          Height = 336
+          Height = 319
           Align = alClient
           Groups = <>
           OptionsData.SaveExpanding = False
           Styles.StyleSheet = DM1.GosOrePivotGridStyleSheet
           TabOrder = 0
           OnCustomization = PivotGridGCCustomization
+          ExplicitHeight = 336
           object cxDBPivotGrid1CODICEARTICOLO: TcxDBPivotGridField
             AreaIndex = 0
             DataBinding.FieldName = 'CODICEARTICOLO'
@@ -8819,6 +8829,7 @@ inherited TabGCForm: TTabGCForm
       object TabGCCharts: TcxTabSheet
         Caption = 'Grafico'
         ImageIndex = 1
+        ExplicitHeight = 336
       end
     end
   end
@@ -10285,7 +10296,7 @@ inherited TabGCForm: TTabGCForm
       PrinterPage._dxMeasurementUnits_ = 0
       PrinterPage._dxLastMU_ = 2
       ReportDocument.Caption = 'Giornale di Cantiere'
-      ReportDocument.CreationDate = 44297.007479664350000000
+      ReportDocument.CreationDate = 44313.401397025460000000
       ReportTitle.Font.Charset = ANSI_CHARSET
       ReportTitle.Font.Color = clBlack
       ReportTitle.Font.Height = -12
