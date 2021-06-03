@@ -191,6 +191,8 @@ type
     function _Value(AValue:TDateTime): IioWhere; overload;
     function _Value(AValue:Integer): IioWhere; overload;
     function _Value(AValue:Double): IioWhere; overload;
+    function _Value(AValue: TObject): IioWhere; overload;
+    function _Value(AValue: IInterface): IioWhere; overload;
     function _OrderBy(const ATextOrderBy:String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere; overload;
     procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
@@ -305,6 +307,8 @@ type
     function _Value(AValue:TDateTime): IioWhere<T>; overload;
     function _Value(AValue:Double): IioWhere<T>; overload;
     function _Value(AValue:Integer): IioWhere<T>; overload;
+    function _Value(AValue: TObject): IioWhere<T>; overload;
+    function _Value(AValue: IInterface): IioWhere<T>; overload;
     function _OrderBy(const ATextOrderBy:String): IioWhere<T>; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere<T>; overload;
   end;

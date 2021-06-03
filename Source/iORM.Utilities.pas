@@ -68,12 +68,15 @@ type
     class function ExtractPropertyName(const AFullPathPropertyName: String): String;
     class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass;
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
+    class function ExtractOID(const AObj: TObject): Integer; overload; static;
+    class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers;
+  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers,
+  iORM.Context.Factory, iORM.Context.Interfaces, iORM.Context.Map.Interfaces;
 
 { TioRttiUtilities }
 
@@ -105,6 +108,23 @@ end;
 class function TioUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;
 begin
   Result := TioRttiContextFactory.RttiContext.GetType(AClassref).AsInstance;
+end;
+
+class function TioUtilities.ExtractOID(const AObj: TObject): Integer;
+var
+  LMap: IioMap;
+begin
+  if not Assigned(AObj) then
+    EioException.Create(ClassName, 'ExtractOID', '"AObj" param is nil.');
+  LMap := TioContextFactory.Map(AObj.ClassType);
+  Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+end;
+
+class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
+begin
+  if not Assigned(AIntf) then
+    EioException.Create(ClassName, 'ExtractOID', '"AIntf" param is nil.');
+  Result := ExtractOID(AIntf as TObject);
 end;
 
 class function TioUtilities.ExtractPropertyName(const AFullPathPropertyName: String): String;
