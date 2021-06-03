@@ -18,18 +18,12 @@ object StartForm: TStartForm
     TabPosition = None
   end
   object MainVCProvider: TioViewContextProvider
-    ioOnRequest = MainVCProviderioOnRequest
-    ioOnAfterRequest = MainVCProviderioOnAfterRequest
-    ioOnRelease = MainVCProviderioOnRelease
     RegisterAsDefault = True
-    AutoParent = True
-    AutoOwner = True
     Left = 136
     Top = 120
   end
   object ioSQLiteConnectionDef1: TioSQLiteConnectionDef
     OnAfterRegister = ioSQLiteConnectionDef1AfterRegister
-    AutoCreateDatabase = True
     Database = 'PizzaOrders.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True
