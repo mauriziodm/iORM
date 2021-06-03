@@ -1259,7 +1259,7 @@ begin
   begin
     // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
     if not(AOutProperty.GetRelationType in [ioRtBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne]) then
-      EioException.Create(ClassName, '_ResolvePath',
+      raise EioException.Create(ClassName, '_ResolvePath',
         Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.', [AOutObj.ClassName, LPropName]));
     AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
     // Recursion: If the child object is not assigned, the recursion stops and the function returns false

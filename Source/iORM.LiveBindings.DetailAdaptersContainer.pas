@@ -122,7 +122,8 @@ begin
       NewAdapter := TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner, AMasterProperty, AWhere);
     ioRTHasMany, ioRTEmbeddedHasMany:
       NewAdapter := TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner, AMasterProperty, AWhere);
-    else raise EioException.Create(Self.ClassName + ': Relation not found');
+    else
+      raise EioException.Create(Self.ClassName + ': Relation not found');
   end;
   // Set the MasterAdapterConatainer reference (Self)
   NewAdapter.SetMasterAdaptersContainer(Self);

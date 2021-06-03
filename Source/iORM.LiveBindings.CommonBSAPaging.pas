@@ -495,7 +495,7 @@ end;
 procedure TioCommonBSAPageManagerConcrete.CheckStrategy;
 begin
   if not Assigned(FStrategy) then
-    EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
+    raise EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
 constructor TioCommonBSAPageManagerConcrete.Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
