@@ -189,8 +189,6 @@
         <DCCReference Include="..\..\Source\iORM.SqlItems.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.SqlItems.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.SqLite.CompareOperators.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.SqLite.LogicRelations.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.SqLite.SqlDataConverter.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.SqLite.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\iORM.DuckTyped.StreamObject.pas"/>

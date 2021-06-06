@@ -83,8 +83,6 @@ contains
   iORM.SqlItems in '..\..\Source\iORM.SqlItems.pas',
   iORM.Where in '..\..\Source\iORM.Where.pas',
   iORM.Where.SqlItems in '..\..\Source\iORM.Where.SqlItems.pas',
-  iORM.DB.SqLite.CompareOperators in '..\..\Source\iORM.DB.SqLite.CompareOperators.pas',
-  iORM.DB.SqLite.LogicRelations in '..\..\Source\iORM.DB.SqLite.LogicRelations.pas',
   iORM.DB.SqLite.SqlDataConverter in '..\..\Source\iORM.DB.SqLite.SqlDataConverter.pas',
   iORM.DB.SqLite.SqlGenerator in '..\..\Source\iORM.DB.SqLite.SqlGenerator.pas',
   iORM.DuckTyped.StreamObject in '..\..\Source\iORM.DuckTyped.StreamObject.pas',

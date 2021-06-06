@@ -129,7 +129,7 @@ type
     procedure ShowEach(const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
 
     // ------ Conditions
-    function ByOID(const AOID: Integer): IioWhere;
+    function ByID(const AID: Integer): IioWhere;
     function Add(const ATextCondition: String): IioWhere; overload;
     function Add(const AWhereCond: IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
@@ -198,6 +198,7 @@ type
     function _Where: IioWhere; overload;
     function _Where(AWhere: IioWhere): IioWhere; overload;
     function _Where(ATextCondition: String): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere; overload;
     function _Property(APropertyName: String): IioWhere;
     function _PropertyOID: IioWhere;
 
@@ -246,7 +247,7 @@ type
     // procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); override;
 
     // ------ Conditions
-    function ByOID(const AOID: Integer): IioWhere<T>;
+    function ByID(const AID: Integer): IioWhere<T>;
     function Add(const ATextCondition: String): IioWhere<T>; overload;
     function Add(const AWhereCond: IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
@@ -564,10 +565,10 @@ begin
   FDetailsContainer.AddOrUpdate(AMasterPropertyName, AWhereCond);
 end;
 
-function TioWhere.ByOID(const AOID: Integer): IioWhere;
+function TioWhere.ByID(const AID: Integer): IioWhere;
 begin
   Result := Self;
-  Self._PropertyOIDEqualsTo(AOID);
+  Self._PropertyOIDEqualsTo(AID);
 end;
 
 constructor TioWhere.Create;
@@ -1345,10 +1346,10 @@ begin
   TioWhere(Self).AddDetail(AMasterPropertyName, AWhereCond);
 end;
 
-function TioWhere<T>.ByOID(const AOID: Integer): IioWhere<T>;
+function TioWhere<T>.ByID(const AID: Integer): IioWhere<T>;
 begin
   Result := Self;
-  TioWhere(Self).ByOID(AOID);
+  TioWhere(Self).ByID(AID);
 end;
 
 function TioWhere<T>.DisableClassFromField: IioWhere<T>;
@@ -1826,6 +1827,11 @@ function TioWhere<T>._Value(AValue: TObject): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._Value(AValue);
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere;
+begin
+  Result := Self;
 end;
 
 end.

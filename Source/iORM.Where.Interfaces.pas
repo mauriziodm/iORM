@@ -109,7 +109,7 @@ type
     procedure ShowEach(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
 
     // ------ Conditions
-    function ByOID(const constAOID:Integer): IioWhere;
+    function ByID(const AID:Integer): IioWhere;
     function Add(const ATextCondition:String): IioWhere; overload;
     function Add(const AWhereCond:IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere; overload;
@@ -228,7 +228,7 @@ type
     function ToInterfacedList: IioList<T>; overload;
 //    function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
     // ------ Conditions
-    function ByOID(const AOID:Integer): IioWhere<T>;
+    function ByID(const AID:Integer): IioWhere<T>;
     function Add(const ATextCondition:String): IioWhere<T>; overload;
     function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere<T>; overload;

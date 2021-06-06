@@ -52,7 +52,9 @@ uses
 
 type
 
-  // iORM
+  TioCompareOp = iORM.CommonTypes.TioCompareOp;
+  TioLogicOp = iORM.CommonTypes.TioLogicOp;
+
   io = class
   public
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
@@ -64,8 +66,10 @@ type
     class function Load(const ATypeInfo: PTypeInfo; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AIID: TGUID; const ATypeAlias: String = ''): IioWhere; overload;
-    class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
     class function Load(const AWhere: IioWhere): IioWhere; overload;
+    class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
+    class function Load<T>(const AID: Integer): T; overload;
+    class function Load<T>(const ATypeAlias: String; const AID: Integer): T; overload;
 
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
@@ -271,6 +275,16 @@ end;
 class function io.Load(const AWhere: IioWhere): IioWhere;
 begin
   Result := AWhere;
+end;
+
+class function io.Load<T>(const ATypeAlias: String; const AID: Integer): T;
+begin
+  Result := io.Load<T>(ATypeAlias).ByID(AID).ToObject;
+end;
+
+class function io.Load<T>(const AID: Integer): T;
+begin
+  Result := io.Load<T>.ByID(AID).ToObject;
 end;
 
 class function io.Load(const AIID: TGUID; const ATypeAlias: String): IioWhere;

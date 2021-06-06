@@ -55,6 +55,12 @@ const
 
 type
 
+  // Compare operators
+  TioCompareOp = (coEqual, coNotEqual, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
+
+  // Logic relations
+  TioLogicOp = (loAnd, loOr, loNot, loOpenPar, loClosePar);
+
   // Object Status
   TioObjectStatus = (osDirty = 0, osClean, osDeleted);
 

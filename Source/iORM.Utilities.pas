@@ -62,10 +62,11 @@ type
     class function GUIDtoInterfaceName(const IID: TGUID): String; static;
     class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
     class function ExtractPropertyName(const AFullPathPropertyName: String): String;
-    class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass;
+    class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass; static;
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
-    class function ExtractOID(const AObj: Tobject): Integer; overload;
-    class function ExtractOID(const AIntf: IInterface): Integer; overload;
+    class function ExtractOID(const AObj: Tobject): Integer; overload; static;
+    class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
+    class function EnumToString<T>(const AEnumValue:T): String;
   end;
 
 implementation
@@ -113,6 +114,11 @@ begin
     raise EioException.Create(ClassName, 'ExtractOID', '"AObj" cannot be nil.');
   LMap := TioContextFactory.Map(AObj.ClassType);
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+end;
+
+class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;
+begin
+  Result := TRttiEnumerationType.GetName<T>(AEnumValue);
 end;
 
 class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
