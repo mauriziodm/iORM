@@ -178,6 +178,7 @@ type
     function _Where: IioWhere; overload;
     function _Where(AWhereCond:IioWhere): IioWhere; overload;
     function _Where(ATextCondition:String): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere; overload;
     function _Property(APropertyName:String): IioWhere;
     function _PropertyOID: IioWhere;
     function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere; overload;
@@ -294,6 +295,7 @@ type
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond:IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition:String): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere<T>; overload;
     function _Property(APropertyName:String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
     function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere<T>; overload;

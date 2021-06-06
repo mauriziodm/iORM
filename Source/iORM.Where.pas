@@ -69,6 +69,10 @@ type
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
+
+    function _Criteria(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Criteria(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere; overload;
+    function _Criteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T): IioWhere; overload;
     // -------------------------------------------
     // Details property
     function GetDetails: IioWhereDetailsContainer;
@@ -313,6 +317,7 @@ type
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond: IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition: String): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere<T>; overload;
     function _Property(APropertyName: String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
 
@@ -393,6 +398,27 @@ begin
   Result := Self;
   Self._ClosePar;
   Self.Add(ATextCondition)
+end;
+
+function TioWhere._Criteria(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+var
+  AProp: IioContextProperty;
+begin
+  Result := Self;
+  FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
+  FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));
+end;
+
+function TioWhere._Criteria(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere;
+begin
+  Result := _Criteria(APropertyName, ACompareOp);
+  if not AValue.IsEmpty then
+    FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
+end;
+
+function TioWhere._Criteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T): IioWhere;
+begin
+  Result := _Criteria(APropertyName, ACompareOp, TValue.From<T>(AValue));
 end;
 
 function TioWhere._Equal: IioWhere;
@@ -1823,6 +1849,12 @@ begin
   TioWhere(Self)._Value(AValue);
 end;
 
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
+end;
+
 function TioWhere<T>._Value(AValue: TObject): IioWhere<T>;
 begin
   Result := Self;
@@ -1830,8 +1862,13 @@ begin
 end;
 
 function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere;
+var
+  AProp: IioContextProperty;
 begin
   Result := Self;
+  FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
+  FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));
+  FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
 end;
 
 end.
