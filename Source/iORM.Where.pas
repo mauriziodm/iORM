@@ -72,6 +72,8 @@ type
 
     procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
     procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
     procedure _AddCriteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T); overload;
     // -------------------------------------------
     // Details property
@@ -196,33 +198,42 @@ type
     function _LikeTo(AValue: TDateTime): IioWhere; overload;
     function _LikeTo(AValue: Double): IioWhere; overload;
     function _LikeTo(AValue: Integer): IioWhere; overload;
+    // ------ New criteria
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     // ------
     function _Where: IioWhere; overload;
     function _Where(AWhere: IioWhere): IioWhere; overload;
     function _Where(ATextCondition: String): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     function _Property(APropertyName: String): IioWhere;
     function _PropertyOID: IioWhere;
-
     function _PropertyEqualsTo(APropertyName: String; AValue: TValue): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere; overload;
-
     function _PropertyIsNull(APropertyName: String): IioWhere;
     function _PropertyIsNotNull(APropertyName: String): IioWhere;
-
     function _PropertyOIDEqualsTo(AValue: Integer): IioWhere;
-
     function _Value(AValue: TValue): IioWhere; overload;
     function _Value(AValue: TDateTime): IioWhere; overload;
     function _Value(AValue: Integer): IioWhere; overload;
     function _Value(AValue: Double): IioWhere; overload;
     function _Value(AValue: TObject): IioWhere; overload;
     function _Value(AValue: IInterface): IioWhere; overload;
-
     function _OrderBy(const ATextOrderBy: String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere; overload;
     procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
@@ -312,10 +323,24 @@ type
     function _LikeTo(AValue: TDateTime): IioWhere<T>; overload;
     function _LikeTo(AValue: Double): IioWhere<T>; overload;
     function _LikeTo(AValue: Integer): IioWhere<T>; overload;
+    // ------ New criteria
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     // ------
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond: IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition: String): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
@@ -421,6 +446,42 @@ end;
 procedure TioWhere._AddCriteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T);
 begin
   _AddCriteria(APropertyName, ACompareOp, TValue.From<T>(AValue));
+end;
+
+procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
+begin
+  FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+  _AddCriteria(APropertyName, ACompareOp, AValue);
+end;
+
+procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp);
+begin
+  FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+  _AddCriteria(APropertyName, ACompareOp);
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp);
 end;
 
 function TioWhere._Equal: IioWhere;
@@ -1082,6 +1143,30 @@ begin
   Self.Add(ATextCondition)
 end;
 
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp);
+end;
+
 function TioWhere._NotEqual: IioWhere;
 begin
   Result := Self;
@@ -1133,6 +1218,30 @@ begin
     Exit;
   Self._Or;
   Self.Add(ATextCondition)
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp);
 end;
 
 function TioWhere._OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere;
@@ -1448,6 +1557,30 @@ begin
   TioWhere(Self)._And(ATextCondition);
 end;
 
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp);
+end;
+
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
+end;
+
 function TioWhere<T>._ClosePar(ATextCondition: String): IioWhere<T>;
 begin
   Result := Self;
@@ -1621,6 +1754,30 @@ function TioWhere<T>._Or(ATextCondition: String): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._Or(ATextCondition);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp);
 end;
 
 function TioWhere<T>._OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere<T>;
@@ -1845,6 +2002,12 @@ begin
   TioWhere(Self)._Value(AValue);
 end;
 
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp);
+end;
+
 function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
 begin
   Result := Self;
@@ -1881,10 +2044,40 @@ begin
   _AddCriteria(APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
 end;
 
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp);
+end;
+
 function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
 begin
   Result := Self;
   _AddCriteria(APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp);
 end;
 
 end.

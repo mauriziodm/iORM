@@ -174,10 +174,24 @@ type
     function _LikeTo(AValue:TDateTime): IioWhere; overload;
     function _LikeTo(AValue:Double): IioWhere; overload;
     function _LikeTo(AValue:Integer): IioWhere; overload;
+    // ------ New criteria
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     // ------
     function _Where: IioWhere; overload;
     function _Where(AWhereCond:IioWhere): IioWhere; overload;
     function _Where(ATextCondition:String): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
@@ -296,10 +310,24 @@ type
     function _LikeTo(AValue:TDateTime): IioWhere<T>; overload;
     function _LikeTo(AValue:Double): IioWhere<T>; overload;
     function _LikeTo(AValue:Integer): IioWhere<T>; overload;
+    // ------ New criteria
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     // ------
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond:IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition:String): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
