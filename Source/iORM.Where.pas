@@ -135,8 +135,8 @@ type
 
     // ------ Conditions
     function ByID(const AID: Integer): IioWhere;
-    function Add(const ATextCondition: String): IioWhere; overload;
-    function Add(const AWhereCond: IioWhere): IioWhere; overload;
+    function Add(const ATextCondition:String): IioWhere; overload;
+    function Add(const AWhereCond:IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere; overload;
     function DisableClassFromField: IioWhere;
@@ -261,8 +261,8 @@ type
 
     // ------ Conditions
     function ByID(const AID: Integer): IioWhere<T>;
-    function Add(const ATextCondition: String): IioWhere<T>; overload;
-    function Add(const AWhereCond: IioWhere): IioWhere<T>; overload;
+    function Add(const ATextCondition:String): IioWhere<T>; overload;
+    function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere<T>; overload;
     function DisableClassFromField: IioWhere<T>;
