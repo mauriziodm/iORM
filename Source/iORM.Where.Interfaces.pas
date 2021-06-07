@@ -178,7 +178,9 @@ type
     function _Where: IioWhere; overload;
     function _Where(AWhereCond:IioWhere): IioWhere; overload;
     function _Where(ATextCondition:String): IioWhere; overload;
-    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     function _Property(APropertyName:String): IioWhere;
     function _PropertyOID: IioWhere;
     function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere; overload;
@@ -188,14 +190,17 @@ type
     function _PropertyOIDEqualsTo(AValue:Integer): IioWhere;
     function _PropertyIsNull(APropertyName:String): IioWhere;
     function _PropertyIsNotNull(APropertyName:String): IioWhere;
+
     function _Value(AValue:TValue): IioWhere; overload;
     function _Value(AValue:TDateTime): IioWhere; overload;
     function _Value(AValue:Integer): IioWhere; overload;
     function _Value(AValue:Double): IioWhere; overload;
     function _Value(AValue: TObject): IioWhere; overload;
     function _Value(AValue: IInterface): IioWhere; overload;
+
     function _OrderBy(const ATextOrderBy:String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere; overload;
+
     procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
     procedure CreateIndex(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
     procedure DropIndex(const AIndexName:String);
@@ -295,7 +300,9 @@ type
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond:IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition:String): IioWhere<T>; overload;
-    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     function _Property(APropertyName:String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
     function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere<T>; overload;

@@ -52,12 +52,6 @@ uses
 
 type
 
-  // Compare operators
-  TioCompareOp = (coEqual, coNotEqual, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
-
-  // Logic relations
-  TioLogicOp = (loAnd, loOr, loNot, loOpenPar, loClosePar);
-
   io = class
   public
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;

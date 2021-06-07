@@ -70,9 +70,9 @@ type
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
 
-    function _Criteria(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
-    function _Criteria(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere; overload;
-    function _Criteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T): IioWhere; overload;
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T); overload;
     // -------------------------------------------
     // Details property
     function GetDetails: IioWhereDetailsContainer;
@@ -91,15 +91,14 @@ type
     constructor Create; reintroduce; overload;
     function GetWhereItems: IWhereItems;
     function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
-    function GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean;
-      const AClassFromField: IioClassFromField): String;
+    function GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean; const AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
-    function GetPagingObj: TObject;  // TObject to avoid circular reference
-    procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
+    function GetPagingObj: TObject; // TObject to avoid circular reference
+    procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -114,17 +113,16 @@ type
 
     procedure ToList(const AList: TObject); overload;
     function ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean = True): TObject; overload;
-    function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True)
-      : TObject; overload;
+    function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True): TObject; overload;
     function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
     function GetCount: Integer;
 
     procedure Delete;
 
-    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True;
-      const AOwnsObject: Boolean = True): TBindSourceAdapter; overload;
-    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True;
-      const AOwnsObject: Boolean = True): TBindSourceAdapter; overload;
+    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True; const AOwnsObject: Boolean = True)
+      : TBindSourceAdapter; overload;
+    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True; const AOwnsObject: Boolean = True)
+      : TBindSourceAdapter; overload;
     function ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
     function ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
 
@@ -202,7 +200,9 @@ type
     function _Where: IioWhere; overload;
     function _Where(AWhere: IioWhere): IioWhere; overload;
     function _Where(ATextCondition: String): IioWhere; overload;
-    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     function _Property(APropertyName: String): IioWhere;
     function _PropertyOID: IioWhere;
 
@@ -225,10 +225,9 @@ type
 
     function _OrderBy(const ATextOrderBy: String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere; overload;
-    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
+    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
       const AUnique: Boolean = False); overload;
-    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String;
-      const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
     procedure DropIndex(const AIndexName: String);
     // ----- Properties -----
     property Details: IioWhereDetailsContainer read GetDetails;
@@ -317,27 +316,24 @@ type
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond: IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition: String): IioWhere<T>; overload;
-    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     function _Property(APropertyName: String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
-
     function _PropertyEqualsTo(APropertyName: String; AValue: TValue): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere<T>; overload;
-
     function _PropertyIsNull(APropertyName: String): IioWhere<T>;
     function _PropertyIsNotNull(APropertyName: String): IioWhere<T>;
-
     function _PropertyOIDEqualsTo(AValue: Integer): IioWhere<T>;
-
     function _Value(AValue: TValue): IioWhere<T>; overload;
     function _Value(AValue: TDateTime): IioWhere<T>; overload;
     function _Value(AValue: Double): IioWhere<T>; overload;
     function _Value(AValue: Integer): IioWhere<T>; overload;
     function _Value(AValue: TObject): IioWhere<T>; overload;
     function _Value(AValue: IInterface): IioWhere<T>; overload;
-
     function _OrderBy(const ATextOrderBy: String): IioWhere<T>; overload;
     function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere<T>; overload;
   end;
@@ -400,25 +396,31 @@ begin
   Self.Add(ATextCondition)
 end;
 
-function TioWhere._Criteria(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp);
 var
   AProp: IioContextProperty;
 begin
-  Result := Self;
   FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
   FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));
 end;
 
-function TioWhere._Criteria(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere;
+procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
 begin
-  Result := _Criteria(APropertyName, ACompareOp);
-  if not AValue.IsEmpty then
-    FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
+  _AddCriteria(APropertyName, ACompareOp);
+  if AValue.IsEmpty then
+    Exit;
+  case AValue.Kind of
+    tkClass:
+      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsObject));
+    tkInterface:
+      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsInterface));
+  end;
+  FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
 end;
 
-function TioWhere._Criteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T): IioWhere;
+procedure TioWhere._AddCriteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T);
 begin
-  Result := _Criteria(APropertyName, ACompareOp, TValue.From<T>(AValue));
+  _AddCriteria(APropertyName, ACompareOp, TValue.From<T>(AValue));
 end;
 
 function TioWhere._Equal: IioWhere;
@@ -616,8 +618,7 @@ begin
   Self.CreateIndex('', ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
-procedure TioWhere.CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean);
+procedure TioWhere.CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   AResolvedTypeList: IioResolvedTypeList;
   AResolvedTypeName: String;
@@ -789,8 +790,7 @@ begin
   end;
 end;
 
-function TioWhere.GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean;
-  const AClassFromField: IioClassFromField): String;
+function TioWhere.GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean; const AClassFromField: IioClassFromField): String;
 begin
   Result := Self.GetSql(AMap);
   if AIsClassFromField then
@@ -943,8 +943,7 @@ begin
   io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(LList).Show;
 end;
 
-function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean)
-  : TBindSourceAdapter;
+function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AContext: IioContext;
 begin
@@ -961,13 +960,11 @@ begin
     // Get the context
     AContext := TioContextFactory.Context(FTypeName, Self);
     // Create the BSA
-    Result := TioActiveListBindSourceAdapter.Create(AContext.GetClassRef, Self, AOwner, TObjectList<TObject>.Create(AOwnsObject),
-      AAutoLoadData);
+    Result := TioActiveListBindSourceAdapter.Create(AContext.GetClassRef, Self, AOwner, TObjectList<TObject>.Create(AOwnsObject), AAutoLoadData);
   end;
 end;
 
-function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean)
-  : TBindSourceAdapter;
+function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AContext: IioContext;
 begin
@@ -1021,8 +1018,7 @@ var
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-    Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName,
-      AOwnsObject)
+    Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName, AOwnsObject)
     // else if the master property type is a class...
   else
   begin
@@ -1849,7 +1845,19 @@ begin
   TioWhere(Self)._Value(AValue);
 end;
 
-function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere<T>;
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
@@ -1861,14 +1869,22 @@ begin
   TioWhere(Self)._Value(AValue);
 end;
 
-function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TValue): IioWhere;
-var
-  AProp: IioContextProperty;
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
 begin
   Result := Self;
-  FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
-  FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));
-  FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
+  _AddCriteria(APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp, TValue.From<TObject>(AValue));
 end;
 
 end.
