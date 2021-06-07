@@ -131,8 +131,6 @@ type
     function _And(ATextCondition:String): IioWhere; overload;
     function _Or(ATextCondition:String): IioWhere; overload;
     function _Not(ATextCondition:String): IioWhere; overload;
-    function _OpenPar(ATextCondition:String): IioWhere; overload;
-    function _ClosePar(ATextCondition:String): IioWhere; overload;
     // ------ Logic relations with TioWere
     function _And(AWhereCond:IioWhere): IioWhere overload;
     // ------ Compare operators
@@ -267,8 +265,6 @@ type
     function _And(ATextCondition:String): IioWhere<T>; overload;
     function _Or(ATextCondition:String): IioWhere<T>; overload;
     function _Not(ATextCondition:String): IioWhere<T>; overload;
-    function _OpenPar(ATextCondition:String): IioWhere<T>; overload;
-    function _ClosePar(ATextCondition:String): IioWhere<T>; overload;
     // ------ Logic relations with TioWere
     function _And(AWhereCond:IioWhere): IioWhere<T>; overload;
     // ------ Compare operators

@@ -74,7 +74,8 @@ type
     procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
     procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp); overload;
     procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
-    procedure _AddCriteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T); overload;
+    procedure _AddCriteria(const AText: String); overload;
+    procedure _AddCriteria(const AWhere: IioWhere); overload;
     // -------------------------------------------
     // Details property
     function GetDetails: IioWhereDetailsContainer;
@@ -155,8 +156,6 @@ type
     function _And(ATextCondition: String): IioWhere; overload;
     function _Or(ATextCondition: String): IioWhere; overload;
     function _Not(ATextCondition: String): IioWhere; overload;
-    function _OpenPar(ATextCondition: String): IioWhere; overload;
-    function _ClosePar(ATextCondition: String): IioWhere; overload;
     // ------ Logic relations with TioWere
     function _And(AWhereCond: IioWhere): IioWhere overload;
     // ------ Compare operators
@@ -280,8 +279,6 @@ type
     function _And(ATextCondition: String): IioWhere<T>; overload;
     function _Or(ATextCondition: String): IioWhere<T>; overload;
     function _Not(ATextCondition: String): IioWhere<T>; overload;
-    function _OpenPar(ATextCondition: String): IioWhere<T>; overload;
-    function _ClosePar(ATextCondition: String): IioWhere<T>; overload;
     // ------ Logic relations with TioWere
     function _And(AWhereCond: IioWhere): IioWhere<T>; overload;
     // ------ Compare operators
@@ -414,13 +411,6 @@ begin
   Self.FWhereItems.Add(TioDbFactory.LogicRelation._ClosePar);
 end;
 
-function TioWhere._ClosePar(ATextCondition: String): IioWhere;
-begin
-  Result := Self;
-  Self._ClosePar;
-  Self.Add(ATextCondition)
-end;
-
 procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp);
 var
   AProp: IioContextProperty;
@@ -443,20 +433,17 @@ begin
   FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
 end;
 
-procedure TioWhere._AddCriteria<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: T);
-begin
-  _AddCriteria(APropertyName, ACompareOp, TValue.From<T>(AValue));
-end;
-
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
 begin
-  FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+  if not WhereConditionExists then
+    FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
   _AddCriteria(APropertyName, ACompareOp, AValue);
 end;
 
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp);
 begin
-  FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+  if not WhereConditionExists then
+    FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
   _AddCriteria(APropertyName, ACompareOp);
 end;
 
@@ -470,6 +457,21 @@ function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompare
 begin
   Result := Self;
   _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+procedure TioWhere._AddCriteria(const AWhere: IioWhere);
+var
+  AItem: IioSqlItem;
+begin
+  if Assigned(AWhere) then
+    for AItem in AWhere.GetWhereItems do
+      FWhereItems.Add(AItem);
+end;
+
+procedure TioWhere._AddCriteria(const AText: String);
+begin
+  if not AText.IsEmpty then
+    FWhereItems.Add(TioSqlItemsWhereText.Create(AText));
 end;
 
 function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
@@ -1204,13 +1206,6 @@ begin
     Self.FWhereItems.Add(TioDbFactory.LogicRelation._Or);
 end;
 
-function TioWhere._OpenPar(ATextCondition: String): IioWhere;
-begin
-  Result := Self;
-  Self._OpenPar;
-  Self.Add(ATextCondition)
-end;
-
 function TioWhere._Or(ATextCondition: String): IioWhere;
 begin
   Result := Self;
@@ -1581,12 +1576,6 @@ begin
   TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
 end;
 
-function TioWhere<T>._ClosePar(ATextCondition: String): IioWhere<T>;
-begin
-  Result := Self;
-  TioWhere(Self)._ClosePar(ATextCondition);
-end;
-
 function TioWhere<T>._Equal: IioWhere<T>;
 begin
   Result := Self;
@@ -1742,12 +1731,6 @@ function TioWhere<T>._NotEqualTo(AValue: TValue): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._NotEqualTo(AValue);
-end;
-
-function TioWhere<T>._OpenPar(ATextCondition: String): IioWhere<T>;
-begin
-  Result := Self;
-  TioWhere(Self)._OpenPar(ATextCondition);
 end;
 
 function TioWhere<T>._Or(ATextCondition: String): IioWhere<T>;
