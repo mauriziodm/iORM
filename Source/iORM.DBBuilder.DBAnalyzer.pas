@@ -24,7 +24,7 @@ type
 implementation
 
 uses
-  iORM;
+  iORM, iORM.DB.Factory, iORM.DB.Interfaces;
 
 { TioDBBuilderDBAnalyzer }
 
@@ -38,6 +38,9 @@ procedure TioDBBuilderDBAnalyzer.SQLite_AllOrNothingPostProcess;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
+  // Only for SQLite connection
+  if TioDbFactory.Connection(FSchema.ConnectionDefName).GetConnectionInfo.ConnectionType <> cdtSQLite then
+    Exit;
   // If even one table is to be altered then all of them are to be altered
   //  (even those that have not actually changed). Instead those that are new
   //  (to be created) obviously remain to be created.
@@ -75,7 +78,7 @@ begin
     //  (even those that have not actually changed). Instead those that are new
     //  (to be created) obviously remain to be created.
     //TODO: MM 12/06/21
-    //SQLite_AllOrNothingPostProcess;
+    SQLite_AllOrNothingPostProcess;
     // Commit or rollback the transaction (if in transaction)
     if FSchema.Status <> stCreate then
       io.CommitTransaction(FSchema.ConnectionDefName);
