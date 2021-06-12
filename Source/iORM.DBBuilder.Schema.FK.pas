@@ -45,7 +45,7 @@ end;
 
 function TioDBBuilderSchemaFK.Name: String;
 begin
-  Result := Format('FK_%s_%s', [DependentFieldName, ReferenceTableName]);
+  Result := Format('FK_%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName]);
 end;
 
 function TioDBBuilderSchemaFK.OnDeleteAction: TioFKAction;

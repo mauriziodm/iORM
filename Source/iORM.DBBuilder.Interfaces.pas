@@ -32,7 +32,7 @@ type
     function FieldDefault: TValue;
     function FieldDefaultExists: Boolean;
     function FieldLength: integer;
-    function FieldName: String;
+    function FieldName(const AClearDelimiters: Boolean = False): String;
     function FieldPrecision: integer;
     function FieldScale: integer;
     function FieldSubType: string;

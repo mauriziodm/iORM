@@ -117,6 +117,11 @@ type
     [MVCDoc('Execute a SQL command to load a DataSet')]
     procedure SQLDestLoadDataSet;
 
+    // M.M. 12/06/21
+    [MVCPath('/count')]
+    [MVCHTTPMethod([httpPUT])]
+    procedure Count;
+
     // Other
     procedure OnBeforeAction(Context: TWebContext; const AActionName: string; var Handled: Boolean); override;
     procedure OnAfterAction(Context: TWebContext; const AActionName: string); override;
@@ -129,6 +134,23 @@ implementation
 
 uses iORM, iORM.REST.Factory, System.Generics.Collections, iORM.DB.Interfaces,
   FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON, System.JSON;
+
+// M.M. 12/06/21
+procedure TioDMVCController.Count;
+var
+  LRequestBody: IioRESTRequestBody;
+  LResponseBody: IioRESTResponseBody;
+  LCount: integer;
+begin
+  // Get the IioRESTRequestBody
+  LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body);
+  // Execute iORM call
+  LCount := io.RefTo(LRequestBody.Where).GetCount;
+  // Create the IioRESTResponseBody and return it to the client
+  LResponseBody := TioRESTFactory.NewResponseBody;
+  LResponseBody.JSONDataValue := TJSONNumber.Create(LCount);
+  Render(LResponseBody.ToJSONObject, False);
+end;
 
 procedure TioDMVCController.Delete;
 var
@@ -152,7 +174,7 @@ begin
   // Get the IioRESTRequestBody
   LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
   // Execute iORM call
-  io.Delete(LRequestBody.DataObject, '');  // ConnectionName
+  io.Delete(LRequestBody.DataObject);  // ConnectionName
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRESTFactory.NewResponseBody;
   Render(LResponseBody.ToJSONObject, False);
@@ -249,7 +271,6 @@ begin
   LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
   // Execute iORM call
   io.PersistCollection(LRequestBody.DataObject,
-                       '', // ConnectionName
                        LRequestBody.BlindInsert);
   // Return the updated/inserted DataObject back to the client for new IDs
   // Create the IioRESTResponseBody and return it to the client
@@ -270,8 +291,7 @@ begin
   io.Persist(LRequestBody.DataObject,
              LRequestBody.RelationPropertyName,
              LRequestBody.RelationOID,
-             LRequestBody.BlindInsert,
-             '');  // ConnectionName
+             LRequestBody.BlindInsert);  // ConnectionName
   // Return the updated/inserted DataObject back to the client for new IDs
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRESTFactory.NewResponseBody;
@@ -289,7 +309,7 @@ begin
   // Get the IioRESTRequestBody
   LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body);
   // Execute iORM call
-  LRecordsAffected := io.SQL(LRequestBody.SQLDestination).Execute(LRequestBody.SQLDestination.GetIgnoreObjNotExists);
+  io.SQL(LRequestBody.SQLDestination).Execute(LRequestBody.SQLDestination.GetIgnoreObjNotExists);
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRESTFactory.NewResponseBody;
   LResponseBody.JSONDataValue := TJSONNumber.Create(LRecordsAffected);

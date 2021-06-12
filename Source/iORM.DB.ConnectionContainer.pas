@@ -252,7 +252,8 @@ end;
 
 class function TioConnectionManager.GetDefaultConnectionDef: IIoConnectionDef;
 begin
-  GetConnectionDefByName(GetDefaultConnectionName);
+  // M.M. 12/06/21 Aggiunto ritorno perchè non veniva ritornato il valore
+  Result := GetConnectionDefByName(GetDefaultConnectionName);
 end;
 
 class function TioConnectionManager.GetDefaultConnectionName: String;

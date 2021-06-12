@@ -102,9 +102,9 @@ begin
     LConnection.RequestBody.Clear;
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('Count');
-    // Deserialize  the JSONDataValue to the result object
-{ TODO : Da sistemare }
-//    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.TypeAnnotationsON.&To(AList);
+    // Deserialize the JSONDataValue to the result object
+    // M.M. 12/06/21
+    Result := LConnection.ResponseBody.JSONDataValue.AsType<integer>;
     // Commit
     LConnection.Commit;
   except

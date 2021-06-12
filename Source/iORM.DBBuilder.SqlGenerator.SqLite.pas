@@ -75,7 +75,6 @@ begin
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, True);
   // Compose the create index query text
   LQuery := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
-  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
   ScriptAdd(LQuery);
 end;
 

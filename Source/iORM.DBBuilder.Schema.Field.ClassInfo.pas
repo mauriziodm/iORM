@@ -21,7 +21,7 @@ type
     function FieldDefault: TValue;
     function FieldDefaultExists: Boolean;
     function FieldLength: integer;
-    function FieldName: String;
+    function FieldName(const AClearDelimiters: Boolean = False): String;
     function FieldPrecision: integer;
     function FieldScale: integer;
     function FieldSubType: string;
@@ -70,7 +70,7 @@ begin
   Result := IO_CLASSFROMFIELD_FIELDLENGTH;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldName: String;
+function TioDBBuilderSchemaFieldClassInfo.FieldName(const AClearDelimiters: Boolean = False): String;
 begin
   Result := IO_CLASSFROMFIELD_FIELDNAME;
 end;

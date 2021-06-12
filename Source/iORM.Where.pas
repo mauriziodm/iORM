@@ -45,7 +45,9 @@ uses
   iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
-  iORM.Utilities, iORM.LiveBindings.CommonBSAPaging;
+  iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
+  // M.M. 12/06/21
+  ObjMapper.Attributes;
 
 type
 
@@ -65,6 +67,9 @@ type
     FDetailsContainer: IioWhereDetailsContainer;
     // Riferimento al BSACommonPageManager che potrebbe essere usato per la gestione
     // del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
+    // M.M. 12/06/21
+    // Aggiunto attributo per non serializzare l'oggetto TioCommonBSAPageManager
+    [DoNotSerializeAttribute]
     FPagingObj: TioCommonBSAPageManager;
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
