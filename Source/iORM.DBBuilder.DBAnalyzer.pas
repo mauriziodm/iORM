@@ -24,7 +24,7 @@ type
 implementation
 
 uses
-  iORM, iORM.DB.Factory, iORM.DB.Interfaces;
+  iORM, iORM.DB.Factory, iORM.DB.Interfaces, iORM.DB.ConnectionContainer;
 
 { TioDBBuilderDBAnalyzer }
 
@@ -39,7 +39,7 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   // Only for SQLite connection
-  if TioDbFactory.Connection(FSchema.ConnectionDefName).GetConnectionInfo.ConnectionType <> cdtSQLite then
+  if TioConnectionManager.GetConnectionInfo(FSchema.ConnectionDefName).ConnectionType <> cdtSQLite then
     Exit;
   // If even one table is to be altered then all of them are to be altered
   //  (even those that have not actually changed). Instead those that are new
