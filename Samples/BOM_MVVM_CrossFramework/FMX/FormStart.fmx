@@ -17,25 +17,6 @@ object StartForm: TStartForm
     TabOrder = 6
     TabPosition = None
   end
-  object SQLIteConn: TioSQLiteConnectionDef
-    OnAfterRegister = SQLIteConnAfterRegister
-    AutoCreateDB.Enabled = True
-    Database = 'BOM.db'
-    DatabaseStdFolder = sfDocuments
-    DefaultConnection = False
-    Persistent = False
-    Pooled = False
-    Left = 152
-    Top = 80
-  end
-  object VCProviderMaster: TioViewContextProvider
-    OnAfterRequest = VCProviderMasterioOnAfterRequest
-    OnRelease = VCProviderMasterioOnRelease
-    OnRequest = VCProviderMasterioOnRequest
-    RegisterAsDefault = True
-    Left = 152
-    Top = 136
-  end
   object ActionList1: TActionList
     Left = 152
     Top = 192
@@ -48,8 +29,27 @@ object StartForm: TStartForm
       TabControl = TabControl
     end
   end
+  object ioViewContextProvider1: TioViewContextProvider
+    OnAfterRequest = VCProviderMasterioOnAfterRequest
+    OnRelease = VCProviderMasterioOnRelease
+    OnRequest = VCProviderMasterioOnRequest
+    RegisterAsDefault = True
+    Left = 168
+    Top = 136
+  end
   object ioFMX1: TioFMX
-    Left = 152
-    Top = 256
+    Left = 160
+    Top = 80
+  end
+  object ioSQLiteConnectionDef1: TioSQLiteConnectionDef
+    AutoCreateDB.Enabled = True
+    Database = 'BOM.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    OnAfterCreateOrAlterDB = ioSQLiteConnectionDef1AfterCreateOrAlterDB
+    Left = 144
+    Top = 280
   end
 end

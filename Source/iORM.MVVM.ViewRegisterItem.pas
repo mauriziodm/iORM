@@ -14,6 +14,7 @@ type
     FViewContext: TComponent;
     FViewContextProvider: TioViewContextProvider;
     FViewContextFreeMethod: TProc;
+    FViewContextFreeMethodIsPresent: Boolean;
     FReleasingViewContext: Boolean;
     procedure SetView(const AView:TComponent);
     procedure SetViewContext(const AViewContext:TComponent);
@@ -57,6 +58,7 @@ begin
   SetViewContext(AViewContext);
   SetViewContextProvider(AViewContextProvider);
   FViewContextFreeMethod := AViewContextFreeMethod;
+  FViewContextFreeMethodIsPresent := Assigned(AViewContextFreeMethod);
 end;
 
 //function TioViewContextRegisterItem.GetViewContext: TComponent;
@@ -98,7 +100,11 @@ begin
     Exit;
   if Assigned(FViewContextProvider) then
     FViewContextProvider.ReleaseViewContext(FView, FViewContext);
-  if Assigned(FViewContextFreeMethod) then
+  // NB: Ho sostituito il test Assigned con una apposita variabile "FViewContextFreeMethodIsPresent" settata nle costruttore
+  //      perchè altrimenti capitava che su android 10 "FViewContextFreeMethod" cambiasse senza apparente mitovo e da nil
+  //      assumesse un altro valore non nil che poi causava un AV (perchè l'anonimous method in realtà non c'era.
+//  if Assigned(FViewContextFreeMethod) then
+  if FViewContextFreeMethodIsPresent then
     FViewContextFreeMethod;
 end;
 
