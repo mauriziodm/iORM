@@ -1,39 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.DB.ConnectionContainer;
 
@@ -54,10 +50,11 @@ type
 {$IFDEF MSWINDOWS}
   // Il TioConnectionMonitor incapsula la funzionalità di tracing e monitoring di quanto avviene sulle connessioni
   TioConnectionMonitorRef = class of TioConnectionMonitor;
+
   TioConnectionMonitor = class
   private
-    class var FMoniRemoteClientLink: TFDMoniRemoteClientLink;  // Not to use directly (use function "RemoteClientLink"
-    class var FMoniFlatFileClientLink: TFDMoniFlatFileClientLink;  // Not to use directly (use function "RemoteFlatFileLink"
+    class var FMoniRemoteClientLink: TFDMoniRemoteClientLink; // Not to use directly (use function "RemoteClientLink"
+    class var FMoniFlatFileClientLink: TFDMoniFlatFileClientLink; // Not to use directly (use function "RemoteFlatFileLink"
     class var FMode: TioMonitorMode;
     class function GetMode: TioMonitorMode; static;
     class procedure SetMode(const Value: TioMonitorMode); static;
@@ -71,99 +68,113 @@ type
 {$ENDIF}
 
   // IL connection manager ha il compito di mantenere i parametri delle connessioni impostate all'avvio
-  //  dell'applicazione per una loro successiva istanziazione e di gestione del connection pooling
-  //  se richiesto.
-  //  In realtà questa classe utilizza il TFDManager fornito da FireDAC e non fa molto altro
-  //  se non aggiungere un campo per mantenere un riferimento al nome della ConnectionDef
-  //  di default. Una gestione di una connessione di default mi serviva perchè volevo fare in modo che
-  //  fosse necessario specificare esplicitamente una ConnectionDef (con un attribute) per ogni classe/entità
-  //  e quindi ho deciso di mantenere un riferimento al nome della connectionDef di dafault in modo che per tutte le classi
-  //  che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
-  //  che utilizzano una sola ConnectionDef non è necessario specificare nulla nella dichiarazione delle classi perchè
-  //  tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
+  // dell'applicazione per una loro successiva istanziazione e di gestione del connection pooling
+  // se richiesto.
+  // In realtà questa classe utilizza il TFDManager fornito da FireDAC e non fa molto altro
+  // se non aggiungere un campo per mantenere un riferimento al nome della ConnectionDef
+  // di default. Una gestione di una connessione di default mi serviva perchè volevo fare in modo che
+  // fosse necessario specificare esplicitamente una ConnectionDef (con un attribute) per ogni classe/entità
+  // e quindi ho deciso di mantenere un riferimento al nome della connectionDef di dafault in modo che per tutte le classi
+  // che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
+  // che utilizzano una sola ConnectionDef non è necessario specificare nulla nella dichiarazione delle classi perchè
+  // tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
   TioConnectionManagerContainer = TDictionary<String, TioConnectionInfo>;
+  TioPerThreadCurrentConnectionName = TDictionary<TThreadID, String>;
   TioConnectionManagerRef = class of TioConnectionManager;
-  TioConnectionManager = class
+
+  TioConnectionManager = class // NB: Is thread-safe
   strict private
-    class var FDefaultConnectionName: String;
-    class var FConnectionManagerContainer: TioConnectionManagerContainer;  // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
+    class var FCurrentConnectionName: String;
+    class var FPerThreadCurrentConnectionName: TioPerThreadCurrentConnectionName;
+    class var FConnectionManagerContainer: TioConnectionManagerContainer;
+    // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class var FShowWaitProc: TProc;
     class var FHideWaitProc: TProc;
-    class function NewCustomConnectionDef(const AConnectionName:String; const APooled:Boolean; const AAsDefault:Boolean): IIoConnectionDef;
+    class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoConnectionDef;
+    class function CheckConnectionName(AConnectionName: String): String;
+    class procedure _Lock;
+    class procedure _Unlock;
   protected
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;
   public
-    class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault:Boolean=True; const APersistent:Boolean=False; const APooled:Boolean=False; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class procedure NewRESTConnection(const ABaseURL:String; const AAsDefault:Boolean=True; const APersistent:Boolean=True; const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
-    class function GetDefaultConnectionDef: IIoConnectionDef;
-    class function GetConnectionDefByName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function IsEmptyConnectionName(const AConnectionName:String): Boolean;
-    class function GetDefaultConnectionName: String;
-    class function GetDefaultConnectionNameIfEmpty(const AConnectionDefName: String): String;
-    class function GetDatabaseFileName(const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME): String;
-    class function GetConnectionInfo(AConnectionName:String): TioConnectionInfo;
-    class procedure SetDefaultConnectionName(AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
-    class procedure SetShowHideWaitProc(const AShowWaitProc:TProc; const AHideWaitProc:TProc);
+    class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const APersistent: Boolean = False;
+      const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class procedure NewRESTConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
+      const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+    class function GetCurrentConnectionDef: IIoConnectionDef;
+    class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function IsEmptyConnectionName(const AConnectionName: String): Boolean;
+    class function GetCurrentConnectionName: String;
+    class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
+    class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
+    class function GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
+    class procedure Use(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+    class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
     class procedure ShowWaitProc;
     class procedure HideWaitProc;
+    class procedure ThreadUse(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+    class procedure ThreadUseClear;
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
 {$ENDIF}
   end;
 
   // Il ConnectionContainer contiene le connessioni attive in un dato momento, cioè quelle
-  //  connections che sono effettivamente in uso al momento; il loro ciclo di vita (delle connessioni)
-  //  coincide con il ciclo della transazion in essere sulla connessione stessa, quando la transazione
-  //  termina (con un commit/rollback) anche la connessione viene elimimata.
-  //  Le connessioni sono separate per thread in modo da predisporeìle fin da subito ad eventuali sviluppi in
-  //  senso multithreading.
-  //  NB: Questa classe non gestisce l'eventuale connection pooling e non contiene i parametri della/e connesioni
-  //       da creare ma è semplicemente un repository delle sole connessioni in uso in modo che chiamate ricorsive
-  //       all'ORM all'interno di una singola operazione (ad esempio quando carichiamo una classe che ha al suo interno
-  //       proprietà con relazioni il caricamento degli oggetti dettaglio avviene con una chiamata ricorsiva all'ORM
-  //       e questa chicìamata deve svolgersi all'interno della stessa transazione del master e quindi con la stessa connection)
-  //       possano accedere allo stesso oggetto connection (via factory).
+  // connections che sono effettivamente in uso al momento; il loro ciclo di vita (delle connessioni)
+  // coincide con il ciclo della transazion in essere sulla connessione stessa, quando la transazione
+  // termina (con un commit/rollback) anche la connessione viene elimimata.
+  // Le connessioni sono separate per thread in modo da predisporeìle fin da subito ad eventuali sviluppi in
+  // senso multithreading.
+  // NB: Questa classe non gestisce l'eventuale connection pooling e non contiene i parametri della/e connesioni
+  // da creare ma è semplicemente un repository delle sole connessioni in uso in modo che chiamate ricorsive
+  // all'ORM all'interno di una singola operazione (ad esempio quando carichiamo una classe che ha al suo interno
+  // proprietà con relazioni il caricamento degli oggetti dettaglio avviene con una chiamata ricorsiva all'ORM
+  // e questa chicìamata deve svolgersi all'interno della stessa transazione del master e quindi con la stessa connection)
+  // possano accedere allo stesso oggetto connection (via factory).
   TioInternalContainerType = TDictionary<String, IioConnection>;
   TioConnectionContainerRef = class of TioConnectionContainer;
+
   TioConnectionContainer = class
   strict private
     class var FContainer: TioInternalContainerType;
-    class function GetCurrentThreadID: TThreadID;
-    class function ConnectionNameToContainerKey(AConnectionName:String): String;
+    class function ConnectionNameToContainerKey(AConnectionName: String): String;
   protected
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;
   public
-    class procedure AddConnection(const AConnection:IioConnection);
-    class procedure FreeConnection(const AConnection:IioConnection);
-    class function GetConnection(const AConnectionName:String): IioConnection;
-    class function ConnectionExist(const AConnectionName:String): Boolean;
+    class procedure AddConnection(const AConnection: IioConnection);
+    class procedure FreeConnection(const AConnection: IioConnection);
+    class function GetConnection(const AConnectionName: String): IioConnection;
+    class function ConnectionExist(const AConnectionName: String): Boolean;
   end;
 
 implementation
 
 uses
-  System.Classes, iORM.Exceptions;
+  System.Classes, iORM.Exceptions, iORM.Utilities;
 
 { TioConnectionContainer }
 
 class procedure TioConnectionContainer.AddConnection(const AConnection: IioConnection);
 begin
-  FContainer.Add(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName), AConnection   );
+  FContainer.Add(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName), AConnection);
 end;
 
-class function TioConnectionContainer.ConnectionExist(const AConnectionName:String): Boolean;
+class function TioConnectionContainer.ConnectionExist(const AConnectionName: String): Boolean;
 begin
-  Result := FContainer.ContainsKey(   Self.ConnectionNameToContainerKey(AConnectionName)   );
+  Result := FContainer.ContainsKey(Self.ConnectionNameToContainerKey(AConnectionName));
 end;
 
 class function TioConnectionContainer.ConnectionNameToContainerKey(AConnectionName: String): String;
 begin
-  Result := AConnectionName + '-' + Self.GetCurrentThreadID.ToString;
+  Result := AConnectionName + '-' + TioUtilities.GetThreadID.ToString;
 end;
 
 class procedure TioConnectionContainer.CreateInternalContainer;
@@ -171,19 +182,19 @@ begin
   Self.FContainer := TioInternalContainerType.Create;
 end;
 
-class procedure TioConnectionContainer.FreeConnection(const AConnection:IioConnection);
+class procedure TioConnectionContainer.FreeConnection(const AConnection: IioConnection);
 begin
   // Remove the reference to the connection
-  //  NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
-  //       tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
-  //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
-  //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
-  //       a vicenda e rendevano inefficace il Reference Count
+  // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+  // tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
+  // che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+  // questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+  // a vicenda e rendevano inefficace il Reference Count
   if AConnection.IsDBConnection then
     AConnection.AsDBConnection.QueryContainer.CleanQueryConnectionsRef;
   // RImuove la connessione causandone anche la distruzione perchè a questo punto non c'è
-  //  più alcun riferimento ad essa.
-  FContainer.Remove(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName)   );
+  // più alcun riferimento ad essa.
+  FContainer.Remove(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName));
 end;
 
 class procedure TioConnectionContainer.FreeInternalContainer;
@@ -191,84 +202,120 @@ var
   AConnection: IioConnection;
 begin
   // Remove the reference to the connection
-  //  NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
-  //       tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
-  //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
-  //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
-  //       a vicenda e rendevano inefficace il Reference Count
-  for AConnection in Self.FContainer.Values
-  do Self.FreeConnection(AConnection);
+  // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+  // tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
+  // che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+  // questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+  // a vicenda e rendevano inefficace il Reference Count
+  for AConnection in Self.FContainer.Values do
+    Self.FreeConnection(AConnection);
   // Free the Container
   Self.FContainer.Free;
 end;
 
-class function TioConnectionContainer.GetConnection(const AConnectionName:String): IioConnection;
+class function TioConnectionContainer.GetConnection(const AConnectionName: String): IioConnection;
 begin
-  Result := FContainer.Items[   Self.ConnectionNameToContainerKey(AConnectionName)   ];
-end;
-
-class function TioConnectionContainer.GetCurrentThreadID: TThreadID;
-begin
-  Result := System.Classes.TThread.CurrentThread.ThreadID;
+  Result := FContainer.Items[Self.ConnectionNameToContainerKey(AConnectionName)];
 end;
 
 { TioConnectionManager }
 
+class function TioConnectionManager.CheckConnectionName(AConnectionName: String): String;
+begin
+  // NB: Lasciare anche se il parametro è già defaultizzato perchè in alcune circostanze serve
+  if IsEmptyConnectionName(AConnectionName) then
+    AConnectionName := IO_CONNECTIONDEF_DEFAULTNAME;
+  // If a connectionDef with this name is not founded then raise an exception
+  if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(AConnectionName)) then
+    raise EioException.Create(Self.ClassName + ': Connection params definition "' + AConnectionName + '" not found!');
+end;
+
 class procedure TioConnectionManager.CreateInternalContainer;
 begin
   FConnectionManagerContainer := TioConnectionManagerContainer.Create;
+  FPerThreadCurrentConnectionName := TioPerThreadCurrentConnectionName.Create;
 end;
 
 class procedure TioConnectionManager.FreeInternalContainer;
 begin
-  Self.FConnectionManagerContainer.Free;
+  FConnectionManagerContainer.Free;
+  FPerThreadCurrentConnectionName.Free;
 end;
 
 class function TioConnectionManager.GetConnectionDefByName(AConnectionName: String): IIoConnectionDef;
 begin
-  Result := nil;
-  // If desired ConnectionName is empty then get then Default one.
-  AConnectionName := GetDefaultConnectionNameIfEmpty(AConnectionName);
-  // Get the ConnectionDef info's
-  Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
-  // Connection not found
-  if not Assigned(Result) then
-    raise EioException.Create(Self.ClassName + ': ConnectionDef not found.');
+  _Lock;
+  try
+    Result := nil;
+    // If desired ConnectionName is empty then get then Default one.
+    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    // Get the ConnectionDef info's
+    Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
+    // Connection not found
+    if not Assigned(Result) then
+      raise EioException.Create(Self.ClassName + ': ConnectionDef not found.');
+  finally
+    _Unlock;
+  end;
 end;
 
-class function TioConnectionManager.GetConnectionInfo(
-  AConnectionName: String): TioConnectionInfo;
+class function TioConnectionManager.GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
 begin
-  // If desired ConnectionName is empty then get then Default one.
-  AConnectionName := GetDefaultConnectionNameIfEmpty(AConnectionName);
-  // Return the desired connection type
-  Result := FConnectionManagerContainer.Items[AConnectionName];
+  _Lock;
+  try
+    // If desired ConnectionName is empty then get then Default one.
+    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    // Return the desired connection type
+    Result := FConnectionManagerContainer.Items[AConnectionName];
+  finally
+    _Unlock;
+  end;
 end;
 
 class function TioConnectionManager.GetDatabaseFileName(const AConnectionName: String): String;
 begin
-  Result := Self.GetConnectionDefByName(AConnectionName).Params.Database;
+  _Lock;
+  try
+    Result := Self.GetConnectionDefByName(AConnectionName).Params.Database;
+  finally
+    _Unlock;
+  end;
 end;
 
-class function TioConnectionManager.GetDefaultConnectionDef: IIoConnectionDef;
+class function TioConnectionManager.GetCurrentConnectionDef: IIoConnectionDef;
 begin
-  // M.M. 12/06/21 Aggiunto ritorno perchè non veniva ritornato il valore
-  Result := GetConnectionDefByName(GetDefaultConnectionName);
+  _Lock;
+  try
+    Result := GetConnectionDefByName(GetCurrentConnectionName);
+  finally
+    _Unlock;
+  end;
 end;
 
-class function TioConnectionManager.GetDefaultConnectionName: String;
+class function TioConnectionManager.GetCurrentConnectionName: String;
 begin
-  Result := Self.FDefaultConnectionName;
+  _Lock;
+  try
+    if not FPerThreadCurrentConnectionName.TryGetValue(TioUtilities.GetThreadID, Result) then
+      Result := FCurrentConnectionName;
+  finally
+    _Unlock
+  end;
 end;
 
-class function TioConnectionManager.GetDefaultConnectionNameIfEmpty(const AConnectionDefName: String): String;
+class function TioConnectionManager.GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
 begin
-  // If AConnectionName param is not specified (is empty) then
-  //  use the default connection def
-  if IsEmptyConnectionName(AConnectionDefName) then
-    Result := GetDefaultConnectionName
-  else
-    Result := AConnectionDefName;
+  _Lock;
+  try
+    // If AConnectionName param is not specified (is empty) then
+    // use the default connection def
+    if IsEmptyConnectionName(AConnectionDefName) then
+      Result := GetCurrentConnectionName
+    else
+      Result := AConnectionDefName;
+  finally
+    _Unlock;
+  end;
 end;
 
 class procedure TioConnectionManager.HideWaitProc;
@@ -283,122 +330,177 @@ begin
     FShowWaitProc;
 end;
 
-class function TioConnectionManager.IsEmptyConnectionName(const
-  AConnectionName: String): Boolean;
+class procedure TioConnectionManager.ThreadUse(AConnectionName: String);
+begin
+  _Lock;
+  try
+    // Verifica ed eventualmente defaultizza il parametro
+    AConnectionName := CheckConnectionName(AConnectionName);
+    // Set the current connection fot the currend thread
+    FPerThreadCurrentConnectionName.AddOrSetValue(TioUtilities.GetThreadID, AConnectionName);
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioConnectionManager.ThreadUseClear;
+begin
+  _Lock;
+  try
+    FPerThreadCurrentConnectionName.Remove(TioUtilities.GetThreadID);
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioConnectionManager._Lock;
+begin
+  TMonitor.Enter(FConnectionManagerContainer);
+end;
+
+class procedure TioConnectionManager._Unlock;
+begin
+  TMonitor.Exit(FConnectionManagerContainer);
+end;
+
+class function TioConnectionManager.IsEmptyConnectionName(const AConnectionName: String): Boolean;
 begin
   Result := (AConnectionName.IsEmpty or (AConnectionName = IO_CONNECTIONDEF_DEFAULTNAME));
 end;
 
 {$IFDEF MSWINDOWS}
+
 class function TioConnectionManager.Monitor: TioConnectionMonitorRef;
 begin
   Result := TioConnectionMonitor;
 end;
 {$ENDIF}
 
-class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const APooled:Boolean; const AAsDefault: Boolean): IIoConnectionDef;
+class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoConnectionDef;
 begin
-   // Create the ConnectionDef object and set his name
-  //  NB: The name of the connectionDef should never be changed after
+  // Create the ConnectionDef object and set his name
+  // NB: The name of the connectionDef should never be changed after
   Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
   if not Assigned(Result) then
     Result := FDManager.ConnectionDefs.AddConnectionDef;
   Result.Name := AConnectionName;
   Result.Params.Pooled := APooled;
   // If the AsDefault param is True or this is the first ConnectionDef of the application
-  //  then set it as default
-  if AAsDefault or (Self.FDefaultConnectionName = '') then
-    Self.FDefaultConnectionName := AConnectionName;
+  // then set it as default
+  if AAsDefault or (Self.FCurrentConnectionName = '') then
+    Self.FCurrentConnectionName := AConnectionName;
 end;
 
-class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String;
-  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
-  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
+  const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
-  Result.Params.DriverID := 'FB';
-  Result.Params.Values['Server'] := AServer;
-  Result.Params.Database := ADatabase;
-  Result.Params.UserName := AUserName;
-  Result.Params.Password := APassword;
-  Result.Params.Values['Protocol'] := 'TCPIP';
-  if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
-  // Add the connection type to the internal container
-  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent));
+  _Lock;
+  try
+    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result.Params.DriverID := 'FB';
+    Result.Params.Values['Server'] := AServer;
+    Result.Params.Database := ADatabase;
+    Result.Params.UserName := AUserName;
+    Result.Params.Password := APassword;
+    Result.Params.Values['Protocol'] := 'TCPIP';
+    if ACharSet <> '' then
+      Result.Params.Values['CharacterSet'] := ACharSet;
+    // Add the connection type to the internal container
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent));
+  finally
+    _Unlock
+  end;
 end;
 
-class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet:String;
-  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
-  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
+  const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
-  Result.Params.DriverID := 'MySQL';
-  Result.Params.Values['Server'] := AServer;
-  Result.Params.Database := ADatabase;
-  Result.Params.UserName := AUserName;
-  Result.Params.Password := APassword;
-  if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
-  // Add the connection type to the internal container
-  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
+  _Lock;
+  try
+    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result.Params.DriverID := 'MySQL';
+    Result.Params.Values['Server'] := AServer;
+    Result.Params.Database := ADatabase;
+    Result.Params.UserName := AUserName;
+    Result.Params.Password := APassword;
+    if ACharSet <> '' then
+      Result.Params.Values['CharacterSet'] := ACharSet;
+    // Add the connection type to the internal container
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
+  finally
+    _Unlock;
+  end;
 end;
 
-class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String;
-  const AAsDefault:Boolean=True; const APersistent:Boolean=True;
-  const AConnectionName:String=IO_CONNECTIONDEF_DEFAULTNAME);
+class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
+  const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
 var
   LConnectionInfo: TioConnectionInfo;
 begin
-  // If the AsDefault param is True or this is the first ConnectionDef of the application
-  //  then set it as default
-  if AAsDefault or (Self.FDefaultConnectionName = '') then
-    Self.FDefaultConnectionName := AConnectionName;
-  // Setup the connection info
-  LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent);
-  LConnectionInfo.BaseURL := ABaseURL;
-  // Add the connection type to the internal container
-  FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
+  _Lock;
+  try
+    // If the AsDefault param is True or this is the first ConnectionDef of the application
+    // then set it as default
+    if AAsDefault or (Self.FCurrentConnectionName = '') then
+      Self.FCurrentConnectionName := AConnectionName;
+    // Setup the connection info
+    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent);
+    LConnectionInfo.BaseURL := ABaseURL;
+    // Add the connection type to the internal container
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
+  finally
+    _Unlock;
+  end;
 end;
 
-class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase:String;
-  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
-  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const APersistent: Boolean = False;
+  const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
-  Result.Params.DriverID := 'SQLite';
-  Result.Params.Database := ADatabase;
-  Result.Params.Values['FailIfMissing'] := 'False';
-  // Add the connection type to the internal container
-  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
+  _Lock;
+  try
+    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result.Params.DriverID := 'SQLite';
+    Result.Params.Database := ADatabase;
+    Result.Params.Values['FailIfMissing'] := 'False';
+    // Add the connection type to the internal container
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
+  finally
+    _Unlock;
+  end;
 end;
 
-class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword:String;
-  const AAsDefault:Boolean=True; const APersistent:Boolean=False;
-  const APooled:Boolean=False; const AConnectionName: String=IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True;
+  const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
-  Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
-  Result.Params.DriverID := 'MSSQL';
-  Result.Params.Values['Server'] := AServer;
-  Result.Params.Database := ADatabase;
-  Result.Params.UserName := AUserName;
-  Result.Params.Password := APassword;
-  // Add the connection type to the internal container
-  FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
+  _Lock;
+  try
+    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result.Params.DriverID := 'MSSQL';
+    Result.Params.Values['Server'] := AServer;
+    Result.Params.Database := ADatabase;
+    Result.Params.UserName := AUserName;
+    Result.Params.Password := APassword;
+    // Add the connection type to the internal container
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
+  finally
+    _Unlock;
+  end;
 end;
 
-class procedure TioConnectionManager.SetDefaultConnectionName(AConnectionName: String);
+class procedure TioConnectionManager.Use(AConnectionName: String);
 begin
-  // NB: Lasciare anche se il parametro è già defoultizzato perchè in alcune circostanze serve
-  if IsEmptyConnectionName(AConnectionName) then
-    AConnectionName := IO_CONNECTIONDEF_DEFAULTNAME;
-  // If a connectionDef with this name is not founded then raise an exception
-  if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(AConnectionName)) then
-    raise EioException.Create(Self.ClassName + ': Connection params definition "' + AConnectionName + '" not found!');
-  // Set the connection as default
-  Self.FDefaultConnectionName := AConnectionName;
+  _Lock;
+  try
+    // Verifica ed eventualmente defaultizza il parametro
+    AConnectionName := CheckConnectionName(AConnectionName);
+    // Set the connection as default
+    FCurrentConnectionName := AConnectionName;
+  finally
+    _Unlock;
+  end;
 end;
 
-class procedure TioConnectionManager.SetShowHideWaitProc(
-  const AShowWaitProc: TProc; const AHideWaitProc: TProc);
+class procedure TioConnectionManager.SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
 begin
   FShowWaitProc := AShowWaitProc;
   FHideWaitProc := AHideWaitProc;
@@ -407,6 +509,7 @@ end;
 { TioConnectionMonitor }
 
 {$IFDEF MSWINDOWS}
+
 class procedure TioConnectionMonitor.FreeFDMoniClientLinks;
 begin
   // Destroy existing FDMoniClientLinks
@@ -423,14 +526,14 @@ end;
 
 class function TioConnectionMonitor.RemoteClientLink: TFDMoniRemoteClientLink;
 begin
-  if not Assigned (FMoniRemoteClientLink) then
+  if not Assigned(FMoniRemoteClientLink) then
     FMoniRemoteClientLink := TFDMoniRemoteClientLink.Create(nil);
   Result := FMoniRemoteClientLink;
 end;
 
 class function TioConnectionMonitor.RemoteFlatFileLink: TFDMoniFlatFileClientLink;
 begin
-  if not Assigned (FMoniFlatFileClientLink) then
+  if not Assigned(FMoniFlatFileClientLink) then
     FMoniFlatFileClientLink := TFDMoniFlatFileClientLink.Create(nil);
   Result := FMoniFlatFileClientLink;
 end;
@@ -449,25 +552,29 @@ begin
     FMoniFlatFileClientLink.Tracing := False;
   // Enable the proper client link depending by Mode
   case FMode of
-    mmRemote:   RemoteClientLink.Tracing   := True;
-    mmFlatFile: RemoteFlatFileLink.Tracing := True;
+    mmRemote:
+      RemoteClientLink.Tracing := True;
+    mmFlatFile:
+      RemoteFlatFileLink.Tracing := True;
   end;
 end;
 {$ENDIF}
+{ TioInUseConnectionRegister }
 
 initialization
-  // NB: Per evitare l'errore di FireDAC sul WaitCursor
-  FDManager.SilentMode := true;
 
-  TioConnectionContainer.CreateInternalContainer;
-  TioConnectionManager.CreateInternalContainer;
+// NB: Per evitare l'errore di FireDAC sul WaitCursor
+FDManager.SilentMode := True;
+
+TioConnectionContainer.CreateInternalContainer;
+TioConnectionManager.CreateInternalContainer;
 
 finalization
 
-  TioConnectionContainer.FreeInternalContainer;
-  TioConnectionManager.FreeInternalContainer;
+TioConnectionContainer.FreeInternalContainer;
+TioConnectionManager.FreeInternalContainer;
 {$IFDEF MSWINDOWS}
-  TioConnectionMonitor.FreeFDMoniClientLinks;
+TioConnectionMonitor.FreeFDMoniClientLinks;
 {$ENDIF}
 
 end.

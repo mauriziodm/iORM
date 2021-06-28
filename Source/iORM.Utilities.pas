@@ -67,6 +67,7 @@ type
     class function ExtractOID(const AObj: Tobject): Integer; overload; static;
     class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
     class function EnumToString<T>(const AEnumValue:T): String;
+    class function GetThreadID: TThreadID;
   end;
 
 implementation
@@ -159,6 +160,11 @@ end;
 class function TioUtilities.GetQualifiedTypeName(const ATypeInfo: Pointer): String;
 begin
   Result := TioRttiContextFactory.RttiContext.GetType(ATypeInfo).QualifiedName;
+end;
+
+class function TioUtilities.GetThreadID: TThreadID;
+begin
+  Result := System.Classes.TThread.CurrentThread.ThreadID;
 end;
 
 class function TioUtilities.GUIDtoInterfaceName(const IID: TGUID): String;

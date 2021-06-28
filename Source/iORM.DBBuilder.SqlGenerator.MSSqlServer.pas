@@ -146,7 +146,7 @@ var
   LDefaultConnectionDef: IIoConnectionDef;
   LQuery: IioQuery;
 begin
-  LDefaultConnectionDef := io.Connections.GetDefaultConnectionDef;
+  LDefaultConnectionDef := io.Connections.GetCurrentConnectionDef;
   // Create a new connection in database master
   io.Connections.NewSQLServerConnectionDef(LDefaultConnectionDef.AsString['Server'], 'master', LDefaultConnectionDef.Params.UserName,
     LDefaultConnectionDef.Params.Password, False, False, False, CONNECTION_NAME_MSSQL_MASTER);

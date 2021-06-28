@@ -211,7 +211,7 @@ end;
 
 function TioContextTable.GetConnectionDefName: String;
 begin
-  Result := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
+  Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
 end;
 
 function TioContextTable.GetGroupBy: IioGroupBy;
@@ -272,7 +272,7 @@ var
   LCurrentConnectionDefName: String;
 begin
   // Defaultize the connection def name to check (default connection name if empty)
-  AConnectionDefNameToCheck := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionDefNameToCheck);
+  AConnectionDefNameToCheck := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionDefNameToCheck);
   // Extract the curret connection def of the context table (ask it to the table itself obviously)
   LCurrentConnectionDefName := GetConnectionDefName;
   // The table is for this connection if the current connection name of the table: is empty (no connection name is

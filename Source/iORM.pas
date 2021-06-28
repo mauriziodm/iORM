@@ -775,7 +775,7 @@ class procedure io.DeleteCollection(const ACollection: TObject);
 var
   LConnectionDefName: String;
 begin
-  LConnectionDefName := TioConnectionManager.GetDefaultConnectionName;
+  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
   TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteCollection(ACollection);
 end;
 
@@ -841,7 +841,7 @@ class procedure io.PersistCollection(const ACollection: TObject; const ARelation
 var
   LConnectionDefName: String;
 begin
-  LConnectionDefName := TioConnectionManager.GetDefaultConnectionName;
+  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
   TioStrategyFactory.GetStrategy(LConnectionDefName).PersistCollection(ACollection, ARelationPropertyName, ARelationOID, ABlindInsert);
 end;
 

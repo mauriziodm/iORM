@@ -92,7 +92,7 @@ class function TioDbFactory.Connection(AConnectionName: String = IO_CONNECTIONDE
 begin
   // If AConnectionName param is not specified (is empty) then
   // use the default connection def
-  AConnectionName := Self.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionName);
+  AConnectionName := Self.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionName);
   // If the connection already exists in the COnnectionContainer then return then else
   // create a new connection, add it to the COnnectionContainer thne return the connection
   // itself to the caller code
