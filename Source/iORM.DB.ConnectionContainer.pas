@@ -145,6 +145,8 @@ type
   strict private
     class var FContainer: TioInternalContainerType;
     class function ConnectionNameToContainerKey(AConnectionName: String): String;
+    class procedure _Lock;
+    class procedure _Unlock;
   protected
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;
@@ -164,12 +166,22 @@ uses
 
 class procedure TioConnectionContainer.AddConnection(const AConnection: IioConnection);
 begin
-  FContainer.Add(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName), AConnection);
+  _Lock;
+  try
+    FContainer.Add(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName), AConnection);
+  finally
+    _Unlock;
+  end;
 end;
 
 class function TioConnectionContainer.ConnectionExist(const AConnectionName: String): Boolean;
 begin
-  Result := FContainer.ContainsKey(Self.ConnectionNameToContainerKey(AConnectionName));
+  _Lock;
+  try
+    Result := FContainer.ContainsKey(Self.ConnectionNameToContainerKey(AConnectionName));
+  finally
+    _Unlock;
+  end;
 end;
 
 class function TioConnectionContainer.ConnectionNameToContainerKey(AConnectionName: String): String;
@@ -184,17 +196,22 @@ end;
 
 class procedure TioConnectionContainer.FreeConnection(const AConnection: IioConnection);
 begin
-  // Remove the reference to the connection
-  // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
-  // tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
-  // che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
-  // questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
-  // a vicenda e rendevano inefficace il Reference Count
-  if AConnection.IsDBConnection then
-    AConnection.AsDBConnection.QueryContainer.CleanQueryConnectionsRef;
-  // RImuove la connessione causandone anche la distruzione perchè a questo punto non c'è
-  // più alcun riferimento ad essa.
-  FContainer.Remove(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName));
+  _Lock;
+  try
+    // Remove the reference to the connection
+    // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+    // tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
+    // che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+    // questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+    // a vicenda e rendevano inefficace il Reference Count
+    if AConnection.IsDBConnection then
+      AConnection.AsDBConnection.QueryContainer.CleanQueryConnectionsRef;
+    // RImuove la connessione causandone anche la distruzione perchè a questo punto non c'è
+    // più alcun riferimento ad essa.
+    FContainer.Remove(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName));
+  finally
+    _Unlock;
+  end;
 end;
 
 class procedure TioConnectionContainer.FreeInternalContainer;
@@ -215,7 +232,22 @@ end;
 
 class function TioConnectionContainer.GetConnection(const AConnectionName: String): IioConnection;
 begin
-  Result := FContainer.Items[Self.ConnectionNameToContainerKey(AConnectionName)];
+  _Lock;
+  try
+    Result := FContainer.Items[Self.ConnectionNameToContainerKey(AConnectionName)];
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioConnectionContainer._Lock;
+begin
+  TMonitor.Enter(FContainer);
+end;
+
+class procedure TioConnectionContainer._Unlock;
+begin
+  TMonitor.Exit(FContainer);
 end;
 
 { TioConnectionManager }
