@@ -68,6 +68,7 @@ type
     class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
     class function EnumToString<T>(const AEnumValue:T): String;
     class function GetThreadID: TThreadID;
+    class function ExtractItemRttiType<T>: TRttiType;
   end;
 
 implementation
@@ -120,6 +121,19 @@ end;
 class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;
 begin
   Result := TRttiEnumerationType.GetName<T>(AEnumValue);
+end;
+
+class function TioUtilities.ExtractItemRttiType<T>: TRttiType;
+var
+  LType: TRttiType;
+  LGetItemMethod: TRttiMethod;
+begin
+  LType := TioRttiContextFactory.RttiContext.GetType(TypeInfo(T));
+  LGetItemMethod := LType.GetMethod('GetItem');
+  if Assigned(LGetItemMethod) then
+    Result := LGetItemMethod.ReturnType
+  else
+    raise EioException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
 end;
 
 class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
