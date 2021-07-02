@@ -421,11 +421,10 @@ type
   ioConnectionDefName = class(TioCustomStringAttribute)
   end;
 
-  // ClassFromField
-  ioClassFromField = class(TioCustomAttribute)
+  // TrueClass
+  ioTrueClass = class(TioCustomAttribute)
   end;
-
-  ioTrueClass = ioClassFromField;
+  ioClassFromField = ioTrueClass;  // DEPRECATED
 
   // GroupBy
   ioGroupBy = class(TioCustomStringAttribute)

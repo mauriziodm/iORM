@@ -71,11 +71,11 @@ type
     ['{CB0292C6-A7A8-4951-A867-D5A5F6D8F053}']
     function GetWhereItems: IWhereItems;
     function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
-    function GetSqlWithClassFromField(const AMap:IioMap; const AIsClassFromField:Boolean; const AClassFromField: IioClassFromField): String;
+    function GetSqlWithTrueClass(const AMap:IioMap; const AIsTrueClass:Boolean; const ATrueClass: IioTrueClass): String;
     function GetOrderBySql(const AMap:IioMap): String;
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
-    function GetDisableClassFromField: Boolean;
+    function GetDisableTrueClass: Boolean;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
     function GetPagingObj: TObject;  // TObject to avoid circular reference
@@ -114,7 +114,7 @@ type
     function Add(const AWhereCond:IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere; overload;
-    function DisableClassFromField: IioWhere;
+    function DisableTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
     function IsLazy: Boolean;
@@ -251,7 +251,7 @@ type
     function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere<T>; overload;
-    function DisableClassFromField: IioWhere<T>;
+    function DisableTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;

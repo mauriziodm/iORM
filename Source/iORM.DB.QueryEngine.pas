@@ -110,8 +110,8 @@ begin
     if Supports(ASqlItem, IioSqlItemWhere, ASqlItemWhere) and ASqlItemWhere.HasParameter then
       AQuery.ParamByName(ASqlItemWhere.GetSqlParamName(AContext.Map)).Value := ASqlItemWhere.GetValue(AContext.Map).AsVariant;
   end;
-  if AContext.IsClassFromField then
-    AQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := '%' + AContext.ClassFromField.GetClassName + '%';
+  if AContext.IsTrueClass then
+    AQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := '%' + AContext.TrueClass.GetClassName + '%';
 end;
 
 class function TioQueryEngine.GetQueryForCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
@@ -194,9 +194,9 @@ begin
         ;
     end;
   end;
-  // Add the ClassFromField value if enabled
-  if AContext.IsClassFromField then
-    AQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
+  // Add the TrueClass value if enabled
+  if AContext.IsTrueClass then
+    AQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
 end;
 
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
@@ -306,9 +306,9 @@ begin
         ;
     end;
   end;
-  // Add the ClassFromField value if enabled
-  if AContext.IsClassFromField then
-    LQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
+  // Add the TrueClass value if enabled
+  if AContext.IsTrueClass then
+    LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
   // Where conditions
   LQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
     .AsVariant;

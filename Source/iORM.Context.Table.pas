@@ -101,8 +101,8 @@ type
   // END: JOIN
   // ===========================================================================
 
-  // Classe che incapsula le informazioni per la funzione ClassFromField
-  TioClassFromField = class(TioBaseTableCompanion, IioClassFromField)
+  // Classe che incapsula le informazioni per la funzione TrueClass
+  TioTrueClass = class(TioBaseTableCompanion, IioTrueClass)
   strict private
     FAncestors: String;
     FSqlFieldName: String;
@@ -123,7 +123,7 @@ type
   TioContextTable = class(TioSqlItem, IioContextTable)
   strict private
     FMapMode: TioMapModeType;
-    FClassFromField: IioClassFromField;
+    FTrueClass: IioTrueClass;
     FJoins: IioJoins;
     FGroupBy: IioGroupBy;
     FConnectionDefName_DoNotCallDirectly: String;
@@ -132,13 +132,13 @@ type
     FIndexList: TioIndexList;
     FAutoCreateDB: Boolean;
   public
-    constructor Create(const ASqlText, AKeyGenerator: String; const AClassFromField: IioClassFromField; const AJoins: IioJoins;
+    constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins;
       const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType; const AAutoCreateDB: Boolean;
       const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     function GetSql: String; override;
-    function GetClassFromField: IioClassFromField;
-    function IsClassFromField: Boolean;
+    function GetTrueClass: IioTrueClass;
+    function IsTrueClass: Boolean;
     function TableName: String;
     function GetKeyGenerator: String;
     function GetJoin: IioJoins;
@@ -163,7 +163,7 @@ uses
 
 { TioContextTable }
 
-constructor TioContextTable.Create(const ASqlText, AKeyGenerator: String; const AClassFromField: IioClassFromField;
+constructor TioContextTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass;
   const AJoins: IioJoins; const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType;
   const AAutoCreateDB: Boolean; const ARttiType: TRttiInstanceType);
 begin
@@ -174,10 +174,10 @@ begin
   FRttiType := ARttiType;
   FIndexList := nil;
   FAutoCreateDB := AAutoCreateDB;
-  // Set ClassFromField
-  FClassFromField := AClassFromField;
-  if Assigned(FClassFromField) then
-    FClassFromField.SetTable(Self);
+  // Set TrueClass
+  FTrueClass := ATrueClass;
+  if Assigned(FTrueClass) then
+    FTrueClass.SetTable(Self);
   // Set Joins
   FJoins := AJoins;
   FJoins.SetTable(Self);
@@ -199,9 +199,9 @@ begin
   Result := FAutoCreateDB;
 end;
 
-function TioContextTable.GetClassFromField: IioClassFromField;
+function TioContextTable.GetTrueClass: IioTrueClass;
 begin
-  Result := FClassFromField;
+  Result := FTrueClass;
 end;
 
 function TioContextTable.GetClassName: String;
@@ -262,9 +262,9 @@ begin
   Result := Assigned(FIndexList);
 end;
 
-function TioContextTable.IsClassFromField: Boolean;
+function TioContextTable.IsTrueClass: Boolean;
 begin
-  Result := Assigned(FClassFromField);
+  Result := Assigned(FTrueClass);
 end;
 
 function TioContextTable.IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
@@ -292,55 +292,55 @@ begin
   Result := Self.FSqlText;
 end;
 
-{ TioClassFromField }
+{ TioTrueClass }
 
-constructor TioClassFromField.Create(ASqlFieldName: String);
+constructor TioTrueClass.Create(ASqlFieldName: String);
 begin
   FSqlFieldName := ASqlFieldName;
   FAncestors := '';
 end;
 
-function TioClassFromField.GetClassName: String;
+function TioTrueClass.GetClassName: String;
 begin
   Result := Table.GetClassName;
 end;
 
-function TioClassFromField.GetFieldName: string;
+function TioTrueClass.GetFieldName: string;
 begin
   Result := FSqlFieldName;
 end;
 
-function TioClassFromField.GetQualifiedClassName: String;
+function TioTrueClass.GetQualifiedClassName: String;
 begin
   Result := Table.GetQualifiedClassName;
 end;
 
-function TioClassFromField.GetSqlFieldName: string;
+function TioTrueClass.GetSqlFieldName: string;
 begin
   Result := TioDBFActory.SqlDataConverter(Table.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
-function TioClassFromField.GetSqlParamName: String;
+function TioTrueClass.GetSqlParamName: String;
 begin
   Result := 'P_' + FSqlFieldName;
 end;
 
-function TioClassFromField.GetSqlValue: string;
+function TioTrueClass.GetSqlValue: string;
 begin
   Result := TioDBFActory.SqlDataConverter(Table.GetConnectionDefName).StringToSQL(Self.GetValue);
 end;
 
-function TioClassFromField.GetValue: String;
+function TioTrueClass.GetValue: String;
 begin
   Result := Table.GetQualifiedClassName + ';' + Self.FAncestors;
 end;
 
-function TioClassFromField.QualifiedClassNameFromClassInfoFieldValue(AValue: String): String;
+function TioTrueClass.QualifiedClassNameFromClassInfoFieldValue(AValue: String): String;
 begin
   Result := Copy(AValue, 0, Pos(';', AValue) - 1);
 end;
 
-procedure TioClassFromField.SetTable(const ATable: IioContextTable);
+procedure TioTrueClass.SetTable(const ATable: IioContextTable);
 var
   LRttiType: TRttiType;
 begin

@@ -50,8 +50,8 @@ type
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
-    function ClassFromField: IioClassFromField;
-    function IsClassFromField: Boolean;
+    function TrueClass: IioTrueClass;
+    function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;

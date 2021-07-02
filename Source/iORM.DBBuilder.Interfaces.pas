@@ -64,10 +64,10 @@ type
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
-    // IsClassFromField
-    procedure SetIsClassFromField(const AValue: boolean);
-    function GetIsClassFromField: boolean;
-    property IsClassFromField: boolean read GetIsClassFromField write SetIsClassFromField;
+    // IsTrueClass
+    procedure SetIsTrueClass(const AValue: boolean);
+    function GetIsTrueClass: boolean;
+    property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);

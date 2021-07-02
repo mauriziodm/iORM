@@ -77,7 +77,7 @@ contains
   iORM.ObjectsForge.Factory in '..\..\Source\iORM.ObjectsForge.Factory.pas',
   iORM.ObjectsForge.Interfaces in '..\..\Source\iORM.ObjectsForge.Interfaces.pas',
   iORM.ObjectsForge.ObjectMaker in '..\..\Source\iORM.ObjectsForge.ObjectMaker.pas',
-  iORM.ObjectsForge.ObjectMakerClassFromField in '..\..\Source\iORM.ObjectsForge.ObjectMakerClassFromField.pas',
+  iORM.ObjectsForge.ObjectMakerTrueClass in '..\..\Source\iORM.ObjectsForge.ObjectMakerTrueClass.pas',
   iORM in '..\..\Source\iORM.pas',
   iORM.RttiContext.Factory in '..\..\Source\iORM.RttiContext.Factory.pas',
   iORM.SqlItems in '..\..\Source\iORM.SqlItems.pas',

@@ -359,7 +359,7 @@ var
       // If a record is fuìound then load the object and return True
       if not AQuery.Eof then
         // Create the object as TObject
-        Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+        Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsTrueClass).MakeObject(AContext, AQuery);
     finally
       // Close query
       AQuery.Close;
@@ -412,7 +412,7 @@ begin
   try
     // Create the object as TObject
     if not AQuery.IsEmpty then
-      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsTrueClass).MakeObject(AContext, AQuery);
   finally
     // Close query
     AQuery.Close;
@@ -793,7 +793,7 @@ var
         // Clean the DataObject (it contains the previous)
         AContext.DataObject := nil;
         // Create the object as TObject
-        AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+        AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsTrueClass).MakeObject(AContext, AQuery);
         // Add current object to the list
         ADuckTypedList.Add(AObj);
         // Next

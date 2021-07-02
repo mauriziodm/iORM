@@ -33,7 +33,7 @@
 
 
 
-unit iORM.ObjectsForge.ObjectMakerClassFromField;
+unit iORM.ObjectsForge.ObjectMakerTrueClass;
 
 interface
 
@@ -45,7 +45,7 @@ uses
 type
 
   // Standard Object Maker
-  TioObjectMakerClassFromField = class(TioObjectMakerIntf)
+  TioObjectMakerTrueClass = class(TioObjectMakerIntf)
   public
     class function MakeObject(const AContext:IioContext; const AQuery:IioQuery): TObject; override;
   end;
@@ -56,17 +56,17 @@ uses
   System.Rtti, iORM.Exceptions, iORM, System.SysUtils,
   iORM.RttiContext.Factory;
 
-{ TioObjectMakerClassFromField }
+{ TioObjectMakerTrueClass }
 
-class function TioObjectMakerClassFromField.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
+class function TioObjectMakerTrueClass.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
 var
   Ctx: TRttiContext;
   Typ: TRttiInstanceType;
   AClassName: String;
 begin
   // Get full qualified class name
-  AClassName := AQuery.GetValueByFieldNameAsVariant(AContext.ClassFromField.GetFieldName);
-  AClassName := AContext.ClassFromField.QualifiedClassNameFromClassInfoFieldValue(AClassName);
+  AClassName := AQuery.GetValueByFieldNameAsVariant(AContext.TrueClass.GetFieldName);
+  AClassName := AContext.TrueClass.QualifiedClassNameFromClassInfoFieldValue(AClassName);
   // Get rtti class type for classref
   Ctx := TioRttiContextFactory.RttiContext;
   Typ := Ctx.FindType(AClassName) as TRttiInstanceType;
@@ -75,7 +75,7 @@ begin
   // Load object
   Result := io.Load(Typ.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
                                            .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
-                                           .DisableClassFromField
+                                           .DisableTrueClass
                                            ._ToObjectInternalByClassOnly(AContext.DataObject);
 end;
 

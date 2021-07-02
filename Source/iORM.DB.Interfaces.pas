@@ -395,7 +395,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
   else
     AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlParamName]));
   // GroupBy
@@ -411,7 +411,7 @@ begin
   // is an internal query.
   if AContext.WhereExist then
     // AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
-    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
   else
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
   // -----------------------------------------------------------------
@@ -427,9 +427,9 @@ begin
   AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
   AQuery.SQL.Add('(');
   AQuery.SQL.Add(AContext.GetProperties.GetSQL(ioInsert));
-  // Add the ClassFromField if enabled
-  if AContext.IsClassFromField then
-    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // Add the TrueClass if enabled
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
   // -----------------------------------------------------------------
   AQuery.SQL.Add(') VALUES (');
   // -----------------------------------------------------------------
@@ -445,9 +445,9 @@ begin
     AQuery.SQL.Add(Comma + ':' + Prop.GetSqlParamName);
     Comma := ',';
   end;
-  // Add the ClassFromField if enabled
-  if AContext.IsClassFromField then
-    AQuery.SQL.Add(',:' + AContext.ClassFromField.GetSqlParamName);
+  // Add the TrueClass if enabled
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',:' + AContext.TrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
   // -----------------------------------------------------------------
 end;
@@ -484,8 +484,8 @@ begin
   AQuery.SQL.Add('SELECT');
   // Field list
   AQuery.SQL.Add(AContext.GetProperties.GetSQL(ioSelect));
-  if AContext.IsClassFromField then
-    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
   // From
   AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSQL);
   // Join
@@ -493,7 +493,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.Map, AContext.IsClassFromField, AContext.ClassFromField))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
   else
     AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlParamName]));
   // GroupBy
@@ -522,9 +522,9 @@ begin
     AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
     Comma := ',';
   end;
-  // Add the ClassFromField if enabled
-  if AContext.IsClassFromField then
-    AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=:' + AContext.ClassFromField.GetSqlParamName);
+  // Add the ioTrueClass if enabled
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
   // Where conditions
   // AQuery.SQL.Add(AContext.Where.GetSql);
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);

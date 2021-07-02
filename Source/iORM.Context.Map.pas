@@ -60,7 +60,7 @@ type
     function GetClassName: String;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
-    function ClassFromField: IioClassFromField;
+    function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function ObjStatusExist: Boolean;
@@ -90,9 +90,9 @@ begin
   Result := FProperties.BlobFieldExists;
 end;
 
-function TioMap.ClassFromField: IioClassFromField;
+function TioMap.TrueClass: IioTrueClass;
 begin
-  Result := FTable.GetClassFromField;
+  Result := FTable.GetTrueClass;
 end;
 
 constructor TioMap.Create(AClassRef: TioClassRef; ARttiContext: TRttiContext;

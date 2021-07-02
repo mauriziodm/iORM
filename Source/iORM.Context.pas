@@ -66,8 +66,8 @@ type
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
-    function ClassFromField: IioClassFromField;
-    function IsClassFromField: Boolean;
+    function TrueClass: IioTrueClass;
+    function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
@@ -106,9 +106,9 @@ begin
   Result := Self.GetProperties.BlobFieldExists;
 end;
 
-function TioContext.ClassFromField: IioClassFromField;
+function TioContext.TrueClass: IioTrueClass;
 begin
-  Result := Self.Map.GetTable.GetClassFromField;
+  Result := Self.Map.GetTable.GetTrueClass;
 end;
 
 constructor TioContext.Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil);
@@ -220,10 +220,10 @@ begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
 end;
 
-function TioContext.IsClassFromField: Boolean;
+function TioContext.IsTrueClass: Boolean;
 begin
-  Result := Self.GetTable.IsClassFromField
-            and (   (not Assigned(FWhere)) or (not FWhere.GetDisableClassFromField)   );
+  Result := Self.GetTable.IsTrueClass
+            and (   (not Assigned(FWhere)) or (not FWhere.GetDisableTrueClass)   );
 end;
 
 function TioContext.Map: IioMap;

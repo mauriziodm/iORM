@@ -183,7 +183,7 @@
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMaker.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMakerClassFromField.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMakerTrueClass.pas"/>
         <DCCReference Include="..\..\Source\iORM.pas"/>
         <DCCReference Include="..\..\Source\iORM.RttiContext.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.SqlItems.pas"/>

@@ -56,7 +56,7 @@ type
   strict protected
     FTypeName, FTypeAlias: String;
     FTypeInfo: PTypeInfo;
-    FDisableClassFromField: Boolean;
+    FDisableTrueClass: Boolean;
     FLazyLoad: Boolean;
     FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
@@ -99,8 +99,8 @@ type
     constructor Create; reintroduce; overload;
     function GetWhereItems: IWhereItems;
     function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
-    function GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean; const AClassFromField: IioClassFromField): String;
-    function GetDisableClassFromField: Boolean;
+    function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
+    function GetDisableTrueClass: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
@@ -144,7 +144,7 @@ type
     function Add(const AWhereCond:IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere; overload;
-    function DisableClassFromField: IioWhere;
+    function DisableTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
     function IsLazy: Boolean;
@@ -270,7 +270,7 @@ type
     function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere<T>; overload;
-    function DisableClassFromField: IioWhere<T>;
+    function DisableTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
@@ -671,7 +671,7 @@ constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
 
-  FDisableClassFromField := False;
+  FDisableTrueClass := False;
   FLazyLoad := False;
   FWhereItems := TioWhereFactory.NewWhereItems;
   FDetailsContainer := TioWhereFactory.NewDetailsContainer;
@@ -732,10 +732,10 @@ begin
   TioStrategyFactory.GetStrategy('').Delete(Self);
 end;
 
-function TioWhere.DisableClassFromField: IioWhere;
+function TioWhere.DisableTrueClass: IioWhere;
 begin
   Result := Self;
-  FDisableClassFromField := True;
+  FDisableTrueClass := True;
 end;
 
 procedure TioWhere.DropIndex(const AIndexName: String);
@@ -789,9 +789,9 @@ begin
   Result := FDetailsContainer;
 end;
 
-function TioWhere.GetDisableClassFromField: Boolean;
+function TioWhere.GetDisableTrueClass: Boolean;
 begin
-  Result := FDisableClassFromField;
+  Result := FDisableTrueClass;
 end;
 
 function TioWhere.GetItems: IWhereItems;
@@ -858,17 +858,17 @@ begin
   end;
 end;
 
-function TioWhere.GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean; const AClassFromField: IioClassFromField): String;
+function TioWhere.GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
 begin
   Result := Self.GetSql(AMap);
-  if AIsClassFromField then
+  if AIsTrueClass then
   begin
     if Result = '' then
       Result := 'WHERE '
     else
       Result := Result + ' AND ';
-    // Result := Result + AClassFromField.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+AClassFromField.GetClassName+'>%');
-    Result := Result + AClassFromField.GetSqlFieldName + ' LIKE :' + AClassFromField.GetSqlParamName;
+    // Result := Result + ATrueClass.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+ATrueClass.GetClassName+'>%');
+    Result := Result + ATrueClass.GetSqlFieldName + ' LIKE :' + ATrueClass.GetSqlParamName;
   end;
 end;
 
@@ -1483,10 +1483,10 @@ begin
   TioWhere(Self).ByID(AID);
 end;
 
-function TioWhere<T>.DisableClassFromField: IioWhere<T>;
+function TioWhere<T>.DisableTrueClass: IioWhere<T>;
 begin
   Result := Self;
-  TioWhere(Self).DisableClassFromField;
+  TioWhere(Self).DisableTrueClass;
 end;
 
 function TioWhere<T>.Lazy(const ALazyEnabled: Boolean): IioWhere<T>;

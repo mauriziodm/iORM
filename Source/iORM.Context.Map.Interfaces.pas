@@ -51,7 +51,7 @@ type
     function GetClassName: String;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
-    function ClassFromField: IioClassFromField;
+    function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     // ObjStatusExist
