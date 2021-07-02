@@ -233,7 +233,7 @@ end;
 
 function TioContext.ObjStatusExist: Boolean;
 begin
-  Result := Self.Map.ObjStatusExist;
+  Result := Self.GetProperties.ObjStatusExist;
 end;
 
 end.

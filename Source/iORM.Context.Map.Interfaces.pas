@@ -54,8 +54,6 @@ type
     function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
-    // ObjStatusExist
-    function ObjStatusExist: Boolean;
     // Blob field present
     function BlobFieldExists: Boolean;
     // Reference to a map of the ancestor if the ancestor itself is mapped (is an entity)

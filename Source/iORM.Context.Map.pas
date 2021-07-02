@@ -53,7 +53,6 @@ type
     FRttiType: TRttiInstanceType;
     FAncestorMap: IioMap;
     fDIContainerImplementersItem: TioDIContainerImplementersItem;
-  strict protected
   public
     constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioContextTable; AProperties:IioContextProperties); overload;
     function GetClassRef: TioClassRef;
@@ -63,7 +62,6 @@ type
     function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
-    function ObjStatusExist: Boolean;
     function BlobFieldExists: Boolean;
     function AncestorMap: Iiomap;
     // True if the class has a mapped ancestor (the ancestor is even an entity)
@@ -140,11 +138,6 @@ end;
 function TioMap.HasMappedAncestor: Boolean;
 begin
   Result := Assigned(FAncestorMap);
-end;
-
-function TioMap.ObjStatusExist: Boolean;
-begin
-  Result := Self.GetProperties.ObjStatusExist;
 end;
 
 function TioMap.RttiContext: TRttiContext;
