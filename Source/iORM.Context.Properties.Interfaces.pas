@@ -143,10 +143,16 @@ type
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
     function ObjStatusExist: Boolean;
+    // ObjectVersion Exist
+    function ObjVersionExist: Boolean;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(const AValue: IioContextProperty);
     property ObjStatusProperty:IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
+    // ObjVersion property
+    function GetObjVersionProperty: IioContextProperty;
+    procedure SetObjVersionProperty(const AValue: IioContextProperty);
+    property ObjVersionProperty: IioContextProperty read GetObjVersionProperty write SetObjVersionProperty;
   end;
 
 implementation

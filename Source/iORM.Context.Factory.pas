@@ -320,6 +320,15 @@ begin
         PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction, PropMetadata_FKOnDeleteAction);
       Continue;
     end;
+    // ObjVersion property
+    if PropFieldName = 'ObjVersion' then
+    begin
+      Result.ObjVersionProperty := Self.GetProperty(ATable, Prop, '', '', '', '', False, iorwReadWrite, ioRTNone, '', '', '', ioEagerLoad,
+        PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType,
+        PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction, PropMetadata_FKOnDeleteAction);
+      Continue;
+    end;
     // Prop Init
     PropID := (Uppercase(PropFieldName) = 'ID');
     // Is a OID property if the name of the property itself is 'ID'

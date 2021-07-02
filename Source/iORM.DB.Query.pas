@@ -67,7 +67,7 @@ type
     function IsEmpty: Boolean;
     function IsSqlEmpty: Boolean;
     function IsActive: Boolean;
-    procedure ExecSQL;
+    function ExecSQL: integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
@@ -139,9 +139,10 @@ begin
   Result := FSqlQuery.Eof;
 end;
 
-procedure TioQuery.ExecSQL;
+function TioQuery.ExecSQL: integer;
 begin
   FSqlQuery.ExecSQL;
+  Result := FSqlQuery.RowsAffected;
 end;
 
 function TioQuery.Fields: TioFields;

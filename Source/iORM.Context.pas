@@ -56,8 +56,8 @@ type
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
     // ObjectStatus
-    function GetObjectStatus: TioObjectStatus;
-    procedure SetObjectStatus(const AValue: TioObjectStatus);
+    function GetObjectStatus: TioObjStatus;
+    procedure SetObjectStatus(const AValue: TioObjStatus);
     // Where
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
@@ -88,7 +88,7 @@ type
     // DataObject
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
-    property ObjectStatus:TioObjectStatus read GetObjectStatus write SetObjectStatus;
+    property ObjectStatus:TioObjStatus read GetObjectStatus write SetObjectStatus;
     // Where
     property Where:IioWhere read GetWhere write SetWhere;
   end;
@@ -152,10 +152,10 @@ begin
   Result := Self.GetTable.GetJoin;
 end;
 
-function TioContext.GetObjectStatus: TioObjectStatus;
+function TioContext.GetObjectStatus: TioObjStatus;
 begin
   if Self.GetProperties.ObjStatusExist
-    then Result := TioObjectStatus(   Self.GetProperties.ObjStatusProperty.GetValue(Self.FDataObject).AsOrdinal   )
+    then Result := TioObjStatus(   Self.GetProperties.ObjStatusProperty.GetValue(Self.FDataObject).AsOrdinal   )
     else Result := osDirty;
 end;
 
@@ -184,14 +184,14 @@ begin
   FDataObject := AValue;
 end;
 
-procedure TioContext.SetObjectStatus(const AValue: TioObjectStatus);
+procedure TioContext.SetObjectStatus(const AValue: TioObjStatus);
 var
   PropValue: TValue;
 begin
   // If ObjectStatus property not exist then exit
   if not Self.GetProperties.ObjStatusExist then Exit;
   // If exist set the property value
-  PropValue := TValue.From<TioObjectStatus>(AValue);
+  PropValue := TValue.From<TioObjStatus>(AValue);
   Self.GetProperties.ObjStatusProperty.SetValue(Self.FDataObject, PropValue);
 end;
 

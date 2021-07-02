@@ -68,9 +68,9 @@ type
     // ObjStatusExist
     function ObjStatusExist: Boolean;
     // ObjectStatus
-    procedure SetObjectStatus(const AValue: TioObjectStatus);
-    function GetObjectStatus: TioObjectStatus;
-    property ObjectStatus:TioObjectStatus read GetObjectStatus write SetObjectStatus;
+    procedure SetObjectStatus(const AValue: TioObjStatus);
+    function GetObjectStatus: TioObjStatus;
+    property ObjectStatus:TioObjStatus read GetObjectStatus write SetObjectStatus;
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;

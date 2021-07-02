@@ -62,7 +62,7 @@ type
   TioLogicOp = (loAnd, loOr, loNot, loOpenPar, loClosePar);
 
   // Object Status
-  TioObjectStatus = (osDirty = 0, osClean, osDeleted);
+  TioObjStatus = (osDirty = 0, osClean, osDeleted);
 
   // Common ClassRef
   TioClassRef = class of TObject;

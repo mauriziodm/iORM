@@ -199,12 +199,16 @@ type
     FPropertyItems: TList<IioContextProperty>;
     FIdProperty: IioContextProperty;
     FObjStatusProperty: IioContextProperty;
+    FObjVersionProperty: IioContextProperty;
     FBlobFieldExists: Boolean;
-  strict protected
+  private
     function InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
-    // ObjectStatus property
+    // ObjStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(const AValue: IioContextProperty);
+    // ObjVersion property
+    function GetObjVersionProperty: IioContextProperty;
+    procedure SetObjVersionProperty(const AValue: IioContextProperty);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -222,8 +226,12 @@ type
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
     function ObjStatusExist: Boolean;
-    // ObjectStatus property
+    // ObjectVersion Exist
+    function ObjVersionExist: Boolean;
+    // ObjStatus property
     property ObjStatusProperty: IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
+    // ObjVersion property
+    property ObjVersionProperty: IioContextProperty read GetObjVersionProperty write SetObjVersionProperty;
   end;
 
 implementation
@@ -775,6 +783,7 @@ constructor TioProperties.Create;
 begin
   FBlobFieldExists := False;
   FObjStatusProperty := nil;
+  FObjVersionProperty := nil;
   FPropertyItems := TList<IioContextProperty>.Create;
 end;
 
@@ -807,6 +816,11 @@ end;
 function TioProperties.GetObjStatusProperty: IioContextProperty;
 begin
   Result := FObjStatusProperty;
+end;
+
+function TioProperties.GetObjVersionProperty: IioContextProperty;
+begin
+  Result := FObjVersionProperty;
 end;
 
 function TioProperties.GetPropertyByName(const APropertyName: String): IioContextProperty;
@@ -879,6 +893,11 @@ begin
   Result := Assigned(FObjStatusProperty);
 end;
 
+function TioProperties.ObjVersionExist: Boolean;
+begin
+  Result := Assigned(FObjVersionProperty);
+end;
+
 procedure TioProperties.SetFieldData;
 var
   AProperty: IioContextProperty;
@@ -898,6 +917,11 @@ end;
 procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);
 begin
   FObjStatusProperty := AValue;
+end;
+
+procedure TioProperties.SetObjVersionProperty(const AValue: IioContextProperty);
+begin
+  FObjVersionProperty := AValue;
 end;
 
 procedure TioProperties.SetTable(const ATable: IioContextTable);

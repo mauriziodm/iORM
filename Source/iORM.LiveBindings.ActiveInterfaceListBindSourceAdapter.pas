@@ -131,7 +131,7 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
-    procedure SetObjStatus(AObjStatus: TioObjectStatus);
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
     // <TObject> (for non interfaced list such as TList<IInterface>)
@@ -897,7 +897,7 @@ begin
   FMasterPropertyName := AMasterProperty.GetName;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
+procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
 end;
