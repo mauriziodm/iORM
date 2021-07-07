@@ -224,13 +224,14 @@ type
   end;
 
   // ID attribute
-  ioOID = class(TioCustomAttribute)
+  ioID = class(TioCustomAttribute)
   strict private
     FSkipOnInsert: Boolean;
   public
     constructor Create(const ASkipOnInsert: Boolean = True);
     property SkipOnInsert: Boolean read FSkipOnInsert;
   end;
+  ioOID = ioID; // Deprecated
 
   // FieldName attribute
   ioField = class(TioCustomStringAttribute)

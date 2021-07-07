@@ -256,10 +256,12 @@ class function TioConnectionManager.CheckConnectionName(AConnectionName: String)
 begin
   // NB: Lasciare anche se il parametro è già defaultizzato perchè in alcune circostanze serve
   if IsEmptyConnectionName(AConnectionName) then
-    AConnectionName := IO_CONNECTIONDEF_DEFAULTNAME;
+    Result := IO_CONNECTIONDEF_DEFAULTNAME
+  else
+    Result := AConnectionName;
   // If a connectionDef with this name is not founded then raise an exception
-  if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(AConnectionName)) then
-    raise EioException.Create(Self.ClassName + ': Connection params definition "' + AConnectionName + '" not found!');
+  if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
+    raise EioException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
 end;
 
 class procedure TioConnectionManager.CreateInternalContainer;

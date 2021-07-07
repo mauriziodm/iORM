@@ -189,7 +189,8 @@ var
   PropValue: TValue;
 begin
   // If ObjectStatus property not exist then exit
-  if not Self.GetProperties.ObjStatusExist then Exit;
+  if not Self.GetProperties.ObjStatusExist then
+    Exit;
   // If exist set the property value
   PropValue := TValue.From<TioObjStatus>(AValue);
   Self.GetProperties.ObjStatusProperty.SetValue(Self.FDataObject, PropValue);
@@ -222,8 +223,7 @@ end;
 
 function TioContext.IsTrueClass: Boolean;
 begin
-  Result := Self.GetTable.IsTrueClass
-            and (   (not Assigned(FWhere)) or (not FWhere.GetDisableTrueClass)   );
+  Result := Self.GetTable.IsTrueClass and (   (not Assigned(FWhere)) or (not FWhere.GetDisableTrueClass)   );
 end;
 
 function TioContext.Map: IioMap;
