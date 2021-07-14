@@ -259,7 +259,7 @@ begin
     Result := IO_CONNECTIONDEF_DEFAULTNAME
   else
     Result := AConnectionName;
-  // If a connectionDef with this name is not founded then raise an exception
+  // If a connectionDef with this name is not found then raise an exception
   if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
     raise EioException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
 end;
