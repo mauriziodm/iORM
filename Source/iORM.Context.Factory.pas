@@ -75,7 +75,7 @@ uses
   iORM.Context, iORM.Context.Properties,
   System.SysUtils, iORM.Context.Table,
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
-  System.StrUtils, iORM.Exceptions;
+  System.StrUtils, iORM.Exceptions, System.TypInfo;
 
 { TioBuilderProperties }
 
@@ -181,6 +181,7 @@ var
   PropTypeAlias: String;
   PropFieldName: String;
   PropFieldType: String;
+  PropFieldValueType: System.Rtti.TRttiType;
   PropLoadSql: String;
   PropSkip: Boolean;
   PropReadWrite: TioReadWrite;
@@ -255,12 +256,13 @@ begin
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind,
-        LRttiProperty.PropertyType.QualifiedName);
+      PropFieldValueType := LRttiProperty.PropertyType;
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
     end
     else if Prop is TRttiField then
     begin
       LRttiField := Prop as TRttiField;
+      PropFieldValueType := LRttiField.FieldType;
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end
     else
@@ -311,8 +313,8 @@ begin
     // Se la proprietà esiste già nella mappa (può accadere quando si fa property override)
     if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or Result.PropertyExists(PropFieldName) then
       Continue;
-    // ObjStatus property
-    if PropFieldName = 'ObjStatus' then
+    // ObjStatus property 8detect it by the type "TioObjStatus"
+    if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
     begin
       Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioEagerLoad,
         PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,

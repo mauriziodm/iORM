@@ -53,6 +53,7 @@ type
     acDelete: TAction;
     SQLiteConn: TioSQLiteConnectionDef;
     ioFMX1: TioFMX;
+    ioFMX2: TioFMX;
     procedure FormCreate(Sender: TObject);
     procedure acPersistExecute(Sender: TObject);
     procedure acRefreshExecute(Sender: TObject);
@@ -72,7 +73,7 @@ var
 
 implementation
 
-uses iORM, iORM.DB.DBCreator.Factory, iORM.CommonTypes, System.IOUtils;
+uses iORM, iORM.CommonTypes, System.IOUtils;
 
 
 {$R *.fmx}

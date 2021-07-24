@@ -13,7 +13,7 @@ type
     FName: String;
     FImg: TBitmap;
     FID: Integer;
-    FObjectStatus: TioObjectStatus;
+    FObjectStatus: TioObjStatus;
     procedure SetImg(const Value: TBitmap);
   public
     constructor Create;
@@ -21,7 +21,7 @@ type
     property ID:Integer read FID write FID;
     property Name:String read FName write FName;
     property Img:TBitmap read FImg write SetImg;
-    property ObjStatus: TioObjectStatus read FObjectStatus write FObjectStatus;
+    property ObjStatus: TioObjStatus read FObjectStatus write FObjectStatus;
   end;
 
 implementation
