@@ -221,7 +221,7 @@ var
       tkFloat:
         if AQualifiedName = 'System.TDate' then
           Exit(ioMdDate)
-        else if AQualifiedName = 'System.TDateTime' then
+        else if (AQualifiedName = 'System.TDateTime') or (AQualifiedName = 'iORM.CommonTypes.TioObjVersion') then
           Exit(ioMdDateTime)
         else if AQualifiedName = 'System.TTime' then
           Exit(ioMdTime)
@@ -323,12 +323,13 @@ begin
       Continue;
     end;
     // ObjVersion property
-    if PropFieldName = 'ObjVersion' then
+    if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjVersion)) then
     begin
-      Result.ObjVersionProperty := Self.GetProperty(ATable, Prop, '', '', '', '', False, iorwReadWrite, ioRTNone, '', '', '', ioEagerLoad,
+      Result.ObjVersionProperty := Self.GetProperty(ATable, Prop, '', PropFieldName, '', '', False, iorwReadWrite, ioRTNone, '', '', '', ioEagerLoad,
         PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
         PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType,
         PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction, PropMetadata_FKOnDeleteAction);
+      Result.Add(Result.ObjVersionProperty);
       Continue;
     end;
     // Prop Init

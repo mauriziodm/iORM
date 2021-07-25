@@ -64,6 +64,9 @@ type
   // Object Status
   TioObjStatus = (osDirty = 0, osClean, osDeleted);
 
+  // Object version
+  TioObjVersion = type TDateTime;
+
   // Common ClassRef
   TioClassRef = class of TObject;
 
