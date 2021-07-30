@@ -81,8 +81,6 @@ type
 
   // This is the specialized class for DB connections
   TioConnectionDB = class(TioConnectionBase, IioConnectionDB)
-  const
-    TRANSACTION_TIMESTAMP_NULL = 0;
   strict private
     FConnection: TioInternalSqlConnection;
     FFDGUIxWaitCursor: TFDGUIxWaitCursor;

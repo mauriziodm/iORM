@@ -57,6 +57,8 @@ type
     function WhereExist: Boolean;
     function GetID: Integer;
     function IDIsNull: Boolean;
+    // TransactionTimestamp
+    function TransactionTimestamp: TDateTime;
     // Map
     function Map: IioMap;
     // Blob field present
@@ -68,9 +70,15 @@ type
     // ObjStatusExist
     function ObjStatusExist: Boolean;
     // ObjectStatus
-    procedure SetObjectStatus(const AValue: TioObjStatus);
-    function GetObjectStatus: TioObjStatus;
-    property ObjectStatus:TioObjStatus read GetObjectStatus write SetObjectStatus;
+    procedure SetObjStatus(const AValue: TioObjStatus);
+    function GetObjStatus: TioObjStatus;
+    property ObjStatus:TioObjStatus read GetObjStatus write SetObjStatus;
+    // ObjVersionExist
+    function ObjVersionExist: Boolean;
+    // ObjVersion
+    function GetObjVersion: TioObjVersion;
+    procedure SetObjVersion(const AValue: TioObjVersion);
+    property ObjVersion:TioObjVersion read GetObjVersion write SetObjVersion;
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;

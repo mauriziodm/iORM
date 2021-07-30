@@ -499,7 +499,7 @@ begin
     Self.PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
-    case LContext.ObjectStatus of
+    case LContext.ObjStatus of
       // DIRTY
       // If the ID property of the object is not assigned
       // then insert the object else update
@@ -512,7 +512,7 @@ begin
             Self.UpdateObject(LContext)
           else
             Self.InsertObject(LContext, ABlindInsert);
-          LContext.ObjectStatus := osClean;
+          LContext.ObjStatus := osClean;
         end;
       // DELETE
       osDeleted:
@@ -836,8 +836,10 @@ end;
 class procedure TioStrategyDB.UpdateObject(const AContext: IioContext);
 begin
   inherited;
-  // Create and execute query
-  TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL;
+  if TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL > 0 then
+    AContext.ObjVersion := AContext.TransactionTimestamp
+  else
+    raise EioConcurrencyConflictException.
 end;
 
 end.

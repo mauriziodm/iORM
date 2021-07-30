@@ -47,6 +47,8 @@ uses
   FireDAC.Comp.DataSet;
 
 const
+  TRANSACTION_TIMESTAMP_NULL = 0;
+
   KEY_WHERE = 'Where';
   KEY_SQLDESTINATION = 'SQLDestination';
   KEY_DATAOBJECT = 'DataObj';

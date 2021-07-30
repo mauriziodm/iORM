@@ -881,7 +881,7 @@ end;
 procedure TioActiveListBindSourceAdapter.SetObjStatus(
   AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetRefreshing(const Value: boolean);

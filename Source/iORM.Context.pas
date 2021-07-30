@@ -55,9 +55,12 @@ type
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
-    // ObjectStatus
-    function GetObjectStatus: TioObjStatus;
-    procedure SetObjectStatus(const AValue: TioObjStatus);
+    // ObjStatus
+    function GetObjStatus: TioObjStatus;
+    procedure SetObjStatus(const AValue: TioObjStatus);
+    // ObjVersion
+    function GetObjVersion: TioObjVersion;
+    procedure SetObjVersion(const AValue: TioObjVersion);
     // Where
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
@@ -73,12 +76,16 @@ type
     function WhereExist: Boolean;
     function GetID: Integer;
     function IDIsNull: Boolean;
+    // TransactionTimestamp
+    function TransactionTimestamp: TDateTime;
     // Map
     function Map: IioMap;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjStatusExist
     function ObjStatusExist: Boolean;
+    // ObjVersionExist
+    function ObjVersionExist: Boolean;
     // GroupBy
     function GetGroupBySql: String;
     // OrderBy
@@ -88,7 +95,9 @@ type
     // DataObject
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
-    property ObjectStatus:TioObjStatus read GetObjectStatus write SetObjectStatus;
+    property ObjStatus:TioObjStatus read GetObjStatus write SetObjStatus;
+    // ObjectVersion
+    property ObjVersion:TioObjVersion read GetObjVersion write SetObjVersion;
     // Where
     property Where:IioWhere read GetWhere write SetWhere;
   end;
@@ -97,13 +106,24 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
-  iORM.Context.Container, System.SysUtils, iORM.Exceptions;
+  iORM.Context.Container, System.SysUtils, iORM.Exceptions, iORM.DB.Interfaces;
 
 { TioContext }
 
 function TioContext.BlobFieldExists: Boolean;
 begin
   Result := Self.GetProperties.BlobFieldExists;
+end;
+
+function TioContext.TransactionTimestamp: TDateTime;
+var
+  LConnection: IioConnection;
+begin
+  LConnection := TioDbFactory.Connection(GetTable.GetConnectionDefName);
+  if LConnection.IsDBConnection then
+    Result := LConnection.AsDBConnection.TransactionTimestamp
+  else
+    Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
 function TioContext.TrueClass: IioTrueClass;
@@ -152,11 +172,20 @@ begin
   Result := Self.GetTable.GetJoin;
 end;
 
-function TioContext.GetObjectStatus: TioObjStatus;
+function TioContext.GetObjStatus: TioObjStatus;
 begin
-  if Self.GetProperties.ObjStatusExist
-    then Result := TioObjStatus(   Self.GetProperties.ObjStatusProperty.GetValue(Self.FDataObject).AsOrdinal   )
-    else Result := osDirty;
+  if ObjStatusExist then
+    Result := TioObjStatus(   GetProperties.ObjStatusProperty.GetValue(FDataObject).AsOrdinal   )
+  else
+    Result := osDirty;
+end;
+
+function TioContext.GetObjVersion: TioObjVersion;
+begin
+  if ObjVersionExist then
+    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
+  else
+    Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
 function TioContext.GetOrderBySql: String;
@@ -184,16 +213,24 @@ begin
   FDataObject := AValue;
 end;
 
-procedure TioContext.SetObjectStatus(const AValue: TioObjStatus);
+procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
 var
-  PropValue: TValue;
+  LPropValue: TValue;
 begin
-  // If ObjectStatus property not exist then exit
-  if not Self.GetProperties.ObjStatusExist then
+  if not ObjStatusExist then
     Exit;
-  // If exist set the property value
-  PropValue := TValue.From<TioObjStatus>(AValue);
-  Self.GetProperties.ObjStatusProperty.SetValue(Self.FDataObject, PropValue);
+  LPropValue := TValue.From<TioObjStatus>(AValue);
+  GetProperties.ObjStatusProperty.SetValue(FDataObject, LPropValue);
+end;
+
+procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
+var
+  LPropValue: TValue;
+begin
+  if not ObjVersionExist then
+    Exit;
+  LPropValue := TValue.From<TioObjVersion>(AValue);
+  GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
 end;
 
 procedure TioContext.SetWhere(const AWhere: IioWhere);
@@ -233,7 +270,12 @@ end;
 
 function TioContext.ObjStatusExist: Boolean;
 begin
-  Result := Self.GetProperties.ObjStatusExist;
+  Result := GetProperties.ObjStatusExist;
+end;
+
+function TioContext.ObjVersionExist: Boolean;
+begin
+  Result := GetProperties.ObjVersionExist;
 end;
 
 end.
