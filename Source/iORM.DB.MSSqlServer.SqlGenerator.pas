@@ -46,11 +46,12 @@ type
   // Classe che si occupa di generare il codice SQL delle varie query
   TioSqlGeneratorMSSqlServer = class(TioSqlGenerator)
   public
-    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
 implementation
@@ -59,6 +60,11 @@ uses
   iORM.SqlTranslator;
 
 { TioSqlGeneratorMSSqlServer }
+
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP');
+end;
 
 class procedure TioSqlGeneratorMSSqlServer.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String);

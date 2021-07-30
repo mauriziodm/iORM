@@ -47,12 +47,13 @@ type
     class function BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String; override;
   public
-    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
 implementation
@@ -151,6 +152,12 @@ begin
   // Assign the query text
   AQuery.SQL.Add(LQueryText);
   // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorFirebird.GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  inherited;
+  AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP FROM RDB$DATABASE');
 end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext;

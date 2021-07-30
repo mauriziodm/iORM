@@ -209,6 +209,7 @@ type
     class procedure GenerateSqlCount(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); virtual; abstract;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
@@ -217,7 +218,6 @@ type
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
-//    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations

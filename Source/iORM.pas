@@ -76,11 +76,16 @@ type
     class procedure Delete(const AIntfObj: IInterface); overload;
     class procedure DeleteCollection(const ACollection: TObject); overload;
     class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
+
     class procedure Delete<T>(const AID: Integer); overload;
     class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
     class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
     class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
     class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
+
+    class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
+    class function Count<T>(const AWhere: IioWhere): Integer; overload;
+    class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
 
     class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); overload;
@@ -617,6 +622,23 @@ begin
   Result := Self.GlobalFactory.DBFactory.ConnectionManager;
 end;
 
+class function io.Count<T>(const ATypeAlias: String): Integer;
+begin
+  Result := Self.RefTo<T>(ATypeAlias).GetCount;
+end;
+
+class function io.Count<T>(const AWhere: IioWhere): Integer;
+begin
+  Result := Self.Count<T>('', AWhere);
+end;
+
+class function io.Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer;
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.GetCount;
+end;
+
 class function io.Create<T>(const ATypeAlias: String; const AParams: TioConstructorParams): T;
 begin
   Result := di.Locate<T>(ATypeAlias).ConstructorParams(AParams).Get;
@@ -857,7 +879,7 @@ end;
 
 class procedure io.DeleteAll<T>(const ATypeAlias: String);
 begin
-  Self.DeleteAll<T>(ATypeAlias, nil); // nil is the IioWhere
+  Self.RefTo<T>(ATypeAlias).Delete;
 end;
 
 class procedure io.DeleteAll<T>(const AWhere: IioWhere);

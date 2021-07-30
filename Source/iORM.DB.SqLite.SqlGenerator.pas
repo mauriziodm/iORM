@@ -44,12 +44,13 @@ type
   // Classe che si occupa di generare il codice SQL delle varie query
   TioSqlGeneratorSqLite = class(TioSqlGenerator)
   public
-    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
 implementation
@@ -111,30 +112,27 @@ begin
   // -----------------------------------------------------------------
 end;
 
+class procedure TioSqlGeneratorSqLite.GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  AQuery.SQL.Add('SELECT STRFTIME("%Y-%m-%d %H:%M:%f", "now")');
+end;
+
 class procedure TioSqlGeneratorSqLite.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String);
 begin
-  // Index Name
   AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
-  // Build the query text
-  // -----------------------------------------------------------------
   AQuery.SQL.Add('DROP INDEX IF EXISTS ' + AIndexName);
-  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext);
 begin
-  // Build the query text
-  // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
     AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' +
     AContext.GetProperties.GetIdProperty.GetSqlParamName + ')');
-  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);
 begin
-  // Build the query text
   AQuery.SQL.Add('SELECT last_insert_rowid()');
 end;
 
@@ -144,7 +142,6 @@ begin
   // Limit
   if AContext.WhereExist and AContext.Where.LimitExists then
     AQuery.SQL.Add(Format('LIMIT %d OFFSET %d', [AContext.Where.GetLimitRows, AContext.Where.GetLimitOffset]));
-  // -----------------------------------------------------------------
 end;
 
 end.
