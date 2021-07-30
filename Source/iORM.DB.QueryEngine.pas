@@ -56,6 +56,7 @@ type
     class function GetQueryCount(const AContext: IioContext): IioQuery;
     class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
+    class function GetQueryCurrentTimestamp(const AContext: IioContext): IioQuery;
     class function GetQueryDelete(const AContext: IioContext): IioQuery;
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
     class function GetQueryExists(const AContext: IioContext): IioQuery;
@@ -213,6 +214,18 @@ begin
   Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, '')); // NoQueryIdentity
   if Result.IsSqlEmpty then
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlNextID(Result, AContext);
+end;
+
+class function TioQueryEngine.GetQueryCurrentTimestamp(const AContext: IioContext): IioQuery;
+var
+  AQuery: IioQuery;
+begin
+  // Get the query object and if does not contain an SQL text (come from QueryContainer)
+  // then call the sql query generator
+  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'TIMESTAMP'));
+  Result := AQuery;
+  if AQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCurrentTimestamp(AQuery, AContext);
 end;
 
 class function TioQueryEngine.GetQueryCount(const AContext: IioContext): IioQuery;
