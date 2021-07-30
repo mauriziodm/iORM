@@ -129,6 +129,8 @@ type
     ['{997CFE22-031A-468A-BF67-E076C43DC0E2}']
     function GetConnection: TioInternalSqlConnection;
     function QueryContainer: IioQueryContainer;
+    function TransactionTimestamp: TDateTime;
+    procedure TransactionTimestampReset;
   end;
 
   IioRESTRequestBody = interface;
@@ -209,7 +211,7 @@ type
     class procedure GenerateSqlCount(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); virtual; abstract;
-    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); virtual; abstract;
     class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;

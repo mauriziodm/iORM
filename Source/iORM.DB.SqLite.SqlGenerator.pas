@@ -46,7 +46,7 @@ type
   public
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
@@ -112,7 +112,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorSqLite.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
 begin
   AQuery.SQL.Add('SELECT STRFTIME("%Y-%m-%d %H:%M:%f", "now")');
 end;

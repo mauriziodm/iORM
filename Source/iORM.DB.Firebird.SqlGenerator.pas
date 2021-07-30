@@ -49,7 +49,7 @@ type
   public
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
@@ -154,7 +154,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorFirebird.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
 begin
   inherited;
   AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP FROM RDB$DATABASE');

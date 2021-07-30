@@ -48,7 +48,7 @@ type
   public
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
@@ -61,7 +61,7 @@ uses
 
 { TioSqlGeneratorMSSqlServer }
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
 begin
   AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP');
 end;

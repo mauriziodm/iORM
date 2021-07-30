@@ -33,7 +33,7 @@
 
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unit iORM.DB.Connection;
+unit iORM.DB.Connection;
 
 interface
 {$I ioGlobalDef.inc}   // iORM global definitions
@@ -81,10 +81,13 @@ type
 
   // This is the specialized class for DB connections
   TioConnectionDB = class(TioConnectionBase, IioConnectionDB)
+  const
+    TRANSACTION_TIMESTAMP_NULL = 0;
   strict private
     FConnection: TioInternalSqlConnection;
     FFDGUIxWaitCursor: TFDGUIxWaitCursor;
     FQueryContainer: IioQueryContainer;
+    FTransactionTimestamp: TDateTime;
   strict protected
     procedure DoStartTransaction; override;
     procedure DoCommitTransaction; override;
@@ -92,6 +95,8 @@ type
   public
     constructor Create(const AConnection:TioInternalSqlConnection; const AQueryContainer:IioQueryContainer; const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
+    procedure TransactionTimestampReset;
+    function TransactionTimestamp: TDateTime;
     function AsDBConnection: IioConnectionDB; override;
     function QueryContainer: IioQueryContainer;
     function GetConnection: TioInternalSqlConnection;
@@ -197,6 +202,7 @@ begin
 
   FConnection := AConnection;
   FQueryContainer := AQueryContainer;
+  TransactionTimestampReset;
 end;
 
 destructor TioConnectionDB.Destroy;
@@ -238,6 +244,28 @@ end;
 function TioConnectionDB.QueryContainer: IioQueryContainer;
 begin
   Result := FQueryContainer;
+end;
+
+function TioConnectionDB.TransactionTimestamp: TDateTime;
+var
+  LQuery: IioQuery;
+begin
+  if FTransactionTimestamp = TRANSACTION_TIMESTAMP_NULL then
+  begin
+    LQuery := TioDBFactory.QueryEngine.GetQueryCurrentTimestamp(FConnection.ConnectionDefName);
+    LQuery.Open;
+    try
+      FTransactionTimestamp := LQuery.Fields[0].AsDateTime;
+    finally
+      LQuery.Close;
+    end;
+  end;
+  Result := FTransactionTimestamp;
+end;
+
+procedure TioConnectionDB.TransactionTimestampReset;
+begin
+  FTransactionTimestamp := TRANSACTION_TIMESTAMP_NULL;
 end;
 
 end.

@@ -143,7 +143,7 @@ var
         LConnection.Params.MonitorBy := mbFlatFile;
     end;
 {$ENDIF}
-    // Extract the file path anche create the directory if not exists
+    // Extract the file path and create the directory if not exists
     // DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
     // if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
     // Open the connection
