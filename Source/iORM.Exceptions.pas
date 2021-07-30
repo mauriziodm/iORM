@@ -48,6 +48,9 @@ type
     constructor Create(const AClassName, AMsg: string); overload;
   end;
 
+  EioConcurrencyConflictException = class(EioException)
+  end;
+
 implementation
 
 { EioException }

@@ -207,17 +207,17 @@ type
       const AUnique: Boolean): String; virtual;
   public
     class procedure GenerateSqlCount(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
-    class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
-    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
-    class procedure GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
+    class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); virtual; abstract;
-    class procedure GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
-
+    class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
+    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
+//    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations
@@ -419,8 +419,8 @@ end;
 
 class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
 var
-  Comma: Char;
-  Prop: IioContextProperty;
+  LComma: Char;
+  LProp: IioContextProperty;
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -434,16 +434,16 @@ begin
   AQuery.SQL.Add(') VALUES (');
   // -----------------------------------------------------------------
   // Iterate for all properties
-  Comma := ' ';
-  for Prop in AContext.GetProperties do
+  LComma := ' ';
+  for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
     // If the current property RelationType is HasMany then skip it
-    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = ioRTHasMany) or (Prop.GetRelationType = ioRTHasOne) then
+    if (not LProp.IsSqlRequestCompliant(ioInsert)) or (LProp.GetRelationType = ioRTHasMany) or (LProp.GetRelationType = ioRTHasOne) then
       Continue;
     // Add the field param
-    AQuery.SQL.Add(Comma + ':' + Prop.GetSqlParamName);
-    Comma := ',';
+    AQuery.SQL.Add(LComma + ':' + LProp.GetSqlParamName);
+    LComma := ',';
   end;
   // Add the TrueClass if enabled
   if AContext.IsTrueClass then

@@ -123,7 +123,7 @@ begin
   AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlForCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
 class function TioQueryEngine.GetQueryForDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
@@ -134,7 +134,7 @@ begin
   AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlForDropIndex(AQuery, AContext, AIndexName);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDropIndex(AQuery, AContext, AIndexName);
 end;
 
 class function TioQueryEngine.GetQueryForExists(const AContext: IioContext): IioQuery;
@@ -146,7 +146,7 @@ begin
   AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlForExists(AQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlExists(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)

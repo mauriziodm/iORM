@@ -49,10 +49,10 @@ type
   public
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
   end;
 
 implementation
@@ -103,7 +103,7 @@ begin
   Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
+class procedure TioSqlGeneratorFirebird.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
@@ -153,7 +153,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext;
+class procedure TioSqlGeneratorFirebird.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String);
 begin
   // Index Name
@@ -164,7 +164,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorFirebird.GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext);
 begin
   // No inherited
   // inherited;
