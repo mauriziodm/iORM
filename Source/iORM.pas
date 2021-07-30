@@ -76,6 +76,11 @@ type
     class procedure Delete(const AIntfObj: IInterface); overload;
     class procedure DeleteCollection(const ACollection: TObject); overload;
     class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
+    class procedure Delete<T>(const AID: Integer); overload;
+    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
+    class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
     class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); overload;
@@ -838,6 +843,33 @@ end;
 class procedure io.Delete(const AIntfObj: IInterface);
 begin
   Self.Delete(AIntfObj as TObject);
+end;
+
+class procedure io.Delete<T>(const AID: Integer);
+begin
+  Self.Delete<T>('', AID);
+end;
+
+class procedure io.Delete<T>(const ATypeAlias: String; const AID: Integer);
+begin
+  Self.RefTo<T>(ATypeAlias).ByID(AID).Delete;
+end;
+
+class procedure io.DeleteAll<T>(const ATypeAlias: String);
+begin
+  Self.DeleteAll<T>(ATypeAlias, nil); // nil is the IioWhere
+end;
+
+class procedure io.DeleteAll<T>(const AWhere: IioWhere);
+begin
+  Self.DeleteAll<T>('', AWhere);
+end;
+
+class procedure io.DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere);
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  AWhere.Delete;
 end;
 
 class procedure io.DeleteCollection(const AIntfCollection: IInterface);
