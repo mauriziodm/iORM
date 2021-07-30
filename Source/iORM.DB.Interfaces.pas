@@ -207,9 +207,9 @@ type
       const AUnique: Boolean): String; virtual;
   public
     class procedure GenerateSqlCount(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); virtual; abstract;
+    class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;

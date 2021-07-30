@@ -107,7 +107,7 @@ var
   var
     AQuery: IioQuery;
   begin
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectForCount(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQueryCount(AContext);
     AQuery.Open;
     try
       Result := Result + AQuery.Fields[0].AsInteger;
@@ -353,7 +353,7 @@ var
     Result := nil;
     // Create & open query
     // AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext); // NB: Prima era così ma probabilmente era una svista
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectForObject(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
     AQuery.Open;
     try
       // If a record is fuìound then load the object and return True
@@ -407,7 +407,7 @@ begin
   // Get the Context
   AContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result);
   // Create & open query
-  AQuery := TioDBFactory.QueryEngine.GetQuerySelectForObject(AContext);
+  AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
   AQuery.Open;
   try
     // Create the object as TObject
@@ -425,7 +425,7 @@ var
 begin
   inherited;
   // Generate and open the query
-  AQuery := TioDBFactory.QueryEngine.GetQueryForExists(AContext);
+  AQuery := TioDBFactory.QueryEngine.GetQueryExists(AContext);
   AQuery.Open;
   try
     Result := AQuery.Fields[0].AsInteger <> 0;
@@ -720,7 +720,7 @@ var
     LQry: IioQuery;
   begin
     // Create & open query
-    LQry := TioDBFactory.QueryEngine.GetQuerySelectForList(AContext);
+    LQry := TioDBFactory.QueryEngine.GetQuerySelectList(AContext);
     LQry.Open;
     try
       // Copy data to the MemoryTable
@@ -784,7 +784,7 @@ var
     AObj: TObject;
   begin
     // Create & open query
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectForList(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQuerySelectList(AContext);
     AQuery.Open;
     try
       // Loop

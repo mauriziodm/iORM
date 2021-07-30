@@ -53,17 +53,17 @@ type
     // class procedure PersistRelationChildObject(AMasterContext: IioContext;
     // AMasterProperty: IioContextProperty);
   public
-    class function GetQuerySelectForObject(const AContext: IioContext): IioQuery;
-    class function GetQuerySelectForList(const AContext: IioContext): IioQuery;
-    class function GetQuerySelectForCount(const AContext: IioContext): IioQuery;
+    class function GetQueryCount(const AContext: IioContext): IioQuery;
+    class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String;
+      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
+    class function GetQueryDelete(const AContext: IioContext): IioQuery;
+    class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
+    class function GetQueryExists(const AContext: IioContext): IioQuery;
     class function GetQueryInsert(const AContext: IioContext): IioQuery;
     class function GetQueryNextID(const AContext: IioContext): IioQuery;
+    class function GetQuerySelectList(const AContext: IioContext): IioQuery;
+    class function GetQuerySelectObject(const AContext: IioContext): IioQuery;
     class function GetQueryUpdate(const AContext: IioContext): IioQuery;
-    class function GetQueryDelete(const AContext: IioContext): IioQuery;
-    class function GetQueryForExists(const AContext: IioContext): IioQuery;
-    class function GetQueryForCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String;
-      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
-    class function GetQueryForDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
   end;
 
 implementation
@@ -114,7 +114,7 @@ begin
     AQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := '%' + AContext.TrueClass.GetClassName + '%';
 end;
 
-class function TioQueryEngine.GetQueryForCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
+class function TioQueryEngine.GetQueryCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
   const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
 var
   AQuery: IioQuery;
@@ -126,7 +126,7 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
-class function TioQueryEngine.GetQueryForDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
+class function TioQueryEngine.GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
 var
   AQuery: IioQuery;
 begin
@@ -137,7 +137,7 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDropIndex(AQuery, AContext, AIndexName);
 end;
 
-class function TioQueryEngine.GetQueryForExists(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQueryExists(const AContext: IioContext): IioQuery;
 var
   AQuery: IioQuery;
 begin
@@ -215,7 +215,7 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlNextID(Result, AContext);
 end;
 
-class function TioQueryEngine.GetQuerySelectForCount(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQueryCount(const AContext: IioContext): IioQuery;
 var
   AQuery: IioQuery;
 begin
@@ -234,7 +234,7 @@ begin
       .AsVariant;
 end;
 
-class function TioQueryEngine.GetQuerySelectForList(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQuerySelectList(const AContext: IioContext): IioQuery;
 var
   AQuery: IioQuery;
 begin
@@ -253,7 +253,7 @@ begin
       .AsVariant;
 end;
 
-class function TioQueryEngine.GetQuerySelectForObject(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQuerySelectObject(const AContext: IioContext): IioQuery;
 var
   AQuery: IioQuery;
 begin

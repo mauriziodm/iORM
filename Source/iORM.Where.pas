@@ -698,7 +698,7 @@ var
     AQuery: IioQuery;
   begin
     // Create & execute query
-    AQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
+    AQuery := TioDbFactory.QueryEngine.GetQueryCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
     AQuery.ExecSQL;
   end;
 
@@ -750,7 +750,7 @@ var
     AQuery: IioQuery;
   begin
     // Create & execute query
-    AQuery := TioDbFactory.QueryEngine.GetQueryForDropIndex(AContext, AIndexName);
+    AQuery := TioDbFactory.QueryEngine.GetQueryDropIndex(AContext, AIndexName);
     AQuery.ExecSQL;
   end;
 
