@@ -91,6 +91,7 @@ var
   LConnection: IioConnectionREST;
 begin
   inherited;
+  Result := 0;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRESTConnection;
   // Start transaction

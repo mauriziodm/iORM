@@ -145,6 +145,7 @@ type
     function ObjStatusExist: Boolean;
     // ObjectVersion Exist
     function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(const AValue: IioContextProperty);

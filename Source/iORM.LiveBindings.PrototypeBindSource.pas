@@ -549,7 +549,9 @@ end;
 function TioPrototypeBindSource.DataObject: TObject;
 begin
   if CheckActiveAdapter then
-    Result := GetActiveBindSourceAdapter.DataObject;
+    Result := GetActiveBindSourceAdapter.DataObject
+  else
+    Result := nil;
 end;
 
 function TioPrototypeBindSource.DataObjectAs<T>: T;

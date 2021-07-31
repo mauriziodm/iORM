@@ -154,37 +154,43 @@ end;
 
 class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
 var
-  AProp: IioContextProperty;
-  AQuery: IioQuery;
+  LProp: IioContextProperty;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlInsert(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlInsert(LQuery, AContext);
   // Iterate for all properties
-  for AProp in AContext.GetProperties do
+  for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not AProp.IsSqlRequestCompliant(ioInsert) then
+    if not LProp.IsSqlRequestCompliant(ioInsert) then
       Continue;
     // If current property is the ID property and its value is null (0)
     // then skip its value (always NULL)
-    if AProp.IsID and AContext.IDIsNull then
+    if LProp.IsID and AContext.IDIsNull then
     begin
-      AQuery.SetParamValueToNull(AProp, ftLargeInt);
+      LQuery.SetParamValueToNull(LProp, ftLargeInt);
+      Continue;
+    end;
+    // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
+    if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
+    begin
+      LQuery.ParamByProp(LProp).Value := AContext.TransactionTimestamp;
       Continue;
     end;
     // Relation type
-    case AProp.GetRelationType of
+    case LProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
       // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
       ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne:
-        AQuery.SetParamValueByContext(AProp, AContext);
+        LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
       ioRTBelongsTo:
-        Self.SetIntegerToQueryParamNullIfZero(AQuery.ParamByProp(AProp), AProp.GetRelationChildObjectID(AContext.DataObject));
+        Self.SetIntegerToQueryParamNullIfZero(LQuery.ParamByProp(LProp), LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
       ioRTHasOne: { Nothing }
         ;
@@ -195,7 +201,7 @@ begin
   end;
   // Add the TrueClass value if enabled
   if AContext.IsTrueClass then
-    AQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
+    LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
 end;
 
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
@@ -297,6 +303,12 @@ begin
     // If the current property is ReadOnly then skip it
     if not LProp.IsSqlRequestCompliant(ioUpdate) then
       Continue;
+    // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
+    if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
+    begin
+      LQuery.ParamByProp(LProp).Value := AContext.TransactionTimestamp;
+      Continue;
+    end;
     // Relation type
     case LProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
@@ -320,7 +332,7 @@ begin
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
   if AContext.ObjVersionExist then
-    LQuery.ParamByProp(AContext.GetProperties.ObjVersionProperty).Value := AContext.TransactionTimestamp;
+    LQuery.ParamByProp(AContext.GetProperties.ObjVersionProperty).Value := AContext.GetProperties.ObjVersionProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class procedure TioQueryEngine.SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);

@@ -394,10 +394,10 @@ end;
 procedure TioQuery.SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
 begin
   // Set the parameter to NULL
-  Self.ParamByProp(AProp).Clear;
+  ParamByProp(AProp).Clear;
   // If a DataType is specified then set the parameter DataType
   if AForceDataType <> ftUnknown then
-    Self.ParamByProp(AProp).DataType := AForceDataType;
+    ParamByProp(AProp).DataType := AForceDataType;
 end;
 
 end.

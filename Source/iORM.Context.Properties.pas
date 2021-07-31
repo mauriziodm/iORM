@@ -109,8 +109,6 @@ type
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
-    function IsBlob: Boolean;
-    function IsStream: Boolean;
     function GetValue(const Instance: Pointer): TValue; virtual;
     function GetValueAsObject(const Instance: Pointer): TObject; virtual;
     procedure SetValue(const Instance: Pointer; const AValue: TValue); virtual;
@@ -119,7 +117,6 @@ type
     function GetTypeInfo: PTypeInfo; virtual;
     function GetTypeName: String;
     function GetTypeAlias: String;
-    function IsInterface: Boolean;
     function GetRelationType: TioRelationType;
     function GetRelationChildTypeName: String;
     function GetRelationChildTypeAlias: String;
@@ -132,16 +129,20 @@ type
     procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
-    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
     procedure SetIsID(const AValue: Boolean);
-    function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
+
+    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
+    function IsID: Boolean;
+    function IsInterface: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean; virtual;
     function IsSkipped: Boolean;
+    function IsBlob: Boolean;
+    function IsStream: Boolean;
 
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
@@ -228,6 +229,7 @@ type
     function ObjStatusExist: Boolean;
     // ObjectVersion Exist
     function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
     // ObjStatus property
     property ObjStatusProperty: IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
@@ -886,6 +888,11 @@ begin
       Result := Result + ', ';
     Result := Result + AFunc(Prop);
   end;
+end;
+
+function TioProperties.IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
+begin
+  Result := Assigned(AProperty) and (AProperty = FObjVersionProperty);
 end;
 
 function TioProperties.ObjStatusExist: Boolean;

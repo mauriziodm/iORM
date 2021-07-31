@@ -86,6 +86,7 @@ type
     function ObjStatusExist: Boolean;
     // ObjVersionExist
     function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProp: IioContextProperty): Boolean;
     // GroupBy
     function GetGroupBySql: String;
     // OrderBy
@@ -256,6 +257,11 @@ end;
 function TioContext.IDIsNull: Boolean;
 begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
+end;
+
+function TioContext.IsObjVersionProperty(const AProp: IioContextProperty): Boolean;
+begin
+  Result := GetProperties.IsObjVersionProperty(AProp);
 end;
 
 function TioContext.IsTrueClass: Boolean;

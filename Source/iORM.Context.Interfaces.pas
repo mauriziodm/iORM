@@ -75,6 +75,7 @@ type
     property ObjStatus:TioObjStatus read GetObjStatus write SetObjStatus;
     // ObjVersionExist
     function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProp: IioContextProperty): Boolean;
     // ObjVersion
     function GetObjVersion: TioObjVersion;
     procedure SetObjVersion(const AValue: TioObjVersion);
