@@ -76,8 +76,7 @@ uses
 
 { TioQueryEngine }
 
-class function TioQueryEngine.ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String;
-  const AIdentity: String = ''): String;
+class function TioQueryEngine.ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String; const AIdentity: String = ''): String;
 begin
   Result := AContext.GetClassRef.QualifiedClassName + ':' + APreIdentity + ':' + AIdentity;
 end;
@@ -97,8 +96,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
-      .AsVariant;
+    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class procedure TioQueryEngine.FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
@@ -124,7 +122,8 @@ begin
   AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList,
+      AIndexOrientation, AUnique);
 end;
 
 class function TioQueryEngine.GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
@@ -150,8 +149,7 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlExists(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
-  AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
-    .AsVariant;
+  AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
@@ -243,8 +241,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
-      .AsVariant;
+    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQuerySelectList(const AContext: IioContext): IioQuery;
@@ -262,8 +259,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
-      .AsVariant;
+    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQuerySelectObject(const AContext: IioContext): IioQuery;
@@ -281,8 +277,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
-      .AsVariant;
+    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
@@ -305,12 +300,12 @@ begin
     // Relation type
     case LProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
-      // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method
+      // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
       ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne:
         LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
       ioRTBelongsTo:
-        Self.SetIntegerToQueryParamNullIfZero(LQuery.ParamByProp(LProp), LProp.GetRelationChildObjectID(AContext.DataObject));
+        SetIntegerToQueryParamNullIfZero(LQuery.ParamByProp(LProp), LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
       ioRTHasOne: { Nothing }
         ;
@@ -322,9 +317,10 @@ begin
   // Add the TrueClass value if enabled
   if AContext.IsTrueClass then
     LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
-  // Where conditions
-  LQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject)
-    .AsVariant;
+  // Where conditions (with ObjVersion if exists for this entity type)
+  LQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  if AContext.ObjVersionExist then
+    LQuery.ParamByProp(AContext.GetProperties.ObjVersionProperty).Value := AContext.TransactionTimestamp;
 end;
 
 class procedure TioQueryEngine.SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);
