@@ -529,9 +529,10 @@ begin
   // Add the ioTrueClass if enabled
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
-  // Where conditions
-  // AQuery.SQL.Add(AContext.Where.GetSql);
+  // Where conditions (with ObjVersion if exists for this entity type)
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  if AContext.ObjVersionExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlParamName);
   // -----------------------------------------------------------------
 end;
 
