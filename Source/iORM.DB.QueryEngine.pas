@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.Context.Interfaces, iORM.DB.Interfaces, iORM.Where,
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.Context.Properties.Interfaces;
 
 type
 
@@ -46,7 +46,9 @@ type
   // INterfaccia per le classi che devono generare i vari tipi di query
   // Select/Update/Insert/Delete
   TioQueryEngine = class
+  private
   protected
+    class procedure SetObjVersionQueryParam(const AContext: IioContext; const AProp: IioContextProperty; const AQuery: IioQuery);
     class procedure SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);
     class function ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String; const AIdentity: String = ''): String;
     class procedure FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
@@ -70,7 +72,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, iORM.Context.Properties.Interfaces, FireDac.Stan.Param,
+  iORM.DB.Factory, FireDac.Stan.Param,
   iORM.Attributes, Data.DB, iORM.Interfaces, SysUtils,
   iORM.Where.SqlItems.Interfaces, iORM.DB.ConnectionContainer;
 
@@ -179,7 +181,7 @@ begin
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
-      LQuery.ParamByProp(LProp).Value := AContext.TransactionTimestamp;
+      SetObjVersionQueryParam(AContext, LProp, LQuery);
       Continue;
     end;
     // Relation type
@@ -341,6 +343,15 @@ begin
     AParam.Value := AValue
   else
     AParam.Value := Null; // Thanks to Marco Mottadelli
+end;
+
+class procedure TioQueryEngine.SetObjVersionQueryParam(const AContext: IioContext; const AProp: IioContextProperty; const AQuery: IioQuery);
+begin
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if AQuery.Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    AQuery.ParamByProp(AProp).AsFloat := AContext.TransactionTimestamp
+  else
+    AQuery.ParamByProp(AProp).AsDateTime := AContext.TransactionTimestamp;
 end;
 
 end.
