@@ -49,6 +49,7 @@ type
   private
   protected
     class procedure SetObjVersionQueryParam(const AContext: IioContext; const AProp: IioContextProperty; const AQuery: IioQuery);
+    class procedure SetObjVersionQueryWhereParam(const AContext: IioContext; const AQuery: IioQuery);
     class procedure SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);
     class function ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String; const AIdentity: String = ''): String;
     class procedure FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
@@ -98,7 +99,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class procedure TioQueryEngine.FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
@@ -151,7 +152,7 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlExists(AQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
-  AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
@@ -249,7 +250,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQuerySelectList(const AContext: IioContext): IioQuery;
@@ -267,7 +268,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQuerySelectObject(const AContext: IioContext): IioQuery;
@@ -285,7 +286,7 @@ begin
   if AContext.WhereExist then
     Self.FillQueryWhereParams(AContext, AQuery)
   else
-    AQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
@@ -308,7 +309,7 @@ begin
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
-      LQuery.ParamByProp(LProp).Value := AContext.TransactionTimestamp;
+      SetObjVersionQueryParam(AContext, LProp, LQuery);
       Continue;
     end;
     // Relation type
@@ -332,9 +333,9 @@ begin
   if AContext.IsTrueClass then
     LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
   // Where conditions (with ObjVersion if exists for this entity type)
-  LQuery.ParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  LQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
   if AContext.ObjVersionExist then
-    LQuery.ParamByProp(AContext.GetProperties.ObjVersionProperty).Value := AContext.GetProperties.ObjVersionProperty.GetValue(AContext.DataObject).AsVariant;
+    SetObjVersionQueryWhereParam(AContext, LQuery);
 end;
 
 class procedure TioQueryEngine.SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);
@@ -352,6 +353,18 @@ begin
     AQuery.ParamByProp(AProp).AsFloat := AContext.TransactionTimestamp
   else
     AQuery.ParamByProp(AProp).AsDateTime := AContext.TransactionTimestamp;
+end;
+
+class procedure TioQueryEngine.SetObjVersionQueryWhereParam(const AContext: IioContext; const AQuery: IioQuery);
+var
+  LProp: IioContextProperty;
+begin
+  LProp := AContext.GetProperties.ObjVersionProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if AQuery.Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    AQuery.WhereParamByProp(LProp).AsFloat := LProp.GetValue(AContext.DataObject).AsVariant
+  else
+    AQuery.WhereParamByProp(LProp).AsDateTime := LProp.GetValue(AContext.DataObject).AsVariant;
 end;
 
 end.

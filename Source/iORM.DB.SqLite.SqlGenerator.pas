@@ -128,7 +128,7 @@ class procedure TioSqlGeneratorSqLite.GenerateSqlExists(const AQuery: IioQuery; 
 begin
   AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
     AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' +
-    AContext.GetProperties.GetIdProperty.GetSqlParamName + ')');
+    AContext.GetProperties.GetIdProperty.GetSqlWhereParamName + ')');
 end;
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);

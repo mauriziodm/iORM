@@ -72,6 +72,7 @@ type
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
     function ParamByProp(const AProp: IioContextProperty): TioParam;
+    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
     function Connection: IioConnection;
@@ -398,6 +399,11 @@ begin
   // If a DataType is specified then set the parameter DataType
   if AForceDataType <> ftUnknown then
     ParamByProp(AProp).DataType := AForceDataType;
+end;
+
+function TioQuery.WhereParamByProp(const AProp: IioContextProperty): TioParam;
+begin
+  Result := Self.ParamByName(AProp.GetSqlWhereParamName);
 end;
 
 end.

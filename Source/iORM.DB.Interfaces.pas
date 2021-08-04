@@ -172,6 +172,7 @@ type
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
     function ParamByProp(const AProp: IioContextProperty): TioParam;
+    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
     function Connection: IioConnection;
@@ -401,7 +402,7 @@ begin
   if AContext.WhereExist then
     AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
   else
-    AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlParamName]));
+    AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlWhereParamName]));
   // GroupBy
   AQuery.SQL.Add(AContext.GetGroupBySql);
 end;
@@ -417,7 +418,7 @@ begin
     // AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
     AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
   else
-    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 
@@ -499,7 +500,7 @@ begin
   if AContext.WhereExist then
     AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
   else
-    AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlParamName]));
+    AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlWhereParamName]));
   // GroupBy
   AQuery.SQL.Add(AContext.GetGroupBySql);
   // OrderBy
@@ -530,9 +531,9 @@ begin
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
   // Where conditions (with ObjVersion if exists for this entity type)
-  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   if AContext.ObjVersionExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlParamName);
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 

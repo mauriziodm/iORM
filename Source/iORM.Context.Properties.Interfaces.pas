@@ -67,6 +67,7 @@ type
     function GetSqlFieldName(const AClearDelimiters: Boolean=False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
+    function GetSqlWhereParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
     function IsStream: Boolean;

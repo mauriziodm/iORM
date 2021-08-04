@@ -178,7 +178,7 @@ begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
-    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName +
+    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName +
     ')) THEN 1 ELSE 0 END FROM RDB$DATABASE');
   // -----------------------------------------------------------------
 end;

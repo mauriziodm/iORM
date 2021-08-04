@@ -108,6 +108,7 @@ type
     function GetSqlFieldName(const AClearDelimiters: Boolean = False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
+    function GetSqlWhereParamName: String;
     function GetFieldType: String;
     function GetValue(const Instance: Pointer): TValue; virtual;
     function GetValueAsObject(const Instance: Pointer): TObject; virtual;
@@ -534,6 +535,11 @@ end;
 function TioProperty.GetSqlValue(const ADataObject: TObject): String;
 begin
   Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).TValueToSql(Self.GetValue(ADataObject));
+end;
+
+function TioProperty.GetSqlWhereParamName: String;
+begin
+  Result := 'W_' + Self.GetSqlFieldAlias;
 end;
 
 function TioProperty.GetValue(const Instance: Pointer): TValue;
