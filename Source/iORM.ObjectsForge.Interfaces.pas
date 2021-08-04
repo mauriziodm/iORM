@@ -418,7 +418,7 @@ begin
   // Create the instance if not assigned
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // Load the relation child object
-  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByOID(LChildID).ToObject(Result);
+  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).ToObject(Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);

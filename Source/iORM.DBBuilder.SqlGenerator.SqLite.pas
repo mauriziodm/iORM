@@ -75,7 +75,6 @@ begin
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, True);
   // Compose the create index query text
   LQuery := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
-  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
   ScriptAdd(LQuery);
 end;
 
@@ -253,17 +252,17 @@ begin
     ioMdFloat:
       Result := 'REAL';
     ioMdDate:
-      Result := 'NUMERIC';
+      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
     ioMdTime:
-      Result := 'NUMERIC';
+      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
     ioMdDateTime:
-      Result := 'NUMERIC';
+      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
     ioMdDecimal:
       Result := 'NUMERIC';
     ioMdNumeric:
       Result := 'NUMERIC';
     ioMdBoolean:
-      Result := 'NUMERIC';
+      Result := 'INTEGER'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
     ioMdBinary:
       Result := 'BLOB';
     ioMdCustomFieldType:

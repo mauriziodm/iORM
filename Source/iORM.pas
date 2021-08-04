@@ -52,7 +52,6 @@ uses
 
 type
 
-  // iORM
   io = class
   public
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
@@ -64,13 +63,29 @@ type
     class function Load(const ATypeInfo: PTypeInfo; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AIID: TGUID; const ATypeAlias: String = ''): IioWhere; overload;
-    class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
     class function Load(const AWhere: IioWhere): IioWhere; overload;
+    class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
+    class function Load<T>(const AID: Integer): T; overload;
+    class function Load<T>(const ATypeAlias: String; const AID: Integer): T; overload;
+
+    class function LoadList<T: class, constructor>(const AItemAlias: String = ''): T; overload;
+    class function LoadList<T: class, constructor>(const AWhere: IioWhere): T; overload;
+    class function LoadList<T: class, constructor>(const AItemAlias: String; const AWhere: IioWhere): T; overload;
 
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
     class procedure DeleteCollection(const ACollection: TObject); overload;
     class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
+
+    class procedure Delete<T>(const AID: Integer); overload;
+    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
+    class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
+
+    class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
+    class function Count<T>(const AWhere: IioWhere): Integer; overload;
+    class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
 
     class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); overload;
@@ -89,9 +104,17 @@ type
     class function Connections: TioConnectionManagerRef;
 
     class function Where: IioWhere; overload;
-    class function Where<T>: IioWhere<T>; overload;
     class function Where(const ATextCondition: String): IioWhere; overload;
+    class function Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    class function Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    class function Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    class function Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    class function Where<T>: IioWhere<T>; overload;
     class function Where<T>(const ATextCondition: String): IioWhere<T>; overload;
+    class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
 
     class function SQL(const ASQL: String): IioSQLDestination; overload;
     class function SQL(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
@@ -256,7 +279,7 @@ uses
   iORM.Strategy.Factory,
   iORM.Context.Container,
   iORM.AbstractionLayer.Framework,
-  iORM.DBBuilder.Factory;
+  iORM.DBBuilder.Factory, System.Rtti;
 
 { io }
 
@@ -271,6 +294,38 @@ end;
 class function io.Load(const AWhere: IioWhere): IioWhere;
 begin
   Result := AWhere;
+end;
+
+class function io.Load<T>(const ATypeAlias: String; const AID: Integer): T;
+begin
+  Result := io.Load<T>(ATypeAlias).ByID(AID).ToObject;
+end;
+
+class function io.LoadList<T>(const AWhere: IioWhere): T;
+begin
+  Result := Self.LoadList<T>('', AWhere);
+end;
+
+class function io.LoadList<T>(const AItemAlias: String; const AWhere: IioWhere): T;
+var
+  LItemRttiType: TRttiType;
+begin
+  LItemRttiType := TioUtilities.ExtractItemRttiType<T>;
+  Result := T.Create;
+  AWhere.TypeName := LItemRttiType.Name;
+  AWhere.TypeAlias := AItemAlias;
+  AWhere.TypeInfo := LItemRttiType.Handle;
+  AWhere.ToList(Result);
+end;
+
+class function io.LoadList<T>(const AItemAlias: String): T;
+begin
+  Result := Self.LoadList<T>('ATypeAlias', Self.Where);
+end;
+
+class function io.Load<T>(const AID: Integer): T;
+begin
+  Result := io.Load<T>.ByID(AID).ToObject;
 end;
 
 class function io.Load(const AIID: TGUID; const ATypeAlias: String): IioWhere;
@@ -294,6 +349,46 @@ end;
 class function io.Where(const ATextCondition: String): IioWhere;
 begin
   Result := Self.Where.Add(ATextCondition);
+end;
+
+class function io.Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self.Where._Where(APropertyName, ACompareOp);
+end;
+
+class function io.Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self.Where._Where(APropertyName, ACompareOp, AValue);
+end;
+
+class function io.Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self.Where._Where(APropertyName, ACompareOp, AValue);
+end;
+
+class function io.Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self.Where._Where(APropertyName, ACompareOp, AValue);
+end;
+
+class function io.Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self.Where<T>._Where(APropertyName, ACompareOp);
+end;
+
+class function io.Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self.Where<T>._Where(APropertyName, ACompareOp, AValue);
+end;
+
+class function io.Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self.Where<T>._Where(APropertyName, ACompareOp, AValue);
+end;
+
+class function io.Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self.Where<T>._Where(APropertyName, ACompareOp, AValue);
 end;
 
 class function io.Where<T>(const ATextCondition: String): IioWhere<T>;
@@ -527,6 +622,23 @@ begin
   Result := Self.GlobalFactory.DBFactory.ConnectionManager;
 end;
 
+class function io.Count<T>(const ATypeAlias: String): Integer;
+begin
+  Result := Self.RefTo<T>(ATypeAlias).GetCount;
+end;
+
+class function io.Count<T>(const AWhere: IioWhere): Integer;
+begin
+  Result := Self.Count<T>('', AWhere);
+end;
+
+class function io.Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer;
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.GetCount;
+end;
+
 class function io.Create<T>(const ATypeAlias: String; const AParams: TioConstructorParams): T;
 begin
   Result := di.Locate<T>(ATypeAlias).ConstructorParams(AParams).Get;
@@ -755,6 +867,33 @@ begin
   Self.Delete(AIntfObj as TObject);
 end;
 
+class procedure io.Delete<T>(const AID: Integer);
+begin
+  Self.Delete<T>('', AID);
+end;
+
+class procedure io.Delete<T>(const ATypeAlias: String; const AID: Integer);
+begin
+  Self.RefTo<T>(ATypeAlias).ByID(AID).Delete;
+end;
+
+class procedure io.DeleteAll<T>(const ATypeAlias: String);
+begin
+  Self.RefTo<T>(ATypeAlias).Delete;
+end;
+
+class procedure io.DeleteAll<T>(const AWhere: IioWhere);
+begin
+  Self.DeleteAll<T>('', AWhere);
+end;
+
+class procedure io.DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere);
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  AWhere.Delete;
+end;
+
 class procedure io.DeleteCollection(const AIntfCollection: IInterface);
 begin
   Self.DeleteCollection(AIntfCollection as TObject);
@@ -764,7 +903,7 @@ class procedure io.DeleteCollection(const ACollection: TObject);
 var
   LConnectionDefName: String;
 begin
-  LConnectionDefName := TioConnectionManager.GetDefaultConnectionName;
+  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
   TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteCollection(ACollection);
 end;
 
@@ -830,7 +969,7 @@ class procedure io.PersistCollection(const ACollection: TObject; const ARelation
 var
   LConnectionDefName: String;
 begin
-  LConnectionDefName := TioConnectionManager.GetDefaultConnectionName;
+  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
   TioStrategyFactory.GetStrategy(LConnectionDefName).PersistCollection(ACollection, ARelationPropertyName, ARelationOID, ABlindInsert);
 end;
 

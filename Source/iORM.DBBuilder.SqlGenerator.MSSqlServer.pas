@@ -21,6 +21,7 @@ type
     function ReplaceSpecialWords(const ASql: string): string;
     function TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
     function TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
+    function ClearSquareBrackets(const AFieldName: String): String;
   public
     procedure ScriptBegin; override;
     // Database related methods
@@ -64,12 +65,14 @@ end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
 begin
+  // M.M. 12/06/21
+  // TODO: La ClearSquareBrackets andrebbe rimossa anche da qui.
   ScriptAdd(Format('ALTER TABLE [%s]', [AForeignKey.DependentTableName]));
   IncIndentationLevel;
-  ScriptAdd(Format(' ADD CONSTRAINT %s', [AForeignKey.Name]));
+  ScriptAdd(Format(' ADD CONSTRAINT %s', [ClearSquareBrackets(AForeignKey.Name)]));
   IncIndentationLevel;
-  ScriptAdd(Format('FOREIGN KEY ([%s])', [AForeignKey.DependentFieldName]));
-  ScriptAdd(Format('REFERENCES  %s ([%s])', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+  ScriptAdd(Format('FOREIGN KEY (%s)', [ClearSquareBrackets(AForeignKey.DependentFieldName)]));
+  ScriptAdd(Format('REFERENCES  [%s] (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
   if AForeignKey.OnUpdateAction > fkUnspecified then
     ScriptAdd(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
   if AForeignKey.OnDeleteAction > fkUnspecified then
@@ -87,8 +90,8 @@ begin
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, True);
   // Compose the create index query text
-  LQuery := Format('CREATE %s INDEX %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
-  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
+  // M.M. 12/06/21
+  LQuery := Format('CREATE %s INDEX %s ON [%s] (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
   // Sistemazione parole riservate SQL SERVER
   LQuery := ReplaceSpecialWords(LQuery);
   ScriptAdd(LQuery);
@@ -96,8 +99,8 @@ end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('ALTER TABLE %s ADD CONSTRAINT PK_%s_%s PRIMARY KEY CLUSTERED(%s);', [ATable.TableName, ATable.TableName,
-    ATable.PrimaryKeyField.FieldName, ATable.PrimaryKeyField.FieldName]));
+  // M.M. 12/06/21
+  ScriptAdd(Format('ALTER TABLE [%s] ADD CONSTRAINT PK_%s PRIMARY KEY CLUSTERED(%s);', [ATable.TableName, ATable.TableName, ATable.PrimaryKeyField.FieldName]));
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.AddSequence(const ASequenceName: String; const ACreatingNewDatabase: Boolean);
@@ -112,14 +115,20 @@ end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('ALTER TABLE %s', [ATable.TableName]));
+  ScriptAdd(Format('ALTER TABLE [%s]', [ATable.TableName]));
   IncIndentationLevel;
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.BeginCreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  ScriptAdd(Format('CREATE TABLE %s (', [ATable.TableName]));
+  ScriptAdd(Format('CREATE TABLE [%s] (', [ATable.TableName]));
   IncIndentationLevel;
+end;
+
+function TioDBBuilderSqlGenMSSqlServer.ClearSquareBrackets(
+  const AFieldName: String): String;
+begin
+  Result := AFieldName.Replace('[','',[rfReplaceAll]).Replace(']','',[rfReplaceAll]);
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.CreateDatabase;
@@ -137,12 +146,13 @@ var
   LDefaultConnectionDef: IIoConnectionDef;
   LQuery: IioQuery;
 begin
-  LDefaultConnectionDef := io.Connections.GetDefaultConnectionDef;
+  LDefaultConnectionDef := io.Connections.GetCurrentConnectionDef;
   // Create a new connection in database master
   io.Connections.NewSQLServerConnectionDef(LDefaultConnectionDef.AsString['Server'], 'master', LDefaultConnectionDef.Params.UserName,
     LDefaultConnectionDef.Params.Password, False, False, False, CONNECTION_NAME_MSSQL_MASTER);
   // Create the query to retrieve if DB exists
-  LQuery := OpenQuery(CONNECTION_NAME_MSSQL_MASTER, Format('select db_id(%s)', [FSchema.DatabaseFileName]));
+  // M.M. 12/06/21
+  LQuery := OpenQuery(CONNECTION_NAME_MSSQL_MASTER, Format('select db_id(''%s'')', [FSchema.DatabaseFileName]));
   Result := not(LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -201,7 +211,7 @@ begin
   LQuery := OpenQuery(Format('exec sp_columns ''%s''', [ATable.TableName]));
   while not LQuery.Eof do
   begin
-    if LQuery.Fields.FieldByName('column_name').AsString.ToLower = AField.FieldName.ToLower then
+    if LQuery.Fields.FieldByName('column_name').AsString.ToLower = AField.FieldName(True).ToLower then
       Exit(True);
     LQuery.Next;
   end;
@@ -230,7 +240,7 @@ begin
   while not LQuery.Eof do
   begin
     LOldFieldName := LQuery.Fields.FieldByName('column_name').AsString;
-    LNewFieldName := AField.FieldName;
+    LNewFieldName := AField.FieldName(True);
     // Find the field
     if SameText(LOldFieldName, LNewFieldName) then
     begin
@@ -298,11 +308,15 @@ var
 begin
   // If primary key...
   if AField.PrimaryKey then
-    Exit(Format('%s [INT] IDENTITY(1,1) NOT NULL', [AField.FieldName]));
+    // M.M. 12/06/21
+    // Exit(Format('%s [INT] IDENTITY(1,1) NOT NULL', [AField.FieldName]));
+    Exit(Format('%s INT IDENTITY(1,1) NOT NULL', [AField.FieldName]));
   // ...then continue
   LDefault := ExtractFieldDefaultValue(AField);
   LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-  Result := Format('%s [%s] %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
+  // M.M. 12/06/21
+  //Result := Format('%s [%s] %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
+  Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldTypeForCreate(AField), LDefault, LNotNull]).Trim;
 end;
 
 function TioDBBuilderSqlGenMSSqlServer.ReplaceSpecialWords(const ASql: string): string;

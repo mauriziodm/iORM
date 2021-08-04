@@ -58,7 +58,7 @@ type
       const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction;
       const AMetadata_FKOnUpdateAction: TioFKAction): IioContextProperty;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
-    class function ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
+    class function TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_TRUECLASS_FIELDNAME): IioTrueClass;
     class function Joins: IioJoins;
     class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
     class function GroupBy(const ASqlText: String): IioGroupBy;
@@ -75,11 +75,11 @@ uses
   iORM.Context, iORM.Context.Properties,
   System.SysUtils, iORM.Context.Table,
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
-  System.StrUtils, iORM.Exceptions;
+  System.StrUtils, iORM.Exceptions, System.TypInfo;
 
 { TioBuilderProperties }
 
-class function TioContextFactory.ClassFromField(Typ: TRttiInstanceType; const ASqlFieldName: String): IioClassFromField;
+class function TioContextFactory.TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String): IioTrueClass;
 var
   Ancestors, QualifiedClassName, ClassName: String;
 begin
@@ -94,7 +94,7 @@ begin
   end;
   until not Assigned(Typ);
   // Create
-  Result := TioClassFromField.Create(ASqlFieldName);
+  Result := TioTrueClass.Create(ASqlFieldName);
 end;
 
 class function TioContextFactory.Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject): IioContext;
@@ -181,6 +181,7 @@ var
   PropTypeAlias: String;
   PropFieldName: String;
   PropFieldType: String;
+  PropFieldValueType: System.Rtti.TRttiType;
   PropLoadSql: String;
   PropSkip: Boolean;
   PropReadWrite: TioReadWrite;
@@ -220,7 +221,7 @@ var
       tkFloat:
         if AQualifiedName = 'System.TDate' then
           Exit(ioMdDate)
-        else if AQualifiedName = 'System.TDateTime' then
+        else if (AQualifiedName = 'System.TDateTime') or (AQualifiedName = 'iORM.CommonTypes.TioObjVersion') then
           Exit(ioMdDateTime)
         else if AQualifiedName = 'System.TTime' then
           Exit(ioMdTime)
@@ -255,12 +256,13 @@ begin
     if Prop is TRttiProperty then
     begin
       LRttiProperty := Prop as TRttiProperty;
-      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind,
-        LRttiProperty.PropertyType.QualifiedName);
+      PropFieldValueType := LRttiProperty.PropertyType;
+      PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
     end
     else if Prop is TRttiField then
     begin
       LRttiField := Prop as TRttiField;
+      PropFieldValueType := LRttiField.FieldType;
       PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
     end
     else
@@ -311,13 +313,23 @@ begin
     // Se la proprietà esiste già nella mappa (può accadere quando si fa property override)
     if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or Result.PropertyExists(PropFieldName) then
       Continue;
-    // ObjStatus property
-    if PropFieldName = 'ObjStatus' then
+    // ObjStatus property 8detect it by the type "TioObjStatus"
+    if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
     begin
       Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioEagerLoad,
         PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
         PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType,
         PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction, PropMetadata_FKOnDeleteAction);
+      Continue;
+    end;
+    // ObjVersion property
+    if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjVersion)) then
+    begin
+      Result.ObjVersionProperty := Self.GetProperty(ATable, Prop, '', PropFieldName, '', '', False, iorwReadWrite, ioRTNone, '', '', '', ioEagerLoad,
+        PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale,
+        PropMetadata_FieldNotNull, nil, PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType,
+        PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction, PropMetadata_FKOnDeleteAction);
+      Result.Add(Result.ObjVersionProperty);
       Continue;
     end;
     // Prop Init
@@ -511,7 +523,7 @@ class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioContext
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionDefName, LKeyGenerator: String;
-  LClassFromField: IioClassFromField;
+  LTrueClass: IioTrueClass;
   LJoins: IioJoins;
   LGroupBy: IioGroupBy;
   LMapMode: TioMapModeType;
@@ -525,7 +537,7 @@ begin
     LConnectionDefName := '';
     LKeyGenerator := '';
     LJoins := Self.Joins;
-    LClassFromField := nil;
+    LTrueClass := nil;
     LGroupBy := nil;
     LMapMode := ioProperties;
     LIndexList := nil;
@@ -543,8 +555,8 @@ begin
         LKeyGenerator := ioKeyGenerator(LAttr).Value;
       if LAttr is ioConnectionDefName then
         LConnectionDefName := ioConnectionDefName(LAttr).Value;
-      if LAttr is ioClassFromField then
-        LClassFromField := Self.ClassFromField(Typ);
+      if LAttr is ioTrueClass then
+        LTrueClass := Self.TrueClass(Typ);
       if LAttr is ioJoin then
         LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
       if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
@@ -560,7 +572,7 @@ begin
       end;
     end;
     // Create result Properties object
-    Result := TioContextTable.Create(LTableName, LKeyGenerator, LClassFromField, LJoins, LGroupBy, LConnectionDefName, LMapMode,
+    Result := TioContextTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode,
       LAutoCreateDB, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then

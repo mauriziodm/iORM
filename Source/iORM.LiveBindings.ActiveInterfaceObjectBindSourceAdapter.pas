@@ -127,7 +127,7 @@ type
     procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType);
     procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean);
     procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType);
-    procedure SetObjStatus(AObjStatus: TioObjectStatus);
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
     //  <TObject> (for non interfaced list such as TList<IInterface>)
@@ -154,6 +154,7 @@ type
     procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
+    procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
@@ -615,6 +616,11 @@ begin
   Result := True;
 end;
 
+procedure TioActiveInterfaceObjectBindSourceAdapter.LoadPage;
+begin
+  raise EioException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
+end;
+
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
 begin
   // Fire the event handler
@@ -788,9 +794,9 @@ begin
   FMasterPropertyName := AMasterProperty.GetName;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetRefreshing(const Value: boolean);

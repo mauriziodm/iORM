@@ -47,16 +47,25 @@ const
   IO_DEFAULT_FIELD_PRECISION = 10;
   IO_DEFAULT_FIELD_SCALE = 3;
 
-  IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
-  IO_CLASSFROMFIELD_FIELDLENGTH = 250;
+  IO_TRUECLASS_FIELDNAME = 'ClassInfo';
+  IO_TRUECLASS_FIELDLENGTH = 250;
 
   IO_CONNECTIONDEF_DEFAULTNAME = 'NO_NAME';
   IO_INTEGER_NULL_VALUE = 0;
 
 type
 
+  // Compare operators
+  TioCompareOp = (coEqual, coNotEqual, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
+
+  // Logic relations
+  TioLogicOp = (loAnd, loOr, loNot, loOpenPar, loClosePar);
+
   // Object Status
-  TioObjectStatus = (osDirty = 0, osClean, osDeleted);
+  TioObjStatus = (osDirty = 0, osClean, osDeleted);
+
+  // Object version
+  TioObjVersion = type TDateTime;
 
   // Common ClassRef
   TioClassRef = class of TObject;

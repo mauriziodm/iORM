@@ -32,7 +32,7 @@ begin
     procedure(Config: TMVCConfig)
     begin
       //enable static files
-      Config[TMVCConfigKey.DocumentRoot] := ExtractFilePath(GetModuleName(HInstance)) + '\www';
+//      Config[TMVCConfigKey.DocumentRoot] := ExtractFilePath(GetModuleName(HInstance)) + '\www';
       // session timeout (0 means session cookie)
       Config[TMVCConfigKey.SessionTimeout] := '0';
       //default content-type
@@ -46,7 +46,7 @@ begin
       //view path
       Config[TMVCConfigKey.ViewPath] := 'templates';
       //Enable STOMP messaging controller
-      Config[TMVCConfigKey.Messaging] := 'false';
+//      Config[TMVCConfigKey.Messaging] := 'false';
       //Enable Server Signature in response
       Config[TMVCConfigKey.ExposeServerSignature] := 'true';
     end);

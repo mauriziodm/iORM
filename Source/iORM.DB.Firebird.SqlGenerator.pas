@@ -47,12 +47,13 @@ type
     class function BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String; override;
   public
-    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
+    class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
+    class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
 implementation
@@ -103,7 +104,7 @@ begin
   Result := TioSqlTranslator.Translate(Result, AContext.GetClassRef.ClassName, False);
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
+class procedure TioSqlGeneratorFirebird.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
@@ -153,7 +154,13 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext;
+class procedure TioSqlGeneratorFirebird.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
+begin
+  inherited;
+  AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP FROM RDB$DATABASE');
+end;
+
+class procedure TioSqlGeneratorFirebird.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String);
 begin
   // Index Name
@@ -164,14 +171,14 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorFirebird.GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorFirebird.GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext);
 begin
   // No inherited
   // inherited;
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT CASE WHEN (EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
-    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName +
+    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName +
     ')) THEN 1 ELSE 0 END FROM RDB$DATABASE');
   // -----------------------------------------------------------------
 end;

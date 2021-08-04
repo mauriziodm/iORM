@@ -1,39 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.Utilities;
 
@@ -47,38 +43,43 @@ type
 
   TioUtilities = class
   public
-    class function ObjectAsIInterface(const AObj:Tobject): IInterface; static;
-    class function ObjectAsIioViewModel(const AObj:Tobject): IioViewModel; static;
+    class function ObjectAsIInterface(const AObj: Tobject): IInterface; static;
+    class function ObjectAsIioViewModel(const AObj: Tobject): IioViewModel; static;
     class function IsAnInterface<T>: Boolean; static;
-    class function CastObjectToGeneric<T>(const AObj:TObject): T; overload; static;
-    class function CastObjectToGeneric<T>(const AObj:TObject; IID:TGUID): T; overload; static;
-    class function GenericToString<T>(const AQualified:Boolean=False): String; static;
-    class function ClassRefToRttiType(const AClassRef:TioClassRef): TRttiInstanceType; static;
-    class function IsAnInterfaceTypeName(const ATypeName:String): Boolean; static;
-    class function ResolveChildPropertyPath(const ARootObj:TObject; const AChildPropertyPath:TStrings): TObject; static;
-    class function TypeInfoToTypeName(const ATypeInfo:PTypeInfo; const AQualified:Boolean=False): String; static;
-    class function SameObject(const AObj1, AObj2: TObject): boolean;
-    class function GetImplementedInterfaceName(const AClassType:TRttiInstanceType; const IID:TGUID): String; static;
-    class function TValueToObject(const AValue: TValue; const ASilentException:Boolean=True): TObject; static;
-    class function TObjectFrom<T>(const AInstancePointer:Pointer): TObject;
-    class function TypeInfoToGUID(const ATypeInfo:PTypeInfo):TGUID; static;
-    class function GUIDtoTypeInfo(const IID:TGUID): PTypeInfo; static;
-    class function GUIDtoInterfaceName(const IID:TGUID): String; static;
+    class function CastObjectToGeneric<T>(const AObj: Tobject): T; overload; static;
+    class function CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T; overload; static;
+    class function GenericToString<T>(const AQualified: Boolean = False): String; static;
+    class function ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType; static;
+    class function IsAnInterfaceTypeName(const ATypeName: String): Boolean; static;
+    class function ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject; static;
+    class function TypeInfoToTypeName(const ATypeInfo: PTypeInfo; const AQualified: Boolean = False): String; static;
+    class function SameObject(const AObj1, AObj2: Tobject): Boolean;
+    class function GetImplementedInterfaceName(const AClassType: TRttiInstanceType; const IID: TGUID): String; static;
+    class function TValueToObject(const AValue: TValue; const ASilentException: Boolean = True): Tobject; static;
+    class function TObjectFrom<T>(const AInstancePointer: Pointer): Tobject;
+    class function TypeInfoToGUID(const ATypeInfo: PTypeInfo): TGUID; static;
+    class function GUIDtoTypeInfo(const IID: TGUID): PTypeInfo; static;
+    class function GUIDtoInterfaceName(const IID: TGUID): String; static;
     class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
     class function ExtractPropertyName(const AFullPathPropertyName: String): String;
-    class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass;
+    class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass; static;
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
+    class function ExtractOID(const AObj: Tobject): Integer; overload; static;
+    class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
+    class function EnumToString<T>(const AEnumValue:T): String;
+    class function GetThreadID: TThreadID;
+    class function ExtractItemRttiType<T>: TRttiType;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers;
+  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers,
+  iORM.Context.Factory, iORM.Context.Interfaces, iORM.Context.Map.Interfaces;
 
 { TioRttiUtilities }
 
-
-class function TioUtilities.CastObjectToGeneric<T>(const AObj: TObject; IID:TGUID): T;
+class function TioUtilities.CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T;
 begin
   if not Assigned(AObj) then
     Exit(TValue.Empty.AsType<T>);
@@ -94,17 +95,52 @@ begin
       raise EioException.Create('TioRttiUtilities.CastObjectToGeneric: Interface not supported.');
   end
   else
-    Result := TValue.From<TObject>(AObj).AsType<T>;
+    Result := TValue.From<Tobject>(AObj).AsType<T>;
 end;
 
-class function TioUtilities.CastObjectToGeneric<T>(const AObj: TObject): T;
+class function TioUtilities.CastObjectToGeneric<T>(const AObj: Tobject): T;
 begin
   Result := CastObjectToGeneric<T>(AObj, GUID_NULL);
 end;
 
 class function TioUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;
 begin
-  Result := TioRttiContextFactory.RttiContext.GetType(AClassref).AsInstance;
+  Result := TioRttiContextFactory.RttiContext.GetType(AClassRef).AsInstance;
+end;
+
+class function TioUtilities.ExtractOID(const AObj: Tobject): Integer;
+var
+  LMap: IioMap;
+begin
+  if not Assigned(AObj) then
+    raise EioException.Create(ClassName, 'ExtractOID', '"AObj" cannot be nil.');
+  LMap := TioContextFactory.Map(AObj.ClassType);
+  Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+end;
+
+class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;
+begin
+  Result := TRttiEnumerationType.GetName<T>(AEnumValue);
+end;
+
+class function TioUtilities.ExtractItemRttiType<T>: TRttiType;
+var
+  LType: TRttiType;
+  LGetItemMethod: TRttiMethod;
+begin
+  LType := TioRttiContextFactory.RttiContext.GetType(TypeInfo(T));
+  LGetItemMethod := LType.GetMethod('GetItem');
+  if Assigned(LGetItemMethod) then
+    Result := LGetItemMethod.ReturnType
+  else
+    raise EioException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
+end;
+
+class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
+begin
+  if Assigned(AIntf) then
+    raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
+  Result := ExtractOID(AIntf as Tobject);
 end;
 
 class function TioUtilities.ExtractPropertyName(const AFullPathPropertyName: String): String;
@@ -120,13 +156,12 @@ begin
   end;
 end;
 
-class function TioUtilities.GenericToString<T>(const AQualified:Boolean=False): String;
+class function TioUtilities.GenericToString<T>(const AQualified: Boolean = False): String;
 begin
   Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
 end;
 
-class function TioUtilities.GetImplementedInterfaceName(
-  const AClassType: TRttiInstanceType; const IID: TGUID): String;
+class function TioUtilities.GetImplementedInterfaceName(const AClassType: TRttiInstanceType; const IID: TGUID): String;
 var
   LRttiInterfaceType: TRttiInterfaceType;
 begin
@@ -141,23 +176,28 @@ begin
   Result := TioRttiContextFactory.RttiContext.GetType(ATypeInfo).QualifiedName;
 end;
 
+class function TioUtilities.GetThreadID: TThreadID;
+begin
+  Result := System.Classes.TThread.CurrentThread.ThreadID;
+end;
+
 class function TioUtilities.GUIDtoInterfaceName(const IID: TGUID): String;
 var
-  LType : TRttiType;
+  LType: TRttiType;
 begin
   for LType in TioRttiContextFactory.RttiContext.GetTypes do
-   if LType is TRTTIInterfaceType and (TRTTIInterfaceType(LType).GUID = IID) then
-     exit(TRTTIInterfaceType(LType).Name);
+    if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
+      Exit(TRttiInterfaceType(LType).Name);
   raise EioException.Create('TioRttiUtilities.GUIDtoInterfaceName: IID is not an interface.');
 end;
 
 class function TioUtilities.GUIDtoTypeInfo(const IID: TGUID): PTypeInfo;
 var
-  LType : TRttiType;
+  LType: TRttiType;
 begin
   for LType in TioRttiContextFactory.RttiContext.GetTypes do
-   if LType is TRTTIInterfaceType and (TRTTIInterfaceType(LType).GUID = IID) then
-     exit(TRTTIInterfaceType(LType).Handle);
+    if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
+      Exit(TRttiInterfaceType(LType).Handle);
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
 end;
 
@@ -166,27 +206,25 @@ begin
   Result := ATypeName.StartsWith('I');
 end;
 
-class function TioUtilities.ObjectAsIInterface(
-  const AObj: Tobject): IInterface;
+class function TioUtilities.ObjectAsIInterface(const AObj: Tobject): IInterface;
 begin
   if not Supports(AObj, IInterface, Result) then
     raise EioException.Create('TioRttiUtilities: IInterface not implemented by the object (' + AObj.ClassName + ').');
 end;
 
-class function TioUtilities.ObjectAsIioViewModel(
-  const AObj: Tobject): IioViewModel;
+class function TioUtilities.ObjectAsIioViewModel(const AObj: Tobject): IioViewModel;
 begin
   if not Supports(AObj, IioViewModel, Result) then
     raise EioException.Create('TioRttiUtilities: IioViewModel not implemented by the object (' + AObj.ClassName + ').');
 end;
 
 // Questa funzione, a partire dal RootObject, restituisce l'oggetto a relativo al ChildPropertyPath navigando le proprietà
-//  dei vari livelli di oggetti.
-class function TioUtilities.ResolveChildPropertyPath(const ARootObj: TObject; const AChildPropertyPath: TStrings): TObject;
+// dei vari livelli di oggetti.
+class function TioUtilities.ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject;
 var
   Ctx: TRttiContext;
   ACurrPropName: String;
-  function GetChildObject(const AMasterObj:TObject; const AMasterPropertyName:String): TObject;
+  function GetChildObject(const AMasterObj: Tobject; const AMasterPropertyName: String): Tobject;
   var
     Typ: TRttiType;
     Prop: TRttiProperty;
@@ -201,6 +239,7 @@ var
     // Return the resolved child object
     Result := TValueToObject(AValue, True);
   end;
+
 begin
   // Init
   Result := ARootObj;
@@ -232,23 +271,21 @@ var
 begin
   if ARttiType.IsInstance then
     Exit(ARttiType)
-  else
-  if ARttiType is TRttiInterfaceType then
+  else if ARttiType is TRttiInterfaceType then
   begin
     LContainerImplementersItem := io.di.Locate(ARttiType.Name).GetItem;
     Exit(LContainerImplementersItem.RttiType);
   end
   else
-    raise eioException.Create(Self.ClassName, 'RttiTypeToClassRef', '"ARttiType" parameter must be a TRttiInstanceType or TRttiInterfaceType.');
+    raise EioException.Create(Self.ClassName, 'RttiTypeToClassRef', '"ARttiType" parameter must be a TRttiInstanceType or TRttiInterfaceType.');
 end;
 
-class function TioUtilities.SameObject(const AObj1,
-  AObj2: TObject): boolean;
+class function TioUtilities.SameObject(const AObj1, AObj2: Tobject): Boolean;
 begin
   Result := (@AObj1 = @AObj2);
 end;
 
-class function TioUtilities.TObjectFrom<T>(const AInstancePointer: Pointer): TObject;
+class function TioUtilities.TObjectFrom<T>(const AInstancePointer: Pointer): Tobject;
 var
   LValue: TValue;
 begin
@@ -256,19 +293,21 @@ begin
   Result := Self.TValueToObject(LValue, False);
 end;
 
-class function TioUtilities.TValueToObject(const AValue: TValue; const ASilentException:Boolean): TObject;
+class function TioUtilities.TValueToObject(const AValue: TValue; const ASilentException: Boolean): Tobject;
 begin
   Result := nil;
   case AValue.TypeInfo.Kind of
-    tkInterface: Result := AValue.AsInterface As TObject;
-    tkClass: Result := AValue.AsObject;
-  else if not ASilentException then
-    raise EioException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
+    tkInterface:
+      Result := AValue.AsInterface As Tobject;
+    tkClass:
+      Result := AValue.AsObject;
+  else
+    if not ASilentException then
+      raise EioException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
   end;
 end;
 
-class function TioUtilities.TypeInfoToGUID(
-  const ATypeInfo: PTypeInfo): TGUID;
+class function TioUtilities.TypeInfoToGUID(const ATypeInfo: PTypeInfo): TGUID;
 var
   LTyp: TRttiType;
 begin
@@ -276,14 +315,14 @@ begin
     raise EioException.Create('TioRttiUtilities.TypeInfoToGUID: ATypeInfo is not relative to an interface.');
   LTyp := TioRttiContextFactory.RttiContext.GetType(ATypeInfo);
   if not Assigned(LTyp) then
-    raise EioException.Create('TioRttiUtilities.TypeInfoToGUID: RTTI type info not found, derive it from IInvokable or insert the {M+} directive before its declaration to solve the problem.');
+    raise EioException.Create
+      ('TioRttiUtilities.TypeInfoToGUID: RTTI type info not found, derive it from IInvokable or insert the {M+} directive before its declaration to solve the problem.');
   Result := TRttiInterfaceType(LTyp).GUID;
 end;
 
-class function TioUtilities.TypeInfoToTypeName(
-  const ATypeInfo: PTypeInfo; const AQualified:Boolean=False): String;
+class function TioUtilities.TypeInfoToTypeName(const ATypeInfo: PTypeInfo; const AQualified: Boolean = False): String;
 begin
-// From XE7
+  // From XE7
 {$IFDEF NEXTGEN}
   // Get the type name
   Result := ATypeInfo.NameFld.ToString;
@@ -291,13 +330,13 @@ begin
   if AQualified then
   begin
     // If it is an interface then link the Interface unit to the TypeName
-    if  ATypeInfo.Kind = tkInterface then
+    if ATypeInfo.Kind = tkInterface then
       Result := ATypeInfo.TypeData.IntfUnitFld.ToString + '.' + Result
-    // else (class) link the class unit to the TypeName
+      // else (class) link the class unit to the TypeName
     else
       Result := ATypeInfo.TypeData.UnitNameFld.ToString + '.' + Result;
   end;
-// Before XE7
+  // Before XE7
 {$ELSE  NEXTGEN}
   Result := String(ATypeInfo.Name);
 {$ENDIF NEXTGEN}
@@ -306,11 +345,8 @@ end;
 class function TioUtilities.IsAnInterface<T>: Boolean;
 begin
   // Result is True if T si an interface
-//  Result := (   TioRttiContextFactory.RttiContext.GetType(TypeInfo(T)) is TRttiInterfaceType   );
+  // Result := (   TioRttiContextFactory.RttiContext.GetType(TypeInfo(T)) is TRttiInterfaceType   );
   Result := PTypeInfo(TypeInfo(T)).Kind = tkInterface;
 end;
 
 end.
-
-
-

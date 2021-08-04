@@ -61,8 +61,7 @@ type
     class procedure CommitTransaction(const AConnectionName: String); override;
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: Boolean); override;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean); override;
     class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
       const ABlindInsert: Boolean); override;
     class procedure DeleteObject(const AObj: TObject); override;
@@ -72,6 +71,7 @@ type
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function Count(const AWhere: IioWhere): Integer; override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
@@ -84,7 +84,7 @@ uses
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
-  iORM.Exceptions, iORM;
+  iORM.Exceptions, iORM, System.SysUtils;
 
 { TioStrategyDB }
 
@@ -92,6 +92,53 @@ class procedure TioStrategyDB.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
+end;
+
+class function TioStrategyDB.Count(const AWhere: IioWhere): Integer;
+var
+  AResolvedTypeList: IioResolvedTypeList;
+  AResolvedTypeName: String;
+  AContext: IioContext;
+  ATransactionCollection: IioTransactionCollection;
+  ADuckTypedList: IioDuckTypedList;
+  // Nested
+  procedure NestedCount;
+  var
+    AQuery: IioQuery;
+  begin
+    AQuery := TioDBFactory.QueryEngine.GetQueryCount(AContext);
+    AQuery.Open;
+    try
+      Result := Result + AQuery.Fields[0].AsInteger;
+    finally
+      AQuery.Close;
+    end;
+  end;
+
+begin
+  inherited;
+  // Resolve the type and alias
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  // Get the transaction collection
+  ATransactionCollection := TioDBFactory.TransactionCollection;
+  try
+    // Loop for all classes in the sesolved type list
+    for AResolvedTypeName in AResolvedTypeList do
+    begin
+      // Get the Context for the current ResolverTypeName
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere);
+      // Start transaction
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      // Get the count value for the current resolved type
+      NestedCount;
+    end;
+    // Commit ALL transactions
+    ATransactionCollection.CommitAll;
+  except
+    // Rollback ALL transactions
+    ATransactionCollection.RollbackAll;
+    raise;
+  end;
 end;
 
 class procedure TioStrategyDB.Delete(const AWhere: IioWhere);
@@ -176,19 +223,19 @@ begin
   end;
 end;
 
-//class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
-//var
-//  AContext: IioContext;
-//begin
-//  inherited;
-//  // Check
-//  if not Assigned(AObj) then
-//    Exit;
-//  // Create Context
-//  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-//  // Execute
-//  Self.DeleteObject_Internal(AContext);
-//end;
+// class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
+// var
+// AContext: IioContext;
+// begin
+// inherited;
+// // Check
+// if not Assigned(AObj) then
+// Exit;
+// // Create Context
+// AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+// // Execute
+// Self.DeleteObject_Internal(AContext);
+// end;
 
 class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
 var
@@ -249,8 +296,8 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtFirebird) and
-    AContext.IDIsNull then
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtFirebird) and AContext.IDIsNull
+  then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -263,8 +310,11 @@ begin
   end;
   // -----------------------------------------------------------
 
-  // Create and execute insert query
+  // Create and execute insert query and set the version of the entity
+  //  (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
+  if not ABlindInsert then
+    AContext.ObjVersion := AContext.TransactionTimestamp;
 
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
@@ -305,13 +355,13 @@ var
     Result := nil;
     // Create & open query
     // AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext); // NB: Prima era così ma probabilmente era una svista
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectForObject(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
     AQuery.Open;
     try
       // If a record is fuìound then load the object and return True
       if not AQuery.Eof then
         // Create the object as TObject
-        Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+        Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsTrueClass).MakeObject(AContext, AQuery);
     finally
       // Close query
       AQuery.Close;
@@ -359,12 +409,12 @@ begin
   // Get the Context
   AContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result);
   // Create & open query
-  AQuery := TioDBFactory.QueryEngine.GetQuerySelectForObject(AContext);
+  AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
   AQuery.Open;
   try
     // Create the object as TObject
     if not AQuery.IsEmpty then
-      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsTrueClass).MakeObject(AContext, AQuery);
   finally
     // Close query
     AQuery.Close;
@@ -377,7 +427,7 @@ var
 begin
   inherited;
   // Generate and open the query
-  AQuery := TioDBFactory.QueryEngine.GetQueryForExists(AContext);
+  AQuery := TioDBFactory.QueryEngine.GetQueryExists(AContext);
   AQuery.Open;
   try
     Result := AQuery.Fields[0].AsInteger <> 0;
@@ -386,8 +436,8 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const ABlindInsert: Boolean);
+class procedure TioStrategyDB.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+  const ABlindInsert: Boolean);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -427,8 +477,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean);
+class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean);
 var
   LContext: IioContext;
 begin
@@ -442,8 +491,7 @@ begin
   Self.StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
-    if (ARelationPropertyName <> '') and (ARelationOID <> 0) and
-      (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = ioRTNone)
+    if (ARelationPropertyName <> '') and (ARelationOID <> 0) and (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = ioRTNone)
     // Altrimenti in alcuni casi particolare dava errori
     then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
@@ -451,7 +499,7 @@ begin
     Self.PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
-    case LContext.ObjectStatus of
+    case LContext.ObjStatus of
       // DIRTY
       // If the ID property of the object is not assigned
       // then insert the object else update
@@ -464,18 +512,18 @@ begin
             Self.UpdateObject(LContext)
           else
             Self.InsertObject(LContext, ABlindInsert);
-          LContext.ObjectStatus := osClean;
+          LContext.ObjStatus := osClean;
         end;
       // DELETE
       osDeleted:
         begin
           Self.DeleteObject_Internal(LContext);
           // Mauri 23/04/2020: Ho eliminato la riga sotto perchè non c'è alcun motivo per il quale lo status
-          //  debba tornare clean, non è come nel persist, in più mi creava anche qualche problema (LDE)
-          //  perchè in alcuni casi dovevo poi ciclare tra tutti gli elementi di una relazione HasMany
-          //  facendo cose diverse in base al fatto che l'oggetto fosse Deleted oppure no (e se lui
-          //  me lo rimette clean...)
-//          LContext.ObjectStatus := osClean;
+          // debba tornare clean, non è come nel persist, in più mi creava anche qualche problema (LDE)
+          // perchè in alcuni casi dovevo poi ciclare tra tutti gli elementi di una relazione HasMany
+          // facendo cose diverse in base al fatto che l'oggetto fosse Deleted oppure no (e se lui
+          // me lo rimette clean...)
+          // LContext.ObjectStatus := osClean;
         end;
     end;
     // --------------------------
@@ -493,9 +541,8 @@ end;
 class procedure TioStrategyDB.PersistRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
 begin
   // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
-  Self.PersistCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject),
-    AMasterProperty.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject)
-    .AsInteger, False); // Blind
+  Self.PersistCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject), AMasterProperty.GetRelationChildPropertyName,
+    AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False); // Blind
 end;
 
 class procedure TioStrategyDB.PersistRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
@@ -505,8 +552,8 @@ begin
   // Get the child object
   AObj := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   // Persist object
-  Self.PersistObject(AObj, AMasterProperty.GetRelationChildPropertyName,
-    AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False); // Blind
+  Self.PersistObject(AObj, AMasterProperty.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject)
+    .AsInteger, False); // Blind
 end;
 
 class procedure TioStrategyDB.PreProcessRelationChildOnDelete(const AContext: IioContext);
@@ -581,7 +628,7 @@ begin
           // Nel caso dovesse servire, in futuro, si potrebbe aggiungere un parametro all'attributo
           // [ioBelongsTo] per poter forare o meno il persist anche del dettaglio della BelongsTo
           // che di default preferisco rimanga disabilitata.
-          //io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
+          // io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
           // ---------- M.M. 17/08/18 ----------
           { Nothing }  // Non persiste più nulla in caso di relazione BelongsTo
         end;
@@ -672,7 +719,7 @@ var
     LQry: IioQuery;
   begin
     // Create & open query
-    LQry := TioDBFactory.QueryEngine.GetQuerySelectForList(AContext);
+    LQry := TioDBFactory.QueryEngine.GetQuerySelectList(AContext);
     LQry.Open;
     try
       // Copy data to the MemoryTable
@@ -736,7 +783,7 @@ var
     AObj: TObject;
   begin
     // Create & open query
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectForList(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQuerySelectList(AContext);
     AQuery.Open;
     try
       // Loop
@@ -745,7 +792,7 @@ var
         // Clean the DataObject (it contains the previous)
         AContext.DataObject := nil;
         // Create the object as TObject
-        AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+        AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsTrueClass).MakeObject(AContext, AQuery);
         // Add current object to the list
         ADuckTypedList.Add(AObj);
         // Next
@@ -788,8 +835,12 @@ end;
 class procedure TioStrategyDB.UpdateObject(const AContext: IioContext);
 begin
   inherited;
-  // Create and execute query
-  TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL;
+  // Create and execute the query to update the entity into the DB cheking the version to avoid concurrrency
+  //  conflict (if versioning is enabled for this type of entity)
+  if TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL > 0 then
+    AContext.ObjVersion := AContext.TransactionTimestamp
+  else
+    raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
 end;
 
 end.

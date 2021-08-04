@@ -161,5 +161,8 @@ Samples/PhoneContacts_Interfaces_TwoConnections/__history/
 Samples/PhoneContacts_Interfaces_TwoConnections/Win32/
 Samples/SamplesData/DataSetTest_original.DB
 Samples/DataSet_MVVM/__recovery/
-Samples/PagingFmx/__history/FormMain.pas.~16~
 Samples/PagingFmx/__history/
+Samples/Paging_MVVM/Common/__history/
+Samples/Paging_MVVM/VCL/__history/
+Samples/PagingFmx/__recovery/
+Samples/Paging_MVVM/FMX/__history/

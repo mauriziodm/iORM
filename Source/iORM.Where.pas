@@ -45,7 +45,9 @@ uses
   iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
-  iORM.Utilities;
+  iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
+  // M.M. 12/06/21
+  ObjMapper.Attributes;
 
 type
 
@@ -54,7 +56,7 @@ type
   strict protected
     FTypeName, FTypeAlias: String;
     FTypeInfo: PTypeInfo;
-    FDisableClassFromField: Boolean;
+    FDisableTrueClass: Boolean;
     FLazyLoad: Boolean;
     FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
@@ -63,9 +65,22 @@ type
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
     // e contiene il nome della MasterPropertyName
     FDetailsContainer: IioWhereDetailsContainer;
+    // Riferimento al BSACommonPageManager che potrebbe essere usato per la gestione
+    // del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
+    // M.M. 12/06/21
+    // Aggiunto attributo per non serializzare l'oggetto TioCommonBSAPageManager
+    [DoNotSerializeAttribute]
+    FPagingObj: TioCommonBSAPageManager;
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
+
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria(const AText: String); overload;
+    procedure _AddCriteria(const AWhere: IioWhere); overload;
     // -------------------------------------------
     // Details property
     function GetDetails: IioWhereDetailsContainer;
@@ -84,13 +99,14 @@ type
     constructor Create; reintroduce; overload;
     function GetWhereItems: IWhereItems;
     function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
-    function GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean;
-      const AClassFromField: IioClassFromField): String;
-    function GetDisableClassFromField: Boolean;
+    function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
+    function GetDisableTrueClass: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
+    function GetPagingObj: TObject; // TObject to avoid circular reference
+    procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -105,16 +121,16 @@ type
 
     procedure ToList(const AList: TObject); overload;
     function ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean = True): TObject; overload;
-    function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True)
-      : TObject; overload;
+    function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True): TObject; overload;
     function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
+    function GetCount: Integer;
 
     procedure Delete;
 
-    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True;
-      const AOwnsObject: Boolean = True): TBindSourceAdapter; overload;
-    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True;
-      const AOwnsObject: Boolean = True): TBindSourceAdapter; overload;
+    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True; const AOwnsObject: Boolean = True)
+      : TBindSourceAdapter; overload;
+    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData: Boolean = True; const AOwnsObject: Boolean = True)
+      : TBindSourceAdapter; overload;
     function ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
     function ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
 
@@ -123,12 +139,12 @@ type
     procedure ShowEach(const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
 
     // ------ Conditions
-    function ByOID(const AOID: Integer): IioWhere;
-    function Add(const ATextCondition: String): IioWhere; overload;
-    function Add(const AWhereCond: IioWhere): IioWhere; overload;
+    function ByID(const AID: Integer): IioWhere;
+    function Add(const ATextCondition:String): IioWhere; overload;
+    function Add(const AWhereCond:IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere; overload;
-    function DisableClassFromField: IioWhere;
+    function DisableTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
     function IsLazy: Boolean;
@@ -145,8 +161,6 @@ type
     function _And(ATextCondition: String): IioWhere; overload;
     function _Or(ATextCondition: String): IioWhere; overload;
     function _Not(ATextCondition: String): IioWhere; overload;
-    function _OpenPar(ATextCondition: String): IioWhere; overload;
-    function _ClosePar(ATextCondition: String): IioWhere; overload;
     // ------ Logic relations with TioWere
     function _And(AWhereCond: IioWhere): IioWhere overload;
     // ------ Compare operators
@@ -188,34 +202,47 @@ type
     function _LikeTo(AValue: TDateTime): IioWhere; overload;
     function _LikeTo(AValue: Double): IioWhere; overload;
     function _LikeTo(AValue: Integer): IioWhere; overload;
+    // ------ New criteria
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     // ------
     function _Where: IioWhere; overload;
     function _Where(AWhere: IioWhere): IioWhere; overload;
     function _Where(ATextCondition: String): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     function _Property(APropertyName: String): IioWhere;
     function _PropertyOID: IioWhere;
-
     function _PropertyEqualsTo(APropertyName: String; AValue: TValue): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere; overload;
-
     function _PropertyIsNull(APropertyName: String): IioWhere;
     function _PropertyIsNotNull(APropertyName: String): IioWhere;
-
     function _PropertyOIDEqualsTo(AValue: Integer): IioWhere;
-
     function _Value(AValue: TValue): IioWhere; overload;
     function _Value(AValue: TDateTime): IioWhere; overload;
     function _Value(AValue: Integer): IioWhere; overload;
     function _Value(AValue: Double): IioWhere; overload;
-
+    function _Value(AValue: TObject): IioWhere; overload;
+    function _Value(AValue: IInterface): IioWhere; overload;
     function _OrderBy(const ATextOrderBy: String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere; overload;
-    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
+    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
       const AUnique: Boolean = False); overload;
-    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String;
-      const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
     procedure DropIndex(const AIndexName: String);
     // ----- Properties -----
     property Details: IioWhereDetailsContainer read GetDetails;
@@ -238,12 +265,12 @@ type
     // procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); override;
 
     // ------ Conditions
-    function ByOID(const AOID: Integer): IioWhere<T>;
-    function Add(const ATextCondition: String): IioWhere<T>; overload;
-    function Add(const AWhereCond: IioWhere): IioWhere<T>; overload;
+    function ByID(const AID: Integer): IioWhere<T>;
+    function Add(const ATextCondition:String): IioWhere<T>; overload;
+    function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere<T>; overload;
-    function DisableClassFromField: IioWhere<T>;
+    function DisableTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
@@ -257,8 +284,6 @@ type
     function _And(ATextCondition: String): IioWhere<T>; overload;
     function _Or(ATextCondition: String): IioWhere<T>; overload;
     function _Not(ATextCondition: String): IioWhere<T>; overload;
-    function _OpenPar(ATextCondition: String): IioWhere<T>; overload;
-    function _ClosePar(ATextCondition: String): IioWhere<T>; overload;
     // ------ Logic relations with TioWere
     function _And(AWhereCond: IioWhere): IioWhere<T>; overload;
     // ------ Compare operators
@@ -300,28 +325,42 @@ type
     function _LikeTo(AValue: TDateTime): IioWhere<T>; overload;
     function _LikeTo(AValue: Double): IioWhere<T>; overload;
     function _LikeTo(AValue: Integer): IioWhere<T>; overload;
+    // ------ New criteria
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     // ------
     function _Where: IioWhere<T>; overload;
     function _Where(AWhereCond: IioWhere): IioWhere<T>; overload;
     function _Where(ATextCondition: String): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
+    function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     function _Property(APropertyName: String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
-
     function _PropertyEqualsTo(APropertyName: String; AValue: TValue): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere<T>; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere<T>; overload;
-
     function _PropertyIsNull(APropertyName: String): IioWhere<T>;
     function _PropertyIsNotNull(APropertyName: String): IioWhere<T>;
-
     function _PropertyOIDEqualsTo(AValue: Integer): IioWhere<T>;
-
     function _Value(AValue: TValue): IioWhere<T>; overload;
     function _Value(AValue: TDateTime): IioWhere<T>; overload;
     function _Value(AValue: Double): IioWhere<T>; overload;
     function _Value(AValue: Integer): IioWhere<T>; overload;
-
+    function _Value(AValue: TObject): IioWhere<T>; overload;
+    function _Value(AValue: IInterface): IioWhere<T>; overload;
     function _OrderBy(const ATextOrderBy: String): IioWhere<T>; overload;
     function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere<T>; overload;
   end;
@@ -377,11 +416,79 @@ begin
   Self.FWhereItems.Add(TioDbFactory.LogicRelation._ClosePar);
 end;
 
-function TioWhere._ClosePar(ATextCondition: String): IioWhere;
+procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp);
+var
+  AProp: IioContextProperty;
+begin
+  FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
+  FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));
+end;
+
+procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
+begin
+  _AddCriteria(APropertyName, ACompareOp);
+  if AValue.IsEmpty then
+    Exit;
+  case AValue.Kind of
+    tkClass:
+      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsObject));
+    tkInterface:
+      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsInterface));
+  end;
+  FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
+end;
+
+procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
+begin
+  if not WhereConditionExists then
+    FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+  _AddCriteria(APropertyName, ACompareOp, AValue);
+end;
+
+procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp);
+begin
+  if not WhereConditionExists then
+    FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+  _AddCriteria(APropertyName, ACompareOp);
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
 begin
   Result := Self;
-  Self._ClosePar;
-  Self.Add(ATextCondition)
+  _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+procedure TioWhere._AddCriteria(const AWhere: IioWhere);
+var
+  AItem: IioSqlItem;
+begin
+  if Assigned(AWhere) then
+    for AItem in AWhere.GetWhereItems do
+      FWhereItems.Add(AItem);
+end;
+
+procedure TioWhere._AddCriteria(const AText: String);
+begin
+  if not AText.IsEmpty then
+    FWhereItems.Add(TioSqlItemsWhereText.Create(AText));
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loAnd, APropertyName, ACompareOp);
 end;
 
 function TioWhere._Equal: IioWhere;
@@ -554,23 +661,24 @@ begin
   FDetailsContainer.AddOrUpdate(AMasterPropertyName, AWhereCond);
 end;
 
-function TioWhere.ByOID(const AOID: Integer): IioWhere;
+function TioWhere.ByID(const AID: Integer): IioWhere;
 begin
   Result := Self;
-  Self._PropertyOIDEqualsTo(AOID);
+  Self._PropertyOIDEqualsTo(AID);
 end;
 
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
 
-  FDisableClassFromField := False;
+  FDisableTrueClass := False;
   FLazyLoad := False;
   FWhereItems := TioWhereFactory.NewWhereItems;
   FDetailsContainer := TioWhereFactory.NewDetailsContainer;
   FOrderBy := nil;
   FLimitRows := 0;
   FLimitOffset := 0;
+  FPagingObj := nil;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -578,8 +686,7 @@ begin
   Self.CreateIndex('', ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
-procedure TioWhere.CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean);
+procedure TioWhere.CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   AResolvedTypeList: IioResolvedTypeList;
   AResolvedTypeName: String;
@@ -591,7 +698,7 @@ var
     AQuery: IioQuery;
   begin
     // Create & execute query
-    AQuery := TioDbFactory.QueryEngine.GetQueryForCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
+    AQuery := TioDbFactory.QueryEngine.GetQueryCreateIndex(AContext, AIndexName, ACommaSepFieldList, AIndexOrientation, AUnique);
     AQuery.ExecSQL;
   end;
 
@@ -625,10 +732,10 @@ begin
   TioStrategyFactory.GetStrategy('').Delete(Self);
 end;
 
-function TioWhere.DisableClassFromField: IioWhere;
+function TioWhere.DisableTrueClass: IioWhere;
 begin
   Result := Self;
-  FDisableClassFromField := True;
+  FDisableTrueClass := True;
 end;
 
 procedure TioWhere.DropIndex(const AIndexName: String);
@@ -643,7 +750,7 @@ var
     AQuery: IioQuery;
   begin
     // Create & execute query
-    AQuery := TioDbFactory.QueryEngine.GetQueryForDropIndex(AContext, AIndexName);
+    AQuery := TioDbFactory.QueryEngine.GetQueryDropIndex(AContext, AIndexName);
     AQuery.ExecSQL;
   end;
 
@@ -672,14 +779,19 @@ begin
   end;
 end;
 
+function TioWhere.GetCount: Integer;
+begin
+  Result := TioStrategyFactory.GetStrategy('').Count(Self);
+end;
+
 function TioWhere.GetDetails: IioWhereDetailsContainer;
 begin
   Result := FDetailsContainer;
 end;
 
-function TioWhere.GetDisableClassFromField: Boolean;
+function TioWhere.GetDisableTrueClass: Boolean;
 begin
-  Result := FDisableClassFromField;
+  Result := FDisableTrueClass;
 end;
 
 function TioWhere.GetItems: IWhereItems;
@@ -690,11 +802,21 @@ end;
 function TioWhere.GetLimitOffset: Integer;
 begin
   Result := FLimitOffset;
+  // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
+  // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
+  // attivo allora chiede a lui
+  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.Enabled then
+    Result := FPagingObj.GetSqlLimitOffset;
 end;
 
 function TioWhere.GetLimitRows: Integer;
 begin
   Result := FLimitRows;
+  // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
+  // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
+  // attivo allora chiede a lui
+  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.Enabled then
+    Result := FPagingObj.GetSqlLimit;
 end;
 
 function TioWhere.GetOrderByInstance: IioSqlItemWhere;
@@ -708,6 +830,11 @@ begin
     Result := FOrderBy.GetSql(AMap)
   else
     Result := '';
+end;
+
+function TioWhere.GetPagingObj: TObject;
+begin
+  Result := FPagingObj;
 end;
 
 function TioWhere.GetSql(const AMap: IioMap; const AddWhere: Boolean): String;
@@ -731,18 +858,17 @@ begin
   end;
 end;
 
-function TioWhere.GetSqlWithClassFromField(const AMap: IioMap; const AIsClassFromField: Boolean;
-  const AClassFromField: IioClassFromField): String;
+function TioWhere.GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
 begin
   Result := Self.GetSql(AMap);
-  if AIsClassFromField then
+  if AIsTrueClass then
   begin
     if Result = '' then
       Result := 'WHERE '
     else
       Result := Result + ' AND ';
-    // Result := Result + AClassFromField.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+AClassFromField.GetClassName+'>%');
-    Result := Result + AClassFromField.GetSqlFieldName + ' LIKE :' + AClassFromField.GetSqlParamName;
+    // Result := Result + ATrueClass.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+ATrueClass.GetClassName+'>%');
+    Result := Result + ATrueClass.GetSqlFieldName + ' LIKE :' + ATrueClass.GetSqlParamName;
   end;
 end;
 
@@ -771,6 +897,11 @@ begin
   Result := (FWhereItems.Count = 0);
 end;
 
+procedure TioWhere.SetPagingObj(const APagingObj: TObject);
+begin
+  FPagingObj := APagingObj as TioCommonBSAPageManager;
+end;
+
 function TioWhere.IsLazy: Boolean;
 begin
   Result := FLazyLoad;
@@ -791,7 +922,7 @@ end;
 
 function TioWhere.LimitExists: Boolean;
 begin
-  Result := FLimitRows > 0;
+  Result := GetLimitRows > 0;
 end;
 
 function TioWhere.SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
@@ -880,8 +1011,7 @@ begin
   io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(LList).Show;
 end;
 
-function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean)
-  : TBindSourceAdapter;
+function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AContext: IioContext;
 begin
@@ -898,13 +1028,11 @@ begin
     // Get the context
     AContext := TioContextFactory.Context(FTypeName, Self);
     // Create the BSA
-    Result := TioActiveListBindSourceAdapter.Create(AContext.GetClassRef, Self, AOwner, TObjectList<TObject>.Create(AOwnsObject),
-      AAutoLoadData);
+    Result := TioActiveListBindSourceAdapter.Create(AContext.GetClassRef, Self, AOwner, TObjectList<TObject>.Create(AOwnsObject), AAutoLoadData);
   end;
 end;
 
-function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean)
-  : TBindSourceAdapter;
+function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AContext: IioContext;
 begin
@@ -958,8 +1086,7 @@ var
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-    Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName,
-      AOwnsObject)
+    Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName, AOwnsObject)
     // else if the master property type is a class...
   else
   begin
@@ -1023,6 +1150,30 @@ begin
   Self.Add(ATextCondition)
 end;
 
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loNot, APropertyName, ACompareOp);
+end;
+
 function TioWhere._NotEqual: IioWhere;
 begin
   Result := Self;
@@ -1060,13 +1211,6 @@ begin
     Self.FWhereItems.Add(TioDbFactory.LogicRelation._Or);
 end;
 
-function TioWhere._OpenPar(ATextCondition: String): IioWhere;
-begin
-  Result := Self;
-  Self._OpenPar;
-  Self.Add(ATextCondition)
-end;
-
 function TioWhere._Or(ATextCondition: String): IioWhere;
 begin
   Result := Self;
@@ -1074,6 +1218,30 @@ begin
     Exit;
   Self._Or;
   Self.Add(ATextCondition)
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(loOr, APropertyName, ACompareOp);
 end;
 
 function TioWhere._OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere;
@@ -1190,6 +1358,14 @@ begin
   Result := TioStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj);
 end;
 
+function TioWhere._Value(AValue: IInterface): IioWhere;
+var
+  LID: Integer;
+begin
+  LID := TioUtilities.ExtractOID(AValue);
+  Result := Self._Value(TValue.From<Integer>(LID));
+end;
+
 function TioWhere._Value(AValue: Integer): IioWhere;
 begin
   Result := Self._Value(TValue.From<Integer>(AValue));
@@ -1219,13 +1395,14 @@ end;
 function TioWhere._Where(AWhere: IioWhere): IioWhere;
 begin
   // Clear all previous items
-  Result := Self._Where;
+  Result := _Where;
   // Add the source items and details
   if not Assigned(AWhere) then
     Exit;
-  Self.Add(AWhere);
-  Self.FDetailsContainer := AWhere.Details;
-  Self.FOrderBy := AWhere.GetOrderByInstance;
+  Add(AWhere);
+  FPagingObj := AWhere.GetPagingObj as TioCommonBSAPageManager;
+  FDetailsContainer := AWhere.Details;
+  FOrderBy := AWhere.GetOrderByInstance;
 end;
 
 function TioWhere._Where(ATextCondition: String): IioWhere;
@@ -1300,16 +1477,16 @@ begin
   TioWhere(Self).AddDetail(AMasterPropertyName, AWhereCond);
 end;
 
-function TioWhere<T>.ByOID(const AOID: Integer): IioWhere<T>;
+function TioWhere<T>.ByID(const AID: Integer): IioWhere<T>;
 begin
   Result := Self;
-  TioWhere(Self).ByOID(AOID);
+  TioWhere(Self).ByID(AID);
 end;
 
-function TioWhere<T>.DisableClassFromField: IioWhere<T>;
+function TioWhere<T>.DisableTrueClass: IioWhere<T>;
 begin
   Result := Self;
-  TioWhere(Self).DisableClassFromField;
+  TioWhere(Self).DisableTrueClass;
 end;
 
 function TioWhere<T>.Lazy(const ALazyEnabled: Boolean): IioWhere<T>;
@@ -1380,10 +1557,28 @@ begin
   TioWhere(Self)._And(ATextCondition);
 end;
 
-function TioWhere<T>._ClosePar(ATextCondition: String): IioWhere<T>;
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
 begin
   Result := Self;
-  TioWhere(Self)._ClosePar(ATextCondition);
+  TioWhere(Self)._And(APropertyName, ACompareOp);
+end;
+
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._And(APropertyName, ACompareOp, AValue);
 end;
 
 function TioWhere<T>._Equal: IioWhere<T>;
@@ -1543,16 +1738,34 @@ begin
   TioWhere(Self)._NotEqualTo(AValue);
 end;
 
-function TioWhere<T>._OpenPar(ATextCondition: String): IioWhere<T>;
-begin
-  Result := Self;
-  TioWhere(Self)._OpenPar(ATextCondition);
-end;
-
 function TioWhere<T>._Or(ATextCondition: String): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._Or(ATextCondition);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Or(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Or(APropertyName, ACompareOp);
 end;
 
 function TioWhere<T>._OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere<T>;
@@ -1761,6 +1974,98 @@ function TioWhere<T>._PropertyIsNull(APropertyName: String): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._PropertyIsNull(APropertyName);
+end;
+
+function TioWhere._Value(AValue: TObject): IioWhere;
+var
+  LID: Integer;
+begin
+  LID := TioUtilities.ExtractOID(AValue);
+  Result := Self._Value(TValue.From<Integer>(LID));
+end;
+
+function TioWhere<T>._Value(AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Value(AValue);
+end;
+
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp);
+end;
+
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Value(AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Value(AValue);
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp, TValue.FromVariant(AValue));
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp, TValue.From<IInterface>(AValue));
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp);
+end;
+
+function TioWhere._Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere;
+begin
+  Result := Self;
+  _AddCriteria(APropertyName, ACompareOp, TValue.From<TObject>(AValue));
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp, AValue);
+end;
+
+function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Not(APropertyName, ACompareOp);
 end;
 
 end.

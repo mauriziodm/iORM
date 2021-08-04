@@ -224,13 +224,14 @@ type
   end;
 
   // ID attribute
-  ioOID = class(TioCustomAttribute)
+  ioID = class(TioCustomAttribute)
   strict private
     FSkipOnInsert: Boolean;
   public
     constructor Create(const ASkipOnInsert: Boolean = True);
     property SkipOnInsert: Boolean read FSkipOnInsert;
   end;
+  ioOID = ioID; // Deprecated
 
   // FieldName attribute
   ioField = class(TioCustomStringAttribute)
@@ -421,11 +422,10 @@ type
   ioConnectionDefName = class(TioCustomStringAttribute)
   end;
 
-  // ClassFromField
-  ioClassFromField = class(TioCustomAttribute)
+  // TrueClass
+  ioTrueClass = class(TioCustomAttribute)
   end;
-
-  ioTrueClass = ioClassFromField;
+  ioClassFromField = ioTrueClass;  // DEPRECATED
 
   // GroupBy
   ioGroupBy = class(TioCustomStringAttribute)

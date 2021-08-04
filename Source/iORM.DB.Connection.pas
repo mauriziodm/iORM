@@ -33,7 +33,7 @@
 
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unit iORM.DB.Connection;
+unit iORM.DB.Connection;
 
 interface
 {$I ioGlobalDef.inc}   // iORM global definitions
@@ -85,6 +85,8 @@ type
     FConnection: TioInternalSqlConnection;
     FFDGUIxWaitCursor: TFDGUIxWaitCursor;
     FQueryContainer: IioQueryContainer;
+    FTransactionTimestamp: TDateTime;
+    function GetCurrentTimeStamp: TDateTime;
   strict protected
     procedure DoStartTransaction; override;
     procedure DoCommitTransaction; override;
@@ -92,6 +94,8 @@ type
   public
     constructor Create(const AConnection:TioInternalSqlConnection; const AQueryContainer:IioQueryContainer; const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
+    procedure TransactionTimestampReset;
+    function TransactionTimestamp: TDateTime;
     function AsDBConnection: IioConnectionDB; override;
     function QueryContainer: IioQueryContainer;
     function GetConnection: TioInternalSqlConnection;
@@ -101,7 +105,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, iORM.Exceptions;
+  iORM.DB.Factory, iORM.Exceptions, System.SysUtils;
 
 { TioConnectionSqLite }
 
@@ -197,6 +201,7 @@ begin
 
   FConnection := AConnection;
   FQueryContainer := AQueryContainer;
+  TransactionTimestampReset;
 end;
 
 destructor TioConnectionDB.Destroy;
@@ -238,6 +243,50 @@ end;
 function TioConnectionDB.QueryContainer: IioQueryContainer;
 begin
   Result := FQueryContainer;
+end;
+
+function TioConnectionDB.GetCurrentTimeStamp: TDateTime;
+var
+  LQuery: IioQuery;
+  function SQLiteDateTimeToDateTime(const AStrDateTime: String): TDateTime;
+  var
+    LFormatSettings: TFormatSettings;
+  begin
+    LFormatSettings := TFormatSettings.Create;
+    LFormatSettings.DateSeparator := '-';
+    LFormatSettings.ShortDateFormat := 'yyyy-MM-dd';
+    LFormatSettings.TimeSeparator := ':';
+    LFormatSettings.ShortTimeFormat := 'hh:mm';
+    LFormatSettings.LongTimeFormat := 'hh:mm:ss.zzz';
+    Result := StrToDateTime(AStrDateTime, LFormatSettings);
+  end;
+begin
+  LQuery := TioDBFactory.QueryEngine.GetQueryCurrentTimestamp(FConnection.ConnectionDefName);
+  LQuery.Open;
+  try
+    // NB: SQLite ritorna i current_timestamp come una stringa che poi va convertita in
+    //      TDateTime, invece per gli altri DB non c'è bisogno di questa conversione.
+    if GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+      Result := SQLiteDateTimeToDateTime(LQuery.Fields[0].AsString)
+    else
+      Result := LQuery.Fields[0].AsDateTime;
+  finally
+    LQuery.Close;
+  end;
+end;
+
+function TioConnectionDB.TransactionTimestamp: TDateTime;
+var
+  LQuery: IioQuery;
+begin
+  if FTransactionTimestamp = TRANSACTION_TIMESTAMP_NULL then
+    FTransactionTimestamp := GetCurrentTimeStamp;
+  Result := FTransactionTimestamp;
+end;
+
+procedure TioConnectionDB.TransactionTimestampReset;
+begin
+  FTransactionTimestamp := TRANSACTION_TIMESTAMP_NULL;
 end;
 
 end.

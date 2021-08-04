@@ -140,7 +140,7 @@ type
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
     procedure DoSelection(var ASelected: TObject; var ASelectionType:TioSelectionType; var ADone:Boolean);
     procedure DoAfterSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
-    procedure SetObjStatus(AObjStatus: TioObjectStatus);
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     function GetBaseObjectClassName: String;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
@@ -171,6 +171,7 @@ type
     procedure Insert(AObject:IInterface); reintroduce; overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
+    procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
@@ -399,9 +400,12 @@ end;
 procedure TioActiveListBindSourceAdapter.DoAfterScroll;
 begin
   inherited;
-  Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
+  FDetailAdaptersContainer.SetMasterObject(Current);
   // DataSet synchro
-  Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
+  GetDataSetLinkContainer.SetRecNo(ItemIndex);
+  // Paging notification
+  if Assigned(FBindSource) then
+    FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
@@ -724,6 +728,11 @@ begin
   end;
 end;
 
+procedure TioActiveListBindSourceAdapter.LoadPage;
+begin
+  TioCommonBSAPersistence.LoadPage(Self);
+end;
+
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;
   ANotification: IioBSANotification);
 begin
@@ -870,9 +879,9 @@ begin
 end;
 
 procedure TioActiveListBindSourceAdapter.SetObjStatus(
-  AObjStatus: TioObjectStatus);
+  AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetRefreshing(const Value: boolean);

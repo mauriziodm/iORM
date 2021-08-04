@@ -93,7 +93,6 @@ begin
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, False);
   // Compose the create index query text
   LQuery := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.TableName, LFieldList]);
-  LQuery := TioSqlTranslator.Translate(LQuery, ATable.GetContextTable.GetClassName, False);
   ScriptAdd(LQuery);
 end;
 

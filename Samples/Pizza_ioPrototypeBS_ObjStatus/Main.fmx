@@ -450,4 +450,8 @@ object MainForml: TMainForml
     Left = 232
     Top = 308
   end
+  object ioFMX2: TioFMX
+    Left = 152
+    Top = 92
+  end
 end

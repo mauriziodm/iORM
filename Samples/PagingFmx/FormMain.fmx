@@ -1,0 +1,170 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Button1: TButton
+    Position.X = 296.000000000000000000
+    Position.Y = 13.000000000000000000
+    Size.Width = 105.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Create articles'
+    OnClick = Button1Click
+  end
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 3
+    Text = '1000'
+    Position.X = 192.000000000000000000
+    Position.Y = 13.000000000000000000
+    Size.Width = 100.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 193.000000000000000000
+    Size.Height = 32.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'How many articles will be created'
+    TabOrder = 4
+  end
+  object Grid1: TGrid
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    CanFocus = True
+    ClipChildren = True
+    Position.X = 16.000000000000000000
+    Position.Y = 72.000000000000000000
+    Size.Width = 609.000000000000000000
+    Size.Height = 393.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    RowCount = 200
+    Viewport.Width = 605.000000000000000000
+    Viewport.Height = 368.000000000000000000
+  end
+  object SpeedButton1: TSpeedButton
+    Position.X = 540.000000000000000000
+    Position.Y = 14.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Next page'
+    OnClick = SpeedButton1Click
+  end
+  object SpeedButton2: TSpeedButton
+    Position.X = 452.000000000000000000
+    Position.Y = 14.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Prev page'
+    OnClick = SpeedButton2Click
+  end
+  object LabelPageCount: TLabel
+    Position.X = 192.000000000000000000
+    Position.Y = 40.000000000000000000
+    Text = 'LabelPageCount'
+    TabOrder = 16
+  end
+  object TimerPageCount: TTimer
+    Interval = 250
+    OnTimer = TimerPageCountTimer
+    Left = 352
+    Top = 104
+  end
+  object SpeedButton3: TSpeedButton
+    Position.X = 452.000000000000000000
+    Position.Y = 46.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Hard refresh'
+    OnClick = SpeedButton3Click
+  end
+  object SpeedButton4: TSpeedButton
+    Position.X = 540.000000000000000000
+    Position.Y = 46.000000000000000000
+    Size.Width = 69.000000000000000000
+    Size.Height = 23.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Soft refresh'
+    OnClick = SpeedButton4Click
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkGridToDataSourcePBSArticles: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = PBSArticles
+      GridControl = Grid1
+      Columns = <>
+    end
+  end
+  object ioFMX1: TioFMX
+    Left = 256
+    Top = 88
+  end
+  object SQLIteConn: TioSQLiteConnectionDef
+    AutoCreateDB.Enabled = True
+    Database = 'PagingArticles.db'
+    DatabaseStdFolder = sfDocuments
+    DefaultConnection = True
+    Persistent = False
+    Pooled = False
+    Left = 256
+    Top = 152
+  end
+  object PBSArticles: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <>
+    ScopeMappings = <>
+    ioTypeName = 'TArticle'
+    ioAsync = False
+    ioAutoLoadData = True
+    ioAutoPersist = True
+    ioViewDataType = dtList
+    ioWhereDetailsFromDetailAdapters = False
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    ioOnReceiveSelectionAutoEdit = False
+    ioOnReceiveSelectionAutoPost = False
+    ioOnReceiveSelectionAutoPersist = False
+    ioPropagateEdit = False
+    ioPropagatePost = False
+    ioPropagatePersist = False
+    ioPaging.PageSize = 10
+    ioPaging.PagingType = ptProgressiveAuto
+    Left = 256
+    Top = 216
+  end
+  object ActionList1: TActionList
+    Left = 384
+    Top = 192
+    object LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior
+      Category = 'LiveBindings'
+      Text = 'Prior'
+    end
+  end
+  object ActionList2: TActionList
+    Left = 448
+    Top = 312
+    object Action1: TAction
+      Text = 'Action1'
+    end
+    object LiveBindingsBindNavigateNext1: TFMXBindNavigateNext
+      Category = 'LiveBindings'
+      Text = 'Next'
+    end
+  end
+end

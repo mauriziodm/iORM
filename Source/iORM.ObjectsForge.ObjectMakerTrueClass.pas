@@ -33,53 +33,54 @@
 
 
 
-unit iORM.DB.SqLite.LogicRelations;
+unit iORM.ObjectsForge.ObjectMakerTrueClass;
 
 interface
 
 uses
-  iORM.DB.Interfaces,
-  iORM.Interfaces;
+  iORM.ObjectsForge.Interfaces,
+  iORM.Context.Interfaces,
+  iORM.DB.Interfaces;
 
 type
-  TioLogicRelationSqLite = class(TioLogicRelation)
-    class function _And: IioSqlItem; override;
-    class function _Or: IioSqlItem; override;
-    class function _Not: IioSqlItem; override;
-    class function _OpenPar: IioSqlItem; override;
-    class function _ClosePar: IioSqlItem; override;
+
+  // Standard Object Maker
+  TioObjectMakerTrueClass = class(TioObjectMakerIntf)
+  public
+    class function MakeObject(const AContext:IioContext; const AQuery:IioQuery): TObject; override;
   end;
 
 implementation
 
 uses
-  iORM.SqlItems;
+  System.Rtti, iORM.Exceptions, iORM, System.SysUtils,
+  iORM.RttiContext.Factory;
 
-{ TioLrFactory }
+{ TioObjectMakerTrueClass }
 
-class function TioLogicRelationSqLite._And: IioSqlItem;
+class function TioObjectMakerTrueClass.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
+var
+  Ctx: TRttiContext;
+  Typ: TRttiInstanceType;
+  AClassName: String;
 begin
-  Result := TioSqlItem.Create(' AND ');
-end;
-
-class function TioLogicRelationSqLite._ClosePar: IioSqlItem;
-begin
-  Result := TioSqlItem.Create(')');
-end;
-
-class function TioLogicRelationSqLite._Not: IioSqlItem;
-begin
-  Result := TioSqlItem.Create(' NOT ');
-end;
-
-class function TioLogicRelationSqLite._OpenPar: IioSqlItem;
-begin
-  Result := TioSqlItem.Create('(');
-end;
-
-class function TioLogicRelationSqLite._Or: IioSqlItem;
-begin
-  Result := TioSqlItem.Create(' OR ');
+  // Get full qualified class name
+  AClassName := AQuery.GetValueByFieldNameAsVariant(AContext.TrueClass.GetFieldName);
+  AClassName := AContext.TrueClass.QualifiedClassNameFromClassInfoFieldValue(AClassName);
+  // Get rtti class type for classref
+  Ctx := TioRttiContextFactory.RttiContext;
+  Typ := Ctx.FindType(AClassName) as TRttiInstanceType;
+  if not Assigned(Typ) then
+    raise EioException.Create(Self.ClassName + ': RttiType not found (' + AClassName + ')');
+  // Load object
+  Result := io.Load(Typ.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
+                                           .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
+                                           .DisableTrueClass
+                                           ._ToObjectInternalByClassOnly(AContext.DataObject);
 end;
 
 end.
+
+
+
+

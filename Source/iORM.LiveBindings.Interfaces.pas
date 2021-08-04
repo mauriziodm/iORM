@@ -87,6 +87,8 @@ type
     procedure DoBeforeSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
     procedure DoSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType; var ADone:Boolean); overload;
     procedure DoAfterSelection(var ASelected:IInterface; var ASelectionType:TioSelectionType); overload;
+    // Paging
+    procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
   end;
 
   // The common ancestor for all PrototypeBindSource components
@@ -116,6 +118,7 @@ type
     procedure PersistAll;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
+    procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
     procedure Insert; overload;
@@ -127,7 +130,7 @@ type
     procedure Delete;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     procedure Cancel;
-    procedure SetObjStatus(AObjStatus: TioObjectStatus);
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): TBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): TBindSourceAdapter;
@@ -266,8 +269,19 @@ type
   // BindSourceAdapter List
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
 
-  // Paging
+  // Paging type
   TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual, ptProgressiveAuto);
+
+  // Paging: SQL limit strategy
+  IioBSAPageManagerStrategy = interface
+    ['{65896A9F-5B1A-407B-AB2E-C486D7B19ABF}']
+    function GetSqlLimit: Integer;
+    function GetSqlLimitOffset: Integer;
+    function IsProgressive: Boolean;
+    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean;
+    procedure PrepareForRefresh;
+  end;
 
 implementation
 

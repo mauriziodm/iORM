@@ -93,7 +93,7 @@ begin
     if not (LProperty.IsSkipped or (LProperty.GetRelationType = ioRTHasMany) or (LProperty.GetRelationType = ioRTHasOne)) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   // Add the ClassInfo field if necessary
-  if LSchemaTable.IsClassFromField then
+  if LSchemaTable.IsTrueClass then
     LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo);
   // Add indexes
   BuildIndexList(LSchemaTable, AMap);

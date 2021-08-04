@@ -58,7 +58,7 @@ begin
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
   FStatus := stClean;
-  FConnectionDefName := TioDBFActory.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionDefName);
+  FConnectionDefName := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionDefName);
   FWarnings := TStringList.Create;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
@@ -85,9 +85,9 @@ begin
   if not FTables.ContainsKey(LTableName) then
     FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable));
   Result := FTables.Items[LTableName];
-  // NB: Se anche una sola classe mappata su questa tabella è ClassFromField allora IsClassFromField deve essere true
+  // NB: Se anche una sola classe mappata su questa tabella è TrueClass allora IsTrueClass deve essere true
   // (vedi setter nella classe)
-  Result.IsClassFromField := AMap.GetTable.IsClassFromField;
+  Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
 
 function TioDBBuilderSchema.FindTable(const ATableName: String): IioDBBuilderSchemaTable;

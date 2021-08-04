@@ -44,12 +44,13 @@ type
   // Classe che si occupa di generare il codice SQL delle varie query
   TioSqlGeneratorSqLite = class(TioSqlGenerator)
   public
-    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
+    class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
       const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
+    class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
 implementation
@@ -61,7 +62,7 @@ uses
 
 { TioSqlGeneratorSqLite }
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
+class procedure TioSqlGeneratorSqLite.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
   AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
@@ -111,30 +112,27 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext;
-  AIndexName: String);
+class procedure TioSqlGeneratorSqLite.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
 begin
-  // Index Name
-  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
-  // Build the query text
-  // -----------------------------------------------------------------
-  AQuery.SQL.Add('DROP INDEX IF EXISTS ' + AIndexName);
-  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT STRFTIME("%Y-%m-%d %H:%M:%f", "now")');
 end;
 
-class procedure TioSqlGeneratorSqLite.GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorSqLite.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext;
+  AIndexName: String);
 begin
-  // Build the query text
-  // -----------------------------------------------------------------
+  AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
+  AQuery.SQL.Add('DROP INDEX IF EXISTS ' + AIndexName);
+end;
+
+class procedure TioSqlGeneratorSqLite.GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext);
+begin
   AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
     AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' +
-    AContext.GetProperties.GetIdProperty.GetSqlParamName + ')');
-  // -----------------------------------------------------------------
+    AContext.GetProperties.GetIdProperty.GetSqlWhereParamName + ')');
 end;
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);
 begin
-  // Build the query text
   AQuery.SQL.Add('SELECT last_insert_rowid()');
 end;
 
@@ -144,7 +142,6 @@ begin
   // Limit
   if AContext.WhereExist and AContext.Where.LimitExists then
     AQuery.SQL.Add(Format('LIMIT %d OFFSET %d', [AContext.Where.GetLimitRows, AContext.Where.GetLimitOffset]));
-  // -----------------------------------------------------------------
 end;
 
 end.

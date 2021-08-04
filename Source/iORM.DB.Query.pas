@@ -67,13 +67,19 @@ type
     function IsEmpty: Boolean;
     function IsSqlEmpty: Boolean;
     function IsActive: Boolean;
-    procedure ExecSQL;
+    function ExecSQL: integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
     function ParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
+    procedure SetObjVersionParam(const AContext: IioContext);
+    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    procedure SetObjIDWhereParam(const AContext: IioContext);
+    procedure SetObjVersionWhereParam(const AContext: IioContext);
+    procedure FillQueryWhereParams(const AContext: IioContext);
+    procedure SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
@@ -87,7 +93,8 @@ uses
   System.TypInfo, iORM.Exceptions, iORM.Attributes, FireDAC.Stan.Param,
   iORM.ObjectsForge.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, System.JSON,
-  iORM.Utilities;
+  iORM.Utilities, iORM.Interfaces, iORM.Where.SqlItems.Interfaces,
+  System.SysUtils;
 
 { TioQuerySqLite }
 
@@ -139,14 +146,29 @@ begin
   Result := FSqlQuery.Eof;
 end;
 
-procedure TioQuery.ExecSQL;
+function TioQuery.ExecSQL: integer;
 begin
   FSqlQuery.ExecSQL;
+  Result := FSqlQuery.RowsAffected;
 end;
 
 function TioQuery.Fields: TioFields;
 begin
   Result := FSqlQuery.Fields;
+end;
+
+procedure TioQuery.FillQueryWhereParams(const AContext: IioContext);
+var
+  ASqlItem: IioSqlItem;
+  ASqlItemWhere: IioSqlItemWhere;
+begin
+  for ASqlItem in AContext.Where.GetWhereItems do
+  begin
+    if Supports(ASqlItem, IioSqlItemWhere, ASqlItemWhere) and ASqlItemWhere.HasParameter then
+      ParamByName(ASqlItemWhere.GetSqlParamName(AContext.Map)).Value := ASqlItemWhere.GetValue(AContext.Map).AsVariant;
+  end;
+  if AContext.IsTrueClass then
+    ParamByName(AContext.TrueClass.GetSqlParamName).Value := '%' + AContext.TrueClass.GetClassName + '%';
 end;
 
 procedure TioQuery.First;
@@ -296,6 +318,43 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
+procedure TioQuery.SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
+begin
+  if AValue <> 0 then
+    ParamByProp(AProp).Value := AValue
+  else
+    ParamByProp(AProp).Value := Null; // Thanks to Marco Mottadelli
+end;
+
+procedure TioQuery.SetObjIDWhereParam(const AContext: IioContext);
+begin
+  WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+end;
+
+procedure TioQuery.SetObjVersionParam(const AContext: IioContext);
+var
+  LProp: IioContextProperty;
+begin
+  LProp := AContext.GetProperties.ObjVersionProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    ParamByProp(LProp).AsFloat := AContext.TransactionTimestamp
+  else
+    ParamByProp(LProp).AsDateTime := AContext.TransactionTimestamp;
+end;
+
+procedure TioQuery.SetObjVersionWhereParam(const AContext: IioContext);
+var
+  LProp: IioContextProperty;
+begin
+  LProp := AContext.GetProperties.ObjVersionProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    WhereParamByProp(LProp).AsFloat := LProp.GetValue(AContext.DataObject).AsVariant
+  else
+    WhereParamByProp(LProp).AsDateTime := LProp.GetValue(AContext.DataObject).AsVariant;
+end;
+
 procedure TioQuery.SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
 var
   AObj: TObject;
@@ -393,10 +452,15 @@ end;
 procedure TioQuery.SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
 begin
   // Set the parameter to NULL
-  Self.ParamByProp(AProp).Clear;
+  ParamByProp(AProp).Clear;
   // If a DataType is specified then set the parameter DataType
   if AForceDataType <> ftUnknown then
-    Self.ParamByProp(AProp).DataType := AForceDataType;
+    ParamByProp(AProp).DataType := AForceDataType;
+end;
+
+function TioQuery.WhereParamByProp(const AProp: IioContextProperty): TioParam;
+begin
+  Result := Self.ParamByName(AProp.GetSqlWhereParamName);
 end;
 
 end.

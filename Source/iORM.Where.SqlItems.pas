@@ -108,7 +108,7 @@ type
   end;
 
   // Specialized SqlItemWhere for propertyID equals to for param (best for internal use)
-  TioSqlItemsWherePropertyOIDEqualsTo = class(TioSqlItemsWhere)
+  TioSqlItemsWherePropertyIDEqualsTo = class(TioSqlItemsWhere)
   strict private
     FValue: TValue;
   public
@@ -120,11 +120,25 @@ type
     function HasParameter: Boolean; override;
   end;
 
+//  TioSqlItemsCriteria<T> = class(TioSqlItemsWhere)
+//  strict private
+//    FValue: TValue;
+//    FCompareOp: String;
+//    FLogicOp: String;
+//  public
+//    constructor Create(const ASqlText: String); reintroduce; overload; // raise exception
+//    constructor Create(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: T); reintroduce; overload;
+//    function GetSql(const AMap: IioMap): String; override;
+//    function GetSqlParamName(const AMap: IioMap): String; override;
+//    function GetValue(const AMap: IioMap): TValue; override;
+//    function HasParameter: Boolean; override;
+//  end;
+
 implementation
 
 uses
   iORM.Exceptions, iORM.DB.Factory, iORM.SqlTranslator,
-  iORM.Context.Properties.Interfaces;
+  iORM.Context.Properties.Interfaces, System.SysUtils;
 
 { TioSqlItemsWhereValue }
 
@@ -233,35 +247,35 @@ end;
 
 { TioSqlItemsWherePropertyOIDEqualsTo }
 
-constructor TioSqlItemsWherePropertyOIDEqualsTo.Create(const ASqlText: String);
+constructor TioSqlItemsWherePropertyIDEqualsTo.Create(const ASqlText: String);
 begin
   raise EioException.Create(Self.ClassName + ': wrong constructor called');
 end;
 
-constructor TioSqlItemsWherePropertyOIDEqualsTo.Create(const AValue: TValue);
+constructor TioSqlItemsWherePropertyIDEqualsTo.Create(const AValue: TValue);
 begin
   inherited Create('');
   FValue := AValue;
 end;
 
-function TioSqlItemsWherePropertyOIDEqualsTo.GetSql(const AMap: IioMap): String;
+function TioSqlItemsWherePropertyIDEqualsTo.GetSql(const AMap: IioMap): String;
 begin
   // NB: No inherited
   Result := AMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + TioDBFactory.CompareOperator._Equal.GetSql +
     ':' + AMap.GetProperties.GetIdProperty.GetSqlParamName;
 end;
 
-function TioSqlItemsWherePropertyOIDEqualsTo.GetSqlParamName(const AMap: IioMap): String;
+function TioSqlItemsWherePropertyIDEqualsTo.GetSqlParamName(const AMap: IioMap): String;
 begin
   Result := AMap.GetProperties.GetIdProperty.GetSqlParamName;
 end;
 
-function TioSqlItemsWherePropertyOIDEqualsTo.GetValue(const AMap: IioMap): TValue;
+function TioSqlItemsWherePropertyIDEqualsTo.GetValue(const AMap: IioMap): TValue;
 begin
   Result := FValue;
 end;
 
-function TioSqlItemsWherePropertyOIDEqualsTo.HasParameter: Boolean;
+function TioSqlItemsWherePropertyIDEqualsTo.HasParameter: Boolean;
 begin
   Result := True;
 end;
@@ -286,5 +300,44 @@ function TioSqlItemsOrderBy.GetSql(const AMap: IioMap): String;
 begin
   Result := 'ORDER BY ' + inherited GetSql(AMap);
 end;
+
+{ TioSqlItemsCriteria }
+
+//constructor TioSqlItemsCriteria<T>.Create(const ASqlText: String);
+//begin
+//  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+//end;
+//
+//constructor TioSqlItemsCriteria<T>.Create(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: T);
+//begin
+//  inherited Create(APropertyName);
+//  FLogicOp := TioDBFactory.LogicRelation.GetLogicOp(ALogicOp);
+//  FCompareOp := TioDBFactory.CompareOperator.GetCompareOp(ACompareOperator);
+//  FValue := TValue.From<T>(AValue);
+//end;
+//
+//function TioSqlItemsCriteria<T>.GetSql(const AMap: IioMap): String;
+//var
+//  AProp: IioContextProperty;
+//begin
+//  // NB: No inherited
+//  AProp := AMap.GetProperties.GetPropertyByName(FSqlText);
+//  Result := Format('%s %s %s :%s', [FLogicOp, AProp.GetSqlQualifiedFieldName, FCompareOp, AProp.GetSqlParamName]).Trim;
+//end;
+//
+//function TioSqlItemsCriteria<T>.GetSqlParamName(const AMap: IioMap): String;
+//begin
+//  Result := AMap.GetProperties.GetPropertyByName(FSqlText).GetSqlParamName;
+//end;
+//
+//function TioSqlItemsCriteria<T>.GetValue(const AMap: IioMap): TValue;
+//begin
+//  Result := FValue;
+//end;
+//
+//function TioSqlItemsCriteria<T>.HasParameter: Boolean;
+//begin
+//  Result := True;
+//end;
 
 end.

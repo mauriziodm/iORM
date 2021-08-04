@@ -108,9 +108,8 @@ type
     function GetSqlFieldName(const AClearDelimiters: Boolean = False): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
+    function GetSqlWhereParamName: String;
     function GetFieldType: String;
-    function IsBlob: Boolean;
-    function IsStream: Boolean;
     function GetValue(const Instance: Pointer): TValue; virtual;
     function GetValueAsObject(const Instance: Pointer): TObject; virtual;
     procedure SetValue(const Instance: Pointer; const AValue: TValue); virtual;
@@ -119,7 +118,6 @@ type
     function GetTypeInfo: PTypeInfo; virtual;
     function GetTypeName: String;
     function GetTypeAlias: String;
-    function IsInterface: Boolean;
     function GetRelationType: TioRelationType;
     function GetRelationChildTypeName: String;
     function GetRelationChildTypeAlias: String;
@@ -132,16 +130,20 @@ type
     procedure SetTable(const ATable: IioContextTable);
     procedure SetFieldData;
     procedure SetLoadSqlData;
-    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
     procedure SetIsID(const AValue: Boolean);
-    function IsID: Boolean;
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
+
+    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
+    function IsID: Boolean;
+    function IsInterface: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean; virtual;
     function IsSkipped: Boolean;
+    function IsBlob: Boolean;
+    function IsStream: Boolean;
 
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
@@ -199,12 +201,16 @@ type
     FPropertyItems: TList<IioContextProperty>;
     FIdProperty: IioContextProperty;
     FObjStatusProperty: IioContextProperty;
+    FObjVersionProperty: IioContextProperty;
     FBlobFieldExists: Boolean;
-  strict protected
+  private
     function InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
-    // ObjectStatus property
+    // ObjStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(const AValue: IioContextProperty);
+    // ObjVersion property
+    function GetObjVersionProperty: IioContextProperty;
+    procedure SetObjVersionProperty(const AValue: IioContextProperty);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -222,8 +228,13 @@ type
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
     function ObjStatusExist: Boolean;
-    // ObjectStatus property
+    // ObjectVersion Exist
+    function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
+    // ObjStatus property
     property ObjStatusProperty: IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
+    // ObjVersion property
+    property ObjVersionProperty: IioContextProperty read GetObjVersionProperty write SetObjVersionProperty;
   end;
 
 implementation
@@ -526,6 +537,11 @@ begin
   Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).TValueToSql(Self.GetValue(ADataObject));
 end;
 
+function TioProperty.GetSqlWhereParamName: String;
+begin
+  Result := 'W_' + Self.GetSqlFieldAlias;
+end;
+
 function TioProperty.GetValue(const Instance: Pointer): TValue;
 begin
   Result := FRttiProperty.GetValue(Instance);
@@ -775,6 +791,7 @@ constructor TioProperties.Create;
 begin
   FBlobFieldExists := False;
   FObjStatusProperty := nil;
+  FObjVersionProperty := nil;
   FPropertyItems := TList<IioContextProperty>.Create;
 end;
 
@@ -807,6 +824,11 @@ end;
 function TioProperties.GetObjStatusProperty: IioContextProperty;
 begin
   Result := FObjStatusProperty;
+end;
+
+function TioProperties.GetObjVersionProperty: IioContextProperty;
+begin
+  Result := FObjVersionProperty;
 end;
 
 function TioProperties.GetPropertyByName(const APropertyName: String): IioContextProperty;
@@ -874,9 +896,19 @@ begin
   end;
 end;
 
+function TioProperties.IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
+begin
+  Result := Assigned(AProperty) and (AProperty = FObjVersionProperty);
+end;
+
 function TioProperties.ObjStatusExist: Boolean;
 begin
   Result := Assigned(FObjStatusProperty);
+end;
+
+function TioProperties.ObjVersionExist: Boolean;
+begin
+  Result := Assigned(FObjVersionProperty);
 end;
 
 procedure TioProperties.SetFieldData;
@@ -898,6 +930,11 @@ end;
 procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);
 begin
   FObjStatusProperty := AValue;
+end;
+
+procedure TioProperties.SetObjVersionProperty(const AValue: IioContextProperty);
+begin
+  FObjVersionProperty := AValue;
 end;
 
 procedure TioProperties.SetTable(const ATable: IioContextTable);

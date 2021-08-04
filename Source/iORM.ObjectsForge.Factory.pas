@@ -44,22 +44,22 @@ type
 
   TioObjectMakerFactory = class
   public
-    class function GetObjectMaker(ClassFromField:Boolean): TioObjectMakerRef;
+    class function GetObjectMaker(LTrueClass:Boolean): TioObjectMakerRef;
     class function GetObjectMapper: TioObjectMapperRef;
   end;
 
 implementation
 
 uses
-  iORM.ObjectsForge.ObjectMakerClassFromField,
+  iORM.ObjectsForge.ObjectMakerTrueClass,
   iORM.ObjectsForge.ObjectMaker;
 
 { TioObjectMakerFactory }
 
-class function TioObjectMakerFactory.GetObjectMaker(ClassFromField:Boolean): TioObjectMakerRef;
+class function TioObjectMakerFactory.GetObjectMaker(LTrueClass:Boolean): TioObjectMakerRef;
 begin
-  if ClassFromField
-    then Result := TioObjectMakerClassFromField
+  if LTrueClass
+    then Result := TioObjectMakerTrueClass
     else Result := TioObjectMaker;
 end;
 

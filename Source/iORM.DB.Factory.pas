@@ -73,8 +73,7 @@ type
 implementation
 
 uses
-  iORM.DB.SqLite.CompareOperators, System.IOUtils,
-  iORM.DB.Connection, iORM.DB.SqLite.LogicRelations, iORM.DB.Query,
+  System.IOUtils, iORM.DB.Connection, iORM.DB.Query,
   iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator,
   iORM.Where.SqlItems, System.SysUtils, iORM.DB.QueryContainer,
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
@@ -86,14 +85,14 @@ uses
 
 class function TioDbFactory.CompareOperator: TioCompareOperatorRef;
 begin
-  Result := TioCompareOperatorSqLite;
+  Result := TioCompareOperator;
 end;
 
 class function TioDbFactory.Connection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
 begin
   // If AConnectionName param is not specified (is empty) then
   // use the default connection def
-  AConnectionName := Self.ConnectionManager.GetDefaultConnectionNameIfEmpty(AConnectionName);
+  AConnectionName := Self.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionName);
   // If the connection already exists in the COnnectionContainer then return then else
   // create a new connection, add it to the COnnectionContainer thne return the connection
   // itself to the caller code
@@ -114,7 +113,7 @@ end;
 
 class function TioDbFactory.LogicRelation: TioLogicRelationRef;
 begin
-  Result := TioLogicRelationSqLite;
+  Result := TioLogicRelation;
 end;
 
 class function TioDbFactory.NewConnection(const AConnectionName: String): IioConnection;
@@ -144,7 +143,7 @@ var
         LConnection.Params.MonitorBy := mbFlatFile;
     end;
 {$ENDIF}
-    // Extract the file path anche create the directory if not exists
+    // Extract the file path and create the directory if not exists
     // DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
     // if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
     // Open the connection
@@ -270,7 +269,7 @@ end;
 
 class function TioDbFactory.WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
 begin
-  Result := TioSqlItemsWherePropertyOIDEqualsTo.Create(AValue);
+  Result := TioSqlItemsWherePropertyIDEqualsTo.Create(AValue);
 end;
 
 class function TioDbFactory.WhereItemTValue(AValue: TValue): IioSqlItemWhere;

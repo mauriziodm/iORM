@@ -1,0 +1,105 @@
+object ViewBindSourceGridFmx: TViewBindSourceGridFmx
+  Align = Client
+  Size.Width = 300.000000000000000000
+  Size.Height = 500.000000000000000000
+  Size.PlatformDefault = False
+  object ToolBarTop: TToolBar
+    Size.Width = 300.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object SpeedButtonPrev: TSpeedButton
+      Align = Left
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'priortoolbutton'
+      Text = 'SpeedButtonPrev'
+    end
+    object SpeedButtonNext: TSpeedButton
+      Align = Right
+      Position.X = 260.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'nexttoolbutton'
+      Text = 'SpeedButton1'
+    end
+    object LabelTitle: TLabel
+      Align = Center
+      StyledSettings = [Family, Size, FontColor]
+      TextSettings.Font.StyleExt = {00060000000000000004000000}
+      TextSettings.HorzAlign = Center
+      Text = 'Grid view'
+      TabOrder = 0
+    end
+  end
+  object Grid1: TGrid
+    Align = Client
+    CanFocus = True
+    ClipChildren = True
+    Size.Width = 300.000000000000000000
+    Size.Height = 460.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    RowCount = 200
+    Viewport.Width = 280.000000000000000000
+    Viewport.Height = 435.000000000000000000
+  end
+  object MBSArticles: TioModelBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Price'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'MPArticles'
+    Left = 136
+    Top = 144
+  end
+  object VMBridge: TioViewModelBridge
+    Left = 136
+    Top = 88
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 132
+    Top = 197
+    object LinkGridToDataSourceMBSArticles: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = MBSArticles
+      GridControl = Grid1
+      Columns = <
+        item
+          MemberName = 'ID'
+          Width = 40
+        end
+        item
+          MemberName = 'Description'
+          Width = 130
+        end
+        item
+          MemberName = 'Price'
+          Width = 70
+          CustomFormat = 'Format('#39'%%m'#39', %s)'
+        end>
+    end
+  end
+end

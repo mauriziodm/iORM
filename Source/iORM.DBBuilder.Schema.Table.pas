@@ -14,12 +14,12 @@ type
     FFields: TioDBBuilderSchemaFields;
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
     FIndexes: TioDBBuilderSchemaIndexes;
-    FIsClassFromField: Boolean;
+    FIsTrueClass: Boolean;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
-    // IsClassFromField
-    function GetIsClassFromField: Boolean;
-    procedure SetIsClassFromField(const AValue: Boolean);
+    // IsTrueClass
+    function GetIsTrueClass: Boolean;
+    procedure SetIsTrueClass(const AValue: Boolean);
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
@@ -38,7 +38,7 @@ type
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
 
-    property IsClassFromField: Boolean read GetIsClassFromField write SetIsClassFromField;
+    property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -63,7 +63,7 @@ constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable)
 begin
   FStatus := stClean;
   FContextTable := AContextTable;
-  FIsClassFromField := AContextTable.IsClassFromField;
+  FIsTrueClass := AContextTable.IsTrueClass;
   FFields := TioDBBuilderSchemaFields.Create;
   FForeignKeys := TioDBBuilderSchemaForeignKeys.Create;
   FIndexes := TioDBBuilderSchemaIndexes.Create;
@@ -125,9 +125,9 @@ begin
   Result := FContextTable;
 end;
 
-function TioDBBuilderSchemaTable.GetIsClassFromField: Boolean;
+function TioDBBuilderSchemaTable.GetIsTrueClass: Boolean;
 begin
-  Result := FIsClassFromField;
+  Result := FIsTrueClass;
 end;
 
 function TioDBBuilderSchemaTable.GetSequenceName: String;
@@ -140,10 +140,10 @@ begin
   Result := FStatus;
 end;
 
-procedure TioDBBuilderSchemaTable.SetIsClassFromField(const AValue: Boolean);
+procedure TioDBBuilderSchemaTable.SetIsTrueClass(const AValue: Boolean);
 begin
   // Una volta a true rimane sempre a true
-  FIsClassFromField := AValue or FIsClassFromField;
+  FIsTrueClass := AValue or FIsTrueClass;
 end;
 
 procedure TioDBBuilderSchemaTable.SetStatus(const AValue: TioDBBuilderStatus);

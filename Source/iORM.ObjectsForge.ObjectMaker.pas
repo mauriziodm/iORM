@@ -69,7 +69,7 @@ begin
     AContext.DataObject := Self.CreateObjectByClassRef(AContext.GetClassRef);
   Result := AContext.DataObject;
   // ObjectStatus
-  AContext.ObjectStatus := osClean;
+  AContext.ObjStatus := osClean;
   // Load properties values
   for CurrProp in AContext.GetProperties do
   begin

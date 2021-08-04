@@ -131,7 +131,7 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
-    procedure SetObjStatus(AObjStatus: TioObjectStatus);
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
     // <TObject> (for non interfaced list such as TList<IInterface>)
@@ -165,6 +165,7 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     procedure Notify(Sender: TObject; ANotification: IioBSANotification); virtual;
     procedure Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True); reintroduce; overload;
+    procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
@@ -349,6 +350,9 @@ begin
   Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
   // DataSet synchro
   Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
+  // Paging notification
+  if Assigned(FBindSource) then
+    FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -384,7 +388,6 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
 var
-  { TODO : Abort da eliminare??? }
   LAbort: Boolean;
 begin
   inherited;
@@ -689,6 +692,11 @@ begin
   end;
 end;
 
+procedure TioActiveInterfaceListBindSourceAdapter.LoadPage;
+begin
+  TioCommonBSAPersistence.LoadPage(Self);
+end;
+
 procedure TioActiveInterfaceListBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
 begin
   // Fire the event handler
@@ -889,9 +897,9 @@ begin
   FMasterPropertyName := AMasterProperty.GetName;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjectStatus);
+procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetRefreshing(const Value: boolean);

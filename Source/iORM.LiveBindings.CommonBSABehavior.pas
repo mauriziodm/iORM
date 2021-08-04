@@ -342,13 +342,13 @@ begin
   Result := nil;
   if AProperty.IsReadable then
     if AProperty.IsWritable then
-      Result := TBindSourceAdapterReadWriteObjectField<T>.Create(ABindSourceAdapter, AProperty.Name,
+      Result := TBindSourceAdapterReadWriteObjectField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject,
-        TPropertyValueReader<T>.Create, TPropertyValueWriter<T>.Create, AMemberType)
+        TioPropertyValueReader<T>.Create, TPropertyValueWriter<T>.Create, AMemberType)
     else
-      Result := TBindSourceAdapterReadObjectField<T>.Create(ABindSourceAdapter, AProperty.Name,
+      Result := TBindSourceAdapterReadObjectField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject,
-        TPropertyValueReader<T>.Create, AMemberType);
+        TioPropertyValueReader<T>.Create, AMemberType);
 end;
 
 { TBindSourceAdapterFieldHelper }

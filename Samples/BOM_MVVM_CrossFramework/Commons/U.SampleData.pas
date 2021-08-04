@@ -63,14 +63,14 @@ begin
 
     LProduct := TProduct.Create('PDT002', 'Asse posteriore completo', 'Pz');
 //    LProduct.BOMItems.Add(   TBOMItemProduct.Create(io.Load<IProduct>._Where._PropertyEqualsTo('Code', 'PDT001').ToObject, 2)   );
-    LProduct.BOMItems.Add(   TBOMItemProduct.Create(io.Load<IProduct>.ByOID(9).ToObject, 2)   );
+    LProduct.BOMItems.Add(   TBOMItemProduct.Create(io.Load<IProduct>(9), 2)   );
     LProduct.BOMItems.Add(   TBOMItemMaterial.Create(io.Load<IMaterial>._Where._PropertyEqualsTo('Code', 'MTR004').ToObject, 1)   );
     LProduct.BOMItems.Add(   TBOMItemProcess.Create(io.Load<IProcess>._Where._PropertyEqualsTo('Code', 'PCS003').ToObject, 1)   );
     io.Persist(LProduct);
 
     LProduct := TProduct.Create('PDT003', 'Gruppo asse/sosp. posteriore', 'Pz');
 //    LProduct.BOMItems.Add(   TBOMItemProduct.Create(io.Load<IProduct>._Where._PropertyEqualsTo('Code', 'PDT002').ToObject, 2)   );
-    LProduct.BOMItems.Add(   TBOMItemProduct.Create(io.Load<IProduct>.ByOID(10).ToObject, 2)   );
+    LProduct.BOMItems.Add(   TBOMItemProduct.Create(io.Load<IProduct>(10), 2)   );
     LProduct.BOMItems.Add(   TBOMItemMaterial.Create(io.Load<IMaterial>._Where._PropertyEqualsTo('Code', 'MTR001').ToObject, 5)   );
     LProduct.BOMItems.Add(   TBOMItemMaterial.Create(io.Load<IMaterial>._Where._PropertyEqualsTo('Code', 'MTR003').ToObject, 1)   );
     LProduct.BOMItems.Add(   TBOMItemProcess.Create(io.Load<IProcess>._Where._PropertyEqualsTo('Code', 'PCS002').ToObject, 1)   );

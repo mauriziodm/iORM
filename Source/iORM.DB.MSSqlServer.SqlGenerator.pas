@@ -46,11 +46,12 @@ type
   // Classe che si occupa di generare il codice SQL delle varie query
   TioSqlGeneratorMSSqlServer = class(TioSqlGenerator)
   public
+    class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
+      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
+    class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
+    class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
+    class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
-      const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
-    class procedure GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
   end;
 
 implementation
@@ -60,8 +61,12 @@ uses
 
 { TioSqlGeneratorMSSqlServer }
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlForDropIndex(const AQuery: IioQuery; const AContext: IioContext;
-  AIndexName: String);
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
+begin
+  AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP');
+end;
+
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String);
 begin
   // Index Name
   AIndexName := TioSqlTranslator.Translate(AIndexName, AContext.GetClassRef.ClassName, False);
@@ -71,12 +76,12 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlForExists(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext);
 begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT CAST(CASE WHEN EXISTS (SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
-    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName +
+    AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName +
     ') THEN 1 ELSE 0 END AS INTEGER)');
   // -----------------------------------------------------------------
 end;
@@ -87,8 +92,8 @@ begin
   AQuery.SQL.Add('select @@IDENTITY');
 end;
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlForCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
-  AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
+  const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
   LQueryText, LIndexOrientationText, LField, LUniqueText: String;

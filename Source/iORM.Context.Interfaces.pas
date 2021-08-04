@@ -50,13 +50,15 @@ type
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
-    function ClassFromField: IioClassFromField;
-    function IsClassFromField: Boolean;
+    function TrueClass: IioTrueClass;
+    function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     function GetID: Integer;
     function IDIsNull: Boolean;
+    // TransactionTimestamp
+    function TransactionTimestamp: TDateTime;
     // Map
     function Map: IioMap;
     // Blob field present
@@ -68,9 +70,16 @@ type
     // ObjStatusExist
     function ObjStatusExist: Boolean;
     // ObjectStatus
-    procedure SetObjectStatus(const AValue: TioObjectStatus);
-    function GetObjectStatus: TioObjectStatus;
-    property ObjectStatus:TioObjectStatus read GetObjectStatus write SetObjectStatus;
+    procedure SetObjStatus(const AValue: TioObjStatus);
+    function GetObjStatus: TioObjStatus;
+    property ObjStatus:TioObjStatus read GetObjStatus write SetObjStatus;
+    // ObjVersionExist
+    function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProp: IioContextProperty): Boolean;
+    // ObjVersion
+    function GetObjVersion: TioObjVersion;
+    procedure SetObjVersion(const AValue: TioObjVersion);
+    property ObjVersion:TioObjVersion read GetObjVersion write SetObjVersion;
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
