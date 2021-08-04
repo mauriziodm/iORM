@@ -172,9 +172,11 @@ type
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
     function ParamByProp(const AProp: IioContextProperty): TioParam;
-    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
+    procedure SetObjVersionParam(const AContext: IioContext);
+    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    procedure SetObjVersionWhereParam(const AContext: IioContext);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
@@ -300,9 +302,9 @@ type
     function GetRelationPropertyName: String;
     property RelationPropertyName: String read GetRelationPropertyName write SetRelationPropertyName;
     // RelationOID
-    procedure SetRelationOID(const Value: Integer);
-    function GetRelationOID: Integer;
-    property RelationOID: Integer read GetRelationOID write SetRelationOID;
+    procedure SetRelationOID(const Value: integer);
+    function GetRelationOID: integer;
+    property RelationOID: integer read GetRelationOID write SetRelationOID;
     // BlindInsert
     procedure SetBlindInsert(const Value: Boolean);
     function GetBlindInsert: Boolean;
@@ -332,9 +334,9 @@ type
     class procedure CommitTransaction(const AConnectionName: String); virtual; abstract;
     class procedure RollbackTransaction(const AConnectionName: String); virtual; abstract;
     class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean);
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean);
       virtual; abstract;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: integer;
       const ABlindInsert: Boolean); virtual; abstract;
     class procedure DeleteObject(const AObj: TObject); virtual; abstract;
     class procedure DeleteCollection(const ACollection: TObject); virtual; abstract;
@@ -343,7 +345,7 @@ type
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual; abstract;
-    class function Count(const AWhere: IioWhere): Integer; virtual; abstract;
+    class function Count(const AWhere: IioWhere): integer; virtual; abstract;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
@@ -582,8 +584,9 @@ begin
       Result := _IsNull;
     coIsNotNull:
       Result := _IsNotNull;
-    else
-      raise EioException.Create(Self.ClassName, 'CompareOpToCompareOperator', Format('Invalid CompareOp value "%s"', [TioUtilities.EnumToString<TioCompareOp>(ACompareOp)]));
+  else
+    raise EioException.Create(Self.ClassName, 'CompareOpToCompareOperator', Format('Invalid CompareOp value "%s"',
+      [TioUtilities.EnumToString<TioCompareOp>(ACompareOp)]));
   end;
 end;
 
@@ -652,8 +655,9 @@ begin
       Result := _OpenPar;
     loClosePar:
       Result := _ClosePar;
-    else
-      raise EioException.Create(Self.ClassName, 'LogicOpToLogicRelation', Format('Invalid LogicOp value "%s"', [TioUtilities.EnumToString<TioLogicOp>(ALogicOp)]));
+  else
+    raise EioException.Create(Self.ClassName, 'LogicOpToLogicRelation', Format('Invalid LogicOp value "%s"',
+      [TioUtilities.EnumToString<TioLogicOp>(ALogicOp)]));
   end;
 end;
 

@@ -72,9 +72,11 @@ type
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
     function ParamByProp(const AProp: IioContextProperty): TioParam;
-    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
+    procedure SetObjVersionParam(const AContext: IioContext);
+    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    procedure SetObjVersionWhereParam(const AContext: IioContext);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
@@ -296,6 +298,30 @@ begin
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
+end;
+
+procedure TioQuery.SetObjVersionParam(const AContext: IioContext);
+var
+  LProp: IioContextProperty;
+begin
+  LProp := AContext.GetProperties.ObjVersionProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    ParamByProp(LProp).AsFloat := AContext.TransactionTimestamp
+  else
+    ParamByProp(LProp).AsDateTime := AContext.TransactionTimestamp;
+end;
+
+procedure TioQuery.SetObjVersionWhereParam(const AContext: IioContext);
+var
+  LProp: IioContextProperty;
+begin
+  LProp := AContext.GetProperties.ObjVersionProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    WhereParamByProp(LProp).AsFloat := LProp.GetValue(AContext.DataObject).AsVariant
+  else
+    WhereParamByProp(LProp).AsDateTime := LProp.GetValue(AContext.DataObject).AsVariant;
 end;
 
 procedure TioQuery.SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
