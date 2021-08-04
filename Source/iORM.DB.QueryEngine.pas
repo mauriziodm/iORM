@@ -48,9 +48,7 @@ type
   TioQueryEngine = class
   private
   protected
-    class procedure SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);
     class function ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String; const AIdentity: String = ''): String;
-    class procedure FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
     // class procedure PersistRelationChildObject(AMasterContext: IioContext;
     // AMasterProperty: IioContextProperty);
   public
@@ -95,23 +93,9 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, LQuery)
+    LQuery.FillQueryWhereParams(AContext)
   else
     LQuery.SetObjIDWhereParam(AContext);
-end;
-
-class procedure TioQueryEngine.FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
-var
-  ASqlItem: IioSqlItem;
-  ASqlItemWhere: IioSqlItemWhere;
-begin
-  for ASqlItem in AContext.Where.GetWhereItems do
-  begin
-    if Supports(ASqlItem, IioSqlItemWhere, ASqlItemWhere) and ASqlItemWhere.HasParameter then
-      AQuery.ParamByName(ASqlItemWhere.GetSqlParamName(AContext.Map)).Value := ASqlItemWhere.GetValue(AContext.Map).AsVariant;
-  end;
-  if AContext.IsTrueClass then
-    AQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := '%' + AContext.TrueClass.GetClassName + '%';
 end;
 
 class function TioQueryEngine.GetQueryCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
@@ -191,7 +175,7 @@ begin
         LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
       ioRTBelongsTo:
-        Self.SetIntegerToQueryParamNullIfZero(LQuery.ParamByProp(LProp), LProp.GetRelationChildObjectID(AContext.DataObject));
+        LQuery.SetIntegerParamNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
       ioRTHasOne: { Nothing }
         ;
@@ -246,7 +230,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    FillQueryWhereParams(AContext, LQuery)
+    LQuery.FillQueryWhereParams(AContext)
   else
     LQuery.SetObjIDWhereParam(AContext);
 end;
@@ -264,7 +248,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, LQuery)
+    LQuery.FillQueryWhereParams(AContext)
   else
     LQuery.SetObjIDWhereParam(AContext);
 end;
@@ -282,7 +266,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, LQuery)
+    LQuery.FillQueryWhereParams(AContext)
   else
     LQuery.SetObjIDWhereParam(AContext);
 end;
@@ -318,7 +302,7 @@ begin
         LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
       ioRTBelongsTo:
-        SetIntegerToQueryParamNullIfZero(LQuery.ParamByProp(LProp), LProp.GetRelationChildObjectID(AContext.DataObject));
+        LQuery.SetIntegerParamNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
       ioRTHasOne: { Nothing }
         ;
@@ -335,14 +319,6 @@ begin
   LQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
   if AContext.ObjVersionExist then
     LQuery.SetObjVersionWhereParam(AContext);
-end;
-
-class procedure TioQueryEngine.SetIntegerToQueryParamNullIfZero(const AParam: TioParam; const AValue: Integer);
-begin
-  if AValue <> 0 then
-    AParam.Value := AValue
-  else
-    AParam.Value := Null; // Thanks to Marco Mottadelli
 end;
 
 end.

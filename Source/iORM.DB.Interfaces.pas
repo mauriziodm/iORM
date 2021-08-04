@@ -178,6 +178,8 @@ type
     function WhereParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
+    procedure FillQueryWhereParams(const AContext: IioContext);
+    procedure SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;

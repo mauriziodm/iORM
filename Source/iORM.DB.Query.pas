@@ -78,6 +78,8 @@ type
     function WhereParamByProp(const AProp: IioContextProperty): TioParam;
     procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
+    procedure FillQueryWhereParams(const AContext: IioContext);
+    procedure SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
@@ -91,7 +93,8 @@ uses
   System.TypInfo, iORM.Exceptions, iORM.Attributes, FireDAC.Stan.Param,
   iORM.ObjectsForge.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, System.JSON,
-  iORM.Utilities;
+  iORM.Utilities, iORM.Interfaces, iORM.Where.SqlItems.Interfaces,
+  System.SysUtils;
 
 { TioQuerySqLite }
 
@@ -152,6 +155,20 @@ end;
 function TioQuery.Fields: TioFields;
 begin
   Result := FSqlQuery.Fields;
+end;
+
+procedure TioQuery.FillQueryWhereParams(const AContext: IioContext);
+var
+  ASqlItem: IioSqlItem;
+  ASqlItemWhere: IioSqlItemWhere;
+begin
+  for ASqlItem in AContext.Where.GetWhereItems do
+  begin
+    if Supports(ASqlItem, IioSqlItemWhere, ASqlItemWhere) and ASqlItemWhere.HasParameter then
+      ParamByName(ASqlItemWhere.GetSqlParamName(AContext.Map)).Value := ASqlItemWhere.GetValue(AContext.Map).AsVariant;
+  end;
+  if AContext.IsTrueClass then
+    ParamByName(AContext.TrueClass.GetSqlParamName).Value := '%' + AContext.TrueClass.GetClassName + '%';
 end;
 
 procedure TioQuery.First;
@@ -299,6 +316,14 @@ begin
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
+end;
+
+procedure TioQuery.SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
+begin
+  if AValue <> 0 then
+    ParamByProp(AProp).Value := AValue
+  else
+    ParamByProp(AProp).Value := Null; // Thanks to Marco Mottadelli
 end;
 
 procedure TioQuery.SetObjIDWhereParam(const AContext: IioContext);
