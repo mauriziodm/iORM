@@ -84,20 +84,20 @@ end;
 
 class function TioQueryEngine.GetQueryDelete(const AContext: IioContext): IioQuery;
 var
-  AQuery: IioQuery;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'DEL'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'DEL'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, AQuery)
+    Self.FillQueryWhereParams(AContext, LQuery)
   else
-    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    LQuery.SetObjIDWhereParam(AContext);
 end;
 
 class procedure TioQueryEngine.FillQueryWhereParams(const AContext: IioContext; const AQuery: IioQuery);
@@ -140,17 +140,17 @@ end;
 
 class function TioQueryEngine.GetQueryExists(const AContext: IioContext): IioQuery;
 var
-  AQuery: IioQuery;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlExists(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'EXIST'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlExists(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
-  AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  LQuery.SetObjIDWhereParam(AContext);
 end;
 
 class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
@@ -235,56 +235,56 @@ end;
 
 class function TioQueryEngine.GetQueryCount(const AContext: IioContext): IioQuery;
 var
-  AQuery: IioQuery;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELCNT'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCount(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELCNT'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlCount(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, AQuery)
+    FillQueryWhereParams(AContext, LQuery)
   else
-    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    LQuery.SetObjIDWhereParam(AContext);
 end;
 
 class function TioQueryEngine.GetQuerySelectList(const AContext: IioContext): IioQuery;
 var
-  AQuery: IioQuery;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELLST'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelect(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELLST'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelect(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, AQuery)
+    Self.FillQueryWhereParams(AContext, LQuery)
   else
-    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    LQuery.SetObjIDWhereParam(AContext);
 end;
 
 class function TioQueryEngine.GetQuerySelectObject(const AContext: IioContext): IioQuery;
 var
-  AQuery: IioQuery;
+  LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELOBJ'));
-  Result := AQuery;
-  if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelect(AQuery, AContext);
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'SELOBJ'));
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelect(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    Self.FillQueryWhereParams(AContext, AQuery)
+    Self.FillQueryWhereParams(AContext, LQuery)
   else
-    AQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+    LQuery.SetObjIDWhereParam(AContext);
 end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
@@ -331,6 +331,7 @@ begin
   if AContext.IsTrueClass then
     LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
   // Where conditions (with ObjVersion if exists for this entity type)
+  LQuery.SetObjIDWhereParam(AContext);
   LQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
   if AContext.ObjVersionExist then
     LQuery.SetObjVersionWhereParam(AContext);

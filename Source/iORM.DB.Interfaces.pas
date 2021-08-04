@@ -176,6 +176,7 @@ type
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
     procedure SetObjVersionParam(const AContext: IioContext);
     function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     function Connection: IioConnection;
     procedure CleanConnectionRef;

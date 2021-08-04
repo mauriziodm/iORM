@@ -76,6 +76,7 @@ type
     procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
     procedure SetObjVersionParam(const AContext: IioContext);
     function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
@@ -298,6 +299,11 @@ begin
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
+end;
+
+procedure TioQuery.SetObjIDWhereParam(const AContext: IioContext);
+begin
+  WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
 end;
 
 procedure TioQuery.SetObjVersionParam(const AContext: IioContext);
