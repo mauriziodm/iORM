@@ -909,7 +909,7 @@ end;
 
 procedure TioPrototypeBindSource.WhereOnChangeEventHandler(Sender: TObject);
 begin
-  SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(Self.FioWhereStr.Text));
+  SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FioWhereStr.Text));
 end;
 
 function TioPrototypeBindSource._AddRef: Integer;

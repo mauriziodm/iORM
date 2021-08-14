@@ -224,8 +224,7 @@ type
     function DataObjectAssigned: Boolean;
     // Properties
     property Active: Boolean read GetActive write SetActive;
-    property BindSourceAdapter: IioActiveBindSourceAdapter
-      read GetBindSourceAdapter write SetBindSourceAdapter;
+    property BindSourceAdapter: IioActiveBindSourceAdapter read GetBindSourceAdapter write SetBindSourceAdapter;
     property Where: IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
     property ItemCount: Integer read GetCount;
@@ -593,8 +592,7 @@ function TioModelPresenter.GetDetailBindSourceAdapter(const AOwner: TComponent;
   const AMasterPropertyName: String; const AWhere: IioWhere)
   : IioActiveBindSourceAdapter;
 begin
-  if not Supports(GetBindSourceAdapter.NewDetailBindSourceAdapter(AOwner,
-    AMasterPropertyName, AWhere), IioActiveBindSourceAdapter, Result) then
+  if not Supports(GetBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere), IioActiveBindSourceAdapter, Result) then
     Result := nil;
 end;
 

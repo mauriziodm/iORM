@@ -128,6 +128,7 @@ type
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>;
       const ANativeFormat: Boolean);
   protected
+    function CheckAdapter: Boolean;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
     function GetInternalAdapter: TBindSourceAdapter;
@@ -499,6 +500,11 @@ end;
 
 { TMdListDataSet }
 
+function TioBSADataSet.CheckAdapter: Boolean;
+begin
+  Result :=  (FBindSourceAdapter <> nil) and FBindSourceAdapter.CanActivate;
+end;
+
 function TioBSADataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 var
   LProperty: IioContextProperty;
@@ -547,7 +553,7 @@ end;
 
 function TioBSADataSet.GetInternalAdapter: TBindSourceAdapter;
 begin
-  if Assigned(FBindSourceAdapter) then
+  if CheckAdapter then
     Result := FBindSourceAdapter as TBindSourceAdapter
   else
     Result := nil;

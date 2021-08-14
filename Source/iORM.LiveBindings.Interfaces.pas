@@ -229,6 +229,9 @@ type
     function GetRefreshing: boolean;
     procedure SetRefreshing(const Value: boolean);
     property Refreshing: boolean read GetRefreshing write SetRefreshing;
+    // CanActivate
+    function GetCanActivate: Boolean;
+    property CanActivate: Boolean read GetCanActivate;
   end;
 
   // Bind source adapter container
