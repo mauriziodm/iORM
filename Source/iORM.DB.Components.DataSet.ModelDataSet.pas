@@ -21,14 +21,14 @@ type
     // dataset virtual methods
     procedure InternalPreOpen; override;
     /// ViewModelBridge
-    procedure SetViewModelBridge(const AVMBridge:TioViewModelBridge);
+    procedure SetViewModelBridge(const AVMBridge: TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
+    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
-    property ModelPresenter:String read FModelPresenter write FModelPresenter;
+    property ModelPresenter: String read FModelPresenter write FModelPresenter;
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
   end;
@@ -52,8 +52,7 @@ begin
     TioComponentsCommon.ViewModelBridgeAutosetting(Self, Owner);
 end;
 
-procedure TioModelDataSet.DeleteListViewItem(const AItemIndex,
-  ADelayMilliseconds: integer);
+procedure TioModelDataSet.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
   GetModelPresenterInstance.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
@@ -69,9 +68,6 @@ begin
 end;
 
 procedure TioModelDataSet.InternalPreOpen;
-var
-  ADataObject: TBindSourceAdapter;
-  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Checks
   if not Assigned(FViewModelBridge) then
@@ -81,18 +77,14 @@ begin
   if FModelPresenter.IsEmpty then
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
   // Get the BindSourceAdapter from ViewModel and open it
-  //  NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
-  //       from it (for cross view with microviews)
+  // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
+  // from it (for cross view with microviews)
   if Assigned(FCrossView_MasterBindSource) then
-  begin
-    ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FCrossView_MasterBindSource.InternalActiveAdapter, FCrossView_MasterPropertyName, nil);
-    if not Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) then
-      raise EioException.Create(Self.ClassName, 'DoCreateAdapter', '"IioActiveBindSourceAdapter" interface not implemented by object.');
-    ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter := LActiveBSA;
-  end;
-  SetInternalAdapter(   ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter   );
-  if Assigned(InternalAdapter) then
-    InternalAdapter.Active := True;
+    ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
+      FCrossView_MasterBindSource.InternalActiveAdapter, FCrossView_MasterPropertyName, nil);
+  SetInternalAdapter(ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter);
+  if Assigned(InternalActiveAdapter) then
+    InternalActiveAdapter.Active := True;
   inherited;
 end;
 
@@ -100,33 +92,32 @@ procedure TioModelDataSet.Loaded;
 begin
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
-  if not (csDesigning in ComponentState) then
+  if not(csDesigning in ComponentState) then
     TioComponentsCommon.RegisterConnectionDefComponents(Owner);
   // ===========================================================================
 
   // VIEWMODELBRIDGE - CHECK FOR VIEWMODEL IF NOT ALREADY EXECUTED
-  //  (ALWAYS BEFORE DOCREATEADAPTER CALL)
+  // (ALWAYS BEFORE DOCREATEADAPTER CALL)
   // ===========================================================================
-  if Assigned(ViewModelBridge) and not (csDesigning in ComponentState) then
+  if Assigned(ViewModelBridge) and not(csDesigning in ComponentState) then
     ViewModelBridge.CheckForViewModel;
   // ===========================================================================
 
   inherited;
 end;
 
-procedure TioModelDataSet.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TioModelDataSet.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
-  if (Operation = opRemove) and (AComponent = FViewModelBridge)
-    then FViewModelBridge := nil;
+  if (Operation = opRemove) and (AComponent = FViewModelBridge) then
+    FViewModelBridge := nil;
 end;
 
-procedure TioModelDataSet.SetViewModelBridge(
-  const AVMBridge: TioViewModelBridge);
+procedure TioModelDataSet.SetViewModelBridge(const AVMBridge: TioViewModelBridge);
 begin
   FViewModelBridge := AVMBridge;
-  if AVMBridge <> nil then AVMBridge.FreeNotification(Self);
+  if AVMBridge <> nil then
+    AVMBridge.FreeNotification(Self);
 end;
 
 end.

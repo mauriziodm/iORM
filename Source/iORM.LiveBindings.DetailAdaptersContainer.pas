@@ -51,7 +51,7 @@ type
     constructor Create(const AMasterAdapter:IioContainedBindSourceAdapter); overload;
     destructor Destroy; override;
     procedure SetMasterObject(const AMasterObj: TObject);
-    function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): TBindSourceAdapter;
+    function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
     procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
     procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -106,32 +106,31 @@ begin
   inherited;
 end;
 
-function TioDetailAdaptersContainer.NewBindSourceAdapter(const AOwner: TComponent;
-  const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): TBindSourceAdapter;
+function TioDetailAdaptersContainer.NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
 var
-  AMasterContext: IioContext;
-  AMasterProperty: IioContextProperty;
-  NewAdapter: IioContainedBindSourceAdapter;
+  LMasterContext: IioContext;
+  LMasterProperty: IioContextProperty;
+  LNewAdapter: IioContainedBindSourceAdapter;
 begin
   // Retrieve MasterContext and MasterProperty
-  AMasterContext := TioContextFactory.Context(AMasterClassName);
-  AMasterProperty := AMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);
+  LMasterContext := TioContextFactory.Context(AMasterClassName);
+  LMasterProperty := LMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);
   // Create the Adapter
-  case AMasterProperty.GetRelationType of
+  case LMasterProperty.GetRelationType of
     ioRTBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne:
-      NewAdapter := TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner, AMasterProperty, AWhere);
+      LNewAdapter := TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner, LMasterProperty, AWhere);
     ioRTHasMany, ioRTEmbeddedHasMany:
-      NewAdapter := TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner, AMasterProperty, AWhere);
+      LNewAdapter := TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner, LMasterProperty, AWhere);
     else
       raise EioException.Create(Self.ClassName + ': Relation not found');
   end;
   // Set the MasterAdapterConatainer reference (Self)
-  NewAdapter.SetMasterAdaptersContainer(Self);
+  LNewAdapter.SetMasterAdaptersContainer(Self);
   // Add the new adapter to the contained adapters
 { TODO : NB: BISOGNEREBBE AGGIUNGERE IL NOME DEL MODELPRESENTE O DEL PROTOTYPEBINDSOURCE ALLA CHIAVE DEL DICTIONARY IN MODO DA RISOLVERE UN POSSIBILE PROBLEMA SE DUE MODEL PRESENTER PRESENTANO LA STESSA CLASSE/INTERFACCIA COME DETTAGLI DI UNO STESSO MASTER E DELLA STESSA MASTERPROPERTYNAME }
-  Self.FDetailAdapters.Add(AMasterPropertyName, NewAdapter);
+  FDetailAdapters.Add(AMasterPropertyName, LNewAdapter);
   // Return the new adapter
-  Result := NewAdapter as TBindSourceAdapter;
+  Result := LNewAdapter.AsActiveBindSourceAdapter;
 end;
 
 function TioDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(

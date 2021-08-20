@@ -131,8 +131,7 @@ type
     function CheckAdapter: Boolean;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
-    function GetInternalAdapter: TBindSourceAdapter;
-    procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+    procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
     // dataset virtual methods
     procedure InternalPreOpen; override;
     // custom dataset virtual methods
@@ -152,7 +151,6 @@ type
   public
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
-    property InternalAdapter: TBindSourceAdapter read GetInternalAdapter; // Must be ReadOnly
     property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter; // Must be ReadOnly
     property Map: IioMap read FMap;
   end;
@@ -551,14 +549,6 @@ begin
   Result := FBindSourceAdapter;
 end;
 
-function TioBSADataSet.GetInternalAdapter: TBindSourceAdapter;
-begin
-  if CheckAdapter then
-    Result := FBindSourceAdapter as TBindSourceAdapter
-  else
-    Result := nil;
-end;
-
 procedure TioBSADataSet.InternalCancel;
 begin
   // If destroying then exit
@@ -779,7 +769,9 @@ end;
 procedure TioBSADataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   if not Assigned(AActiveBindSourceAdpter) then
-    raise EioException.Create(Self.ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
+    raise EioException.Create(ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
+  if AActiveBindSourceAdpter = FBindSourceAdapter then
+    Exit;
   // Set the Map of the BaseObject of the ActiveBindSourceAdapter
   FMap := TioMapContainer.GetMap(AActiveBindSourceAdpter.GetBaseObjectClassName);
   // Set the BindSourceAdapter

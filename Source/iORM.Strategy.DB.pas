@@ -100,7 +100,6 @@ var
   AResolvedTypeName: String;
   AContext: IioContext;
   ATransactionCollection: IioTransactionCollection;
-  ADuckTypedList: IioDuckTypedList;
   // Nested
   procedure NestedCount;
   var

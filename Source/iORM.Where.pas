@@ -417,8 +417,6 @@ begin
 end;
 
 procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp);
-var
-  AProp: IioContextProperty;
 begin
   FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
   FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));

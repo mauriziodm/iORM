@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.MVVM.Components.ModelPresenter;
 
@@ -85,7 +83,7 @@ type
     FDetailPresentersContainer: TList<TioModelPresenter>;
     // Questo è un riferimento di tipo interfaccia e serve solo per
     // mantenere in vita l'oggetto
-//    FDummyInterfaceRef: IInterface; NB: Hint prevention "symbol declared but never used"
+    // FDummyInterfaceRef: IInterface; NB: Hint prevention "symbol declared but never used"
     // Selection related events
     FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
     FonSelectionObject: TioBSASelectionObjectEvent;
@@ -118,8 +116,7 @@ type
     // TypeAlias
     procedure SetTypeAlias(const Value: String);
     // BindSourceAdapter
-    procedure SetBindSourceAdapter(const Value: TBindSourceAdapter); overload;
-    procedure SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter); overload;
+    procedure SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
     function GetBindSourceAdapter: IioActiveBindSourceAdapter;
     // OrderBy
     procedure SetOrderBy(const Value: String);
@@ -160,12 +157,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    class function IsValidForDependencyInjectionLocator(const AModelPresenter
-      : TioModelPresenter; const ACheckCurrentObj, ARaiseExceptions
-      : Boolean): Boolean;
+    class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
-    procedure Notify(const Sender: TObject;
-      const ANotification: IioBSANotification);
+    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailPresenter(const ADetailPresenter: TioModelPresenter);
     procedure ForceDetailAdaptersCreation;
@@ -183,7 +177,7 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); overload;
+    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
@@ -240,7 +234,7 @@ type
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
     property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
-    property OnBeforeSelectionInterface : TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
     // Properties
@@ -321,8 +315,7 @@ begin
     Self.Cancel;
 end;
 
-function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned
-  : Boolean): Boolean;
+function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
   if ACreateIfNotAssigned and not Assigned(FBindSourceAdapter) then
@@ -377,8 +370,7 @@ begin
     begin
       if CheckAdapter then
         BindSourceAdapter.LoadPage;
-    end
-  );
+    end);
   // Set even an onChange event handler (always after the creation of the PageManager)
   FWhereStr := TStringList.Create;
   SetWhereStr(FWhereStr); // set TStringList.onChange event handler
@@ -406,8 +398,7 @@ begin
     BindSourceAdapter.Delete;
 end;
 
-procedure TioModelPresenter.DeleteListViewItem(const AItemIndex,
-  ADelayMilliseconds: Integer);
+procedure TioModelPresenter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
   GetBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
@@ -426,8 +417,7 @@ begin
   inherited;
 end;
 
-procedure TioModelPresenter.DoAfterSelection(var ASelected: IInterface;
-  var ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
@@ -440,8 +430,7 @@ begin
     PersistCurrent;
 end;
 
-procedure TioModelPresenter.DoAfterSelection(var ASelected: TObject;
-  var ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
@@ -454,15 +443,13 @@ begin
     PersistCurrent;
 end;
 
-procedure TioModelPresenter.DoBeforeSelection(var ASelected: IInterface;
-  var ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionInterface) then
     FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioModelPresenter.DoBeforeSelection(var ASelected: TObject;
-  var ASelectionType: TioSelectionType);
+procedure TioModelPresenter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
@@ -478,15 +465,13 @@ begin
     Self.Refresh(Self.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
 end;
 
-procedure TioModelPresenter.DoSelection(var ASelected: TObject;
-  var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioModelPresenter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
 end;
 
-procedure TioModelPresenter.DoSelection(var ASelected: IInterface;
-  var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioModelPresenter.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionInterface) then
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
@@ -588,8 +573,7 @@ begin
     Result := False;
 end;
 
-function TioModelPresenter.GetDetailBindSourceAdapter(const AOwner: TComponent;
-  const AMasterPropertyName: String; const AWhere: IioWhere)
+function TioModelPresenter.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
   : IioActiveBindSourceAdapter;
 begin
   if not Supports(GetBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere), IioActiveBindSourceAdapter, Result) then
@@ -636,8 +620,7 @@ begin
     Result := -1;
 end;
 
-function TioModelPresenter.GetNaturalObjectBindSourceAdapter
-  (const AOwner: TComponent): IioActiveBindSourceAdapter;
+function TioModelPresenter.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
   if not Supports(GetBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
     Result := nil;
@@ -685,8 +668,7 @@ begin
   begin
     FAsDefault := True;
     for I := 0 to Owner.ComponentCount - 1 do
-      if (Owner.Components[I] is TioModelPresenter) and
-        (Owner.Components[I] <> Self) then
+      if (Owner.Components[I] is TioModelPresenter) and (Owner.Components[I] <> Self) then
       begin
         FAsDefault := False;
         Exit;
@@ -794,8 +776,7 @@ begin
     BindSourceAdapter.Next;
 end;
 
-procedure TioModelPresenter.Notify(const Sender: TObject;
-  const ANotification: IioBSANotification);
+procedure TioModelPresenter.Notify(const Sender: TObject; const ANotification: IioBSANotification);
 begin
   DoNotify(ANotification);
 end;
@@ -826,7 +807,7 @@ end;
 procedure TioModelPresenter.PostIfEditing;
 begin
   if CheckAdapter and Editing then
-    Self.Post;
+    Post;
 end;
 
 procedure TioModelPresenter.Prior;
@@ -835,14 +816,13 @@ begin
     BindSourceAdapter.Prior;
 end;
 
-procedure TioModelPresenter.Refresh(const AReloadData:Boolean; const ANotify:Boolean=True);
+procedure TioModelPresenter.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
 begin
   if CheckAdapter then
     FBindSourceAdapter.Refresh(AReloadData, ANotify);
 end;
 
-procedure TioModelPresenter.RegisterDetailPresenter(const ADetailPresenter
-  : TioModelPresenter);
+procedure TioModelPresenter.RegisterDetailPresenter(const ADetailPresenter: TioModelPresenter);
 begin
   if not Assigned(FDetailPresentersContainer) then
     FDetailPresentersContainer := TList<TioModelPresenter>.Create;
@@ -886,8 +866,7 @@ begin
     FBindSourceAdapter.ioAutoLoadData := Value;
 end;
 
-procedure TioModelPresenter.SetBindSourceAdapter(const Value
-  : IioActiveBindSourceAdapter);
+procedure TioModelPresenter.SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
 begin
   if Value = FBindSourceAdapter then
     Exit;
@@ -895,23 +874,10 @@ begin
   // Set some properties
   FBindSourceAdapter.ioAsync := FAsync;
   FBindSourceAdapter.ioAutoPersist := FAutoPersist;
-  FBindSourceAdapter.ioWhereDetailsFromDetailAdapters :=
-    FWhereDetailsFromDetailAdapters;
+  FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   FBindSourceAdapter.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
   FBindSourceAdapter.SetBindSource(Self);
-end;
-
-procedure TioModelPresenter.SetBindSourceAdapter(const Value
-  : TBindSourceAdapter);
-var
-  LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-begin
-  if Supports(Value, IioActiveBindSourceAdapter, LActiveBindSourceAdapter) then
-    Self.SetBindSourceAdapter(LActiveBindSourceAdapter)
-  else
-    raise EioException.Create(TioModelPresenter.ClassName +
-      '.SetBindSourceAdapter: IioActiveBindSourceAdapter interface not implemented by object.');
 end;
 
 // procedure TioModelPresenter.SetMasterBindSourceAdapter(
@@ -931,8 +897,7 @@ end;
 // Self.SetBindSourceAdapter(LBindSourceAdapter);
 // end;
 
-procedure TioModelPresenter.SetDataObject(const ADataObject: TObject;
-  const AOwnsObject: Boolean);
+procedure TioModelPresenter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   if not Assigned(ADataObject) then
     ClearDataObject;
@@ -945,8 +910,7 @@ begin
     BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 end;
 
-procedure TioModelPresenter.SetDataObject(const ADataObject: IInterface;
-  const AOwnsObject: Boolean);
+procedure TioModelPresenter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
   if not Assigned(ADataObject) then
     ClearDataObject;
@@ -1027,8 +991,7 @@ begin
     FBindSourceAdapter.ioWhere := AWhere;
 end;
 
-procedure TioModelPresenter.SetWhereDetailsFromDetailAdapters
-  (const Value: Boolean);
+procedure TioModelPresenter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
   // Update the adapter
@@ -1052,38 +1015,32 @@ begin
   WhereOnChangeEventHandler(Self);
 end;
 
-procedure TioModelPresenter.ShowCurrent(const AViewContext: TComponent;
-  const AAlias: String);
+procedure TioModelPresenter.ShowCurrent(const AViewContext: TComponent; const AAlias: String);
 begin
   io.ShowCurrent(Self, AViewContext, AAlias);
 end;
 
-procedure TioModelPresenter.ShowCurrent(const AVCProvider
-  : TioViewContextProvider; const AAlias: String);
+procedure TioModelPresenter.ShowCurrent(const AVCProvider: TioViewContextProvider; const AAlias: String);
 begin
   io.ShowCurrent(Self, AVCProvider, AAlias);
 end;
 
-procedure TioModelPresenter.ShowCurrent(const AAlias: String;
-  const AVCProviderName: String);
+procedure TioModelPresenter.ShowCurrent(const AAlias: String; const AVCProviderName: String);
 begin
   io.ShowCurrent(Self, AAlias, AVCProviderName);
 end;
 
-procedure TioModelPresenter.ShowEach(const AViewContext: TComponent;
-  const AAlias: String);
+procedure TioModelPresenter.ShowEach(const AViewContext: TComponent; const AAlias: String);
 begin
   io.ShowEach(Self, AViewContext, AAlias);
 end;
 
-procedure TioModelPresenter.ShowEach(const AVCProvider: TioViewContextProvider;
-  const AAlias: String);
+procedure TioModelPresenter.ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String);
 begin
   io.ShowEach(Self, AVCProvider, AAlias);
 end;
 
-procedure TioModelPresenter.ShowEach(const AAlias: String;
-  const AVCProviderName: String);
+procedure TioModelPresenter.ShowEach(const AAlias: String; const AVCProviderName: String);
 begin
   io.ShowEach(Self, AAlias, AVCProviderName);
 end;
@@ -1096,29 +1053,24 @@ begin
   // Self.SetWhere(TioWhereFactory.NewWhere.Add(FWhereStr.Text));
 end;
 
-procedure TioModelPresenter._CreateAdapter(const ADataObject: TObject;
-  const AOwnsObject: Boolean);
+procedure TioModelPresenter._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
-    raise EioException.Create(Self.ClassName, '_CreateAdapter',
-      'Active bind source adapter already exists.');
+    raise EioException.Create(ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
   // if the TypeName is empty then set it
   if TypeName.IsEmpty then
-    raise EioException.Create(Self.ClassName, 'SetDataObject',
-      'ModelPresenter.TypeName value is not valid.');
+    raise EioException.Create(ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterPresenter) then
     // Get the BindSourceAdapter
-    SetBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterModelPresenter
-      (nil, MasterPresenter, MasterPropertyName))
+    SetBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterPresenter.BindSourceAdapter, MasterPropertyName))
     // else create the BSA from TypeName & TypeAlias
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias,
-      Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
+    SetBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
@@ -1182,33 +1134,26 @@ begin
   end;
 end;
 
-class function TioModelPresenter.IsValidForDependencyInjectionLocator
-  (const AModelPresenter: TioModelPresenter;
-  const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
+class function TioModelPresenter.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter;
+const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
 begin
   // Init
   Result := True;
   // Check the ModelPresenter
   Result := Result and Assigned(AModelPresenter);
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName,
-      'IsValidForDependencyInjectionLocator',
-      'Parameter "AModelPresenter" not assigned.');
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
   // Check the bind source adapter
   Result := Result and AModelPresenter.CheckAdapter;
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName,
-      'IsValidForDependencyInjectionLocator',
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator',
       'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
   // Check the ModelPresenter.Current object
   if not ACheckCurrentObj then
     Exit;
   Result := Result and (AModelPresenter.Current <> nil);
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName,
-      'IsValidForDependencyInjectionLocator',
-      '"Current" object of the ModelPresenter not assigned.');
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
 end;
 
 end.
-

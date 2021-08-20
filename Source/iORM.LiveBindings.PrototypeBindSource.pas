@@ -177,8 +177,7 @@ type
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure ClearDataObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil)
-      : TBindSourceAdapter;
+    function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
@@ -303,7 +302,7 @@ end;
 procedure TioPrototypeBindSource.CancelIfEditing;
 begin
   if Editing then
-    Self.Cancel;
+    Cancel;
 end;
 
 function TioPrototypeBindSource.CheckActiveAdapter: Boolean;
@@ -425,18 +424,17 @@ begin
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
     // else get the adapter directly from iORM
     if Assigned(Self.ioMasterBindSource) then
-      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName,
-        TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy))
+      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FioMasterBindSource.GetActiveBindSourceAdapter, ioMasterPropertyName,
+        TioWhereFactory.NewWhere.Add(ioWhereStr.Text)._OrderBy(FioOrderBy)).AsTBindSourceAdapter
     else
       ADataObject := TioLiveBindingsFactory.GetBSA(Self, FioTypeName, FioTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging)
-        .Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil, True) as TBindSourceAdapter;
+        .Add(ioWhereStr.Text)._OrderBy(FioOrderBy), FioViewDataType, FioAutoLoadData, nil, True).AsTBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
   // in the ActiveBindSourceAdapter
   // PS: Set ioAsync also (and other properties)
-  if Assigned(ADataObject) and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) and
-    Supports(Self, IioNotifiableBindSource) then
+  if Assigned(ADataObject) and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
     LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.ioAsync := FioAsync;
@@ -570,8 +568,7 @@ begin
     Result := False;
 end;
 
-function TioPrototypeBindSource.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String;
-  const AWhere: IioWhere): TBindSourceAdapter;
+function TioPrototypeBindSource.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 var
   AContainedBSA: IioContainedBindSourceAdapter;
 begin
@@ -639,7 +636,7 @@ end;
 
 function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
 begin
-  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner);
+  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner).AsTBindSourceAdapter;
 end;
 
 function TioPrototypeBindSource.GetState: TBindSourceAdapterState;

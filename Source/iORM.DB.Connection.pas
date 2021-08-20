@@ -276,8 +276,6 @@ begin
 end;
 
 function TioConnectionDB.TransactionTimestamp: TDateTime;
-var
-  LQuery: IioQuery;
 begin
   if FTransactionTimestamp = TRANSACTION_TIMESTAMP_NULL then
     FTransactionTimestamp := GetCurrentTimeStamp;

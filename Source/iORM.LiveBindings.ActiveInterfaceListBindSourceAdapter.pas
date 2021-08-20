@@ -153,9 +153,8 @@ type
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
-      : TBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -179,6 +178,7 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
+    function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 
     property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
@@ -232,6 +232,11 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: TObject);
 begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+begin
+  Result := Self as IioActiveBindSourceAdapter;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.AsTBindSourceAdapter: TBindSourceAdapter;
@@ -542,8 +547,8 @@ begin
   Result := FAsync;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String;
-  const AWhere: IioWhere): TBindSourceAdapter;
+function TioActiveInterfaceListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
+      : IioActiveBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, GetBaseObjectRttiType.Name, AMasterPropertyName, AWhere);
@@ -622,7 +627,7 @@ begin
   Result := Self.State;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
+function TioActiveInterfaceListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
   Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
 end;
