@@ -49,14 +49,14 @@ type
     class function NewWhere: IioWhere; overload;
     class function NewWhere<T>: IioWhere<T>; overload;
     class function NewWhereWithPaging(const APaging: TioCommonBSAPageManager): IioWhere; overload;
-    class function NewWhereItems: IWhereItems;
+    class function NewWhereItems: TWhereItems;
     class function NewDetailsContainer: IioWhereDetailsContainer;
   end;
 
 implementation
 
 uses
-  iORM.Where.DetailsContainer, iORM.Containers.List, iORM.Interfaces;
+  iORM.Where.DetailsContainer, iORM.Interfaces, System.Generics.Collections;
 
 { TioWhereFactory }
 
@@ -75,9 +75,9 @@ begin
   Result := TioWhere<T>.Create;
 end;
 
-class function TioWhereFactory.NewWhereItems: IWhereItems;
+class function TioWhereFactory.NewWhereItems: TWhereItems;
 begin
-  Result := TioInterfacedList<IioSqlItem>.Create;
+  Result := TList<IioSqlItem>.Create;
 end;
 
 class function TioWhereFactory.NewWhereWithPaging(const APaging: TioCommonBSAPageManager): IioWhere;

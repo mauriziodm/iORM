@@ -51,7 +51,7 @@ type
   IioWhere = interface;
 
   // WhereItems container
-  IWhereItems = IioList<IioSqlItem>;
+  TWhereItems = TList<IioSqlItem>;
 
   // WhereDetails container
   TioWhereDetailsContainerInternalInstance = TDictionary<String, IioWhere>;
@@ -69,7 +69,8 @@ type
   // Where interface
   IioWhere = interface
     ['{CB0292C6-A7A8-4951-A867-D5A5F6D8F053}']
-    function GetWhereItems: IWhereItems;
+    procedure Clear(const AClearWhereDetails: Boolean = True);
+    function GetWhereItems: TWhereItems;
     function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
     function GetSqlWithTrueClass(const AMap:IioMap; const AIsTrueClass:Boolean; const ATrueClass: IioTrueClass): String;
     function GetOrderBySql(const AMap:IioMap): String;
@@ -232,8 +233,8 @@ type
     function GetDetails: IioWhereDetailsContainer;
     property Details:IioWhereDetailsContainer read GetDetails;
     // Items property
-    function GetItems: IWhereItems;
-    property Items: IWhereItems read GetItems;
+    function GetItems: TWhereItems;
+    property Items: TWhereItems read GetItems;
   end;
 
   // Where interface (generic version)

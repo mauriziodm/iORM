@@ -61,7 +61,7 @@ type
     FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
     // Contiene le clausole where specificate fino ad ora
-    FWhereItems: IWhereItems;
+    FWhereItems: TWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
     // e contiene il nome della MasterPropertyName
     FDetailsContainer: IioWhereDetailsContainer;
@@ -85,7 +85,7 @@ type
     // Details property
     function GetDetails: IioWhereDetailsContainer;
     // Items property
-    function GetItems: IWhereItems;
+    function GetItems: TWhereItems;
     // TypeName
     function GetTypeName: String;
     procedure SetTypeName(const Value: String);
@@ -97,7 +97,9 @@ type
     procedure SetTypeInfo(const Value: PTypeInfo);
   public
     constructor Create; reintroduce; overload;
-    function GetWhereItems: IWhereItems;
+    destructor Destroy; override;
+    procedure Clear(const AClearWhereDetails: Boolean = True);
+    function GetWhereItems: TWhereItems;
     function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
     function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
     function GetDisableTrueClass: Boolean;
@@ -246,7 +248,7 @@ type
     procedure DropIndex(const AIndexName: String);
     // ----- Properties -----
     property Details: IioWhereDetailsContainer read GetDetails;
-    property Items: IWhereItems read GetItems;
+    property Items: TWhereItems read GetItems;
     property TypeAlias: String read GetTypeAlias write SetTypeAlias;
     property TypeInfo: PTypeInfo read GetTypeInfo write SetTypeInfo;
     property TypeName: String read GetTypeName write SetTypeName;
@@ -665,6 +667,13 @@ begin
   Self._PropertyOIDEqualsTo(AID);
 end;
 
+procedure TioWhere.Clear(const AClearWhereDetails: Boolean = True);
+begin
+  FWhereItems.Clear;
+  if AClearWhereDetails then
+    FDetailsContainer.Clear;
+end;
+
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
@@ -730,6 +739,12 @@ begin
   TioStrategyFactory.GetStrategy('').Delete(Self);
 end;
 
+destructor TioWhere.Destroy;
+begin
+  FWhereItems.Free;
+  inherited;
+end;
+
 function TioWhere.DisableTrueClass: IioWhere;
 begin
   Result := Self;
@@ -792,7 +807,7 @@ begin
   Result := FDisableTrueClass;
 end;
 
-function TioWhere.GetItems: IWhereItems;
+function TioWhere.GetItems: TWhereItems;
 begin
   Result := FWhereItems;
 end;
@@ -885,7 +900,7 @@ begin
   Result := FTypeName;
 end;
 
-function TioWhere.GetWhereItems: IWhereItems;
+function TioWhere.GetWhereItems: TWhereItems;
 begin
   Result := FWhereItems;
 end;
