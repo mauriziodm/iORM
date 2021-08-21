@@ -3,7 +3,7 @@
         <ProjectGuid>{FF463EAB-8210-49FE-A198-A2E2265A493C}</ProjectGuid>
         <MainSource>iORM_Project_DesignTime.dpk</MainSource>
         <ProjectVersion>19.2</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -67,7 +67,7 @@
         <GenPackage>true</GenPackage>
         <SanitizedProjectName>iORM_Project_DesignTime</SanitizedProjectName>
         <DesignOnlyPackage>true</DesignOnlyPackage>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
@@ -151,6 +151,10 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DesignTime.pas"/>
         <DCCReference Include="..\..\Source\iORM.AbstractionLayer.Framework.DesignTime.pas"/>
+        <DCCReference Include="C:\Users\Mauri\Desktop\NewDataSetDemo\Prova1\FormMain.pas">
+            <Form>MainForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -198,7 +202,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\iORM_Project_DesignTime.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\21.0\Bpl\iORM_Project_DesignTime.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>iORM_Project_DesignTime.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

@@ -44,11 +44,12 @@ interface
 implementation
 
 uses
-  System.Classes, iORM.DB.Components.DataSet.ModelDataSet;
+  System.Classes, iORM.DB.Components.DataSet.ModelDataSet, iORM.DB.Components.DataSet.DataSet;
 
   procedure Register;
   begin
     RegisterComponents('iORM', [TioModelDataSet]);
+    RegisterComponents('iORM', [TioDataSet]);
   end;
 
 end.

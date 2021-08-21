@@ -407,6 +407,7 @@ procedure TioDataSet.InternalPreOpen;
 begin
   if not CheckAdapter(True) then
     raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the BindSourceAdapter');
+  InternalActiveAdapter.Active := True;
   inherited;
 end;
 
@@ -478,10 +479,10 @@ end;
 
 procedure TioDataSet.SetAutoLoadData(const Value: Boolean);
 begin
-  FAsync := Value;
+  FAutoLoadData := Value;
   // Update the adapter
   if CheckAdapter then
-    InternalActiveAdapter.ioAsync := Value;
+    InternalActiveAdapter.ioAutoLoadData := Value;
 end;
 
 procedure TioDataSet.SetAutoPersist(const Value: Boolean);
@@ -503,8 +504,10 @@ end;
 procedure TioDataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   inherited;
+  // Init the BSA
   // Set some properties
   InternalActiveAdapter.ioAsync := FAsync;
+  InternalActiveAdapter.ioAutoPost := FAutoPost;
   InternalActiveAdapter.ioAutoPersist := FAutoPersist;
   InternalActiveAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   InternalActiveAdapter.ioWhere := FWhere;
@@ -601,8 +604,6 @@ begin
     // del Master.
     ForceDetailAdaptersCreation;
   end;
-  // Init the BSA
-  // FBindSourceAdapter.ioAutoPost := FAutoPost;
 end;
 
 procedure TioDataSet._ReceivePropagateCancel(const ASenderBindSource: TioDataSet);
