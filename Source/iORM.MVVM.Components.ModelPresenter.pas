@@ -67,6 +67,8 @@ type
     FOnReceiveSelectionAutoEdit: Boolean;
     FOnReceiveSelectionAutoPost: Boolean;
     FOnReceiveSelectionAutoPersist: Boolean;
+    FOnReceiveSelectionCloneObject: Boolean;
+    FOnReceiveSelectionFreeObject: Boolean;
     // Edit/Insert/Post/Cancel propagation
     FPropagateEdit: Boolean;
     FPropagatePost: Boolean;
@@ -254,9 +256,11 @@ type
     property WhereStr: TStrings read FWhereStr write SetWhereStr;
     // Selectors
     property SelectorFor: TioModelPresenter read FSelectorFor write FSelectorFor;
-    property ioOnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit;
-    property ioOnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost;
-    property ioOnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist;
+    property ioOnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit default False;
+    property ioOnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost default False;
+    property ioOnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist default False;
+    property ioOnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
+    property ioOnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
     // Edit/Insert/Post/Cancel propagation
     property ioPropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
@@ -346,6 +350,8 @@ begin
   FOnReceiveSelectionAutoEdit := False;
   FOnReceiveSelectionAutoPost := False;
   FOnReceiveSelectionAutoPersist := False;
+  FOnReceiveSelectionCloneObject := True;
+  FOnReceiveSelectionFreeObject := True;
   // Edit/Insert/Post/Cancel propagation
   FPropagateEdit := False;
   FPropagatePost := False;
@@ -466,9 +472,16 @@ begin
 end;
 
 procedure TioModelPresenter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+var
+  LPreviousCurrentObj: TObject;
 begin
+  LPreviousCurrentObj := Current;
+  if FOnReceiveSelectionCloneObject then
+    ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
+  if FOnReceiveSelectionFreeObject and (FViewDataType = TioViewDataType.dtSingle) and (LPreviousCurrentObj <> nil) then
+    LPreviousCurrentObj.Free;
 end;
 
 procedure TioModelPresenter.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -720,9 +733,9 @@ var
 begin
   // Some checks
   if not Assigned(FSelectorFor) then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
+    raise EioException.Create(ClassName, 'Select<T>', '"SelectorFor" property not assigned.');
   if not FSelectorFor.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.BindSourceAdapter;
   // Encapsulate the SelectedInstance into a TValue then assign it
@@ -735,7 +748,7 @@ begin
   else if LValue.Kind = TTypeKind.tkClass then
     LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
   else
-    raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
+    raise EioException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
 procedure TioModelPresenter.SelectCurrent(ASelectionType: TioSelectionType);
@@ -744,7 +757,7 @@ var
 begin
   // Some checks
   if not CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'ActiveBindSourceAdapter, not present.');
+    raise EioException.Create(ClassName, 'SelectCurrent', 'ActiveBindSourceAdapter, not present.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.BindSourceAdapter;
   // Make the selection of current
@@ -1060,7 +1073,7 @@ begin
     raise EioException.Create(ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
   // if the TypeName is empty then set it
   if TypeName.IsEmpty then
-    raise EioException.Create(ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
+    raise EioException.Create(ClassName, '_CreateAdapter', 'ModelPresenter.TypeName value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterPresenter) then

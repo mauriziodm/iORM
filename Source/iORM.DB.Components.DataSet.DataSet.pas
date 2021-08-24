@@ -37,6 +37,8 @@ type
     FOnReceiveSelectionAutoEdit: Boolean;
     FOnReceiveSelectionAutoPost: Boolean;
     FOnReceiveSelectionAutoPersist: Boolean;
+    FOnReceiveSelectionCloneObject: Boolean;
+    FOnReceiveSelectionFreeObject: Boolean;
     // Edit/Insert/Post/Cancel propagation
     FPropagateEdit: Boolean;
     FPropagatePost: Boolean;
@@ -127,6 +129,10 @@ type
     procedure PersistAll;
     procedure CancelIfEditing;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
+    function Current: TObject;
+    function CurrentAs<T>: T;
+    procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Propagation
     procedure _ReceivePropagateEdit(const ASenderBindSource: TioDataSet);
     procedure _ReceivePropagatePost(const ASenderBindSource: TioDataSet);
@@ -166,9 +172,11 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // Selectors
     property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor;
-    property OnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit;
-    property OnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost;
-    property OnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist;
+    property OnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit default False;
+    property OnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost default False;
+    property OnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist default False;
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
     // Edit/Insert/Post/Cancel propagation
     property PropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
     property PropagatePost: Boolean read FPropagatePost write FPropagatePost;
@@ -181,7 +189,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Where.Factory, iORM.Exceptions,
-  iORM.LiveBindings.Factory, iORM.Components.Common;
+  iORM.LiveBindings.Factory, iORM.Components.Common, System.Rtti, iORM;
 
 { TioDataSet }
 
@@ -216,6 +224,8 @@ begin
   FOnReceiveSelectionAutoEdit := False;
   FOnReceiveSelectionAutoPost := False;
   FOnReceiveSelectionAutoPersist := False;
+  FOnReceiveSelectionCloneObject := True;
+  FOnReceiveSelectionFreeObject := True;
   // Edit/Insert/Post/Cancel propagation
   FPropagateEdit := False;
   FPropagatePost := False;
@@ -236,11 +246,26 @@ begin
     begin
       if CheckAdapter then
         InternalActiveAdapter.LoadPage;
-    end
-  );
+    end);
   // Set even an onChange event handler (always after the creation of the PageManager)
   FWhereStr := TStringList.Create;
   SetWhereStr(FWhereStr); // set TStringList.onChange event handler
+end;
+
+function TioDataSet.Current: TObject;
+begin
+  if CheckAdapter(True) then
+    Result := InternalActiveAdapter.Current
+  else
+    Result := nil;
+end;
+
+function TioDataSet.CurrentAs<T>: T;
+var
+  LCurrent: TObject;
+begin
+  LCurrent := Self.Current;
+  Result := TioUtilities.CastObjectToGeneric<T>(LCurrent);
 end;
 
 destructor TioDataSet.Destroy;
@@ -251,6 +276,9 @@ begin
     FDetailDatasetContainer.Free;
   // Destroy paging object
   FPaging.Free;
+  // Destroy the internal adapter
+  if InternalActiveAdapter <> nil then
+    InternalActiveAdapter.Free;
   inherited;
 end;
 
@@ -263,8 +291,8 @@ begin
     Edit;
   if FOnReceiveSelectionAutoPost then
     PostIfEditing;
-//##  if FOnReceiveSelectionAutoPersist then
-//##    PersistCurrent;
+  if FOnReceiveSelectionAutoPersist then
+    PersistCurrent;
 end;
 
 procedure TioDataSet.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -274,10 +302,10 @@ begin
   // SelectorAutoEdit/Post/Persist
   if FOnReceiveSelectionAutoEdit then
     Edit;
-//##  if FOnReceiveSelectionAutoPost then
-//##    PostIfEditing;
-//##  if FOnReceiveSelectionAutoPersist then
-//##    PersistCurrent;
+  if FOnReceiveSelectionAutoPost then
+    PostIfEditing;
+  if FOnReceiveSelectionAutoPersist then
+    PersistCurrent;
 end;
 
 procedure TioDataSet.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -303,9 +331,16 @@ begin
 end;
 
 procedure TioDataSet.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+var
+  LPreviousCurrentObj: TObject;
 begin
+  LPreviousCurrentObj := Current;
+  if FOnReceiveSelectionCloneObject then
+    ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
+  if FOnReceiveSelectionFreeObject and (FViewDataType = TioViewDataType.dtSingle) and (LPreviousCurrentObj <> nil) then
+    LPreviousCurrentObj.Free;
 end;
 
 procedure TioDataSet.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -469,6 +504,47 @@ begin
   FDetailDatasetContainer.Add(ADetailDataSet);
 end;
 
+procedure TioDataSet.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
+var
+  LDestBSA: IioActiveBindSourceAdapter;
+  LValue: TValue;
+begin
+  // Some checks
+  if not Assigned(FSelectorFor) then
+    raise EioException.Create(ClassName, 'Select<T>', '"SelectorFor" property not assigned.');
+  if not FSelectorFor.CheckAdapter then
+    raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
+  // Get the selection destination BindSourceAdapter
+  LDestBSA := FSelectorFor.InternalActiveAdapter;
+  // Encapsulate the SelectedInstance into a TValue then assign it
+  // as selection in a proper way
+  // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
+  // facendo cos' invece (cioè passando per un TValue) funziona correttamente.
+  LValue := TValue.From<T>(AInstance);
+  if LValue.Kind = TTypeKind.tkInterface then
+    LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
+  else if LValue.Kind = TTypeKind.tkClass then
+    LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
+  else
+    raise EioException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
+end;
+
+procedure TioDataSet.SelectCurrent(ASelectionType: TioSelectionType);
+var
+  LDestBSA: IioActiveBindSourceAdapter;
+begin
+  // Some checks
+  if not CheckAdapter then
+    raise EioException.Create(ClassName, 'SelectCurrent', 'ActiveBindSourceAdapter, not present.');
+  // Get the selection destination BindSourceAdapter
+  LDestBSA := FSelectorFor.InternalActiveAdapter;
+  // Make the selection of current
+  if LDestBSA.IsInterfaceBSA then
+    Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
+  else
+    Select<TObject>(Current, ASelectionType);
+end;
+
 procedure TioDataSet.SetAsync(const Value: Boolean);
 begin
   FAsync := Value;
@@ -587,12 +663,12 @@ begin
     raise EioException.Create(ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
   // if the TypeName is empty then set it
   if TypeName.IsEmpty then
-    raise EioException.Create(ClassName, 'SetDataObject', 'ModelPresenter.TypeName value is not valid.');
+    raise EioException.Create(ClassName, '_CreateAdapter', 'ModelPresenter.TypeName value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterDataSet) then
     SetInternalAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterDataSet.InternalActiveAdapter, MasterPropertyName))
-  // else create the BSA from TypeName & TypeAlias
+    // else create the BSA from TypeName & TypeAlias
   else
   begin
     // Get the ActiveBindSourceAdapter
