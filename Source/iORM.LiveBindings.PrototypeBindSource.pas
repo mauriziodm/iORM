@@ -68,6 +68,8 @@ type
     FOnReceiveSelectionAutoEdit: Boolean;
     FOnReceiveSelectionAutoPost: Boolean;
     FOnReceiveSelectionAutoPersist: Boolean;
+    FOnReceiveSelectionCloneObject: Boolean;
+    FOnReceiveSelectionFreeObject: Boolean;
     // Edit/Insert/Post/Cancel propagation
     FPropagateEdit: Boolean;
     FPropagatePost: Boolean;
@@ -218,9 +220,11 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // Selectors
     property ioSelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor;
-    property ioOnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit;
-    property ioOnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost;
-    property ioOnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist;
+    property ioOnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit default False;
+    property ioOnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost default False;
+    property ioOnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist default False;
+    property ioOnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
+    property ioOnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
     // Edit/Insert/Post/Cancel propagation
     property ioPropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
@@ -232,7 +236,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.LiveBindings.Factory,
+  iORM, iORM.Exceptions, iORM.LiveBindings.Factory,
   iORM.Where.Factory, iORM.Utilities, iORM.Components.Common, System.Rtti;
 
 { TioPrototypeBindSource }
@@ -336,6 +340,8 @@ begin
   FOnReceiveSelectionAutoEdit := False;
   FOnReceiveSelectionAutoPost := False;
   FOnReceiveSelectionAutoPersist := False;
+  FOnReceiveSelectionCloneObject := True;
+  FOnReceiveSelectionFreeObject := True;
   // Edit/Insert/Post/Cancel propagation
   FPropagateEdit := False;
   FPropagatePost := False;
@@ -456,9 +462,16 @@ begin
 end;
 
 procedure TioPrototypeBindSource.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+var
+  LPreviousCurrentObj: TObject;
 begin
+  LPreviousCurrentObj := Current;
+  if FOnReceiveSelectionCloneObject then
+    ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
+  if FOnReceiveSelectionFreeObject and (FioViewDataType = TioViewDataType.dtSingle) and (LPreviousCurrentObj <> nil) then
+    LPreviousCurrentObj.Free;
 end;
 
 procedure TioPrototypeBindSource.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
