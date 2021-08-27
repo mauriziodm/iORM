@@ -43,9 +43,6 @@ type
     FPropagateEdit: Boolean;
     FPropagatePost: Boolean;
     FPropagatePersist: Boolean;
-    // FLoaded flag for iORM DoCreateAdapter internal use only just before
-    // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
-    FLoaded: Boolean;
     // Questà è una collezione dove eventuali ModelPresenters di dettaglio
     // si registrano per rendere nota la loro esistenza al Master. Sarà poi
     // usata dal Master per fare in modo che, quando viene richiesta la creazione
