@@ -118,6 +118,7 @@ type
     procedure InternalEdit; override;
     procedure InternalInsert; override;
     procedure InternalCancel; override;
+    procedure InternalPost; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -133,6 +134,8 @@ type
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
     function Current: TObject;
     function CurrentAs<T>: T;
+    function CurrentMasterObject: TObject;
+    function CurrentMasterObjectAs<T>: T;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Propagation
@@ -276,6 +279,22 @@ var
 begin
   LCurrent := Self.Current;
   Result := TioUtilities.CastObjectToGeneric<T>(LCurrent);
+end;
+
+function TioDataSet.CurrentMasterObject: TObject;
+begin
+  if CheckAdapter and IsDetail then
+    Result := InternalActiveAdapter.GetMasterBindSourceAdapter.Current
+  else
+    Result := nil;
+end;
+
+function TioDataSet.CurrentMasterObjectAs<T>: T;
+var
+  LMasterObject: TObject;
+begin
+  LMasterObject := Self.CurrentMasterObject;
+  Result := TioUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
 destructor TioDataSet.Destroy;
@@ -438,7 +457,7 @@ end;
 procedure TioDataSet.InternalCancel;
 begin
   inherited;
-  _ReceivePropagateCancel(Self);
+    _ReceivePropagateCancel(Self);
 end;
 
 procedure TioDataSet.InternalEdit;
@@ -451,6 +470,12 @@ procedure TioDataSet.InternalInsert;
 begin
   inherited;
   _ReceivePropagateEdit(Self);
+end;
+
+procedure TioDataSet.InternalPost;
+begin
+  inherited;
+  _ReceivePropagatePost(Self);
 end;
 
 procedure TioDataSet.InternalPreOpen;
