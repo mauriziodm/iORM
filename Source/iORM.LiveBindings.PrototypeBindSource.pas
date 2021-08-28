@@ -127,6 +127,9 @@ type
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
+    // AutoRefreshOnNotificationInProgress
+    procedure SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+    function GetAutoRefreshOnNotificationInProgress: Boolean;
   protected
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
@@ -549,6 +552,11 @@ begin
     Result := FAutoPost;
 end;
 
+function TioPrototypeBindSource.GetAutoRefreshOnNotificationInProgress: Boolean;
+begin
+  // There seems to be no need for this functionality in this component
+end;
+
 function TioPrototypeBindSource.GetCount: Integer;
 begin
   if CheckActiveAdapter then
@@ -824,6 +832,11 @@ begin
   // Update the adapter
   if CheckAdapter then
     Self.InternalAdapter.AutoPost := Value;
+end;
+
+procedure TioPrototypeBindSource.SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+begin
+  // There seems to be no need for this functionality in this component
 end;
 
 procedure TioPrototypeBindSource.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);

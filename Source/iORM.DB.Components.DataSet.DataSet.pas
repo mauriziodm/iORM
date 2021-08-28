@@ -29,6 +29,7 @@ type
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
+    FAutoRefreshOnNotificationInProgress: Boolean;  // Flag indicating that an auto refresh is in progress after receiving an event notification
     FonNotify: TioBSANotificationEvent;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
@@ -71,6 +72,9 @@ type
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
+    // AutoRefreshOnNotificationInProgress
+    procedure SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+    function GetAutoRefreshOnNotificationInProgress: Boolean;
     // Editing
     function GetEditing: Boolean;
     // IsDetail
@@ -124,6 +128,7 @@ type
     procedure PostIfEditing;
     procedure PersistCurrent;
     procedure PersistAll;
+    procedure Cancel; override;
     procedure CancelIfEditing;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
     function Current: TObject;
@@ -190,6 +195,13 @@ uses
 
 { TioDataSet }
 
+procedure TioDataSet.Cancel;
+begin
+  // Flag indicating that an auto refresh is in progress after receiving an event notification
+  if not FAutoRefreshOnNotificationInProgress then
+    inherited;
+end;
+
 procedure TioDataSet.CancelIfEditing;
 begin
   if CheckAdapter and Editing then
@@ -210,6 +222,7 @@ begin
   inherited;
   FAutoPost := False;
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
+  FAutoRefreshOnNotificationInProgress := False; // Flag indicating that an auto refresh is in progress after receiving an event notification
   FAsync := False;
   FAutoLoadData := True;
   FAutoPersist := True;
@@ -361,6 +374,11 @@ begin
     Result := InternalActiveAdapter.ioAutoPost
   else
     Result := FAutoPost;
+end;
+
+function TioDataSet.GetAutoRefreshOnNotificationInProgress: Boolean;
+begin
+  Result := FAutoRefreshOnNotificationInProgress;
 end;
 
 function TioDataSet.GetCount: Integer;
@@ -572,6 +590,11 @@ begin
   // Update the adapter
   if CheckAdapter then
     InternalActiveAdapter.ioAutoPost := Value;
+end;
+
+procedure TioDataSet.SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+begin
+  FAutoRefreshOnNotificationInProgress := AValue;
 end;
 
 procedure TioDataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);

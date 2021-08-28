@@ -61,6 +61,9 @@ type
 
 implementation
 
+uses
+  System.SysUtils;
+
 { TioBSAToDataSetLinkContainer }
 
 constructor TioBSAToDataSetLinkContainer.Create;
@@ -93,12 +96,22 @@ end;
 procedure TioBSAToDataSetLinkContainer.Refresh(const AForce: Boolean);
 var
   LDataSet: TDataSet;
+  LNotifiableBS: IioNotifiableBindSource;
 begin
   if FDisabled and not AForce then
     Exit;
   for LDataSet in FContainer do
     if LDataSet.Active then
-      LDataSet.Refresh;
+    begin
+      if Supports(LDataSet, IioNotifiableBindSource, LNotifiableBS) then
+        LNotifiableBS.AutoRefreshOnNotificationInProgress := True;
+      try
+        LDataSet.Refresh;
+      finally
+        if LNotifiableBS <> nil then
+          LNotifiableBS.AutoRefreshOnNotificationInProgress := False;
+      end;
+    end;
 end;
 
 procedure TioBSAToDataSetLinkContainer.RegisterDataSet(

@@ -78,6 +78,10 @@ type
 
   IioNotifiableBindSource = interface(IioNotifiable)
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
+    // AutoRefreshOnNotificationInProgress
+    procedure SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+    function GetAutoRefreshOnNotificationInProgress: Boolean;
+    property AutoRefreshOnNotificationInProgress: Boolean read GetAutoRefreshOnNotificationInProgress write SetAutoRefreshOnNotificationInProgress;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;

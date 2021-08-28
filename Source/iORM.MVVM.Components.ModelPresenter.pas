@@ -98,6 +98,9 @@ type
     procedure DoNotify(ANotification: IioBSANotification);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     procedure SetAutoLoadData(const Value: Boolean);
+    // AutoRefreshOnNotificationInProgress
+    procedure SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+    function GetAutoRefreshOnNotificationInProgress: Boolean;
   protected
     procedure Loaded; override;
     // Paging
@@ -539,6 +542,11 @@ begin
     Result := Self.BindSourceAdapter.ioAutoPost
   else
     Result := FAutoPost;
+end;
+
+function TioModelPresenter.GetAutoRefreshOnNotificationInProgress: Boolean;
+begin
+  // There seems to be no need for this functionality in this component
 end;
 
 function TioModelPresenter.GetBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -993,6 +1001,11 @@ begin
   // Update the adapter
   if CheckAdapter then
     Self.BindSourceAdapter.ioAutoPost := Value;
+end;
+
+procedure TioModelPresenter.SetAutoRefreshOnNotificationInProgress(const AValue: Boolean);
+begin
+  // There seems to be no need for this functionality in this component
 end;
 
 procedure TioModelPresenter.SetWhere(const AWhere: IioWhere);
