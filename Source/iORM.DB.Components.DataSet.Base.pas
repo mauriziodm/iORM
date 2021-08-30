@@ -994,8 +994,6 @@ procedure TioBSADataSet.RestoreBeforeEditValues;
 var
   LObj: TObject;
 begin
-  // Get the current object
-  LObj := FBindSourceAdapter.Current;
   // restore object status
   // NB: Solo se ci sono state modifiche altrimenti, in alcuni casi, si verificavano
   // delle fastidiose duplicazioni dei dettagli nelle relazioni HasMany dovute al
@@ -1003,7 +1001,10 @@ begin
   // sono state modifiche e questo, unito alla funzionalità di propagazione degli
   // eventi (edit, post, cancel ecc) causava ilproblema.
   if Modified then
+  begin
+    LObj := FBindSourceAdapter.Current;
     om.FromJSON(FBeforeEditValues).TypeAnnotationsON.&To(LObj);
+  end;
 end;
 
 { TSqlTimeStampUtils }
