@@ -125,8 +125,7 @@ type
     // Methods
     procedure SaveBeforeEditValues;
     procedure RestoreBeforeEditValues;
-    procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>;
-      const ANativeFormat: Boolean);
+    procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
     function CheckAdapter: Boolean;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
@@ -500,7 +499,7 @@ end;
 
 function TioBSADataSet.CheckAdapter: Boolean;
 begin
-  Result :=  (FBindSourceAdapter <> nil) and FBindSourceAdapter.CanActivate;
+  Result := (FBindSourceAdapter <> nil) and FBindSourceAdapter.CanActivate;
 end;
 
 function TioBSADataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
@@ -812,8 +811,7 @@ begin
 end;
 
 // Convert and load Data into the buffer (GetFieldData)
-procedure TioBSADataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>;
-  const ANativeFormat: Boolean);
+procedure TioBSADataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
 var
   LTempValueBuffer: TValueBuffer;
 begin
@@ -1000,10 +998,10 @@ begin
   LObj := FBindSourceAdapter.Current;
   // restore object status
   // NB: Solo se ci sono state modifiche altrimenti, in alcuni casi, si verificavano
-  //      delle fastidiose duplicazioni dei dettagli nelle relazioni HasMany dovute al
-  //      al fatto che normalmente TDataSet effettua un cancel automaticamente se non ci
-  //      sono state modifiche e questo, unito alla funzionalità di propagazione degli
-  //      eventi (edit, post, cancel ecc) causava ilproblema.
+  // delle fastidiose duplicazioni dei dettagli nelle relazioni HasMany dovute al
+  // al fatto che normalmente TDataSet effettua un cancel automaticamente se non ci
+  // sono state modifiche e questo, unito alla funzionalità di propagazione degli
+  // eventi (edit, post, cancel ecc) causava ilproblema.
   if Modified then
     om.FromJSON(FBeforeEditValues).TypeAnnotationsON.&To(LObj);
 end;
@@ -1028,8 +1026,8 @@ class function TSqlTimeStampUtils.SqlTimeStampToTValue(const ASqlTimeStamp: TSql
 var
   LDateTime: TDateTime;
 begin
-  LDateTime := EncodeDateTime(ASqlTimeStamp.Year, ASqlTimeStamp.Month, ASqlTimeStamp.Day, ASqlTimeStamp.Hour, ASqlTimeStamp.Minute,
-    ASqlTimeStamp.Second, ASqlTimeStamp.Fractions);
+  LDateTime := EncodeDateTime(ASqlTimeStamp.Year, ASqlTimeStamp.Month, ASqlTimeStamp.Day, ASqlTimeStamp.Hour, ASqlTimeStamp.Minute, ASqlTimeStamp.Second,
+    ASqlTimeStamp.Fractions);
   Result := TValue.From<TDateTime>(LDateTime);
 end;
 
@@ -1251,8 +1249,7 @@ begin
   end;
 end;
 
-class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioContextProperty;
-  AFullPathPropName: String): Boolean;
+class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioContextProperty; AFullPathPropName: String): Boolean;
 var
   LPropName: String;
 begin
@@ -1263,8 +1260,8 @@ begin
   begin
     // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
     if not(AOutProperty.GetRelationType in [ioRtBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne]) then
-      raise EioException.Create(ClassName, '_ResolvePath',
-        Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.', [AOutObj.ClassName, LPropName]));
+      raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
+        [AOutObj.ClassName, LPropName]));
     AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
     // Recursion: If the child object is not assigned, the recursion stops and the function returns false
     if Assigned(AOutObj) then
@@ -1292,8 +1289,7 @@ begin
     LProperty.SetValue(AObj, AValue)
   else
     raise EioException.Create(Self.ClassName, 'SetValue',
-      Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.',
-      [AFullPathPropName]));
+      Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
 end;
 
 end.

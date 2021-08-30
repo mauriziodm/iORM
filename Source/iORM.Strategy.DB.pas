@@ -832,11 +832,14 @@ begin
 end;
 
 class procedure TioStrategyDB.UpdateObject(const AContext: IioContext);
+var
+  LQuery: IioQuery;
 begin
   inherited;
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrrency
   //  conflict (if versioning is enabled for this type of entity)
-  if TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL > 0 then
+  LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
+  if LQuery.ExecSQL > 0 then
     AContext.ObjVersion := AContext.TransactionTimestamp
   else
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);

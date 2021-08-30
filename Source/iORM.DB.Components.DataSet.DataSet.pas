@@ -503,7 +503,9 @@ end;
 
 procedure TioDataSet.PersistCurrent;
 begin
-  if CheckAdapter then
+  if IsDetail and FPropagatePersist then
+    _ReceivePropagatePersistCurrent(Self)
+  else if CheckAdapter then
     InternalActiveAdapter.PersistCurrent;
 end;
 
