@@ -1,5 +1,5 @@
 { *******************************************************************************
-   Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
+  Unit added by Maurizio Del Magno to the ObjectsMappers of Daniele Teti
   ******************************************************************************** }
 
 unit ObjMapper.Engine;
@@ -57,27 +57,27 @@ type
     function GetSerializers: TomSerializersContainer;
     property Serializers: TomSerializersContainer read GetSerializers;
     // ItemsKeyDefaultQualifiedName
-    procedure SetItemsKeyDefaultQualifiedName(const AValue:String);
+    procedure SetItemsKeyDefaultQualifiedName(const AValue: String);
     function GetItemsKeyDefaultQualifiedName: String;
     property ItemsKeyDefaultQualifiedName: String read GetItemsKeyDefaultQualifiedName write SetItemsKeyDefaultQualifiedName;
     // ItemsValueDefaultQualifiedName
-    procedure SetItemsValueDefaultQualifiedName(const AValue:String);
+    procedure SetItemsValueDefaultQualifiedName(const AValue: String);
     function GetItemsValueDefaultQualifiedName: String;
     property ItemsValueDefaultQualifiedName: String read GetItemsValueDefaultQualifiedName write SetItemsValueDefaultQualifiedName;
     // ItemsKeyDefaultTypeInfo
-    procedure SetItemsKeyDefaultTypeInfo(const AValue:PTypeInfo);
+    procedure SetItemsKeyDefaultTypeInfo(const AValue: PTypeInfo);
     function GetItemsKeyDefaultTypeInfo: PTypeInfo;
     property ItemsKeyDefaultTypeInfo: PTypeInfo read GetItemsKeyDefaultTypeInfo write SetItemsKeyDefaultTypeInfo;
     // ItemsValueDefaultTypeInfo
-    procedure SetItemsValueDefaultTypeInfo(const AValue:PTypeInfo);
+    procedure SetItemsValueDefaultTypeInfo(const AValue: PTypeInfo);
     function GetItemsValueDefaultTypeInfo: PTypeInfo;
     property ItemsValueDefaultTypeInfo: PTypeInfo read GetItemsValueDefaultTypeInfo write SetItemsValueDefaultTypeInfo;
     // OwnJSONValue
-    procedure SetOwnJSONValue(const AValue:Boolean);
+    procedure SetOwnJSONValue(const AValue: Boolean);
     function GetOwnJSONValue: Boolean;
     property OwnJSONValue: Boolean read GetOwnJSONValue write SetOwnJSONValue;
     // OwnJSONValue
-    procedure SetClearListBefore(const AValue:Boolean);
+    procedure SetClearListBefore(const AValue: Boolean);
     function GetClearListBefore: Boolean;
     property ClearListBefore: Boolean read GetClearListBefore write SetClearListBefore;
   end;
@@ -96,8 +96,8 @@ type
 
   TomCustomSerializer = class abstract
   public
-    class function Serialize(const AValue:TValue; const AParams:IomParams; var ADone:Boolean): TJSONValue; virtual;
-    class function Deserialize(const AJSONValue:TJSONValue; const AExistingValue:TValue; const AParams:IomParams; var ADone:Boolean): TValue; virtual;
+    class function Serialize(const AValue: TValue; const AParams: IomParams; var ADone: Boolean): TJSONValue; virtual;
+    class function Deserialize(const AJSONValue: TJSONValue; const AExistingValue: TValue; const AParams: IomParams; var ADone: Boolean): TValue; virtual;
   end;
 
   TomSerializersContainer = class
@@ -106,17 +106,17 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure &Register(const ATargetTypeInfo:PTypeInfo; const ASerializer:TomCustomSerializerRef; const AParams:IomParams=nil); overload;
-    procedure &Register(const ATargetClass:TClass; const ASerializer:TomCustomSerializerRef; const AParams:IomParams=nil); overload;
-    procedure &Register<Target>(const ASerializer:TomCustomSerializerRef; const AParams:IomParams=nil); overload;
-    procedure &Register<Target; Serializer:TomCustomSerializer>(const AParams:IomParams=nil); overload;
-    procedure Unregister(const ATargetTypeInfo:PTypeInfo); overload;
-    procedure Unregister(const ATargetClass:TClass); overload;
+    procedure &Register(const ATargetTypeInfo: PTypeInfo; const ASerializer: TomCustomSerializerRef; const AParams: IomParams = nil); overload;
+    procedure &Register(const ATargetClass: TClass; const ASerializer: TomCustomSerializerRef; const AParams: IomParams = nil); overload;
+    procedure &Register<Target>(const ASerializer: TomCustomSerializerRef; const AParams: IomParams = nil); overload;
+    procedure &Register<Target; Serializer: TomCustomSerializer>(const AParams: IomParams = nil); overload;
+    procedure Unregister(const ATargetTypeInfo: PTypeInfo); overload;
+    procedure Unregister(const ATargetClass: TClass); overload;
     procedure Unregister<T>; overload;
-    function _GetSerializerItem(const ATargetTypeInfo:PTypeInfo): IomSerializersContainerItem;
-    function _Exists(const ATargetTypeInfo:PTypeInfo): Boolean;
-    function Exists(const ATargetTypeInfo:PTypeInfo): Boolean; overload;
-    function Exists(const ATargetClass:TClass): Boolean; overload;
+    function _GetSerializerItem(const ATargetTypeInfo: PTypeInfo): IomSerializersContainerItem;
+    function _Exists(const ATargetTypeInfo: PTypeInfo): Boolean;
+    function Exists(const ATargetTypeInfo: PTypeInfo): Boolean; overload;
+    function Exists(const ATargetClass: TClass): Boolean; overload;
     function Exists<T>: Boolean; overload;
   end;
 
@@ -124,23 +124,25 @@ type
   private
     class var ctx: TRttiContext;
     class function IsPropertyToBeIgnored(const APropField: TRttiNamedObject; const AParams: IomParams): Boolean; static;
-    class function HasAttribute<T: class>(const ARTTIMember: TRttiNamedObject): boolean; overload;
-    class function HasAttribute<T: class>(const ARTTIMember: TRttiNamedObject; out AAttribute: T): boolean; overload; static;
-    class function GetKeyName(const ARttiMember: TRttiNamedObject; const AType: TRttiType): string; static;
+    class function HasAttribute<T: class>(const ARTTIMember: TRttiNamedObject): Boolean; overload;
+    class function HasAttribute<T: class>(const ARTTIMember: TRttiNamedObject; out AAttribute: T): Boolean; overload; static;
+    class function GetKeyName(const ARTTIMember: TRttiNamedObject; const AType: TRttiType): string; static;
     class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
-    class function TValueToTObject(const AValue:TValue): TObject;
-    class procedure GetItemsTypeNameIfEmpty(const APropField: TRttiNamedObject; const AParams:IomParams; var AValueTypeName: String); overload; static;
-    class procedure GetItemsTypeNameIfEmpty(const APropField: TRttiNamedObject; const AParams:IomParams; var AKeyTypeName, AValueTypeName: String); overload; static;
+    class function TValueToTObject(const AValue: TValue): TObject;
+    class procedure GetItemsTypeNameIfEmpty(const APropField: TRttiNamedObject; const AParams: IomParams; var AValueTypeName: String); overload; static;
+    class procedure GetItemsTypeNameIfEmpty(const APropField: TRttiNamedObject; const AParams: IomParams; var AKeyTypeName, AValueTypeName: String);
+      overload; static;
   public
     class procedure Initialize; static;
     class function GetCtx: TRttiContext; static;
     class function TypeInfoToRttiType(const ATypeInfo: Pointer): TRttiType; static;
-    class function QualifiedTypeNameToRttiType(const AQualifiedTypeName:String): TRttiType; static;
+    class function QualifiedTypeNameToRttiType(const AQualifiedTypeName: String): TRttiType; static;
     // Parameters
     class function DefaultByProperty: IomParams; static;
     class function DefaultByFields: IomParams; static;
     // Serializers
-    class function SerializePropField(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams; const AEnableCustomSerializers:Boolean=True): TJSONValue; static;
+    class function SerializePropField(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams;
+      const AEnableCustomSerializers: Boolean = True): TJSONValue; static;
     class function SerializeFloat(const AValue: TValue): TJSONValue; static;
     class function SerializeEnumeration(const AValue: TValue): TJSONValue; static;
     class function SerializeInteger(const AValue: TValue): TJSONValue; static;
@@ -150,35 +152,41 @@ type
     class function SerializeInterface(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue; static;
     class function SerializeObject(const AObject: TObject; const AParams: IomParams): TJSONBox; overload; static;
     class function SerializeObject(const AInterfacedObject: IInterface; const AParams: IomParams): TJSONBox; overload; static;
-    class function SerializeObjectList(const AList:TObjectList<TObject>; const AParams: IomParams; AOwnsInstance: boolean; AForEach: TJSONObjectActionProc): TJSONBox; static;
+    class function SerializeObjectList(const AList: TObjectList<TObject>; const AParams: IomParams; AOwnsInstance: Boolean; AForEach: TJSONObjectActionProc)
+      : TJSONBox; static;
     class function SerializeList(const AList: TObject; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue; static;
     class function SerializeTValue(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue; static;
     class function SerializeDictionary(const ADictionary: TObject; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue; static;
-    class function SerializeCustom(AValue:TValue; const APropField: TRttiNamedObject; const AParams: IomParams; out ResultJSONValue:TJSONValue): Boolean; static;
+    class function SerializeCustom(AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams; out ResultJSONValue: TJSONValue)
+      : Boolean; static;
     // Deserializers
-    class function DeserializePropField(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; const AMasterObj: TObject; const AParams: IomParams): TValue; static;
+    class function DeserializePropField(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject;
+      const AMasterObj: TObject; const AParams: IomParams): TValue; static;
     class function DeserializeFloat(const AJSONValue: TJSONValue; const AValueType: TRttiType): TValue; static;
     class function DeserializeEnumeration(const AJSONValue: TJSONValue; const AValueType: TRttiType): TValue; static;
     class function DeserializeInteger(const AJSONValue: TJSONValue): TValue; static;
     class function DeserializeString(const AJSONValue: TJSONValue): TValue; static;
     class function DeserializeRecord(const AJSONValue: TJSONValue; const AValueType: TRttiType; const AParams: IomParams): TValue; static;
-    class procedure DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams); static;
-    class function DeserializeClass(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject; const AParams: IomParams): TValue; static;
-    class function DeserializeInterface(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject; const AParams: IomParams): TValue; static;
+    class procedure DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
+      const AParams: IomParams); static;
+    class function DeserializeClass(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject;
+      const AParams: IomParams): TValue; static;
+    class function DeserializeInterface(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject;
+      const AParams: IomParams): TValue; static;
     class function DeserializeObjectByClass(const AJSONBox: TJSONBox; const AClassName: String; const AParams: IomParams): TObject; static;
-    class function DeserializeObject(const AJSONBox: TJSONBox; AObject:TObject; const AParams: IomParams): TObject; static;
+    class function DeserializeObject(const AJSONBox: TJSONBox; AObject: TObject; const AParams: IomParams): TObject; static;
     class procedure DeserializeObjectList<T: class, constructor>(const AJSONBox: TJSONBox; AList: TObjectList<T>; const AParams: IomParams); static;
     class function DeserializeList(AList: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams): TValue; static;
     class function DeserializeTValue(const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams): TValue; static;
-    class function DeserializeDictionary(ADictionary: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams): TValue; static;
-    class function DeserializeCustom(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; const AMasterObj: TObject; const AParams: IomParams; out ResultValue:TValue): Boolean; static;
+    class function DeserializeDictionary(ADictionary: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams)
+      : TValue; static;
+    class function DeserializeCustom(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; const AMasterObj: TObject;
+      const AParams: IomParams; out ResultValue: TValue): Boolean; static;
   end;
 
   EMapperException = class(Exception)
 
   end;
-
-
 
 function ISODateTimeToString(ADateTime: TDateTime): string;
 function ISODateToString(ADate: TDateTime): string;
@@ -200,7 +208,6 @@ uses
   ObjMapper.RTTIUtils, ObjMapper.Attributes, System.DateUtils, ObjMapper.DuckDictionary,
   iORM.Utilities;
 
-
 type
 
   TomSerializersContainerItem = class(TInterfacedObject, IomSerializersContainerItem)
@@ -213,7 +220,7 @@ type
     function GetParams: IomParams;
     procedure SetParams(const Value: IomParams);
   public
-    constructor Create(const ASerializer:TomCustomSerializerRef; const AParams:IomParams); overload;
+    constructor Create(const ASerializer: TomCustomSerializerRef; const AParams: IomParams); overload;
     property Serializer: TomCustomSerializerRef read GetSerializer write SetSerializer;
     property Params: IomParams read GetParams write SetParams;
   end;
@@ -248,28 +255,27 @@ type
     // Serializers
     function GetSerializers: TomSerializersContainer;
     // ItemsKeyDefaultQualifiedName
-    procedure SetItemsKeyDefaultQualifiedName(const AValue:String);
+    procedure SetItemsKeyDefaultQualifiedName(const AValue: String);
     function GetItemsKeyDefaultQualifiedName: String;
     // ItemsValueDefaultQualifiedName
-    procedure SetItemsValueDefaultQualifiedName(const AValue:String);
+    procedure SetItemsValueDefaultQualifiedName(const AValue: String);
     function GetItemsValueDefaultQualifiedName: String;
     // ItemsKeyDefaultTypeInfo
-    procedure SetItemsKeyDefaultTypeInfo(const AValue:PTypeInfo);
+    procedure SetItemsKeyDefaultTypeInfo(const AValue: PTypeInfo);
     function GetItemsKeyDefaultTypeInfo: PTypeInfo;
     // ItemsValueDefaultTypeInfo
-    procedure SetItemsValueDefaultTypeInfo(const AValue:PTypeInfo);
+    procedure SetItemsValueDefaultTypeInfo(const AValue: PTypeInfo);
     function GetItemsValueDefaultTypeInfo: PTypeInfo;
     // OwnJSONValue
-    procedure SetOwnJSONValue(const AValue:Boolean);
+    procedure SetOwnJSONValue(const AValue: Boolean);
     function GetOwnJSONValue: Boolean;
     // OwnJSONValue
-    procedure SetClearListBefore(const AValue:Boolean);
+    procedure SetClearListBefore(const AValue: Boolean);
     function GetClearListBefore: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
   end;
-
 
 function ISOTimeToString(ATime: TTime): string;
 var
@@ -294,22 +300,18 @@ end;
 
 function ISOStrToDateTime(DateTimeAsString: string): TDateTime;
 begin
-  Result := EncodeDateTime(StrToInt(Copy(DateTimeAsString, 1, 4)),
-    StrToInt(Copy(DateTimeAsString, 6, 2)), StrToInt(Copy(DateTimeAsString, 9, 2)),
-    StrToInt(Copy(DateTimeAsString, 12, 2)), StrToInt(Copy(DateTimeAsString, 15, 2)),
-    StrToInt(Copy(DateTimeAsString, 18, 2)), 0);
+  Result := EncodeDateTime(StrToInt(Copy(DateTimeAsString, 1, 4)), StrToInt(Copy(DateTimeAsString, 6, 2)), StrToInt(Copy(DateTimeAsString, 9, 2)),
+    StrToInt(Copy(DateTimeAsString, 12, 2)), StrToInt(Copy(DateTimeAsString, 15, 2)), StrToInt(Copy(DateTimeAsString, 18, 2)), 0);
 end;
 
 function ISOStrToTime(TimeAsString: string): TTime;
 begin
-  Result := EncodeTime(StrToInt(Copy(TimeAsString, 1, 2)), StrToInt(Copy(TimeAsString, 4, 2)),
-    StrToInt(Copy(TimeAsString, 7, 2)), 0);
+  Result := EncodeTime(StrToInt(Copy(TimeAsString, 1, 2)), StrToInt(Copy(TimeAsString, 4, 2)), StrToInt(Copy(TimeAsString, 7, 2)), 0);
 end;
 
 function ISOStrToDate(DateAsString: string): TDate;
 begin
-  Result := EncodeDate(StrToInt(Copy(DateAsString, 1, 4)), StrToInt(Copy(DateAsString, 6, 2)),
-    StrToInt(Copy(DateAsString, 9, 2)));
+  Result := EncodeDate(StrToInt(Copy(DateAsString, 1, 4)), StrToInt(Copy(DateAsString, 6, 2)), StrToInt(Copy(DateAsString, 9, 2)));
   // , StrToInt
   // (Copy(DateAsString, 12, 2)), StrToInt(Copy(DateAsString, 15, 2)),
   // StrToInt(Copy(DateAsString, 18, 2)), 0);
@@ -325,7 +327,6 @@ end;
 // begin
 // Result := FormatDateTime('HH:nn:ss', ATime);
 // end;
-
 
 { Serializer }
 
@@ -345,40 +346,40 @@ begin
   Result.TypeAnnotations := False;
 end;
 
-class function omEngine.DeserializeClass(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject;
-  AMasterObj: TObject; const AParams: IomParams): TValue;
+class function omEngine.DeserializeClass(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject;
+  const AParams: IomParams): TValue;
 var
   LChildObj: TObject;
 begin
   // Init
   LChildObj := nil;
   // If the Property/Field is valid then try to get the value (Object) from the
-  //  master object else the MasterObject itself is the destination of the deserialization
+  // master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
     if TDuckPropField.IsValidPropField(APropField) then
-      LChildObj := TioUtilities.TValueToObject(   TDuckPropField.GetValue(AMasterObj, APropField)   )
+      LChildObj := TioUtilities.TValueToObject(TDuckPropField.GetValue(AMasterObj, APropField))
     else
       LChildObj := AMasterObj;
   // If the LChildObj is not assigned and the AValueType is assigned then
-  //  create the LChildObj of the type specified by the AValueType parameter,
-  //  PS: normally used by DeserializeList or other collection deserialization
+  // create the LChildObj of the type specified by the AValueType parameter,
+  // PS: normally used by DeserializeList or other collection deserialization
   if Assigned(AValueType) and (not Assigned(LChildObj)) then // and (not AParams.TypeAnnotations) then
     LChildObj := TRTTIUtils.CreateObject(AValueType.QualifiedName);
   // Deserialize
   DeserializeClassCommon(LChildObj, AJSONValue, APropField, AParams);
   // Make the result TValue
-  //  NB: If the MasterObj is assigned return an empty TValue because if the
-  //       deserialized object is a detail of a MasterObject the creation of the
-  //       child object is responsibility of the Master object itself, so the
-  //       child object is already assigned to the master object property.
+  // NB: If the MasterObj is assigned return an empty TValue because if the
+  // deserialized object is a detail of a MasterObject the creation of the
+  // child object is responsibility of the Master object itself, so the
+  // child object is already assigned to the master object property.
   if Assigned(AMasterObj) then
     Result := TValue.Empty
   else
     TValue.Make(@LChildObj, LChildObj.ClassInfo, Result);
 end;
 
-class procedure omEngine.DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue;
-  const APropField: TRttiNamedObject; const AParams: IomParams);
+class procedure omEngine.DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
+  const AParams: IomParams);
 var
   _attrser: MapperSerializeAsString;
   SerStreamASString: string;
@@ -388,11 +389,11 @@ var
   MS: TMemoryStream;
   wObj: IWrappedObject;
 begin
-  if not Assigned(AJSONValue) then   // JSONKey not present
+  if not Assigned(AJSONValue) then // JSONKey not present
   begin
-//    if Assigned(AChildObj) then   // WHY???
-//      FreeAndNil(AChildObj);      // WHY???
-      Exit;
+    // if Assigned(AChildObj) then   // WHY???
+    // FreeAndNil(AChildObj);      // WHY???
+    Exit;
   end;
 
   // ---------- Stream ----------
@@ -447,7 +448,7 @@ begin
   else if Assigned(AChildObj) and (HasAttribute<StreamableAttribute>(APropField)) then
   begin
     SerStreamASString := (AJSONValue as TJSONString).Value;
-    SS := TSTringStream.Create;
+    SS := TStringStream.Create;
     MS := TMemoryStream.Create;
     try
       SS.WriteString(SerStreamASString);
@@ -478,10 +479,8 @@ begin
   // ---------- End Other type of object ----------
 end;
 
-class function omEngine.DeserializeCustom(const AJSONValue: TJSONValue;
-  const AValueType: TRttiType; const APropField: TRttiNamedObject;
-  const AMasterObj: TObject; const AParams: IomParams;
-  out ResultValue: TValue): Boolean;
+class function omEngine.DeserializeCustom(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject;
+  const AMasterObj: TObject; const AParams: IomParams; out ResultValue: TValue): Boolean;
 var
   LSerializerItem: IomSerializersContainerItem;
   LSerializer: TomCustomSerializerRef;
@@ -494,7 +493,8 @@ var
   LTypeJSONValue: TJSONValue;
   LJSONValue: TJSONValue;
   LObj: TObject;
-  function DeserializeCustomByInternalClassMethod(const AJSONValue:TJSONValue; const AValueType:TRttiType; const AExistingValue:TValue; out ResultValue: TValue): Boolean;
+  function DeserializeCustomByInternalClassMethod(const AJSONValue: TJSONValue; const AValueType: TRttiType; const AExistingValue: TValue;
+    out ResultValue: TValue): Boolean;
   var
     LMethod: TRttiMethod;
     LObj: TObject;
@@ -516,6 +516,7 @@ var
     LMethod.Invoke(LObj, [AJSONValue]);
     Result := True;
   end;
+
 begin
   // Init
   Result := True;
@@ -528,19 +529,20 @@ begin
   if not AParams.EnableCustomSerializers then
     Exit(False);
   // If the Property/Field is valid then try to get the value (Object) from the
-  //  master object else the MasterObject itself is the destination of the deserialization
+  // master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
     if TDuckPropField.IsValidPropField(APropField) then
       LExistingValue := TDuckPropField.GetValue(AMasterObj, APropField)
     else
       TValue.Make(@AMasterObj, AMasterObj.ClassInfo, LExistingValue);
   // Check if a value type is embedded in the JSON and extract it (if exists)
-  //  else use the received value type.
-  //  If the value type is embedded in the JSON (TypeAnnotations = True) then extract
-  //   then contained value too as JSONValue and pass it to the custom serializer
+  // else use the received value type.
+  // If the value type is embedded in the JSON (TypeAnnotations = True) then extract
+  // then contained value too as JSONValue and pass it to the custom serializer
   LValueType := AValueType;
   LJSONValue := AJSONValue;
-  if (AJSONValue is TJSONObject) then begin
+  if (AJSONValue is TJSONObject) then
+  begin
     // Retrieve the value type if embedded in JSON
     LTypeJSONValue := TJSONObject(AJSONValue).GetValue(DMVC_TYPENAME);
     if Assigned(LTypeJSONValue) then
@@ -552,49 +554,41 @@ begin
   end;
   // ---------- Custom serialization method in the class ----------
   // If the Value is an Interface type then convert it to real object class
-  //  type implementing the interface
+  // type implementing the interface
   if (LValueType.TypeKind = tkInterface) and not LExistingValue.IsEmpty then
   begin
     LObj := LExistingValue.AsInterface as TObject;
     TValue.Make(@LObj, LObj.ClassInfo, LExistingValue);
   end;
   // If the value is an object and a Serializer method is present directly in the class
-  if (LValueType.TypeKind = tkClass)
-  and DeserializeCustomByInternalClassMethod(LJSONValue, LValueType, LExistingValue, ResultValue)
-  then
+  if (LValueType.TypeKind = tkClass) and DeserializeCustomByInternalClassMethod(LJSONValue, LValueType, LExistingValue, ResultValue) then
     LDone := True
   else
-  // ---------- End: Custom serialization method in the class ----------
-  // Get custom serializer if exists
-  if AParams.Serializers._Exists(LValueType.Handle) then
-  begin
-    LSerializerItem := AParams.Serializers._GetSerializerItem(LValueType.Handle);
-    LSerializer := LSerializerItem.Serializer;
-    // Get the custom Params
-    if Assigned(LSerializerItem.Params) then
-      LParams := LSerializerItem.Params;
-  end
-  else
-  if HasAttribute<MapperCustomSerializer>(TypeInfoToRttiType(LValueType.Handle), LMapperCustomSerializer) then
-    LSerializer := LMapperCustomSerializer.Serializer
-  else
-    Exit(False);
+    // ---------- End: Custom serialization method in the class ----------
+    // Get custom serializer if exists
+    if AParams.Serializers._Exists(LValueType.Handle) then
+    begin
+      LSerializerItem := AParams.Serializers._GetSerializerItem(LValueType.Handle);
+      LSerializer := LSerializerItem.Serializer;
+      // Get the custom Params
+      if Assigned(LSerializerItem.Params) then
+        LParams := LSerializerItem.Params;
+    end
+    else if HasAttribute<MapperCustomSerializer>(TypeInfoToRttiType(LValueType.Handle), LMapperCustomSerializer) then
+      LSerializer := LMapperCustomSerializer.Serializer
+    else
+      Exit(False);
   // Serialize (if a custom serializer exists)
   if Assigned(LSerializer) then
-    ResultValue := LSerializer.Deserialize(
-      LJSONValue,
-      LExistingValue,
-      LParams,
-      LDone
-      );
+    ResultValue := LSerializer.Deserialize(LJSONValue, LExistingValue, LParams, LDone);
   // if the work has not been done by the custom serializer then
-  //  call the standard serializers with custom params (if exists)
+  // call the standard serializers with custom params (if exists)
   if not LDone then
     ResultValue := DeserializePropField(LJSONValue, LValueType, APropField, AMasterObj, AParams);
 end;
 
-class function omEngine.DeserializeDictionary(ADictionary: TObject; const AJSONValue: TJSONValue;
-  const APropField: TRttiNamedObject; const AParams: IomParams): TValue;
+class function omEngine.DeserializeDictionary(ADictionary: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
+  const AParams: IomParams): TValue;
 var
   LDuckDictionary: IWrappedDictionary;
   LKeyQualifiedTypeName, LValueQualifiedTypeName, LDictionaryTypeName: String;
@@ -605,21 +599,21 @@ var
   LKey, LValue: TValue;
   I: Integer;
 begin
-  result := nil;
+  Result := nil;
   LKeyJSONValue := nil;
   LValueJSONValue := nil;
   // If JSONValue not assigned
   if (AJSONValue is TJSONNull) or not Assigned(AJSONValue) then
     Exit(TValue.Empty);
   // Defaults
-  LDictionaryTypeName     := '';
-  LKeyQualifiedTypeName   := '';
+  LDictionaryTypeName := '';
+  LKeyQualifiedTypeName := '';
   LValueQualifiedTypeName := '';
   // If AUseClassName is true then get the "items" JSONArray containing che containing the list items
-  //  else AJSONValue is the JSONArray containing che containing the list items
+  // else AJSONValue is the JSONArray containing che containing the list items
   if AParams.TypeAnnotations then
   begin
-    if not (AJSONValue is TJSONObject) then
+    if not(AJSONValue is TJSONObject) then
       raise EMapperException.Create('Wrong serialization for ' + ADictionary.QualifiedClassName);
     LJObj := AJSONValue as TJSONObject;
     // Get the Dictionary class
@@ -643,13 +637,13 @@ begin
   else
     LJSONValue := AJSONValue;
   // Check and extract the JSONArray
-  if not (LJSONValue is TJSONArray) then
+  if not(LJSONValue is TJSONArray) then
     raise EMapperException.Create('Cannot restore the dictionary because the related JSONValue is not an array');
   LJSONArray := TJSONArray(LJSONValue);
   // Get values RttiType, if the RttiType is not found then check for
-  //  "MapperItemsClassType"  or "MapperItemsType" attribute
+  // "MapperItemsClassType"  or "MapperItemsType" attribute
   GetItemsTypeNameIfEmpty(APropField, AParams, LKeyQualifiedTypeName, LValueQualifiedTypeName);
-  LKeyRttiType   := QualifiedTypeNameToRttiType(LKeyQualifiedTypeName);
+  LKeyRttiType := QualifiedTypeNameToRttiType(LKeyQualifiedTypeName);
   LValueRTTIType := QualifiedTypeNameToRttiType(LValueQualifiedTypeName);
   if LJSONArray.Count > 0 then
   begin
@@ -667,20 +661,20 @@ begin
     // Get the key anche value JSONValue
     case AParams.SerializationMode of
       smJavaScript:
-      begin
-        // Key can be any value (string, objects etc).
-        LKeyJSONValue   := TJSONObject.ParseJSONValue(   LJObj.Pairs[0].JsonString.ToJSON   );
-        LValueJSONValue := LJObj.Pairs[0].JsonValue;
-      end;
+        begin
+          // Key can be any value (string, objects etc).
+          LKeyJSONValue := TJSONObject.ParseJSONValue(LJObj.Pairs[0].JsonString.ToJSON);
+          LValueJSONValue := LJObj.Pairs[0].JsonValue;
+        end;
       smDataContract:
-      begin
-        LKeyJSONValue   := LJObj.GetValue(DMVC_KEY);
-        LValueJSONValue := LJObj.GetValue(DMVC_VALUE);
-      end;
+        begin
+          LKeyJSONValue := LJObj.GetValue(DMVC_KEY);
+          LValueJSONValue := LJObj.GetValue(DMVC_VALUE);
+        end;
     end;
     // Deserialization key and value
-    LKey   := DeserializePropField(LKeyJSONValue, LKeyRttiType, APropField, nil, AParams);
-    LValue := DeserializePropField(LValueJSONValue, LValueRttiType, APropField, nil, AParams);
+    LKey := DeserializePropField(LKeyJSONValue, LKeyRttiType, APropField, nil, AParams);
+    LValue := DeserializePropField(LValueJSONValue, LValueRTTIType, APropField, nil, AParams);
     // Add to the dictionary
     LDuckDictionary.Add(LKey, LValue);
   end;
@@ -690,15 +684,15 @@ end;
 
 class function omEngine.DeserializeEnumeration(const AJSONValue: TJSONValue; const AValueType: TRttiType): TValue;
 begin
-//  if not Assigned(AJSONValue) then   // JSONKey not present
-//    raise EMapperException.Create(APropField.Name + ' key field is not present in the JSONObject');
+  // if not Assigned(AJSONValue) then   // JSONKey not present
+  // raise EMapperException.Create(APropField.Name + ' key field is not present in the JSONObject');
 
   if AValueType.QualifiedName = 'System.Boolean' then
   begin
     if AJSONValue is TJSONTrue then
-       Result := True
+      Result := True
     else if AJSONValue is TJSONFalse then
-       Result := False
+      Result := False
     else
       raise EMapperException.Create('Invalid value for boolean value ');
   end
@@ -710,7 +704,7 @@ class function omEngine.DeserializeFloat(const AJSONValue: TJSONValue; const AVa
 var
   LQualifiedTypeName: String;
 begin
-  if not Assigned(AJSONValue) then   // JSONKey not present
+  if not Assigned(AJSONValue) then // JSONKey not present
     Result := 0
   else
   begin
@@ -734,30 +728,27 @@ begin
       if AJSONValue is TJSONString then
         Result := TValue.From<TTime>(ISOStrToTime(AJSONValue.Value))
       else
-        raise EMapperException.CreateFmt('Cannot deserialize TTime value, expected [%s] got [%s]',
-          ['TJSONString', AJSONValue.ClassName]);
+        raise EMapperException.CreateFmt('Cannot deserialize TTime value, expected [%s] got [%s]', ['TJSONString', AJSONValue.ClassName]);
     end
     else { if APropFieldRttiType.QualifiedName = 'System.Currency' then }
     begin
       if AJSONValue is TJSONNumber then
         Result := TJSONNumber(AJSONValue).AsDouble
       else
-        raise EMapperException.CreateFmt('Cannot deserialize float value, expected [%s] got [%s]',
-          ['TJSONNumber', AJSONValue.ClassName]);
+        raise EMapperException.CreateFmt('Cannot deserialize float value, expected [%s] got [%s]', ['TJSONNumber', AJSONValue.ClassName]);
     end;
   end;
 end;
 
 class function omEngine.DeserializeInteger(const AJSONValue: TJSONValue): TValue;
 begin
-  if not Assigned(AJSONValue) then  // JSONKey not present
+  if not Assigned(AJSONValue) then // JSONKey not present
     Result := 0
   else
     Result := StrToIntDef(AJSONValue.Value, 0);
 end;
 
-class function omEngine.DeserializeInterface(const AJSONValue: TJSONValue; const AValueType: TRttiType;
-  const APropField: TRttiNamedObject; AMasterObj: TObject;
+class function omEngine.DeserializeInterface(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject;
   const AParams: IomParams): TValue;
 var
   LChildObj: TObject;
@@ -766,32 +757,31 @@ begin
   // Init
   LChildObj := nil;
   // If the Property/Field is valid then try to get the value (Object) from the
-  //  master object else the MasterObject itself is the destination of the deserialization
+  // master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
     if TDuckPropField.IsValidPropField(APropField) then
       LChildObj := TValueToTObject(TDuckPropField.GetValue(AMasterObj, APropField))
     else
       LChildObj := AMasterObj;
   // If the LChildObj is not assigned and the AValueType is assigned then
-  //  create the LChildObj of the type specified by the AValueType parameter,
-  //  PS: normally used by DeserializeList or other collection deserialization
+  // create the LChildObj of the type specified by the AValueType parameter,
+  // PS: normally used by DeserializeList or other collection deserialization
   if Assigned(AValueType) and (not Assigned(LChildObj)) and (not AParams.TypeAnnotations) then
     LChildObj := TRTTIUtils.CreateObject(AValueType.QualifiedName);
   // Deserialize
   DeserializeClassCommon(LChildObj, AJSONValue, APropField, AParams);
   // Make the result TValue
-  //  NB: If the MasterObj is assigned return an empty TValue because if the
-  //       deserialized object is a detail of a MasterObject the creation of the
-  //       child object is responsibility of the Master object itself, so the
-  //       child object is already assigned to the master object property.
+  // NB: If the MasterObj is assigned return an empty TValue because if the
+  // deserialized object is a detail of a MasterObject the creation of the
+  // child object is responsibility of the Master object itself, so the
+  // child object is already assigned to the master object property.
   if Assigned(AMasterObj) then
     Result := TValue.Empty
   else
     TValue.Make(@LChildObj, LChildObj.ClassInfo, Result);
 end;
 
-class function omEngine.DeserializeList(AList: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
-  const AParams: IomParams): TValue;
+class function omEngine.DeserializeList(AList: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams): TValue;
 var
   LListTypeName, LValueQualifiedTypeName: String;
   LJObj: TJSONObject;
@@ -806,14 +796,14 @@ begin
   if not Assigned(AJSONValue) then
     Exit(TValue.Empty);
   // Defaults
-//  LValueRTTIType          := nil;
-  LListTypeName           := '';
+  // LValueRTTIType          := nil;
+  LListTypeName := '';
   LValueQualifiedTypeName := '';
   // If AUseClassName is true then get the "items" JSONArray containing che containing the list items
-  //  else AJSONValue is the JSONArray containing che containing the list items
+  // else AJSONValue is the JSONArray containing che containing the list items
   if AParams.TypeAnnotations then
   begin
-    if not (AJSONValue is TJSONObject) then
+    if not(AJSONValue is TJSONObject) then
       raise EMapperException.Create('Wrong serialization for ' + AList.QualifiedClassName);
     LJObj := AJSONValue as TJSONObject;
     // Get the collection class
@@ -833,11 +823,11 @@ begin
   else
     LJSONValue := AJSONValue;
   // Check and extract the JSONArray
-  if not (LJSONValue is TJSONArray) then
+  if not(LJSONValue is TJSONArray) then
     raise EMapperException.Create('Cannot restore the list because the related JSONValue is not an array');
   LJSONArray := TJSONArray(LJSONValue);
   // Get values RttiType, if the RttiType is not found then check for
-  //  "MapperItemsClassType"  or "MapperItemsType" attribute or from PARAMS
+  // "MapperItemsClassType"  or "MapperItemsType" attribute or from PARAMS
   GetItemsTypeNameIfEmpty(APropField, AParams, LValueQualifiedTypeName);
   LValueRTTIType := QualifiedTypeNameToRttiType(LValueQualifiedTypeName);
   if (not Assigned(LValueRTTIType)) and (LJSONArray.Count > 0) then
@@ -853,7 +843,7 @@ begin
     // Extract the current element
     LValueJSONValue := LJSONArray.Items[I];
     // Deserialize the current element
-    LValue := DeserializePropField(LValueJSONValue, LValueRttiType, APropField, nil, AParams);
+    LValue := DeserializePropField(LValueJSONValue, LValueRTTIType, APropField, nil, AParams);
     // Add to the list
     LDuckList.AddValue(LValue);
   end;
@@ -871,13 +861,13 @@ begin
   // Init                      \
   Result := TValue.Empty;
   // Determina il ValueType del valore/oggetto corrente
-  //  NB: If TypeAnnotations is enabled and a TypeAnnotation is present in the AJSONValue for the current
-  //  value/object then load and use it as AValueType
-  //  NB: Ho aggiunto questa parte perchè altrimenti in caso di una lista di interfacce (es: TList<IPerson>)
-  //  NB. Se alla fine del blocco non trova un ValueTypeValido allora usa quello ricevuto come parametro
+  // NB: If TypeAnnotations is enabled and a TypeAnnotation is present in the AJSONValue for the current
+  // value/object then load and use it as AValueType
+  // NB: Ho aggiunto questa parte perchè altrimenti in caso di una lista di interfacce (es: TList<IPerson>)
+  // NB. Se alla fine del blocco non trova un ValueTypeValido allora usa quello ricevuto come parametro
   LValueType := nil;
   if AParams.TypeAnnotations and (AJSONValue is TJSONObject) and (AValueType.Name <> 'TValue') then
-//  if AParams.TypeAnnotations and (AJSONValue is TJSONObject) then
+  // if AParams.TypeAnnotations and (AJSONValue is TJSONObject) then
   begin
     // Get the value type name
     LJSONValue := TJSONObject(AJSONValue).GetValue(DMVC_TYPENAME);
@@ -887,7 +877,7 @@ begin
       LValueType := QualifiedTypeNameToRttiType(LValueQualifiedTypeName);
     end;
   end;
- if not Assigned(LValueType) then
+  if not Assigned(LValueType) then
     LValueType := AValueType;
   // If a custom serializer exists for the current type then use it
   if DeserializeCustom(AJSONValue, LValueType, APropField, AMasterObj, AParams, Result) then
@@ -905,21 +895,9 @@ begin
     tkRecord:
       Result := DeserializeRecord(AJSONValue, LValueType, AParams);
     tkClass:
-      Result := DeserializeClass(
-        AJSONValue,
-        LValueType,
-        APropField,
-        AMasterObj,
-        AParams
-        );
+      Result := DeserializeClass(AJSONValue, LValueType, APropField, AMasterObj, AParams);
     tkInterface:
-      Result := DeserializeInterface(
-        AJSONValue,
-        LValueType,
-        APropField,
-        AMasterObj,
-        AParams
-        );
+      Result := DeserializeInterface(AJSONValue, LValueType, APropField, AMasterObj, AParams);
   end;
 end;
 
@@ -931,10 +909,10 @@ begin
   // TTimeStamp
   if LQualifiedTypeName = 'System.SysUtils.TTimeStamp' then
   begin
-    if not Assigned(AJSONValue) then  // JSONKey not present
+    if not Assigned(AJSONValue) then // JSONKey not present
       Result := TValue.From<TTimeStamp>(MSecsToTimeStamp(0))
     else
-      Result := TValue.From<TTimeStamp>(MSecsToTimeStamp(   (AJSONValue as TJSONNumber).AsInt64   ));
+      Result := TValue.From<TTimeStamp>(MSecsToTimeStamp((AJSONValue as TJSONNumber).AsInt64));
   end
   // TValue
   else if LQualifiedTypeName = 'System.Rtti.TValue' then
@@ -945,20 +923,20 @@ end;
 
 class function omEngine.DeserializeString(const AJSONValue: TJSONValue): TValue;
 begin
-  if not Assigned(AJSONValue) then  // JSONKey not present
+  if not Assigned(AJSONValue) then // JSONKey not present
     Result := ''
   else
     Result := AJSONValue.Value;
 end;
 
-class function omEngine.DeserializeTValue(const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams:IomParams): TValue;
+class function omEngine.DeserializeTValue(const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IomParams): TValue;
 var
   LJObj: TJSONObject;
   LValueQualifiedTypeName: String;
   LValueRTTIType: TRttiType;
   LJSONValue: TJSONValue;
-//  LObj: TObject;
-//  LIntf: IInterface;
+  // LObj: TObject;
+  // LIntf: IInterface;
 begin
   // Defaults
   LValueQualifiedTypeName := '';
@@ -966,10 +944,10 @@ begin
   if not Assigned(AJSONValue) then
     Exit(TValue.Empty);
   // If AUseClassName is true then get the "items" JSONArray containing che containing the list items
-  //  else AJSONValue is the JSONArray containing che containing the list items
+  // else AJSONValue is the JSONArray containing che containing the list items
   if AParams.TypeAnnotations then
   begin
-    if not (AJSONValue is TJSONObject) then
+    if not(AJSONValue is TJSONObject) then
       raise EMapperException.Create('Wrong serialization for TValue');
     // Extract the JSONObject from the received JSONValue
     LJObj := (AJSONValue as TJSONObject);
@@ -983,28 +961,25 @@ begin
   else
     LJSONValue := AJSONValue;
   // Get values RttiType, if the RttiType is not found then check for
-  //  "MapperItemsClassType"  or "MapperItemsType" attribute
+  // "MapperItemsClassType"  or "MapperItemsType" attribute
   GetItemsTypeNameIfEmpty(APropField, AParams, LValueQualifiedTypeName);
   LValueRTTIType := QualifiedTypeNameToRttiType(LValueQualifiedTypeName);
   if not Assigned(LValueRTTIType) then
     raise EMapperException.Create('Value type not found deserializing a TValue');
   // Durante la serializzazione del TVAlue, se questo conteneva un oggetto/interfaccia
-  //  il serializzatore lo ha serializzato con il parametro "AUSeClassName = False" perchè
-  //  siccome la serializzazione del TValue inserisce anch'essa il QualifiedTypeName del
-  //  valore si sarebbe venuto a creare un doppione.
-  //  Per questo motivo ora inietto il QualifiedTypeName dell'oggetto da deserializzare
-  //  (se si tratta di un oggetto) nel JSONObject come se fosse stato originariamente inserito
-  //  dal "SerializeObject" in modo che il "DeserializeObject" lo possa trovare e utilizzare.
-  if  AParams.TypeAnnotations
-  and (   (LValueRTTIType.TypeKind = tkClass) or (LValueRTTIType.TypeKind = tkInterface)   )
-  then
+  // il serializzatore lo ha serializzato con il parametro "AUSeClassName = False" perchè
+  // siccome la serializzazione del TValue inserisce anch'essa il QualifiedTypeName del
+  // valore si sarebbe venuto a creare un doppione.
+  // Per questo motivo ora inietto il QualifiedTypeName dell'oggetto da deserializzare
+  // (se si tratta di un oggetto) nel JSONObject come se fosse stato originariamente inserito
+  // dal "SerializeObject" in modo che il "DeserializeObject" lo possa trovare e utilizzare.
+  if AParams.TypeAnnotations and ((LValueRTTIType.TypeKind = tkClass) or (LValueRTTIType.TypeKind = tkInterface)) then
     (LJSONValue as TJSONObject).AddPair(DMVC_TYPENAME, LValueQualifiedTypeName);
   // Deserialize the value
   Result := DeserializePropField(LJSONValue, LValueRTTIType, APropField, nil, AParams);
 end;
 
-class function omEngine.DeserializeObject(const AJSONBox: TJSONBox; AObject: TObject;
-  const AParams: IomParams): TObject;
+class function omEngine.DeserializeObject(const AJSONBox: TJSONBox; AObject: TObject; const AParams: IomParams): TObject;
 var
   PropField: System.Rtti.TRttiNamedObject;
   PropsFields: TArray<System.Rtti.TRttiNamedObject>;
@@ -1017,7 +992,7 @@ var
 begin
   AObjectIsValid := Assigned(AObject);
   // If the AObject is not assigned then try to create the Object using the DMVC_ClassName value in the
-  //  JSONBox
+  // JSONBox
   if not AObjectIsValid then
   begin
 {$IF CompilerVersion <= 26}
@@ -1034,7 +1009,7 @@ begin
     AObject := TRTTIUtils.CreateObject(lJClassName.Value);
   end;
 
-//  JValue := nil;
+  // JValue := nil;
   _type := GetCtx.GetType(AObject.ClassInfo);
 
   try
@@ -1049,12 +1024,9 @@ begin
     for PropField in PropsFields do
     begin
       // Check to continue or not
-      if (not TDuckPropField.IsWritable(PropField) and (TDuckPropField.RttiType(PropField).TypeKind <> tkClass))
-      or (HasAttribute<MapperTransientAttribute>(PropField))
-      or (PropField.Name = 'FRefCount')
-      or (PropField.Name = 'RefCount')
-      or IsPropertyToBeIgnored(PropField, AParams)
-      then
+      if (not TDuckPropField.IsWritable(PropField) and (TDuckPropField.RttiType(PropField).TypeKind <> tkClass)) or
+        (HasAttribute<MapperTransientAttribute>(PropField)) or (PropField.Name = 'FRefCount') or (PropField.Name = 'RefCount') or
+        IsPropertyToBeIgnored(PropField, AParams) then
         Continue;
       // Get the JSONPair KeyName
       KeyName := GetKeyName(PropField, _type);
@@ -1076,8 +1048,7 @@ begin
   end;
 end;
 
-class function omEngine.DeserializeObjectByClass(const AJSONBox: TJSONBox; const AClassName: String;
-  const AParams: IomParams): TObject;
+class function omEngine.DeserializeObjectByClass(const AJSONBox: TJSONBox; const AClassName: String; const AParams: IomParams): TObject;
 var
   AObject: TObject;
   _rttiType: TRttiType;
@@ -1085,8 +1056,8 @@ begin
   // Init (NB: NON TOGLIERE)
   AObject := nil;
   // If AUseClassName parameter is not passed then create a new object of the generic passed
-  //  type, else (if AUseClassName = True) the creation of a new object of the right class
-  //  is made by the "DeserializeObject" function using the informations contained in the JSON.
+  // type, else (if AUseClassName = True) the creation of a new object of the right class
+  // is made by the "DeserializeObject" function using the informations contained in the JSON.
   if not AParams.TypeAnnotations then
   begin
     _rttiType := omEngine.GetCtx.FindType(AClassName);
@@ -1105,8 +1076,7 @@ begin
   end;
 end;
 
-class procedure omEngine.DeserializeObjectList<T>(const AJSONBox: TJSONBox; AList: TObjectList<T>;
-  const AParams: IomParams);
+class procedure omEngine.DeserializeObjectList<T>(const AJSONBox: TJSONBox; AList: TObjectList<T>; const AParams: IomParams);
 var
   I: Integer;
   JChildObj: TJSONObject;
@@ -1116,9 +1086,9 @@ begin
     for I := 0 to AJSONBox.Count - 1 do
     begin
       JChildObj := AJSONBox.Pairs[I].JsonValue as TJSONObject;
-//      AList.Add(Mapper.JSONObjectToObject<T>(AJSONArray.Get(I) as TJSONObject));
+      // AList.Add(Mapper.JSONObjectToObject<T>(AJSONArray.Get(I) as TJSONObject));
 
-//    ***** NB: DA FINIRE *****
+      // ***** NB: DA FINIRE *****
 
     end;
   end;
@@ -1126,19 +1096,17 @@ end;
 
 class function omEngine.GetCtx: TRttiContext;
 begin
-  Result := Ctx;
+  Result := ctx;
 end;
 
-class procedure omEngine.GetItemsTypeNameIfEmpty(
-  const APropField: TRttiNamedObject; const AParams:IomParams; var AValueTypeName: String);
+class procedure omEngine.GetItemsTypeNameIfEmpty(const APropField: TRttiNamedObject; const AParams: IomParams; var AValueTypeName: String);
 var
   LKeyTypeNameDummy: String;
 begin
   GetItemsTypeNameIfEmpty(APropField, AParams, LKeyTypeNameDummy, AValueTypeName);
 end;
 
-class procedure omEngine.GetItemsTypeNameIfEmpty(
-  const APropField: TRttiNamedObject; const AParams:IomParams; var AKeyTypeName, AValueTypeName: String);
+class procedure omEngine.GetItemsTypeNameIfEmpty(const APropField: TRttiNamedObject; const AParams: IomParams; var AKeyTypeName, AValueTypeName: String);
 var
   MapperItemsClassTypeAttribute: MapperItemsClassType;
 begin
@@ -1151,16 +1119,16 @@ begin
   if not HasAttribute<MapperItemsClassType>(APropField, MapperItemsClassTypeAttribute) then
     HasAttribute<MapperItemsClassType>(TDuckPropField.RttiType(APropField), MapperItemsClassTypeAttribute);
   // If the KeyType received as parameter is empty then get the type from
-  //  the attribute and if also the attribute key type name is empty then
-  //  get the default specified in the params
+  // the attribute and if also the attribute key type name is empty then
+  // get the default specified in the params
   if AKeyTypeName.IsEmpty then
     if Assigned(MapperItemsClassTypeAttribute) and not MapperItemsClassTypeAttribute.KeyQualifiedName.IsEmpty then
       AKeyTypeName := MapperItemsClassTypeAttribute.KeyQualifiedName
     else
       AKeyTypeName := AParams.ItemsKeyDefaultQualifiedName;
   // If the ValueType received as parameter is empty then get the type from
-  //  the attribute and if also the attribute value type name is empty then
-  //  get the default specified in the params
+  // the attribute and if also the attribute value type name is empty then
+  // get the default specified in the params
   if AValueTypeName.IsEmpty then
     if Assigned(MapperItemsClassTypeAttribute) and not MapperItemsClassTypeAttribute.ValueQualifiedName.IsEmpty then
       AValueTypeName := MapperItemsClassTypeAttribute.ValueQualifiedName
@@ -1168,13 +1136,13 @@ begin
       AValueTypeName := AParams.ItemsValueDefaultQualifiedName;
 end;
 
-class function omEngine.GetKeyName(const ARttiMember: TRttiNamedObject; const AType: TRttiType): string;
+class function omEngine.GetKeyName(const ARTTIMember: TRttiNamedObject; const AType: TRttiType): string;
 var
   attrs: TArray<TCustomAttribute>;
   attr: TCustomAttribute;
 begin
   // JSONSer property attribute handling
-  attrs := ARttiMember.GetAttributes;
+  attrs := ARTTIMember.GetAttributes;
   for attr in attrs do
   begin
     if attr is MapperJSONSer then
@@ -1190,18 +1158,18 @@ begin
       case MapperJSONNaming(attr).KeyCase of
         JSONNameUpperCase:
           begin
-            Exit(UpperCase(ARttiMember.Name));
+            Exit(UpperCase(ARTTIMember.Name));
           end;
         JSONNameLowerCase:
           begin
-            Exit(LowerCase(ARttiMember.Name));
+            Exit(LowerCase(ARTTIMember.Name));
           end;
       end;
     end;
   end;
 
   // Default
-  Result := ARttiMember.Name;
+  Result := ARTTIMember.Name;
 end;
 
 class function omEngine.GetQualifiedTypeName(const ATypeInfo: Pointer): String;
@@ -1209,14 +1177,14 @@ begin
   Result := GetCtx.GetType(ATypeInfo).QualifiedName;
 end;
 
-class function omEngine.HasAttribute<T>(const ARTTIMember: TRttiNamedObject): boolean;
+class function omEngine.HasAttribute<T>(const ARTTIMember: TRttiNamedObject): Boolean;
 var
   AAttribute: TCustomAttribute;
 begin
   Result := HasAttribute<T>(ARTTIMember, AAttribute);
 end;
 
-class function omEngine.HasAttribute<T>(const ARTTIMember: TRttiNamedObject; out AAttribute: T): boolean;
+class function omEngine.HasAttribute<T>(const ARTTIMember: TRttiNamedObject; out AAttribute: T): Boolean;
 var
   attrs: TArray<TCustomAttribute>;
   attr: TCustomAttribute;
@@ -1224,7 +1192,7 @@ begin
   if not Assigned(ARTTIMember) then
     Exit(False);
   AAttribute := nil;
-  Result := false;
+  Result := False;
   attrs := ARTTIMember.GetAttributes;
   for attr in attrs do
     if attr is T then
@@ -1236,11 +1204,10 @@ end;
 
 class procedure omEngine.Initialize;
 begin
-  Ctx := TRttiContext.Create;
+  ctx := TRttiContext.Create;
 end;
 
-class function omEngine.IsPropertyToBeIgnored(
-  const APropField: TRttiNamedObject; const AParams: IomParams): Boolean;
+class function omEngine.IsPropertyToBeIgnored(const APropField: TRttiNamedObject; const AParams: IomParams): Boolean;
 var
   I: Integer;
 begin
@@ -1252,10 +1219,9 @@ begin
       Exit(True);
 end;
 
-class function omEngine.QualifiedTypeNameToRttiType(
-  const AQualifiedTypeName: String): TRttiType;
+class function omEngine.QualifiedTypeNameToRttiType(const AQualifiedTypeName: String): TRttiType;
 begin
-//  Result := nil;
+  // Result := nil;
   Result := GetCtx.FindType(AQualifiedTypeName);
 end;
 
@@ -1281,7 +1247,7 @@ var
   ResultJSONObj: TJSONObject;
 begin
   // Init
-  LListTypeName           := '';
+  LListTypeName := '';
   LValueQualifiedTypeName := '';
   // Wrap the dictionary in the DuckObject
   LDuckList := WrapAsList(AList);
@@ -1289,7 +1255,7 @@ begin
   LJSONArray := TJSONArray.Create;
   // Loop for all objects in the list (now compatible with interfaces)
   First := True;
-  for I := 0 to LDuckList.Count-1 do
+  for I := 0 to LDuckList.Count - 1 do
   begin
     // Read values
     LValue := LDuckList.GetItemValue(I);
@@ -1305,7 +1271,7 @@ begin
     LJSONArray.AddElement(LJSONValue);
   end;
   // If AUseClassName is true then return a JSONObject with ClassName and a JSONArray containing the list items
-  //  else return only the JSONArray containing the list items
+  // else return only the JSONArray containing the list items
   if AParams.TypeAnnotations then
   begin
     ResultJSONObj := TJSONObject.Create;
@@ -1401,7 +1367,7 @@ begin
       Result := SerializeObject(AChildObj, AParams);
     end;
     // ---------- End other type of object ----------
-  // Object (o) not assigned
+    // Object (o) not assigned
   end
   else
   begin
@@ -1412,9 +1378,7 @@ begin
   end;
 end;
 
-class function omEngine.SerializeCustom(AValue: TValue;
-  const APropField: TRttiNamedObject; const AParams: IomParams;
-  out ResultJSONValue: TJSONValue): Boolean;
+class function omEngine.SerializeCustom(AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams; out ResultJSONValue: TJSONValue): Boolean;
 var
   LSerializerItem: IomSerializersContainerItem;
   LSerializer: TomCustomSerializerRef;
@@ -1424,7 +1388,7 @@ var
   LParams: IomParams;
   LDone: Boolean;
   LObj: TObject;
-  function SerializeCustomByInternalClassMethod(const AValue:TValue; out ResultJSONValue: TJSONValue): Boolean;
+  function SerializeCustomByInternalClassMethod(const AValue: TValue; out ResultJSONValue: TJSONValue): Boolean;
   var
     LType: TRttiType;
     LMethod: TRttiMethod;
@@ -1439,6 +1403,7 @@ var
     ResultJSONValue := LMethod.Invoke(AValue.AsObject, []).AsObject as TJSONValue;
     Result := True;
   end;
+
 begin
   // Init
   Result := True;
@@ -1450,47 +1415,40 @@ begin
     Exit(False);
   // ---------- Custom serialization method in the class ----------
   // If the Value is an Interface type then convert it to real object class
-  //  type implementing the interface
+  // type implementing the interface
   if AValue.Kind = tkInterface then
   begin
     LObj := AValue.AsInterface as TObject;
     TValue.Make(@LObj, LObj.ClassInfo, AValue);
   end;
   // If the value is an object and a Serializer method is present directly in the class
-  if (AValue.Kind = tkClass)
-  and SerializeCustomByInternalClassMethod(AValue, LJSONValue)
-  then
+  if (AValue.Kind = tkClass) and SerializeCustomByInternalClassMethod(AValue, LJSONValue) then
     LDone := True
   else
-  // ---------- End: Custom serialization method in the class ----------
-  // Get custom serializer if exists
-  if AParams.Serializers._Exists(AValue.TypeInfo) then
-  begin
-    LSerializerItem := AParams.Serializers._GetSerializerItem(AValue.TypeInfo);
-    LSerializer := LSerializerItem.Serializer;
-    // Get the custom Params
-    if Assigned(LSerializerItem.Params) then
-      LParams := LSerializerItem.Params;
-  end
-  else
-  if HasAttribute<MapperCustomSerializer>(TypeInfoToRttiType(AValue.TypeInfo), LMapperCustomSerializer) then
-    LSerializer := LMapperCustomSerializer.Serializer
-  else
-    Exit(False);
+    // ---------- End: Custom serialization method in the class ----------
+    // Get custom serializer if exists
+    if AParams.Serializers._Exists(AValue.TypeInfo) then
+    begin
+      LSerializerItem := AParams.Serializers._GetSerializerItem(AValue.TypeInfo);
+      LSerializer := LSerializerItem.Serializer;
+      // Get the custom Params
+      if Assigned(LSerializerItem.Params) then
+        LParams := LSerializerItem.Params;
+    end
+    else if HasAttribute<MapperCustomSerializer>(TypeInfoToRttiType(AValue.TypeInfo), LMapperCustomSerializer) then
+      LSerializer := LMapperCustomSerializer.Serializer
+    else
+      Exit(False);
   // Serialize (if a custom serializer exists)
   if Assigned(LSerializer) then
-    LJSONValue := LSerializer.Serialize(
-      AValue,
-      LParams,
-      LDone
-      );
+    LJSONValue := LSerializer.Serialize(AValue, LParams, LDone);
   // if the work has not been done by the custom serializer then
-  //  call the standard serializers with custom params (if exists)
-  //  NB: Custom serializers are disabled
+  // call the standard serializers with custom params (if exists)
+  // NB: Custom serializers are disabled
   if not LDone then
     LJSONValue := SerializePropField(AValue, APropField, LParams, False);
   // If DataTypeAnnotation is enabled then wrap the resutling JSONValue
-  //  in a JSONObject with the type information
+  // in a JSONObject with the type information
   if LParams.TypeAnnotations then
   begin
     if LJSONValue is TJSONObject then
@@ -1510,8 +1468,7 @@ begin
     ResultJSONValue := LJSONValue;
 end;
 
-class function omEngine.SerializeDictionary(
-  const ADictionary: TObject; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue;
+class function omEngine.SerializeDictionary(const ADictionary: TObject; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue;
 var
   LDuckDictionary: IWrappedDictionary;
   LJSONArray: TJSONArray;
@@ -1522,7 +1479,7 @@ var
   LKeyQualifiedTypeName, LValueQualifiedTypeName: String;
 begin
   // Init
-  LKeyQualifiedTypeName   := '';
+  LKeyQualifiedTypeName := '';
   LValueQualifiedTypeName := '';
   // Wrap the dictionary in the DuckObject
   LDuckDictionary := WrapAsDictionary(ADictionary);
@@ -1533,15 +1490,15 @@ begin
   while LDuckDictionary.MoveNext do
   begin
     // Read values
-    LKey   := LDuckDictionary.GetCurrentKey;
+    LKey := LDuckDictionary.GetCurrentKey;
     LValue := LDuckDictionary.GetCurrentValue;
     // Serialize values
-    LJSONKey   := SerializePropField(LKey,   APropField, AParams);
+    LJSONKey := SerializePropField(LKey, APropField, AParams);
     LJSONValue := SerializePropField(LValue, APropField, AParams);
     // If first loop then add the type infos
     if AParams.TypeAnnotations and First then
     begin
-      LKeyQualifiedTypeName   := GetQualifiedTypeName(LKey.TypeInfo);
+      LKeyQualifiedTypeName := GetQualifiedTypeName(LKey.TypeInfo);
       LValueQualifiedTypeName := GetQualifiedTypeName(LValue.TypeInfo);
       First := False;
     end;
@@ -1549,23 +1506,23 @@ begin
     CurrJSONObj := TJSONObject.Create;
     case AParams.SerializationMode of
       smJavaScript:
-      begin
-        if LJSONKey is TJSONString then
-          CurrJSONObj.AddPair(LJSONKey.Value, LJSONValue)
-        else
-          CurrJSONObj.AddPair(LJSONKey.ToJSON, LJSONValue);
-        LJSONKey.Free; // To avoid a memory leak
-      end;
+        begin
+          if LJSONKey is TJSONString then
+            CurrJSONObj.AddPair(LJSONKey.Value, LJSONValue)
+          else
+            CurrJSONObj.AddPair(LJSONKey.ToJSON, LJSONValue);
+          LJSONKey.Free; // To avoid a memory leak
+        end;
       smDataContract:
-      begin
-        CurrJSONObj.AddPair(DMVC_KEY,   LJSONKey);
-        CurrJSONObj.AddPair(DMVC_VALUE, LJSONValue)
-      end;
+        begin
+          CurrJSONObj.AddPair(DMVC_KEY, LJSONKey);
+          CurrJSONObj.AddPair(DMVC_VALUE, LJSONValue)
+        end;
     end;
     LJSONArray.AddElement(CurrJSONObj);
   end;
   // If AUseClassName is true then return a JSONObject with ClassName and a JSONArray containing the list items
-  //  else return only the JSONArray containing the list items
+  // else return only the JSONArray containing the list items
   if AParams.TypeAnnotations then
   begin
     ResultJSONObj := TJSONObject.Create;
@@ -1585,7 +1542,7 @@ class function omEngine.SerializeEnumeration(const AValue: TValue): TJSONValue;
 var
   LQualifiedTypeName: String;
 begin
-//  AQualifiedTypeName := TDuckPropField.QualifiedName(ARttiType);
+  // AQualifiedTypeName := TDuckPropField.QualifiedName(ARttiType);
   LQualifiedTypeName := GetQualifiedTypeName(AValue.TypeInfo);
   if LQualifiedTypeName = 'System.Boolean' then
   begin
@@ -1604,7 +1561,7 @@ class function omEngine.SerializeFloat(const AValue: TValue): TJSONValue;
 var
   LQualifiedTypeName: String;
 begin
-//  AQualifiedTypeName := TDuckPropField.QualifiedName(ARttiType);
+  // AQualifiedTypeName := TDuckPropField.QualifiedName(ARttiType);
   LQualifiedTypeName := GetQualifiedTypeName(AValue.TypeInfo);
   if LQualifiedTypeName = 'System.TDate' then
   begin
@@ -1621,7 +1578,7 @@ begin
       Result := TJSONString.Create(ISODateTimeToString(AValue.AsExtended))
   end
   else if LQualifiedTypeName = 'System.TTime' then
-   Result := TJSONString.Create(ISOTimeToString(AValue.AsExtended))
+    Result := TJSONString.Create(ISOTimeToString(AValue.AsExtended))
   else
     Result := TJSONNumber.Create(AValue.AsExtended);
 end;
@@ -1657,7 +1614,8 @@ begin
     for PropField in PropsFields do
     begin
       // Skip the RefCount
-      if (PropField.Name = 'FRefCount') or (PropField.Name = 'RefCount') then Continue;
+      if (PropField.Name = 'FRefCount') or (PropField.Name = 'RefCount') then
+        Continue;
       // f := LowerCase(_property.Name);
       KeyName := GetKeyName(PropField, _type);
       // Check if there is properties to ignore
@@ -1682,7 +1640,8 @@ begin
   Result := SerializeObject(AInterfacedObject as TObject, AParams);
 end;
 
-class function omEngine.SerializeObjectList(const AList: TObjectList<TObject>; const AParams: IomParams; AOwnsInstance: boolean; AForEach: TJSONObjectActionProc): TJSONBox;
+class function omEngine.SerializeObjectList(const AList: TObjectList<TObject>; const AParams: IomParams; AOwnsInstance: Boolean;
+  AForEach: TJSONObjectActionProc): TJSONBox;
 var
   I: Integer;
   JV: TJSONObject;
@@ -1702,13 +1661,14 @@ begin
     AList.Free;
 end;
 
-class function omEngine.SerializePropField(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams; const AEnableCustomSerializers:Boolean): TJSONValue;
+class function omEngine.SerializePropField(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams;
+  const AEnableCustomSerializers: Boolean): TJSONValue;
 begin
   // If a custom serializer exists for the current type then use it
   if AEnableCustomSerializers and AParams.EnableCustomSerializers and SerializeCustom(AValue, APropField, AParams, Result) then
     Exit;
   // Standard serialization by TypeKind
-//  case TDuckPropField.TypeKind(ARttiType) of
+  // case TDuckPropField.TypeKind(ARttiType) of
   case AValue.Kind of
     tkInteger, tkInt64:
       Result := SerializeInteger(AValue);
@@ -1732,8 +1692,8 @@ var
   ts: TTimeStamp;
   LQualifiedTypeName: String;
 begin
-  result := nil;
-//  LQualifiedTypeName := TDuckPropField.QualifiedName(APropField);
+  Result := nil;
+  // LQualifiedTypeName := TDuckPropField.QualifiedName(APropField);
   LQualifiedTypeName := GetQualifiedTypeName(AValue.TypeInfo);
   // TTimeStamp
   if LQualifiedTypeName = 'System.SysUtils.TTimeStamp' then
@@ -1752,9 +1712,6 @@ class function omEngine.SerializeString(const AValue: TValue): TJSONValue;
 begin
   Result := TJSONString.Create(AValue.AsString);
 end;
-
-
-
 
 class function omEngine.SerializeTValue(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IomParams): TJSONValue;
 var
@@ -1794,8 +1751,10 @@ class function omEngine.TValueToTObject(const AValue: TValue): TObject;
 begin
   Result := nil;
   case AValue.Kind of
-    tkClass: Result := AValue.AsObject;
-    tkInterface: Result := AValue.AsInterface as TObject;
+    tkClass:
+      Result := AValue.AsObject;
+    tkInterface:
+      Result := AValue.AsInterface as TObject;
   end;
 end;
 
@@ -1896,7 +1855,7 @@ end;
 
 procedure TomParams.SetEnableCustomSerializers(const AValue: Boolean);
 begin
- FEnableCustomSerializers := AValue;
+  FEnableCustomSerializers := AValue;
 end;
 
 procedure TomParams.SetIgnoredProperties(const AValue: TIgnoredProperties);
@@ -1941,8 +1900,7 @@ end;
 
 { TomCustomSerializersItem }
 
-constructor TomSerializersContainerItem.Create(
-  const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
+constructor TomSerializersContainerItem.Create(const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
 begin
   inherited Create;
   FSerializer := ASerializer;
@@ -1968,8 +1926,7 @@ begin
   Result := Self._Exists(ATargetClass.ClassInfo);
 end;
 
-function TomSerializersContainer.Exists(
-  const ATargetTypeInfo: PTypeInfo): Boolean;
+function TomSerializersContainer.Exists(const ATargetTypeInfo: PTypeInfo): Boolean;
 begin
   Result := Self._Exists(ATargetTypeInfo);
 end;
@@ -1979,29 +1936,22 @@ begin
   Result := Self._Exists(TypeInfo(T));
 end;
 
-procedure TomSerializersContainer.Register(const ATargetTypeInfo: PTypeInfo;
-  const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
+procedure TomSerializersContainer.Register(const ATargetTypeInfo: PTypeInfo; const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
 begin
-  FSerializersContainer.Add(
-    omEngine.GetQualifiedTypeName(ATargetTypeInfo),
-    TomSerializersContainerItem.Create(ASerializer, AParams)
-    );
+  FSerializersContainer.Add(omEngine.GetQualifiedTypeName(ATargetTypeInfo), TomSerializersContainerItem.Create(ASerializer, AParams));
 end;
 
-procedure TomSerializersContainer.Register(const ATargetClass: TClass;
-  const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
+procedure TomSerializersContainer.Register(const ATargetClass: TClass; const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
 begin
   Self.Register(ATargetClass.ClassInfo, ASerializer, AParams);
 end;
 
-procedure TomSerializersContainer.Register<Target>(
-  const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
+procedure TomSerializersContainer.Register<Target>(const ASerializer: TomCustomSerializerRef; const AParams: IomParams);
 begin
   Self.Register(TypeInfo(Target), ASerializer, AParams);
 end;
 
-procedure TomSerializersContainer.Register<Target; Serializer>(
-  const AParams: IomParams);
+procedure TomSerializersContainer.Register<Target; Serializer>(const AParams: IomParams);
 begin
   Self.Register(TypeInfo(Target), Serializer, AParams);
 end;
@@ -2021,14 +1971,12 @@ begin
   Self.Unregister(TypeInfo(T));
 end;
 
-function TomSerializersContainer._Exists(
-  const ATargetTypeInfo: PTypeInfo): Boolean;
+function TomSerializersContainer._Exists(const ATargetTypeInfo: PTypeInfo): Boolean;
 begin
   Result := FSerializersContainer.ContainsKey(omEngine.GetQualifiedTypeName(ATargetTypeInfo));
 end;
 
-function TomSerializersContainer._GetSerializerItem(
-  const ATargetTypeInfo:PTypeInfo): IomSerializersContainerItem;
+function TomSerializersContainer._GetSerializerItem(const ATargetTypeInfo: PTypeInfo): IomSerializersContainerItem;
 begin
   Result := FSerializersContainer.Items[omEngine.GetQualifiedTypeName(ATargetTypeInfo)];
 end;
@@ -2048,23 +1996,20 @@ begin
   FParams := Value;
 end;
 
-procedure TomSerializersContainerItem.SetSerializer(
-  const Value: TomCustomSerializerRef);
+procedure TomSerializersContainerItem.SetSerializer(const Value: TomCustomSerializerRef);
 begin
   FSerializer := Value;
 end;
 
 { TomCustomSerializer }
 
-class function TomCustomSerializer.Deserialize(const AJSONValue:TJSONValue;
-  const AExistingValue:TValue; const AParams:IomParams;
-  var ADone:Boolean): TValue;
+class function TomCustomSerializer.Deserialize(const AJSONValue: TJSONValue; const AExistingValue: TValue; const AParams: IomParams;
+  var ADone: Boolean): TValue;
 begin
   // None
 end;
 
-class function TomCustomSerializer.Serialize(const AValue: TValue;
-  const AParams: IomParams; var ADone: Boolean): TJSONValue;
+class function TomCustomSerializer.Serialize(const AValue: TValue; const AParams: IomParams; var ADone: Boolean): TJSONValue;
 begin
   // Prevent warning
   Result := nil;
@@ -2072,7 +2017,6 @@ end;
 
 initialization
 
-  omEngine.Initialize;
+omEngine.Initialize;
 
 end.
-

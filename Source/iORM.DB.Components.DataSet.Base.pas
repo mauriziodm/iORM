@@ -1000,11 +1000,8 @@ begin
   // al fatto che normalmente TDataSet effettua un cancel automaticamente se non ci
   // sono state modifiche e questo, unito alla funzionalità di propagazione degli
   // eventi (edit, post, cancel ecc) causava ilproblema.
-  if Modified then
-  begin
-    LObj := FBindSourceAdapter.Current;
-    om.FromJSON(FBeforeEditValues).TypeAnnotationsON.&To(LObj);
-  end;
+  LObj := FBindSourceAdapter.Current;
+  om.FromJSON(FBeforeEditValues).TypeAnnotationsON.ClearListBefore.&To(LObj);
 end;
 
 { TSqlTimeStampUtils }
