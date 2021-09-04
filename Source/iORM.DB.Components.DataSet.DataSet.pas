@@ -109,6 +109,9 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    // BeforeEditValues management methods
+    procedure SaveBeforeEditValues; override;
+    procedure RestoreBeforeEditValues; override;
     // Overridenof soma base pethods
     procedure InternalPreOpen; override;
     procedure InternalEdit; override;
@@ -444,8 +447,9 @@ end;
 
 procedure TioDataSet.InternalEdit;
 begin
-  inherited;
+  // NB: Must be before inherited
   _ReceivePropagateEdit(Self);
+  inherited;
 end;
 
 procedure TioDataSet.InternalInsert;
@@ -526,6 +530,22 @@ begin
   if not Assigned(FDetailDatasetContainer) then
     FDetailDatasetContainer := TList<TioDataSet>.Create;
   FDetailDatasetContainer.Add(ADetailDataSet);
+end;
+
+procedure TioDataSet.RestoreBeforeEditValues;
+begin
+  // Disable the save/restore before edit values system if the current DataSet is a detail dataset and the propagation is enabled
+  if IsDetail and FPropagateEdit then
+    Exit;
+  inherited;
+end;
+
+procedure TioDataSet.SaveBeforeEditValues;
+begin
+  // Disable the save/restore before edit values system if the current DataSet is a detail dataset and the propagation is enabled
+  if IsDetail and FPropagateEdit then
+    Exit;
+  inherited;
 end;
 
 procedure TioDataSet.Select<T>(AInstance: T; ASelectionType: TioSelectionType);

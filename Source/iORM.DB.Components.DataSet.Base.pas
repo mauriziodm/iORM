@@ -123,8 +123,6 @@ type
     // Before edit data buffer
     FBeforeEditValues: String;
     // Methods
-    procedure SaveBeforeEditValues;
-    procedure RestoreBeforeEditValues;
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
     function CheckAdapter: Boolean;
@@ -136,6 +134,9 @@ type
     // custom dataset virtual methods
     function InternalRecordCount: Integer; override;
     procedure InternalLoadCurrentRecord(Buffer: TRecordBuffer); override;
+    // BeforeEditValues management methods
+    procedure SaveBeforeEditValues; virtual;
+    procedure RestoreBeforeEditValues; virtual;
     // Others
     procedure InternalInitFieldDefs; override;
     procedure InternalPost; override;
