@@ -248,9 +248,12 @@ type
   // Base class for all DB field type definitions
   ioFTBase = class(TioCustomAttribute)
   strict private
+    FFieldName: String;
     FNotNull: Boolean;
   public
-    constructor Create(const ANotNull: Boolean = False); virtual;
+    constructor Create(const ANotNull: Boolean = False); overload;
+    constructor Create(const AFieldName: String; const ANotNull: Boolean = False); overload;
+    property FieldName: String read FFieldName;
     property NotNull: Boolean read FNotNull;
   end;
 
@@ -820,7 +823,14 @@ end;
 
 constructor ioFTBase.Create(const ANotNull: Boolean);
 begin
+  FFieldName := '';
   FNotNull := ANotNull;
+end;
+
+constructor ioFTBase.Create(const AFieldName: String; const ANotNull: Boolean);
+begin
+  Create(ANotNull);
+  FFieldName := AFieldName;
 end;
 
 constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);

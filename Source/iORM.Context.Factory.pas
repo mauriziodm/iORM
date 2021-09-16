@@ -313,7 +313,7 @@ begin
     // Se la proprietà esiste già nella mappa (può accadere quando si fa property override)
     if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or Result.PropertyExists(PropFieldName) then
       Continue;
-    // ObjStatus property 8detect it by the type "TioObjStatus"
+    // ObjStatus property detect it by the type "TioObjStatus"
     if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
     begin
       Result.ObjStatusProperty := Self.GetProperty(ATable, Prop, '', '', '', '', True, iorwReadOnly, ioRTNone, '', '', '', ioEagerLoad,
