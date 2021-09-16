@@ -237,34 +237,22 @@ type
   ioField = class(TioCustomStringAttribute)
   end;
 
-  // FieldName attribute
+  ioNotNull = class(TioCustomAttribute)
+  end;
+
   ioLoadSQL = class(TioCustomStringAttribute)
   end;
 
-  // FieldType attribute
   ioFieldType = class(TioCustomStringAttribute)
   end;
 
-  // Base class for all DB field type definitions
-  ioFTBase = class(TioCustomAttribute)
-  strict private
-    FFieldName: String;
-    FNotNull: Boolean;
-  public
-    constructor Create(const ANotNull: Boolean = False); overload;
-    constructor Create(const AFieldName: String; const ANotNull: Boolean = False); overload;
-    property FieldName: String read FFieldName;
-    property NotNull: Boolean read FNotNull;
-  end;
-
-  // Define VarChar Type
-  ioFTVarchar = class(ioFTBase)
+  // Define Varchar Type
+  ioFTVarchar = class(TioCustomAttribute)
   strict private
     FIsUnicode: Boolean;
     FLength: Integer;
   public
-    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
-    constructor Create(const ALength: Integer; const ANotNull: Boolean = False; const AIsUnicode: Boolean = True); reintroduce;
+    constructor Create(const ALength: Integer = 255; const AIsUnicode: Boolean = True);
       overload;
     property IsUnicode: Boolean read FIsUnicode;
     property Length: Integer read FLength;
@@ -275,59 +263,56 @@ type
   end;
 
   // Define Integer Type (SmallInt, Integer, BigInt)
-  ioFTInteger = class(ioFTBase)
+  ioFTInteger = class(TioCustomAttribute)
   strict private
     FPrecision: Integer;
   public
-    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
-    constructor Create(const APrecision: Integer = 10; const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const APrecision: Integer = 10);
     property Precision: Integer read FPrecision;
   end;
 
   // Define Float Type (Float)
-  ioFTFloat = class(ioFTBase)
+  ioFTFloat = class(TioCustomAttribute)
   end;
 
   // Define Date Type (Date)
-  ioFTDate = class(ioFTBase)
+  ioFTDate = class(TioCustomAttribute)
   end;
 
   // Define Date Type (Time)
-  ioFTTime = class(ioFTBase)
+  ioFTTime = class(TioCustomAttribute)
   end;
 
   // Define DateTime Type (DateTime)
-  ioFTDateTime = class(ioFTBase)
+  ioFTDateTime = class(TioCustomAttribute)
   end;
 
   // Define Boolean Type (Boolean)
-  ioFTBoolean = class(ioFTBase)
+  ioFTBoolean = class(TioCustomAttribute)
   end;
 
   // Define Decimal Or Numeric Type
   // DECIMAL(p,s) --> DECIMAL(13,2) 11 Digits Before the decimal and 2 Digits after decimal
   // NUMERIC(p,s) --> NUMERIC(13,2) Treated in the same way of Decimal
-  ioFTDecimal = class(ioFTBase)
+  ioFTDecimal = class(TioCustomAttribute)
   strict private
     FPrecision: Integer;
     FScale: Integer;
   public
-    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
-    constructor Create(const APrecision: Integer; const AScale: Integer; const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const APrecision: Integer = 13; const AScale: Integer = 2);
     property Precision: Integer read FPrecision;
     property Scale: Integer read FScale;
   end;
 
-  ioFTNumeric = class(ioFTDecimal)
+  ioFTNumeric = class(TioCustomAttribute)
   end;
 
   // Define Binary Type (Binary Data)
-  ioFTBinary = class(ioFTBase)
+  ioFTBinary = class(TioCustomAttribute)
   strict private
     FBinarySubType: string;
   public
-    constructor Create(const ANotNull: Boolean = False); reintroduce; overload;
-    constructor Create(const ABinarySubType: string; const ANotNull: Boolean = False); reintroduce; overload;
+    constructor Create(const ABinarySubType: string = '');
     property BinarySubType: string read FBinarySubType;
   end;
 
@@ -762,75 +747,32 @@ end;
 
 { ioVarchar }
 
-constructor ioFTVarchar.Create(const ALength: Integer; const ANotNull: Boolean; const AIsUnicode: Boolean);
+constructor ioFTVarchar.Create(const ALength: Integer; const AIsUnicode: Boolean = True);
 begin
-  inherited Create(ANotNull);
   FLength := ALength;
   FIsUnicode := AIsUnicode;
 end;
 
-constructor ioFTVarchar.Create(const ANotNull: Boolean);
-begin
-  inherited;
-  FLength := 255;
-end;
-
 { ioInteger }
 
-constructor ioFTInteger.Create(const APrecision: Integer; const ANotNull: Boolean);
+constructor ioFTInteger.Create(const APrecision: Integer = 10);
 begin
-  inherited Create(ANotNull);
   FPrecision := APrecision;
-end;
-
-constructor ioFTInteger.Create(const ANotNull: Boolean);
-begin
-  inherited;
-  FPrecision := 10;
 end;
 
 { ioDecimalOrNumeric }
 
-constructor ioFTDecimal.Create(const APrecision, AScale: Integer; const ANotNull: Boolean);
+constructor ioFTDecimal.Create(const APrecision: Integer = 13; const AScale: Integer = 2);
 begin
-  inherited Create(ANotNull);
   FPrecision := APrecision;
   FScale := AScale;
 end;
 
-constructor ioFTDecimal.Create(const ANotNull: Boolean);
-begin
-  inherited;
-  FPrecision := 13;
-  FScale := 2;
-end;
-
 { ioBinary }
 
-constructor ioFTBinary.Create(const ABinarySubType: string; const ANotNull: Boolean);
+constructor ioFTBinary.Create(const ABinarySubType: string);
 begin
-  inherited Create(ANotNull);
   FBinarySubType := ABinarySubType;
-end;
-
-constructor ioFTBinary.Create(const ANotNull: Boolean);
-begin
-  inherited;
-  FBinarySubType := '';
-end;
-
-{ ioFTBase }
-
-constructor ioFTBase.Create(const ANotNull: Boolean);
-begin
-  FFieldName := '';
-  FNotNull := ANotNull;
-end;
-
-constructor ioFTBase.Create(const AFieldName: String; const ANotNull: Boolean);
-begin
-  Create(ANotNull);
-  FFieldName := AFieldName;
 end;
 
 constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);
