@@ -428,79 +428,79 @@ begin
         ATable.GetIndexList(True).Add(ioIndex(Attr));
       end;
       // M.M. 01/08/18 - Metadata Used by DBBuilder
-      if Attr is ioFTVarchar then
+      if Attr is ioVarchar then
       begin
         PropMetadata_FieldType := ioMdVarchar;
-        PropMetadata_FieldLength := ioFTVarchar(Attr).Length;
-        PropMetadata_FieldNotNull := ioFTVarchar(Attr).NotNull;
-        PropMetadata_FieldUnicode := ioFTVarchar(Attr).IsUnicode;
+        PropMetadata_FieldLength := ioVarchar(Attr).Length;
+//        PropMetadata_FieldNotNull := ioVarcharAttribute(Attr).NotNull;
+        PropMetadata_FieldUnicode := ioVarchar(Attr).IsUnicode;
       end;
-      if Attr is ioFTChar then
+      if Attr is ioChar then
       begin
         PropMetadata_FieldType := ioMdChar;
-        PropMetadata_FieldLength := ioFTChar(Attr).Length;
-        PropMetadata_FieldNotNull := ioFTChar(Attr).NotNull;
-        PropMetadata_FieldUnicode := ioFTChar(Attr).IsUnicode;
+        PropMetadata_FieldLength := ioChar(Attr).Length;
+        PropMetadata_FieldNotNull := ioChar(Attr).NotNull;
+        PropMetadata_FieldUnicode := ioChar(Attr).IsUnicode;
       end;
-      if Attr is ioFTInteger then
+      if Attr is ioInteger then
       begin
         PropMetadata_FieldType := ioMdInteger;
-        PropMetadata_FieldPrecision := ioFTInteger(Attr).Precision;
-        PropMetadata_FieldNotNull := ioFTChar(Attr).NotNull;
+        PropMetadata_FieldPrecision := ioInteger(Attr).Precision;
+        PropMetadata_FieldNotNull := ioChar(Attr).NotNull;
       end;
-      if Attr is ioFTFloat then
+      if Attr is ioFloat then
       begin
         PropMetadata_FieldType := ioMdFloat;
-        PropMetadata_FieldNotNull := ioFTFloat(Attr).NotNull;
+        PropMetadata_FieldNotNull := ioFloat(Attr).NotNull;
       end;
-      if Attr is ioFTDate then
+      if Attr is ioDate then
       begin
         PropMetadata_FieldType := ioMdDate;
-        PropMetadata_FieldNotNull := ioFTDate(Attr).NotNull;
+        PropMetadata_FieldNotNull := ioDate(Attr).NotNull;
       end;
-      if Attr is ioFTTime then
+      if Attr is ioTime then
       begin
         PropMetadata_FieldType := ioMdTime;
-        PropMetadata_FieldNotNull := ioFTTime(Attr).NotNull;
+        PropMetadata_FieldNotNull := ioTime(Attr).NotNull;
       end;
-      if Attr is ioFTDateTime then
+      if Attr is ioDateTime then
       begin
         PropMetadata_FieldType := ioMdDateTime;
-        PropMetadata_FieldNotNull := ioFTDateTime(Attr).NotNull;
+        PropMetadata_FieldNotNull := ioDateTime(Attr).NotNull;
       end;
-      if Attr is ioFTDecimal then
+      if Attr is ioDecimal then
       begin
         PropMetadata_FieldType := ioMdDecimal;
-        PropMetadata_FieldPrecision := ioFTDecimal(Attr).Precision;
-        PropMetadata_FieldScale := ioFTDecimal(Attr).Scale;
-        PropMetadata_FieldNotNull := ioFTDecimal(Attr).NotNull;
+        PropMetadata_FieldPrecision := ioDecimal(Attr).Precision;
+        PropMetadata_FieldScale := ioDecimal(Attr).Scale;
+        PropMetadata_FieldNotNull := ioDecimal(Attr).NotNull;
       end;
-      if Attr is ioFTNumeric then
+      if Attr is ioNumeric then
       begin
         PropMetadata_FieldType := ioMdNumeric;
-        PropMetadata_FieldPrecision := ioFTNumeric(Attr).Precision;
-        PropMetadata_FieldScale := ioFTNumeric(Attr).Scale;
-        PropMetadata_FieldNotNull := ioFTNumeric(Attr).NotNull;
+        PropMetadata_FieldPrecision := ioNumeric(Attr).Precision;
+        PropMetadata_FieldScale := ioNumeric(Attr).Scale;
+        PropMetadata_FieldNotNull := ioNumeric(Attr).NotNull;
       end;
-      if Attr is ioFTBoolean then
+      if Attr is ioBoolean then
       begin
         PropMetadata_FieldType := ioMdBoolean;
-        PropMetadata_FieldNotNull := ioFTBoolean(Attr).NotNull;
+        PropMetadata_FieldNotNull := ioBoolean(Attr).NotNull;
       end;
-      if Attr is ioFTBinary then
+      if Attr is ioBinary then
       begin
         PropMetadata_FieldType := ioMdBinary;
-        PropMetadata_FieldSubType := ioFTBinary(Attr).BinarySubType;
-        PropMetadata_FieldNotNull := ioFTBinary(Attr).NotNull;
+        PropMetadata_FieldSubType := ioBinary(Attr).BinarySubType;
+        PropMetadata_FieldNotNull := ioBinary(Attr).NotNull;
       end;
       if Attr is ioFTCustom then
       begin
         PropMetadata_FieldType := ioMdCustomFieldType;
         PropMetadata_CustomFieldType := ioFTCustom(Attr).Value;
       end;
-      if Attr is ioFTDefault then
+      if Attr is ioDefault then
       begin
-        PropMetadata_Default := ioFTDefault(Attr).Value;
+        PropMetadata_Default := ioDefault(Attr).Value;
       end;
       if Attr is ioForeignKey then
       begin

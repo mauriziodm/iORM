@@ -247,7 +247,7 @@ type
   end;
 
   // Define Varchar Type
-  ioFTVarchar = class(TioCustomAttribute)
+  ioVarchar = class(TioCustomAttribute)
   strict private
     FIsUnicode: Boolean;
     FLength: Integer;
@@ -259,11 +259,11 @@ type
   end;
 
   // Define Char Type
-  ioFTChar = class(ioFTVarchar)
+  ioChar = class(ioVarchar)
   end;
 
   // Define Integer Type (SmallInt, Integer, BigInt)
-  ioFTInteger = class(TioCustomAttribute)
+  ioInteger = class(TioCustomAttribute)
   strict private
     FPrecision: Integer;
   public
@@ -272,29 +272,29 @@ type
   end;
 
   // Define Float Type (Float)
-  ioFTFloat = class(TioCustomAttribute)
+  ioFloat = class(TioCustomAttribute)
   end;
 
   // Define Date Type (Date)
-  ioFTDate = class(TioCustomAttribute)
+  ioDate = class(TioCustomAttribute)
   end;
 
   // Define Date Type (Time)
-  ioFTTime = class(TioCustomAttribute)
+  ioTime = class(TioCustomAttribute)
   end;
 
   // Define DateTime Type (DateTime)
-  ioFTDateTime = class(TioCustomAttribute)
+  ioDateTime = class(TioCustomAttribute)
   end;
 
   // Define Boolean Type (Boolean)
-  ioFTBoolean = class(TioCustomAttribute)
+  ioBoolean = class(TioCustomAttribute)
   end;
 
   // Define Decimal Or Numeric Type
   // DECIMAL(p,s) --> DECIMAL(13,2) 11 Digits Before the decimal and 2 Digits after decimal
   // NUMERIC(p,s) --> NUMERIC(13,2) Treated in the same way of Decimal
-  ioFTDecimal = class(TioCustomAttribute)
+  ioDecimal = class(TioCustomAttribute)
   strict private
     FPrecision: Integer;
     FScale: Integer;
@@ -304,11 +304,11 @@ type
     property Scale: Integer read FScale;
   end;
 
-  ioFTNumeric = class(TioCustomAttribute)
+  ioNumeric = class(ioDecimal)
   end;
 
   // Define Binary Type (Binary Data)
-  ioFTBinary = class(TioCustomAttribute)
+  ioBinary = class(TioCustomAttribute)
   strict private
     FBinarySubType: string;
   public
@@ -316,12 +316,12 @@ type
     property BinarySubType: string read FBinarySubType;
   end;
 
-  // Custom FieldType attribute
-  ioFTCustom = class(TioCustomStringAttribute)
+  // Default value for the DB field (SQL DEFAULT)
+  ioDefault = class(TioCustomTValueAttribute)
   end;
 
-  // Default value for the DB field (SQL DEFAULT)
-  ioFTDefault = class(TioCustomTValueAttribute)
+  // Custom FieldType attribute
+  ioFTCustom = class(TioCustomStringAttribute)
   end;
 
   // ForeignKey enable/disable and actions
@@ -747,7 +747,7 @@ end;
 
 { ioVarchar }
 
-constructor ioFTVarchar.Create(const ALength: Integer; const AIsUnicode: Boolean = True);
+constructor ioVarchar.Create(const ALength: Integer; const AIsUnicode: Boolean = True);
 begin
   FLength := ALength;
   FIsUnicode := AIsUnicode;
@@ -755,14 +755,14 @@ end;
 
 { ioInteger }
 
-constructor ioFTInteger.Create(const APrecision: Integer = 10);
+constructor ioInteger.Create(const APrecision: Integer = 10);
 begin
   FPrecision := APrecision;
 end;
 
 { ioDecimalOrNumeric }
 
-constructor ioFTDecimal.Create(const APrecision: Integer = 13; const AScale: Integer = 2);
+constructor ioDecimal.Create(const APrecision: Integer = 13; const AScale: Integer = 2);
 begin
   FPrecision := APrecision;
   FScale := AScale;
@@ -770,7 +770,7 @@ end;
 
 { ioBinary }
 
-constructor ioFTBinary.Create(const ABinarySubType: string);
+constructor ioBinary.Create(const ABinarySubType: string);
 begin
   FBinarySubType := ABinarySubType;
 end;
