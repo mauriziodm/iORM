@@ -747,7 +747,7 @@ end;
 
 { ioVarchar }
 
-constructor ioVarchar.Create(const ALength: Integer; const AIsUnicode: Boolean = True);
+constructor ioVarchar.Create(const ALength: Integer; const AIsUnicode: Boolean);
 begin
   FLength := ALength;
   FIsUnicode := AIsUnicode;
