@@ -525,7 +525,7 @@ begin
         LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
       if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
         LGroupBy := Self.GroupBy(ioGroupBy(LAttr).Value);
-      if LAttr is ioDisableAutoCreateDB then
+      if LAttr is ioDisableAutoCreateOnDB then
         LAutoCreateDB := False;
       // Index attribute (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
       if LAttr is ioIndex then

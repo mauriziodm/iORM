@@ -452,7 +452,7 @@ type
   end;
 
   // KeyGeneratorName attribute
-  ioDisableAutoCreateDB = class(TioCustomAttribute)
+  ioDisableAutoCreateOnDB = class(TioCustomAttribute)
   end;
 
   // DIC - diRegister attribute (register the class as is, without interfaces)
@@ -494,22 +494,18 @@ type
 
   // EmbeddedHasMany attribute
   ioEmbeddedHasMany = class(TioCustomRelationAttribute)
-
   end;
 
   // EmbeddedHasOne attribute
   ioEmbeddedHasOne = class(TioCustomRelationAttribute)
-
   end;
 
   // EmbeddedSkip attribute
   ioEmbeddedSkip = class(DoNotSerializeAttribute) // from DMVC ObjectsMappers
-
   end;
 
   // EmbeddedSkip attribute
   ioEmbeddedStreamable = class(StreamableAttribute) // from DMVC ObjectsMappers
-
   end;
 
   // ---------------------------------------------------------------------------
