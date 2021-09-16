@@ -345,6 +345,7 @@ end;
 
 procedure TioDataSet.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
+  SaveBeforeEditValues;
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
