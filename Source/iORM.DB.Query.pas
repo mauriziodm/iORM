@@ -323,7 +323,10 @@ begin
   if AValue <> 0 then
     ParamByProp(AProp).Value := AValue
   else
-    ParamByProp(AProp).Value := Null; // Thanks to Marco Mottadelli
+  begin
+    ParamByProp(AProp).Clear;
+    ParamByProp(AProp).DataType := ftInteger; // Thanks to Marco Mottadelli
+  end;
 end;
 
 procedure TioQuery.SetObjIDWhereParam(const AContext: IioContext);
