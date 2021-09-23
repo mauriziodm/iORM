@@ -25,7 +25,7 @@ type
     function GetProcessCost: Currency;
   public
     constructor Create; override;
-    [ioHasMany(IBOMItem, 'MasterID', ioLazyLoad)]
+    [ioHasMany(IBOMItem, 'MasterID', ltLazyLoad)]
     property BOMItems:IioList<IBOMItem> read GetBOMItems;
     [ioSkip]
     property Cost:Currency read GetCost;

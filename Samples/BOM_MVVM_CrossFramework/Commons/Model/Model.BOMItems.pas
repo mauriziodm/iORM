@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass, diImplements(IBOMItem)]
+  [ioEntity('BOMItems', mmFields), ioTrueClass, diImplements(IBOMItem)]
   TBOMItem = class(TInterfacedObject, IBOMItem)
   private
     [ioIndex]
@@ -26,7 +26,7 @@ type
     property Qty:Single read FQty write FQty;
   end;
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass]
+  [ioEntity('BOMItems', mmFields), ioTrueClass]
   TBOMItemMaterial = class(TBOMItem)
   private
     [ioBelongsTo('IMaterial')]
@@ -40,7 +40,7 @@ type
     property ItemCost:Currency read GetCost;
   end;
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass]
+  [ioEntity('BOMItems', mmFields), ioTrueClass]
   TBOMItemProcess = class(TBOMItem)
   private
     [ioBelongsTo(IProcess)]
@@ -56,7 +56,7 @@ type
     property ItemTime:Integer read GetTime;
   end;
 
-  [ioEntity('BOMItems', ioFields), ioTrueClass]
+  [ioEntity('BOMItems', mmFields), ioTrueClass]
   TBOMItemProduct = class(TBOMItem)
   private
     [ioBelongsTo(IProduct)]

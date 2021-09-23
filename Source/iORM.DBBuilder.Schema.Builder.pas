@@ -48,7 +48,7 @@ var
 begin
   for LProperty in AMap.GetProperties do
   begin
-    if (LProperty.GetRelationType in [ioRTNone, ioRTEmbeddedHasOne, ioRTEmbeddedHasMany]) or
+    if (LProperty.GetRelationType in [rtNone, rtEmbeddedHasOne, rtEmbeddedHasMany]) or
       (LProperty.GetMetadata_FKCreate = fkDoNotCreate) then
       Continue;
     // Resolve the type and alias for the relation child type
@@ -62,7 +62,7 @@ begin
       // If FK is between two classes mapped to two different ConnectionDefNames then skip it
       if AMap.GetTable.GetConnectionDefName <> LResolvedTypeMap.GetTable.GetConnectionDefName then
         Continue;
-      if LProperty.GetRelationType in [ioRTBelongsTo] then
+      if LProperty.GetRelationType in [rtBelongsTo] then
       begin
         LDependentProperty := LProperty;
         ASchema.FindTable(AMap.GetTable.TableName).AddForeignKey(LResolvedTypeMap, AMap, LProperty,
@@ -90,7 +90,7 @@ begin
   LSchemaTable := ASchema.FindOrCreateTable(AMap);
   // Add fields
   for LProperty in AMap.GetProperties do
-    if not (LProperty.IsSkipped or (LProperty.GetRelationType = ioRTHasMany) or (LProperty.GetRelationType = ioRTHasOne)) then
+    if not (LProperty.IsTransient or (LProperty.GetRelationType = rtHasMany) or (LProperty.GetRelationType = rtHasOne)) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   // Add the ClassInfo field if necessary
   if LSchemaTable.IsTrueClass then

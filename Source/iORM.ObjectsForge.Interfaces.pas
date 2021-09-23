@@ -111,7 +111,7 @@ begin
   begin
     // Create the child object/list if it isn't not already created by the master class constructor
     if not Assigned(Result) then
-      if AProperty.GetRelationType = ioRTHasMany then
+      if AProperty.GetRelationType = rtHasMany then
         Result := Self.CreateListByRttiType(   AProperty.GetRttiType   )
       else
         Result := Self.CreateObjectByRttiType(   AProperty.GetRttiType   );
@@ -435,7 +435,7 @@ begin
   // Get the where conditions for the details if exists (nil if not exists)
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // If LazyLoadable then set LazyLoad data - Set the lazy load relation data
-  if (AProperty.GetRelationLoadType = ioLazyLoad) and Supports(LChildObject, IioLazyLoadable, LLazyLoadableObj) then
+  if (AProperty.GetRelationLoadType = ltLazyLoad) and Supports(LChildObject, IioLazyLoadable, LLazyLoadableObj) then
     LLazyLoadableObj.SetRelationInfo(
        AProperty.GetRelationChildTypeName
       ,AProperty.GetRelationChildTypeAlias

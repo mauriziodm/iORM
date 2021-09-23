@@ -449,7 +449,7 @@ begin
   begin
     // If the current property is ReadOnly then skip it
     // If the current property RelationType is HasMany then skip it
-    if (not LProp.IsSqlRequestCompliant(ioInsert)) or (LProp.GetRelationType = ioRTHasMany) or (LProp.GetRelationType = ioRTHasOne) then
+    if (not LProp.IsSqlRequestCompliant(ioInsert)) or (LProp.GetRelationType = rtHasMany) or (LProp.GetRelationType = rtHasOne) then
       Continue;
     // Add the field param
     AQuery.SQL.Add(LComma + ':' + LProp.GetSqlParamName);
@@ -466,15 +466,15 @@ class function TioSqlGenerator.GenerateSqlJoinSectionItem(const AJoinItem: IioJo
 begin
   // Join
   case AJoinItem.GetJoinType of
-    ioCross:
+    jtCross:
       Result := 'CROSS JOIN ';
-    ioInner:
+    jtInner:
       Result := 'INNER JOIN ';
-    ioLeftOuter:
+    jtLeftOuter:
       Result := 'LEFT OUTER JOIN ';
-    ioRightOuter:
+    jtRightOuter:
       Result := 'RIGHT OUTER JOIN ';
-    ioFullOuter:
+    jtFullOuter:
       Result := 'FULL OUTER JOIN ';
   else
     raise EioException.Create(Self.ClassName + ': Join type not valid.');
@@ -482,7 +482,7 @@ begin
   // Joined table name
   Result := Result + '[' + AJoinItem.GetJoinClassRef.ClassName + ']';
   // Conditions
-  if AJoinItem.GetJoinType <> ioCross then
+  if AJoinItem.GetJoinType <> jtCross then
     Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
 end;
 
@@ -526,7 +526,7 @@ begin
   begin
     // If the current property is ReadOnly then skip it
     // If the current property RelationType is HasMany then skip it
-    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = ioRTHasMany) or (Prop.GetRelationType = ioRTHasOne) then
+    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = rtHasMany) or (Prop.GetRelationType = rtHasOne) then
       Continue;
     // Add the field param
     AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);

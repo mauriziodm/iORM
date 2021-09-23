@@ -1,14 +1,17 @@
-unit M.Model;
+unit Model;
 
 interface
 
-uses iORM.Attributes, System.Generics.Collections,
-  iORM.Containers.Interfaces, iORM.CommonTypes, ObjMapper.Attributes,
-  M.Interfaces;
+uses iORM.Attributes, System.Generics.Collections, Interfaces,
+  iORM.Containers.Interfaces, iORM.CommonTypes;
 
 type
 
+//{$RTTI EXPLICIT METHODS([vcPublic, vcProtected, vcPrivate])}
+{$RTTI EXPLICIT METHODS([vcPublic, vcProtected])}
+
   [ioEntity('Phones'), diImplements(IPhoneNumber)]
+//  [ioConnectionDefName('SQLiteConn')]
   TPhoneNumber = class(TInterfacedObject, IPhoneNumber)
   private
     FPhoneNumber: String;
@@ -25,8 +28,7 @@ type
     procedure SetPhoneNumber(AValue:String);
     function GetPhoneNumber: String;
   public
-    constructor Create; overload;
-    constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer; NewID: Integer = 0); overload;
+    constructor Create(NewPhoneType, NewPhoneNumber: String; NewPersonID: Integer); overload;
     destructor Destroy; override;
     property ID: Integer read GetID write SetID;
     property PersonID:Integer read GetPersonID write SetPersonID;
@@ -34,39 +36,38 @@ type
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
   end;
 
-  [ioEntity('Persons'), ioTrueClass, diImplements(IPerson)]
+  [ioEntity('Persons', mmFields), ioTrueClass, diImplements(IPerson)]
+//  [ioConnectionDefName('FBConn')]
   TPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;
     FLastName: String;
     FFirstName: String;
+    [ioHasMany(IPhoneNumber, 'PersonID', ioLazyLoad), ioInject]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);
-    function GetID: Integer;
     procedure SetFirstName(AValue:String);
-    function GetFirstName: String;
     procedure SetLastName(AValue:String);
-    function GetLastName: String;
     procedure SetPhones(AValue:IioList<IPhoneNumber>);
+    function GetID: Integer;
+    function GetFirstName: String;
+    function GetLastName: String;
     function GetPhones: IioList<IPhoneNumber>;
     function GetFullName: String;
     function GetClassNameProp: String;
   public
-    constructor Create; overload;
-    constructor Create(NewFirstName, NewLastName: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName: String; NewID: Integer); overload;
     property ID:Integer read GetID write SetID;
     property FirstName:String read GetFirstName write SetFirstName;
     property LastName:String read GetLastName write SetLastName;
-    [ioHasMany(IPhoneNumber, 'PersonID', ltLazyLoad)]
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
-    [ioSkip]
     property FullName:String read GetFullName;
-    [ioSkip]
     property ClassNameProp:String read GetClassNameProp;
   end;
 
-  [ioEntity('Persons'), ioTrueClass, diImplements(IEmployee)]
+  [ioEntity('Persons',  mmFields), ioTrueClass, diImplements(IEmployee)]
+//  [ioConnectionDefName('FBConn')]
   TEmployee = class(TPerson, IEmployee)
   private
     FBranchOffice: String;
@@ -74,23 +75,27 @@ type
     procedure SetBranchOffice(AValue:String);
     function GetBranchOffice: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewBranchOffice: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewBranchOffice: String; NewID: Integer); overload;
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Persons'), ioTrueClass, diImplements(ICustomer)]
+  [ioEntity('Persons',  mmFields), ioTrueClass, diImplements(ICustomer)]
+//  [ioConnectionDefName('FBConn')]
   TCustomer = class(TPerson, ICustomer)
   private
+    [ioIndex]
+    [ioIndex(ioDescending)]
     FFidelityCardCode: String;
   protected
     procedure SetFidelityCardCode(AValue:String);
     function GetFidelityCardCode: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode: String; NewID: Integer); overload;
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('Persons'), ioTrueClass, diImplements(IVipCustomer)]
+  [ioEntity('Persons',  mmFields), ioTrueClass, diImplements(IVipCustomer)]
+//  [ioConnectionDefName('FBConn')]
   TVipCustomer = class(TCustomer, IVipCustomer)
   private
     FVipCardCode: String;
@@ -98,7 +103,7 @@ type
     procedure SetVipCardCode(AValue:String);
     function GetVipCardCode: String;
   public
-    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode, NewVipCardCode: String; NewID: Integer = 0); overload;
+    constructor Create(NewFirstName, NewLastName, NewFidelityCardCode, NewVipCardCode: String; NewID: Integer); overload;
     property VipCardCode:String read GetVipCardCode write SetVipCardCode;
   end;
 
@@ -111,16 +116,10 @@ uses
 
 constructor TPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);
 begin
-  Self.Create;
+  inherited Create;
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;
-end;
-
-constructor TPerson.Create;
-begin
-  inherited;
-  FPhones := io.di.Locate<IioList<IPhoneNumber>>.Get;
 end;
 
 function TPerson.GetClassNameProp: String;
@@ -178,7 +177,7 @@ end;
 constructor TEmployee.Create(NewFirstName, NewLastName, NewBranchOffice: String;
   NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName);
+  inherited Create(NewFirstName, NewLastName, NewID);
   FBranchOffice := NewBranchOffice;
 end;
 
@@ -197,7 +196,7 @@ end;
 constructor TCustomer.Create(NewFirstName, NewLastName,
   NewFidelityCardCode: String; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName);
+  inherited Create(NewFirstName, NewLastName, NewID);
   FFidelityCardCode := NewFidelityCardCode;
 end;
 
@@ -216,14 +215,14 @@ end;
 constructor TVipCustomer.Create(NewFirstName, NewLastName,
   NewFidelityCardCode, NewVipCardCode: String; NewID: Integer);
 begin
-  inherited Create(NewFirstName, NewLastName, NewFidelityCardCode);
+  inherited Create(NewFirstName, NewLastName, NewFidelityCardCode, NewID);
   FVipCardCode := NewVipCardCode;
 end;
 
 { TPhoneNumbers }
 
 constructor TPhoneNumber.Create(NewPhoneType, NewPhoneNumber: String;
-  NewPersonID, NewID: Integer);
+  NewPersonID: Integer);
 begin
   inherited Create;
   FPersonID := NewPersonID;
@@ -240,11 +239,6 @@ end;
 procedure TVipCustomer.SetVipCardCode(AValue: String);
 begin
   FVipCardCode := AValue;
-end;
-
-constructor TPhoneNumber.Create;
-begin
-  inherited;
 end;
 
 destructor TPhoneNumber.Destroy;

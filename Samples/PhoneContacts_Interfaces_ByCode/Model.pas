@@ -36,7 +36,7 @@ type
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
   end;
 
-  [ioEntity('Persons', ioFields), ioTrueClass]
+  [ioEntity('Persons', mmFields), ioTrueClass]
   [ioIndex('[.LastName], [.FirstName]')]
   TPerson = class(TInterfacedObject, IPerson)
   private
@@ -69,7 +69,7 @@ type
     property ClassNameProp:String read GetClassNameProp;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioEntity('Persons',  mmFields), ioTrueClass]
   TEmployee = class(TPerson, IEmployee)
   private
     FBranchOffice: String;
@@ -81,7 +81,7 @@ type
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioEntity('Persons',  mmFields), ioTrueClass]
   TCustomer = class(TPerson, ICustomer)
   private
     [ioIndex]
@@ -95,7 +95,7 @@ type
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass]
+  [ioEntity('Persons',  mmFields), ioTrueClass]
   TVipCustomer = class(TCustomer, IVipCustomer)
   private
     FVipCardCode: String;

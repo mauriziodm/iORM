@@ -36,14 +36,14 @@ type
     property PhoneNumber:String read FPhoneNumber write FPhoneNumber;
   end;
 
-  [ioEntity('Persons', ioFields), ioTrueClass, diImplements(IPerson)]
+  [ioEntity('Persons', mmFields), ioTrueClass, diImplements(IPerson)]
 //  [ioConnectionDefName('FBConn')]
   TPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;
     FLastName: String;
     FFirstName: String;
-    [ioHasMany(IPhoneNumber, 'PersonID', ioLazyLoad), ioInject]
+    [ioHasMany(IPhoneNumber, 'PersonID', ltLazyLoad), ioInject]
     FPhones: IioList<IPhoneNumber>;
   protected
     procedure SetID(AValue:Integer);
@@ -66,7 +66,7 @@ type
     property ClassNameProp:String read GetClassNameProp;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass, diImplements(IEmployee)]
+  [ioEntity('Persons',  mmFields), ioTrueClass, diImplements(IEmployee)]
 //  [ioConnectionDefName('FBConn')]
   TEmployee = class(TPerson, IEmployee)
   private
@@ -79,7 +79,7 @@ type
     property BranchOffice:String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass, diImplements(ICustomer)]
+  [ioEntity('Persons',  mmFields), ioTrueClass, diImplements(ICustomer)]
 //  [ioConnectionDefName('FBConn')]
   TCustomer = class(TPerson, ICustomer)
   private
@@ -94,7 +94,7 @@ type
     property FidelityCardCode:String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('Persons',  ioFields), ioTrueClass, diImplements(IVipCustomer)]
+  [ioEntity('Persons',  mmFields), ioTrueClass, diImplements(IVipCustomer)]
 //  [ioConnectionDefName('FBConn')]
   TVipCustomer = class(TCustomer, IVipCustomer)
   private

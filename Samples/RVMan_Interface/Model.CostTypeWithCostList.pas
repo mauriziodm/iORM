@@ -12,7 +12,7 @@ type
   // Classe che rappresenta i tipi di spesa possibili comprensivo
   // però anche della lista dei costi e dell'importo totale
   [ioTable('COSTTYPES')]
-  [ioJoin(ioInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
+  [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
   [ioGroupBy('[TCostType.ID], [TCostType.Descrizione], [TCostGeneric.TravelID], [TCostType.ObjectType]')]
   TCostTypeWithCostList = class(TCostType, ICostTypeWithCostList)
   strict private
@@ -34,7 +34,7 @@ type
   public
     [ioField('[TCostGeneric].TravelID')]
     property TravelID:Integer read GetTRavelID write SetTravelID;
-    [ioHasMany(ICostGeneric, 'CostType', ioEagerLoad)]
+    [ioHasMany(ICostGeneric, 'CostType', ltEagerLoad)]
     property CostList:IioList<ICostGeneric> read GetCostList write SetCostList;
     [ioSkip]
     property CostTotalAmount: Currency read GetCostTotalAmount;

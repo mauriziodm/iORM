@@ -79,7 +79,7 @@ begin
     case CurrProp.GetRelationType of
 // ------------------------------ NO RELATION --------------------------------------------------------------------------------------
       // If RelationType = ioRTNone then load normal property value (No relation)
-      ioRTNone: begin
+      rtNone: begin
         // If it isn't related to a blob field then load as normal value
         if not CurrProp.IsBlob then
           CurrProp.SetValue(Result, AQuery.GetValue(CurrProp, AContext))
@@ -94,11 +94,11 @@ begin
       end;
 // ------------------------------ RELATION -----------------------------------------------------------------------------------------
       // Load the related object/s
-      ioRTHasMany:          LoadPropertyHasMany(AContext, AQuery, CurrProp);
-      ioRTEmbeddedHasMany:  LoadPropertyEmbeddedHasMany(AContext, AQuery, CurrProp);
-      ioRTBelongsTo:        AObj := LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
-      ioRTHasOne:           AObj := LoadPropertyHasOne(AContext, AQuery, CurrProp);
-      ioRTEmbeddedHasOne:   AObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, CurrProp);
+      rtHasMany:          LoadPropertyHasMany(AContext, AQuery, CurrProp);
+      rtEmbeddedHasMany:  LoadPropertyEmbeddedHasMany(AContext, AQuery, CurrProp);
+      rtBelongsTo:        AObj := LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
+      rtHasOne:           AObj := LoadPropertyHasOne(AContext, AQuery, CurrProp);
+      rtEmbeddedHasOne:   AObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, CurrProp);
     end;
     if Assigned(AObj) then
     begin

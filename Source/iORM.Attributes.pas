@@ -44,20 +44,20 @@ type
   TioActionEvent = (Null, OnExecute, OnUpdate, OnHint);
 
   // Type of class mapping
-  TioMapModeType = (ioProperties, ioFields);
+  TioMapModeType = (mmHybrid, mmProperties, mmFields);
 
   // Relation types
-  TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne);
+  TioRelationType = (rtNone, rtBelongsTo, rtHasMany, rtHasOne, rtEmbeddedHasMany, rtEmbeddedHasOne);
 
   // ForeignKey types
   TioFKAction = (fkUnspecified, fkNoAction, fkSetNull, fkSetDefault, fkCascade);
   TioFKCreate = (fkCreate, fkDoNotCreate);
 
   // LazyLoad
-  TioLoadType = (ioEagerLoad = 0, ioLazyLoad);
+  TioLoadType = (ltEagerLoad = 0, ltLazyLoad);
 
   // Join types
-  TioJoinType = (ioInner, ioCross, ioLeftOuter, ioRightOuter, ioFullOuter);
+  TioJoinType = (jtInner, jtCross, jtLeftOuter, jtRightOuter, jtFullOuter);
 
   // ===========================================================================
   // START BASE ATTRIBUTES
@@ -222,6 +222,7 @@ type
   // Skip attribute
   ioSkip = class(TioCustomAttribute)
   end;
+  ioTransient = ioSkip;
 
   // ID attribute
   ioID = class(TioCustomAttribute)
@@ -350,13 +351,13 @@ type
     FLoadType: TioLoadType;
   public
     constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String;
-      const ALoadType: TioLoadType = ioEagerLoad); overload;
+      const ALoadType: TioLoadType = ltEagerLoad); overload;
     constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String;
-      const ALoadType: TioLoadType = ioEagerLoad); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad); overload;
+      const ALoadType: TioLoadType = ltEagerLoad); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ltEagerLoad); overload;
     constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String;
-      const ALoadType: TioLoadType = ioEagerLoad); overload;
-    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ioEagerLoad); overload;
+      const ALoadType: TioLoadType = ltEagerLoad); overload;
+    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ltEagerLoad); overload;
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
   end;
@@ -392,7 +393,7 @@ type
   strict private
     FMapMode: TioMapModeType;
   public
-    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = ioProperties); overload;
+    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = mmProperties); overload;
     constructor Create(const AMapMode: TioMapModeType); overload;
     property MapMode: TioMapModeType read FMapMode;
   end;
@@ -571,7 +572,7 @@ end;
 { ioHasMany }
 
 constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String;
-  const ALoadType: TioLoadType = ioEagerLoad);
+  const ALoadType: TioLoadType = ltEagerLoad);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;

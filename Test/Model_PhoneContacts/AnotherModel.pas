@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('OtherPersons',  ioFields), ioTrueClass, ioKeyGenerator('PERSONS')]
+  [ioEntity('OtherPersons',  mmFields), ioTrueClass, ioKeyGenerator('PERSONS')]
 //  [ioConnectionDefName('FBConn')]
   TAnotherPerson = class(TInterfacedObject, IPerson)
   private

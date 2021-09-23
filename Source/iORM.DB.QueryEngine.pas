@@ -171,16 +171,16 @@ begin
     case LProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
       // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
-      ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne:
+      rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
         LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
-      ioRTBelongsTo:
+      rtBelongsTo:
         LQuery.SetIntegerParamNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
-      ioRTHasOne: { Nothing }
+      rtHasOne: { Nothing }
         ;
       // else if RelationType = ioRTHasMany
-      ioRTHasMany: { Nothing }
+      rtHasMany: { Nothing }
         ;
     end;
   end;
@@ -298,16 +298,16 @@ begin
     case LProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
       // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
-      ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne:
+      rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
         LQuery.SetParamValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
-      ioRTBelongsTo:
+      rtBelongsTo:
         LQuery.SetIntegerParamNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
-      ioRTHasOne: { Nothing }
+      rtHasOne: { Nothing }
         ;
       // else if RelationType = ioRTHasMany
-      ioRTHasMany: { Nothing }
+      rtHasMany: { Nothing }
         ;
     end;
   end;

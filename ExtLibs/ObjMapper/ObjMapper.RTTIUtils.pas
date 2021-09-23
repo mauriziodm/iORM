@@ -248,8 +248,7 @@ begin
   Result := Assigned(GetAttribute<T>(Obj));
 end;
 
-class
-  function TRTTIUtils.HasAttribute<T>(ARTTIMember: TRttiMember;
+class function TRTTIUtils.HasAttribute<T>(ARTTIMember: TRttiMember;
   out AAttribute: T): boolean;
 var
   attrs: TArray<TCustomAttribute>;
@@ -281,7 +280,6 @@ begin
       AAttribute := T(Attr);
       Exit(true);
     end;
-
 end;
 
 class

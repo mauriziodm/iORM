@@ -190,7 +190,7 @@ function TioQuery.GetValue(const AProperty: IioContextProperty; const AContext: 
 begin
   // If the property is a BelongsTo relation then return data as Integer
   // (the type for ID)
-  if AProperty.GetRelationType = ioRTBelongsTo then
+  if AProperty.GetRelationType = rtBelongsTo then
     Exit(FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger);
 
   // If the property is mapped into a blob field
@@ -392,12 +392,12 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   // Embedded property (ioRTEmbeddedHasMany & ioRTEmbeddedHasOne relation type)
   // -------------------------------------------------------------------------------------------------------------------------------
-  if (AProp.GetRelationType = ioRTEmbeddedHasMany) or (AProp.GetRelationType = ioRTEmbeddedHasOne) then
+  if (AProp.GetRelationType = rtEmbeddedHasMany) or (AProp.GetRelationType = rtEmbeddedHasOne) then
   begin
     case AProp.GetRelationType of
-      ioRTEmbeddedHasMany:
+      rtEmbeddedHasMany:
         AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(AObj);
-      ioRTEmbeddedHasOne:
+      rtEmbeddedHasOne:
         AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(AObj);
     else
       AJSONValue := nil;

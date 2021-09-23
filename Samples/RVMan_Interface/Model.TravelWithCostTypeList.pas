@@ -25,7 +25,7 @@ type
   public
     procedure RefreshTotals;
     // Properties
-    [ioHasMany(ICostTypeWithCostList, 'TravelID', ioLazyLoad)]
+    [ioHasMany(ICostTypeWithCostList, 'TravelID', ltLazyLoad)]
     property CostTypeList:IioList<ICostTypeWithCostList> read GetCostTypeList write SetCostTypeList;
     [ioLoadSql('select sum([TCostGeneric.CostAmount]) from [TCostGeneric] where [TCostGeneric.TravelID] = [TTravel.ID]')]
     property TotalAmount:Currency read FTotalAmount write FTotalAmount;

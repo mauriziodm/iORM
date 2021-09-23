@@ -162,10 +162,10 @@ begin
       Continue;
     Inst := Typ.AsInstance;
     // Only classes with explicit ioTable attribute
-    if not Self.IsValidEntity_diAutoRegister(Inst) then
+    if not IsValidEntity_diAutoRegister(Inst) then
       Continue;
     // Load the current class (entity) into the ContextContainer
-    Self.Add(Inst.MetaclassType);
+    Add(Inst.MetaclassType);
   end;
 end;
 

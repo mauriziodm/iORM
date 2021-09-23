@@ -490,7 +490,7 @@ begin
   Self.StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
-    if (ARelationPropertyName <> '') and (ARelationOID <> 0) and (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = ioRTNone)
+    if (ARelationPropertyName <> '') and (ARelationOID <> 0) and (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone)
     // Altrimenti in alcuni casi particolare dava errori
     then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
@@ -568,13 +568,13 @@ begin
       Continue;
     case Prop.GetRelationType of
       // If relation HasBelongsToOne
-      ioRTBelongsTo: { Nothing }
+      rtBelongsTo: { Nothing }
         ;
       // If relation HasMany
-      ioRTHasMany:
+      rtHasMany:
         DeleteRelationChildList(AContext, Prop);
       // If relation HasOne
-      ioRTHasOne:
+      rtHasOne:
         DeleteRelationChildObject(AContext, Prop);
     end;
   end;
@@ -593,13 +593,13 @@ begin
       Continue;
     case Prop.GetRelationType of
       // If relation HasBelongsToOne
-      ioRTBelongsTo: { Nothing }
+      rtBelongsTo: { Nothing }
         ;
       // If relation HasMany
-      ioRTHasMany:
+      rtHasMany:
         PersistRelationChildList(AContext, Prop);
       // If relation HasOne
-      ioRTHasOne:
+      rtHasOne:
         PersistRelationChildObject(AContext, Prop);
     end;
   end;
@@ -618,7 +618,7 @@ begin
       Continue;
     case Prop.GetRelationType of
       // If relation BelongsTo: persist the child object to retrieve the ID (if new object or ID changed)
-      ioRTBelongsTo:
+      rtBelongsTo:
         begin
           // ---------- M.M. 17/08/18 ----------
           // Marco ha aggiunto questa riga che persiste anche l'oggetto child di una relazione BelongsTo
@@ -632,10 +632,10 @@ begin
           { Nothing }  // Non persiste più nulla in caso di relazione BelongsTo
         end;
       // If relation HasMany
-      ioRTHasMany: { Nothing }
+      rtHasMany: { Nothing }
         ;
       // If relation HasOne
-      ioRTHasOne: { Nothing }
+      rtHasOne: { Nothing }
         ;
     end;
   end;

@@ -77,7 +77,7 @@ implementation
 uses
   Model, iORM, System.Generics.Collections, iORM.Containers.List,
   iORM.Containers.Interfaces, iORM.LiveBindings.InterfaceListBindSourceAdapter,
-  iORM.Rtti.Utilities, iORM.LiveBindings.Interfaces,
+  iORM.Utilities, iORM.LiveBindings.Interfaces,
   iORM.Where.Interfaces, iORM.Where, FireDAC.Comp.Client,
   iORM.DB.Interfaces;
 
@@ -85,12 +85,12 @@ uses
 
 procedure TMainForm.btImmediateLoadClick(Sender: TObject);
 begin
-  GlobalPerson := io.Load<IPerson>.ByOID(1).ToObject;
+  GlobalPerson := io.Load<IPerson>.ByID(1).ToObject;
 end;
 
 procedure TMainForm.btLazyLoadClick(Sender: TObject);
 begin
-  GlobalPerson := io.Load<IPerson>.Lazy.ByOID(1).ToObject;
+  GlobalPerson := io.Load<IPerson>.Lazy.ByID(1).ToObject;
 end;
 
 procedure TMainForm.btPersonDemoClick(Sender: TObject);
@@ -156,7 +156,7 @@ procedure TMainForm.Button1Click(Sender: TObject);
 var
   APerson: TPerson;
 begin
-  APerson := io.Load<TPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
+  APerson := io.Load<TPerson>.ByID(Edit1.Text.ToInteger).ToObject;
   ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString + ' Numbers');
   APerson.Free;
 end;
@@ -165,7 +165,7 @@ procedure TMainForm.Button2Click(Sender: TObject);
 var
   LPerson: IPerson;
 begin
-  LPerson := io.Load<IPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
+  LPerson := io.Load<IPerson>.ByID(Edit1.Text.ToInteger).ToObject;
   ShowMessage(LPerson.ID.ToString + ' - ' + LPerson.FullName + ' (' + LPerson.ClassNameProp + ') ' + LPerson.Phones.Count.ToString + ' Numbers');
 end;
 

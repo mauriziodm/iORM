@@ -117,9 +117,9 @@ begin
   LMasterProperty := LMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);
   // Create the Adapter
   case LMasterProperty.GetRelationType of
-    ioRTBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne:
+    rtBelongsTo, rtHasOne, rtEmbeddedHasOne:
       LNewAdapter := TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner, LMasterProperty, AWhere);
-    ioRTHasMany, ioRTEmbeddedHasMany:
+    rtHasMany, rtEmbeddedHasMany:
       LNewAdapter := TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner, LMasterProperty, AWhere);
     else
       raise EioException.Create(Self.ClassName + ': Relation not found');

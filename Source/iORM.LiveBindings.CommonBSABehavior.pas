@@ -312,7 +312,7 @@ begin
   LMap := TioContextFactory.Map(TioUtilities.ResolveRttiTypeToClassRef(AType));
   for LProperty in LMap.GetProperties do
   begin
-    if LProperty.GetRelationType in [ioRtBelongsTo, ioRTHasOne, ioRTEmbeddedHasOne] then
+    if LProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne] then
     begin
       LChildPath := AMasterPath + LProperty.GetName + '.';
       LChildGetMemberObject := TioBindSourceAdapterGetChildMemberObject.Create(AMasterGetMemberObject, LProperty);

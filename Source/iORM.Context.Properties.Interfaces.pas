@@ -48,7 +48,7 @@ uses
 type
 
   // ReadWrite options (for properties and even classes)
-  TioReadWrite = (iorwReadOnly, iorwReadWrite, iorwWriteOnly);
+  TioLoadPersist = (lpLoadOnly, lpLoadAndPersist, lpPersistOnly);
 
   // Options set for GetSql functions parameter
   TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert, ioDelete, ioExist);
@@ -101,7 +101,7 @@ type
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
     function IsWritable: Boolean;
-    function IsSkipped: Boolean;
+    function IsTransient: Boolean;
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
     procedure SetMetadata_FieldPrecision(const AMetadata_FieldPrecision: Integer);
@@ -132,7 +132,7 @@ type
   IioContextProperties = interface(IioSqlItem)
     ['{AB30A3A2-640C-4BEF-B301-2CB7C855037B}']
     function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioContextProperty>;
-    procedure Add(const AProperty:IioContextProperty; const AIsId:Boolean=False; const AIDSkipOnInsert:Boolean=True);
+    procedure Add(const AProperty:IioContextProperty);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName:String): IioContextProperty;

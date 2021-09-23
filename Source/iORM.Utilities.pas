@@ -69,6 +69,7 @@ type
     class function EnumToString<T>(const AEnumValue:T): String;
     class function GetThreadID: TThreadID;
     class function ExtractItemRttiType<T>: TRttiType;
+    class function HasAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
   end;
 
 implementation
@@ -199,6 +200,22 @@ begin
     if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
       Exit(TRttiInterfaceType(LType).Handle);
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
+end;
+
+class function TioUtilities.HasAttribute<T>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
+var
+  LAttributes: TArray<TCustomAttribute>;
+  LAttribute: TCustomAttribute;
+begin
+  OAttribute := nil;
+  Result := False;
+  LAttributes := ARTTIMember.GetAttributes;
+  for LAttribute in LAttributes do
+    if LAttribute is T then
+    begin
+      OAttribute := LAttribute;
+      Exit(true);
+    end;
 end;
 
 class function TioUtilities.IsAnInterfaceTypeName(const ATypeName: String): Boolean;

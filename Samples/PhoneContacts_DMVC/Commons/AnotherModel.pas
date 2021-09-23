@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('OtherPersons',  ioFields), ioTrueClass, ioKeyGenerator('PERSONS')]
+  [ioEntity('OtherPersons',  mmFields), ioTrueClass, ioKeyGenerator('PERSONS')]
   TAnotherPerson = class(TInterfacedObject, IPerson)
   private
     FID: Integer;
