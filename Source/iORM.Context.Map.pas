@@ -52,7 +52,7 @@ type
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
     FAncestorMap: IioMap;
-    fDIContainerImplementersItem: TioDIContainerImplementersItem;
+    FDIContainerImplementersItem: TioDIContainerImplementersItem;
   public
     constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioContextTable; AProperties:IioContextProperties); overload;
     function GetClassRef: TioClassRef;
@@ -122,7 +122,7 @@ end;
 
 function TioMap.GetDIContainerImplementersItem: TioDIContainerImplementersItem;
 begin
-  Result := fDIContainerImplementersItem;
+  Result := FDIContainerImplementersItem;
 end;
 
 function TioMap.GetProperties: IioContextProperties;
@@ -153,7 +153,7 @@ end;
 procedure TioMap.SetDIContainerImplementersItem(
   const AValue: TioDIContainerImplementersItem);
 begin
-  fDIContainerImplementersItem := AValue;
+  FDIContainerImplementersItem := AValue;
 end;
 
 end.

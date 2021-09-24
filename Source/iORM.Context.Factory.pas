@@ -213,33 +213,33 @@ var
     LRttiField: TRttiField;
     LAttribute: TCustomAttribute;
     // DB field metadata (DBBuilder)
-    PropMetadata_FieldType: TioMetadataFieldType;
-    PropMetadata_FieldSubType: string;
-    PropMetadata_FieldLength: Integer;
-    PropMetadata_FieldPrecision: Integer;
-    PropMetadata_FieldScale: Integer;
-    PropMetadata_FieldNotNull: Boolean;
-    PropMetadata_FieldUnicode: Boolean;
-    PropMetadata_CustomFieldType: string;
-    PropMetadata_Default: TValue;
-    PropMetadata_FKAutoCreate: TioFKCreate;
-    PropMetadata_FKOnDeleteAction: TioFKAction;
-    PropMetadata_FKOnUpdateAction: TioFKAction;
+    LDB_FieldType: TioMetadataFieldType;
+    LDB_FieldSubType: string;
+    LDB_FieldLength: Integer;
+    LDB_FieldPrecision: Integer;
+    LDB_FieldScale: Integer;
+    LDB_FieldNotNull: Boolean;
+    LDB_FieldUnicode: Boolean;
+    LDB_CustomFieldType: string;
+    LDB_Default: TValue;
+    LDB_FKAutoCreate: TioFKCreate;
+    LDB_FKOnDeleteAction: TioFKAction;
+    LDB_FKOnUpdateAction: TioFKAction;
     // Map metadata
-    PropID: Boolean;
-    PropIDSkipOnInsert: Boolean;
-    PropTypeAlias: String;
-    PropFieldName: String;
-    PropFieldType: String;
-    PropFieldValueType: System.Rtti.TRttiType;
-    PropLoadSql: String;
-    PropTransient: Boolean;
-    PropLoadPersist: TioLoadPersist;
-    PropRelationType: TioRelationType;
-    PropRelationChildTypeName: String;
-    PropRelationChildTypeAlias: String;
-    PropRelationChildPropertyName: String;
-    PropRelationChildLoadType: TioLoadType;
+    LMember_IsID: Boolean;
+    LMember_IDSkipOnInsert: Boolean;
+    LMember_TypeAlias: String;
+    LMember_FieldName: String;
+    LMember_FieldType: String;
+    LMember_FieldValueType: System.Rtti.TRttiType;
+    LMember_LoadSql: String;
+    LMember_Transient: Boolean;
+    LMember_LoadPersist: TioLoadPersist;
+    LMember_RelationType: TioRelationType;
+    LMember_RelationChildTypeName: String;
+    LMember_RelationChildTypeAlias: String;
+    LMember_RelationChildPropertyName: String;
+    LMember_RelationChildLoadType: TioLoadType;
   begin
     // Loop all properties
     for LMember in LMembers do
@@ -248,66 +248,66 @@ var
       if LMember is TRttiField then
       begin
         LRttiField := LMember as TRttiField;
-        PropFieldValueType := LRttiField.FieldType;
-        PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
-        PropFieldName := TioField.Remove_F_FromName(LMember.Name);
+        LMember_FieldValueType := LRttiField.FieldType;
+        LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
+        LMember_FieldName := TioField.Remove_F_FromName(LMember.Name);
       end
       else
       if LMember is TRttiProperty then
       begin
         LRttiProperty := LMember as TRttiProperty;
-        PropFieldValueType := LRttiProperty.PropertyType;
-        PropMetadata_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
-        PropFieldName := LMember.Name;
+        LMember_FieldValueType := LRttiProperty.PropertyType;
+        LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
+        LMember_FieldName := LMember.Name;
       end
       else
         raise EioException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');
       // Skip if this member is the RefCount or Disposed property (TInterfacedObject) or it's an already exist member
-      if (PropFieldName = 'RefCount') or (PropFieldName = 'Disposed') or Result.PropertyExists(PropFieldName) then
+      if (LMember_FieldName = 'RefCount') or (LMember_FieldName = 'Disposed') or Result.PropertyExists(LMember_FieldName) then
         Continue;
       // DB metadata initialization
-      PropMetadata_FieldLength := IO_DEFAULT_FIELD_LENGTH;
-      PropMetadata_FieldPrecision := IO_DEFAULT_FIELD_PRECISION;
-      PropMetadata_FieldScale := IO_DEFAULT_FIELD_SCALE;
-      PropMetadata_FieldNotNull := False;
-      PropMetadata_Default := nil;
-      PropMetadata_FieldUnicode := True;
-      PropMetadata_CustomFieldType := '';
-      PropMetadata_FieldSubType := '';
-      PropMetadata_FKAutoCreate := fkCreate;
-      PropMetadata_FKOnDeleteAction := fkUnspecified;
-      PropMetadata_FKOnUpdateAction := fkUnspecified;
+      LDB_FieldLength := IO_DEFAULT_FIELD_LENGTH;
+      LDB_FieldPrecision := IO_DEFAULT_FIELD_PRECISION;
+      LDB_FieldScale := IO_DEFAULT_FIELD_SCALE;
+      LDB_FieldNotNull := False;
+      LDB_Default := nil;
+      LDB_FieldUnicode := True;
+      LDB_CustomFieldType := '';
+      LDB_FieldSubType := '';
+      LDB_FKAutoCreate := fkCreate;
+      LDB_FKOnDeleteAction := fkUnspecified;
+      LDB_FKOnUpdateAction := fkUnspecified;
       // Map members (props and/or fields) initialization
-      PropID := (Uppercase(PropFieldName) = 'ID');
-      PropIDSkipOnInsert := True;
-      PropTypeAlias := '';
-      PropFieldType := '';
-      PropLoadSql := '';
-      PropTransient := ATransientAsDeafult;
-      PropLoadPersist := lpLoadAndPersist;
-      PropRelationType := rtNone;
-      PropRelationChildTypeName := '';
-      PropRelationChildTypeAlias := '';
-      PropRelationChildPropertyName := '';
-      PropRelationChildLoadType := ltEagerLoad;
+      LMember_IsID := (Uppercase(LMember_FieldName) = 'ID');
+      LMember_IDSkipOnInsert := True;
+      LMember_TypeAlias := '';
+      LMember_FieldType := '';
+      LMember_LoadSql := '';
+      LMember_Transient := ATransientAsDeafult;
+      LMember_LoadPersist := lpLoadAndPersist;
+      LMember_RelationType := rtNone;
+      LMember_RelationChildTypeName := '';
+      LMember_RelationChildTypeAlias := '';
+      LMember_RelationChildPropertyName := '';
+      LMember_RelationChildLoadType := ltEagerLoad;
       // ObjStatus property detection by type "TioObjStatus"
-      if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
+      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
       begin
         Result.ObjStatusProperty := Self.GetProperty(ATable, LMember, '', '', '', '', True, False, False, lpLoadOnly, rtNone, '', '', '', ltEagerLoad,
-          PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNotNull, nil,
-          PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType, PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction,
-          PropMetadata_FKOnDeleteAction);
+          LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil,
+          LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction,
+          LDB_FKOnDeleteAction);
         Continue;
       end;
       // ObjVersion property detection by type "TioObjVersion"
-      if PropFieldValueType.Name = GetTypeName(TypeInfo(TioObjVersion)) then
+      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjVersion)) then
       begin
         if TioUtilities.HasAttribute<ioField>(LMember, LAttribute) then
-          PropFieldName := ioField(LAttribute).Value;
-        Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', PropFieldName, '', '', False, False, False, lpLoadAndPersist, rtNone, '', '', '',
-          ltEagerLoad, PropMetadata_FieldType, PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNotNull, nil,
-          PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType, PropMetadata_FKAutoCreate, PropMetadata_FKOnUpdateAction,
-          PropMetadata_FKOnDeleteAction);
+          LMember_FieldName := ioField(LAttribute).Value;
+        Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, False, lpLoadAndPersist, rtNone, '', '', '',
+          ltEagerLoad, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil,
+          LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction,
+          LDB_FKOnDeleteAction);
         Result.Add(Result.ObjVersionProperty);
         Continue;
       end;
@@ -316,139 +316,139 @@ var
       begin
         if LAttribute is ioOID then
         begin
-          PropID := True;
-          PropIDSkipOnInsert := ioOID(LAttribute).SkipOnInsert;
+          LMember_IsID := True;
+          LMember_IDSkipOnInsert := ioOID(LAttribute).SkipOnInsert;
         end;
         if LAttribute is ioField then
         begin
           if not ioField(LAttribute).Value.IsEmpty then
-            PropFieldName := ioField(LAttribute).Value;
-          PropTransient := False;
+            LMember_FieldName := ioField(LAttribute).Value;
+          LMember_Transient := False;
         end;
         if LAttribute is ioSkip then // Leave after ioField attribute detection
-          PropTransient := True;
+          LMember_Transient := True;
         if LAttribute is ioTypeAlias then
-          PropTypeAlias := ioTypeAlias(LAttribute).Value;
+          LMember_TypeAlias := ioTypeAlias(LAttribute).Value;
         if LAttribute is ioFieldType then
-          PropFieldType := ioFieldType(LAttribute).Value;
+          LMember_FieldType := ioFieldType(LAttribute).Value;
         if LAttribute is ioLoadSql then
-          PropLoadSql := ioLoadSql(LAttribute).Value;
+          LMember_LoadSql := ioLoadSql(LAttribute).Value;
         if LAttribute is ioLoadOnly then
-          PropLoadPersist := lpLoadOnly;
+          LMember_LoadPersist := lpLoadOnly;
         if LAttribute is ioPersistOnly then
-          PropLoadPersist := lpPersistOnly;
+          LMember_LoadPersist := lpPersistOnly;
         // Relations
         if LAttribute is ioEmbeddedHasMany then
         begin
-          PropRelationType := rtEmbeddedHasMany;
-          PropRelationChildTypeName := ioEmbeddedHasMany(LAttribute).ChildTypeName;
-          PropRelationChildTypeAlias := ioEmbeddedHasMany(LAttribute).ChildTypeAlias;
+          LMember_RelationType := rtEmbeddedHasMany;
+          LMember_RelationChildTypeName := ioEmbeddedHasMany(LAttribute).ChildTypeName;
+          LMember_RelationChildTypeAlias := ioEmbeddedHasMany(LAttribute).ChildTypeAlias;
         end;
         if LAttribute is ioEmbeddedHasOne then
         begin
-          PropRelationType := rtEmbeddedHasOne;
-          PropRelationChildTypeName := ioEmbeddedHasOne(LAttribute).ChildTypeName;
-          PropRelationChildTypeAlias := ioEmbeddedHasOne(LAttribute).ChildTypeAlias;
+          LMember_RelationType := rtEmbeddedHasOne;
+          LMember_RelationChildTypeName := ioEmbeddedHasOne(LAttribute).ChildTypeName;
+          LMember_RelationChildTypeAlias := ioEmbeddedHasOne(LAttribute).ChildTypeAlias;
         end;
         if LAttribute is ioBelongsTo then
         begin
-          PropRelationType := rtBelongsTo;
-          PropRelationChildTypeName := ioBelongsTo(LAttribute).ChildTypeName;
-          PropRelationChildTypeAlias := ioBelongsTo(LAttribute).ChildTypeAlias;
-          PropMetadata_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
+          LMember_RelationType := rtBelongsTo;
+          LMember_RelationChildTypeName := ioBelongsTo(LAttribute).ChildTypeName;
+          LMember_RelationChildTypeAlias := ioBelongsTo(LAttribute).ChildTypeAlias;
+          LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
         end;
         if LAttribute is ioHasMany then
         begin
-          PropRelationType := rtHasMany;
-          PropRelationChildTypeName := ioHasMany(LAttribute).ChildTypeName;
-          PropRelationChildTypeAlias := ioHasMany(LAttribute).ChildTypeAlias;
-          PropRelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
-          PropRelationChildLoadType := ioHasMany(LAttribute).LoadType;
+          LMember_RelationType := rtHasMany;
+          LMember_RelationChildTypeName := ioHasMany(LAttribute).ChildTypeName;
+          LMember_RelationChildTypeAlias := ioHasMany(LAttribute).ChildTypeAlias;
+          LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
+          LMember_RelationChildLoadType := ioHasMany(LAttribute).LoadType;
         end;
         if LAttribute is ioHasOne then
         begin
-          PropRelationType := rtHasOne;
-          PropRelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
-          PropRelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
-          PropRelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
+          LMember_RelationType := rtHasOne;
+          LMember_RelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
+          LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
+          LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
         end;
         // Indexes
         if LAttribute is ioIndex then
         begin
           if ioIndex(LAttribute).CommaSepFieldList.IsEmpty then // If the "ACommaSepFieldList" is empty then set the current property field name
-            ioIndex(LAttribute).CommaSepFieldList := PropFieldName;
+            ioIndex(LAttribute).CommaSepFieldList := LMember_FieldName;
           ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
         end;
         // Metadata Used by DBBuilder (M.M. 01/08/18)
         if LAttribute is ioNotNull then
-          PropMetadata_FieldNotNull := True;
+          LDB_FieldNotNull := True;
         if LAttribute is ioVarchar then
         begin
-          PropMetadata_FieldType := ioMdVarchar;
-          PropMetadata_FieldLength := ioVarchar(LAttribute).Length;
-          PropMetadata_FieldUnicode := ioVarchar(LAttribute).IsUnicode;
+          LDB_FieldType := ioMdVarchar;
+          LDB_FieldLength := ioVarchar(LAttribute).Length;
+          LDB_FieldUnicode := ioVarchar(LAttribute).IsUnicode;
         end;
         if LAttribute is ioChar then
         begin
-          PropMetadata_FieldType := ioMdChar;
-          PropMetadata_FieldLength := ioChar(LAttribute).Length;
-          PropMetadata_FieldUnicode := ioChar(LAttribute).IsUnicode;
+          LDB_FieldType := ioMdChar;
+          LDB_FieldLength := ioChar(LAttribute).Length;
+          LDB_FieldUnicode := ioChar(LAttribute).IsUnicode;
         end;
         if LAttribute is ioInteger then
         begin
-          PropMetadata_FieldType := ioMdInteger;
-          PropMetadata_FieldPrecision := ioInteger(LAttribute).Precision;
+          LDB_FieldType := ioMdInteger;
+          LDB_FieldPrecision := ioInteger(LAttribute).Precision;
         end;
         if LAttribute is ioFloat then
-          PropMetadata_FieldType := ioMdFloat;
+          LDB_FieldType := ioMdFloat;
         if LAttribute is ioDate then
-          PropMetadata_FieldType := ioMdDate;
+          LDB_FieldType := ioMdDate;
         if LAttribute is ioTime then
-          PropMetadata_FieldType := ioMdTime;
+          LDB_FieldType := ioMdTime;
         if LAttribute is ioDateTime then
-          PropMetadata_FieldType := ioMdDateTime;
+          LDB_FieldType := ioMdDateTime;
         if LAttribute is ioDecimal then
         begin
-          PropMetadata_FieldType := ioMdDecimal;
-          PropMetadata_FieldPrecision := ioDecimal(LAttribute).Precision;
-          PropMetadata_FieldScale := ioDecimal(LAttribute).Scale;
+          LDB_FieldType := ioMdDecimal;
+          LDB_FieldPrecision := ioDecimal(LAttribute).Precision;
+          LDB_FieldScale := ioDecimal(LAttribute).Scale;
         end;
         if LAttribute is ioNumeric then
         begin
-          PropMetadata_FieldType := ioMdNumeric;
-          PropMetadata_FieldPrecision := ioNumeric(LAttribute).Precision;
-          PropMetadata_FieldScale := ioNumeric(LAttribute).Scale;
+          LDB_FieldType := ioMdNumeric;
+          LDB_FieldPrecision := ioNumeric(LAttribute).Precision;
+          LDB_FieldScale := ioNumeric(LAttribute).Scale;
         end;
         if LAttribute is ioBoolean then
-          PropMetadata_FieldType := ioMdBoolean;
+          LDB_FieldType := ioMdBoolean;
         if LAttribute is ioBinary then
         begin
-          PropMetadata_FieldType := ioMdBinary;
-          PropMetadata_FieldSubType := ioBinary(LAttribute).BinarySubType;
+          LDB_FieldType := ioMdBinary;
+          LDB_FieldSubType := ioBinary(LAttribute).BinarySubType;
         end;
         if LAttribute is ioFTCustom then
         begin
-          PropMetadata_FieldType := ioMdCustomFieldType;
-          PropMetadata_CustomFieldType := ioFTCustom(LAttribute).Value;
+          LDB_FieldType := ioMdCustomFieldType;
+          LDB_CustomFieldType := ioFTCustom(LAttribute).Value;
         end;
         if LAttribute is ioDefault then
-          PropMetadata_Default := ioDefault(LAttribute).Value;
+          LDB_Default := ioDefault(LAttribute).Value;
         if LAttribute is ioForeignKey then
         begin
-          PropMetadata_FKAutoCreate := ioForeignKey(LAttribute).AutoCreate;
-          PropMetadata_FKOnDeleteAction := ioForeignKey(LAttribute).OnDeleteAction;
-          PropMetadata_FKOnUpdateAction := ioForeignKey(LAttribute).OnUpdateAction;
+          LDB_FKAutoCreate := ioForeignKey(LAttribute).AutoCreate;
+          LDB_FKOnDeleteAction := ioForeignKey(LAttribute).OnDeleteAction;
+          LDB_FKOnUpdateAction := ioForeignKey(LAttribute).OnUpdateAction;
         end;
       end;
       // If the current member is a ReadOnly TRttiProperty then force it as PersistOnly
       if (LMember is TRttiProperty) and not TRttiProperty(LMember).IsWritable then
-        PropLoadPersist := lpPersistOnly;
+        LMember_LoadPersist := lpPersistOnly;
       // Create and add property into the map
-      Result.Add(GetProperty(ATable, LMember, PropTypeAlias, PropFieldName, PropLoadSql, PropFieldType, PropTransient, PropID, PropIDSkipOnInsert, PropLoadPersist,
-        PropRelationType, PropRelationChildTypeName, PropRelationChildTypeAlias, PropRelationChildPropertyName, PropRelationChildLoadType, PropMetadata_FieldType,
-        PropMetadata_FieldLength, PropMetadata_FieldPrecision, PropMetadata_FieldScale, PropMetadata_FieldNotNull, PropMetadata_Default,
-        PropMetadata_FieldUnicode, PropMetadata_CustomFieldType, PropMetadata_FieldSubType, PropMetadata_FKAutoCreate, PropMetadata_FKOnDeleteAction,
-        PropMetadata_FKOnUpdateAction));
+      Result.Add(GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID, LMember_IDSkipOnInsert, LMember_LoadPersist,
+        LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias, LMember_RelationChildPropertyName, LMember_RelationChildLoadType, LDB_FieldType,
+        LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, LDB_Default,
+        LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
+        LDB_FKOnUpdateAction));
       end;
   end;
 begin
