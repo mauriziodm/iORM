@@ -361,6 +361,8 @@ type
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
   end;
+  // Disable the automatic detection for HasMany relation
+  ioNotHasMany = class(TioCustomAttribute);
 
   // Relation BelongsTo attribute
   ioHasOne = class(ioHasMany)
@@ -492,7 +494,6 @@ type
   // ===========================================================================
   // START EMBEDDED ATTRIBUTES
   // ---------------------------------------------------------------------------
-
   // EmbeddedHasMany attribute
   ioEmbeddedHasMany = class(TioCustomRelationAttribute)
   end;
@@ -500,15 +501,6 @@ type
   // EmbeddedHasOne attribute
   ioEmbeddedHasOne = class(TioCustomRelationAttribute)
   end;
-
-  // EmbeddedSkip attribute
-  ioEmbeddedSkip = class(DoNotSerializeAttribute) // from DMVC ObjectsMappers
-  end;
-
-  // EmbeddedSkip attribute
-  ioEmbeddedStreamable = class(StreamableAttribute) // from DMVC ObjectsMappers
-  end;
-
   // ---------------------------------------------------------------------------
   // end EMBEDDED ATTRIBUTES
   // ===========================================================================

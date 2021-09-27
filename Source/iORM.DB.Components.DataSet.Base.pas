@@ -995,12 +995,6 @@ procedure TioBSADataSet.RestoreBeforeEditValues;
 var
   LObj: TObject;
 begin
-  // restore object status
-  // NB: Solo se ci sono state modifiche altrimenti, in alcuni casi, si verificavano
-  // delle fastidiose duplicazioni dei dettagli nelle relazioni HasMany dovute al
-  // al fatto che normalmente TDataSet effettua un cancel automaticamente se non ci
-  // sono state modifiche e questo, unito alla funzionalità di propagazione degli
-  // eventi (edit, post, cancel ecc) causava ilproblema.
   LObj := FBindSourceAdapter.Current;
   om.FromJSON(FBeforeEditValues).TypeAnnotationsON.ClearListBefore.&To(LObj);
 end;

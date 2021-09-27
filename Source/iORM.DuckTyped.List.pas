@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.DuckTyped.List;
 
@@ -54,9 +52,10 @@ type
     FGetItemMethod: TRttiMethod;
     FDelete: TRttiMethod;
   strict protected
-    procedure SetOwnsObjects(AValue:Boolean);
+    procedure SetOwnsObjects(AValue: Boolean);
     function GetOwnsObjects: Boolean;
   public
+    class function CanWrap(const AObj: TObject): Boolean;
     constructor Create(AListObject: TObject);
     procedure Add(AObject: TObject);
     procedure Clear;
@@ -66,7 +65,7 @@ type
     function GetItemTypeName: String;
     function GetItemTypeInfo: PTypeInfo;
     function GetEnumerator: IEnumerator;
-    property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
+    property OwnsObjects: Boolean read GetOwnsObjects write SetOwnsObjects;
   end;
 
   // DuckTypedListEnumerator
@@ -77,7 +76,7 @@ type
   public
     constructor Create(ADuckTypedList: IioDuckTypedList);
     procedure Reset;
-    function MoveNext: boolean;
+    function MoveNext: Boolean;
     function GetCurrent: TObject;
     property Current: TObject read GetCurrent;
   end;
@@ -102,6 +101,30 @@ end;
 function TioDuckTypedList.Count: Integer;
 begin
   Result := FCountProperty.GetValue(FListObject).AsInteger;
+end;
+
+class function TioDuckTypedList.CanWrap(const AObj: TObject): Boolean;
+var
+  Ctx: TRttiContext;
+  Typ: TRttiType;
+  LAddMethod, LGetItemMethod: TRttiMethod;
+begin
+  // Init Rtti
+  Ctx := TioRttiContextFactory.RttiContext;
+  Typ := Ctx.GetType(AObj.ClassInfo);
+  // GetItem method
+{$IF CompilerVersion >= 23}
+  LGetItemMethod := Typ.GetIndexedProperty('Items').ReadMethod;
+{$IFEND}
+  if not Assigned(LGetItemMethod) then
+    LGetItemMethod := Typ.GetMethod('GetItem');
+  if not Assigned(LGetItemMethod) then
+    LGetItemMethod := Typ.GetMethod('GetElement');
+  // Get the Add method, i need it to verify if its parameter is of class or interface type (avoid TStrings)
+  LAddMethod := Typ.GetMethod('Add');
+  // Get the result
+  Result := (LAddMethod <> nil) and (LAddMethod.ReturnType.IsInstance or (LAddMethod.ReturnType is TRttiInterfaceType)) and (LGetItemMethod <> nil) and
+    (Typ.GetProperty('Count') <> nil) and (Typ.GetMethod('Clear') <> nil) and (Typ.GetMethod('Delete') <> nil)
 end;
 
 constructor TioDuckTypedList.Create(AListObject: TObject);
@@ -152,7 +175,7 @@ end;
 
 function TioDuckTypedList.GetEnumerator: IEnumerator;
 begin
-  Result := TioDuckTypedListEnumerator.Create(self);
+  Result := TioDuckTypedListEnumerator.Create(Self);
 end;
 
 function TioDuckTypedList.GetItem(Index: Integer): TObject;
@@ -165,8 +188,8 @@ begin
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsObject;
     tkInterface:
       Result := FGetItemMethod.Invoke(FListObject, [index]).AsInterface as TObject;
-    else
-      Result := nil;
+  else
+    Result := nil;
   end;
 end;
 
@@ -177,7 +200,7 @@ end;
 
 function TioDuckTypedList.GetItemTypeName: String;
 begin
-  result := FGetItemMethod.ReturnType.ToString;
+  Result := FGetItemMethod.ReturnType.ToString;
 end;
 
 function TioDuckTypedList.GetOwnsObjects: Boolean;
@@ -210,13 +233,15 @@ begin
     raise EioException.Create(Self.ClassName + ': Call MoveNext first');
 end;
 
-function TioDuckTypedListEnumerator.MoveNext: boolean;
+function TioDuckTypedListEnumerator.MoveNext: Boolean;
 begin
   if FPosition < FDuckTypedList.Count - 1 then
   begin
     Inc(FPosition);
     Result := True;
-  end else Result := false;
+  end
+  else
+    Result := False;
 end;
 
 procedure TioDuckTypedListEnumerator.Reset;
