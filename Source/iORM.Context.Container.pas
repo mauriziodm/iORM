@@ -92,7 +92,7 @@ uses
 
 class procedure TioMapContainer.Add(const AClassRef: TioClassRef);
 begin
-  if Self.Exist(AClassRef.ClassName) then
+  if Exist(AClassRef.ClassName) then
     Exit;
   FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.Create(AClassRef));
 end;

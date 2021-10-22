@@ -198,6 +198,7 @@ contains
   iORM.DBBuilder.Strategy.Base in '..\..\Source\iORM.DBBuilder.Strategy.Base.pas',
   iORM.DB.Script in '..\..\Source\iORM.DB.Script.pas',
   iORM.LiveBindings.CommonBSAPaging in '..\..\Source\iORM.LiveBindings.CommonBSAPaging.pas',
-  iORM.DB.Components.DataSet.DataSet in '..\..\Source\iORM.DB.Components.DataSet.DataSet.pas';
+  iORM.DB.Components.DataSet.DataSet in '..\..\Source\iORM.DB.Components.DataSet.DataSet.pas',
+  iORM.Context.RelationAutoDetect in '..\..\Source\iORM.Context.RelationAutoDetect.pas';
 
 end.

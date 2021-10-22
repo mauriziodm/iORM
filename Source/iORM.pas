@@ -991,9 +991,8 @@ TioDependencyInjectionContainer.Build;
 // Register as default DuckTypedStreamObject invoker
 // NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
 // venive eseguito
-io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef
-// Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
-  .Execute;
+// NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
+io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
 
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
