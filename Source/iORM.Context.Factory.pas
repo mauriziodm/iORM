@@ -76,7 +76,8 @@ uses
   iORM.Context, iORM.Context.Properties,
   System.SysUtils, iORM.Context.Table,
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
-  System.StrUtils, iORM.Exceptions, System.TypInfo, iORM.Utilities;
+  System.StrUtils, iORM.Exceptions, System.TypInfo, iORM.Utilities,
+  iORM.DuckTyped.Factory;
 
 { TioBuilderProperties }
 
@@ -240,7 +241,7 @@ var
     LMember_RelationChildTypeAlias: String;
     LMember_RelationChildPropertyName: String;
     LMember_RelationChildLoadType: TioLoadType;
-    LMember_NotHasMany: Boolean;
+    LMember_RelationAutodetectEnabled: Boolean;
   begin
     // Loop all properties
     for LMember in LMembers do
@@ -290,7 +291,7 @@ var
       LMember_RelationChildTypeAlias := '';
       LMember_RelationChildPropertyName := '';
       LMember_RelationChildLoadType := ltEagerLoad;
-      LMember_NotHasMany := False;
+      LMember_RelationAutodetectEnabled := True;
       // ObjStatus property detection by type "TioObjStatus"
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
       begin
@@ -336,7 +337,7 @@ var
           LMember_LoadPersist := lpLoadOnly;
         if LAttribute is ioPersistOnly then
           LMember_LoadPersist := lpPersistOnly;
-        // Relations
+        // Relations attributes
         if LAttribute is ioEmbeddedHasMany then
         begin
           LMember_RelationType := rtEmbeddedHasMany;
@@ -371,6 +372,21 @@ var
           LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
           LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
         end;
+
+        // Attribute to disable the relation auto detection
+        if LAttribute is ioDisableRelationAutodetect then
+          LMember_RelationAutodetectEnabled := False;
+        // Automatic relation detection (only for class or interface member type)
+        if LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
+          (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
+        begin
+          // HasMany relation autodetect
+          if TioDuckTypedFactory.IsList(LMember_FieldValueType) then
+          begin
+
+          end;
+        end;
+
         // Indexes
         if LAttribute is ioIndex then
         begin
@@ -438,8 +454,6 @@ var
           LDB_FKOnDeleteAction := ioForeignKey(LAttribute).OnDeleteAction;
           LDB_FKOnUpdateAction := ioForeignKey(LAttribute).OnUpdateAction;
         end;
-        if LAttribute is ioNotHasMany then
-          LMember_NotHasMany := True;
       end;
       // If the current member is a ReadOnly TRttiProperty then force it as PersistOnly
       if (LMember is TRttiProperty) and not TRttiProperty(LMember).IsWritable then
@@ -447,7 +461,7 @@ var
       // Create and add property into the map
       Result.Add(GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID,
         LMember_IDSkipOnInsert, LMember_LoadPersist, LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias,
-        LMember_RelationChildPropertyName, LMember_RelationChildLoadType, LMember_NotHasMany, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
+        LMember_RelationChildPropertyName, LMember_RelationChildLoadType, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
         LDB_FieldScale, LDB_FieldNotNull, LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
         LDB_FKOnUpdateAction));
     end;

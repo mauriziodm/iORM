@@ -362,7 +362,7 @@ type
     property LoadType: TioLoadType read FLoadType;
   end;
   // Disable the automatic detection for HasMany relation
-  ioNotHasMany = class(TioCustomAttribute);
+  ioDisableRelationAutodetect = class(TioCustomAttribute);
 
   // Relation BelongsTo attribute
   ioHasOne = class(ioHasMany)

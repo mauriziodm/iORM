@@ -604,9 +604,9 @@ procedure TioBSADataSet.InternalInitFieldDefs;
         tkFloat:
           FieldDefs.Add(LProperty.GetName, TFieldType.ftFloat, 0);
         tkString, tkLString:
-          FieldDefs.Add(LProperty.GetName, TFieldType.ftString, 250); // TODO: fix size
+          FieldDefs.Add(LProperty.GetName, TFieldType.ftString, 250);
         tkWString, tkUString:
-          FieldDefs.Add(LProperty.GetName, TFieldType.ftWideString, 250); // TODO: fix size
+          FieldDefs.Add(LProperty.GetName, TFieldType.ftWideString, 250);
         // tkClass, tkMethod, tkWChar
         // tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray
       end;

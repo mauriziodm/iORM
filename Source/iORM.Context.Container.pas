@@ -66,11 +66,10 @@ type
   private
     class var FInternalContainer: TioMapContainerInstance;
   protected
+    // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
     class procedure Init;
-    class procedure SetPropertiesFieldData;
     class procedure SetPropertiesLoadSqlData;
-    class procedure SetRelationIndexes;
   public
     class procedure Build;
     class procedure CleanUp;
@@ -101,7 +100,6 @@ class procedure TioMapContainer.Build;
 begin
   FInternalContainer := TioMapContainerInstance.Create([doOwnsValues]);
   TioMapContainer.Init;
-  TioMapContainer.SetPropertiesFieldData;
   TioMapContainer.SetPropertiesLoadSqlData;
 end;
 
@@ -162,6 +160,7 @@ begin
       Continue;
     Inst := Typ.AsInstance;
     // Only classes with explicit ioTable attribute
+    // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     if not IsValidEntity_diAutoRegister(Inst) then
       Continue;
     // Load the current class (entity) into the ContextContainer
@@ -169,6 +168,7 @@ begin
   end;
 end;
 
+// NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
 class function TioMapContainer.IsValidEntity_diAutoRegister(const AType: TRttiInstanceType): Boolean;
 type
   TdiImplementsItem = record
@@ -266,15 +266,6 @@ begin
     end;
 end;
 
-class procedure TioMapContainer.SetPropertiesFieldData;
-var
-  AMapSlot: TioMapSlot;
-begin
-  // Calculate field data for all properties in the container
-  for AMapSlot in FInternalContainer.Values do
-    AMapSlot.GetMap.GetProperties.SetFieldData;
-end;
-
 class procedure TioMapContainer.SetPropertiesLoadSqlData;
 var
   AMapSlot: TioMapSlot;
@@ -282,11 +273,6 @@ begin
   // Calculate field data for all properties in the container
   for AMapSlot in FInternalContainer.Values do
     AMapSlot.GetMap.GetProperties.SetLoadSqlData;
-end;
-
-class procedure TioMapContainer.SetRelationIndexes;
-begin
-
 end;
 
 { TioContextSlot }

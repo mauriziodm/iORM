@@ -55,7 +55,7 @@ type
     procedure SetOwnsObjects(AValue: Boolean);
     function GetOwnsObjects: Boolean;
   public
-    class function CanWrap(const AObj: TObject): Boolean;
+    class function IsList(const ARttiType: TRttiType): Boolean;
     constructor Create(AListObject: TObject);
     procedure Add(AObject: TObject);
     procedure Clear;
@@ -101,30 +101,6 @@ end;
 function TioDuckTypedList.Count: Integer;
 begin
   Result := FCountProperty.GetValue(FListObject).AsInteger;
-end;
-
-class function TioDuckTypedList.CanWrap(const AObj: TObject): Boolean;
-var
-  Ctx: TRttiContext;
-  Typ: TRttiType;
-  LAddMethod, LGetItemMethod: TRttiMethod;
-begin
-  // Init Rtti
-  Ctx := TioRttiContextFactory.RttiContext;
-  Typ := Ctx.GetType(AObj.ClassInfo);
-  // GetItem method
-{$IF CompilerVersion >= 23}
-  LGetItemMethod := Typ.GetIndexedProperty('Items').ReadMethod;
-{$IFEND}
-  if not Assigned(LGetItemMethod) then
-    LGetItemMethod := Typ.GetMethod('GetItem');
-  if not Assigned(LGetItemMethod) then
-    LGetItemMethod := Typ.GetMethod('GetElement');
-  // Get the Add method, i need it to verify if its parameter is of class or interface type (avoid TStrings)
-  LAddMethod := Typ.GetMethod('Add');
-  // Get the result
-  Result := (LAddMethod <> nil) and (LAddMethod.ReturnType.IsInstance or (LAddMethod.ReturnType is TRttiInterfaceType)) and (LGetItemMethod <> nil) and
-    (Typ.GetProperty('Count') <> nil) and (Typ.GetMethod('Clear') <> nil) and (Typ.GetMethod('Delete') <> nil)
 end;
 
 constructor TioDuckTypedList.Create(AListObject: TObject);
@@ -208,6 +184,25 @@ begin
   Result := False;
   if Assigned(FOwnsObjectsProperty) then
     Result := FOwnsObjectsProperty.GetValue(FListObject).AsBoolean;
+end;
+
+class function TioDuckTypedList.IsList(const ARttiType: TRttiType): Boolean;
+var
+  LAddMethod, LGetItemMethod: TRttiMethod;
+begin
+  // GetItem method
+{$IF CompilerVersion >= 23}
+  LGetItemMethod := ARttiType.GetIndexedProperty('Items').ReadMethod;
+{$IFEND}
+  if not Assigned(LGetItemMethod) then
+    LGetItemMethod := ARttiType.GetMethod('GetItem');
+  if not Assigned(LGetItemMethod) then
+    LGetItemMethod := ARttiType.GetMethod('GetElement');
+  // Get the Add method, i need it to verify if its parameter is of class or interface type (avoid TStrings)
+  LAddMethod := ARttiType.GetMethod('Add');
+  // Get the result
+  Result := (LAddMethod <> nil) and (LAddMethod.ReturnType.IsInstance or (LAddMethod.ReturnType is TRttiInterfaceType)) and (LGetItemMethod <> nil) and
+    (ARttiType.GetProperty('Count') <> nil) and (ARttiType.GetMethod('Clear') <> nil) and (ARttiType.GetMethod('Delete') <> nil)
 end;
 
 procedure TioDuckTypedList.SetOwnsObjects(AValue: Boolean);

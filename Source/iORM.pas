@@ -986,6 +986,7 @@ end;
 initialization
 
 // Initialize the dependency injection container
+//  NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
 TioDependencyInjectionContainer.Build;
 
 // Register as default DuckTypedStreamObject invoker
@@ -996,6 +997,7 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
+// NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
 TioMapContainer.Build;
 
 end.

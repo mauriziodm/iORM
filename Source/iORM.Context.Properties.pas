@@ -88,6 +88,7 @@ type
       const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
+    procedure SetFieldData;
   public
     constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioContextTable;
       const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean;
@@ -125,7 +126,6 @@ type
     function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetFieldData;
     procedure SetLoadSqlData;
     procedure SetIsID(const AValue: Boolean);
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
@@ -219,7 +219,6 @@ type
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName: String): IioContextProperty;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetFieldData;
     procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
@@ -299,7 +298,16 @@ begin
   FMetadata_FKOnDeleteAction := AMetadata_FKOnDeleteAction;
   FMetadata_FKOnUpdateAction := AMetadata_FKOnUpdateAction;
   // Set the RelationChildPropertyName & RelationChildPropertyPath
-  Self.SetRelationChildNameAndPath(ARelationChildPropertyName);
+  SetRelationChildNameAndPath(ARelationChildPropertyName);
+  // --------------------------------
+  // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietà che ricevono il valore dai campi della
+  //  joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
+  //  valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
+  //  Esempio:
+  // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
+  // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
+  // --------------------------------
+  SetFieldData;
 end;
 
 function TioProperty.GetFieldType: String;
@@ -611,7 +619,7 @@ end;
 
 function TioProperty.IsStream: Boolean;
 begin
-  Result := (Self.GetRttiType.IsInstance) and (Self.GetRttiType.AsInstance.MetaclassType.InheritsFrom(TSTream));
+  Result := (Self.GetRttiType.IsInstance) and (Self.GetRttiType.AsInstance.MetaclassType.InheritsFrom(TStream));
 end;
 
 function TioProperty.IsWritable: Boolean;
@@ -639,6 +647,14 @@ var
   LDotPos, LAsPos: Smallint;
   LValue: String;
 begin
+  // --------------------------------
+  // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietà che ricevono il valore dai campi della
+  //  joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
+  //  valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
+  //  Esempio:
+  // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
+  // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
+  // --------------------------------
   LValue := FFieldDefinitionString;
   // Translate (if contains tags)
   LValue := TioSqlTranslator.Translate(LValue, FTable.GetClassName);
@@ -903,14 +919,6 @@ end;
 function TioProperties.ObjVersionExist: Boolean;
 begin
   Result := Assigned(FObjVersionProperty);
-end;
-
-procedure TioProperties.SetFieldData;
-var
-  AProperty: IioContextProperty;
-begin
-  for AProperty in FPropertyItems do
-    AProperty.SetFieldData;
 end;
 
 procedure TioProperties.SetLoadSqlData;
