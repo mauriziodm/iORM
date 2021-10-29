@@ -69,7 +69,6 @@ type
     // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
     class procedure Init;
-    class procedure SetPropertiesLoadSqlData;
   public
     class procedure Build;
     class procedure CleanUp;
@@ -100,7 +99,6 @@ class procedure TioMapContainer.Build;
 begin
   FInternalContainer := TioMapContainerInstance.Create([doOwnsValues]);
   TioMapContainer.Init;
-  TioMapContainer.SetPropertiesLoadSqlData;
 end;
 
 class procedure TioMapContainer.CleanUp;
@@ -264,15 +262,6 @@ begin
             .Execute;
       end;
     end;
-end;
-
-class procedure TioMapContainer.SetPropertiesLoadSqlData;
-var
-  AMapSlot: TioMapSlot;
-begin
-  // Calculate field data for all properties in the container
-  for AMapSlot in FInternalContainer.Values do
-    AMapSlot.GetMap.GetProperties.SetLoadSqlData;
 end;
 
 { TioContextSlot }

@@ -90,7 +90,6 @@ type
     function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetLoadSqlData;
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
     procedure SetIsID(const AValue:Boolean);
     function IsID: Boolean;
@@ -137,7 +136,6 @@ type
     function GetPropertyByName(const APropertyName:String): IioContextProperty;
     function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; overload;
     procedure SetTable(const ATable:IioContextTable);
-    procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist

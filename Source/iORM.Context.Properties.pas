@@ -80,6 +80,8 @@ type
     FMetadata_FKOnDeleteAction: TioFKAction;
     FMetadata_FKOnUpdateAction: TioFKAction;
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
+    procedure SetFieldData;
+    procedure SetLoadSqlData;
   strict protected
     constructor Create(const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
@@ -88,7 +90,6 @@ type
       const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
-    procedure SetFieldData;
   public
     constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioContextTable;
       const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean;
@@ -126,7 +127,6 @@ type
     function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetLoadSqlData;
     procedure SetIsID(const AValue: Boolean);
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
@@ -219,7 +219,6 @@ type
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(const APropertyName: String): IioContextProperty;
     procedure SetTable(const ATable: IioContextTable);
-    procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
@@ -308,6 +307,8 @@ begin
   // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
   SetFieldData;
+  // Translate the LoadSQLData statement if needed
+  SetLoadSqlData;
 end;
 
 function TioProperty.GetFieldType: String;
@@ -919,14 +920,6 @@ end;
 function TioProperties.ObjVersionExist: Boolean;
 begin
   Result := Assigned(FObjVersionProperty);
-end;
-
-procedure TioProperties.SetLoadSqlData;
-var
-  AProperty: IioContextProperty;
-begin
-  for AProperty in FPropertyItems do
-    AProperty.SetLoadSqlData;
 end;
 
 procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);
