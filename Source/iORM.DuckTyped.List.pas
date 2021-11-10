@@ -55,7 +55,7 @@ type
     procedure SetOwnsObjects(AValue: Boolean);
     function GetOwnsObjects: Boolean;
   public
-    class function IsList(const ARttiType: TRttiType): Boolean;
+    class function TryGetHasManyRelationChildTypeName(const ARttiType: TRttiType): String;
     constructor Create(AListObject: TObject);
     procedure Add(AObject: TObject);
     procedure Clear;
@@ -84,7 +84,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.RttiContext.Factory;
+  iORM.Exceptions, iORM.RttiContext.Factory, iORM.Utilities, iORM.Attributes;
 
 { TioDuckTypedList }
 
@@ -101,21 +101,6 @@ end;
 function TioDuckTypedList.Count: Integer;
 begin
   Result := FCountProperty.GetValue(FListObject).AsInteger;
-end;
-
-class function TioDuckTypedList.IsList(const ARttiType: TRttiType): Boolean;
-var
-  LItemsProperty: TRttiIndexedProperty;
-begin
-  // Get Items indexed property
-  LItemsProperty := ARttiType.GetIndexedProperty('Items');
-  // Get the result
-  Result := (LItemsProperty <> nil)
-    and (LItemsProperty.PropertyType.IsInstance or (LItemsProperty.PropertyType is TRttiInterfaceType))
-    and (ARttiType.GetProperty('Count') <> nil)
-    and (ARttiType.GetMethod('Add') <> nil)
-    and (ARttiType.GetMethod('Clear') <> nil)
-    and (ARttiType.GetMethod('Delete') <> nil);
 end;
 
 constructor TioDuckTypedList.Create(AListObject: TObject);
@@ -201,6 +186,21 @@ procedure TioDuckTypedList.SetOwnsObjects(AValue: Boolean);
 begin
   if Assigned(FOwnsObjectsProperty) then
     FOwnsObjectsProperty.SetValue(FListObject, AValue);
+end;
+
+class function TioDuckTypedList.TryGetHasManyRelationChildTypeName(const ARttiType: TRttiType): String;
+var
+  LItemsProperty: TRttiIndexedProperty;
+begin
+  // Get Items indexed property
+  LItemsProperty := ARttiType.GetIndexedProperty('Items');
+  // Get the result
+  if (LItemsProperty <> nil) and (LItemsProperty.PropertyType.IsInstance or (LItemsProperty.PropertyType is TRttiInterfaceType)) and
+    (ARttiType.GetProperty('Count') <> nil) and (ARttiType.GetMethod('Add') <> nil) and (ARttiType.GetMethod('Clear') <> nil) and
+    (ARttiType.GetMethod('Delete') <> nil) and TioUtilities.HasAttribute<ioEntity>(LItemsProperty.PropertyType) then
+    Result := LItemsProperty.PropertyType.Name
+  else
+    Result := '';
 end;
 
 { TioDuckTypedListEnumerator }

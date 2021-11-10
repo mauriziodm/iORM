@@ -191,17 +191,17 @@ end;
 
 class function TioContextFactory.Map(const AClassRef: TioClassRef): IioMap;
 var
-  ARttiContext: TRttiContext;
-  ARttiType: TRttiInstanceType;
-  ATable: IioContextTable;
+  LRttiContext: TRttiContext;
+  LRttiType: TRttiInstanceType;
+  LTable: IioContextTable;
 begin
   // Rtti init
-  ARttiContext := TioRttiContextFactory.RttiContext;
-  ARttiType := ARttiContext.GetType(AClassRef).AsInstance;
+  LRttiContext := TioRttiContextFactory.RttiContext;
+  LRttiType := LRttiContext.GetType(AClassRef).AsInstance;
   // Get the table
-  ATable := Self.Table(ARttiType);
+  LTable := Self.Table(LRttiType);
   // Create the context
-  Result := TioMap.Create(AClassRef, ARttiContext, ARttiType, ATable, Self.Properties(ARttiType, ATable));
+  Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
 end;
 
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
@@ -303,7 +303,7 @@ var
       // ObjVersion property detection by type "TioObjVersion"
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjVersion)) then
       begin
-        if TioUtilities.HasAttribute<ioField>(LMember, LAttribute) then
+        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
           LMember_FieldName := ioField(LAttribute).Value;
         Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, False, lpLoadAndPersist, rtNone, '', '', '',
           ltEagerLoad, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
@@ -385,9 +385,11 @@ var
           (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
         begin
           // HasMany relation autodetect
-          if TioDuckTypedFactory.IsList(LMember_FieldValueType) then
+          LMember_RelationChildTypeName := TioDuckTypedFactory.TryGetHasManyRelationChildTypeName(LMember_FieldValueType);
+          if not LMember_RelationChildTypeName.IsEmpty then
           begin
-
+            LMember_RelationType := rtHasMany;
+//            LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
           end;
         end;
 

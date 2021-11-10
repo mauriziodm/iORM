@@ -274,7 +274,7 @@ end;
 class procedure TioStrategyDB.DeleteRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
 begin
   // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
-  Self.DeleteCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject));
+  DeleteCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject));
 end;
 
 class procedure TioStrategyDB.DeleteRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
@@ -438,8 +438,8 @@ end;
 class procedure TioStrategyDB.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: Boolean);
 var
-  ADuckTypedList: IioDuckTypedList;
-  AObj: TObject;
+  LDuckTypedList: IioDuckTypedList;
+  LObj: TObject;
 begin
   inherited;
   // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
@@ -459,19 +459,17 @@ begin
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
   // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
   // che operano su Database diversi contemporaneamente.
-  Self.StartTransaction('');
+  StartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
-    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
     // Loop the list
-    for AObj in ADuckTypedList do
-    begin
-      // Persist object
-      Self.PersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert);
-    end;
-    Self.CommitTransaction('');
+    for LObj in LDuckTypedList do
+      PersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert);
+    // Commit the transaction
+    CommitTransaction('');
   except
-    Self.RollbackTransaction('');
+    RollbackTransaction('');
     raise;
   end;
 end;
@@ -487,7 +485,7 @@ begin
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
   LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
   // Start transaction
-  Self.StartTransaction(LContext.GetTable.GetConnectionDefName);
+  StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     if (ARelationPropertyName <> '') and (ARelationOID <> 0) and (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone)
@@ -495,7 +493,7 @@ begin
     then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
     // PreProcess (persist) relation childs (BelongsTo)
-    Self.PreProcessRelationChildOnPersist(LContext);
+    PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
     case LContext.ObjStatus of
@@ -508,15 +506,15 @@ begin
         begin
           // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
           if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-            Self.UpdateObject(LContext)
+            UpdateObject(LContext)
           else
-            Self.InsertObject(LContext, ABlindInsert);
+            InsertObject(LContext, ABlindInsert);
           LContext.ObjStatus := osClean;
         end;
       // DELETE
       osDeleted:
         begin
-          Self.DeleteObject_Internal(LContext);
+          DeleteObject_Internal(LContext);
           // Mauri 23/04/2020: Ho eliminato la riga sotto perchè non c'è alcun motivo per il quale lo status
           // debba tornare clean, non è come nel persist, in più mi creava anche qualche problema (LDE)
           // perchè in alcuni casi dovevo poi ciclare tra tutti gli elementi di una relazione HasMany
@@ -527,12 +525,12 @@ begin
     end;
     // --------------------------
     // PostProcess (persist) relation childs (HasMany, HasOne)
-    Self.PostProcessRelationChildOnPersist(LContext);
+    PostProcessRelationChildOnPersist(LContext);
     // Commit
-    Self.CommitTransaction(LContext.GetTable.GetConnectionDefName);
+    CommitTransaction(LContext.GetTable.GetConnectionDefName);
   except
     // Rollback
-    Self.RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+    RollbackTransaction(LContext.GetTable.GetConnectionDefName);
     raise;
   end;
 end;
@@ -540,7 +538,7 @@ end;
 class procedure TioStrategyDB.PersistRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioContextProperty);
 begin
   // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
-  Self.PersistCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject), AMasterProperty.GetRelationChildPropertyName,
+  PersistCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject), AMasterProperty.GetRelationChildPropertyName,
     AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False); // Blind
 end;
 

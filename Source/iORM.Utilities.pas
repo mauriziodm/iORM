@@ -53,7 +53,7 @@ type
     class function IsAnInterfaceTypeName(const ATypeName: String): Boolean; static;
     class function ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject; static;
     class function TypeInfoToTypeName(const ATypeInfo: PTypeInfo; const AQualified: Boolean = False): String; static;
-    class function SameObject(const AObj1, AObj2: Tobject): Boolean;
+    class function SameObject(const AObj1, AObj2: Tobject): Boolean; static;
     class function GetImplementedInterfaceName(const AClassType: TRttiInstanceType; const IID: TGUID): String; static;
     class function TValueToObject(const AValue: TValue; const ASilentException: Boolean = True): Tobject; static;
     class function TObjectFrom<T>(const AInstancePointer: Pointer): Tobject;
@@ -67,9 +67,10 @@ type
     class function ExtractOID(const AObj: Tobject): Integer; overload; static;
     class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
     class function EnumToString<T>(const AEnumValue:T): String;
-    class function GetThreadID: TThreadID;
+    class function GetThreadID: TThreadID; static;
     class function ExtractItemRttiType<T>: TRttiType;
-    class function HasAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
+    class function TryGetMemberAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
+    class function HasAttribute<T: class>(ARTTIType: TRttiType): boolean; static;
   end;
 
 implementation
@@ -202,7 +203,19 @@ begin
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
 end;
 
-class function TioUtilities.HasAttribute<T>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
+class function TioUtilities.HasAttribute<T>(ARTTIType: TRttiType): boolean;
+var
+  LAttributes: TArray<TCustomAttribute>;
+  LAttribute: TCustomAttribute;
+begin
+  Result := False;
+  LAttributes := ARTTIType.GetAttributes;
+  for LAttribute in LAttributes do
+    if LAttribute is T then
+      Exit(true);
+end;
+
+class function TioUtilities.TryGetMemberAttribute<T>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
 var
   LAttributes: TArray<TCustomAttribute>;
   LAttribute: TCustomAttribute;
