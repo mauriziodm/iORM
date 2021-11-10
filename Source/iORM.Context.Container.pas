@@ -273,8 +273,6 @@ end;
 
 function TioMapSlot.GetMap: IioMap;
 begin
-  if not Assigned(FMap)
-    then FMap := TioContextFactory.Map(FClassRef);
   Result := FMap;
 end;
 
@@ -282,6 +280,7 @@ constructor TioMapSlot.Create(const AClassRef:TioClassRef);
 begin
   inherited Create;
   FClassRef := AClassRef;
+  FMap := TioContextFactory.Map(FClassRef);
 end;
 
 
