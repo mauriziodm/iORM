@@ -373,6 +373,10 @@ var
           LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
         end;
 
+
+
+
+
         // Attribute to disable the relation auto detection
         if LAttribute is ioDisableRelationAutodetect then
           LMember_RelationAutodetectEnabled := False;
@@ -386,6 +390,11 @@ var
 
           end;
         end;
+
+
+
+
+
 
         // Indexes
         if LAttribute is ioIndex then

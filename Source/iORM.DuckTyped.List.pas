@@ -103,45 +103,56 @@ begin
   Result := FCountProperty.GetValue(FListObject).AsInteger;
 end;
 
+class function TioDuckTypedList.IsList(const ARttiType: TRttiType): Boolean;
+var
+  LItemsProperty: TRttiIndexedProperty;
+begin
+  // Get Items indexed property
+  LItemsProperty := ARttiType.GetIndexedProperty('Items');
+  // Get the result
+  Result := (LItemsProperty <> nil)
+    and (LItemsProperty.PropertyType.IsInstance or (LItemsProperty.PropertyType is TRttiInterfaceType))
+    and (ARttiType.GetProperty('Count') <> nil)
+    and (ARttiType.GetMethod('Add') <> nil)
+    and (ARttiType.GetMethod('Clear') <> nil)
+    and (ARttiType.GetMethod('Delete') <> nil);
+end;
+
 constructor TioDuckTypedList.Create(AListObject: TObject);
 var
-  Ctx: TRttiContext;
-  Typ: TRttiType;
+  LRttiType: TRttiType;
+  LItemsProperty: TRttiIndexedProperty;
 begin
   inherited Create;
   FListObject := AListObject;
   // Init Rtti
-  Ctx := TioRttiContextFactory.RttiContext;
-  Typ := Ctx.GetType(AListObject.ClassInfo);
+  LRttiType := TioRttiContextFactory.RttiContext.GetType(AListObject.ClassInfo);
   // OwnsObjects Property (No exception if not exist)
   FOwnsObjectsProperty := nil;
-  FOwnsObjectsProperty := Typ.GetProperty('OwnsObjects');
+  FOwnsObjectsProperty := LRttiType.GetProperty('OwnsObjects');
   // Count Property
-  FCountProperty := Typ.GetProperty('Count');
+  FCountProperty := LRttiType.GetProperty('Count');
   if not Assigned(FCountProperty) then
     raise EioException.Create('DuckTypedList: "Count" property not found in the object');
   // Add method
-  FAddMethod := Typ.GetMethod('Add');
+  FAddMethod := LRttiType.GetMethod('Add');
   if not Assigned(FAddMethod) then
     raise EioException.Create('DuckTypedList: "Add" method not found in the object');
   // Clear
-  FClearMethod := Typ.GetMethod('Clear');
+  FClearMethod := LRttiType.GetMethod('Clear');
   if not Assigned(FClearMethod) then
     raise EioException.Create('DuckTypedList: "Clear" method not found in the object');
   // Delete
-  FDelete := Typ.GetMethod('Delete');
+  FDelete := LRttiType.GetMethod('Delete');
   if not Assigned(FDelete) then
     raise EioException.Create('DuckTypedList: "Delete" method not found in the object');
   // GetItem method
-{$IF CompilerVersion >= 23}
-  FGetItemMethod := Typ.GetIndexedProperty('Items').ReadMethod;
-{$IFEND}
+  LItemsProperty := LRttiType.GetIndexedProperty('Items');
+  if not Assigned(LItemsProperty) then
+    raise EioException.Create('DuckTypedList: "Items" indexed property not found in the object');
+  FGetItemMethod := LItemsProperty.ReadMethod;
   if not Assigned(FGetItemMethod) then
-    FGetItemMethod := Typ.GetMethod('GetItem');
-  if not Assigned(FGetItemMethod) then
-    FGetItemMethod := Typ.GetMethod('GetElement');
-  if not Assigned(FGetItemMethod) then
-    raise EioException.Create(Self.ClassName + ': "Items" property or "GetItem/GetElement" method not found in the object');
+    raise EioException.Create(Self.ClassName + ': "GetItem" method not found in the object');
 end;
 
 procedure TioDuckTypedList.Delete(Index: Integer);
@@ -184,25 +195,6 @@ begin
   Result := False;
   if Assigned(FOwnsObjectsProperty) then
     Result := FOwnsObjectsProperty.GetValue(FListObject).AsBoolean;
-end;
-
-class function TioDuckTypedList.IsList(const ARttiType: TRttiType): Boolean;
-var
-  LAddMethod, LGetItemMethod: TRttiMethod;
-begin
-  // GetItem method
-{$IF CompilerVersion >= 23}
-  LGetItemMethod := ARttiType.GetIndexedProperty('Items').ReadMethod;
-{$IFEND}
-  if not Assigned(LGetItemMethod) then
-    LGetItemMethod := ARttiType.GetMethod('GetItem');
-  if not Assigned(LGetItemMethod) then
-    LGetItemMethod := ARttiType.GetMethod('GetElement');
-  // Get the Add method, i need it to verify if its parameter is of class or interface type (avoid TStrings)
-  LAddMethod := ARttiType.GetMethod('Add');
-  // Get the result
-  Result := (LAddMethod <> nil) and (LAddMethod.ReturnType.IsInstance or (LAddMethod.ReturnType is TRttiInterfaceType)) and (LGetItemMethod <> nil) and
-    (ARttiType.GetProperty('Count') <> nil) and (ARttiType.GetMethod('Clear') <> nil) and (ARttiType.GetMethod('Delete') <> nil)
 end;
 
 procedure TioDuckTypedList.SetOwnsObjects(AValue: Boolean);
