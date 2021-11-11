@@ -213,6 +213,7 @@ var
     LRttiProperty: TRttiProperty;
     LRttiField: TRttiField;
     LAttribute: TCustomAttribute;
+    LNewProperty: IioContextProperty;
     // DB field metadata (DBBuilder)
     LDB_FieldType: TioMetadataFieldType;
     LDB_FieldSubType: string;
@@ -389,7 +390,7 @@ var
           if not LMember_RelationChildTypeName.IsEmpty then
           begin
             LMember_RelationType := rtHasMany;
-//            LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
+            LMember_RelationChildPropertyName := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
           end;
         end;
 
@@ -470,11 +471,16 @@ var
       if (LMember is TRttiProperty) and not TRttiProperty(LMember).IsWritable then
         LMember_LoadPersist := lpPersistOnly;
       // Create and add property into the map
-      Result.Add(GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID,
+      LNewProperty := GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID,
         LMember_IDSkipOnInsert, LMember_LoadPersist, LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias,
         LMember_RelationChildPropertyName, LMember_RelationChildLoadType, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
         LDB_FieldScale, LDB_FieldNotNull, LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
-        LDB_FKOnUpdateAction));
+        LDB_FKOnUpdateAction);
+      Result.Add(LNewProperty);
+      // If the current property is a virtual property (autodetected has many relation) then
+      //  add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
+      if LNewProperty.isAutodetectedHasManyRelation then
+        TioMapContainer.GetAutodetectedHasManyRelationCollection.Add(LNewProperty);
     end;
   end;
 

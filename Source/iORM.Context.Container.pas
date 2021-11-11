@@ -39,8 +39,8 @@ interface
 
 uses
   System.Rtti,
-  iORM.CommonTypes, System.Generics.Collections,
-  iORM.Context.Map.Interfaces;
+  iORM.CommonTypes,
+  iORM.Context.Map.Interfaces, System.Generics.Collections, iORM.Context.Properties.Interfaces;
 
 type
 
@@ -65,6 +65,7 @@ type
   TioMapContainer = class
   private
     class var FInternalContainer: TioMapContainerInstance;
+    class var FAutodetectedHasManyRelationCollection: TList<IioContextProperty>;
   protected
     // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
@@ -78,21 +79,21 @@ type
     class function GetClassRef(const AClassName:String): TioClassRef;
     class function GetConnectionDefName(const AClassName:String): String;
     class function GetMap(const AClassName:String; const RaiseAnExceptionIfNotFound:Boolean=True): IioMap;
+    class function GetAutodetectedHasManyRelationCollection: TList<IioContextProperty>;
   end;
 
 implementation
 
 uses
   iORM.Context.Factory, iORM.Exceptions,
-  iORM.RttiContext.Factory, iORM.Attributes, iORM;
+  iORM.RttiContext.Factory, iORM.Attributes, iORM, System.SysUtils;
 
 { TioContextContainer }
 
 class procedure TioMapContainer.Add(const AClassRef: TioClassRef);
 begin
-  if Exist(AClassRef.ClassName) then
-    Exit;
-  FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.Create(AClassRef));
+  if not Exist(AClassRef.ClassName) then
+    FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.Create(AClassRef));
 end;
 
 class procedure TioMapContainer.Build;
@@ -109,6 +110,11 @@ end;
 class function TioMapContainer.Exist(const AClassName: String): Boolean;
 begin
   Result := FInternalContainer.ContainsKey(AClassName);
+end;
+
+class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioContextProperty>;
+begin
+  Result := FAutodetectedHasManyRelationCollection;
 end;
 
 class function TioMapContainer.GetClassRef(const AClassName: String): TioClassRef;
@@ -147,20 +153,23 @@ var
   LRttiContext: TRttiContext;
   LRttiType: TRttiType;
 begin
-  // Init ContextContainer loading all ClassRef relative to the entities (classes)
-  //  in the application
-  LRttiContext := TioRttiContextFactory.RttiContext;
-  for LRttiType in LRttiContext.GetTypes do
-  begin
-    // Only instance type
-    if not LRttiType.IsInstance then
-      Continue;
-    // Only classes with explicit ioTable attribute
-    // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
-    if not IsValidEntity_diAutoRegister(LRttiType.AsInstance) then
-      Continue;
-    // Load the current class (entity) into the ContextContainer
-    Add(LRttiType.AsInstance);
+  // Create the temporary collection of autodetected hasmany relation virtual properties
+  FAutodetectedHasManyRelationCollection := TList<IioContextProperty>.Create;
+  try
+    // Init ContextContainer loading all ClassRef relative to the entities (classes)
+    //  in the application
+    LRttiContext := TioRttiContextFactory.RttiContext;
+    for LRttiType in LRttiContext.GetTypes do
+    begin
+      // Only instance type
+      // Only classes with explicit ioTable attribute
+      // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
+      if LRttiType.IsInstance and IsValidEntity_diAutoRegister(LRttiType.AsInstance) then
+        // Load the current class (entity) into the ContextContainer
+        Add(LRttiType.AsInstance.MetaclassType);
+    end;
+  finally
+    FreeAndNil(FAutodetectedHasManyRelationCollection);
   end;
 end;
 

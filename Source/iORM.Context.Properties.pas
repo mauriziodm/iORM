@@ -141,6 +141,7 @@ type
     function IsTransient: Boolean;
     function IsBlob: Boolean;
     function IsStream: Boolean;
+    function isAutodetectedHasManyRelation: Boolean;
 
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
@@ -565,6 +566,11 @@ end;
 function TioProperty.IDSkipOnInsert: Boolean;
 begin
   Result := FIDSkipOnInsert;
+end;
+
+function TioProperty.isAutodetectedHasManyRelation: Boolean;
+begin
+  Result := (FRelationType = rtHasMany) and (FRelationChildPropertyName = IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME);
 end;
 
 function TioProperty.IsBlob: Boolean;
