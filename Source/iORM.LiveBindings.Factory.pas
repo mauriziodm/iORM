@@ -47,9 +47,9 @@ type
   TioLiveBindingsFactory = class
   public
     class function DetailAdaptersContainer(const AMasterAdapter: IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;
-    class function ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioContextProperty; const AWhere: IioWhere)
+    class function ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
       : IioContainedBindSourceAdapter;
-    class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioContextProperty; const AWhere: IioWhere)
+    class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
       : IioContainedBindSourceAdapter;
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
     class function Notification(ASender: TObject; ASubject: TObject; ANotificationType: TioBSANotificationType): IioBSANotification;
@@ -84,7 +84,7 @@ begin
   Result := TioBSAToDataSetLinkContainer.Create;
 end;
 
-class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioContextProperty;
+class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty;
   const AWhere: IioWhere): IioContainedBindSourceAdapter;
 var
   AContext: IioContext;
@@ -105,7 +105,7 @@ begin
   Result.SetMasterProperty(AMasterProperty);
 end;
 
-class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioContextProperty;
+class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty;
   const AWhere: IioWhere): IioContainedBindSourceAdapter;
 var
   AContext: IioContext;

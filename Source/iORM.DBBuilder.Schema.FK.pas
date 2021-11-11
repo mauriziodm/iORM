@@ -10,12 +10,12 @@ type
   TioDBBuilderSchemaFK = class(TInterfacedObject, IioDBBuilderSchemaFK)
   private
     FDependentMap: IioMap;
-    FDependentProperty: IioContextProperty;
+    FDependentProperty: IioProperty;
     FOnDeleteAction: TioFKAction;
     FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;
   public
-    constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+    constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     function DependentTableName: String;
     function DependentFieldName: String;
@@ -58,7 +58,7 @@ begin
   Result := FOnUpdateAction;
 end;
 
-constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
   FReferenceMap := AReferenceMap;

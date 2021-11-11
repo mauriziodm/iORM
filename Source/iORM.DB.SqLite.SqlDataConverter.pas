@@ -53,8 +53,8 @@ type
     class function FloatToSQL(const AFloat:Extended): String; override;
 //    class function PropertyToFieldType(const AProp:IioContextProperty): String; override;
     class function TValueToSql(const AValue:TValue): String; override;
-    class function QueryToTValue(const AQuery:IioQuery; const AProperty:IioContextProperty): TValue; override;
-    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
+    class function QueryToTValue(const AQuery:IioQuery; const AProperty:IioProperty): TValue; override;
+    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioProperty;const AContext:IioContext); override;
     class function FieldNameToSqlFieldName(const AFieldName: string): string; override;
   end;
 
@@ -105,7 +105,7 @@ begin
   Result := AFieldName;
 end;
 
-class function TioSqlDataConverterSqLite.QueryToTValue(const AQuery: IioQuery; const AProperty: IioContextProperty): TValue;
+class function TioSqlDataConverterSqLite.QueryToTValue(const AQuery: IioQuery; const AProperty: IioProperty): TValue;
 begin
   // If the field is null
   // HO levato questo controllo perchè nel caso in cui il campo fosse NULL mi dava un errore
@@ -134,7 +134,7 @@ begin
 end;
 
 class procedure TioSqlDataConverterSqLite.SetQueryParamByContext(
-  const AQuery: IioQuery; const AProp: IioContextProperty;
+  const AQuery: IioQuery; const AProp: IioProperty;
   const AContext: IioContext);
 begin
   inherited;

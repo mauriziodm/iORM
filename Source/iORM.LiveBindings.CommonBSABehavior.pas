@@ -62,9 +62,9 @@ TioBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
   TioBindSourceAdapterGetChildMemberObject = class(TInterfacedObject, IGetMemberObject)
   private
     FMasterMemberObject: IGetMemberObject;
-    FMasterProperty: IioContextProperty;
+    FMasterProperty: IioProperty;
   public
-    constructor Create(const AMasterGetMemberObject: IGetMemberObject; const AMasterProperty: IioContextProperty);
+    constructor Create(const AMasterGetMemberObject: IGetMemberObject; const AMasterProperty: IioProperty);
     function GetMemberObject: TObject;
   end;
 
@@ -122,7 +122,7 @@ class procedure TioCommonBSABehavior.InternalSetDataObjectAsDetail<T>(const AAct
   const ADataObject: T);
 var
   LMasterObj: TObject;
-  LMasterProperty: IioContextProperty;
+  LMasterProperty: IioProperty;
   LValue: TValue;
 begin
   LMasterObj := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current;
@@ -305,7 +305,7 @@ class procedure TioCommonBSABehavior.AddChildPropertiesToList(AType: TRttiType; 
   AFieldsList: TList<TBindSourceAdapterField>; const AMasterGetMemberObject: IGetMemberObject; const AMasterPath: String);
 var
   LMap: IioMap;
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
   LChildPath: String;
   LChildGetMemberObject: IGetMemberObject;
 begin
@@ -383,7 +383,7 @@ end;
 { TBindSourceAdapterGetChildMemberObject }
 
 constructor TioBindSourceAdapterGetChildMemberObject.Create(const AMasterGetMemberObject: IGetMemberObject;
-  const AMasterProperty: IioContextProperty);
+  const AMasterProperty: IioProperty);
 begin
   FMasterMemberObject := AMasterGetMemberObject;
   FMasterProperty := AMasterProperty;

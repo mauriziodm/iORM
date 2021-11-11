@@ -47,7 +47,7 @@ uses
 type
 
   // Classe che rappresenta una proprietà
-  TioProperty = class(TInterfacedObject, IioContextProperty)
+  TioProperty = class(TInterfacedObject, IioProperty)
   strict private
     FIsID: Boolean;
     FTransient: Boolean;
@@ -192,33 +192,33 @@ type
   end;
 
   // Classe con l'elenco delle proprietà della classe
-  TioPropertiesGetSqlFunction = reference to function(AProperty: IioContextProperty): String;
+  TioPropertiesGetSqlFunction = reference to function(AProperty: IioProperty): String;
 
-  TioProperties = class(TioSqlItem, IioContextProperties)
+  TioProperties = class(TioSqlItem, IioProperties)
   strict private
-    FPropertyItems: TList<IioContextProperty>;
-    FIdProperty: IioContextProperty;
-    FObjStatusProperty: IioContextProperty;
-    FObjVersionProperty: IioContextProperty;
+    FPropertyItems: TList<IioProperty>;
+    FIdProperty: IioProperty;
+    FObjStatusProperty: IioProperty;
+    FObjVersionProperty: IioProperty;
     FBlobFieldExists: Boolean;
   private
     function InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
     // ObjStatus property
-    function GetObjStatusProperty: IioContextProperty;
-    procedure SetObjStatusProperty(const AValue: IioContextProperty);
+    function GetObjStatusProperty: IioProperty;
+    procedure SetObjStatusProperty(const AValue: IioProperty);
     // ObjVersion property
-    function GetObjVersionProperty: IioContextProperty;
-    procedure SetObjVersionProperty(const AValue: IioContextProperty);
+    function GetObjVersionProperty: IioProperty;
+    procedure SetObjVersionProperty(const AValue: IioProperty);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
-    function GetEnumerator: TEnumerator<IioContextProperty>;
+    function GetEnumerator: TEnumerator<IioProperty>;
     function GetSql: String; reintroduce; overload;
     function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
-    procedure Add(const AProperty: IioContextProperty);
+    procedure Add(const AProperty: IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
-    function GetIdProperty: IioContextProperty;
-    function GetPropertyByName(const APropertyName: String): IioContextProperty;
+    function GetIdProperty: IioProperty;
+    function GetPropertyByName(const APropertyName: String): IioProperty;
     procedure SetTable(const ATable: IioContextTable);
     // Blob field present
     function BlobFieldExists: Boolean;
@@ -226,11 +226,11 @@ type
     function ObjStatusExist: Boolean;
     // ObjectVersion Exist
     function ObjVersionExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
+    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     // ObjStatus property
-    property ObjStatusProperty: IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
+    property ObjStatusProperty: IioProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
-    property ObjVersionProperty: IioContextProperty read GetObjVersionProperty write SetObjVersionProperty;
+    property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
   end;
 
 implementation
@@ -790,7 +790,7 @@ end;
 
 { TioProperties }
 
-procedure TioProperties.Add(const AProperty: IioContextProperty);
+procedure TioProperties.Add(const AProperty: IioProperty);
 begin
   FPropertyItems.Add(AProperty);
   if AProperty.IsID then
@@ -809,7 +809,7 @@ begin
   FBlobFieldExists := False;
   FObjStatusProperty := nil;
   FObjVersionProperty := nil;
-  FPropertyItems := TList<IioContextProperty>.Create;
+  FPropertyItems := TList<IioProperty>.Create;
 end;
 
 destructor TioProperties.Destroy;
@@ -820,7 +820,7 @@ end;
 
 function TioProperties.PropertyExists(const APropertyName: String): Boolean;
 var
-  CurrProp: IioContextProperty;
+  CurrProp: IioProperty;
 begin
   for CurrProp in FPropertyItems do
     if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
@@ -828,29 +828,29 @@ begin
   Result := False;
 end;
 
-function TioProperties.GetEnumerator: TEnumerator<IioContextProperty>;
+function TioProperties.GetEnumerator: TEnumerator<IioProperty>;
 begin
   Result := FPropertyItems.GetEnumerator;
 end;
 
-function TioProperties.GetIdProperty: IioContextProperty;
+function TioProperties.GetIdProperty: IioProperty;
 begin
   Result := FIdProperty;
 end;
 
-function TioProperties.GetObjStatusProperty: IioContextProperty;
+function TioProperties.GetObjStatusProperty: IioProperty;
 begin
   Result := FObjStatusProperty;
 end;
 
-function TioProperties.GetObjVersionProperty: IioContextProperty;
+function TioProperties.GetObjVersionProperty: IioProperty;
 begin
   Result := FObjVersionProperty;
 end;
 
-function TioProperties.GetPropertyByName(const APropertyName: String): IioContextProperty;
+function TioProperties.GetPropertyByName(const APropertyName: String): IioProperty;
 var
-  CurrProp: IioContextProperty;
+  CurrProp: IioProperty;
 begin
   for CurrProp in FPropertyItems do
     if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
@@ -862,7 +862,7 @@ function TioProperties.GetSql: String;
 begin
   // Use Internal function with an anonomous method
   Result := Self.InternalGetSql(ioAll,
-    function(AProp: IioContextProperty): String
+    function(AProp: IioProperty): String
     begin
       Result := AProp.GetSqlFieldName;
     end);
@@ -876,7 +876,7 @@ begin
   case ASqlRequestType of
     ioSelect:
       AFunc :=
-              function(AProp: IioContextProperty): String
+              function(AProp: IioProperty): String
     begin
       if AProp.LoadSqlExist then
         Result := AProp.GetLoadSql
@@ -885,7 +885,7 @@ begin
     end;
   else
     AFunc :=
-          function(AProp: IioContextProperty): String
+          function(AProp: IioProperty): String
     begin
       Result := AProp.GetSqlFieldName;
     end;
@@ -896,7 +896,7 @@ end;
 
 function TioProperties.InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
 var
-  Prop: IioContextProperty;
+  Prop: IioProperty;
 begin
   for Prop in FPropertyItems do
   begin
@@ -913,7 +913,7 @@ begin
   end;
 end;
 
-function TioProperties.IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
+function TioProperties.IsObjVersionProperty(const AProperty: IioProperty): Boolean;
 begin
   Result := Assigned(AProperty) and (AProperty = FObjVersionProperty);
 end;
@@ -928,19 +928,19 @@ begin
   Result := Assigned(FObjVersionProperty);
 end;
 
-procedure TioProperties.SetObjStatusProperty(const AValue: IioContextProperty);
+procedure TioProperties.SetObjStatusProperty(const AValue: IioProperty);
 begin
   FObjStatusProperty := AValue;
 end;
 
-procedure TioProperties.SetObjVersionProperty(const AValue: IioContextProperty);
+procedure TioProperties.SetObjVersionProperty(const AValue: IioProperty);
 begin
   FObjVersionProperty := AValue;
 end;
 
 procedure TioProperties.SetTable(const ATable: IioContextTable);
 var
-  AProperty: IioContextProperty;
+  AProperty: IioProperty;
 begin
   for AProperty in FPropertyItems do
     AProperty.SetTable(ATable);

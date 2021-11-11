@@ -160,7 +160,7 @@ type
     procedure Next;
     procedure Prior;
     function Eof: Boolean;
-    function GetValue(const AProperty: IioContextProperty; const AContext: IioContext): TValue;
+    function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
     function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
     procedure Open;
     procedure Close;
@@ -171,19 +171,19 @@ type
     function GetSQL: TStrings;
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
-    function ParamByProp(const AProp: IioContextProperty): TioParam;
-    procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
-    procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
+    function ParamByProp(const AProp: IioProperty): TioParam;
+    procedure SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
+    procedure SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
     procedure SetObjVersionParam(const AContext: IioContext);
-    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    function WhereParamByProp(const AProp: IioProperty): TioParam;
     procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
-    procedure SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
+    procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: Integer);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
-    function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
-    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioContextProperty);
+    function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
+    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
     property SQL: TStrings read GetSQL;
   end;
 
@@ -199,10 +199,10 @@ type
   public
     class function StringToSQL(const AString: String): String; virtual; abstract;
     class function FloatToSQL(const AFloat: Extended): String; virtual; abstract;
-    class function PropertyToFieldType(const AProp: IioContextProperty): String; virtual; abstract;
+    class function PropertyToFieldType(const AProp: IioProperty): String; virtual; abstract;
     class function TValueToSql(const AValue: TValue): String; virtual; abstract;
-    class function QueryToTValue(const AQuery: IioQuery; const AProperty: IioContextProperty): TValue; virtual; abstract;
-    class procedure SetQueryParamByContext(const AQuery: IioQuery; const AProp: IioContextProperty; const AContext: IioContext); virtual; abstract;
+    class function QueryToTValue(const AQuery: IioQuery; const AProperty: IioProperty): TValue; virtual; abstract;
+    class procedure SetQueryParamByContext(const AQuery: IioQuery; const AProp: IioProperty; const AContext: IioContext); virtual; abstract;
     class function FieldNameToSqlFieldName(const AFieldName: string): string; virtual; abstract;
   end;
 
@@ -430,7 +430,7 @@ end;
 class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
 var
   LComma: Char;
-  LProp: IioContextProperty;
+  LProp: IioProperty;
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -515,7 +515,7 @@ end;
 class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext);
 var
   Comma: Char;
-  Prop: IioContextProperty;
+  Prop: IioProperty;
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -544,7 +544,7 @@ end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);
 var
-  Prop: IioContextProperty;
+  Prop: IioProperty;
 begin
   // Load query parameters from context
   for Prop in AContext.GetProperties do

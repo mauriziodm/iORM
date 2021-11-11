@@ -49,7 +49,7 @@ type
   strict protected
   public
     class function TValueToSql(const AValue:TValue): String; override;
-    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioContextProperty;const AContext:IioContext); override;
+    class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioProperty;const AContext:IioContext); override;
   end;
 
 implementation
@@ -60,7 +60,7 @@ uses
 { TioSqlDataConverterFirebird }
 
 class procedure TioSqlDataConverterFirebird.SetQueryParamByContext(
-  const AQuery: IioQuery; const AProp: IioContextProperty;
+  const AQuery: IioQuery; const AProp: IioProperty;
   const AContext: IioContext);
 begin
   // TDateTime (NULL is zero)

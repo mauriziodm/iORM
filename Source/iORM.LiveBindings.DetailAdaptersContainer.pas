@@ -109,7 +109,7 @@ end;
 function TioDetailAdaptersContainer.NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
 var
   LMasterContext: IioContext;
-  LMasterProperty: IioContextProperty;
+  LMasterProperty: IioProperty;
   LNewAdapter: IioContainedBindSourceAdapter;
 begin
   // Retrieve MasterContext and MasterProperty

@@ -139,7 +139,7 @@ end;
 
 class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
 var
-  LProp: IioContextProperty;
+  LProp: IioProperty;
   LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
@@ -273,7 +273,7 @@ end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
 var
-  LProp: IioContextProperty;
+  LProp: IioProperty;
   LQuery: IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)

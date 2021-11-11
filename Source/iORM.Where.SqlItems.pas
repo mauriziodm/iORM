@@ -223,7 +223,7 @@ end;
 
 function TioSqlItemsWherePropertyEqualsTo.GetSql(const AMap: IioMap): String;
 var
-  AProp: IioContextProperty;
+  AProp: IioProperty;
 begin
   // NB: No inherited
   AProp := AMap.GetProperties.GetPropertyByName(FSqlText);

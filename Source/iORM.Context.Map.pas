@@ -48,17 +48,17 @@ type
   strict private
     FClassRef: TioClassRef;
     FTable: IioContextTable;
-    FProperties: IioContextProperties;
+    FProperties: IioProperties;
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
     FAncestorMap: IioMap;
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
   public
-    constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioContextTable; AProperties:IioContextProperties); overload;
+    constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioContextTable; AProperties:IioProperties); overload;
     function GetClassRef: TioClassRef;
     function GetClassName: String;
     function GetTable: IioContextTable;
-    function GetProperties: IioContextProperties;
+    function GetProperties: IioProperties;
     function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
@@ -95,7 +95,7 @@ end;
 
 constructor TioMap.Create(AClassRef: TioClassRef; ARttiContext: TRttiContext;
   ARttiType: TRttiInstanceType; ATable: IioContextTable;
-  AProperties: IioContextProperties);
+  AProperties: IioProperties);
 begin
   inherited Create;
   FClassRef := AClassRef;
@@ -125,7 +125,7 @@ begin
   Result := FDIContainerImplementersItem;
 end;
 
-function TioMap.GetProperties: IioContextProperties;
+function TioMap.GetProperties: IioProperties;
 begin
   Result := FProperties;
 end;

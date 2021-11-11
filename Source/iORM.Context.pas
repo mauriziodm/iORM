@@ -68,7 +68,7 @@ type
     constructor Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil); overload;
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
-    function GetProperties: IioContextProperties;
+    function GetProperties: IioProperties;
     function TrueClass: IioTrueClass;
     function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
@@ -86,7 +86,7 @@ type
     function ObjStatusExist: Boolean;
     // ObjVersionExist
     function ObjVersionExist: Boolean;
-    function IsObjVersionProperty(const AProp: IioContextProperty): Boolean;
+    function IsObjVersionProperty(const AProp: IioProperty): Boolean;
     // GroupBy
     function GetGroupBySql: String;
     // OrderBy
@@ -194,7 +194,7 @@ begin
   Result := Self.Where.GetOrderBySql(FMap);
 end;
 
-function TioContext.GetProperties: IioContextProperties;
+function TioContext.GetProperties: IioProperties;
 begin
   Result := Self.Map.GetProperties;
 end;
@@ -259,7 +259,7 @@ begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
 end;
 
-function TioContext.IsObjVersionProperty(const AProp: IioContextProperty): Boolean;
+function TioContext.IsObjVersionProperty(const AProp: IioProperty): Boolean;
 begin
   Result := GetProperties.IsObjVersionProperty(AProp);
 end;

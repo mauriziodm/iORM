@@ -57,7 +57,7 @@ type
   TioMetadataFieldType = (ioMdVarchar, ioMdChar, ioMdInteger, ioMdFloat, ioMdDate, ioMdTime, ioMdDateTime, ioMdDecimal, ioMdNumeric,
     ioMdBoolean, ioMdBinary, ioMdCustomFieldType);
 
-  IioContextProperty = interface
+  IioProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
@@ -128,13 +128,13 @@ type
 
   end;
 
-  IioContextProperties = interface(IioSqlItem)
+  IioProperties = interface(IioSqlItem)
     ['{AB30A3A2-640C-4BEF-B301-2CB7C855037B}']
-    function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioContextProperty>;
-    procedure Add(const AProperty:IioContextProperty);
+    function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioProperty>;
+    procedure Add(const AProperty:IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
-    function GetIdProperty: IioContextProperty;
-    function GetPropertyByName(const APropertyName:String): IioContextProperty;
+    function GetIdProperty: IioProperty;
+    function GetPropertyByName(const APropertyName:String): IioProperty;
     function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; overload;
     procedure SetTable(const ATable:IioContextTable);
     // Blob field present
@@ -143,15 +143,15 @@ type
     function ObjStatusExist: Boolean;
     // ObjectVersion Exist
     function ObjVersionExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioContextProperty): Boolean;
+    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     // ObjectStatus property
-    function GetObjStatusProperty: IioContextProperty;
-    procedure SetObjStatusProperty(const AValue: IioContextProperty);
-    property ObjStatusProperty:IioContextProperty read GetObjStatusProperty write SetObjStatusProperty;
+    function GetObjStatusProperty: IioProperty;
+    procedure SetObjStatusProperty(const AValue: IioProperty);
+    property ObjStatusProperty:IioProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
-    function GetObjVersionProperty: IioContextProperty;
-    procedure SetObjVersionProperty(const AValue: IioContextProperty);
-    property ObjVersionProperty: IioContextProperty read GetObjVersionProperty write SetObjVersionProperty;
+    function GetObjVersionProperty: IioProperty;
+    procedure SetObjVersionProperty(const AValue: IioProperty);
+    property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
   end;
 
 implementation

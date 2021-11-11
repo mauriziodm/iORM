@@ -60,7 +60,7 @@ type
     procedure Next;
     procedure Prior;
     function Eof: Boolean;
-    function GetValue(const AProperty: IioContextProperty; const AContext: IioContext): TValue;
+    function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
     function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
     procedure Open;
     procedure Close;
@@ -71,19 +71,19 @@ type
     function GetSQL: TStrings;
     function Fields: TioFields;
     function ParamByName(const AParamName: String): TioParam;
-    function ParamByProp(const AProp: IioContextProperty): TioParam;
-    procedure SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
-    procedure SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
+    function ParamByProp(const AProp: IioProperty): TioParam;
+    procedure SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
+    procedure SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
     procedure SetObjVersionParam(const AContext: IioContext);
-    function WhereParamByProp(const AProp: IioContextProperty): TioParam;
+    function WhereParamByProp(const AProp: IioProperty): TioParam;
     procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
-    procedure SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
+    procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: Integer);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
-    function CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
-    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioContextProperty);
+    function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
+    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
     property SQL: TStrings read GetSQL;
   end;
 
@@ -128,7 +128,7 @@ begin
     FSqlQuery.Connection := AConnection.AsDBConnection.GetConnection;
 end;
 
-function TioQuery.CreateBlobStream(const AProperty: IioContextProperty; const Mode: TBlobStreamMode): TStream;
+function TioQuery.CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
 begin
   Result := FSqlQuery.CreateBlobStream(Fields.FieldByName(AProperty.GetSqlFieldAlias), Mode);
 end;
@@ -186,7 +186,7 @@ begin
   Result := FSqlQuery.SQL;
 end;
 
-function TioQuery.GetValue(const AProperty: IioContextProperty; const AContext: IioContext): TValue;
+function TioQuery.GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
 begin
   // If the property is a BelongsTo relation then return data as Integer
   // (the type for ID)
@@ -248,7 +248,7 @@ begin
   Result := Self.FSqlQuery.ParamByName(AParamName);
 end;
 
-function TioQuery.ParamByProp(const AProp: IioContextProperty): TioParam;
+function TioQuery.ParamByProp(const AProp: IioProperty): TioParam;
 begin
   Result := Self.ParamByName(AProp.GetSqlParamName);
 end;
@@ -258,7 +258,7 @@ begin
   FSqlQuery.Prior;
 end;
 
-procedure TioQuery.SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioContextProperty);
+procedure TioQuery.SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
 var
   AParam: TioParam;
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
@@ -318,7 +318,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioQuery.SetIntegerParamNullIfZero(const AProp: IioContextProperty; const AValue: Integer);
+procedure TioQuery.SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: Integer);
 begin
   if AValue <> 0 then
     ParamByProp(AProp).Value := AValue
@@ -336,7 +336,7 @@ end;
 
 procedure TioQuery.SetObjVersionParam(const AContext: IioContext);
 var
-  LProp: IioContextProperty;
+  LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
@@ -348,7 +348,7 @@ end;
 
 procedure TioQuery.SetObjVersionWhereParam(const AContext: IioContext);
 var
-  LProp: IioContextProperty;
+  LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
@@ -358,7 +358,7 @@ begin
     WhereParamByProp(LProp).AsDateTime := LProp.GetValue(AContext.DataObject).AsVariant;
 end;
 
-procedure TioQuery.SetParamValueByContext(const AProp: IioContextProperty; const AContext: IioContext);
+procedure TioQuery.SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
 var
   AObj: TObject;
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
@@ -452,7 +452,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioQuery.SetParamValueToNull(const AProp: IioContextProperty; const AForceDataType: TFieldType = ftUnknown);
+procedure TioQuery.SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
 begin
   // Set the parameter to NULL
   ParamByProp(AProp).Clear;
@@ -461,7 +461,7 @@ begin
     ParamByProp(AProp).DataType := AForceDataType;
 end;
 
-function TioQuery.WhereParamByProp(const AProp: IioContextProperty): TioParam;
+function TioQuery.WhereParamByProp(const AProp: IioProperty): TioParam;
 begin
   Result := Self.ParamByName(AProp.GetSqlWhereParamName);
 end;

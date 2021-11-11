@@ -309,7 +309,7 @@ end;
 
 class procedure TioCommonBSAPersistence.PersistAll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
-  LMasterProperty: IioContextProperty;
+  LMasterProperty: IioProperty;
   LRelationChildPropertyName: String;
   LMasterOID: Integer;
   LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
@@ -366,7 +366,7 @@ end;
 
 class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean);
 var
-  LMasterProperty: IioContextProperty;
+  LMasterProperty: IioProperty;
   LRelationChildPropertyName: String;
   LMasterOID: Integer;
   LExecuteMethod: TioCommonBSAPersistenceThreadExecute;

@@ -251,7 +251,7 @@ type
     ['{66AF6AD7-9093-4526-A18C-54447FB220A3}']
     procedure Free;
     procedure SetMasterAdaptersContainer(AMasterAdapterContainer: IioDetailBindSourceAdaptersContainer);
-    procedure SetMasterProperty(AMasterProperty: IioContextProperty);
+    procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
     function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
     procedure Notify(Sender: TObject; ANotification: IioBSANotification);

@@ -27,7 +27,7 @@ type
     constructor Create(const AContextTable: IioContextTable);
     destructor Destroy; override;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     function Fields: TioDBBuilderSchemaFields;
@@ -90,7 +90,7 @@ begin
 end;
 
 procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;
-  const ADependentProperty: IioContextProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction);
+  const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 var
   LForeignKey: IioDBBuilderSchemaFK;
 begin

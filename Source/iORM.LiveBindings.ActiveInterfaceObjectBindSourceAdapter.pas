@@ -137,7 +137,7 @@ type
       const AutoLoadData: Boolean); overload;
     destructor Destroy; override;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
-    procedure SetMasterProperty(AMasterProperty: IioContextProperty);
+    procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
     procedure ExtractDetailObject(AMasterObj: TObject);
@@ -417,7 +417,7 @@ procedure TioActiveInterfaceObjectBindSourceAdapter.ExtractDetailObject(AMasterO
 var
   LDetailIntf: IInterface;
   LValue: TValue;
-  LMasterProperty: IioContextProperty;
+  LMasterProperty: IioProperty;
 begin
   LDetailIntf := nil;
   // Check parameter, if the MasterObject is not assigned
@@ -787,7 +787,7 @@ begin
   FMasterAdaptersContainer := AMasterAdaptersContainer;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetMasterProperty(AMasterProperty: IioContextProperty);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetMasterProperty(AMasterProperty: IioProperty);
 begin
   FMasterPropertyName := AMasterProperty.GetName;
 end;

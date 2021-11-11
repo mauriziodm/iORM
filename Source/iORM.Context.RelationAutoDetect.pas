@@ -20,7 +20,7 @@ class procedure TioRelationAutoDetect.AutomaticRelationDetection;
 var
   LMapSlot: TioMapSlot;
   LMap: IioMap;
-  LProp: IioContextProperty;
+  LProp: IioProperty;
 begin
   for LMapSlot in TioMapContainer.GetContainer.Values do
   begin

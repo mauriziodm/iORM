@@ -51,21 +51,21 @@ type
   // ObjectMaker interface
   TioObjectMakerIntf = class abstract
   strict protected
-    class function CheckOrCreateRelationChildObject(const AContext:IioContext; const AProperty:IioContextProperty): TObject;
+    class function CheckOrCreateRelationChildObject(const AContext:IioContext; const AProperty:IioProperty): TObject;
     class procedure InitializeObjectAfterCreate(const AObj:TObject; const AContainerItem:TioDIContainerImplementersItem);
-    class procedure LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
-    class procedure LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
-    class procedure LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
-    class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
-    class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
-    class function LoadPropertyBelongsTo(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
-    class function LoadPropertyEmbeddedHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class procedure LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
+    class procedure LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
+    class procedure LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
+    class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
+    class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty): TObject;
+    class function LoadPropertyBelongsTo(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty): TObject;
+    class function LoadPropertyEmbeddedHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty): TObject;
     class function InternalFindMethod(ARttiType:TRttiType; AMethodName,AMarkerText:String; IsConstructor:Boolean; const AParameters:Array of TValue): TRttiMethod;
     class function FindConstructor(ARttiType:TRttiType; const AParameters:Array of TValue; AMarkerText:String=''; AMethodName:String=''): TRttiMethod;
     class function FindMethod(ARttiType:TRttiType; AMethodName:String; const AParameters:Array of TValue; AMarkerText:String=''): TRttiMethod;
   public
     class procedure InitializeViewModelPresentersAfterCreate(const AViewModel:TObject; const APresenterSettingsPointer:PioDIPresenterSettingsContainer);
-    class function CreateObjectFromBlobField(AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class function CreateObjectFromBlobField(AQuery:IioQuery; AProperty:IioProperty): TObject;
     class function CreateObjectByClassRef(AClassRef: TClass): TObject;
     class function CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams:array of TValue; AConstructorMarkerText:String=''; AConstructorMethodName:String=''; AContainerItem:TioDIContainerImplementersItem=nil): TObject;
     class function CreateObjectByRttiType(ARttiType:TRttiType): TObject;
@@ -94,7 +94,7 @@ uses
 //       la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
 //       "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
 //       la ChildProperty destinazione.
-class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioContextProperty): TObject;
+class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
 begin
   // Get the child object if already assigned
   Result := AProperty.GetRelationChildObject(AContext.DataObject);
@@ -338,7 +338,7 @@ end;
 
 
 class function TioObjectMakerIntf.CreateObjectFromBlobField(
-  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+  AQuery: IioQuery; AProperty: IioProperty): TObject;
 var
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   AStream: TStream;
@@ -374,7 +374,7 @@ begin
   Result := Self.InternalFindMethod(ARttiType, AMethodName, AMarkerText, True, AParameters);
 end;
 
-class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
 begin
   // Prima di tutto verifica se esiste un oggetto di dettaglio sul DB
   //  per farlo, al momento, non ho trovato altro modo che farlo caricare
@@ -398,7 +398,7 @@ begin
 end;
 
 class function TioObjectMakerIntf.LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery;
-  AProperty: IioContextProperty): TObject;
+  AProperty: IioProperty): TObject;
 var
   LChildID: Integer;
 begin
@@ -421,7 +421,7 @@ begin
   io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).ToObject(Result);
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
 var
   LChildObject: TObject;
   LLazyLoadableObj: IioLazyLoadable;
@@ -456,7 +456,7 @@ begin
   end
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+class procedure TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
 var
   LChildObject: TObject;
   LJSONValue: TJSONValue;
@@ -482,7 +482,7 @@ begin
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery;
-  AProperty: IioContextProperty): TObject;
+  AProperty: IioProperty): TObject;
 var
   LJSONObject: TJSONObject;
   LJSONObjectString: String;
@@ -510,7 +510,7 @@ begin
   end;
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty);
+class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
 var
   LChildObject: TObject;
   LChildStream, LBlobStream: TStream;
@@ -533,7 +533,7 @@ begin
   end;
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
+class procedure TioObjectMakerIntf.LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioProperty);
 var
   LChildObject: TObject;
   LDuckTypedStreamObject: IioDuckTypedStreamObject;

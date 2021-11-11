@@ -40,8 +40,8 @@ end;
 class procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
 var
   // LSchemaTable: IioDBBuilderSchemaTable;
-  LProperty: IioContextProperty;
-  LDependentProperty: IioContextProperty;
+  LProperty: IioProperty;
+  LDependentProperty: IioProperty;
   LResolvedTypeList: IioList<string>;
   LResolvedTypeName: String;
   LResolvedTypeMap: IioMap;
@@ -81,7 +81,7 @@ end;
 class procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
 var
   LSchemaTable: IioDBBuilderSchemaTable;
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
 begin
   // Check if the class/table must be skipped or not
   if not(AMap.GetTable.GetAutoCreateDB and AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName)) then

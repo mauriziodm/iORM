@@ -60,7 +60,7 @@ uses
 
 class function TioObjectMaker.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
 var
-  CurrProp: IioContextProperty;
+  CurrProp: IioProperty;
   AObj: TObject;
 begin
   inherited;

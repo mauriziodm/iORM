@@ -57,8 +57,8 @@ type
       const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
       const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
-      const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioContextProperty;
-    class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
+      const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
+    class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioProperties;
     class function TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_TRUECLASS_FIELDNAME): IioTrueClass;
     class function Joins: IioJoins;
     class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
@@ -66,8 +66,8 @@ type
     class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AioWhere: IioWhere = nil; const ADataObject: TObject = nil): IioContext;
-    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioContextProperty;
-    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
+    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioProperty;
+    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioProperty;
   end;
 
 implementation
@@ -105,7 +105,7 @@ begin
   Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AioWhere, ADataObject);
 end;
 
-class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioContextProperty;
+class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioProperty;
 begin
   Result := Self.Map(AClassRef).GetProperties.GetIdProperty;
 end;
@@ -149,7 +149,7 @@ class function TioContextFactory.GetProperty(const ATable: IioContextTable; cons
   const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
   const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
   const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
-  const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioContextProperty;
+  const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
 begin
   if AMember is TRttiField then
   begin
@@ -169,7 +169,7 @@ begin
     raise EioException.Create(Self.ClassName, 'GetProperty', 'Invalid member type');
 end;
 
-class function TioContextFactory.GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioContextProperty;
+class function TioContextFactory.GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioProperty;
 begin
   Result := Self.Map(AClassRef).GetProperties.GetPropertyByName(APropertyName);
 end;
@@ -204,7 +204,7 @@ begin
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
 end;
 
-class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioContextProperties;
+class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioProperties;
 var
   LMembers: TArray<System.Rtti.TRttiMember>;
   procedure ExtractMembersInfo(const ATransientAsDeafult: Boolean);
@@ -213,7 +213,7 @@ var
     LRttiProperty: TRttiProperty;
     LRttiField: TRttiField;
     LAttribute: TCustomAttribute;
-    LNewProperty: IioContextProperty;
+    LNewProperty: IioProperty;
     // DB field metadata (DBBuilder)
     LDB_FieldType: TioMetadataFieldType;
     LDB_FieldSubType: string;

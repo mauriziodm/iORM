@@ -9,14 +9,14 @@ type
 
   TioDBBuilderSchemaField = class(TInterfacedObject, IioDBBuilderSchemaField)
   private
-    FContextProperty: IioContextProperty;
+    FContextProperty: IioProperty;
     FStatus: TioDBBuilderStatus;
     FAltered: TioDBBuilderFieldAlter;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
-    constructor Create(const AContextProperty: IioContextProperty);
+    constructor Create(const AContextProperty: IioProperty);
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
     function Altered: TioDBBuilderFieldAlter;
     function FieldCustomType: string;
@@ -49,7 +49,7 @@ begin
   Result := FAltered;
 end;
 
-constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioContextProperty);
+constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioProperty);
 begin
   FStatus := stClean;
   FContextProperty := AContextProperty;

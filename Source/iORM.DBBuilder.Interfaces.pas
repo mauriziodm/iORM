@@ -53,7 +53,7 @@ type
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
-    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioContextProperty;
+    procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     function Fields: TioDBBuilderSchemaFields;

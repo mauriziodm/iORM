@@ -58,7 +58,7 @@ type
     FAutoLoadData: Boolean;
     FAutoPersist: Boolean;
     FRefreshing: Boolean;
-    FMasterProperty: IioContextProperty;
+    FMasterProperty: IioProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FBindSource: IioNotifiableBindSource;
@@ -146,7 +146,7 @@ type
       AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
-    procedure SetMasterProperty(AMasterProperty: IioContextProperty);
+    procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
     procedure ExtractDetailObject(AMasterObj: TObject);
@@ -827,7 +827,7 @@ begin
   FMasterAdaptersContainer := AMasterAdaptersContainer;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetMasterProperty(AMasterProperty: IioContextProperty);
+procedure TioActiveObjectBindSourceAdapter.SetMasterProperty(AMasterProperty: IioProperty);
 begin
   FMasterProperty := AMasterProperty;
 end;

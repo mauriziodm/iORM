@@ -65,7 +65,7 @@ type
   TioMapContainer = class
   private
     class var FInternalContainer: TioMapContainerInstance;
-    class var FAutodetectedHasManyRelationCollection: TList<IioContextProperty>;
+    class var FAutodetectedHasManyRelationCollection: TList<IioProperty>;
   protected
     // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
@@ -79,7 +79,7 @@ type
     class function GetClassRef(const AClassName:String): TioClassRef;
     class function GetConnectionDefName(const AClassName:String): String;
     class function GetMap(const AClassName:String; const RaiseAnExceptionIfNotFound:Boolean=True): IioMap;
-    class function GetAutodetectedHasManyRelationCollection: TList<IioContextProperty>;
+    class function GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
   end;
 
 implementation
@@ -112,7 +112,7 @@ begin
   Result := FInternalContainer.ContainsKey(AClassName);
 end;
 
-class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioContextProperty>;
+class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
 begin
   Result := FAutodetectedHasManyRelationCollection;
 end;
@@ -154,7 +154,7 @@ var
   LRttiType: TRttiType;
 begin
   // Create the temporary collection of autodetected hasmany relation virtual properties
-  FAutodetectedHasManyRelationCollection := TList<IioContextProperty>.Create;
+  FAutodetectedHasManyRelationCollection := TList<IioProperty>.Create;
   try
     // Init ContextContainer loading all ClassRef relative to the entities (classes)
     //  in the application

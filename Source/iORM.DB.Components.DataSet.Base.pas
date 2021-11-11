@@ -189,7 +189,7 @@ type
   TioFullPathPropertyReadWrite = class
   strict private
     class function _ExtractPropName(var AFullPathPropName: String): String;
-    class function _ResolvePath(var AOutObj: TObject; var AOutProperty: IioContextProperty; AFullPathPropName: String): Boolean;
+    class function _ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
   public
     class function GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
     class procedure SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
@@ -505,7 +505,7 @@ end;
 
 function TioBSADataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 var
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
 begin
   Result := nil;
   // Get Property, Object, Value
@@ -592,7 +592,7 @@ procedure TioBSADataSet.InternalInitFieldDefs;
 // InitFieldDefsByProperties
   procedure InitFieldDefsByProperties;
   var
-    LProperty: IioContextProperty;
+    LProperty: IioProperty;
   begin
     for LProperty in FMap.GetProperties do
     begin
@@ -1092,7 +1092,7 @@ end;
 procedure TioWideMemoBlobStream.ReadBlobData;
 var
   LRecordIndex: Integer;
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
   LObj: TObject;
   LStrings: TStrings;
   LBytes: TBytes;
@@ -1122,7 +1122,7 @@ end;
 procedure TioWideMemoBlobStream.WriteBlobData;
 var
   LRecordIndex: Integer;
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
   LObj: TObject;
   LValue: TValue;
   LStrings: TStrings;
@@ -1156,7 +1156,7 @@ end;
 procedure TioStreamableObjBlobStream.ReadBlobData;
 var
   LRecordIndex: Integer;
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
   LCurrRecObj, LStreamableObj: TObject;
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
 begin
@@ -1197,7 +1197,7 @@ end;
 procedure TioStreamableObjBlobStream.WriteBlobData;
 var
   LRecordIndex: Integer;
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
   LCurrRecObj, LStreamableObj: TObject;
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
 begin
@@ -1242,7 +1242,7 @@ begin
   end;
 end;
 
-class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioContextProperty; AFullPathPropName: String): Boolean;
+class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
 var
   LPropName: String;
 begin
@@ -1266,7 +1266,7 @@ end;
 
 class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
 var
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
 begin
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
     Result := LProperty.GetValue(AObj)
@@ -1276,7 +1276,7 @@ end;
 
 class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
-  LProperty: IioContextProperty;
+  LProperty: IioProperty;
 begin
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
     LProperty.SetValue(AObj, AValue)
