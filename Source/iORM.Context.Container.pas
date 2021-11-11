@@ -135,7 +135,7 @@ end;
 class function TioMapContainer.GetMap(const AClassName: String; const RaiseAnExceptionIfNotFound:Boolean): IioMap;
 begin
   Result := nil;
-  if Self.Exist(AClassName) then
+  if Exist(AClassName) then
     Result := FInternalContainer.Items[AClassName].GetMap
   else
   if RaiseAnExceptionIfNotFound then
@@ -144,25 +144,23 @@ end;
 
 class procedure TioMapContainer.Init;
 var
-  Ctx: TRttiContext;
-  Typ: TRttiType;
-  Inst: TRttiInstanceType;
+  LRttiContext: TRttiContext;
+  LRttiType: TRttiType;
 begin
   // Init ContextContainer loading all ClassRef relative to the entities (classes)
   //  in the application
-  Ctx := TioRttiContextFactory.RttiContext;
-  for Typ in Ctx.GetTypes do
+  LRttiContext := TioRttiContextFactory.RttiContext;
+  for LRttiType in LRttiContext.GetTypes do
   begin
     // Only instance type
-    if not Typ.IsInstance then
+    if not LRttiType.IsInstance then
       Continue;
-    Inst := Typ.AsInstance;
     // Only classes with explicit ioTable attribute
     // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
-    if not IsValidEntity_diAutoRegister(Inst) then
+    if not IsValidEntity_diAutoRegister(LRttiType.AsInstance) then
       Continue;
     // Load the current class (entity) into the ContextContainer
-    Add(Inst.MetaclassType);
+    Add(LRttiType.AsInstance);
   end;
 end;
 
