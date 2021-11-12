@@ -58,7 +58,7 @@ type
     procedure AddIndex(const AIndexAttr: ioIndex);
     function Fields: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
-    function GetContextTable: IioCOntextTable;
+    function GetContextTable: IioTable;
     function GetSequenceName: String;
     // function IDField: IioDBBuilderSchemaField;
     function Indexes: TioDBBuilderSchemaIndexes;

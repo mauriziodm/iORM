@@ -43,11 +43,11 @@ uses
 
 type
 
-  IioContextTable = interface;
+  IioTable = interface;
 
   IioBaseTableCompanion = interface(IioSqlItem)
     ['{A0C3B8E0-CFA3-4957-A142-FA5E8C18C6B2}']
-    procedure SetTable(const ATable: IioContextTable);
+    procedure SetTable(const ATable: IioTable);
   end;
 
   IioGroupBy = interface(IioBaseTableCompanion)
@@ -69,7 +69,7 @@ type
 
   IioTrueClass = interface
     ['{D15A9A28-FB90-4753-BE4A-7484A834CD2D}']
-    procedure SetTable(const ATable: IioContextTable);
+    procedure SetTable(const ATable: IioTable);
     function GetFieldName: string;
     function GetSqlFieldName: string;
     function GetSqlParamName: String;
@@ -82,7 +82,7 @@ type
 
   TioIndexList = TList<ioIndex>;
 
-  IioContextTable = interface(IioSqlItem)
+  IioTable = interface(IioSqlItem)
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']
     function GetTrueClass: IioTrueClass;
     function IsTrueClass: Boolean;

@@ -49,25 +49,27 @@ type
   TioContextFactory = class
   private
     class function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
+    class function Table(const Typ: TRttiInstanceType): IioTable;
+    class function Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
+    class function HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
+    class function TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_TRUECLASS_FIELDNAME): IioTrueClass;
+    class function Joins: IioJoins;
+    class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
+    class function GroupBy(const ASqlText: String): IioGroupBy;
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const ATable: IioContextTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
+    class function GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
       const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
       const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
       const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
-    class function Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioProperties;
-    class function TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_TRUECLASS_FIELDNAME): IioTrueClass;
-    class function Joins: IioJoins;
-    class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
-    class function GroupBy(const ASqlText: String): IioGroupBy;
-    class function Table(const Typ: TRttiInstanceType): IioContextTable;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AioWhere: IioWhere = nil; const ADataObject: TObject = nil): IioContext;
     class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioProperty;
     class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioProperty;
+    class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
 implementation
@@ -99,10 +101,29 @@ begin
   Result := TioTrueClass.Create(ASqlFieldName);
 end;
 
+class function TioContextFactory.HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
+begin
+  Result := TioHasManyChildVirtualProperty.Create(ATable);
+end;
+
 class function TioContextFactory.Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject): IioContext;
 begin
   // Get the Context from the ContextContainer
   Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AioWhere, ADataObject);
+end;
+
+class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
+var
+  LMasterProperty: IioProperty;
+  LDetailVirtualProperty: IioProperty;
+  LDetailMap: IioMap;
+begin
+  for LMasterProperty in TioMapContainer.GetAutodetectedHasManyRelationCollection do
+  begin
+    LDetailMap := TioMapContainer.GetMap(LMasterProperty.GetRelationChildTypeName);
+    LDetailVirtualProperty := HasManyChildVirtualProperty(LDetailMap.GetTable);
+    LDetailMap.GetProperties.Add(LDetailVirtualProperty);
+  end;
 end;
 
 class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioProperty;
@@ -143,7 +164,7 @@ begin
   end;
 end;
 
-class function TioContextFactory.GetProperty(const ATable: IioContextTable; const AMember: TRttiMember;
+class function TioContextFactory.GetProperty(const ATable: IioTable; const AMember: TRttiMember;
   const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist;
   const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
   const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
@@ -193,7 +214,7 @@ class function TioContextFactory.Map(const AClassRef: TioClassRef): IioMap;
 var
   LRttiContext: TRttiContext;
   LRttiType: TRttiInstanceType;
-  LTable: IioContextTable;
+  LTable: IioTable;
 begin
   // Rtti init
   LRttiContext := TioRttiContextFactory.RttiContext;
@@ -204,7 +225,7 @@ begin
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
 end;
 
-class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioContextTable): IioProperties;
+class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
 var
   LMembers: TArray<System.Rtti.TRttiMember>;
   procedure ExtractMembersInfo(const ATransientAsDeafult: Boolean);
@@ -373,32 +394,9 @@ var
           LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
           LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
         end;
-
-
-
-
-
         // Attribute to disable the relation auto detection
         if LAttribute is ioDisableRelationAutodetect then
           LMember_RelationAutodetectEnabled := False;
-        // Automatic relation detection (only for class or interface member type)
-        if LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
-          (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
-        begin
-          // HasMany relation autodetect
-          LMember_RelationChildTypeName := TioDuckTypedFactory.TryGetHasManyRelationChildTypeName(LMember_FieldValueType);
-          if not LMember_RelationChildTypeName.IsEmpty then
-          begin
-            LMember_RelationType := rtHasMany;
-            LMember_RelationChildPropertyName := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
-          end;
-        end;
-
-
-
-
-
-
         // Indexes
         if LAttribute is ioIndex then
         begin
@@ -467,6 +465,26 @@ var
           LDB_FKOnUpdateAction := ioForeignKey(LAttribute).OnUpdateAction;
         end;
       end;
+
+
+
+
+      // Automatic relation detection (only for class or interface member type)
+      if LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
+        (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
+      begin
+        // HasMany relation autodetect
+        LMember_RelationChildTypeName := TioDuckTypedFactory.TryGetHasManyRelationChildTypeName(LMember_FieldValueType);
+        if not LMember_RelationChildTypeName.IsEmpty then
+        begin
+          LMember_RelationType := rtHasMany;
+          LMember_RelationChildPropertyName := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+        end;
+      end;
+
+
+
+
       // If the current member is a ReadOnly TRttiProperty then force it as PersistOnly
       if (LMember is TRttiProperty) and not TRttiProperty(LMember).IsWritable then
         LMember_LoadPersist := lpPersistOnly;
@@ -500,7 +518,7 @@ begin
   end;
 end;
 
-class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioContextTable;
+class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioTable;
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionDefName, LKeyGenerator: String;
@@ -553,7 +571,7 @@ begin
       end;
     end;
     // Create result Properties object
-    Result := TioContextTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
+    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

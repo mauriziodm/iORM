@@ -10,7 +10,7 @@ type
 
   TioDBBuilderSchemaTable = class(TInterfacedObject, IioDBBuilderSchemaTable)
   private
-    FContextTable: IioContextTable;
+    FContextTable: IioTable;
     FFields: TioDBBuilderSchemaFields;
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
     FIndexes: TioDBBuilderSchemaIndexes;
@@ -24,7 +24,7 @@ type
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create(const AContextTable: IioContextTable);
+    constructor Create(const AContextTable: IioTable);
     destructor Destroy; override;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
@@ -32,7 +32,7 @@ type
     procedure AddIndex(const AIndexAttr: ioIndex);
     function Fields: TioDBBuilderSchemaFields;
     function ForeignKeys: TioDBBuilderSchemaForeignKeys;
-    function GetContextTable: IioContextTable;
+    function GetContextTable: IioTable;
     function GetSequenceName: String;
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
@@ -59,7 +59,7 @@ begin
     FPrimaryKeyField := ASchemaField;
 end;
 
-constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioContextTable);
+constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable);
 begin
   FStatus := stClean;
   FContextTable := AContextTable;
@@ -120,7 +120,7 @@ begin
   Result := FContextTable.TableName;
 end;
 
-function TioDBBuilderSchemaTable.GetContextTable: IioContextTable;
+function TioDBBuilderSchemaTable.GetContextTable: IioTable;
 begin
   Result := FContextTable;
 end;

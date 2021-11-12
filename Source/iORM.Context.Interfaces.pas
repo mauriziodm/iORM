@@ -48,7 +48,7 @@ type
   IioContext = interface
     ['{6B512CDA-23C6-42A3-AC44-905344B019E9}']
     function GetClassRef: TioClassRef;
-    function GetTable: IioContextTable;
+    function GetTable: IioTable;
     function GetProperties: IioProperties;
     function TrueClass: IioTrueClass;
     function IsTrueClass: Boolean;

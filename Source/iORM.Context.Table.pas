@@ -42,16 +42,16 @@ uses
 
 type
 
-  TioContextTable = class;
+  TioTable = class;
 
   // Base class for all ContextTable companions
   TioBaseTableCompanion = class(TInterfacedObject)
   strict private
-    FTable: TioContextTable; // This field is of class type to avoid circular reference with the table (memory leak prevention)
+    FTable: TioTable; // This field is of class type to avoid circular reference with the table (memory leak prevention)
   strict protected
-    function Table: TioContextTable;
+    function Table: TioTable;
   public
-    procedure SetTable(const ATable: IioContextTable); virtual;
+    procedure SetTable(const ATable: IioTable); virtual;
   end;
 
   // Classe che incapsula le informazioni per l'eventuale GroubBY
@@ -108,7 +108,7 @@ type
     FSqlFieldName: String;
   public
     constructor Create(ASqlFieldName: String);
-    procedure SetTable(const ATable: IioContextTable); override;
+    procedure SetTable(const ATable: IioTable); override;
     function GetFieldName: string;
     function GetSqlFieldName: string;
     function GetSqlParamName: String;
@@ -120,7 +120,7 @@ type
   end;
 
   // Classe che incapsula le info sulla tabella
-  TioContextTable = class(TioSqlItem, IioContextTable)
+  TioTable = class(TioSqlItem, IioTable)
   strict private
     FMapMode: TioMapModeType;
     FTrueClass: IioTrueClass;
@@ -163,7 +163,7 @@ uses
 
 { TioContextTable }
 
-constructor TioContextTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass;
+constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass;
   const AJoins: IioJoins; const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType;
   const AAutoCreateDB: Boolean; const ARttiType: TRttiInstanceType);
 begin
@@ -187,87 +187,87 @@ begin
     FGroupBy.SetTable(Self);
 end;
 
-destructor TioContextTable.Destroy;
+destructor TioTable.Destroy;
 begin
   if Self.IndexListExists then
     FIndexList.Free;
   inherited;
 end;
 
-function TioContextTable.GetAutoCreateDB: Boolean;
+function TioTable.GetAutoCreateDB: Boolean;
 begin
   Result := FAutoCreateDB;
 end;
 
-function TioContextTable.GetTrueClass: IioTrueClass;
+function TioTable.GetTrueClass: IioTrueClass;
 begin
   Result := FTrueClass;
 end;
 
-function TioContextTable.GetClassName: String;
+function TioTable.GetClassName: String;
 begin
   Result := FRttiType.Name;
 end;
 
-function TioContextTable.GetConnectionDefName: String;
+function TioTable.GetConnectionDefName: String;
 begin
   Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
 end;
 
-function TioContextTable.GetGroupBy: IioGroupBy;
+function TioTable.GetGroupBy: IioGroupBy;
 begin
   Result := FGroupBy;
 end;
 
-function TioContextTable.GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
+function TioTable.GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
 begin
   if AAutoCreateIfUnassigned and (not Self.IndexListExists) then
     FIndexList := TioIndexList.Create;
   Result := FIndexList;
 end;
 
-function TioContextTable.GetJoin: IioJoins;
+function TioTable.GetJoin: IioJoins;
 begin
   Result := FJoins;
 end;
 
-function TioContextTable.GetKeyGenerator: String;
+function TioTable.GetKeyGenerator: String;
 begin
   Result := IfThen(FKeyGenerator.IsEmpty, TableName, FKeyGenerator);
 end;
 
-function TioContextTable.GetMapMode: TioMapModeType;
+function TioTable.GetMapMode: TioMapModeType;
 begin
   Result := FMapMode;
 end;
 
-function TioContextTable.GetQualifiedClassName: String;
+function TioTable.GetQualifiedClassName: String;
 begin
   Result := FRttiType.QualifiedName;
 end;
 
-function TioContextTable.GetRttiType: TRttiInstanceType;
+function TioTable.GetRttiType: TRttiInstanceType;
 begin
   Result := FRttiType;
 end;
 
-function TioContextTable.GetSql: String;
+function TioTable.GetSql: String;
 begin
   Result := inherited;
   Result := TioDBFActory.SqlDataConverter(GetConnectionDefName).FieldNameToSqlFieldName(Result);
 end;
 
-function TioContextTable.IndexListExists: Boolean;
+function TioTable.IndexListExists: Boolean;
 begin
   Result := Assigned(FIndexList);
 end;
 
-function TioContextTable.IsTrueClass: Boolean;
+function TioTable.IsTrueClass: Boolean;
 begin
   Result := Assigned(FTrueClass);
 end;
 
-function TioContextTable.IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
+function TioTable.IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
 var
   LCurrentConnectionDefName: String;
 begin
@@ -282,12 +282,12 @@ begin
     (LCurrentConnectionDefName = AConnectionDefNameToCheck);
 end;
 
-procedure TioContextTable.SetIndexList(AIndexList: TioIndexList);
+procedure TioTable.SetIndexList(AIndexList: TioIndexList);
 begin
   FIndexList := AIndexList;
 end;
 
-function TioContextTable.TableName: String;
+function TioTable.TableName: String;
 begin
   Result := Self.FSqlText;
 end;
@@ -340,7 +340,7 @@ begin
   Result := Copy(AValue, 0, Pos(';', AValue) - 1);
 end;
 
-procedure TioTrueClass.SetTable(const ATable: IioContextTable);
+procedure TioTrueClass.SetTable(const ATable: IioTable);
 var
   LRttiType: TRttiType;
 begin
@@ -428,12 +428,12 @@ end;
 
 { TioBaseTableCompanion }
 
-procedure TioBaseTableCompanion.SetTable(const ATable: IioContextTable);
+procedure TioBaseTableCompanion.SetTable(const ATable: IioTable);
 begin
-  FTable := ATable as TioContextTable;
+  FTable := ATable as TioTable;
 end;
 
-function TioBaseTableCompanion.Table: TioContextTable;
+function TioBaseTableCompanion.Table: TioTable;
 begin
   Result := FTable;
 end;

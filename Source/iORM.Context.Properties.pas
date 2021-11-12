@@ -64,7 +64,7 @@ type
     FRelationChildPropertyPath: TStrings;
     FRelationLoadType: TioLoadType;
     FNotHasMany: Boolean;
-    FTable: IioContextTable;
+    FTable: IioTable;
     FReadWrite: TioLoadPersist;
     // M.M. 01/08/18 - MetadataType used by DBBuilder
     FMetadata_FieldType: TioMetadataFieldType;
@@ -83,7 +83,7 @@ type
     procedure SetFieldData;
     procedure SetLoadSqlData;
   strict protected
-    constructor Create(const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+    constructor Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
       const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
@@ -91,7 +91,7 @@ type
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
   public
-    constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioContextTable;
+    constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioTable;
       const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean;
       const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
       ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
@@ -104,7 +104,7 @@ type
     function GetSqlQualifiedFieldName: String;
     function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldTableName: String;
-    function GetSqlFieldName(const AClearDelimiters: Boolean = False): String;
+    function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; virtual;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetSqlWhereParamName: String;
@@ -126,7 +126,7 @@ type
     function GetRelationLoadType: TioLoadType;
     function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
-    procedure SetTable(const ATable: IioContextTable);
+    procedure SetTable(const ATable: IioTable);
     procedure SetIsID(const AValue: Boolean);
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
@@ -169,13 +169,28 @@ type
     function GetMetadata_FKOnUpdateAction: TioFKAction;
   end;
 
+  // Autodetected HasMany relation child virtual property (foreign key)
+  TioHasManyChildVirtualProperty = class(TioProperty)
+  strict private
+    FRttiType: TRttiType;
+  public
+    constructor Create(const ATable: IioTable);
+    function GetName: String; override;
+    function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; override;
+    function GetValue(const Instance: Pointer): TValue; override;
+    procedure SetValue(const Instance: Pointer; const AValue: TValue); override;
+    function GetRttiType: TRttiType; override;
+    function GetTypeInfo: PTypeInfo; override;
+    function IsWritable: Boolean; override;
+  end;
+
   // Classe che rappresenta un field della classe
   TioField = class(TioProperty)
   strict private
     FRttiProperty: TRttiField;
     FName: String;
   public
-    constructor Create(const ARttiField: TRttiField; const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+    constructor Create(const ARttiField: TRttiField; const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
       const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
@@ -219,7 +234,7 @@ type
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
     function GetPropertyByName(const APropertyName: String): IioProperty;
-    procedure SetTable(const ATable: IioContextTable);
+    procedure SetTable(const ATable: IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
@@ -243,7 +258,7 @@ uses
 
 { TioProperty }
 
-constructor TioProperty.Create(const ARttiProperty: TRttiProperty; const ATable: IioContextTable;
+constructor TioProperty.Create(const ARttiProperty: TRttiProperty; const ATable: IioTable;
   const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist;
   const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
   const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
@@ -260,7 +275,7 @@ begin
   FRttiProperty := ARttiProperty;
 end;
 
-constructor TioProperty.Create(const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+constructor TioProperty.Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
   const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
   const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean;
   const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
@@ -777,7 +792,7 @@ begin
     FreeAndNil(FRelationChildPropertyPath);
 end;
 
-procedure TioProperty.SetTable(const ATable: IioContextTable);
+procedure TioProperty.SetTable(const ATable: IioTable);
 begin
   FTable := ATable;
 end;
@@ -938,7 +953,7 @@ begin
   FObjVersionProperty := AValue;
 end;
 
-procedure TioProperties.SetTable(const ATable: IioContextTable);
+procedure TioProperties.SetTable(const ATable: IioTable);
 var
   AProperty: IioProperty;
 begin
@@ -948,7 +963,7 @@ end;
 
 { TioField }
 
-constructor TioField.Create(const ARttiField: TRttiField; const ATable: IioContextTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+constructor TioField.Create(const ARttiField: TRttiField; const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
   const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
   const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean;
   const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
@@ -1006,6 +1021,57 @@ procedure TioField.SetValue(const Instance: Pointer; const AValue: TValue);
 begin
   // No inherited
   FRttiProperty.SetValue(Instance, AValue);
+end;
+
+{ TioHasManyChildVirtualProperty }
+
+constructor TioHasManyChildVirtualProperty.Create(const ATable: IioTable);
+begin
+  inherited Create(ATable, '', '', '', '', False, False, False, lpLoadAndPersist, rtNone, '', '', '', ltEagerLoad, False, ioMdInteger, IO_DEFAULT_FIELD_LENGTH,
+    IO_DEFAULT_FIELD_PRECISION, IO_DEFAULT_FIELD_SCALE, True, TValue.Empty, True, '', '', fkCreate, fkUnspecified, fkUnspecified);
+  FRttiType := TRttiContext.Create.GetType(TypeInfo(Integer));
+end;
+
+function TioHasManyChildVirtualProperty.GetName: String;
+begin
+  // No inherited
+  Result := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
+function TioHasManyChildVirtualProperty.GetRttiType: TRttiType;
+begin
+  // No inherited
+  Result := FRttiType;
+end;
+
+function TioHasManyChildVirtualProperty.GetSqlFieldName(const AClearDelimiters: Boolean): String;
+begin
+  // No inherited
+  Result := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
+function TioHasManyChildVirtualProperty.GetTypeInfo: PTypeInfo;
+begin
+  // No inherited
+  Result := FRttiType.Handle;
+end;
+
+function TioHasManyChildVirtualProperty.GetValue(const Instance: Pointer): TValue;
+begin
+  // No inherited
+  EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+end;
+
+function TioHasManyChildVirtualProperty.IsWritable: Boolean;
+begin
+  // No inherited
+  Result := False;
+end;
+
+procedure TioHasManyChildVirtualProperty.SetValue(const Instance: Pointer; const AValue: TValue);
+begin
+  // No inherited
+  EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
 end;
 
 end.

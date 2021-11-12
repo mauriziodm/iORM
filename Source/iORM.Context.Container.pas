@@ -168,6 +168,10 @@ begin
         // Load the current class (entity) into the ContextContainer
         Add(LRttiType.AsInstance.MetaclassType);
     end;
+
+    // Generate childs virtual properties related to autodetected HasMany relations
+    TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
+
   finally
     FreeAndNil(FAutodetectedHasManyRelationCollection);
   end;

@@ -47,17 +47,17 @@ type
   TioMap = class(TInterfacedObject, IioMap)
   strict private
     FClassRef: TioClassRef;
-    FTable: IioContextTable;
+    FTable: IioTable;
     FProperties: IioProperties;
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
     FAncestorMap: IioMap;
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
   public
-    constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioContextTable; AProperties:IioProperties); overload;
+    constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioTable; AProperties:IioProperties); overload;
     function GetClassRef: TioClassRef;
     function GetClassName: String;
-    function GetTable: IioContextTable;
+    function GetTable: IioTable;
     function GetProperties: IioProperties;
     function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
@@ -94,7 +94,7 @@ begin
 end;
 
 constructor TioMap.Create(AClassRef: TioClassRef; ARttiContext: TRttiContext;
-  ARttiType: TRttiInstanceType; ATable: IioContextTable;
+  ARttiType: TRttiInstanceType; ATable: IioTable;
   AProperties: IioProperties);
 begin
   inherited Create;
@@ -130,7 +130,7 @@ begin
   Result := FProperties;
 end;
 
-function TioMap.GetTable: IioContextTable;
+function TioMap.GetTable: IioTable;
 begin
   Result := FTable;
 end;

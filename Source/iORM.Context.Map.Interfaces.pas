@@ -49,7 +49,7 @@ type
     ['{874979DB-BE8E-40CE-89DC-C265302D8E16}']
     function GetClassRef: TioClassRef;
     function GetClassName: String;
-    function GetTable: IioContextTable;
+    function GetTable: IioTable;
     function GetProperties: IioProperties;
     function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;

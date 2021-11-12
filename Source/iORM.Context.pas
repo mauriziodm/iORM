@@ -67,7 +67,7 @@ type
   public
     constructor Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil); overload;
     function GetClassRef: TioClassRef;
-    function GetTable: IioContextTable;
+    function GetTable: IioTable;
     function GetProperties: IioProperties;
     function TrueClass: IioTrueClass;
     function IsTrueClass: Boolean;
@@ -244,7 +244,7 @@ begin
   Result := Assigned(FWhere);
 end;
 
-function TioContext.GetTable: IioContextTable;
+function TioContext.GetTable: IioTable;
 begin
   Result := Self.Map.GetTable;
 end;
