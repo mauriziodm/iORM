@@ -105,9 +105,9 @@ type
     function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldTableName: String;
     function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; virtual;
-    function GetSqlFieldAlias: String;
-    function GetSqlParamName: String;
-    function GetSqlWhereParamName: String;
+    function GetSqlFieldAlias: String; virtual;
+    function GetSqlParamName: String; virtual;
+    function GetSqlWhereParamName: String; virtual;
     function GetFieldType: String;
     function GetValue(const Instance: Pointer): TValue; virtual;
     function GetValueAsObject(const Instance: Pointer): TObject; virtual;
@@ -141,7 +141,8 @@ type
     function IsTransient: Boolean;
     function IsBlob: Boolean;
     function IsStream: Boolean;
-    function isAutodetectedHasManyRelation: Boolean;
+    function HasAutodetectedHasManyRelation: Boolean;
+    function isHasManyChildVirtualProperty: Boolean; virtual;
 
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
@@ -177,11 +178,15 @@ type
     constructor Create(const ATable: IioTable);
     function GetName: String; override;
     function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; override;
+    function GetSqlFieldAlias: String; override;
+    function GetSqlParamName: String; override;
+    function GetSqlWhereParamName: String; override;
     function GetValue(const Instance: Pointer): TValue; override;
     procedure SetValue(const Instance: Pointer; const AValue: TValue); override;
     function GetRttiType: TRttiType; override;
     function GetTypeInfo: PTypeInfo; override;
     function IsWritable: Boolean; override;
+    function isHasManyChildVirtualProperty: Boolean; override;
   end;
 
   // Classe che rappresenta un field della classe
@@ -583,7 +588,7 @@ begin
   Result := FIDSkipOnInsert;
 end;
 
-function TioProperty.isAutodetectedHasManyRelation: Boolean;
+function TioProperty.HasAutodetectedHasManyRelation: Boolean;
 begin
   Result := (FRelationType = rtHasMany) and (FRelationChildPropertyName = IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME);
 end;
@@ -652,6 +657,11 @@ end;
 function TioProperty.IsDBWriteEnabled: Boolean;
 begin
   Result := (FReadWrite >= lpLoadAndPersist) and not FTransient;
+end;
+
+function TioProperty.isHasManyChildVirtualProperty: Boolean;
+begin
+  Result := False;
 end;
 
 function TioProperty.LoadSqlExist: Boolean;
@@ -1044,10 +1054,28 @@ begin
   Result := FRttiType;
 end;
 
+function TioHasManyChildVirtualProperty.GetSqlFieldAlias: String;
+begin
+  // No inherited
+  Result := GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
 function TioHasManyChildVirtualProperty.GetSqlFieldName(const AClearDelimiters: Boolean): String;
 begin
   // No inherited
   Result := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
+function TioHasManyChildVirtualProperty.GetSqlParamName: String;
+begin
+  // No inherited
+  Result := 'P_' + GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
+function TioHasManyChildVirtualProperty.GetSqlWhereParamName: String;
+begin
+  // No inherited
+  Result := 'W_' + GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetTypeInfo: PTypeInfo;
@@ -1060,6 +1088,12 @@ function TioHasManyChildVirtualProperty.GetValue(const Instance: Pointer): TValu
 begin
   // No inherited
   EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+end;
+
+function TioHasManyChildVirtualProperty.isHasManyChildVirtualProperty: Boolean;
+begin
+  // No inherited
+  Result := True;
 end;
 
 function TioHasManyChildVirtualProperty.IsWritable: Boolean;

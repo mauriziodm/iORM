@@ -51,7 +51,7 @@ type
     FMap: IioMap;
     FDataObject: TObject;
     FWhere: IioWhere;
-  strict protected
+    FHasManyChildVirtualPropertyValue: Integer;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -64,6 +64,9 @@ type
     // Where
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
+    // RelationOID
+    function GetRelationOID: Integer;
+    procedure SetRelationOID(const Value: Integer);
   public
     constructor Create(const AClassName:String; const AMap:IioMap; const AWhere:IioWhere=nil; const ADataObject:TObject=nil); overload;
     function GetClassRef: TioClassRef;
@@ -101,6 +104,8 @@ type
     property ObjVersion:TioObjVersion read GetObjVersion write SetObjVersion;
     // Where
     property Where:IioWhere read GetWhere write SetWhere;
+    // RelationOID
+    property RelationOID: Integer read GetRelationOID write SetRelationOID;
   end;
 
 implementation
@@ -138,6 +143,7 @@ begin
   FMap := AMap;
   FDataObject := ADataObject;
   FWhere := AWhere;
+  FHasManyChildVirtualPropertyValue := 0;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -159,6 +165,11 @@ begin
   // Aggiungere qui l'eventuale futuro codice per aggiungere/sostituire
   //  l'eventuale GroupBy specificato nel ioWhere e che quindi è nel
   //  context e che sostituisce il GroupBy fisso
+end;
+
+function TioContext.GetRelationOID: Integer;
+begin
+  Result := FHasManyChildVirtualPropertyValue;
 end;
 
 function TioContext.GetID: Integer;
@@ -212,6 +223,11 @@ end;
 procedure TioContext.SetDataObject(const AValue: TObject);
 begin
   FDataObject := AValue;
+end;
+
+procedure TioContext.SetRelationOID(const Value: Integer);
+begin
+  FHasManyChildVirtualPropertyValue := Value;
 end;
 
 procedure TioContext.SetObjStatus(const AValue: TioObjStatus);

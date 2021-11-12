@@ -497,7 +497,7 @@ var
       Result.Add(LNewProperty);
       // If the current property is a virtual property (autodetected has many relation) then
       //  add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
-      if LNewProperty.isAutodetectedHasManyRelation then
+      if LNewProperty.HasAutodetectedHasManyRelation then
         TioMapContainer.GetAutodetectedHasManyRelationCollection.Add(LNewProperty);
     end;
   end;

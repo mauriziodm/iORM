@@ -310,7 +310,7 @@ begin
   // -----------------------------------------------------------
 
   // Create and execute insert query and set the version of the entity
-  //  (if it's not a BlindInsert and versioning is enabled for this entity type)
+  // (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
   if not ABlindInsert then
     AContext.ObjVersion := AContext.TransactionTimestamp;
@@ -488,9 +488,10 @@ begin
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
-    if (ARelationPropertyName <> '') and (ARelationOID <> 0) and (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone)
-    // Altrimenti in alcuni casi particolare dava errori
-    then
+    // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchè altrimenti in alcuni casi particolare dava errori
+    LContext.RelationOID := ARelationOID;
+    if (ARelationPropertyName <> '') and (ARelationPropertyName <> IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME) and (ARelationOID <> 0) and
+      (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
     // PreProcess (persist) relation childs (BelongsTo)
     PreProcessRelationChildOnPersist(LContext);
@@ -835,7 +836,7 @@ var
 begin
   inherited;
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrrency
-  //  conflict (if versioning is enabled for this type of entity)
+  // conflict (if versioning is enabled for this type of entity)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
   if LQuery.ExecSQL > 0 then
     AContext.ObjVersion := AContext.TransactionTimestamp

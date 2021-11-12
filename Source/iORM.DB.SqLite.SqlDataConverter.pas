@@ -151,6 +151,9 @@ begin
       AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsType<TDate>;
   end
   else
+  if AProp.isHasManyChildVirtualProperty then
+    AQuery.ParamByProp(AProp).Value := AContext.RelationOID
+  else
     AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
 
 

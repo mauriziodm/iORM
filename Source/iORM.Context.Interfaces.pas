@@ -90,6 +90,10 @@ type
     function GetOrderBySql: String;
     // Join
     function GetJoin: IioJoins;
+    // RelationOID
+    function GetRelationOID: Integer;
+    procedure SetRelationOID(const Value: Integer);
+    property RelationOID: Integer read GetRelationOID write SetRelationOID;
   end;
 
 implementation

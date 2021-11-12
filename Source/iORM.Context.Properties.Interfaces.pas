@@ -100,7 +100,8 @@ type
     function IsInstance: Boolean;
     function IsWritable: Boolean;
     function IsTransient: Boolean;
-    function isAutodetectedHasManyRelation: Boolean;
+    function HasAutodetectedHasManyRelation: Boolean;
+    function isHasManyChildVirtualProperty: Boolean;
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
     procedure SetMetadata_FieldPrecision(const AMetadata_FieldPrecision: Integer);
