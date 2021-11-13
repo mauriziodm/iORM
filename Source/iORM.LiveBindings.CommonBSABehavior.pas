@@ -125,7 +125,6 @@ var
   LValue: TValue;
 begin
   LMasterObj := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current;
-//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(LMasterObj.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
   LMasterProperty := TioMapContainer.GetMap(LMasterObj.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
   TValue.Make(@ADataObject, LMasterProperty.GetTypeInfo, LValue);
   LMasterProperty.SetValue(LMasterObj, LValue);

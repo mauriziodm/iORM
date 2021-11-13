@@ -498,7 +498,6 @@ begin
     Exit;
   end;
   // Extract master property value
-//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
   LValue := FMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue (always as TObject)
   if not LValue.IsEmpty then

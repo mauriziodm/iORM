@@ -429,7 +429,6 @@ begin
     Exit;
   end;
   // Extract master property value
-//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
   LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FMasterPropertyName);
   LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue
