@@ -655,8 +655,8 @@ procedure TioDependencyInjectionRegister.Execute;
 begin
   Self.LoadInjectAttributes;
   if FSetMapImplementersRef then
-    Self.SetMapImplementersRef;
-  Self.Container.Add(Self.FInterfaceName, Self.FAlias, Self.FContainerValue);
+    SetMapImplementersRef;
+  Self.Container.Add(FInterfaceName, FAlias, FContainerValue);
   Self.Free;
 end;
 
