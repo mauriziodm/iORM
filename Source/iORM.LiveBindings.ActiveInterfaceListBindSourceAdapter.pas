@@ -198,7 +198,7 @@ type
 implementation
 
 uses
-  iORM, iORM.LiveBindings.Factory,
+  iORM, iORM.LiveBindings.Factory, iORM.Context.Factory,
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Context.Map.Interfaces,
   iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
@@ -519,7 +519,7 @@ end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetCurrentOID: Integer;
 begin
-  Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
+  Result := TioMapContainer.GetMap(Current.ClassName).GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.DataObject: TObject;
@@ -905,7 +905,7 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
+  TioContextFactory.Context(Current.ClassName, nil, Current).ObjStatus := AObjStatus;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetRefreshing(const Value: boolean);

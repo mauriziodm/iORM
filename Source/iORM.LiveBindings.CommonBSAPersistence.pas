@@ -36,7 +36,8 @@ unit iORM.LiveBindings.CommonBSAPersistence;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces, iORM.Where.Interfaces, iORM.CommonTypes;
+  iORM.LiveBindings.Interfaces, iORM.Where.Interfaces, iORM.CommonTypes,
+  iORM.Context.Container;
 
 type
 
@@ -75,7 +76,7 @@ type
 implementation
 
 uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
-  iORM.Context.Properties.Interfaces, iORM.Context.Factory, Data.Bind.ObjectScope, System.Generics.Collections,
+  iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.LiveBindings.CommonBSAPaging;
 
 type
@@ -332,8 +333,7 @@ begin
   if AActiveBindSourceAdapter.IsDetail then
   begin
     // Get the MasterProperty of the current object
-    LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName
-      (AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
+    LMasterProperty := TioMapContainer.GetMap(AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
     // Get a local reference of some values
     LRelationChildPropertyName := LMasterProperty.GetRelationChildPropertyName;
     LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;
@@ -388,8 +388,7 @@ begin
     if AActiveBindSourceAdapter.IsDetail then
     begin
       // Get the MasterProperty of the current object
-      LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName
-        (AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
+      LMasterProperty := TioMapContainer.GetMap(AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
       // Get a local reference of some values
       LRelationChildPropertyName := LMasterProperty.GetRelationChildPropertyName;
       LMasterOID := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.GetCurrentOID;

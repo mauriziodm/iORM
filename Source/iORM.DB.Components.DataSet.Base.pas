@@ -198,7 +198,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, System.SysUtils, iORM.Context.Factory, iORM.Attributes,
+  iORM.Exceptions, System.SysUtils, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper, iORM.Utilities, System.StrUtils;
 
@@ -1248,7 +1248,7 @@ var
 begin
   Result := False;
   LPropName := _ExtractPropName(AFullPathPropName);
-  AOutProperty := TioContextFactory.GetPropertyByClassRefAndName(AOutObj.ClassType, LPropName);
+  AOutProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
   if not AFullPathPropName.IsEmpty then
   begin
     // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship

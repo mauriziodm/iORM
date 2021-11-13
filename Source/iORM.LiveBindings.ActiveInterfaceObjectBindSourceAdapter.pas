@@ -189,7 +189,8 @@ implementation
 uses
   iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Map.Interfaces, iORM.Where.Factory,
   iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.LiveBindings.CommonBSABehavior, iORM.Utilities, iORM.Context.Container;
+  iORM.LiveBindings.CommonBSABehavior, iORM.Utilities, iORM.Context.Container,
+  iORM.Context.Factory;
 
 { TioActiveInterfaceObjectBindSourceAdapter }
 
@@ -490,7 +491,7 @@ end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetCurrentOID: Integer;
 begin
-  Result := TioContextFactory.GetIDPropertyByClassRef(Self.Current.ClassType).GetValue(Self.Current).AsInteger;
+  Result := TioMapContainer.GetMap(Current.ClassName).GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.DataObject: TObject;
@@ -795,7 +796,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
+  TioContextFactory.Context(Current.ClassName, nil, Current).ObjStatus := AObjStatus;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetRefreshing(const Value: Boolean);

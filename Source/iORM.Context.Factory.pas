@@ -67,8 +67,6 @@ type
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AioWhere: IioWhere = nil; const ADataObject: TObject = nil): IioContext;
-    class function GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioProperty;
-    class function GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioProperty;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -124,11 +122,6 @@ begin
     LDetailVirtualProperty := HasManyChildVirtualProperty(LDetailMap.GetTable);
     LDetailMap.GetProperties.Add(LDetailVirtualProperty);
   end;
-end;
-
-class function TioContextFactory.GetIDPropertyByClassRef(const AClassRef: TioClassRef): IioProperty;
-begin
-  Result := Self.Map(AClassRef).GetProperties.GetIdProperty;
 end;
 
 class function TioContextFactory.GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
@@ -188,11 +181,6 @@ begin
   end
   else
     raise EioException.Create(Self.ClassName, 'GetProperty', 'Invalid member type');
-end;
-
-class function TioContextFactory.GetPropertyByClassRefAndName(const AClassRef: TioClassRef; const APropertyName: String): IioProperty;
-begin
-  Result := Self.Map(AClassRef).GetProperties.GetPropertyByName(APropertyName);
 end;
 
 class function TioContextFactory.GroupBy(const ASqlText: String): IioGroupBy;
