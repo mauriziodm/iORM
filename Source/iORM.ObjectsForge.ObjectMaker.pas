@@ -74,8 +74,8 @@ begin
   for CurrProp in AContext.GetProperties do
   begin
     AObj := nil;
-    // If the property is not ReadEnabled then skip it
-    if not CurrProp.IsDBReadEnabled then Continue;
+    if CurrProp.isHasManyChildVirtualProperty or not CurrProp.IsDBReadEnabled then
+      Continue;
     case CurrProp.GetRelationType of
 // ------------------------------ NO RELATION --------------------------------------------------------------------------------------
       // If RelationType = ioRTNone then load normal property value (No relation)

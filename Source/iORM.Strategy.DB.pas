@@ -490,7 +490,7 @@ begin
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchè altrimenti in alcuni casi particolare dava errori
     LContext.RelationOID := ARelationOID;
-    if (ARelationPropertyName <> '') and (ARelationPropertyName <> IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME) and (ARelationOID <> 0) and
+    if (ARelationPropertyName <> '') and (ARelationPropertyName <> IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME) and (ARelationOID <> 0) and
       (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
     // PreProcess (persist) relation childs (BelongsTo)

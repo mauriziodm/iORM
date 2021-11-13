@@ -157,12 +157,12 @@ begin
   end;
 end;
 
-class function TioContextFactory.GetProperty(const ATable: IioTable; const AMember: TRttiMember;
-  const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist;
-  const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
-  const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
-  const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
-  const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
+class function TioContextFactory.GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
+  const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
+  const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
   const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
 begin
   if AMember is TRttiField then
@@ -454,9 +454,6 @@ var
         end;
       end;
 
-
-
-
       // Automatic relation detection (only for class or interface member type)
       if (not ATransientAsDeafult) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
         (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
@@ -466,12 +463,9 @@ var
         if not LMember_RelationChildTypeName.IsEmpty then
         begin
           LMember_RelationType := rtHasMany;
-          LMember_RelationChildPropertyName := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+          LMember_RelationChildPropertyName := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
         end;
       end;
-
-
-
 
       // If the current member is a ReadOnly TRttiProperty then force it as PersistOnly
       if (LMember is TRttiProperty) and not TRttiProperty(LMember).IsWritable then
@@ -484,7 +478,7 @@ var
         LDB_FKOnUpdateAction);
       Result.Add(LNewProperty);
       // If the current property is a virtual property (autodetected has many relation) then
-      //  add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
+      // add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
       if LNewProperty.HasAutodetectedHasManyRelation then
         TioMapContainer.GetAutodetectedHasManyRelationCollection.Add(LNewProperty);
     end;

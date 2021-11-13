@@ -592,7 +592,7 @@ end;
 
 function TioProperty.HasAutodetectedHasManyRelation: Boolean;
 begin
-  Result := (FRelationType = rtHasMany) and (FRelationChildPropertyName = IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME);
+  Result := (FRelationType = rtHasMany) and (FRelationChildPropertyName = IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME);
 end;
 
 function TioProperty.IsBlob: Boolean;
@@ -629,7 +629,7 @@ function TioProperty.IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestT
 begin
   case ASqlRequestType of
     ioSelect:
-      Result := (FReadWrite <= lpLoadAndPersist) and not FTransient;
+      Result := (FReadWrite <= lpLoadAndPersist) and (not isHasManyChildVirtualProperty) and (not FTransient);
     ioInsert:
       begin
         Result := (FReadWrite >= lpLoadAndPersist) and not FTransient;
@@ -902,17 +902,15 @@ begin
   // Get the function by ASqlRequestType value
   case ASqlRequestType of
     ioSelect:
-      AFunc :=
-              function(AProp: IioProperty): String
-    begin
-      if AProp.LoadSqlExist then
-        Result := AProp.GetLoadSql
-      else
-        Result := AProp.GetSqlFullQualifiedFieldName;
-    end;
+      AFunc := function(AProp: IioProperty): String
+      begin
+        if AProp.LoadSqlExist then
+          Result := AProp.GetLoadSql
+        else
+          Result := AProp.GetSqlFullQualifiedFieldName;
+      end;
   else
-    AFunc :=
-          function(AProp: IioProperty): String
+    AFunc := function(AProp: IioProperty): String
     begin
       Result := AProp.GetSqlFieldName;
     end;
@@ -1047,7 +1045,7 @@ end;
 function TioHasManyChildVirtualProperty.GetName: String;
 begin
   // No inherited
-  Result := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetRttiType: TRttiType;
@@ -1059,38 +1057,37 @@ end;
 function TioHasManyChildVirtualProperty.GetSqlFieldAlias: String;
 begin
   // No inherited
-  Result := GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := GetSqlFieldTableName + '_' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetSqlFieldName(const AClearDelimiters: Boolean): String;
 begin
   // No inherited
-  Result := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetSqlFullQualifiedFieldName: String;
 begin
   // No inherited
-  Result := GetSqlFieldTableName + '.' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME + ' AS ' + GetSqlFieldTableName + '_' +
-    IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := GetSqlFieldTableName + '.' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME + ' AS ' + GetSqlFieldTableName + '_' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetSqlParamName: String;
 begin
   // No inherited
-  Result := 'P_' + GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := 'P_' + GetSqlFieldTableName + '_' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetSqlQualifiedFieldName: String;
 begin
   // No inherited
-  Result := GetSqlFieldTableName + '.' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := GetSqlFieldTableName + '.' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetSqlWhereParamName: String;
 begin
   // No inherited
-  Result := 'W_' + GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+  Result := 'W_' + GetSqlFieldTableName + '_' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetTypeInfo: PTypeInfo;
@@ -1102,7 +1099,7 @@ end;
 function TioHasManyChildVirtualProperty.GetValue(const Instance: Pointer): TValue;
 begin
   // No inherited
-  EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+  raise EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
 end;
 
 function TioHasManyChildVirtualProperty.isHasManyChildVirtualProperty: Boolean;
@@ -1120,7 +1117,7 @@ end;
 procedure TioHasManyChildVirtualProperty.SetValue(const Instance: Pointer; const AValue: TValue);
 begin
   // No inherited
-  EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+  raise EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
 end;
 
 end.
