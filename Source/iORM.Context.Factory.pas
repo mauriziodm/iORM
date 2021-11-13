@@ -464,6 +464,14 @@ var
         begin
           LMember_RelationType := rtHasMany;
           LMember_RelationChildPropertyName := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
+        end
+        else
+        // BelongsTo relation autodetect
+        if TioUtilities.HasAttribute<ioEntity>(LMember_FieldValueType) then
+        begin
+          LMember_RelationType := rtBelongsTo;
+          LMember_RelationChildTypeName := LMember_FieldValueType.Name;
+          LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
         end;
       end;
 
