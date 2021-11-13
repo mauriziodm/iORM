@@ -470,7 +470,7 @@ var
 
 
       // Automatic relation detection (only for class or interface member type)
-      if LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
+      if (not ATransientAsDeafult) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
         (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
       begin
         // HasMany relation autodetect

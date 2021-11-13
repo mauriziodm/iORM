@@ -91,18 +91,18 @@ type
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
   public
-    constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioTable;
-      const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean;
-      const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
-      ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
-      const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean;
-      const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
+    constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
+      const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
+      const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
+      const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
+      const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
+      const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String; virtual;
-    function GetSqlQualifiedFieldName: String;
-    function GetSqlFullQualifiedFieldName: String;
+    function GetSqlQualifiedFieldName: String; virtual;
+    function GetSqlFullQualifiedFieldName: String; virtual;
     function GetSqlFieldTableName: String;
     function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; virtual;
     function GetSqlFieldAlias: String; virtual;
@@ -181,6 +181,8 @@ type
     function GetSqlFieldAlias: String; override;
     function GetSqlParamName: String; override;
     function GetSqlWhereParamName: String; override;
+    function GetSqlQualifiedFieldName: String; override;
+    function GetSqlFullQualifiedFieldName: String; override;
     function GetValue(const Instance: Pointer): TValue; override;
     procedure SetValue(const Instance: Pointer; const AValue: TValue); override;
     function GetRttiType: TRttiType; override;
@@ -321,9 +323,9 @@ begin
   SetRelationChildNameAndPath(ARelationChildPropertyName);
   // --------------------------------
   // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietà che ricevono il valore dai campi della
-  //  joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
-  //  valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
-  //  Esempio:
+  // joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
+  // valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
+  // Esempio:
   // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
   // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
@@ -681,9 +683,9 @@ var
 begin
   // --------------------------------
   // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietà che ricevono il valore dai campi della
-  //  joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
-  //  valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
-  //  Esempio:
+  // joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
+  // valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
+  // Esempio:
   // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
   // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
@@ -1066,10 +1068,23 @@ begin
   Result := IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
 end;
 
+function TioHasManyChildVirtualProperty.GetSqlFullQualifiedFieldName: String;
+begin
+  // No inherited
+  Result := GetSqlFieldTableName + '.' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME + ' AS ' + GetSqlFieldTableName + '_' +
+    IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
 function TioHasManyChildVirtualProperty.GetSqlParamName: String;
 begin
   // No inherited
   Result := 'P_' + GetSqlFieldTableName + '_' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
+end;
+
+function TioHasManyChildVirtualProperty.GetSqlQualifiedFieldName: String;
+begin
+  // No inherited
+  Result := GetSqlFieldTableName + '.' + IO_AUTODETECTED_RELATIONS_MASTER_PROPERTY_NAME;
 end;
 
 function TioHasManyChildVirtualProperty.GetSqlWhereParamName: String;

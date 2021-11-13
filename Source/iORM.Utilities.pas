@@ -77,7 +77,7 @@ implementation
 
 uses
   System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers,
-  iORM.Context.Factory, iORM.Context.Interfaces, iORM.Context.Map.Interfaces;
+  iORM.Context.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Container;
 
 { TioRttiUtilities }
 
@@ -116,7 +116,8 @@ var
 begin
   if not Assigned(AObj) then
     raise EioException.Create(ClassName, 'ExtractOID', '"AObj" cannot be nil.');
-  LMap := TioContextFactory.Map(AObj.ClassType);
+//  LMap := TioContextFactory.Map(AObj.ClassType);
+  LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;
 

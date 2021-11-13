@@ -187,9 +187,9 @@ type
 implementation
 
 uses
-  iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Factory, iORM.Context.Map.Interfaces, iORM.Where.Factory,
+  iORM, System.SysUtils, iORM.LiveBindings.Factory, iORM.Context.Map.Interfaces, iORM.Where.Factory,
   iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.LiveBindings.CommonBSABehavior, iORM.Utilities;
+  iORM.LiveBindings.CommonBSABehavior, iORM.Utilities, iORM.Context.Container;
 
 { TioActiveInterfaceObjectBindSourceAdapter }
 
@@ -428,7 +428,8 @@ begin
     Exit;
   end;
   // Extract master property value
-  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+  LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FMasterPropertyName);
   LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue
   if not LValue.IsEmpty then

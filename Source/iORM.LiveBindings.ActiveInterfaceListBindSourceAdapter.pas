@@ -198,12 +198,12 @@ type
 implementation
 
 uses
-  iORM, iORM.LiveBindings.Factory, iORM.Context.Factory,
+  iORM, iORM.LiveBindings.Factory,
   iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
   iORM.Exceptions, iORM.Context.Map.Interfaces,
   iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
   iORM.AbstractionLayer.Framework, iORM.Containers.Interfaces,
-  iORM.LiveBindings.CommonBSABehavior;
+  iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -473,7 +473,8 @@ begin
     Exit;
   end;
   // Extract master property value
-  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(AMasterObj.ClassType, FMasterPropertyName);
+  LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FMasterPropertyName);
   LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue (always as TObject)
   if not LValue.IsEmpty then

@@ -113,8 +113,7 @@ TioBindSourceAdapterFieldHelper = class helper for TBindSourceAdapterField
 
 implementation
 
-uses iORM.Context.Map.Interfaces, iORM.Context.Factory, iORM.Attributes,
-  System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions;
+uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container;
 
 { TioCommonBSABehavior }
 
@@ -126,8 +125,8 @@ var
   LValue: TValue;
 begin
   LMasterObj := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current;
-  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(LMasterObj.ClassType,
-    AActiveBindSourceAdapter.GetMasterPropertyName);
+//  LMasterProperty := TioContextFactory.GetPropertyByClassRefAndName(LMasterObj.ClassType, AActiveBindSourceAdapter.GetMasterPropertyName);
+  LMasterProperty := TioMapContainer.GetMap(LMasterObj.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
   TValue.Make(@ADataObject, LMasterProperty.GetTypeInfo, LValue);
   LMasterProperty.SetValue(LMasterObj, LValue);
   AActiveBindSourceAdapter.GetMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
@@ -309,7 +308,8 @@ var
   LChildPath: String;
   LChildGetMemberObject: IGetMemberObject;
 begin
-  LMap := TioContextFactory.Map(TioUtilities.ResolveRttiTypeToClassRef(AType));
+//  LMap := TioContextFactory.Map(TioUtilities.ResolveRttiTypeToClassRef(AType));
+  LMap := TioMapContainer.GetMap(TioUtilities.ResolveRttiTypeToRttiType(AType).Name);
   for LProperty in LMap.GetProperties do
   begin
     if LProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne] then
