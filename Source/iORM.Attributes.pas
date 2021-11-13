@@ -395,7 +395,7 @@ type
   strict private
     FMapMode: TioMapModeType;
   public
-    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = mmProperties); overload;
+    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = mmHybrid); overload;
     constructor Create(const AMapMode: TioMapModeType); overload;
     property MapMode: TioMapModeType read FMapMode;
   end;

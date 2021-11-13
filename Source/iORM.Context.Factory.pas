@@ -216,7 +216,7 @@ end;
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
 var
   LMembers: TArray<System.Rtti.TRttiMember>;
-  procedure ExtractMembersInfo(const ATransientAsDeafult: Boolean);
+  procedure ExtractMembersInfo(const ATransientAsDefault: Boolean);
   var
     LMember: System.Rtti.TRttiMember;
     LRttiProperty: TRttiProperty;
@@ -294,7 +294,7 @@ var
       LMember_TypeAlias := '';
       LMember_FieldType := '';
       LMember_LoadSql := '';
-      LMember_Transient := ATransientAsDeafult;
+      LMember_Transient := ATransientAsDefault;
       LMember_LoadPersist := lpLoadAndPersist;
       LMember_RelationType := rtNone;
       LMember_RelationChildTypeName := '';
@@ -455,7 +455,7 @@ var
       end;
 
       // Automatic relation detection (only for class or interface member type)
-      if (not ATransientAsDeafult) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
+      if (not ATransientAsDefault) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
         (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
       begin
         // HasMany relation autodetect
