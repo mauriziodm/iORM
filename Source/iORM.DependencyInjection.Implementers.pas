@@ -79,6 +79,7 @@ type
     DefaultConstructorMethod: String;
     DefaultConstructorMarker: String;
     DefaultConstructorParams: array of TValue;
+    IsEntity: Boolean;
     IsSingleton: Boolean;
     PresenterSettings: TioDIPresenterSettingsContainer;
     property PresenterSettingsPointer:PioDIPresenterSettingsContainer read GetPresenterSettingsPointer;
