@@ -274,6 +274,7 @@ type
 
 
   // Class for ResolverByDependencyInjection
+  // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
   TioDependencyInjectionResolverBase = class(TioDependencyInjectionBase)
   public
     // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
@@ -1738,6 +1739,7 @@ end;
 
 { TioDependencyInjectionResolverBase }
 
+// NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
 class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String; const AAlias: String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
 var
   AImplementer: TioDIContainerImplementersItem;
@@ -1761,6 +1763,9 @@ begin
     // Loop for all the implementers
     for AImplementer in AImplementerCollection do
     begin
+      // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+      if not AImplementer.IsEntity then
+        Continue;
       // Get the map for the current implementer
       AMap := TioMapContainer.GetMap(AImplementer.ClassName);
       // NB: Solo le classi (implementers) che non derivino da classi anch'esse contenute nell'elenco degli implementers (per evitare duplicati)
@@ -1775,6 +1780,7 @@ begin
     Result.Add(   Self.Container.Get(ATypeName, AAlias).ClassName   );
 end;
 
+// NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
 class function TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(
   const ATypeName, AAlias: String): TRttiType;
 var

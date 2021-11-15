@@ -45,6 +45,7 @@ uses
 type
 
   // Service Locator Class
+  // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
   TioResolverByDependencyInjection = class(TioResolver)
   public
     // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
@@ -61,12 +62,14 @@ uses
 
 { TioResolverByDependencyInjection }
 
+// NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
 class function TioResolverByDependencyInjection.Resolve(const ATypeName:String; const AAlias: String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
 begin
   inherited;
   Result := TioDependencyInjectionResolverBase.Resolve(ATypeName, AAlias, AResolverMode);
 end;
 
+// NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
 class function TioResolverByDependencyInjection.ResolveInaccurateAsRttiType(
   const ATypeName, AAlias: String): TRttiType;
 begin
