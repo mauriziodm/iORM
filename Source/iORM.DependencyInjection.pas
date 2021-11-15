@@ -539,6 +539,7 @@ begin
   ContainerValue.ClassName := ARttiType.MetaclassType.ClassName;
   ContainerValue.RttiType := ARttiType;
   ContainerValue.IsSingleton := False;
+  ContainerValue.IsEntity := False;
   Result := TioDependencyInjectionFactory.GetRegister(ContainerValue);
 end;
 
@@ -627,7 +628,6 @@ begin
   inherited Create;
   Self.FSetMapImplementersRef := True;
   Self.FContainerValue := AContainerValue;
-  Self.FContainerValue.IsEntity := False;
   Self.FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
   Self.FAlias := '';
 end;

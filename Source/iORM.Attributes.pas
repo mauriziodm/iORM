@@ -474,6 +474,10 @@ type
   end;
 
   // DIC - diAsSingleton attribute
+  diDoNotRegisterAsInterfacedEntity = class(TioCustomAttribute)
+  end;
+
+  // DIC - diAsSingleton attribute
   diAsSingleton = class(TioCustomAttribute)
   end;
 

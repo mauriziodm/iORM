@@ -66,7 +66,6 @@ type
   private
     class var FInternalContainer: TioMapContainerInstance;
     class var FAutodetectedHasManyRelationCollection: TList<IioProperty>;
-  protected
     // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
     class procedure Init;
@@ -193,15 +192,18 @@ type
 var
   LAttr: TCustomAttribute;
   LdiRegister: Boolean;
+  LdiRegisterAsInterfacedEntity: Boolean;
   LdiAsSingleton: Boolean;
   LdiImplements: array of TdiImplementsItem;
   LdiVVMforItems: array of TdiVVMforItem;
+  LdiImplementedInterfaces: TArray<TRttiInterfaceType>;
   Index: Integer;
 begin
   // Init
   Result := False;
 //  Index := 0;
   LdiRegister := False;
+  LdiRegisterAsInterfacedEntity := True;
   LdiAsSingleton := False;
   SetLength(LdiImplements, 0);
   // Loop for attributes
@@ -213,6 +215,9 @@ begin
     // DIC - diRegister
     if LAttr is diRegister then
       LdiRegister := True;
+    // DIC - diDoNotRegisterAsInterfacedEntity
+    if LAttr is diDoNotRegisterAsInterfacedEntity then
+      LdiRegisterAsInterfacedEntity := False;
     // DIC - diIsSingleton
     if LAttr is diAsSingleton then
       LdiAsSingleton := True;
@@ -242,6 +247,14 @@ begin
       LdiVVMforItems[Index].Target := diViewModelFor(LAttr).TargetTypeName;
       LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
     end;
+  end;
+  // Dependency Injection Container - Auto register the class for the resolver (persistance only) to use for load, persist, delete only
+  if Result and LdiRegisterAsInterfacedEntity then
+  begin
+    LdiImplementedInterfaces := AType.GetImplementedInterfaces;
+    for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
+      if (LdiImplementedInterfaces[Index].GUID <> IInterface) then  // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
+        io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name).AsEntity.Execute;
   end;
   // Dependency Injection Container - Register the class as is without any interface
   if LdiRegister then
