@@ -207,7 +207,7 @@ begin
   // Loop for attributes
   for LAttr in AType.GetAttributes do
   begin
-    // ioTable or ioEntity attribute
+    // ioEntity attribute (it means it is an entity class)
     if LAttr is ioTable then
       Result := True;
     // DIC - diRegister

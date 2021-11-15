@@ -120,6 +120,7 @@ type
     function InjectField(const AFieldName:String; const AValue:TValue):TioDependencyInjectionRegister; overload;
     function InjectField(const AFieldName, ATypeName:String; const ATypeAlias:String=''):TioDependencyInjectionRegister; overload;
     function AsSingleton(const AIsSingleton:Boolean=True):TioDependencyInjectionRegister;
+    function AsEntity:TioDependencyInjectionRegister;
     function DefaultConstructorMethod(const AValue:String): TioDependencyInjectionRegister;
     function DefaultConstructorMarker(const AValue:String): TioDependencyInjectionRegister;
     function DefaultConstructorParams(const AParams: array of TValue): TioDependencyInjectionRegister;
@@ -609,6 +610,12 @@ begin
   Result := Self;
 end;
 
+function TioDependencyInjectionRegister.AsEntity: TioDependencyInjectionRegister;
+begin
+  Self.FContainerValue.IsEntity := True;
+  Result := Self;
+end;
+
 function TioDependencyInjectionRegister.AsSingleton(const AIsSingleton:Boolean): TioDependencyInjectionRegister;
 begin
   Self.FContainerValue.IsSingleton := AIsSingleton;
@@ -620,6 +627,7 @@ begin
   inherited Create;
   Self.FSetMapImplementersRef := True;
   Self.FContainerValue := AContainerValue;
+  Self.FContainerValue.IsEntity := False;
   Self.FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
   Self.FAlias := '';
 end;
