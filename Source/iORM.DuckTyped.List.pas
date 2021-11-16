@@ -195,9 +195,11 @@ begin
   // Get Items indexed property
   LItemsProperty := ARttiType.GetIndexedProperty('Items');
   // Get the result
-  if (LItemsProperty <> nil) and (LItemsProperty.PropertyType.IsInstance or (LItemsProperty.PropertyType is TRttiInterfaceType)) and
-    (ARttiType.GetProperty('Count') <> nil) and (ARttiType.GetMethod('Add') <> nil) and (ARttiType.GetMethod('Clear') <> nil) and
-    (ARttiType.GetMethod('Delete') <> nil) and TioUtilities.HasAttribute<ioEntity>(LItemsProperty.PropertyType) then
+  // NB: In questo punto qualunque relazione con una interfaccia come child passa (poi viene controllata se relativa
+  // ad una entità sarà più avanti
+  if (LItemsProperty <> nil) and ((LItemsProperty.PropertyType.IsInstance and TioUtilities.HasAttribute<ioEntity>(LItemsProperty.PropertyType)) or
+    (LItemsProperty.PropertyType is TRttiInterfaceType)) and (ARttiType.GetProperty('Count') <> nil) and (ARttiType.GetMethod('Add') <> nil) and
+    (ARttiType.GetMethod('Clear') <> nil) and (ARttiType.GetMethod('Delete') <> nil) then
     Result := LItemsProperty.PropertyType.Name
   else
     Result := '';
