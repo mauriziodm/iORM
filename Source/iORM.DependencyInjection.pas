@@ -1749,10 +1749,38 @@ end;
 
 // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
 class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String; const AAlias: String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
-var
-  AImplementer: TioDIContainerImplementersItem;
-  AImplementerCollection: TioDIContainerImplementers;
-  AMap: IioMap;
+  procedure _NestedResolveInterface;
+  var
+    LImplementer: TioDIContainerImplementersItem;
+    LImplementerCollection: TioDIContainerImplementers;
+    LMap: IioMap;
+    LCurrentConnectionAndTable: String;
+    LConnectionAndTableList: TStrings;
+  begin
+    LConnectionAndTableList := TStringList.Create;
+    try
+      // Get the collection of the classes implementing the interface
+      LImplementerCollection := Self.Container.GetInterfaceImplementers(ATypeName);
+      // Loop for all the implementers
+      for LImplementer in LImplementerCollection do
+      begin
+        // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+        if not LImplementer.IsEntity then
+          Continue;
+        // Get the map for the current implementer
+        LMap := TioMapContainer.GetMap(LImplementer.ClassName);
+        // Compose connection name and table name to void duplicated
+        LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName;
+        if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
+        begin
+          Result.Add(LImplementer.ClassName);
+          LConnectionAndTableList.Add(LCurrentConnectionAndTable);
+        end;
+      end;
+    finally
+      LConnectionAndTableList.Free;
+    end;
+  end;
 begin
   // Create the ResolvedTypeList
   Result := TioResolverFactory.GetResolvedTypeList;
@@ -1764,25 +1792,8 @@ begin
     Exit;
   end;
   // If ResolverMode = rmAll and Alias is NOT specified
-  if (AResolverMode = rmAll) and AAlias.IsEmpty then
-  begin
-    // Get the collection of the classes implementing the interface
-    AImplementerCollection := Self.Container.GetInterfaceImplementers(ATypeName);
-    // Loop for all the implementers
-    for AImplementer in AImplementerCollection do
-    begin
-      // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
-      if not AImplementer.IsEntity then
-        Continue;
-      // Get the map for the current implementer
-      AMap := TioMapContainer.GetMap(AImplementer.ClassName);
-      // NB: Solo le classi (implementers) che non derivino da classi anch'esse contenute nell'elenco degli implementers (per evitare duplicati)
-      if (not AMap.HasMappedAncestor)
-      or (not AImplementerCollection.ContainsClass(   AMap.AncestorMap.GetClassRef.ClassName   ))
-      then
-        Result.Add(AImplementer.ClassName);
-    end;
-  end
+  if (AResolverMode <= rmAllDistinctByConnectionAndTable) and AAlias.IsEmpty then
+    _NestedResolveInterface
   // If Alias IS specified
   else
     Result.Add(   Self.Container.Get(ATypeName, AAlias).ClassName   );
@@ -1797,7 +1808,7 @@ var
   LFirstResolvedClassMap: IioMap;
 begin
   // Resolve the type and alias
-  LResolvedTypeList := Self.Resolve(ATypeName, AAlias, TioResolverMode.rmAll);
+  LResolvedTypeList := Self.Resolve(ATypeName, AAlias, TioResolverMode.rmAllDistinctByConnectionAndTable);
   // Se non trova nemmeno una classe solleva un'eccezione
   if LResolvedTypeList.Count = 0 then
     raise EioException.Create(Self.ClassName, 'ResolveInaccurateAsRttiType', Format('No class was found that implements the interface ("%s" alias "%s").', [ATypeName, AAlias]));

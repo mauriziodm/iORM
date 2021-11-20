@@ -98,6 +98,7 @@ type
       const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
+    procedure ClearRelationData;
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String; virtual;
@@ -264,6 +265,15 @@ uses
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container;
 
 { TioProperty }
+
+procedure TioProperty.ClearRelationData;
+begin
+  FRelationType := rtNone;
+  FRelationChildTypeName := '';
+  FRelationChildTypeAlias := '';
+  FRelationChildPropertyName := '';
+  FRelationLoadType := ltEagerLoad;
+end;
 
 constructor TioProperty.Create(const ARttiProperty: TRttiProperty; const ATable: IioTable;
   const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist;

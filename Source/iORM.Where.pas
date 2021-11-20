@@ -711,7 +711,7 @@ var
 
 begin
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   ATransactionCollection := TioDbFactory.TransactionCollection;
   try
@@ -769,7 +769,7 @@ var
 
 begin
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   ATransactionCollection := TioDbFactory.TransactionCollection;
   try

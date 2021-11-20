@@ -46,11 +46,11 @@ type
     class function ObjectAsIInterface(const AObj: Tobject): IInterface; static;
     class function ObjectAsIioViewModel(const AObj: Tobject): IioViewModel; static;
     class function IsAnInterface<T>: Boolean; static;
+    class function IsAnInterfaceTypeName(const ATypeName: String): Boolean; static;
     class function CastObjectToGeneric<T>(const AObj: Tobject): T; overload; static;
     class function CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T; overload; static;
     class function GenericToString<T>(const AQualified: Boolean = False): String; static;
     class function ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType; static;
-    class function IsAnInterfaceTypeName(const ATypeName: String): Boolean; static;
     class function ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject; static;
     class function TypeInfoToTypeName(const ATypeInfo: PTypeInfo; const AQualified: Boolean = False): String; static;
     class function SameObject(const AObj1, AObj2: Tobject): Boolean; static;

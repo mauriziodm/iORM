@@ -59,6 +59,7 @@ type
 
   IioProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
+    procedure ClearRelationData;
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: string;

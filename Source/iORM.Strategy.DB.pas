@@ -117,7 +117,7 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   ATransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -159,7 +159,7 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   ATransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -371,7 +371,7 @@ begin
   inherited;
   Result := nil;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   ATransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -744,7 +744,7 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   ATransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -805,7 +805,7 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAll);
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Wrap the list into a DuckTypedList
   ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
   // Get the transaction collection

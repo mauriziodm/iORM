@@ -53,7 +53,7 @@ begin
       Continue;
     // Resolve the type and alias for the relation child type
     LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LProperty.GetRelationChildTypeName,
-      LProperty.GetRelationChildTypeAlias, rmAll);
+      LProperty.GetRelationChildTypeAlias, rmAllDistinctByConnectionAndTable);
     // Loop for all classes in the resolved type list
     for LResolvedTypeName in LResolvedTypeList do
     begin
