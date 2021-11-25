@@ -660,10 +660,10 @@ procedure TioBSADataSet.SaveBeforeEditValues;
 var
   LObj: TObject;
 begin
-  // Get the current object
-  LObj := FBindSourceAdapter.Current;
-  // Save object status
-  FBeforeEditValues := om.From(LObj).TypeAnnotationsON.ToString;
+//  // Get the current object
+//  LObj := FBindSourceAdapter.Current;
+//  // Save object status
+//  FBeforeEditValues := om.From(LObj).TypeAnnotationsON.ToString;
 end;
 
 procedure TioBSADataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
@@ -995,8 +995,8 @@ procedure TioBSADataSet.RestoreBeforeEditValues;
 var
   LObj: TObject;
 begin
-  LObj := FBindSourceAdapter.Current;
-  om.FromJSON(FBeforeEditValues).TypeAnnotationsON.ClearListBefore.&To(LObj);
+//  LObj := FBindSourceAdapter.Current;
+//  om.FromJSON(FBeforeEditValues).TypeAnnotationsON.ClearListBefore.&To(LObj);
 end;
 
 { TSqlTimeStampUtils }

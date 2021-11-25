@@ -443,7 +443,7 @@ end;
 procedure TioDataSet.InternalCancel;
 begin
   inherited;
-    _ReceivePropagateCancel(Self);
+  _ReceivePropagateCancel(Self);
 end;
 
 procedure TioDataSet.InternalEdit;
