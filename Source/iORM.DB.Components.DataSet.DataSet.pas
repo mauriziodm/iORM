@@ -394,7 +394,7 @@ end;
 procedure TioDataSet.InternalPreOpen;
 begin
   if not CheckAdapter(True) then
-    raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the BindSourceAdapter');
+    raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
   InternalActiveAdapter.Active := True;
   inherited;
 end;
@@ -613,10 +613,10 @@ procedure TioDataSet._CreateAdapter(const ADataObject: TObject; const AOwnsObjec
 begin
   // If an adapter already exists then raise an exception
   if CheckAdapter then
-    raise EioException.Create(ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
+    raise EioException.Create(ClassName, '_CreateAdapter', 'ActiveBindSourceAdapter already exists.');
   // if the TypeName is empty then set it
   if TypeName.IsEmpty then
-    raise EioException.Create(ClassName, '_CreateAdapter', 'ModelPresenter.TypeName value is not valid.');
+    raise EioException.Create(ClassName, '_CreateAdapter', '"TypeName" value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterDataSet) then
