@@ -10,9 +10,6 @@ inherited VM: TVM
     TypeName = 'TArticle'
     ViewDataType = dtList
     WhereDetailsFromDetailAdapters = False
-    ioOnReceiveSelectionAutoEdit = False
-    ioOnReceiveSelectionAutoPost = False
-    ioOnReceiveSelectionAutoPersist = False
     ioPropagateEdit = False
     ioPropagatePost = False
     ioPropagatePersist = False
