@@ -104,41 +104,30 @@ type
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // Override of some base methods
     procedure InternalPreOpen; override;
-    // Properties
+    // Public properties
     property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property IsDetail: Boolean read GetIsDetail; // public: Nascondere? Serve all'esterno?
     property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
-    property ItemCount: Integer read GetCount; // public:
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
-    // Properties
+    // Published properties
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
-    property Async: Boolean read FAsync write SetAsync; // published: Master
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData; // published: Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
+    property Async: Boolean read FAsync write SetAsync default False; // published: Master
+    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
+    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters; // published: Nascondere
+    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
     property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
-    property AutoRefreshOnNotification: TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification; // published: Master+Detail
-    property AutoPost: Boolean read GetAutoPost write SetAutoPost; // published: Nascondere e default = True
-    // Selectors
+    property AutoRefreshOnNotification: TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
+    // Published properties: selectors
     property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; // published: Master
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
-    // Paging
+    // Published properties: paging
     property Paging: TioCommonBSAPageManager read FPaging write FPaging; // published: Master
-    // Events
-    property OnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
-    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
-    property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
-    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
-    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
-    property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
-    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -157,6 +146,20 @@ type
     function CurrentMasterObjectAs<T>: T;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    // Propreties
+    property ItemCount: Integer read GetCount;
+  published
+    // Events
+    property OnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
+    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
+    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
+    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
+    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
+    // Published properties: selectors
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
   end;
 
 implementation
@@ -185,11 +188,11 @@ end;
 constructor TioDataSet.Create(AOwner: TComponent);
 begin
   inherited;
-  FAutoPost := False;
+  FAutoPost := True;
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
   FAutoLoadData := True;
-  FAutoPersist := True;
+  FAutoPersist := False;
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
