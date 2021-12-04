@@ -124,12 +124,12 @@ type
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
-    property Editing: Boolean read GetEditing; // Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
-    property IsDetail: Boolean read GetIsDetail; // Nascondere? Serve all'esterno?
-    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // Nascondere? Serve all'esterno?
-    property ItemCount: Integer read GetCount;
-    property State: TBindSourceAdapterState read GetState; // Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
-    property Where: IioWhere read GetWhere write SetWhere; // Master
+    property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
+    property IsDetail: Boolean read GetIsDetail; // public: Nascondere? Serve all'esterno?
+    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
+    property ItemCount: Integer read GetCount; // public:
+    property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
+    property Where: IioWhere read GetWhere write SetWhere; // public: Master
   published
     // Events
     property OnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
@@ -140,25 +140,25 @@ type
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
     // Properties
-    property TypeName: String read FTypeName write SetTypeName; // Master
-    property TypeAlias: String read FTypeAlias write SetTypeAlias; // Master
-    property Async: Boolean read FAsync write SetAsync; // Master
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData; // Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist; // Master (però cambiarlo in modo che, se true, persiste al cambio di record)
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // Master+Detail (si potrebbe fare una rilevazione automatica?)
-    property WhereStr: TStrings read FWhereStr write SetWhereStr; // Master
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters; // Nascondere
-    property OrderBy: String read FOrderBy Write SetOrderBy; // Master
-    property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // Detail
-    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // Detail
-    property AutoRefreshOnNotification: TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification; // Master+Detail
-    property AutoPost: Boolean read GetAutoPost write SetAutoPost; // Nascondere e default = True
+    property TypeName: String read FTypeName write SetTypeName; // published: Master
+    property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
+    property Async: Boolean read FAsync write SetAsync; // published: Master
+    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData; // published: Master
+    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
+    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
+    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters; // published: Nascondere
+    property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
+    property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
+    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
+    property AutoRefreshOnNotification: TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification; // published: Master+Detail
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost; // published: Nascondere e default = True
     // Selectors
-    property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; // Master
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // Master+Detail
+    property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; published: // Master
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
     // Paging
-    property Paging: TioCommonBSAPageManager read FPaging write FPaging; // Master
+    property Paging: TioCommonBSAPageManager read FPaging write FPaging; // published: Master
   end;
 
 implementation
