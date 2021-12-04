@@ -120,8 +120,6 @@ type
     FMap: IioMap;
     // the bind source adapter holding the data
     FBindSourceAdapter: IioActiveBindSourceAdapter;
-    // Before edit data buffer
-    FBeforeEditValues: String;
     // Methods
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
@@ -134,9 +132,6 @@ type
     // custom dataset virtual methods
     function InternalRecordCount: Integer; override;
     procedure InternalLoadCurrentRecord(Buffer: TRecordBuffer); override;
-    // BeforeEditValues management methods
-    procedure SaveBeforeEditValues; virtual;
-    procedure RestoreBeforeEditValues; virtual;
     // Others
     procedure InternalInitFieldDefs; override;
     procedure InternalPost; override;
@@ -557,7 +552,6 @@ begin
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
-    RestoreBeforeEditValues;
     FBindSourceAdapter.Cancel;
   finally
     FBindSourceAdapter.GetDataSetLinkContainer.Enable;
@@ -580,7 +574,6 @@ begin
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
-    SaveBeforeEditValues;
     FBindSourceAdapter.Edit;
   finally
     FBindSourceAdapter.GetDataSetLinkContainer.Enable;
@@ -648,23 +641,12 @@ begin
       FBindSourceAdapter.Insert;
     // Put the current record index in the record buffer
     PInteger(ActiveBuffer)^ := FBindSourceAdapter.ItemIndex;
-    SaveBeforeEditValues;
   finally
     FBindSourceAdapter.GetDataSetLinkContainer.Enable;
   end;
 end;
 
 // -----------------------------------------------------------------------------
-
-procedure TioBSADataSet.SaveBeforeEditValues;
-var
-  LObj: TObject;
-begin
-//  // Get the current object
-//  LObj := FBindSourceAdapter.Current;
-//  // Save object status
-//  FBeforeEditValues := om.From(LObj).TypeAnnotationsON.ToString;
-end;
 
 procedure TioBSADataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
 var
@@ -989,14 +971,6 @@ function TioBSADataSet.InternalRecordCount: Integer;
 begin
   // Get the RecordCount from the linked BindSourceAdapter
   Result := FBindSourceAdapter.ItemCount;
-end;
-
-procedure TioBSADataSet.RestoreBeforeEditValues;
-var
-  LObj: TObject;
-begin
-//  LObj := FBindSourceAdapter.Current;
-//  om.FromJSON(FBeforeEditValues).TypeAnnotationsON.ClearListBefore.&To(LObj);
 end;
 
 { TSqlTimeStampUtils }

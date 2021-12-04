@@ -20,8 +20,8 @@ type
     FTypeAlias: String;
     FAutoLoadData: Boolean;
     FAsync: Boolean;
-    FAutoPersist: Boolean;
-    FViewDataType: TioViewDataType;
+    FAutoPersist: Boolean; // Eliminare???
+    FViewDataType: TioViewDataType; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
     FMasterDataSet: TioMasterDataSet;
     FMasterPropertyName: String;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
@@ -34,15 +34,8 @@ type
     FPaging: TioCommonBSAPageManager;
     // Selectors
     FSelectorFor: TioDataSet;
-    FOnReceiveSelectionAutoEdit: Boolean;
-    FOnReceiveSelectionAutoPost: Boolean;
-    FOnReceiveSelectionAutoPersist: Boolean;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
-    // Edit/Insert/Post/Cancel propagation
-    FPropagateEdit: Boolean;
-    FPropagatePost: Boolean;
-    FPropagatePersist: Boolean;
     // Questà è una collezione dove eventuali ModelPresenters di dettaglio
     // si registrano per rendere nota la loro esistenza al Master. Sarà poi
     // usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -50,7 +43,7 @@ type
     // anche di tutti gli adapters relativi ai presenters di dettaglio (che si sono
     // registrati). In questo modo evito alcuni problemi di "sequenza" dovuti
     // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
-    // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
+    // Ad esempio capitava che i filtri dei presenters di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
     FDetailDatasetContainer: TList<TioDataSet>;
     // Selection related events
@@ -109,15 +102,8 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
-    // BeforeEditValues management methods
-    procedure SaveBeforeEditValues; override;
-    procedure RestoreBeforeEditValues; override;
-    // Overridenof soma base pethods
+    // Override of some base methods
     procedure InternalPreOpen; override;
-    procedure InternalEdit; override;
-    procedure InternalInsert; override;
-    procedure InternalCancel; override;
-    procedure InternalPost; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -136,12 +122,6 @@ type
     function CurrentMasterObjectAs<T>: T;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
-    // Propagation
-    procedure _ReceivePropagateEdit(const ASenderBindSource: TioDataSet);
-    procedure _ReceivePropagatePost(const ASenderBindSource: TioDataSet);
-    procedure _ReceivePropagateCancel(const ASenderBindSource: TioDataSet);
-    procedure _ReceivePropagatePersistCurrent(const ASenderBindSource: TioDataSet);
-    procedure _ReceivePropagatePersistAll(const ASenderBindSource: TioDataSet);
     // ----------------------------------------------------------------------------------------------------------------------------
     // Properties
     property Editing: Boolean read GetEditing;
@@ -175,15 +155,8 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // Selectors
     property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor;
-    property OnReceiveSelectionAutoEdit: Boolean read FOnReceiveSelectionAutoEdit write FOnReceiveSelectionAutoEdit default False;
-    property OnReceiveSelectionAutoPost: Boolean read FOnReceiveSelectionAutoPost write FOnReceiveSelectionAutoPost default False;
-    property OnReceiveSelectionAutoPersist: Boolean read FOnReceiveSelectionAutoPersist write FOnReceiveSelectionAutoPersist default False;
     property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
     property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
-    // Edit/Insert/Post/Cancel propagation
-    property PropagateEdit: Boolean read FPropagateEdit write FPropagateEdit;
-    property PropagatePost: Boolean read FPropagatePost write FPropagatePost;
-    property PropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
     // Paging
     property Paging: TioCommonBSAPageManager read FPaging write FPaging;
   end;
@@ -224,15 +197,8 @@ begin
   FWhereDetailsFromDetailAdapters := False;
   // Selectors
   FSelectorFor := nil;
-  FOnReceiveSelectionAutoEdit := False;
-  FOnReceiveSelectionAutoPost := False;
-  FOnReceiveSelectionAutoPersist := False;
   FOnReceiveSelectionCloneObject := True;
   FOnReceiveSelectionFreeObject := True;
-  // Edit/Insert/Post/Cancel propagation
-  FPropagateEdit := False;
-  FPropagatePost := False;
-  FPropagatePersist := False;
   // Questà è una collezione dove eventuali ModelPresenters di dettaglio
   // si registrano per rendere nota la loro esistenza al Master. Sarà poi
   // usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -305,26 +271,12 @@ procedure TioDataSet.DoAfterSelection(var ASelected: TObject; var ASelectionType
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
-  // SelectorAutoEdit/Post/Persist
-  if FOnReceiveSelectionAutoEdit then
-    Edit;
-  if FOnReceiveSelectionAutoPost then
-    PostIfEditing;
-  if FOnReceiveSelectionAutoPersist then
-    PersistCurrent;
 end;
 
 procedure TioDataSet.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
-  // SelectorAutoEdit/Post/Persist
-  if FOnReceiveSelectionAutoEdit then
-    Edit;
-  if FOnReceiveSelectionAutoPost then
-    PostIfEditing;
-  if FOnReceiveSelectionAutoPersist then
-    PersistCurrent;
 end;
 
 procedure TioDataSet.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -345,7 +297,6 @@ end;
 
 procedure TioDataSet.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
-  SaveBeforeEditValues;
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
@@ -440,31 +391,6 @@ begin
   Result := FWhere;
 end;
 
-procedure TioDataSet.InternalCancel;
-begin
-  inherited;
-  _ReceivePropagateCancel(Self);
-end;
-
-procedure TioDataSet.InternalEdit;
-begin
-  // NB: Must be before inherited
-  _ReceivePropagateEdit(Self);
-  inherited;
-end;
-
-procedure TioDataSet.InternalInsert;
-begin
-  inherited;
-  _ReceivePropagateEdit(Self);
-end;
-
-procedure TioDataSet.InternalPost;
-begin
-  inherited;
-  _ReceivePropagatePost(Self);
-end;
-
 procedure TioDataSet.InternalPreOpen;
 begin
   if not CheckAdapter(True) then
@@ -508,9 +434,7 @@ end;
 
 procedure TioDataSet.PersistCurrent;
 begin
-  if IsDetail and FPropagatePersist then
-    _ReceivePropagatePersistCurrent(Self)
-  else if CheckAdapter then
+  if CheckAdapter then
     InternalActiveAdapter.PersistCurrent;
 end;
 
@@ -531,22 +455,6 @@ begin
   if not Assigned(FDetailDatasetContainer) then
     FDetailDatasetContainer := TList<TioDataSet>.Create;
   FDetailDatasetContainer.Add(ADetailDataSet);
-end;
-
-procedure TioDataSet.RestoreBeforeEditValues;
-begin
-  // Disable the save/restore before edit values system if the current DataSet is a detail dataset and the propagation is enabled
-  if IsDetail and FPropagateEdit then
-    Exit;
-  inherited;
-end;
-
-procedure TioDataSet.SaveBeforeEditValues;
-begin
-  // Disable the save/restore before edit values system if the current DataSet is a detail dataset and the propagation is enabled
-  if IsDetail and FPropagateEdit then
-    Exit;
-  inherited;
 end;
 
 procedure TioDataSet.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
@@ -725,46 +633,6 @@ begin
     // del Master.
     ForceDetailAdaptersCreation;
   end;
-end;
-
-procedure TioDataSet._ReceivePropagateCancel(const ASenderBindSource: TioDataSet);
-begin
-  if IsDetail and FPropagatePost then
-    FMasterDataSet._ReceivePropagateCancel(Self)
-  else if ASenderBindSource <> Self then
-    CancelIfEditing;
-end;
-
-procedure TioDataSet._ReceivePropagateEdit(const ASenderBindSource: TioDataSet);
-begin
-  if IsDetail and FPropagateEdit then
-    FMasterDataSet._ReceivePropagateEdit(Self)
-  else if ASenderBindSource <> Self then
-    Edit;
-end;
-
-procedure TioDataSet._ReceivePropagatePersistAll(const ASenderBindSource: TioDataSet);
-begin
-  if IsDetail and FPropagatePersist then
-    FMasterDataSet._ReceivePropagatePersistAll(Self)
-  else if ASenderBindSource <> Self then
-    PersistAll;
-end;
-
-procedure TioDataSet._ReceivePropagatePersistCurrent(const ASenderBindSource: TioDataSet);
-begin
-  if IsDetail and FPropagatePersist then
-    FMasterDataSet._ReceivePropagatePersistCurrent(Self)
-  else if ASenderBindSource <> Self then
-    PersistCurrent;
-end;
-
-procedure TioDataSet._ReceivePropagatePost(const ASenderBindSource: TioDataSet);
-begin
-  if IsDetail and FPropagatePost then
-    FMasterDataSet._ReceivePropagatePost(Self)
-  else if ASenderBindSource <> Self then
-    PostIfEditing;
 end;
 
 end.
