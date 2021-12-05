@@ -8,6 +8,9 @@ uses
 type
 
   TioDataSetMaster = class(TioDataSet)
+  private
+    function GetSourceDataSet: TioDataSet;
+    procedure SetSourceDataSet(const Value: TioDataSet);
   public
     property Where;
   published
@@ -24,8 +27,22 @@ type
     property SelectorFor;
     // Published properties: paging
     property Paging;
+    // Added properties
+    property SourceDataSet: TioDataSet read GetSourceDataSet write SetSourceDataSet;
   end;
 
 implementation
+
+{ TioDataSetMaster }
+
+function TioDataSetMaster.GetSourceDataSet: TioDataSet;
+begin
+  Result := MasterDataSet;
+end;
+
+procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSet);
+begin
+  MasterDataSet := Value;
+end;
 
 end.

@@ -616,8 +616,8 @@ begin
   if CheckAdapter then
     raise EioException.Create(ClassName, '_CreateAdapter', 'ActiveBindSourceAdapter already exists.');
   // if the TypeName is empty then set it
-  if TypeName.IsEmpty then
-    raise EioException.Create(ClassName, '_CreateAdapter', '"TypeName" value is not valid.');
+//  if TypeName.IsEmpty then
+//    raise EioException.Create(ClassName, '_CreateAdapter', '"TypeName" value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterDataSet) then
