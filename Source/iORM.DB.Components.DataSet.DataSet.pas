@@ -16,7 +16,6 @@ type
 
   TioDataSet = class(TioBSADataSet, IioNotifiableBindSource)
   private
-    FActive: Boolean;
     FTypeName: String;
     FTypeAlias: String;
     FAutoLoadData: Boolean;
@@ -56,9 +55,6 @@ type
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure DoNotify(ANotification: IioBSANotification);
-    // Active
-    function GetActive: Boolean;
-    procedure SetActive(const Value: Boolean);
     // Async
     procedure SetAsync(const Value: Boolean);
     // AutoLoadData
@@ -153,8 +149,6 @@ type
     // Propreties
     property ItemCount: Integer read GetCount;
   published
-    // Active property redeclaration to permit the active state at DesignTime
-    property Active: Boolean read GetActive write SetActive; // Non mettere il Default
     // Events
     property OnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
@@ -194,7 +188,6 @@ end;
 constructor TioDataSet.Create(AOwner: TComponent);
 begin
   inherited;
-  FActive := True;
   FAutoPost := True;
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
@@ -337,13 +330,6 @@ begin
       LDetailDataSet.CheckAdapter(True);
 end;
 
-function TioDataSet.GetActive: Boolean;
-begin
-  if not(csDesigning in ComponentState) then
-    FActive := inherited Active;
-  Result := FActive;
-end;
-
 function TioDataSet.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
@@ -429,10 +415,6 @@ begin
   // ===========================================================================
 
   inherited;
-
-  // If not at design time then set the inherited Active proprerty
-  if not(csDesigning in ComponentState) then
-    inherited Active := Active;
 end;
 
 procedure TioDataSet.Notify(const Sender: TObject; const ANotification: IioBSANotification);
@@ -515,17 +497,6 @@ begin
     Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
   else
     Select<TObject>(Current, ASelectionType);
-end;
-
-procedure TioDataSet.SetActive(const Value: Boolean);
-begin
-  if not(csDesigning in ComponentState) then
-  begin
-    inherited Active := Value;
-    FActive := inherited Active;
-  end
-  else
-    FActive := Value;
 end;
 
 procedure TioDataSet.SetAsync(const Value: Boolean);
