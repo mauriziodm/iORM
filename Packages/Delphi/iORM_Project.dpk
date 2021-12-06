@@ -201,6 +201,7 @@ contains
   iORM.DB.Components.DataSet.DataSet in '..\..\Source\iORM.DB.Components.DataSet.DataSet.pas',
   iORM.Context.RelationAutoDetect in '..\..\Source\iORM.Context.RelationAutoDetect.pas',
   iORM.DB.Components.DataSet.DataSetMaster in '..\..\Source\iORM.DB.Components.DataSet.DataSetMaster.pas',
-  iORM.DB.Components.DataSet.DataSetDetail in '..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas';
+  iORM.DB.Components.DataSet.DataSetDetail in '..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas',
+  iORM.DB.Components.BindSourceObjState in '..\..\Source\iORM.DB.Components.BindSourceObjState.pas';
 
 end.

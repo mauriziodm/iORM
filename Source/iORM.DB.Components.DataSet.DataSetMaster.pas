@@ -3,16 +3,22 @@ unit iORM.DB.Components.DataSet.DataSetMaster;
 interface
 
 uses
-  iORM.DB.Components.DataSet.DataSet, iORM.LiveBindings.Interfaces;
+  iORM.DB.Components.DataSet.DataSet, iORM.LiveBindings.Interfaces,
+  iORM.DB.Components.BindSourceObjState, System.Classes;
 
 type
 
-  TioDataSetMaster = class(TioDataSet)
+  TioDataSetMaster = class(TioDataSet, IioBindSourceObjStateClient)
   private
+    FObjState: TioBindSourceObjState;
     function GetSourceDataSet: TioDataSet;
     procedure SetSourceDataSet(const Value: TioDataSet);
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     property Where;
+    // Added properties
+    property ObjState: TioBindSourceObjState read FObjState;
   published
     property TypeName;
     property TypeAlias;
@@ -34,6 +40,18 @@ type
 implementation
 
 { TioDataSetMaster }
+
+constructor TioDataSetMaster.Create(AOwner: TComponent);
+begin
+  inherited;
+  FObjState := TioBindSourceObjState.Create(Self);
+end;
+
+destructor TioDataSetMaster.Destroy;
+begin
+  FObjState.Free;
+  inherited;
+end;
 
 function TioDataSetMaster.GetSourceDataSet: TioDataSet;
 begin
