@@ -10,22 +10,26 @@ type
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
   end;
 
-  TioBindSourceObjState = class
+  TioBindSourceObjState = (osUnsaved, osSaved, osChanged);
+
+  TioBindSourceObjStateManager = class
   private
-    FObjState: String;
-    FIsEmpty: Boolean;
+    FState: TioBindSourceObjState;
+    FSavedObjState: String;
     FBindSource: IioBindSourceObjStateClient;
-    function GetIsEmpty: Boolean;
+    function GetIsSaved: Boolean;
     function GetIsChanged: Boolean;
     function GetCurrentAsString: String;
+    function GetState: TioBindSourceObjState;
   public
     constructor Create(const ABindSourceObjStateClient: IioBindSourceObjStateClient);
     procedure Save;
     procedure Revert;
     procedure Clear;
     property IsChanged: Boolean read GetIsChanged;
-    property IsEmpty: Boolean read GetIsEmpty;
-    property SavedObjState: string read FObjState;
+    property IsSaved: Boolean read GetIsSaved;
+    property SavedObjState: string read FSavedObjState;
+    property State: TioBindSourceObjState read GetState;
   end;
 
 implementation
@@ -35,45 +39,59 @@ uses
 
 { TioBindSourceObjState }
 
-procedure TioBindSourceObjState.Clear;
+procedure TioBindSourceObjStateManager.Clear;
 begin
-  FObjState := '';
+  FSavedObjState := '';
 end;
 
-constructor TioBindSourceObjState.Create(const ABindSourceObjStateClient: IioBindSourceObjStateClient);
+constructor TioBindSourceObjStateManager.Create(const ABindSourceObjStateClient: IioBindSourceObjStateClient);
 begin
   inherited Create;
   FBindSource := ABindSourceObjStateClient;
   Clear;
 end;
 
-function TioBindSourceObjState.GetIsChanged: Boolean;
+function TioBindSourceObjStateManager.GetIsChanged: Boolean;
 begin
-  Result := GetCurrentAsString <> FObjState;
+  Result := GetState = osChanged;
 end;
 
-function TioBindSourceObjState.GetIsEmpty: Boolean;
+function TioBindSourceObjStateManager.GetIsSaved: Boolean;
 begin
-  Result := FObjState = '';
+  Result := GetState > osUnsaved;
 end;
 
-procedure TioBindSourceObjState.Revert;
+function TioBindSourceObjStateManager.GetState: TioBindSourceObjState;
 begin
-  if IsEmpty then
+  if FSavedObjState.IsEmpty then
+    Result := osUnsaved
+  else if GetCurrentAsString <> FSavedObjState then
+    Result := osChanged
+  else
+    Result := osSaved;
+end;
+
+procedure TioBindSourceObjStateManager.Revert;
+begin
+  if IsSaved then
+  begin
+    om.FromJSON(FSavedObjState).TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
+    Clear;
+    FBindSource.Refresh(False);
+  end
+  else
     raise EioException.Create(ClassName, 'Revert', 'There is no state you can revert to. (call "Save" method before)');
-  om.FromJSON(FObjState).TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
-  FBindSource.Refresh(False);
 end;
 
-procedure TioBindSourceObjState.Save;
+procedure TioBindSourceObjStateManager.Save;
 begin
-  if FObjState = '' then
-    FObjState := GetCurrentAsString
+  if FSavedObjState = '' then
+    FSavedObjState := GetCurrentAsString
   else
     raise EioException.Create(ClassName, 'Save', 'A previously saved state is present, it must be cleared before (Persist, Revert or Clear)');
 end;
 
-function TioBindSourceObjState.GetCurrentAsString: String;
+function TioBindSourceObjStateManager.GetCurrentAsString: String;
 begin
   if FBindSource.Current <> nil then
     Result := om.From(FBindSource.Current).TypeAnnotationsON.ToString

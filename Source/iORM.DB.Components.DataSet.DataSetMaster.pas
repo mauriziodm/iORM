@@ -10,7 +10,7 @@ type
 
   TioDataSetMaster = class(TioDataSet, IioBindSourceObjStateClient)
   private
-    FObjState: TioBindSourceObjState;
+    FObjState: TioBindSourceObjStateManager;
     function GetSourceDataSet: TioDataSet;
     procedure SetSourceDataSet(const Value: TioDataSet);
   public
@@ -18,7 +18,7 @@ type
     destructor Destroy; override;
     property Where;
     // Added properties
-    property ObjState: TioBindSourceObjState read FObjState;
+    property ObjState: TioBindSourceObjStateManager read FObjState;
   published
     property TypeName;
     property TypeAlias;
@@ -44,7 +44,7 @@ implementation
 constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FObjState := TioBindSourceObjState.Create(Self);
+  FObjState := TioBindSourceObjStateManager.Create(Self);
 end;
 
 destructor TioDataSetMaster.Destroy;
