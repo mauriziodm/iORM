@@ -53,6 +53,20 @@ object MainForm: TMainForm
           StyleLookup = 'nexttoolbutton'
           TabOrder = 0
         end
+        object Button3: TButton
+          AutoTranslate = False
+          Position.X = 8.000000000000000000
+          Position.Y = 8.000000000000000000
+          TabOrder = 1
+          Text = 'Button3'
+        end
+        object Button4: TButton
+          Position.X = 120.000000000000000000
+          Position.Y = 8.000000000000000000
+          TabOrder = 3
+          Text = 'Button4'
+          OnClick = Button4Click
+        end
       end
       object MasterListView: TListView
         ItemAppearanceClassName = 'TImageListItemAppearance'
@@ -384,9 +398,6 @@ object MainForm: TMainForm
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = True
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioOnReceiveSelectionAutoEdit = False
-    ioOnReceiveSelectionAutoPost = False
-    ioOnReceiveSelectionAutoPersist = False
     ioPropagateEdit = False
     ioPropagatePost = False
     ioPropagatePersist = False
@@ -497,9 +508,6 @@ object MainForm: TMainForm
     ioMasterBindSource = BSMaster
     ioMasterPropertyName = 'Phones'
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioOnReceiveSelectionAutoEdit = False
-    ioOnReceiveSelectionAutoPost = False
-    ioOnReceiveSelectionAutoPersist = False
     ioPropagateEdit = False
     ioPropagatePost = False
     ioPropagatePersist = False
@@ -517,11 +525,14 @@ object MainForm: TMainForm
       Category = 'Tab'
       TabControl = TabControl2
     end
+    object ioTestActionFMX1: TioTestActionFMX
+      Category = 'iORM'
+      Text = 'ioTestActionFMX1'
+    end
   end
   object SQLiteConn: TioSQLiteConnectionDef
     OnAfterRegister = SQLiteConnAfterRegister
     AutoCreateDB.Enabled = True
-    AutoCreateDB.ReferentialIntegrityConstraints = False
     Database = 'ContactsIntf.db'
     DatabaseStdFolder = sfDocuments
     DefaultConnection = True

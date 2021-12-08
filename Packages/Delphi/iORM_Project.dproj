@@ -312,6 +312,8 @@
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DataSetMaster.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.BindSourceObjState.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.VCL.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.FMX.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

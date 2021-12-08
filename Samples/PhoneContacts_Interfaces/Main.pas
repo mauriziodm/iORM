@@ -10,7 +10,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base,
   FMX.Controls.Presentation, Data.Bind.Controls, FMX.Grid.Style, FMX.ScrollBox,
-  FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX;
+  FMX.Grid, FMX.Layouts, Fmx.Bind.Navigator, Fmx.Bind.Grid, iORM.DB.Components.ConnectionDef, iORM.AbstractionLayer.Framework.FMX,
+  iORM.DB.Components.BindSourceObjState.StdActions.FMX, FMX.StdActns;
 
 type
   TMainForm = class(TForm)
@@ -60,7 +61,11 @@ type
     ioFMX1: TioFMX;
     BindExpression1: TBindExpression;
     LinkControlToField4: TLinkControlToField;
+    Button3: TButton;
+    Button4: TButton;
+    ioTestActionFMX1: TioTestActionFMX;
     procedure SQLiteConnAfterRegister(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -73,9 +78,14 @@ var
 implementation
 
 uses
-  SampleData;
+  SampleData, iORM.AbstractionLayer.Framework;
 
 {$R *.fmx}
+
+procedure TMainForm.Button4Click(Sender: TObject);
+begin
+  Button3.Action := ioTestActionFMX1;
+end;
 
 procedure TMainForm.SQLiteConnAfterRegister(Sender: TObject);
 begin

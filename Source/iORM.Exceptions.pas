@@ -36,7 +36,8 @@ unit iORM.Exceptions;
 interface
 
 uses
-  System.SysUtils, iORM.Context.Interfaces;
+  System.SysUtils, iORM.Context.Interfaces,
+  iORM.DB.Components.BindSourceObjState;
 
 type
 
@@ -50,6 +51,11 @@ type
   public
     constructor Create(const AClassName, AMethodName: string; const AContext: IioContext); overload;
   end;
+
+  EioBindSourceObjStateException = class(EioException)
+
+  end;
+
 
 implementation
 
