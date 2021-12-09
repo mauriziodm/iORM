@@ -7,13 +7,7 @@ uses
 
 type
 
-  TioTestActionVCL = class(Vcl.ActnList.TAction)
-  public
-    function HandlesTarget(Target: TObject): Boolean; override;
-    procedure ExecuteTarget(Target: TObject); override;
-    function Update: Boolean; override;
-  end;
-
+  // Base class for all BinsDourceObjState standard actions
   TioBSObjStateStdAction = class(Vcl.ActnList.TAction)
   strict private
     FClearAfterExecute: Boolean;
@@ -80,24 +74,6 @@ implementation
 
 uses
   iORM.AbstractionLayer.Framework, System.SysUtils;
-
-{ TioTestAction }
-
-procedure TioTestActionVCL.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-  TioApplication.ShowMessage('Eureka VCL!!!');
-end;
-
-function TioTestActionVCL.HandlesTarget(Target: TObject): Boolean;
-begin
-  Result := True;
-end;
-
-function TioTestActionVCL.Update: Boolean;
-begin
-  Result := True;
-end;
 
 { TioBSObjStateStdAction }
 

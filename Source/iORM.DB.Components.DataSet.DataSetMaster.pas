@@ -11,11 +11,14 @@ type
   TioDataSetMaster = class(TioDataSet, IioBindSourceObjStateClient)
   private
     FObjState: TioBindSourceObjStateManager;
+    FOnRecordChangeAction: TioBSOnRecordChangeAction;
     function GetSourceDataSet: TioDataSet;
     procedure SetSourceDataSet(const Value: TioDataSet);
     // Added methods
     function GetObjState: TioBindSourceObjStateManager;
     function IsActive: Boolean;
+  protected
+    procedure DoBeforeScroll; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -37,10 +40,14 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
+    property OnRecordChangeAction: TioBSOnRecordChangeAction read FOnRecordChangeAction write FOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioDataSet read GetSourceDataSet write SetSourceDataSet;
   end;
 
 implementation
+
+uses
+  System.SysUtils;
 
 { TioDataSetMaster }
 
@@ -48,12 +55,19 @@ constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
   FObjState := TioBindSourceObjStateManager.Create(Self);
+  FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
 destructor TioDataSetMaster.Destroy;
 begin
   FObjState.Free;
   inherited;
+end;
+
+procedure TioDataSetMaster.DoBeforeScroll;
+begin
+  inherited;
+  ObjState.NotifyRecordChange(FOnRecordChangeAction);
 end;
 
 function TioDataSetMaster.GetObjState: TioBindSourceObjStateManager;

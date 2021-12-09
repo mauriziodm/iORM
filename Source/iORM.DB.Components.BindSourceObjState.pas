@@ -17,14 +17,15 @@ type
     property ObjState: TioBindSourceObjStateManager read GetObjState;
   end;
 
-  TioBindSourceObjState = (osUnassigned, osUnsaved, osSaved, osChanged);
+  TioBSObjState = (osUnassigned, osUnsaved, osSaved, osChanged);
+  TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
 
   TioBindSourceObjStateManager = class
   private
     FSavedObjState: String;
     FBindSource: IioBindSourceObjStateClient;
     function GetCurrentAsString: String;
-    function GetState: TioBindSourceObjState;
+    function GetState: TioBSObjState;
     function GetStateAsString: String;
     procedure CheckUnassigned(const AMethodName: String);
   public
@@ -41,8 +42,10 @@ type
     function IsChanged: Boolean;
     function IsSaved: Boolean;
     function IsClear: Boolean;
+    procedure NotifyRecordChange(const AAction: TioBSOnRecordChangeAction);
+    procedure NotifyDelete;
     property SavedObjState: string read FSavedObjState;
-    property State: TioBindSourceObjState read GetState;
+    property State: TioBSObjState read GetState;
     property StateAsString: string read GetStateAsString;
   end;
 
@@ -113,7 +116,24 @@ begin
   Result := GetState > osUnsaved;
 end;
 
-function TioBindSourceObjStateManager.GetState: TioBindSourceObjState;
+procedure TioBindSourceObjStateManager.NotifyDelete;
+begin
+  Clear(False);
+end;
+
+procedure TioBindSourceObjStateManager.NotifyRecordChange(const AAction: TioBSOnRecordChangeAction);
+begin
+  if ((AAction = rcPersistAlways) and IsSaved) or ((AAction = rcPersistIfChanged) and IsChanged) then
+    Persist
+  else
+  if ((AAction = rcAbortAlways) and IsSaved) or ((AAction = rcAbortIfChanged) and IsChanged) then
+    Abort
+  else
+  if IsSaved then
+    Clear(False);
+end;
+
+function TioBindSourceObjStateManager.GetState: TioBSObjState;
 begin
   if (FBindSource = nil) or (not FBindSource.IsActive) or (FBindSource.Current = nil) then
     Result := osUnassigned
@@ -128,7 +148,7 @@ end;
 
 function TioBindSourceObjStateManager.GetStateAsString: String;
 begin
-  Result := TioUtilities.EnumToString<TioBindSourceObjState>(State);
+  Result := TioUtilities.EnumToString<TioBSObjState>(State);
 end;
 
 procedure TioBindSourceObjStateManager.Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
