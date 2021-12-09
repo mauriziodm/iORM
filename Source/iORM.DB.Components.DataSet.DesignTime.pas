@@ -50,6 +50,11 @@ begin
   RegisterComponents('iORM', [TioModelDataSet]);
 
   RegisterActions('iORM', [TioTestActionVCL], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStateSave], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStateClear], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStatePersist], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStateRevert], nil);
+
   RegisterActions('iORM', [TioTestActionFMX], nil);
 end;
 

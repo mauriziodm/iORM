@@ -13,12 +13,15 @@ type
     FObjState: TioBindSourceObjStateManager;
     function GetSourceDataSet: TioDataSet;
     procedure SetSourceDataSet(const Value: TioDataSet);
+    // Added methods
+    function GetObjState: TioBindSourceObjStateManager;
+    function IsActive: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Where;
     // Added properties
-    property ObjState: TioBindSourceObjStateManager read FObjState;
+    property ObjState: TioBindSourceObjStateManager read GetObjState;
   published
     property TypeName;
     property TypeAlias;
@@ -53,9 +56,19 @@ begin
   inherited;
 end;
 
+function TioDataSetMaster.GetObjState: TioBindSourceObjStateManager;
+begin
+  Result := FObjState;
+end;
+
 function TioDataSetMaster.GetSourceDataSet: TioDataSet;
 begin
   Result := MasterDataSet;
+end;
+
+function TioDataSetMaster.IsActive: Boolean;
+begin
+  Result := Active;
 end;
 
 procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSet);

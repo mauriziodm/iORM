@@ -76,7 +76,7 @@ type
     procedure SetOwnJSONValue(const AValue: Boolean);
     function GetOwnJSONValue: Boolean;
     property OwnJSONValue: Boolean read GetOwnJSONValue write SetOwnJSONValue;
-    // OwnJSONValue
+    // ClearListBefore
     procedure SetClearListBefore(const AValue: Boolean);
     function GetClearListBefore: Boolean;
     property ClearListBefore: Boolean read GetClearListBefore write SetClearListBefore;
