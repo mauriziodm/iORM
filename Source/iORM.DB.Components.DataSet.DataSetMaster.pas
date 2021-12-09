@@ -11,6 +11,7 @@ type
   TioDataSetMaster = class(TioDataSet, IioBindSourceObjStateClient)
   private
     FObjState: TioBindSourceObjStateManager;
+    FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     function GetSourceDataSet: TioDataSet;
     procedure SetSourceDataSet(const Value: TioDataSet);
@@ -18,6 +19,8 @@ type
     function GetObjState: TioBindSourceObjStateManager;
     function IsActive: Boolean;
   protected
+    procedure DoBeforeOpen; override;
+    procedure DoBeforeEdit; override;
     procedure DoBeforeScroll; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -30,7 +33,6 @@ type
     property TypeAlias;
     property Async default False;
     property AutoLoadData default True;
-//    property AutoPersist default True; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr; // published: Master
     property OrderBy;
@@ -40,6 +42,7 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
+    property OnEditAction: TioBSOnEditAction read FOnEditAction write FOnEditAction default eSaveObjState;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read FOnRecordChangeAction write FOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioDataSet read GetSourceDataSet write SetSourceDataSet;
   end;
@@ -55,6 +58,7 @@ constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
   FObjState := TioBindSourceObjStateManager.Create(Self);
+  FOnEditAction := eSaveObjState;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
@@ -62,6 +66,18 @@ destructor TioDataSetMaster.Destroy;
 begin
   FObjState.Free;
   inherited;
+end;
+
+procedure TioDataSetMaster.DoBeforeEdit;
+begin
+  inherited;
+  ObjState.NotifyEdit(FOnEditAction);
+end;
+
+procedure TioDataSetMaster.DoBeforeOpen;
+begin
+  inherited;
+  ObjState.Clear(False);
 end;
 
 procedure TioDataSetMaster.DoBeforeScroll;

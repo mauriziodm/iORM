@@ -19,6 +19,7 @@ type
 
   TioBSObjState = (osUnassigned, osUnsaved, osSaved, osChanged);
   TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
+  TioBSOnEditAction = (eDoNothing, eSaveObjState, eAbortIfNotSaved);
 
   TioBindSourceObjStateManager = class
   private
@@ -43,7 +44,7 @@ type
     function IsSaved: Boolean;
     function IsClear: Boolean;
     procedure NotifyRecordChange(const AAction: TioBSOnRecordChangeAction);
-    procedure NotifyDelete;
+    procedure NotifyEdit(const AAction: TioBSOnEditAction);
     property SavedObjState: string read FSavedObjState;
     property State: TioBSObjState read GetState;
     property StateAsString: string read GetStateAsString;
@@ -116,9 +117,13 @@ begin
   Result := GetState > osUnsaved;
 end;
 
-procedure TioBindSourceObjStateManager.NotifyDelete;
+procedure TioBindSourceObjStateManager.NotifyEdit(const AAction: TioBSOnEditAction);
 begin
-  Clear(False);
+  if (AAction = eSaveObjState) and IsClear then
+    Save
+  else
+  if (AAction = eAbortIfNotSaved) and IsClear then
+    Abort;
 end;
 
 procedure TioBindSourceObjStateManager.NotifyRecordChange(const AAction: TioBSOnRecordChangeAction);
