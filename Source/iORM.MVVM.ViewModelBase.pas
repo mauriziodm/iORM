@@ -120,12 +120,14 @@ uses iORM.Exceptions, iORM.RttiContext.Factory,
 {$IFNDEF AUTOREFCOUNT}
 procedure TioViewModel.AfterConstruction;
 begin
+  inherited;
 // Release the constructor's implicit refcount
   AtomicDecrement(FRefCount);
 end;
 
 procedure TioViewModel.BeforeDestruction;
 begin
+  inherited;
   if RefCount <> 0 then
     Error(reInvalidPtr);
 end;
