@@ -65,7 +65,6 @@ type
     // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
-    FonNotify: TioBSANotificationEvent;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -122,7 +121,6 @@ type
     procedure DoAfterCancel; override;
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
-    procedure DoNotify(ANotification: IioBSANotification);
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -180,8 +178,6 @@ type
     property ioOwnsObjects: Boolean read GetOwnsObjects;
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
     property Refreshing: Boolean read GetRefreshing write SetRefreshing;
-
-    property ioOnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
   end;
 
 implementation
@@ -400,12 +396,6 @@ procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeSelection(var ASelec
 begin
   if Assigned(FBindSource) then
     FBindSource.DoBeforeSelection(ASelected, ASelectionType);
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoNotify(ANotification: IioBSANotification);
-begin
-  if Assigned(FonNotify) then
-    ioOnNotify(Self, ANotification);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -629,9 +619,6 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
 begin
-  // Fire the event handler
-  if Sender <> Self then
-    Self.DoNotify(ANotification);
   // Replicate notification to the BindSource
   if Assigned(FBindSource) and (Sender <> TObject(FBindSource)) then
     FBindSource.Notify(Self, ANotification);

@@ -70,7 +70,6 @@ type
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
     FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
-    FonNotify: TioBSANotificationEvent;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -136,7 +135,6 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
-    procedure DoNotify(ANotification:IioBSANotification);
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
     procedure DoSelection(var ASelected: TObject; var ASelectionType:TioSelectionType; var ADone:Boolean);
     procedure DoAfterSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
@@ -199,8 +197,6 @@ type
     property ioOwnsObjects:Boolean read GetOwnsObjects;
     property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
     property Refreshing: boolean read GetRefreshing write SetRefreshing;
-
-    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
 
 implementation
@@ -465,13 +461,6 @@ begin
       FInsertObj_NewObj := nil;
     end;
   end;
-end;
-
-procedure TioActiveListBindSourceAdapter.DoNotify(
-  ANotification: IioBSANotification);
-begin
-  if Assigned(FonNotify)
-    then FonNotify(Self, ANotification);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType;
@@ -741,9 +730,6 @@ end;
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;
   ANotification: IioBSANotification);
 begin
-  // Fire the event handler
-  if Sender <> Self
-    then Self.DoNotify(ANotification);
   // Replicate notification to the BindSource
   if Assigned(FBindSource) and (Sender <> TObject(FBindSource))
     then FBindSource.Notify(Self, ANotification);
