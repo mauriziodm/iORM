@@ -147,6 +147,7 @@ type
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
+    function HasBindSource: boolean;
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
@@ -638,6 +639,11 @@ end;
 procedure TioActiveObjectBindSourceAdapter.Insert(AObject: IInterface);
 begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+end;
+
+function TioActiveObjectBindSourceAdapter.HasBindSource: boolean;
+begin
+  Result := Assigned(FBindSource);
 end;
 
 function TioActiveObjectBindSourceAdapter.HasMasterBSA: Boolean;

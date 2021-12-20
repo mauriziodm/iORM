@@ -155,6 +155,7 @@ type
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
+    function HasBindSource: boolean;
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
@@ -691,6 +692,11 @@ begin
   // Init InsertObj subsystem values
   FInsertObj_Enabled := False;
   FInsertObj_NewObj := nil;
+end;
+
+function TioActiveListBindSourceAdapter.HasBindSource: boolean;
+begin
+  Result := Assigned(FBindSource);
 end;
 
 function TioActiveListBindSourceAdapter.HasMasterBSA: Boolean;

@@ -57,7 +57,6 @@ type
   // Bind source adapters notification type
   TioBSANotificationType = (ntAfterPost, ntAfterDelete, ntAfterRefresh);
   TioBSNotificationType = (ntRefresh, ntBrowse, ntSaveObjState);
-  TioBSNotificationDirection = (ndNone, ndToMaster, ndToDetails, ndToMasterAndDetails);
 
   // BindSource AutoRefresh type after notification
   TioAutoRefreshType = (arDisabled, arEnabledNoReload, arEnabledReload);
@@ -124,6 +123,7 @@ type
     procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
+    function HasBindSource: boolean;
     procedure Insert; overload;
     procedure Insert(AObject: TObject); overload;
     procedure Insert(AObject: IInterface); overload;

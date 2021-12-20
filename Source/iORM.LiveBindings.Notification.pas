@@ -55,12 +55,13 @@ type
   end;
 
   TioBSNotification = record
-    Sender: TObject;
-    Subject: TObject;
     NotificationType: TioBSNotificationType;
-    ArgumentInt: Integer;
-    constructor Create(const ASender, ASubject: TObject; const ANotificationType: TioBSNotificationType); overload;
-    constructor Create(const ASender, ASubject: TObject; const ANotificationType: TioBSNotificationType; const AArgumentInteger: Integer); overload;
+    DirectionRoot: Boolean;
+    DirectionLeaves: Boolean;
+    DeliverToMasterBS: Boolean;
+    DeliverToDetailBS: Boolean;
+    StopAtTheFirstDestination: Boolean;
+    constructor Create(const ANotificationType: TioBSNotificationType);
   end;
 
   PioBSNotification = ^TioBSNotification;
@@ -94,19 +95,41 @@ end;
 
 { TioBSNotification }
 
-constructor TioBSNotification.Create(const ASender, ASubject: TObject; const ANotificationType: TioBSNotificationType; const AArgumentInteger: Integer);
+constructor TioBSNotification.Create(const ANotificationType: TioBSNotificationType);
 begin
-  Sender := ASender;
-  Subject := ASubject;
   NotificationType := ANotificationType;
-  ArgumentInt := AArgumentInteger;
-end;
-
-constructor TioBSNotification.Create(const ASender, ASubject: TObject; const ANotificationType: TioBSNotificationType);
-begin
-  Sender := ASender;
-  Subject := ASubject;
-  NotificationType := ANotificationType;
+  case ANotificationType of
+    // NB: ntBrowse is used both for paging and for the ObjStateManager;
+    //     in both cases it applies only to the master BindSource and does not propagate
+    ntBrowse:
+      begin
+        DirectionRoot := False;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstDestination := True;
+      end;
+    // NB: ntRefresh is used to notify all BindSources to refresh;
+    //     it is applied both to the BindSource masters and to the details and it propagates in both directions until it reaches the root or leaves
+    ntRefresh:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := True;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := True;
+        StopAtTheFirstDestination := False;
+      end;
+    // NB: ntSaveObjState is for the ObjStateManager;
+    //     it only applies to BindSource masters and propagates from the details to the first master encountered
+    ntSaveObjState:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstDestination := True;
+      end;
+  end;
 end;
 
 end.
