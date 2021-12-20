@@ -56,6 +56,8 @@ type
 
   // Bind source adapters notification type
   TioBSANotificationType = (ntAfterPost, ntAfterDelete, ntAfterRefresh);
+  TioBSNotificationType = (ntRefresh, ntBrowse, ntSaveObjState);
+  TioBSNotificationDirection = (ndNone, ndToMaster, ndToDetails, ndToMasterAndDetails);
 
   // BindSource AutoRefresh type after notification
   TioAutoRefreshType = (arDisabled, arEnabledNoReload, arEnabledReload);
@@ -73,11 +75,13 @@ type
   // to the ActiveBindSourceAdapter for notify changes)
   IioNotifiable = interface
     ['{D08E956F-C836-4E2A-B966-62FFFB7FD09F}']
-    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
   end;
 
   IioNotifiableBindSource = interface(IioNotifiable)
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
+    function IsMasterBS: boolean;
+    function IsDetailBS: boolean;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -147,7 +151,7 @@ type
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function GetCurrentOID: Integer;
-    function IsDetail: Boolean;
+    function HasMasterBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function AsTBindSourceAdapter: TBindSourceAdapter;
     // function TypeName: String;       // Added TypeName property
@@ -240,7 +244,7 @@ type
     procedure SetMasterObject(const AMasterObj: TObject);
     function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
       : IioActiveBindSourceAdapter;
-    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;

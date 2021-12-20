@@ -231,7 +231,7 @@ var
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // If the adapter is a detail adapter or AutuLoadData is not active then do not execute
-  if AActiveBindSourceAdapter.IsDetail or (AActiveBindSourceAdapter.ioViewDataType <> dtList) or not AActiveBindSourceAdapter.ioAutoLoadData
+  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.ioViewDataType <> dtList) or not AActiveBindSourceAdapter.ioAutoLoadData
   then
     Exit;
   // Extract the paging obj from the where obj
@@ -257,7 +257,7 @@ begin
   // Se il BindSourceAdapter è un dettaglio allora propaga il Refresh al suo Master
   // questo perchè solo il master esegue realmente le query e quindi è quest'ultimo che
   // deve gestire il refresh con reload.
-  if AActiveBindSourceAdapter.IsDetail and Assigned(AActiveBindSourceAdapter.GetMasterBindSourceAdapter) and AReloadData then
+  if AActiveBindSourceAdapter.HasMasterBSA and Assigned(AActiveBindSourceAdapter.GetMasterBindSourceAdapter) and AReloadData then
     AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Refresh(AReloadData)
   else if AReloadData and AActiveBindSourceAdapter.ioAutoLoadData then
     _RefreshReload(AActiveBindSourceAdapter, ANotify)
@@ -330,7 +330,7 @@ begin
   LRelationChildPropertyName := '';
   LMasterOID := 0;
   // If it is a detail adapter...
-  if AActiveBindSourceAdapter.IsDetail then
+  if AActiveBindSourceAdapter.HasMasterBSA then
   begin
     // Get the MasterProperty of the current object
     LMasterProperty := TioMapContainer.GetMap(AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
@@ -385,7 +385,7 @@ begin
   if AActiveBindSourceAdapter.ioAutoPersist or AForce then
   begin
     // If it is a detail adapter...
-    if AActiveBindSourceAdapter.IsDetail then
+    if AActiveBindSourceAdapter.HasMasterBSA then
     begin
       // Get the MasterProperty of the current object
       LMasterProperty := TioMapContainer.GetMap(AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);

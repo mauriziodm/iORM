@@ -131,6 +131,8 @@ type
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
+    function IsMasterBS: boolean;
+    function IsDetailBS: boolean;
     // Paging
     procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
     // Selectors related event for TObject selection
@@ -144,7 +146,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure Edit; override;
     procedure Post; override;
@@ -617,6 +619,16 @@ begin
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
+function TioPrototypeBindSource.IsDetailBS: boolean;
+begin
+  // To be implemented
+end;
+
+function TioPrototypeBindSource.IsMasterBS: boolean;
+begin
+  // To be implemented
+end;
+
 procedure TioPrototypeBindSource.Insert(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
@@ -688,7 +700,7 @@ begin
   inherited;
 end;
 
-procedure TioPrototypeBindSource.Notify(const Sender: TObject; const ANotification: IioBSANotification);
+procedure TioPrototypeBindSource.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
 begin
   Self.DoNotify(ANotification);
 end;

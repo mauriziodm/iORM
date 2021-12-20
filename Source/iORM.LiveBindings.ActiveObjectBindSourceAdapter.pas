@@ -167,7 +167,7 @@ type
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
-    function IsDetail: Boolean;
+    function HasMasterBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
@@ -591,7 +591,7 @@ end;
 function TioActiveObjectBindSourceAdapter.GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := nil;
-  if Self.IsDetail then
+  if Self.HasMasterBSA then
     Result := FMasterAdaptersContainer.GetMasterBindSourceAdapter;
 end;
 
@@ -640,7 +640,7 @@ begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
-function TioActiveObjectBindSourceAdapter.IsDetail: Boolean;
+function TioActiveObjectBindSourceAdapter.HasMasterBSA: Boolean;
 begin
   Result := Assigned(FMasterProperty);
 end;
@@ -659,13 +659,13 @@ procedure TioActiveObjectBindSourceAdapter.Notify(Sender: TObject; ANotification
 begin
   // Replicate notification to the BindSource
   if Assigned(FBindSource) and (Sender <> TObject(FBindSource)) then
-    FBindSource.Notify(Self, ANotification);
+    FBindSource.Notify_old(Self, ANotification);
   // Replicate notification to the DetailAdaptersContainer
   if Sender <> TObject(FDetailAdaptersContainer) then
-    FDetailAdaptersContainer.Notify(Self, ANotification);
+    FDetailAdaptersContainer.Notify_old(Self, ANotification);
   // Replicate notification to the MasterAdaptersContainer
   if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer)) then
-    FMasterAdaptersContainer.Notify(Self, ANotification);
+    FMasterAdaptersContainer.Notify_old(Self, ANotification);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.PersistAll;
@@ -724,7 +724,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  if Self.IsDetail then
+  if Self.HasMasterBSA then
     TioCommonBSABehavior.InternalSetDataObjectAsDetail<TObject>(Self, ADataObject)
   else
     InternalSetDataObject(ADataObject, AOwnsObject);

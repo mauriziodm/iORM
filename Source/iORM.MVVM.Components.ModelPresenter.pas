@@ -100,6 +100,8 @@ type
     procedure SetAutoLoadData(const Value: Boolean);
   protected
     procedure Loaded; override;
+    function IsMasterBS: boolean;
+    function IsDetailBS: boolean;
     // Paging
     procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
     // Selectors related event for TObject selection
@@ -161,7 +163,7 @@ type
     destructor Destroy; override;
     class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
-    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailPresenter(const ADetailPresenter: TioModelPresenter);
     procedure ForceDetailAdaptersCreation;
@@ -612,7 +614,7 @@ end;
 function TioModelPresenter.GetIsDetail: Boolean;
 begin
   if CheckAdapter then
-    Result := BindSourceAdapter.IsDetail
+    Result := BindSourceAdapter.HasMasterBSA
   else
     Result := Assigned(MasterPresenter);
 end;
@@ -789,7 +791,7 @@ begin
     BindSourceAdapter.Next;
 end;
 
-procedure TioModelPresenter.Notify(const Sender: TObject; const ANotification: IioBSANotification);
+procedure TioModelPresenter.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
 begin
   DoNotify(ANotification);
 end;
@@ -1145,6 +1147,16 @@ begin
     // invocato un Post in seguito al Refresh stesso.
     // BindSourceAdapter.Refresh(False);
   end;
+end;
+
+function TioModelPresenter.IsDetailBS: boolean;
+begin
+  // To be implemented
+end;
+
+function TioModelPresenter.IsMasterBS: boolean;
+begin
+  // To be implemented
 end;
 
 class function TioModelPresenter.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter;

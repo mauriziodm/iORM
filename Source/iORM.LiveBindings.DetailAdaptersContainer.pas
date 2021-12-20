@@ -52,7 +52,7 @@ type
     destructor Destroy; override;
     procedure SetMasterObject(const AMasterObj: TObject);
     function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
-    procedure Notify(const Sender:TObject; const ANotification:IioBSANotification);
+    procedure Notify_old(const Sender:TObject; const ANotification:IioBSANotification);
     procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName:String): IioActiveBindSourceAdapter;
@@ -160,7 +160,7 @@ begin
   end;
 end;
 
-procedure TioDetailAdaptersContainer.Notify(const Sender: TObject;
+procedure TioDetailAdaptersContainer.Notify_old(const Sender: TObject;
   const ANotification: IioBSANotification);
 var
   AAdapter: IioContainedBindSourceAdapter;

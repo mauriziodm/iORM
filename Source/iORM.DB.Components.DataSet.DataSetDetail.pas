@@ -9,6 +9,9 @@ uses
 type
 
   TioDataSetDetail = class(TioDataSet)
+  protected
+    function IsMasterBS: boolean; override;
+    function IsDetailBS: boolean; override;
   published
     // Published properties
     property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -18,5 +21,19 @@ type
   end;
 
 implementation
+
+{ TioDataSetDetail }
+
+function TioDataSetDetail.IsDetailBS: boolean;
+begin
+  // Do not inherit
+  Result := True;
+end;
+
+function TioDataSetDetail.IsMasterBS: boolean;
+begin
+  // Do not inherit
+  Result := False;
+end;
 
 end.

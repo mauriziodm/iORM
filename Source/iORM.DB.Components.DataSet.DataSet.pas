@@ -66,8 +66,6 @@ type
     function GetAutoPost: Boolean;
     // Editing
     function GetEditing: Boolean;
-    // IsDetail
-    function GetIsDetail: Boolean;
     // IsInterfacePresenting
     function GetIsInterfacePresenting: Boolean;
     // ItemCount
@@ -90,6 +88,8 @@ type
     procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
     procedure Loaded; override;
+    function IsMasterBS: boolean; virtual; abstract;
+    function IsDetailBS: boolean; virtual; abstract;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Paging
@@ -106,7 +106,6 @@ type
     procedure InternalPreOpen; override;
     // Public properties
     property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
-    property IsDetail: Boolean read GetIsDetail; // public: Nascondere? Serve all'esterno?
     property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
@@ -134,7 +133,7 @@ type
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
     procedure RegisterDetailPresenter(const ADetailDataSet: TioDataSet);
     procedure ForceDetailAdaptersCreation;
-    procedure Notify(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure PostIfEditing;
     procedure PersistCurrent;
     procedure PersistAll;
@@ -240,7 +239,7 @@ end;
 
 function TioDataSet.CurrentMasterObject: TObject;
 begin
-  if CheckAdapter and IsDetail then
+  if CheckAdapter and IsDetailBS then
     Result := InternalActiveAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
@@ -354,11 +353,6 @@ begin
     Result := False
 end;
 
-function TioDataSet.GetIsDetail: Boolean;
-begin
-  Result := Assigned(FMasterDataSet);
-end;
-
 function TioDataSet.GetIsInterfacePresenting: Boolean;
 begin
   if CheckAdapter then
@@ -410,14 +404,14 @@ begin
 
   // REGISTER ITSELF AS DETAIL MODEL PRESENTER (IF IT IS A DETAIL) INTO THE MASTER PRESENTER
   // ===========================================================================
-  if Self.IsDetail then
+  if IsDetailBS then
     MasterDataSet.RegisterDetailPresenter(Self);
   // ===========================================================================
 
   inherited;
 end;
 
-procedure TioDataSet.Notify(const Sender: TObject; const ANotification: IioBSANotification);
+procedure TioDataSet.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
 begin
   DoNotify(ANotification);
 end;

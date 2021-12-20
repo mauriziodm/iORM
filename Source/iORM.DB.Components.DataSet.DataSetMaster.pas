@@ -19,6 +19,8 @@ type
     function GetObjState: TioBindSourceObjStateManager;
     function IsActive: Boolean;
   protected
+    function IsMasterBS: boolean; override;
+    function IsDetailBS: boolean; override;
     procedure DoBeforeOpen; override;
     procedure DoBeforeEdit; override;
     procedure DoBeforeScroll; override;
@@ -99,6 +101,18 @@ end;
 function TioDataSetMaster.IsActive: Boolean;
 begin
   Result := Active;
+end;
+
+function TioDataSetMaster.IsDetailBS: boolean;
+begin
+  // Do not inherit
+  Result := False;
+end;
+
+function TioDataSetMaster.IsMasterBS: boolean;
+begin
+  // Do not inherit
+  Result := True;
 end;
 
 procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSet);
