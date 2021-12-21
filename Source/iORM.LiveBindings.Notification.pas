@@ -35,24 +35,26 @@ unit iORM.LiveBindings.Notification;
 
 interface
 
-uses
-  iORM.LiveBindings.Interfaces;
+//uses
+//  iORM.LiveBindings.Interfaces;
 
 type
 
-  TioBSANotificationEvent = procedure(Sender: TObject; const ANotification: IioBSANotification) of object;
+//  TioBSANotificationEvent = procedure(Sender: TObject; const ANotification: IioBSANotification) of object;
+//
+//  TioBSANotification = class(TInterfacedObject, IioBSANotification)
+//  strict protected
+//    FSender: TObject;
+//    FSubject: TObject;
+//    FNotificationType: TioBSANotificationType;
+//  public
+//    constructor Create(ASender: TObject; ASubject: TObject; ANotificationType: TioBSANotificationType); overload;
+//    function Sender: TObject;
+//    function Subject: TObject;
+//    function NotificationType: TioBSANotificationType;
+//  end;
 
-  TioBSANotification = class(TInterfacedObject, IioBSANotification)
-  strict protected
-    FSender: TObject;
-    FSubject: TObject;
-    FNotificationType: TioBSANotificationType;
-  public
-    constructor Create(ASender: TObject; ASubject: TObject; ANotificationType: TioBSANotificationType); overload;
-    function Sender: TObject;
-    function Subject: TObject;
-    function NotificationType: TioBSANotificationType;
-  end;
+  TioBSNotificationType = (ntRefresh, ntBrowse, ntSaveObjState);
 
   TioBSNotification = record
     NotificationType: TioBSNotificationType;
@@ -64,34 +66,32 @@ type
     constructor Create(const ANotificationType: TioBSNotificationType);
   end;
 
-  PioBSNotification = ^TioBSNotification;
-
 implementation
 
 { TioBSANotification }
 
-constructor TioBSANotification.Create(ASender, ASubject: TObject; ANotificationType: TioBSANotificationType);
-begin
-  inherited Create;
-  Self.FSender := ASender;
-  Self.FSubject := ASubject;
-  Self.FNotificationType := ANotificationType;
-end;
-
-function TioBSANotification.NotificationType: TioBSANotificationType;
-begin
-  Result := Self.FNotificationType;
-end;
-
-function TioBSANotification.Sender: TObject;
-begin
-  Result := Self.FSender;
-end;
-
-function TioBSANotification.Subject: TObject;
-begin
-  Result := Self.FSubject;
-end;
+//constructor TioBSANotification.Create(ASender, ASubject: TObject; ANotificationType: TioBSANotificationType);
+//begin
+//  inherited Create;
+//  Self.FSender := ASender;
+//  Self.FSubject := ASubject;
+//  Self.FNotificationType := ANotificationType;
+//end;
+//
+//function TioBSANotification.NotificationType: TioBSANotificationType;
+//begin
+//  Result := Self.FNotificationType;
+//end;
+//
+//function TioBSANotification.Sender: TObject;
+//begin
+//  Result := Self.FSender;
+//end;
+//
+//function TioBSANotification.Subject: TObject;
+//begin
+//  Result := Self.FSubject;
+//end;
 
 { TioBSNotification }
 

@@ -38,7 +38,7 @@ interface
 uses
   System.Generics.Collections, Data.Bind.ObjectScope,
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
-  iORM.Where.Interfaces, Data.DB, System.Rtti;
+  iORM.Where.Interfaces, Data.DB, System.Rtti, iORM.LiveBindings.Notification;
 
 type
 
@@ -56,7 +56,6 @@ type
 
   // Bind source adapters notification type
   TioBSANotificationType = (ntAfterPost, ntAfterDelete, ntAfterRefresh);
-  TioBSNotificationType = (ntRefresh, ntBrowse, ntSaveObjState);
 
   // BindSource AutoRefresh type after notification
   TioAutoRefreshType = (arDisabled, arEnabledNoReload, arEnabledReload);
@@ -74,6 +73,7 @@ type
   // to the ActiveBindSourceAdapter for notify changes)
   IioNotifiable = interface
     ['{D08E956F-C836-4E2A-B966-62FFFB7FD09F}']
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
   end;
 
@@ -81,6 +81,7 @@ type
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
     function IsMasterBS: boolean;
     function IsDetailBS: boolean;
+    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -90,7 +91,14 @@ type
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // Paging
-    procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
+    procedure Paging_NotifyItemIndexChanged;
+    // AutoRefreshOnotification property
+    function GetAutoRefreshOnNotification: TioAutoRefreshType;
+    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification;
+    // BindSourceAdapter state
+    function GetState: TBindSourceAdapterState;
+    property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
   end;
 
   // The common ancestor for all PrototypeBindSource components
@@ -139,6 +147,7 @@ type
     function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function DataObject: TObject;
     // procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
@@ -245,6 +254,7 @@ type
     function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
       : IioActiveBindSourceAdapter;
     procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;

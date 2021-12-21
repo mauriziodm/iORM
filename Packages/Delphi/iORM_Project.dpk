@@ -204,7 +204,8 @@ contains
   iORM.DB.Components.DataSet.DataSetDetail in '..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas',
   iORM.DB.Components.BindSourceObjState in '..\..\Source\iORM.DB.Components.BindSourceObjState.pas',
   iORM.DB.Components.BindSourceObjState.StdActions.VCL in '..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.VCL.pas',
-  iORM.DB.Components.BindSourceObjState.StdActions.FMX in '..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.FMX.pas';
+  iORM.DB.Components.BindSourceObjState.StdActions.FMX in '..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.FMX.pas',
+  iORM.LiveBindings.CommonBSBehavior in '..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas';
 
 end.
 

@@ -92,7 +92,7 @@ type
   TioCommonBSABehavior = class
   public
     // NB: Common code for ABSA to manage notifications
-    class procedure Notify(const ASender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotificationPointer: PioBSNotification);
+    class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
     // NB: Generic type for this methods must be only TObject or IInterface
     class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T); overload;
     // ==========================================================================================================================
@@ -130,33 +130,29 @@ begin
   AActiveBindSourceAdapter.GetMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
 end;
 
-class procedure TioCommonBSABehavior.Notify(const ASender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-  const ANotificationPointer: PioBSNotification);
+class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+  const [Ref] ANotification: TioBSNotification);
 begin
   // Notify the BindSource
-//  if AActiveBindSourceAdapter.HasBindSource and (ASender <> TObject(AActiveBindSourceAdapter.GetBindSource)) then
-//    AActiveBindSourceAdapter.GetBindSource.Notify_old(AActiveBindSourceAdapter, ANotificationPointer);
+  // NB: First check that the BSA has a BindSource and that the message is not actually coming from it,
+  // then it also verifies that the BindSource connected to the BSA is the correct directory for this notification
+  if AActiveBindSourceAdapter.HasBindSource and (Sender <> TObject(AActiveBindSourceAdapter.GetBindSource)) then
+    if (ANotification.DeliverToMasterBS and AActiveBindSourceAdapter.GetBindSource.IsMasterBS) or
+      (ANotification.DeliverToDetailBS and AActiveBindSourceAdapter.GetBindSource.IsDetailBS) then
+    begin
+      AActiveBindSourceAdapter.GetBindSource.Notify(AActiveBindSourceAdapter as TObject, ANotification);
+      if ANotification.StopAtTheFirstDestination then
+        Exit;
+    end;
 
+  // Replicate notification to the details
+  if ANotification.DirectionLeaves and (Sender <> TObject(AActiveBindSourceAdapter.DetailAdaptersContainer)) then
+    AActiveBindSourceAdapter.DetailAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
 
-
-  // Replicate notification to the DetailAdaptersContainer
-//  if Sender <> TObject(FDetailAdaptersContainer) then
-
-
-
-
-
-
-
-//  // Replicate notification to the BindSource
-//  if Assigned(FBindSource) and (Sender <> TObject(FBindSource)) then
-//    FBindSource.Notify_old(Self, ANotification);
-//  // Replicate notification to the DetailAdaptersContainer
-//  if Sender <> TObject(FDetailAdaptersContainer) then
-//    FDetailAdaptersContainer.Notify_old(Self, ANotification);
-//  // Replicate notification to the MasterAdaptersContainer
-//  if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer)) then
-//    FMasterAdaptersContainer.Notify_old(Self, ANotification);
+  // Replicate notification to the MasterAdaptersContainer
+  if ANotification.DirectionRoot and Assigned(AActiveBindSourceAdapter.MasterAdaptersContainer) and
+    (Sender <> TObject(AActiveBindSourceAdapter.MasterAdaptersContainer)) then
+    AActiveBindSourceAdapter.MasterAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
 end;
 
 class procedure TioCommonBSABehavior.AddFields(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;

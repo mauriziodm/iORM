@@ -4,6 +4,10 @@ interface
 
 type
 
+  TioBSObjState = (osUnassigned, osUnsaved, osSaved, osChanged);
+  TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
+  TioBSOnEditAction = (eDoNothing, eSaveObjState, eAbortIfNotSaved);
+
   TioBindSourceObjStateManager = class;
 
   IioBindSourceObjStateClient = interface
@@ -15,11 +19,15 @@ type
     // ObjState property
     function GetObjState: TioBindSourceObjStateManager;
     property ObjState: TioBindSourceObjStateManager read GetObjState;
+    // OnEditAction property
+    function GetOnEditAction: TioBSOnEditAction;
+    procedure SetOnEditAction(const Value: TioBSOnEditAction);
+    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction;
+    // OnRecordChangeAction property
+    function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
+    procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
+    property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction;
   end;
-
-  TioBSObjState = (osUnassigned, osUnsaved, osSaved, osChanged);
-  TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
-  TioBSOnEditAction = (eDoNothing, eSaveObjState, eAbortIfNotSaved);
 
   TioBindSourceObjStateManager = class
   private
@@ -43,8 +51,8 @@ type
     function IsChanged: Boolean;
     function IsSaved: Boolean;
     function IsClear: Boolean;
-    procedure NotifyRecordChange(const AAction: TioBSOnRecordChangeAction);
-    procedure NotifyEdit(const AAction: TioBSOnEditAction);
+    procedure NotifyRecordChange;
+    procedure NotifyEdit;
     property SavedObjState: string read FSavedObjState;
     property State: TioBSObjState read GetState;
     property StateAsString: string read GetStateAsString;
@@ -117,21 +125,21 @@ begin
   Result := GetState > osUnsaved;
 end;
 
-procedure TioBindSourceObjStateManager.NotifyEdit(const AAction: TioBSOnEditAction);
+procedure TioBindSourceObjStateManager.NotifyEdit;
 begin
-  if (AAction = eSaveObjState) and IsClear then
+  if (FBindSource.OnEditAction = eSaveObjState) and IsClear then
     Save
   else
-  if (AAction = eAbortIfNotSaved) and IsClear then
+  if (FBindSource.OnEditAction = eAbortIfNotSaved) and IsClear then
     Abort;
 end;
 
-procedure TioBindSourceObjStateManager.NotifyRecordChange(const AAction: TioBSOnRecordChangeAction);
+procedure TioBindSourceObjStateManager.NotifyRecordChange;
 begin
-  if ((AAction = rcPersistAlways) and IsSaved) or ((AAction = rcPersistIfChanged) and IsChanged) then
+  if ((FBindSource.OnRecordChangeAction = rcPersistAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcPersistIfChanged) and IsChanged) then
     Persist
   else
-  if ((AAction = rcAbortAlways) and IsSaved) or ((AAction = rcAbortIfChanged) and IsChanged) then
+  if ((FBindSource.OnRecordChangeAction = rcAbortAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcAbortIfChanged) and IsChanged) then
     Abort
   else
   if IsSaved then

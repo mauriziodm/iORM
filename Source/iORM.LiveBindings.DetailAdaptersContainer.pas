@@ -39,7 +39,8 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.CommonTypes, Data.Bind.ObjectScope,
-  System.Classes, iORM.Where, iORM.Where.Interfaces;
+  System.Classes, iORM.Where, iORM.Where.Interfaces,
+  iORM.LiveBindings.Notification;
 
 type
 
@@ -53,6 +54,7 @@ type
     procedure SetMasterObject(const AMasterObj: TObject);
     function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
     procedure Notify_old(const Sender:TObject; const ANotification:IioBSANotification);
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName:String): IioActiveBindSourceAdapter;
@@ -160,8 +162,12 @@ begin
   end;
 end;
 
-procedure TioDetailAdaptersContainer.Notify_old(const Sender: TObject;
-  const ANotification: IioBSANotification);
+procedure TioDetailAdaptersContainer.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+begin
+  // To be implemented
+end;
+
+procedure TioDetailAdaptersContainer.Notify_old(const Sender:TObject; const ANotification:IioBSANotification);
 var
   AAdapter: IioContainedBindSourceAdapter;
 begin

@@ -151,6 +151,7 @@ type
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
     constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: IInterface; AutoLoadData: Boolean; AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
+    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
@@ -409,7 +410,7 @@ begin
   GetDataSetLinkContainer.SetRecNo(ItemIndex);
   // Paging notification
   if Assigned(FBindSource) then
-    FBindSource.Paging_NotifyItemIndexChanged(ItemIndex);
+    FBindSource.Paging_NotifyItemIndexChanged;
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
@@ -731,6 +732,11 @@ end;
 procedure TioActiveListBindSourceAdapter.LoadPage;
 begin
   TioCommonBSAPersistence.LoadPage(Self);
+end;
+
+function TioActiveListBindSourceAdapter.MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+begin
+  Result := FMasterAdaptersContainer;
 end;
 
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;

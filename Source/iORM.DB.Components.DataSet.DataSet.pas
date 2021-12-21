@@ -29,7 +29,6 @@ type
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
     FAutoRefreshOnNotification: TioAutoRefreshType;
-    FonNotify: TioBSANotificationEvent;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     // Selectors
@@ -54,7 +53,6 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
-    procedure DoNotify(ANotification: IioBSANotification);
     // Async
     procedure SetAsync(const Value: Boolean);
     // AutoLoadData
@@ -64,6 +62,9 @@ type
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
+    // AutoRefreshOnotification
+    function GetAutoRefreshOnNotification: TioAutoRefreshType;
+    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
     // Editing
     function GetEditing: Boolean;
     // IsInterfacePresenting
@@ -93,7 +94,7 @@ type
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Paging
-    procedure Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
+    procedure Paging_NotifyItemIndexChanged;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -121,7 +122,7 @@ type
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
     property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
-    property AutoRefreshOnNotification: TioAutoRefreshType read FAutoRefreshOnNotification write FAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
+    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
     property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; // published: Master
@@ -134,6 +135,7 @@ type
     procedure RegisterDetailPresenter(const ADetailDataSet: TioDataSet);
     procedure ForceDetailAdaptersCreation;
     procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
     procedure PersistCurrent;
     procedure PersistAll;
@@ -149,7 +151,6 @@ type
     property ItemCount: Integer read GetCount;
   published
     // Events
-    property OnNotify: TioBSANotificationEvent read FonNotify write FonNotify;
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
     property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
@@ -285,16 +286,6 @@ begin
     FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioDataSet.DoNotify(ANotification: IioBSANotification);
-begin
-  // If assigned execute the event handler
-  if Assigned(FonNotify) then
-    OnNotify(Self, ANotification);
-  // If enabled perform an AutoRefresh operation
-  if (AutoRefreshOnNotification > arDisabled) and (State <> TBindSourceAdapterState.seInactive) then
-    Refresh(AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
-end;
-
 procedure TioDataSet.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionObject) then
@@ -335,6 +326,11 @@ begin
     Result := InternalActiveAdapter.ioAutoPost
   else
     Result := FAutoPost;
+end;
+
+function TioDataSet.GetAutoRefreshOnNotification: TioAutoRefreshType;
+begin
+  Result := FAutoRefreshOnNotification;
 end;
 
 function TioDataSet.GetCount: Integer;
@@ -411,14 +407,43 @@ begin
   inherited;
 end;
 
-procedure TioDataSet.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
+procedure TioDataSet.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
-  DoNotify(ANotification);
+  // If the notification was sent by itself then it forwards it to the ActiveBindSourceAdapter for its propagation (outbound notification)
+  if Sender = Self then
+  begin
+    // To be implemented
+  end
+  // If the notification was not sent by itself then react to it if necessary (inbound notification)
+  else
+  begin
+    case Anotification.NotificationType of
+      ntRefresh: begin
+        // If enabled perform an AutoRefresh operation
+        if (AutoRefreshOnNotification > arDisabled) and (State <> TBindSourceAdapterState.seInactive) then
+          Refresh(AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
+      end;
+      ntBrowse: begin
+
+      end;
+      ntSaveObjState: begin
+
+      end;
+    end;
+
+
+
+  end;
 end;
 
-procedure TioDataSet.Paging_NotifyItemIndexChanged(const ANewItemIndex: Integer);
+procedure TioDataSet.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
 begin
-  FPaging.NotifyItemIndexChanged(ANewItemIndex);
+//  DoNotify(ANotification);
+end;
+
+procedure TioDataSet.Paging_NotifyItemIndexChanged;
+begin
+  FPaging.NotifyItemIndexChanged(InternalActiveAdapter.ItemIndex);
 end;
 
 procedure TioDataSet.PersistAll;
@@ -523,6 +548,11 @@ begin
   // Update the adapter
   if CheckAdapter then
     InternalActiveAdapter.ioAutoPost := Value;
+end;
+
+procedure TioDataSet.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+begin
+  FAutoRefreshOnNotification := Value;
 end;
 
 procedure TioDataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);

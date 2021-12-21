@@ -222,7 +222,7 @@ end;
 
 class function TioLiveBindingsFactory.Notification(ASender, ASubject: TObject; ANotificationType: TioBSANotificationType): IioBSANotification;
 begin
-  Result := TioBSANotification.Create(ASender, ASubject, ANotificationType);
+//  Result := TioBSANotification.Create(ASender, ASubject, ANotificationType);
 end;
 
 end.

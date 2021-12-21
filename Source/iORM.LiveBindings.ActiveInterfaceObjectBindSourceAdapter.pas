@@ -134,6 +134,7 @@ type
     constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
       const AutoLoadData: Boolean); overload;
     destructor Destroy; override;
+    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
@@ -621,6 +622,11 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.LoadPage;
 begin
   raise EioException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+begin
+  Result := FMasterAdaptersContainer;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);

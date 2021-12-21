@@ -18,6 +18,12 @@ type
     // Added methods
     function GetObjState: TioBindSourceObjStateManager;
     function IsActive: Boolean;
+    // OnEditAction property
+    function GetOnEditAction: TioBSOnEditAction;
+    procedure SetOnEditAction(const Value: TioBSOnEditAction);
+    // OnRecordChangeAction property
+    function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
+    procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
   protected
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
@@ -44,8 +50,8 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
-    property OnEditAction: TioBSOnEditAction read FOnEditAction write FOnEditAction default eSaveObjState;
-    property OnRecordChangeAction: TioBSOnRecordChangeAction read FOnRecordChangeAction write FOnRecordChangeAction default rcPersistIfChanged;
+    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveObjState;
+    property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioDataSet read GetSourceDataSet write SetSourceDataSet;
   end;
 
@@ -73,7 +79,7 @@ end;
 procedure TioDataSetMaster.DoBeforeEdit;
 begin
   inherited;
-  ObjState.NotifyEdit(FOnEditAction);
+//  ObjState.NotifyEdit(FOnEditAction);
 end;
 
 procedure TioDataSetMaster.DoBeforeOpen;
@@ -85,12 +91,22 @@ end;
 procedure TioDataSetMaster.DoBeforeScroll;
 begin
   inherited;
-  ObjState.NotifyRecordChange(FOnRecordChangeAction);
+//  ObjState.NotifyRecordChange;
 end;
 
 function TioDataSetMaster.GetObjState: TioBindSourceObjStateManager;
 begin
   Result := FObjState;
+end;
+
+function TioDataSetMaster.GetOnEditAction: TioBSOnEditAction;
+begin
+  Result := FOnEditAction;
+end;
+
+function TioDataSetMaster.GetOnRecordChangeAction: TioBSOnRecordChangeAction;
+begin
+  Result := FOnRecordChangeAction;
 end;
 
 function TioDataSetMaster.GetSourceDataSet: TioDataSet;
@@ -113,6 +129,16 @@ function TioDataSetMaster.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := True;
+end;
+
+procedure TioDataSetMaster.SetOnEditAction(const Value: TioBSOnEditAction);
+begin
+  FOnEditAction := Value;
+end;
+
+procedure TioDataSetMaster.SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
+begin
+  FOnRecordChangeAction := Value;
 end;
 
 procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSet);
