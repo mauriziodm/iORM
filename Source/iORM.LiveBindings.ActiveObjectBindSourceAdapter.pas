@@ -161,7 +161,7 @@ type
     procedure Append(AObject: IInterface); reintroduce; overload;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
-    procedure Notify(Sender: TObject; ANotification: IioBSANotification); virtual;
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification); virtual;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); reintroduce; overload;
     procedure LoadPage;
     function DataObject: TObject;
@@ -667,17 +667,9 @@ begin
   Result := FMasterAdaptersContainer;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
+procedure TioActiveObjectBindSourceAdapter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
-  // Replicate notification to the BindSource
-  if Assigned(FBindSource) and (Sender <> TObject(FBindSource)) then
-    FBindSource.Notify_old(Self, ANotification);
-  // Replicate notification to the DetailAdaptersContainer
-  if Sender <> TObject(FDetailAdaptersContainer) then
-    FDetailAdaptersContainer.Notify_old(Self, ANotification);
-  // Replicate notification to the MasterAdaptersContainer
-  if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer)) then
-    FMasterAdaptersContainer.Notify_old(Self, ANotification);
+  TioCommonBSABehavior.Notify(Sender, Self, ANotification);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.PersistAll;

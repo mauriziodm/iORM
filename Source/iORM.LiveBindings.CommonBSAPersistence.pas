@@ -77,7 +77,7 @@ implementation
 
 uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
   iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
-  iORM.LiveBindings.CommonBSAPaging;
+  iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification;
 
 type
 
@@ -273,8 +273,7 @@ begin
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh(True); // Force
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   if ANotify then
-    AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-      TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterRefresh));
+    AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
 end;
 
 class procedure TioCommonBSAPersistence._RefreshReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
