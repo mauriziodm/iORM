@@ -141,7 +141,7 @@ object MainForm: TMainForm
     ioPropagatePost = False
     ioPropagatePersist = False
     ioPaging.PageSize = 10
-    ioPaging.PagingType = ptHardPaging
+    ioPaging.PagingType = ptProgressiveAuto
     Left = 256
     Top = 216
   end
