@@ -141,7 +141,7 @@ type
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset;
     property PageCount: Integer read FPageCount;
     property PageSize: Integer read FPageSize write FPageSize;
-    property PagingType: TioBSAPagingType read FPagingType write SetPagingType default ptDisabled;
+    property PagingType: TioBSAPagingType read FPagingType write SetPagingType;
   end;
 
   // Base class for all SQL limit strategy classes
