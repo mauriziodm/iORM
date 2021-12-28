@@ -164,7 +164,6 @@ type
     procedure SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
-    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailPresenter(const ADetailPresenter: TioModelPresenter);
@@ -794,11 +793,6 @@ end;
 procedure TioModelPresenter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   // To be implemented
-end;
-
-procedure TioModelPresenter.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
-begin
-//  DoNotify(ANotification);
 end;
 
 procedure TioModelPresenter.PersistAll;

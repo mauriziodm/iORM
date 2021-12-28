@@ -148,7 +148,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure Edit; override;
@@ -705,11 +704,6 @@ end;
 procedure TioPrototypeBindSource.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   // To be implemented
-end;
-
-procedure TioPrototypeBindSource.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
-begin
-//  Self.DoNotify(ANotification);
 end;
 
 procedure TioPrototypeBindSource.PersistAll;

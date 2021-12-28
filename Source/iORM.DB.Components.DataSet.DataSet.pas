@@ -135,7 +135,6 @@ type
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
     procedure RegisterDetailPresenter(const ADetailDataSet: TioDataSet);
     procedure ForceDetailAdaptersCreation;
-    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
     procedure PersistCurrent;
@@ -417,11 +416,6 @@ end;
 procedure TioDataSet.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
-end;
-
-procedure TioDataSet.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
-begin
-//  DoNotify(ANotification);
 end;
 
 procedure TioDataSet.PersistAll;
