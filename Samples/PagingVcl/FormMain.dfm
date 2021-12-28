@@ -117,7 +117,7 @@ object Form1: TForm1
     TypeName = 'TArticle'
     ViewDataType = dtList
     Paging.PageSize = 10
-    Paging.PagingType = ptProgressiveManual
+    Paging.PagingType = ptProgressiveAuto
     Left = 192
     Top = 240
   end

@@ -96,8 +96,6 @@ type
     function IsDetailBS: boolean; virtual; abstract;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
-    // Paging
-    procedure Paging_NotifyItemIndexChanged;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -424,11 +422,6 @@ end;
 procedure TioDataSet.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
 begin
 //  DoNotify(ANotification);
-end;
-
-procedure TioDataSet.Paging_NotifyItemIndexChanged;
-begin
-  FPaging.NotifyItemIndexChanged(GetActiveBindSourceAdapter.ItemIndex);
 end;
 
 procedure TioDataSet.PersistAll;

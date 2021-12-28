@@ -137,8 +137,6 @@ type
     function CheckActiveAdapter: Boolean;
     function IsMasterBS: boolean;
     function IsDetailBS: boolean;
-    // Paging
-    procedure Paging_NotifyItemIndexChanged;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -712,11 +710,6 @@ end;
 procedure TioPrototypeBindSource.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
 begin
 //  Self.DoNotify(ANotification);
-end;
-
-procedure TioPrototypeBindSource.Paging_NotifyItemIndexChanged;
-begin
-  FPaging.NotifyItemIndexChanged(GetActiveBindSourceAdapter.ItemIndex);
 end;
 
 procedure TioPrototypeBindSource.PersistAll;
