@@ -37,6 +37,7 @@ object Form1: TForm1
     Height = 22
     Caption = 'Prev page'
     Flat = True
+    OnClick = SpeedButton1Click
   end
   object SpeedButton2: TSpeedButton
     Left = 527
@@ -45,6 +46,7 @@ object Form1: TForm1
     Height = 22
     Caption = 'Next page'
     Flat = True
+    OnClick = SpeedButton2Click
   end
   object SpeedButton3: TSpeedButton
     Left = 448
@@ -53,6 +55,7 @@ object Form1: TForm1
     Height = 22
     Caption = 'Hard refresh'
     Flat = True
+    OnClick = SpeedButton3Click
   end
   object SpeedButton4: TSpeedButton
     Left = 527
@@ -61,6 +64,7 @@ object Form1: TForm1
     Height = 22
     Caption = 'Soft refresh'
     Flat = True
+    OnClick = SpeedButton4Click
   end
   object Edit1: TEdit
     Left = 199
@@ -112,6 +116,8 @@ object Form1: TForm1
   object DSArticles: TioDataSetMaster
     TypeName = 'TArticle'
     ViewDataType = dtList
+    Paging.PageSize = 10
+    Paging.PagingType = ptProgressiveManual
     Left = 192
     Top = 240
   end

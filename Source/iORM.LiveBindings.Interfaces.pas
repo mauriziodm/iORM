@@ -93,8 +93,9 @@ type
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // Paging
+    procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
-    property Paging: TioCommonBSAPageManager read GetPaging;
+    property Paging: TioCommonBSAPageManager read GetPaging write SetPaging;
     // AutoRefreshOnotification property
     function GetAutoRefreshOnNotification: TioAutoRefreshType;
     procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);

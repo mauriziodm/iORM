@@ -25,6 +25,10 @@ type
     SourceArticles: TDataSource;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -49,6 +53,26 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   DSArticles.Open;
+end;
+
+procedure TForm1.SpeedButton1Click(Sender: TObject);
+begin
+  DSArticles.Paging.PrevPage;
+end;
+
+procedure TForm1.SpeedButton2Click(Sender: TObject);
+begin
+  DSArticles.Paging.NextPage;
+end;
+
+procedure TForm1.SpeedButton3Click(Sender: TObject);
+begin
+  DSArticles.Refresh(True);
+end;
+
+procedure TForm1.SpeedButton4Click(Sender: TObject);
+begin
+  DSArticles.Refresh(False);
 end;
 
 end.

@@ -129,6 +129,7 @@ type
     function GetAutoRefreshOnNotification: TioAutoRefreshType;
     procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
     // Paging
+    procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
   protected
     procedure Loaded; override;
@@ -235,7 +236,7 @@ type
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
     property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
     // Paging
-    property ioPaging: TioCommonBSAPageManager read GetPaging;
+    property ioPaging: TioCommonBSAPageManager read GetPaging write SetPaging;
   end;
 
 implementation
@@ -912,6 +913,15 @@ begin
   // update the where of the adapter also
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioWhere.SetOrderBySql(Value);
+end;
+
+procedure TioPrototypeBindSource.SetPaging(const Value: TioCommonBSAPageManager);
+begin
+  // In reality this property would be read-only but if I left it read-only
+  //  then it no longer writes me the values of the sub-properties in the DFM file.
+  //  So I also put the set method where, however, I raise an exception if someone
+  //  tries to set a value.
+  raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
 procedure TioPrototypeBindSource.SetTypeAlias(const Value: String);

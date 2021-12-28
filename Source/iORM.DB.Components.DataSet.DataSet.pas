@@ -88,6 +88,7 @@ type
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     // Paging
+    procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
   protected
     procedure Loaded; override;
@@ -129,7 +130,7 @@ type
     // Published properties: selectors
     property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
-    property Paging: TioCommonBSAPageManager read GetPaging; // published: Master
+    property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -560,6 +561,15 @@ begin
   // update the where of the adapter also
   if CheckAdapter then
     GetActiveBindSourceAdapter.ioWhere.SetOrderBySql(Value);
+end;
+
+procedure TioDataSet.SetPaging(const Value: TioCommonBSAPageManager);
+begin
+  // In reality this property would be read-only but if I left it read-only
+  //  then it no longer writes me the values of the sub-properties in the DFM file.
+  //  So I also put the set method where, however, I raise an exception if someone
+  //  tries to set a value.
+  raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
 procedure TioDataSet.SetTypeAlias(const Value: String);
