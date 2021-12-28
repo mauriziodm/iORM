@@ -40,7 +40,8 @@ uses
   System.Generics.Collections, iORM.Context.Properties.Interfaces,
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource,
   iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
-  iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter;
+  iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter,
+  iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -74,8 +75,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, iORM.Context.Factory,
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
-  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink,
-  iORM.LiveBindings.CommonBSAPaging;
+  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink;
 
 { TioLiveBindingsFactory }
 

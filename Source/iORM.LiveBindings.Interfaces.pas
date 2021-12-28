@@ -38,7 +38,8 @@ interface
 uses
   System.Generics.Collections, Data.Bind.ObjectScope,
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
-  iORM.Where.Interfaces, Data.DB, System.Rtti, iORM.LiveBindings.Notification;
+  iORM.Where.Interfaces, Data.DB, System.Rtti, iORM.LiveBindings.Notification,
+  iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -51,6 +52,7 @@ type
     of object;
 
   // Forward declaration
+  IioActiveBindSourceAdapter = interface;
   IioContainedBindSourceAdapter = interface;
   IioDetailBindSourceAdaptersContainer = interface;
 
@@ -74,11 +76,11 @@ type
   IioNotifiable = interface
     ['{D08E956F-C836-4E2A-B966-62FFFB7FD09F}']
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
   end;
 
   IioNotifiableBindSource = interface(IioNotifiable)
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function IsMasterBS: boolean;
     function IsDetailBS: boolean;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
@@ -91,7 +93,8 @@ type
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // Paging
-//    procedure Paging_NotifyItemIndexChanged;
+    function GetPaging: TioCommonBSAPageManager;
+    property Paging: TioCommonBSAPageManager read GetPaging;
     // AutoRefreshOnotification property
     function GetAutoRefreshOnNotification: TioAutoRefreshType;
     procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
@@ -253,7 +256,6 @@ type
     procedure SetMasterObject(const AMasterObj: TObject);
     function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
       : IioActiveBindSourceAdapter;
-    procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -286,20 +288,6 @@ type
 
   // BindSourceAdapter List
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
-
-  // Paging type
-  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual, ptProgressiveAuto);
-
-  // Paging: SQL limit strategy
-  IioBSAPageManagerStrategy = interface
-    ['{65896A9F-5B1A-407B-AB2E-C486D7B19ABF}']
-    function GetSqlLimit: Integer;
-    function GetSqlLimitOffset: Integer;
-    function IsProgressive: Boolean;
-    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
-    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean;
-    procedure PrepareForRefresh;
-  end;
 
 implementation
 

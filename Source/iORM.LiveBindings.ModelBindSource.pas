@@ -60,18 +60,16 @@ type
     // ViewModelBridge
     procedure SetViewModelBridge(const AVMBridge: TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
-    // InternalActiveAdapter
-    function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property ModelPresenter: String read FModelPresenter write FModelPresenter;
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
-    property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter; // Must be ReadOnly
   end;
 
 implementation
@@ -124,20 +122,20 @@ begin
     if Assigned(FCrossView_MasterBindSource) then
     begin
       // Get the BSA from the MasterModelPresenter
-      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FCrossView_MasterBindSource.GetModelPresenterInstance.BindSourceAdapter,
-        FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
+      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
+        FCrossView_MasterBindSource.GetModelPresenterInstance.GetActiveBindSourceAdapter, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
       // Set the retrieved BSA as adapter for this Presenter
-      ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter := LActiveBSA;
+      ViewModelBridge.Presenter[ModelPresenter].SetActiveBindSourceAdapter(LActiveBSA);
     end
     else
       // Get the BSA from the presenter
-      LActiveBSA := ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter;
+      LActiveBSA := ViewModelBridge.Presenter[ModelPresenter].GetActiveBindSourceAdapter;
     // Assign the BindSourceAdapter
     ADataObject := LActiveBSA as TBindSourceAdapter;
   end;
 end;
 
-function TioModelBindSource.GetInternalActiveAdapter: IioActiveBindSourceAdapter;
+function TioModelBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := nil;
   if CheckAdapter and Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then

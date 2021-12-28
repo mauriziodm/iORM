@@ -39,7 +39,7 @@ interface
 
 uses
   iORM.LiveBindings.ActiveObjectBindSourceAdapter,
-  iORM.LiveBindings.Interfaces, System.Classes;
+  iORM.LiveBindings.Interfaces, System.Classes, iORM.LiveBindings.Notification;
 
 type
 
@@ -51,7 +51,7 @@ type
     procedure DoAfterDelete; override;
   public
     constructor Create(AOwner:TComponent; ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
-    procedure Notify(Sender:TObject; ANotification:IioBSANotification); override;
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification); override;
   end;
 
 implementation
@@ -117,8 +117,7 @@ begin
      TBindSourceAdapter(FSourceAdapter).Delete;
 end;
 
-procedure TioNaturalActiveObjectBindSourceAdapter.Notify(Sender: TObject;
-  ANotification: IioBSANotification);
+procedure TioNaturalActiveObjectBindSourceAdapter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   inherited;
   if Assigned(FSourceAdapter)

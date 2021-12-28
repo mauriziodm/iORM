@@ -43,9 +43,9 @@ begin
       end;
       // Actually used for paging and for ObjStateManager purposes
       ntBrowse: begin
-        ATargetBS.Paging_NotifyItemIndexChanged;
         if Supports(ATargetBS, IioBindSourceObjStateClient, LBSObjStateClient) then
           LBSObjStateClient.ObjState.NotifyRecordChange;
+        ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
       end;
       // Actually used ObjStateManager purposes
       ntSaveObjState: begin

@@ -80,11 +80,11 @@ begin
   // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
   // from it (for cross view with microviews)
   if Assigned(FCrossView_MasterBindSource) then
-    ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
-      FCrossView_MasterBindSource.InternalActiveAdapter, FCrossView_MasterPropertyName, nil);
-  SetInternalAdapter(ViewModelBridge.Presenter[ModelPresenter].BindSourceAdapter);
-  if Assigned(InternalActiveAdapter) then
-    InternalActiveAdapter.Active := True;
+    ViewModelBridge.Presenter[ModelPresenter].SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
+      FCrossView_MasterBindSource.GetActiveBindSourceAdapter, FCrossView_MasterPropertyName, nil)  );
+  SetActiveBindSourceAdapter(  ViewModelBridge.Presenter[ModelPresenter].GetActiveBindSourceAdapter  );
+  if (GetActiveBindSourceAdapter <> nil) then
+    GetActiveBindSourceAdapter.Active := True;
   inherited;
 end;
 

@@ -169,7 +169,7 @@ type
     procedure Append(AObject:IInterface); reintroduce; overload;
     procedure Insert(AObject:TObject); reintroduce; overload;
     procedure Insert(AObject:IInterface); reintroduce; overload;
-    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);); virtual;
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification); virtual;
     procedure Refresh(const AReloadData:Boolean; const ANotify:Boolean=True); reintroduce; overload;
     procedure LoadPage;
     function DataObject: TObject;
@@ -409,9 +409,7 @@ begin
   // DataSet synchro
   GetDataSetLinkContainer.SetRecNo(ItemIndex);
   // Paging notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBrowse);
-  if Assigned(FBindSource) then
-    FBindSource.Paging_NotifyItemIndexChanged;
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBrowse));
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);

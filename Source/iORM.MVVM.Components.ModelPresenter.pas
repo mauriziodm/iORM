@@ -96,6 +96,8 @@ type
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     procedure SetAutoLoadData(const Value: Boolean);
+    // Paging
+    function GetPaging: TioCommonBSAPageManager;
   protected
     procedure Loaded; override;
     function IsMasterBS: boolean;
@@ -117,9 +119,6 @@ type
     procedure SetTypeName(const Value: String);
     // TypeAlias
     procedure SetTypeAlias(const Value: String);
-    // BindSourceAdapter
-    procedure SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
-    function GetBindSourceAdapter: IioActiveBindSourceAdapter;
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Where
@@ -163,6 +162,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
+    procedure SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
     procedure Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
@@ -224,7 +225,6 @@ type
     function DataObjectAssigned: Boolean;
     // Properties
     property Active: Boolean read GetActive write SetActive;
-    property BindSourceAdapter: IioActiveBindSourceAdapter read GetBindSourceAdapter write SetBindSourceAdapter;
     property Where: IioWhere read GetWhere write SetWhere;
     property State: TBindSourceAdapterState read GetState;
     property ItemCount: Integer read GetCount;
@@ -269,7 +269,7 @@ type
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
     property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
     // Paging
-    property ioPaging: TioCommonBSAPageManager read FPaging write FPaging;
+    property ioPaging: TioCommonBSAPageManager read GetPaging;
   end;
 
 implementation
@@ -284,7 +284,7 @@ procedure TioModelPresenter.Append(AObject: TObject);
 begin
   if CheckAdapter then
   begin
-    BindSourceAdapter.Append(AObject);
+    GetActiveBindSourceAdapter.Append(AObject);
     // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
     // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
     // invocato un Post in seguito al Refresh stesso.
@@ -295,14 +295,14 @@ end;
 procedure TioModelPresenter.Append;
 begin
   if CheckAdapter then
-    (BindSourceAdapter as TBindSourceAdapter).Append;
+    (GetActiveBindSourceAdapter as TBindSourceAdapter).Append;
 end;
 
 procedure TioModelPresenter.Append(AObject: IInterface);
 begin
   if CheckAdapter then
   begin
-    BindSourceAdapter.Append(AObject);
+    GetActiveBindSourceAdapter.Append(AObject);
     // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
     // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
     // invocato un Post in seguito al Refresh stesso.
@@ -313,7 +313,7 @@ end;
 procedure TioModelPresenter.Cancel;
 begin
   if CheckAdapter and Editing then
-    BindSourceAdapter.Cancel;
+    GetActiveBindSourceAdapter.Cancel;
 end;
 
 procedure TioModelPresenter.CancelIfEditing;
@@ -334,7 +334,7 @@ end;
 procedure TioModelPresenter.ClearDataObject;
 begin
   if CheckAdapter then
-    BindSourceAdapter.ClearDataObject;
+    GetActiveBindSourceAdapter.ClearDataObject;
 end;
 
 constructor TioModelPresenter.Create(AOwner: TComponent);
@@ -378,7 +378,7 @@ begin
     procedure
     begin
       if CheckAdapter then
-        BindSourceAdapter.LoadPage;
+        GetActiveBindSourceAdapter.LoadPage;
     end);
   // Set even an onChange event handler (always after the creation of the PageManager)
   FWhereStr := TStringList.Create;
@@ -388,7 +388,7 @@ end;
 function TioModelPresenter.Current: TObject;
 begin
   if CheckAdapter(True) then
-    Result := BindSourceAdapter.Current
+    Result := GetActiveBindSourceAdapter.Current
   else
     Result := nil;
 end;
@@ -404,12 +404,12 @@ end;
 procedure TioModelPresenter.Delete;
 begin
   if CheckAdapter then
-    BindSourceAdapter.Delete;
+    GetActiveBindSourceAdapter.Delete;
 end;
 
 procedure TioModelPresenter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
-  GetBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
+  GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
 destructor TioModelPresenter.Destroy;
@@ -486,13 +486,13 @@ end;
 procedure TioModelPresenter.Edit(AForce: Boolean);
 begin
   if CheckAdapter then
-    BindSourceAdapter.Edit(AForce);
+    GetActiveBindSourceAdapter.Edit(AForce);
 end;
 
 procedure TioModelPresenter.First;
 begin
   if CheckAdapter then
-    BindSourceAdapter.First;
+    GetActiveBindSourceAdapter.First;
 end;
 
 procedure TioModelPresenter.ForceDetailAdaptersCreation;
@@ -508,7 +508,7 @@ procedure TioModelPresenter.ForEach(const AForEachMethod: TProc);
 var
   I, PreviousItemIndex: Integer;
 begin
-  PreviousItemIndex := BindSourceAdapter.ItemIndex;
+  PreviousItemIndex := GetActiveBindSourceAdapter.ItemIndex;
   try
     First;
     for I := 1 to ItemCount do
@@ -517,19 +517,19 @@ begin
       Next;
     end;
   finally
-    BindSourceAdapter.ItemIndex := PreviousItemIndex;
+    GetActiveBindSourceAdapter.ItemIndex := PreviousItemIndex;
   end;
 end;
 
 function TioModelPresenter.GetActive: Boolean;
 begin
-  Result := CheckAdapter(False) and BindSourceAdapter.Active;
+  Result := CheckAdapter(False) and GetActiveBindSourceAdapter.Active;
 end;
 
 function TioModelPresenter.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
-    Result := Self.BindSourceAdapter.ioAutoPost
+    Result := Self.GetActiveBindSourceAdapter.ioAutoPost
   else
     Result := FAutoPost;
 end;
@@ -539,7 +539,7 @@ begin
   result := FAutoRefreshOnNotification;
 end;
 
-function TioModelPresenter.GetBindSourceAdapter: IioActiveBindSourceAdapter;
+function TioModelPresenter.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   // If the BindSourceAdapter is not assigned then create it
   if CheckAdapter(True) then
@@ -565,7 +565,7 @@ end;
 function TioModelPresenter.DataObject: TObject;
 begin
   // Result := nil;
-  Result := BindSourceAdapter.DataObject;
+  Result := GetActiveBindSourceAdapter.DataObject;
 end;
 
 function TioModelPresenter.DataObjectAs<T>: T;
@@ -579,7 +579,7 @@ end;
 function TioModelPresenter.DataObjectAssigned: Boolean;
 begin
   if CheckAdapter then
-    Result := Assigned(BindSourceAdapter.DataObject)
+    Result := Assigned(GetActiveBindSourceAdapter.DataObject)
   else
     Result := False;
 end;
@@ -587,14 +587,14 @@ end;
 function TioModelPresenter.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
   : IioActiveBindSourceAdapter;
 begin
-  if not Supports(GetBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere), IioActiveBindSourceAdapter, Result) then
+  if not Supports(GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere), IioActiveBindSourceAdapter, Result) then
     Result := nil;
 end;
 
 function TioModelPresenter.GetEditing: Boolean;
 begin
   if CheckAdapter then
-    Result := BindSourceAdapter.State in seEditModes
+    Result := GetActiveBindSourceAdapter.State in seEditModes
   else
     Result := False
 end;
@@ -610,7 +610,7 @@ end;
 function TioModelPresenter.GetIsDetail: Boolean;
 begin
   if CheckAdapter then
-    Result := BindSourceAdapter.HasMasterBSA
+    Result := GetActiveBindSourceAdapter.HasMasterBSA
   else
     Result := Assigned(MasterPresenter);
 end;
@@ -618,7 +618,7 @@ end;
 function TioModelPresenter.GetIsInterfacePresenting: Boolean;
 begin
   if CheckAdapter then
-    Result := BindSourceAdapter.IsInterfaceBSA
+    Result := GetActiveBindSourceAdapter.IsInterfaceBSA
   else
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
@@ -633,14 +633,19 @@ end;
 
 function TioModelPresenter.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
-  if not Supports(GetBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
+  if not Supports(GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
     Result := nil;
+end;
+
+function TioModelPresenter.GetPaging: TioCommonBSAPageManager;
+begin
+  Result := FPaging;
 end;
 
 function TioModelPresenter.GetState: TBindSourceAdapterState;
 begin
   if CheckAdapter then
-    Result := BindSourceAdapter.State
+    Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
 end;
@@ -665,7 +670,7 @@ end;
 procedure TioModelPresenter.Insert;
 begin
   if CheckAdapter then
-    (BindSourceAdapter as TBindSourceAdapter).Insert;
+    (GetActiveBindSourceAdapter as TBindSourceAdapter).Insert;
 end;
 
 procedure TioModelPresenter.InitAsDefaultOnCreate;
@@ -693,7 +698,7 @@ procedure TioModelPresenter.Insert(AObject: TObject);
 begin
   if CheckAdapter then
   begin
-    BindSourceAdapter.Insert(AObject);
+    GetActiveBindSourceAdapter.Insert(AObject);
     // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
     // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
     // invocato un Post in seguito al Refresh stesso.
@@ -704,7 +709,7 @@ end;
 procedure TioModelPresenter.Last;
 begin
   if CheckAdapter then
-    BindSourceAdapter.Last;
+    GetActiveBindSourceAdapter.Last;
 end;
 
 procedure TioModelPresenter.Loaded;
@@ -735,7 +740,7 @@ begin
   if not FSelectorFor.CheckAdapter then
     raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
   // Get the selection destination BindSourceAdapter
-  LDestBSA := FSelectorFor.BindSourceAdapter;
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
@@ -757,7 +762,7 @@ begin
   if not CheckAdapter then
     raise EioException.Create(ClassName, 'SelectCurrent', 'ActiveBindSourceAdapter, not present.');
   // Get the selection destination BindSourceAdapter
-  LDestBSA := FSelectorFor.BindSourceAdapter;
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Make the selection of current
   if LDestBSA.IsInterfaceBSA then
     Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
@@ -768,7 +773,7 @@ end;
 function TioModelPresenter.CurrentMasterObject: TObject;
 begin
   if CheckAdapter and IsDetail then
-    Result := BindSourceAdapter.GetMasterBindSourceAdapter.Current
+    Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
 end;
@@ -784,7 +789,7 @@ end;
 procedure TioModelPresenter.Next;
 begin
   if CheckAdapter then
-    BindSourceAdapter.Next;
+    GetActiveBindSourceAdapter.Next;
 end;
 
 procedure TioModelPresenter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
@@ -799,25 +804,25 @@ end;
 
 procedure TioModelPresenter.Paging_NotifyItemIndexChanged;
 begin
-  FPaging.NotifyItemIndexChanged(BindSourceAdapter.ItemIndex);
+  FPaging.NotifyItemIndexChanged(GetActiveBindSourceAdapter.ItemIndex);
 end;
 
 procedure TioModelPresenter.PersistAll;
 begin
   if CheckAdapter then
-    BindSourceAdapter.PersistAll;
+    GetActiveBindSourceAdapter.PersistAll;
 end;
 
 procedure TioModelPresenter.PersistCurrent;
 begin
   if CheckAdapter then
-    BindSourceAdapter.PersistCurrent;
+    GetActiveBindSourceAdapter.PersistCurrent;
 end;
 
 procedure TioModelPresenter.Post;
 begin
   if CheckAdapter and Editing then
-    BindSourceAdapter.Post;
+    GetActiveBindSourceAdapter.Post;
 end;
 
 procedure TioModelPresenter.PostIfEditing;
@@ -829,7 +834,7 @@ end;
 procedure TioModelPresenter.Prior;
 begin
   if CheckAdapter then
-    BindSourceAdapter.Prior;
+    GetActiveBindSourceAdapter.Prior;
 end;
 
 procedure TioModelPresenter.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
@@ -848,7 +853,7 @@ end;
 procedure TioModelPresenter.SetActive(const Value: Boolean);
 begin
   if CheckAdapter(True) and Value then
-    BindSourceAdapter.Active := Value;
+    GetActiveBindSourceAdapter.Active := Value;
 end;
 
 procedure TioModelPresenter.SetAsDefault(const Value: Boolean);
@@ -882,7 +887,7 @@ begin
     FBindSourceAdapter.ioAutoLoadData := Value;
 end;
 
-procedure TioModelPresenter.SetBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
+procedure TioModelPresenter.SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
 begin
   if Value = FBindSourceAdapter then
     Exit;
@@ -923,7 +928,7 @@ begin
     _CreateAdapter(ADataObject, AOwnsObject)
   else
     // Set the data object into the BSA
-    BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
+    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 end;
 
 procedure TioModelPresenter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
@@ -939,7 +944,7 @@ begin
     _CreateAdapter(ADataObject as TObject, AOwnsObject)
   else
     // Set the data object into the BSA
-    BindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
+    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 end;
 
 procedure TioModelPresenter.SetItemIndex(const Value: Integer);
@@ -995,7 +1000,7 @@ begin
   FAutoPost := Value;
   // Update the adapter
   if CheckAdapter then
-    Self.BindSourceAdapter.ioAutoPost := Value;
+    GetActiveBindSourceAdapter.ioAutoPost := Value;
 end;
 
 procedure TioModelPresenter.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
@@ -1086,12 +1091,12 @@ begin
   // the DetailBindSourceAdapter from it
   if Assigned(MasterPresenter) then
     // Get the BindSourceAdapter
-    SetBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterPresenter.BindSourceAdapter, MasterPropertyName))
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterPresenter.GetActiveBindSourceAdapter, MasterPropertyName))
     // else create the BSA from TypeName & TypeAlias
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
@@ -1147,7 +1152,7 @@ procedure TioModelPresenter.Insert(AObject: IInterface);
 begin
   if CheckAdapter then
   begin
-    BindSourceAdapter.Insert(AObject);
+    GetActiveBindSourceAdapter.Insert(AObject);
     // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
     // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
     // invocato un Post in seguito al Refresh stesso.

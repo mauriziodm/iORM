@@ -124,9 +124,7 @@ type
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
     function CheckAdapter: Boolean;
-    // InternalAdapter (there is a setter but the property must be ReadOnly)
-    function GetInternalActiveAdapter: IioActiveBindSourceAdapter;
-    procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
+    procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
     // dataset virtual methods
     procedure InternalPreOpen; override;
     // custom dataset virtual methods
@@ -144,9 +142,9 @@ type
     procedure DoAfterScroll; override;
     function GetRecordIdx: Integer;
   public
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
-    property InternalActiveAdapter: IioActiveBindSourceAdapter read GetInternalActiveAdapter; // Must be ReadOnly
     property Map: IioMap read FMap;
   end;
 
@@ -539,7 +537,7 @@ begin
   Result := True; // read-write
 end;
 
-function TioBSADataSet.GetInternalActiveAdapter: IioActiveBindSourceAdapter;
+function TioBSADataSet.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := FBindSourceAdapter;
 end;
@@ -744,11 +742,11 @@ begin
   // invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
   // in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
   // sembra non dare problemi.
-  if InternalActiveAdapter.ioAutoPost and (FBindSourceAdapter.State in seEditModes) then
-    InternalActiveAdapter.Post;
+  if GetActiveBindSourceAdapter.ioAutoPost and (FBindSourceAdapter.State in seEditModes) then
+    GetActiveBindSourceAdapter.Post;
 end;
 
-procedure TioBSADataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+procedure TioBSADataSet.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   if not Assigned(AActiveBindSourceAdpter) then
     raise EioException.Create(ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
@@ -1078,7 +1076,7 @@ begin
     LRecordIndex := FDataset.GetRecordIdx;
     // Get Property, Object, Value
     LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-    LObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+    LObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
     LValue := LProperty.GetValue(LObj);
     // Get value as TStrings
     LStrings := LValue.AsType<TStrings>;
@@ -1107,7 +1105,7 @@ begin
   LRecordIndex := FDataset.GetRecordIdx;
   // Get Property, Object, Value
   LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-  LObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+  LObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
   LValue := LProperty.GetValue(LObj);
   // Get value as TStrings
   LStrings := LValue.AsType<TStrings>;
@@ -1140,7 +1138,7 @@ begin
     LRecordIndex := FDataset.GetRecordIdx;
     // Get Property, Object, Value (Value as StremableObj instance)
     LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-    LCurrRecObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+    LCurrRecObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
     // At this point the property refer to a blob field (and to an Object) type then
     // check if the Object is assigned and if it isn't clear
     // the parameter
@@ -1179,7 +1177,7 @@ begin
   LRecordIndex := FDataset.GetRecordIdx;
   // Get Property, Object, Value (Value as StremableObj instance)
   LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-  LCurrRecObj := FDataset.InternalActiveAdapter.Items[LRecordIndex];
+  LCurrRecObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
   // At this point the property refer to a blob field (and to an Object) type then
   // check if the Object is assigned and if it isn't clear
   // the parameter

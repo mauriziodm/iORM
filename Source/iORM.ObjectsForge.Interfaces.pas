@@ -231,7 +231,7 @@ begin
         LIntf := LPresenterSettings[I].InterfacedObj;
         if not Supports(LIntf, IioActiveBindSourceAdapter, LBSA) then
           raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioActiveBindSourceAdapter" not implemented by object.');
-        LViewModel.Presenter[LName].BindSourceAdapter := LBSA;
+        LViewModel.Presenter[LName].SetActiveBindSourceAdapter(LBSA);
       end;
       // MasterModelPresenter
       TioDIPresenterSettingsType.pstMasterModelPresenter:

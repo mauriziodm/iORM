@@ -549,8 +549,7 @@ begin
       // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
       // if FAutoPersist is True then the notify is performed by
       // the "CommonBSAPersistence" else by this method
-      AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-        TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterDelete));
+      AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
     end;
 end;
 
@@ -560,8 +559,7 @@ begin
   result := procedure(AResultValue: TObject)
     begin
       // Send a notification to other ActiveBindSourceAdapters & BindSource
-      AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-        TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current, ntAfterPost));
+      AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
     end;
 end;
 
@@ -611,9 +609,7 @@ begin
       AActiveBindSourceAdapter.Refreshing := False;
       // Send a notification to other ActiveBindSourceAdapters & BindSource
       if ANotify then
-        AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject,
-          TioLiveBindingsFactory.Notification(AActiveBindSourceAdapter as TObject, AActiveBindSourceAdapter.Current,
-          ntAfterRefresh));
+        AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
     end;
 end;
 

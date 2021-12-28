@@ -102,8 +102,8 @@ object MainForm: TMainForm
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 20
-    Top = 5
+    Left = 44
+    Top = 125
     object LinkGridToDataSourcePBSArticles: TLinkGridToDataSource
       Category = 'Quick Bindings'
       DataSource = PBSArticles
@@ -137,14 +137,9 @@ object MainForm: TMainForm
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioOnReceiveSelectionAutoEdit = False
-    ioOnReceiveSelectionAutoPost = False
-    ioOnReceiveSelectionAutoPersist = False
     ioPropagateEdit = False
     ioPropagatePost = False
     ioPropagatePersist = False
-    ioPaging.PageSize = 10
-    ioPaging.PagingType = ptProgressiveAuto
     Left = 256
     Top = 216
   end

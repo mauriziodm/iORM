@@ -162,7 +162,7 @@ type
     procedure Append(AObject: IInterface); reintroduce; overload;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
-    procedure Notify(Sender: TObject; ANotification: IioBSANotification); virtual;
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification); virtual;
     procedure Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True); reintroduce; overload;
     procedure LoadPage;
     function DataObject: TObject;
@@ -349,12 +349,11 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterScroll;
 begin
   inherited;
-  Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
+  FDetailAdaptersContainer.SetMasterObject(Current);
   // DataSet synchro
-  Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
+  GetDataSetLinkContainer.SetRecNo(ItemIndex);
   // Paging notification
-  if Assigned(FBindSource) then
-    FBindSource.Paging_NotifyItemIndexChanged;
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBrowse));
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -621,6 +620,11 @@ begin
   Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
 end;
 
+procedure TioActiveInterfaceListBindSourceAdapter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+begin
+  TioCommonBSABehavior.Notify(Sender, Self, ANotification);
+end;
+
 procedure TioActiveInterfaceListBindSourceAdapter.Insert(AObject: IInterface);
 begin
   // Set sone InsertObj subsystem variables
@@ -699,19 +703,6 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
 begin
   Result := FMasterAdaptersContainer;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.Notify(Sender: TObject; ANotification: IioBSANotification);
-begin
-  // Replicate notification to the BindSource
-  if Assigned(FBindSource) and (Sender <> TObject(FBindSource)) then
-    FBindSource.Notify_old(Self, ANotification);
-  // Replicate notification to the DetailAdaptersContainer
-  if Sender <> TObject(FDetailAdaptersContainer) then
-    FDetailAdaptersContainer.Notify_old(Self, ANotification);
-  // Replicate notification to the MasterAdaptersContainer
-  if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer)) then
-    FMasterAdaptersContainer.Notify_old(Self, ANotification);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.PersistAll;

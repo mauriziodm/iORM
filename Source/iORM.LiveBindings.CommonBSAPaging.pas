@@ -36,20 +36,33 @@ unit iORM.LiveBindings.CommonBSAPaging;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces, System.Classes, System.SysUtils;
+  System.Classes, System.SysUtils;
 
 const
-  PAGING_TYPE_DEFAULT = ptDisabled;
   CURRENT_PAGE_DEFAULT = 1;
   NEXT_PAGE_START_OFFSET = 0;
   PAGE_SIZE_DEFAULT = 100;
 
 type
 
+  TioCommonBSAPageManagerConcrete = class;
+
+  // Paging type
+  TioBSAPagingType = (ptDisabled, ptHardPaging, ptProgressiveManual, ptProgressiveAuto);
+
   // LoadPage anonymous method type
   TioBSAPagingLoadMethod = reference to procedure;
 
-  TioCommonBSAPageManagerConcrete = class;
+  // Paging: SQL limit strategy
+  IioBSAPageManagerStrategy = interface
+    ['{65896A9F-5B1A-407B-AB2E-C486D7B19ABF}']
+    function GetSqlLimit: Integer;
+    function GetSqlLimitOffset: Integer;
+    function IsProgressive: Boolean;
+    function MoveToPage(const AFromPage, AToPage, APageSize, ANextPageStartOffset: Integer): Boolean;
+    function NextPageAfterItemIndexChanged(const ANewItemIndex, ACurrentPage, APageSize: Integer): Boolean;
+    procedure PrepareForRefresh;
+  end;
 
 {$TYPEINFO ON}
 
@@ -90,7 +103,7 @@ type
   published
     property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
     property PageSize: Integer read GetPageSize write SetPageSize default PAGE_SIZE_DEFAULT;
-    property PagingType: TioBSAPagingType read GetPagingType write SetPagingType default PAGING_TYPE_DEFAULT;
+    property PagingType: TioBSAPagingType read GetPagingType write SetPagingType default ptDisabled;
   end;
 
   TioCommonBSAPageManagerConcrete = class
@@ -128,7 +141,7 @@ type
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset;
     property PageCount: Integer read FPageCount;
     property PageSize: Integer read FPageSize write FPageSize;
-    property PagingType: TioBSAPagingType read FPagingType write SetPagingType;
+    property PagingType: TioBSAPagingType read FPagingType write SetPagingType default ptDisabled;
   end;
 
   // Base class for all SQL limit strategy classes
@@ -500,7 +513,7 @@ end;
 
 constructor TioCommonBSAPageManagerConcrete.Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
 begin
-  FPagingType := PAGING_TYPE_DEFAULT;
+  FPagingType := ptDisabled;
   FPageSize := PAGE_SIZE_DEFAULT;
   FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
   FLoadPageMethod := ALoadPageMethod;

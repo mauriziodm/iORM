@@ -87,12 +87,14 @@ type
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
+    // Paging
+    function GetPaging: TioCommonBSAPageManager;
   protected
     procedure Loaded; override;
     function IsMasterBS: boolean; virtual; abstract;
     function IsDetailBS: boolean; virtual; abstract;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
-    procedure SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
+    procedure SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Paging
     procedure Paging_NotifyItemIndexChanged;
     // Selectors related event for TObject selection
@@ -127,7 +129,7 @@ type
     // Published properties: selectors
     property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
-    property Paging: TioCommonBSAPageManager read FPaging write FPaging; // published: Master
+    property Paging: TioCommonBSAPageManager read GetPaging; // published: Master
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -166,7 +168,8 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Where.Factory, iORM.Exceptions,
-  iORM.LiveBindings.Factory, iORM.Components.Common, System.Rtti, iORM;
+  iORM.LiveBindings.Factory, iORM.Components.Common, System.Rtti, iORM,
+  iORM.LiveBindings.CommonBSBehavior;
 
 { TioDataSet }
 
@@ -179,10 +182,10 @@ end;
 function TioDataSet.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
-  if ACreateIfNotAssigned and not Assigned(InternalActiveAdapter) then
+  if ACreateIfNotAssigned and (GetActiveBindSourceAdapter = nil) then
     _CreateAdapter(nil, True);
   // Result
-  Result := Assigned(InternalActiveAdapter);
+  Result := (GetActiveBindSourceAdapter <> nil);
 end;
 
 constructor TioDataSet.Create(AOwner: TComponent);
@@ -215,7 +218,7 @@ begin
     procedure
     begin
       if CheckAdapter then
-        InternalActiveAdapter.LoadPage;
+        GetActiveBindSourceAdapter.LoadPage;
     end);
   // Set even an onChange event handler (always after the creation of the PageManager)
   FWhereStr := TStringList.Create;
@@ -225,7 +228,7 @@ end;
 function TioDataSet.Current: TObject;
 begin
   if CheckAdapter(True) then
-    Result := InternalActiveAdapter.Current
+    Result := GetActiveBindSourceAdapter.Current
   else
     Result := nil;
 end;
@@ -241,7 +244,7 @@ end;
 function TioDataSet.CurrentMasterObject: TObject;
 begin
   if CheckAdapter and IsDetailBS then
-    Result := InternalActiveAdapter.GetMasterBindSourceAdapter.Current
+    Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
 end;
@@ -263,8 +266,8 @@ begin
   // Destroy paging object
   FPaging.Free;
   // Destroy the internal adapter
-  if InternalActiveAdapter <> nil then
-    InternalActiveAdapter.Free;
+  if GetActiveBindSourceAdapter <> nil then
+    GetActiveBindSourceAdapter.Free;
   inherited;
 end;
 
@@ -323,7 +326,7 @@ end;
 function TioDataSet.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
-    Result := InternalActiveAdapter.ioAutoPost
+    Result := GetActiveBindSourceAdapter.ioAutoPost
   else
     Result := FAutoPost;
 end;
@@ -336,7 +339,7 @@ end;
 function TioDataSet.GetCount: Integer;
 begin
   if CheckAdapter then
-    Result := InternalActiveAdapter.ItemCount
+    Result := GetActiveBindSourceAdapter.ItemCount
   else
     Result := 0;
 end;
@@ -344,7 +347,7 @@ end;
 function TioDataSet.GetEditing: Boolean;
 begin
   if CheckAdapter then
-    Result := InternalActiveAdapter.State in seEditModes
+    Result := GetActiveBindSourceAdapter.State in seEditModes
   else
     Result := False
 end;
@@ -352,15 +355,20 @@ end;
 function TioDataSet.GetIsInterfacePresenting: Boolean;
 begin
   if CheckAdapter then
-    Result := InternalActiveAdapter.IsInterfaceBSA
+    Result := GetActiveBindSourceAdapter.IsInterfaceBSA
   else
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
+end;
+
+function TioDataSet.GetPaging: TioCommonBSAPageManager;
+begin
+  Result := FPaging;
 end;
 
 function TioDataSet.GetState: TBindSourceAdapterState;
 begin
   if CheckAdapter then
-    Result := InternalActiveAdapter.State
+    Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
 end;
@@ -371,7 +379,7 @@ begin
   // else return the Self.FWhere
   if CheckAdapter then
   begin
-    Result := InternalActiveAdapter.ioWhere;
+    Result := GetActiveBindSourceAdapter.ioWhere;
     Exit;
   end;
   // if not already assigned then create it (così lo crea solo se serve
@@ -386,7 +394,7 @@ procedure TioDataSet.InternalPreOpen;
 begin
   if not CheckAdapter(True) then
     raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
-  InternalActiveAdapter.Active := True;
+  GetActiveBindSourceAdapter.Active := True;
   inherited;
 end;
 
@@ -409,31 +417,7 @@ end;
 
 procedure TioDataSet.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
-  // If the notification was sent by itself then it forwards it to the ActiveBindSourceAdapter for its propagation (outbound notification)
-  if Sender = Self then
-  begin
-    // To be implemented
-  end
-  // If the notification was not sent by itself then react to it if necessary (inbound notification)
-  else
-  begin
-    case Anotification.NotificationType of
-      ntRefresh: begin
-        // If enabled perform an AutoRefresh operation
-        if (AutoRefreshOnNotification > arDisabled) and (State <> TBindSourceAdapterState.seInactive) then
-          Refresh(AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
-      end;
-      ntBrowse: begin
-
-      end;
-      ntSaveObjState: begin
-
-      end;
-    end;
-
-
-
-  end;
+  TioCommonBSBehavior.Notify(Sender, Self, ANotification);
 end;
 
 procedure TioDataSet.Notify_old(const Sender: TObject; const ANotification: IioBSANotification);
@@ -443,19 +427,19 @@ end;
 
 procedure TioDataSet.Paging_NotifyItemIndexChanged;
 begin
-  FPaging.NotifyItemIndexChanged(InternalActiveAdapter.ItemIndex);
+  FPaging.NotifyItemIndexChanged(GetActiveBindSourceAdapter.ItemIndex);
 end;
 
 procedure TioDataSet.PersistAll;
 begin
   if CheckAdapter then
-    InternalActiveAdapter.PersistAll;
+    GetActiveBindSourceAdapter.PersistAll;
 end;
 
 procedure TioDataSet.PersistCurrent;
 begin
   if CheckAdapter then
-    InternalActiveAdapter.PersistCurrent;
+    GetActiveBindSourceAdapter.PersistCurrent;
 end;
 
 procedure TioDataSet.PostIfEditing;
@@ -467,7 +451,7 @@ end;
 procedure TioDataSet.Refresh(const AReloadData, ANotify: Boolean);
 begin
   if CheckAdapter then
-    InternalActiveAdapter.Refresh(AReloadData, ANotify);
+    GetActiveBindSourceAdapter.Refresh(AReloadData, ANotify);
 end;
 
 procedure TioDataSet.RegisterDetailPresenter(const ADetailDataSet: TioDataSet);
@@ -488,7 +472,7 @@ begin
   if not FSelectorFor.CheckAdapter then
     raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
   // Get the selection destination BindSourceAdapter
-  LDestBSA := FSelectorFor.InternalActiveAdapter;
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
@@ -510,7 +494,7 @@ begin
   if not CheckAdapter then
     raise EioException.Create(ClassName, 'SelectCurrent', 'ActiveBindSourceAdapter, not present.');
   // Get the selection destination BindSourceAdapter
-  LDestBSA := FSelectorFor.InternalActiveAdapter;
+  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Make the selection of current
   if LDestBSA.IsInterfaceBSA then
     Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
@@ -523,7 +507,7 @@ begin
   FAsync := Value;
   // Update the adapter
   if CheckAdapter then
-    InternalActiveAdapter.ioAsync := Value;
+    GetActiveBindSourceAdapter.ioAsync := Value;
 end;
 
 procedure TioDataSet.SetAutoLoadData(const Value: Boolean);
@@ -531,7 +515,7 @@ begin
   FAutoLoadData := Value;
   // Update the adapter
   if CheckAdapter then
-    InternalActiveAdapter.ioAutoLoadData := Value;
+    GetActiveBindSourceAdapter.ioAutoLoadData := Value;
 end;
 
 procedure TioDataSet.SetAutoPersist(const Value: Boolean);
@@ -539,7 +523,7 @@ begin
   FAutoPersist := Value;
   // Update the adapter
   if CheckAdapter then
-    InternalActiveAdapter.ioAutoPersist := Value;
+    GetActiveBindSourceAdapter.ioAutoPersist := Value;
 end;
 
 procedure TioDataSet.SetAutoPost(const Value: Boolean);
@@ -547,7 +531,7 @@ begin
   FAutoPost := Value;
   // Update the adapter
   if CheckAdapter then
-    InternalActiveAdapter.ioAutoPost := Value;
+    GetActiveBindSourceAdapter.ioAutoPost := Value;
 end;
 
 procedure TioDataSet.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
@@ -555,18 +539,18 @@ begin
   FAutoRefreshOnNotification := Value;
 end;
 
-procedure TioDataSet.SetInternalAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+procedure TioDataSet.SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   inherited;
   // Init the BSA
   // Set some properties
-  InternalActiveAdapter.ioAsync := FAsync;
-  InternalActiveAdapter.ioAutoPost := FAutoPost;
-  InternalActiveAdapter.ioAutoPersist := FAutoPersist;
-  InternalActiveAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
-  InternalActiveAdapter.ioWhere := FWhere;
+  GetActiveBindSourceAdapter.ioAsync := FAsync;
+  GetActiveBindSourceAdapter.ioAutoPost := FAutoPost;
+  GetActiveBindSourceAdapter.ioAutoPersist := FAutoPersist;
+  GetActiveBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
+  GetActiveBindSourceAdapter.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
-  InternalActiveAdapter.SetBindSource(Self);
+  GetActiveBindSourceAdapter.SetBindSource(Self);
 end;
 
 procedure TioDataSet.SetOrderBy(const Value: String);
@@ -575,7 +559,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    InternalActiveAdapter.ioWhere.SetOrderBySql(Value);
+    GetActiveBindSourceAdapter.ioWhere.SetOrderBySql(Value);
 end;
 
 procedure TioDataSet.SetTypeAlias(const Value: String);
@@ -584,7 +568,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    InternalActiveAdapter.ioTypeAlias := Value;
+    GetActiveBindSourceAdapter.ioTypeAlias := Value;
 end;
 
 procedure TioDataSet.SetTypeName(const Value: String);
@@ -593,7 +577,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    InternalActiveAdapter.ioTypeName := Value;
+    GetActiveBindSourceAdapter.ioTypeName := Value;
 end;
 
 procedure TioDataSet.SetWhere(const AWhere: IioWhere);
@@ -602,7 +586,7 @@ begin
   FWhere := AWhere;
   // Update the adapter where in the BSAdapter if exist
   if CheckAdapter then
-    InternalActiveAdapter.ioWhere := AWhere;
+    GetActiveBindSourceAdapter.ioWhere := AWhere;
 end;
 
 procedure TioDataSet.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
@@ -610,7 +594,7 @@ begin
   FWhereDetailsFromDetailAdapters := Value;
   // Update the adapter
   if CheckAdapter then
-    InternalActiveAdapter.ioWhereDetailsFromDetailAdapters := Value;
+    GetActiveBindSourceAdapter.ioWhereDetailsFromDetailAdapters := Value;
 end;
 
 procedure TioDataSet.SetWhereStr(const Value: TStrings);
@@ -645,12 +629,12 @@ begin
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterDataSet) then
-    SetInternalAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterDataSet.InternalActiveAdapter, MasterPropertyName))
+    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterDataSet.GetActiveBindSourceAdapter, MasterPropertyName))
     // else create the BSA from TypeName & TypeAlias
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetInternalAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
+    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

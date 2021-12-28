@@ -128,6 +128,8 @@ type
     // AutoRefreshOnNotification
     function GetAutoRefreshOnNotification: TioAutoRefreshType;
     procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    // Paging
+    function GetPaging: TioCommonBSAPageManager;
   protected
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
@@ -233,7 +235,7 @@ type
     property ioPropagatePost: Boolean read FPropagatePost write FPropagatePost;
     property ioPropagatePersist: Boolean read FPropagatePersist write FPropagatePersist;
     // Paging
-    property ioPaging: TioCommonBSAPageManager read FPaging write FPaging;
+    property ioPaging: TioCommonBSAPageManager read GetPaging;
   end;
 
 implementation
@@ -658,6 +660,11 @@ end;
 function TioPrototypeBindSource.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
 begin
   Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner).AsTBindSourceAdapter;
+end;
+
+function TioPrototypeBindSource.GetPaging: TioCommonBSAPageManager;
+begin
+  Result := FPaging;
 end;
 
 function TioPrototypeBindSource.GetState: TBindSourceAdapterState;
