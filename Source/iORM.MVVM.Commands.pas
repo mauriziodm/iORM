@@ -478,7 +478,7 @@ begin
       TioActionEvent.OnHint:
         LActionEventName := 'OnHint';
     end;
-    LActionEventProp := TioRttiContextFactory.RttiContext.GetType(Self.Command.ClassInfo).GetProperty(LActionEventName);
+    LActionEventProp := TioRttiFactory.GetRttiContext.GetType(Self.Command.ClassInfo).GetProperty(LActionEventName);
     // Set the TMethod with the CodeAddress of the RttiMethod we want to assign as event handler
     LMethod.Code := ACmdInfo.RttiMethod.Value.CodeAddress;
     LMethod.Data := AMethodData;
@@ -591,7 +591,7 @@ begin
   if not LCommandItem.IsAction then
     raise EioException.Create(Self.ClassName, 'BindViewControl', 'The command is not an action.');
   // Get the control action property
-  LControlType := TioRttiContextFactory.RttiContext.GetType(AControl.ClassInfo).AsInstance;
+  LControlType := TioRttiFactory.GetRttiContext.GetType(AControl.ClassInfo).AsInstance;
   LControlActionProperty := LControlType.GetProperty('Action');
   if not Assigned(LControlActionProperty) then
     raise EioException.Create(Self.ClassName, 'BindViewControl', '"Action" property not found.');
@@ -620,7 +620,7 @@ begin
   // Load commands from view
   LoadCommands(AView);
   // Retrieve the RttiType of the view
-  LViewType := TioRttiContextFactory.RttiContext.GetType(AView.ClassType).AsInstance;
+  LViewType := TioRttiFactory.GetRttiContext.GetType(AView.ClassType).AsInstance;
   // Bind uniGUI controls
   //  NB: Questo metodo è stato aggiunto (con il relativo attributo "ioUniBindAction" perchè
   //       si è visto che nel caso delle TUniForm e TUniFrame gli attributi relativi ai campi
@@ -727,7 +727,7 @@ var
 begin
   if not Assigned(AOwner) then
     Exit;
-  LOwnerType := TioRttiContextFactory.RttiContext.GetType(AOwner.ClassInfo);
+  LOwnerType := TioRttiFactory.GetRttiContext.GetType(AOwner.ClassInfo);
   // Parse the class
   LoadCommands_ParseRttiElement(AOwner, LOwnerType);
   // Parse the class methods

@@ -75,7 +75,7 @@ begin
   inherited Create;
   FObj := AObj;
   // Init Rtti
-  Ctx := TioRttiContextFactory.RttiContext;
+  Ctx := TioRttiFactory.GetRttiContext;
   Typ := Ctx.GetType(AObj.ClassInfo);
   // LoadFromStreamMethod method
   FLoadFromStreamMethod := Typ.GetMethod('LoadFromStream');

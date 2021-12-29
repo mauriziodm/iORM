@@ -44,11 +44,11 @@ uses
 
 type
 
-  TioRttiContextFactory = class
+  TioRttiFactory = class
   public
-    class function RttiContext: TRttiContext;
-    class function RttiType(const AClass: TClass): TRttiType;
-    class function RttiProperty(const AClass: TClass; const APropertyName: String): TRttiProperty;
+    class function GetRttiContext: TRttiContext;
+    class function GetRttiType(const AClass: TClass): TRttiType;
+    class function GetRttiProperty(const AClass: TClass; const APropertyName: String): TRttiProperty;
   end;
 
 implementation
@@ -60,21 +60,21 @@ var ARttiContext: TRttiContext;
 
 { TioRttiContextFactory }
 
-class function TioRttiContextFactory.RttiContext: TRttiContext;
+class function TioRttiFactory.GetRttiContext: TRttiContext;
 begin
   Result := ARttiContext;
 end;
 
-class function TioRttiContextFactory.RttiType(const AClass: TClass): TRttiType;
+class function TioRttiFactory.GetRttiType(const AClass: TClass): TRttiType;
 begin
   Result := ARttiContext.GetType(AClass);
   if Result = nil then
     raise EioException.Create(ClassName, 'GetRttiType', Format('RttiType not found for "%s" class', [AClass.ClassName]));
 end;
 
-class function TioRttiContextFactory.RttiProperty(const AClass: TClass; const APropertyName: String): TRttiProperty;
+class function TioRttiFactory.GetRttiProperty(const AClass: TClass; const APropertyName: String): TRttiProperty;
 begin
-  Result := RttiType(AClass).GetProperty(APropertyName);
+  Result := GetRttiType(AClass).GetProperty(APropertyName);
   if Result = nil then
     raise EioException.Create(ClassName, 'GetRttiProperty', Format('RttiProperty named "%s" not found for "%s" class', [APropertyName, AClass.ClassName]));
 end;

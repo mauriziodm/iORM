@@ -68,7 +68,7 @@ begin
   AClassName := AQuery.GetValueByFieldNameAsVariant(AContext.TrueClass.GetFieldName);
   AClassName := AContext.TrueClass.QualifiedClassNameFromClassInfoFieldValue(AClassName);
   // Get rtti class type for classref
-  Ctx := TioRttiContextFactory.RttiContext;
+  Ctx := TioRttiFactory.GetRttiContext;
   Typ := Ctx.FindType(AClassName) as TRttiInstanceType;
   if not Assigned(Typ) then
     raise EioException.Create(Self.ClassName + ': RttiType not found (' + AClassName + ')');

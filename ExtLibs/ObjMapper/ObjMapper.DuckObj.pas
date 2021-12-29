@@ -60,7 +60,7 @@ begin
   inherited Create;
   FObj := AObj;
   // Init Rtti
-  Typ := TioRttiContextFactory.RttiContext.GetType(AObj.ClassInfo);
+  Typ := TioRttiFactory.GetRttiContext.GetType(AObj.ClassInfo);
   // LoadFromStreamMethod method
   FLoadFromStreamMethod := Typ.GetMethod('LoadFromStream');
   if not Assigned(FLoadFromStreamMethod) then Exception.Create('DuckTypedStreamObject: "LoadFromStream" method not found in the object');

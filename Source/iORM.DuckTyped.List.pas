@@ -111,7 +111,7 @@ begin
   inherited Create;
   FListObject := AListObject;
   // Init Rtti
-  LRttiType := TioRttiContextFactory.RttiContext.GetType(AListObject.ClassInfo);
+  LRttiType := TioRttiFactory.GetRttiContext.GetType(AListObject.ClassInfo);
   // OwnsObjects Property (No exception if not exist)
   FOwnsObjectsProperty := nil;
   FOwnsObjectsProperty := LRttiType.GetProperty('OwnsObjects');

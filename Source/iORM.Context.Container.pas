@@ -157,7 +157,7 @@ begin
   try
     // Init ContextContainer loading all ClassRef relative to the entities (classes)
     //  in the application
-    LRttiContext := TioRttiContextFactory.RttiContext;
+    LRttiContext := TioRttiFactory.GetRttiContext;
     for LRttiType in LRttiContext.GetTypes do
     begin
       // Only instance type

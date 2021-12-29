@@ -78,7 +78,7 @@ begin
     else
       Result := TioUtilities.CastObjectToGeneric<TRESULT>(
                   (FWhere as TioWhere).ToList(   // TObject and Cast to avoid circular receference
-                    TioRttiContextFactory.RttiContext.GetType(PTypeInfo(TypeInfo(TRESULT))),
+                    TioRttiFactory.GetRttiContext.GetType(PTypeInfo(TypeInfo(TRESULT))),
                     AOwnsObjects
                   )
                 );

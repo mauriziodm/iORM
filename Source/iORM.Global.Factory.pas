@@ -54,7 +54,7 @@ Type
   TioLazyLoadFactoryRef = class of TioLazyLoadFactory;
   TioLiveBindingsFactoryRef = class of TioLiveBindingsFactory;
   TioObjectMakerFactoryRef = class of TioObjectMakerFactory;
-  TioRttiContextFactoryRef = class of TioRttiContextFactory;
+  TioRttiContextFactoryRef = class of TioRttiFactory;
   TioMVVMFactoryRef = class of TioMVVMFactory;
   TioContainersFactoryRef = class of TioContainersFactory;
   TioWhereFactoryRef = class of TioWhereFactory;
@@ -129,7 +129,7 @@ end;
 
 class function TioGlobalFactory.RttiFactory: TioRttiContextFactoryRef;
 begin
-  Result := TioRttiContextFactory;
+  Result := TioRttiFactory;
 end;
 
 class function TioGlobalFactory.StrategyFactory: TioStrategyFactoryRef;

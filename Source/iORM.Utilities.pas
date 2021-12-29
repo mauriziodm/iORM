@@ -107,7 +107,7 @@ end;
 
 class function TioUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;
 begin
-  Result := TioRttiContextFactory.RttiContext.GetType(AClassRef).AsInstance;
+  Result := TioRttiFactory.GetRttiContext.GetType(AClassRef).AsInstance;
 end;
 
 class function TioUtilities.ExtractOID(const AObj: Tobject): Integer;
@@ -131,7 +131,7 @@ var
   LType: TRttiType;
   LGetItemMethod: TRttiMethod;
 begin
-  LType := TioRttiContextFactory.RttiContext.GetType(TypeInfo(T));
+  LType := TioRttiFactory.GetRttiContext.GetType(TypeInfo(T));
   LGetItemMethod := LType.GetMethod('GetItem');
   if Assigned(LGetItemMethod) then
     Result := LGetItemMethod.ReturnType
@@ -176,7 +176,7 @@ end;
 
 class function TioUtilities.GetQualifiedTypeName(const ATypeInfo: Pointer): String;
 begin
-  Result := TioRttiContextFactory.RttiContext.GetType(ATypeInfo).QualifiedName;
+  Result := TioRttiFactory.GetRttiContext.GetType(ATypeInfo).QualifiedName;
 end;
 
 class function TioUtilities.GetThreadID: TThreadID;
@@ -188,7 +188,7 @@ class function TioUtilities.GUIDtoInterfaceName(const IID: TGUID): String;
 var
   LType: TRttiType;
 begin
-  for LType in TioRttiContextFactory.RttiContext.GetTypes do
+  for LType in TioRttiFactory.GetRttiContext.GetTypes do
     if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
       Exit(TRttiInterfaceType(LType).Name);
   raise EioException.Create('TioRttiUtilities.GUIDtoInterfaceName: IID is not an interface.');
@@ -198,7 +198,7 @@ class function TioUtilities.GUIDtoTypeInfo(const IID: TGUID): PTypeInfo;
 var
   LType: TRttiType;
 begin
-  for LType in TioRttiContextFactory.RttiContext.GetTypes do
+  for LType in TioRttiFactory.GetRttiContext.GetTypes do
     if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
       Exit(TRttiInterfaceType(LType).Handle);
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
@@ -278,7 +278,7 @@ begin
   if not Assigned(AChildPropertyPath) then
     Exit;
   // Get the RttiContext
-  Ctx := TioRttiContextFactory.RttiContext;
+  Ctx := TioRttiFactory.GetRttiContext;
   // Loop for properties on the path
   for ACurrPropName in AChildPropertyPath do
   begin
@@ -344,7 +344,7 @@ var
 begin
   if ATypeInfo.Kind <> tkInterface then
     raise EioException.Create('TioRttiUtilities.TypeInfoToGUID: ATypeInfo is not relative to an interface.');
-  LTyp := TioRttiContextFactory.RttiContext.GetType(ATypeInfo);
+  LTyp := TioRttiFactory.GetRttiContext.GetType(ATypeInfo);
   if not Assigned(LTyp) then
     raise EioException.Create
       ('TioRttiUtilities.TypeInfoToGUID: RTTI type info not found, derive it from IInvokable or insert the {M+} directive before its declaration to solve the problem.');

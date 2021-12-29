@@ -121,7 +121,7 @@ end;
 class function TioObjectMakerIntf.CreateListByClassRef(AClassRef: TClass;
   AOwnsObjects: Boolean): TObject;
 begin
-  Result := Self.CreateListByRttiType(   TioRttiContextFactory.RttiContext.GetType(AClassref)   , AOwnsObjects);
+  Result := Self.CreateListByRttiType(   TioRttiFactory.GetRttiContext.GetType(AClassref)   , AOwnsObjects);
 end;
 
 class function TioObjectMakerIntf.CreateListByRttiType(const ARttiType:TRttiType; const AOwnsObject:Boolean): TObject;
@@ -148,7 +148,7 @@ class function TioObjectMakerIntf.CreateObjectByClassRefEx(AClassRef: TClass; co
 begin
   // Create object
   Result := Self.CreateObjectByRttiTypeEx(
-                                          TioRttiContextFactory.RttiContext.GetType(AClassref),
+                                          TioRttiFactory.GetRttiContext.GetType(AClassref),
                                           AConstructorParams,
                                           AConstructorMarkerText,
                                           AConstructorMethodName,

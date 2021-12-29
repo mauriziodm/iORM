@@ -198,7 +198,7 @@ var
   LInstanceType: TRttiInstanceType;
   LField: TRttiField;
 begin
-  LInstanceType := TioRttiContextFactory.RttiContext.GetType(Self.ClassInfo).AsInstance;
+  LInstanceType := TioRttiFactory.GetRttiContext.GetType(Self.ClassInfo).AsInstance;
   LField := LInstanceType.GetField('FRuntimeAdapter');
   LField.SetValue(Self, TValue.Empty);
 end;

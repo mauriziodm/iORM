@@ -238,7 +238,7 @@ var
   LTable: IioTable;
 begin
   // Rtti init
-  LRttiContext := TioRttiContextFactory.RttiContext;
+  LRttiContext := TioRttiFactory.GetRttiContext;
   LRttiType := LRttiContext.GetType(AClassRef).AsInstance;
   // Get the table
   LTable := Self.Table(LRttiType);
