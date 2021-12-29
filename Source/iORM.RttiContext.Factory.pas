@@ -47,9 +47,14 @@ type
   TioRttiContextFactory = class
   public
     class function RttiContext: TRttiContext;
+    class function RttiType(const AClass: TClass): TRttiType;
+    class function RttiProperty(const AClass: TClass; const APropertyName: String): TRttiProperty;
   end;
 
 implementation
+
+uses
+  iORM.Exceptions, System.SysUtils;
 
 var ARttiContext: TRttiContext;
 
@@ -58,6 +63,20 @@ var ARttiContext: TRttiContext;
 class function TioRttiContextFactory.RttiContext: TRttiContext;
 begin
   Result := ARttiContext;
+end;
+
+class function TioRttiContextFactory.RttiType(const AClass: TClass): TRttiType;
+begin
+  Result := ARttiContext.GetType(AClass);
+  if Result = nil then
+    raise EioException.Create(ClassName, 'GetRttiType', Format('RttiType not found for "%s" class', [AClass.ClassName]));
+end;
+
+class function TioRttiContextFactory.RttiProperty(const AClass: TClass; const APropertyName: String): TRttiProperty;
+begin
+  Result := RttiType(AClass).GetProperty(APropertyName);
+  if Result = nil then
+    raise EioException.Create(ClassName, 'GetRttiProperty', Format('RttiProperty named "%s" not found for "%s" class', [APropertyName, AClass.ClassName]));
 end;
 
 initialization

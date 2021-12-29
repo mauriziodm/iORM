@@ -182,7 +182,7 @@ type
   TioFullPathPropertyReadWrite = class
   strict private
     class function _ExtractPropName(var AFullPathPropName: String): String;
-    class function _ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
+    class function _ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
   public
     class function GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
     class procedure SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
@@ -193,7 +193,8 @@ implementation
 uses
   iORM.Exceptions, System.SysUtils, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
-  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper, iORM.Utilities, System.StrUtils;
+  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper, iORM.Utilities, System.StrUtils,
+  iORM.RttiContext.Factory;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -1214,31 +1215,70 @@ begin
   end;
 end;
 
-class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
+//class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
+//var
+//  LPropName: String;
+//begin
+//  Result := False;
+//  LPropName := _ExtractPropName(AFullPathPropName);
+//  AOutProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
+//  if not AFullPathPropName.IsEmpty then
+//  begin
+//    // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
+//    if not(AOutProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
+//      raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
+//        [AOutObj.ClassName, LPropName]));
+//    AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
+//    // Recursion: If the child object is not assigned, the recursion stops and the function returns false
+//    if Assigned(AOutObj) then
+//      Result := _ResolvePath(AOutObj, AOutProperty, AFullPathPropName); // Recursion
+//  end
+//  else
+//    Result := True;
+//end;
+class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
 var
   LPropName: String;
+  LMidPathProperty: IioProperty;
 begin
   Result := False;
   LPropName := _ExtractPropName(AFullPathPropName);
-  AOutProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
+  // If we are in the middle of the path (we are not at the final leaf property)
+  //  then it recursively calls itself by continuing in the path through the mapped prop/fields...
   if not AFullPathPropName.IsEmpty then
   begin
+    LMidPathProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
     // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
-    if not(AOutProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
+    if not(LMidPathProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
       raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
         [AOutObj.ClassName, LPropName]));
-    AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
+    AOutObj := LMidPathProperty.GetRelationChildObject(AOutObj);
     // Recursion: If the child object is not assigned, the recursion stops and the function returns false
     if Assigned(AOutObj) then
-      Result := _ResolvePath(AOutObj, AOutProperty, AFullPathPropName); // Recursion
+      Result := _ResolvePath(AOutObj, AOutRttiProperty, AFullPathPropName); // Recursion
   end
+  // ...instead if we are in a final leaf property then look for the RttiProperty to be returned
+  //  in the RttiType of the final leaf object (not the mapped properties) because otherwise
+  //  if it has been mapped for private fields it would not pass through the possible set method.
   else
+  begin
+    AOutRttiProperty := TioRttiContextFactory.RttiProperty(AOutObj.ClassType, LPropName);
     Result := True;
+  end;
 end;
 
+//class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
+//var
+//  LProperty: IioProperty;
+//begin
+//  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
+//    Result := LProperty.GetValue(AObj)
+//  else
+//    Result := TValue.Empty;
+//end;
 class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
 var
-  LProperty: IioProperty;
+  LProperty: TRttiProperty;
 begin
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
     Result := LProperty.GetValue(AObj)
@@ -1246,9 +1286,19 @@ begin
     Result := TValue.Empty;
 end;
 
+//class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+//var
+//  LProperty: IioProperty;
+//begin
+//  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
+//    LProperty.SetValue(AObj, AValue)
+//  else
+//    raise EioException.Create(Self.ClassName, 'SetValue',
+//      Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
+//end;
 class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
-  LProperty: IioProperty;
+  LProperty: TRttiProperty;
 begin
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
     LProperty.SetValue(AObj, AValue)
