@@ -262,7 +262,8 @@ uses
   iORM.Context.Interfaces,
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
   System.StrUtils, iORM.Context.Map.Interfaces, iORM.Utilities,
-  iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container;
+  iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container,
+  iORM.RttiContext.Factory;
 
 { TioProperty }
 
@@ -1049,7 +1050,7 @@ constructor TioHasManyChildVirtualProperty.Create(const ATable: IioTable);
 begin
   inherited Create(ATable, '', '', '', '', False, False, False, lpLoadAndPersist, rtNone, '', '', '', ltEagerLoad, False, ioMdInteger, IO_DEFAULT_FIELD_LENGTH,
     IO_DEFAULT_FIELD_PRECISION, IO_DEFAULT_FIELD_SCALE, True, TValue.Empty, True, '', '', fkCreate, fkUnspecified, fkUnspecified);
-  FRttiType := TRttiContext.Create.GetType(TypeInfo(Integer));
+  FRttiType := TioRttiFactory.GetRttiTypeByTypeInfo(TypeInfo(Integer));
 end;
 
 function TioHasManyChildVirtualProperty.GetName: String;
