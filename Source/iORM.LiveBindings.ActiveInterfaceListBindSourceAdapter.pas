@@ -124,6 +124,7 @@ type
     procedure DoBeforeCancel; override;
     procedure DoAfterCancel; override;
     procedure DoAfterDelete; override;
+    procedure DoBeforeScroll; override;
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); override;
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -352,8 +353,6 @@ begin
   FDetailAdaptersContainer.SetMasterObject(Current);
   // DataSet synchro
   GetDataSetLinkContainer.SetRecNo(ItemIndex);
-  // Paging notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBrowse));
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -413,6 +412,13 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True);
 begin
   TioCommonBSAPersistence.Refresh(Self, AReloadData, ANotify);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeScroll;
+begin
+  inherited;
+  // Paging notification
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBeforeBrowse));
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);

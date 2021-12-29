@@ -42,7 +42,7 @@ begin
           ATargetBS.Refresh(ATargetBS.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
       end;
       // Actually used for paging and for ObjStateManager purposes
-      ntBrowse: begin
+      ntBeforeBrowse: begin
         if Supports(ATargetBS, IioBindSourceObjStateClient, LBSObjStateClient) then
           LBSObjStateClient.ObjState.NotifyRecordChange;
         ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
