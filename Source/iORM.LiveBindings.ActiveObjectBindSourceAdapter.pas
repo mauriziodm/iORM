@@ -122,6 +122,7 @@ type
 {$ENDIF}
     // =========================================================================
     procedure DoBeforeOpen; override;
+    procedure DoBeforeEdit; override;
     procedure DoBeforeDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
@@ -412,6 +413,13 @@ begin
   TioCommonBSAPersistence.Delete(Self, LAbort);
   if LAbort then
     Abort;
+end;
+
+procedure TioActiveObjectBindSourceAdapter.DoBeforeEdit;
+begin
+  inherited;
+  // ObjStateManager notification
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveObjState));
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeOpen;

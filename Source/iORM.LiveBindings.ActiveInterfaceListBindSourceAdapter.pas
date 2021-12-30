@@ -119,6 +119,7 @@ type
     // =========================================================================
     procedure DoBeforeOpen; override;
     procedure DoBeforeDelete; override;
+    procedure DoBeforeEdit; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoBeforeCancel; override;
@@ -396,6 +397,13 @@ begin
     Abort;
 end;
 
+procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeEdit;
+begin
+  inherited;
+  // ObjStateManager notification
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveObjState));
+end;
+
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
 begin
   inherited;
@@ -418,7 +426,7 @@ procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeScroll;
 begin
   inherited;
   // Paging notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBeforeBrowse));
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBeforeScroll));
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);

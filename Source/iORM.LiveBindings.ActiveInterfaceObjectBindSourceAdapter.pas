@@ -115,6 +115,7 @@ type
     // =========================================================================
     procedure DoBeforeOpen; override;
     procedure DoBeforeDelete; override;
+    procedure DoBeforeEdit; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoBeforeCancel; override;
@@ -381,6 +382,13 @@ begin
   TioCommonBSAPersistence.Delete(Self, LAbort);
   if LAbort then
     Abort;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeEdit;
+begin
+  inherited;
+  // ObjStateManager notification
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveObjState));
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;

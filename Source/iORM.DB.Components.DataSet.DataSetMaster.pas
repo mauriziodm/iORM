@@ -91,6 +91,7 @@ end;
 procedure TioDataSetMaster.DoBeforeScroll;
 begin
   inherited;
+//  Abort;
 //  ObjState.NotifyRecordChange;
 end;
 
