@@ -34,24 +34,18 @@ begin
   // If the notification was not sent by itself then react to it if necessary (inbound notification)
   else
   begin
-    case Anotification.NotificationType of
+    case ANotification.NotificationType of
       // Execute the AutoRefresh if enabled by the specific property
-      ntRefresh: begin
-        // If enabled perform an AutoRefresh operation
+      ntRefresh:
         if (ATargetBS.AutoRefreshOnNotification > arDisabled) and (ATargetBS.State <> TBindSourceAdapterState.seInactive) then
           ATargetBS.Refresh(ATargetBS.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
-      end;
-      // Actually used for paging and for ObjStateManager purposes
-      ntBeforeScroll: begin
-        if Supports(ATargetBS, IioBindSourceObjStateClient, LBSObjStateClient) then
-          LBSObjStateClient.ObjState.NotifyRecordChange;
+      // Actually used for paging purposes (ObjState moved on "OnBeforeScroll" directly in the BindSource/DataSet/ModelPresenter master)
+      ntScroll:
         ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
-      end;
       // Actually used ObjStateManager purposes
-      ntSaveObjState: begin
+      ntSaveObjState:
         if Supports(ATargetBS, IioBindSourceObjStateClient, LBSObjStateClient) then
-          LBSObjStateClient.ObjState.NotifyEdit;
-      end;
+          LBSObjStateClient.ObjState.NotifySaveObjState;
     end;
   end;
 end;

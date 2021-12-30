@@ -450,7 +450,7 @@ procedure TioActiveListBindSourceAdapter.DoBeforeScroll;
 begin
   inherited;
   // Paging & ObjStateManager notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBeforeScroll));
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntScroll));
 end;
 
 procedure TioActiveListBindSourceAdapter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);

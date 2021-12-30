@@ -37,7 +37,7 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntBeforeScroll, ntSaveObjState);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveObjState);
 
   TioBSNotification = record
     NotificationType: TioBSNotificationType;
@@ -59,7 +59,7 @@ begin
   case ANotificationType of
     // NB: ntBrowse is used both for paging and for the ObjStateManager;
     //     in both cases it applies only to the master BindSource and does not propagate
-    ntBeforeScroll:
+    ntScroll:
       begin
         DirectionRoot := False;
         DirectionLeaves := False;

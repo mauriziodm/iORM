@@ -426,7 +426,7 @@ procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeScroll;
 begin
   inherited;
   // Paging notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntBeforeScroll));
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntScroll));
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);

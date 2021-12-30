@@ -28,7 +28,6 @@ type
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
     procedure DoBeforeOpen; override;
-    procedure DoBeforeEdit; override;
     procedure DoBeforeScroll; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -76,12 +75,6 @@ begin
   inherited;
 end;
 
-procedure TioDataSetMaster.DoBeforeEdit;
-begin
-  inherited;
-//  ObjState.NotifyEdit(FOnEditAction);
-end;
-
 procedure TioDataSetMaster.DoBeforeOpen;
 begin
   inherited;
@@ -91,8 +84,7 @@ end;
 procedure TioDataSetMaster.DoBeforeScroll;
 begin
   inherited;
-//  Abort;
-//  ObjState.NotifyRecordChange;
+  ObjState.NotifyBeforeScroll;
 end;
 
 function TioDataSetMaster.GetObjState: TioBindSourceObjStateManager;

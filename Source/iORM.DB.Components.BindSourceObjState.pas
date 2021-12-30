@@ -51,8 +51,8 @@ type
     function IsChanged: Boolean;
     function IsSaved: Boolean;
     function IsClear: Boolean;
-    procedure NotifyRecordChange;
-    procedure NotifyEdit;
+    procedure NotifyBeforeScroll;
+    procedure NotifySaveObjState;
     property SavedObjState: string read FSavedObjState;
     property State: TioBSObjState read GetState;
     property StateAsString: string read GetStateAsString;
@@ -125,7 +125,7 @@ begin
   Result := GetState > osUnsaved;
 end;
 
-procedure TioBindSourceObjStateManager.NotifyEdit;
+procedure TioBindSourceObjStateManager.NotifySaveObjState;
 begin
   if (FBindSource.OnEditAction = eSaveObjState) and IsClear then
     Save
@@ -134,7 +134,7 @@ begin
     Abort;
 end;
 
-procedure TioBindSourceObjStateManager.NotifyRecordChange;
+procedure TioBindSourceObjStateManager.NotifyBeforeScroll;
 begin
   if ((FBindSource.OnRecordChangeAction = rcPersistAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcPersistIfChanged) and IsChanged) then
     Persist
