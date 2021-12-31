@@ -43,7 +43,7 @@ uses
 
 type
 
-  TioNaturalActiveObjectBindSourceAdapter = class(TioActiveObjectBindSourceAdapter)
+  TioNaturalActiveObjectBindSourceAdapter = class(TioActiveObjectBindSourceAdapter, IioNaturalActiveBindSourceAdapter)
   strict private
     FSourceAdapter: IioNaturalBindSourceAdapterSource;
   strict protected
@@ -51,7 +51,7 @@ type
     procedure DoAfterDelete; override;
   public
     constructor Create(AOwner:TComponent; ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
-    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification); override;
+    procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
   end;
 
 implementation
@@ -117,9 +117,8 @@ begin
      TBindSourceAdapter(FSourceAdapter).Delete;
 end;
 
-procedure TioNaturalActiveObjectBindSourceAdapter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+procedure TioNaturalActiveObjectBindSourceAdapter.ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
-  inherited;
   if Assigned(FSourceAdapter)
     then FSourceAdapter.Notify(Self, ANotification);
 end;

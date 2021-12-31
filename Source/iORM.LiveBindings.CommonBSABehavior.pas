@@ -153,6 +153,10 @@ begin
   if ANotification.DirectionRoot and Assigned(AActiveBindSourceAdapter.MasterAdaptersContainer) and
     (Sender <> TObject(AActiveBindSourceAdapter.MasterAdaptersContainer)) then
     AActiveBindSourceAdapter.MasterAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
+
+  // If the current BSA is a NaturalBindSourceAdapter then forward the notification to the source adapter
+  if ANotification.DirectionRoot and Supports(AActiveBindSourceAdapter, IioNaturalActiveBindSourceAdapter) then
+    (AActiveBindSourceAdapter as IioNaturalActiveBindSourceAdapter).ForwardNotificationToSourceAdapter(AActiveBindSourceAdapter as TObject, ANotification);
 end;
 
 class procedure TioCommonBSABehavior.AddFields(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;

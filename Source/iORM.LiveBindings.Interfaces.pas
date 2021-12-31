@@ -287,6 +287,11 @@ type
     function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
   end;
 
+  IioNaturalActiveBindSourceAdapter = interface
+    ['{9452A7CA-2C5F-43FB-BA63-DEE446B4FCC0}']
+    procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+  end;
+
   // BindSourceAdapter List
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
 
