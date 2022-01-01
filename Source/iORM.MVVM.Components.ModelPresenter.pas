@@ -317,7 +317,7 @@ end;
 procedure TioModelPresenter.CancelIfEditing;
 begin
   if CheckAdapter and Editing then
-    Self.Cancel;
+    Cancel;
 end;
 
 function TioModelPresenter.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;

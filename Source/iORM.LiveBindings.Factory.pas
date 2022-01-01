@@ -53,7 +53,6 @@ type
     class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
       : IioContainedBindSourceAdapter;
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
-    class function Notification(ASender: TObject; ASubject: TObject; ANotificationType: TioBSANotificationType): IioBSANotification;
     class function GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioViewDataType;
@@ -218,11 +217,6 @@ end;
 class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
 begin
   Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
-end;
-
-class function TioLiveBindingsFactory.Notification(ASender, ASubject: TObject; ANotificationType: TioBSANotificationType): IioBSANotification;
-begin
-//  Result := TioBSANotification.Create(ASender, ASubject, ANotificationType);
 end;
 
 end.
