@@ -33,6 +33,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Where;
+    property ItemCount;
     // Added properties
     property ObjState: TioBindSourceObjStateManager read GetObjState;
   published
@@ -52,6 +53,16 @@ type
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveObjState;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioCustomDataSet read GetSourceDataSet write SetSourceDataSet;
+    // Published Events: selectors
+    property OnBeforeSelectionObject;
+    property OnSelectionObject;
+    property OnAfterSelectionObject;
+    property OnBeforeSelectionInterface;
+    property OnSelectionInterface;
+    property OnAfterSelectionInterface;
+    // Published properties: selectors
+    property OnReceiveSelectionCloneObject;
+    property OnReceiveSelectionFreeObject;
   end;
 
 implementation
