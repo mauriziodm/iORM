@@ -128,8 +128,8 @@ type
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
-    function IsMasterBS: boolean; virtual; abstract;
-    function IsDetailBS: boolean; virtual; abstract;
+    function IsMasterBS: Boolean; virtual; abstract;
+    function IsDetailBS: Boolean; virtual; abstract;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -138,6 +138,40 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    // Public properties
+    // property Editing; // NB: this property is already declared as public in TBaseObjectBindSource ancestor class
+    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
+    property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
+    property Where: IioWhere read GetWhere write SetWhere; // public: Master
+    property ItemCount: Integer read GetCount; // Public: Master+Detail
+    // Published properties
+    property TypeName: String read FTypeName write SetTypeName; // published: Master
+    property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
+    property Async: Boolean read FAsync write SetAsync default False; // published: Master
+    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
+    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
+    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
+    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
+    property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
+    property MasterBindSource: TioMasterBindSource read FMasterBindSource write FMasterBindSource; // published: Detail
+    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
+    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
+    // Published properties: selectors
+    property SelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor; // published: Master
+    // Published properties: paging
+    property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
+    // Published Events: selectors
+    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
+    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
+    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
+    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
+    // Published properties: selectors
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -171,46 +205,6 @@ type
     function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
-    // ----------------------------------------------------------------------------------------------------------------------------
-    // Properties
-    property Where: IioWhere read GetWhere write SetWhere;
-    property State: TBindSourceAdapterState read GetState;
-    property ItemCount: Integer read GetCount;
-    property IsDetail: Boolean read GetIsDetail;
-    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting;
-  published
-    // Events
-    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject
-      write FonBeforeSelectionObject;
-    property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
-    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject
-      write FonAfterSelectionObject;
-    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface
-      write FonBeforeSelectionInterface;
-    property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
-    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface
-      write FonAfterSelectionInterface;
-    // Properties
-    property TypeName: String read FTypeName write SetTypeName;
-    property TypeAlias: String read FTypeAlias write SetTypeAlias;
-    property Async: Boolean read FAsync write SetAsync;
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData;
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist;
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType;
-    property WhereStr: TStrings read FWhereStr write SetWhereStr;
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters
-      write SetWhereDetailsFromDetailAdapters;
-    property OrderBy: String read FOrderBy Write SetOrderBy;
-    property MasterBindSource: TioMasterBindSource read FMasterBindSource write FMasterBindSource;
-    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName;
-    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification;
-    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
-    // Selectors
-    property SelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor;
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
-    // Paging
-    property Paging: TioCommonBSAPageManager read GetPaging write SetPaging;
   end;
 
 implementation
@@ -319,8 +313,7 @@ begin
     begin
       if CheckActiveAdapter then
         GetActiveBindSourceAdapter.LoadPage;
-    end
-  );
+    end);
 end;
 
 destructor TioPrototypeBindSource.Destroy;
@@ -382,8 +375,8 @@ begin
       ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
         TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
     else
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging)
-        .Add(WhereStr.Text)._OrderBy(FOrderBy), FViewDataType, FAutoLoadData, nil, True).AsTBindSourceAdapter;
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
+        ._OrderBy(FOrderBy), FViewDataType, FAutoLoadData, nil, True).AsTBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
@@ -471,7 +464,8 @@ function TioPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceA
 begin
   Result := nil;
   if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
-    raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter', Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
+    raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter',
+      Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSource.GetAutoPost: Boolean;
@@ -519,7 +513,8 @@ begin
     Result := False;
 end;
 
-function TioPrototypeBindSource.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+function TioPrototypeBindSource.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil)
+  : IioActiveBindSourceAdapter;
 var
   AContainedBSA: IioContainedBindSourceAdapter;
 begin
@@ -568,7 +563,7 @@ begin
   end
   else
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
-    raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSource.GetIsDetail: Boolean;
@@ -824,9 +819,9 @@ end;
 procedure TioPrototypeBindSource.SetPaging(const Value: TioCommonBSAPageManager);
 begin
   // In reality this property would be read-only but if I left it read-only
-  //  then it no longer writes me the values of the sub-properties in the DFM file.
-  //  So I also put the set method where, however, I raise an exception if someone
-  //  tries to set a value.
+  // then it no longer writes me the values of the sub-properties in the DFM file.
+  // So I also put the set method where, however, I raise an exception if someone
+  // tries to set a value.
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
