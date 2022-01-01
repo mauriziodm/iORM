@@ -10,11 +10,11 @@ uses
 
 type
 
-  TioDataSet = class;
+  TioCustomDataSet = class;
 
-  TioMasterDataSet = TioDataSet;
+  TioMasterDataSet = TioCustomDataSet;
 
-  TioDataSet = class(TioBSADataSet, IioNotifiableBindSource)
+  TioCustomDataSet = class(TioBSABaseDataSet, IioNotifiableBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;
@@ -32,7 +32,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     // Selectors
-    FSelectorFor: TioDataSet;
+    FSelectorFor: TioCustomDataSet;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali ModelPresenters di dettaglio
@@ -44,7 +44,7 @@ type
     // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
     // Ad esempio capitava che i filtri dei presenters di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
-    FDetailDatasetContainer: TList<TioDataSet>;
+    FDetailDatasetContainer: TList<TioCustomDataSet>;
     // Selection related events
     FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
     FonSelectionObject: TioBSASelectionObjectEvent;
@@ -126,14 +126,14 @@ type
     property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
-    property SelectorFor: TioDataSet read FSelectorFor write FSelectorFor; // published: Master
+    property SelectorFor: TioCustomDataSet read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
-    procedure RegisterDetailPresenter(const ADetailDataSet: TioDataSet);
+    procedure RegisterDetailPresenter(const ADetailDataSet: TioCustomDataSet);
     procedure ForceDetailAdaptersCreation;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
@@ -171,13 +171,13 @@ uses
 
 { TioDataSet }
 
-procedure TioDataSet.CancelIfEditing;
+procedure TioCustomDataSet.CancelIfEditing;
 begin
   if CheckAdapter and Editing then
     Cancel;
 end;
 
-function TioDataSet.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
+function TioCustomDataSet.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
   if ACreateIfNotAssigned and (GetActiveBindSourceAdapter = nil) then
@@ -186,7 +186,7 @@ begin
   Result := (GetActiveBindSourceAdapter <> nil);
 end;
 
-constructor TioDataSet.Create(AOwner: TComponent);
+constructor TioCustomDataSet.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoPost := True;
@@ -223,7 +223,7 @@ begin
   SetWhereStr(FWhereStr); // set TStringList.onChange event handler
 end;
 
-function TioDataSet.Current: TObject;
+function TioCustomDataSet.Current: TObject;
 begin
   if CheckAdapter(True) then
     Result := GetActiveBindSourceAdapter.Current
@@ -231,7 +231,7 @@ begin
     Result := nil;
 end;
 
-function TioDataSet.CurrentAs<T>: T;
+function TioCustomDataSet.CurrentAs<T>: T;
 var
   LCurrent: TObject;
 begin
@@ -239,7 +239,7 @@ begin
   Result := TioUtilities.CastObjectToGeneric<T>(LCurrent);
 end;
 
-function TioDataSet.CurrentMasterObject: TObject;
+function TioCustomDataSet.CurrentMasterObject: TObject;
 begin
   if CheckAdapter and IsDetailBS then
     Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
@@ -247,7 +247,7 @@ begin
     Result := nil;
 end;
 
-function TioDataSet.CurrentMasterObjectAs<T>: T;
+function TioCustomDataSet.CurrentMasterObjectAs<T>: T;
 var
   LMasterObject: TObject;
 begin
@@ -255,7 +255,7 @@ begin
   Result := TioUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
-destructor TioDataSet.Destroy;
+destructor TioCustomDataSet.Destroy;
 begin
   FWhereStr.Free;
   // If the DetailPresenterContainer was created then destroy it
@@ -269,31 +269,31 @@ begin
   inherited;
 end;
 
-procedure TioDataSet.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioCustomDataSet.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioDataSet.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioCustomDataSet.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioDataSet.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioCustomDataSet.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionInterface) then
     FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioDataSet.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioCustomDataSet.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioDataSet.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioCustomDataSet.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 var
   LPreviousCurrentObj: TObject;
 begin
@@ -306,22 +306,22 @@ begin
     LPreviousCurrentObj.Free;
 end;
 
-procedure TioDataSet.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioCustomDataSet.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionInterface) then
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
 end;
 
-procedure TioDataSet.ForceDetailAdaptersCreation;
+procedure TioCustomDataSet.ForceDetailAdaptersCreation;
 var
-  LDetailDataSet: TioDataSet;
+  LDetailDataSet: TioCustomDataSet;
 begin
   if Assigned(FDetailDatasetContainer) then
     for LDetailDataSet in FDetailDatasetContainer do
       LDetailDataSet.CheckAdapter(True);
 end;
 
-function TioDataSet.GetAutoPost: Boolean;
+function TioCustomDataSet.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
     Result := GetActiveBindSourceAdapter.ioAutoPost
@@ -329,12 +329,12 @@ begin
     Result := FAutoPost;
 end;
 
-function TioDataSet.GetAutoRefreshOnNotification: TioAutoRefreshType;
+function TioCustomDataSet.GetAutoRefreshOnNotification: TioAutoRefreshType;
 begin
   Result := FAutoRefreshOnNotification;
 end;
 
-function TioDataSet.GetCount: Integer;
+function TioCustomDataSet.GetCount: Integer;
 begin
   if CheckAdapter then
     Result := GetActiveBindSourceAdapter.ItemCount
@@ -342,7 +342,7 @@ begin
     Result := 0;
 end;
 
-function TioDataSet.GetEditing: Boolean;
+function TioCustomDataSet.GetEditing: Boolean;
 begin
   if CheckAdapter then
     Result := GetActiveBindSourceAdapter.State in seEditModes
@@ -350,7 +350,7 @@ begin
     Result := False
 end;
 
-function TioDataSet.GetIsInterfacePresenting: Boolean;
+function TioCustomDataSet.GetIsInterfacePresenting: Boolean;
 begin
   if CheckAdapter then
     Result := GetActiveBindSourceAdapter.IsInterfaceBSA
@@ -358,12 +358,12 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
-function TioDataSet.GetPaging: TioCommonBSAPageManager;
+function TioCustomDataSet.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
 end;
 
-function TioDataSet.GetState: TBindSourceAdapterState;
+function TioCustomDataSet.GetState: TBindSourceAdapterState;
 begin
   if CheckAdapter then
     Result := GetActiveBindSourceAdapter.State
@@ -371,7 +371,7 @@ begin
     Result := TBindSourceAdapterState.seInactive
 end;
 
-function TioDataSet.GetWhere: IioWhere;
+function TioCustomDataSet.GetWhere: IioWhere;
 begin
   // If the adapter exists the return the property of the adapter
   // else return the Self.FWhere
@@ -388,7 +388,7 @@ begin
   Result := FWhere;
 end;
 
-procedure TioDataSet.InternalPreOpen;
+procedure TioCustomDataSet.InternalPreOpen;
 begin
   if not CheckAdapter(True) then
     raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
@@ -396,7 +396,7 @@ begin
   inherited;
 end;
 
-procedure TioDataSet.Loaded;
+procedure TioCustomDataSet.Loaded;
 begin
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
@@ -413,43 +413,43 @@ begin
   inherited;
 end;
 
-procedure TioDataSet.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+procedure TioCustomDataSet.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
 end;
 
-procedure TioDataSet.PersistAll;
+procedure TioCustomDataSet.PersistAll;
 begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.PersistAll;
 end;
 
-procedure TioDataSet.PersistCurrent;
+procedure TioCustomDataSet.PersistCurrent;
 begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.PersistCurrent;
 end;
 
-procedure TioDataSet.PostIfEditing;
+procedure TioCustomDataSet.PostIfEditing;
 begin
   if CheckAdapter and Editing then
     Post;
 end;
 
-procedure TioDataSet.Refresh(const AReloadData, ANotify: Boolean);
+procedure TioCustomDataSet.Refresh(const AReloadData, ANotify: Boolean);
 begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.Refresh(AReloadData, ANotify);
 end;
 
-procedure TioDataSet.RegisterDetailPresenter(const ADetailDataSet: TioDataSet);
+procedure TioCustomDataSet.RegisterDetailPresenter(const ADetailDataSet: TioCustomDataSet);
 begin
   if not Assigned(FDetailDatasetContainer) then
-    FDetailDatasetContainer := TList<TioDataSet>.Create;
+    FDetailDatasetContainer := TList<TioCustomDataSet>.Create;
   FDetailDatasetContainer.Add(ADetailDataSet);
 end;
 
-procedure TioDataSet.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
+procedure TioCustomDataSet.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
@@ -474,7 +474,7 @@ begin
     raise EioException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
-procedure TioDataSet.SelectCurrent(ASelectionType: TioSelectionType);
+procedure TioCustomDataSet.SelectCurrent(ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
 begin
@@ -490,7 +490,7 @@ begin
     Select<TObject>(Current, ASelectionType);
 end;
 
-procedure TioDataSet.SetAsync(const Value: Boolean);
+procedure TioCustomDataSet.SetAsync(const Value: Boolean);
 begin
   FAsync := Value;
   // Update the adapter
@@ -498,7 +498,7 @@ begin
     GetActiveBindSourceAdapter.ioAsync := Value;
 end;
 
-procedure TioDataSet.SetAutoLoadData(const Value: Boolean);
+procedure TioCustomDataSet.SetAutoLoadData(const Value: Boolean);
 begin
   FAutoLoadData := Value;
   // Update the adapter
@@ -506,7 +506,7 @@ begin
     GetActiveBindSourceAdapter.ioAutoLoadData := Value;
 end;
 
-procedure TioDataSet.SetAutoPersist(const Value: Boolean);
+procedure TioCustomDataSet.SetAutoPersist(const Value: Boolean);
 begin
   FAutoPersist := Value;
   // Update the adapter
@@ -514,7 +514,7 @@ begin
     GetActiveBindSourceAdapter.ioAutoPersist := Value;
 end;
 
-procedure TioDataSet.SetAutoPost(const Value: Boolean);
+procedure TioCustomDataSet.SetAutoPost(const Value: Boolean);
 begin
   FAutoPost := Value;
   // Update the adapter
@@ -522,12 +522,12 @@ begin
     GetActiveBindSourceAdapter.ioAutoPost := Value;
 end;
 
-procedure TioDataSet.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+procedure TioCustomDataSet.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
 begin
   FAutoRefreshOnNotification := Value;
 end;
 
-procedure TioDataSet.SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+procedure TioCustomDataSet.SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   inherited;
   // Init the BSA
@@ -541,7 +541,7 @@ begin
   GetActiveBindSourceAdapter.SetBindSource(Self);
 end;
 
-procedure TioDataSet.SetOrderBy(const Value: String);
+procedure TioCustomDataSet.SetOrderBy(const Value: String);
 begin
   FOrderBy := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
@@ -550,7 +550,7 @@ begin
     GetActiveBindSourceAdapter.ioWhere.SetOrderBySql(Value);
 end;
 
-procedure TioDataSet.SetPaging(const Value: TioCommonBSAPageManager);
+procedure TioCustomDataSet.SetPaging(const Value: TioCommonBSAPageManager);
 begin
   // In reality this property would be read-only but if I left it read-only
   //  then it no longer writes me the values of the sub-properties in the DFM file.
@@ -559,7 +559,7 @@ begin
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
-procedure TioDataSet.SetTypeAlias(const Value: String);
+procedure TioCustomDataSet.SetTypeAlias(const Value: String);
 begin
   FTypeAlias := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
@@ -568,7 +568,7 @@ begin
     GetActiveBindSourceAdapter.ioTypeAlias := Value;
 end;
 
-procedure TioDataSet.SetTypeName(const Value: String);
+procedure TioCustomDataSet.SetTypeName(const Value: String);
 begin
   FTypeName := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
@@ -577,7 +577,7 @@ begin
     GetActiveBindSourceAdapter.ioTypeName := Value;
 end;
 
-procedure TioDataSet.SetWhere(const AWhere: IioWhere);
+procedure TioCustomDataSet.SetWhere(const AWhere: IioWhere);
 begin
   AWhere.SetPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
   FWhere := AWhere;
@@ -586,7 +586,7 @@ begin
     GetActiveBindSourceAdapter.ioWhere := AWhere;
 end;
 
-procedure TioDataSet.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
+procedure TioCustomDataSet.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
   // Update the adapter
@@ -594,7 +594,7 @@ begin
     GetActiveBindSourceAdapter.ioWhereDetailsFromDetailAdapters := Value;
 end;
 
-procedure TioDataSet.SetWhereStr(const Value: TStrings);
+procedure TioCustomDataSet.SetWhereStr(const Value: TStrings);
 begin
   FWhereStr.Assign(Value);
   // If in DesignTime then Exit
@@ -610,12 +610,12 @@ begin
   WhereOnChangeEventHandler(Self);
 end;
 
-procedure TioDataSet.WhereOnChangeEventHandler(Sender: TObject);
+procedure TioCustomDataSet.WhereOnChangeEventHandler(Sender: TObject);
 begin
   SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FWhereStr.Text));
 end;
 
-procedure TioDataSet._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioCustomDataSet._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   // If an adapter already exists then raise an exception
   if CheckAdapter then

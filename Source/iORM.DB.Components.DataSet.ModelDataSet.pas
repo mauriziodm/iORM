@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioModelDataSet = class(TioBSADataSet, IioVMBridgeClientComponent, IioCrossViewMasterSource)
+  TioModelDataSet = class(TioBSABaseDataSet, IioVMBridgeClientComponent, IioCrossViewMasterSource)
   private
     FViewModelBridge: TioViewModelBridge;
     FModelPresenter: String;

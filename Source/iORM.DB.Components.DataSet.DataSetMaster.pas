@@ -8,13 +8,13 @@ uses
 
 type
 
-  TioDataSetMaster = class(TioDataSet, IioBindSourceObjStateClient)
+  TioDataSetMaster = class(TioCustomDataSet, IioBindSourceObjStateClient)
   private
     FObjState: TioBindSourceObjStateManager;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
-    function GetSourceDataSet: TioDataSet;
-    procedure SetSourceDataSet(const Value: TioDataSet);
+    function GetSourceDataSet: TioCustomDataSet;
+    procedure SetSourceDataSet(const Value: TioCustomDataSet);
     // Added methods
     function GetObjState: TioBindSourceObjStateManager;
     function IsActive: Boolean;
@@ -51,7 +51,7 @@ type
     // Added properties
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveObjState;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourceDataSet: TioDataSet read GetSourceDataSet write SetSourceDataSet;
+    property SourceDataSet: TioCustomDataSet read GetSourceDataSet write SetSourceDataSet;
   end;
 
 implementation
@@ -102,7 +102,7 @@ begin
   Result := FOnRecordChangeAction;
 end;
 
-function TioDataSetMaster.GetSourceDataSet: TioDataSet;
+function TioDataSetMaster.GetSourceDataSet: TioCustomDataSet;
 begin
   Result := MasterDataSet;
 end;
@@ -134,7 +134,7 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSet);
+procedure TioDataSetMaster.SetSourceDataSet(const Value: TioCustomDataSet);
 begin
   MasterDataSet := Value;
 end;

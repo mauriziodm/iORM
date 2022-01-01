@@ -28,7 +28,7 @@ type
 
   PValueBuffer = ^TValueBuffer;
 
-  TioCustomDataSet = class(TDataSet)
+  TioBaseDataSet = class(TDataSet)
   protected
     // status
     FIsTableOpen: Boolean;
@@ -114,7 +114,7 @@ type
     property OnPostError;
   end;
 
-  TioBSADataSet = class(TioCustomDataSet)
+  TioBSABaseDataSet = class(TioBaseDataSet)
   private
     // Map of the base class
     FMap: IioMap;
@@ -151,7 +151,7 @@ type
   TioAbstractBlobStream = class(TMemoryStream)
   strict protected
     FField: TBlobField;
-    FDataset: TioBSADataSet;
+    FDataset: TioBSABaseDataSet;
     FModified: Boolean;
     FIsReadingBlobData: Boolean;
     procedure ReadBlobData; virtual; abstract;
@@ -202,7 +202,7 @@ uses
 /// //////////////////////////////////////////////
 
 // I: open the dataset
-procedure TioCustomDataSet.InternalOpen;
+procedure TioBaseDataSet.InternalOpen;
 begin
   InternalPreOpen; // custom method for subclasses
 
@@ -231,7 +231,7 @@ begin
   FIsTableOpen := True;
 end;
 
-procedure TioCustomDataSet.InternalClose;
+procedure TioBaseDataSet.InternalClose;
 begin
   // disconnet field objects
   BindFields(False);
@@ -245,7 +245,7 @@ begin
 end;
 
 // I: is table open
-function TioCustomDataSet.IsCursorOpen: Boolean;
+function TioBaseDataSet.IsCursorOpen: Boolean;
 begin
   Result := FIsTableOpen;
 end;
@@ -258,7 +258,7 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: set the requested bookmark as current record
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.InternalGotoBookmark(Bookmark: Pointer);
+procedure TioBaseDataSet.InternalGotoBookmark(Bookmark: Pointer);
 var
   ReqBookmark: Integer;
 begin
@@ -269,7 +269,7 @@ begin
     raise EioException.Create(Self.ClassName, 'InternalGotoBookmark', 'Bookmark ' + ReqBookmark.ToString + ' not found');
 end;
 
-procedure TioCustomDataSet.InternalGotoBookmark(Bookmark: TBookmark);
+procedure TioBaseDataSet.InternalGotoBookmark(Bookmark: TBookmark);
 var
   ReqBookmark: Integer;
 begin
@@ -283,7 +283,7 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: same as above (but passes a buffer)
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
+procedure TioBaseDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
 var
   ReqBookmark: Integer;
 begin
@@ -291,7 +291,7 @@ begin
   InternalGotoBookmark(@ReqBookmark); // NB: Deprecated
 end;
 
-procedure TioCustomDataSet.InternalSetToRecord(Buffer: TRecBuf);
+procedure TioBaseDataSet.InternalSetToRecord(Buffer: TRecBuf);
 var
   ReqBookmark: Integer;
 begin
@@ -301,36 +301,36 @@ end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-function TioCustomDataSet.GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag;
+function TioBaseDataSet.GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag;
 begin
   Result := PioRecInfo(Buffer + FRecordSize).BookmarkFlag;
 end;
 
-function TioCustomDataSet.GetBookmarkFlag(Buffer: TRecBuf): TBookmarkFlag;
+function TioBaseDataSet.GetBookmarkFlag(Buffer: TRecBuf): TBookmarkFlag;
 begin
   Result := PioRecInfo(Buffer + FRecordSize)^.BookmarkFlag;
 end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.SetBookmarkFlag(Buffer: TRecordBuffer; Value: TBookmarkFlag);
+procedure TioBaseDataSet.SetBookmarkFlag(Buffer: TRecordBuffer; Value: TBookmarkFlag);
 begin
   PioRecInfo(Buffer + FRecordSize).BookmarkFlag := Value;
 end;
 
-procedure TioCustomDataSet.SetBookmarkFlag(Buffer: TRecBuf; AValue: TBookmarkFlag);
+procedure TioBaseDataSet.SetBookmarkFlag(Buffer: TRecBuf; AValue: TBookmarkFlag);
 begin
   PioRecInfo(Buffer + FRecordSize)^.BookmarkFlag := AValue;
 end;
 
 // II: Go to a special position before the first record
-procedure TioCustomDataSet.InternalFirst;
+procedure TioBaseDataSet.InternalFirst;
 begin
   FCurrentRecord := BofCrack;
 end;
 
 // II: Go to a special position after the last record
-procedure TioCustomDataSet.InternalLast;
+procedure TioBaseDataSet.InternalLast;
 begin
   EofCrack := InternalRecordCount;
   FCurrentRecord := EofCrack;
@@ -339,13 +339,13 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: read the bookmark data from record buffer
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+procedure TioBaseDataSet.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
   Integer(Data^) := PioRecInfo(Buffer + FRecordSize).Bookmark;
 end;
 
 // II: retrieve bookmarks flags from buffer
-procedure TioCustomDataSet.GetBookmarkData(Buffer: TRecBuf; Data: TBookmark);
+procedure TioBaseDataSet.GetBookmarkData(Buffer: TRecBuf; Data: TBookmark);
 begin
   PInteger(Data)^ := PioRecInfo(Buffer + FRecordSize)^.Bookmark;
 end;
@@ -353,31 +353,31 @@ end;
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // II: set the bookmark data in the buffer
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-procedure TioCustomDataSet.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+procedure TioBaseDataSet.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
   PioRecInfo(Buffer + FRecordSize).Bookmark := Integer(Data^);
 end;
 
 // II: change the bookmark flags in the buffer
-procedure TioCustomDataSet.SetBookmarkData(Buffer: TRecBuf; Data: TBookmark);
+procedure TioBaseDataSet.SetBookmarkData(Buffer: TRecBuf; Data: TBookmark);
 begin
   PioRecInfo(Buffer + FRecordSize)^.Bookmark := PInteger(Data)^;
 end;
 
 // II (optional): Record count
-function TioCustomDataSet.GetRecordCount: Longint;
+function TioBaseDataSet.GetRecordCount: Longint;
 begin
   CheckActive;
   Result := InternalRecordCount;
 end;
 
-function TioCustomDataSet.GetRecordInfo: TioRecInfo;
+function TioBaseDataSet.GetRecordInfo: TioRecInfo;
 begin
   Result := PioRecInfo(ActiveBuffer)^;
 end;
 
 // II (optional): Get the number of the current record
-function TioCustomDataSet.GetRecNo: Longint;
+function TioBaseDataSet.GetRecNo: Longint;
 begin
   UpdateCursorPos;
   if FCurrentRecord < 0 then
@@ -387,7 +387,7 @@ begin
 end;
 
 // II (optional): Move to the given record number
-procedure TioCustomDataSet.SetRecNo(Value: Integer);
+procedure TioBaseDataSet.SetRecNo(Value: Integer);
 begin
   CheckBrowseMode;
   if (Value >= 1) and (Value <= InternalRecordCount) then
@@ -404,7 +404,7 @@ end;
 
 // III: Retrieve data for current, previous, or next record
 // (eventually moving to it) and return the status
-function TioCustomDataSet.GetRecord(Buffer: TRecordBuffer; GetMode: TGetMode; DoCheck: Boolean): TGetResult;
+function TioBaseDataSet.GetRecord(Buffer: TRecordBuffer; GetMode: TGetMode; DoCheck: Boolean): TGetResult;
 begin
   Result := grOK; // default
   case GetMode of
@@ -430,31 +430,31 @@ begin
 end;
 
 // III: Initialize the record (set to 0)
-procedure TioCustomDataSet.InternalInitRecord(Buffer: TRecordBuffer);
+procedure TioBaseDataSet.InternalInitRecord(Buffer: TRecordBuffer);
 begin
   FillChar(Buffer^, FRecordBufferSize, 0);
 end;
 
 // III: Free the buffer
-procedure TioCustomDataSet.FreeRecordBuffer(var Buffer: TRecordBuffer);
+procedure TioBaseDataSet.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
   FreeMem(Buffer);
 end;
 
 /// III: Determine the size of each record buffer in memory
-function TioCustomDataSet.GetRecordSize: Word;
+function TioBaseDataSet.GetRecordSize: Word;
 begin
   Result := FRecordSize; // data only
 end;
 
 /// III: Allocate a buffer for the record
-function TioCustomDataSet.AllocRecordBuffer: TRecordBuffer;
+function TioBaseDataSet.AllocRecordBuffer: TRecordBuffer;
 begin
   GetMem(Result, FRecordBufferSize);
 end;
 
 // III: Delete the current record
-procedure TioCustomDataSet.InternalDelete;
+procedure TioBaseDataSet.InternalDelete;
 begin
   // not supported in this generic version
   raise EioException.Create(Self.ClassName, 'InternalDelete', 'Operation not supported');
@@ -462,42 +462,42 @@ end;
 
 // default exception handling
 
-procedure TioCustomDataSet.InternalHandleException;
+procedure TioBaseDataSet.InternalHandleException;
 begin
   // special purpose exception handling
   // do nothing
 end;
 
-procedure TioCustomDataSet.InternalAddRecord(Buffer: TRecBuf; Append: Boolean);
+procedure TioBaseDataSet.InternalAddRecord(Buffer: TRecBuf; Append: Boolean);
 begin
   // not supported in this generic version
   raise EioException.Create(Self.ClassName, 'InternalAddRecord', 'Operation not supported');
 end;
 
-procedure TioCustomDataSet.InternalPost;
+procedure TioBaseDataSet.InternalPost;
 begin
   // not supported in this generic version
   raise EioException.Create(Self.ClassName, 'InternalPost', 'Operation not supported');
 end;
 
-procedure TioCustomDataSet.InternalAfterOpen;
+procedure TioBaseDataSet.InternalAfterOpen;
 begin
   // nothing to do: subclasses can hook in here
 end;
 
-procedure TioCustomDataSet.InternalPreOpen;
+procedure TioBaseDataSet.InternalPreOpen;
 begin
   // nothing to do: subclasses can hook in here
 end;
 
 { TMdListDataSet }
 
-function TioBSADataSet.CheckAdapter: Boolean;
+function TioBSABaseDataSet.CheckAdapter: Boolean;
 begin
   Result := (FBindSourceAdapter <> nil) and FBindSourceAdapter.CanActivate;
 end;
 
-function TioBSADataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
+function TioBSABaseDataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 var
   LProperty: IioProperty;
 begin
@@ -519,7 +519,7 @@ begin
   end;
 end;
 
-procedure TioBSADataSet.DoAfterScroll;
+procedure TioBSABaseDataSet.DoAfterScroll;
 begin
   inherited;
   // Propagate the operation to the linked BindSourceAdapter
@@ -533,17 +533,17 @@ begin
   end;
 end;
 
-function TioBSADataSet.GetCanModify: Boolean;
+function TioBSABaseDataSet.GetCanModify: Boolean;
 begin
   Result := True; // read-write
 end;
 
-function TioBSADataSet.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+function TioBSABaseDataSet.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := FBindSourceAdapter;
 end;
 
-procedure TioBSADataSet.InternalCancel;
+procedure TioBSABaseDataSet.InternalCancel;
 begin
   // If destroying then exit
   if csDestroying in ComponentState then
@@ -557,7 +557,7 @@ begin
   end;
 end;
 
-procedure TioBSADataSet.InternalDelete;
+procedure TioBSABaseDataSet.InternalDelete;
 begin
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
@@ -568,7 +568,7 @@ begin
   end;
 end;
 
-procedure TioBSADataSet.InternalEdit;
+procedure TioBSABaseDataSet.InternalEdit;
 begin
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
@@ -580,7 +580,7 @@ begin
 end;
 
 // -----------------------------------------------------------------------------
-procedure TioBSADataSet.InternalInitFieldDefs;
+procedure TioBSABaseDataSet.InternalInitFieldDefs;
 // InitFieldDefsByProperties
   procedure InitFieldDefsByProperties;
   var
@@ -618,7 +618,7 @@ begin
     InitFieldDefsByProperties;
 end;
 
-procedure TioBSADataSet.InternalInsert;
+procedure TioBSABaseDataSet.InternalInsert;
 begin
   // Disable all the DataSetLinks on the BindSourceAdapter
   // NB: DataSetLink is used to propagate the operation (insert, post,
@@ -647,7 +647,7 @@ end;
 
 // -----------------------------------------------------------------------------
 
-procedure TioBSADataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
+procedure TioBSABaseDataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
 var
   LValue: TValue;
   LDateTime: TDateTime;
@@ -747,7 +747,7 @@ begin
     GetActiveBindSourceAdapter.Post;
 end;
 
-procedure TioBSADataSet.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+procedure TioBSABaseDataSet.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   if not Assigned(AActiveBindSourceAdpter) then
     raise EioException.Create(ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
@@ -765,7 +765,7 @@ begin
 end;
 
 // Calc the record index for all possibles situations
-function TioBSADataSet.GetRecordIdx: Integer;
+function TioBSABaseDataSet.GetRecordIdx: Integer;
 var
   LBookmarkFlag: TBookmarkFlag;
 begin
@@ -793,7 +793,7 @@ begin
 end;
 
 // Convert and load Data into the buffer (GetFieldData)
-procedure TioBSADataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
+procedure TioBSABaseDataSet.ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
 var
   LTempValueBuffer: TValueBuffer;
 begin
@@ -807,7 +807,7 @@ begin
   DataConvert(AField, LTempValueBuffer, ABuffer, ANativeFormat);
 end;
 
-function TioBSADataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
+function TioBSABaseDataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
 var
   LValue: TValue;
   LRecordIndex: Integer;
@@ -928,7 +928,7 @@ begin
   end;
 end;
 
-procedure TioBSADataSet.InternalLoadCurrentRecord(Buffer: TRecordBuffer);
+procedure TioBSABaseDataSet.InternalLoadCurrentRecord(Buffer: TRecordBuffer);
 // var
 // LBookmarkFlag: TBookmarkFlag;
 begin
@@ -941,7 +941,7 @@ begin
   end;
 end;
 
-procedure TioBSADataSet.InternalPost;
+procedure TioBSABaseDataSet.InternalPost;
 begin
   // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
@@ -959,14 +959,14 @@ begin
   end;
 end;
 
-procedure TioBSADataSet.InternalPreOpen;
+procedure TioBSABaseDataSet.InternalPreOpen;
 begin
   // The buffer of the record contains the index of the current
   // record/object on the BindSourceAdapter
   FRecordSize := sizeof(Integer); // Integer size (4 or 8?)
 end;
 
-function TioBSADataSet.InternalRecordCount: Integer;
+function TioBSABaseDataSet.InternalRecordCount: Integer;
 begin
   // Get the RecordCount from the linked BindSourceAdapter
   Result := FBindSourceAdapter.ItemCount;
@@ -1005,7 +1005,7 @@ begin
   FIsReadingBlobData := False;
   FModified := False;
   FField := AField;
-  FDataset := (AField.DataSet as TioBSADataSet);
+  FDataset := (AField.DataSet as TioBSABaseDataSet);
   if AMode <> TBlobStreamMode.bmRead then
   begin
     if AField.ReadOnly or not AField.DataSet.CanModify then
