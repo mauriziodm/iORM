@@ -46,7 +46,7 @@ type
 
   TioMasterBindSource = TioPrototypeBindSource;
 
-  TioPrototypeBindSource = class(TPrototypeBindSource, IioNotifiableBindSource)
+  TioPrototypeBindSource = class(TCustomPrototypeBindSource, IioNotifiableBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;
