@@ -3,7 +3,7 @@ unit iORM.DB.Components.DataSet.DataSetMaster;
 interface
 
 uses
-  iORM.DB.Components.DataSet.DataSet, iORM.LiveBindings.Interfaces,
+  iORM.DB.Components.DataSet.CustomDataSet, iORM.LiveBindings.Interfaces,
   iORM.DB.Components.BindSourceObjState, System.Classes;
 
 type

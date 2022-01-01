@@ -1,4 +1,4 @@
-unit iORM.DB.Components.DataSet.DataSet;
+unit iORM.DB.Components.DataSet.CustomDataSet;
 
 interface
 
