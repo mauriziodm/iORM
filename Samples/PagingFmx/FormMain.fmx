@@ -137,9 +137,6 @@ object MainForm: TMainForm
     ioViewDataType = dtList
     ioWhereDetailsFromDetailAdapters = False
     ioAutoRefreshOnNotification = arEnabledNoReload
-    ioPropagateEdit = False
-    ioPropagatePost = False
-    ioPropagatePersist = False
     ioPaging.PageSize = 10
     ioPaging.PagingType = ptProgressiveAuto
     Left = 256
