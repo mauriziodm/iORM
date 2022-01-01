@@ -446,7 +446,7 @@ end;
 
 function TioPrototypeBindSource.CurrentMasterObject: TObject;
 begin
-  if CheckAdapter and IsDetail then
+  if CheckAdapter and IsDetailBS then
     Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
