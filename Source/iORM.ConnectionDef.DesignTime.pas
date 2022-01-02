@@ -35,7 +35,7 @@
 
 
 
-unit iORM.MVVM.Components.ModelPresenter.DEsignTime;
+unit iORM.ConnectionDef.DesignTime;
 
 interface
 
@@ -44,11 +44,18 @@ interface
 implementation
 
 uses
-  System.Classes, iORM.MVVM.Components.ModelPresenter;
+  System.Classes,
+  iORM.DB.Components.ConnectionDef,
+  iORM.DB.Components.ConnectionDef.MSSQLServer;
 
   procedure Register;
   begin
-    RegisterComponents('iORM', [TioModelPresenter]);
+    RegisterComponents('iORM', [TioSQLMonitor]);
+    RegisterComponents('iORM', [TioRESTConnectionDef]);
+    RegisterComponents('iORM', [TioSQLiteConnectionDef]);
+    RegisterComponents('iORM', [TioFirebirdConnectionDef]);
+    RegisterComponents('iORM', [TioSQLServerConnectionDef]);
+//    RegisterComponents('iORM', [TioMySQLConnectionDef]);
   end;
 
 end.

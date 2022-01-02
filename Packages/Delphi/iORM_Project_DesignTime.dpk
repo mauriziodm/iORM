@@ -36,14 +36,12 @@ requires
   iORM_Project;
 
 contains
-  iORM.MVVM.ViewContextProvider.DesignTime in '..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas',
-  iORM.DB.Components.ConnectionDef.DesignTime in '..\..\Source\iORM.DB.Components.ConnectionDef.DesignTime.pas',
-  iORM.DB.Components.MemTable.DesignTime in '..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas',
-  iORM.LiveBindings.PrototypeBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas',
-  iORM.MVVM.Components.ModelPresenter.DEsignTime in '..\..\Source\iORM.MVVM.Components.ModelPresenter.DEsignTime.pas',
-  iORM.LiveBindings.ModelBindSource.DesignTime in '..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas',
-  iORM.MVVM.Components.ViewModelBridge.DesignTime in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas',
-  iORM.DB.Components.DataSet.DesignTime in '..\..\Source\iORM.DB.Components.DataSet.DesignTime.pas',
-  iORM.AbstractionLayer.Framework.DesignTime in '..\..\Source\iORM.AbstractionLayer.Framework.DesignTime.pas';
+  iORM.ConnectionDef.DesignTime in '..\..\Source\iORM.ConnectionDef.DesignTime.pas',
+  iORM.LiveBindings.DesignTime in '..\..\Source\iORM.LiveBindings.DesignTime.pas',
+  iORM.DataSet.DesignTime in '..\..\Source\iORM.DataSet.DesignTime.pas',
+  iORM.AbstractionLayer.DesignTime in '..\..\Source\iORM.AbstractionLayer.DesignTime.pas',
+  iORM.StdAction.Vcl.DesignTime in '..\..\Source\iORM.StdAction.Vcl.DesignTime.pas',
+  iORM.StdAction.Fmx.DesignTime in '..\..\Source\iORM.StdAction.Fmx.DesignTime.pas',
+  iORM.MVVM.DesignTime in '..\..\Source\iORM.MVVM.DesignTime.pas';
 
 end.

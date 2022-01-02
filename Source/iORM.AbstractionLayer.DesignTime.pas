@@ -35,7 +35,7 @@
 
 
 
-unit iORM.AbstractionLayer.Framework.DesignTime;
+unit iORM.AbstractionLayer.DesignTime;
 
 interface
 

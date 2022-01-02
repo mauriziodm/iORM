@@ -99,15 +99,13 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="Designide.dcp"/>
         <DCCReference Include="iORM_Project.dcp"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.ConnectionDef.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.MemTable.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.DEsignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ViewModelBridge.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.AbstractionLayer.Framework.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ConnectionDef.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.LiveBindings.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DataSet.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.AbstractionLayer.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.StdAction.Vcl.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.StdAction.Fmx.DesignTime.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.DesignTime.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -135,6 +133,12 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_Project_DesignTime.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>iORM_Project_DesignTime.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
@@ -145,8 +149,8 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -155,14 +159,8 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\21.0\Bpl\iORM_Project_DesignTime.bpl" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>iORM_Project_DesignTime.bpl</RemoteName>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

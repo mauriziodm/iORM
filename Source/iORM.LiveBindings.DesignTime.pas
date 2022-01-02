@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.DB.Components.DataSet.DesignTime;
+unit iORM.LiveBindings.DesignTime;
 
 interface
 
@@ -40,21 +40,12 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.DB.Components.DataSet.ModelDataSet, iORM.DB.Components.DataSet.DataSetMaster, iORM.DB.Components.DataSet.DataSetDetail,
-  System.Actions, iORM.DB.Components.BindSourceObjState.StdActions.VCL, iORM.DB.Components.BindSourceObjState.StdActions.FMX;
+  System.Classes, iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.PrototypeBindSource.Master;
 
 procedure Register;
 begin
-  RegisterComponents('iORM', [TioDataSetMaster]);
-  RegisterComponents('iORM', [TioDataSetDetail]);
-  RegisterComponents('iORM', [TioModelDataSet]);
-
-  RegisterActions('iORM-BSObjState', [TioBSObjStateSave], nil);
-  RegisterActions('iORM-BSObjState', [TioBSObjStateClear], nil);
-  RegisterActions('iORM-BSObjState', [TioBSObjStatePersist], nil);
-  RegisterActions('iORM-BSObjState', [TioBSObjStateRevert], nil);
-
-  RegisterActions('iORM', [TioTestActionFMX], nil);
+  RegisterComponents('iORM', [TioPrototypeBindSourceMaster]);
+  RegisterComponents('iORM', [TioPrototypeBindSource]);
 end;
 
 end.
