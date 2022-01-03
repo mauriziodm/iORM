@@ -38,6 +38,15 @@ type
     // Added properties
     property ObjState: TioBindSourceObjStateManager read GetObjState;
   published
+    // properties redeclared from TioCustomPrototypeBindSource
+    property AutoActivate;
+//    property AutoEdit;
+//    property AutoPost;
+    property RecordCount;
+    property FieldDefs;
+//    property ScopeMappings;
+//    property OnCreateAdapter;
+    // properties redeclared from TioCUstomPrototypeBindSource
     property TypeName;
     property TypeAlias;
     property Async default False;

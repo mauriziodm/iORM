@@ -292,13 +292,13 @@ end;
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
 begin
   inherited;
-  FAutoPost := False;
+  FAutoPost := True;
   FioLoaded := False;
-  FAutoRefreshOnNotification := arEnabledNoReload;
+  FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
   FAutoLoadData := True;
-  FAutoPersist := True;
-  FViewDataType := dtList;
+  FAutoPersist := False;
+  FViewDataType := TioViewDataType.dtList;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
