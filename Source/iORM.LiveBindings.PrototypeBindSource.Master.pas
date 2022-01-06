@@ -42,8 +42,8 @@ type
     property AutoActivate;
 //    property AutoEdit;
 //    property AutoPost;
-    property RecordCount;
-    property FieldDefs;
+//    property RecordCount;
+//    property FieldDefs;
 //    property ScopeMappings;
 //    property OnCreateAdapter;
     // properties redeclared from TioCUstomPrototypeBindSource

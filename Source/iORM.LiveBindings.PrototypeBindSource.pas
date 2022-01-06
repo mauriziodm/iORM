@@ -46,7 +46,7 @@ type
 
   TioMasterBindSource = TioPrototypeBindSource;
 
-  TioPrototypeBindSource = class(TCustomPrototypeBindSource, IioNotifiableBindSource)
+  TioPrototypeBindSource = class(TPrototypeBindSource, IioNotifiableBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;
@@ -157,7 +157,6 @@ type
     property MasterBindSource: TioMasterBindSource read FMasterBindSource write FMasterBindSource; // published: Detail
     property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
-    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
     property SelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
@@ -205,6 +204,8 @@ type
     function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
     procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+  published
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
   end;
 
 implementation

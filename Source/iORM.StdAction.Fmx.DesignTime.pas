@@ -11,7 +11,11 @@ uses
 
 procedure Register;
 begin
-  RegisterActions('iORM', [TioTestActionFMX], nil);
+//  RegisterActions('iORM', [TioTestActionFMX], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStateSave], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStateClear], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStatePersist], nil);
+  RegisterActions('iORM-BSObjState', [TioBSObjStateRevert], nil);
 end;
 
 end.

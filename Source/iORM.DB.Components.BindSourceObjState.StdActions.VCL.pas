@@ -8,7 +8,7 @@ uses
 type
 
   // Base class for all BinsDourceObjState standard actions
-  TioBSObjStateStdAction = class(Vcl.ActnList.TAction)
+  TioBSObjStateStdActionVcl = class(Vcl.ActnList.TAction)
   strict private
     FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
@@ -30,7 +30,7 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioBSObjStateSave = class(TioBSObjStateStdAction)
+  TioBSObjStateSave = class(TioBSObjStateStdActionVcl)
   public
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
@@ -38,7 +38,7 @@ type
     property TargetBindSource;
   end;
 
-  TioBSObjStateClear = class(TioBSObjStateStdAction)
+  TioBSObjStateClear = class(TioBSObjStateStdActionVcl)
   public
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
@@ -48,7 +48,7 @@ type
     property TargetBindSource;
   end;
 
-  TioBSObjStatePersist = class(TioBSObjStateStdAction)
+  TioBSObjStatePersist = class(TioBSObjStateStdActionVcl)
   public
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
@@ -59,7 +59,7 @@ type
     property TargetBindSource;
   end;
 
-  TioBSObjStateRevert = class(TioBSObjStateStdAction)
+  TioBSObjStateRevert = class(TioBSObjStateStdActionVcl)
   public
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
@@ -77,7 +77,7 @@ uses
 
 { TioBSObjStateStdAction }
 
-constructor TioBSObjStateStdAction.Create(AOwner: TComponent);
+constructor TioBSObjStateStdActionVcl.Create(AOwner: TComponent);
 begin
   inherited;
   FClearAfterExecute := True;
@@ -87,19 +87,19 @@ begin
   FRaiseIfChangesExists := True;
 end;
 
-function TioBSObjStateStdAction.HandlesTarget(Target: TObject): Boolean;
+function TioBSObjStateStdActionVcl.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := Assigned(Target) and FTargetBindSource.ObjState.IsActive;
 end;
 
-procedure TioBSObjStateStdAction.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TioBSObjStateStdActionVcl.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
     TargetBindSource := nil;
 end;
 
-procedure TioBSObjStateStdAction.SetTargetBindSource(const Value: IioBindSourceObjStateClient);
+procedure TioBSObjStateStdActionVcl.SetTargetBindSource(const Value: IioBindSourceObjStateClient);
 begin
   if Value <> FTargetBindSource then
   begin
