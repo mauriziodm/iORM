@@ -4,7 +4,7 @@ interface
 
 uses
   iORM.DB.Components.BindSourceObjState, iORM.LiveBindings.PrototypeBindSource,
-  System.Classes, iORM.LiveBindings.Interfaces;
+  System.Classes, iORM.LiveBindings.Interfaces, Data.Bind.Components;
 
 type
 
@@ -29,7 +29,8 @@ type
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
     procedure SetActive(const Value: Boolean); override; // In TioDataSetMaster is DoBeforeOpen but here is SetActive
-//>>>    procedure DoBeforeScroll; override; // To be implemented
+//    procedure DoBeforeScroll; override;
+    procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioDataSetMaster is DoBeforeScroll but here is PosChanging
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -76,6 +77,9 @@ type
   end;
 
 implementation
+
+uses
+  System.SysUtils;
 
 { TioPrototypeBindSourceMaster }
 
@@ -128,6 +132,12 @@ function TioPrototypeBindSourceMaster.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := True;
+end;
+
+procedure TioPrototypeBindSourceMaster.PosChanging(ABindComp: TBasicBindComponent);
+begin
+  inherited;
+  ObjState.NotifyBeforeScroll;
 end;
 
 procedure TioPrototypeBindSourceMaster.SetActive(const Value: Boolean);
