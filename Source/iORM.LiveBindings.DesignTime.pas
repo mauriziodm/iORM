@@ -40,12 +40,13 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.PrototypeBindSource.Master, DesignIntf;
+  System.Classes, iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.PrototypeBindSource.Master, iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf;
 
 procedure Register;
 begin
-  RegisterComponents('iORM', [TioPrototypeBindSource]);
+//  RegisterComponents('iORM', [TioPrototypeBindSource]);
   RegisterComponents('iORM', [TioPrototypeBindSourceMaster]);
+  RegisterComponents('iORM', [TioPrototypeBindSourceDetail]);
   RegisterPropertyEditor(TypeInfo(Boolean), TioPrototypeBindSourceMaster, 'AutoEdit', nil); // Hide property in the ObjectInspector
   RegisterPropertyEditor(TypeInfo(Boolean), TioPrototypeBindSourceMaster, 'AutoPost', nil); // Hide property in the ObjectInspector
 end;

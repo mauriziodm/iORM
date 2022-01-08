@@ -149,14 +149,17 @@ type
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
     property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
+    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False;
+    // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
+    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
+    // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterBindSource: TioMasterBindSource read FMasterBindSource write FMasterBindSource; // published: Detail
     property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
-    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
+    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification
+      default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
     // Published properties: selectors
     property SelectorFor: TioPrototypeBindSource read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
@@ -169,8 +172,10 @@ type
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
     // Published properties: selectors
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
+    // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
+    // published: Master+Detail
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -368,16 +373,26 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   // If AdataObject is NOT already assigned (by onCreateAdapter event handler) then
   // retrieve a BindSourceAdapter automagically by iORM
-  if (not Assigned(ADataObject)) and not TypeName.IsEmpty then
+  if ADataObject = nil then
   begin
-    // If this is a detail BindSource then retrieve the adapter from the master BindSource
-    // else get the adapter directly from iORM
-    if Assigned(Self.MasterBindSource) then
-      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
-        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
-    else
+    // If this is a master bind source then retrieve the ABSA from the factory
+    if IsMasterBS then
+    begin
+      if TypeName.IsEmpty then
+        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
       ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
         ._OrderBy(FOrderBy), FViewDataType, FAutoLoadData, nil, True).AsTBindSourceAdapter;
+    end
+    // If this is a detail BindSource then retrieve the adapter from the master BindSource
+    else
+    begin
+      if FMasterBindSource = nil then
+        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
+      if FMasterPropertyName.IsEmpty then
+        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
+      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
+        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
+    end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
