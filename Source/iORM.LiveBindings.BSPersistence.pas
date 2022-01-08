@@ -1,24 +1,24 @@
-unit iORM.DB.Components.BindSourceObjState;
+unit iORM.LiveBindings.BSPersistence;
 
 interface
 
 type
 
-  TioBSObjState = (osUnassigned, osUnsaved, osSaved, osChanged);
+  TioBSPersistenceState = (osUnassigned, osUnsaved, osSaved, osChanged);
   TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
-  TioBSOnEditAction = (eDoNothing, eSaveObjState, eAbortIfNotSaved);
+  TioBSOnEditAction = (eDoNothing, eSaveRevertPoint, eAbortIfNotSaved);
 
-  TioBindSourceObjStateManager = class;
+  TioBSPersistence = class;
 
-  IioBindSourceObjStateClient = interface
+  IioBSPersistenceClient = interface
     ['{8B930CF9-0EDC-483E-86A2-39C6CFD82D9D}']
     function Current: TObject;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
     procedure PersistCurrent;
     function IsActive: Boolean;
     // ObjState property
-    function GetObjState: TioBindSourceObjStateManager;
-    property ObjState: TioBindSourceObjStateManager read GetObjState;
+    function GetPersistence: TioBSPersistence;
+    property Persistence: TioBSPersistence read GetPersistence;
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -29,17 +29,17 @@ type
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction;
   end;
 
-  TioBindSourceObjStateManager = class
+  TioBSPersistence = class
   private
-    FSavedObjState: String;
-    FBindSource: IioBindSourceObjStateClient;
+    FSavedState: String;
+    FBindSource: IioBSPersistenceClient;
     function GetCurrentAsString: String;
-    function GetState: TioBSObjState;
+    function GetState: TioBSPersistenceState;
     function GetStateAsString: String;
     procedure CheckUnassigned(const AMethodName: String);
   public
-    constructor Create(const ABindSourceObjStateClient: IioBindSourceObjStateClient);
-    procedure Save(const ARaiseIfAlreadySaved: Boolean = True);
+    constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
+    procedure SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean = True);
     procedure Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
@@ -53,8 +53,8 @@ type
     function IsClear: Boolean;
     procedure NotifyBeforeScroll;
     procedure NotifySaveObjState;
-    property SavedObjState: string read FSavedObjState;
-    property State: TioBSObjState read GetState;
+    property SavedObjState: string read FSavedState;
+    property State: TioBSPersistenceState read GetState;
     property StateAsString: string read GetStateAsString;
   end;
 
@@ -65,76 +65,76 @@ uses
 
 { TioBindSourceObjState }
 
-function TioBindSourceObjStateManager.CanClear: Boolean;
+function TioBSPersistence.CanClear: Boolean;
 begin
   Result := GetState > osUnsaved;
 end;
 
-function TioBindSourceObjStateManager.CanPersist: Boolean;
+function TioBSPersistence.CanPersist: Boolean;
 begin
   Result := GetState >= osSaved;
 end;
 
-function TioBindSourceObjStateManager.CanRevert: Boolean;
+function TioBSPersistence.CanRevert: Boolean;
 begin
   Result := GetState >= osSaved;
 end;
 
-function TioBindSourceObjStateManager.CanSave: Boolean;
+function TioBSPersistence.CanSave: Boolean;
 begin
   Result := GetState = osUnsaved;
 end;
 
-procedure TioBindSourceObjStateManager.CheckUnassigned(const AMethodName: String);
+procedure TioBSPersistence.CheckUnassigned(const AMethodName: String);
 begin
   if State = osUnassigned then
     raise EioBindSourceObjStateException.Create(ClassName, AMethodName, 'Unassigned current object (maybe the bindsource is not active or empty)');
 end;
 
-procedure TioBindSourceObjStateManager.Clear(const ARaiseIfChangesExists: Boolean);
+procedure TioBSPersistence.Clear(const ARaiseIfChangesExists: Boolean);
 begin
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Clear', 'Pending changes exists');
-  FSavedObjState := '';
+  FSavedState := '';
 end;
 
-constructor TioBindSourceObjStateManager.Create(const ABindSourceObjStateClient: IioBindSourceObjStateClient);
+constructor TioBSPersistence.Create(const ABSPersistenceClient: IioBSPersistenceClient);
 begin
   inherited Create;
-  FBindSource := ABindSourceObjStateClient;
+  FBindSource := ABSPersistenceClient;
   Clear(False);
 end;
 
-function TioBindSourceObjStateManager.IsActive: Boolean;
+function TioBSPersistence.IsActive: Boolean;
 begin
   Result := GetState > osUnassigned;
 end;
 
-function TioBindSourceObjStateManager.IsChanged: Boolean;
+function TioBSPersistence.IsChanged: Boolean;
 begin
   Result := GetState = osChanged;
 end;
 
-function TioBindSourceObjStateManager.IsClear: Boolean;
+function TioBSPersistence.IsClear: Boolean;
 begin
   Result := GetState = osUnsaved;
 end;
 
-function TioBindSourceObjStateManager.IsSaved: Boolean;
+function TioBSPersistence.IsSaved: Boolean;
 begin
   Result := GetState > osUnsaved;
 end;
 
-procedure TioBindSourceObjStateManager.NotifySaveObjState;
+procedure TioBSPersistence.NotifySaveObjState;
 begin
-  if (FBindSource.OnEditAction = eSaveObjState) and IsClear then
-    Save
+  if (FBindSource.OnEditAction = eSaveRevertPoint) and IsClear then
+    SaveRevertPoint
   else
   if (FBindSource.OnEditAction = eAbortIfNotSaved) and IsClear then
     Abort;
 end;
 
-procedure TioBindSourceObjStateManager.NotifyBeforeScroll;
+procedure TioBSPersistence.NotifyBeforeScroll;
 begin
   if ((FBindSource.OnRecordChangeAction = rcPersistAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcPersistIfChanged) and IsChanged) then
     Persist
@@ -146,25 +146,25 @@ begin
     Clear(False);
 end;
 
-function TioBindSourceObjStateManager.GetState: TioBSObjState;
+function TioBSPersistence.GetState: TioBSPersistenceState;
 begin
   if (FBindSource = nil) or (not FBindSource.IsActive) or (FBindSource.Current = nil) then
     Result := osUnassigned
   else
-  if FSavedObjState.IsEmpty then
+  if FSavedState.IsEmpty then
     Result := osUnsaved
-  else if GetCurrentAsString <> FSavedObjState then
+  else if GetCurrentAsString <> FSavedState then
     Result := osChanged
   else
     Result := osSaved;
 end;
 
-function TioBindSourceObjStateManager.GetStateAsString: String;
+function TioBSPersistence.GetStateAsString: String;
 begin
-  Result := TioUtilities.EnumToString<TioBSObjState>(State);
+  Result := TioUtilities.EnumToString<TioBSPersistenceState>(State);
 end;
 
-procedure TioBindSourceObjStateManager.Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
+procedure TioBSPersistence.Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
 begin
   CheckUnassigned('Persist');
   if ARaiseIfNoChanges and (State < osChanged) then
@@ -174,28 +174,28 @@ begin
     Clear(False);
 end;
 
-procedure TioBindSourceObjStateManager.Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
+procedure TioBSPersistence.Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
 begin
   CheckUnassigned('Revert');
   if State < osSaved then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There isn''t a saved state you can revert to. (call "Save" method before)');
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
-  om.FromJSON(FSavedObjState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
+  om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
   if AClear then
     Clear(False);
   FBindSource.Refresh(False);
 end;
 
-procedure TioBindSourceObjStateManager.Save(const ARaiseIfAlreadySaved: Boolean);
+procedure TioBSPersistence.SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean);
 begin
   CheckUnassigned('Save');
   if ARaiseIfAlreadySaved and (State > osUnsaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Save', 'A previously saved state exists, it must be cleared before (Persist, Revert or Clear)');
-  FSavedObjState := GetCurrentAsString
+  FSavedState := GetCurrentAsString
 end;
 
-function TioBindSourceObjStateManager.GetCurrentAsString: String;
+function TioBSPersistence.GetCurrentAsString: String;
 begin
   if FBindSource.Current <> nil then
     Result := om.From(FBindSource.Current).byFields.TypeAnnotationsON.ToString

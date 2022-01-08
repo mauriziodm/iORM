@@ -18,13 +18,13 @@ implementation
 
 uses
   Data.Bind.ObjectScope, System.SysUtils,
-  iORM.DB.Components.BindSourceObjState;
+  iORM.LiveBindings.BSPersistence;
 
 { TioCommonBSBehavior }
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
 var
-  LBSObjStateClient: IioBindSourceObjStateClient;
+  LBSObjStateClient: IioBSPersistenceClient;
 begin
   // If the notification was sent by itself then it forwards it to the ActiveBindSourceAdapter for its propagation (outbound notification)
   if ASender = (ATargetBS as TObject) then
@@ -44,8 +44,8 @@ begin
         ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
       // Actually used ObjStateManager purposes
       ntSaveObjState:
-        if Supports(ATargetBS, IioBindSourceObjStateClient, LBSObjStateClient) then
-          LBSObjStateClient.ObjState.NotifySaveObjState;
+        if Supports(ATargetBS, IioBSPersistenceClient, LBSObjStateClient) then
+          LBSObjStateClient.Persistence.NotifySaveObjState;
     end;
   end;
 end;

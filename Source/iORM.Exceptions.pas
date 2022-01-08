@@ -37,7 +37,7 @@ interface
 
 uses
   System.SysUtils, iORM.Context.Interfaces,
-  iORM.DB.Components.BindSourceObjState;
+  iORM.LiveBindings.BSPersistence;
 
 type
 

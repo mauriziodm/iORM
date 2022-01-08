@@ -3,20 +3,20 @@ unit iORM.LiveBindings.PrototypeBindSource.Master;
 interface
 
 uses
-  iORM.DB.Components.BindSourceObjState, iORM.LiveBindings.PrototypeBindSource,
+  iORM.LiveBindings.BSPersistence, iORM.LiveBindings.PrototypeBindSource,
   System.Classes, iORM.LiveBindings.Interfaces, Data.Bind.Components;
 
 type
 
-  TioPrototypeBindSourceMaster = class(TioPrototypeBindSource, IioBindSourceObjStateClient)
+  TioPrototypeBindSourceMaster = class(TioPrototypeBindSource, IioBSPersistenceClient)
   private
-    FObjState: TioBindSourceObjStateManager;
+    FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     function GetSourcePBS: TioPrototypeBindSource;
     procedure SetSourcePBS(const Value: TioPrototypeBindSource);
     // Added methods
-    function GetObjState: TioBindSourceObjStateManager;
+    function GetPersistence: TioBSPersistence;
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -36,7 +36,7 @@ type
     property Where;
     property ItemCount;
     // Added properties
-    property ObjState: TioBindSourceObjStateManager read GetObjState;
+    property Persistence: TioBSPersistence read GetPersistence;
   published
     // properties redeclared from TioCustomPrototypeBindSource
     property AutoActivate;
@@ -60,7 +60,7 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
-    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveObjState;
+    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourcePBS: TioPrototypeBindSource read GetSourcePBS write SetSourcePBS;
     // Published Events: selectors
@@ -85,8 +85,8 @@ uses
 constructor TioPrototypeBindSourceMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FObjState := TioBindSourceObjStateManager.Create(Self);
-  FOnEditAction := eSaveObjState;
+  FObjState := TioBSPersistence.Create(Self);
+  FOnEditAction := eSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
@@ -96,7 +96,7 @@ begin
   inherited;
 end;
 
-function TioPrototypeBindSourceMaster.GetObjState: TioBindSourceObjStateManager;
+function TioPrototypeBindSourceMaster.GetPersistence: TioBSPersistence;
 begin
   Result := FObjState;
 end;
@@ -131,13 +131,13 @@ end;
 procedure TioPrototypeBindSourceMaster.PosChanging(ABindComp: TBasicBindComponent);
 begin
   inherited;
-  ObjState.NotifyBeforeScroll;
+  Persistence.NotifyBeforeScroll;
 end;
 
 procedure TioPrototypeBindSourceMaster.SetActive(const Value: Boolean);
 begin
   inherited;
-  ObjState.Clear(False);
+  Persistence.Clear(False);
 end;
 
 procedure TioPrototypeBindSourceMaster.SetOnEditAction(const Value: TioBSOnEditAction);

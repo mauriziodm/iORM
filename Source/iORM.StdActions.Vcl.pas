@@ -3,7 +3,7 @@ unit iORM.StdActions.Vcl;
 interface
 
 uses
-  Vcl.ActnList, iORM.DB.Components.BindSourceObjState, System.Classes;
+  Vcl.ActnList, iORM.LiveBindings.BSPersistence, System.Classes;
 
 type
 
@@ -15,8 +15,8 @@ type
     FDisableIfChangesExists: Boolean;
     FRaiseIfChangesDoesNotExists: Boolean;
     FRaiseIfChangesExists: Boolean;
-    FTargetBindSource: IioBindSourceObjStateClient;
-    procedure SetTargetBindSource(const Value: IioBindSourceObjStateClient);
+    FTargetBindSource: IioBSPersistenceClient;
+    procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -25,7 +25,7 @@ type
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
-    property TargetBindSource: IioBindSourceObjStateClient read FTargetBindSource write SetTargetBindSource;
+    property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -89,7 +89,7 @@ end;
 
 function TioBSObjStateStdActionVcl.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(Target) and FTargetBindSource.ObjState.IsActive;
+  Result := Assigned(Target) and FTargetBindSource.Persistence.IsActive;
 end;
 
 procedure TioBSObjStateStdActionVcl.Notification(AComponent: TComponent; Operation: TOperation);
@@ -99,7 +99,7 @@ begin
     TargetBindSource := nil;
 end;
 
-procedure TioBSObjStateStdActionVcl.SetTargetBindSource(const Value: IioBindSourceObjStateClient);
+procedure TioBSObjStateStdActionVcl.SetTargetBindSource(const Value: IioBSPersistenceClient);
 begin
   if Value <> FTargetBindSource then
   begin
@@ -113,51 +113,51 @@ end;
 
 procedure TioBSObjStateRevert.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.ObjState.Revert(RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  TargetBindSource.Persistence.Revert(RaiseIfChangesDoesNotExists, ClearAfterExecute);
 end;
 
 procedure TioBSObjStateRevert.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.ObjState.CanRevert;
-  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.ObjState.IsChanged);
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
 
 { TioBSObjStatePersist }
 
 procedure TioBSObjStatePersist.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.ObjState.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
 end;
 
 procedure TioBSObjStatePersist.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.ObjState.CanPersist;
-  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.ObjState.IsChanged);
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
 
 { TioBSObjStateSave }
 
 procedure TioBSObjStateSave.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.ObjState.Save(True);
+  TargetBindSource.Persistence.SaveRevertPoint(True);
 end;
 
 procedure TioBSObjStateSave.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.ObjState.CanSave;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSave;
 end;
 
 { TioBSObjStateClear }
 
 procedure TioBSObjStateClear.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.ObjState.Clear(RaiseIfChangesExists);
+  TargetBindSource.Persistence.Clear(RaiseIfChangesExists);
 end;
 
 procedure TioBSObjStateClear.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.ObjState.CanClear;
-  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.ObjState.IsChanged);
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
 end;
 
 end.

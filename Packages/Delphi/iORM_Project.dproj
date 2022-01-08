@@ -266,7 +266,7 @@
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.CustomDataSet.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DataSetMaster.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.BindSourceObjState.pas"/>
+        <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.Vcl.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.Fmx.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas"/>
@@ -354,7 +354,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -365,7 +365,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>

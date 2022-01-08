@@ -4,19 +4,19 @@ interface
 
 uses
   iORM.DB.Components.DataSet.CustomDataSet, iORM.LiveBindings.Interfaces,
-  iORM.DB.Components.BindSourceObjState, System.Classes;
+  iORM.LiveBindings.BSPersistence, System.Classes;
 
 type
 
-  TioDataSetMaster = class(TioCustomDataSet, IioBindSourceObjStateClient)
+  TioDataSetMaster = class(TioCustomDataSet, IioBSPersistenceClient)
   private
-    FObjState: TioBindSourceObjStateManager;
+    FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     function GetSourceDataSet: TioCustomDataSet;
     procedure SetSourceDataSet(const Value: TioCustomDataSet);
     // Added methods
-    function GetObjState: TioBindSourceObjStateManager;
+    function GetPersistence: TioBSPersistence;
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -34,7 +34,7 @@ type
     property Where;
     property ItemCount;
     // Added properties
-    property ObjState: TioBindSourceObjStateManager read GetObjState;
+    property Persistence: TioBSPersistence read GetPersistence;
   published
     property TypeName;
     property TypeAlias;
@@ -49,7 +49,7 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
-    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveObjState;
+    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioCustomDataSet read GetSourceDataSet write SetSourceDataSet;
     // Published Events: selectors
@@ -74,8 +74,8 @@ uses
 constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FObjState := TioBindSourceObjStateManager.Create(Self);
-  FOnEditAction := eSaveObjState;
+  FObjState := TioBSPersistence.Create(Self);
+  FOnEditAction := eSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
@@ -88,16 +88,16 @@ end;
 procedure TioDataSetMaster.DoBeforeOpen;
 begin
   inherited;
-  ObjState.Clear(False);
+  Persistence.Clear(False);
 end;
 
 procedure TioDataSetMaster.DoBeforeScroll;
 begin
   inherited;
-  ObjState.NotifyBeforeScroll;
+  Persistence.NotifyBeforeScroll;
 end;
 
-function TioDataSetMaster.GetObjState: TioBindSourceObjStateManager;
+function TioDataSetMaster.GetPersistence: TioBSPersistence;
 begin
   Result := FObjState;
 end;
