@@ -7,7 +7,7 @@ procedure Register;
 implementation
 
 uses
-  iORM.DB.Components.BindSourceObjState.StdActions.VCL, System.Actions;
+  iORM.StdActions.Vcl, System.Actions;
 
 procedure Register;
 begin

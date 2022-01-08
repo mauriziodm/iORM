@@ -7,7 +7,7 @@ procedure Register;
 implementation
 
 uses
-  System.Actions, iORM.DB.Components.BindSourceObjState.StdActions.FMX;
+  System.Actions, iORM.StdActions.Fmx;
 
 procedure Register;
 begin

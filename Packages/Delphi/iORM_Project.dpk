@@ -202,8 +202,8 @@ contains
   iORM.DB.Components.DataSet.DataSetMaster in '..\..\Source\iORM.DB.Components.DataSet.DataSetMaster.pas',
   iORM.DB.Components.DataSet.DataSetDetail in '..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas',
   iORM.DB.Components.BindSourceObjState in '..\..\Source\iORM.DB.Components.BindSourceObjState.pas',
-  iORM.DB.Components.BindSourceObjState.StdActions.VCL in '..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.VCL.pas',
-  iORM.DB.Components.BindSourceObjState.StdActions.FMX in '..\..\Source\iORM.DB.Components.BindSourceObjState.StdActions.FMX.pas',
+  iORM.StdActions.Vcl in '..\..\Source\iORM.StdActions.Vcl.pas',
+  iORM.StdActions.Fmx in '..\..\Source\iORM.StdActions.Fmx.pas',
   iORM.LiveBindings.CommonBSBehavior in '..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas',
   iORM.LiveBindings.PrototypeBindSource.Master in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Master.pas',
   iORM.LiveBindings.PrototypeBindSource.Detail in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas';
