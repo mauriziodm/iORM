@@ -169,7 +169,7 @@ begin
   else
     LTerminateMethod := nil;
   // ----------------------- SET ANONIMOUS METHODS -----------------------------
-  // If AutoPersist or forced persist the delete from the DB else
+  // If AutoPersist or forced persist then delete from the DB else
   // send a notification to other BSA.
   // Execute synchronous or asynchronous
   _Execute(AActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
