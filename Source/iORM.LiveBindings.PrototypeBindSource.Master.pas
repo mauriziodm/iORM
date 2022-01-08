@@ -17,7 +17,6 @@ type
     procedure SetSourcePBS(const Value: TioPrototypeBindSource);
     // Added methods
     function GetObjState: TioBindSourceObjStateManager;
-    function IsActive: Boolean;
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -115,11 +114,6 @@ end;
 function TioPrototypeBindSourceMaster.GetSourcePBS: TioPrototypeBindSource;
 begin
   Result := MasterBindSource;
-end;
-
-function TioPrototypeBindSourceMaster.IsActive: Boolean;
-begin
-  Result := Active;
 end;
 
 function TioPrototypeBindSourceMaster.IsDetailBS: boolean;

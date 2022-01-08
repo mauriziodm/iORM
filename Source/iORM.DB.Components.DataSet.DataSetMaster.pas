@@ -17,7 +17,6 @@ type
     procedure SetSourceDataSet(const Value: TioCustomDataSet);
     // Added methods
     function GetObjState: TioBindSourceObjStateManager;
-    function IsActive: Boolean;
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -116,11 +115,6 @@ end;
 function TioDataSetMaster.GetSourceDataSet: TioCustomDataSet;
 begin
   Result := MasterDataSet;
-end;
-
-function TioDataSetMaster.IsActive: Boolean;
-begin
-  Result := Active;
 end;
 
 function TioDataSetMaster.IsDetailBS: boolean;

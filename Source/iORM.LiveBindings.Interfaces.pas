@@ -105,6 +105,12 @@ type
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
   end;
 
+  // Interface for standard action target bind source
+  IioStdActionTargetBindSource = interface
+    ['{6E442DF5-154E-4253-9AFB-E5CCFDF32209}']
+    function IsActive: Boolean;
+  end;
+
   // The common ancestor for all PrototypeBindSource components
   TioBaseBindSource = TBaseObjectBindSource;
 

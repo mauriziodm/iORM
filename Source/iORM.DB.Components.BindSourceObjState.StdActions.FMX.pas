@@ -3,18 +3,43 @@ unit iORM.DB.Components.BindSourceObjState.StdActions.FMX;
 interface
 
 uses
-  FMX.ActnList, iORM.DB.Components.BindSourceObjState, System.Classes;
+  FMX.ActnList, iORM.DB.Components.BindSourceObjState, System.Classes,
+  iORM.LiveBindings.Interfaces;
 
 type
 
-  TioTestActionFMX = class(FMX.ActnList.TAction)
-  public
+  // =================================================================================================
+  // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES
+  // =================================================================================================
+
+  // Base class for all BindSource standard actions
+  TioBSStdActionFmx = class(FMX.ActnList.TAction)
+  strict private
+    FTargetBindSource: IioStdActionTargetBindSource;
+    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function HandlesTarget(Target: TObject): Boolean; override;
-    procedure ExecuteTarget(Target: TObject); override;
-    function Update: Boolean; override;
+    property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
   end;
 
-    // Base class for all BinsDourceObjState standard actions
+//  TioBSMakeSelection = class(TioBSStdActionFmx)
+//  public
+//    procedure ExecuteTarget(Target: TObject); override;
+//    procedure UpdateTarget (Target: TObject); override;
+//  published
+//    property TargetBindSource;
+//  end;
+
+  // =================================================================================================
+  // END: FMX STANDARD ACTIONS FOR BIND SOURCES
+  // =================================================================================================
+
+  // =================================================================================================
+  // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
+
+  // Base class for all BinsDourceObjState standard actions
   TioBSObjStateStdActionFmx = class(FMX.ActnList.TAction)
   strict private
     FClearAfterExecute: Boolean;
@@ -77,29 +102,14 @@ type
     property TargetBindSource;
   end;
 
+  // =================================================================================================
+  // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
+
 implementation
 
 uses
   iORM.AbstractionLayer.Framework;
-
-{ TioTestAction }
-
-procedure TioTestActionFMX.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-  TioApplication.ShowMessage('Eureka FMX!!!');
-end;
-
-function TioTestActionFMX.HandlesTarget(Target: TObject): Boolean;
-begin
-  Result := True;
-end;
-
-function TioTestActionFMX.Update: Boolean;
-begin
-  inherited;
-  Enabled := True;
-end;
 
 { TioBSObjStateStdActionFmx }
 
@@ -184,6 +194,30 @@ procedure TioBSObjStateRevert.UpdateTarget(Target: TObject);
 begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.ObjState.CanRevert;
   Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.ObjState.IsChanged);
+end;
+
+{ TioBSStdActionFmx }
+
+function TioBSStdActionFmx.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target) and FTargetBindSource.isActive;
+end;
+
+procedure TioBSStdActionFmx.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
+    TargetBindSource := nil;
+end;
+
+procedure TioBSStdActionFmx.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+begin
+  if Value <> FTargetBindSource then
+  begin
+    FTargetBindSource := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
 end;
 
 end.

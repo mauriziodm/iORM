@@ -46,7 +46,7 @@ type
 
   TioMasterBindSource = TioPrototypeBindSource;
 
-  TioPrototypeBindSource = class(TPrototypeBindSource, IioNotifiableBindSource)
+  TioPrototypeBindSource = class(TPrototypeBindSource, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;
@@ -87,6 +87,7 @@ type
     function __ObjRelease: Integer; override;
 {$ENDIF}
     // =========================================================================
+    function IsActive: Boolean;
     procedure WhereOnChangeEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const Value: String);
@@ -565,6 +566,11 @@ begin
     raise EioException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
+function TioPrototypeBindSource.IsActive: Boolean;
+begin
+  Result := Active;
+end;
+
 procedure TioPrototypeBindSource.Insert(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
@@ -694,7 +700,7 @@ begin
   if not Assigned(FSelectorFor) then
     raise EioException.Create(Self.ClassName, 'MakeSelection', '"SelectorFor" property not assigned.');
   if not FSelectorFor.CheckAdapter then
-    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(Self.ClassName, 'MakeSelection', 'Selection destination ActiveBindSourceAdapter not assigned.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
   // Encapsulate the SelectedInstance into a TValue then assign it

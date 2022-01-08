@@ -14,7 +14,7 @@ type
 
   TioMasterDataSet = TioCustomDataSet;
 
-  TioCustomDataSet = class(TioBSABaseDataSet, IioNotifiableBindSource)
+  TioCustomDataSet = class(TioBSABaseDataSet, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;
@@ -53,6 +53,7 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+    function IsActive: Boolean;
     // Async
     procedure SetAsync(const Value: Boolean);
     // AutoLoadData
@@ -392,6 +393,11 @@ begin
     raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
   GetActiveBindSourceAdapter.Active := True;
   inherited;
+end;
+
+function TioCustomDataSet.IsActive: Boolean;
+begin
+  Result := Active;
 end;
 
 procedure TioCustomDataSet.Loaded;
