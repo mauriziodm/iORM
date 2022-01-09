@@ -319,13 +319,6 @@ begin
   end;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoAfterDelete;
-begin
-  inherited;
-  // Send AfterDelete notification
-  TioCommonBSAPersistence.AfterDelete(Self);
-end;
-
 procedure TioActiveObjectBindSourceAdapter.DoAfterPost;
 begin
   inherited;
@@ -406,13 +399,15 @@ begin
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeDelete;
-var
-  LAbort: Boolean;
 begin
   inherited;
-  TioCommonBSAPersistence.Delete(Self, LAbort);
-  if LAbort then
-    Abort;
+  TioCommonBSAPersistence.Delete(Self);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.DoAfterDelete;
+begin
+  inherited;
+  TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeEdit;

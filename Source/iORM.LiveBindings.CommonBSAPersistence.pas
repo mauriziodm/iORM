@@ -66,7 +66,8 @@ type
     class procedure LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
       const AReloadData, ANotify: Boolean); static;
-    class procedure Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean); static;
+    class procedure Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure Delete_old(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean); static;
     class procedure AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean = False); static;
     class procedure PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -138,7 +139,39 @@ begin
     _SyncExecute(AExecuteMethod, ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean);
+class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
+  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+begin
+  // If current is nil then exit
+  if not Assigned(AActiveBindSourceAdapter.Current) then
+    Exit;
+  // If UseObjStatus is true then set ObjStatus propriety and abort
+  if AActiveBindSourceAdapter.UseObjStatus then
+  begin
+    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
+    Abort;
+  end;
+end;
+
+class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LAfterDeleteMethod: TioCommonBSAPersistenceThreadOnTerminate;
+begin
+  // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
+  // in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
+  // eliminato l'oggetto. Se lo metto qui invece va bene.
+
+  // Set the OnTerminate anonymous method when in Async mode
+  // If not in Async mode then execute this code in the "AfterDelete" method called by the BSA
+  // from the OnAfterDelete event handler.
+//  if not AActiveBindSourceAdapter.ioAsync then
+  LAfterDeleteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(AActiveBindSourceAdapter);
+  LAfterDeleteMethod(nil);
+end;
+
+class procedure TioCommonBSAPersistence.Delete_old(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean);
 var
   LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
@@ -173,19 +206,6 @@ begin
   // send a notification to other BSA.
   // Execute synchronous or asynchronous
   _Execute(AActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
-end;
-
-class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-begin
-  // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
-  // in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
-  // eliminato l'oggetto. Se lo metto qui invece va bene.
-
-  // Set the OnTerminate anonymous method when in Async mode
-  // If not in Async mode then execute this code in the "AfterDelete" method called by the BSA
-  // from the OnAfterDelete event handler.
-  if not AActiveBindSourceAdapter.ioAsync then
-    TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(AActiveBindSourceAdapter);
 end;
 
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);

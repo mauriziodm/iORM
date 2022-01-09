@@ -389,13 +389,15 @@ begin
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
-var
-  LAbort: Boolean;
 begin
   inherited;
-  TioCommonBSAPersistence.Delete(Self, LAbort);
-  if LAbort then
-    Abort;
+  TioCommonBSAPersistence.Delete(Self);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
+begin
+  inherited;
+  TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeEdit;
@@ -403,13 +405,6 @@ begin
   inherited;
   // ObjStateManager notification
   Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveObjState));
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
-begin
-  inherited;
-  // Send AfterDelete notification
-  TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeOpen;
