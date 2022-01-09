@@ -65,6 +65,7 @@ type
     // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;  *** NB: Code presente (commented) in the unit body ***
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    FBSPersistenceDeleting: Boolean;
     // TypeName
     procedure SetTypeName(const AValue: String);
     function GetTypeName: String;
@@ -106,6 +107,9 @@ type
     // Refreshing
     function GetRefreshing: Boolean;
     procedure SetRefreshing(const Value: Boolean);
+    // BSPersistenceDeleting
+    function GetBSPersistenceDeleting: Boolean;
+    procedure SetBSPersistenceDeleting(const Value: Boolean);
   protected
     function SupportsNestedFields: Boolean; override;
     procedure AddFields; override;
@@ -264,6 +268,7 @@ begin
   FAsync := False;
   FAutoPersist := True;
   FRefreshing := False;
+  FBSPersistenceDeleting := False;
 
   // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
   // AObject is always a TObject by generic constraint
@@ -501,6 +506,11 @@ begin
   Result := FBindSource;
 end;
 
+function TioActiveObjectBindSourceAdapter.GetBSPersistenceDeleting: Boolean;
+begin
+  Result := FBSPersistenceDeleting;
+end;
+
 function TioActiveObjectBindSourceAdapter.GetCanActivate: Boolean;
 begin
   // Riportato allo stato originale della classe capostipite perchè
@@ -727,6 +737,11 @@ end;
 procedure TioActiveObjectBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
 begin
   FBindSource := ANotifiableBindSource;
+end;
+
+procedure TioActiveObjectBindSourceAdapter.SetBSPersistenceDeleting(const Value: Boolean);
+begin
+  FBSPersistenceDeleting := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);

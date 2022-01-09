@@ -2,6 +2,9 @@ unit iORM.LiveBindings.BSPersistence;
 
 interface
 
+uses
+  iORM.LiveBindings.Interfaces;
+
 type
 
   TioBSPersistenceState = (osUnassigned, osUnsaved, osSaved, osChanged);
@@ -13,9 +16,11 @@ type
   IioBSPersistenceClient = interface
     ['{8B930CF9-0EDC-483E-86A2-39C6CFD82D9D}']
     function Current: TObject;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
-    procedure PersistCurrent;
+    procedure Delete;
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function IsActive: Boolean;
+    procedure PersistCurrent;
+    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
     // ObjState property
     function GetPersistence: TioBSPersistence;
     property Persistence: TioBSPersistence read GetPersistence;
@@ -43,6 +48,7 @@ type
     procedure Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
+    procedure Delete;
     function CanSave: Boolean;
     function CanRevert: Boolean;
     function CanPersist: Boolean;
@@ -61,7 +67,8 @@ type
 implementation
 
 uses
-  ObjMapper, iORM.Exceptions, System.SysUtils, iORM.Utilities;
+  ObjMapper, iORM.Exceptions, System.SysUtils, iORM.Utilities,
+  iORM.LiveBindings.CommonBSAPersistence;
 
 { TioBindSourceObjState }
 
@@ -103,6 +110,14 @@ begin
   inherited Create;
   FBindSource := ABSPersistenceClient;
   Clear(False);
+end;
+
+procedure TioBSPersistence.Delete;
+begin
+  // First call the persistence for delete the current object from the DB...
+  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  // ...then call the regular Delete method of the BindSource
+  FBindSource.Delete;
 end;
 
 function TioBSPersistence.IsActive: Boolean;

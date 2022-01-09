@@ -65,6 +65,7 @@ type
     // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
+    FBSPersistenceDeleting: Boolean;
     // Async property
     function GetIoAsync: Boolean;
     procedure SetIoAsync(const Value: Boolean);
@@ -100,6 +101,9 @@ type
     // Refreshing
     function GetRefreshing: Boolean;
     procedure SetRefreshing(const Value: Boolean);
+    // BSPersistenceDeleting
+    function GetBSPersistenceDeleting: Boolean;
+    procedure SetBSPersistenceDeleting(const Value: Boolean);
   protected
     function GetCanActivate: Boolean; override;
     // =========================================================================
@@ -170,17 +174,6 @@ type
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-
-    property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
-    property ioAsync: Boolean read GetIoAsync write SetIoAsync;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
-    property ioAutoPersist: Boolean read GetioAutoPersist write SetioAutoPersist;
-    property ioWhere: IioWhere read GetioWhere write SetIoWhere;
-    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
-    property ioViewDataType: TioViewDataType read GetIoViewDataType;
-    property ioOwnsObjects: Boolean read GetOwnsObjects;
-    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
-    property Refreshing: Boolean read GetRefreshing write SetRefreshing;
   end;
 
 implementation
@@ -241,6 +234,7 @@ begin
   FAsync := False;
   FAutoPersist := True;
   FRefreshing := False;
+  FBSPersistenceDeleting := False;
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
   FLocalOwnsObject := False; // Always false because it's a BSA for an interface (AutoRefCount)
   FWhere := AWhere;
@@ -472,6 +466,11 @@ begin
   Result := FBindSource;
 end;
 
+function TioActiveInterfaceObjectBindSourceAdapter.GetBSPersistenceDeleting: Boolean;
+begin
+  Result := FBSPersistenceDeleting;
+end;
+
 function TioActiveInterfaceObjectBindSourceAdapter.GetCanActivate: Boolean;
 begin
   // Riportato allo stato originale della classe capostipite perchè
@@ -689,6 +688,11 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
 begin
   FBindSource := ANotifiableBindSource;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetBSPersistenceDeleting(const Value: Boolean);
+begin
+  FBSPersistenceDeleting := Value;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);

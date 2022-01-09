@@ -173,8 +173,6 @@ type
     function HasMasterBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function AsTBindSourceAdapter: TBindSourceAdapter;
-    // function TypeName: String;       // Added TypeName property
-    // function TypeAlias: String;      // Added TypeAlias property
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function GetMasterPropertyName: String;
     function GetBaseObjectClassName: String;
@@ -182,78 +180,83 @@ type
     // TypeName
     procedure SetTypeName(const AValue: String);
     function GetTypeName: String;
-    property ioTypeName: String read GetTypeName write SetTypeName;
     // TypeAlias
     procedure SetTypeAlias(const AValue: String);
     function GetTypeAlias: String;
-    property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
-    property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
     // Current property
     function GetCurrent: TObject;
-    property Current: TObject read GetCurrent;
     // Async property
     procedure SetIoAsync(const Value: Boolean);
     function GetIoAsync: Boolean;
-    property ioAsync: Boolean read GetIoAsync write SetIoAsync;
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
     // AutoPersist property
     procedure SetioAutoPersist(const Value: Boolean);
     function GetioAutoPersist: Boolean;
-    property ioAutoPersist: Boolean read GetioAutoPersist write SetioAutoPersist;
     // WhereStr property
     procedure SetIoWhere(const Value: IioWhere);
     function GetioWhere: IioWhere;
-    property ioWhere: IioWhere read GetioWhere write SetIoWhere;
     // ioWhereDetailsFromDetailAdapters property
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
-    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
     // ioViewDataType
     function GetIoViewDataType: TioViewDataType;
-    property ioViewDataType: TioViewDataType read GetIoViewDataType;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
-    property ioOwnsObjects: Boolean read GetOwnsObjects;
     // State
     function GetState: TBindSourceAdapterState;
-    property State: TBindSourceAdapterState read GetState;
     // EOF
     function GetEOF: Boolean;
-    property Eof: Boolean read GetEOF;
     // BOF
     function GetBOF: Boolean;
-    property BOF: Boolean read GetBOF;
     // ItemCount
     function GetCount: Integer;
-    property ItemCount: Integer read GetCount;
     // ItemIndex
     function GetItemIndex: Integer;
     procedure SetItemIndex(const Value: Integer);
-    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
-    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
     // Fields
     function GetFields: TList<TBindSourceAdapterField>;
-    property Fields: TList<TBindSourceAdapterField> read GetFields;
     // Active
     procedure SetActive(Value: Boolean);
     function GetActive: Boolean;
-    property Active: Boolean read GetActive write SetActive;
     // Refreshing
     function GetRefreshing: Boolean;
     procedure SetRefreshing(const Value: Boolean);
-    property Refreshing: Boolean read GetRefreshing write SetRefreshing;
     // CanActivate
     function GetCanActivate: Boolean;
+    // BSPersistenceDeleting
+    function GetBSPersistenceDeleting: Boolean;
+    procedure SetBSPersistenceDeleting(const Value: Boolean);
+    // Properties
+    property Active: Boolean read GetActive write SetActive;
+    property BOF: Boolean read GetBOF;
     property CanActivate: Boolean read GetCanActivate;
+    property Current: TObject read GetCurrent;
+    property EOF: Boolean read GetEOF;
+    property Fields: TList<TBindSourceAdapterField> read GetFields;
+    property ioAsync: Boolean read GetIoAsync write SetIoAsync;
+    property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
+    property ioAutoPersist: Boolean read GetioAutoPersist write SetioAutoPersist;
+    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
+    property ioOwnsObjects: Boolean read GetOwnsObjects;
+    property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;
+    property ioTypeName: String read GetTypeName write SetTypeName;
+    property ioWhere: IioWhere read GetioWhere write SetIoWhere;
+    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
+    property ioViewDataType: TioViewDataType read GetIoViewDataType;
+    property ItemCount: Integer read GetCount;
+    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
+    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
+    property Refreshing: Boolean read GetRefreshing write SetRefreshing;
+    property State: TBindSourceAdapterState read GetState;
+    property BSPersistenceDeleting: boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
   end;
 
   // Bind source adapter container

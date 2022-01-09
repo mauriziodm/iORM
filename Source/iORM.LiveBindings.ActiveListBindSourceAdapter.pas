@@ -69,7 +69,9 @@ type
     FInsertObj_NewObj: TObject;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDeleteAfterCancel: Boolean;
-    FInterfacedList: IInterface;  // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
+    FBSPersistenceDeleting: Boolean;
+    // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
+    FInterfacedList: IInterface;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue:String);
@@ -112,6 +114,9 @@ type
     // Refreshing
     function GetRefreshing: boolean;
     procedure SetRefreshing(const Value: boolean);
+    // BSPersistenceDeleting
+    function GetBSPersistenceDeleting: Boolean;
+    procedure SetBSPersistenceDeleting(const Value: Boolean);
   protected
     function SupportsNestedFields: Boolean; override;
     procedure AddFields; override;
@@ -187,19 +192,6 @@ type
     procedure ReceiveSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
     procedure ReceiveSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-
-    property ioTypeName:String read GetTypeName write SetTypeName;
-    property ioTypeAlias:String read GetTypeAlias write SetTypeAlias;
-    property ioAutoLoadData:Boolean read GetAutoLoadData write SetAutoLoadData;
-    property ioAsync:Boolean read GetIoAsync write SetIoAsync;
-    property ioAutoPost:Boolean read GetioAutoPost write SetioAutoPost;
-    property ioAutoPersist:Boolean read GetioAutoPersist write SetioAutoPersist;
-    property ioWhere:IioWhere read GetIoWhere write SetIoWhere;
-    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
-    property ioViewDataType:TioViewDataType read GetIoViewDataType;
-    property ioOwnsObjects:Boolean read GetOwnsObjects;
-    property Items[const AIndex:Integer]:TObject read GetItems write SetItems;
-    property Refreshing: boolean read GetRefreshing write SetRefreshing;
   end;
 
 implementation
@@ -535,6 +527,11 @@ begin
   Result := FBindSource;
 end;
 
+function TioActiveListBindSourceAdapter.GetBSPersistenceDeleting: Boolean;
+begin
+  Result := FBSPersistenceDeleting;
+end;
+
 function TioActiveListBindSourceAdapter.GetCurrentOID: Integer;
 begin
   Result := TioMapContainer.GetMap(Current.ClassName).GetProperties.GetIdProperty.GetValue(Self.Current).AsInteger;
@@ -682,6 +679,7 @@ begin
   FAsync := False;
   FAutoPersist := True;
   FRefreshing := False;
+  FBSPersistenceDeleting := False;
 //  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
@@ -797,6 +795,11 @@ end;
 procedure TioActiveListBindSourceAdapter.SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
 begin
   FBindSource := ANotifiableBindSource;
+end;
+
+procedure TioActiveListBindSourceAdapter.SetBSPersistenceDeleting(const Value: Boolean);
+begin
+  FBSPersistenceDeleting := Value;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
