@@ -48,7 +48,7 @@ type
     procedure Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
-    procedure Delete;
+    procedure Delete(const ARaiseIfSaved: Boolean = False; ARaiseIfChangesExists: Boolean = False);
     function CanSave: Boolean;
     function CanRevert: Boolean;
     function CanPersist: Boolean;
@@ -112,12 +112,13 @@ begin
   Clear(False);
 end;
 
-procedure TioBSPersistence.Delete;
+procedure TioBSPersistence.Delete(const ARaiseIfSaved: Boolean = False; ARaiseIfChangesExists: Boolean = False);
 begin
-  // First call the persistence for delete the current object from the DB...
+  if ARaiseIfSaved and (State > osUnsaved) then
+    raise EioBindSourceObjStateException.Create(ClassName, 'Delete', 'A previously saved state exists, it must be cleared before (Persist, Revert or Clear)');
+  if ARaiseIfChangesExists and (State > osSaved) then
+    raise EioBindSourceObjStateException.Create(ClassName, 'Delete', 'Pending changes exists');
   TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
-  // ...then call the regular Delete method of the BindSource
-  FBindSource.Delete;
 end;
 
 function TioBSPersistence.IsActive: Boolean;
