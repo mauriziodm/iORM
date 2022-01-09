@@ -45,8 +45,10 @@ type
     FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
+    FDisableIfSaved: Boolean;
     FRaiseIfChangesDoesNotExists: Boolean;
     FRaiseIfChangesExists: Boolean;
+    FRaiseIfSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   strict protected
@@ -55,8 +57,10 @@ type
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
+    property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
     property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
+    property RaiseIfSaved: Boolean read FRaiseIfSaved write FRaiseIfSaved default False;
     property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -102,6 +106,20 @@ type
     property TargetBindSource;
   end;
 
+  TioBSPersistenceDelete = class(TioBSPersistenceStdActionFmx)
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfSaved;
+    property TargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
   // =================================================================================================
   // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
   // =================================================================================================
@@ -121,6 +139,7 @@ begin
   FDisableIfChangesExists := False;
   FRaiseIfChangesDoesNotExists := False;
   FRaiseIfChangesExists := True;
+  FRaiseIfSaved := False;
 end;
 
 function TioBSPersistenceStdActionFmx.HandlesTarget(Target: TObject): Boolean;
@@ -218,6 +237,26 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
+end;
+
+{ TioBSPersistenceDelete }
+
+constructor TioBSPersistenceDelete.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
+begin
+  TargetBindSource.Persistence.Delete(RaiseIfSaved, RaiseIfChangesExists);
+end;
+
+procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
 end;
 
 end.

@@ -15,6 +15,7 @@ begin
   RegisterActions('iORM-BSPersistence', [TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [TioBSPersistencePersist], nil);
   RegisterActions('iORM-BSPersistence', [TioBSPersistenceRevert], nil);
+  RegisterActions('iORM-BSPersistence', [TioBSPersistenceDelete], nil);
 end;
 
 end.

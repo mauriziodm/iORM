@@ -13,8 +13,10 @@ type
     FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
+    FDisableIfSaved: Boolean;
     FRaiseIfChangesDoesNotExists: Boolean;
     FRaiseIfChangesExists: Boolean;
+    FRaiseIfSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   strict protected
@@ -23,8 +25,10 @@ type
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
+    property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
     property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
+    property RaiseIfSaved: Boolean read FRaiseIfSaved write FRaiseIfSaved default False;
     property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -70,6 +74,20 @@ type
     property TargetBindSource;
   end;
 
+  TioBSPersistenceDelete = class(TioBSPersistenceStdActionVcl)
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfSaved;
+    property TargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
 implementation
 
 uses
@@ -83,8 +101,10 @@ begin
   FClearAfterExecute := True;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
+  FDisableIfSaved := False;
   FRaiseIfChangesDoesNotExists := False;
   FRaiseIfChangesExists := True;
+  FRaiseIfSaved := False;
 end;
 
 function TioBSPersistenceStdActionVcl.HandlesTarget(Target: TObject): Boolean;
@@ -158,6 +178,26 @@ procedure TioBSPersistenceClear.UpdateTarget(Target: TObject);
 begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+end;
+
+{ TioBSPersistenceDelete }
+
+constructor TioBSPersistenceDelete.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
+begin
+  TargetBindSource.Persistence.Delete(RaiseIfSaved, RaiseIfChangesExists);
+end;
+
+procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
 end;
 
 end.

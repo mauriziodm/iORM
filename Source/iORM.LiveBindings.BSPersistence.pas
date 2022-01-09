@@ -53,6 +53,7 @@ type
     function CanRevert: Boolean;
     function CanPersist: Boolean;
     function CanClear: Boolean;
+    function CanDelete: Boolean;
     function IsActive: Boolean;
     function IsChanged: Boolean;
     function IsSaved: Boolean;
@@ -75,6 +76,11 @@ uses
 function TioBSPersistence.CanClear: Boolean;
 begin
   Result := GetState > osUnsaved;
+end;
+
+function TioBSPersistence.CanDelete: Boolean;
+begin
+  Result := GetState >= osUnassigned;
 end;
 
 function TioBSPersistence.CanPersist: Boolean;
@@ -114,8 +120,9 @@ end;
 
 procedure TioBSPersistence.Delete(const ARaiseIfSaved: Boolean = False; ARaiseIfChangesExists: Boolean = False);
 begin
+  CheckUnassigned('Delete');
   if ARaiseIfSaved and (State > osUnsaved) then
-    raise EioBindSourceObjStateException.Create(ClassName, 'Delete', 'A previously saved state exists, it must be cleared before (Persist, Revert or Clear)');
+    raise EioBindSourceObjStateException.Create(ClassName, 'Delete', 'A previously saved revert point exists, it must be cleared before (Persist, Revert or Clear)');
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Delete', 'Pending changes exists');
   TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
@@ -207,7 +214,7 @@ procedure TioBSPersistence.SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean);
 begin
   CheckUnassigned('Save');
   if ARaiseIfAlreadySaved and (State > osUnsaved) then
-    raise EioBindSourceObjStateException.Create(ClassName, 'Save', 'A previously saved state exists, it must be cleared before (Persist, Revert or Clear)');
+    raise EioBindSourceObjStateException.Create(ClassName, 'Save', 'A previously saved revert point exists, it must be cleared before (Persist, Revert or Clear)');
   FSavedState := GetCurrentAsString
 end;
 
