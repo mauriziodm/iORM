@@ -174,17 +174,21 @@ begin
   if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
 
+  // NB: Mauri 11/01/2022: Da quando nel DoAfterDelete dell'ABSA richiamo il DoAfterScroll (perchè ho scoperto che non lo faceva da solo)
+  //      in pratica non c'è più bisogno delle righe sotto (cmq per ora le lascio per sicurezza)
+  // ====================================================================================================================================
   // NB: Ho spostato qui l'invio della notifica perchè altrimenti si presentava un problema di sequenza.
   // in pratica la notifica arrivava ai destinatari prima che il BSA avesse effettivamente
   // eliminato l'oggetto. Se lo metto qui invece va bene.
   // -------------------------------------------------------
   // DataSet synchro
-  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+//  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
   // if FAutoPersist is True then the notify is performed by
   // the "CommonBSAPersistence" else by this method
-  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
+//  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
+  // ====================================================================================================================================
 end;
 
 class procedure TioCommonBSAPersistence.Delete_old(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean);
