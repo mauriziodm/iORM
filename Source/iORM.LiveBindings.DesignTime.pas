@@ -40,7 +40,7 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.PrototypeBindSource.Master, iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf;
+  System.Classes, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf;
 
 procedure Register;
 begin

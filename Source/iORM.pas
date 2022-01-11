@@ -48,7 +48,7 @@ uses
   System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper,
   System.SysUtils, iORM.DependencyInjection.Interfaces,
   iORM.MVVM.Components.ViewContextProvider, iORM.MVVM.Interfaces,
-  iORM.MVVM.Components.ModelPresenter, iORM.DBBuilder.Interfaces;
+  iORM.MVVM.Components.ModelPresenter.Custom, iORM.DBBuilder.Interfaces;
 
 type
 

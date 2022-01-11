@@ -43,7 +43,7 @@ uses
   iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
   System.Rtti, System.UITypes, iORM.CommonTypes,
   iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, iORM.MVVM.ViewRegisterItem,
+  iORM.MVVM.Components.ModelPresenter.Custom, iORM.MVVM.ViewRegisterItem,
   System.SysUtils, iORM.AbstractionLayer.Framework;
 
 type

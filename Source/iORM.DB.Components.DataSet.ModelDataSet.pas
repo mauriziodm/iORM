@@ -4,7 +4,7 @@ interface
 
 uses
   iORM.DB.Components.DataSet.Base, iORM.MVVM.Components.ViewModelBridge, System.Classes,
-  iORM.Components.Common.Interfaces, iORM.MVVM.Components.ModelPresenter;
+  iORM.Components.Common.Interfaces, iORM.MVVM.Components.ModelPresenter.Custom;
 
 type
 

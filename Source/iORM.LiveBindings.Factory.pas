@@ -40,7 +40,7 @@ uses
   System.Generics.Collections, iORM.Context.Properties.Interfaces,
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom,
   iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
-  iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter,
+  iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter.Custom,
   iORM.LiveBindings.CommonBSAPaging;
 
 type

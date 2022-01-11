@@ -38,7 +38,7 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.MVVM.Components.ViewModelBridge, System.Classes,
   iORM.Components.Common.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.MVVM.Components.ModelPresenter;
+  iORM.MVVM.Components.ModelPresenter.Custom;
 
 type
 

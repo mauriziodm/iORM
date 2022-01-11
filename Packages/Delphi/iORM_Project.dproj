@@ -228,7 +228,7 @@
         <DCCReference Include="..\..\Source\iORM.DB.Components.ConnectionDef.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.Custom.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.Base.pas"/>
@@ -272,6 +272,8 @@
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Master.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.Master.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.Detail.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -354,8 +356,8 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -365,8 +367,8 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

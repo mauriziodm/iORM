@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.MVVM.Components.ModelPresenter;
+unit iORM.MVVM.Components.ModelPresenter.Custom;
 
 interface
 

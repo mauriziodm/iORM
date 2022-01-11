@@ -163,7 +163,7 @@ contains
   iORM.DB.Components.ConnectionDef in '..\..\Source\iORM.DB.Components.ConnectionDef.pas',
   iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas',
   iORM.MVVM.Components.ViewModelBridge in '..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas',
-  iORM.MVVM.Components.ModelPresenter in '..\..\Source\iORM.MVVM.Components.ModelPresenter.pas',
+  iORM.MVVM.Components.ModelPresenter.Custom in '..\..\Source\iORM.MVVM.Components.ModelPresenter.Custom.pas',
   iORM.Components.Common in '..\..\Source\iORM.Components.Common.pas',
   iORM.LiveBindings.ModelBindSource in '..\..\Source\iORM.LiveBindings.ModelBindSource.pas',
   iORM.DB.Components.DataSet.Base in '..\..\Source\iORM.DB.Components.DataSet.Base.pas',
@@ -206,7 +206,9 @@ contains
   iORM.StdActions.Fmx in '..\..\Source\iORM.StdActions.Fmx.pas',
   iORM.LiveBindings.CommonBSBehavior in '..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas',
   iORM.LiveBindings.PrototypeBindSource.Master in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Master.pas',
-  iORM.LiveBindings.PrototypeBindSource.Detail in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas';
+  iORM.LiveBindings.PrototypeBindSource.Detail in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas',
+  iORM.MVVM.Components.ModelPresenter.Master in '..\..\Source\iORM.MVVM.Components.ModelPresenter.Master.pas',
+  iORM.MVVM.Components.ModelPresenter.Detail in '..\..\Source\iORM.MVVM.Components.ModelPresenter.Detail.pas';
 
 end.
 

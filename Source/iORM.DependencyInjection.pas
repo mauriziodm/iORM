@@ -44,7 +44,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,
   iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces, System.Classes,
+  iORM.MVVM.Components.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes,
   System.SysUtils;
 
 type

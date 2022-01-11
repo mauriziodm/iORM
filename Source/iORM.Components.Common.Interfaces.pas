@@ -41,7 +41,7 @@ interface
 
 uses
   iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.Interfaces,
-  iORM.MVVM.Components.ModelPresenter;
+  iORM.MVVM.Components.ModelPresenter.Custom;
 
 type
 
