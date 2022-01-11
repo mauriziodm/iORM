@@ -559,7 +559,6 @@ end;
 
 procedure TioBSABaseDataSet.InternalDelete;
 begin
-  // Propagate the operation to the linked BindSourceAdapter
   FBindSourceAdapter.GetDataSetLinkContainer.Disable;
   try
     FBindSourceAdapter.Delete;

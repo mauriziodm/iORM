@@ -183,20 +183,6 @@ type
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-
-    property ioTypeName: String read GetTypeName write SetTypeName;
-    property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;
-    property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
-    property ioAsync: Boolean read GetIoAsync write SetIoAsync;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
-    property ioAutoPersist: Boolean read GetioAutoPersist write SetioAutoPersist;
-    property ioWhere: IioWhere read GetIoWhere write SetIoWhere;
-    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters
-      write SetioWhereDetailsFromDetailAdapters;
-    property ioViewDataType: TioViewDataType read GetIoViewDataType;
-    property ioOwnsObjects: Boolean read GetOwnsObjects;
-    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
-    property Refreshing: Boolean read GetRefreshing write SetRefreshing;
   end;
 
 implementation
