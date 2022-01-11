@@ -7,7 +7,7 @@ uses
 
 type
 
-  TioPrototypeBindSourceDetail = class(TioPrototypeBindSource)
+  TioPrototypeBindSourceDetail = class(TioCustomPrototypeBindSource)
   protected
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
