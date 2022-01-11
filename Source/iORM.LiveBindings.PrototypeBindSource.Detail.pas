@@ -3,7 +3,7 @@ unit iORM.LiveBindings.PrototypeBindSource.Detail;
 interface
 
 uses
-  iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces;
 
 type
 

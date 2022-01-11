@@ -3,7 +3,7 @@ unit iORM.LiveBindings.PrototypeBindSource.Master;
 interface
 
 uses
-  iORM.LiveBindings.BSPersistence, iORM.LiveBindings.PrototypeBindSource,
+  iORM.LiveBindings.BSPersistence, iORM.LiveBindings.PrototypeBindSource.Custom,
   System.Classes, iORM.LiveBindings.Interfaces, Data.Bind.Components;
 
 type

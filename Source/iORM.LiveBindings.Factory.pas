@@ -38,7 +38,7 @@ interface
 uses
   iORM.LiveBindings.Interfaces, iORM.CommonTypes, System.Classes,
   System.Generics.Collections, iORM.Context.Properties.Interfaces,
-  Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource,
+  Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom,
   iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
   iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter,
   iORM.LiveBindings.CommonBSAPaging;

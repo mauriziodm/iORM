@@ -39,7 +39,7 @@ interface
 
 uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
-  iORM.LiveBindings.PrototypeBindSource, iORM.LiveBindings.Interfaces,
+  iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider,
   iORM.MVVM.Components.ModelPresenter, iORM.Where.Interfaces, System.Classes,
   System.SysUtils;

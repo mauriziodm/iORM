@@ -91,7 +91,7 @@ contains
   iORM.LiveBindings.Interfaces in '..\..\Source\iORM.LiveBindings.Interfaces.pas',
   iORM.LiveBindings.DetailAdaptersContainer in '..\..\Source\iORM.LiveBindings.DetailAdaptersContainer.pas',
   iORM.LiveBindings.Factory in '..\..\Source\iORM.LiveBindings.Factory.pas',
-  iORM.LiveBindings.PrototypeBindSource in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.pas',
+  iORM.LiveBindings.PrototypeBindSource.Custom in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Custom.pas',
   iORM.SqlTranslator in '..\..\Source\iORM.SqlTranslator.pas',
   iORM.Context.Map in '..\..\Source\iORM.Context.Map.pas',
   iORM.Context.Map.Interfaces in '..\..\Source\iORM.Context.Map.Interfaces.pas',

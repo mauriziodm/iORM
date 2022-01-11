@@ -41,7 +41,7 @@ interface
 
 uses
   iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.PrototypeBindSource, iORM.Where.Interfaces,
+  iORM.LiveBindings.PrototypeBindSource.Custom, iORM.Where.Interfaces,
   System.Rtti, System.Classes, iORM.CommonTypes,
   iORM.AbstractionLayer.Framework;
 

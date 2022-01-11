@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.LiveBindings.PrototypeBindSource;
+unit iORM.LiveBindings.PrototypeBindSource.Custom;
 
 interface
 
