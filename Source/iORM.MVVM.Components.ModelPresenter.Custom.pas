@@ -139,8 +139,8 @@ type
     procedure SetWhereStr(const Value: TStrings);
   protected
     procedure Loaded; override;
-    function IsMasterBS: boolean; virtual; abstract;
-    function IsDetailBS: boolean; virtual; abstract;
+    function IsMasterBS: Boolean; virtual; abstract;
+    function IsDetailBS: Boolean; virtual; abstract;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -153,12 +153,32 @@ type
     property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
-    property Where: IioWhere read GetWhere write SetWhere; // public: Master
-    property ItemCount: Integer read GetCount; // Public: Master+Detail
-
-
-
-
+    property Active: Boolean read GetActive write SetActive; // Public: Master+Detail
+    property ItemIndex: Integer read GetItemIndex write SetItemIndex; // Public: Master+Detail
+    property Bof: Boolean read GetBOF; // Public: Master+Detail
+    property Eof: Boolean read GetEOF; // Public: Master+Detail
+    // Published properties
+    property Async: Boolean read FAsync write SetAsync default False; // Published: Master
+    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // Published: Master
+    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // Da eliminare tutto il discorso AutoPersist
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
+    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Nascondere e default = false
+    property TypeAlias: String read FTypeAlias write SetTypeAlias;
+    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType;
+    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
+    property WhereStr: TStrings read FWhereStr write SetWhereStr; // Published: Master
+    // Published properties: paging
+    property ioPaging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
+    // Published properties: selectors
+    property ioOnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property ioOnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
+    // Published Events: selectors
+    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
+    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
+    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
+    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -217,40 +237,16 @@ type
     function DataObject: TObject;
     function DataObjectAs<T>: T;
     function DataObjectAssigned: Boolean;
-    // Properties
-    property Active: Boolean read GetActive write SetActive;
-    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
-    property Bof: Boolean read GetBOF;
-    property Eof: Boolean read GetEOF;
-  published
-    // Events
-    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
-    property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
-    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
-    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
-    property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
-    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
-    // Properties
-    property AsDefault: Boolean read FAsDefault write SetAsDefault;
-    property Async: Boolean read FAsync write SetAsync;
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData;
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist;
-    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
-    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification;
-    property MasterPresenter: TioModelPresenter read FMasterPresenter write FMasterPresenter;
-    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName;
-    property OrderBy: String read FOrderBy Write SetOrderBy;
-    property TypeAlias: String read FTypeAlias write SetTypeAlias;
-    property TypeName: String read FTypeName write SetTypeName;
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType;
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
-    property WhereStr: TStrings read FWhereStr write SetWhereStr;
-    // Selectors
-    property SelectorFor: TioModelPresenter read FSelectorFor write FSelectorFor;
-    property ioOnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
-    property ioOnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
-    // Paging
-    property ioPaging: TioCommonBSAPageManager read GetPaging write SetPaging;
+    // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
+    property AsDefault: Boolean read FAsDefault write SetAsDefault; // Published: Master
+    property ItemCount: Integer read GetCount; // Public: Master+Detail
+    property MasterPresenter: TioModelPresenter read FMasterPresenter write FMasterPresenter; // Published: Detail
+    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // Published: Detail
+    property OrderBy: String read FOrderBy Write SetOrderBy; // Published: Master
+    property TypeName: String read FTypeName write SetTypeName; // Published: Master
+    property Where: IioWhere read GetWhere write SetWhere; // public: Master
+    // Published properties: selectors (NB: lasciata public perchè usata da qualche parte nel codice)
+    property SelectorFor: TioModelPresenter read FSelectorFor write FSelectorFor; // published: Master
   end;
 
 implementation
@@ -497,7 +493,7 @@ end;
 
 function TioModelPresenter.GetAutoRefreshOnNotification: TioAutoRefreshType;
 begin
-  result := FAutoRefreshOnNotification;
+  Result := FAutoRefreshOnNotification;
 end;
 
 function TioModelPresenter.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -914,9 +910,9 @@ end;
 procedure TioModelPresenter.SetPaging(const Value: TioCommonBSAPageManager);
 begin
   // In reality this property would be read-only but if I left it read-only
-  //  then it no longer writes me the values of the sub-properties in the DFM file.
-  //  So I also put the set method where, however, I raise an exception if someone
-  //  tries to set a value.
+  // then it no longer writes me the values of the sub-properties in the DFM file.
+  // So I also put the set method where, however, I raise an exception if someone
+  // tries to set a value.
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 

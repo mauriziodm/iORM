@@ -148,7 +148,7 @@ type
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
     property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False;
+    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // Da eliminare tutto il discorso AutoPersist
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
@@ -163,6 +163,9 @@ type
     property SelectorFor: TioCustomPrototypeBindSource read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
+    // Published properties: selectors
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
     // Published Events: selectors
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
@@ -170,11 +173,6 @@ type
     property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
-    // Published properties: selectors
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
-    // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
-    // published: Master+Detail
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
