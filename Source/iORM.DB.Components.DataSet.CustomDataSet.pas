@@ -72,8 +72,11 @@ type
     function GetIsInterfacePresenting: Boolean;
     // ItemCount
     function GetCount: Integer;
-    // OrderBy property
+    // OrderBy
     procedure SetOrderBy(const Value: String);
+    // Paging
+    procedure SetPaging(const Value: TioCommonBSAPageManager);
+    function GetPaging: TioCommonBSAPageManager;
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -88,9 +91,6 @@ type
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
-    // Paging
-    procedure SetPaging(const Value: TioCommonBSAPageManager);
-    function GetPaging: TioCommonBSAPageManager;
   protected
     procedure Loaded; override;
     function IsMasterBS: boolean; virtual; abstract;

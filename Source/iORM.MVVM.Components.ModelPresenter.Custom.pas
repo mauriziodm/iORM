@@ -88,10 +88,55 @@ type
     // Methods
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure WhereOnChangeEventHandler(Sender: TObject);
+    // Active
+    function GetActive: Boolean;
+    procedure SetActive(const Value: Boolean);
+    // AsDefault
+    procedure SetAsDefault(const Value: Boolean);
+    procedure InitAsDefaultOnCreate;
+    // Async
+    procedure SetAsync(const Value: Boolean);
+    // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
+    // AutoPersist
+    procedure SetAutoPersist(const Value: Boolean);
+    // AutoPost
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
+    // AutoRefreshOnNotification;
+    function GetAutoRefreshOnNotification: TioAutoRefreshType;
+    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    // Bof
+    function GetBOF: Boolean;
+    // Editing
+    function GetEditing: Boolean;
+    // Eof
+    function GetEOF: Boolean;
+    // IsInterfacePresenting
+    function GetIsInterfacePresenting: Boolean;
+    // ItemCount
+    function GetCount: Integer;
+    // ItemIndex
+    function GetItemIndex: Integer;
+    procedure SetItemIndex(const Value: Integer);
+    // OrderBy
+    procedure SetOrderBy(const Value: String);
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
+    // State
+    function GetState: TBindSourceAdapterState;
+    // TypeAlias
+    procedure SetTypeAlias(const Value: String);
+    // TypeName
+    procedure SetTypeName(const Value: String);
+    // Where
+    procedure SetWhere(const AWhere: IioWhere);
+    function GetWhere: IioWhere;
+    // WhereDetailsFromDetailAdapters
+    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
+    // WhereStr
+    procedure SetWhereStr(const Value: TStrings);
   protected
     procedure Loaded; override;
     function IsMasterBS: boolean; virtual; abstract;
@@ -104,50 +149,16 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
-    // AsDefault
-    procedure SetAsDefault(const Value: Boolean);
-    procedure InitAsDefaultOnCreate;
-    // TypeName
-    procedure SetTypeName(const Value: String);
-    // TypeAlias
-    procedure SetTypeAlias(const Value: String);
-    // OrderBy
-    procedure SetOrderBy(const Value: String);
-    // Where
-    procedure SetWhere(const AWhere: IioWhere);
-    function GetWhere: IioWhere;
-    // WhereDetailsFromDetailAdapters
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-    // WhereStr
-    procedure SetWhereStr(const Value: TStrings);
-    // State
-    function GetState: TBindSourceAdapterState;
-    // IsInterfacePresenting
-    function GetIsInterfacePresenting: Boolean;
-    // Editing
-    function GetEditing: Boolean;
-    // ItemCount
-    function GetCount: Integer;
-    // ItemIndex
-    function GetItemIndex: Integer;
-    procedure SetItemIndex(const Value: Integer);
-    // Async
-    procedure SetAsync(const Value: Boolean);
-    // AutoPersist
-    procedure SetAutoPersist(const Value: Boolean);
-    // AutoPost
-    procedure SetAutoPost(const Value: Boolean);
-    function GetAutoPost: Boolean;
-    // Active
-    function GetActive: Boolean;
-    procedure SetActive(const Value: Boolean);
-    // Bof
-    function GetBOF: Boolean;
-    // Eof
-    function GetEOF: Boolean;
-    // AutoRefreshOnNotification;
-    function GetAutoRefreshOnNotification: TioAutoRefreshType;
-    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    // Public properties
+    property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
+    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
+    property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
+    property Where: IioWhere read GetWhere write SetWhere; // public: Master
+    property ItemCount: Integer read GetCount; // Public: Master+Detail
+
+
+
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -208,12 +219,7 @@ type
     function DataObjectAssigned: Boolean;
     // Properties
     property Active: Boolean read GetActive write SetActive;
-    property Where: IioWhere read GetWhere write SetWhere;
-    property State: TBindSourceAdapterState read GetState;
-    property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
-    property Editing: Boolean read GetEditing;
-    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting;
     property Bof: Boolean read GetBOF;
     property Eof: Boolean read GetEOF;
   published

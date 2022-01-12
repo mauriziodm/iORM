@@ -88,32 +88,10 @@ type
 {$ENDIF}
     // =========================================================================
     function IsActive: Boolean;
-    procedure WhereOnChangeEventHandler(Sender: TObject);
-    // TypeName
-    procedure SetTypeName(const Value: String);
-    // TypeAlias
-    procedure SetTypeAlias(const Value: String);
-    // ioWhereStr
-    procedure SetWhereStr(const Value: TStrings);
-    // ioWhere property
-    procedure SetWhere(const AWhere: IioWhere);
-    function GetWhere: IioWhere;
-    // OrderBy property
-    procedure SetOrderBy(const Value: String);
-    // ioWhereDetailsFromDetailAdapters
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-    // IsDetail
-    function GetIsDetail: Boolean;
-    // IsInterfacePresenting
-    function GetIsInterfacePresenting: Boolean;
-    // State
-    function GetState: TBindSourceAdapterState;
-    // ItemCount
-    function GetCount: Integer;
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
     // Async
     procedure SetAsync(const Value: Boolean);
+    // AutoLoadData
+    procedure SetAutoLoadData(const Value: Boolean);
     // AutoPersist
     procedure SetAutoPersist(const Value: Boolean);
     // AutoPost
@@ -122,9 +100,29 @@ type
     // AutoRefreshOnNotification
     function GetAutoRefreshOnNotification: TioAutoRefreshType;
     procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    // IsInterfacePresenting
+    function GetIsInterfacePresenting: Boolean;
+    // ItemCount
+    function GetCount: Integer;
+    // OrderBy
+    procedure SetOrderBy(const Value: String);
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
+    // State
+    function GetState: TBindSourceAdapterState;
+    // TypeAlias
+    procedure SetTypeAlias(const Value: String);
+    // TypeName
+    procedure SetTypeName(const Value: String);
+    // Where
+    procedure SetWhere(const AWhere: IioWhere);
+    function GetWhere: IioWhere;
+    // WhereDetailsFromDetailAdapters
+    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
+    // WhereStr
+    procedure SetWhereStr(const Value: TStrings);
+    procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
@@ -586,11 +584,6 @@ begin
   else
     raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
   raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
-end;
-
-function TioCustomPrototypeBindSource.GetIsDetail: Boolean;
-begin
-  Result := Assigned(FMasterBindSource);
 end;
 
 function TioCustomPrototypeBindSource.GetIsInterfacePresenting: Boolean;
