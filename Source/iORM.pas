@@ -1001,3 +1001,4 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 TioMapContainer.Build;
 
 end.
+

@@ -56,19 +56,8 @@ type
   IioContainedBindSourceAdapter = interface;
   IioDetailBindSourceAdaptersContainer = interface;
 
-  // Bind source adapters notification type
-  TioBSANotificationType = (ntAfterPost, ntAfterDelete, ntAfterRefresh);
-
   // BindSource AutoRefresh type after notification
   TioAutoRefreshType = (arDisabled, arEnabledNoReload, arEnabledReload);
-
-  // Bind source adapters notification interface
-  IioBSANotification = interface
-    ['{CE7FCAD1-5D60-4C5C-9BE6-7D6E36571AE3}']
-    function Sender: TObject;
-    function Subject: TObject;
-    function NotificationType: TioBSANotificationType;
-  end;
 
   // Interface (without RefCount) for ioBindSources detection
   // (useful for detect iORM bind sources to pass itself

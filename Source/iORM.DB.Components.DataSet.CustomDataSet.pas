@@ -14,7 +14,7 @@ type
 
   TioMasterDataSet = TioCustomDataSet;
 
-  TioCustomDataSet = class(TioBSABaseDataSet, IioNotifiableBindSource, IioStdActionTargetBindSource)
+  TioCustomDataSet = class abstract(TioBSABaseDataSet, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;

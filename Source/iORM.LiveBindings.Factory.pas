@@ -68,7 +68,6 @@ uses
   iORM.LiveBindings.DetailAdaptersContainer,
   iORM.LiveBindings.ActiveListBindSourceAdapter,
   iORM.LiveBindings.ActiveObjectBindSourceAdapter,
-  iORM.LiveBindings.Notification,
   iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter,
   iORM.Context.Container, iORM.Context.Interfaces,
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, iORM.Context.Factory,
