@@ -235,34 +235,34 @@ type
     class procedure Show<T>(const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    class procedure ShowCurrent(const AModelPresenter: TioModelPresenter; const AVVMAlias: String = '';
+    class procedure ShowCurrent(const AModelPresenter: TioCustomModelPresenter; const AVVMAlias: String = '';
       const AVCProviderName: String = ''); overload;
-    class procedure ShowCurrent(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+    class procedure ShowCurrent(const AModelPresenter: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
       const AVVMAlias: String = ''); overload;
-    class procedure ShowCurrent(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent;
+    class procedure ShowCurrent(const AModelPresenter: TioCustomModelPresenter; const AViewContext: TComponent;
       const AVVMAlias: String = ''); overload;
 
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    class procedure ShowEach(const AModelPresenter: TioModelPresenter; const AVVMAlias: String = '';
+    class procedure ShowEach(const AModelPresenter: TioCustomModelPresenter; const AVVMAlias: String = '';
       const AVCProviderName: String = ''); overload;
-    class procedure ShowEach(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+    class procedure ShowEach(const AModelPresenter: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
       const AVVMAlias: String = ''); overload;
-    class procedure ShowEach(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent;
+    class procedure ShowEach(const AModelPresenter: TioCustomModelPresenter; const AViewContext: TComponent;
       const AVVMAlias: String = ''); overload;
 
     // Show selector
-    class procedure ShowAsSelector(const ATargetMP: TioModelPresenter; const AVVMAlias: String = '';
+    class procedure ShowAsSelector(const ATargetMP: TioCustomModelPresenter; const AVVMAlias: String = '';
       const AVCProviderName: String = ''); overload;
-    class procedure ShowAsSelector(const ATargetMP: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+    class procedure ShowAsSelector(const ATargetMP: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
       const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector(const ATargetMP: TioModelPresenter; const AViewContext: TComponent;
+    class procedure ShowAsSelector(const ATargetMP: TioCustomModelPresenter; const AViewContext: TComponent;
       const AVVMAlias: String = ''); overload;
     // Show selector (Generic version)
-    class procedure ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AVVMAlias: String = '';
+    class procedure ShowAsSelector<T>(const ATargetMP: TioCustomModelPresenter; const AVVMAlias: String = '';
       const AVCProviderName: String = ''); overload;
-    class procedure ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+    class procedure ShowAsSelector<T>(const ATargetMP: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
       const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AViewContext: TComponent;
+    class procedure ShowAsSelector<T>(const ATargetMP: TioCustomModelPresenter; const AViewContext: TComponent;
       const AVVMAlias: String = ''); overload;
   end;
 
@@ -511,28 +511,28 @@ begin
   di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
-class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowCurrent(const AModelPresenter: TioCustomModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowCurrent;
 end;
 
-class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+class procedure io.ShowCurrent(const AModelPresenter: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProvider).ShowCurrent;
 end;
 
-class procedure io.ShowCurrent(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName: String);
+class procedure io.ShowCurrent(const AModelPresenter: TioCustomModelPresenter; const AVVMAlias: String; const AVCProviderName: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProviderName).ShowCurrent;
 end;
 
-class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowEach(const AModelPresenter: TioCustomModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
 end;
 
@@ -541,54 +541,54 @@ begin
   TioApplication.ShowMessage(AMessage);
 end;
 
-class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AVVMAlias, AVCProviderName: String);
+class procedure io.ShowAsSelector(const ATargetMP: TioCustomModelPresenter; const AVVMAlias, AVCProviderName: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor(ATargetMP.TypeName, AVVMAlias).VCProvider(AVCProviderName).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
-class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+class procedure io.ShowAsSelector(const ATargetMP: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor(ATargetMP.TypeName, AVVMAlias).VCProvider(AVCProvider).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
-class procedure io.ShowAsSelector(const ATargetMP: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowAsSelector(const ATargetMP: TioCustomModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor(ATargetMP.TypeName, AVVMAlias).SetViewContext(AViewContext).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
-class procedure io.ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowAsSelector<T>(const ATargetMP: TioCustomModelPresenter; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor<T>(AVVMAlias).SetViewContext(AViewContext).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
-class procedure io.ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+class procedure io.ShowAsSelector<T>(const ATargetMP: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
-class procedure io.ShowAsSelector<T>(const ATargetMP: TioModelPresenter; const AVVMAlias, AVCProviderName: String);
+class procedure io.ShowAsSelector<T>(const ATargetMP: TioCustomModelPresenter; const AVVMAlias, AVCProviderName: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
     io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).SetPresenterAsSelectorFor(ATargetMP).Get;
 end;
 
-class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVCProvider: TioViewContextProvider;
+class procedure io.ShowEach(const AModelPresenter: TioCustomModelPresenter; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProvider).ShowEach;
 end;
 
-class procedure io.ShowEach(const AModelPresenter: TioModelPresenter; const AVVMAlias: String; const AVCProviderName: String);
+class procedure io.ShowEach(const AModelPresenter: TioCustomModelPresenter; const AVVMAlias: String; const AVCProviderName: String);
 begin
-  if TioModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
+  if TioCustomModelPresenter.IsValidForDependencyInjectionLocator(AModelPresenter, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(AModelPresenter, AVVMAlias, False).VCProvider(AVCProviderName).ShowEach;
 end;
 

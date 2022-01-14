@@ -128,10 +128,10 @@ type
 
     function SetPresenter(const AName:String; const ADataObject:TObject): TioDependencyInjectionRegister; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): TioDependencyInjectionRegister; overload;
-    function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): TioDependencyInjectionRegister; overload;
+    function SetPresenter(const AName:String; const AMasterPresenter:TioCustomModelPresenter; const AMasterPropertyName:String=''): TioDependencyInjectionRegister; overload;
     function SetPresenter(const AName:String; const AWhere:IioWhere): TioDependencyInjectionRegister; overload;
     function SetPresenter(const AName:String; const AOrderBy:String): TioDependencyInjectionRegister; overload;
-    function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioModelPresenter): TioDependencyInjectionRegister;
+    function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioCustomModelPresenter): TioDependencyInjectionRegister;
 
     function AsViewFor(const ATargetTypeName:String; const AAlias:String=''): TioDependencyInjectionRegister; overload;
     function AsViewFor(const ATargetClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
@@ -175,7 +175,7 @@ type
     FViewContext: TComponent;  // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider
     FViewContextFreeMethod: TProc;  // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider (or in combination with it)
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
-    FForEachModelPresenter: TioModelPresenter;
+    FForEachModelPresenter: TioCustomModelPresenter;
     FForEachLocateViewModel: Boolean;
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     procedure ClearPresenterSettings;
@@ -203,7 +203,7 @@ type
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
     procedure ShowEach;
-    procedure _SetForEachModelPresenter(const AModelPresenter:TioModelPresenter; const ALocateViewModel:Boolean);
+    procedure _SetForEachModelPresenter(const AModelPresenter:TioCustomModelPresenter; const ALocateViewModel:Boolean);
     procedure _DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDependencyInjectionLocator);
     function _GetAlias: String;
     function _GetConstructorMethod: String;
@@ -218,18 +218,18 @@ type
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AInterfacedObj:IInterface): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
-    function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AName:String; const AMasterPresenter:TioCustomModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AName:String; const AOrderBy:String): IioDependencyInjectionLocator; overload;
-    function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioModelPresenter): IioDependencyInjectionLocator; overload;
+    function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioCustomModelPresenter): IioDependencyInjectionLocator; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetPresenter(const ADataObject:TObject): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AInterfacedObj:IInterface): IioDependencyInjectionLocator; overload;
     function SetPresenter(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
-    function SetPresenter(const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    function SetPresenter(const AMasterPresenter:TioCustomModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
     function SetPresenter(const AOrderBy:String): IioDependencyInjectionLocator; overload;
-    function SetPresenterAsSelectorFor(const ASelectionDest:TioModelPresenter): IioDependencyInjectionLocator; overload;
+    function SetPresenterAsSelectorFor(const ASelectionDest:TioCustomModelPresenter): IioDependencyInjectionLocator; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
@@ -252,18 +252,18 @@ type
     function SetPresenter(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AInterfacedObj:IInterface): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
-    function SetPresenter(const AName:String; const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AName:String; const AMasterPresenter:TioCustomModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AName:String; const AOrderBy:String): IioDependencyInjectionLocator<TI>; overload;
-    function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioModelPresenter): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenterAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:TioCustomModelPresenter): IioDependencyInjectionLocator<TI>; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetPresenter(const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AInterfacedObj:IInterface): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
-    function SetPresenter(const AMasterPresenter:TioModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenter(const AMasterPresenter:TioCustomModelPresenter; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetPresenter(const AOrderBy:String): IioDependencyInjectionLocator<TI>; overload;
-    function SetPresenterAsSelectorFor(const ASelectionDest:TioModelPresenter): IioDependencyInjectionLocator<TI>; overload;
+    function SetPresenterAsSelectorFor(const ASelectionDest:TioCustomModelPresenter): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
@@ -290,7 +290,7 @@ type
   TioDependencyInjection = class(TioDependencyInjectionBase)
   private
     class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
-    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP:TioModelPresenter; const ATargetTypeName:String; const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
+    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP:TioCustomModelPresenter; const ATargetTypeName:String; const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
   public
     class function Singletons: TioSingletonsFacadeRef;
     class function RegisterClass<T: class>: TioDependencyInjectionRegister; overload;
@@ -308,7 +308,7 @@ type
     class function LocateViewFor<T>(const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewFor(const ATargetObj:TObject; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewFor(const ATargetIntf:IInterface; const AAlias:String=''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor(const ATargetMP:TioModelPresenter; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor(const ATargetMP:TioCustomModelPresenter; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     // LocateFor ViewModel
     class function LocateVMfor(const ATargetTypeName:String; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateVMfor(const AClassRef:TioClassRef; const AAlias:String=''): IioDependencyInjectionLocator; overload;
@@ -321,7 +321,7 @@ type
     class function LocateViewVMfor<T>(const AAlias:String=''; const AViewModelMarker:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetObj:TObject; const AAlias:String=''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetIntf:IInterface; const AAlias:String=''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMFor(const ASourceMP:TioModelPresenter; const AAlias:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMFor(const ASourceMP:TioCustomModelPresenter; const AAlias:String=''): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -332,8 +332,8 @@ type
     class function GetRegister(const AContainerValue:TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName:String; const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator; overload;
     class function GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
-    class function GetViewLocatorFor(const ATargetMP:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
-    class function GetViewVMLocatorFor(const ATargetMP:TioModelPresenter; const AAlias:String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator; overload;
+    class function GetViewLocatorFor(const ATargetMP:TioCustomModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
+    class function GetViewVMLocatorFor(const ATargetMP:TioCustomModelPresenter; const AAlias:String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator; overload;
 // NB: IL codice del metodo sotto commentato è anch'esso commentato
 //    class function GetVMLocatorFor(const AModelPresenter:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
   end;
@@ -467,7 +467,7 @@ begin
 end;
 
 class function TioDependencyInjection.LocateViewFor(
-  const ATargetMP: TioModelPresenter;
+  const ATargetMP: TioCustomModelPresenter;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
@@ -572,14 +572,14 @@ begin
   Result := LocateViewFor((ATargetIntf as TObject).ClassName, AAlias);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: TioModelPresenter;
+class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: TioCustomModelPresenter;
   const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AAlias, False);
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: TioModelPresenter; const ATargetTypeName, AAlias,
+class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: TioCustomModelPresenter; const ATargetTypeName, AAlias,
   AViewModelMarker: String): IioDependencyInjectionLocator;
 var
   LViewModel: IioViewModel;
@@ -821,7 +821,7 @@ begin
 end;
 
 function TioDependencyInjectionRegister.SetPresenter(const AName: String;
-  const AMasterPresenter: TioModelPresenter;
+  const AMasterPresenter: TioCustomModelPresenter;
   const AMasterPropertyName: String): TioDependencyInjectionRegister;
 var
   I: Integer;
@@ -879,7 +879,7 @@ begin
 end;
 
 function TioDependencyInjectionRegister.SetPresenterAsSelectorFor(const ASourcePresenterName: String;
-  const ASelectionDest: TioModelPresenter): TioDependencyInjectionRegister;
+  const ASelectionDest: TioCustomModelPresenter): TioDependencyInjectionRegister;
 var
   I: Integer;
 begin
@@ -1135,7 +1135,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator.SetPresenter(const AName: String;
-  const AMasterPresenter: TioModelPresenter;
+  const AMasterPresenter: TioCustomModelPresenter;
   const AMasterPropertyName: String): IioDependencyInjectionLocator;
 var
   I: Integer;
@@ -1188,7 +1188,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator.SetPresenter(
-  const AMasterPresenter: TioModelPresenter;
+  const AMasterPresenter: TioCustomModelPresenter;
   const AMasterPropertyName: String): IioDependencyInjectionLocator;
 begin
   Result := SetPresenter('', AMasterPresenter, AMasterPropertyName);
@@ -1219,7 +1219,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator.SetPresenterAsSelectorFor(const ASourcePresenterName: String;
-  const ASelectionDest: TioModelPresenter): IioDependencyInjectionLocator;
+  const ASelectionDest: TioCustomModelPresenter): IioDependencyInjectionLocator;
 var
   I: Integer;
 begin
@@ -1232,7 +1232,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator.SetPresenterAsSelectorFor(
-  const ASelectionDest: TioModelPresenter): IioDependencyInjectionLocator;
+  const ASelectionDest: TioCustomModelPresenter): IioDependencyInjectionLocator;
 begin
   Result := SetPresenterAsSelectorFor('', ASelectionDest);
 end;
@@ -1440,7 +1440,7 @@ begin
 end;
 
 procedure TioDependencyInjectionLocator._SetForEachModelPresenter(
-  const AModelPresenter: TioModelPresenter; const ALocateViewModel:Boolean);
+  const AModelPresenter: TioCustomModelPresenter; const ALocateViewModel:Boolean);
 begin
   FForEachModelPresenter := AModelPresenter;
   FForEachLocateViewModel := ALocateViewModel;
@@ -1502,10 +1502,10 @@ begin
   Result := TioDependencyInjectionLocator.Create(AInterfaceName, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetMP: TioModelPresenter; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetMP: TioCustomModelPresenter; const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
-  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
+  TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a locator for MP.Current instance
   if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist then
 //    Result := io.di.LocateViewFor(ATargetMP.Current, AAlias) // NB: Mauri 05/03/2020 - Vecchio codice con il quale non funzionava l'AutorefreshOnNotification
@@ -1552,10 +1552,10 @@ begin
 // ---------- OLD CODE -----------
 end;
 
-class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: TioModelPresenter; const AAlias: String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: TioCustomModelPresenter; const AAlias: String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
-  TioModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
+  TioCustomModelPresenter.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a locator for MP.Current instance
   if  io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist then
   begin
@@ -1695,7 +1695,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator<TI>.SetPresenter(const AName: String;
-  const AMasterPresenter: TioModelPresenter;
+  const AMasterPresenter: TioCustomModelPresenter;
   const AMasterPropertyName: String): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
@@ -1884,7 +1884,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator<TI>.SetPresenter(
-  const AMasterPresenter: TioModelPresenter;
+  const AMasterPresenter: TioCustomModelPresenter;
   const AMasterPropertyName: String): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
@@ -1912,14 +1912,14 @@ begin
 end;
 
 function TioDependencyInjectionLocator<TI>.SetPresenterAsSelectorFor(const ASourcePresenterName: String;
-  const ASelectionDest: TioModelPresenter): IioDependencyInjectionLocator<TI>;
+  const ASelectionDest: TioCustomModelPresenter): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetPresenterAsSelectorFor(ASourcePresenterName, ASelectionDest);
 end;
 
 function TioDependencyInjectionLocator<TI>.SetPresenterAsSelectorFor(
-  const ASelectionDest: TioModelPresenter): IioDependencyInjectionLocator<TI>;
+  const ASelectionDest: TioCustomModelPresenter): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetPresenterAsSelectorFor(ASelectionDest);

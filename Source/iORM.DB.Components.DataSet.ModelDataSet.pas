@@ -17,7 +17,7 @@ type
   protected
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function GetModelPresenterInstance: TioModelPresenter;
+    function GetModelPresenterInstance: TioCustomModelPresenter;
     // dataset virtual methods
     procedure InternalPreOpen; override;
     /// ViewModelBridge
@@ -57,7 +57,7 @@ begin
   GetModelPresenterInstance.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
-function TioModelDataSet.GetModelPresenterInstance: TioModelPresenter;
+function TioModelDataSet.GetModelPresenterInstance: TioCustomModelPresenter;
 begin
   Result := ViewModelBridge.Presenter[ModelPresenter];
 end;

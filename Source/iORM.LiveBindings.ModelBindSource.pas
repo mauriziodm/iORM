@@ -56,7 +56,7 @@ type
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function GetModelPresenterInstance: TioModelPresenter;
+    function GetModelPresenterInstance: TioCustomModelPresenter;
     // ViewModelBridge
     procedure SetViewModelBridge(const AVMBridge: TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
@@ -141,7 +141,7 @@ begin
   if CheckAdapter and Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
 end;
 
-function TioModelBindSource.GetModelPresenterInstance: TioModelPresenter;
+function TioModelBindSource.GetModelPresenterInstance: TioCustomModelPresenter;
 begin
   Result := ViewModelBridge.Presenter[ModelPresenter];
 end;
