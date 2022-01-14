@@ -85,6 +85,7 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    function IsActive: Boolean;
     // Methods
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure WhereOnChangeEventHandler(Sender: TObject);
@@ -168,10 +169,10 @@ type
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // Published: Master
     // Published properties: paging
-    property ioPaging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
+    property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
-    property ioOnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
-    property ioOnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
+    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
     // Published Events: selectors
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
@@ -1066,6 +1067,11 @@ begin
     // invocato un Post in seguito al Refresh stesso.
     // BindSourceAdapter.Refresh(False);
   end;
+end;
+
+function TioModelPresenter.IsActive: Boolean;
+begin
+  Result := CheckAdapter and FBindSourceAdapter.Active;
 end;
 
 class function TioModelPresenter.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenter;

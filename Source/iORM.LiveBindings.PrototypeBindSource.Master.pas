@@ -13,6 +13,7 @@ type
     FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    // SourcePrototypeBindSource
     function GetSourcePBS: TioCustomPrototypeBindSource;
     procedure SetSourcePBS(const Value: TioCustomPrototypeBindSource);
     // Added methods

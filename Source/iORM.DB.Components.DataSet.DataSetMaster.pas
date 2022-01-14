@@ -13,6 +13,7 @@ type
     FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    // SourceDataSet
     function GetSourceDataSet: TioCustomDataSet;
     procedure SetSourceDataSet(const Value: TioCustomDataSet);
     // Added methods
