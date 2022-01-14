@@ -40,14 +40,15 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.MVVM.Components.ModelPresenter.Custom, iORM.DB.Components.DataSet.ModelDataSet, iORM.LiveBindings.ModelBindSource,
+  System.Classes, iORM.MVVM.Components.ModelPresenter.Master, iORM.MVVM.Components.ModelPresenter.Detail, iORM.DB.Components.DataSet.ModelDataSet, iORM.LiveBindings.ModelBindSource,
   iORM.MVVM.Components.ViewModelBridge, iORM.MVVM.Components.ViewContextProvider;
 
 procedure Register;
 begin
   RegisterComponents('iORM', [TioViewModelBridge]);
   RegisterComponents('iORM', [TioViewContextProvider]);
-  RegisterComponents('iORM', [TioModelPresenter]);
+  RegisterComponents('iORM', [TioModelPresenterMaster]);
+  RegisterComponents('iORM', [TioModelPresenterDetail]);
   RegisterComponents('iORM', [TioModelDataSet]);
   RegisterComponents('iORM', [TioModelBindSource]);
 end;
