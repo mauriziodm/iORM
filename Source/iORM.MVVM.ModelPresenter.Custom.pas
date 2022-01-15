@@ -39,7 +39,7 @@ uses
   System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
   System.Generics.Collections, iORM.MVVM.ViewContextProvider,
-  System.Rtti, System.SysUtils, iORM.LiveBindings.CommonBSAPaging;
+  System.Rtti, iORM.LiveBindings.CommonBSAPaging, System.SysUtils;
 
 type
 
@@ -255,7 +255,7 @@ implementation
 uses
   iORM.Where.Factory, iORM.LiveBindings.Factory,
   iORM.Exceptions, iORM.Utilities, iORM, iORM.Components.Common,
-  iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.CommonBSBehavior, iORM.LiveBindings.BSPersistence;
 
 { TioModelProvider }
 
@@ -626,6 +626,7 @@ end;
 procedure TioModelPresenterCustom.InitAsDefaultOnCreate;
 var
   I: Integer;
+  LComponent: TObject;
 begin
   // At DesignTime initialize the "AsDefault" property at True if it is the
   // first ModelPresenter inserted (no other presenters presents).
@@ -634,11 +635,15 @@ begin
   begin
     FAsDefault := True;
     for I := 0 to Owner.ComponentCount - 1 do
-      if (Owner.Components[I] is TioModelPresenterCustom) and (Owner.Components[I] <> Self) then
+    begin
+      LComponent := Owner.Components[I];
+      // If the current component supports the IioBSPersistenceClient then it's a ModelPresenterMaster
+      if (LComponent is TioModelPresenterCustom) and Supports(LComponent, IioBSPersistenceClient) and (LComponent <> Self) then
       begin
         FAsDefault := False;
         Exit;
       end;
+    end;
   end
   else
     FAsDefault := False;
@@ -1034,7 +1039,7 @@ begin
   if Assigned(FBindSourceAdapter) then
     raise EioException.Create(ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
   // if the TypeName is empty then set it
-  if TypeName.IsEmpty then
+  if IsMasterBS and TypeName.IsEmpty then
     raise EioException.Create(ClassName, '_CreateAdapter', 'ModelPresenter.TypeName value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
