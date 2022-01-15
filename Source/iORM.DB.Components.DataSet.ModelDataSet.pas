@@ -18,6 +18,9 @@ type
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetModelPresenterInstance: TioCustomModelPresenter;
+    // These methods handle the "Persistence" property which is actually located on the ModelPresenter
+    procedure DoBeforeOpen; override;
+    procedure DoBeforeScroll; override;
     // dataset virtual methods
     procedure InternalPreOpen; override;
     /// ViewModelBridge
@@ -38,7 +41,7 @@ implementation
 uses
   iORM.Exceptions, System.SysUtils, iORM.Components.Common,
   Data.Bind.ObjectScope, iORM.LiveBindings.Factory,
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, iORM.LiveBindings.BSPersistence;
 
 { TioModelDataSet }
 
@@ -55,6 +58,24 @@ end;
 procedure TioModelDataSet.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
   GetModelPresenterInstance.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
+end;
+
+procedure TioModelDataSet.DoBeforeOpen;
+var
+  LBSPersistenceClient: IioBSPersistenceClient;
+begin
+  inherited;
+  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+    LBSPersistenceClient.Persistence.Clear(False);
+end;
+
+procedure TioModelDataSet.DoBeforeScroll;
+var
+  LBSPersistenceClient: IioBSPersistenceClient;
+begin
+  inherited;
+  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+    LBSPersistenceClient.Persistence.NotifyBeforeScroll;
 end;
 
 function TioModelDataSet.GetModelPresenterInstance: TioCustomModelPresenter;
@@ -80,9 +101,9 @@ begin
   // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
   // from it (for cross view with microviews)
   if Assigned(FCrossView_MasterBindSource) then
-    ViewModelBridge.Presenter[ModelPresenter].SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
+    GetModelPresenterInstance.SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
       FCrossView_MasterBindSource.GetActiveBindSourceAdapter, FCrossView_MasterPropertyName, nil)  );
-  SetActiveBindSourceAdapter(  ViewModelBridge.Presenter[ModelPresenter].GetActiveBindSourceAdapter  );
+  SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
   if (GetActiveBindSourceAdapter <> nil) then
     GetActiveBindSourceAdapter.Active := True;
   inherited;

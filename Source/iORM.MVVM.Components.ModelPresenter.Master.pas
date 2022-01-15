@@ -27,10 +27,10 @@ type
     procedure DoBeforeOpen;
     procedure DoBeforeScroll;
   protected
-    function IsMasterBS: boolean; override;
-    function IsDetailBS: boolean; override;
-//    procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul BindSource della view e poi passarlo al ModelPresenter
-//    procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul BindSource della view e poi passarlo al ModelPresenter
+    function IsMasterBS: Boolean; override;
+    function IsDetailBS: Boolean; override;
+//    procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
+//    procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
