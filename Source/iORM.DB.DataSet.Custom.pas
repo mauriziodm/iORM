@@ -96,7 +96,7 @@ type
     function IsMasterBS: boolean; virtual; abstract;
     function IsDetailBS: boolean; virtual; abstract;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
-    procedure SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
+    procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -531,7 +531,7 @@ begin
   FAutoRefreshOnNotification := Value;
 end;
 
-procedure TioDataSetCustom.SetActiveBindSOurceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   inherited;
   // Init the BSA

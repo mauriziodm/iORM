@@ -19,8 +19,9 @@ type
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function HandlesTarget(Target: TObject): Boolean; override;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
+  public
+    function HandlesTarget(Target: TObject): Boolean; override;
   end;
 
 //  TioBSMakeSelection = class(TioBSStdActionFmx)
@@ -53,7 +54,6 @@ type
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function HandlesTarget(Target: TObject): Boolean; override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
@@ -64,6 +64,7 @@ type
     property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx)

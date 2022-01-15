@@ -25,8 +25,6 @@ type
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
-    procedure DoBeforeOpen;
-    procedure DoBeforeScroll;
   protected
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
@@ -84,18 +82,6 @@ destructor TioModelPresenterMaster.Destroy;
 begin
   FObjState.Free;
   inherited;
-end;
-
-procedure TioModelPresenterMaster.DoBeforeOpen;
-begin
-  inherited;
-  Persistence.Clear(False);
-end;
-
-procedure TioModelPresenterMaster.DoBeforeScroll;
-begin
-  inherited;
-  Persistence.NotifyBeforeScroll;
 end;
 
 function TioModelPresenterMaster.GetOnEditAction: TioBSOnEditAction;

@@ -151,8 +151,6 @@ begin
 end;
 
 class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-var
-  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
 begin
   // If it is during a BSPersistenceDeleting operation or current is nil then exit
   if AActiveBindSourceAdapter.BSPersistenceDeleting or not Assigned(AActiveBindSourceAdapter.Current) then
