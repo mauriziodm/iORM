@@ -792,7 +792,7 @@ end;
 
 procedure TioModelPresenterCustom.SetActive(const Value: Boolean);
 begin
-  if CheckAdapter(True) and Value then
+  if CheckAdapter(True) then
     GetActiveBindSourceAdapter.Active := Value;
 end;
 

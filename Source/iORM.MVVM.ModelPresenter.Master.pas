@@ -33,6 +33,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    property Active;
     property Where;
     property ItemCount;
     // Added properties
