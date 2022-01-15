@@ -1,9 +1,9 @@
-unit iORM.MVVM.Components.ViewModelBridge;
+unit iORM.MVVM.ViewModelBridge;
 
 interface
 
 uses
-  System.Classes, iORM.MVVM.Interfaces, iORM.MVVM.Components.ModelPresenter.Custom;
+  System.Classes, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom;
 
 type
 

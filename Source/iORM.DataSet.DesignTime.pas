@@ -40,8 +40,7 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.DB.Components.DataSet.DataSetMaster, iORM.DB.Components.DataSet.DataSetDetail,
-  iORM.DB.Components.MemTable;
+  System.Classes, iORM.DB.DataSet.Master, iORM.DB.DataSet.Detail, iORM.DB.MemTable;
 
 procedure Register;
 begin

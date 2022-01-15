@@ -35,14 +35,12 @@
 
 
 
-unit iORM.AbstractionLayer.Framework.VCL;
+unit iORM.Abstraction.VCL;
 
 interface
 
 uses
-  iORM.AbstractionLayer.Framework, Vcl.ActnList, Vcl.ExtCtrls,
-  System.Rtti, System.Classes,
-  FireDAC.VCLUI.Wait; // For FireDAC compatibility without insert the original component
+  iORM.Abstraction, Vcl.ActnList, Vcl.ExtCtrls, System.Rtti, System.Classes, FireDAC.VCLUI.Wait; // For FireDAC compatibility without original component
 
 type
 

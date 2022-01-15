@@ -35,7 +35,7 @@
 
 
 
-unit iORM.AbstractionLayer.Framework;
+unit iORM.Abstraction;
 
 interface
 

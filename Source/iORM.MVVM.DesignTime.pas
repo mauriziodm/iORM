@@ -40,8 +40,8 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.MVVM.Components.ModelPresenter.Master, iORM.MVVM.Components.ModelPresenter.Detail, iORM.DB.Components.DataSet.ModelDataSet, iORM.LiveBindings.ModelBindSource,
-  iORM.MVVM.Components.ViewModelBridge, iORM.MVVM.Components.ViewContextProvider;
+  System.Classes, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet, iORM.MVVM.ModelBindSource,
+  iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider;
 
 procedure Register;
 begin

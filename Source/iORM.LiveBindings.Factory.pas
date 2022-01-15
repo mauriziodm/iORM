@@ -36,12 +36,9 @@ unit iORM.LiveBindings.Factory;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces, iORM.CommonTypes, System.Classes,
-  System.Generics.Collections, iORM.Context.Properties.Interfaces,
-  Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom,
-  iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
-  iORM.Where.Interfaces, iORM.MVVM.Components.ModelPresenter.Custom,
-  iORM.LiveBindings.CommonBSAPaging;
+  iORM.LiveBindings.Interfaces, iORM.CommonTypes, System.Classes, System.Generics.Collections, iORM.Context.Properties.Interfaces,
+  Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
+  iORM.Where.Interfaces, iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.CommonBSAPaging;
 
 type
 

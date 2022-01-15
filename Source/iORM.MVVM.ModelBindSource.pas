@@ -31,14 +31,14 @@
 { }
 { *************************************************************************** }
 
-unit iORM.LiveBindings.ModelBindSource;
+unit iORM.MVVM.ModelBindSource;
 
 interface
 
 uses
-  Data.Bind.ObjectScope, iORM.MVVM.Components.ViewModelBridge, System.Classes,
+  Data.Bind.ObjectScope, iORM.MVVM.ViewModelBridge, System.Classes,
   iORM.Components.Common.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.MVVM.Components.ModelPresenter.Custom, Data.Bind.Components;
+  iORM.MVVM.ModelPresenter.Custom, Data.Bind.Components;
 
 type
 

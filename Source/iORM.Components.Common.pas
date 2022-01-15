@@ -55,8 +55,7 @@ type
 implementation
 
 uses
-  iORM.DB.Components.ConnectionDef, System.SysUtils,
-  iORM.MVVM.Components.ViewModelBridge;
+  iORM.DB.ConnectionDef, System.SysUtils, iORM.MVVM.ViewModelBridge;
 
 { TioComponentsCommon }
 

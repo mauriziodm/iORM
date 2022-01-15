@@ -35,13 +35,13 @@
 
 
 
-unit iORM.DB.Components.ConnectionDef.MSSQLServer;
+unit iORM.DB.ConnectionDef.MSSQLServer;
 
 interface
 
 uses
   FireDAC.Phys.MSSQL,  // For compatibility with FireDAC without need to put then Phys driver in the project
-  iORM.DB.Components.ConnectionDef, System.SysUtils, iORM.DBBuilder.Interfaces;
+  iORM.DB.ConnectionDef, System.SysUtils, iORM.DBBuilder.Interfaces;
 
 type
 

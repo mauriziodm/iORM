@@ -1,9 +1,9 @@
-unit iORM.MVVM.Components.ModelPresenter.Master;
+unit iORM.MVVM.ModelPresenter.Master;
 
 interface
 
 uses
-  iORM.MVVM.Components.ModelPresenter.Custom, iORM.LiveBindings.BSPersistence,
+  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.BSPersistence,
   System.Classes, iORM.LiveBindings.Interfaces;
 
 type
@@ -13,6 +13,7 @@ type
     FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    function IsActive: Boolean;
     // SourceModelPresenter
     function GetSourcePresenter: TioModelPresenterCustom;
     procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
@@ -115,6 +116,11 @@ end;
 function TioModelPresenterMaster.GetSourcePresenter: TioModelPresenterCustom;
 begin
   Result := MasterPresenter;
+end;
+
+function TioModelPresenterMaster.IsActive: Boolean;
+begin
+  Result := Active;
 end;
 
 function TioModelPresenterMaster.IsDetailBS: boolean;

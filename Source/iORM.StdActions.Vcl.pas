@@ -91,7 +91,7 @@ type
 implementation
 
 uses
-  iORM.AbstractionLayer.Framework, System.SysUtils;
+  iORM.Abstraction, System.SysUtils;
 
 { TioBSObjStateStdAction }
 

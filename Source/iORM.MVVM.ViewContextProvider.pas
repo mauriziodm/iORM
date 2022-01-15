@@ -35,7 +35,7 @@
 
 
 
-unit iORM.MVVM.Components.ViewContextProvider;
+unit iORM.MVVM.ViewContextProvider;
 
 interface
 

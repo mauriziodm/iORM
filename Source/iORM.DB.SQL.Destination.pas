@@ -75,8 +75,7 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.Strategy.Factory,
-  iORM.AbstractionLayer.Framework;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.Strategy.Factory, iORM.Abstraction;
 
 { TioSQLDestination }
 

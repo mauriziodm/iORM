@@ -198,13 +198,9 @@ type
 implementation
 
 uses
-  iORM, iORM.LiveBindings.Factory,
-  iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces,
-  iORM.Exceptions, iORM.Utilities,
-  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.AbstractionLayer.Framework, iORM.Containers.Interfaces,
-  iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container,
-  iORM.Context.Factory;
+  iORM, iORM.LiveBindings.Factory, iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces, iORM.Exceptions, iORM.Utilities,
+  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence, iORM.Abstraction, iORM.Containers.Interfaces,
+  iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container, iORM.Context.Factory;
 
 { TioActiveListBindSourceAdapter<T> }
 

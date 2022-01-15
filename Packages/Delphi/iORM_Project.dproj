@@ -201,7 +201,7 @@
         <DCCReference Include="..\..\Source\iORM.Where.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.Destinations.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.SQL.Destination.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.MemTable.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.MemTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Implementers.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Commands.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
@@ -224,24 +224,24 @@
         <DCCReference Include="..\..\Source\iORM.REST.Body.Response.pas"/>
         <DCCReference Include="..\..\Source\iORM.REST.Factory.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ViewContextProvider.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.ConnectionDef.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ViewModelBridge.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.Custom.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModelBridge.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Custom.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.ModelBindSource.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.Base.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.ModelDataSet.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ModelBindSource.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Base.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ModelDataSet.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.Common.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegister.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegisterItem.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.AbstractionLayer.Framework.pas"/>
-        <DCCReference Include="..\..\Source\iORM.AbstractionLayer.Framework.VCL.pas"/>
-        <DCCReference Include="..\..\Source\iORM.AbstractionLayer.Framework.FMX.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.ConnectionDef.MSSQLServer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.VCL.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.FMX.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Interfaces.pas"/>
@@ -263,17 +263,17 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Script.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPaging.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.CustomDataSet.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DataSetMaster.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Components.DataSet.DataSetDetail.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Custom.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Master.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Detail.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.Vcl.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.Fmx.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Master.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.Master.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Components.ModelPresenter.Detail.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Master.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Detail.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -356,7 +356,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -367,7 +367,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>

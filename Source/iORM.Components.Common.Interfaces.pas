@@ -40,8 +40,7 @@ unit iORM.Components.Common.Interfaces;
 interface
 
 uses
-  iORM.MVVM.Components.ViewModelBridge, iORM.LiveBindings.Interfaces,
-  iORM.MVVM.Components.ModelPresenter.Custom;
+  iORM.MVVM.ViewModelBridge, iORM.LiveBindings.Interfaces, iORM.MVVM.ModelPresenter.Custom;
 
 type
 

@@ -45,8 +45,7 @@ implementation
 
 uses
   System.Classes,
-  iORM.DB.Components.ConnectionDef,
-  iORM.DB.Components.ConnectionDef.MSSQLServer;
+  iORM.DB.ConnectionDef, iORM.DB.ConnectionDef.MSSQLServer;
 
   procedure Register;
   begin

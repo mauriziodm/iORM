@@ -1,9 +1,9 @@
-unit iORM.DB.Components.DataSet.CustomDataSet;
+unit iORM.DB.DataSet.Custom;
 
 interface
 
 uses
-  iORM.DB.Components.DataSet.Base, iORM.CommonTypes, System.Classes,
+  iORM.DB.DataSet.Base, iORM.CommonTypes, System.Classes,
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.LiveBindings.CommonBSAPaging, iORM.Where.Interfaces,
   Data.Bind.ObjectScope, System.Generics.Collections;

@@ -38,14 +38,10 @@ unit iORM.DependencyInjection;
 interface
 
 uses
-  iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.Interfaces,
-  System.SyncObjs, iORM.DependencyInjection.Interfaces, System.Rtti,
-  iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces,
-  iORM.Resolver.Interfaces, iORM.Context.Container,
-  iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,
-  iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes,
-  System.SysUtils;
+  iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.Interfaces, System.SyncObjs, iORM.DependencyInjection.Interfaces, System.Rtti,
+  iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces,  iORM.Resolver.Interfaces, iORM.Context.Container,
+  iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,  iORM.MVVM.ViewContextProvider,
+  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, System.SysUtils;
 
 type
 
@@ -341,12 +337,9 @@ type
 implementation
 
 uses
-  iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker,
-  iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
-  iORM.Context.Map.Interfaces,
-  iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
-  iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces,
-  iORM.MVVM.Components.ViewModelBridge, iORM.AbstractionLayer.Framework,
+  iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker, iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
+  iORM.Context.Map.Interfaces, iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
+  iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces, iORM.MVVM.ViewModelBridge, iORM.Abstraction,
   iORM.MVVM.ViewModelBase;
 
 { TioDependencyInjectionBase }

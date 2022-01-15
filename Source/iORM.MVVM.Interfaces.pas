@@ -40,11 +40,9 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes,
-  System.Rtti, System.UITypes, iORM.CommonTypes,
-  iORM.Attributes, System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter.Custom, iORM.MVVM.ViewRegisterItem,
-  System.SysUtils, iORM.AbstractionLayer.Framework;
+  iORM.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes, System.Rtti, System.UITypes, iORM.CommonTypes, iORM.Attributes,
+  System.Generics.Collections, iORM.MVVM.ViewContextProvider, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ViewRegisterItem, System.SysUtils,
+  iORM.Abstraction;
 
 type
 

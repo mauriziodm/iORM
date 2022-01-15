@@ -40,9 +40,8 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  System.Rtti, iORM.MVVM.Interfaces,
-  System.Generics.Collections, System.Classes, System.UITypes,
-  iORM.Attributes, iORM.CommonTypes, iORM.AbstractionLayer.Framework;
+  System.Rtti, iORM.MVVM.Interfaces, System.Generics.Collections, System.Classes, System.UITypes, iORM.Attributes, iORM.CommonTypes,
+  iORM.Abstraction;
 
 type
 

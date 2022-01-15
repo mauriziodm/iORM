@@ -31,14 +31,14 @@
 { }
 { *************************************************************************** }
 
-unit iORM.MVVM.Components.ModelPresenter.Custom;
+unit iORM.MVVM.ModelPresenter.Custom;
 
 interface
 
 uses
   System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
-  System.Generics.Collections, iORM.MVVM.Components.ViewContextProvider,
+  System.Generics.Collections, iORM.MVVM.ViewContextProvider,
   System.Rtti, System.SysUtils, iORM.LiveBindings.CommonBSAPaging;
 
 type
@@ -85,7 +85,7 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
-    function IsActive: Boolean;
+//    function IsActive: Boolean;
     // Methods
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure WhereOnChangeEventHandler(Sender: TObject);
@@ -1069,10 +1069,10 @@ begin
   end;
 end;
 
-function TioModelPresenterCustom.IsActive: Boolean;
-begin
-  Result := CheckAdapter and FBindSourceAdapter.Active;
-end;
+//function TioModelPresenterCustom.IsActive: Boolean;
+//begin
+//  Result := CheckAdapter and FBindSourceAdapter.Active;
+//end;
 
 class function TioModelPresenterCustom.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom;
 const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;

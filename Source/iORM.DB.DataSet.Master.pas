@@ -1,9 +1,9 @@
-unit iORM.DB.Components.DataSet.DataSetMaster;
+unit iORM.DB.DataSet.Master;
 
 interface
 
 uses
-  iORM.DB.Components.DataSet.CustomDataSet, iORM.LiveBindings.Interfaces,
+  iORM.DB.DataSet.Custom, iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.BSPersistence, System.Classes;
 
 type

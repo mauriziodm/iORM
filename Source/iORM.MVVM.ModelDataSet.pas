@@ -1,10 +1,10 @@
-unit iORM.DB.Components.DataSet.ModelDataSet;
+unit iORM.MVVM.ModelDataSet;
 
 interface
 
 uses
-  iORM.DB.Components.DataSet.Base, iORM.MVVM.Components.ViewModelBridge, System.Classes,
-  iORM.Components.Common.Interfaces, iORM.MVVM.Components.ModelPresenter.Custom;
+  iORM.DB.DataSet.Base, iORM.MVVM.ViewModelBridge, System.Classes,
+  iORM.Components.Common.Interfaces, iORM.MVVM.ModelPresenter.Custom;
 
 type
 

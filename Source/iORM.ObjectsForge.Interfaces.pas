@@ -85,8 +85,8 @@ uses
   Data.DB, iORM.LazyLoad.Interfaces, System.SysUtils, iORM.Attributes,
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
   iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Utilities,
-  iORM.LiveBindings.Interfaces, iORM.MVVM.Components.ModelPresenter.Custom,
-  iORM.Where.Interfaces, iORM.MVVM.Components.ViewModelBridge, iORM.MVVM.ViewModelBase;
+  iORM.LiveBindings.Interfaces, iORM.MVVM.ModelPresenter.Custom,
+  iORM.Where.Interfaces, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewModelBase;
 
 { TioObjectMakerIntf }
 

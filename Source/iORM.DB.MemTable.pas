@@ -35,7 +35,7 @@
 
 
 
-unit iORM.DB.Components.MemTable;
+unit iORM.DB.MemTable;
 
 interface
 

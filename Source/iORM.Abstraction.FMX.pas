@@ -35,13 +35,13 @@
 
 
 
-unit iORM.AbstractionLayer.Framework.FMX;
+unit iORM.Abstraction.FMX;
 
 interface
 
 uses
   FireDAC.FMXUI.Wait, // For FireDAC compatibility without insert the original component
-  iORM.AbstractionLayer.Framework, FMX.Types, System.Classes, FMX.ActnList,
+  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList,
   System.Rtti;
 
 type

@@ -47,8 +47,8 @@ uses
   iORM.DB.ConnectionContainer, iORM.Where.Interfaces, iORM.Where.Factory,
   System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper,
   System.SysUtils, iORM.DependencyInjection.Interfaces,
-  iORM.MVVM.Components.ViewContextProvider, iORM.MVVM.Interfaces,
-  iORM.MVVM.Components.ModelPresenter.Custom, iORM.DBBuilder.Interfaces;
+  iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces,
+  iORM.MVVM.ModelPresenter.Custom, iORM.DBBuilder.Interfaces;
 
 type
 
@@ -278,7 +278,7 @@ uses
   iORM.Utilities,
   iORM.Strategy.Factory,
   iORM.Context.Container,
-  iORM.AbstractionLayer.Framework,
+  iORM.Abstraction,
   iORM.DBBuilder.Factory, System.Rtti;
 
 { io }

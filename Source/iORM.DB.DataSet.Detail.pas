@@ -1,13 +1,14 @@
-unit iORM.MVVM.Components.ModelPresenter.Detail;
+unit iORM.DB.DataSet.Detail;
 
 interface
 
 uses
-  iORM.MVVM.Components.ModelPresenter.Custom, iORM.LiveBindings.Interfaces;
+  iORM.DB.DataSet.Custom, iORM.LiveBindings.Interfaces,
+  System.Classes;
 
 type
 
-  TioModelPresenterDetail = class(TioModelPresenterCustom)
+  TioDataSetDetail = class(TioDataSetCustom)
   protected
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
@@ -16,7 +17,7 @@ type
   published
     // Published properties
     property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
-    property MasterPresenter; // published: Detail
+    property MasterDataSet; // published: Detail
     property MasterPropertyName; // published: Detail
     property AutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
     // Published properties: selectors
@@ -33,18 +34,17 @@ type
     property OnReceiveSelectionFreeObject;
   end;
 
-
 implementation
 
-{ TioModelPresenterDetail }
+{ TioDataSetDetail }
 
-function TioModelPresenterDetail.IsDetailBS: boolean;
+function TioDataSetDetail.IsDetailBS: boolean;
 begin
   // Do not inherit
   Result := True;
 end;
 
-function TioModelPresenterDetail.IsMasterBS: boolean;
+function TioDataSetDetail.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := False;

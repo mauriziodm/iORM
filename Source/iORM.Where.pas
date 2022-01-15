@@ -370,21 +370,12 @@ type
 implementation
 
 uses
-  iORM.DB.Factory,
-  iORM.Context.Factory, System.SysUtils,
-  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory,
-  iORM.ObjectsForge.Factory,
-  iORM.RttiContext.Factory, iORM,
-  iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems,
-  iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Context.Interfaces, iORM.Containers.Factory,
-  iORM.LiveBindings.InterfaceListBindSourceAdapter,
-  iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
-  iORM.LiveBindings.InterfaceObjectBindSourceAdapter,
-  iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
-  iORM.LiveBindings.ActiveObjectBindSourceAdapter, iORM.Where.Factory,
-  iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
-  iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
-  iORM.MVVM.Interfaces, iORM.AbstractionLayer.Framework, iORM.Context.Container;
+  iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
+  iORM.RttiContext.Factory, iORM, iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
+  iORM.Context.Interfaces, iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
+  iORM.LiveBindings.InterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
+  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
+  iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container;
 
 { TioWhere }
 

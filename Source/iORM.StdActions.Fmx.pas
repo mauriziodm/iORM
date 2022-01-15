@@ -127,7 +127,7 @@ type
 implementation
 
 uses
-  iORM.AbstractionLayer.Framework;
+  iORM.Abstraction;
 
 { TioBSObjStateStdActionFmx }
 

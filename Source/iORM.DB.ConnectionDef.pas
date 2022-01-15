@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.DB.Components.ConnectionDef;
+unit iORM.DB.ConnectionDef;
 
 interface
 

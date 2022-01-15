@@ -38,11 +38,8 @@ unit iORM.DependencyInjection.Interfaces;
 interface
 
 uses
-  iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces,
-  iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes, iORM.MVVM.Components.ViewContextProvider,
-  iORM.MVVM.Components.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes,
-  System.SysUtils;
+  iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.ViewContextProvider,
+  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, System.SysUtils;
 
 type
 

@@ -44,9 +44,7 @@ interface
 implementation
 
 uses
-  System.Classes,
-  iORM.AbstractionLayer.Framework.VCL,
-  iORM.AbstractionLayer.Framework.FMX;
+  System.Classes, iORM.Abstraction.VCL, iORM.Abstraction.FMX;
 
   procedure Register;
   begin
