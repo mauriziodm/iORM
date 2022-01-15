@@ -38,7 +38,7 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.MVVM.Components.ViewModelBridge, System.Classes,
   iORM.Components.Common.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.MVVM.Components.ModelPresenter.Custom;
+  iORM.MVVM.Components.ModelPresenter.Custom, Data.Bind.Components;
 
 type
 
@@ -55,6 +55,10 @@ type
   protected
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
+//    procedure DoBeforeOpen; override; // NB:  In TioCustomModelPresenter is DoBeforeOpen but here is SetActive
+//    procedure DoBeforeScroll; override; // NB: In TioCustomModelPresenter is DoBeforeScroll but here is PosChanging
+    procedure SetActive(const Value: Boolean); override; // In TioCustomModelPresenter is DoBeforeOpen but here is SetActive
+    procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioCustomModelPresenter is DoBeforeScroll but here is PosChanging
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetModelPresenterInstance: TioCustomModelPresenter;
     // ViewModelBridge
@@ -77,7 +81,8 @@ implementation
 uses
   System.SysUtils, iORM.Components.Common,
   iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.LiveBindings.Factory,
-  iORM.Exceptions, System.Rtti, iORM.RttiContext.Factory;
+  iORM.Exceptions, System.Rtti, iORM.RttiContext.Factory,
+  iORM.LiveBindings.BSPersistence;
 
 { TioModelBindSource }
 
@@ -125,11 +130,11 @@ begin
       LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
         FCrossView_MasterBindSource.GetModelPresenterInstance.GetActiveBindSourceAdapter, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
       // Set the retrieved BSA as adapter for this Presenter
-      ViewModelBridge.Presenter[ModelPresenter].SetActiveBindSourceAdapter(LActiveBSA);
+      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
     end
     else
       // Get the BSA from the presenter
-      LActiveBSA := ViewModelBridge.Presenter[ModelPresenter].GetActiveBindSourceAdapter;
+      LActiveBSA := GetModelPresenterInstance.GetActiveBindSourceAdapter;
     // Assign the BindSourceAdapter
     ADataObject := LActiveBSA as TBindSourceAdapter;
   end;
@@ -193,6 +198,15 @@ begin
     FViewModelBridge := nil;
 end;
 
+procedure TioModelBindSource.PosChanging(ABindComp: TBasicBindComponent);
+var
+  LBSPersistenceClient: IioBSPersistenceClient;
+begin
+  inherited;
+  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+    LBSPersistenceClient.Persistence.NotifyBeforeScroll;
+end;
+
 procedure TioModelBindSource.PreventBindSourceAdapterDestruction;
 var
   LInstanceType: TRttiInstanceType;
@@ -201,6 +215,15 @@ begin
   LInstanceType := TioRttiFactory.GetRttiContext.GetType(Self.ClassInfo).AsInstance;
   LField := LInstanceType.GetField('FRuntimeAdapter');
   LField.SetValue(Self, TValue.Empty);
+end;
+
+procedure TioModelBindSource.SetActive(const Value: Boolean);
+var
+  LBSPersistenceClient: IioBSPersistenceClient;
+begin
+  inherited;
+  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+    LBSPersistenceClient.Persistence.Clear(False);
 end;
 
 procedure TioModelBindSource.SetViewModelBridge(const AVMBridge: TioViewModelBridge);
