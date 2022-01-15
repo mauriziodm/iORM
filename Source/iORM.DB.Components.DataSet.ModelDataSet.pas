@@ -17,7 +17,7 @@ type
   protected
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function GetModelPresenterInstance: TioCustomModelPresenter;
+    function GetModelPresenterInstance: TioModelPresenterCustom;
     // These methods handle the "Persistence" property which is actually located on the ModelPresenter
     procedure DoBeforeOpen; override;
     procedure DoBeforeScroll; override;
@@ -78,7 +78,7 @@ begin
     LBSPersistenceClient.Persistence.NotifyBeforeScroll;
 end;
 
-function TioModelDataSet.GetModelPresenterInstance: TioCustomModelPresenter;
+function TioModelDataSet.GetModelPresenterInstance: TioModelPresenterCustom;
 begin
   Result := ViewModelBridge.Presenter[ModelPresenter];
 end;

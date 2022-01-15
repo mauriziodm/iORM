@@ -42,11 +42,11 @@ uses
 
 type
 
-  TioCustomPrototypeBindSource = class;
+  TioPrototypeBindSourceCustom = class;
 
-  TioMasterBindSource = TioCustomPrototypeBindSource;
+  TioMasterBindSource = TioPrototypeBindSourceCustom;
 
-  TioCustomPrototypeBindSource = class abstract(TPrototypeBindSource, IioNotifiableBindSource, IioStdActionTargetBindSource)
+  TioPrototypeBindSourceCustom = class abstract(TPrototypeBindSource, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
     FTypeName: String;
     FTypeAlias: String;
@@ -63,7 +63,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     // Selectors
-    FSelectorFor: TioCustomPrototypeBindSource;
+    FSelectorFor: TioPrototypeBindSourceCustom;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
@@ -160,7 +160,7 @@ type
     property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification
       default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
     // Published properties: selectors
-    property SelectorFor: TioCustomPrototypeBindSource read FSelectorFor write FSelectorFor; // published: Master
+    property SelectorFor: TioPrototypeBindSourceCustom read FSelectorFor write FSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
@@ -232,13 +232,13 @@ begin
 end;
 {$ENDIF}
 
-procedure TioCustomPrototypeBindSource.Append;
+procedure TioPrototypeBindSourceCustom.Append;
 begin
   if CheckAdapter then
     GetInternalAdapter.Append;
 end;
 
-procedure TioCustomPrototypeBindSource.Append(AObject: TObject);
+procedure TioPrototypeBindSourceCustom.Append(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -254,7 +254,7 @@ begin
     raise EioException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
-procedure TioCustomPrototypeBindSource.Append(AObject: IInterface);
+procedure TioPrototypeBindSourceCustom.Append(AObject: IInterface);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -270,13 +270,13 @@ begin
     raise EioException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
-procedure TioCustomPrototypeBindSource.CancelIfEditing;
+procedure TioPrototypeBindSourceCustom.CancelIfEditing;
 begin
   if Editing then
     Cancel;
 end;
 
-function TioCustomPrototypeBindSource.CheckActiveAdapter: Boolean;
+function TioPrototypeBindSourceCustom.CheckActiveAdapter: Boolean;
 begin
   // ------------- prima era così -------------
   // Result := (not (csDesigning in ComponentState))
@@ -286,13 +286,13 @@ begin
   Result := CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
 end;
 
-procedure TioCustomPrototypeBindSource.ClearDataObject;
+procedure TioPrototypeBindSourceCustom.ClearDataObject;
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ClearDataObject;
 end;
 
-constructor TioCustomPrototypeBindSource.Create(AOwner: TComponent);
+constructor TioPrototypeBindSourceCustom.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoPost := True;
@@ -319,44 +319,44 @@ begin
     end);
 end;
 
-destructor TioCustomPrototypeBindSource.Destroy;
+destructor TioPrototypeBindSourceCustom.Destroy;
 begin
   FWhereStr.Free;
   FPaging.Free;
   inherited;
 end;
 
-procedure TioCustomPrototypeBindSource.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
+procedure TioPrototypeBindSourceCustom.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
-procedure TioCustomPrototypeBindSource.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioCustomPrototypeBindSource.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioCustomPrototypeBindSource.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionInterface) then
     FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioCustomPrototypeBindSource.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonBeforeSelectionObject) then
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioCustomPrototypeBindSource.DoCreateAdapter(var ADataObject: TBindSourceAdapter);
+procedure TioPrototypeBindSourceCustom.DoCreateAdapter(var ADataObject: TBindSourceAdapter);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -406,7 +406,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioCustomPrototypeBindSource.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioPrototypeBindSourceCustom.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 var
   LPreviousCurrentObj: TObject;
 begin
@@ -419,13 +419,13 @@ begin
     LPreviousCurrentObj.Free;
 end;
 
-procedure TioCustomPrototypeBindSource.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioPrototypeBindSourceCustom.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionInterface) then
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
 end;
 
-procedure TioCustomPrototypeBindSource.ForEach(const AForEachMethod: TProc);
+procedure TioPrototypeBindSourceCustom.ForEach(const AForEachMethod: TProc);
 var
   I, PreviousItemIndex: Integer;
 begin
@@ -442,14 +442,14 @@ begin
   end;
 end;
 
-function TioCustomPrototypeBindSource.Current: TObject;
+function TioPrototypeBindSourceCustom.Current: TObject;
 begin
   Result := nil;
   if CheckAdapter then
     Result := Self.InternalAdapter.Current;
 end;
 
-function TioCustomPrototypeBindSource.CurrentAs<T>: T;
+function TioPrototypeBindSourceCustom.CurrentAs<T>: T;
 var
   LCurrent: TObject;
 begin
@@ -457,7 +457,7 @@ begin
   Result := TioUtilities.CastObjectToGeneric<T>(LCurrent);
 end;
 
-function TioCustomPrototypeBindSource.CurrentMasterObject: TObject;
+function TioPrototypeBindSourceCustom.CurrentMasterObject: TObject;
 begin
   if CheckAdapter and IsDetailBS then
     Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
@@ -465,7 +465,7 @@ begin
     Result := nil;
 end;
 
-function TioCustomPrototypeBindSource.CurrentMasterObjectAs<T>: T;
+function TioPrototypeBindSourceCustom.CurrentMasterObjectAs<T>: T;
 var
   LMasterObject: TObject;
 begin
@@ -473,7 +473,7 @@ begin
   Result := TioUtilities.CastObjectToGeneric<T>(LMasterObject);
 end;
 
-function TioCustomPrototypeBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+function TioPrototypeBindSourceCustom.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := nil;
   if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
@@ -481,7 +481,7 @@ begin
       Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
 end;
 
-function TioCustomPrototypeBindSource.GetAutoPost: Boolean;
+function TioPrototypeBindSourceCustom.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
     Result := Self.InternalAdapter.AutoPost
@@ -489,12 +489,12 @@ begin
     Result := FAutoPost;
 end;
 
-function TioCustomPrototypeBindSource.GetAutoRefreshOnNotification: TioAutoRefreshType;
+function TioPrototypeBindSourceCustom.GetAutoRefreshOnNotification: TioAutoRefreshType;
 begin
   Result := FAutoRefreshOnNotification;
 end;
 
-function TioCustomPrototypeBindSource.GetCount: Integer;
+function TioPrototypeBindSourceCustom.GetCount: Integer;
 begin
   if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.ItemCount
@@ -502,7 +502,7 @@ begin
     Result := 0;
 end;
 
-function TioCustomPrototypeBindSource.DataObject: TObject;
+function TioPrototypeBindSourceCustom.DataObject: TObject;
 begin
   if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.DataObject
@@ -510,7 +510,7 @@ begin
     Result := nil;
 end;
 
-function TioCustomPrototypeBindSource.DataObjectAs<T>: T;
+function TioPrototypeBindSourceCustom.DataObjectAs<T>: T;
 var
   LObj: TObject;
 begin
@@ -518,7 +518,7 @@ begin
   Result := TioUtilities.CastObjectToGeneric<T>(LObj);
 end;
 
-function TioCustomPrototypeBindSource.DataObjectAssigned: Boolean;
+function TioPrototypeBindSourceCustom.DataObjectAssigned: Boolean;
 begin
   if CheckActiveAdapter then
     Result := Assigned(GetActiveBindSourceAdapter.DataObject)
@@ -526,7 +526,7 @@ begin
     Result := False;
 end;
 
-function TioCustomPrototypeBindSource.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil)
+function TioPrototypeBindSourceCustom.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil)
   : IioActiveBindSourceAdapter;
 var
   AContainedBSA: IioContainedBindSourceAdapter;
@@ -536,7 +536,7 @@ begin
     Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
 end;
 
-function TioCustomPrototypeBindSource.GetWhere: IioWhere;
+function TioPrototypeBindSourceCustom.GetWhere: IioWhere;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -546,7 +546,7 @@ begin
     Result := nil;
 end;
 
-procedure TioCustomPrototypeBindSource.Insert(AObject: IInterface);
+procedure TioPrototypeBindSourceCustom.Insert(AObject: IInterface);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -562,12 +562,12 @@ begin
     raise EioException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
-function TioCustomPrototypeBindSource.IsActive: Boolean;
+function TioPrototypeBindSourceCustom.IsActive: Boolean;
 begin
   Result := Active;
 end;
 
-procedure TioCustomPrototypeBindSource.Insert(AObject: TObject);
+procedure TioPrototypeBindSourceCustom.Insert(AObject: TObject);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -584,7 +584,7 @@ begin
   raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
-function TioCustomPrototypeBindSource.GetIsInterfacePresenting: Boolean;
+function TioPrototypeBindSourceCustom.GetIsInterfacePresenting: Boolean;
 begin
   if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.IsInterfaceBSA
@@ -592,17 +592,17 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
-function TioCustomPrototypeBindSource.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
+function TioPrototypeBindSourceCustom.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
 begin
   Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner).AsTBindSourceAdapter;
 end;
 
-function TioCustomPrototypeBindSource.GetPaging: TioCommonBSAPageManager;
+function TioPrototypeBindSourceCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
 end;
 
-function TioCustomPrototypeBindSource.GetState: TBindSourceAdapterState;
+function TioPrototypeBindSourceCustom.GetState: TBindSourceAdapterState;
 begin
   if CheckActiveAdapter then
     Result := GetActiveBindSourceAdapter.State
@@ -610,7 +610,7 @@ begin
     Result := TBindSourceAdapterState.seInactive
 end;
 
-procedure TioCustomPrototypeBindSource.Loaded;
+procedure TioPrototypeBindSourceCustom.Loaded;
 var
   LAdapter: TBindSourceAdapter;
 begin
@@ -638,30 +638,30 @@ begin
   inherited;
 end;
 
-procedure TioCustomPrototypeBindSource.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+procedure TioPrototypeBindSourceCustom.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
 end;
 
-procedure TioCustomPrototypeBindSource.PersistAll;
+procedure TioPrototypeBindSourceCustom.PersistAll;
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.PersistAll;
 end;
 
-procedure TioCustomPrototypeBindSource.PersistCurrent;
+procedure TioPrototypeBindSourceCustom.PersistCurrent;
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.PersistCurrent;
 end;
 
-procedure TioCustomPrototypeBindSource.PostIfEditing;
+procedure TioPrototypeBindSourceCustom.PostIfEditing;
 begin
   if Editing then
     Post;
 end;
 
-function TioCustomPrototypeBindSource.QueryInterface(const IID: TGUID; out Obj): HResult;
+function TioPrototypeBindSourceCustom.QueryInterface(const IID: TGUID; out Obj): HResult;
 begin
   // RefCount disabled
   if GetInterface(IID, Obj) then
@@ -670,7 +670,7 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioCustomPrototypeBindSource.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+procedure TioPrototypeBindSourceCustom.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -682,7 +682,7 @@ begin
     GetInternalAdapter.Refresh;
 end;
 
-procedure TioCustomPrototypeBindSource.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
@@ -707,7 +707,7 @@ begin
     raise EioException.Create(Self.ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
-procedure TioCustomPrototypeBindSource.SelectCurrent(ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.SelectCurrent(ASelectionType: TioSelectionType);
 var
   LDestBSA: IioActiveBindSourceAdapter;
 begin
@@ -723,7 +723,7 @@ begin
     Select<TObject>(Current, ASelectionType);
 end;
 
-procedure TioCustomPrototypeBindSource.SetAsync(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetAsync(const Value: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -733,7 +733,7 @@ begin
     LActiveBSA.ioAsync := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetAutoLoadData(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetAutoLoadData(const Value: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -743,7 +743,7 @@ begin
     LActiveBSA.ioAutoLoadData := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetAutoPersist(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetAutoPersist(const Value: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -753,7 +753,7 @@ begin
     LActiveBSA.ioAutoPersist := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetAutoPost(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetAutoPost(const Value: Boolean);
 begin
   FAutoPost := Value;
   // Update the adapter
@@ -761,12 +761,12 @@ begin
     Self.InternalAdapter.AutoPost := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+procedure TioPrototypeBindSourceCustom.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
 begin
   FAutoRefreshOnNotification := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
@@ -778,7 +778,7 @@ begin
   // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
 
-procedure TioCustomPrototypeBindSource.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
@@ -790,7 +790,7 @@ begin
   // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
 end;
 
-procedure TioCustomPrototypeBindSource.SetWhere(const AWhere: IioWhere);
+procedure TioPrototypeBindSourceCustom.SetWhere(const AWhere: IioWhere);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -802,7 +802,7 @@ begin
   end;
 end;
 
-procedure TioCustomPrototypeBindSource.SetWhereStr(const Value: TStrings);
+procedure TioPrototypeBindSourceCustom.SetWhereStr(const Value: TStrings);
 begin
   FWhereStr.Assign(Value);
   // If in DesignTime then Exit
@@ -818,7 +818,7 @@ begin
   WhereOnChangeEventHandler(Self);
 end;
 
-procedure TioCustomPrototypeBindSource.SetOrderBy(const Value: String);
+procedure TioPrototypeBindSourceCustom.SetOrderBy(const Value: String);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -829,7 +829,7 @@ begin
     LActiveBSA.ioWhere.SetOrderBySql(Value);
 end;
 
-procedure TioCustomPrototypeBindSource.SetPaging(const Value: TioCommonBSAPageManager);
+procedure TioPrototypeBindSourceCustom.SetPaging(const Value: TioCommonBSAPageManager);
 begin
   // In reality this property would be read-only but if I left it read-only
   // then it no longer writes me the values of the sub-properties in the DFM file.
@@ -838,7 +838,7 @@ begin
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
-procedure TioCustomPrototypeBindSource.SetTypeAlias(const Value: String);
+procedure TioPrototypeBindSourceCustom.SetTypeAlias(const Value: String);
 begin
   FTypeAlias := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
@@ -847,7 +847,7 @@ begin
     GetActiveBindSourceAdapter.ioTypeAlias := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetTypeName(const Value: String);
+procedure TioPrototypeBindSourceCustom.SetTypeName(const Value: String);
 begin
   FTypeName := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
@@ -856,7 +856,7 @@ begin
     GetActiveBindSourceAdapter.ioTypeName := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -866,18 +866,18 @@ begin
     LActiveBSA.ioWhereDetailsFromDetailAdapters := Value;
 end;
 
-procedure TioCustomPrototypeBindSource.WhereOnChangeEventHandler(Sender: TObject);
+procedure TioPrototypeBindSourceCustom.WhereOnChangeEventHandler(Sender: TObject);
 begin
   SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FWhereStr.Text));
 end;
 
-function TioCustomPrototypeBindSource._AddRef: Integer;
+function TioPrototypeBindSourceCustom._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
   Result := -1;
 end;
 
-function TioCustomPrototypeBindSource._Release: Integer;
+function TioPrototypeBindSourceCustom._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
   Result := -1;

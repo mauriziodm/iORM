@@ -73,11 +73,11 @@ type
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
     // Presenter
-    function GetPresenter(const AName: String): TioCustomModelPresenter;
-    property Presenter[const AName:String]:TioCustomModelPresenter read GetPresenter;
+    function GetPresenter(const AName: String): TioModelPresenterCustom;
+    property Presenter[const AName:String]:TioModelPresenterCustom read GetPresenter;
     // DefaultPresenter
-    function GetDefaultPresenter: TioCustomModelPresenter;
-    property DefaultPresenter:TioCustomModelPresenter read GetDefaultPresenter;
+    function GetDefaultPresenter: TioModelPresenterCustom;
+    property DefaultPresenter:TioModelPresenterCustom read GetDefaultPresenter;
   end;
 
   IioViewRegister = interface

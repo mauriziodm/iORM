@@ -8,14 +8,14 @@ uses
 
 type
 
-  TioModelPresenterMaster = class(TioCustomModelPresenter, IioBSPersistenceClient)
+  TioModelPresenterMaster = class(TioModelPresenterCustom, IioBSPersistenceClient)
   private
     FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourceModelPresenter
-    function GetSourcePresenter: TioCustomModelPresenter;
-    procedure SetSourcePresenter(const Value: TioCustomModelPresenter);
+    function GetSourcePresenter: TioModelPresenterCustom;
+    procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnEditAction property
@@ -54,7 +54,7 @@ type
     // Added properties
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourcePresenter: TioCustomModelPresenter read GetSourcePresenter write SetSourcePresenter;
+    property SourcePresenter: TioModelPresenterCustom read GetSourcePresenter write SetSourcePresenter;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -112,7 +112,7 @@ begin
   Result := FObjState;
 end;
 
-function TioModelPresenterMaster.GetSourcePresenter: TioCustomModelPresenter;
+function TioModelPresenterMaster.GetSourcePresenter: TioModelPresenterCustom;
 begin
   Result := MasterPresenter;
 end;
@@ -139,7 +139,7 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioModelPresenterMaster.SetSourcePresenter(const Value: TioCustomModelPresenter);
+procedure TioModelPresenterMaster.SetSourcePresenter(const Value: TioModelPresenterCustom);
 begin
   MasterPresenter := Value;
 end;

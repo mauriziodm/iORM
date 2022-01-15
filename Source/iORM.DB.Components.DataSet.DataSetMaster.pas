@@ -8,14 +8,14 @@ uses
 
 type
 
-  TioDataSetMaster = class(TioCustomDataSet, IioBSPersistenceClient)
+  TioDataSetMaster = class(TioDataSetCustom, IioBSPersistenceClient)
   private
     FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourceDataSet
-    function GetSourceDataSet: TioCustomDataSet;
-    procedure SetSourceDataSet(const Value: TioCustomDataSet);
+    function GetSourceDataSet: TioDataSetCustom;
+    procedure SetSourceDataSet(const Value: TioDataSetCustom);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnEditAction property
@@ -52,7 +52,7 @@ type
     // Added properties
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourceDataSet: TioCustomDataSet read GetSourceDataSet write SetSourceDataSet;
+    property SourceDataSet: TioDataSetCustom read GetSourceDataSet write SetSourceDataSet;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -113,7 +113,7 @@ begin
   Result := FOnRecordChangeAction;
 end;
 
-function TioDataSetMaster.GetSourceDataSet: TioCustomDataSet;
+function TioDataSetMaster.GetSourceDataSet: TioDataSetCustom;
 begin
   Result := MasterDataSet;
 end;
@@ -140,7 +140,7 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioDataSetMaster.SetSourceDataSet(const Value: TioCustomDataSet);
+procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSetCustom);
 begin
   MasterDataSet := Value;
 end;

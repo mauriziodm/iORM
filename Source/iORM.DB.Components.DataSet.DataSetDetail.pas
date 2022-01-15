@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioDataSetDetail = class(TioCustomDataSet)
+  TioDataSetDetail = class(TioDataSetCustom)
   protected
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;

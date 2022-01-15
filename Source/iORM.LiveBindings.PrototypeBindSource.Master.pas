@@ -8,14 +8,14 @@ uses
 
 type
 
-  TioPrototypeBindSourceMaster = class(TioCustomPrototypeBindSource, IioBSPersistenceClient)
+  TioPrototypeBindSourceMaster = class(TioPrototypeBindSourceCustom, IioBSPersistenceClient)
   private
     FObjState: TioBSPersistence;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourcePrototypeBindSource
-    function GetSourcePBS: TioCustomPrototypeBindSource;
-    procedure SetSourcePBS(const Value: TioCustomPrototypeBindSource);
+    function GetSourcePBS: TioPrototypeBindSourceCustom;
+    procedure SetSourcePBS(const Value: TioPrototypeBindSourceCustom);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnEditAction property
@@ -63,7 +63,7 @@ type
     // Added properties
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourcePBS: TioCustomPrototypeBindSource read GetSourcePBS write SetSourcePBS;
+    property SourcePBS: TioPrototypeBindSourceCustom read GetSourcePBS write SetSourcePBS;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -112,7 +112,7 @@ begin
   Result := FOnRecordChangeAction;
 end;
 
-function TioPrototypeBindSourceMaster.GetSourcePBS: TioCustomPrototypeBindSource;
+function TioPrototypeBindSourceMaster.GetSourcePBS: TioPrototypeBindSourceCustom;
 begin
   Result := MasterBindSource;
 end;
@@ -151,7 +151,7 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioPrototypeBindSourceMaster.SetSourcePBS(const Value: TioCustomPrototypeBindSource);
+procedure TioPrototypeBindSourceMaster.SetSourcePBS(const Value: TioPrototypeBindSourceCustom);
 begin
   MasterBindSource := Value;
 end;

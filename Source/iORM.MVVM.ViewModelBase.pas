@@ -62,9 +62,9 @@ type
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------
     // DefaultPresenter
-    function GetDefaultPresenter: TioCustomModelPresenter;
+    function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
-    function GetPresenter(const AName: String): TioCustomModelPresenter;
+    function GetPresenter(const AName: String): TioModelPresenterCustom;
     // Command
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
@@ -90,8 +90,8 @@ type
 // ---------------- End: section added for IInterface support ---------------
     // Properties
     property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
-    property DefaultPresenter:TioCustomModelPresenter read GetDefaultPresenter;
-    property Presenter[const AName:String]:TioCustomModelPresenter read GetPresenter;
+    property DefaultPresenter:TioModelPresenterCustom read GetDefaultPresenter;
+    property Presenter[const AName:String]:TioModelPresenterCustom read GetPresenter;
   end;
 // ---------------- Start: section added for IInterface support ---------------
   {$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
@@ -147,19 +147,19 @@ begin
   Result := Commands.Get(ACmdName, False);
 end;
 
-function TioViewModel.GetDefaultPresenter: TioCustomModelPresenter;
+function TioViewModel.GetDefaultPresenter: TioModelPresenterCustom;
 var
   I: Integer;
 begin
   Result := nil;
   for I := 0 to ComponentCount-1 do
-    if (Components[I] is TioCustomModelPresenter)
-    and TioCustomModelPresenter(Components[I]).AsDefault
+    if (Components[I] is TioModelPresenterCustom)
+    and TioModelPresenterCustom(Components[I]).AsDefault
     then
-      Exit(TioCustomModelPresenter(Components[I]));
+      Exit(TioModelPresenterCustom(Components[I]));
 end;
 
-function TioViewModel.GetPresenter(const AName: String): TioCustomModelPresenter;
+function TioViewModel.GetPresenter(const AName: String): TioModelPresenterCustom;
 var
   LComponent: TComponent;
 begin
@@ -167,9 +167,9 @@ begin
   if AName.IsEmpty then
     Exit(GetDefaultPresenter);
   LComponent := FindComponent(AName);
-  if not (Assigned(LComponent) and (LComponent is TioCustomModelPresenter)) then
+  if not (Assigned(LComponent) and (LComponent is TioModelPresenterCustom)) then
     raise EioException.Create(Self.ClassName, 'GetPresenters', Format('ModelPresenter named "%s" not found.', [AName]));
-  Result := TioCustomModelPresenter(LComponent);
+  Result := TioModelPresenterCustom(LComponent);
 end;
 
 procedure TioViewModel.HideViews;

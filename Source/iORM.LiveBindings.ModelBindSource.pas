@@ -60,7 +60,7 @@ type
     procedure SetActive(const Value: Boolean); override; // In TioCustomModelPresenter is DoBeforeOpen but here is SetActive
     procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioCustomModelPresenter is DoBeforeScroll but here is PosChanging
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    function GetModelPresenterInstance: TioCustomModelPresenter;
+    function GetModelPresenterInstance: TioModelPresenterCustom;
     // ViewModelBridge
     procedure SetViewModelBridge(const AVMBridge: TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
@@ -146,7 +146,7 @@ begin
   if CheckAdapter and Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
 end;
 
-function TioModelBindSource.GetModelPresenterInstance: TioCustomModelPresenter;
+function TioModelBindSource.GetModelPresenterInstance: TioModelPresenterCustom;
 begin
   Result := ViewModelBridge.Presenter[ModelPresenter];
 end;

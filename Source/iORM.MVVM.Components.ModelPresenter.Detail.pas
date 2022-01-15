@@ -7,7 +7,7 @@ uses
 
 type
 
-  TioModelPresenterDetail = class(TioCustomModelPresenter)
+  TioModelPresenterDetail = class(TioModelPresenterCustom)
   protected
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
