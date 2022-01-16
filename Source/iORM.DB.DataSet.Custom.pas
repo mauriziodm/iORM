@@ -53,6 +53,7 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+    function AdapterExists: Boolean; // IioNotifiableBindSource
     function IsActive: Boolean;
     // Async
     procedure SetAsync(const Value: Boolean);
@@ -157,7 +158,6 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Select<T>(AInstance: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   end;
 
@@ -169,6 +169,11 @@ uses
   iORM.LiveBindings.CommonBSBehavior;
 
 { TioDataSet }
+
+function TioDataSetCustom.AdapterExists: Boolean;
+begin
+  Result := CheckAdapter(False);
+end;
 
 procedure TioDataSetCustom.CancelIfEditing;
 begin
@@ -453,50 +458,12 @@ begin
   FDetailDatasetContainer.Add(ADetailDataSet);
 end;
 
-procedure TioDataSetCustom.Select<T>(AInstance: T; ASelectionType: TioSelectionType);
-var
-  LDestBSA: IioActiveBindSourceAdapter;
-  LValue: TValue;
-begin
-  // Some checks
-  if not Assigned(FSelectorFor) then
-    raise EioException.Create(ClassName, 'Select<T>', '"SelectorFor" property not assigned.');
-  if not FSelectorFor.CheckAdapter then
-    raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
-  // Get the selection destination BindSourceAdapter
-  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
-  // If the selection is allowed then send a ntSaveRevertPoint notification
-  if TioCommonBSBehavior.CanDoSelection(Self, LDestBSA) then
-    LDestBSA.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
-  else
-    raise EioException.Create(ClassName, 'Select<T>', 'Destination BindSource hasn''t saved a revert point');
-  // Encapsulate the SelectedInstance into a TValue then assign it
-  // as selection in a proper way
-  // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
-  // facendo cos' invece (cioè passando per un TValue) funziona correttamente.
-  LValue := TValue.From<T>(AInstance);
-  if LValue.Kind = TTypeKind.tkInterface then
-    LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
-  else if LValue.Kind = TTypeKind.tkClass then
-    LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
-  else
-    raise EioException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
-end;
-
 procedure TioDataSetCustom.SelectCurrent(ASelectionType: TioSelectionType);
-var
-  LDestBSA: IioActiveBindSourceAdapter;
 begin
-  // Some checks
-  if not CheckAdapter then
-    raise EioException.Create(ClassName, 'SelectCurrent', 'ActiveBindSourceAdapter, not present.');
-  // Get the selection destination BindSourceAdapter
-  LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
-  // Make the selection of current
-  if LDestBSA.IsInterfaceBSA then
-    Select<IInterface>(CurrentAs<IInterface>, ASelectionType)
+  if IsInterfacePresenting then
+    TioCommonBSBehavior.Select<IInterface>(Self, FSelectorFor, CurrentAs<IInterface>, ASelectionType)
   else
-    Select<TObject>(Current, ASelectionType);
+    TioCommonBSBehavior.Select<TObject>(Self, FSelectorFor, Current, ASelectionType);
 end;
 
 procedure TioDataSetCustom.SetAsync(const Value: Boolean);
