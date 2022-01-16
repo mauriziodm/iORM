@@ -134,7 +134,7 @@ class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActive
   const [Ref] ANotification: TioBSNotification);
 begin
   // Notify the BindSource
-  // NB: First check that the BSA has a BindSource and that the message is not actually coming from it,
+  // NB: First check if the BSA has a BindSource and if the message is not actually coming from it,
   // then it also verifies that the BindSource connected to the BSA is the correct directory for this notification
   if AActiveBindSourceAdapter.HasBindSource and (Sender <> TObject(AActiveBindSourceAdapter.GetBindSource)) then
     if (ANotification.DeliverToMasterBS and AActiveBindSourceAdapter.GetBindSource.IsMasterBS) or
