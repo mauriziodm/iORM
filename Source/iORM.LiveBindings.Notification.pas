@@ -37,7 +37,7 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveObjState);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint);
 
   TioBSNotification = record
     NotificationType: TioBSNotificationType;
@@ -79,7 +79,7 @@ begin
       end;
     // NB: ntSaveObjState is for the ObjStateManager;
     //     it only applies to BindSource masters and propagates from the details to the first master encountered
-    ntSaveObjState:
+    ntSaveRevertPoint:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;

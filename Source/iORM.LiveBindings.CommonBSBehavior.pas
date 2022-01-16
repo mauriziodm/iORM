@@ -24,7 +24,7 @@ uses
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
 var
-  LBSObjStateClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioBSPersistenceClient;
 begin
   // If the notification was sent by itself then it forwards it to the ActiveBindSourceAdapter for its propagation (outbound notification)
   if ASender = (ATargetBS as TObject) then
@@ -42,10 +42,10 @@ begin
       // Actually used for paging purposes (ObjState moved on "OnBeforeScroll" directly in the BindSource/DataSet/ModelPresenter master)
       ntScroll:
         ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
-      // Actually used ObjStateManager purposes
-      ntSaveObjState:
-        if Supports(ATargetBS, IioBSPersistenceClient, LBSObjStateClient) then
-          LBSObjStateClient.Persistence.NotifySaveObjState;
+      // Actually used BSPersistence purposes
+      ntSaveRevertPoint:
+        if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+          LBSPersistenceClient.Persistence.NotifySaveObjState;
     end;
   end;
 end;

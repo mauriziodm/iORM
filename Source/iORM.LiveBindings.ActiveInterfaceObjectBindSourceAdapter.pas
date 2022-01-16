@@ -378,7 +378,7 @@ procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeEdit;
 begin
   inherited;
   // ObjStateManager notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveObjState));
+  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;
