@@ -696,6 +696,11 @@ begin
     raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
   // Get the selection destination BindSourceAdapter
   LDestBSA := FSelectorFor.GetActiveBindSourceAdapter;
+  // If the selection is allowed then send a ntSaveRevertPoint notification
+  if TioCommonBSBehavior.CanDoSelection(Self, LDestBSA) then
+    LDestBSA.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
+  else
+    raise EioException.Create(ClassName, 'Select<T>', 'Destination BindSource hasn''t saved a revert point');
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore

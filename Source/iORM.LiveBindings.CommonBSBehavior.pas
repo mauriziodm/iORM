@@ -12,6 +12,7 @@ type
   public
     // NB: Common code for ABSA to manage notifications
     class procedure Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
+    class function CanDoSelection(const ASender: TObject; const ASelectionDestBSA: IioActiveBindSourceAdapter): Boolean;
   end;
 
 implementation
@@ -22,31 +23,39 @@ uses
 
 { TioCommonBSBehavior }
 
+class function TioCommonBSBehavior.CanDoSelection(const ASender: TObject; const ASelectionDestBSA: IioActiveBindSourceAdapter): Boolean;
+var
+  LNotification: TioBSNotification;
+begin
+  LNotification := TioBSNotification.Create(TioBSNotificationType.ntCanDoSelection);
+  ASelectionDestBSA.Notify(ASender, LNotification);
+  Result := LNotification.Response;
+end;
+
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
 var
   LBSPersistenceClient: IioBSPersistenceClient;
+  LNotificationPointer: PioBSNotification;
 begin
-  // If the notification was sent by itself then it forwards it to the ActiveBindSourceAdapter for its propagation (outbound notification)
-  if ASender = (ATargetBS as TObject) then
-  begin
-    // To be implemented (for now a BindSource can only receive notifications, not send them)
-  end
-  // If the notification was not sent by itself then react to it if necessary (inbound notification)
-  else
-  begin
-    case ANotification.NotificationType of
-      // Execute the AutoRefresh if enabled by the specific property
-      ntRefresh:
-        if (ATargetBS.AutoRefreshOnNotification > arDisabled) and (ATargetBS.State <> TBindSourceAdapterState.seInactive) then
-          ATargetBS.Refresh(ATargetBS.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
-      // Actually used for paging purposes (ObjState moved on "OnBeforeScroll" directly in the BindSource/DataSet/ModelPresenter master)
-      ntScroll:
-        ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
-      // Actually used BSPersistence purposes
-      ntSaveRevertPoint:
-        if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
-          LBSPersistenceClient.Persistence.NotifySaveObjState;
-    end;
+  case ANotification.NotificationType of
+    // Execute the AutoRefresh if enabled by the specific property
+    ntRefresh:
+      if (ATargetBS.AutoRefreshOnNotification > arDisabled) and (ATargetBS.State <> TBindSourceAdapterState.seInactive) then
+        ATargetBS.Refresh(ATargetBS.AutoRefreshOnNotification = TioAutoRefreshType.arEnabledReload, False);
+    // Actually used for paging purposes (ObjState moved on "OnBeforeScroll" directly in the BindSource/DataSet/ModelPresenter master)
+    ntScroll:
+      ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
+    // Actually used BSPersistence purposes
+    ntSaveRevertPoint:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+        LBSPersistenceClient.Persistence.NotifySaveObjState;
+    // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
+    ntCanDoSelection:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      begin
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDoSelection;
+      end;
   end;
 end;
 

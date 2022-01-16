@@ -37,7 +37,9 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection);
+
+  PioBSNotification = ^TioBSNotification;
 
   TioBSNotification = record
     NotificationType: TioBSNotificationType;
@@ -46,6 +48,7 @@ type
     DeliverToMasterBS: Boolean;
     DeliverToDetailBS: Boolean;
     StopAtTheFirstDestination: Boolean;
+    Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
   end;
 
@@ -56,6 +59,7 @@ implementation
 constructor TioBSNotification.Create(const ANotificationType: TioBSNotificationType);
 begin
   NotificationType := ANotificationType;
+  Response := True;
   case ANotificationType of
     // NB: ntBrowse is used both for paging and for the ObjStateManager;
     //     in both cases it applies only to the master BindSource and does not propagate
@@ -80,6 +84,16 @@ begin
     // NB: ntSaveObjState is for the ObjStateManager;
     //     it only applies to BindSource masters and propagates from the details to the first master encountered
     ntSaveRevertPoint:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstDestination := True;
+      end;
+    // NB: ntCanDoSelection is for selectors;
+    //     in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
+    ntCanDoSelection:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;

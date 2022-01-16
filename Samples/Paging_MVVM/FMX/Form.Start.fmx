@@ -63,6 +63,8 @@ object StartForm: TStartForm
       StyleLookup = ''
       TabOrder = 0
       Text = 'ListBox'
+      ExplicitSize.cx = 58.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
     end
   end
   object ioFMX1: TioFMX

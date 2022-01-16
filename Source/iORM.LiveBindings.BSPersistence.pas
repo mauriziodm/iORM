@@ -54,6 +54,7 @@ type
     function CanPersist: Boolean;
     function CanClear: Boolean;
     function CanDelete: Boolean;
+    function CanDoSelection: Boolean;
     function IsActive: Boolean;
     function IsChanged: Boolean;
     function IsSaved: Boolean;
@@ -81,6 +82,11 @@ end;
 function TioBSPersistence.CanDelete: Boolean;
 begin
   Result := GetState >= osUnassigned;
+end;
+
+function TioBSPersistence.CanDoSelection: Boolean;
+begin
+  Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eAbortIfNotSaved);
 end;
 
 function TioBSPersistence.CanPersist: Boolean;
