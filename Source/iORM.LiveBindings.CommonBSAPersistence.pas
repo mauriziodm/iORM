@@ -161,6 +161,7 @@ begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
     Abort;
   end;
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteNotification(AActiveBindSourceAdapter.Current));
 end;
 
 class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);

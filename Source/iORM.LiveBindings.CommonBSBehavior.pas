@@ -49,7 +49,7 @@ begin
     // Actually used for paging purposes (ObjState moved on "OnBeforeScroll" directly in the BindSource/DataSet/ModelPresenter master)
     ntScroll:
       ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
-    // Actually used BSPersistence purposes
+    // Actually used for BSPersistence purposes
     ntSaveRevertPoint:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
         LBSPersistenceClient.Persistence.NotifySaveObjState;
@@ -59,6 +59,12 @@ begin
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDoSelection;
+      end;
+    // Actually used for BSPersistence purposes:
+    // if enabled save a reference to the deleted object to perform a delete query when persist
+    ntDelete:
+      begin
+        Sleep(1);
       end;
   end;
 end;
