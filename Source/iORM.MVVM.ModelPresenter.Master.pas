@@ -10,7 +10,8 @@ type
 
   TioModelPresenterMaster = class(TioModelPresenterCustom, IioBSPersistenceClient)
   private
-    FObjState: TioBSPersistence;
+    FPersistence: TioBSPersistence;
+    FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     function IsActive: Boolean;
@@ -19,6 +20,9 @@ type
     procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
     // Added methods
     function GetPersistence: TioBSPersistence;
+    // OnDeleteAction property
+    function GetOnDeleteAction: TioBSOnDeleteAction;
+    procedure SetOnDeleteAction(const Value: TioBSOnDeleteAction);
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -53,6 +57,7 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
+    property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daDeleteOnPersist;
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourcePresenter: TioModelPresenterCustom read GetSourcePresenter write SetSourcePresenter;
@@ -75,15 +80,21 @@ implementation
 constructor TioModelPresenterMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FObjState := TioBSPersistence.Create(Self);
+  FPersistence := TioBSPersistence.Create(Self);
+  FOnDeleteAction := daDeleteOnPersist;
   FOnEditAction := eSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
 destructor TioModelPresenterMaster.Destroy;
 begin
-  FObjState.Free;
+  FPersistence.Free;
   inherited;
+end;
+
+function TioModelPresenterMaster.GetOnDeleteAction: TioBSOnDeleteAction;
+begin
+  Result := FOnDeleteAction;
 end;
 
 function TioModelPresenterMaster.GetOnEditAction: TioBSOnEditAction;
@@ -98,7 +109,7 @@ end;
 
 function TioModelPresenterMaster.GetPersistence: TioBSPersistence;
 begin
-  Result := FObjState;
+  Result := FPersistence;
 end;
 
 function TioModelPresenterMaster.GetSourcePresenter: TioModelPresenterCustom;
@@ -121,6 +132,11 @@ function TioModelPresenterMaster.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := True;
+end;
+
+procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);
+begin
+  FOnDeleteAction := Value;
 end;
 
 procedure TioModelPresenterMaster.SetOnEditAction(const Value: TioBSOnEditAction);

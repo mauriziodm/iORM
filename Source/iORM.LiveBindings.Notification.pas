@@ -37,7 +37,7 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntDelete);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -48,11 +48,17 @@ type
     DeliverToMasterBS: Boolean;
     DeliverToDetailBS: Boolean;
     StopAtTheFirstDestination: Boolean;
+    PayloadAsInteger: Integer;
+    PayloadAsString: String;
     Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
+    constructor CreateDeleteNotification(const ADeletedObj: TObject);
   end;
 
 implementation
+
+uses
+  iORM.Utilities;
 
 { TioBSNotification }
 
@@ -81,7 +87,7 @@ begin
         DeliverToDetailBS := True;
         StopAtTheFirstDestination := False;
       end;
-    // NB: ntSaveObjState is for the ObjStateManager;
+    // NB: ntSaveObjState is for the TBSPersist;
     //     it only applies to BindSource masters and propagates from the details to the first master encountered
     ntSaveRevertPoint:
       begin
@@ -101,7 +107,34 @@ begin
         DeliverToDetailBS := False;
         StopAtTheFirstDestination := True;
       end;
+    // NB: ntDelete is for the TBSPersist;
+    //     Notifies the MasterBS.Persistence that an item has been deleted
+    //     PayloadAsInteger = ID of the deleted object
+    //     PayloadAsString = ClassName of the deleted object
+    ntDelete:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstDestination := True;
+      end;
   end;
+end;
+
+constructor TioBSNotification.CreateDeleteNotification(const ADeletedObj: TObject);
+begin
+  // Initialization
+  NotificationType := ntDelete;
+  // Routing
+  DirectionRoot := True;
+  DirectionLeaves := False;
+  DeliverToMasterBS := True;
+  DeliverToDetailBS := False;
+  StopAtTheFirstDestination := True;
+  // Payload
+  PayLoadAsString := ADeletedObj.ClassName;
+  PayLoadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
 end;
 
 end.

@@ -10,7 +10,8 @@ type
 
   TioDataSetMaster = class(TioDataSetCustom, IioBSPersistenceClient)
   private
-    FObjState: TioBSPersistence;
+    FPersistence: TioBSPersistence;
+    FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourceDataSet
@@ -18,6 +19,9 @@ type
     procedure SetSourceDataSet(const Value: TioDataSetCustom);
     // Added methods
     function GetPersistence: TioBSPersistence;
+    // OnDeleteAction property
+    function GetOnDeleteAction: TioBSOnDeleteAction;
+    procedure SetOnDeleteAction(const Value: TioBSOnDeleteAction);
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
@@ -50,6 +54,7 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
+    property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daDeleteOnPersist;
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioDataSetCustom read GetSourceDataSet write SetSourceDataSet;
@@ -75,14 +80,15 @@ uses
 constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FObjState := TioBSPersistence.Create(Self);
+  FPersistence := TioBSPersistence.Create(Self);
+  FOnDeleteAction := daDeleteOnPersist;
   FOnEditAction := eSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
 destructor TioDataSetMaster.Destroy;
 begin
-  FObjState.Free;
+  FPersistence.Free;
   inherited;
 end;
 
@@ -100,7 +106,12 @@ end;
 
 function TioDataSetMaster.GetPersistence: TioBSPersistence;
 begin
-  Result := FObjState;
+  Result := FPersistence;
+end;
+
+function TioDataSetMaster.GetOnDeleteAction: TioBSOnDeleteAction;
+begin
+  Result := FOnDeleteAction;
 end;
 
 function TioDataSetMaster.GetOnEditAction: TioBSOnEditAction;
@@ -128,6 +139,11 @@ function TioDataSetMaster.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := True;
+end;
+
+procedure TioDataSetMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);
+begin
+  FOnDeleteAction := Value;
 end;
 
 procedure TioDataSetMaster.SetOnEditAction(const Value: TioBSOnEditAction);

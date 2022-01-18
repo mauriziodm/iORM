@@ -116,7 +116,6 @@ var
 begin
   if not Assigned(AObj) then
     raise EioException.Create(ClassName, 'ExtractOID', '"AObj" cannot be nil.');
-//  LMap := TioContextFactory.Map(AObj.ClassType);
   LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;
