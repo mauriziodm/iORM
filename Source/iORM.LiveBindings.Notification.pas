@@ -37,7 +37,7 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntDelete);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntDeleteSmart, ntDeleteObjStatus);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -52,7 +52,7 @@ type
     PayloadAsString: String;
     Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
-    constructor CreateDeleteNotification(const ADeletedObj: TObject);
+    constructor CreateDeleteSmart(const ADeletedObj: TObject);
   end;
 
 implementation
@@ -111,7 +111,7 @@ begin
     //     Notifies the MasterBS.Persistence that an item has been deleted
     //     PayloadAsInteger = ID of the deleted object
     //     PayloadAsString = ClassName of the deleted object
-    ntDelete:
+    ntDeleteSmart:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;
@@ -122,10 +122,11 @@ begin
   end;
 end;
 
-constructor TioBSNotification.CreateDeleteNotification(const ADeletedObj: TObject);
+constructor TioBSNotification.CreateDeleteSmart(const ADeletedObj: TObject);
 begin
   // Initialization
-  NotificationType := ntDelete;
+  NotificationType := ntDeleteSmart;
+  Response := True;
   // Routing
   DirectionRoot := True;
   DirectionLeaves := False;

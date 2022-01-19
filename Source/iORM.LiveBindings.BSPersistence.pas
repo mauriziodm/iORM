@@ -10,7 +10,7 @@ type
   TioBSPersistenceState = (osUnassigned, osUnsaved, osSaved, osChanged);
   TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
   TioBSOnEditAction = (eDoNothing, eSaveRevertPoint, eAbortIfNotSaved);
-  TioBSOnDeleteAction = (daDoNothing, daDeleteOnPersist);
+  TioBSOnDeleteAction = (daDoNothing, daSetObjStatusIfExists, daSetSmartDeleteSystem);
 
   TioBSPersistence = class;
 

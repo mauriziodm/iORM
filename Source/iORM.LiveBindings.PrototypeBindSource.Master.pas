@@ -65,7 +65,7 @@ type
     // Published properties: paging
     property Paging;
     // Added properties
-    property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daDeleteOnPersist;
+    property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daSetSmartDeleteSystem;
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourcePBS: TioPrototypeBindSourceCustom read GetSourcePBS write SetSourcePBS;
@@ -92,7 +92,7 @@ constructor TioPrototypeBindSourceMaster.Create(AOwner: TComponent);
 begin
   inherited;
   FPersistence := TioBSPersistence.Create(Self);
-  FOnDeleteAction := daDeleteOnPersist;
+  FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;

@@ -11,10 +11,10 @@ type
   // Methods and functionalities common to all BindSouces (ioDataSet also)
   TioCommonBSBehavior = class
   private
+    class function CanDoSelection(const ASender: TObject; const ASelectionDestBSA: IioActiveBindSourceAdapter): Boolean;
   public
     // NB: Common code for ABSA to manage notifications
     class procedure Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
-    class function CanDoSelection(const ASender: TObject; const ASelectionDestBSA: IioActiveBindSourceAdapter): Boolean;
     class procedure Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   end;
@@ -62,7 +62,7 @@ begin
       end;
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the deleted object to perform a delete query when persist
-    ntDelete:
+    ntDeleteSmart:
       begin
         Sleep(1);
       end;
@@ -83,7 +83,7 @@ begin
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
   // If the selection is allowed then send a ntSaveRevertPoint notification
-  if TioCommonBSBehavior.CanDoSelection(ASender, LDestBSA) then
+  if CanDoSelection(ASender, LDestBSA) then
     LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
     raise EioException.Create(ClassName, 'Select<T>', 'Destination BindSource hasn''t saved a revert point');

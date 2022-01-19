@@ -65,7 +65,6 @@ type
     class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AReloadData, ANotify: Boolean); static;
     class procedure BSPersistenceDelete(const ABindSource: IioBSPersistenceClient); static;
     class procedure Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
-    class procedure Delete_old(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean); static;
     class procedure AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AForce: Boolean = False); static;
     class procedure PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -76,7 +75,8 @@ implementation
 
 uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
   iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
-  iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification;
+  iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification,
+  iORM.Utilities;
 
 type
 
@@ -89,7 +89,7 @@ type
     class function GetPostExecuteMethod(const ADataObj: TObject; const ARelationChildPropertyName: String; const AMasterOID: Integer)
       : TioCommonBSAPersistenceThreadExecute;
     // Delete
-    class function GetDeleteExecuteMethod(const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
+    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
     class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
     // Refresh
     class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
@@ -144,14 +144,39 @@ begin
   if not Assigned(LActiveBindSourceAdapter.Current) then
     Exit;
   // Set anonimous methods
-  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter.Current);
+  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter, LActiveBindSourceAdapter.Current);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(LActiveBindSourceAdapter);
   // Execute synchronous or asynchronous
   _Execute(LActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
 end;
 
 class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LNotification: TioBSNotification;
 begin
+  if AActiveBindSourceAdapter.Current = nil then
+    Exit;
+
+  LNotification := TioBSNotification.CreateDeleteSmart(AActiveBindSourceAdapter.Current);
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), LNotification);
+  if LNotification.Response then
+    Sleep(1);
+
+  if AActiveBindSourceAdapter.UseObjStatus then
+  begin
+    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
+    Abort;
+  end;
+
+
+
+
+
+
+
+
+
+
   // If it is during a BSPersistenceDeleting operation or current is nil then exit
   if AActiveBindSourceAdapter.BSPersistenceDeleting or not Assigned(AActiveBindSourceAdapter.Current) then
     Exit;
@@ -161,7 +186,7 @@ begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
     Abort;
   end;
-  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteNotification(AActiveBindSourceAdapter.Current));
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmart(AActiveBindSourceAdapter.Current));
 end;
 
 class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -187,43 +212,6 @@ begin
   // the "CommonBSAPersistence" else by this method
 //  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
   // ====================================================================================================================================
-end;
-
-class procedure TioCommonBSAPersistence.Delete_old(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; out AAbort: Boolean);
-var
-  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
-begin
-  AAbort := False;
-  // If current is nil then exit
-  if not Assigned(AActiveBindSourceAdapter.Current) then
-    Exit;
-  // If not AutoPersist then exit
-  if not AActiveBindSourceAdapter.ioAutoPersist then
-  begin
-    // If UseObjStatus is true and not AutoPersist then set ObjStatus propriety and exit
-    if AActiveBindSourceAdapter.UseObjStatus then
-    begin
-      AActiveBindSourceAdapter.SetObjStatus(osDeleted);
-      AAbort := True;
-    end;
-    Exit;
-  end;
-  // ----------------------- SET ANONIMOUS METHODS -----------------------------
-  // Set Execute anonimous methods
-  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(AActiveBindSourceAdapter.Current);
-  // Set the OnTerminate anonymous method when in Async mode
-  // If not in Async mode then execute this code in the "AfterDelete" method called by the BSA
-  // from the OnAfterDelete event handler.
-  if AActiveBindSourceAdapter.ioAsync then
-    LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(AActiveBindSourceAdapter)
-  else
-    LTerminateMethod := nil;
-  // ----------------------- SET ANONIMOUS METHODS -----------------------------
-  // If AutoPersist or forced persist then delete from the DB else
-  // send a notification to other BSA.
-  // Execute synchronous or asynchronous
-  _Execute(AActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
 end;
 
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -562,12 +550,19 @@ end;
 
 { TioCommonBSAAnonymousMethodsFactory }
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
+var
+  LID: Integer;
+  LClassName: String;
 begin
+  // Save into local variables to avoid multithread resource access inconsistency problems
+  LClassName := ADataObj.ClassName;
+  LID := TioUtilities.ExtractOID(ADataObj);
+  AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
   Result := function: TObject
     begin
       Result := nil;
-      io.Delete(ADataObj);
+      io.RefTo(LClassName).ByID(LID).Delete;
     end;
 end;
 
@@ -577,6 +572,7 @@ begin
   Result := procedure(AResultValue: TObject)
     begin
       AActiveBindSourceAdapter.Delete;
+      AActiveBindSourceAdapter.BSPersistenceDeleting := False; // Look at GetDeleteExecuteMethod above
     end;
 end;
 
