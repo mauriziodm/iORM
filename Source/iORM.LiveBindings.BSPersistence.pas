@@ -124,6 +124,7 @@ begin
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Clear', 'Pending changes exists');
   FSavedState := '';
+  FSmartDeleteSystem.Clear;
 end;
 
 constructor TioBSPersistence.Create(const ABSPersistenceClient: IioBSPersistenceClient);
