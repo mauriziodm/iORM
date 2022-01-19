@@ -58,6 +58,8 @@ begin
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction = daSetSmartDeleteSystem);
+        if ANotification.Response then
+          LBSPersistenceClient.Persistence.SmartDeleteSystem.Add(ANotification.PayloadAsString, ANotification.PayloadAsInteger);
       end;
     // Actually used for ActiveBindSourceAdapters delete purposes:
     // It return true (Response field of the notification) if the ObjStatus delete mode system is enabled on the MasterBS

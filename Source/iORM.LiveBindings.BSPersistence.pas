@@ -3,7 +3,8 @@ unit iORM.LiveBindings.BSPersistence;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces,
+  iORM.LiveBindings.BSPersistence.SmartDeleteSystem;
 
 type
 
@@ -41,14 +42,16 @@ type
 
   TioBSPersistence = class
   private
-    FSavedState: String;
     FBindSource: IioBSPersistenceClient;
+    FSavedState: String;
+    FSmartDeleteSystem: TioSmartDeleteSystem;
     function GetCurrentAsString: String;
     function GetState: TioBSPersistenceState;
     function GetStateAsString: String;
     procedure CheckUnassigned(const AMethodName: String);
   public
     constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
+    destructor Destroy; override;
     procedure SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean = True);
     procedure Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
@@ -67,6 +70,7 @@ type
     procedure NotifyBeforeScroll;
     procedure NotifySaveObjState;
     property SavedObjState: string read FSavedState;
+    property SmartDeleteSystem: TioSmartDeleteSystem read FSmartDeleteSystem;
     property State: TioBSPersistenceState read GetState;
     property StateAsString: string read GetStateAsString;
   end;
@@ -126,6 +130,7 @@ constructor TioBSPersistence.Create(const ABSPersistenceClient: IioBSPersistence
 begin
   inherited Create;
   FBindSource := ABSPersistenceClient;
+  FSmartDeleteSystem := TioSmartDeleteSystem.Create;
   Clear(False);
 end;
 
@@ -137,6 +142,12 @@ begin
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Delete', 'Pending changes exists');
   TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+end;
+
+destructor TioBSPersistence.Destroy;
+begin
+  FSmartDeleteSystem.Free;
+  inherited;
 end;
 
 function TioBSPersistence.IsActive: Boolean;
