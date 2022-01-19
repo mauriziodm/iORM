@@ -126,7 +126,7 @@ type
     // procedure Persist(ReloadData:Boolean=False);
     procedure PersistCurrent;
     procedure PersistAll;
-    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
     procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
@@ -270,7 +270,7 @@ type
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
     function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
-    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     function GetMasterPropertyName: String;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     // WhereStr property
@@ -279,7 +279,7 @@ type
 
   IioNaturalBindSourceAdapterSource = interface
     ['{892D8DAE-96F3-48FC-925C-F3F5CD5C0F68}']
-    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
     function GetCurrent: TObject;
     function UseObjStatus: Boolean;
