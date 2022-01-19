@@ -22,10 +22,14 @@ type
     function IsActive: Boolean;
     procedure PersistCurrent;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
-    // ObjState property
     function GetPersistence: TioBSPersistence;
     property Persistence: TioBSPersistence read GetPersistence;
+    // OnDeleteAction property
+    function GetOnDeleteAction: TioBSOnDeleteAction;
+    procedure SetOnDeleteAction(const Value: TioBSOnDeleteAction);
+    property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction;
     // OnEditAction property
+    // ObjState property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction;

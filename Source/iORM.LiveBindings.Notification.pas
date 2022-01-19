@@ -52,23 +52,23 @@ type
     PayloadAsString: String;
     Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
-    constructor CreateDeleteSmart(const ADeletedObj: TObject);
+    constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);
   end;
 
 implementation
 
 uses
-  iORM.Utilities;
+  iORM.Utilities, iORM.Exceptions, System.SysUtils;
 
 { TioBSNotification }
 
 constructor TioBSNotification.Create(const ANotificationType: TioBSNotificationType);
 begin
   NotificationType := ANotificationType;
-  Response := True;
+  Response := False;
   case ANotificationType of
     // NB: ntBrowse is used both for paging and for the ObjStateManager;
-    //     in both cases it applies only to the master BindSource and does not propagate
+    // in both cases it applies only to the master BindSource and does not propagate
     ntScroll:
       begin
         DirectionRoot := False;
@@ -78,7 +78,7 @@ begin
         StopAtTheFirstDestination := True;
       end;
     // NB: ntRefresh is used to notify all BindSources to refresh;
-    //     it is applied both to the BindSource masters and to the details and it propagates in both directions until it reaches the root or leaves
+    // it is applied both to the BindSource masters and to the details and it propagates in both directions until it reaches the root or leaves
     ntRefresh:
       begin
         DirectionRoot := True;
@@ -88,7 +88,7 @@ begin
         StopAtTheFirstDestination := False;
       end;
     // NB: ntSaveObjState is for the TBSPersist;
-    //     it only applies to BindSource masters and propagates from the details to the first master encountered
+    // it only applies to BindSource masters and propagates from the details to the first master encountered
     ntSaveRevertPoint:
       begin
         DirectionRoot := True;
@@ -98,7 +98,7 @@ begin
         StopAtTheFirstDestination := True;
       end;
     // NB: ntCanDoSelection is for selectors;
-    //     in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
+    // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
     ntCanDoSelection:
       begin
         DirectionRoot := True;
@@ -108,10 +108,10 @@ begin
         StopAtTheFirstDestination := True;
       end;
     // NB: ntDelete is for the TBSPersist;
-    //     Notifies the MasterBS.Persistence that an item has been deleted
-    //     PayloadAsInteger = ID of the deleted object
-    //     PayloadAsString = ClassName of the deleted object
-    ntDeleteSmart:
+    // Notifies the MasterBS.Persistence that an item has been deleted
+    // PayloadAsInteger = ID of the deleted object
+    // PayloadAsString = ClassName of the deleted object
+    ntDeleteObjStatus:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;
@@ -119,14 +119,19 @@ begin
         DeliverToDetailBS := False;
         StopAtTheFirstDestination := True;
       end;
+    // Else raise exception
+  else
+    raise EioException.Create('TioBSNotification', 'Create',
+      Format('Notification type not recognized (%s)'#13'It may be that you have to use a specific constructor.',
+      [TioUtilities.EnumToString<TioBSNotificationType>(ANotificationType)]));
   end;
 end;
 
-constructor TioBSNotification.CreateDeleteSmart(const ADeletedObj: TObject);
+constructor TioBSNotification.CreateDeleteSmartNotification(const ADeletedObj: TObject);
 begin
   // Initialization
   NotificationType := ntDeleteSmart;
-  Response := True;
+  Response := False;
   // Routing
   DirectionRoot := True;
   DirectionLeaves := False;
@@ -134,8 +139,8 @@ begin
   DeliverToDetailBS := False;
   StopAtTheFirstDestination := True;
   // Payload
-  PayLoadAsString := ADeletedObj.ClassName;
-  PayLoadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
+  PayloadAsString := ADeletedObj.ClassName;
+  PayloadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
 end;
 
 end.

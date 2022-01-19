@@ -89,7 +89,8 @@ type
     class function GetPostExecuteMethod(const ADataObj: TObject; const ARelationChildPropertyName: String; const AMasterOID: Integer)
       : TioCommonBSAPersistenceThreadExecute;
     // Delete
-    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
+    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
+      : TioCommonBSAPersistenceThreadExecute;
     class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
     // Refresh
     class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
@@ -154,39 +155,17 @@ class procedure TioCommonBSAPersistence.Delete(const AActiveBindSourceAdapter: I
 var
   LNotification: TioBSNotification;
 begin
-  if AActiveBindSourceAdapter.Current = nil then
+  // If it is during a BSPersistenceDeleting operation or current is nil or if daSetSmartDeleteSystem is selected as OnDeleteAction on the MasterBS
+  if AActiveBindSourceAdapter.BSPersistenceDeleting or (AActiveBindSourceAdapter.Current = nil) or
+    AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
     Exit;
-
-  LNotification := TioBSNotification.CreateDeleteSmart(AActiveBindSourceAdapter.Current);
-  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), LNotification);
-  if LNotification.Response then
-    Sleep(1);
-
-  if AActiveBindSourceAdapter.UseObjStatus then
+  // If UseObjStatus is true then set ObjStatus propriety and abort (If "daSetObjStatusIfExists" delete mode is selected as OnDeleteAction on the MasterBS)
+  if AActiveBindSourceAdapter.UseObjStatus and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntDeleteObjStatus))
+  then
   begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
     Abort;
   end;
-
-
-
-
-
-
-
-
-
-
-  // If it is during a BSPersistenceDeleting operation or current is nil then exit
-  if AActiveBindSourceAdapter.BSPersistenceDeleting or not Assigned(AActiveBindSourceAdapter.Current) then
-    Exit;
-  // If UseObjStatus is true then set ObjStatus propriety and abort
-  if AActiveBindSourceAdapter.UseObjStatus then
-  begin
-    AActiveBindSourceAdapter.SetObjStatus(osDeleted);
-    Abort;
-  end;
-  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmart(AActiveBindSourceAdapter.Current));
 end;
 
 class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -204,13 +183,13 @@ begin
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
   // NB: Mauri 11/01/2022: Da quando nel DoAfterDelete dell'ABSA richiamo il DoAfterScroll (perchè ho scoperto che non lo faceva da solo)
-  //      in pratica non c'è più bisogno delle righe sotto (cmq per ora le lascio per sicurezza)
+  // in pratica non c'è più bisogno delle righe sotto (cmq per ora le lascio per sicurezza)
   // ====================================================================================================================================
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   // NB: Moved into "CommonBSAPersistence" (Delete, LOnTerminate)
   // if FAutoPersist is True then the notify is performed by
   // the "CommonBSAPersistence" else by this method
-//  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
+  // AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
   // ====================================================================================================================================
 end;
 
@@ -550,7 +529,8 @@ end;
 
 { TioCommonBSAAnonymousMethodsFactory }
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
+  : TioCommonBSAPersistenceThreadExecute;
 var
   LID: Integer;
   LClassName: String;

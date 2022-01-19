@@ -10,8 +10,6 @@ type
 
   // Methods and functionalities common to all BindSouces (ioDataSet also)
   TioCommonBSBehavior = class
-  private
-    class function CanDoSelection(const ASender: TObject; const ASelectionDestBSA: IioActiveBindSourceAdapter): Boolean;
   public
     // NB: Common code for ABSA to manage notifications
     class procedure Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
@@ -26,15 +24,6 @@ uses
   iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions;
 
 { TioCommonBSBehavior }
-
-class function TioCommonBSBehavior.CanDoSelection(const ASender: TObject; const ASelectionDestBSA: IioActiveBindSourceAdapter): Boolean;
-var
-  LNotification: TioBSNotification;
-begin
-  LNotification := TioBSNotification.Create(TioBSNotificationType.ntCanDoSelection);
-  ASelectionDestBSA.Notify(ASender, LNotification);
-  Result := LNotification.Response;
-end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
 var
@@ -61,10 +50,22 @@ begin
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDoSelection;
       end;
     // Actually used for BSPersistence purposes:
-    // if enabled save a reference to the deleted object to perform a delete query when persist
+    // if enabled save a reference to the deleted object to perform a delete query when persist the MasterBS.
+    // It return true (Response field of the notification) if the smart delete system is enabled and the
+    //  operation is succesfull
     ntDeleteSmart:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
       begin
-        Sleep(1);
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction = daSetSmartDeleteSystem);
+      end;
+    // Actually used for ActiveBindSourceAdapters delete purposes:
+    // It return true (Response field of the notification) if the ObjStatus delete mode system is enabled on the MasterBS
+    ntDeleteObjStatus:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      begin
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction = daSetObjStatusIfExists);
       end;
   end;
 end;
@@ -83,7 +84,7 @@ begin
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
   // If the selection is allowed then send a ntSaveRevertPoint notification
-  if CanDoSelection(ASender, LDestBSA) then
+  if LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntCanDoSelection)) then
     LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
     raise EioException.Create(ClassName, 'Select<T>', 'Destination BindSource hasn''t saved a revert point');

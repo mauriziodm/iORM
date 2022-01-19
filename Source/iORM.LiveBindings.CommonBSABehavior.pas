@@ -92,7 +92,7 @@ type
   TioCommonBSABehavior = class
   public
     // NB: Common code for ABSA to manage notifications
-    class function  Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification): Boolean;
+    class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
     // NB: Generic type for this methods must be only TObject or IInterface
     class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T); overload;
     // ==========================================================================================================================
@@ -130,7 +130,7 @@ begin
   AActiveBindSourceAdapter.GetMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
 end;
 
-class function TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification): Boolean;
+class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
 begin
   // Notify the BindSource
   // NB: First check if the BSA has a BindSource and if the message is not actually coming from it,
@@ -156,9 +156,6 @@ begin
   // If the current BSA is a NaturalBindSourceAdapter then forward the notification to the source adapter
   if ANotification.DirectionRoot and Supports(AActiveBindSourceAdapter, IioNaturalActiveBindSourceAdapter) then
     (AActiveBindSourceAdapter as IioNaturalActiveBindSourceAdapter).ForwardNotificationToSourceAdapter(AActiveBindSourceAdapter as TObject, ANotification);
-
-  // Return the response
-  Result := ANotification.Response;
 end;
 
 class procedure TioCommonBSABehavior.AddFields(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;

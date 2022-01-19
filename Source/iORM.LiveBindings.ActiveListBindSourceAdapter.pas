@@ -739,7 +739,8 @@ end;
 
 function TioActiveListBindSourceAdapter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
 begin
-  Result := TioCommonBSABehavior.Notify(Sender, Self, ANotification);
+  TioCommonBSABehavior.Notify(Sender, Self, ANotification);
+  Result := ANotification.Response;
 end;
 
 procedure TioActiveListBindSourceAdapter.PersistAll;
