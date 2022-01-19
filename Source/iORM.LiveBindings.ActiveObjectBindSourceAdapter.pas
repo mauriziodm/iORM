@@ -56,7 +56,6 @@ type
     FTypeName, FTypeAlias: String; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
-    FAutoPersist: Boolean;
     FRefreshing: Boolean;
     FMasterProperty: IioProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -64,7 +63,6 @@ type
     FBindSource: IioNotifiableBindSource;
     // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;  *** NB: Code presente (commented) in the unit body ***
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    FDeleteAfterCancel: Boolean;
     FBSPersistenceDeleting: Boolean;
     // TypeName
     procedure SetTypeName(const AValue: String);
@@ -78,9 +76,6 @@ type
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // AutoPersist property
-    function GetioAutoPersist: Boolean;
-    procedure SetioAutoPersist(const Value: Boolean);
     // WhereStr property
     procedure SetIoWhere(const Value: IioWhere);
     function GetIoWhere: IioWhere;
@@ -130,8 +125,6 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
-    procedure DoBeforeCancel; override;
-    procedure DoAfterCancel; override;
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
@@ -252,7 +245,6 @@ constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; AWhe
 begin
   FAutoLoadData := AutoLoadData;
   FAsync := False;
-  FAutoPersist := True;
   FRefreshing := False;
   FBSPersistenceDeleting := False;
 
@@ -293,69 +285,22 @@ begin
   Result := FDetailAdaptersContainer;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoAfterCancel;
-begin
-  inherited;
-  // Flag che indica se poi, nel DoAfterCancer, deve provvedere
-  // a fare il Delete del record/oggetto di cui si richiede l'annullamento.
-  // NB. Tutto questo serve per fare in modo che il BSA e quindi anche il DataSet
-  // si comporti come si comportano i DataSet normalmente quando si fa il
-  // cancel durante l'ìnsert/append di un nuovo record/oggetto e cioè
-  // che il nuovo record viene automaticamente eliminato (nei BSA invece
-  // rimane il nuovo oggetto "vuoto".
-  if FDeleteAfterCancel then
-  begin
-    Self.GetDataSetLinkContainer.Refresh(True); // Altrimenti da un errore sull'Append
-    Self.Delete;
-  end;
-end;
-
 procedure TioActiveObjectBindSourceAdapter.DoAfterPost;
 begin
   inherited;
-  // NB: Effettua da qui la chiamata per la persistenza (AutoPersist = true) solo se
-  // la proprietà "ioAutoPost" = false. In realtà non ci sarebbe nemmeno bisogno
-  // dell'if perchè ho notato che se ioAutoPost=true già non ci passerebbe di suo
-  // ma meglio andare sul sicuro.
-  // In pratica se ioAutoPost=true esegue l'auto persist (se abilitato) nel metodo
-  // DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
-  // ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
-  // NB: Mauri 03/03/2020 - Ho elininato la condizione perchè, come scritto anche sopra
-  // non necessaria in quanto già di suo passava in questo evento (o nell'altro)
-  // in maniera corretta. Inoltre facendo così e aggiungendo alla fine del metodo
-  // TioBSADataSet.SetFieldData una chiamata a InternalActiveAdapter.Post (se AutoPost = True)
-  // ho potuto dare anche un giusto comportamento del DataSet anche con Autopost = True
-  // (precedentemente invece in pratica con faceva mai il post)
-  // if not Self.ioAutoPost then
   TioCommonBSAPersistence.Post(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>);
 begin
   inherited;
-  // NB: Effettua da qui la chiamata per la persistenza (AutoPersist = false) solo se
-  // la proprietà "ioAutoPost" = true. In realtà non ci sarebbe nemmeno bisogno
-  // dell'if perchè ho notato che se ioAutoPost=false già non ci passerebbe di suo
-  // ma meglio andare sul sicuro.
-  // In pratica se ioAutoPost=true esegue l'auto persist (se abilitato) nel metodo
-  // DoAfterPostFields e alla modifica di ogni singola proprietà, se invece
-  // ioAutoPost=False invece esegue il persist nel metodo DoAfterPost.
-  // NB: Mauri 03/03/2020 - Ho elininato la condizione perchè, come scritto anche sopra
-  // non necessaria in quanto già di suo passava in questo evento (o nell'altro)
-  // in maniera corretta. Inoltre facendo così e aggiungendo alla fine del metodo
-  // TioBSADataSet.SetFieldData una chiamata a InternalActiveAdapter.Post (se AutoPost = True)
-  // ho potuto dare anche un giusto comportamento del DataSet anche con Autopost = True
-  // (precedentemente invece in pratica con faceva mai il post)
-  // if not Self.ioAutoPost then
   TioCommonBSAPersistence.Post(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterScroll;
 begin
   inherited;
-  Self.FDetailAdaptersContainer.SetMasterObject(Self.Current);
-  // DataSet synchro
-  Self.GetDataSetLinkContainer.SetRecNo(Self.ItemIndex);
+  TioCommonBSAPersistence.AfterScroll(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
@@ -364,35 +309,10 @@ begin
     FBindSource.DoAfterSelection(ASelected, ASelectionType);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoBeforeCancel;
-begin
-  inherited;
-  // Flag che indica se poi, nel DoAfterCancer, deve provvedere
-  // a fare il Delete del record/oggetto di cui si richiede l'annullamento.
-  // NB. Tutto questo serve per fare in modo che il BSA e quindi anche il DataSet
-  // si comporti come si comportano i DataSet normalmente quando si fa il
-  // cancel durante l'ìnsert/append di un nuovo record/oggetto e cioè
-  // che il nuovo record viene automaticamente eliminato (nei BSA invece
-  // rimane il nuovo oggetto "vuoto".
-  // NB: DISABILITATO PERCHE' CAUSAVA ALCUNI PROBLEMI:
-  // 1) Quando si faceva un Append(AObject) causava l'eliminazione automatica
-  // dell'oggetto appena inserito. Questo succedeva perchè nel
-  // PrototypeBindSource/ModelPresenter, nel metodo Append(AObject),
-  // subito dopo l'Append normale veniva fatto anche un Refresh, al suo interno
-  // il refresh a sua volta faceva un cancel e innescava l'AutoDelete di cui sotto
-  // che eliminava il nuovo oggetto appena inserito.
-  // 2) Quando si faceva l'append di un nuovo oggetto e poi si editava
-  // l'istanza stessa con un NaturalBindSourceAdapter (MVVM) al Post
-  // si innescava di nuovo un Cancel sul BSA master he a sua volta
-  // innescava l'AutoDelete in modo simile al punto 1.
-  // FDeleteAfterCancel := (Self.State = TBindSourceAdapterState.seInsert);
-  FDeleteAfterCancel := False;
-end;
-
 procedure TioActiveObjectBindSourceAdapter.DoBeforeDelete;
 begin
   inherited;
-  TioCommonBSAPersistence.Delete(Self);
+  TioCommonBSAPersistence.BeforeDelete(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterDelete;
@@ -405,8 +325,7 @@ end;
 procedure TioActiveObjectBindSourceAdapter.DoBeforeEdit;
 begin
   inherited;
-  // ObjStateManager notification
-  Notify(Tobject(Self), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
+  TioCommonBSAPersistence.BeforeEdit(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeOpen;
@@ -545,11 +464,6 @@ begin
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Current);
-end;
-
-function TioActiveObjectBindSourceAdapter.GetioAutoPersist: Boolean;
-begin
-  Result := FAutoPersist;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetioAutoPost: Boolean;
@@ -788,11 +702,6 @@ end;
 procedure TioActiveObjectBindSourceAdapter.SetIoAsync(const Value: Boolean);
 begin
   FAsync := Value;
-end;
-
-procedure TioActiveObjectBindSourceAdapter.SetioAutoPersist(const Value: Boolean);
-begin
-  FAutoPersist := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetioAutoPost(const Value: Boolean);

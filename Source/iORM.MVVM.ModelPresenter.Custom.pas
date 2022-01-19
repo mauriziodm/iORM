@@ -50,7 +50,6 @@ type
     FTypeName, FTypeAlias: String;
     FAsync: Boolean;
     FAutoLoadData: Boolean;
-    FAutoPersist: Boolean;
     FViewDataType: TioViewDataType;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
@@ -100,8 +99,6 @@ type
     procedure SetAsync(const Value: Boolean);
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
-    // AutoPersist
-    procedure SetAutoPersist(const Value: Boolean);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -162,7 +159,6 @@ type
     // Published properties
     property Async: Boolean read FAsync write SetAsync default False; // Published: Master
     property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // Published: Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // Da eliminare tutto il discorso AutoPersist
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
@@ -328,7 +324,6 @@ begin
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
   FAutoLoadData := True;
-  FAutoPersist := True;
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
@@ -811,7 +806,6 @@ begin
   FBindSourceAdapter := Value;
   // Set some properties
   FBindSourceAdapter.ioAsync := FAsync;
-  FBindSourceAdapter.ioAutoPersist := FAutoPersist;
   FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   FBindSourceAdapter.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
@@ -910,15 +904,6 @@ begin
   // update the where of the adapter also
   if CheckAdapter then
     FBindSourceAdapter.ioTypeName := Value;
-end;
-
-procedure TioModelPresenterCustom.SetAutoPersist(const Value: Boolean);
-begin
-  FAutoPersist := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    FBindSourceAdapter.ioAutoPersist := Value;
 end;
 
 procedure TioModelPresenterCustom.SetAutoPost(const Value: Boolean);

@@ -184,9 +184,6 @@ type
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // AutoPersist property
-    procedure SetioAutoPersist(const Value: Boolean);
-    function GetioAutoPersist: Boolean;
     // WhereStr property
     procedure SetIoWhere(const Value: IioWhere);
     function GetioWhere: IioWhere;
@@ -233,7 +230,6 @@ type
     property Fields: TList<TBindSourceAdapterField> read GetFields;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
     property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
-    property ioAutoPersist: Boolean read GetioAutoPersist write SetioAutoPersist;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
     property ioOwnsObjects: Boolean read GetOwnsObjects;
     property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;

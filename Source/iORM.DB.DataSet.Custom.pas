@@ -20,7 +20,6 @@ type
     FTypeAlias: String;
     FAutoLoadData: Boolean;
     FAsync: Boolean;
-    FAutoPersist: Boolean; // Eliminare???
     FViewDataType: TioViewDataType; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
     FMasterDataSet: TioMasterDataSet;
     FMasterPropertyName: String;
@@ -59,8 +58,6 @@ type
     procedure SetAsync(const Value: Boolean);
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
-    // AutoPersist
-    procedure SetAutoPersist(const Value: Boolean);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -119,7 +116,6 @@ type
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
     property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
@@ -197,7 +193,6 @@ begin
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
   FAutoLoadData := True;
-  FAutoPersist := False;
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
@@ -482,14 +477,6 @@ begin
     GetActiveBindSourceAdapter.ioAutoLoadData := Value;
 end;
 
-procedure TioDataSetCustom.SetAutoPersist(const Value: Boolean);
-begin
-  FAutoPersist := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.ioAutoPersist := Value;
-end;
-
 procedure TioDataSetCustom.SetAutoPost(const Value: Boolean);
 begin
   FAutoPost := Value;
@@ -510,7 +497,6 @@ begin
   // Set some properties
   GetActiveBindSourceAdapter.ioAsync := FAsync;
   GetActiveBindSourceAdapter.ioAutoPost := FAutoPost;
-  GetActiveBindSourceAdapter.ioAutoPersist := FAutoPersist;
   GetActiveBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   GetActiveBindSourceAdapter.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter

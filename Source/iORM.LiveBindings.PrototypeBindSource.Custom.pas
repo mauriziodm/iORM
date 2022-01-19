@@ -52,7 +52,6 @@ type
     FTypeAlias: String;
     FAutoLoadData: Boolean;
     FAsync: Boolean;
-    FAutoPersist: Boolean;
     FViewDataType: TioViewDataType;
     FMasterBindSource: TioMasterBindSource;
     FMasterPropertyName: String;
@@ -93,8 +92,6 @@ type
     procedure SetAsync(const Value: Boolean);
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
-    // AutoPersist
-    procedure SetAutoPersist(const Value: Boolean);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -149,7 +146,6 @@ type
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
     property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
-    property AutoPersist: Boolean read FAutoPersist write SetAutoPersist default False; // Da eliminare tutto il discorso AutoPersist
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
@@ -307,7 +303,6 @@ begin
   FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
   FAsync := False;
   FAutoLoadData := True;
-  FAutoPersist := False;
   FViewDataType := TioViewDataType.dtList;
   // Selectors
   FSelectorFor := nil;
@@ -407,7 +402,6 @@ begin
     LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.ioAsync := FAsync;
     LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
-    LActiveBSA.ioAutoPersist := FAutoPersist;
     LActiveBSA.SetBindSource(Self);
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -715,16 +709,6 @@ begin
   // Update the adapter
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAutoLoadData := Value;
-end;
-
-procedure TioPrototypeBindSourceCustom.SetAutoPersist(const Value: Boolean);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
-begin
-  FAutoPersist := Value;
-  // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
-    LActiveBSA.ioAutoPersist := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAutoPost(const Value: Boolean);
