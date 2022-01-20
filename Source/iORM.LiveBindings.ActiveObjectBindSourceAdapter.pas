@@ -56,7 +56,7 @@ type
     FTypeName, FTypeAlias: String; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
-    FRefreshing: Boolean;
+    FReloading: Boolean;
     FMasterProperty: IioProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -99,9 +99,9 @@ type
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
-    // Refreshing
-    function GetRefreshing: Boolean;
-    procedure SetRefreshing(const Value: Boolean);
+    // Reloading
+    function GetReloading: Boolean;
+    procedure SetReloading(const Value: Boolean);
     // BSPersistenceDeleting
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
@@ -161,6 +161,7 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); reintroduce; overload;
+    procedure Reload;
     procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -245,7 +246,7 @@ constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; AWhe
 begin
   FAutoLoadData := AutoLoadData;
   FAsync := False;
-  FRefreshing := False;
+  FReloading := False;
   FBSPersistenceDeleting := False;
 
   // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
@@ -521,9 +522,9 @@ begin
   Result := FLocalOwnsObject;
 end;
 
-function TioActiveObjectBindSourceAdapter.GetRefreshing: Boolean;
+function TioActiveObjectBindSourceAdapter.GetReloading: Boolean;
 begin
-  Result := FRefreshing;
+  Result := FReloading;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetState: TBindSourceAdapterState;
@@ -629,6 +630,11 @@ end;
 procedure TioActiveObjectBindSourceAdapter.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
 begin
   TioCommonBSAPersistence.Refresh(Self, AReloadData, ANotify);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.Reload;
+begin
+  TioCommonBSAPersistence.Reload(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetAutoLoadData(const Value: Boolean);
@@ -744,9 +750,9 @@ begin
   TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetRefreshing(const Value: Boolean);
+procedure TioActiveObjectBindSourceAdapter.SetReloading(const Value: Boolean);
 begin
-  FRefreshing := Value;
+  FReloading := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetTypeAlias(const AValue: String);

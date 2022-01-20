@@ -213,9 +213,9 @@ type
     // Active
     procedure SetActive(Value: Boolean);
     function GetActive: Boolean;
-    // Refreshing
-    function GetRefreshing: Boolean;
-    procedure SetRefreshing(const Value: Boolean);
+    // Reloading
+    function GetReloading: Boolean;
+    procedure SetReloading(const Value: Boolean);
     // CanActivate
     function GetCanActivate: Boolean;
     // BSPersistenceDeleting
@@ -240,7 +240,7 @@ type
     property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
-    property Refreshing: Boolean read GetRefreshing write SetRefreshing;
+    property Reloading: Boolean read GetReloading write SetReloading;
     property State: TBindSourceAdapterState read GetState;
     property BSPersistenceDeleting: boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
   end;

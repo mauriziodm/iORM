@@ -63,8 +63,9 @@ type
     // Load
     class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
-    // Refresh
+    // Refresh/ Reload
     class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AReloadData, ANotify: Boolean); static;
+    class procedure Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Delete
     class procedure BSPersistenceDelete(const ABindSource: IioBSPersistenceClient); static;
     class procedure BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -142,7 +143,7 @@ end;
 
 class procedure TioCommonBSAPersistence.BeforeEdit(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
-  AActiveBindSourceAdapter.Notify(Tobject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
 end;
 
 class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioBSPersistenceClient);
@@ -197,8 +198,8 @@ var
 begin
   LTargetClass := nil;
   // If AutoLoadData is disabled then exit
-  // Prevent AutoLoadData when refreshing
-  if AActiveBindSourceAdapter.Refreshing or not AActiveBindSourceAdapter.ioAutoLoadData then
+  // Prevent AutoLoadData when reloading
+  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.ioAutoLoadData then
     Exit;
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
@@ -213,7 +214,6 @@ begin
       else
         AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
     end;
-
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingle:
@@ -273,7 +273,7 @@ begin
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.SetRecNo(AActiveBindSourceAdapter.ItemIndex);
   // Paging & BSPersistence notification
-  AActiveBindSourceAdapter.Notify(Tobject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntScroll));
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntScroll));
 end;
 
 class procedure TioCommonBSAPersistence._RefreshNoReload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean);
@@ -294,7 +294,7 @@ var
 begin
   LTargetClass := nil;
   // Prevent AutoLoadData when activating the BSA
-  AActiveBindSourceAdapter.Refreshing := True;
+  AActiveBindSourceAdapter.Reloading := True;
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
@@ -313,6 +313,45 @@ begin
         LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence._RefreshReload: wrong ViewDataType.');
+  end;
+end;
+
+class procedure TioCommonBSAPersistence.Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LPagingObj: TioCommonBSAPageManager;
+  LTargetClass: TioClassRef;
+  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+begin
+  // Checks
+  if AActiveBindSourceAdapter.GetBindSource = nil then
+    raise EioException.Create(ClassName, 'Reload', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
+      [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
+  if not AActiveBindSourceAdapter.GetBindSource.IsMasterBS then
+    raise EioException.Create(ClassName, 'Reload',
+      Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
+      [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
+
+  LTargetClass := nil;
+  // Prevent AutoLoadData when activating the BSA
+  AActiveBindSourceAdapter.Reloading := True;
+  // If it's a ListBindSourceAdapter then retrieve the list target class
+  if Assigned(AActiveBindSourceAdapter.DataObject) then
+    LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
+  // Set the OnTerminate method
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetRefreshTerminateMethod(AActiveBindSourceAdapter, False); // Notify = false (verificare)
+  // Extract the paging obj from the where obj and prepare it for an HardRefresh
+  LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
+  LPagingObj.PrepareForRefresh;
+  // Load
+  case AActiveBindSourceAdapter.ioViewDataType of
+    TioViewDataType.dtSingle:
+      _LoadSingle(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+        LTerminateMethod);
+    TioViewDataType.dtList:
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+        LTargetClass, LTerminateMethod);
+  else
+    raise EioException.Create('TioCommonBSAPersistence._Reload: wrong ViewDataType.');
   end;
 end;
 
@@ -518,7 +557,8 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+  : TioCommonBSAPersistenceThreadExecute;
 begin
   Result := function: TObject
     begin
@@ -527,7 +567,8 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+  : TioCommonBSAPersistenceThreadExecute;
 begin
   Result := function: TObject
     begin
@@ -559,7 +600,7 @@ begin
       else
         AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
       // Prevent AutoLoadData when activating the BSA
-      AActiveBindSourceAdapter.Refreshing := False;
+      AActiveBindSourceAdapter.Reloading := False;
       // Send a notification to other ActiveBindSourceAdapters & BindSource
       if ANotify then
         AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));

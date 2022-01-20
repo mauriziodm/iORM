@@ -57,7 +57,7 @@ type
     FTypeName, FTypeAlias: String;
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
-    FRefreshing: Boolean;
+    FReloading: Boolean;
     FMasterPropertyName: String;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -98,9 +98,9 @@ type
     // AutoLoadData
     procedure SetAutoLoadData(const Value: Boolean);
     function GetAutoLoadData: Boolean;
-    // Refreshing
-    function GetRefreshing: Boolean;
-    procedure SetRefreshing(const Value: Boolean);
+    // Reloading
+    function GetReloading: Boolean;
+    procedure SetReloading(const Value: Boolean);
     // BSPersistenceDeleting
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
@@ -142,7 +142,7 @@ type
     constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
       const AutoLoadData: Boolean; const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
-    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
+    function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
@@ -162,6 +162,7 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     procedure Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True); reintroduce; overload;
+    procedure Reload;
     procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -324,6 +325,11 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True);
 begin
   TioCommonBSAPersistence.Refresh(Self, AReloadData, ANotify);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.Reload;
+begin
+  TioCommonBSAPersistence.Reload(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -516,9 +522,9 @@ begin
   Result := FLocalOwnsObject;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetRefreshing: Boolean;
+function TioActiveInterfaceListBindSourceAdapter.GetReloading: Boolean;
 begin
-  Result := FRefreshing;
+  Result := FReloading;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetState: TBindSourceAdapterState;
@@ -552,7 +558,7 @@ begin
   FInterfacedList := nil;
   FAutoLoadData := AutoLoadData;
   FAsync := False;
-  FRefreshing := False;
+  FReloading := False;
   FBSPersistenceDeleting := False;
   // inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
@@ -805,9 +811,9 @@ begin
   TioContextFactory.Context(Current.ClassName, nil, Current).ObjStatus := AObjStatus;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetRefreshing(const Value: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetReloading(const Value: Boolean);
 begin
-  FRefreshing := Value;
+  FReloading := Value;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.UseObjStatus: Boolean;
