@@ -121,6 +121,20 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx)
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfSaved;
+    property TargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
   // =================================================================================================
   // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
   // =================================================================================================
@@ -256,6 +270,26 @@ end;
 procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
 begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioBSPersistenceReload }
+
+constructor TioBSPersistenceReload.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioBSPersistenceReload.ExecuteTarget(Target: TObject);
+begin
+  TargetBindSource.Persistence.Reload(RaiseIfSaved, RaiseIfChangesExists);
+end;
+
+procedure TioBSPersistenceReload.UpdateTarget(Target: TObject);
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
 end;
