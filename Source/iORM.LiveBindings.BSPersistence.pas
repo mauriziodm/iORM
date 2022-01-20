@@ -56,13 +56,15 @@ type
     procedure Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
-    procedure Delete(const ARaiseIfSaved: Boolean = False; ARaiseIfChangesExists: Boolean = False);
+    procedure Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure Reload(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     function CanSave: Boolean;
     function CanRevert: Boolean;
     function CanPersist: Boolean;
     function CanClear: Boolean;
     function CanDelete: Boolean;
     function CanDoSelection: Boolean;
+    function CanReload: Boolean;
     function IsActive: Boolean;
     function IsChanged: Boolean;
     function IsSaved: Boolean;
@@ -103,6 +105,11 @@ begin
   Result := GetState >= osSaved;
 end;
 
+function TioBSPersistence.CanReload: Boolean;
+begin
+  Result := GetState >= osUnassigned;
+end;
+
 function TioBSPersistence.CanRevert: Boolean;
 begin
   Result := GetState >= osSaved;
@@ -135,7 +142,7 @@ begin
   Clear(False);
 end;
 
-procedure TioBSPersistence.Delete(const ARaiseIfSaved: Boolean = False; ARaiseIfChangesExists: Boolean = False);
+procedure TioBSPersistence.Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Delete');
   if ARaiseIfSaved and (State > osUnsaved) then
@@ -218,6 +225,17 @@ begin
   FBindSource.PersistCurrent;
   if AClear then
     Clear(False);
+end;
+
+procedure TioBSPersistence.Reload(const ARaiseIfSaved: Boolean; const ARaiseIfChangesExists: Boolean);
+begin
+  CheckUnassigned('Reload');
+  if ARaiseIfSaved and (State > osUnsaved) then
+    raise EioBindSourceObjStateException.Create(ClassName, 'Reload', 'A previously saved revert point exists, it must be cleared before (Persist, Revert or Clear)');
+  if ARaiseIfChangesExists and (State > osSaved) then
+    raise EioBindSourceObjStateException.Create(ClassName, 'Reload', 'Pending changes exists');
+  FSavedState := '';
+  FSmartDeleteSystem.Clear;
 end;
 
 procedure TioBSPersistence.Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
