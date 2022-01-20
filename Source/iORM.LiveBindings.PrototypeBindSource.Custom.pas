@@ -186,7 +186,7 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); reintroduce; overload;
+    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
@@ -671,14 +671,14 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioPrototypeBindSourceCustom.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+procedure TioPrototypeBindSourceCustom.Refresh(const ANotify: Boolean = True);
 var
   AnActiveBSA: IioActiveBindSourceAdapter;
 begin
   if not CheckAdapter then
     Exit;
   if Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-    AnActiveBSA.Refresh(AReloadData, ANotify)
+    AnActiveBSA.Refresh(ANotify)
   else
     GetInternalAdapter.Refresh;
 end;

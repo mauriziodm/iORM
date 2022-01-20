@@ -22,7 +22,7 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function IsActive: Boolean;
     procedure PersistCurrent;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+    procedure Refresh(const ANotify: Boolean = True);
     function GetPersistence: TioBSPersistence;
     property Persistence: TioBSPersistence read GetPersistence;
     // OnDeleteAction property

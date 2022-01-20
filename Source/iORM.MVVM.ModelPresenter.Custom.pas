@@ -202,7 +202,7 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
+    procedure Refresh(const ANotify: Boolean = True); overload;
     procedure PersistCurrent;
     procedure PersistAll;
     procedure Append; overload;
@@ -749,10 +749,10 @@ begin
     GetActiveBindSourceAdapter.Prior;
 end;
 
-procedure TioModelPresenterCustom.Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+procedure TioModelPresenterCustom.Refresh(const ANotify: Boolean = True);
 begin
   if CheckAdapter then
-    FBindSourceAdapter.Refresh(AReloadData, ANotify);
+    FBindSourceAdapter.Refresh(ANotify);
 end;
 
 procedure TioModelPresenterCustom.RegisterDetailPresenter(const ADetailPresenter: TioModelPresenterCustom);

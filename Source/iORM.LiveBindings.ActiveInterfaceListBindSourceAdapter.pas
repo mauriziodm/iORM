@@ -161,7 +161,7 @@ type
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True); reintroduce; overload;
+    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
     procedure Reload;
     procedure LoadPage;
     function DataObject: TObject;
@@ -322,9 +322,9 @@ begin
   TioCommonBSAPersistence.Load(Self);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.Refresh(const AReloadData: Boolean = True; const ANotify: Boolean = True);
+procedure TioActiveInterfaceListBindSourceAdapter.Refresh(const ANotify: Boolean = True);
 begin
-  TioCommonBSAPersistence.Refresh(Self, AReloadData, ANotify);
+  TioCommonBSAPersistence.Refresh(Self, ANotify);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Reload;

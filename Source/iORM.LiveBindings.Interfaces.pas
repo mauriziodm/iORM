@@ -73,7 +73,7 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function IsMasterBS: boolean;
     function IsDetailBS: boolean;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+    procedure Refresh(const ANotify: Boolean = True);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -127,7 +127,7 @@ type
     procedure PersistCurrent;
     procedure PersistAll;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+    procedure Refresh(const ANotify: Boolean = True);
     procedure Reload;
     procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
@@ -277,7 +277,7 @@ type
   IioNaturalBindSourceAdapterSource = interface
     ['{892D8DAE-96F3-48FC-925C-F3F5CD5C0F68}']
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
+    procedure Refresh(const ANotify: Boolean = True); overload;
     function GetCurrent: TObject;
     function UseObjStatus: Boolean;
     function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;

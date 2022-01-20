@@ -149,7 +149,7 @@ type
     procedure PersistCurrent;
     procedure PersistAll;
     procedure CancelIfEditing;
-    procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True); overload;
+    procedure Refresh(const ANotify: Boolean = True); overload;
     function Current: TObject;
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
@@ -440,10 +440,10 @@ begin
     Post;
 end;
 
-procedure TioDataSetCustom.Refresh(const AReloadData, ANotify: Boolean);
+procedure TioDataSetCustom.Refresh(const ANotify: Boolean = True);
 begin
   if CheckAdapter then
-    GetActiveBindSourceAdapter.Refresh(AReloadData, ANotify);
+    GetActiveBindSourceAdapter.Refresh(ANotify);
 end;
 
 procedure TioDataSetCustom.RegisterDetailPresenter(const ADetailDataSet: TioDataSetCustom);
