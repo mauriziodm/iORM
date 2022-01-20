@@ -128,6 +128,7 @@ type
     procedure PersistAll;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     procedure Refresh(const AReloadData: Boolean; const ANotify: Boolean = True);
+    procedure Reload;
     procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;

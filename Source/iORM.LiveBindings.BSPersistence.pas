@@ -234,8 +234,8 @@ begin
     raise EioBindSourceObjStateException.Create(ClassName, 'Reload', 'A previously saved revert point exists, it must be cleared before (Persist, Revert or Clear)');
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Reload', 'Pending changes exists');
-  FSavedState := '';
-  FSmartDeleteSystem.Clear;
+  FBindSource.GetActiveBindSourceAdapter.Reload;
+  Clear(ARaiseIfChangesExists);
 end;
 
 procedure TioBSPersistence.Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
