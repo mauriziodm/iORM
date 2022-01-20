@@ -247,7 +247,7 @@ begin
   else
     // If, on the other hand, the pagination is not progressive then it performs a normal Refresh(True)
     // which in practice causes a normal loading in a new list which is then set as a new DataObject
-    _RefreshReload(AActiveBindSourceAdapter, False);
+    Reload(AActiveBindSourceAdapter);
 end;
 
 class procedure TioCommonBSAPersistence.Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean);
@@ -538,7 +538,7 @@ begin
   Result := procedure(AResultValue: TObject)
     begin
       // Perform a RefreshNoReload without nofications
-      TioCommonBSAPersistence._RefreshNoReload(AActiveBindSourceAdapter, False);
+      TioCommonBSAPersistence.Refresh(AActiveBindSourceAdapter, False);
     end;
 end;
 
