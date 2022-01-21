@@ -57,7 +57,7 @@ type
     FOrderBy: String;
     FMasterPresenter: TioModelPresenterCustom;
     FMasterPropertyName: String;
-    FAutoRefreshOnNotification: TioAutoRefreshType;
+    FAutoRefreshOnNotification: Boolean;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     // Selectors
@@ -103,8 +103,8 @@ type
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
     // AutoRefreshOnNotification;
-    function GetAutoRefreshOnNotification: TioAutoRefreshType;
-    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    function GetAutoRefreshOnNotification: Boolean;
+    procedure SetAutoRefreshOnNotification(const Value: Boolean);
     // Bof
     function GetBOF: Boolean;
     // Editing
@@ -160,7 +160,7 @@ type
     property Async: Boolean read FAsync write SetAsync default False; // Published: Master
     property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // Published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
-    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Nascondere e default = false
+    property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType;
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
@@ -321,7 +321,7 @@ constructor TioModelPresenterCustom.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoPost := False;
-  FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
+  FAutoRefreshOnNotification := True;
   FAsync := False;
   FAutoLoadData := True;
   FViewDataType := TioViewDataType.dtList;
@@ -492,7 +492,7 @@ begin
     Result := FAutoPost;
 end;
 
-function TioModelPresenterCustom.GetAutoRefreshOnNotification: TioAutoRefreshType;
+function TioModelPresenterCustom.GetAutoRefreshOnNotification: Boolean;
 begin
   Result := FAutoRefreshOnNotification;
 end;
@@ -914,7 +914,7 @@ begin
     GetActiveBindSourceAdapter.ioAutoPost := Value;
 end;
 
-procedure TioModelPresenterCustom.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+procedure TioModelPresenterCustom.SetAutoRefreshOnNotification(const Value: Boolean);
 begin
   FAutoRefreshOnNotification := Value;
 end;

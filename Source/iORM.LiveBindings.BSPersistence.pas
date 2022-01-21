@@ -248,7 +248,7 @@ begin
   om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
   if AClear then
     Clear(False);
-  FBindSource.Refresh(False);
+  FBindSource.Refresh(True);
 end;
 
 procedure TioBSPersistence.SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean);

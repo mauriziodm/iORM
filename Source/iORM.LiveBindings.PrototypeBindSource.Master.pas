@@ -59,7 +59,7 @@ type
     property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr; // published: Master
     property OrderBy;
-    property AutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload;
+    property AutoRefreshOnNotification default True;
     // Published properties: selectors
     property SelectorFor;
     // Published properties: paging

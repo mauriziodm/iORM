@@ -19,7 +19,7 @@ type
     property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property MasterPresenter; // published: Detail
     property MasterPropertyName; // published: Detail
-    property AutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
+    property AutoRefreshOnNotification default True; // published: Master+Detail
     // Published properties: selectors
     property SelectorFor;
     // Published Events: selectors

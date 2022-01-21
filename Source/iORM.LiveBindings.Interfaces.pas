@@ -56,9 +56,6 @@ type
   IioContainedBindSourceAdapter = interface;
   IioDetailBindSourceAdaptersContainer = interface;
 
-  // BindSource AutoRefresh type after notification
-  TioAutoRefreshType = (arDisabled, arEnabledNoReload, arEnabledReload);
-
   // Interface (without RefCount) for ioBindSources detection
   // (useful for detect iORM bind sources to pass itself
   // to the ActiveBindSourceAdapter for notify changes)
@@ -87,9 +84,9 @@ type
     function GetPaging: TioCommonBSAPageManager;
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging;
     // AutoRefreshOnotification property
-    function GetAutoRefreshOnNotification: TioAutoRefreshType;
-    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
-    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification;
+    function GetAutoRefreshOnNotification: Boolean;
+    procedure SetAutoRefreshOnNotification(const Value: Boolean);
+    property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification;
     // BindSourceAdapter state
     function GetState: TBindSourceAdapterState;
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?

@@ -27,7 +27,7 @@ type
     FWhereStr: TStrings;
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
-    FAutoRefreshOnNotification: TioAutoRefreshType;
+    FAutoRefreshOnNotification: Boolean;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     // Selectors
@@ -62,8 +62,8 @@ type
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
     // AutoRefreshOnotification
-    function GetAutoRefreshOnNotification: TioAutoRefreshType;
-    procedure SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+    function GetAutoRefreshOnNotification: Boolean;
+    procedure SetAutoRefreshOnNotification(const Value: Boolean);
     // Editing
     function GetEditing: Boolean;
     // IsInterfacePresenting
@@ -122,7 +122,7 @@ type
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
     property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
-    property AutoRefreshOnNotification: TioAutoRefreshType read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default TioAutoRefreshType.arEnabledNoReload; // published: Master+Detail
+    property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
     property SelectorFor: TioDataSetCustom read FSelectorFor write FSelectorFor; // published: Master
@@ -190,7 +190,7 @@ constructor TioDataSetCustom.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoPost := True;
-  FAutoRefreshOnNotification := TioAutoRefreshType.arEnabledNoReload;
+  FAutoRefreshOnNotification := True;
   FAsync := False;
   FAutoLoadData := True;
   FViewDataType := TioViewDataType.dtList;
@@ -328,7 +328,7 @@ begin
     Result := FAutoPost;
 end;
 
-function TioDataSetCustom.GetAutoRefreshOnNotification: TioAutoRefreshType;
+function TioDataSetCustom.GetAutoRefreshOnNotification: Boolean;
 begin
   Result := FAutoRefreshOnNotification;
 end;
@@ -485,7 +485,7 @@ begin
     GetActiveBindSourceAdapter.ioAutoPost := Value;
 end;
 
-procedure TioDataSetCustom.SetAutoRefreshOnNotification(const Value: TioAutoRefreshType);
+procedure TioDataSetCustom.SetAutoRefreshOnNotification(const Value: Boolean);
 begin
   FAutoRefreshOnNotification := Value;
 end;

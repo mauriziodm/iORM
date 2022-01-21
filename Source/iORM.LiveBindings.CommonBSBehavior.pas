@@ -33,7 +33,7 @@ begin
   case ANotification.NotificationType of
     // Execute the AutoRefresh if enabled by the specific property
     ntRefresh:
-      if (ATargetBS.AutoRefreshOnNotification > arDisabled) and (ATargetBS.State <> TBindSourceAdapterState.seInactive) then
+      if ATargetBS.AutoRefreshOnNotification and (ATargetBS.State <> TBindSourceAdapterState.seInactive) then
         ATargetBS.Refresh(False);
     // Actually used for paging purposes (ObjState moved on "OnBeforeScroll" directly in the BindSource/DataSet/ModelPresenter master)
     ntScroll:
