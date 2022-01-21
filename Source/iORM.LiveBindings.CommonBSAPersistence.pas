@@ -84,7 +84,7 @@ implementation
 uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
   iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification,
-  iORM.Utilities;
+  iORM.Utilities, iORM.LiveBindings.BSPersistence.SmartDeleteSystem;
 
 type
 
@@ -524,11 +524,30 @@ end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
   : TioCommonBSAPersistenceThreadExecute;
+var
+  LBSPersistenceClient: IioBSPersistenceClient;
 begin
   Result := function: TObject
     begin
       Result := nil;
-      io.Persist(AActiveBindSourceAdapter.Current, False);
+      io.StartTransaction;
+      try
+        // Persist the main obj
+        io.Persist(AActiveBindSourceAdapter.Current, False);
+
+        // Delete objects referenced into the SmartDeleteSystem
+        if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
+          LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
+            procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
+            begin
+              io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Delete;
+            end);
+
+        // commit
+        io.CommitTransaction;
+      except
+        io.RollbackTransaction;
+      end;
     end;
 end;
 

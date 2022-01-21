@@ -32,7 +32,7 @@ procedure TioSmartDeleteSystem.Add(const ATypeName: String; const AID: Integer);
 begin
   Lock;
   try
-    SetLength(FContainer, High(FContainer)+1);
+    SetLength(FContainer, Length(FContainer)+1);
     with FContainer[High(FContainer)] do
     begin
       TypeName := ATypeName;
