@@ -165,6 +165,11 @@ class procedure TioCommonBSAPersistence.BeforeDelete(const AActiveBindSourceAdap
 var
   LNotification: TioBSNotification;
 begin
+  // If the delete detail is allowed then send a ntSaveRevertPoint notification
+  if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
+    AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
+  else
+    raise EioException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');
   // If it is during a BSPersistenceDeleting operation or current is nil or if daSetSmartDeleteSystem is selected as OnDeleteAction on the MasterBS
   if AActiveBindSourceAdapter.BSPersistenceDeleting or (AActiveBindSourceAdapter.Current = nil) or
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
@@ -187,6 +192,8 @@ begin
     LBSPersistenceClient.Persistence.Clear(False);
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+  // Refresh notification
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
 end;
 
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -534,7 +541,6 @@ begin
       try
         // Persist the main obj
         io.Persist(AActiveBindSourceAdapter.Current, False);
-
         // Delete objects referenced into the SmartDeleteSystem
         if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
           LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
@@ -542,7 +548,6 @@ begin
             begin
               io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Delete;
             end);
-
         // commit
         io.CommitTransaction;
       except

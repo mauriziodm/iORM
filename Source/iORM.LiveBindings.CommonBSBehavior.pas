@@ -49,6 +49,13 @@ begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDoSelection;
       end;
+    // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
+    ntCanDeleteDetail:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      begin
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDeleteDetail;
+      end;
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the deleted object to perform a delete query when persist the MasterBS.
     // It return true (Response field of the notification) if the smart delete system is enabled and the
@@ -89,7 +96,7 @@ begin
   if LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntCanDoSelection)) then
     LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
-    raise EioException.Create(ClassName, 'Select<T>', 'Destination BindSource hasn''t saved a revert point');
+    raise EioException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore

@@ -37,7 +37,7 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntDeleteSmart, ntDeleteObjStatus);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntDeleteObjStatus);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -100,6 +100,16 @@ begin
     // NB: ntCanDoSelection is for selectors;
     // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
     ntCanDoSelection:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstDestination := True;
+      end;
+    // NB: ntCanDeleteDetail;
+    // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
+    ntCanDeleteDetail:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;
