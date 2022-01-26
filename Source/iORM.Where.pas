@@ -631,16 +631,6 @@ begin
   Self.Add(AWhereCond);
 end;
 
-function TioWhere.Add(const AWhereCond: IioWhere): IioWhere;
-var
-  AItem: IioSqlItem;
-begin
-  Result := Self;
-  if Assigned(AWhereCond) then
-    for AItem in AWhereCond.GetWhereItems do
-      Self.FWhereItems.Add(AItem);
-end;
-
 function TioWhere.AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere;
 begin
   Result := Self.AddDetail(AMasterPropertyName, TioWhereFactory.NewWhere.Add(ATextCondition));
@@ -1404,9 +1394,19 @@ begin
   if not Assigned(AWhere) then
     Exit;
   Add(AWhere);
-  FPagingObj := AWhere.GetPagingObj as TioCommonBSAPageManager;
-  FDetailsContainer := AWhere.Details;
-  FOrderBy := AWhere.GetOrderByInstance;
+end;
+
+function TioWhere.Add(const AWhereCond: IioWhere): IioWhere;
+var
+  AItem: IioSqlItem;
+begin
+  Result := Self;
+  if Assigned(AWhereCond) then
+    for AItem in AWhereCond.GetWhereItems do
+      Self.FWhereItems.Add(AItem);
+  FPagingObj := AWhereCond.GetPagingObj as TioCommonBSAPageManager;
+  FDetailsContainer := AWhereCond.Details;
+  FOrderBy := AWhereCond.GetOrderByInstance;
 end;
 
 function TioWhere._Where(ATextCondition: String): IioWhere;
