@@ -209,7 +209,8 @@ contains
   iORM.LiveBindings.PrototypeBindSource.Detail in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas',
   iORM.MVVM.ModelPresenter.Master in '..\..\Source\iORM.MVVM.ModelPresenter.Master.pas',
   iORM.MVVM.ModelPresenter.Detail in '..\..\Source\iORM.MVVM.ModelPresenter.Detail.pas',
-  iORM.LiveBindings.BSPersistence.SmartDeleteSystem in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas';
+  iORM.LiveBindings.BSPersistence.SmartDeleteSystem in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas',
+  iORM.LiveBindings.BSPersistence.SmartUpdateDetection in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartUpdateDetection.pas';
 
 end.
 
