@@ -50,6 +50,7 @@ type
     StopAtTheFirstDestination: Boolean;
     PayloadAsInteger: Integer;
     PayloadAsString: String;
+    PayloadAsObject: TObject;
     Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
     constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);

@@ -73,7 +73,7 @@ type
     function IsSaved: Boolean;
     function IsClear: Boolean;
     procedure NotifyBeforeScroll;
-    procedure NotifySaveObjState;
+    procedure NotifySaveRevertPoint;
     property SavedObjState: string read FSavedState;
     property SmartDeleteSystem: TioSmartDeleteSystem read FSmartDeleteSystem;
     property SmartUpdateDetection: IioSmartUpdateDetection read FSmartUpdateDetection;
@@ -189,7 +189,7 @@ begin
   Result := GetState > osUnsaved;
 end;
 
-procedure TioBSPersistence.NotifySaveObjState;
+procedure TioBSPersistence.NotifySaveRevertPoint;
 begin
   if (FBindSource.OnEditAction = eSaveRevertPoint) and IsClear then
     SaveRevertPoint

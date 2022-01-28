@@ -41,7 +41,7 @@ begin
     // Actually used for BSPersistence purposes
     ntSaveRevertPoint:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
-        LBSPersistenceClient.Persistence.NotifySaveObjState;
+        LBSPersistenceClient.Persistence.NotifySaveRevertPoint;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
     ntCanDoSelection:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
