@@ -8,7 +8,6 @@ uses
 const
   NEW_OBJ_KEY = 'NEW';
 
-
 type
 
   IioSmartUpdateDetection = interface
@@ -16,9 +15,13 @@ type
     procedure Clear;
     procedure NotifyEdit(const ACurrentObj: TObject);
     procedure NotifyPost(const ACurrentObj: TObject);
-    function IsUpdated(const ACurrentObj: TObject): Boolean;
+    function IsToBePersisted(const ACurrentObj: TObject): Boolean;
   end;
 
+  TioSmartUpdateDetectionFaxtory = class
+  public
+    class function NewSmartUpdateDetectionSystem: IioSmartUpdateDetection;
+  end;
 
 implementation
 
@@ -27,45 +30,40 @@ uses
 
 type
 
-  TioSmartUpdateDetectionBase = class abstract
-  private
+  TioSmartUpdateDetectionBase = class abstract (TInterfacedObject, IioSmartUpdateDetection)
+  strict private
     FContainer: TDictionary<string, string>;
     FMonitor: TMonitor;
-    procedure Lock;
-    procedure Unlock;
-    procedure Add(const ACurrentObj: TObject);
   protected
+    procedure LockContainer;
+    procedure UnlockContainer;
+    procedure Add(const ACurrentObj: TObject);
     function EncodeKey(const ACurrentObj: TObject): string;
-    function EncodeValue(const ACurrentObj: TObject): string; virtual; abstract;
-    function DoIsUpdated(const ACurrentObj: TObject): Boolean; virtual; abstract;
-    procedure DoNotifyEdit(const ACurrentObj: TObject); virtual; abstract;
-    procedure DoNotifyPost(const ACurrentObj: TObject); virtual; abstract;
+    function EncodeValue(const ACurrentObj: TObject): string; virtual;
+    property Container: TDictionary<string, string> read FContainer;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    procedure NotifyEdit(const ACurrentObj: TObject);
-    procedure NotifyPost(const ACurrentObj: TObject);
-    function IsUpdated(const ACurrentObj: TObject): Boolean;
+    function IsToBePersisted(const ACurrentObj: TObject): Boolean; virtual; abstract;
+    procedure NotifyEdit(const ACurrentObj: TObject); virtual;
+    procedure NotifyPost(const ACurrentObj: TObject); virtual;
   end;
 
   TioSmartUpdateDetectionStateLess = class(TioSmartUpdateDetectionBase)
   protected
-    function EncodeValue(const ACurrentObj: TObject): string; override;
-    function DoIsUpdated(const ACurrentObj: TObject): Boolean; override;
-    procedure DoNotifyEdit(const ACurrentObj: TObject); override;
-    procedure DoNotifyPost(const ACurrentObj: TObject); override;
+    function IsToBePersisted(const ACurrentObj: TObject): Boolean; override;
+    procedure NotifyPost(const ACurrentObj: TObject); override;
   end;
 
-  TioSmartUpdateDetectionFullState = class(TioSmartUpdateDetectionBase)
+  TioSmartUpdateDetectionStateFull = class(TioSmartUpdateDetectionBase)
   protected
     function EncodeValue(const ACurrentObj: TObject): string; override;
-    function DoIsUpdated(const ACurrentObj: TObject): Boolean; override;
-    procedure DoNotifyEdit(const ACurrentObj: TObject); override;
-    procedure DoNotifyPost(const ACurrentObj: TObject); override;
+    function IsToBePersisted(const ACurrentObj: TObject): Boolean; override;
+    procedure NotifyEdit(const ACurrentObj: TObject); override;
   end;
 
-{ TioSmartUpdateDetection }
+  { TioSmartUpdateDetection }
 
 procedure TioSmartUpdateDetectionBase.Add(const ACurrentObj: TObject);
 var
@@ -77,16 +75,21 @@ begin
   if LKey = NEW_OBJ_KEY then
     Exit;
   LValue := EncodeValue(ACurrentObj);
-  FContainer.Add(LKey, LValue);
+  LockContainer;
+  try
+    FContainer.Add(LKey, LValue);
+  finally
+    UnlockContainer;
+  end;
 end;
 
 procedure TioSmartUpdateDetectionBase.Clear;
 begin
-  Lock;
+  LockContainer;
   try
     FContainer.Clear;
   finally
-    Unlock;
+    UnlockContainer;
   end;
 end;
 
@@ -102,16 +105,6 @@ begin
   inherited;
 end;
 
-function TioSmartUpdateDetectionBase.IsUpdated(const ACurrentObj: TObject): Boolean;
-begin
-  Lock;
-  try
-    Result := DoIsUpdated(ACurrentObj);
-  finally
-    Unlock;
-  end;
-end;
-
 function TioSmartUpdateDetectionBase.EncodeKey(const ACurrentObj: TObject): string;
 var
   LID: Integer;
@@ -123,93 +116,91 @@ begin
     Result := NEW_OBJ_KEY;
 end;
 
-procedure TioSmartUpdateDetectionBase.Lock;
+function TioSmartUpdateDetectionBase.EncodeValue(const ACurrentObj: TObject): string;
+begin
+  Result := '';
+end;
+
+procedure TioSmartUpdateDetectionBase.LockContainer;
 begin
   FMonitor.Enter(Self);
 end;
 
 procedure TioSmartUpdateDetectionBase.NotifyEdit(const ACurrentObj: TObject);
 begin
-  Lock;
-  try
-    DoNotifyEdit(ACurrentObj);
-  finally
-    Unlock;
-  end;
+  // Do nothing
 end;
 
 procedure TioSmartUpdateDetectionBase.NotifyPost(const ACurrentObj: TObject);
 begin
-  Lock;
-  try
-    DoNotifyPost(ACurrentObj);
-  finally
-    Unlock;
-  end;
+  // Do Nothing
 end;
 
-procedure TioSmartUpdateDetectionBase.Unlock;
+procedure TioSmartUpdateDetectionBase.UnlockContainer;
 begin
   FMonitor.Exit(Self);
 end;
 
 { TioSmartUpdateDetectionStateLess }
 
-function TioSmartUpdateDetectionStateLess.DoIsUpdated(const ACurrentObj: TObject): Boolean;
+function TioSmartUpdateDetectionStateLess.IsToBePersisted(const ACurrentObj: TObject): Boolean;
 var
   LKey: String;
 begin
   if not Assigned(ACurrentObj) then
     Exit(False);
   LKey := EncodeKey(ACurrentObj);
-  Result := (LKey = NEW_OBJ_KEY) or FContainer.ContainsKey(LKey);
+  LockContainer;
+  try
+    Result := (LKey = NEW_OBJ_KEY) or Container.ContainsKey(LKey);
+  finally
+    UnlockContainer;
+  end;
 end;
 
-procedure TioSmartUpdateDetectionStateLess.DoNotifyEdit(const ACurrentObj: TObject);
-begin
-  // Do nothing
-end;
-
-procedure TioSmartUpdateDetectionStateLess.DoNotifyPost(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionStateLess.NotifyPost(const ACurrentObj: TObject);
 begin
   Add(ACurrentObj);
 end;
 
-function TioSmartUpdateDetectionStateLess.EncodeValue(const ACurrentObj: TObject): string;
-begin
-  Result := '';
-end;
-
 { TioSmartUpdateDetectionFullState }
 
-function TioSmartUpdateDetectionFullState.DoIsUpdated(const ACurrentObj: TObject): Boolean;
+function TioSmartUpdateDetectionStateFull.IsToBePersisted(const ACurrentObj: TObject): Boolean;
 var
   LKey, LCurrentState: String;
 begin
   if not Assigned(ACurrentObj) then
     Exit(False);
   LKey := EncodeKey(ACurrentObj);
-  Result := (LKey = NEW_OBJ_KEY) or FContainer.ContainsKey(LKey);
-  if Result then
-  begin
-    LCurrentState := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
-    Result := Result and (LCurrentState <> FContainer[LKey]);
+  LockContainer;
+  try
+    Result := (LKey = NEW_OBJ_KEY) or Container.ContainsKey(LKey);
+    if Result then
+    begin
+      LCurrentState := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
+      Result := Result and (LCurrentState <> Container[LKey]);
+    end;
+  finally
+    UnlockContainer;
   end;
 end;
 
-procedure TioSmartUpdateDetectionFullState.DoNotifyEdit(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionStateFull.NotifyEdit(const ACurrentObj: TObject);
 begin
   Add(ACurrentObj);
 end;
 
-procedure TioSmartUpdateDetectionFullState.DoNotifyPost(const ACurrentObj: TObject);
-begin
-  // Do nothing
-end;
-
-function TioSmartUpdateDetectionFullState.EncodeValue(const ACurrentObj: TObject): string;
+function TioSmartUpdateDetectionStateFull.EncodeValue(const ACurrentObj: TObject): string;
 begin
   Result := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
+end;
+
+{ TioSmartUpdateDetectionFaxtory }
+
+class function TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem: IioSmartUpdateDetection;
+begin
+  Result := TioSmartUpdateDetectionStateLess.Create;
+//  Result := TioSmartUpdateDetectionStateFull.Create;
 end;
 
 end.

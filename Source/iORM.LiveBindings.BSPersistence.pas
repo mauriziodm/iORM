@@ -4,7 +4,8 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.BSPersistence.SmartDeleteSystem;
+  iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
+  iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 type
 
@@ -45,6 +46,7 @@ type
     FBindSource: IioBSPersistenceClient;
     FSavedState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
+    FSmartUpdateDetection: IioSmartUpdateDetection;
     function GetCurrentAsString: String;
     function GetState: TioBSPersistenceState;
     function GetStateAsString: String;
@@ -74,6 +76,7 @@ type
     procedure NotifySaveObjState;
     property SavedObjState: string read FSavedState;
     property SmartDeleteSystem: TioSmartDeleteSystem read FSmartDeleteSystem;
+    property SmartUpdateDetection: IioSmartUpdateDetection read FSmartUpdateDetection;
     property State: TioBSPersistenceState read GetState;
     property StateAsString: string read GetStateAsString;
   end;
@@ -138,6 +141,7 @@ begin
     raise EioBindSourceObjStateException.Create(ClassName, 'Clear', 'Pending changes exists');
   FSavedState := '';
   FSmartDeleteSystem.Clear;
+  FSmartUpdateDetection.Clear;
 end;
 
 constructor TioBSPersistence.Create(const ABSPersistenceClient: IioBSPersistenceClient);
@@ -145,6 +149,7 @@ begin
   inherited Create;
   FBindSource := ABSPersistenceClient;
   FSmartDeleteSystem := TioSmartDeleteSystem.Create;
+  FSmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem;
   Clear(False);
 end;
 
