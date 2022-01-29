@@ -37,7 +37,8 @@ interface
 
 type
 
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntDeleteObjStatus);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntDeleteObjStatus,
+    ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -54,6 +55,8 @@ type
     Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
     constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);
+    constructor CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject);
+    constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject);
   end;
 
 implementation
@@ -152,6 +155,36 @@ begin
   // Payload
   PayloadAsString := ADeletedObj.ClassName;
   PayloadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
+end;
+
+constructor TioBSNotification.CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject);
+begin
+  // Initialization
+  NotificationType := ntSUD_RegisterObjOnEdit;
+  Response := False;
+  // Routing
+  DirectionRoot := True;
+  DirectionLeaves := False;
+  DeliverToMasterBS := True;
+  DeliverToDetailBS := False;
+  StopAtTheFirstDestination := True;
+  // Payload
+  PayloadAsObject := ACurrentObj;
+end;
+
+constructor TioBSNotification.CreateSUDRegisterObjOnPost(const ACurrentObj: TObject);
+begin
+  // Initialization
+  NotificationType := ntSUD_RegisterObjOnPost;
+  Response := False;
+  // Routing
+  DirectionRoot := True;
+  DirectionLeaves := False;
+  DeliverToMasterBS := True;
+  DeliverToDetailBS := False;
+  StopAtTheFirstDestination := True;
+  // Payload
+  PayloadAsObject := ACurrentObj;
 end;
 
 end.

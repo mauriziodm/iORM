@@ -46,21 +46,23 @@ type
     destructor Destroy; override;
     procedure Clear;
     function IsToBePersisted(const ACurrentObj: TObject): Boolean; virtual; abstract;
-    procedure NotifyEdit(const ACurrentObj: TObject); virtual;
-    procedure NotifyPost(const ACurrentObj: TObject); virtual;
+    procedure NotifyEdit(const ACurrentObj: TObject); virtual; abstract;
+    procedure NotifyPost(const ACurrentObj: TObject); virtual; abstract;
   end;
 
   TioSmartUpdateDetectionStateLess = class(TioSmartUpdateDetectionBase)
-  protected
+  public
     function IsToBePersisted(const ACurrentObj: TObject): Boolean; override;
+    procedure NotifyEdit(const ACurrentObj: TObject); override;
     procedure NotifyPost(const ACurrentObj: TObject); override;
   end;
 
   TioSmartUpdateDetectionStateFull = class(TioSmartUpdateDetectionBase)
-  protected
+  public
     function EncodeValue(const ACurrentObj: TObject): string; override;
     function IsToBePersisted(const ACurrentObj: TObject): Boolean; override;
     procedure NotifyEdit(const ACurrentObj: TObject); override;
+    procedure NotifyPost(const ACurrentObj: TObject); override;
   end;
 
   { TioSmartUpdateDetection }
@@ -74,9 +76,11 @@ begin
   LKey := EncodeKey(ACurrentObj);
   if LKey = NEW_OBJ_KEY then
     Exit;
-  LValue := EncodeValue(ACurrentObj);
   LockContainer;
   try
+    if FContainer.ContainsKey(LKey) then
+      Exit;
+    LValue := EncodeValue(ACurrentObj);
     FContainer.Add(LKey, LValue);
   finally
     UnlockContainer;
@@ -126,16 +130,6 @@ begin
   FMonitor.Enter(Self);
 end;
 
-procedure TioSmartUpdateDetectionBase.NotifyEdit(const ACurrentObj: TObject);
-begin
-  // Do nothing
-end;
-
-procedure TioSmartUpdateDetectionBase.NotifyPost(const ACurrentObj: TObject);
-begin
-  // Do Nothing
-end;
-
 procedure TioSmartUpdateDetectionBase.UnlockContainer;
 begin
   FMonitor.Exit(Self);
@@ -156,6 +150,11 @@ begin
   finally
     UnlockContainer;
   end;
+end;
+
+procedure TioSmartUpdateDetectionStateLess.NotifyEdit(const ACurrentObj: TObject);
+begin
+  // Do nothing
 end;
 
 procedure TioSmartUpdateDetectionStateLess.NotifyPost(const ACurrentObj: TObject);
@@ -188,6 +187,11 @@ end;
 procedure TioSmartUpdateDetectionStateFull.NotifyEdit(const ACurrentObj: TObject);
 begin
   Add(ACurrentObj);
+end;
+
+procedure TioSmartUpdateDetectionStateFull.NotifyPost(const ACurrentObj: TObject);
+begin
+  // Do nothing
 end;
 
 function TioSmartUpdateDetectionStateFull.EncodeValue(const ACurrentObj: TObject): string;
