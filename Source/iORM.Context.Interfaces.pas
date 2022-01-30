@@ -97,6 +97,9 @@ type
     // MasterPropertyPath
     function GetMasterPropertyPath: String;
     property MasterPropertyPath: String read GetMasterPropertyPath;
+    // MasterBSPersistence
+    function GetMasterBSPersistence: TioBSPersistence;
+    property MasterBSPersistence: TioBSPersistence;
   end;
 
 implementation

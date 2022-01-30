@@ -40,7 +40,8 @@ uses
   iORM.Context.Interfaces,
   iORM.CommonTypes,
   iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
-  iORM.Context.Map.Interfaces, iORM.Where.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -51,6 +52,7 @@ type
     FMap: IioMap;
     FWhere: IioWhere;
     FMasterPropertyPath: String;
+    FMasterBSPersistence: TioBSPersistence;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -68,9 +70,11 @@ type
     // Where
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
+    // MasterBSPersistence
+    function GetMasterBSPersistence: TioBSPersistence;
   public
     constructor Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
-      const AMasterPropertyName, AMasterPropertyPath: String); overload;
+      const AMasterPropertyName, AMasterPropertyPath: String; const AMasterBSPersistence: TioBSPersistence); overload;
     function GetClassRef: TioClassRef;
     function GetTable: IioTable;
     function GetProperties: IioProperties;
@@ -110,6 +114,8 @@ type
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     // MasterPropertyPath
     property MasterPropertyPath: String read GetMasterPropertyPath;
+    // MasterBSPersistence
+    property MasterBSPersistence: TioBSPersistence;
   end;
 
 implementation
@@ -142,7 +148,7 @@ begin
 end;
 
 constructor TioContext.Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
-  const AMasterPropertyName, AMasterPropertyPath: String);
+      const AMasterPropertyName, AMasterPropertyPath: String; const AMasterBSPersistence: TioBSPersistence);
 begin
   inherited Create;
   FMap := AMap;
@@ -150,6 +156,7 @@ begin
   FWhere := AWhere;
   FHasManyChildVirtualPropertyValue := 0;
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyPath.IsEmpty, '', '.') + AMasterPropertyName;
+  FMasterBSPersistence: := AMasterBSPersistence;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -188,6 +195,11 @@ end;
 function TioContext.GetJoin: IioJoins;
 begin
   Result := Self.GetTable.GetJoin;
+end;
+
+function TioContext.GetMasterBSPersistence: TioBSPersistence;
+begin
+  Result := FMasterBSPersistence;
 end;
 
 function TioContext.GetMasterPropertyPath: String;

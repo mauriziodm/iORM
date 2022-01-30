@@ -5,7 +5,8 @@ interface
 uses
   iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
-  iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
+  iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
+  ObjMapper.Attributes;
 
 type
 
@@ -43,8 +44,8 @@ type
 
   TioBSPersistence = class
   private
-    FBindSource: IioBSPersistenceClient;
-    FSavedState: String;
+    [DoNotSerializeAttribute] FBindSource: IioBSPersistenceClient;
+    [DoNotSerializeAttribute] FSavedState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
     FSmartUpdateDetection: IioSmartUpdateDetection;
     function GetCurrentAsString: String;
