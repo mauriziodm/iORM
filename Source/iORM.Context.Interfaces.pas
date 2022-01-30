@@ -94,6 +94,9 @@ type
     function GetRelationOID: Integer;
     procedure SetRelationOID(const Value: Integer);
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
+    // MasterPropertyPath
+    function GetMasterPropertyPath: String;
+    property MasterPropertyPath: String read GetMasterPropertyPath;
   end;
 
 implementation
