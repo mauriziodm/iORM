@@ -69,7 +69,8 @@ type
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
   public
-    constructor Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere = nil; const ADataObject: TObject = nil); overload;
+    constructor Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
+      const AMasterPropertyName, AMasterPropertyPath: String); overload;
     function GetClassRef: TioClassRef;
     function GetTable: IioTable;
     function GetProperties: IioProperties;
@@ -140,13 +141,15 @@ begin
   Result := Self.Map.GetTable.GetTrueClass;
 end;
 
-constructor TioContext.Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere = nil; const ADataObject: TObject = nil);
+constructor TioContext.Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
+  const AMasterPropertyName, AMasterPropertyPath: String);
 begin
   inherited Create;
   FMap := AMap;
   FDataObject := ADataObject;
   FWhere := AWhere;
   FHasManyChildVirtualPropertyValue := 0;
+  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyPath.IsEmpty, '', '.') + AMasterPropertyName;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
