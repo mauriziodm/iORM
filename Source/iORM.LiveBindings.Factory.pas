@@ -49,7 +49,8 @@ type
       : IioContainedBindSourceAdapter;
     class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
       : IioContainedBindSourceAdapter;
-    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
+      : IioActiveBindSourceAdapter;
     class function GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioViewDataType;
@@ -79,10 +80,8 @@ begin
   Result := TioBSAToDataSetLinkContainer.Create;
 end;
 
-class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty;
-  const AWhere: IioWhere): IioContainedBindSourceAdapter;
-var
-  AContext: IioContext;
+class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
+  : IioContainedBindSourceAdapter;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
@@ -92,18 +91,15 @@ begin
     // else if the master property type is a class...
   else
   begin
-    AContext := TioContextFactory.Context(AMasterProperty.GetRelationChildTypeName);
-    Result := TioActiveListBindSourceAdapter.Create(AContext.GetClassRef, AWhere // where
-      , AOwner, TList<TObject>.Create, False);
+    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner,
+      TList<TObject>.Create, False);
   end;
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;
 
-class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty;
-  const AWhere: IioWhere): IioContainedBindSourceAdapter;
-var
-  AContext: IioContext;
+class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
+  : IioContainedBindSourceAdapter;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
@@ -114,9 +110,8 @@ begin
     // else if the master property type is a class...
   else
   begin
-    AContext := TioContextFactory.Context(AMasterProperty.GetRelationChildTypeName);
-    Result := TioActiveObjectBindSourceAdapter.Create(AContext.GetClassRef, AWhere // where
-      , AOwner, nil // AObject:TObject;
+    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil
+      // AObject:TObject;
       , False);
   end;
   // Set MasterProperty for the adapter
@@ -132,7 +127,6 @@ class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATy
   const AViewDataType: TioViewDataType; const AAutoLoadData: Boolean; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
-  LContext: IioContext;
   LDataObject: TObject;
 begin
   // Depending of the DataType (list or single object)...
@@ -153,12 +147,11 @@ begin
         // Class
         else
         begin
-          LContext := TioContextFactory.Context(ATypeName);
           if Assigned(ADataObject) then
             LDataObject := ADataObject
           else
             LDataObject := TObjectList<TObject>.Create(True);
-          Result := TioActiveListBindSourceAdapter.Create(LContext.GetClassRef, AWhere, AOwner, TObjectList<TObject>(LDataObject), AAutoLoadData, AOwnsObject);
+          Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, TObjectList<TObject>(LDataObject), AAutoLoadData, AOwnsObject);
         end;
       end;
 
@@ -175,8 +168,7 @@ begin
         // Class
         else
         begin
-          LContext := TioContextFactory.Context(ATypeName);
-          Result := TioActiveObjectBindSourceAdapter.Create(LContext.GetClassRef, AWhere, AOwner, ADataObject, AAutoLoadData, AOwnsObject);
+          Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, ADataObject, AAutoLoadData, AOwnsObject);
           // False);
         end;
 
@@ -185,7 +177,7 @@ begin
 end;
 
 class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+  const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 begin
   // If the MasterPropertyName property is empty then get a NaturalActiveBindSourceAdapter
   // from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the
@@ -210,7 +202,8 @@ begin
   end;
 end;
 
-class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
+  : IioActiveBindSourceAdapter;
 begin
   Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
 end;

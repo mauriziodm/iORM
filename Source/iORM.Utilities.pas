@@ -71,6 +71,7 @@ type
     class function ExtractItemRttiType<T>: TRttiType;
     class function TryGetMemberAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
     class function HasAttribute<T: class>(ARTTIType: TRttiType): boolean; static;
+    class function ClassNameToClassRef(const AClassName: String): TioClassRef;
   end;
 
 implementation
@@ -103,6 +104,11 @@ end;
 class function TioUtilities.CastObjectToGeneric<T>(const AObj: Tobject): T;
 begin
   Result := CastObjectToGeneric<T>(AObj, GUID_NULL);
+end;
+
+class function TioUtilities.ClassNameToClassRef(const AClassName: String): TioClassRef;
+begin
+  Result := TioMapCOntainer.GetMap(AClassName).GetClassRef;
 end;
 
 class function TioUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;

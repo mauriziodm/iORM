@@ -75,11 +75,11 @@ type
 implementation
 
 uses
-  iORM.Context.Interfaces, iORM.Context.Factory,
-  iORM.Context.Properties.Interfaces, iORM.Attributes,
-  iORM.LiveBindings.ActiveObjectBindSourceAdapter,
+  iORM.Attributes, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
   iORM.LiveBindings.ActiveListBindSourceAdapter, System.Generics.Collections,
-  iORM.Exceptions, iORM.LiveBindings.Factory, iORM, System.SysUtils;
+  iORM.Exceptions, iORM.LiveBindings.Factory, iORM, System.SysUtils,
+  iORM.Context.Map.Interfaces, iORM.Context.Container,
+  iORM.Context.Properties.Interfaces;
 
 { TioDetailAdaptersContainer }
 
@@ -109,13 +109,13 @@ end;
 
 function TioDetailAdaptersContainer.NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
 var
-  LMasterContext: IioContext;
+  LMap: IioMap;
   LMasterProperty: IioProperty;
   LNewAdapter: IioContainedBindSourceAdapter;
 begin
   // Retrieve MasterContext and MasterProperty
-  LMasterContext := TioContextFactory.Context(AMasterClassName);
-  LMasterProperty := LMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);
+  LMap := TioMapContainer.GetMap(AMasterClassName);
+  LMasterProperty := LMap.GetProperties.GetPropertyByName(AMasterPropertyName);
   // Create the Adapter
   case LMasterProperty.GetRelationType of
     rtBelongsTo, rtHasOne, rtEmbeddedHasOne:

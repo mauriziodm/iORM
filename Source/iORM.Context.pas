@@ -149,7 +149,7 @@ begin
 end;
 
 constructor TioContext.Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
-      const AMasterPropertyName, AMasterPropertyPath: String; const AMasterBSPersistence: TioBSPersistence);
+  const AMasterPropertyName, AMasterPropertyPath: String; const AMasterBSPersistence: TioBSPersistence);
 begin
   inherited Create;
   FMap := AMap;
