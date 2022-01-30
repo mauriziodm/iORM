@@ -700,7 +700,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, Self);
+      AContext := TioContextFactory.Context(AResolvedTypeName, Self, nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -758,7 +758,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, Self);
+      AContext := TioContextFactory.Context(AResolvedTypeName, Self, nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -1006,8 +1006,6 @@ begin
 end;
 
 function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
-var
-  AContext: IioContext;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
@@ -1019,16 +1017,12 @@ begin
   // else if the master property type is a class...
   else
   begin
-    // Get the context
-    AContext := TioContextFactory.Context(FTypeName, Self);
     // Create the BSA
-    Result := TioActiveListBindSourceAdapter.Create(AContext.GetClassRef, Self, AOwner, TObjectList<TObject>.Create(AOwnsObject), AAutoLoadData);
+    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, TObjectList<TObject>.Create(AOwnsObject), AAutoLoadData);
   end;
 end;
 
 function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData, AOwnsObject: Boolean): TBindSourceAdapter;
-var
-  AContext: IioContext;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
@@ -1041,10 +1035,8 @@ begin
   // else if the master property type is a class...
   else
   begin
-    // Get the context
-    AContext := TioContextFactory.Context(FTypeName, Self);
     // Create the BSA
-    Result := TioActiveObjectBindSourceAdapter.Create(AContext.GetClassRef, Self, // Where
+    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, // Where
       AOwner, nil, // AObject:TObject
       AAutoLoadData, // AutoLoadData := True
       False);
@@ -1075,18 +1067,13 @@ begin
 end;
 
 function TioWhere.ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
-var
-  AContext: IioContext;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
     Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName, AOwnsObject)
-    // else if the master property type is a class...
+  // else if the master property type is a class...
   else
-  begin
-    AContext := TioContextFactory.Context(FTypeName);
-    Result := TListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<TObject>>, AContext.GetClassRef, AOwnsObject);
-  end;
+    Result := TListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<TObject>>, TioUtilities.ClassNameToClassRef(FTypeName), AOwnsObject);
 end;
 
 function TioWhere.ToMemTable: TFDMemTable;
@@ -1117,7 +1104,6 @@ end;
 
 function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
 var
-  LContext: IioContext;
   LIntfObj: IInterface;
 begin
   // If the master property type is an interface...
@@ -1129,10 +1115,7 @@ begin
   end
   // else if the master property type is a class...
   else
-  begin
-    LContext := TioContextFactory.Context(FTypeName);
-    Result := TObjectBindSourceAdapter.Create(AOwner, Self.ToObject, LContext.GetClassRef, AOwnsObject);
-  end;
+    Result := TObjectBindSourceAdapter.Create(AOwner, Self.ToObject, TioUtilities.ClassNameToClassRef(FTypeName), AOwnsObject);
 end;
 
 function TioWhere._Not(ATextCondition: String): IioWhere;

@@ -66,7 +66,7 @@ type
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject): IioContext;
+    class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -104,10 +104,10 @@ begin
   Result := TioHasManyChildVirtualProperty.Create(ATable);
 end;
 
-class function TioContextFactory.Context(const AClassName: String; const AioWhere: IioWhere; const ADataObject: TObject): IioContext;
+class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject): IioContext;
 begin
   // Get the Context from the ContextContainer
-  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AioWhere, ADataObject, '', '', nil);
+  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, '', '', nil);
 end;
 
 //class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
