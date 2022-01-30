@@ -125,7 +125,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil);
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, '', '', nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Get the count value for the current resolved type
@@ -167,7 +167,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil);
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, '', '', nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -245,19 +245,19 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, '', '', nil);
   // Start transaction
-  Self.StartTransaction(LContext.GetTable.GetConnectionDefName);
+  StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // PreProcess (delete) relation childs (HasMany, HasOne)
-    Self.PreProcessRelationChildOnDelete(LContext);
+    PreProcessRelationChildOnDelete(LContext);
     // Delete the object
-    Self.DeleteObject_Internal(LContext);
+    DeleteObject_Internal(LContext);
     // Commit
-    Self.CommitTransaction(LContext.GetTable.GetConnectionDefName);
+    CommitTransaction(LContext.GetTable.GetConnectionDefName);
   except
     // Rollback
-    Self.RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+    RollbackTransaction(LContext.GetTable.GetConnectionDefName);
     raise;
   end;
 end;
@@ -379,7 +379,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, AObj);
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, AObj, '', '', nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class object is founded
@@ -406,7 +406,7 @@ begin
   // Init
   Result := AObj;
   // Get the Context
-  AContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result);
+  AContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result, '', '', nil);
   // Create & open query
   AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
   AQuery.Open;
@@ -483,7 +483,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, '', '', nil);
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
@@ -752,7 +752,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil);
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, '', '', nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -815,7 +815,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil);
+      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, '', '', nil);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list

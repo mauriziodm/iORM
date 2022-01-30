@@ -914,21 +914,12 @@ end;
 
 class function io.ExtractOID(const AIntfObj: IInterface): Integer;
 begin
-  Result := ExtractOID(AIntfObj as TObject);
+  Result := TioUtilities.ExtractOID(AIntfObj);
 end;
 
 class function io.ExtractOID(const AObj: TObject): Integer;
-var
-  AContext: IioContext;
 begin
-  inherited;
-  // Check
-  if not Assigned(AObj) then
-    raise EioException.Create(Self.ClassName + '.ExtractOID: DataObject not assigned');
-  // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-  // Extract the OID
-  Result := AContext.GetID;
+  Result := TioUtilities.ExtractOID(AObj);
 end;
 
 class function io.GlobalFactory: TioGlobalFactoryRef;

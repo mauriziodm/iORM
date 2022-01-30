@@ -37,7 +37,8 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, Rtti, Data.Bind.ObjectScope, System.Generics.Collections, Data.Bind.Components,
-  iORM.Context.Properties.Interfaces, iORM.LiveBindings.Notification;
+  iORM.Context.Properties.Interfaces, iORM.LiveBindings.Notification,
+  iORM.CommonTypes;
 
 type
 
@@ -95,6 +96,9 @@ type
     class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
     // NB: Generic type for this methods must be only TObject or IInterface
     class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T); overload;
+    // ObjectStatus
+    class procedure SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
+    class function UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
     // ==========================================================================================================================
     // Changes to the BindSourceAdapters to make it possible to create fields that access nested properties/fields
     // (eg: "Customer.Payment.Description")
@@ -113,7 +117,8 @@ type
 
 implementation
 
-uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container;
+uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container,
+  iORM.Context.Factory;
 
 { TioCommonBSABehavior }
 
@@ -156,6 +161,16 @@ begin
   // If the current BSA is a NaturalBindSourceAdapter then forward the notification to the source adapter
   if ANotification.DirectionRoot and Supports(AActiveBindSourceAdapter, IioNaturalActiveBindSourceAdapter) then
     (AActiveBindSourceAdapter as IioNaturalActiveBindSourceAdapter).ForwardNotificationToSourceAdapter(AActiveBindSourceAdapter as TObject, ANotification);
+end;
+
+class procedure TioCommonBSABehavior.SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
+begin
+  TioContextFactory.Context(AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, '', '', nil).ObjStatus := AObjStatus;
+end;
+
+class function TioCommonBSABehavior.UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
+begin
+  Result := TioContextFactory.Context(AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, '', '', nil).ObjStatusExist;
 end;
 
 class procedure TioCommonBSABehavior.AddFields(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;

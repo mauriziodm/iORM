@@ -710,7 +710,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Current.ClassName, nil, Current).ObjStatus := AObjStatus;
+  TioCommonBSABehavior.SetObjStatus(Self, AObjStatus);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetReloading(const Value: Boolean);
@@ -720,7 +720,7 @@ end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.UseObjStatus: Boolean;
 begin
-  Result := TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatusExist;
+  Result := TioCommonBSABehavior.UseObjStatus(Self);
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter._AddRef: Integer;

@@ -41,7 +41,8 @@ uses
   iORM.CommonTypes,
   iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Attributes, System.Generics.Collections,
-  iORM.Context.Map.Interfaces, iORM.Where.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -66,7 +67,8 @@ type
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject): IioContext;
+    class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterPropertyName, AMasterPropertyPath: String;
+      const AMasterBSPersistence: TioBSPersistence): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -104,25 +106,27 @@ begin
   Result := TioHasManyChildVirtualProperty.Create(ATable);
 end;
 
-class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject): IioContext;
+class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
+  const AMasterPropertyName, AMasterPropertyPath: String; const AMasterBSPersistence: TioBSPersistence): IioContext;
 begin
   // Get the Context from the ContextContainer
-  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, '', '', nil);
+  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterPropertyName, AMasterPropertyPath,
+    AMasterBSPersistence);
 end;
 
-//class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
-//var
-//  LMasterProperty: IioProperty;
-//  LDetailVirtualProperty: IioProperty;
-//  LDetailMap: IioMap;
-//begin
-//  for LMasterProperty in TioMapContainer.GetAutodetectedHasManyRelationCollection do
-//  begin
-//    LDetailMap := TioMapContainer.GetMap(LMasterProperty.GetRelationChildTypeName);
-//    LDetailVirtualProperty := HasManyChildVirtualProperty(LDetailMap.GetTable);
-//    LDetailMap.GetProperties.Add(LDetailVirtualProperty);
-//  end;
-//end;
+// class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
+// var
+// LMasterProperty: IioProperty;
+// LDetailVirtualProperty: IioProperty;
+// LDetailMap: IioMap;
+// begin
+// for LMasterProperty in TioMapContainer.GetAutodetectedHasManyRelationCollection do
+// begin
+// LDetailMap := TioMapContainer.GetMap(LMasterProperty.GetRelationChildTypeName);
+// LDetailVirtualProperty := HasManyChildVirtualProperty(LDetailMap.GetTable);
+// LDetailMap.GetProperties.Add(LDetailVirtualProperty);
+// end;
+// end;
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
 var
   LMasterProperty: IioProperty;
@@ -131,13 +135,14 @@ var
   AResolvedTypeList: IioResolvedTypeList;
   AResolvedTypeName: String;
 begin
-   // Loop for all (hypothetical) autodetected HasMany relationship
+  // Loop for all (hypothetical) autodetected HasMany relationship
   for LMasterProperty in TioMapContainer.GetAutodetectedHasManyRelationCollection do
   begin
     // Resolve the type and alias (if the RelationChildTypeName is relative to a class then the resolver return the class itself)
-    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LMasterProperty.GetRelationChildTypeName, '', rmAll); // NB: rmAll (qua deve rimanere questo)
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LMasterProperty.GetRelationChildTypeName, '', rmAll);
+    // NB: rmAll (qua deve rimanere questo)
     // The resolver return as a result ONLY entity classes so if the AResolvedTypeList is empty then the (hypothetical) relationship
-    //  is not to be considered as an HasMany (so clear the HasMany informations for this property).
+    // is not to be considered as an HasMany (so clear the HasMany informations for this property).
     if AResolvedTypeList.Count = 0 then
     begin
       LMasterProperty.ClearRelationData;
@@ -147,7 +152,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // If the ChildTypeName is directly on indirectly (through an interface) relative to an entity then
-      //  add the virtual child property in the Map (if not already exists)
+      // add the virtual child property in the Map (if not already exists)
       LDetailMap := TioMapContainer.GetMap(AResolvedTypeName);
       if LDetailMap.GetProperties.PropertyExists(IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME) then
         Continue;
@@ -499,13 +504,13 @@ var
           LMember_RelationChildPropertyName := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
         end
         else
-        // BelongsTo relation autodetect
-        if TioUtilities.HasAttribute<ioEntity>(LMember_FieldValueType) then
-        begin
-          LMember_RelationType := rtBelongsTo;
-          LMember_RelationChildTypeName := LMember_FieldValueType.Name;
-          LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
-        end;
+          // BelongsTo relation autodetect
+          if TioUtilities.HasAttribute<ioEntity>(LMember_FieldValueType) then
+          begin
+            LMember_RelationType := rtBelongsTo;
+            LMember_RelationChildTypeName := LMember_FieldValueType.Name;
+            LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
+          end;
       end;
 
       // If the current member is a ReadOnly TRttiProperty then force it as PersistOnly

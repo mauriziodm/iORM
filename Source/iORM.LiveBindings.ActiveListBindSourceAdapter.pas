@@ -789,10 +789,9 @@ begin
   FMasterProperty := AMasterProperty;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetObjStatus(
-  AObjStatus: TioObjStatus);
+procedure TioActiveListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatus := AObjStatus;
+  TioCommonBSABehavior.SetObjStatus(Self, AObjStatus);
 end;
 
 procedure TioActiveListBindSourceAdapter.SetReloading(const Value: boolean);
@@ -819,7 +818,7 @@ end;
 
 function TioActiveListBindSourceAdapter.UseObjStatus: Boolean;
 begin
-  Result := TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjStatusExist;
+  Result := TioCommonBSABehavior.UseObjStatus(Self);
 end;
 
 function TioActiveListBindSourceAdapter._AddRef: Integer;
