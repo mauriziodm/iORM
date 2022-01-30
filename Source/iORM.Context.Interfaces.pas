@@ -40,7 +40,7 @@ interface
 uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Where.Interfaces,
-  iORM.Context.Map.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -99,7 +99,7 @@ type
     property MasterPropertyPath: String read GetMasterPropertyPath;
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence;
-    property MasterBSPersistence: TioBSPersistence;
+    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
   end;
 
 implementation

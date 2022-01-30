@@ -115,14 +115,15 @@ type
     // MasterPropertyPath
     property MasterPropertyPath: String read GetMasterPropertyPath;
     // MasterBSPersistence
-    property MasterBSPersistence: TioBSPersistence;
+    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
   end;
 
 implementation
 
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
-  iORM.Context.Container, System.SysUtils, iORM.Exceptions, iORM.DB.Interfaces;
+  iORM.Context.Container, System.SysUtils, iORM.Exceptions, iORM.DB.Interfaces,
+  System.StrUtils;
 
 { TioContext }
 
@@ -156,7 +157,7 @@ begin
   FWhere := AWhere;
   FHasManyChildVirtualPropertyValue := 0;
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyPath.IsEmpty, '', '.') + AMasterPropertyName;
-  FMasterBSPersistence: := AMasterBSPersistence;
+  FMasterBSPersistence := AMasterBSPersistence;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
