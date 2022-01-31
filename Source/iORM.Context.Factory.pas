@@ -67,8 +67,8 @@ type
       const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterPropertyName, AMasterPropertyPath: String;
-      const AMasterBSPersistence: TioBSPersistence): IioContext;
+    class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -107,11 +107,11 @@ begin
 end;
 
 class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
-  const AMasterPropertyName, AMasterPropertyPath: String; const AMasterBSPersistence: TioBSPersistence): IioContext;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
 begin
   // Get the Context from the ContextContainer
-  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterPropertyName, AMasterPropertyPath,
-    AMasterBSPersistence);
+  Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName,
+    AMasterPropertyPath);
 end;
 
 // class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
