@@ -169,6 +169,8 @@ type
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
     function HasMasterBSA: Boolean;
+    function IsMasterBSA: Boolean;
+    function IsDetailBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
@@ -567,9 +569,19 @@ begin
   Result := Assigned(FMasterProperty);
 end;
 
+function TioActiveObjectBindSourceAdapter.IsDetailBSA: Boolean;
+begin
+  Result := HasMasterBSA;
+end;
+
 function TioActiveObjectBindSourceAdapter.IsInterfaceBSA: Boolean;
 begin
   Result := False;
+end;
+
+function TioActiveObjectBindSourceAdapter.IsMasterBSA: Boolean;
+begin
+  Result := not HasMasterBSA;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.LoadPage;

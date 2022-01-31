@@ -160,6 +160,8 @@ type
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function GetCurrentOID: Integer;
     function HasMasterBSA: Boolean;
+    function IsMasterBSA: Boolean;
+    function IsDetailBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function AsTBindSourceAdapter: TBindSourceAdapter;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;

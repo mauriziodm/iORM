@@ -179,8 +179,11 @@ type
     function GetCurrentOID: Integer;
 
     function HasMasterBSA: Boolean;
+    function IsMasterBSA: Boolean;
+    function IsDetailBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
+    function GetMasterPropertyPath: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
     function AsTBindSourceAdapter: TBindSourceAdapter;
@@ -544,6 +547,11 @@ begin
   Result := FMasterProperty.GetName;
 end;
 
+function TioActiveListBindSourceAdapter.GetMasterPropertyPath: String;
+begin
+
+end;
+
 function TioActiveListBindSourceAdapter.GetOwnsObjects: Boolean;
 begin
   Result := FLocalOwnsObject;
@@ -621,9 +629,19 @@ begin
   Result := Assigned(FMasterProperty);
 end;
 
+function TioActiveListBindSourceAdapter.IsDetailBSA: Boolean;
+begin
+  Result := HasMasterBSA;
+end;
+
 function TioActiveListBindSourceAdapter.IsInterfaceBSA: Boolean;
 begin
   Result := False;
+end;
+
+function TioActiveListBindSourceAdapter.IsMasterBSA: Boolean;
+begin
+  Result := not HasMasterBSA;
 end;
 
 procedure TioActiveListBindSourceAdapter.ListViewDeletingTimerEventHandler(
