@@ -53,6 +53,13 @@ uses
 type
 
   io = class
+  strict private
+    // Vedere se questi metodi privati (Persist e PersistCollection) si possono eliminare
+    // NB: Prima erano nella parte pubblica
+    class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const ABlindInsert: Boolean); overload;
+    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const ABlindInsert: Boolean); overload;
   public
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
@@ -87,12 +94,12 @@ type
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
 
-    class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: Boolean); overload;
+//    class procedure Persist(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+//      const ABlindInsert: Boolean); overload;
     class procedure Persist(const AObj: TObject; const ABlindInsert: Boolean = False); overload;
     class procedure Persist(const AIntfObj: IInterface; const ABlindInsert: Boolean = False); overload;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: Boolean); overload;
+//    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+//      const ABlindInsert: Boolean); overload;
     class procedure PersistCollection(const ACollection: TObject; const ABlindInsert: Boolean = False); overload;
     class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: Boolean = False); overload;
 
