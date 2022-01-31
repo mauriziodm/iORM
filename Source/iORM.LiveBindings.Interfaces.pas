@@ -166,6 +166,7 @@ type
     function AsTBindSourceAdapter: TBindSourceAdapter;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function GetMasterPropertyName: String;
+    function GetMasterPropertyPath: String;
     function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
     // TypeName

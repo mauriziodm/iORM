@@ -56,8 +56,8 @@ type
     Response: Boolean;
     constructor Create(const ANotificationType: TioBSNotificationType);
     constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);
-    constructor CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject);
-    constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject);
+    constructor CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
+    constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
     constructor CreateSUDRegisterDetailPropertyPath(const AMasterPropertyName: String);
   end;
 
@@ -174,7 +174,7 @@ begin
   PayloadAsString := AMasterPropertyName;
 end;
 
-constructor TioBSNotification.CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject);
+constructor TioBSNotification.CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 begin
   // Initialization
   NotificationType := ntSUD_RegisterObjOnEdit;
@@ -187,9 +187,10 @@ begin
   StopAtTheFirstMasterBS := True;
   // Payload
   PayloadAsObject := ACurrentObj;
+  PayloadAsString := AMasterPropertyPath;
 end;
 
-constructor TioBSNotification.CreateSUDRegisterObjOnPost(const ACurrentObj: TObject);
+constructor TioBSNotification.CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 begin
   // Initialization
   NotificationType := ntSUD_RegisterObjOnPost;
@@ -202,6 +203,7 @@ begin
   StopAtTheFirstMasterBS := True;
   // Payload
   PayloadAsObject := ACurrentObj;
+  PayloadAsString := AMasterPropertyPath;
 end;
 
 end.

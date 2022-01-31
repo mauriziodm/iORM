@@ -174,6 +174,7 @@ type
     function IsDetailBSA: Boolean;
     function IsInterfaceBSA: Boolean;
     function GetMasterPropertyName: String;
+    function GetMasterPropertyPath: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     function AsTBindSourceAdapter: TBindSourceAdapter;
@@ -517,6 +518,14 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetMasterPropertyPath: String;
+begin
+  if HasMasterBSA then
+    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterBindSourceAdapter.GetMasterPropertyName
+  else
+    Result := '';
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetOwnsObjects: Boolean;

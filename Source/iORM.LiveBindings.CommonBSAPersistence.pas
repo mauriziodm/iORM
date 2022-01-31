@@ -144,7 +144,8 @@ begin
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
-  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnEdit(AActiveBindSourceAdapter.Current));
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnEdit(AActiveBindSourceAdapter.Current,
+    AActiveBindSourceAdapter.GetMasterPropertyPath));
 end;
 
 class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioBSPersistenceClient);
@@ -358,7 +359,8 @@ class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: Iio
 begin
   AActiveBindSourceAdapter.SetObjStatus(osDirty);
   // Notification to register the current object into the SmartUpdateDetection system
-  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnPost(AActiveBindSourceAdapter.Current));
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnPost(AActiveBindSourceAdapter.Current,
+    AActiveBindSourceAdapter.GetMasterPropertyPath));
 end;
 
 class procedure TioCommonBSAPersistence._SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);

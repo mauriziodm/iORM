@@ -549,7 +549,10 @@ end;
 
 function TioActiveListBindSourceAdapter.GetMasterPropertyPath: String;
 begin
-
+  if HasMasterBSA then
+    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterBindSourceAdapter.GetMasterPropertyName
+  else
+    Result := '';
 end;
 
 function TioActiveListBindSourceAdapter.GetOwnsObjects: Boolean;
