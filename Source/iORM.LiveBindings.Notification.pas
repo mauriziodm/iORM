@@ -58,7 +58,6 @@ type
     constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);
     constructor CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
     constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
-    constructor CreateSUDRegisterDetailPropertyPath(const AMasterPropertyName: String);
   end;
 
 implementation
@@ -157,21 +156,6 @@ begin
   // Payload
   PayloadAsString := ADeletedObj.ClassName;
   PayloadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
-end;
-
-constructor TioBSNotification.CreateSUDRegisterDetailPropertyPath(const AMasterPropertyName: String);
-begin
-  // Initialization
-  NotificationType := ntSUD_RegisterDetailPropertyPath;
-  Response := False;
-  // Routing
-  DirectionRoot := True;
-  DirectionLeaves := False;
-  DeliverToMasterBS := True;
-  DeliverToDetailBS := True;
-  StopAtTheFirstMasterBS := True;
-  // Payload
-  PayloadAsString := AMasterPropertyName;
 end;
 
 constructor TioBSNotification.CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);

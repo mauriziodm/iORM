@@ -13,9 +13,8 @@ type
   IioSmartUpdateDetection = interface
     ['{715911CE-4750-422C-BC74-C8674A90AA3F}']
     procedure Clear;
-    procedure NotifyEdit(const ACurrentObj: TObject);
-    procedure NotifyPost(const ACurrentObj: TObject);
-    procedure NotifyRegisterPropertyPath(const APropertyPath: String);
+    procedure NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
+    procedure NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
     function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean;
   end;
 
@@ -33,52 +32,48 @@ type
 
   TioSmartUpdateDetectionBase = class abstract(TInterfacedObject, IioSmartUpdateDetection)
   strict private
-    FDetailPropertyPathCollection: TList<String>;
     FObjStateCollection: TDictionary<string, string>;
     FMonitor: TMonitor;
   protected
     procedure Lock;
     procedure Unlock;
-    procedure Add(const ACurrentObj: TObject);
-    function EncodeKey(const ACurrentObj: TObject): string;
+    procedure Add(const ACurrentObj: TObject; const AMasterPropertyPath: String);
+    function EncodeKey(const ACurrentObj: TObject; const AMasterPropertyPath: String): string;
     function EncodeValue(const ACurrentObj: TObject): string; virtual;
-    function IsManagedPropertyPath(const AMasterPropertyPath: String): Boolean;
-    property DetailPropertyPathCollection: TList<String> read FDetailPropertyPathCollection;
     property ObjStateCollection: TDictionary<string, string> read FObjStateCollection;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
     function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; virtual; abstract;
-    procedure NotifyEdit(const ACurrentObj: TObject); virtual; abstract;
-    procedure NotifyPost(const ACurrentObj: TObject); virtual; abstract;
-    procedure NotifyRegisterPropertyPath(const APropertyPath: String);
+    procedure NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String); virtual; abstract;
+    procedure NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String); virtual; abstract;
   end;
 
   TioSmartUpdateDetectionStateLess = class(TioSmartUpdateDetectionBase)
   public
     function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; override;
-    procedure NotifyEdit(const ACurrentObj: TObject); override;
-    procedure NotifyPost(const ACurrentObj: TObject); override;
+    procedure NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String); override;
+    procedure NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String); override;
   end;
 
   TioSmartUpdateDetectionStateFull = class(TioSmartUpdateDetectionBase)
   public
     function EncodeValue(const ACurrentObj: TObject): string; override;
     function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; override;
-    procedure NotifyEdit(const ACurrentObj: TObject); override;
-    procedure NotifyPost(const ACurrentObj: TObject); override;
+    procedure NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String); override;
+    procedure NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String); override;
   end;
 
   { TioSmartUpdateDetection }
 
-procedure TioSmartUpdateDetectionBase.Add(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionBase.Add(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 var
   LKey, LValue: String;
 begin
   if not Assigned(ACurrentObj) then
     Exit;
-  LKey := EncodeKey(ACurrentObj);
+  LKey := EncodeKey(ACurrentObj, AMasterPropertyPath);
   if LKey = NEW_OBJ_KEY then
     Exit;
   Lock;
@@ -106,23 +101,21 @@ constructor TioSmartUpdateDetectionBase.Create;
 begin
   inherited;
   FObjStateCollection := TDictionary<string, string>.Create;
-  FDetailPropertyPathCollection := TList<String>.Create;
 end;
 
 destructor TioSmartUpdateDetectionBase.Destroy;
 begin
   FObjStateCollection.Free;
-  FDetailPropertyPathCollection.Free;
   inherited;
 end;
 
-function TioSmartUpdateDetectionBase.EncodeKey(const ACurrentObj: TObject): string;
+function TioSmartUpdateDetectionBase.EncodeKey(const ACurrentObj: TObject; const AMasterPropertyPath: String): string;
 var
   LID: Integer;
 begin
   LID := TioUtilities.ExtractOID(ACurrentObj);
   if LID <> 0 then
-    Result := ACurrentObj.ClassName + '___' + LID.ToString
+    Result := AMasterPropertyPath + '.' + ACurrentObj.ClassName + '___' + LID.ToString
   else
     Result := NEW_OBJ_KEY;
 end;
@@ -132,27 +125,9 @@ begin
   Result := '';
 end;
 
-function TioSmartUpdateDetectionBase.IsManagedPropertyPath(const AMasterPropertyPath: String): Boolean;
-begin
-  Result := FDetailPropertyPathCollection.IndexOf(AMasterPropertyPath) > -1;
-end;
-
 procedure TioSmartUpdateDetectionBase.Lock;
 begin
   FMonitor.Enter(Self);
-end;
-
-procedure TioSmartUpdateDetectionBase.NotifyRegisterPropertyPath(const APropertyPath: String);
-begin
-  if APropertyPath.IsEmpty then
-    Exit;
-  Lock;
-  try
-    if not IsManagedPropertyPath(APropertyPath) then
-      FDetailPropertyPathCollection.Add(APropertyPath);
-  finally
-    Unlock;
-  end;
 end;
 
 procedure TioSmartUpdateDetectionBase.Unlock;
@@ -168,23 +143,23 @@ var
 begin
   if not Assigned(ACurrentObj) then
     Exit(False);
-  LKey := EncodeKey(ACurrentObj);
+  LKey := EncodeKey(ACurrentObj, AMasterPropertyPath);
   Lock;
   try
-    Result := (LKey = NEW_OBJ_KEY) or (not IsManagedPropertyPath(AMasterPropertyPath)) or ObjStateCollection.ContainsKey(LKey);
+    Result := (LKey = NEW_OBJ_KEY) or ObjStateCollection.ContainsKey(LKey);
   finally
     Unlock;
   end;
 end;
 
-procedure TioSmartUpdateDetectionStateLess.NotifyEdit(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionStateLess.NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 begin
   // Do nothing
 end;
 
-procedure TioSmartUpdateDetectionStateLess.NotifyPost(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionStateLess.NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 begin
-  Add(ACurrentObj);
+  Add(ACurrentObj, AMasterPropertyPath);
 end;
 
 { TioSmartUpdateDetectionFullState }
@@ -195,10 +170,10 @@ var
 begin
   if not Assigned(ACurrentObj) then
     Exit(False);
-  LKey := EncodeKey(ACurrentObj);
+  LKey := EncodeKey(ACurrentObj, AMasterPropertyPath);
   Lock;
   try
-    Result := (LKey = NEW_OBJ_KEY) or (not IsManagedPropertyPath(AMasterPropertyPath)) or ObjStateCollection.ContainsKey(LKey);
+    Result := (LKey = NEW_OBJ_KEY) or ObjStateCollection.ContainsKey(LKey);
     if Result then
     begin
       LCurrentState := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
@@ -209,12 +184,12 @@ begin
   end;
 end;
 
-procedure TioSmartUpdateDetectionStateFull.NotifyEdit(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionStateFull.NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 begin
-  Add(ACurrentObj);
+  Add(ACurrentObj, AMasterPropertyPath);
 end;
 
-procedure TioSmartUpdateDetectionStateFull.NotifyPost(const ACurrentObj: TObject);
+procedure TioSmartUpdateDetectionStateFull.NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
 begin
   // Do nothing
 end;
