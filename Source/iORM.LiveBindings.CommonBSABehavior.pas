@@ -145,7 +145,7 @@ begin
       (ANotification.DeliverToDetailBS and AActiveBindSourceAdapter.GetBindSource.IsDetailBS) then
     begin
       AActiveBindSourceAdapter.GetBindSource.Notify(AActiveBindSourceAdapter as TObject, ANotification);
-      if ANotification.StopAtTheFirstDestination then
+      if ANotification.StopAtTheFirstMasterBS and AActiveBindSourceAdapter.GetBindSource.IsMasterBS then
         Exit;
     end;
 

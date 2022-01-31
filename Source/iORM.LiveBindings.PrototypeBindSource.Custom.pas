@@ -102,6 +102,9 @@ type
     function GetIsInterfacePresenting: Boolean;
     // ItemCount
     function GetCount: Integer;
+    // MasterPropertyName
+    procedure SetMasterPropertyName(const Value: String);
+    function GetMasterPropertyName: String;
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Paging
@@ -153,7 +156,7 @@ type
     // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterBindSource: TioMasterBindSource read FMasterBindSource write FMasterBindSource; // published: Detail
-    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
+    property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     // Published properties: selectors
     property SelectorFor: TioPrototypeBindSourceCustom read FSelectorFor write FSelectorFor; // published: Master
@@ -592,6 +595,11 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
+function TioPrototypeBindSourceCustom.GetMasterPropertyName: String;
+begin
+  Result := FMasterPropertyName;
+end;
+
 function TioPrototypeBindSourceCustom.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
 begin
   Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner).AsTBindSourceAdapter;
@@ -733,6 +741,11 @@ begin
   GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
   // else
   // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+end;
+
+procedure TioPrototypeBindSourceCustom.SetMasterPropertyName(const Value: String);
+begin
+  FMasterPropertyName := Trim(Value);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);

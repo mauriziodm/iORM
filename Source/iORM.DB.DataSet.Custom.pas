@@ -70,6 +70,9 @@ type
     function GetIsInterfacePresenting: Boolean;
     // ItemCount
     function GetCount: Integer;
+    // MasterPropertyName
+    procedure SetMasterPropertyName(const Value: String);
+    function GetMasterPropertyName: String;
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Paging
@@ -121,7 +124,7 @@ type
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
-    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // published: Detail
+    property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
@@ -357,6 +360,11 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
+function TioDataSetCustom.GetMasterPropertyName: String;
+begin
+  Result := FMasterPropertyName;
+end;
+
 function TioDataSetCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
@@ -488,6 +496,11 @@ end;
 procedure TioDataSetCustom.SetAutoRefreshOnNotification(const Value: Boolean);
 begin
   FAutoRefreshOnNotification := Value;
+end;
+
+procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);
+begin
+  FMasterPropertyName := Trim(Value);
 end;
 
 procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);

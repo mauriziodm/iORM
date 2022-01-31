@@ -68,6 +68,7 @@ type
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
     function AdapterExists: Boolean;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    function GetMasterPropertyName: String;
     function IsMasterBS: boolean;
     function IsDetailBS: boolean;
     procedure Refresh(const ANotify: Boolean = True);

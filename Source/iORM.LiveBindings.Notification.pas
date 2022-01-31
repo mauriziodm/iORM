@@ -37,8 +37,9 @@ interface
 
 type
 
+  // NB: The acronym SUD means "Smart Update Detection"
   TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntDeleteObjStatus,
-    ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost);
+    ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost, ntSUD_RegisterDetailPropertyPath);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -48,7 +49,7 @@ type
     DirectionLeaves: Boolean;
     DeliverToMasterBS: Boolean;
     DeliverToDetailBS: Boolean;
-    StopAtTheFirstDestination: Boolean;
+    StopAtTheFirstMasterBS: Boolean;
     PayloadAsInteger: Integer;
     PayloadAsString: String;
     PayloadAsObject: TObject;
@@ -57,6 +58,7 @@ type
     constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);
     constructor CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject);
     constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject);
+    constructor CreateSUDRegisterDetailPropertyPath(const AMasterPropertyName: String);
   end;
 
 implementation
@@ -79,7 +81,7 @@ begin
         DirectionLeaves := False;
         DeliverToMasterBS := True;
         DeliverToDetailBS := False;
-        StopAtTheFirstDestination := True;
+        StopAtTheFirstMasterBS := True;
       end;
     // NB: ntRefresh is used to notify all BindSources to refresh;
     // it is applied both to the BindSource masters and to the details and it propagates in both directions until it reaches the root or leaves
@@ -89,7 +91,7 @@ begin
         DirectionLeaves := True;
         DeliverToMasterBS := True;
         DeliverToDetailBS := True;
-        StopAtTheFirstDestination := False;
+        StopAtTheFirstMasterBS := False;
       end;
     // NB: ntSaveObjState is for the TBSPersist;
     // it only applies to BindSource masters and propagates from the details to the first master encountered
@@ -99,7 +101,7 @@ begin
         DirectionLeaves := False;
         DeliverToMasterBS := True;
         DeliverToDetailBS := False;
-        StopAtTheFirstDestination := True;
+        StopAtTheFirstMasterBS := True;
       end;
     // NB: ntCanDoSelection is for selectors;
     // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
@@ -109,7 +111,7 @@ begin
         DirectionLeaves := False;
         DeliverToMasterBS := True;
         DeliverToDetailBS := False;
-        StopAtTheFirstDestination := True;
+        StopAtTheFirstMasterBS := True;
       end;
     // NB: ntCanDeleteDetail;
     // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
@@ -119,7 +121,7 @@ begin
         DirectionLeaves := False;
         DeliverToMasterBS := True;
         DeliverToDetailBS := False;
-        StopAtTheFirstDestination := True;
+        StopAtTheFirstMasterBS := True;
       end;
     // NB: ntDelete is for the TBSPersist;
     // Notifies the MasterBS.Persistence that an item has been deleted
@@ -131,7 +133,7 @@ begin
         DirectionLeaves := False;
         DeliverToMasterBS := True;
         DeliverToDetailBS := False;
-        StopAtTheFirstDestination := True;
+        StopAtTheFirstMasterBS := True;
       end;
     // Else raise exception
   else
@@ -151,10 +153,25 @@ begin
   DirectionLeaves := False;
   DeliverToMasterBS := True;
   DeliverToDetailBS := False;
-  StopAtTheFirstDestination := True;
+  StopAtTheFirstMasterBS := True;
   // Payload
   PayloadAsString := ADeletedObj.ClassName;
   PayloadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
+end;
+
+constructor TioBSNotification.CreateSUDRegisterDetailPropertyPath(const AMasterPropertyName: String);
+begin
+  // Initialization
+  NotificationType := ntSUD_RegisterDetailPropertyPath;
+  Response := False;
+  // Routing
+  DirectionRoot := True;
+  DirectionLeaves := False;
+  DeliverToMasterBS := True;
+  DeliverToDetailBS := True;
+  StopAtTheFirstMasterBS := True;
+  // Payload
+  PayloadAsString := AMasterPropertyName;
 end;
 
 constructor TioBSNotification.CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject);
@@ -167,7 +184,7 @@ begin
   DirectionLeaves := False;
   DeliverToMasterBS := True;
   DeliverToDetailBS := False;
-  StopAtTheFirstDestination := True;
+  StopAtTheFirstMasterBS := True;
   // Payload
   PayloadAsObject := ACurrentObj;
 end;
@@ -182,7 +199,7 @@ begin
   DirectionLeaves := False;
   DeliverToMasterBS := True;
   DeliverToDetailBS := False;
-  StopAtTheFirstDestination := True;
+  StopAtTheFirstMasterBS := True;
   // Payload
   PayloadAsObject := ACurrentObj;
 end;

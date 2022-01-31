@@ -118,6 +118,9 @@ type
     // ItemIndex
     function GetItemIndex: Integer;
     procedure SetItemIndex(const Value: Integer);
+    // MasterPropertyName
+    procedure SetMasterPropertyName(const Value: String);
+    function GetMasterPropertyName: String;
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Paging
@@ -238,7 +241,7 @@ type
     property AsDefault: Boolean read FAsDefault write SetAsDefault; // Published: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     property MasterPresenter: TioModelPresenterCustom read FMasterPresenter write FMasterPresenter; // Published: Detail
-    property MasterPropertyName: String read FMasterPropertyName write FMasterPropertyName; // Published: Detail
+    property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // Published: Detail
     property OrderBy: String read FOrderBy Write SetOrderBy; // Published: Master
     property TypeName: String read FTypeName write SetTypeName; // Published: Master
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
@@ -581,6 +584,11 @@ begin
     Result := -1;
 end;
 
+function TioModelPresenterCustom.GetMasterPropertyName: String;
+begin
+  Result := FMasterPropertyName;
+end;
+
 function TioModelPresenterCustom.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
   if not Supports(GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
@@ -864,6 +872,11 @@ begin
     FBindSourceAdapter.ItemIndex := Value
   else
     raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
+end;
+
+procedure TioModelPresenterCustom.SetMasterPropertyName(const Value: String);
+begin
+  FMasterPropertyName := Trim(Value);
 end;
 
 procedure TioModelPresenterCustom.SetOrderBy(const Value: String);

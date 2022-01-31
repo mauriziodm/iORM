@@ -84,6 +84,18 @@ begin
     ntSUD_RegisterObjOnPost:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
         LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyPost(ANotification.PayloadAsObject);
+    ntSUD_RegisterDetailPropertyPath:
+    begin
+      // If it's a master BS then register the received detail property path...
+      // ...else adds its MasterPropertyName to the path
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+        LBSPersistenceClient.Persistence.NotifyRegisterDetailPropertyPath(ANotification.PayloadAsString)
+      else
+      begin
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.PayloadAsString := ATargetBS.GetMasterPropertyName + '.' + ANotification.PayloadAsString;
+      end;
+    end;
   end;
 end;
 
