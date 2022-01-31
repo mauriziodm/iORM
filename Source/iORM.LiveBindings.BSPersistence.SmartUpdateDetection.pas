@@ -15,7 +15,8 @@ type
     procedure Clear;
     procedure NotifyEdit(const ACurrentObj: TObject);
     procedure NotifyPost(const ACurrentObj: TObject);
-    function IsToBePersisted(const ACurrentObj: TObject): Boolean;
+    procedure NotifyRegisterPropertyPath(const APropertyPath: String);
+    function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean;
   end;
 
   TioSmartUpdateDetectionFaxtory = class
@@ -30,29 +31,33 @@ uses
 
 type
 
-  TioSmartUpdateDetectionBase = class abstract (TInterfacedObject, IioSmartUpdateDetection)
+  TioSmartUpdateDetectionBase = class abstract(TInterfacedObject, IioSmartUpdateDetection)
   strict private
-    FContainer: TDictionary<string, string>;
+    FDetailPropertyPathCollection: TList<String>;
+    FObjStateCollection: TDictionary<string, string>;
     FMonitor: TMonitor;
   protected
-    procedure LockContainer;
-    procedure UnlockContainer;
+    procedure Lock;
+    procedure Unlock;
     procedure Add(const ACurrentObj: TObject);
     function EncodeKey(const ACurrentObj: TObject): string;
     function EncodeValue(const ACurrentObj: TObject): string; virtual;
-    property Container: TDictionary<string, string> read FContainer;
+    function IsManagedPropertyPath(const AMasterPropertyPath: String): Boolean;
+    property DetailPropertyPathCollection: TList<String> read FDetailPropertyPathCollection;
+    property ObjStateCollection: TDictionary<string, string> read FObjStateCollection;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    function IsToBePersisted(const ACurrentObj: TObject): Boolean; virtual; abstract;
+    function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; virtual; abstract;
     procedure NotifyEdit(const ACurrentObj: TObject); virtual; abstract;
     procedure NotifyPost(const ACurrentObj: TObject); virtual; abstract;
+    procedure NotifyRegisterPropertyPath(const APropertyPath: String);
   end;
 
   TioSmartUpdateDetectionStateLess = class(TioSmartUpdateDetectionBase)
   public
-    function IsToBePersisted(const ACurrentObj: TObject): Boolean; override;
+    function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; override;
     procedure NotifyEdit(const ACurrentObj: TObject); override;
     procedure NotifyPost(const ACurrentObj: TObject); override;
   end;
@@ -60,7 +65,7 @@ type
   TioSmartUpdateDetectionStateFull = class(TioSmartUpdateDetectionBase)
   public
     function EncodeValue(const ACurrentObj: TObject): string; override;
-    function IsToBePersisted(const ACurrentObj: TObject): Boolean; override;
+    function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; override;
     procedure NotifyEdit(const ACurrentObj: TObject); override;
     procedure NotifyPost(const ACurrentObj: TObject); override;
   end;
@@ -76,36 +81,38 @@ begin
   LKey := EncodeKey(ACurrentObj);
   if LKey = NEW_OBJ_KEY then
     Exit;
-  LockContainer;
+  Lock;
   try
-    if FContainer.ContainsKey(LKey) then
+    if FObjStateCollection.ContainsKey(LKey) then
       Exit;
     LValue := EncodeValue(ACurrentObj);
-    FContainer.Add(LKey, LValue);
+    FObjStateCollection.Add(LKey, LValue);
   finally
-    UnlockContainer;
+    Unlock;
   end;
 end;
 
 procedure TioSmartUpdateDetectionBase.Clear;
 begin
-  LockContainer;
+  Lock;
   try
-    FContainer.Clear;
+    FObjStateCollection.Clear;
   finally
-    UnlockContainer;
+    Unlock;
   end;
 end;
 
 constructor TioSmartUpdateDetectionBase.Create;
 begin
   inherited;
-  FContainer := TDictionary<string, string>.Create;
+  FObjStateCollection := TDictionary<string, string>.Create;
+  FDetailPropertyPathCollection := TList<String>.Create;
 end;
 
 destructor TioSmartUpdateDetectionBase.Destroy;
 begin
-  FContainer.Free;
+  FObjStateCollection.Free;
+  FDetailPropertyPathCollection.Free;
   inherited;
 end;
 
@@ -125,30 +132,48 @@ begin
   Result := '';
 end;
 
-procedure TioSmartUpdateDetectionBase.LockContainer;
+function TioSmartUpdateDetectionBase.IsManagedPropertyPath(const AMasterPropertyPath: String): Boolean;
+begin
+  Result := FDetailPropertyPathCollection.IndexOf(AMasterPropertyPath) > -1;
+end;
+
+procedure TioSmartUpdateDetectionBase.Lock;
 begin
   FMonitor.Enter(Self);
 end;
 
-procedure TioSmartUpdateDetectionBase.UnlockContainer;
+procedure TioSmartUpdateDetectionBase.NotifyRegisterPropertyPath(const APropertyPath: String);
+begin
+  if APropertyPath.IsEmpty then
+    Exit;
+  Lock;
+  try
+    if not IsManagedPropertyPath(APropertyPath) then
+      FDetailPropertyPathCollection.Add(APropertyPath);
+  finally
+    Unlock;
+  end;
+end;
+
+procedure TioSmartUpdateDetectionBase.Unlock;
 begin
   FMonitor.Exit(Self);
 end;
 
 { TioSmartUpdateDetectionStateLess }
 
-function TioSmartUpdateDetectionStateLess.IsToBePersisted(const ACurrentObj: TObject): Boolean;
+function TioSmartUpdateDetectionStateLess.IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean;
 var
   LKey: String;
 begin
   if not Assigned(ACurrentObj) then
     Exit(False);
   LKey := EncodeKey(ACurrentObj);
-  LockContainer;
+  Lock;
   try
-    Result := (LKey = NEW_OBJ_KEY) or Container.ContainsKey(LKey);
+    Result := (LKey = NEW_OBJ_KEY) or (not IsManagedPropertyPath(AMasterPropertyPath)) or ObjStateCollection.ContainsKey(LKey);
   finally
-    UnlockContainer;
+    Unlock;
   end;
 end;
 
@@ -164,23 +189,23 @@ end;
 
 { TioSmartUpdateDetectionFullState }
 
-function TioSmartUpdateDetectionStateFull.IsToBePersisted(const ACurrentObj: TObject): Boolean;
+function TioSmartUpdateDetectionStateFull.IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean;
 var
   LKey, LCurrentState: String;
 begin
   if not Assigned(ACurrentObj) then
     Exit(False);
   LKey := EncodeKey(ACurrentObj);
-  LockContainer;
+  Lock;
   try
-    Result := (LKey = NEW_OBJ_KEY) or Container.ContainsKey(LKey);
+    Result := (LKey = NEW_OBJ_KEY) or (not IsManagedPropertyPath(AMasterPropertyPath)) or ObjStateCollection.ContainsKey(LKey);
     if Result then
     begin
       LCurrentState := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
-      Result := Result and (LCurrentState <> Container[LKey]);
+      Result := Result and (LCurrentState <> ObjStateCollection[LKey]);
     end;
   finally
-    UnlockContainer;
+    Unlock;
   end;
 end;
 
@@ -204,7 +229,7 @@ end;
 class function TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem: IioSmartUpdateDetection;
 begin
   Result := TioSmartUpdateDetectionStateLess.Create;
-//  Result := TioSmartUpdateDetectionStateFull.Create;
+  // Result := TioSmartUpdateDetectionStateFull.Create;
 end;
 
 end.

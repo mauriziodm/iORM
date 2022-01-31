@@ -89,7 +89,7 @@ begin
       // If it's a master BS then register the received detail property path...
       // ...else adds its MasterPropertyName to the path
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
-        LBSPersistenceClient.Persistence.NotifyRegisterDetailPropertyPath(ANotification.PayloadAsString)
+        LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyRegisterPropertyPath(ANotification.PayloadAsString)
       else
       begin
         LNotificationPointer := @ANotification;

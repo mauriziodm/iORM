@@ -76,7 +76,6 @@ type
     function IsClear: Boolean;
     procedure NotifyBeforeScroll;
     procedure NotifySaveRevertPoint;
-    procedure NotifyRegisterDetailPropertyPath(const ADetailPropertyPath: String);
     property SavedObjState: string read FSavedState;
     property SmartDeleteSystem: TioSmartDeleteSystem read FSmartDeleteSystem;
     property SmartUpdateDetection: IioSmartUpdateDetection read FSmartUpdateDetection;
@@ -211,12 +210,6 @@ begin
   else
   if IsSaved then
     Clear(False);
-end;
-
-procedure TioBSPersistence.NotifyRegisterDetailPropertyPath(const ADetailPropertyPath: String);
-begin
-  if ADetailPropertyPath.IsEmpty then
-    Exit;
 end;
 
 function TioBSPersistence.GetState: TioBSPersistenceState;
