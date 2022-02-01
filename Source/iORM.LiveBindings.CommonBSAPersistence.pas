@@ -166,8 +166,6 @@ begin
 end;
 
 class procedure TioCommonBSAPersistence.BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-var
-  LNotification: TioBSNotification;
 begin
   // If the delete detail is allowed then send a ntSaveRevertPoint notification
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
