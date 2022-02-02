@@ -115,7 +115,7 @@ var
 begin
   LID := TioUtilities.ExtractOID(ACurrentObj);
   if LID <> 0 then
-    Result := AMasterPropertyPath + '.' + ACurrentObj.ClassName + '___' + LID.ToString
+    Result := AMasterPropertyPath + '.' + ACurrentObj.ClassName + '.' + LID.ToString
   else
     Result := NEW_OBJ_KEY;
 end;

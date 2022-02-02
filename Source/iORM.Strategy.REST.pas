@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.Strategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
-  FireDAC.Comp.DataSet;
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -52,10 +52,10 @@ type
     class procedure CommitTransaction(const AConnectionName: String); override;
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: boolean); override;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: boolean); override;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure DeleteObject(const AObj: TObject); override;
     class procedure DeleteCollection(const ACollection: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
@@ -105,7 +105,7 @@ begin
     LConnection.Execute('Count');
     // Deserialize the JSONDataValue to the result object
     // M.M. 12/06/21
-    Result := LConnection.ResponseBody.JSONDataValue.AsType<integer>;
+    Result := LConnection.ResponseBody.JSONDataValue.AsType<Integer>;
     // Commit
     LConnection.Commit;
   except
@@ -306,8 +306,9 @@ end;
 // Result := GUIDToString(LGUID);
 // end;
 
-class procedure TioStrategyREST.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const ABlindInsert: boolean);
+{ TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
+class procedure TioStrategyREST.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnection: IioConnectionREST;
 begin
@@ -340,8 +341,9 @@ begin
   end;
 end;
 
+{ TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
 class procedure TioStrategyREST.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: boolean);
+  const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionREST;
@@ -402,7 +404,7 @@ begin
     // Get the number of records affected by the SQL command
     LJSONValue := LConnection.ResponseBody.JSONDataValue;
     if Assigned(LJSONValue) and (LJSONValue is TJSONNumber) then
-//      Result := TJSONNumber(LJSONValue).AsInt
+      // Result := TJSONNumber(LJSONValue).AsInt
     else
       raise EioException.Create(Self.ClassName + ': wrong JSONValue (SQLDest_Execute).');
     // Commit

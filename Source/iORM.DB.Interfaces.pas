@@ -44,7 +44,7 @@ uses
   FireDAC.Comp.Client, FireDAC.Stan.Param,
   Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes,
   System.JSON, iORM.Where.Interfaces,
-  FireDAC.Comp.DataSet;
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence;
 
 const
   TRANSACTION_TIMESTAMP_NULL = 0;
@@ -179,7 +179,7 @@ type
     procedure SetObjIDWhereParam(const AContext: IioContext);
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
-    procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: Integer);
+    procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: integer);
     function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
@@ -337,10 +337,10 @@ type
     class procedure CommitTransaction(const AConnectionName: String); virtual; abstract;
     class procedure RollbackTransaction(const AConnectionName: String); virtual; abstract;
     class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean);
-      virtual; abstract;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: integer;
-      const ABlindInsert: Boolean); virtual; abstract;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); virtual; abstract;
+    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); virtual; abstract;
     class procedure DeleteObject(const AObj: TObject); virtual; abstract;
     class procedure DeleteCollection(const ACollection: TObject); virtual; abstract;
     class procedure Delete(const AWhere: IioWhere); virtual; abstract;

@@ -503,7 +503,7 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.GetMasterPropertyPath: String;
 begin
   if HasMasterBSA then
-    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterBindSourceAdapter.GetMasterPropertyName
+    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterPropertyName
   else
     Result := '';
 end;

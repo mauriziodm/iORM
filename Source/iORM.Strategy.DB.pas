@@ -38,7 +38,8 @@ interface
 uses
   iORM.Context.Interfaces,
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
-  iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB;
+  iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB,
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -48,22 +49,19 @@ type
     class procedure InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
     class procedure UpdateObject(const AContext: IioContext);
     class procedure DeleteObject_Internal(const AContext: IioContext);
-    class procedure PreProcessRelationChildOnDelete(const AContext: IioContext);
-    class procedure PreProcessRelationChildOnPersist(const AContext: IioContext);
-    class procedure PostProcessRelationChildOnPersist(const AContext: IioContext);
-    class procedure PersistRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
-    class procedure PersistRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
-    class procedure DeleteRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
-    class procedure DeleteRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
+    class procedure PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
+    class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
+    class procedure PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class function ObjectExists(const AContext: IioContext): Boolean;
   public
     class procedure StartTransaction(const AConnectionName: String); override;
     class procedure CommitTransaction(const AConnectionName: String); override;
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean); override;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: Boolean); override;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure DeleteObject(const AObj: TObject); override;
     class procedure DeleteCollection(const ACollection: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
@@ -271,22 +269,6 @@ begin
     TioDBFactory.QueryEngine.GetQueryDelete(AContext).ExecSQL;
 end;
 
-class procedure TioStrategyDB.DeleteRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
-begin
-  // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
-  DeleteCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject));
-end;
-
-class procedure TioStrategyDB.DeleteRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
-var
-  AObj: TObject;
-begin
-  // Get the child object
-  AObj := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
-  // Persist object
-  Self.DeleteObject(AObj);
-end;
-
 class procedure TioStrategyDB.InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
 var
   AQuery: IioQuery;
@@ -436,7 +418,7 @@ begin
 end;
 
 class procedure TioStrategyDB.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean);
+  const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -465,7 +447,7 @@ begin
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
     // Loop the list
     for LObj in LDuckTypedList do
-      PersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert);
+      PersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
     // Commit the transaction
     CommitTransaction('');
   except
@@ -474,7 +456,8 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean);
+class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LContext: IioContext;
 begin
@@ -483,7 +466,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, nil, '', '');
+  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
@@ -536,108 +519,65 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistRelationChildList(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
-begin
-  // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
-  PersistCollection(AMasterProperty.GetRelationChildObject(AMasterContext.DataObject), AMasterProperty.GetRelationChildPropertyName,
-    AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False); // Blind
-end;
-
-class procedure TioStrategyDB.PersistRelationChildObject(const AMasterContext: IioContext; const AMasterProperty: IioProperty);
+class procedure TioStrategyDB.PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
 var
-  AObj: TObject;
-begin
-  // Get the child object
-  AObj := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
-  // Persist object
-  Self.PersistObject(AObj, AMasterProperty.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject)
-    .AsInteger, False); // Blind
-end;
-
-class procedure TioStrategyDB.PreProcessRelationChildOnDelete(const AContext: IioContext);
-var
-  Prop: IioProperty;
+  LMasterProp: IioProperty;
 begin
   inherited;
   // Loop for all properties
-  for Prop in AContext.GetProperties do
+  for LMasterProp in AMasterContext.GetProperties do
   begin
     // If the property is not WriteEnabled then skip it
-    if not Prop.IsDBWriteEnabled then
+    if not LMasterProp.IsDBWriteEnabled then
       Continue;
-    case Prop.GetRelationType of
-      // If relation HasBelongsToOne
-      rtBelongsTo: { Nothing }
-        ;
+    case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        DeleteRelationChildList(AContext, Prop);
+        DeleteCollection(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
       // If relation HasOne
       rtHasOne:
-        DeleteRelationChildObject(AContext, Prop);
+        DeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
     end;
   end;
 end;
 
-class procedure TioStrategyDB.PostProcessRelationChildOnPersist(const AContext: IioContext);
+class procedure TioStrategyDB.PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
 var
-  Prop: IioProperty;
+  LMasterProp: IioProperty;
 begin
   inherited;
   // Loop for all properties
-  for Prop in AContext.GetProperties do
+  for LMasterProp in AMasterContext.GetProperties do
   begin
     // If the property is not WriteEnabled then skip it
-    if not Prop.IsDBWriteEnabled then
+    if not LMasterProp.IsDBWriteEnabled then
       Continue;
-    case Prop.GetRelationType of
-      // If relation HasBelongsToOne
-      rtBelongsTo: { Nothing }
-        ;
+    case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        PersistRelationChildList(AContext, Prop);
+        PersistCollection(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
+          LMasterProp.GetName, AMasterContext.MasterPropertyPath);
       // If relation HasOne
       rtHasOne:
-        PersistRelationChildObject(AContext, Prop);
+        PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
+          LMasterProp.GetName, AMasterContext.MasterPropertyPath);
     end;
   end;
 end;
 
-class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AContext: IioContext);
-var
-  Prop: IioProperty;
+class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
+//var
+//  LMasterProp: IioProperty;
 begin
   inherited;
-  // Loop for all properties
-  for Prop in AContext.GetProperties do
-  begin
-    // If the property is not WriteEnabled then skip it
-    if not Prop.IsDBWriteEnabled then
-      Continue;
-    case Prop.GetRelationType of
-      // If relation BelongsTo: persist the child object to retrieve the ID (if new object or ID changed)
-      rtBelongsTo:
-        begin
-          // ---------- M.M. 17/08/18 ----------
-          // Marco ha aggiunto questa riga che persiste anche l'oggetto child di una relazione BelongsTo
-          // ma io ritengo che non vada persistito (non serve persistere un dettaglio di una BelongsTo).
-          // Ho parlato con lui questa mattina (17/09/2019) e anche lui è d'accordo.
-          // Nel caso dovesse servire, in futuro, si potrebbe aggiungere un parametro all'attributo
-          // [ioBelongsTo] per poter forare o meno il persist anche del dettaglio della BelongsTo
-          // che di default preferisco rimanga disabilitata.
-          // io.Persist(Prop.GetRelationChildObject(AContext.DataObject));
-          // ---------- M.M. 17/08/18 ----------
-          { Nothing }  // Non persiste più nulla in caso di relazione BelongsTo
-        end;
-      // If relation HasMany
-      rtHasMany: { Nothing }
-        ;
-      // If relation HasOne
-      rtHasOne: { Nothing }
-        ;
-    end;
-  end;
+//  // Loop for all properties
+//  for LMasterProp in AMasterContext.GetProperties do
+//    // If the property is write enabled and has a BelongsTo relation...
+//    if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
+//      PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
+//        AMasterContext.MasterPropertyPath);
 end;
 
 class procedure TioStrategyDB.RollbackTransaction(const AConnectionName: String);
