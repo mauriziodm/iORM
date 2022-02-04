@@ -12,8 +12,9 @@ type
 
   TioBSPersistenceState = (osUnassigned, osUnsaved, osSaved, osChanged);
   TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
-  TioBSOnEditAction = (eDoNothing, eSaveRevertPoint, eAbortIfNotSaved);
+  TioBSOnEditAction = (eaDoNothing, eaSaveRevertPoint, eaAbortIfNotSaved);
   TioBSOnDeleteAction = (daDoNothing, daSetObjStatusIfExists, daSetSmartDeleteSystem);
+  TioBSOnInsertUpdateAction = (iuDoNothing, iuSetObjStatusIfExists, iuSetSmartUpdateStateLess, iuSetSmartUpdateStateFull);
 
   TioBSPersistence = class;
 
@@ -37,6 +38,10 @@ type
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction;
+    // OnInsertUpdateAction property
+    function GetOnInsertUpdateAction: TioBSOnInsertUpdateAction;
+    procedure SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
+    property OnInsertUpdateAction: TioBSOnInsertUpdateAction read GetOnInsertUpdateAction write SetOnInsertUpdateAction;
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
@@ -103,12 +108,12 @@ end;
 
 function TioBSPersistence.CanDeleteDetail: Boolean;
 begin
-  Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eAbortIfNotSaved);
+  Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eaAbortIfNotSaved);
 end;
 
 function TioBSPersistence.CanDoSelection: Boolean;
 begin
-  Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eAbortIfNotSaved);
+  Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eaAbortIfNotSaved);
 end;
 
 function TioBSPersistence.CanPersist: Boolean;
@@ -193,10 +198,10 @@ end;
 
 procedure TioBSPersistence.NotifySaveRevertPoint;
 begin
-  if (FBindSource.OnEditAction = eSaveRevertPoint) and IsClear then
+  if (FBindSource.OnEditAction = eaSaveRevertPoint) and IsClear then
     SaveRevertPoint
   else
-  if (FBindSource.OnEditAction = eAbortIfNotSaved) and IsClear then
+  if (FBindSource.OnEditAction = eaAbortIfNotSaved) and IsClear then
     Abort;
 end;
 

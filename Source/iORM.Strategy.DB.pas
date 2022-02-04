@@ -465,7 +465,7 @@ begin
   // Check
   if not Assigned(AObj) then
     Exit;
-  // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
+  // Create Context
   LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
@@ -481,11 +481,7 @@ begin
     // Process the current object
     // --------------------------
     case LContext.ObjStatus of
-      // DIRTY
-      // If the ID property of the object is not assigned
-      // then insert the object else update
-      // If the object is not present in the database then perform
-      // an Insert instead of an Update to prevent a data loss
+      // Persist if dirty
       osDirty:
         begin
           // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
@@ -495,17 +491,9 @@ begin
             InsertObject(LContext, ABlindInsert);
           LContext.ObjStatus := osClean;
         end;
-      // DELETE
+      // Delete if deleted
       osDeleted:
-        begin
-          DeleteObject_Internal(LContext);
-          // Mauri 23/04/2020: Ho eliminato la riga sotto perchè non c'è alcun motivo per il quale lo status
-          // debba tornare clean, non è come nel persist, in più mi creava anche qualche problema (LDE)
-          // perchè in alcuni casi dovevo poi ciclare tra tutti gli elementi di una relazione HasMany
-          // facendo cose diverse in base al fatto che l'oggetto fosse Deleted oppure no (e se lui
-          // me lo rimette clean...)
-          // LContext.ObjectStatus := osClean;
-        end;
+        DeleteObject_Internal(LContext);
     end;
     // --------------------------
     // PostProcess (persist) relation childs (HasMany, HasOne)

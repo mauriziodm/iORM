@@ -13,6 +13,7 @@ type
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
+    FOnInsertUpdateAction: TioBSOnInsertUpdateAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     function IsActive: Boolean;
     // SourceModelPresenter
@@ -26,6 +27,9 @@ type
     // OnEditAction property
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
+    // OnInsertUpdateAction property
+    function GetOnInsertUpdateAction: TioBSOnInsertUpdateAction;
+    procedure SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
@@ -58,7 +62,8 @@ type
     property Paging;
     // Added properties
     property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daSetSmartDeleteSystem;
-    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eSaveRevertPoint;
+    property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eaSaveRevertPoint;
+    property OnInsertUpdateAction: TioBSOnInsertUpdateAction read GetOnInsertUpdateAction write SetOnInsertUpdateAction default iuSetSmartUpdateStateLess;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourcePresenter: TioModelPresenterCustom read GetSourcePresenter write SetSourcePresenter;
     // Published Events: selectors
@@ -82,7 +87,8 @@ begin
   inherited;
   FPersistence := TioBSPersistence.Create(Self);
   FOnDeleteAction := daSetSmartDeleteSystem;
-  FOnEditAction := eSaveRevertPoint;
+  FOnEditAction := eaSaveRevertPoint;
+  FOnInsertUpdateAction := iuSetSmartUpdateStateLess;
   FOnRecordChangeAction := rcPersistIfChanged;
 end;
 
@@ -100,6 +106,11 @@ end;
 function TioModelPresenterMaster.GetOnEditAction: TioBSOnEditAction;
 begin
   Result := FOnEditAction;
+end;
+
+function TioModelPresenterMaster.GetOnInsertUpdateAction: TioBSOnInsertUpdateAction;
+begin
+  Result := FOnInsertUpdateAction;
 end;
 
 function TioModelPresenterMaster.GetOnRecordChangeAction: TioBSOnRecordChangeAction;
@@ -142,6 +153,11 @@ end;
 procedure TioModelPresenterMaster.SetOnEditAction(const Value: TioBSOnEditAction);
 begin
   FOnEditAction := Value;
+end;
+
+procedure TioModelPresenterMaster.SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
+begin
+  FOnInsertUpdateAction := Value;
 end;
 
 procedure TioModelPresenterMaster.SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
