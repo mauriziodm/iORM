@@ -480,21 +480,32 @@ begin
     PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
-    case LContext.ObjStatus of
-      // Persist if dirty
-      osDirty:
-        begin
-          // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-          if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-            UpdateObject(LContext)
-          else
-            InsertObject(LContext, ABlindInsert);
-          LContext.ObjStatus := osClean;
-        end;
-      // Delete if deleted
-      osDeleted:
-        DeleteObject_Internal(LContext);
+
+
+    if (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+    begin
+
+
+      case LContext.ObjStatus of
+        // Persist if dirty
+        osDirty:
+          begin
+            // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+            if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
+              UpdateObject(LContext)
+            else
+              InsertObject(LContext, ABlindInsert);
+            LContext.ObjStatus := osClean;
+          end;
+        // Delete if deleted
+        osDeleted:
+          DeleteObject_Internal(LContext);
+      end;
+
+
     end;
+
+
     // --------------------------
     // PostProcess (persist) relation childs (HasMany, HasOne)
     PostProcessRelationChildOnPersist(LContext);

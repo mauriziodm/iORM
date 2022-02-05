@@ -156,7 +156,7 @@ begin
   FDataObject := ADataObject;
   FWhere := AWhere;
   FHasManyChildVirtualPropertyValue := 0;
-  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyPath.IsEmpty, '', '.') + AMasterPropertyName;
+  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
   FMasterBSPersistence := AMasterBSPersistence;
 end;
 

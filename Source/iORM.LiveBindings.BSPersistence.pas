@@ -79,6 +79,7 @@ type
     function IsChanged: Boolean;
     function IsSaved: Boolean;
     function IsClear: Boolean;
+    function IsSmartUpdateDetectionEnabled: Boolean;
     procedure NotifyBeforeScroll;
     procedure NotifySaveRevertPoint;
     property SavedObjState: string read FSavedState;
@@ -194,6 +195,11 @@ end;
 function TioBSPersistence.IsSaved: Boolean;
 begin
   Result := GetState > osUnsaved;
+end;
+
+function TioBSPersistence.IsSmartUpdateDetectionEnabled: Boolean;
+begin
+  Result := FBindSource.OnInsertUpdateAction >= iuSetSmartUpdateStateLess;
 end;
 
 procedure TioBSPersistence.NotifySaveRevertPoint;
