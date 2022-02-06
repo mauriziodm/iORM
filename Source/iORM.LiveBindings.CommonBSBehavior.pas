@@ -79,10 +79,10 @@ begin
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the current object to register it in the SmartUpdateDetection system
     ntSUD_RegisterObjOnEdit:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
         LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyEdit(ANotification.PayloadAsObject, ANotification.PayloadAsString);
     ntSUD_RegisterObjOnPost:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
         LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyPost(ANotification.PayloadAsObject, ANotification.PayloadAsString);
   end;
 end;

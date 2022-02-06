@@ -84,7 +84,7 @@ type
     procedure NotifySaveRevertPoint;
     property SavedObjState: string read FSavedState;
     property SmartDeleteSystem: TioSmartDeleteSystem read FSmartDeleteSystem;
-    property SmartUpdateDetection: IioSmartUpdateDetection read FSmartUpdateDetection;
+    property SmartUpdateDetection: IioSmartUpdateDetection read FSmartUpdateDetection write FSmartUpdateDetection;
     property State: TioBSPersistenceState read GetState;
     property StateAsString: string read GetStateAsString;
   end;
@@ -157,7 +157,6 @@ begin
   inherited Create;
   FBindSource := ABSPersistenceClient;
   FSmartDeleteSystem := TioSmartDeleteSystem.Create;
-  FSmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem;
   Clear(False);
 end;
 

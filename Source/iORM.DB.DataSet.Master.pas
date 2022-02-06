@@ -78,18 +78,18 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 { TioDataSetMaster }
 
 constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FPersistence := TioBSPersistence.Create(Self);
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
   FOnInsertUpdateAction := iuSetSmartUpdateStateLess;
   FOnRecordChangeAction := rcPersistIfChanged;
+  FPersistence := TioBSPersistence.Create(Self);
 end;
 
 destructor TioDataSetMaster.Destroy;
@@ -165,6 +165,7 @@ end;
 procedure TioDataSetMaster.SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
 begin
   FOnInsertUpdateAction := Value;
+  FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnInsertUpdateAction = iuSetSmartUpdateStateFull);
 end;
 
 procedure TioDataSetMaster.SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);

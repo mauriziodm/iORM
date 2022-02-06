@@ -96,11 +96,11 @@ uses
 constructor TioPrototypeBindSourceMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FPersistence := TioBSPersistence.Create(Self);
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
   FOnInsertUpdateAction := iuSetSmartUpdateStateLess;
   FOnRecordChangeAction := rcPersistIfChanged;
+  FPersistence := TioBSPersistence.Create(Self);
 end;
 
 destructor TioPrototypeBindSourceMaster.Destroy;

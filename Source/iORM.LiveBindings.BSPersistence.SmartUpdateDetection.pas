@@ -20,7 +20,7 @@ type
 
   TioSmartUpdateDetectionFaxtory = class
   public
-    class function NewSmartUpdateDetectionSystem: IioSmartUpdateDetection;
+    class function NewSmartUpdateDetectionSystem(const AStateFullSUD: Boolean): IioSmartUpdateDetection;
   end;
 
 implementation
@@ -201,10 +201,12 @@ end;
 
 { TioSmartUpdateDetectionFaxtory }
 
-class function TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem: IioSmartUpdateDetection;
+class function TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(const AStateFullSUD: Boolean): IioSmartUpdateDetection;
 begin
-  Result := TioSmartUpdateDetectionStateLess.Create;
-  // Result := TioSmartUpdateDetectionStateFull.Create;
+  if AStateFullSUD then
+    Result := TioSmartUpdateDetectionStateFull.Create
+  else
+    Result := TioSmartUpdateDetectionStateLess.Create;
 end;
 
 end.
