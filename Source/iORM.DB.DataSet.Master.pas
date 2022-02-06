@@ -164,8 +164,11 @@ end;
 
 procedure TioDataSetMaster.SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
 begin
-  FOnInsertUpdateAction := Value;
-  FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnInsertUpdateAction = iuSetSmartUpdateStateFull);
+  if Value <> FOnInsertUpdateAction then
+  begin
+    FOnInsertUpdateAction := Value;
+    FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnInsertUpdateAction = iuSetSmartUpdateStateFull);
+  end
 end;
 
 procedure TioDataSetMaster.SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);

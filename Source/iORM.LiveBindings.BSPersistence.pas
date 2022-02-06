@@ -149,7 +149,8 @@ begin
     raise EioBindSourceObjStateException.Create(ClassName, 'Clear', 'Pending changes exists');
   FSavedState := '';
   FSmartDeleteSystem.Clear;
-  FSmartUpdateDetection.Clear;
+  if Assigned(FSmartUpdateDetection) then
+    FSmartUpdateDetection.Clear;
 end;
 
 constructor TioBSPersistence.Create(const ABSPersistenceClient: IioBSPersistenceClient);
@@ -157,6 +158,7 @@ begin
   inherited Create;
   FBindSource := ABSPersistenceClient;
   FSmartDeleteSystem := TioSmartDeleteSystem.Create;
+  FSmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(False);
   Clear(False);
 end;
 

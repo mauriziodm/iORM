@@ -80,6 +80,9 @@ type
 
 implementation
 
+uses
+  iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
+
 { TioModelPresenterMaster }
 
 constructor TioModelPresenterMaster.Create(AOwner: TComponent);
@@ -157,7 +160,11 @@ end;
 
 procedure TioModelPresenterMaster.SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
 begin
-  FOnInsertUpdateAction := Value;
+  if Value <> FOnInsertUpdateAction then
+  begin
+    FOnInsertUpdateAction := Value;
+    FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnInsertUpdateAction = iuSetSmartUpdateStateFull);
+  end
 end;
 
 procedure TioModelPresenterMaster.SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);

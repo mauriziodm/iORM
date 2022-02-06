@@ -89,7 +89,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 { TioPrototypeBindSourceMaster }
 
@@ -175,7 +175,11 @@ end;
 
 procedure TioPrototypeBindSourceMaster.SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
 begin
-  FOnInsertUpdateAction := Value;
+  if Value <> FOnInsertUpdateAction then
+  begin
+    FOnInsertUpdateAction := Value;
+    FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnInsertUpdateAction = iuSetSmartUpdateStateFull);
+  end
 end;
 
 procedure TioPrototypeBindSourceMaster.SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
