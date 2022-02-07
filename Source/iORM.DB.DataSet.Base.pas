@@ -145,6 +145,10 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
+    procedure Append(AObject: TObject); reintroduce; overload;
+    procedure Append(AObject: IInterface); reintroduce; overload;
+    procedure Insert(AObject: TObject); reintroduce; overload;
+    procedure Insert(AObject: IInterface); reintroduce; overload;
     property Map: IioMap read FMap;
   end;
 
@@ -492,6 +496,38 @@ end;
 
 { TMdListDataSet }
 
+procedure TioBSABaseDataSet.Append(AObject: IInterface);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Append(AObject);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
+  end
+  else
+    raise EioException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+end;
+
+procedure TioBSABaseDataSet.Append(AObject: TObject);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Append(AObject);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
+  end
+  else
+    raise EioException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+end;
+
 function TioBSABaseDataSet.CheckAdapter: Boolean;
 begin
   Result := (FBindSourceAdapter <> nil) and FBindSourceAdapter.CanActivate;
@@ -541,6 +577,38 @@ end;
 function TioBSABaseDataSet.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Result := FBindSourceAdapter;
+end;
+
+procedure TioBSABaseDataSet.Insert(AObject: IInterface);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Insert(AObject);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
+  end
+  else
+    raise EioException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+end;
+
+procedure TioBSABaseDataSet.Insert(AObject: TObject);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Insert(AObject);
+    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
+    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
+    // invocato un Post in seguito al Refresh stesso.
+    // AnActiveBSA.Refresh(False);
+  end
+  else
+    raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 procedure TioBSABaseDataSet.InternalCancel;

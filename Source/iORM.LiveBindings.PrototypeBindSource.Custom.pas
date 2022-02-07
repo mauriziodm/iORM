@@ -583,8 +583,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
-  raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSourceCustom.GetIsInterfacePresenting: Boolean;

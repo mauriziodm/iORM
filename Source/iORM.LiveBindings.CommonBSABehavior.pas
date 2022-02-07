@@ -165,8 +165,6 @@ begin
 end;
 
 class procedure TioCommonBSABehavior.SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
-var
-  LBindSource: IioBSPersistenceClient;
 begin
   TioContextFactory.Context(AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '').ObjStatus := AObjStatus;
 end;
