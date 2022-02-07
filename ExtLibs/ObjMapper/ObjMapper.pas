@@ -44,6 +44,7 @@ type
     function ItemsOfType(const AKeyType, AValueType: PTypeInfo): TomValueDestination; overload;
     function ItemsOfType<Value>: TomValueDestination; overload;
     function ItemsOfType<Key,Value>: TomValueDestination; overload;
+    function IgnoreObjStatus: TomValueDestination;
     function JavaScriptMode: TomValueDestination;
     function DataContractMode: TomValueDestination;
     function byProperties: TomValueDestination;
@@ -78,6 +79,7 @@ type
     function ItemsOfType(const AKeyType, AValueType: PTypeInfo): TomJSONDestination; overload;
     function ItemsOfType<Value>: TomJSONDestination; overload;
     function ItemsOfType<Key,Value>: TomJSONDestination; overload;
+    function IgnoreObjStatus: TomJSONDestination;
     function JavaScriptMode: TomJSONDestination;
     function DataContractMode: TomJSONDestination;
     function byProperties: TomJSONDestination;
@@ -285,6 +287,12 @@ begin
   inherited;
 end;
 
+function TomJSONDestination.IgnoreObjStatus: TomJSONDestination;
+begin
+  FParams.IgnoreObjStatus := True;
+  Result := Self;
+end;
+
 function TomJSONDestination.ItemsOfType(const AKeyType,
   AValueType: PTypeInfo): TomJSONDestination;
 begin
@@ -433,6 +441,12 @@ function TomValueDestination.ItemsOfType(
   const AValueType: PTypeInfo): TomValueDestination;
 begin
   FParams.ItemsValueDefaultTypeInfo := AValueType;
+  Result := Self;
+end;
+
+function TomValueDestination.IgnoreObjStatus: TomValueDestination;
+begin
+  FParams.IgnoreObjStatus := True;
   Result := Self;
 end;
 

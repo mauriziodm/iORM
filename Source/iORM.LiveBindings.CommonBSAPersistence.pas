@@ -177,7 +177,7 @@ begin
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
     Exit;
   // If UseObjStatus is true then set ObjStatus propriety and abort (If "daSetObjStatusIfExists" delete mode is selected as OnDeleteAction on the MasterBS)
-  if AActiveBindSourceAdapter.UseObjStatus and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntDeleteObjStatus))
+  if AActiveBindSourceAdapter.UseObjStatus and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntObjStatusSetDeleted))
   then
   begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
@@ -355,7 +355,9 @@ end;
 
 class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
-  AActiveBindSourceAdapter.SetObjStatus(osDirty);
+  // If enabled then set che bjStatus property of the object to Dirty
+  if AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntObjStatusSetDirty)) then
+    AActiveBindSourceAdapter.SetObjStatus(osDirty);
   // Notification to register the current object into the SmartUpdateDetection system
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnPost(AActiveBindSourceAdapter.Current,
     AActiveBindSourceAdapter.GetMasterPropertyPath));

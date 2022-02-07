@@ -28,7 +28,6 @@ type
   TIgnoredProperties = array of string;
 
   TomCustomSerializerRef = class of TomCustomSerializer;
-
   TomSerializersContainer = class;
 
   IomParams = interface
@@ -49,6 +48,10 @@ type
     procedure SetIgnoredProperties(const AValue: TIgnoredProperties);
     function GetIgnoredProperties: TIgnoredProperties;
     property IgnoredProperties: TIgnoredProperties read GetIgnoredProperties write SetIgnoredProperties;
+    // IgnoreObjStatus
+    procedure SetIgnoreObjStatus(const AValue: Boolean);
+    function GetIgnoreObjStatus: Boolean;
+    property IgnoreObjStatus: Boolean read GetIgnoreObjStatus write SetIgnoreObjStatus;
     // EnableCustomSerializers
     procedure SetEnableCustomSerializers(const AValue: Boolean);
     function GetEnableCustomSerializers: Boolean;
@@ -237,6 +240,7 @@ type
     FItemsValueDefaultQualifiedName: String;
     FOwnJSONValue: Boolean;
     FClearListBefore: Boolean;
+    FIgnoreObjStatus: Boolean;
     // SerializationMode
     procedure SetSerializationMode(const AValue: TSerializationMode);
     function GetSerializationMode: TSerializationMode;
@@ -272,6 +276,9 @@ type
     // OwnJSONValue
     procedure SetClearListBefore(const AValue: Boolean);
     function GetClearListBefore: Boolean;
+    // IgnoreObjStatus
+    procedure SetIgnoreObjStatus(const AValue: Boolean);
+    function GetIgnoreObjStatus: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -1212,6 +1219,8 @@ var
   I: Integer;
 begin
   Result := False;
+  if (TDuckPropField.RttiType(APropField).Name = 'TioObjStatus') and AParams.IgnoreObjStatus then
+    Exit(True);
   if Length(AParams.IgnoredProperties) = 0 then
     Exit;
   for I := low(AParams.IgnoredProperties) to high(AParams.IgnoredProperties) do
@@ -1775,6 +1784,7 @@ begin
   FItemsValueDefaultQualifiedName := '';
   FOwnJSONValue := False; // JSONValue is not owned by default
   FClearListBefore := False;
+  FIgnoreObjStatus := False;
 end;
 
 destructor TomParams.Destroy;
@@ -1801,6 +1811,11 @@ end;
 function TomParams.GetIgnoredProperties: TIgnoredProperties;
 begin
   Result := FIgnoredProperties;
+end;
+
+function TomParams.GetIgnoreObjStatus: Boolean;
+begin
+  Result := FIgnoreObjStatus;
 end;
 
 function TomParams.GetItemsKeyDefaultQualifiedName: String;
@@ -1861,6 +1876,11 @@ end;
 procedure TomParams.SetIgnoredProperties(const AValue: TIgnoredProperties);
 begin
   FIgnoredProperties := AValue;
+end;
+
+procedure TomParams.SetIgnoreObjStatus(const AValue: Boolean);
+begin
+  FIgnoreObjStatus := AValue;
 end;
 
 procedure TomParams.SetItemsKeyDefaultQualifiedName(const AValue: String);

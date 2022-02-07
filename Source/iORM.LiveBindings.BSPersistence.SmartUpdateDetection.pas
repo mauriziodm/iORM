@@ -176,7 +176,7 @@ begin
     Result := (LKey = NEW_OBJ_KEY) or ObjStateCollection.ContainsKey(LKey);
     if Result then
     begin
-      LCurrentState := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
+      LCurrentState := EncodeValue(ACurrentObj);
       Result := Result and (LCurrentState <> ObjStateCollection[LKey]);
     end;
   finally
@@ -196,7 +196,7 @@ end;
 
 function TioSmartUpdateDetectionStateFull.EncodeValue(const ACurrentObj: TObject): string;
 begin
-  Result := om.From(ACurrentObj).byFields.TypeAnnotationsON.ToString;
+  Result := om.From(ACurrentObj).byFields.IgnoreObjStatus.TypeAnnotationsON.ToString;
 end;
 
 { TioSmartUpdateDetectionFaxtory }

@@ -118,7 +118,7 @@ type
 implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container,
-  iORM.Context.Factory;
+  iORM.Context.Factory, iORM.LiveBindings.BSPersistence;
 
 { TioCommonBSABehavior }
 
@@ -135,7 +135,8 @@ begin
   AActiveBindSourceAdapter.GetMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
 end;
 
-class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
+class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+  const [Ref] ANotification: TioBSNotification);
 begin
   // Notify the BindSource
   // NB: First check if the BSA has a BindSource and if the message is not actually coming from it,
@@ -164,6 +165,8 @@ begin
 end;
 
 class procedure TioCommonBSABehavior.SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
+var
+  LBindSource: IioBSPersistenceClient;
 begin
   TioContextFactory.Context(AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '').ObjStatus := AObjStatus;
 end;

@@ -38,8 +38,8 @@ interface
 type
 
   // NB: The acronym SUD means "Smart Update Detection"
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntDeleteObjStatus,
-    ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost, ntSUD_RegisterDetailPropertyPath);
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntObjStatusSetDeleted,
+    ntObjStatusSetDirty, ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost, ntSUD_RegisterDetailPropertyPath);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -122,11 +122,10 @@ begin
         DeliverToDetailBS := False;
         StopAtTheFirstMasterBS := True;
       end;
-    // NB: ntDelete is for the TBSPersist;
-    // Notifies the MasterBS.Persistence that an item has been deleted
-    // PayloadAsInteger = ID of the deleted object
-    // PayloadAsString = ClassName of the deleted object
-    ntDeleteObjStatus:
+    // NB: ntObjStatusSetDeleted is for the CommonBSBehaviour:
+    // Actually used for ActiveBindSourceAdapters delete purposes:
+    // It return true (Response field of the notification) if the ObjStatus delete mode system is enabled on the MasterBS
+    ntObjStatusSetDeleted:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;
@@ -134,7 +133,18 @@ begin
         DeliverToDetailBS := False;
         StopAtTheFirstMasterBS := True;
       end;
-    // Else raise exception
+    // NB: ntObjStatusSetDirty is for the CommonBSBehaviour:
+    // Actually used for ActiveBindSourceAdapters insert/update purposes:
+    // It return true (Response field of the notification) if the ObjStatus (dirty) mode system is enabled on the MasterBS
+    ntObjStatusSetDirty:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstMasterBS := True;
+      end;
+  // Else raise exception
   else
     raise EioException.Create('TioBSNotification', 'Create',
       Format('Notification type not recognized (%s)'#13'It may be that you have to use a specific constructor.',

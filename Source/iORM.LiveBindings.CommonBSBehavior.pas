@@ -70,11 +70,19 @@ begin
       end;
     // Actually used for ActiveBindSourceAdapters delete purposes:
     // It return true (Response field of the notification) if the ObjStatus delete mode system is enabled on the MasterBS
-    ntDeleteObjStatus:
+    ntObjStatusSetDeleted:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
-        LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction = daSetObjStatusIfExists);
+        LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction >= daSetObjStatusIfExists);
+      end;
+    // Actually used for ActiveBindSourceAdapters insert/update purposes:
+    // It return true (Response field of the notification) if the ObjStatus (dirty) mode system is enabled on the MasterBS
+    ntObjStatusSetDirty:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      begin
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.Response := (LBSPersistenceClient.OnInsertUpdateAction >= iuSetObjStatusIfExists);
       end;
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the current object to register it in the SmartUpdateDetection system
