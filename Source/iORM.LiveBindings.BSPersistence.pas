@@ -26,6 +26,12 @@ type
     function IsActive: Boolean;
     procedure PersistCurrent;
     procedure Refresh(const ANotify: Boolean = True);
+    procedure Append; overload;
+    procedure Append(AObject: TObject); overload;
+    procedure Append(AObject: IInterface); overload;
+    procedure Insert; overload;
+    procedure Insert(AObject: TObject); overload;
+    procedure Insert(AObject: IInterface); overload;
     // Persistence property
     function GetPersistence: TioBSPersistence;
     property Persistence: TioBSPersistence read GetPersistence;
@@ -110,21 +116,21 @@ procedure TioBSPersistence.Append(const ARaiseIfSaved: Boolean; const ARaiseIfCh
 begin
   CheckUnassigned('Append');
   CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
-//  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  FBindSource.Append;
 end;
 
 procedure TioBSPersistence.Append(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Append');
   CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
-//  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  FBindSource.Append(AObject);
 end;
 
 procedure TioBSPersistence.Append(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Append');
   CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
-//  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  FBindSource.Append(AObject);
 end;
 
 function TioBSPersistence.CanClear: Boolean;
@@ -227,21 +233,21 @@ procedure TioBSPersistence.Insert(const ARaiseIfSaved: Boolean = False; const AR
 begin
   CheckUnassigned('Insert');
   CheckRaiseIfSavedOrChengesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
-//  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  FBindSource.Insert;
 end;
 
 procedure TioBSPersistence.Insert(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Insert');
   CheckRaiseIfSavedOrChengesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
-//  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  FBindSource.Insert(Aobject);
 end;
 
 procedure TioBSPersistence.Insert(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Insert');
   CheckRaiseIfSavedOrChengesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
-//  TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
+  FBindSource.Insert(AObject);
 end;
 
 function TioBSPersistence.IsActive: Boolean;

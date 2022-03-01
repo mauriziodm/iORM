@@ -77,7 +77,7 @@ type
     class procedure AfterScroll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Edit
     class procedure BeforeEdit(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
-    // Insert
+    // Insert/Append
     class procedure BeforeInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
   end;
 
