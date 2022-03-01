@@ -77,6 +77,8 @@ type
     class procedure AfterScroll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Edit
     class procedure BeforeEdit(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    // Insert
+    class procedure BeforeInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
   end;
 
 implementation
@@ -146,6 +148,15 @@ begin
   // Notification to register the current object into the SmartUpdateDetection system
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnEdit(AActiveBindSourceAdapter.Current,
     AActiveBindSourceAdapter.GetMasterPropertyPath));
+end;
+
+class procedure TioCommonBSAPersistence.BeforeInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+begin
+//  // Notification to save revert point before edit
+//  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
+//  // Notification to register the current object into the SmartUpdateDetection system
+//  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnEdit(AActiveBindSourceAdapter.Current,
+//    AActiveBindSourceAdapter.GetMasterPropertyPath));
 end;
 
 class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioBSPersistenceClient);

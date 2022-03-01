@@ -333,7 +333,7 @@ end;
 procedure TioActiveListBindSourceAdapter.DoAfterDelete;
 begin
   inherited;
-  DoAfterScroll; // Mauri 11/01/2022: Aggiunto perchè altrimenti iin alcuni casi particolari dava errori
+  DoAfterScroll; // Mauri 11/01/2022: Aggiunto perchè altrimenti in alcuni casi particolari dava errori
   TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
