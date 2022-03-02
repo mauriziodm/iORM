@@ -119,6 +119,8 @@ type
     procedure DoBeforeOpen; override;
     procedure DoBeforeDelete; override;
     procedure DoBeforeEdit; override;
+    procedure DoBeforeInsert; override;
+    procedure DoAfterInsert; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoAfterDelete; override;
@@ -313,10 +315,23 @@ begin
   TioCommonBSAPersistence.AfterDelete(Self);
 end;
 
+procedure TioActiveInterfaceListBindSourceAdapter.DoAfterInsert;
+begin
+  inherited;
+  DoAfterScroll; // Mauri 11/01/2022: Aggiunto perchè altrimenti iin alcuni casi particolari dava errori
+  TioCommonBSAPersistence.AfterInsert(Self);
+end;
+
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeEdit;
 begin
   inherited;
   TioCommonBSAPersistence.BeforeEdit(Self);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeInsert;
+begin
+  inherited;
+  TioCommonBSAPersistence.BeforeInsert(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeOpen;

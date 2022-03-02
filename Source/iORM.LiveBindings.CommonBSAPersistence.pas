@@ -79,6 +79,7 @@ type
     class procedure BeforeEdit(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Insert/Append
     class procedure BeforeInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure AfterInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
   end;
 
 implementation
@@ -152,11 +153,11 @@ end;
 
 class procedure TioCommonBSAPersistence.BeforeInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
-//  // Notification to save revert point before edit
-//  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
-//  // Notification to register the current object into the SmartUpdateDetection system
-//  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnEdit(AActiveBindSourceAdapter.Current,
-//    AActiveBindSourceAdapter.GetMasterPropertyPath));
+  // If the delete detail is allowed then send a ntSaveRevertPoint notification
+  if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanInsertDetail)) then
+    AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
+  else
+    raise EioException.Create(ClassName, 'BeforeInsert', 'Master BindSource hasn''t saved a revert point');
 end;
 
 class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioBSPersistenceClient);
@@ -182,7 +183,7 @@ begin
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
-    raise EioException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');
+    raise EioException.Create(ClassName, 'Delete', 'Master BindSource hasn''t saved a revert point');
   // If it is during a BSPersistenceDeleting operation or current is nil or if daSetSmartDeleteSystem is selected as OnDeleteAction on the MasterBS
   if AActiveBindSourceAdapter.BSPersistenceDeleting or (AActiveBindSourceAdapter.Current = nil) or
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
@@ -278,6 +279,19 @@ begin
   // Send a notification to other ActiveBindSourceAdapters & BindSource
   if ANotify then
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
+end;
+
+class procedure TioCommonBSAPersistence.AfterInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LBSPersistenceClient: IioBSPersistenceClient;
+begin
+  // If it is a MasterBindSource then clear the BSPersistence revert point
+  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
+    LBSPersistenceClient.Persistence.Clear(False);
+  // DataSet synchro
+  AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
+  // Refresh notification
+  AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
 end;
 
 class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);

@@ -144,9 +144,11 @@ begin
   if not Assigned(ACurrentObj) then
     Exit(False);
   LKey := EncodeKey(ACurrentObj, AMasterPropertyPath);
+  if LKey = NEW_OBJ_KEY then
+    Exit(True);
   Lock;
   try
-    Result := (LKey = NEW_OBJ_KEY) or ObjStateCollection.ContainsKey(LKey);
+    Result := ObjStateCollection.ContainsKey(LKey);
   finally
     Unlock;
   end;
@@ -171,14 +173,17 @@ begin
   if not Assigned(ACurrentObj) then
     Exit(False);
   LKey := EncodeKey(ACurrentObj, AMasterPropertyPath);
+  if LKey = NEW_OBJ_KEY then
+    Exit(True);
   Lock;
   try
-    Result := (LKey = NEW_OBJ_KEY) or ObjStateCollection.ContainsKey(LKey);
-    if Result then
+    if ObjStateCollection.ContainsKey(LKey) then
     begin
       LCurrentState := EncodeValue(ACurrentObj);
-      Result := Result and (LCurrentState <> ObjStateCollection[LKey]);
-    end;
+      Result := LCurrentState <> ObjStateCollection[LKey];
+    end
+    else
+      Result := False;
   finally
     Unlock;
   end;
