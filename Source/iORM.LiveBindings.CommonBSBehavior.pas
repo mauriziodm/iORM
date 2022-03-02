@@ -50,6 +50,13 @@ begin
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDoSelection;
       end;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
+    ntCanInsertDetail:
+      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      begin
+        LNotificationPointer := @ANotification;
+        LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanInsertDetail;
+      end;
+    // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
     ntCanDeleteDetail:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
       begin

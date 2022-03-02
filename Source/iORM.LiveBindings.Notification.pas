@@ -38,7 +38,7 @@ interface
 type
 
   // NB: The acronym SUD means "Smart Update Detection"
-  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanDeleteDetail, ntDeleteSmart, ntObjStatusSetDeleted,
+  TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanInsertDetail, ntCanDeleteDetail, ntDeleteSmart, ntObjStatusSetDeleted,
     ntObjStatusSetDirty, ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost, ntSUD_RegisterDetailPropertyPath);
 
   PioBSNotification = ^TioBSNotification;
@@ -115,6 +115,16 @@ begin
     // NB: ntCanDeleteDetail;
     // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
     ntCanDeleteDetail:
+      begin
+        DirectionRoot := True;
+        DirectionLeaves := False;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := False;
+        StopAtTheFirstMasterBS := True;
+      end;
+    // NB: ntCanInsertDetail;
+    // in the Response field return True if the MasterBS has saved a revert point (or can save it aautomatically)
+    ntCanInsertDetail:
       begin
         DirectionRoot := True;
         DirectionLeaves := False;
