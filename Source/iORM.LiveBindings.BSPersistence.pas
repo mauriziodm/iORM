@@ -123,6 +123,7 @@ procedure TioBSPersistence.Append(AObject: TObject; const ARaiseIfSaved: Boolean
 begin
   CheckUnassigned('Append');
   CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
+  NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Append(AObject);
 end;
 
