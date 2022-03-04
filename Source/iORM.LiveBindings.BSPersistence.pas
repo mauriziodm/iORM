@@ -1,4 +1,4 @@
-﻿unit iORM.LiveBindings.BSPersistence;
+unit iORM.LiveBindings.BSPersistence;
 
 interface
 
@@ -48,11 +48,15 @@ type
     // OnUpdateAction property
     function GetOnUpdateAction: TioBSOnUpdateAction;
     procedure SetOnUpdateAction(const Value: TioBSOnUpdateAction);
-    property OnInsertUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction;
+    property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction;
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction;
+    // OnInsertAction property
+    function GetOnInsertAction: TioOnInsertAction;
+    procedure SetOnInsertAction(const Value: TioOnInsertAction);
+    property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction;
   end;
 
   TioBSPersistence = class
@@ -61,11 +65,13 @@ type
     [DoNotSerializeAttribute] FSavedState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
     FSmartUpdateDetection: IioSmartUpdateDetection;
+    FIsInserting: Boolean;
     function GetCurrentAsString: String;
     function GetState: TioBSPersistenceState;
     function GetStateAsString: String;
     procedure CheckUnassigned(const AMethodName: String);
     procedure CheckRaiseIfSavedOrChengesExists(const AMethodName: String; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+    procedure _Append<T>(AObject: T; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
   public
     constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
     destructor Destroy; override;
@@ -117,7 +123,14 @@ procedure TioBSPersistence.Append(const ARaiseIfSaved: Boolean; const ARaiseIfCh
 begin
   CheckUnassigned('Append');
   CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
+  NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Append;
+  FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
+  if FBindSource.OnInsertAction = iaSaveRevertPoint then
+  begin
+    SaveRevertPoint;
+    FIsInserting := True;
+  end;
 end;
 
 procedure TioBSPersistence.Append(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -126,6 +139,12 @@ begin
   CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Append(AObject);
+  FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
+  if FBindSource.OnInsertAction = iaSaveRevertPoint then
+  begin
+    SaveRevertPoint;
+    FIsInserting := True;
+  end;
 end;
 
 procedure TioBSPersistence.Append(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -204,6 +223,7 @@ begin
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Clear', 'Pending changes exists');
   FSavedState := '';
+  FIsInserting := False;
   FSmartDeleteSystem.Clear;
   if Assigned(FSmartUpdateDetection) then
     FSmartUpdateDetection.Clear;
@@ -274,7 +294,7 @@ end;
 
 function TioBSPersistence.IsSmartUpdateDetectionEnabled: Boolean;
 begin
-  Result := FBindSource.OnInsertUpdateAction >= uaSetSmartUpdateStateLess;
+  Result := FBindSource.OnUpdateAction >= uaSetSmartUpdateStateLess;
 end;
 
 procedure TioBSPersistence.NotifySaveRevertPoint;
@@ -341,7 +361,10 @@ begin
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There isn''t a saved state you can revert to. (call "Save" method before)');
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
-  om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
+  if FIsInserting then
+    Delete
+  else
+    om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
   if AClear then
     Clear(False);
   FBindSource.Refresh(True);
@@ -353,6 +376,11 @@ begin
   if ARaiseIfAlreadySaved and (State > osUnsaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Save', 'A previously saved revert point exists, it must be cleared before');
   FSavedState := GetCurrentAsString
+end;
+
+procedure TioBSPersistence._Append<T>(AObject: T; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+
 end;
 
 function TioBSPersistence.GetCurrentAsString: String;

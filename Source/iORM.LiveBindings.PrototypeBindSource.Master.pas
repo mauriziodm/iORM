@@ -14,6 +14,7 @@ type
     FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
     FOnUpdateAction: TioBSOnUpdateAction;
+    FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourcePrototypeBindSource
     function GetSourcePBS: TioPrototypeBindSourceCustom;
@@ -29,6 +30,9 @@ type
     // OnInsertUpdateAction property
     function GetOnUpdateAction: TioBSOnUpdateAction;
     procedure SetOnUpdateAction(const Value: TioBSOnUpdateAction);
+    // OnInsertAction property
+    function GetOnInsertAction: TioOnInsertAction;
+    procedure SetOnInsertAction(const Value: TioOnInsertAction);
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
@@ -72,6 +76,7 @@ type
     property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daSetSmartDeleteSystem;
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eaSaveRevertPoint;
     property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
+    property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourcePBS: TioPrototypeBindSourceCustom read GetSourcePBS write SetSourcePBS;
     // Published Events: selectors
@@ -99,6 +104,7 @@ begin
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
   FOnUpdateAction := uaSetSmartUpdateStateLess;
+  FOnInsertAction := iaSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
   FPersistence := TioBSPersistence.Create(Self);
 end;
@@ -122,6 +128,11 @@ end;
 function TioPrototypeBindSourceMaster.GetOnEditAction: TioBSOnEditAction;
 begin
   Result := FOnEditAction;
+end;
+
+function TioPrototypeBindSourceMaster.GetOnInsertAction: TioOnInsertAction;
+begin
+  Result := FOnInsertAction;
 end;
 
 function TioPrototypeBindSourceMaster.GetOnUpdateAction: TioBSOnUpdateAction;
@@ -171,6 +182,11 @@ end;
 procedure TioPrototypeBindSourceMaster.SetOnEditAction(const Value: TioBSOnEditAction);
 begin
   FOnEditAction := Value;
+end;
+
+procedure TioPrototypeBindSourceMaster.SetOnInsertAction(const Value: TioOnInsertAction);
+begin
+  FOnInsertAction := Value;
 end;
 
 procedure TioPrototypeBindSourceMaster.SetOnUpdateAction(const Value: TioBSOnUpdateAction);

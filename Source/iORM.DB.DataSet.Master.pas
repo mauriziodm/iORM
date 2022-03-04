@@ -15,6 +15,7 @@ type
     FOnEditAction: TioBSOnEditAction;
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    FOnInsertAction: TioOnInsertAction;
     // SourceDataSet
     function GetSourceDataSet: TioDataSetCustom;
     procedure SetSourceDataSet(const Value: TioDataSetCustom);
@@ -29,6 +30,9 @@ type
     // OnInsertUpdateAction property
     function GetOnUpdateAction: TioBSOnUpdateAction;
     procedure SetOnUpdateAction(const Value: TioBSOnUpdateAction);
+    // OnInsertAction property
+    function GetOnInsertAction: TioOnInsertAction;
+    procedure SetOnInsertAction(const Value: TioOnInsertAction);
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
@@ -61,6 +65,7 @@ type
     property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daSetSmartDeleteSystem;
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eaSaveRevertPoint;
     property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
+    property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioDataSetCustom read GetSourceDataSet write SetSourceDataSet;
     // Published Events: selectors
@@ -88,6 +93,7 @@ begin
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
   FOnUpdateAction := uaSetSmartUpdateStateLess;
+  FOnInsertAction := iaSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
   FPersistence := TioBSPersistence.Create(Self);
 end;
@@ -125,6 +131,11 @@ begin
   Result := FOnEditAction;
 end;
 
+function TioDataSetMaster.GetOnInsertAction: TioOnInsertAction;
+begin
+  Result := FOnInsertAction;
+end;
+
 function TioDataSetMaster.GetOnUpdateAction: TioBSOnUpdateAction;
 begin
   Result := FOnUpdateAction;
@@ -160,6 +171,11 @@ end;
 procedure TioDataSetMaster.SetOnEditAction(const Value: TioBSOnEditAction);
 begin
   FOnEditAction := Value;
+end;
+
+procedure TioDataSetMaster.SetOnInsertAction(const Value: TioOnInsertAction);
+begin
+  FOnInsertAction := Value;
 end;
 
 procedure TioDataSetMaster.SetOnUpdateAction(const Value: TioBSOnUpdateAction);
