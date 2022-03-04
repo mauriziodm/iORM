@@ -14,7 +14,8 @@ type
   TioBSOnRecordChangeAction = (rcDoNothing, rcPersistIfChanged, rcPersistAlways, rcAbortIfChanged, rcAbortAlways);
   TioBSOnEditAction = (eaDoNothing, eaSaveRevertPoint, eaAbortIfNotSaved);
   TioBSOnDeleteAction = (daDoNothing, daSetObjStatusIfExists, daSetSmartDeleteSystem);
-  TioBSOnInsertUpdateAction = (iuDoNothing, iuSetObjStatusIfExists, iuSetSmartUpdateStateLess, iuSetSmartUpdateStateFull);
+  TioBSOnUpdateAction = (uaDoNothing, uaSetObjStatusIfExists, uaSetSmartUpdateStateLess, uaSetSmartUpdateStateFull);
+  TioOnInsertAction = (iaDoNothing, iaSaveRevertPoint);
 
   TioBSPersistence = class;
 
@@ -45,9 +46,9 @@ type
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction;
     // OnInsertUpdateAction property
-    function GetOnInsertUpdateAction: TioBSOnInsertUpdateAction;
-    procedure SetOnInsertUpdateAction(const Value: TioBSOnInsertUpdateAction);
-    property OnInsertUpdateAction: TioBSOnInsertUpdateAction read GetOnInsertUpdateAction write SetOnInsertUpdateAction;
+    function GetOnInsertUpdateAction: TioBSOnUpdateAction;
+    procedure SetOnInsertUpdateAction(const Value: TioBSOnUpdateAction);
+    property OnInsertUpdateAction: TioBSOnUpdateAction read GetOnInsertUpdateAction write SetOnInsertUpdateAction;
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
@@ -273,7 +274,7 @@ end;
 
 function TioBSPersistence.IsSmartUpdateDetectionEnabled: Boolean;
 begin
-  Result := FBindSource.OnInsertUpdateAction >= iuSetSmartUpdateStateLess;
+  Result := FBindSource.OnInsertUpdateAction >= uaSetSmartUpdateStateLess;
 end;
 
 procedure TioBSPersistence.NotifySaveRevertPoint;

@@ -89,7 +89,7 @@ begin
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
-        LNotificationPointer^.Response := (LBSPersistenceClient.OnInsertUpdateAction >= iuSetObjStatusIfExists);
+        LNotificationPointer^.Response := (LBSPersistenceClient.OnInsertUpdateAction >= uaSetObjStatusIfExists);
       end;
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the current object to register it in the SmartUpdateDetection system
