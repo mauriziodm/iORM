@@ -1,4 +1,4 @@
-unit iORM.LiveBindings.BSPersistence;
+﻿unit iORM.LiveBindings.BSPersistence;
 
 interface
 
@@ -45,10 +45,10 @@ type
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction;
-    // OnInsertUpdateAction property
-    function GetOnInsertUpdateAction: TioBSOnUpdateAction;
-    procedure SetOnInsertUpdateAction(const Value: TioBSOnUpdateAction);
-    property OnInsertUpdateAction: TioBSOnUpdateAction read GetOnInsertUpdateAction write SetOnInsertUpdateAction;
+    // OnUpdateAction property
+    function GetOnUpdateAction: TioBSOnUpdateAction;
+    procedure SetOnUpdateAction(const Value: TioBSOnUpdateAction);
+    property OnInsertUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction;
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);

@@ -13,7 +13,7 @@ type
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
-    FOnInsertUpdateAction: TioBSOnUpdateAction;
+    FOnUpdateAction: TioBSOnUpdateAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourceDataSet
     function GetSourceDataSet: TioDataSetCustom;
@@ -27,8 +27,8 @@ type
     function GetOnEditAction: TioBSOnEditAction;
     procedure SetOnEditAction(const Value: TioBSOnEditAction);
     // OnInsertUpdateAction property
-    function GetOnInsertUpdateAction: TioBSOnUpdateAction;
-    procedure SetOnInsertUpdateAction(const Value: TioBSOnUpdateAction);
+    function GetOnUpdateAction: TioBSOnUpdateAction;
+    procedure SetOnUpdateAction(const Value: TioBSOnUpdateAction);
     // OnRecordChangeAction property
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
@@ -60,7 +60,7 @@ type
     // Added properties
     property OnDeleteAction: TioBSOnDeleteAction read GetOnDeleteAction write SetOnDeleteAction default daSetSmartDeleteSystem;
     property OnEditAction: TioBSOnEditAction read GetOnEditAction write SetOnEditAction default eaSaveRevertPoint;
-    property OnInsertUpdateAction: TioBSOnUpdateAction read GetOnInsertUpdateAction write SetOnInsertUpdateAction default uaSetSmartUpdateStateLess;
+    property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceDataSet: TioDataSetCustom read GetSourceDataSet write SetSourceDataSet;
     // Published Events: selectors
@@ -87,7 +87,7 @@ begin
   inherited;
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
-  FOnInsertUpdateAction := uaSetSmartUpdateStateLess;
+  FOnUpdateAction := uaSetSmartUpdateStateLess;
   FOnRecordChangeAction := rcPersistIfChanged;
   FPersistence := TioBSPersistence.Create(Self);
 end;
@@ -125,9 +125,9 @@ begin
   Result := FOnEditAction;
 end;
 
-function TioDataSetMaster.GetOnInsertUpdateAction: TioBSOnUpdateAction;
+function TioDataSetMaster.GetOnUpdateAction: TioBSOnUpdateAction;
 begin
-  Result := FOnInsertUpdateAction;
+  Result := FOnUpdateAction;
 end;
 
 function TioDataSetMaster.GetOnRecordChangeAction: TioBSOnRecordChangeAction;
@@ -162,12 +162,12 @@ begin
   FOnEditAction := Value;
 end;
 
-procedure TioDataSetMaster.SetOnInsertUpdateAction(const Value: TioBSOnUpdateAction);
+procedure TioDataSetMaster.SetOnUpdateAction(const Value: TioBSOnUpdateAction);
 begin
-  if Value <> FOnInsertUpdateAction then
+  if Value <> FOnUpdateAction then
   begin
-    FOnInsertUpdateAction := Value;
-    FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnInsertUpdateAction = uaSetSmartUpdateStateFull);
+    FOnUpdateAction := Value;
+    FPersistence.SmartUpdateDetection := TioSmartUpdateDetectionFaxtory.NewSmartUpdateDetectionSystem(FOnUpdateAction = uaSetSmartUpdateStateFull);
   end
 end;
 
