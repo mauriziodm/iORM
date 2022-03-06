@@ -405,6 +405,13 @@ var
           LMember_RelationChildTypeAlias := ioBelongsTo(LAttribute).ChildTypeAlias;
           LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
         end;
+        if LAttribute is ioHasOne then
+        begin
+          LMember_RelationType := rtHasOne;
+          LMember_RelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
+          LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
+          LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
+        end;
         if LAttribute is ioHasMany then
         begin
           LMember_RelationType := rtHasMany;
@@ -413,13 +420,8 @@ var
           LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
           LMember_RelationChildLoadType := ioHasMany(LAttribute).LoadType;
         end;
-        if LAttribute is ioHasOne then
-        begin
-          LMember_RelationType := rtHasOne;
-          LMember_RelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
-          LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
-          LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
-        end;
+        if LAttribute is ioLazyLoad then
+          LMember_RelationChildLoadType := ltLazyLoad;
         // Attribute to disable the relation auto detection
         if LAttribute is ioDisableRelationAutodetect then
           LMember_RelationAutodetectEnabled := False;

@@ -371,6 +371,7 @@ type
   // LazyLoad attribute
   ioLazyLoad = class(TioCustomAttribute)
   end;
+  ioLazy = ioLazyLoad;
 
   // ReadOnly attribute
   ioLoadOnly = class(TioCustomAttribute)
