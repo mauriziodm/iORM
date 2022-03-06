@@ -8,6 +8,9 @@ uses
 
 type
 
+  TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
+  TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
+
   // =================================================================================================
   // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES
   // =================================================================================================
@@ -135,6 +138,46 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TioBSPersistenceAppend = class(TioBSPersistenceStdActionFmx)
+  private
+    FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
+    FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfSaved;
+    property TargetBindSource;
+    // events
+    property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
+    property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TioBSPersistenceInsert = class(TioBSPersistenceStdActionFmx)
+  private
+    FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
+    FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfSaved;
+    property TargetBindSource;
+    // events
+    property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
+    property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
   // =================================================================================================
   // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
   // =================================================================================================
@@ -142,7 +185,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction;
+  iORM.Abstraction, iORM.Exceptions;
 
 { TioBSObjStateStdActionFmx }
 
@@ -290,6 +333,106 @@ end;
 procedure TioBSPersistenceReload.UpdateTarget(Target: TObject);
 begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioBSPersistenceAppend }
+
+constructor TioBSPersistenceAppend.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioBSPersistenceAppend.ExecuteTarget(Target: TObject);
+var
+  LNewInstanceAsObject: TObject;
+  LNewInstanceAsInterface: IInterface;
+begin
+  inherited;
+  // New instance as object (OnNewInstanceAsObject event handler)
+  if Assigned(FOnNewInstanceAsObject) then
+  begin
+    FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
+    if LNewInstanceAsObject <> nil then
+    begin
+      TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsObject event handler', 'Invalid new instance (nil)');
+  end;
+  // New instance as Interface (OnNewInstanceAsInterface event handler)
+  if Assigned(FOnNewInstanceAsInterface) then
+  begin
+    FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
+    if LNewInstanceAsInterface <> nil then
+    begin
+      TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
+  end;
+  // New instance not provided (created by the ABSAdapter itself)
+  TargetBindSource.Persistence.Append(RaiseIfSaved, RaiseIfChangesExists);
+end;
+
+procedure TioBSPersistenceAppend.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioBSPersistenceInsert }
+
+constructor TioBSPersistenceInsert.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioBSPersistenceInsert.ExecuteTarget(Target: TObject);
+var
+  LNewInstanceAsObject: TObject;
+  LNewInstanceAsInterface: IInterface;
+begin
+  inherited;
+  // New instance as object (OnNewInstanceAsObject event handler)
+  if Assigned(FOnNewInstanceAsObject) then
+  begin
+    FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
+    if LNewInstanceAsObject <> nil then
+    begin
+      TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsObject event handler', 'Invalid new instance (nil)');
+  end;
+  // New instance as Interface (OnNewInstanceAsInterface event handler)
+  if Assigned(FOnNewInstanceAsInterface) then
+  begin
+    FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
+    if LNewInstanceAsInterface <> nil then
+    begin
+      TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
+  end;
+  // New instance not provided (created by the ABSAdapter itself)
+  TargetBindSource.Persistence.Insert(RaiseIfSaved, RaiseIfChangesExists);
+end;
+
+procedure TioBSPersistenceInsert.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
 end;
