@@ -418,7 +418,6 @@ var
           LMember_RelationChildTypeName := ioHasMany(LAttribute).ChildTypeName;
           LMember_RelationChildTypeAlias := ioHasMany(LAttribute).ChildTypeAlias;
           LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
-          LMember_RelationChildLoadType := ioHasMany(LAttribute).LoadType;
         end;
         if LAttribute is ioLazyLoad then
           LMember_RelationChildLoadType := ltLazyLoad;

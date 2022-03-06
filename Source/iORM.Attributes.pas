@@ -348,19 +348,15 @@ type
   ioHasMany = class(TioCustomRelationAttribute)
   strict private
     FChildPropertyName: String;
-    FLoadType: TioLoadType;
   public
-    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String;
-      const ALoadType: TioLoadType = ltEagerLoad); overload;
-    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String;
-      const ALoadType: TioLoadType = ltEagerLoad); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType = ltEagerLoad); overload;
-    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String;
-      const ALoadType: TioLoadType = ltEagerLoad); overload;
-    constructor Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType = ltEagerLoad); overload;
+    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String); overload;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName: String); overload;
+    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String); overload;
+    constructor Create(AIID: TGUID; const AChildPropertyName: String); overload;
     property ChildPropertyName: String read FChildPropertyName;
-    property LoadType: TioLoadType read FLoadType;
   end;
+
   // Disable the automatic detection for HasMany relation
   ioDisableRelationAutodetect = class(TioCustomAttribute);
 
@@ -572,34 +568,31 @@ end;
 
 { ioHasMany }
 
-constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String;
-  const ALoadType: TioLoadType = ltEagerLoad);
+constructor ioHasMany.Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;
-  FLoadType := ALoadType;
 end;
 
-constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType);
+constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String);
 begin
   inherited Create(AChildTypeName, AChildTypeAlias);
   FChildPropertyName := AChildPropertyName;
-  FLoadType := ALoadType;
 end;
 
-constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType);
+constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String);
 begin
-  Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType);
+  Self.Create(AChildTypeName, '', AChildPropertyName);
 end;
 
-constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType);
+constructor ioHasMany.Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String);
 begin
-  Self.Create(TioUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName, ALoadType);
+  Self.Create(TioUtilities.GUIDtoInterfaceName(AIID), AChildTypeAlias, AChildPropertyName);
 end;
 
-constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String; const ALoadType: TioLoadType);
+constructor ioHasMany.Create(AIID: TGUID; const AChildPropertyName: String);
 begin
-  Self.Create(TioUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName, ALoadType);
+  Self.Create(TioUtilities.GUIDtoInterfaceName(AIID), '', AChildPropertyName);
 end;
 
 { ioJoin }
