@@ -53,9 +53,6 @@ type
   TioFKAction = (fkUnspecified, fkNoAction, fkSetNull, fkSetDefault, fkCascade);
   TioFKCreate = (fkCreate, fkDoNotCreate);
 
-  // LazyLoad
-  TioLoadType = (ltEagerLoad = 0, ltLazyLoad);
-
   // Join types
   TioJoinType = (jtInner, jtCross, jtLeftOuter, jtRightOuter, jtFullOuter);
 

@@ -60,12 +60,12 @@ type
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
     class function GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
-      const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
-      const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType;
-      const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer;
-      const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue;
-      const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
-      const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
+  const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
+  const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
+  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+  const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
+  const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
+  const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
@@ -197,7 +197,7 @@ end;
 
 class function TioContextFactory.GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
   const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
-  const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType; const ANotHasMany: Boolean;
+  const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
   const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
   const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
@@ -206,14 +206,14 @@ begin
   if AMember is TRttiField then
   begin
     Result := TioField.Create(AMember as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AIDSkipOnInsert, AReadWrite,
-      ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ANotHasMany, AMetadata_FieldType,
+      ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType,
       AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode,
       AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
   else if AMember is TRttiProperty then
   begin
     Result := TioProperty.Create(AMember as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AIDSkipOnInsert,
-      AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLoadType, ANotHasMany,
+      AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany,
       AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default,
       AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
@@ -288,7 +288,7 @@ var
     LMember_RelationChildTypeName: String;
     LMember_RelationChildTypeAlias: String;
     LMember_RelationChildPropertyName: String;
-    LMember_RelationChildLoadType: TioLoadType;
+    LMember_RelationChildLazyLoad: Boolean;
     LMember_RelationAutodetectEnabled: Boolean;
   begin
     // Loop all properties
@@ -338,12 +338,12 @@ var
       LMember_RelationChildTypeName := '';
       LMember_RelationChildTypeAlias := '';
       LMember_RelationChildPropertyName := '';
-      LMember_RelationChildLoadType := ltEagerLoad;
+      LMember_RelationChildLazyLoad := False;
       LMember_RelationAutodetectEnabled := True;
       // ObjStatus property detection by type "TioObjStatus"
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
       begin
-        Result.ObjStatusProperty := Self.GetProperty(ATable, LMember, '', '', '', '', True, False, False, lpLoadOnly, rtNone, '', '', '', ltEagerLoad, True,
+        Result.ObjStatusProperty := Self.GetProperty(ATable, LMember, '', '', '', '', True, False, False, lpLoadOnly, rtNone, '', '', '', False, True,
           LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType,
           LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Continue;
@@ -354,7 +354,7 @@ var
         if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
           LMember_FieldName := ioField(LAttribute).Value;
         Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, False, lpLoadAndPersist, rtNone, '', '', '',
-          ltEagerLoad, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
           LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Result.Add(Result.ObjVersionProperty);
         Continue;
@@ -420,7 +420,7 @@ var
           LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
         end;
         if LAttribute is ioLazyLoad then
-          LMember_RelationChildLoadType := ltLazyLoad;
+          LMember_RelationChildLazyLoad := True;
         // Attribute to disable the relation auto detection
         if LAttribute is ioDisableRelationAutodetect then
           LMember_RelationAutodetectEnabled := False;
@@ -520,7 +520,7 @@ var
       // Create and add property into the map
       LNewProperty := GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID,
         LMember_IDSkipOnInsert, LMember_LoadPersist, LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias,
-        LMember_RelationChildPropertyName, LMember_RelationChildLoadType, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
+        LMember_RelationChildPropertyName, LMember_RelationChildLazyLoad, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
         LDB_FieldScale, LDB_FieldNotNull, LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
         LDB_FKOnUpdateAction);
       Result.Add(LNewProperty);

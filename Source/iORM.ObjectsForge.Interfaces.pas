@@ -435,7 +435,7 @@ begin
   // Get the where conditions for the details if exists (nil if not exists)
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // If LazyLoadable then set LazyLoad data - Set the lazy load relation data
-  if (AProperty.GetRelationLoadType = ltLazyLoad) and Supports(LChildObject, IioLazyLoadable, LLazyLoadableObj) then
+  if AProperty.GetRelationLazyLoad and Supports(LChildObject, IioLazyLoadable, LLazyLoadableObj) then
     LLazyLoadableObj.SetRelationInfo(
        AProperty.GetRelationChildTypeName
       ,AProperty.GetRelationChildTypeAlias
