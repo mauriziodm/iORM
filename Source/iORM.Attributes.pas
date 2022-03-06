@@ -368,6 +368,10 @@ type
   ioHasOne = class(ioHasMany)
   end;
 
+  // LazyLoad attribute
+  ioLazyLoad = class(TioCustomAttribute)
+  end;
+
   // ReadOnly attribute
   ioLoadOnly = class(TioCustomAttribute)
   end;
