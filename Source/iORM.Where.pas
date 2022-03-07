@@ -47,7 +47,7 @@ uses
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   // M.M. 12/06/21
-  ObjMapper.Attributes;
+  ObjMapper.Attributes, iORM.Context.Interfaces;
 
 type
 
@@ -58,6 +58,7 @@ type
     FTypeInfo: PTypeInfo;
     FDisableTrueClass: Boolean;
     FLazyLoad: Boolean;
+    FLazyProps: String;
     FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
     // Contiene le clausole where specificate fino ad ora
@@ -142,14 +143,16 @@ type
 
     // ------ Conditions
     function ByID(const AID: Integer): IioWhere;
-    function Add(const ATextCondition:String): IioWhere; overload;
-    function Add(const AWhereCond:IioWhere): IioWhere; overload;
+    function Add(const ATextCondition: String): IioWhere; overload;
+    function Add(const AWhereCond: IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere; overload;
     function DisableTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
+    function LazyProps(const ALazyProps: String): IioWhere;
     function IsLazy: Boolean;
+    function IsLazyProperty(const AContext: IioContext; const AProperty: IioProperty): Boolean;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
     function LimitExists: Boolean;
     // --------------------------------------------------------------
@@ -268,13 +271,14 @@ type
 
     // ------ Conditions
     function ByID(const AID: Integer): IioWhere<T>;
-    function Add(const ATextCondition:String): IioWhere<T>; overload;
-    function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
+    function Add(const ATextCondition: String): IioWhere<T>; overload;
+    function Add(const AWhereCond: IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere<T>; overload;
     function DisableTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
+    function LazyProps(const ALazyProps: String): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
@@ -371,11 +375,10 @@ implementation
 
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
-  iORM.RttiContext.Factory, iORM, iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
-  iORM.Context.Interfaces, iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
+  iORM.RttiContext.Factory, iORM, iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
-  iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container;
+  iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils;
 
 { TioWhere }
 
@@ -432,14 +435,14 @@ end;
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
 begin
   if not WhereConditionExists then
-    FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+    FWhereItems.Add(TioDbFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
   _AddCriteria(APropertyName, ACompareOp, AValue);
 end;
 
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp);
 begin
   if not WhereConditionExists then
-    FWhereItems.Add(TioDBFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+    FWhereItems.Add(TioDbFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
   _AddCriteria(APropertyName, ACompareOp);
 end;
 
@@ -661,6 +664,7 @@ begin
 
   FDisableTrueClass := False;
   FLazyLoad := False;
+  FLazyProps := '';
   FWhereItems := TioWhereFactory.NewWhereItems;
   FDetailsContainer := TioWhereFactory.NewDetailsContainer;
   FOrderBy := nil;
@@ -901,10 +905,22 @@ begin
   Result := FLazyLoad;
 end;
 
+function TioWhere.IsLazyProperty(const AContext: IioContext; const AProperty: IioProperty): Boolean;
+begin
+  Result := ContainsText(FLazyProps, ';'+AProperty.GetName+';') or ContainsText(FLazyProps, ';'+AContext.Map.GetClassName+'.'+AProperty.GetName+';');
+end;
+
 function TioWhere.Lazy(const ALazyEnabled: Boolean): IioWhere;
 begin
   Result := Self;
   Self.FLazyLoad := ALazyEnabled;
+end;
+
+function TioWhere.LazyProps(const ALazyProps: String): IioWhere;
+begin
+  Result := Self;
+  // Removes all spaces and makes sure there is a semicolon at the beginning and end as well
+  FLazyProps := ';' + ReplaceStr(ALazyProps, ' ', '') + ';';
 end;
 
 function TioWhere._Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
@@ -1018,7 +1034,8 @@ begin
   else
   begin
     // Create the BSA
-    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, TObjectList<TObject>.Create(AOwnsObject), AAutoLoadData);
+    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, TObjectList<TObject>.Create(AOwnsObject),
+      AAutoLoadData);
   end;
 end;
 
@@ -1071,7 +1088,7 @@ begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
     Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName, AOwnsObject)
-  // else if the master property type is a class...
+    // else if the master property type is a class...
   else
     Result := TListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<TObject>>, TioUtilities.ClassNameToClassRef(FTypeName), AOwnsObject);
 end;
@@ -1480,6 +1497,12 @@ function TioWhere<T>.Lazy(const ALazyEnabled: Boolean): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).Lazy(ALazyEnabled);
+end;
+
+function TioWhere<T>.LazyProps(const ALazyProps: String): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self).LazyProps(ALazyProps);
 end;
 
 function TioWhere<T>._Limit(const ARows, AOffset: Integer): IioWhere<T>;
