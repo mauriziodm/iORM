@@ -907,7 +907,9 @@ end;
 
 function TioWhere.IsLazyProperty(const AContext: IioContext; const AProperty: IioProperty): Boolean;
 begin
-  Result := ContainsText(FLazyProps, ';'+AProperty.GetName+';') or ContainsText(FLazyProps, ';'+AContext.Map.GetClassName+'.'+AProperty.GetName+';');
+  Result := (FLazyLoad and AProperty.GetRelationLazyLoad)
+    or ContainsText(FLazyProps, ';'+AProperty.GetName+';')
+    or ContainsText(FLazyProps, ';'+AContext.Map.GetClassName+'.'+AProperty.GetName+';');
 end;
 
 function TioWhere.Lazy(const ALazyEnabled: Boolean): IioWhere;
