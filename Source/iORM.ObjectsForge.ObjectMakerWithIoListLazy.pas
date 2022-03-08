@@ -31,19 +31,20 @@
 { }
 { *************************************************************************** }
 
-unit iORM.ObjectsForge.ObjectMaker;
+unit iORM.ObjectsForge.ObjectMakerWithIoListLazy;
 
 interface
 
 uses
-  iORM.ObjectsForge.Interfaces,
-  iORM.Context.Interfaces,
-  iORM.DB.Interfaces;
+  iORM.ObjectsForge.Interfaces, iORM.Context.Interfaces, iORM.DB.Interfaces,
+  iORM.Context.Properties.Interfaces, iORM.Exceptions;
 
 type
 
   // Standard Object Maker
-  TioObjectMaker = class(TioObjectMakerIntf)
+  TioObjectMakerWithIioListLazy = class(TioObjectMakerIntf)
+  protected
+    class procedure LoadPropertyHasManyWithIioListLazy(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
   public
     class function MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject; override;
   end;
@@ -51,12 +52,12 @@ type
 implementation
 
 uses
-  iORM.Context.Properties.Interfaces, System.Rtti, iORM.Attributes, iORM,
-  iORM.CommonTypes, iORM.Utilities, System.StrUtils;
+  iORM.CommonTypes, iORM.Attributes, iORM.Utilities, iORM.LazyLoad.Interfaces,
+  iORM.Where.Interfaces, System.SysUtils;
 
-{ TObjectMaker }
+{ TioObjectMaker }
 
-class function TioObjectMaker.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
+class function TioObjectMakerWithIioListLazy.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
 var
   LProp: IioProperty;
   LObj: TObject;
@@ -72,37 +73,41 @@ begin
   for LProp in AContext.GetProperties do
   begin
     LObj := nil;
-    if LProp.isHasManyChildVirtualProperty or AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) or not LProp.IsDBReadEnabled then
+    if LProp.isHasManyChildVirtualProperty or not LProp.IsDBReadEnabled then
       Continue;
     case LProp.GetRelationType of
       // ------------------------------ NO RELATION --------------------------------------------------------------------------------------
       // If RelationType = ioRTNone then load normal property value (No relation)
       rtNone:
         begin
-          // If it isn't related to a blob field then load as normal value
+          if AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) then
+            Continue;
           if not LProp.IsBlob then
             LProp.SetValue(Result, AQuery.GetValue(LProp, AContext))
-            // If it's related to a blob field and it is of TStream or descendant the load as stream
           else if LProp.IsStream then
             LoadPropertyStream(AContext, AQuery, LProp)
-            // If it's related to a blob field and it is a "streamable object" (has LoadFromStream and SaveToStream methods)
           else
             LoadPropertyStreamable(AContext, AQuery, LProp);
-          // Next property
-          Continue;
         end;
       // ------------------------------ RELATION -----------------------------------------------------------------------------------------
       // Load the related object/s
       rtHasMany:
-        LoadPropertyHasMany(AContext, AQuery, LProp);
+        if AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) then
+          LoadPropertyHasManyWithIioListLazy(AContext, AQuery, LProp)
+        else
+          LoadPropertyHasMany(AContext, AQuery, LProp);
       rtEmbeddedHasMany:
-        LoadPropertyEmbeddedHasMany(AContext, AQuery, LProp);
+        if not AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) then
+          LoadPropertyEmbeddedHasMany(AContext, AQuery, LProp);
       rtBelongsTo:
-        LObj := LoadPropertyBelongsTo(AContext, AQuery, LProp);
+        if not AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) then
+          LObj := LoadPropertyBelongsTo(AContext, AQuery, LProp);
       rtHasOne:
-        LObj := LoadPropertyHasOne(AContext, AQuery, LProp);
+        if not AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) then
+          LObj := LoadPropertyHasOne(AContext, AQuery, LProp);
       rtEmbeddedHasOne:
-        LObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, LProp);
+        if not AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) then
+          LObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, LProp);
     end;
     if Assigned(LObj) then
     begin
@@ -115,6 +120,26 @@ begin
     end;
     // ---------------------------------------------------------------------------------------------------------------------------------
   end;
+end;
+
+class procedure TioObjectMakerWithIioListLazy.LoadPropertyHasManyWithIioListLazy(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
+var
+  LChildObject: TObject;
+  LLazyLoadableObj: IioLazyLoadable;
+  LWhere, LDetailWhere: IioWhere;
+begin
+  // Get the child object if already assigned
+  LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
+  // If the related child object not exists then exit (return 'NULL')
+  if not Assigned(LChildObject) then
+    raise EioException.Create(Self.ClassName, 'LoadPropertyHasManyLazyIioList', Format('Child collection object not assigned on property "%s", class "%s"',
+      [AProperty.GetName, AContext.Map.GetClassName]));
+  // Get the where conditions for the details if exists (nil if not exists)
+  LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
+  // If LazyLoadable then set LazyLoad data - Set the lazy load relation data
+  if Supports(LChildObject, IioLazyLoadable, LLazyLoadableObj) then
+    LLazyLoadableObj.SetRelationInfo(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias, AProperty.GetRelationChildPropertyName,
+      AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger, LDetailWhere); // Eventuale detail where
 end;
 
 end.

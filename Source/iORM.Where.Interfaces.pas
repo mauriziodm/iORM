@@ -117,8 +117,9 @@ type
     function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere; overload;
     function DisableTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
-    function Lazy(const ALazyEnabled:Boolean=True): IioWhere;
-    function IsLazy: Boolean;
+    function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
+    function LazyProps(const ALazyProps: String): IioWhere;
+    function IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
     function LimitExists: Boolean;
     // --------------------------------------------------------------
@@ -254,7 +255,8 @@ type
     function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere<T>; overload;
     function DisableTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
-    function Lazy(const ALazyEnabled:Boolean=True): IioWhere<T>;
+    function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
+    function LazyProps(const ALazyProps: String): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;

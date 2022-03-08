@@ -151,8 +151,7 @@ type
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
     function LazyProps(const ALazyProps: String): IioWhere;
-    function IsLazy: Boolean;
-    function IsLazyProperty(const AContext: IioContext; const AProperty: IioProperty): Boolean;
+    function IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
     function LimitExists: Boolean;
     // --------------------------------------------------------------
@@ -375,7 +374,8 @@ implementation
 
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
-  iORM.RttiContext.Factory, iORM, iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
+  iORM.RttiContext.Factory, iORM, iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
+  iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils;
@@ -900,16 +900,10 @@ begin
   FPagingObj := APagingObj as TioCommonBSAPageManager;
 end;
 
-function TioWhere.IsLazy: Boolean;
+function TioWhere.IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
 begin
-  Result := FLazyLoad;
-end;
-
-function TioWhere.IsLazyProperty(const AContext: IioContext; const AProperty: IioProperty): Boolean;
-begin
-  Result := (FLazyLoad and AProperty.GetRelationLazyLoad)
-    or ContainsText(FLazyProps, ';'+AProperty.GetName+';')
-    or ContainsText(FLazyProps, ';'+AContext.Map.GetClassName+'.'+AProperty.GetName+';');
+  Result := (FLazyLoad and AProperty.GetRelationLazyLoad) or ContainsText(FLazyProps, ';' + AProperty.GetName + ';') or
+    ContainsText(FLazyProps, ';' + AClassName + '.' + AProperty.GetName + ';');
 end;
 
 function TioWhere.Lazy(const ALazyEnabled: Boolean): IioWhere;
@@ -1109,10 +1103,10 @@ end;
 function TioWhere.ToObject(const AObj: TObject): TObject;
 begin
   // if it is a LazyLoad....
-  if Self.IsLazy then
-    Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject
-    // else...
-  else
+//  if Self.IsLazy then
+//    Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject
+//    // else...
+//  else
     Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj);
 end;
 

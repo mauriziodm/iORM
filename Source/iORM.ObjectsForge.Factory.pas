@@ -58,9 +58,10 @@ uses
 
 class function TioObjectMakerFactory.GetObjectMaker(LTrueClass:Boolean): TioObjectMakerRef;
 begin
-  if LTrueClass
-    then Result := TioObjectMakerTrueClass
-    else Result := TioObjectMaker;
+  if LTrueClass then
+    Result := TioObjectMakerTrueClass
+  else
+    Result := TioObjectMaker;
 end;
 
 class function TioObjectMakerFactory.GetObjectMapper: TioObjectMapperRef;

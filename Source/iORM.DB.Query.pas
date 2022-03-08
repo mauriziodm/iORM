@@ -193,12 +193,6 @@ begin
   if AProperty.GetRelationType = rtBelongsTo then
     Exit(FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger);
 
-  // If the property is mapped into a blob field
-  // NB: Non più usato per il caricamento degli oggetti, per il caricamento dei campi
-  // BLOB vedere a partire dal metodo "MakeObject" dell'ObjectMaker
-  // if AProperty.IsBlob
-  // then Exit(TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty));
-
   // Else return the value for the field related to the AProperty as TValue
   Result := TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).QueryToTValue(Self, AProperty);
 end;
