@@ -38,13 +38,14 @@ unit iORM.ObjectsForge.Factory;
 interface
 
 uses
-  iORM.ObjectsForge.Interfaces, iORM.ObjectsForge.ObjectMapper;
+  iORM.ObjectsForge.Interfaces, iORM.ObjectsForge.ObjectMapper,
+  iORM.Context.Interfaces;
 
 type
 
   TioObjectMakerFactory = class
   public
-    class function GetObjectMaker(LTrueClass:Boolean): TioObjectMakerRef;
+    class function GetObjectMaker(const AContext: IioContext): TioObjectMakerRef;
     class function GetObjectMapper: TioObjectMapperRef;
   end;
 
@@ -52,14 +53,17 @@ implementation
 
 uses
   iORM.ObjectsForge.ObjectMakerTrueClass,
-  iORM.ObjectsForge.ObjectMaker;
+  iORM.ObjectsForge.ObjectMaker, iORM.ObjectsForge.ObjectMakerWithIoListLazy;
 
 { TioObjectMakerFactory }
 
-class function TioObjectMakerFactory.GetObjectMaker(LTrueClass:Boolean): TioObjectMakerRef;
+class function TioObjectMakerFactory.GetObjectMaker(const AContext: IioContext): TioObjectMakerRef;
 begin
-  if LTrueClass then
+  if AContext.IsTrueClass then
     Result := TioObjectMakerTrueClass
+  else
+  if AContext.Map.GetTable.ContainsSomeIioListLazyProperty then
+    Result := TioObjectMakerWithIioListLazy
   else
     Result := TioObjectMaker;
 end;

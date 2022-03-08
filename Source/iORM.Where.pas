@@ -378,7 +378,8 @@ uses
   iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.InterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
-  iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils;
+  iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
+  iORM.ObjectsForge.Interfaces;
 
 { TioWhere }
 
@@ -1069,7 +1070,7 @@ end;
 function TioWhere.ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean): TObject;
 begin
   // Create the list
-  Result := TioObjectMakerFactory.GetObjectMaker(False).CreateListByRttiType(AListRttiType, AOwnsObjects);
+  Result := TioObjectMakerIntf.CreateListByRttiType(AListRttiType, AOwnsObjects);
   // Fill the list
   Self.ToList(Result);
 end;
