@@ -60,12 +60,12 @@ type
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
     class function GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
-  const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
-  const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
-  const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
-  const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
-  const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
+      const ATransient, AIsID, AIDSkipOnInsert: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
+      const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
+      const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
+      const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
+      const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
+      const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
@@ -301,6 +301,9 @@ var
         LMember_FieldValueType := LRttiField.FieldType;
         LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
         LMember_FieldName := TioField.Remove_F_FromName(LMember.Name);
+        // Detect is the current member is an autoloadable IioList lazy prop/field
+        if StartsText('iORM.Lazy', LRttiField.FieldType.QualifiedName) then
+          ATable.ContainsSomeIioListLazyProperty := True;
       end
       else if LMember is TRttiProperty then
       begin
@@ -308,6 +311,9 @@ var
         LMember_FieldValueType := LRttiProperty.PropertyType;
         LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
         LMember_FieldName := LMember.Name;
+        // Detect is the current member is an autoloadable IioList lazy prop/field
+        if StartsText('iORM.Lazy', LRttiProperty.PropertyType.QualifiedName) then
+          ATable.ContainsSomeIioListLazyProperty := True;
       end
       else
         raise EioException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');

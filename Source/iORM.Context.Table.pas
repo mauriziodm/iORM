@@ -131,6 +131,11 @@ type
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
     FAutoCreateDB: Boolean;
+    FContainsSomeIioListProperty: Boolean;
+  private
+    // ContainsSomeIioListProperty
+    function GetContainsSomeIioListLazyProperty: Boolean;
+    procedure SetContainsSomeIioListLazyProperty(const Value: Boolean);
   public
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins;
       const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType; const AAutoCreateDB: Boolean;
@@ -154,6 +159,8 @@ type
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
     procedure SetIndexList(AIndexList: TioIndexList);
+    // ContainsSomeIioListLazyProperty
+    property ContainsSomeIioListLazyProperty: Boolean read GetContainsSomeIioListLazyProperty write SetContainsSomeIioListLazyProperty;
   end;
 
 implementation
@@ -174,6 +181,7 @@ begin
   FRttiType := ARttiType;
   FIndexList := nil;
   FAutoCreateDB := AAutoCreateDB;
+  FContainsSomeIioListProperty := False;
   // Set TrueClass
   FTrueClass := ATrueClass;
   if Assigned(FTrueClass) then
@@ -212,6 +220,11 @@ end;
 function TioTable.GetConnectionDefName: String;
 begin
   Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
+end;
+
+function TioTable.GetContainsSomeIioListLazyProperty: Boolean;
+begin
+  Result := FContainsSomeIioListProperty;
 end;
 
 function TioTable.GetGroupBy: IioGroupBy;
@@ -280,6 +293,11 @@ begin
   //  specifically setted for the connection name received to check (AConnectionDefNameToCheck).
   Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
     (LCurrentConnectionDefName = AConnectionDefNameToCheck);
+end;
+
+procedure TioTable.SetContainsSomeIioListLazyProperty(const Value: Boolean);
+begin
+  FContainsSomeIioListProperty := Value;
 end;
 
 procedure TioTable.SetIndexList(AIndexList: TioIndexList);
