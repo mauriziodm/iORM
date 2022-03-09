@@ -229,7 +229,6 @@ type
     procedure ShowEach(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
     procedure ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
     procedure ShowEach(const AViewContext: TComponent; const AAlias: String = ''); overload;
-    // ----------------------------------------------------------------------------------------------------------------------------
     // DataObject
     procedure ClearDataObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -237,6 +236,7 @@ type
     function DataObject: TObject;
     function DataObjectAs<T>: T;
     function DataObjectAssigned: Boolean;
+    // ----------------------------------------------------------------------------------------------------------------------------
     // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
     property AsDefault: Boolean read FAsDefault write SetAsDefault; // Published: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail

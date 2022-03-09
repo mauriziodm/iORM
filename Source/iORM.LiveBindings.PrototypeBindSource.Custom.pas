@@ -182,6 +182,13 @@ type
     procedure PostIfEditing;
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
+    // DataObject
+    procedure ClearDataObject;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    function DataObject: TObject;
+    function DataObjectAs<T>: T;
+    function DataObjectAssigned: Boolean;
     // ----------------------------------------------------------------------------------------------------------------------------
     // BindSourceAdapter methods/properties published by TioPrototypeBindSource also
     function Current: TObject;
@@ -196,12 +203,6 @@ type
     procedure Append(AObject: IInterface); overload;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
-    function DataObjectAssigned: Boolean;
-    function DataObject: TObject;
-    function DataObjectAs<T>: T;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    procedure ClearDataObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;

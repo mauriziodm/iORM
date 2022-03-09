@@ -158,6 +158,13 @@ type
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    // DataObject
+    procedure ClearDataObject;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    function DataObject: TObject;
+    function DataObjectAs<T>: T;
+    function DataObjectAssigned: Boolean;
   end;
 
 implementation
@@ -187,6 +194,12 @@ begin
     _CreateAdapter(nil, True);
   // Result
   Result := (GetActiveBindSourceAdapter <> nil);
+end;
+
+procedure TioDataSetCustom.ClearDataObject;
+begin
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.ClearDataObject;
 end;
 
 constructor TioDataSetCustom.Create(AOwner: TComponent);
@@ -255,6 +268,28 @@ var
 begin
   LMasterObject := Self.CurrentMasterObject;
   Result := TioUtilities.CastObjectToGeneric<T>(LMasterObject);
+end;
+
+function TioDataSetCustom.DataObject: TObject;
+begin
+  // Result := nil;
+  Result := GetActiveBindSourceAdapter.DataObject;
+end;
+
+function TioDataSetCustom.DataObjectAs<T>: T;
+var
+  LObj: TObject;
+begin
+  LObj := Self.DataObject;
+  Result := TioUtilities.CastObjectToGeneric<T>(LObj);
+end;
+
+function TioDataSetCustom.DataObjectAssigned: Boolean;
+begin
+  if CheckAdapter then
+    Result := Assigned(GetActiveBindSourceAdapter.DataObject)
+  else
+    Result := False;
 end;
 
 destructor TioDataSetCustom.Destroy;
@@ -496,6 +531,35 @@ end;
 procedure TioDataSetCustom.SetAutoRefreshOnNotification(const Value: Boolean);
 begin
   FAutoRefreshOnNotification := Value;
+end;
+
+procedure TioDataSetCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+begin
+  if not Assigned(ADataObject) then
+    ClearDataObject;
+  // if the adapter is not already assigned then create it
+  if not CheckAdapter then
+    // Create the BSA
+    _CreateAdapter(ADataObject, AOwnsObject)
+  else
+    // Set the data object into the BSA
+    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
+end;
+
+procedure TioDataSetCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+begin
+  if not Assigned(ADataObject) then
+    ClearDataObject;
+  // if the adapter is not already assigned then create it
+  if not CheckAdapter then
+    // Create the BSA
+    // NB: Nel caso in cui si sita impostando il DataObject ma il BSA non era ancora creato lo crea (il BSA)
+    // usando il ClassName dell'oggetto; in questo modo siamo sicuri che abbiamo il BSA più
+    // adatto e non uno che magari è più generico e a cui mancano alcune proprietà (è successo).
+    _CreateAdapter(ADataObject as TObject, AOwnsObject)
+  else
+    // Set the data object into the BSA
+    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 end;
 
 procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);
