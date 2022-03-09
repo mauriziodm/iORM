@@ -118,6 +118,9 @@ type
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable: TFDMemTable); overload;
 
+    function _ToLazyObject(const AObj: TObject = nil): TObject; overload;
+    function _ToLazyObject(const AIntf: IInterface): TObject; overload;
+
     function _ToObjectInternalByClassOnly(const AObj: TObject = nil): TObject;
     function ToObject(const AObj: TObject = nil): TObject; overload;
     function ToObject(const AIntf: IInterface): TObject; overload;
@@ -1103,12 +1106,7 @@ end;
 
 function TioWhere.ToObject(const AObj: TObject): TObject;
 begin
-  // if it is a LazyLoad....
-//  if Self.IsLazy then
-//    Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject
-//    // else...
-//  else
-    Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj);
+  Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj);
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1342,6 +1340,16 @@ begin
       raise EioException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
         [(ADataObject as TObject).ClassName, TypeName, AVVMAlias]));
+end;
+
+function TioWhere._ToLazyObject(const AObj: TObject): TObject;
+begin
+  Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject;
+end;
+
+function TioWhere._ToLazyObject(const AIntf: IInterface): TObject;
+begin
+  Result := _ToLazyObject(AIntf as TObject);
 end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AObj: TObject = nil): TObject;
