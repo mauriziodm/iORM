@@ -96,7 +96,10 @@ type
     function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList(const AInterfacedListTypeName:String; const AAlias:String=''; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList(const AListClassRef:TioClassRef; const AOwnsObjects:Boolean=True): TObject; overload;
+
     function Count: Integer;
+    function Exists: Boolean;
+    function NotExists: Boolean;
 
     procedure Delete;
 

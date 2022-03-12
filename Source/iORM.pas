@@ -88,10 +88,18 @@ type
     class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
     class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
-    // Count (accepting generic type to delete and ciriteria)
+    // Count (accepting generic type and ciriteria)
     class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
+    // Exists (accepting generic type and ciriteria)
+    class function Exists<T>(const ATypeAlias: String = ''): Boolean; overload;
+    class function Exists<T>(const AWhere: IioWhere): Boolean; overload;
+    class function Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean; overload;
+    // Exists (accepting generic type and ciriteria)
+    class function NotExists<T>(const ATypeAlias: String = ''): Boolean; overload;
+    class function NotExists<T>(const AWhere: IioWhere): Boolean; overload;
+    class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean; overload;
 
     // Persist (accepting instance to persist directly)
     class procedure Persist(const AObj: TObject; const ABlindInsert: Boolean = False); overload;
@@ -391,6 +399,23 @@ end;
 class function io.Mapper: omRef;
 begin
   Result := ObjMapper.om;
+end;
+
+class function io.NotExists<T>(const ATypeAlias: String): Boolean;
+begin
+  Result := Self.RefTo<T>(ATypeAlias).NotExists;
+end;
+
+class function io.NotExists<T>(const AWhere: IioWhere): Boolean;
+begin
+  Result := Self.NotExists<T>('', AWhere);
+end;
+
+class function io.NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean;
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.NotExists;
 end;
 
 class procedure io._PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
@@ -883,6 +908,23 @@ end;
 class function io.di: TioDependencyInjectionRef;
 begin
   Result := TioDependencyInjection;
+end;
+
+class function io.Exists<T>(const ATypeAlias: String): Boolean;
+begin
+  Result := Self.RefTo<T>(ATypeAlias).Exists;
+end;
+
+class function io.Exists<T>(const AWhere: IioWhere): Boolean;
+begin
+  Result := Self.Exists<T>('', AWhere);
+end;
+
+class function io.Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean;
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Exists;
 end;
 
 class function io.ExtractOID(const AIntfObj: IInterface): Integer;

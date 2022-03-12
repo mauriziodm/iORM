@@ -131,6 +131,8 @@ type
     function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
 
     function Count: Integer;
+    function Exists: Boolean;
+    function NotExists: Boolean;
 
     procedure Delete;
 
@@ -782,6 +784,11 @@ begin
   end;
 end;
 
+function TioWhere.Exists: Boolean;
+begin
+  Result := Count > 0;
+end;
+
 function TioWhere.Count: Integer;
 begin
   Result := TioStrategyFactory.GetStrategy('').Count(Self);
@@ -934,6 +941,11 @@ end;
 function TioWhere.LimitExists: Boolean;
 begin
   Result := GetLimitRows > 0;
+end;
+
+function TioWhere.NotExists: Boolean;
+begin
+  Result := Count = 0;
 end;
 
 function TioWhere.SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
