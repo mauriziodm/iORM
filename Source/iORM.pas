@@ -608,7 +608,7 @@ end;
 
 class function io.Count<T>(const ATypeAlias: String): Integer;
 begin
-  Result := Self.RefTo<T>(ATypeAlias).GetCount;
+  Result := Self.RefTo<T>(ATypeAlias).Count;
 end;
 
 class function io.Count<T>(const AWhere: IioWhere): Integer;
@@ -620,7 +620,7 @@ class function io.Count<T>(const ATypeAlias: String; const AWhere: IioWhere): In
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>(False);
   AWhere.TypeAlias := ATypeAlias;
-  Result := AWhere.GetCount;
+  Result := AWhere.Count;
 end;
 
 class function io.Create<T>(const ATypeAlias: String; const AParams: TioConstructorParams): T;

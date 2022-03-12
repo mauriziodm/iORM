@@ -393,7 +393,7 @@ var
   LCount: Integer;
   LPagingObj: TioCommonBSAPageManager;
 begin
-  LCount := io.Load(ATypeName, ATypeAlias)._Where(AWhere).GetCount;
+  LCount := io.RefTo(ATypeName, ATypeAlias)._Where(AWhere).Count;
   LPagingObj := AWhere.GetPagingObj as TioCommonBSAPageManager;
   LPagingObj.SetItemCount(LCount);
 end;
