@@ -72,13 +72,15 @@ type
     class function TryGetMemberAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
     class function HasAttribute<T: class>(ARTTIType: TRttiType): boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
+    class procedure ClearList(const AList: TObject);
   end;
 
 implementation
 
 uses
   System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers,
-  iORM.Context.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Container;
+  iORM.Context.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Container,
+  iORM.DuckTyped.Factory;
 
 { TioRttiUtilities }
 
@@ -116,12 +118,19 @@ begin
   Result := TioRttiFactory.GetRttiContext.GetType(AClassRef).AsInstance;
 end;
 
+class procedure TioUtilities.ClearList(const AList: TObject);
+begin
+  if not Assigned(AList) then
+    raise EioException.Create(ClassName, 'ClearList', '"AList" parameter not assigned');
+  TioDuckTypedFactory.DuckTypedList(AList).Clear;
+end;
+
 class function TioUtilities.ExtractOID(const AObj: Tobject): Integer;
 var
   LMap: IioMap;
 begin
   if not Assigned(AObj) then
-    raise EioException.Create(ClassName, 'ExtractOID', '"AObj" cannot be nil.');
+    raise EioException.Create(ClassName, 'ExtractOID', '"AObj" parameter not assigned');
   LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;

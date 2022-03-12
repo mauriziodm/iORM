@@ -61,6 +61,7 @@ type
     FLazyProps: String;
     FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
+    FClearListBefore: Boolean;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: TWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
@@ -100,6 +101,7 @@ type
     constructor Create; reintroduce; overload;
     destructor Destroy; override;
     procedure Clear(const AClearWhereDetails: Boolean = True);
+    function GetClearListBefore: Boolean;
     function GetWhereItems: TWhereItems;
     function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
     function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
@@ -129,6 +131,7 @@ type
     function ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean = True): TObject; overload;
     function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True): TObject; overload;
     function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
+    function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
 
     function Count: Integer;
     function Exists: Boolean;
@@ -271,6 +274,7 @@ type
     // function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<TObject>;
     function ToInterfacedList: IioList<T>; overload;
     // function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
+    function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
 
     // procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); override;
 
@@ -665,6 +669,12 @@ begin
     FDetailsContainer.Clear;
 end;
 
+function TioWhere.ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
+begin
+  Result := Self;
+  FClearListBefore := AClearListBefore;
+end;
+
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
@@ -678,6 +688,7 @@ begin
   FLimitRows := 0;
   FLimitOffset := 0;
   FPagingObj := nil;
+  FClearListBefore := False;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -792,6 +803,11 @@ end;
 function TioWhere.Count: Integer;
 begin
   Result := TioStrategyFactory.GetStrategy('').Count(Self);
+end;
+
+function TioWhere.GetClearListBefore: Boolean;
+begin
+  Result := FClearListBefore;
 end;
 
 function TioWhere.GetDetails: IioWhereDetailsContainer;
@@ -1075,6 +1091,10 @@ end;
 
 procedure TioWhere.ToList(const AList: TObject);
 begin
+  if not Assigned(AList) then
+    raise EioException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
+  if FClearListBefore then
+    TioUtilities.ClearList(AList);
   TioStrategyFactory.GetStrategy('').LoadList(Self, AList);
 end;
 
@@ -1503,6 +1523,12 @@ function TioWhere<T>.ByID(const AID: Integer): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).ByID(AID);
+end;
+
+function TioWhere<T>.ClearListBefore(const AClearListBefore: Boolean): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self).ClearListBefore(AClearListBefore);
 end;
 
 function TioWhere<T>.DisableTrueClass: IioWhere<T>;

@@ -70,6 +70,7 @@ type
   IioWhere = interface
     ['{CB0292C6-A7A8-4951-A867-D5A5F6D8F053}']
     procedure Clear(const AClearWhereDetails: Boolean = True);
+    function GetClearListBefore: Boolean;
     function GetWhereItems: TWhereItems;
     function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
     function GetSqlWithTrueClass(const AMap:IioMap; const AIsTrueClass:Boolean; const ATrueClass: IioTrueClass): String;
@@ -96,6 +97,7 @@ type
     function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList(const AInterfacedListTypeName:String; const AAlias:String=''; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList(const AListClassRef:TioClassRef; const AOwnsObjects:Boolean=True): TObject; overload;
+    function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
 
     function Count: Integer;
     function Exists: Boolean;
@@ -250,6 +252,7 @@ type
 //    function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<TObject>;
     function ToInterfacedList: IioList<T>; overload;
 //    function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
+    function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
     // ------ Conditions
     function ByID(const AID:Integer): IioWhere<T>;
     function Add(const ATextCondition:String): IioWhere<T>; overload;

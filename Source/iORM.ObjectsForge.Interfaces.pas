@@ -427,7 +427,7 @@ begin
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // It set the first part of the load operation
   LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._PropertyEqualsTo(AProperty.GetRelationChildPropertyName,
-    AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext));
+    AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).ClearListBefore(AContext.Where.GetClearListBefore);
   // If a Details Where conditions (for the details) is present then add it to the load operation
   if Assigned(LDetailWhere) then
     LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance); // Eventuale DetailWhere & OrderBy
