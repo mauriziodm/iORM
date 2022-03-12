@@ -485,7 +485,8 @@ begin
       osDirty:
         begin
           // If SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-          if (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+          if (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+            AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
           begin
             // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
             if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
@@ -560,16 +561,16 @@ begin
 end;
 
 class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
-//var
-//  LMasterProp: IioProperty;
+// var
+// LMasterProp: IioProperty;
 begin
   inherited;
-//  // Loop for all properties
-//  for LMasterProp in AMasterContext.GetProperties do
-//    // If the property is write enabled and has a BelongsTo relation...
-//    if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
-//      PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-//        AMasterContext.MasterPropertyPath);
+  // // Loop for all properties
+  // for LMasterProp in AMasterContext.GetProperties do
+  // // If the property is write enabled and has a BelongsTo relation...
+  // if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
+  // PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
+  // AMasterContext.MasterPropertyPath);
 end;
 
 class procedure TioStrategyDB.RollbackTransaction(const AConnectionName: String);
