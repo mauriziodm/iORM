@@ -55,44 +55,50 @@ type
 
   io = class
   public
+    // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
     class function RefTo(const AWhere: IioWhere): IioWhere; overload;
 
+    // Load (returning IioWhere fluent interface)
     class function Load(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const ATypeInfo: PTypeInfo; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AIID: TGUID; const ATypeAlias: String = ''): IioWhere; overload;
     class function Load(const AWhere: IioWhere): IioWhere; overload;
     class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
+    // Load (returning result instance directly)
     class function Load<T>(const AID: Integer): T; overload;
     class function Load<T>(const ATypeAlias: String; const AID: Integer): T; overload;
-
+    // LoadList (returning result instance directly)
     class function LoadList<T: class, constructor>(const AItemAlias: String = ''): T; overload;
     class function LoadList<T: class, constructor>(const AWhere: IioWhere): T; overload;
     class function LoadList<T: class, constructor>(const AItemAlias: String; const AWhere: IioWhere): T; overload;
 
+    // Delete (accepting instance to delete directly)
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
     class procedure DeleteCollection(const ACollection: TObject); overload;
     class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
-
+    // Delete (accepting generic type to delete and ciriteria)
     class procedure Delete<T>(const AID: Integer); overload;
     class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
     class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
     class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
     class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
+    // Count (accepting generic type to delete and ciriteria)
     class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
 
+    // Persist (accepting instance to persist directly)
     class procedure Persist(const AObj: TObject; const ABlindInsert: Boolean = False); overload;
     class procedure Persist(const AIntfObj: IInterface; const ABlindInsert: Boolean = False); overload;
     class procedure _PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
-
+    // PersistCollection (accepting instance to persist directly)
     class procedure PersistCollection(const ACollection: TObject; const ABlindInsert: Boolean = False); overload;
     class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: Boolean = False); overload;
     class procedure _PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
