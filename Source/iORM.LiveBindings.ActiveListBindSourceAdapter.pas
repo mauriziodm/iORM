@@ -59,7 +59,7 @@ type
     FTypeName, FTypeAlias: String;  // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
     FReloading: Boolean;
-    FAutoLoadData: Boolean;
+    FLoadType: TioLoadType;
     FMasterProperty: IioProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -103,9 +103,9 @@ type
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
-    function GetAutoLoadData: Boolean;
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
     // Reloading
     function GetReloading: boolean;
     procedure SetReloading(const Value: boolean);
@@ -147,10 +147,10 @@ type
     procedure _InternalSetDataObject<T>(const ADataObject:TObject; const AOwnsObject:Boolean); overload;
     procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
-    constructor InternalCreate(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
+    constructor InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
-    constructor Create(AClassRef:TioClassRef; AWhere:IioWhere; AOwner: TComponent; ADataObject: IInterface; AutoLoadData: Boolean; AOwnsObject: Boolean = False); overload;
+    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
+    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const ALoadType: TioLoadType; const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer:IioDetailBindSourceAdaptersContainer);
@@ -256,23 +256,20 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; ADataObject: IInterface;
-  AutoLoadData, AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const ALoadType: TioLoadType; const AOwnsObject: Boolean);
 var
   LDataObject: TObject;
 begin
   LDataObject := ADataObject as TObject;
   inherited Create(AOwner, TList<TObject>(LDataObject), AClassRef, AOwnsObject);
-  InternalCreate(AClassRef, AWhere, AOwner, AutoLoadData, AOwnsObject);
+  InternalCreate(AClassRef, AWhere, AOwner, ALoadType, AOwnsObject);
   FInterfacedList := ADataObject;  // To keep che interfaced list live
 end;
 
-constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef;
-  AWhere: IioWhere; AOwner: TComponent; ADataObject: TList<TObject>; AutoLoadData,
-  AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const ALoadType: TioLoadType; const AOwnsObject: Boolean);
 begin
   inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
-  InternalCreate(AClassRef, AWhere, AOwner, AutoLoadData, AOwnsObject);
+  InternalCreate(AClassRef, AWhere, AOwner, ALoadType, AOwnsObject);
 end;
 
 procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer);
@@ -452,9 +449,9 @@ begin
     Self.InternalSetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
-function TioActiveListBindSourceAdapter.GetAutoLoadData: Boolean;
+function TioActiveListBindSourceAdapter.GetLoadType: TioLoadType;
 begin
-  Result := FAutoLoadData;
+  Result := FLoadType;
 end;
 
 function TioActiveListBindSourceAdapter.GetBaseObjectClassName: String;
@@ -614,11 +611,10 @@ begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
-constructor TioActiveListBindSourceAdapter.InternalCreate(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; AutoLoadData,
-  AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True);
 begin
   FInterfacedList := nil;
-  FAutoLoadData := AutoLoadData;
+  FLoadType := ALoadType;
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
@@ -740,9 +736,9 @@ begin
   ReceiveSelection(ASelected as TObject, ASelectionType);
 end;
 
-procedure TioActiveListBindSourceAdapter.SetAutoLoadData(const Value: Boolean);
+procedure TioActiveListBindSourceAdapter.SetLoadType(const Value: TioLoadType);
 begin
-  FAutoLoadData := Value;
+  FLoadType := Value;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
@@ -865,7 +861,7 @@ end;
 
 procedure TioActiveListBindSourceAdapter._InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
 var
-  LPrecAutoLoadData: Boolean;
+  LPrecLoadType: TioLoadType;
 begin
   // Init
   Self.FInterfacedList := nil;
@@ -885,12 +881,12 @@ begin
       Supports(ADataObject, IInterface, Self.FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
-    LPrecAutoLoadData := FAutoLoadData;
+    LPrecLoadType := FLoadType;
     try
-      FAutoLoadData := False;
-      Self.Active := True;
+      FLoadType := ltSetDataObject;
+      Active := True;
     finally
-      FAutoLoadData := LPrecAutoLoadData;
+      FLoadType := LPrecLoadType;
     end;
   end
   else
