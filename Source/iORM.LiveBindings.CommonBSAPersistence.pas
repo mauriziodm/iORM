@@ -218,7 +218,7 @@ begin
   LTargetClass := nil;
   // If AutoLoadData is disabled then exit
   // Prevent AutoLoadData when reloading
-  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.ioAutoLoadData then
+  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.AutoLoad then
     Exit;
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
@@ -252,7 +252,7 @@ var
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // If the adapter is a detail adapter or AutoLoadData is not active then do not execute
-  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.ioViewDataType <> dtList) or not AActiveBindSourceAdapter.ioAutoLoadData then
+  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.ioViewDataType <> dtList) or not AActiveBindSourceAdapter.AutoLoad then
     Exit;
   // Extract the paging obj from the where obj
   LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;

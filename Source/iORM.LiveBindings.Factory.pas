@@ -87,12 +87,12 @@ begin
   if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
     Result := TioActiveInterfaceListBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
       // Where
-      AOwner, TList<IInterface>.Create, False)
+      AOwner, TList<IInterface>.Create, ltSetDataObject) // AutoLoad := False
     // else if the master property type is a class...
   else
   begin
     Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner,
-      TList<TObject>.Create, False);
+      TList<TObject>.Create, ltSetDataObject); // AutoLoad := False
   end;
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
@@ -106,13 +106,13 @@ begin
     Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
       // where
       AOwner, nil, // AObject:TObject;
-      False)
+      ltSetDataObject) // AutoLoad := False
     // else if the master property type is a class...
   else
   begin
     Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil
       // AObject:TObject;
-      , False);
+      , ltSetDataObject); // AutoLoad := False
   end;
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);

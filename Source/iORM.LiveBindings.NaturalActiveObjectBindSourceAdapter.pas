@@ -57,7 +57,7 @@ type
 implementation
 
 uses
-  Data.Bind.ObjectScope;
+  Data.Bind.ObjectScope, iORM.CommonTypes;
 
 
 
@@ -70,10 +70,10 @@ constructor TioNaturalActiveObjectBindSourceAdapter.Create(AOwner:TComponent;
 begin
   inherited Create(
                    ASourceAdapter.GetCurrent.ClassType,
-                   nil,  // Where
+                   nil,  // Where          \
                    AOwner,
                    ASourceAdapter.GetCurrent,
-                   False,
+                   ltSetDataObject, // AutoLoad := False
                    False
                   );
   FSourceAdapter := ASourceAdapter;

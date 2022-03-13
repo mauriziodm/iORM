@@ -432,7 +432,7 @@ end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetLoadType: TioLoadType;
 begin
-  Result := FLoadTypre;
+  Result := FLoadType;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetAutoLoad: Boolean;

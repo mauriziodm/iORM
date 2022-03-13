@@ -660,7 +660,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 var
-  LPrecLoadType: Boolean;
+  LPrecLoadType: TioLoadType;
 begin
   // Disable the adapter
   First; // Bug

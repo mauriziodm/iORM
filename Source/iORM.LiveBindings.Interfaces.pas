@@ -234,7 +234,7 @@ type
     property Fields: TList<TBindSourceAdapterField> read GetFields;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
     property LoadType: TioLoadType read GetLoadType write SetLoadType;
-    property AutoLoadLoad: Boolean read GetAutoLoad;
+    property AutoLoad: Boolean read GetAutoLoad;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
     property ioOwnsObjects: Boolean read GetOwnsObjects;
     property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;

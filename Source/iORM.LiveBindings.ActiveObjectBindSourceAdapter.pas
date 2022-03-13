@@ -140,7 +140,7 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
+    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -181,8 +181,6 @@ type
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType,
-      AOwnsObject: Boolean);
   end;
 
 implementation
@@ -247,13 +245,7 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
-  const ALoadType: TioLoadType; const AOwnsObject: Boolean);
-begin
-
-end;
-
-constructor TioActiveObjectBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: Boolean; const AOwnsObject: Boolean);
+constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean);
 begin
   FLoadType := ALoadType;
   FAsync := False;
