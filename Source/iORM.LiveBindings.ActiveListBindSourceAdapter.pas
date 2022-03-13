@@ -864,21 +864,21 @@ var
   LPrecLoadType: TioLoadType;
 begin
   // Init
-  Self.FInterfacedList := nil;
+  FInterfacedList := nil;
   // Disable the adapter
-  Self.First;  // Bug
-  Self.Active := False;
+  First;  // Bug
+  Active := False;
   // AObj is assigned then set it as DataObject
   //  else set DataObject to nil and set MasterObject to nil
   //  to disable all Details adapters also
   if Assigned(ADataObject) then
   begin
     // Set the provided DataObject (always as TList<IInterface>)
-    Self.SetList(TList<TObject>(ADataObject), AOwnsObject);
+    SetList(TList<TObject>(ADataObject), AOwnsObject);
     // If the DataObject (List) is an interface referenced object then
     //  set the FInterfacedList field to it to keep alive the list itself
     if TioUtilities.IsAnInterface<T> then
-      Supports(ADataObject, IInterface, Self.FInterfacedList);
+      Supports(ADataObject, IInterface, FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     //  then restore the original value of the "AutoLoadData" property.
     LPrecLoadType := FLoadType;
@@ -891,11 +891,11 @@ begin
   end
   else
   begin
-    Self.SetList(nil, AOwnsObject);
-    Self.FDetailAdaptersContainer.SetMasterObject(nil);
+    SetList(nil, AOwnsObject);
+    FDetailAdaptersContainer.SetMasterObject(nil);
   end;
   // DataSet synchro
-  Self.GetDataSetLinkContainer.Refresh;
+  GetDataSetLinkContainer.Refresh;
 
   // -------------------------------------------------------------------------------------------------------
   // If is a LazyLoadable list then set the internal List

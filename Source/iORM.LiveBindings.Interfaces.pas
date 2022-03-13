@@ -175,9 +175,9 @@ type
     // TypeAlias
     procedure SetTypeAlias(const AValue: String);
     function GetTypeAlias: String;
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
-    function GetAutoLoadData: Boolean;
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
     // Current property
     function GetCurrent: TObject;
     // Async property
@@ -231,7 +231,7 @@ type
     property EOF: Boolean read GetEOF;
     property Fields: TList<TBindSourceAdapterField> read GetFields;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
-    property ioAutoLoadData: Boolean read GetAutoLoadData write SetAutoLoadData;
+    property LoadType: Boolean read GetLoadType write SetLoadType;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
     property ioOwnsObjects: Boolean read GetOwnsObjects;
     property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;

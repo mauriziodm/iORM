@@ -55,7 +55,7 @@ type
     // FClassRef: TioClassRef;
     FTypeName, FTypeAlias: String; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
-    FAutoLoadData: Boolean;
+    FLoadType: TioLoadType;
     FReloading: Boolean;
     FMasterProperty: IioProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -96,9 +96,9 @@ type
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
-    function GetAutoLoadData: Boolean;
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
@@ -138,8 +138,7 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; ADataObject: TObject; AutoLoadData: Boolean;
-      AOwnsObject: Boolean = True); overload;
+    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -244,10 +243,9 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; AWhere: IioWhere; AOwner: TComponent; ADataObject: TObject;
-  AutoLoadData: Boolean; AOwnsObject: Boolean);
+constructor TioActiveObjectBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: Boolean; const AOwnsObject: Boolean);
 begin
-  FAutoLoadData := AutoLoadData;
+  FLoadType := ALoadType;
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
@@ -401,9 +399,9 @@ end;
 // Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 // end;
 
-function TioActiveObjectBindSourceAdapter.GetAutoLoadData: Boolean;
+function TioActiveObjectBindSourceAdapter.GetLoadType: TioLoadType;
 begin
-  Result := FAutoLoadData;
+  Result := FLoadType;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetBaseObjectClassName: String;
@@ -658,9 +656,9 @@ begin
   TioCommonBSAPersistence.Reload(Self);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetAutoLoadData(const Value: Boolean);
+procedure TioActiveObjectBindSourceAdapter.SetLoadType(const Value: TioLoadType);
 begin
-  FAutoLoadData := Value;
+  FLoadType := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
@@ -695,11 +693,11 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 var
-  LPrecAutoLoadData: Boolean;
+  LPrecLoadType: TioLoadType;
 begin
   // Disable the adapter
-  Self.First; // Bug
-  Self.Active := False;
+  First; // Bug
+  Active := False;
   // AObj is assigned then set it as DataObject
   // else set DataObject to nil and set MasterObject to nil
   // to disable all Details adapters also
@@ -709,21 +707,21 @@ begin
     inherited SetDataObject(ADataObject, AOwnsObject);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     // then restore the original value of the "AutoLoadData" property.
-    LPrecAutoLoadData := FAutoLoadData;
+    LPrecLoadType := FLoadType;
     try
-      FAutoLoadData := False;
-      Self.Active := True;
+      FLoadType := ltSetDataObject;
+      Active := True;
     finally
-      FAutoLoadData := LPrecAutoLoadData;
+      FLoadType := LPrecLoadType;
     end;
   end
   else
   begin
     inherited SetDataObject(nil, AOwnsObject);
-    Self.FDetailAdaptersContainer.SetMasterObject(nil);
+    FDetailAdaptersContainer.SetMasterObject(nil);
   end;
   // DataSet synchro
-  Self.GetDataSetLinkContainer.Refresh;
+  GetDataSetLinkContainer.Refresh;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetIoAsync(const Value: Boolean);
