@@ -105,8 +105,8 @@ type
 
     procedure Delete;
 
-    function ToActiveListBindSourceAdapter(const AOwner:TComponent; const AAutoLoadData:Boolean=True; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
-    function ToActiveObjectBindSourceAdapter(const AOwner:TComponent; const AAutoLoadData:Boolean=True; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+    function ToActiveListBindSourceAdapter(const AOwner:TComponent; const ALoadType:TioLoadType=ltByTypeName; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+    function ToActiveObjectBindSourceAdapter(const AOwner:TComponent; const ALoadType:TioLoadType=ltByTypeName; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
     function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     function ToObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
 

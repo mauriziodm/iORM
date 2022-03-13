@@ -54,7 +54,7 @@ type
     class function GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioViewDataType;
-      const AAutoLoadData: Boolean; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
+      const ALoadType: TioLoadType; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     class function GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
   end;
@@ -124,7 +124,7 @@ begin
 end;
 
 class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
-  const AViewDataType: TioViewDataType; const AAutoLoadData: Boolean; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
+  const AViewDataType: TioViewDataType; const ALoadType: TioLoadType; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
   LDataObject: TObject;
@@ -142,7 +142,7 @@ begin
             LDataObject := ADataObject
           else
             LDataObject := TList<IInterface>.Create;
-          Result := TioActiveInterfaceListBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LDataObject, AAutoLoadData, AOwnsObject);
+          Result := TioActiveInterfaceListBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LDataObject, ALoadType, AOwnsObject);
         end
         // Class
         else
@@ -151,7 +151,7 @@ begin
             LDataObject := ADataObject
           else
             LDataObject := TObjectList<TObject>.Create(True);
-          Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, TObjectList<TObject>(LDataObject), AAutoLoadData, AOwnsObject);
+          Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, TObjectList<TObject>(LDataObject), ALoadType, AOwnsObject);
         end;
       end;
 
@@ -163,12 +163,12 @@ begin
         begin
           if Assigned(ADataObject) and not Supports(ADataObject, IInterface, LIntfDataObject) then
             raise EioException.Create(Self.ClassName, 'GetBSA', 'TypeName is an interface but ADataObject does not implement any interface.');
-          Result := TioActiveInterfaceObjectBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LIntfDataObject, AAutoLoadData);
+          Result := TioActiveInterfaceObjectBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LIntfDataObject, ALoadType);
         end
         // Class
         else
         begin
-          Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, ADataObject, AAutoLoadData, AOwnsObject);
+          Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, ADataObject, ALoadType, AOwnsObject);
           // False);
         end;
 
