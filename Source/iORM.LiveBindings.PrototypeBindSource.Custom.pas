@@ -50,7 +50,7 @@ type
   private
     FTypeName: String;
     FTypeAlias: String;
-    FAutoLoadData: Boolean;
+    FLoadType: TioLoadType;
     FAsync: Boolean;
     FViewDataType: TioViewDataType;
     FMasterBindSource: TioMasterBindSource;
@@ -90,8 +90,8 @@ type
     function IsActive: Boolean;
     // Async
     procedure SetAsync(const Value: Boolean);
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -148,7 +148,7 @@ type
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
+    property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // published: Master
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
@@ -305,7 +305,7 @@ begin
   FioLoaded := False;
   FAutoRefreshOnNotification := True;
   FAsync := False;
-  FAutoLoadData := True;
+  FLoadType := ltAuto;
   FViewDataType := TioViewDataType.dtList;
   // Selectors
   FSelectorFor := nil;
@@ -383,7 +383,7 @@ begin
       if TypeName.IsEmpty then
         raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
       ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-        ._OrderBy(FOrderBy), FViewDataType, FAutoLoadData, nil, True).AsTBindSourceAdapter;
+        ._OrderBy(FOrderBy), FViewDataType, FLoadType, nil, True).AsTBindSourceAdapter;
     end
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
     else
@@ -708,14 +708,14 @@ begin
     LActiveBSA.ioAsync := Value;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetAutoLoadData(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetLoadType(const Value: TioLoadType);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
-  FAutoLoadData := Value;
+  FLoadType := Value;
   // Update the adapter
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
-    LActiveBSA.ioAutoLoadData := Value;
+    LActiveBSA.LoadType := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAutoPost(const Value: Boolean);

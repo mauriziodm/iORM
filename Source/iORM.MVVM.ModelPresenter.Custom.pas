@@ -49,7 +49,7 @@ type
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     FTypeName, FTypeAlias: String;
     FAsync: Boolean;
-    FAutoLoadData: Boolean;
+    FLoadType: TioLoadType;
     FViewDataType: TioViewDataType;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
@@ -97,8 +97,8 @@ type
     procedure InitAsDefaultOnCreate;
     // Async
     procedure SetAsync(const Value: Boolean);
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -161,7 +161,7 @@ type
     property Eof: Boolean read GetEOF; // Public: Master+Detail
     // Published properties
     property Async: Boolean read FAsync write SetAsync default False; // Published: Master
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // Published: Master
+    property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // Published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
@@ -326,7 +326,7 @@ begin
   FAutoPost := False;
   FAutoRefreshOnNotification := True;
   FAsync := False;
-  FAutoLoadData := True;
+  FLoadType := ltAuto;
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
@@ -798,13 +798,13 @@ begin
     FBindSourceAdapter.ioAsync := Value;
 end;
 
-procedure TioModelPresenterCustom.SetAutoLoadData(const Value: Boolean);
+procedure TioModelPresenterCustom.SetLoadType(const Value: TioLoadType);
 begin
-  FAutoLoadData := Value;
+  FLoadType := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    FBindSourceAdapter.ioAutoLoadData := Value;
+    FBindSourceAdapter.LoadType := Value;
 end;
 
 procedure TioModelPresenterCustom.SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
@@ -1020,7 +1020,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, LoadType, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

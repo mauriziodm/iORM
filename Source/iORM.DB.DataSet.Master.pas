@@ -4,7 +4,7 @@ interface
 
 uses
   iORM.DB.DataSet.Custom, iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.BSPersistence, System.Classes;
+  iORM.LiveBindings.BSPersistence, System.Classes, iORM.CommonTypes;
 
 type
 
@@ -52,7 +52,7 @@ type
     property TypeName;
     property TypeAlias;
     property Async default False;
-    property AutoLoadData default True;
+    property LoadType default ltAuto;
     property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr; // published: Master
     property OrderBy;

@@ -18,7 +18,7 @@ type
   private
     FTypeName: String;
     FTypeAlias: String;
-    FAutoLoadData: Boolean;
+    FLoadType: TioLoadType;
     FAsync: Boolean;
     FViewDataType: TioViewDataType; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
     FMasterDataSet: TioMasterDataSet;
@@ -56,8 +56,8 @@ type
     function IsActive: Boolean;
     // Async
     procedure SetAsync(const Value: Boolean);
-    // AutoLoadData
-    procedure SetAutoLoadData(const Value: Boolean);
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -118,7 +118,7 @@ type
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
-    property AutoLoadData: Boolean read FAutoLoadData write SetAutoLoadData default True; // published: Master
+    property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // published: Master
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
@@ -208,7 +208,7 @@ begin
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsync := False;
-  FAutoLoadData := True;
+  FLoadType := ltAuto;
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
@@ -512,12 +512,12 @@ begin
     GetActiveBindSourceAdapter.ioAsync := Value;
 end;
 
-procedure TioDataSetCustom.SetAutoLoadData(const Value: Boolean);
+procedure TioDataSetCustom.SetLoadType(const Value: TioLoadType);
 begin
-  FAutoLoadData := Value;
+  FLoadType := Value;
   // Update the adapter
   if CheckAdapter then
-    GetActiveBindSourceAdapter.ioAutoLoadData := Value;
+    GetActiveBindSourceAdapter.LoadType := Value;
 end;
 
 procedure TioDataSetCustom.SetAutoPost(const Value: Boolean);
@@ -670,7 +670,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, AutoLoadData, ADataObject, AOwnsObject));
+    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, LoadType, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
