@@ -99,6 +99,8 @@ type
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
+    // AutoLoad
+    function GetAutoLoad: Boolean;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
@@ -179,6 +181,8 @@ type
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType,
+      AOwnsObject: Boolean);
   end;
 
 implementation
@@ -241,6 +245,12 @@ end;
 procedure TioActiveObjectBindSourceAdapter.ClearDataObject;
 begin
   Self.InternalSetDataObject(nil, False);
+end;
+
+constructor TioActiveObjectBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+  const ALoadType: TioLoadType; const AOwnsObject: Boolean);
+begin
+
 end;
 
 constructor TioActiveObjectBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: Boolean; const AOwnsObject: Boolean);
@@ -402,6 +412,11 @@ end;
 function TioActiveObjectBindSourceAdapter.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetAutoLoad: Boolean;
+begin
+  Result := FLoadType >= ltByTypeName;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetBaseObjectClassName: String;

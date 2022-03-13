@@ -106,6 +106,8 @@ type
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
+    // AutoLoad
+    function GetAutoLoad: Boolean;
     // Reloading
     function GetReloading: boolean;
     procedure SetReloading(const Value: boolean);
@@ -452,6 +454,11 @@ end;
 function TioActiveListBindSourceAdapter.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
+end;
+
+function TioActiveListBindSourceAdapter.GetAutoLoad: Boolean;
+begin
+  Result := FLoadType >= ltByTypeName;
 end;
 
 function TioActiveListBindSourceAdapter.GetBaseObjectClassName: String;
