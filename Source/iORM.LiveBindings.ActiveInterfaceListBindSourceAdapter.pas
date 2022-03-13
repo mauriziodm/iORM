@@ -56,6 +56,8 @@ type
     FWhereDetailsFromDetailAdapters: Boolean;
     FTypeName, FTypeAlias: String;
     FLocalOwnsObject: Boolean;
+    FLazy: Boolean;
+    FLazyProps: String;
     FLoadType: TioLoadType;
     FReloading: Boolean;
     FMasterPropertyName: String;
@@ -95,6 +97,12 @@ type
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
+    // Lazy
+    procedure SetLazy(const Value: Boolean);
+    function GetLazy: Boolean;
+    // LazyProps
+    procedure SetLazyProps(const Value: String);
+    function GetLazyProps: String;
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
@@ -139,10 +147,10 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ALoadType: TioLoadType;
-      const AOwnsObject: Boolean = True); overload;
+      const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const ALoadType: TioLoadType; const AOwnsObject: Boolean = False); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String; const AOwnsObject: Boolean = True); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String; const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -237,18 +245,18 @@ begin
 end;
 
 constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const ADataObject: IInterface; const ALoadType: TioLoadType; const AOwnsObject: Boolean);
+  const ADataObject: IInterface; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String; const AOwnsObject: Boolean);
 begin
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
-  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, ALoadType, AOwnsObject);
+  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, ALoadType, ALazy, ALazyProps, AOwnsObject);
   FInterfacedList := ADataObject;
 end;
 
 constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean);
+  const ADataObject: TObject; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String; const AOwnsObject: Boolean);
 begin
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
-  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, ALoadType, AOwnsObject);
+  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, ALoadType, ALazy, ALazyProps, AOwnsObject);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
@@ -430,6 +438,16 @@ begin
   // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
+function TioActiveInterfaceListBindSourceAdapter.GetLazy: Boolean;
+begin
+  Result := FLazy;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetLazyProps: String;
+begin
+  Result := FLazyProps;
+end;
+
 function TioActiveInterfaceListBindSourceAdapter.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
@@ -583,11 +601,13 @@ begin
   Self.Insert;
 end;
 
-constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const ALoadType: TioLoadType; const AOwnsObject: Boolean);
+constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ALoadType: TioLoadType;
+      const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True);
 begin
   FInterfacedList := nil;
   FLoadType := ALoadType;
+  FLazy := ALazy;
+  FLazyProps := ALazyProps;
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
@@ -711,6 +731,16 @@ begin
         Self.Insert(ASelected);
     end;
   DoAfterSelection(ASelected, ASelectionType);
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetLazy(const Value: Boolean);
+begin
+  FLazy := Value;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetLazyProps(const Value: String);
+begin
+  FLazyProps := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetLoadType(const Value: TioLoadType);

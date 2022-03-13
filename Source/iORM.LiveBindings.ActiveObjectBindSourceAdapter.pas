@@ -55,6 +55,8 @@ type
     // FClassRef: TioClassRef;
     FTypeName, FTypeAlias: String; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
+    FLazy: Boolean;
+    FLazyProps: String;
     FLoadType: TioLoadType;
     FReloading: Boolean;
     FMasterProperty: IioProperty;
@@ -96,6 +98,12 @@ type
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
+    // Lazy
+    procedure SetLazy(const Value: Boolean);
+    function GetLazy: Boolean;
+    // LazyProps
+    procedure SetLazyProps(const Value: String);
+    function GetLazyProps: String;
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
@@ -140,7 +148,7 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean = True); overload;
+    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -245,9 +253,11 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const AOwnsObject: Boolean);
+constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True);
 begin
   FLoadType := ALoadType;
+  FLazy := ALazy;
+  FLazyProps := ALazyProps;
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
@@ -400,6 +410,16 @@ end;
 // // Set it to the Adapter itself
 // Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
 // end;
+
+function TioActiveObjectBindSourceAdapter.GetLazy: Boolean;
+begin
+  Result := FLazy;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetLazyProps: String;
+begin
+  Result := FLazyProps;
+end;
 
 function TioActiveObjectBindSourceAdapter.GetLoadType: TioLoadType;
 begin
@@ -661,6 +681,16 @@ end;
 procedure TioActiveObjectBindSourceAdapter.Reload;
 begin
   TioCommonBSAPersistence.Reload(Self);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.SetLazy(const Value: Boolean);
+begin
+  FLazy := Value;
+end;
+
+procedure TioActiveObjectBindSourceAdapter.SetLazyProps(const Value: String);
+begin
+  FLazyProps := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetLoadType(const Value: TioLoadType);

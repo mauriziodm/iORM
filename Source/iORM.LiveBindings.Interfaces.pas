@@ -175,6 +175,12 @@ type
     // TypeAlias
     procedure SetTypeAlias(const AValue: String);
     function GetTypeAlias: String;
+    // Lazy
+    procedure SetLazy(const Value: Boolean);
+    function GetLazy: Boolean;
+    // LazyProps
+    procedure SetLazyProps(const Value: String);
+    function GetLazyProps: String;
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
@@ -233,6 +239,8 @@ type
     property EOF: Boolean read GetEOF;
     property Fields: TList<TBindSourceAdapterField> read GetFields;
     property ioAsync: Boolean read GetIoAsync write SetIoAsync;
+    property Lazy: Boolean read GetLazy write SetLazy;
+    property LazyProps: String read GetLazyProps write SetLazyProps;
     property LoadType: TioLoadType read GetLoadType write SetLoadType;
     property AutoLoad: Boolean read GetAutoLoad;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
