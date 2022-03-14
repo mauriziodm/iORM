@@ -50,6 +50,8 @@ type
     FTypeName, FTypeAlias: String;
     FAsync: Boolean;
     FLoadType: TioLoadType;
+    FLazy: Boolean;
+    FLazyProps: String;
     FViewDataType: TioViewDataType;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
@@ -99,6 +101,10 @@ type
     procedure SetAsync(const Value: Boolean);
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
+    // Lazy
+    procedure SetLazy(const Value: Boolean);
+    // LazyProps
+    procedure SetLazyProps(const Value: String);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -162,6 +168,8 @@ type
     // Published properties
     property Async: Boolean read FAsync write SetAsync default False; // Published: Master
     property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // Published: Master
+    property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
+    property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
@@ -326,6 +334,8 @@ begin
   FAutoRefreshOnNotification := True;
   FAsync := False;
   FLoadType := ltAuto;
+  FLazy := False;
+  FLazyProps := '';
   FViewDataType := TioViewDataType.dtList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
@@ -789,6 +799,16 @@ begin
   // update the where of the adapter also
   if CheckAdapter then
     FBindSourceAdapter.ioAsync := Value;
+end;
+
+procedure TioModelPresenterCustom.SetLazy(const Value: Boolean);
+begin
+  FLazy := Value;
+end;
+
+procedure TioModelPresenterCustom.SetLazyProps(const Value: String);
+begin
+  FLazyProps := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLoadType(const Value: TioLoadType);

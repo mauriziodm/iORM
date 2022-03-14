@@ -51,6 +51,8 @@ type
     FTypeName: String;
     FTypeAlias: String;
     FLoadType: TioLoadType;
+    FLazy: Boolean;
+    FLazyProps: String;
     FAsync: Boolean;
     FViewDataType: TioViewDataType;
     FMasterBindSource: TioMasterBindSource;
@@ -92,6 +94,10 @@ type
     procedure SetAsync(const Value: Boolean);
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
+    // Lazy
+    procedure SetLazy(const Value: Boolean);
+    // LazyProps
+    procedure SetLazyProps(const Value: String);
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -149,6 +155,8 @@ type
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
     property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // published: Master
+    property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
+    property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
@@ -305,6 +313,8 @@ begin
   FAutoRefreshOnNotification := True;
   FAsync := False;
   FLoadType := ltAuto;
+  FLazy := False;
+  FLazyProps := '';
   FViewDataType := TioViewDataType.dtList;
   // Selectors
   FSelectorFor := nil;
@@ -700,6 +710,16 @@ begin
   // Update the adapter
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.ioAsync := Value;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetLazy(const Value: Boolean);
+begin
+  FLazy := Value;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetLazyProps(const Value: String);
+begin
+  FLazyProps := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetLoadType(const Value: TioLoadType);
