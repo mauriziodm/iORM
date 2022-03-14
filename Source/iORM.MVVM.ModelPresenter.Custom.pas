@@ -219,7 +219,6 @@ type
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
     function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-    function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
@@ -587,12 +586,6 @@ end;
 function TioModelPresenterCustom.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
-end;
-
-function TioModelPresenterCustom.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
-begin
-  if not Supports(GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner), IioActiveBindSourceAdapter, Result) then
-    Result := nil;
 end;
 
 function TioModelPresenterCustom.GetPaging: TioCommonBSAPageManager;

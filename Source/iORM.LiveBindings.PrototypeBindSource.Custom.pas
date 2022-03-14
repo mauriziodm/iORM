@@ -205,7 +205,6 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-    function GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   published
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
@@ -598,11 +597,6 @@ end;
 function TioPrototypeBindSourceCustom.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
-end;
-
-function TioPrototypeBindSourceCustom.GetNaturalObjectBindSourceAdapter(const AOwner: TComponent): TBindSourceAdapter;
-begin
-  Result := (Self.InternalAdapter as IioNaturalBindSourceAdapterSource).NewNaturalObjectBindSourceAdapter(AOwner).AsTBindSourceAdapter;
 end;
 
 function TioPrototypeBindSourceCustom.GetPaging: TioCommonBSAPageManager;
