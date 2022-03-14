@@ -39,7 +39,8 @@ interface
 
 uses
   iORM.LiveBindings.ActiveObjectBindSourceAdapter,
-  iORM.LiveBindings.Interfaces, System.Classes, iORM.LiveBindings.Notification;
+  iORM.LiveBindings.Interfaces, System.Classes, iORM.LiveBindings.Notification,
+  iORM.CommonTypes;
 
 type
 
@@ -50,14 +51,14 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
   public
-    constructor Create(AOwner:TComponent; ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
+    constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String); overload;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
   end;
 
 implementation
 
 uses
-  Data.Bind.ObjectScope, iORM.CommonTypes;
+  Data.Bind.ObjectScope;
 
 
 
@@ -65,15 +66,16 @@ uses
 
 { TioNaturalActiveObjectBindSourceAdapter }
 
-constructor TioNaturalActiveObjectBindSourceAdapter.Create(AOwner:TComponent;
-  ASourceAdapter:IioNaturalBindSourceAdapterSource);
+constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String);
 begin
   inherited Create(
                    ASourceAdapter.GetCurrent.ClassType,
-                   nil,  // Where          \
+                   nil,  // Where
                    AOwner,
                    ASourceAdapter.GetCurrent,
-                   ltSetDataObject, // AutoLoad := False
+                   ALoadType, // AutoLoad := False
+                   ALazy,
+                   ALazyProps,
                    False
                   );
   FSourceAdapter := ASourceAdapter;
