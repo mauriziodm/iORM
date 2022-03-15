@@ -411,8 +411,8 @@ begin
   // PS: Set ioAsync also (and other properties)
   if Assigned(ADataObject) and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
-    LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.ioAsync := FAsync;
+    LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
     LActiveBSA.SetBindSource(Self);
   end;
