@@ -157,10 +157,10 @@ type
     procedure _InternalSetDataObject<T>(const ADataObject:TObject; const AOwnsObject:Boolean); overload;
     procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
     procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
-    constructor InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True); overload;
+    constructor InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True); overload;
-    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = False); overload;
+    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const AOwnsObject: Boolean = True); overload;
+    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer:IioDetailBindSourceAdaptersContainer);
@@ -266,20 +266,20 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AOwnsObject: Boolean);
 var
   LDataObject: TObject;
 begin
   LDataObject := ADataObject as TObject;
   inherited Create(AOwner, TList<TObject>(LDataObject), AClassRef, AOwnsObject);
-  InternalCreate(AClassRef, AWhere, AOwner, ALoadType, ALazy, ALazyProps, AOwnsObject);
+  InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
   FInterfacedList := ADataObject;  // To keep che interfaced list live
 end;
 
-constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const AOwnsObject: Boolean);
 begin
   inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
-  InternalCreate(AClassRef, AWhere, AOwner, ALoadType, ALazy, ALazyProps, AOwnsObject);
+  InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
 end;
 
 procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer);
@@ -636,12 +636,12 @@ begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
-constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String; const AOwnsObject: Boolean = True);
+constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True);
 begin
   FInterfacedList := nil;
-  FLoadType := ALoadType;
-  FLazy := ALazy;
-  FLazyProps := ALazyProps;
+  FLoadType := ltAuto;
+  FLazy := False;
+  FLazyProps := '';
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;

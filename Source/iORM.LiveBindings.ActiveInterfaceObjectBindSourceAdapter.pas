@@ -139,8 +139,7 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
-      const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -234,12 +233,11 @@ begin
   Self.InternalSetDataObject(LIntf, False);
 end;
 
-constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
-      const ALoadType: TioLoadType; const ALazy: Boolean; ALazyProps: String);
+constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface);
 begin
-  FLoadType := ALoadType;
-  FLazy := ALazy;
-  FLazyProps := ALazyProps;
+  FLoadType := ltAuto;
+  FLazy := False;
+  FLazyProps := '';
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;

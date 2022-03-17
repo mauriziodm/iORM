@@ -51,7 +51,7 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
   public
-    constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String); overload;
+    constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
   end;
 
@@ -66,16 +66,13 @@ uses
 
 { TioNaturalActiveObjectBindSourceAdapter }
 
-constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource; const ALoadType: TioLoadType; const ALazy: Boolean; const ALazyProps: String);
+constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource);
 begin
   inherited Create(
                    ASourceAdapter.GetCurrent.ClassType,
                    nil,  // Where
                    AOwner,
                    ASourceAdapter.GetCurrent,
-                   ALoadType, // AutoLoad := False
-                   ALazy,
-                   ALazyProps,
                    False
                   );
   FSourceAdapter := ASourceAdapter;
