@@ -105,11 +105,6 @@ type
 
     procedure Delete;
 
-//    function ToActiveListBindSourceAdapter(const AOwner:TComponent; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
-//    function ToActiveObjectBindSourceAdapter(const AOwner:TComponent; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
-//    function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
-//    function ToObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
-
     procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
     procedure ShowList(const AVVMAlias:String='');
     procedure ShowEach(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);

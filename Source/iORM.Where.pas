@@ -41,12 +41,11 @@ uses
   iORM.Interfaces,
   iORM.SqlItems,
   iORM.Context.Properties.Interfaces, iORM.Context.Table.Interfaces,
-  System.Classes, Data.Bind.ObjectScope, iORM.Where.SqlItems.Interfaces,
+  System.Classes, iORM.Where.SqlItems.Interfaces,
   iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
-  // M.M. 12/06/21
   ObjMapper.Attributes, iORM.Context.Interfaces;
 
 type
@@ -138,13 +137,6 @@ type
     function NotExists: Boolean;
 
     procedure Delete;
-
-    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
-      : TBindSourceAdapter; overload;
-    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
-      : TBindSourceAdapter; overload;
-    function ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
-    function ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
 
     procedure Show(const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
     procedure ShowList(const AVVMAlias: String = ''); virtual;
@@ -384,9 +376,7 @@ implementation
 
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
-  iORM.RttiContext.Factory, iORM, iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
-  iORM.Containers.Factory, iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
-  iORM.LiveBindings.InterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
+  iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Containers.Factory,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
   iORM.ObjectsForge.Interfaces;
@@ -1050,29 +1040,6 @@ begin
   io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(LList).Show;
 end;
 
-function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
-      : TBindSourceAdapter;
-begin
-  // If the master property type is an interface...
-  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-    Result := TioActiveInterfaceListBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, AOwner, TList<IInterface>.Create)
-  // else if the master property type is a class...
-  else
-    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, TObjectList<TObject>.Create(AOwnsObject));
-end;
-
-function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
-      : TBindSourceAdapter;
-begin
-  // If the master property type is an interface...
-  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, AOwner, nil)
-  // else if the master property type is a class...
-  else
-    // Create the BSA
-    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, nil, False);
-end;
-
 procedure TioWhere.ToList(const AList: TObject);
 begin
   if not Assigned(AList) then
@@ -1100,16 +1067,6 @@ begin
   Result := Self.ToList(TioUtilities.ClassRefToRttiType(AListClassRef), AOwnsObjects);
 end;
 
-function TioWhere.ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
-begin
-  // If the master property type is an interface...
-  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-    Result := TInterfaceListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<IInterface>>, FTypeAlias, FTypeName, AOwnsObject)
-    // else if the master property type is a class...
-  else
-    Result := TListBindSourceAdapter.Create(AOwner, Self.ToGenericList.OfType<TList<TObject>>, TioUtilities.ClassNameToClassRef(FTypeName), AOwnsObject);
-end;
-
 function TioWhere.ToMemTable: TFDMemTable;
 begin
   Result := TFDMemTable.Create(nil);
@@ -1129,22 +1086,6 @@ end;
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
 begin
   Result := ToObject(AIntf as TObject);
-end;
-
-function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
-var
-  LIntfObj: IInterface;
-begin
-  // If the master property type is an interface...
-  if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-  begin
-    if not Supports(Self.ToObject, IInterface, LIntfObj) then
-      raise EioException.Create(Self.ClassName, 'ToObjectBindSourceAdapter', 'Object does not implement IInterface.');
-    Result := TInterfaceObjectBindSourceAdapter.Create(AOwner, LIntfObj, FTypeAlias, FTypeName);
-  end
-  // else if the master property type is a class...
-  else
-    Result := TObjectBindSourceAdapter.Create(AOwner, Self.ToObject, TioUtilities.ClassNameToClassRef(FTypeName), AOwnsObject);
 end;
 
 function TioWhere._Not(ATextCondition: String): IioWhere;
