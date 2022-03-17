@@ -139,9 +139,9 @@ type
 
     procedure Delete;
 
-    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const ALoadType: TioLoadType = ltByTypeName; const AOwnsObject: Boolean = True)
+    function ToActiveListBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
       : TBindSourceAdapter; overload;
-    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const ALoadType: TioLoadType = ltByTypeName; const AOwnsObject: Boolean = True)
+    function ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
       : TBindSourceAdapter; overload;
     function ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
     function ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean = True): TBindSourceAdapter;
@@ -1050,43 +1050,27 @@ begin
   io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(LList).Show;
 end;
 
-function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const ALoadType: TioLoadType; const AOwnsObject: Boolean): TBindSourceAdapter;
+function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
+      : TBindSourceAdapter;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-  begin
-    // Create the BSA
-    Result := TioActiveInterfaceListBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, // Where
-      AOwner, TList<IInterface>.Create, ALoadType)
-  end
+    Result := TioActiveInterfaceListBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, AOwner, TList<IInterface>.Create)
   // else if the master property type is a class...
   else
-  begin
-    // Create the BSA
-    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, TObjectList<TObject>.Create(AOwnsObject),
-      ALoadType);
-  end;
+    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, TObjectList<TObject>.Create(AOwnsObject));
 end;
 
-function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const ALoadType: TioLoadType; const AOwnsObject: Boolean): TBindSourceAdapter;
+function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AOwnsObject: Boolean = True)
+      : TBindSourceAdapter;
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(FTypeName) then
-  begin
-    // Create the BSA
-    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, // Where
-      AOwner, nil, // AObject:TObject
-      ALoadType) // AutoLoadData
-  end
+    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(FTypeName, FTypeAlias, Self, AOwner, nil)
   // else if the master property type is a class...
   else
-  begin
     // Create the BSA
-    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, // Where
-      AOwner, nil, // AObject:TObject
-      ALoadType, // AutoLoadData := True
-      False);
-  end;
+    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(FTypeName), Self, AOwner, nil, False);
 end;
 
 procedure TioWhere.ToList(const AList: TObject);

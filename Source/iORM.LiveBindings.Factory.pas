@@ -85,12 +85,12 @@ begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
     Result := TioActiveInterfaceListBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
-      AOwner, TList<IInterface>.Create, ltSetDataObject, False, '') // Autoload := False and not Lazy
+      AOwner, TList<IInterface>.Create)
     // else if the master property type is a class...
   else
   begin
     Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner,
-      TList<TObject>.Create, ltSetDataObject, False, ''); // Autoload := False and not Lazy
+      TList<TObject>.Create);
   end;
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
@@ -101,15 +101,10 @@ class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOw
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
-    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
-      AOwner, nil, // AObject:TObject;
-      ltSetDataObject, False, '') // Autoload := False and not Lazy
-    // else if the master property type is a class...
+    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere, AOwner, nil) // AObject:TObject;
+  // else if the master property type is a class...
   else
-  begin
-    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil, // AObject:TObject;
-      ltSetDataObject, False, ''); // AutoLoad := False
-  end;
+    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil); // AObject:TObject;
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;

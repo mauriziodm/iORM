@@ -392,7 +392,7 @@ begin
       if TypeName.IsEmpty then
         raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
       ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-        ._OrderBy(FOrderBy), FViewDataType, FLoadType, nil, True).AsTBindSourceAdapter;
+        ._OrderBy(FOrderBy), FViewDataType, nil, True).AsTBindSourceAdapter;
     end
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
     else
@@ -413,6 +413,9 @@ begin
   begin
     LActiveBSA.ioAsync := FAsync;
     LActiveBSA.ioAutoPost := FAutoPost;
+    LActiveBSA.LoadType := FLoadType;
+    LActiveBSA.Lazy := FLazy;
+    LActiveBSA.LazyProps := FLazyProps;
     LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
     LActiveBSA.SetBindSource(Self);
   end;

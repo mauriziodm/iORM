@@ -829,6 +829,9 @@ begin
   FBindSourceAdapter.ioAsync := FAsync;
   FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   FBindSourceAdapter.ioWhere := FWhere;
+  FBindSourceAdapter.LoadType := FLoadType;
+  FBindSourceAdapter.Lazy := FLazy;
+  FBindSourceAdapter.LazyProps := FLazyProps;
   // Register itself for notifications from BindSourceAdapter
   FBindSourceAdapter.SetBindSource(Self);
 end;
@@ -1033,7 +1036,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, LoadType, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

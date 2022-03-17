@@ -591,9 +591,11 @@ procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdp
 begin
   inherited;
   // Init the BSA
-  // Set some properties
   GetActiveBindSourceAdapter.ioAsync := FAsync;
   GetActiveBindSourceAdapter.ioAutoPost := FAutoPost;
+  GetActiveBindSourceAdapter.LoadType := FLoadType;
+  GetActiveBindSourceAdapter.Lazy := FLazy;
+  GetActiveBindSourceAdapter.LazyProps := FLazyProps;
   GetActiveBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   GetActiveBindSourceAdapter.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
@@ -690,7 +692,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, LoadType, ADataObject, AOwnsObject));
+    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
