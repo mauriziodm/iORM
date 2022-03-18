@@ -45,11 +45,13 @@ uses
 type
 
   TioNaturalActiveObjectBindSourceAdapter = class(TioActiveObjectBindSourceAdapter, IioNaturalActiveBindSourceAdapter)
-  strict private
+  private
     FSourceAdapter: IioNaturalBindSourceAdapterSource;
-  strict protected
+  protected
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
+    // AutoLoad
+    function GetAutoLoad: Boolean; override;
   public
     constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
@@ -120,6 +122,12 @@ procedure TioNaturalActiveObjectBindSourceAdapter.ForwardNotificationToSourceAda
 begin
   if Assigned(FSourceAdapter)
     then FSourceAdapter.Notify(Self, ANotification);
+end;
+
+function TioNaturalActiveObjectBindSourceAdapter.GetAutoLoad: Boolean;
+begin
+  // NaturalBindSourceAdapter is always a not AutoLoad adapter by definition
+  Result := False;
 end;
 
 end.

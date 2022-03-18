@@ -106,8 +106,6 @@ type
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
-    // AutoLoad
-    function GetAutoLoad: Boolean;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
@@ -115,6 +113,8 @@ type
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
   protected
+    // AutoLoad
+    function GetAutoLoad: Boolean; virtual;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)

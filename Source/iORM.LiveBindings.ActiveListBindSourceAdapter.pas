@@ -114,8 +114,6 @@ type
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
-    // AutoLoad
-    function GetAutoLoad: Boolean;
     // Reloading
     function GetReloading: boolean;
     procedure SetReloading(const Value: boolean);
@@ -123,6 +121,9 @@ type
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
   protected
+    // AutoLoad
+    function GetAutoLoad: Boolean; virtual;
+
     function SupportsNestedFields: Boolean; override;
     procedure AddFields; override;
     // =========================================================================
