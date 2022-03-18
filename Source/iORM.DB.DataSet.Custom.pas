@@ -219,7 +219,7 @@ begin
   FLoadType := ltAuto;
   FLazy := False;
   FLazyProps := '';
-  FViewDataType := TioViewDataType.dtList;
+  FViewDataType := TioViewDataType.dtListOfObjects;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
   // Selectors
@@ -349,7 +349,7 @@ begin
     ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
-  if FOnReceiveSelectionFreeObject and (FViewDataType = TioViewDataType.dtSingle) and (LPreviousCurrentObj <> nil) then
+  if FOnReceiveSelectionFreeObject and (FViewDataType = TioViewDataType.dtSingleObject) and (LPreviousCurrentObj <> nil) then
     LPreviousCurrentObj.Free;
 end;
 

@@ -124,7 +124,7 @@ begin
   case AViewDataType of
 
     // LIST
-    TioViewDataType.dtList:
+    TioViewDataType.dtListOfObjects:
       begin
         // Interfaced
         if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
@@ -147,7 +147,7 @@ begin
       end;
 
     // SINGLE OBJECT
-    TioViewDataType.dtSingle:
+    TioViewDataType.dtSingleObject:
       begin
         // Interfaced
         if TioUtilities.IsAnInterfaceTypeName(ATypeName) then

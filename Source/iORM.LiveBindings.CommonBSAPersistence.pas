@@ -235,10 +235,10 @@ begin
     end;
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
-    TioViewDataType.dtSingle:
+    TioViewDataType.dtSingleObject:
       _LoadSingle(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTerminateMethod);
-    TioViewDataType.dtList:
+    TioViewDataType.dtListOfObjects:
       _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTargetClass, LTerminateMethod);
   else
@@ -252,7 +252,7 @@ var
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // If the adapter is a detail adapter or AutoLoadData is not active then do not execute
-  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.ioViewDataType <> dtList) or not AActiveBindSourceAdapter.AutoLoad then
+  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.ioViewDataType <> dtListOfObjects) or not AActiveBindSourceAdapter.AutoLoad then
     Exit;
   // Extract the paging obj from the where obj
   LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
@@ -297,7 +297,7 @@ end;
 class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
   // Set the new master object (only for list BSA)
-  if AActiveBindSourceAdapter.ioViewDataType = dtList then
+  if AActiveBindSourceAdapter.ioViewDataType = dtListOfObjects then
     AActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(AActiveBindSourceAdapter.Current);
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.SetRecNo(AActiveBindSourceAdapter.ItemIndex);
@@ -333,10 +333,10 @@ begin
   LPagingObj.PrepareForRefresh;
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
-    TioViewDataType.dtSingle:
+    TioViewDataType.dtSingleObject:
       _LoadSingle(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTerminateMethod);
-    TioViewDataType.dtList:
+    TioViewDataType.dtListOfObjects:
       _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTargetClass, LTerminateMethod);
   else
@@ -350,7 +350,7 @@ var
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // If it's a single object then call the normal PersistCurrent method and exit
-  if AActiveBindSourceAdapter.ioViewDataType = TioViewDataType.dtSingle then
+  if AActiveBindSourceAdapter.ioViewDataType = TioViewDataType.dtSingleObject then
   begin
     PersistCurrent(AActiveBindSourceAdapter);
     Exit;

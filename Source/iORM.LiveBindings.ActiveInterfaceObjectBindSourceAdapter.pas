@@ -43,7 +43,7 @@ uses
   System.Generics.Collections, System.Rtti;
 
 const
-  VIEW_DATA_TYPE = TioViewDataType.dtSingle;
+  VIEW_DATA_TYPE = TioViewDataType.dtSingleObject;
 
 type
 

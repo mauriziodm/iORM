@@ -44,7 +44,7 @@ uses
   iORM.MVVM.Interfaces, iORM.Utilities, System.Rtti;
 
 const
-  VIEW_DATA_TYPE = TioViewDataType.dtList;
+  VIEW_DATA_TYPE = TioViewDataType.dtListOfObjects;
 
 type
 
