@@ -46,16 +46,22 @@ type
 
   TioCommonBSAPersistence = class
   private
+    // Exucute
     class procedure _Execute(const AASync: Boolean; AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
     class procedure _SyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
     class procedure _AsyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
-    class procedure _LoadSingle(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+    // Load object
+    class procedure _LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    class procedure _LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetObject: TObject;
+      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    // Load list
     class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     class procedure _LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetList: TObject;
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    // Page manager
     class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
   public
     // Load
@@ -189,8 +195,8 @@ begin
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
     Exit;
   // If UseObjStatus is true then set ObjStatus propriety and abort (If "daSetObjStatusIfExists" delete mode is selected as OnDeleteAction on the MasterBS)
-  if AActiveBindSourceAdapter.UseObjStatus and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntObjStatusSetDeleted))
-  then
+  if AActiveBindSourceAdapter.UseObjStatus and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter),
+    TioBSNotification.Create(ntObjStatusSetDeleted)) then
   begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
     Abort;
@@ -236,11 +242,11 @@ begin
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingleObject:
-      _LoadSingle(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTerminateMethod);
     TioViewDataType.dtListOfObjects:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-        LTargetClass, LTerminateMethod);
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
+        AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
   end;
@@ -262,8 +268,8 @@ begin
     // If the pagination is progressive then it loads the next page and adds it to the
     // internal list of the BSA and then does a Refresh(False)
     LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(AActiveBindSourceAdapter);
-    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-      AActiveBindSourceAdapter.DataObject, LTerminateMethod);
+    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
+      AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
   end
   else
     // If, on the other hand, the pagination is not progressive then it performs a normal Refresh(True)
@@ -334,11 +340,11 @@ begin
   // Load
   case AActiveBindSourceAdapter.ioViewDataType of
     TioViewDataType.dtSingleObject:
-      _LoadSingle(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTerminateMethod);
     TioViewDataType.dtListOfObjects:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-        LTargetClass, LTerminateMethod);
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
+        AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence._Reload: wrong ViewDataType.');
   end;
@@ -415,8 +421,8 @@ begin
   end;
 end;
 
-class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+  ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -435,8 +441,8 @@ begin
     end, ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetList: TObject;
-ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -456,7 +462,18 @@ begin
     end, ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence._LoadSingle(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+class procedure TioCommonBSAPersistence._LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+  ATargetObject: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+begin
+  _Execute(AASync,
+    function: TObject
+    begin
+      Result := nil;
+      io.Load(ATypeName, ATypeAlias)._Where(AWhere).ClearListBefore.ToObject(ATargetObject);
+    end, ATerminateMethod);
+end;
+
+class procedure TioCommonBSAPersistence._LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
 ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
@@ -572,16 +589,16 @@ begin
       io.StartTransaction;
       try
         // Persist the main obj
-//        io.Persist(AActiveBindSourceAdapter.Current, False);
+        // io.Persist(AActiveBindSourceAdapter.Current, False);
         if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
           // Persist the main obj
           io._PersistInternal(AActiveBindSourceAdapter.Current, '', 0, False, LBSPersistenceClient.Persistence, '', '');
-          // Delete objects referenced into the SmartDeleteSystem
-          LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
-            procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
-            begin
-              io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Delete;
-            end);
+        // Delete objects referenced into the SmartDeleteSystem
+        LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
+          procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
+          begin
+            io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Delete;
+          end);
         // commit
         io.CommitTransaction;
       except
