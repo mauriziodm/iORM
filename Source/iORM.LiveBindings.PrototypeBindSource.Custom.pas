@@ -38,7 +38,8 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
   System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces,
-  System.SysUtils, iORM.LiveBindings.CommonBSAPaging;
+  System.SysUtils, iORM.LiveBindings.CommonBSAPaging,
+  System.Generics.Collections;
 
 type
 
@@ -67,6 +68,17 @@ type
     FSelectorFor: TioPrototypeBindSourceCustom;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
+    // Questà è una collezione dove eventuali BindSource di dettaglio
+    // si registrano per rendere nota la loro esistenza al Master. Sarà poi
+    // usata dal Master per fare in modo che, quando viene richiesta la creazione
+    // del suo BindSourceAdapter (del master), venga scatenata anche la creazione
+    // anche di tutti gli adapters relativi ai presenters di dettaglio (che si sono
+    // registrati). In questo modo evito alcuni problemi di "sequenza" dovuti
+    // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
+    // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
+    // DesignTime (WhereStr property) non funzionassero per questo motivo.
+    // NB: Nei PrototypeBindSources non serve poi il metodo "ForceDetailAdaptersCreation" come dei DataSet o nei ModelPresenter
+    FDetailBindSourceContainer: TList<TioPrototypeBindSourceCustom>;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -77,6 +89,7 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    procedure OpenCLoseDetails(const AActive: Boolean);
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -133,6 +146,7 @@ type
   protected
     procedure Open;
     procedure Close;
+    procedure SetActive(const Value: Boolean); override;
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
@@ -192,6 +206,7 @@ type
     procedure PostIfEditing;
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
+    procedure RegisterDetailBindSource(const ADetailBindSource: TioPrototypeBindSourceCustom);
     // DataObject
     procedure ClearDataObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -332,6 +347,16 @@ begin
   FWhereDetailsFromDetailAdapters := False;
   FWhereStr := TStringList.Create;
   SetWhereStr(FWhereStr); // set TStringList.onChange event handler
+  // Questà è una collezione dove eventuali BindSources di dettaglio
+  // si registrano per rendere nota la loro esistenza al Master. Sarà poi
+  // usata dal Master per fare in modo che, quando viene richiesta la creazione
+  // del suo BindSourceAdapter (del master), venga scatenata anche la creazione
+  // anche di tutti gli adapters relativi ai presenters di dettaglio (che si sono
+  // registrati). In questo modo evito alcuni problemi di "sequenza" dovuti
+  // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
+  // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
+  // DesignTime (WhereStr property) non funzionassero per questo motivo.
+  FDetailBindSourceContainer := nil;
   // Page manager
   FPaging := TioCommonBSAPageManager.Create(
     procedure
@@ -344,6 +369,10 @@ end;
 destructor TioPrototypeBindSourceCustom.Destroy;
 begin
   FWhereStr.Free;
+  // If the DetailPresenterContainer was created then destroy it
+  if Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer.Free;
+  // Destroy paging object
   FPaging.Free;
   inherited;
 end;
@@ -643,6 +672,12 @@ begin
     TioComponentsCommon.RegisterConnectionDefComponents(Owner);
   // ===========================================================================
 
+  // REGISTER ITSELF AS DETAIL MODEL PRESENTER (IF IT IS A DETAIL) INTO THE MASTER PRESENTER
+  // ===========================================================================
+  if IsDetailBS then
+    MasterBindSource.RegisterDetailBindSource(Self);
+  // ===========================================================================
+
   // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
   // ===========================================================================
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
@@ -670,6 +705,18 @@ procedure TioPrototypeBindSourceCustom.Open;
 begin
   if not Active then
     Active := True;
+end;
+
+procedure TioPrototypeBindSourceCustom.OpenCLoseDetails(const AActive: Boolean);
+var
+  LBindSource: TioPrototypeBindSourceCustom;
+begin
+  if Assigned(FDetailBindSourceContainer) then
+    for LBindSource in FDetailBindSourceContainer do
+      if AActive then
+        LBindSource.Open
+      else
+        LBindSource.Close;
 end;
 
 procedure TioPrototypeBindSourceCustom.PersistAll;
@@ -711,12 +758,25 @@ begin
     GetInternalAdapter.Refresh;
 end;
 
+procedure TioPrototypeBindSourceCustom.RegisterDetailBindSource(const ADetailBindSource: TioPrototypeBindSourceCustom);
+begin
+  if not Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer := TList<TioPrototypeBindSourceCustom>.Create;
+  FDetailBindSourceContainer.Add(ADetailBindSource);
+end;
+
 procedure TioPrototypeBindSourceCustom.SelectCurrent(ASelectionType: TioSelectionType);
 begin
   if IsInterfacePresenting then
     TioCommonBSBehavior.Select<IInterface>(Self, FSelectorFor, CurrentAs<IInterface>, ASelectionType)
   else
     TioCommonBSBehavior.Select<TObject>(Self, FSelectorFor, Current, ASelectionType);
+end;
+
+procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
+begin
+  inherited;
+  OpenCLoseDetails(Value);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAsync(const Value: Boolean);

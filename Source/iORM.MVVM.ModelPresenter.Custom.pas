@@ -66,7 +66,7 @@ type
     FSelectorFor: TioModelPresenterCustom;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
-    // Questà è una collezione dove eventuali ModelPresenters di dettaglio
+    // Questà è una collezione dove eventuali ModelPresenter di dettaglio
     // si registrano per rendere nota la loro esistenza al Master. Sarà poi
     // usata dal Master per fare in modo che, quando viene richiesta la creazione
     // del suo BindSourceAdapter (del master), venga scatenata anche la creazione
