@@ -36,7 +36,7 @@ type
     FSelectorFor: TioDataSetCustom;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
-    // Questà è una collezione dove eventuali ModelPresenters di dettaglio
+    // Questà è una collezione dove eventuali DataSet di dettaglio
     // si registrano per rendere nota la loro esistenza al Master. Sarà poi
     // usata dal Master per fare in modo che, quando viene richiesta la creazione
     // del suo BindSourceAdapter (del master), venga scatenata anche la creazione
@@ -55,7 +55,8 @@ type
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function AdapterExists: Boolean; // IioNotifiableBindSource
-    function IsActive: Boolean;
+    function IsActive: Boolean; // IioStdActionTargetBindSource
+    procedure OpenCLoseDetails(const AActive: Boolean);
     // Async
     procedure SetAsync(const Value: Boolean);
     // LoadType
@@ -102,13 +103,8 @@ type
     procedure Loaded; override;
     function IsMasterBS: boolean; virtual; abstract;
     function IsDetailBS: boolean; virtual; abstract;
-
-
-
     procedure DoAfterOpen; override;
-
-
-
+    procedure DoBeforeCLose; override;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Selectors related event for TObject selection
@@ -160,7 +156,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
-    procedure RegisterDetailPresenter(const ADetailDataSet: TioDataSetCustom);
+    procedure RegisterDetailDataSet(const ADetailDataSet: TioDataSetCustom);
     procedure ForceDetailAdaptersCreation;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
@@ -233,7 +229,7 @@ begin
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
   FOnReceiveSelectionFreeObject := True;
-  // Questà è una collezione dove eventuali ModelPresenters di dettaglio
+  // Questà è una collezione dove eventuali DataSet di dettaglio
   // si registrano per rendere nota la loro esistenza al Master. Sarà poi
   // usata dal Master per fare in modo che, quando viene richiesta la creazione
   // del suo BindSourceAdapter (del master), venga scatenata anche la creazione
@@ -312,7 +308,7 @@ end;
 destructor TioDataSetCustom.Destroy;
 begin
   FWhereStr.Free;
-  // If the DetailPresenterContainer was created then destroy it
+  // If the DetailDataSetContainer was created then destroy it
   if Assigned(FDetailDatasetContainer) then
     FDetailDatasetContainer.Free;
   // Destroy paging object
@@ -330,21 +326,21 @@ begin
 end;
 
 procedure TioDataSetCustom.DoAfterOpen;
-var
-  LDataSet: TioDataSetCustom;
 begin
   inherited;
-  if Assigned(FDetailDatasetContainer) then
-  begin
-    for LDataSet in FDetailDatasetContainer do
-      LDataSet.Open;
-  end
+  OpenCLoseDetails(True);
 end;
 
 procedure TioDataSetCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
+end;
+
+procedure TioDataSetCustom.DoBeforeCLose;
+begin
+  inherited;
+  OpenCLoseDetails(False);
 end;
 
 procedure TioDataSetCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -483,7 +479,7 @@ begin
   // REGISTER ITSELF AS DETAIL MODEL PRESENTER (IF IT IS A DETAIL) INTO THE MASTER PRESENTER
   // ===========================================================================
   if IsDetailBS then
-    MasterDataSet.RegisterDetailPresenter(Self);
+    MasterDataSet.RegisterDetailDataSet(Self);
   // ===========================================================================
 
   inherited;
@@ -492,6 +488,18 @@ end;
 procedure TioDataSetCustom.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
+end;
+
+procedure TioDataSetCustom.OpenCLoseDetails(const AActive: Boolean);
+var
+  LDataSet: TioDataSetCustom;
+begin
+  if Assigned(FDetailDatasetContainer) then
+    for LDataSet in FDetailDatasetContainer do
+      if AActive then
+        LDataSet.Open
+      else
+        LDataSet.Close;
 end;
 
 procedure TioDataSetCustom.PersistAll;
@@ -518,7 +526,7 @@ begin
     GetActiveBindSourceAdapter.Refresh(ANotify);
 end;
 
-procedure TioDataSetCustom.RegisterDetailPresenter(const ADetailDataSet: TioDataSetCustom);
+procedure TioDataSetCustom.RegisterDetailDataSet(const ADetailDataSet: TioDataSetCustom);
 begin
   if not Assigned(FDetailDatasetContainer) then
     FDetailDatasetContainer := TList<TioDataSetCustom>.Create;

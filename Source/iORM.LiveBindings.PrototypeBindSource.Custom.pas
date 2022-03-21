@@ -89,7 +89,7 @@ type
 {$ENDIF}
     // =========================================================================
     function AdapterExists: Boolean; // IioNotifiableBindSource
-    function IsActive: Boolean;
+    function IsActive: Boolean; // IioStdActionTargetBindSource
     // Async
     procedure SetAsync(const Value: Boolean);
     // LoadType

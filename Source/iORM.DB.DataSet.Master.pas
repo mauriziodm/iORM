@@ -40,8 +40,6 @@ type
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
     procedure DoBeforeOpen; override;  // In TioPrototypeBindSourceMaster is SetActive but here is DoBeforeOpen, DoAfterOpen and DoBeforeClose
-    procedure DoAfterOpen; override;  // In TioPrototypeBindSourceMaster is SetActive but here is DoBeforeOpen, DoAfterOpen and DoBeforeClose
-    procedure DoBeforeClose; override;  // In TioPrototypeBindSourceMaster is SetActive but here is DoBeforeOpen, DoAfterOpen and DoBeforeClose
     procedure DoBeforeScroll; override;  // In TioPrototypeBindSourceMaster is PosChanging but here is DoBeforeScroll
   public
     constructor Create(AOwner: TComponent); override;
@@ -107,20 +105,6 @@ destructor TioDataSetMaster.Destroy;
 begin
   FPersistence.Free;
   inherited;
-end;
-
-procedure TioDataSetMaster.DoAfterOpen;
-begin
-  inherited;
-  // Send a notification to all client BS to open after
-  GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntBSOpen));
-end;
-
-procedure TioDataSetMaster.DoBeforeClose;
-begin
-  inherited;
-  // If closing send a notification to all client BS to close itself first
-//  GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntBSCLose));
 end;
 
 procedure TioDataSetMaster.DoBeforeOpen;
