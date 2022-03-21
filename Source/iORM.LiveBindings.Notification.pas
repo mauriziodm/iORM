@@ -39,7 +39,7 @@ type
 
   // NB: The acronym SUD means "Smart Update Detection"
   TioBSNotificationType = (ntRefresh, ntScroll, ntSaveRevertPoint, ntCanDoSelection, ntCanInsertDetail, ntCanDeleteDetail, ntDeleteSmart, ntObjStatusSetDeleted,
-    ntObjStatusSetDirty, ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost, ntSUD_RegisterDetailPropertyPath);
+    ntObjStatusSetDirty, ntSUD_RegisterObjOnEdit, ntSUD_RegisterObjOnPost, ntSUD_RegisterDetailPropertyPath, ntBSOpen, ntBSClose);
 
   PioBSNotification = ^TioBSNotification;
 
@@ -153,6 +153,16 @@ begin
         DeliverToMasterBS := True;
         DeliverToDetailBS := False;
         StopAtTheFirstMasterBS := True;
+      end;
+    // NB: ntBSOpen/ntBSClose is for BindSourceAdapters:
+    // Actually used for BindSourceAdapters to open/close all detail bind source adapters of a masterBS:
+    ntBSOpen, ntBSClose:
+      begin
+        DirectionRoot := False;
+        DirectionLeaves := True;
+        DeliverToMasterBS := True;
+        DeliverToDetailBS := True;
+        StopAtTheFirstMasterBS := False;
       end;
   // Else raise exception
   else

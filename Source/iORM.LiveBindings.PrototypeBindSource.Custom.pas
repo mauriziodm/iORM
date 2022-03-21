@@ -131,6 +131,8 @@ type
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
+    procedure Open;
+    procedure Close;
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
@@ -303,6 +305,12 @@ procedure TioPrototypeBindSourceCustom.ClearDataObject;
 begin
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ClearDataObject;
+end;
+
+procedure TioPrototypeBindSourceCustom.Close;
+begin
+  if Active then
+    Active := False;
 end;
 
 constructor TioPrototypeBindSourceCustom.Create(AOwner: TComponent);
@@ -656,6 +664,12 @@ end;
 procedure TioPrototypeBindSourceCustom.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
+end;
+
+procedure TioPrototypeBindSourceCustom.Open;
+begin
+  if not Active then
+    Active := True;
 end;
 
 procedure TioPrototypeBindSourceCustom.PersistAll;

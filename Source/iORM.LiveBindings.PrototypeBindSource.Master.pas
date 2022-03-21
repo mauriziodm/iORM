@@ -40,8 +40,7 @@ type
   protected
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
-    procedure SetActive(const Value: Boolean); override; // In TioDataSetMaster is DoBeforeOpen but here is SetActive
-//    procedure DoBeforeScroll; override;
+    procedure SetActive(const Value: Boolean); override; // In TioDataSetMaster is DoBeforeOpen/DoAfterOpen/DoBeforeClose but here is SetActive
     procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioDataSetMaster is DoBeforeScroll but here is PosChanging
   public
     constructor Create(AOwner: TComponent); override;
@@ -96,7 +95,8 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
+  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
+  iORM.LiveBindings.Notification;
 
 { TioPrototypeBindSourceMaster }
 
@@ -172,8 +172,20 @@ end;
 
 procedure TioPrototypeBindSourceMaster.SetActive(const Value: Boolean);
 begin
+  // If closing send a notification to all client BS to close itself first
+  if not Value then
+    GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntBSCLose));
+
   inherited;
-  Persistence.Clear(False);
+
+  // If opening
+  if Value then
+  begin
+    // Clear the BSPersistence status
+    Persistence.Clear(False);
+    // Send a notification to all client BS to open after
+    GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntBSOpen));
+  end;
 end;
 
 procedure TioPrototypeBindSourceMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);

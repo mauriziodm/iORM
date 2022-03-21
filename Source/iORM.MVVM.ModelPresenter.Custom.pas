@@ -146,6 +146,8 @@ type
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
   protected
+    procedure Open;
+    procedure Close;
     procedure Loaded; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
@@ -325,6 +327,12 @@ procedure TioModelPresenterCustom.ClearDataObject;
 begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.ClearDataObject;
+end;
+
+procedure TioModelPresenterCustom.Close;
+begin
+  if Active then
+    Active := False;
 end;
 
 constructor TioModelPresenterCustom.Create(AOwner: TComponent);
@@ -728,6 +736,12 @@ end;
 procedure TioModelPresenterCustom.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
+end;
+
+procedure TioModelPresenterCustom.Open;
+begin
+  if not Active then
+    Active := True;
 end;
 
 procedure TioModelPresenterCustom.PersistAll;
