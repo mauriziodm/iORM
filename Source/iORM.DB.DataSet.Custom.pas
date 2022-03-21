@@ -102,6 +102,13 @@ type
     procedure Loaded; override;
     function IsMasterBS: boolean; virtual; abstract;
     function IsDetailBS: boolean; virtual; abstract;
+
+
+
+    procedure DoAfterOpen; override;
+
+
+
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Selectors related event for TObject selection
@@ -320,6 +327,18 @@ procedure TioDataSetCustom.DoAfterSelection(var ASelected: TObject; var ASelecti
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
+end;
+
+procedure TioDataSetCustom.DoAfterOpen;
+var
+  LDataSet: TioDataSetCustom;
+begin
+  inherited;
+  if Assigned(FDetailDatasetContainer) then
+  begin
+    for LDataSet in FDetailDatasetContainer do
+      LDataSet.Open;
+  end
 end;
 
 procedure TioDataSetCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);

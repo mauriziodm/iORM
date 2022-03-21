@@ -47,9 +47,7 @@ type
   TioComponentsCommon = class
   public
     class procedure RegisterConnectionDefComponents(const AOwner:TComponent); static;
-    class procedure ViewModelBridgeAutosetting(
-      const AVMBridgeClientComponent: IioVMBridgeClientComponent;
-      const AOwner: TComponent);
+    class procedure ViewModelBridgeAutosetting(const AVMBridgeClientComponent: IioVMBridgeClientComponent; const AOwner: TComponent);
   end;
 
 implementation
@@ -79,9 +77,7 @@ begin
   end;
 end;
 
-class procedure TioComponentsCommon.ViewModelBridgeAutosetting(
-  const AVMBridgeClientComponent: IioVMBridgeClientComponent;
-  const AOwner: TComponent);
+class procedure TioComponentsCommon.ViewModelBridgeAutosetting(const AVMBridgeClientComponent: IioVMBridgeClientComponent; const AOwner: TComponent);
 var
   I: Integer;
   procedure AutoCreateViewModelBridgeIfNotExist;

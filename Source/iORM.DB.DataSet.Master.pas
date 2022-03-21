@@ -120,7 +120,7 @@ procedure TioDataSetMaster.DoBeforeClose;
 begin
   inherited;
   // If closing send a notification to all client BS to close itself first
-  GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntBSCLose));
+//  GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntBSCLose));
 end;
 
 procedure TioDataSetMaster.DoBeforeOpen;
