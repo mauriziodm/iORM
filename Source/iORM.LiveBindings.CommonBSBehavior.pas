@@ -99,12 +99,6 @@ begin
     ntSUD_RegisterObjOnPost:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
         LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyPost(ANotification.PayloadAsObject, ANotification.PayloadAsString);
-    // NB: ntBSOpen/ntBSClose is for BindSourceAdapters:
-    // Actually used for BindSourceAdapters to open/close all detail bind source adapters of a masterBS:
-    ntBSOpen:
-      ATargetBS.Open;
-    ntBSClose:
-      ATargetBS.Close;
   end;
 end;
 
