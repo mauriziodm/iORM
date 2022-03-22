@@ -88,7 +88,7 @@ type
   TioSelectionType = (stAppend, stInsert);
 
   // LoadType property for BindSources
-  TioLoadType = (ltSetDataObject, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltByTypeName, ltAuto);
+  TioLoadType = (ltManual, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
   // Some pointers to TValue
   PValue = ^TValue;

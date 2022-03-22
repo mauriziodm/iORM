@@ -102,6 +102,7 @@ end;
 constructor TioModelPresenterMaster.Create(AOwner: TComponent);
 begin
   inherited;
+  LoadType := ltAuto;
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
   FOnUpdateAction := uaSetSmartUpdateStateLess;

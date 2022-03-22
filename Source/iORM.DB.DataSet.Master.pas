@@ -93,6 +93,7 @@ uses
 constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
+  LoadType := ltAuto;
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
   FOnUpdateAction := uaSetSmartUpdateStateLess;

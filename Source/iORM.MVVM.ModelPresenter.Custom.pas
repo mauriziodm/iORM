@@ -175,7 +175,7 @@ type
     property Eof: Boolean read GetEOF; // Public: Master+Detail
     // Published properties
     property Async: Boolean read FAsync write SetAsync default False; // Published: Master
-    property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // Published: Master
+    property LoadType: TioLoadType read FLoadType write SetLoadType default ltManual; // Published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
@@ -354,7 +354,7 @@ begin
   FAutoPost := False;
   FAutoRefreshOnNotification := True;
   FAsync := False;
-  FLoadType := ltAuto;
+  FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
   FViewDataType := TioViewDataType.dtListOfObjects;

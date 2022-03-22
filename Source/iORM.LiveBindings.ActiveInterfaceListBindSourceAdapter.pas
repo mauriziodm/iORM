@@ -454,7 +454,7 @@ end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetAutoLoad: Boolean;
 begin
-  Result := FLoadType >= ltByTypeName;
+  Result := FLoadType = ltAuto;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetBindSource: IioNotifiableBindSource;
@@ -801,7 +801,7 @@ begin
     // then restore the original value of the "AutoLoadData" property.
     LPrecLoadType := FLoadType;
     try
-      FLoadType := ltSetDataObject;
+      FLoadType := ltManual;
       Active := True;
     finally
       FLoadType := LPrecLoadType;

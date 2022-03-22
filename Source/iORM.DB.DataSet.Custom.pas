@@ -127,7 +127,7 @@ type
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
-    property LoadType: TioLoadType read FLoadType write SetLoadType default ltAuto; // published: Master
+    property LoadType: TioLoadType read FLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -219,7 +219,7 @@ begin
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsync := False;
-  FLoadType := ltAuto;
+  FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
   FViewDataType := TioViewDataType.dtListOfObjects;
