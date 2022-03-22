@@ -16,7 +16,6 @@ type
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
-    function IsActive: Boolean;
     // SourceModelPresenter
     function GetSourcePresenter: TioModelPresenterCustom;
     procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
@@ -45,6 +44,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Open; override;
+    procedure Close; override;
     property Active;
     property Where;
     property ItemCount;
@@ -91,6 +92,12 @@ uses
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 { TioModelPresenterMaster }
+
+procedure TioModelPresenterMaster.Close;
+begin
+  inherited;
+  // Only to make the existing protected method public
+end;
 
 constructor TioModelPresenterMaster.Create(AOwner: TComponent);
 begin
@@ -144,11 +151,6 @@ begin
   Result := MasterPresenter;
 end;
 
-function TioModelPresenterMaster.IsActive: Boolean;
-begin
-  Result := Active;
-end;
-
 function TioModelPresenterMaster.IsDetailBS: boolean;
 begin
   // Do not inherit
@@ -159,6 +161,12 @@ function TioModelPresenterMaster.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := True;
+end;
+
+procedure TioModelPresenterMaster.Open;
+begin
+  inherited;
+  // Only to make the existing protected method public
 end;
 
 procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);

@@ -53,6 +53,8 @@ type
     FioLoaded: Boolean;
     procedure PreventBindSourceAdapterDestruction;
   protected
+    procedure Open;
+    procedure Close;
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
 //    procedure DoBeforeOpen; override; // NB:  In TioCustomModelPresenter is DoBeforeOpen but here is SetActive
@@ -86,6 +88,12 @@ uses
 
 { TioModelBindSource }
 
+procedure TioModelBindSource.Close;
+begin
+  if Active then
+    Active := False;
+end;
+
 constructor TioModelBindSource.Create(AOwner: TComponent);
 begin
   inherited;
@@ -105,6 +113,19 @@ end;
 destructor TioModelBindSource.Destroy;
 begin
   PreventBindSourceAdapterDestruction;
+
+  // UNREGISTER ITSELF AS MODELDATASET/MODELBINDSOURCE CONNECTED TO A MODELPRESENTER
+  //  FOR REMOTED OPEN/CLOSE  BY MODELPRESETER
+  // ===========================================================================
+  if Assigned(ViewModelBridge) and not(csDesigning in ComponentState) then
+  begin
+    ViewModelBridge.CheckForViewModel;
+    // Register itself as ModelDataSet/ModelBindSource (IioVMBridgeClientComponent)
+    //  connected to a ModelPresenter for remoted open/close by ModelPresenter
+    ViewModelBridge.Presenter[ModelPresenter].UnregisterViewBindSource(Self);
+  end;
+
+  // ===========================================================================
   inherited;
 end;
 
@@ -170,7 +191,12 @@ begin
   // (ALWAYS BEFORE DOCREATEADAPTER CALL)
   // ===========================================================================
   if Assigned(ViewModelBridge) and not(csDesigning in ComponentState) then
+  begin
     ViewModelBridge.CheckForViewModel;
+    // Register itself as ModelDataSet/ModelBindSource (IioVMBridgeClientComponent)
+    //  connected to a ModelPresenter for remoted open/close by ModelPresenter
+    ViewModelBridge.Presenter[ModelPresenter].RegisterViewBindSource(Self);
+  end;
   // ===========================================================================
 
   // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
@@ -196,6 +222,12 @@ begin
   inherited;
   if (Operation = opRemove) and (AComponent = FViewModelBridge) then
     FViewModelBridge := nil;
+end;
+
+procedure TioModelBindSource.Open;
+begin
+  if not Active then
+    Active := True;
 end;
 
 procedure TioModelBindSource.PosChanging(ABindComp: TBasicBindComponent);

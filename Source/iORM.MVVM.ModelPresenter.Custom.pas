@@ -76,6 +76,11 @@ type
     // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
     FDetailPresentersContainer: TList<TioModelPresenterCustom>;
+    // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
+    //  la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
+    //  parte del ModelPresenter al quale sono collegati
+    //  NB: IInterface per evitare un circular reference error
+    FViewBindSourceContainer: TList<IInterface>;
     // Questo è un riferimento di tipo interfaccia e serve solo per
     // mantenere in vita l'oggetto
     // FDummyInterfaceRef: IInterface; NB: Hint prevention "symbol declared but never used"
@@ -86,11 +91,12 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
-//    function IsActive: Boolean;
     // Methods
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     function AdapterExists: Boolean; // IioNotifiableBindSource
+    procedure OpenCloseViewBindSources(const AActive: Boolean);
+    procedure OpenCloseDetails(const AActive: Boolean);
     // Active
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
@@ -146,8 +152,8 @@ type
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
   protected
-    procedure Open;
-    procedure Close;
+    procedure Open; virtual;
+    procedure Close; virtual;
     procedure Loaded; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
@@ -200,6 +206,11 @@ type
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailPresenter(const ADetailPresenter: TioModelPresenterCustom);
+
+    // ViewBindSource remote open/close management (ModelBindSource/ModelDataSet)
+    procedure RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
+    procedure UnregisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
+
     procedure ForceDetailAdaptersCreation;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     // ----------------------------------------------------------------------------------------------------------------------------
@@ -211,6 +222,7 @@ type
     procedure Edit(AForce: Boolean = False);
     procedure Post;
     procedure PostIfEditing;
+    function IsActive: Boolean;
     function Current: TObject;
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
@@ -263,7 +275,8 @@ implementation
 uses
   iORM.Where.Factory, iORM.LiveBindings.Factory,
   iORM.Exceptions, iORM.Utilities, iORM, iORM.Components.Common,
-  iORM.LiveBindings.CommonBSBehavior, iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.CommonBSBehavior, iORM.LiveBindings.BSPersistence,
+  iORM.Components.Common.Interfaces;
 
 { TioModelProvider }
 
@@ -361,6 +374,10 @@ begin
   // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
   // DesignTime (WhereStr property) non funzionassero per questo motivo.
   FDetailPresentersContainer := nil;
+  // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
+  //  la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
+  //  parte del ModelPresenter al quale sono collegati
+  FViewBindSourceContainer := TList<IInterface>.Create;
   // At DesignTime initialize the "AsDefault" property at True if it is the
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
@@ -410,6 +427,10 @@ begin
   // Destroy the BindSourceAdapter was created then destroy it
   if CheckAdapter then
     FBindSourceAdapter.Free;
+  // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
+  //  la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
+  //  parte del ModelPresenter al quale sono collegati
+  FViewBindSourceContainer.Free;
   // If the DetailPresenterContainer was created then destroy it
   if Assigned(FDetailPresentersContainer) then
     FDetailPresentersContainer.Free;
@@ -744,6 +765,29 @@ begin
     Active := True;
 end;
 
+procedure TioModelPresenterCustom.OpenCloseDetails(const AActive: Boolean);
+var
+  LDetailModelPresenter: TioModelPresenterCustom;
+begin
+  if Assigned(FDetailPresentersContainer) then
+    for LDetailModelPresenter in FDetailPresentersContainer do
+      if AActive then
+        LDetailModelPresenter.Open
+      else
+        LDetailModelPresenter.Close;
+end;
+
+procedure TioModelPresenterCustom.OpenCloseViewBindSources(const AActive: Boolean);
+var
+  LViewBindSource: IInterface;
+begin
+  for LViewBindSource in FViewBindSourceContainer do
+    if AActive then
+      (LViewBindSource as IioVMBridgeClientComponent).Open
+    else
+      (LViewBindSource as IioVMBridgeClientComponent).Close;
+end;
+
 procedure TioModelPresenterCustom.PersistAll;
 begin
   if CheckAdapter then
@@ -787,10 +831,23 @@ begin
   FDetailPresentersContainer.Add(ADetailPresenter);
 end;
 
+procedure TioModelPresenterCustom.RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
+begin
+  if not Supports(AModelBindSourceOrModelDataSet, IioVMBridgeClientComponent) then
+    raise EioException.Create(Self.ClassName, 'RegisterVewBindSource', '"AModelBindSourceOrModelDataSet" parameter must be a "IioVMBridgeClientComponent" implementer');
+  if not FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
+    FViewBindSourceContainer.Add(AModelBindSourceOrModelDataSet);
+end;
+
 procedure TioModelPresenterCustom.SetActive(const Value: Boolean);
+
 begin
   if CheckAdapter(True) then
     GetActiveBindSourceAdapter.Active := Value;
+  // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
+  OpenCloseViewBindSources(Value);
+  // Open/Close registered details model presenters
+  OpenCloseDetails(Value);
 end;
 
 procedure TioModelPresenterCustom.SetAsDefault(const Value: Boolean);
@@ -1015,6 +1072,14 @@ begin
   io.ShowEach(Self, AViewContext, AAlias);
 end;
 
+procedure TioModelPresenterCustom.UnregisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
+begin
+  if not Supports(AModelBindSourceOrModelDataSet, IioVMBridgeClientComponent) then
+    raise EioException.Create(Self.ClassName, 'RegisterVewBindSource', '"AModelBindSourceOrModelDataSet" parameter must be a "IioVMBridgeClientComponent" implementer');
+  if FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
+    FViewBindSourceContainer.Extract(AModelBindSourceOrModelDataSet);
+end;
+
 procedure TioModelPresenterCustom.ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String);
 begin
   io.ShowEach(Self, AVCProvider, AAlias);
@@ -1078,6 +1143,11 @@ end;
 //begin
 //  Result := CheckAdapter and FBindSourceAdapter.Active;
 //end;
+
+function TioModelPresenterCustom.IsActive: Boolean;
+begin
+  Result := Active;
+end;
 
 class function TioModelPresenterCustom.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom;
 const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;

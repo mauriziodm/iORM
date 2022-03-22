@@ -328,7 +328,7 @@ end;
 procedure TioDataSetCustom.DoAfterOpen;
 begin
   inherited;
-  OpenCLoseDetails(True);
+  OpenCloseDetails(True);
 end;
 
 procedure TioDataSetCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -340,7 +340,7 @@ end;
 procedure TioDataSetCustom.DoBeforeCLose;
 begin
   inherited;
-  OpenCLoseDetails(False);
+  OpenCloseDetails(False);
 end;
 
 procedure TioDataSetCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -492,14 +492,14 @@ end;
 
 procedure TioDataSetCustom.OpenCLoseDetails(const AActive: Boolean);
 var
-  LDataSet: TioDataSetCustom;
+  LDetailDataSet: TioDataSetCustom;
 begin
   if Assigned(FDetailDatasetContainer) then
-    for LDataSet in FDetailDatasetContainer do
+    for LDetailDataSet in FDetailDatasetContainer do
       if AActive then
-        LDataSet.Open
+        LDetailDataSet.Open
       else
-        LDataSet.Close;
+        LDetailDataSet.Close;
 end;
 
 procedure TioDataSetCustom.PersistAll;

@@ -28,6 +28,7 @@ type
     function GetViewModelBridge: TioViewModelBridge;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
@@ -58,6 +59,23 @@ end;
 procedure TioModelDataSet.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
   GetModelPresenterInstance.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
+end;
+
+destructor TioModelDataSet.Destroy;
+begin
+  // UNREGISTER ITSELF AS MODELDATASET/MODELBINDSOURCE CONNECTED TO A MODELPRESENTER
+  //  FOR REMOTED OPEN/CLOSE  BY MODELPRESETER
+  // ===========================================================================
+  if Assigned(ViewModelBridge) and not(csDesigning in ComponentState) then
+  begin
+    ViewModelBridge.CheckForViewModel;
+    // Register itself as ModelDataSet/ModelBindSource (IioVMBridgeClientComponent)
+    //  connected to a ModelPresenter for remoted open/close by ModelPresenter
+    ViewModelBridge.Presenter[ModelPresenter].UnregisterViewBindSource(Self);
+  end;
+  // ===========================================================================
+
+  inherited;
 end;
 
 procedure TioModelDataSet.DoBeforeOpen;
@@ -121,7 +139,14 @@ begin
   // (ALWAYS BEFORE DOCREATEADAPTER CALL)
   // ===========================================================================
   if Assigned(ViewModelBridge) and not(csDesigning in ComponentState) then
+  begin
     ViewModelBridge.CheckForViewModel;
+    // Register itself as ModelDataSet/ModelBindSource (IioVMBridgeClientComponent)
+    //  connected to a ModelPresenter for remoted open/close by ModelPresenter
+    ViewModelBridge.Presenter[ModelPresenter].RegisterViewBindSource(Self);
+    // open itself if the ModelPresenter is already active
+    Active := ViewModelBridge.Presenter[ModelPresenter].IsActive;
+  end;
   // ===========================================================================
 
   inherited;

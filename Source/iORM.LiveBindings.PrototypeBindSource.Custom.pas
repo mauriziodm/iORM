@@ -709,14 +709,14 @@ end;
 
 procedure TioPrototypeBindSourceCustom.OpenCLoseDetails(const AActive: Boolean);
 var
-  LBindSource: TioPrototypeBindSourceCustom;
+  LDetailBindSource: TioPrototypeBindSourceCustom;
 begin
   if Assigned(FDetailBindSourceContainer) then
-    for LBindSource in FDetailBindSourceContainer do
+    for LDetailBindSource in FDetailBindSourceContainer do
       if AActive then
-        LBindSource.Open
+        LDetailBindSource.Open
       else
-        LBindSource.Close;
+        LDetailBindSource.Close;
 end;
 
 procedure TioPrototypeBindSourceCustom.PersistAll;
@@ -776,7 +776,7 @@ end;
 procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
 begin
   inherited;
-  OpenCLoseDetails(Value);
+  OpenCloseDetails(Value);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAsync(const Value: Boolean);
