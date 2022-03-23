@@ -10,12 +10,15 @@ type
 
   TioModelPresenterMaster = class(TioModelPresenterCustom, IioBSPersistenceClient)
   private
+    FWannaBeActive: Boolean;
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    // MasterPresenter
+    procedure SetMasterPresenter(const Value: TioModelPresenterCustom); override;
     // SourceModelPresenter
     function GetSourcePresenter: TioModelPresenterCustom;
     procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
@@ -37,10 +40,13 @@ type
     function GetOnRecordChangeAction: TioBSOnRecordChangeAction;
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
   protected
+    function PostPonedActivation_CanOpen(const ANewDataObject: TObject): Boolean;
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); override;
+    procedure SetActive(const Value: Boolean); override;
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
-//    procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
-//    procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
+    // procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
+    // procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -102,6 +108,7 @@ end;
 constructor TioModelPresenterMaster.Create(AOwner: TComponent);
 begin
   inherited;
+  FWannaBeActive := False;
   LoadType := ltAuto;
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
@@ -152,13 +159,13 @@ begin
   Result := MasterPresenter;
 end;
 
-function TioModelPresenterMaster.IsDetailBS: boolean;
+function TioModelPresenterMaster.IsDetailBS: Boolean;
 begin
   // Do not inherit
   Result := False;
 end;
 
-function TioModelPresenterMaster.IsMasterBS: boolean;
+function TioModelPresenterMaster.IsMasterBS: Boolean;
 begin
   // Do not inherit
   Result := True;
@@ -168,6 +175,36 @@ procedure TioModelPresenterMaster.Open;
 begin
   inherited;
   // Only to make the existing protected method public
+end;
+
+function TioModelPresenterMaster.PostPonedActivation_CanOpen(const ANewDataObject: TObject): Boolean;
+begin
+  case LoadType of
+    ltManual:
+      Result := FWannaBeActive and ((DataObject <> nil) or (ANewDataObject <> nil));
+    ltFromBSAsIs .. ltFromBSReloadNewInstance:
+      Result := FWannaBeActive and Assigned(SourcePresenter);
+  else
+    Result := FWannaBeActive;
+  end;
+end;
+
+procedure TioModelPresenterMaster.SetActive(const Value: Boolean);
+begin
+  FWannaBeActive := Value;
+  inherited;
+end;
+
+procedure TioModelPresenterMaster.SetMasterPresenter(const Value: TioModelPresenterCustom);
+begin
+  inherited;
+  if FWannaBeActive and not Active then
+    Open;
+end;
+
+procedure TioModelPresenterMaster.SetSourcePresenter(const Value: TioModelPresenterCustom);
+begin
+  MasterPresenter := Value;
 end;
 
 procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);
@@ -199,9 +236,10 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioModelPresenterMaster.SetSourcePresenter(const Value: TioModelPresenterCustom);
+procedure TioModelPresenterMaster._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  MasterPresenter := Value;
+  if PostPonedActivation_CanOpen(ADataObject) then
+    inherited;
 end;
 
 end.

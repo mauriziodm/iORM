@@ -92,14 +92,10 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Methods
-    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     function AdapterExists: Boolean; // IioNotifiableBindSource
     procedure OpenCloseViewBindSources(const AActive: Boolean);
     procedure OpenCloseDetails(const AActive: Boolean);
-    // Active
-    function GetActive: Boolean;
-    procedure SetActive(const Value: Boolean);
     // AsDefault
     procedure SetAsDefault(const Value: Boolean);
     procedure InitAsDefaultOnCreate;
@@ -157,6 +153,12 @@ type
     procedure Loaded; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
+    // Active
+    function GetActive: Boolean;
+    procedure SetActive(const Value: Boolean); virtual;
+    // MasterPresenter
+    procedure SetMasterPresenter(const Value: TioModelPresenterCustom); virtual;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -261,7 +263,7 @@ type
     // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
     property AsDefault: Boolean read FAsDefault write SetAsDefault; // Published: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail
-    property MasterPresenter: TioModelPresenterCustom read FMasterPresenter write FMasterPresenter; // Published: Detail
+    property MasterPresenter: TioModelPresenterCustom read FMasterPresenter write SetMasterPresenter; // Published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // Published: Detail
     property OrderBy: String read FOrderBy Write SetOrderBy; // Published: Master
     property TypeName: String read FTypeName write SetTypeName; // Published: Master
@@ -840,14 +842,15 @@ begin
 end;
 
 procedure TioModelPresenterCustom.SetActive(const Value: Boolean);
-
 begin
   if CheckAdapter(True) then
+  begin
     GetActiveBindSourceAdapter.Active := Value;
-  // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
-  OpenCloseViewBindSources(Value);
-  // Open/Close registered details model presenters
-  OpenCloseDetails(Value);
+    // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
+    OpenCloseViewBindSources(Value);
+    // Open/Close registered details model presenters
+    OpenCloseDetails(Value);
+  end;
 end;
 
 procedure TioModelPresenterCustom.SetAsDefault(const Value: Boolean);
@@ -959,6 +962,11 @@ begin
     FBindSourceAdapter.ItemIndex := Value
   else
     raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
+end;
+
+procedure TioModelPresenterCustom.SetMasterPresenter(const Value: TioModelPresenterCustom);
+begin
+  FMasterPresenter := Value;
 end;
 
 procedure TioModelPresenterCustom.SetMasterPropertyName(const Value: String);
