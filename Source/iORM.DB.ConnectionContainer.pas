@@ -300,7 +300,10 @@ begin
     // If desired ConnectionName is empty then get then Default one.
     AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired connection type
-    Result := FConnectionManagerContainer.Items[AConnectionName];
+    if not FConnectionManagerContainer.TryGetValue(AConnectionName, Result) then
+      raise EioException.Create(Self.ClassName, 'GetConnectionInfo',
+        Format('Connection named "%s" not found.'#13#13'It could be that It has not been defined or that its registration in the "connection manager" has not yet taken place (sequence problem, you are trying to use the connection before this has registered).',
+        [AConnectionName]));
   finally
     _Unlock;
   end;
