@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.MVVM.Interfaces;
 
@@ -60,60 +58,57 @@ type
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function Commands: IioCommandsContainer;
-    procedure RegisterView(const AView, AViewContext: TComponent;
-      const AViewContextProvider:TioViewContextProvider;
-      const AViewContextFreeMethod:TProc);
+    procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;
+    procedure BindView(const AView: TComponent);
     // Command
     procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
     function GetCommand(const ACmdName: String): IioCommandsContainerItem;
-    property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
+    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
     // Presenter
     function GetPresenter(const AName: String): TioModelPresenterCustom;
-    property Presenter[const AName:String]:TioModelPresenterCustom read GetPresenter;
+    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
     // DefaultPresenter
     function GetDefaultPresenter: TioModelPresenterCustom;
-    property DefaultPresenter:TioModelPresenterCustom read GetDefaultPresenter;
+    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
   end;
 
   IioViewRegister = interface
     ['{7E0B50E8-B561-44E2-A8A0-6A13CA563875}']
-    procedure Add(const AView, AViewContext: TComponent;
-      const AViewContextProvider:TioViewContextProvider;
-      const AViewContextFreeMethod:TProc);
+    procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
     procedure ReleaseAllViewContexts;
     procedure HideAllViewContexts;
     procedure ShowAllViewContexts;
     function GetItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function GetItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
-    property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
-    property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
+    property ItemByView[const AView: TComponent]: TioViewContextRegisterItem read GetItemByView;
+    property ItemByViewContext[const AViewContext: TComponent]: TioViewContextRegisterItem read GetItemByViewContext;
   end;
 
   // Reference to an anonimous method called by a ViewModel when it need
-  //  to notify their views that something is changed
+  // to notify their views that something is changed
   TioCommandAnonimousMethod = reference to procedure;
 
   TioCommandInfo = record
   private
-    procedure ParseMethodName(const AMethodName:String);
+    procedure ParseMethodName(const AMethodName: String);
   public
-    Name:               TioNullableString;
-    Caption:            TioNullableString;
-    Event:              TioNullable<TioActionEvent>;
-    Enabled:            TioNullableBoolean;
-    Checked:            TioNullableBoolean;
-    GroupIndex:         TioNullableInteger;
-    Hint:               TioNullableString;
-    ImageIndex:         TioNullable<TImageIndex>;
-    Visible:            TioNullableBoolean;
+    Name: TioNullableString;
+    Caption: TioNullableString;
+    Event: TioNullable<TioActionEvent>;
+    Enabled: TioNullableBoolean;
+    Checked: TioNullableBoolean;
+    GroupIndex: TioNullableInteger;
+    Hint: TioNullableString;
+    ImageIndex: TioNullable<TImageIndex>;
+    Visible: TioNullableBoolean;
     NotificationTarget: TioNullableBoolean;
-    CommandType:        TioNullable<TioCommandType>;
-    RttiMethod:         TioNullable<TRttiMethod>;
-    Action:             TioNullable<TioAction>;
-    constructor Create(const ARttiElement:TRttiNamedObject);
+    CommandType: TioNullable<TioCommandType>;
+    RttiMethod: TioNullable<TRttiMethod>;
+    Action: TioNullable<TioAction>;
+    constructor Create(const ARttiElement: TRttiNamedObject);
   end;
 
   IioCommandsContainerItem = interface
@@ -130,59 +125,59 @@ type
     // Owner
     procedure SetOwner(const Value: TObject);
     function GetOwner: TObject;
-    property Owner:TObject read GetOwner write SetOwner;
+    property Owner: TObject read GetOwner write SetOwner;
     // Enabled
     procedure SetEnabled(const Value: Boolean);
     function GetEnabled: Boolean;
-    property Enabled:Boolean read GetEnabled write SetEnabled;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
     // Caption
     procedure SetCaption(const Value: String);
     function GetCaption: String;
-    property Caption:String read GetCaption write SetCaption;
+    property Caption: String read GetCaption write SetCaption;
     // Checked
     procedure SetChecked(const Value: Boolean);
     function GetChecked: Boolean;
-    property Checked:Boolean read GetChecked write SetChecked;
+    property Checked: Boolean read GetChecked write SetChecked;
     // GroupIndex
     procedure setGroupIndex(const Value: Integer);
     function GetGroupIndex: Integer;
-    property GroupIndex:Integer read GetGroupIndex write setGroupIndex;
+    property GroupIndex: Integer read GetGroupIndex write setGroupIndex;
     // Hint
     procedure SetHint(const Value: String);
     function GetHint: String;
-    property Hint:String read GetHint write SetHint;
+    property Hint: String read GetHint write SetHint;
     // ImageIndex
     procedure SetImageIndex(const Value: TImageIndex);
     function GetImageIndex: TImageIndex;
-    property ImageIndex:TImageIndex read GetImageIndex write SetImageIndex;
+    property ImageIndex: TImageIndex read GetImageIndex write SetImageIndex;
     // Visible
     procedure SetVisible(const Value: Boolean);
     function GetVisible: Boolean;
-    property Visible:Boolean read GetVisible write SetVisible;
+    property Visible: Boolean read GetVisible write SetVisible;
     // IsNotificationTarget
     procedure SetIsNotificationTarget(const Value: Boolean);
     function GetIsNotificationTarget: Boolean;
-    property IsNotificationTarget:Boolean read GetIsNotificationTarget write SetIsNotificationTarget;
+    property IsNotificationTarget: Boolean read GetIsNotificationTarget write SetIsNotificationTarget;
   end;
 
   IioCommandsContainer = interface
     ['{E20F72CB-9F84-44B4-A6DD-DFF73B53F0AC}']
-    procedure Add(const AName:String; const ACommandItem:IioCommandsContainerItem);
-    procedure AddOrUpdate(const AName:String; const ACommandItem:IioCommandsContainerItem);
-    procedure LoadCommands(const AOwner:TComponent);
+    procedure Add(const AName: String; const ACommandItem: IioCommandsContainerItem);
+    procedure AddOrUpdate(const AName: String; const ACommandItem: IioCommandsContainerItem);
+    procedure LoadCommands(const AOwner: TComponent);
     procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
-    procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommand(const ACommandName: String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
     procedure Delete(AName: String);
-//    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
-//    procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
-//    procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
-//    procedure Unregister(const AOwner:TComponent);
+    // procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
+    // procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
+    // procedure RegisterAnonimousMethod(const AName:String; const AOwner:TComponent; const AAnonimousMethod:TioCommandAnonimousMethod; const AIsNotificationTarget:Boolean=False);
+    // procedure Unregister(const AOwner:TComponent);
     procedure Notify;
-    procedure Execute(const AName:String; const ANoException:Boolean=False);
-    procedure BindView(const AView:TComponent);
-    procedure BindViewControl(const AControl:TObject; const ACommandName:String);
-    function Get(const AName:String; const ANoException:Boolean=False): IioCommandsContainerItem;
-    function Exists(const AName:String): Boolean;
+    procedure Execute(const AName: String; const ANoException: Boolean = False);
+    procedure BindView(const AView: TComponent);
+    procedure BindViewControl(const AControl: TObject; const ACommandName: String);
+    function Get(const AName: String; const ANoException: Boolean = False): IioCommandsContainerItem;
+    function Exists(const AName: String): Boolean;
   end;
 
 implementation
@@ -202,7 +197,7 @@ begin
     RttiMethod.Value := TRttiMethod(ARttiElement);
   end;
   // Loop for attributes and collect informations about command
-  for Lattr in ARttiElement.GetAttributes do
+  for LAttr in ARttiElement.GetAttributes do
   begin
     // ioAction attribute
     if LAttr is ioAction then
@@ -256,8 +251,7 @@ begin
   // Get the command type (exit if not valid)
   if LMethodName.StartsWith('ACTION_') then
     CommandType.Value := TioCommandType.ctAction
-  else
-  if LMethodName.StartsWith('COMMAND_') then
+  else if LMethodName.StartsWith('COMMAND_') then
     CommandType.Value := TioCommandType.ctMethod
   else
     Exit;
@@ -287,7 +281,8 @@ begin
         end;
       // -----------------------------------
       // If it is a command method
-      TioCommandType.ctMethod:;
+      TioCommandType.ctMethod:
+        ;
       // -----------------------------------
     end;
   finally

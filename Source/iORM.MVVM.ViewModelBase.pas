@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.MVVM.ViewModelBase;
 
@@ -47,20 +45,29 @@ uses
 
 type
 
+  TioViewModel = class;
+
+  TioVMOnViewPairingEvent = procedure(const Sender: TioViewModel) of object;
+
   TioViewModel = class(TDataModule, IInterface, IioViewModel) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     { Private declarations }
     FCommands: IioCommandsContainer;
     FViewRegister: IioViewRegister;
+    FOnViewPairing: TioVMOnViewPairingEvent;
+    procedure DoOnViewPairing;
+    procedure BindView(const AView: TComponent);
+    procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
   protected
-// ---------------- Start: section added for IInterface support ---------------
+    // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
-    [Volatile] FRefCount: Integer;
+    [Volatile]
+    FRefCount: Integer;
 {$ENDIF}
     function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
-// ---------------- End: section added for IInterface support ---------------
+    // ---------------- End: section added for IInterface support ---------------
     // DefaultPresenter
     function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
@@ -73,32 +80,31 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function Commands: IioCommandsContainer;
-    procedure RegisterView(const AView, AViewContext: TComponent;
-      const AViewContextProvider:TioViewContextProvider;
-      const AViewContextFreeMethod:TProc);
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;
     procedure TerminateApplication;
-// ---------------- Start: section added for IInterface support ---------------
+    // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
     class function NewInstance: TObject; override;
     property RefCount: Integer read FRefCount;
 {$ENDIF}
-// ---------------- End: section added for IInterface support ---------------
+    // ---------------- End: section added for IInterface support ---------------
     // Properties
-    property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand;
-    property DefaultPresenter:TioModelPresenterCustom read GetDefaultPresenter;
-    property Presenter[const AName:String]:TioModelPresenterCustom read GetPresenter;
+    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
+    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
+    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
+  published
+    // Events
+    property OnViewPairing: TioVMOnViewPairingEvent read FOnViewPairing write FOnViewPairing;
   end;
-// ---------------- Start: section added for IInterface support ---------------
-  {$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
-//  {$NODEFINE TInterfacedObject}         { defined in systobj.h }
-  {$ENDIF}
-// ---------------- End: section added for IInterface support ---------------
-
+  // ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
+  // {$NODEFINE TInterfacedObject}         { defined in systobj.h }
+{$ENDIF}
+  // ---------------- End: section added for IInterface support ---------------
 
 implementation
 
@@ -109,7 +115,6 @@ uses iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.LiveBindings.Factory, iORM;
 
 {$R *.dfm}
-
 { TioViewModel }
 
 
@@ -118,10 +123,11 @@ uses iORM.Exceptions, iORM.RttiContext.Factory,
 
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
+
 procedure TioViewModel.AfterConstruction;
 begin
   inherited;
-// Release the constructor's implicit refcount
+  // Release the constructor's implicit refcount
   AtomicDecrement(FRefCount);
 end;
 
@@ -132,6 +138,15 @@ begin
     Error(reInvalidPtr);
 end;
 
+procedure TioViewModel.BindView(const AView: TComponent);
+begin
+  try
+    Commands.BindView(AView);
+  finally
+    DoOnViewPairing;
+  end;
+end;
+
 class function TioViewModel.NewInstance: TObject;
 begin
   Result := inherited NewInstance;
@@ -140,8 +155,7 @@ end;
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
 
-function TioViewModel.GetCommand(
-  const ACmdName: String): IioCommandsContainerItem;
+function TioViewModel.GetCommand(const ACmdName: String): IioCommandsContainerItem;
 begin
   // Get the CommandItem if exist
   Result := Commands.Get(ACmdName, False);
@@ -152,10 +166,8 @@ var
   I: Integer;
 begin
   Result := nil;
-  for I := 0 to ComponentCount-1 do
-    if (Components[I] is TioModelPresenterCustom)
-    and TioModelPresenterCustom(Components[I]).AsDefault
-    then
+  for I := 0 to ComponentCount - 1 do
+    if (Components[I] is TioModelPresenterCustom) and TioModelPresenterCustom(Components[I]).AsDefault then
       Exit(TioModelPresenterCustom(Components[I]));
 end;
 
@@ -167,7 +179,7 @@ begin
   if AName.IsEmpty then
     Exit(GetDefaultPresenter);
   LComponent := FindComponent(AName);
-  if not (Assigned(LComponent) and (LComponent is TioModelPresenterCustom)) then
+  if not(Assigned(LComponent) and (LComponent is TioModelPresenterCustom)) then
     raise EioException.Create(Self.ClassName, 'GetPresenters', Format('ModelPresenter named "%s" not found.', [AName]));
   Result := TioModelPresenterCustom(LComponent);
 end;
@@ -185,15 +197,13 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent;
-  const AViewContextProvider: TioViewContextProvider;
+procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
   const AViewContextFreeMethod: TProc);
 begin
   FViewRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
 end;
 
-procedure TioViewModel.SetCommand(const ACmdName: String;
-  const Value: IioCommandsContainerItem);
+procedure TioViewModel.SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
 begin
   Commands.AddOrUpdate(ACmdName, Value);
 end;
@@ -237,7 +247,7 @@ constructor TioViewModel.Create(AOwner: TComponent);
 begin
   inherited;
   // Init
-  FCommands :=  TioMVVMFactory.NewCommandsContainer(Self);
+  FCommands := TioMVVMFactory.NewCommandsContainer(Self);
   FViewRegister := TioMVVMFactory.NewViewRegister;
 end;
 
@@ -245,6 +255,12 @@ destructor TioViewModel.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TioViewModel.DoOnViewPairing;
+begin
+  if Assigned(FOnViewPairing) then
+    FOnViewPairing(Self);
 end;
 
 procedure TioViewModel.FreeViews;

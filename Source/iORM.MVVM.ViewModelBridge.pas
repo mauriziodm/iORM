@@ -224,7 +224,7 @@ begin
   //  and register the view into the VMVoews container of the VM
   // ---------------------------------------------------------------------------
   if Assigned(FViewModel) then
-    FViewModel.Commands.BindView(Self.Owner);
+    FViewModel.BindView(Owner);
   // ===========================================================================
 end;
 
