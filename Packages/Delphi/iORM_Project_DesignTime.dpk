@@ -42,6 +42,8 @@ contains
   iORM.AbstractionLayer.DesignTime in '..\..\Source\iORM.AbstractionLayer.DesignTime.pas',
   iORM.StdAction.Vcl.DesignTime in '..\..\Source\iORM.StdAction.Vcl.DesignTime.pas',
   iORM.StdAction.Fmx.DesignTime in '..\..\Source\iORM.StdAction.Fmx.DesignTime.pas',
-  iORM.MVVM.DesignTime in '..\..\Source\iORM.MVVM.DesignTime.pas';
+  iORM.MVVM.DesignTime in '..\..\Source\iORM.MVVM.DesignTime.pas',
+  iORM.MVVM.ViewModel.Wizard in '..\..\Source\iORM.MVVM.ViewModel.Wizard.pas',
+  iORM.MVVM.ViewModel.Wizard.Creator in '..\..\Source\iORM.MVVM.ViewModel.Wizard.Creator.pas';
 
 end.
