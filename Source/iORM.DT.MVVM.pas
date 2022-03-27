@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.DataSet.DesignTime;
+unit iORM.DT.MVVM;
 
 interface
 
@@ -40,13 +40,17 @@ procedure Register;
 implementation
 
 uses
-  System.Classes, iORM.DB.DataSet.Master, iORM.DB.DataSet.Detail, iORM.DB.MemTable;
+  System.Classes, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet, iORM.MVVM.ModelBindSource,
+  iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider;
 
 procedure Register;
 begin
-  RegisterComponents('iORM', [TioDataSetMaster]);
-  RegisterComponents('iORM', [TioDataSetDetail]);
-  RegisterComponents('iORM', [TioMemTable]);
+  RegisterComponents('iORM', [TioViewModelBridge]);
+  RegisterComponents('iORM', [TioViewContextProvider]);
+  RegisterComponents('iORM', [TioModelPresenterMaster]);
+  RegisterComponents('iORM', [TioModelPresenterDetail]);
+  RegisterComponents('iORM', [TioModelDataSet]);
+  RegisterComponents('iORM', [TioModelBindSource]);
 end;
 
 end.

@@ -1,4 +1,4 @@
-unit iORM.MVVM.ViewModel.Wizard;
+unit iORM.DT.MVVM.ViewModel.Wizard;
 
 interface
 

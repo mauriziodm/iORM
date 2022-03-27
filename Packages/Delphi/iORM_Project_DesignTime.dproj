@@ -95,19 +95,20 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\..\source\iORM.dcr"/>
+        <DCCReference Include="..\..\source\iORM.DT.dcr"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="Designide.dcp"/>
         <DCCReference Include="iORM_Project.dcp"/>
-        <DCCReference Include="..\..\Source\iORM.ConnectionDef.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DataSet.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.AbstractionLayer.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdAction.Vcl.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdAction.Fmx.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.DesignTime.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.Wizard.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.Wizard.Creator.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.ConnectionDef.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.LiveBindings.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.DataSet.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.AbstractionLayer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.StdAction.Vcl.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.StdAction.Fmx.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.MVVM.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.Creator.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.Wizard.Utils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -156,13 +157,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32">
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

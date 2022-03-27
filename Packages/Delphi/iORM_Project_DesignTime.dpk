@@ -1,7 +1,7 @@
 package iORM_Project_DesignTime;
 
 {$R *.res}
-{$R '..\..\source\iORM.dcr'}
+{$R '..\..\source\iORM.DT.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -36,14 +36,15 @@ requires
   iORM_Project;
 
 contains
-  iORM.ConnectionDef.DesignTime in '..\..\Source\iORM.ConnectionDef.DesignTime.pas',
-  iORM.LiveBindings.DesignTime in '..\..\Source\iORM.LiveBindings.DesignTime.pas',
-  iORM.DataSet.DesignTime in '..\..\Source\iORM.DataSet.DesignTime.pas',
-  iORM.AbstractionLayer.DesignTime in '..\..\Source\iORM.AbstractionLayer.DesignTime.pas',
-  iORM.StdAction.Vcl.DesignTime in '..\..\Source\iORM.StdAction.Vcl.DesignTime.pas',
-  iORM.StdAction.Fmx.DesignTime in '..\..\Source\iORM.StdAction.Fmx.DesignTime.pas',
-  iORM.MVVM.DesignTime in '..\..\Source\iORM.MVVM.DesignTime.pas',
-  iORM.MVVM.ViewModel.Wizard in '..\..\Source\iORM.MVVM.ViewModel.Wizard.pas',
-  iORM.MVVM.ViewModel.Wizard.Creator in '..\..\Source\iORM.MVVM.ViewModel.Wizard.Creator.pas';
+  iORM.DT.ConnectionDef in '..\..\Source\iORM.DT.ConnectionDef.pas',
+  iORM.DT.LiveBindings in '..\..\Source\iORM.DT.LiveBindings.pas',
+  iORM.DT.DataSet in '..\..\Source\iORM.DT.DataSet.pas',
+  iORM.DT.AbstractionLayer in '..\..\Source\iORM.DT.AbstractionLayer.pas',
+  iORM.DT.StdAction.Vcl in '..\..\Source\iORM.DT.StdAction.Vcl.pas',
+  iORM.DT.StdAction.Fmx in '..\..\Source\iORM.DT.StdAction.Fmx.pas',
+  iORM.DT.MVVM in '..\..\Source\iORM.DT.MVVM.pas',
+  iORM.DT.MVVM.ViewModel.Wizard in '..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.pas',
+  iORM.DT.MVVM.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.Creator.pas',
+  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas';
 
 end.

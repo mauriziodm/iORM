@@ -1,4 +1,4 @@
-unit iORM.StdAction.Vcl.DesignTime;
+unit iORM.DT.StdAction.Fmx;
 
 interface
 
@@ -7,7 +7,7 @@ procedure Register;
 implementation
 
 uses
-  iORM.StdActions.Vcl, System.Actions;
+  System.Actions, iORM.StdActions.Fmx;
 
 procedure Register;
 begin

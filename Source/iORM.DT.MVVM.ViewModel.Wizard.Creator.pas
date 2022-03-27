@@ -1,9 +1,9 @@
-unit iORM.MVVM.ViewModel.Wizard.Creator;
+unit iORM.DT.MVVM.ViewModel.Wizard.Creator;
 
 interface
 
 uses
-  ToolsAPI;
+  ToolsAPI, iORM.DT.Wizard.Utils;
 
 resourcestring
   SImplFileName = 'ViewModel';
@@ -30,6 +30,16 @@ type
     function NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
     function NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
     procedure FormCreated(const FormEditor: IOTAFormEditor);
+  end;
+
+  TioViewModelPasFile = class(TioOTASourceFile)
+  public
+    function GetSource: string; override;
+  end;
+
+  TioViewModelDfmFile = class(TioOTASourceFile)
+  public
+    function GetSource: string; override;
   end;
 
 implementation
@@ -85,7 +95,7 @@ end;
 
 function TioViewModelWizardCreator.GetOwner: IOTAModule;
 begin
-//  Result := ActiveProject;
+  Result := ActiveProject;
 end;
 
 function TioViewModelWizardCreator.GetShowForm: Boolean;
@@ -105,17 +115,33 @@ end;
 
 function TioViewModelWizardCreator.NewFormFile(const FormIdent, AncestorIdent: string): IOTAFile;
 begin
-
+  Result := TioViewModelDfmFile.Create('iORM_Wizard_ViewModel_DFM');
 end;
 
 function TioViewModelWizardCreator.NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
 begin
-
+  Result := TioViewModelDfmFile.Create('iORM_Wizard_ViewModel_PAS');
 end;
 
 function TioViewModelWizardCreator.NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
 begin
+  Result := nil;
+end;
 
+{ TioViewModelPasFile }
+
+function TioViewModelPasFile.GetSource: string;
+begin
+  Result := inherited GetSource;
+  // Enter any code here that applies changes
+end;
+
+{ TioViewModelDfmFile }
+
+function TioViewModelDfmFile.GetSource: string;
+begin
+  Result := inherited GetSource;
+  // Enter any code here that applies changes
 end;
 
 end.

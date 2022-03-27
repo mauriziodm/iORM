@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.LiveBindings.DesignTime;
+unit iORM.DT.LiveBindings;
 
 interface
 

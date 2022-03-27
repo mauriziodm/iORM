@@ -35,7 +35,7 @@
 
 
 
-unit iORM.ConnectionDef.DesignTime;
+unit iORM.DT.AbstractionLayer;
 
 interface
 
@@ -44,17 +44,12 @@ interface
 implementation
 
 uses
-  System.Classes,
-  iORM.DB.ConnectionDef, iORM.DB.ConnectionDef.MSSQLServer;
+  System.Classes, iORM.Abstraction.VCL, iORM.Abstraction.FMX;
 
   procedure Register;
   begin
-    RegisterComponents('iORM', [TioSQLMonitor]);
-    RegisterComponents('iORM', [TioRESTConnectionDef]);
-    RegisterComponents('iORM', [TioSQLiteConnectionDef]);
-    RegisterComponents('iORM', [TioFirebirdConnectionDef]);
-    RegisterComponents('iORM', [TioSQLServerConnectionDef]);
-//    RegisterComponents('iORM', [TioMySQLConnectionDef]);
+    RegisterComponents('iORM', [TioVCL]);
+    RegisterComponents('iORM', [TioFMX]);
   end;
 
 end.
