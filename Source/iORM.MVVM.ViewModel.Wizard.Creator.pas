@@ -85,7 +85,7 @@ end;
 
 function TioViewModelWizardCreator.GetOwner: IOTAModule;
 begin
-  Result := ActiveProject;
+//  Result := ActiveProject;
 end;
 
 function TioViewModelWizardCreator.GetShowForm: Boolean;
