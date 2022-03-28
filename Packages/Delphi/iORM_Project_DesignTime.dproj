@@ -99,16 +99,10 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="Designide.dcp"/>
         <DCCReference Include="iORM_Project.dcp"/>
-        <DCCReference Include="..\..\Source\iORM.DT.ConnectionDef.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.LiveBindings.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.DataSet.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.AbstractionLayer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.StdAction.Vcl.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.StdAction.Fmx.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.MVVM.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.Creator.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.ViewModel.Wizard.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas"/>
         <DCCReference Include="..\..\Source\iORM.DT.Wizard.Utils.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.Register.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -152,6 +146,11 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
@@ -159,11 +158,6 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

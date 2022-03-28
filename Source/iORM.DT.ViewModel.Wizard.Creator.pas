@@ -1,4 +1,4 @@
-unit iORM.DT.MVVM.ViewModel.Wizard.Creator;
+unit iORM.DT.ViewModel.Wizard.Creator;
 
 interface
 

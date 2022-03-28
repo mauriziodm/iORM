@@ -36,15 +36,9 @@ requires
   iORM_Project;
 
 contains
-  iORM.DT.ConnectionDef in '..\..\Source\iORM.DT.ConnectionDef.pas',
-  iORM.DT.LiveBindings in '..\..\Source\iORM.DT.LiveBindings.pas',
-  iORM.DT.DataSet in '..\..\Source\iORM.DT.DataSet.pas',
-  iORM.DT.AbstractionLayer in '..\..\Source\iORM.DT.AbstractionLayer.pas',
-  iORM.DT.StdAction.Vcl in '..\..\Source\iORM.DT.StdAction.Vcl.pas',
-  iORM.DT.StdAction.Fmx in '..\..\Source\iORM.DT.StdAction.Fmx.pas',
-  iORM.DT.MVVM in '..\..\Source\iORM.DT.MVVM.pas',
-  iORM.DT.MVVM.ViewModel.Wizard in '..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.pas',
-  iORM.DT.MVVM.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.MVVM.ViewModel.Wizard.Creator.pas',
-  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas';
+  iORM.DT.ViewModel.Wizard in '..\..\Source\iORM.DT.ViewModel.Wizard.pas',
+  iORM.DT.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas',
+  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas',
+  iORM.DT.Register in '..\..\Source\iORM.DT.Register.pas';
 
 end.
