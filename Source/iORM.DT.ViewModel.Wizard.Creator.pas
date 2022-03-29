@@ -171,6 +171,7 @@ begin
 
   // Template
   Result :=
+//    'inherited ioViewModel1: TioViewModel1' + sLineBreak +
     'inherited ioViewModel1: TioViewModel1' + sLineBreak +
     '  PixelsPerInch = 96' + sLineBreak +
     'end';

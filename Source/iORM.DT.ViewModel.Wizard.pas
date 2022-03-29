@@ -117,7 +117,7 @@ end;
 
 function TioViewModelWizard.GetGlyph: Cardinal;
 begin
-  Result := LoadIcon(HInstance, 'iORM_ViewModel_Wizard_Icon');
+  Result := 0 // 0 = use standard icon;
 end;
 
 function TioViewModelWizard.GetIDString: string;
