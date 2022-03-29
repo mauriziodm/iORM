@@ -23,6 +23,13 @@ function ActiveProjectGroup: IOTAProjectGroup;
 function ActiveProject: IOTAProject;
 
 /// <summary>
+///  Returns the current Project active (ie. in Bold) in the Project Manager
+///  If there is no Project active, returns NILL
+/// </summary>
+// MaurizioDM 29/03/2022
+function ActiveProjectDirectory: String;
+
+/// <summary>
 ///  Retunrs Source Modules (DPR, DPK, etc) for the given Project
 /// </summary>
 function ProjectModule(const Project: IOTAProject): IOTAModule;
@@ -61,9 +68,7 @@ type
 implementation
 
 uses
-  System.Types,
-  System.SysUtils,
-	System.Classes;
+  System.Types, System.SysUtils, System.IOUtils, System.Classes, Winapi.Windows;
 
 function ActiveProjectGroup: IOTAProjectGroup;
 var
@@ -90,6 +95,15 @@ begin
   PG := ActiveProjectGroup;
   if PG <> NIL then
     Result := PG.ActiveProject;
+end;
+
+function ActiveProjectDirectory: String;
+var
+  LProject: IOTAProject;
+begin
+  LProject := ActiveProject;
+  Assert(Assigned(LProject), 'LProject non assigned');
+  Result := TPath.GetDirectoryName(LProject.FileName);
 end;
 
 function ProjectModule(const Project: IOTAProject): IOTAModule;
@@ -180,7 +194,8 @@ var
   LRes: TResourceStream;
   LStrings: TStrings;
 begin
-  LRes := TResourceStream.Create(HInstance, ResourceName, RT_RCDATA);
+//  LRes := TResourceStream.Create(HInstance, ResourceName, RT_RCDATA);
+  LRes := TResourceStream.Create(GetModuleHandle('iORM_Project_DesignTime.bpl'), ResourceName, RT_RCDATA);
   try
     if LRes.Size = 0 then
       raise Exception.CreateFmt('Resource %s is empty', [ResourceName]);

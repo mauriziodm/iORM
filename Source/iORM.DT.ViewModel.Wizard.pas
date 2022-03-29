@@ -5,7 +5,6 @@ interface
 uses
   Classes, ToolsAPI;
 
-  
 resourcestring
   SName = 'iORM ViewModel Wizard';
   SComment = 'Create a new ViewModel in the project';
@@ -15,8 +14,9 @@ resourcestring
 
 type
 
-  TioViewModelWizard = class(TNotifierObject, IOTAWizard, IOTARepositoryWizard80)
+  TioViewModelWizard = class(TNotifierObject, IOTAWizard, IOTARepositoryWizard, IOTARepositoryWizard60, IOTARepositoryWizard80, IOTAFormWizard)
   public
+    constructor Create;
     // IOTAWizard
     function GetIDString: string;
     function GetName: string;
@@ -36,29 +36,68 @@ type
 implementation
 
 uses
-  WinApi.Windows;
-
-// register with the IDE:
-procedure Register;
-begin
-  RegisterPackageWizard(TioViewModelWizard.Create);
-end;
+  WinApi.Windows, iORM.DT.ViewModel.Wizard.Creator, System.SysUtils;
 
 { TioViewModelWizard }
+
+constructor TioViewModelWizard.Create;
+var
+  LCategoryServices: IOTAGalleryCategoryManager;
+  LCategoryRoot: IOTAGalleryCategory;
+  LCategory: IOTAGalleryCategory;
+begin
+  inherited Create;
+
+  LCategoryServices := (BorlandIDEServices as IOTAGalleryCategoryManager);
+  Assert(Assigned(LCategoryServices), 'LCategoryServices is not assigned!!!');
+
+  LCategoryRoot := LCategoryServices.FindCategory(sCategoryDelphiNew);
+  Assert(Assigned(LCategoryRoot), 'LCategoryRoot is not assigned!!!');
+
+  LCategory := LCategoryServices.AddCategory(LCategoryRoot, SIDString, SGalleryCategory);
+  Assert(Assigned(LCategory), 'LCategory is not assigned!!!');
+
+  Exit;
+
+
+
+  if Supports(BorlandIDEServices, IOTAGalleryCategoryManager, LCategoryServices) then
+  begin
+    LCategoryServices.AddCategory(LCategoryServices.FindCategory(sCategoryRoot), SIDString, SGalleryCategory);
+  end;
+end;
+
+function TioViewModelWizard.GetGalleryCategory: IOTAGalleryCategory;
+var
+  LCategory: IOTAGalleryCategory;
+  LCatManager: IOTAGalleryCategoryManager;
+begin
+  LCatManager := (BorlandIDEServices as IOTAGalleryCategoryManager);
+  Assert(Assigned(LCatManager));
+
+  LCategory := LCatManager.FindCategory(SIDString);
+  Assert(Assigned(LCategory));
+
+  Result := LCategory;
+
+  // OLD CODE: Result := (BorlandIDEServices as IOTAGalleryCategoryManager).FindCategory(SIDString);
+end;
 
 procedure TioViewModelWizard.Execute;
 var
   LModuleServices: IOTAModuleServices;
-  LUnitIdent, LClassName, LFileName: String;
+  LProject: IOTAProject;
 begin
-  if not Assigned(BorlandIDEServices) then
-    Exit;
-  LModuleServices := BorlandIDEServices as IOTAModuleServices;
-  { Given the Prefix, create a new unique Module name and class name }
-  LModuleServices.GetNewModuleAndClassName('ViewModel', LUnitIdent, LClassName, LFileName);
-
-
-
+  if Assigned(BorlandIDEServices) and Supports(BorlandIDEServices, IOTAModuleServices, LModuleServices) then
+  begin
+    // Check if there is an active project
+    LProject := LModuleServices.GetActiveProject;
+    if Assigned(LProject) then
+    begin
+      { Given the Creator, create a new module of the implied type }
+      LModuleServices.CreateModule(TioViewModelWizardCreator.Create);
+    end;
+  end;
 end;
 
 function TioViewModelWizard.GetAuthor: string;
@@ -74,11 +113,6 @@ end;
 function TioViewModelWizard.GetDesigner: string;
 begin
   Result := dAny;
-end;
-
-function TioViewModelWizard.GetGalleryCategory: IOTAGalleryCategory;
-begin
-  Result := (BorlandIDEServices as IOTAGalleryCategoryManager).FindCategory(SIDString);
 end;
 
 function TioViewModelWizard.GetGlyph: Cardinal;

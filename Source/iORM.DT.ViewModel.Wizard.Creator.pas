@@ -45,7 +45,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.IOUtils;
 
 { TioViewModelWizardCreator }
 
@@ -80,7 +80,7 @@ end;
 
 function TioViewModelWizardCreator.GetImplFileName: string;
 begin
-  Result := GetCurrentDir + '\' + SImplFileName + '.pas';
+  Result := TPath.Combine(ActiveProjectDirectory, SImplFileName + '.pas');
 end;
 
 function TioViewModelWizardCreator.GetIntfFileName: string;
@@ -100,7 +100,7 @@ end;
 
 function TioViewModelWizardCreator.GetShowForm: Boolean;
 begin
-  Result := False;
+  Result := True;
 end;
 
 function TioViewModelWizardCreator.GetShowSource: Boolean;
@@ -120,7 +120,7 @@ end;
 
 function TioViewModelWizardCreator.NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
 begin
-  Result := TioViewModelDfmFile.Create('iORM_Wizard_ViewModel_PAS');
+  Result := TioViewModelPasFile.Create('iORM_Wizard_ViewModel_PAS');
 end;
 
 function TioViewModelWizardCreator.NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
@@ -132,16 +132,48 @@ end;
 
 function TioViewModelPasFile.GetSource: string;
 begin
-  Result := inherited GetSource;
+//  Result := inherited GetSource;
   // Enter any code here that applies changes
+
+  // Template
+  Result :=
+    'unit ViewModel;' + sLineBreak +
+    sLineBreak +
+    'interface' + sLineBreak +
+    sLineBreak +
+    'uses' + sLineBreak +
+    '  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase;' + sLineBreak +
+    sLineBreak +
+    'type' + sLineBreak +
+    sLineBreak +
+    'TioViewModel1 = class(TioViewModel)' + sLineBreak +
+    'private' + sLineBreak +
+    '  { Private declarations }' + sLineBreak +
+    'public' + sLineBreak +
+    '  { Public declarations }' + sLineBreak +
+    'end;' + sLineBreak +
+    sLineBreak +
+    'implementation' + sLineBreak +
+    sLineBreak +
+    '{%CLASSGROUP ''System.Classes.TPersistent''}' + sLineBreak +
+    sLineBreak +
+    '{$R *.dfm}' + sLineBreak +
+    sLineBreak +
+    'end.';
 end;
 
 { TioViewModelDfmFile }
 
 function TioViewModelDfmFile.GetSource: string;
 begin
-  Result := inherited GetSource;
+//  Result := inherited GetSource;
   // Enter any code here that applies changes
+
+  // Template
+  Result :=
+    'inherited ioViewModel1: TioViewModel1' + sLineBreak +
+    '  PixelsPerInch = 96' + sLineBreak +
+    'end';
 end;
 
 end.
