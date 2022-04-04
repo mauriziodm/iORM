@@ -104,7 +104,6 @@ contains
   iORM.LiveBindings.Notification in '..\..\Source\iORM.LiveBindings.Notification.pas',
   iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas',
   iORM.MVVM.Interfaces in '..\..\Source\iORM.MVVM.Interfaces.pas',
-  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
   iORM.Global.Factory in '..\..\Source\iORM.Global.Factory.pas',
   iORM.DependencyInjection in '..\..\Source\iORM.DependencyInjection.pas',
   iORM.DependencyInjection.Interfaces in '..\..\Source\iORM.DependencyInjection.Interfaces.pas',
@@ -211,7 +210,9 @@ contains
   iORM.MVVM.ModelPresenter.Detail in '..\..\Source\iORM.MVVM.ModelPresenter.Detail.pas',
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas',
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartUpdateDetection.pas',
-  iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas';
+  iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas',
+  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas',
+  iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas';
 
 end.
 

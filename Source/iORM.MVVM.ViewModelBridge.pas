@@ -11,7 +11,7 @@ type
 
   TioNeedViewModelEvent = procedure(Sender: TioViewModelBridge; var AViewModel: IioViewModel) of object;
 
-  TioViewModelBridge = class (TComponent)
+  TioViewModelBridge = class(TComponent)
   private
     FViewModel: IioViewModel;
     FDI_VMAlias: String;
@@ -37,31 +37,31 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    class function ExtractVMBridge(const AView:TComponent): TioViewModelBridge;
+    class function ExtractVMBridge(const AView: TComponent): TioViewModelBridge;
     procedure CheckForViewModel;
     function ViewModelIsAssigned: Boolean;
     function ViewModelAs<T: IInterface>: T;
     // Properties
-    property ViewModel:IioViewModel read GetViewModel;
-    property Commands:IioCommandsContainer read GetCommands;
-    property Command[const ACmdName:String]:IioCommandsContainerItem read GetCommand write SetCommand; default;
-    property DefaultPresenter:TioModelPresenterCustom read GetDefaultPresenter;
-    property Presenter[const AName:String]:TioModelPresenterCustom read GetPresenter;
+    property ViewModel: IioViewModel read GetViewModel;
+    property Commands: IioCommandsContainer read GetCommands;
+    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand; default;
+    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
+    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
   published
     // Events
-    property OnNeedViewModel:TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
+    property OnNeedViewModel: TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
     // Properties
-    property DI_VMInterface:String read FDI_VMInterface write FDI_VMInterface;
-    property DI_VMAlias:String read FDI_VMAlias write FDI_VMAlias;
-    property DI_VMMarker:String read FDI_VMMarker write FDI_VMMarker;
+    property DI_VMInterface: String read FDI_VMInterface write FDI_VMInterface;
+    property DI_VMAlias: String read FDI_VMAlias write FDI_VMAlias;
+    property DI_VMMarker: String read FDI_VMMarker write FDI_VMMarker;
   end;
 
 implementation
 
 uses
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Utilities,
-  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces, iORM;
-
+  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces, iORM,
+  iORM.Abstraction, iORM.DB.ConnectionDef;
 
 { TioViewModelBridge }
 
@@ -71,12 +71,10 @@ var
   LVMBridgeClientComponent: IioVMBridgeClientComponent;
 begin
   // Loop for Owner's components
-  for I := 0 to Owner.ComponentCount-1 do
-    // If the current component is a ConnectionDef then register it
-    //  if not already registered.
-    if Supports(Owner.Components[I], IioVMBridgeClientComponent, LVMBridgeClientComponent)
-    and not Assigned(LVMBridgeClientComponent.ViewModelBridge)
-    then
+  for I := 0 to Owner.ComponentCount - 1 do
+    // If the currente component is a VMBridgeClientComponent then set
+    // itself as VMBridge for that component
+    if Supports(Owner.Components[I], IioVMBridgeClientComponent, LVMBridgeClientComponent) and not Assigned(LVMBridgeClientComponent.ViewModelBridge) then
       LVMBridgeClientComponent.ViewModelBridge := Self;
 end;
 
@@ -87,7 +85,8 @@ begin
   if (csDesigning in ComponentState) then
     Exit;
   // If a ViewModel is already assigned then exit
-  if Assigned(FViewModel) then Exit;
+  if Assigned(FViewModel) then
+    Exit;
   // ===============================================================================================================================
   // VIEW MODEL CREATION BY DI_VMINterface & DI_VMAlias property if not already created
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -101,13 +100,13 @@ begin
   // LOCKED VIEW MODEL ALREADY CREATED IN THE DEPENDENCY INJECTION CONTAINER  (an external prepared ViewModel)
   // -------------------------------------------------------------------------------------------------------------------------------
   // If a LockedViewModel is present in the DIContainer (an external prepared ViewModel) and the BindSource is not
-  //  a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
-  //  and get the BindSourceAdapter from it.
-  if  (not Assigned(FViewModel)) then
+  // a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
+  // and get the BindSourceAdapter from it.
+  if (not Assigned(FViewModel)) then
     FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
   // ===============================================================================================================================
   // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
-  //  or for retrieve an external created ViewModel
+  // or for retrieve an external created ViewModel
   Self.DoNeedViewModel;
 end;
 
@@ -118,7 +117,7 @@ begin
   FViewModel := nil;
   // ===========================================================================
   // Auto set itself as ViewModelBridge in the ModelBindSource and ModelDataSet
-  //   components
+  // components
   // ---------------------------------------------------------------------------
   if (csDesigning in ComponentState) then
     AutoSetClientComponentsOnCreate;
@@ -137,19 +136,17 @@ begin
     FOnNeedViewModel(Self, FViewModel);
 end;
 
-class function TioViewModelBridge.ExtractVMBridge(
-  const AView: TComponent): TioViewModelBridge;
+class function TioViewModelBridge.ExtractVMBridge(const AView: TComponent): TioViewModelBridge;
 var
   I: Integer;
 begin
   Result := nil;
-  for I := 0 to AView.ComponentCount-1 do
+  for I := 0 to AView.ComponentCount - 1 do
     if AView.Components[I] is TioViewModelBridge then
       Exit(TioViewModelBridge(AView.Components[I]));
 end;
 
-function TioViewModelBridge.GetCommand(
-  const ACmdName: String): IioCommandsContainerItem;
+function TioViewModelBridge.GetCommand(const ACmdName: String): IioCommandsContainerItem;
 begin
   if Assigned(FViewModel) then
     Result := FViewModel.Command[ACmdName]
@@ -174,8 +171,7 @@ begin
     raise EioException.Create(Self.Name, 'GetDefaultPresenter', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetPresenter(
-  const AName: String): TioModelPresenterCustom;
+function TioViewModelBridge.GetPresenter(const AName: String): TioModelPresenterCustom;
 begin
   CheckForViewModel;
   if Assigned(FViewModel) then
@@ -213,26 +209,37 @@ begin
   CheckForViewModel;
   // ===========================================================================
   // Auto set itself as ViewModelBridge in the ModelBindSource and ModelDataSet
-  //   components
+  // components
   // ---------------------------------------------------------------------------
   if (csDesigning in ComponentState) then
     AutoSetClientComponentsOnCreate;
   // ===========================================================================
   // ===========================================================================
   // If the ViewModel is assigned then try
-  //  to Bind the View (Owner) components to ViewModel's actions
-  //  and register the view into the VMVoews container of the VM
+  // to Bind the View (Owner) components to ViewModel's actions
+  // and register the view into the VMVoews container of the VM
   // ---------------------------------------------------------------------------
   if Assigned(FViewModel) then
     FViewModel.BindView(Owner);
   // ===========================================================================
+  if Assigned(FViewModel) then
+    TioAnonymousTimer.Create(10,
+      function: Boolean
+      var
+        I: Integer;
+      begin
+        // If result is True then the timer remains enabled (continue to loop), if result is False then
+        // the timer is disabled and destroyed
+        Result := False;
+        // Loop for Owner's components and if there is
+        for I := 0 to Owner.ComponentCount - 1 do
+          if (Owner.Components[I] is TioCustomConnectionDef) and not TioCustomConnectionDef(Owner.Components[I]).IsRegistered then
+            Exit(True);
+        FViewModel.DoOnViewPairing;
+      end);
 end;
 
-
-
-
-procedure TioViewModelBridge.SetCommand(const ACmdName: String;
-  const Value: IioCommandsContainerItem);
+procedure TioViewModelBridge.SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
 begin
   if Assigned(FViewModel) then
     FViewModel.SetCommand(ACmdName, Value)

@@ -67,7 +67,8 @@ begin
 
   // IDE Wizards
   RegisterPackageWizard(TioViewModelWizard.Create);
-  RegisterCustomModule(TioViewModel, TCustomModule)
+  RegisterCustomModule(TioViewModel, TCustomModule);
+//  RegisterCustomModule(TioViewModel, TDataModuleCustomModule); // TDataModuleCustomModule is declared in "DMForm" unit
 end;
 
 end.

@@ -59,6 +59,7 @@ type
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function Commands: IioCommandsContainer;
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
+    procedure DoOnViewPairing;
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;

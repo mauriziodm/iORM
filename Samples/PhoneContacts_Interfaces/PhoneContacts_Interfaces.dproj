@@ -268,14 +268,14 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule">
-                    <Platform Name="OSX64">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Android\Debug\libPhoneContacts_Interfaces.so" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Android">
                         <RemoteName>libPhoneContacts_Interfaces.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule">
+                    <Platform Name="OSX64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

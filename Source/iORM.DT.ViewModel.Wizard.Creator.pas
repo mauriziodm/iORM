@@ -3,10 +3,10 @@ unit iORM.DT.ViewModel.Wizard.Creator;
 interface
 
 uses
-  ToolsAPI, iORM.DT.Wizard.Utils;
+  ToolsAPI;
 
 resourcestring
-  SImplFileName = 'ViewModel';
+  SImplFileName = 'ioViewModel1';
 
 type
 
@@ -32,14 +32,10 @@ type
     procedure FormCreated(const FormEditor: IOTAFormEditor);
   end;
 
-  TioViewModelPasFile = class(TioOTASourceFile)
+  TioViewModelPasFile = class(TInterfacedObject, IOTAFile)
   public
-    function GetSource: string; override;
-  end;
-
-  TioViewModelDfmFile = class(TioOTASourceFile)
-  public
-    function GetSource: string; override;
+    function GetAge: TDateTime;
+    function GetSource: string;
   end;
 
 implementation
@@ -55,7 +51,7 @@ end;
 
 function TioViewModelWizardCreator.GetAncestorName: string;
 begin
-  Result := 'TioViewModel';
+  Result := 'ioViewModel';
 end;
 
 function TioViewModelWizardCreator.GetCreatorType: string;
@@ -75,12 +71,16 @@ end;
 
 function TioViewModelWizardCreator.GetFormName: string;
 begin
-  Result := SImplFileName;
+  Result := 'ioViewModel1';
+//  Result := SImplFileName;
 end;
 
 function TioViewModelWizardCreator.GetImplFileName: string;
 begin
-  Result := TPath.Combine(ActiveProjectDirectory, SImplFileName + '.pas');
+  Result := TPath.Combine(TPath.GetDirectoryName(GetActiveProject.FileName), 'Unit2.pas');
+//  Result := TPath.Combine(ActiveProjectDirectory, SImplFileName + '.pas');
+//  Result := SImplFileName;
+//  Result := '';
 end;
 
 function TioViewModelWizardCreator.GetIntfFileName: string;
@@ -95,7 +95,7 @@ end;
 
 function TioViewModelWizardCreator.GetOwner: IOTAModule;
 begin
-  Result := ActiveProject;
+  Result := GetActiveProject;
 end;
 
 function TioViewModelWizardCreator.GetShowForm: Boolean;
@@ -115,12 +115,12 @@ end;
 
 function TioViewModelWizardCreator.NewFormFile(const FormIdent, AncestorIdent: string): IOTAFile;
 begin
-  Result := TioViewModelDfmFile.Create('iORM_Wizard_ViewModel_DFM');
+  Result := nil;
 end;
 
 function TioViewModelWizardCreator.NewImplSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
 begin
-  Result := TioViewModelPasFile.Create('iORM_Wizard_ViewModel_PAS');
+  Result := TioViewModelPasFile.Create;
 end;
 
 function TioViewModelWizardCreator.NewIntfSource(const ModuleIdent, FormIdent, AncestorIdent: string): IOTAFile;
@@ -130,14 +130,16 @@ end;
 
 { TioViewModelPasFile }
 
+function TioViewModelPasFile.GetAge: TDateTime;
+begin
+  Result := -1;
+end;
+
 function TioViewModelPasFile.GetSource: string;
 begin
-//  Result := inherited GetSource;
-  // Enter any code here that applies changes
-
   // Template
   Result :=
-    'unit ViewModel;' + sLineBreak +
+    'unit Unit2;' + sLineBreak +
     sLineBreak +
     'interface' + sLineBreak +
     sLineBreak +
@@ -146,12 +148,12 @@ begin
     sLineBreak +
     'type' + sLineBreak +
     sLineBreak +
-    'TioViewModel1 = class(TioViewModel)' + sLineBreak +
-    'private' + sLineBreak +
-    '  { Private declarations }' + sLineBreak +
-    'public' + sLineBreak +
-    '  { Public declarations }' + sLineBreak +
-    'end;' + sLineBreak +
+    '  TioViewModel1 = class(TioViewModel)' + sLineBreak +
+    '  private' + sLineBreak +
+    '    { Private declarations }' + sLineBreak +
+    '  public' + sLineBreak +
+    '    { Public declarations }' + sLineBreak +
+    '  end;' + sLineBreak +
     sLineBreak +
     'implementation' + sLineBreak +
     sLineBreak +
@@ -160,21 +162,6 @@ begin
     '{$R *.dfm}' + sLineBreak +
     sLineBreak +
     'end.';
-end;
-
-{ TioViewModelDfmFile }
-
-function TioViewModelDfmFile.GetSource: string;
-begin
-//  Result := inherited GetSource;
-  // Enter any code here that applies changes
-
-  // Template
-  Result :=
-//    'inherited ioViewModel1: TioViewModel1' + sLineBreak +
-    'inherited ioViewModel1: TioViewModel1' + sLineBreak +
-    '  PixelsPerInch = 96' + sLineBreak +
-    'end';
 end;
 
 end.

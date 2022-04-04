@@ -167,7 +167,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Configuration="Debug" Class="iPad_SpotLight80">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_100x100.png" Configuration="Debug" Class="iPad_SpotLight100">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -177,7 +177,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_100x100.png" Configuration="Debug" Class="iPad_SpotLight100">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Configuration="Debug" Class="iPad_SpotLight80">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -188,26 +188,26 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_768x1004.png" Configuration="Debug" Class="iPad_Launch768">
+                    <Platform Name="iOSSimulator">
+                        <RemoteName>Default~ipad.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_640x960.png" Configuration="Debug" Class="iPhone_Launch640">
                     <Platform Name="iOSSimulator">
                         <RemoteName>Default@2x.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_768x1024.png" Configuration="Debug" Class="iPad_Launch768x1024">
+                    <Platform Name="iOSSimulator">
+                        <RemoteName>Default-Portrait~ipad.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_76x76.png" Configuration="Debug" Class="iPad_AppIcon76">
                     <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\14.0\lib\android\debug\mips\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeMipsFile">
-                    <Platform Name="Android">
-                        <RemoteName>libPhoneContacts.so</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_768x1004.png" Configuration="Debug" Class="iPad_Launch768">
-                    <Platform Name="iOSSimulator">
-                        <RemoteName>Default~ipad.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -217,9 +217,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_768x1024.png" Configuration="Debug" Class="iPad_Launch768x1024">
-                    <Platform Name="iOSSimulator">
-                        <RemoteName>Default-Portrait~ipad.png</RemoteName>
+                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\14.0\lib\android\debug\mips\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteName>libPhoneContacts.so</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -251,14 +251,14 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule">
-                    <Platform Name="OSX64">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\14.0\lib\android\debug\classes.dex" Configuration="Debug" Class="AndroidClassesDexFile">
                     <Platform Name="Android">
                         <RemoteName>classes.dex</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule">
+                    <Platform Name="OSX64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -241,9 +241,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_640x960.png" Configuration="Debug" Class="iPhone_Launch640">
+                <DeployFile LocalName="iOSSimulator\Debug\PhoneContacts_DMVC_Client_ByCode" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="iOSSimulator">
-                        <RemoteName>Default@2x.png</RemoteName>
+                        <RemoteName>PhoneContacts_DMVC_Client_ByCode</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -252,9 +252,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="iOSSimulator\Debug\PhoneContacts_DMVC_Client_ByCode" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_640x960.png" Configuration="Debug" Class="iPhone_Launch640">
                     <Platform Name="iOSSimulator">
-                        <RemoteName>PhoneContacts_DMVC_Client_ByCode</RemoteName>
+                        <RemoteName>Default@2x.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

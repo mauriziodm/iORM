@@ -38,9 +38,10 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  System.Classes, iORM.MVVM.Interfaces, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.ModelPresenter.Custom, System.SysUtils, iORM.Abstraction,
-  iORM.Components.InterfacedDataModule;
+  System.Classes, iORM.MVVM.Interfaces,
+  iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
+  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider,
+  iORM.MVVM.ModelPresenter.Custom, System.SysUtils, iORM.Abstraction;
 
 type
 
@@ -48,7 +49,7 @@ type
 
   TioVMOnViewPairingEvent = procedure(const Sender: TioViewModel) of object;
 
-  TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
+  TioViewModel = class(TDataModule, IInterface, IioViewModel) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     { Private declarations }
     FCommands: IioCommandsContainer;
@@ -58,6 +59,15 @@ type
     procedure BindView(const AView: TComponent);
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
   protected
+    // ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF AUTOREFCOUNT}
+    [Volatile]
+    FRefCount: Integer;
+{$ENDIF}
+    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+    // ---------------- End: section added for IInterface support ---------------
     // DefaultPresenter
     function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
@@ -73,6 +83,14 @@ type
     procedure HideViews;
     procedure ShowViews;
     procedure TerminateApplication;
+    // ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF AUTOREFCOUNT}
+    procedure AfterConstruction; override;
+    procedure BeforeDestruction; override;
+    class function NewInstance: TObject; override;
+    property RefCount: Integer read FRefCount;
+{$ENDIF}
+    // ---------------- End: section added for IInterface support ---------------
     // Properties
     property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
@@ -81,18 +99,60 @@ type
     // Events
     property OnViewPairing: TioVMOnViewPairingEvent read FOnViewPairing write FOnViewPairing;
   end;
+  // ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
+  // {$NODEFINE TInterfacedObject}         { defined in systobj.h }
+{$ENDIF}
+  // ---------------- End: section added for IInterface support ---------------
 
 implementation
+
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses iORM.Exceptions, iORM.RttiContext.Factory,
   iORM.MVVM.Factory, Data.Bind.ObjectScope,
   iORM.LiveBindings.Factory, iORM;
 
-procedure TioViewModel.BindView(const AView: TComponent);
+{$R *.dfm}
+{ TioViewModel }
+
+
+
+
+
+// ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF AUTOREFCOUNT}
+
+procedure TioViewModel.AfterConstruction;
 begin
-  Commands.BindView(AView);
+  inherited;
+  // Release the constructor's implicit refcount
+  AtomicDecrement(FRefCount);
 end;
 
+procedure TioViewModel.BeforeDestruction;
+begin
+  inherited;
+  if RefCount <> 0 then
+    Error(reInvalidPtr);
+end;
+
+procedure TioViewModel.BindView(const AView: TComponent);
+begin
+  try
+    Commands.BindView(AView);
+  finally
+    DoOnViewPairing;
+  end;
+end;
+
+class function TioViewModel.NewInstance: TObject;
+begin
+  Result := inherited NewInstance;
+  TioViewModel(Result).FRefCount := 1;
+end;
+{$ENDIF}
+// ---------------- End: section added for IInterface support ---------------
 
 function TioViewModel.GetCommand(const ACmdName: String): IioCommandsContainerItem;
 begin
@@ -128,6 +188,14 @@ begin
   FViewRegister.HideAllViewContexts;
 end;
 
+function TioViewModel.QueryInterface(const IID: TGUID; out Obj): HResult;
+begin
+  if GetInterface(IID, Obj) then
+    Result := 0
+  else
+    Result := E_NOINTERFACE;
+end;
+
 procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
   const AViewContextFreeMethod: TProc);
 begin
@@ -149,6 +217,25 @@ begin
   io.TerminateApplication;
 end;
 
+function TioViewModel._AddRef: Integer;
+begin
+{$IFNDEF AUTOREFCOUNT}
+  Result := AtomicIncrement(FRefCount);
+{$ELSE}
+  Result := __ObjAddRef;
+{$ENDIF}
+end;
+
+function TioViewModel._Release: Integer;
+begin
+{$IFNDEF AUTOREFCOUNT}
+  Result := AtomicDecrement(FRefCount);
+  if Result = 0 then
+    Destroy;
+{$ELSE}
+  Result := __ObjRelease;
+{$ENDIF}
+end;
 
 function TioViewModel.Commands: IioCommandsContainer;
 begin

@@ -40,7 +40,7 @@ unit iORM.Abstraction;
 interface
 
 uses
-  System.Classes, System.Rtti;
+  System.Classes, System.Rtti, System.SysUtils;
 
 type
   TioApplicationRef = class of TioApplication;
@@ -96,6 +96,15 @@ type
     property Interval: Cardinal read GetInterval write SetInterval default 1000;
     property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
     property Tag:Integer read GetTag write SetTag;
+  end;
+
+  TioAnonymousTimer = class
+  private
+    FTimer: TioTimer;
+    FExecuteMethod: TFunc<boolean>;
+    procedure OnTimerEventHandler(Sender: TObject);
+  public
+    constructor Create(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
   end;
 
   TioActionRef = class of TioAction;
@@ -306,6 +315,28 @@ end;
 class procedure TioControl.SetVisible(const AControl: TObject; const AVisible: Boolean);
 begin
   FConcreteClass_NoDirectCall._SetVisible(AControl, AVisible);
+end;
+
+{ TioAnonymousTimer }
+
+constructor TioAnonymousTimer.Create(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
+begin
+  FTimer := TioTimer.CreateNewTimer;
+  FTimer.Enabled := False;
+  FTimer.OnTimer := OnTimerEventHandler;
+  FTimer.Interval := AIntervalMillisec;
+  if not Assigned(AExecuteMethod) then
+    raise EioException.Create(Self.ClassName, 'Constructor', '"AExecuteMethod" parameter must be assigned');
+  FExecuteMethod := AExecuteMethod;
+  FTimer.Enabled := True;
+end;
+
+procedure TioAnonymousTimer.OnTimerEventHandler(Sender: TObject);
+begin
+  FTimer.Enabled := False;
+  FTimer.Enabled := FExecuteMethod;
+  if not FTimer.Enabled then
+    Self.Free;
 end;
 
 end.

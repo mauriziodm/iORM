@@ -97,8 +97,8 @@ var
 begin
   // Loop for Owner's components
   for I := 0 to AOwner.ComponentCount-1 do
-    // If the current component is a ConnectionDef then register it
-    //  if not already registered.
+    // If the current component is a ViewModelBridge then set it as ViewModelBridge
+    //  for the AVMBridgeClientComponent recevied as parameter
     if AOwner.Components[I] is TioViewModelBridge then
     begin
       AVMBridgeClientComponent.ViewModelBridge := TioViewModelBridge(AOwner.Components[I]);

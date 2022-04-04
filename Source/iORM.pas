@@ -55,6 +55,9 @@ type
 
   io = class
   public
+    // AnonymousTimer
+    class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
+
     // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
@@ -77,20 +80,20 @@ type
     class function LoadList<T: class, constructor>(const AItemAlias: String; const AWhere: IioWhere): T; overload;
 
     // Reload object as class
-    class procedure Reload(const AObj: TObject; const ALazy: Boolean; const ALazyProps: String); overload;
-    class procedure Reload(const AObj: TObject; const ALazy: Boolean = False); overload;
+    class procedure Reload(const AObj: TObject; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure Reload(const AObj: TObject; const ALazy: boolean = False); overload;
     class procedure Reload(const AObj: TObject; const ALazyProps: String); overload;
     // Reload object as interface
-    class procedure Reload(const AIntfObj: IInterface; const ALazy: Boolean; const ALazyProps: String); overload;
-    class procedure Reload(const AIntfObj: IInterface; const ALazy: Boolean = False); overload;
+    class procedure Reload(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure Reload(const AIntfObj: IInterface; const ALazy: boolean = False); overload;
     class procedure Reload(const AIntfObj: IInterface; const ALazyProps: String); overload;
     // Reload list as class
-    class procedure ReloadList(const AListObject: TObject; const ALazy: Boolean; const ALazyProps: String); overload;
-    class procedure ReloadList(const AListObject: TObject; const ALazy: Boolean = False); overload;
+    class procedure ReloadList(const AListObject: TObject; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure ReloadList(const AListObject: TObject; const ALazy: boolean = False); overload;
     class procedure ReloadList(const AListObject: TObject; const ALazyProps: String); overload;
     // Reload list as interface
-    class procedure ReloadList(const AListIntfObject: IInterface; const ALazy: Boolean; const ALazyProps: String); overload;
-    class procedure ReloadList(const AListIntfObject: IInterface; const ALazy: Boolean = False); overload;
+    class procedure ReloadList(const AListIntfObject: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure ReloadList(const AListIntfObject: IInterface; const ALazy: boolean = False); overload;
     class procedure ReloadList(const AListIntfObject: IInterface; const ALazyProps: String); overload;
 
     // Delete (accepting instance to delete directly)
@@ -110,29 +113,29 @@ type
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
     // Exists (accepting generic type and ciriteria)
-    class function Exists<T>(const ATypeAlias: String = ''): Boolean; overload;
-    class function Exists<T>(const AWhere: IioWhere): Boolean; overload;
-    class function Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean; overload;
+    class function Exists<T>(const ATypeAlias: String = ''): boolean; overload;
+    class function Exists<T>(const AWhere: IioWhere): boolean; overload;
+    class function Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
     // Exists (accepting generic type and ciriteria)
-    class function NotExists<T>(const ATypeAlias: String = ''): Boolean; overload;
-    class function NotExists<T>(const AWhere: IioWhere): Boolean; overload;
-    class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean; overload;
+    class function NotExists<T>(const ATypeAlias: String = ''): boolean; overload;
+    class function NotExists<T>(const AWhere: IioWhere): boolean; overload;
+    class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // Persist (accepting instance to persist directly)
-    class procedure Persist(const AObj: TObject; const ABlindInsert: Boolean = False); overload;
-    class procedure Persist(const AIntfObj: IInterface; const ABlindInsert: Boolean = False); overload;
-    class procedure _PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure Persist(const AObj: TObject; const ABlindInsert: boolean = False); overload;
+    class procedure Persist(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
+    class procedure _PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistCollection(const ACollection: TObject; const ABlindInsert: Boolean = False); overload;
-    class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: Boolean = False); overload;
-    class procedure _PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
+    class procedure PersistCollection(const ACollection: TObject; const ABlindInsert: boolean = False); overload;
+    class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: boolean = False); overload;
+    class procedure _PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
 
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
     class procedure RollbackTransaction(const AConnectionName: String = '');
-    class function InTransaction(const AConnectionName: String = ''): Boolean;
+    class function InTransaction(const AConnectionName: String = ''): boolean;
 
     class function Connections: TioConnectionManagerRef;
 
@@ -150,15 +153,15 @@ type
     class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
 
     class function SQL(const ASQL: String): IioSQLDestination; overload;
-    class function SQL(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
+    class function SQL(const ASQL: TStrings; const AOwns: boolean = False): IioSQLDestination; overload;
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
 
     class procedure SetWaitProc(const AShowWaitProc: TProc = nil; const AHideWaitProc: TProc = nil);
     class procedure ShowWait;
     class procedure HideWait;
 
-    class function DBBuilder(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine; overload;
-    class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True)
+    class function DBBuilder(const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True): IioDBBuilderEngine; overload;
+    class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True)
       : IioDBBuilderEngine; overload;
 
     class function di: TioDependencyInjectionRef;
@@ -168,7 +171,7 @@ type
     class procedure HandleException(Sender: TObject);
     class function Mapper: omRef;
     class procedure ShowMessage(const AMessage: String);
-    class function TerminateApplication: Boolean;
+    class function TerminateApplication: boolean;
 
     // Create instance
     class function Create<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
@@ -281,6 +284,7 @@ type
 implementation
 
 uses
+  System.Rtti,
   iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory,
   iORM.DuckTyped.StreamObject,
@@ -291,7 +295,8 @@ uses
   iORM.Strategy.Factory,
   iORM.Context.Container,
   iORM.Abstraction,
-  iORM.DBBuilder.Factory, System.Rtti, iORM.Context.Map.Interfaces;
+  iORM.DBBuilder.Factory,
+  iORM.Context.Map.Interfaces;
 
 { io }
 
@@ -418,24 +423,24 @@ begin
   Result := ObjMapper.om;
 end;
 
-class function io.NotExists<T>(const ATypeAlias: String): Boolean;
+class function io.NotExists<T>(const ATypeAlias: String): boolean;
 begin
   Result := Self.RefTo<T>(ATypeAlias).NotExists;
 end;
 
-class function io.NotExists<T>(const AWhere: IioWhere): Boolean;
+class function io.NotExists<T>(const AWhere: IioWhere): boolean;
 begin
   Result := Self.NotExists<T>('', AWhere);
 end;
 
-class function io.NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean;
+class function io.NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean;
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>(False);
   AWhere.TypeAlias := ATypeAlias;
   Result := AWhere.NotExists;
 end;
 
-class procedure io._PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+class procedure io._PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
@@ -446,22 +451,22 @@ begin
     AMasterPropertyName, AMasterPropertyPath);
 end;
 
-class procedure io.Persist(const AIntfObj: IInterface; const ABlindInsert: Boolean);
+class procedure io.Persist(const AIntfObj: IInterface; const ABlindInsert: boolean);
 begin
   Self.Persist(AIntfObj as TObject, ABlindInsert);
 end;
 
-class procedure io.PersistCollection(const ACollection: TObject; const ABlindInsert: Boolean);
+class procedure io.PersistCollection(const ACollection: TObject; const ABlindInsert: boolean);
 begin
   Self._PersistCollectionInternal(ACollection, '', 0, ABlindInsert, nil, '', '');
 end;
 
-class procedure io.Persist(const AObj: TObject; const ABlindInsert: Boolean);
+class procedure io.Persist(const AObj: TObject; const ABlindInsert: boolean);
 begin
   Self._PersistInternal(AObj, '', 0, ABlindInsert, nil, '', '');
 end;
 
-class procedure io.PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: Boolean);
+class procedure io.PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: boolean);
 begin
   Self.PersistCollection(AIntfCollection as TObject, ABlindInsert);
 end;
@@ -481,12 +486,12 @@ begin
   Result := Self.Load<T>(ATypeAlias);
 end;
 
-class procedure io.Reload(const AIntfObj: IInterface; const ALazy: Boolean; const ALazyProps: String);
+class procedure io.Reload(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String);
 begin
   io.Reload(AIntfObj as TObject, ALazy, ALazyProps);
 end;
 
-class procedure io.Reload(const AIntfObj: IInterface; const ALazy: Boolean);
+class procedure io.Reload(const AIntfObj: IInterface; const ALazy: boolean);
 begin
   io.Reload(AIntfObj as TObject, ALazy, '');
 end;
@@ -496,7 +501,7 @@ begin
   io.Reload(AIntfObj as TObject, False, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListObject: TObject; const ALazy: Boolean);
+class procedure io.ReloadList(const AListObject: TObject; const ALazy: boolean);
 begin
   io.ReloadList(AListObject, ALazy, '');
 end;
@@ -506,7 +511,7 @@ begin
   io.ReloadList(AListObject, False, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazy: Boolean);
+class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazy: boolean);
 begin
   io.ReloadList(AListIntfObject as TObject, ALazy, '');
 end;
@@ -516,12 +521,12 @@ begin
   io.ReloadList(AListIntfObject as TObject, False, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazy: Boolean; const ALazyProps: String);
+class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazy: boolean; const ALazyProps: String);
 begin
   io.ReloadList(AListIntfObject as TObject, ALazy, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListObject: TObject; const ALazy: Boolean; const ALazyProps: String);
+class procedure io.ReloadList(const AListObject: TObject; const ALazy: boolean; const ALazyProps: String);
 var
   LDuckList: IioDuckTypedList;
   LItem: TObject;
@@ -530,7 +535,7 @@ begin
   LDuckList := TioDuckTypedFactory.DuckTypedList(AListObject);
   io.StartTransaction;
   try
-    for I := 0 to LDuckList.Count-1 do
+    for I := 0 to LDuckList.Count - 1 do
       io.Reload(LDuckList.GetItem(I), ALazy, ALazyProps);
     io.CommitTransaction;
   except
@@ -538,14 +543,14 @@ begin
   end;
 end;
 
-class procedure io.Reload(const AObj: TObject; const ALazy: Boolean; const ALazyProps: String);
+class procedure io.Reload(const AObj: TObject; const ALazy: boolean; const ALazyProps: String);
 begin
   if not Assigned(AObj) then
     raise EioException.Create(ClassName, 'Reload', '"AObj" cannot be nil.');
   io.Load(AObj.ClassName).ByID(TioUtilities.ExtractOID(AObj)).Lazy(ALazy).LazyProps(ALazyProps).ClearListBefore.ToObject(AObj);
 end;
 
-class procedure io.Reload(const AObj: TObject; const ALazy: Boolean);
+class procedure io.Reload(const AObj: TObject; const ALazy: boolean);
 begin
   io.Reload(AObj, ALazy, '');
 end;
@@ -702,7 +707,7 @@ begin
   Result := ASQLDestination;
 end;
 
-class function io.SQL(const ASQL: TStrings; const AOwns: Boolean): IioSQLDestination;
+class function io.SQL(const ASQL: TStrings; const AOwns: boolean): IioSQLDestination;
 begin
   Result := TioDBFactory.SQLDestination(ASQL, AOwns);
 end;
@@ -710,6 +715,11 @@ end;
 class procedure io.StartTransaction(const AConnectionName: String);
 begin
   TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
+end;
+
+class procedure io.AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
+begin
+  TioAnonymousTimer.Create(AIntervalMillisec, AExecuteMethod);
 end;
 
 class procedure io.CommitTransaction(const AConnectionName: String);
@@ -941,12 +951,12 @@ begin
   TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj);
 end;
 
-class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
+class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
 begin
   Result := GlobalFactory.DBBuilderFactory.NewEngine(AConnectionDefName, AAddIndexes, AAddForeignKeys);
 end;
 
-class function io.DBBuilder(const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
+class function io.DBBuilder(const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
 begin
   Result := GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
 end;
@@ -1001,17 +1011,17 @@ begin
   Result := TioDependencyInjection;
 end;
 
-class function io.Exists<T>(const ATypeAlias: String): Boolean;
+class function io.Exists<T>(const ATypeAlias: String): boolean;
 begin
   Result := Self.RefTo<T>(ATypeAlias).Exists;
 end;
 
-class function io.Exists<T>(const AWhere: IioWhere): Boolean;
+class function io.Exists<T>(const AWhere: IioWhere): boolean;
 begin
   Result := Self.Exists<T>('', AWhere);
 end;
 
-class function io.Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): Boolean;
+class function io.Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean;
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>(False);
   AWhere.TypeAlias := ATypeAlias;
@@ -1043,7 +1053,7 @@ begin
   TioConnectionManager.HideWaitProc;
 end;
 
-class function io.InTransaction(const AConnectionName: String): Boolean;
+class function io.InTransaction(const AConnectionName: String): boolean;
 begin
   Result := TioStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
 end;
@@ -1061,8 +1071,8 @@ begin
   Result.TypeInfo := ATypeInfo;
 end;
 
-class procedure io._PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure io._PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+  const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
 begin
@@ -1071,7 +1081,7 @@ begin
     AMasterPropertyName, AMasterPropertyPath);
 end;
 
-class function io.TerminateApplication: Boolean;
+class function io.TerminateApplication: boolean;
 begin
   Result := TioApplication.Terminate;
 end;

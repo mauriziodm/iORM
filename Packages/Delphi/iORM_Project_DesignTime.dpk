@@ -38,7 +38,6 @@ requires
 contains
   iORM.DT.ViewModel.Wizard in '..\..\Source\iORM.DT.ViewModel.Wizard.pas',
   iORM.DT.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas',
-  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas',
   iORM.DT.Register in '..\..\Source\iORM.DT.Register.pas';
 
 end.
