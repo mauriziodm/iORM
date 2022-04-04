@@ -36,11 +36,13 @@ begin
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoActivate');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoEdit');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoPost');
+  UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'RecordCount');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'OnCreateAdapter');
   RegisterComponents('iORM', [TioPrototypeBindSourceDetail]);
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoActivate');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoEdit');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoPost');
+  UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'RecordCount');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'OnCreateAdapter');
 
   // MVVM components
