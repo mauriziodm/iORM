@@ -175,7 +175,7 @@ procedure TioPrototypeBindSourceMaster.SetActive(const Value: Boolean);
 begin
   inherited;
   // Clear the BSPersistence status
-  if Value then
+  if Value and not (csDesigning in ComponentState) then
     Persistence.Clear(False);
 end;
 

@@ -89,7 +89,7 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
-    procedure OpenCLoseDetails(const AActive: Boolean);
+    procedure OpenCloseDetails(const AActive: Boolean);
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -707,7 +707,7 @@ begin
     Active := True;
 end;
 
-procedure TioPrototypeBindSourceCustom.OpenCLoseDetails(const AActive: Boolean);
+procedure TioPrototypeBindSourceCustom.OpenCloseDetails(const AActive: Boolean);
 var
   LDetailBindSource: TioPrototypeBindSourceCustom;
 begin
@@ -776,7 +776,8 @@ end;
 procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
 begin
   inherited;
-  OpenCloseDetails(Value);
+  if not (csDesigning in ComponentState) then
+    OpenCloseDetails(Value);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAsync(const Value: Boolean);
