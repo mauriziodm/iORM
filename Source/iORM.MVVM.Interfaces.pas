@@ -58,22 +58,26 @@ type
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function Commands: IioCommandsContainer;
+    // Command property
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
+    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
+    // Presenter property
+    function GetPresenter(const AName: String): TioModelPresenterCustom;
+    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
+    // DefaultPresenter property
+    function GetDefaultPresenter: TioModelPresenterCustom;
+    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
+  end;
+
+  IioViewModelInternal = interface(IioViewModel)
+    ['{7DA6A783-6026-47C2-BFF7-83BF6FECFD2F}']
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
     procedure DoOnViewPairing;
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;
     procedure BindView(const AView: TComponent);
-    // Command
-    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
-    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
-    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
-    // Presenter
-    function GetPresenter(const AName: String): TioModelPresenterCustom;
-    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
-    // DefaultPresenter
-    function GetDefaultPresenter: TioModelPresenterCustom;
-    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
   end;
 
   IioViewRegister = interface

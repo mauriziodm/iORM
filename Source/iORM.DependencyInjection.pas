@@ -1393,7 +1393,7 @@ begin
         FViewModel := ExtractVMFromView(TComponent(Result));
       // Register View, ViewContext and ViewContextProvider in the ViewRegister of the ViewModel
       if Assigned(FViewModel) then
-        FViewModel.RegisterView(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
+        (FViewModel as IioViewModelInternal).RegisterView(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
     end
   finally
     // if the ViewModel is present then UnLock it (MVVM)

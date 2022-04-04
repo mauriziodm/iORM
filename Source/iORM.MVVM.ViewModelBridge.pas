@@ -220,7 +220,7 @@ begin
   // and register the view into the VMVoews container of the VM
   // ---------------------------------------------------------------------------
   if Assigned(FViewModel) then
-    FViewModel.BindView(Owner);
+    (FViewModel as IioViewModelInternal).BindView(Owner);
   // ===========================================================================
   if Assigned(FViewModel) then
     TioAnonymousTimer.Create(10,
@@ -235,7 +235,7 @@ begin
         for I := 0 to Owner.ComponentCount - 1 do
           if (Owner.Components[I] is TioCustomConnectionDef) and not TioCustomConnectionDef(Owner.Components[I]).IsRegistered then
             Exit(True);
-        FViewModel.DoOnViewPairing;
+        (FViewModel as IioViewModelInternal).DoOnViewPairing;
       end);
 end;
 
