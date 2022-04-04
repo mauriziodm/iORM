@@ -15,7 +15,6 @@ type
     property ItemCount;
   published
     // Published properties
-    property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property MasterBindSource; // published: Detail
     property MasterPropertyName; // published: Detail
     property AutoRefreshOnNotification default True; // published: Master+Detail

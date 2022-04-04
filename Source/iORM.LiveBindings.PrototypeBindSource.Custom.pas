@@ -174,7 +174,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType default dtListOfObjects; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
@@ -338,7 +338,7 @@ begin
   FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
-  FViewDataType := TioViewDataType.dtListOfObjects;
+  FViewDataType := dtListOfObjects;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
