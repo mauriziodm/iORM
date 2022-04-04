@@ -183,7 +183,7 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType;
+    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType default dtListOfObjects;
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // Published: Master
     // Published properties: paging
@@ -359,7 +359,7 @@ begin
   FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
-  FViewDataType := TioViewDataType.dtListOfObjects;
+  FViewDataType := dtListOfObjects;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
   // Selectors
