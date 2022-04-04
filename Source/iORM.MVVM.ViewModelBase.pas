@@ -48,10 +48,10 @@ type
 
   TioVMOnViewPairingEvent = procedure(const Sender: TioViewModel) of object;
 
-  TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
+  TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel, IioViewModelInternal) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     { Private declarations }
-    FCommands: IioCommandsContainer;
+    FCommands: IioCommandContainer;
     FViewRegister: IioViewRegister;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
@@ -63,18 +63,18 @@ type
     // Presenter
     function GetPresenter(const AName: String): TioModelPresenterCustom;
     // Command
-    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
-    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+    function GetCommand(const ACmdName: String): IioCommandContainerItem;
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    function Commands: IioCommandsContainer;
+    function Commands: IioCommandContainer;
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;
     procedure TerminateApplication;
     // Properties
-    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
+    property Command[const ACmdName: String]: IioCommandContainerItem read GetCommand write SetCommand;
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
     property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
   published
@@ -94,7 +94,7 @@ begin
 end;
 
 
-function TioViewModel.GetCommand(const ACmdName: String): IioCommandsContainerItem;
+function TioViewModel.GetCommand(const ACmdName: String): IioCommandContainerItem;
 begin
   // Get the CommandItem if exist
   Result := Commands.Get(ACmdName, False);
@@ -134,7 +134,7 @@ begin
   FViewRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
 end;
 
-procedure TioViewModel.SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+procedure TioViewModel.SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
 begin
   Commands.AddOrUpdate(ACmdName, Value);
 end;
@@ -150,7 +150,7 @@ begin
 end;
 
 
-function TioViewModel.Commands: IioCommandsContainer;
+function TioViewModel.Commands: IioCommandContainer;
 begin
   Result := FCommands;
 end;

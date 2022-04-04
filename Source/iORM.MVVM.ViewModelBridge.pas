@@ -22,10 +22,10 @@ type
     procedure AutoSetClientComponentsOnCreate;
     procedure DoNeedViewModel;
     // Commands
-    function GetCommands: IioCommandsContainer;
+    function GetCommands: IioCommandContainer;
     // Command
-    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
-    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+    function GetCommand(const ACmdName: String): IioCommandContainerItem;
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
     // Default presenter
     function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
@@ -43,8 +43,8 @@ type
     function ViewModelAs<T: IInterface>: T;
     // Properties
     property ViewModel: IioViewModel read GetViewModel;
-    property Commands: IioCommandsContainer read GetCommands;
-    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand; default;
+    property Commands: IioCommandContainer read GetCommands;
+    property Command[const ACmdName: String]: IioCommandContainerItem read GetCommand write SetCommand; default;
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
     property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
   published
@@ -146,7 +146,7 @@ begin
       Exit(TioViewModelBridge(AView.Components[I]));
 end;
 
-function TioViewModelBridge.GetCommand(const ACmdName: String): IioCommandsContainerItem;
+function TioViewModelBridge.GetCommand(const ACmdName: String): IioCommandContainerItem;
 begin
   if Assigned(FViewModel) then
     Result := FViewModel.Command[ACmdName]
@@ -154,7 +154,7 @@ begin
     raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetCommands: IioCommandsContainer;
+function TioViewModelBridge.GetCommands: IioCommandContainer;
 begin
   if Assigned(FViewModel) then
     Result := FViewModel.Commands
@@ -239,7 +239,7 @@ begin
       end);
 end;
 
-procedure TioViewModelBridge.SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
+procedure TioViewModelBridge.SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
 begin
   if Assigned(FViewModel) then
     FViewModel.SetCommand(ACmdName, Value)

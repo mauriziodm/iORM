@@ -46,22 +46,24 @@ type
 
   TioCommandType = (ctNull, ctAction, ctMethod, ctAnonimousMethod);
 
-  IioView = interface(IInvokable)
-    ['{AE9431A3-4D53-4ACF-98A1-7870DB6F7B0F}']
-    function FindComponent(const AName: string): TComponent;
-  end;
-
-  IioCommandsContainer = interface;
-  IioCommandsContainerItem = interface;
+  IioCommandContainer = interface;
+  IioCommandContainerItem = interface;
   IioViewRegister = interface;
 
+  // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    function Commands: IioCommandsContainer;
+    function Commands: IioCommandContainer;
+    procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
+    procedure DoOnViewPairing;
+    procedure FreeViews;
+    procedure HideViews;
+    procedure ShowViews;
+    procedure BindView(const AView: TComponent);
     // Command property
-    procedure SetCommand(const ACmdName: String; const Value: IioCommandsContainerItem);
-    function GetCommand(const ACmdName: String): IioCommandsContainerItem;
-    property Command[const ACmdName: String]: IioCommandsContainerItem read GetCommand write SetCommand;
+    procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
+    function GetCommand(const ACmdName: String): IioCommandContainerItem;
+    property Command[const ACmdName: String]: IioCommandContainerItem read GetCommand write SetCommand;
     // Presenter property
     function GetPresenter(const AName: String): TioModelPresenterCustom;
     property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
@@ -70,6 +72,7 @@ type
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
   end;
 
+  // Private interface of ViewModels for INTERNAL USE ONLY
   IioViewModelInternal = interface(IioViewModel)
     ['{7DA6A783-6026-47C2-BFF7-83BF6FECFD2F}']
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
@@ -116,7 +119,7 @@ type
     constructor Create(const ARttiElement: TRttiNamedObject);
   end;
 
-  IioCommandsContainerItem = interface
+  IioCommandContainerItem = interface
     ['{CD74B129-D1DB-47A5-90DF-644172D325CD}']
     procedure Execute;
     procedure FillCommandInfo(const AOwner: TComponent; const ACmdInfo: TioCommandInfo);
@@ -165,13 +168,13 @@ type
     property IsNotificationTarget: Boolean read GetIsNotificationTarget write SetIsNotificationTarget;
   end;
 
-  IioCommandsContainer = interface
+  IioCommandContainer = interface
     ['{E20F72CB-9F84-44B4-A6DD-DFF73B53F0AC}']
-    procedure Add(const AName: String; const ACommandItem: IioCommandsContainerItem);
-    procedure AddOrUpdate(const AName: String; const ACommandItem: IioCommandsContainerItem);
+    procedure Add(const AName: String; const ACommandItem: IioCommandContainerItem);
+    procedure AddOrUpdate(const AName: String; const ACommandItem: IioCommandContainerItem);
     procedure LoadCommands(const AOwner: TComponent);
-    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
-    procedure CopyCommand(const ACommandName: String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommand(const ACommandName: String; const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
     procedure Delete(AName: String);
     // procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
     // procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);
@@ -181,7 +184,7 @@ type
     procedure Execute(const AName: String; const ANoException: Boolean = False);
     procedure BindView(const AView: TComponent);
     procedure BindViewControl(const AControl: TObject; const ACommandName: String);
-    function Get(const AName: String; const ANoException: Boolean = False): IioCommandsContainerItem;
+    function Get(const AName: String; const ANoException: Boolean = False): IioCommandContainerItem;
     function Exists(const AName: String): Boolean;
   end;
 

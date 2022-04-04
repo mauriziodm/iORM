@@ -45,20 +45,20 @@ uses
 
 type
 
-  TioCommandsContainer = class(TInterfacedObject, IioCommandsContainer)
+  TioCommandsContainer = class(TInterfacedObject, IioCommandContainer)
   strict private
-    FContainer: TDictionary<String, IioCommandsContainerItem>;
-    function GetOrCreate(const AName:String; const ACommandType:TioCommandType): IioCommandsContainerItem;
+    FContainer: TDictionary<String, IioCommandContainerItem>;
+    function GetOrCreate(const AName:String; const ACommandType:TioCommandType): IioCommandContainerItem;
     procedure LoadCommands_ParseRttiElement(const AOwner: TComponent; const ARttiElement: TRttiNamedObject);
     procedure LoadCommands_ParseActions(const AOwner: TComponent; const ARttiElement: TRttiNamedObject);
   public
     constructor Create(const AOwner:TComponent);
     destructor Destroy; override;
-    procedure Add(const AName:String; const ACommandItem:IioCommandsContainerItem);
-    procedure AddOrUpdate(const AName:String; const ACommandItem:IioCommandsContainerItem);
+    procedure Add(const AName:String; const ACommandItem:IioCommandContainerItem);
+    procedure AddOrUpdate(const AName:String; const ACommandItem:IioCommandContainerItem);
     procedure LoadCommands(const AOwner:TComponent);
-    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
-    procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
     procedure Delete(AName: String);
     // NB: DI questi metodì è stata lasciata, per il momento, anche l'implementazione commentata
 //    procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
@@ -71,10 +71,10 @@ type
     procedure BindViewControl(const AControl:TObject; const ACommandName:String);
     procedure UniBindViewCommands(const AView:TComponent; const AViewType:TRttiInstanceType);
     function Exists(const AName:String): Boolean;
-    function Get(const AName:String; const ANoException:Boolean=False): IioCommandsContainerItem;
+    function Get(const AName:String; const ANoException:Boolean=False): IioCommandContainerItem;
   end;
 
-  TioCommandsContainerItem<T> = class abstract (TInterfacedObject, IioCommandsContainerItem)
+  TioCommandsContainerItem<T> = class abstract (TInterfacedObject, IioCommandContainerItem)
   strict private
     FCommand: T;
     FOwner: TObject;
@@ -571,7 +571,7 @@ end;
 { TioVMNotifyContainer }
 
 procedure TioCommandsContainer.Add(const AName: String;
-  const ACommandItem: IioCommandsContainerItem);
+  const ACommandItem: IioCommandContainerItem);
 begin
   if Exists(AName) then
     raise EioException.Create(Self.ClassName, 'Add', 'Command "' + AName + '" already exists.');
@@ -581,7 +581,7 @@ end;
 procedure TioCommandsContainer.BindViewControl(const AControl: TObject;
   const ACommandName: String);
 var
-  LCommandItem: IioCommandsContainerItem;
+  LCommandItem: IioCommandContainerItem;
   LControlType: TRttiInstanceType;
   LControlActionProperty: TRttiProperty;
 begin
@@ -599,7 +599,7 @@ begin
 end;
 
 procedure TioCommandsContainer.AddOrUpdate(const AName: String;
-  const ACommandItem: IioCommandsContainerItem);
+  const ACommandItem: IioCommandContainerItem);
 begin
   if Self.Exists(AName) then
     FContainer.Items[AName] := ACommandItem
@@ -646,9 +646,9 @@ begin
       end;
 end;
 
-procedure TioCommandsContainer.CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+procedure TioCommandsContainer.CopyCommand(const ACommandName:String; const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
 var
-  LCommandContainerItem: IioCommandsContainerItem;
+  LCommandContainerItem: IioCommandContainerItem;
 begin
   if AUpdateIfExists and ADestinationCommandsContainer.Exists(ACommandName) then
     ADestinationCommandsContainer.Delete(ACommandName);
@@ -656,7 +656,7 @@ begin
   ADestinationCommandsContainer.Add(ACommandName, LCommandContainerItem);
 end;
 
-procedure TioCommandsContainer.CopyCommands(const ADestinationCommandsContainer: IioCommandsContainer; const AUpdateIfExists: Boolean = False);
+procedure TioCommandsContainer.CopyCommands(const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
 var
   LCommandName: String;
 begin
@@ -668,7 +668,7 @@ constructor TioCommandsContainer.Create(const AOwner:TComponent);
 begin
   inherited Create;
   // Create the internal container
-  FContainer := TDictionary<String, IioCommandsContainerItem>.Create;
+  FContainer := TDictionary<String, IioCommandContainerItem>.Create;
   // Parse the Owner class (the ViewModel) and load its commands
   LoadCommands(AOwner);
 end;
@@ -692,7 +692,7 @@ begin
   Result := FContainer.ContainsKey(   UpperCase(AName)  );
 end;
 
-function TioCommandsContainer.Get(const AName: String; const ANoException:Boolean): IioCommandsContainerItem;
+function TioCommandsContainer.Get(const AName: String; const ANoException:Boolean): IioCommandContainerItem;
 begin
   Result := nil;
   if FContainer.TryGetValue(UpperCase(AName), Result) or ANoException then
@@ -701,7 +701,7 @@ begin
 end;
 
 function TioCommandsContainer.GetOrCreate(
-  const AName: String; const ACommandType:TioCommandType): IioCommandsContainerItem;
+  const AName: String; const ACommandType:TioCommandType): IioCommandContainerItem;
 begin
   if not Self.Exists(AName) then
     Self.Add(   AName, TioMVVMFactory.NewCommandsContainerItem(AName, ACommandType)   );
@@ -710,7 +710,7 @@ end;
 
 procedure TioCommandsContainer.Execute(const AName: String; const ANoException:Boolean);
 var
-  LCmdItem: IioCommandsContainerItem;
+  LCmdItem: IioCommandContainerItem;
 begin
   // Get the CommandItem if exist
   LCmdItem := Get(AName, ANoException);
@@ -740,7 +740,7 @@ procedure TioCommandsContainer.LoadCommands_ParseActions(
   const AOwner: TComponent; const ARttiElement: TRttiNamedObject);
 var
   LField: TRttiField;
-  LCmdItem: IioCommandsContainerItem;
+  LCmdItem: IioCommandContainerItem;
   LObj: TObject;
   LAction: TioAction;
 begin
@@ -765,7 +765,7 @@ procedure TioCommandsContainer.LoadCommands_ParseRttiElement(
   const AOwner: TComponent; const ARttiElement: TRttiNamedObject);
 var
   LCmdInfo: TioCommandInfo;
-  LCmdItem: IioCommandsContainerItem;
+  LCmdItem: IioCommandContainerItem;
 begin
   // Parse the RttiType of the owner (search attributes)
   LCmdInfo := TioCommandInfo.Create(ARttiElement);

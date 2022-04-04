@@ -48,11 +48,11 @@ type
   TioMVVMFactory = class
   public
     class function NewViewRegister: IioViewRegister;
-    class function NewCommandsContainer(const AOwner:TComponent): IioCommandsContainer;
-    class function NewCommandsContainerItem(const AName:String; const ACommandType:TioCommandType): IioCommandsContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const AAction:TioAction): IioCommandsContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const ARttiMethod:TRttiMethod): IioCommandsContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const AAnonimousMethod:TioCommandAnonimousMethod): IioCommandsContainerItem; overload;
+    class function NewCommandsContainer(const AOwner:TComponent): IioCommandContainer;
+    class function NewCommandsContainerItem(const AName:String; const ACommandType:TioCommandType): IioCommandContainerItem; overload;
+    class function NewCommandsContainerItem(const AName:String; const AAction:TioAction): IioCommandContainerItem; overload;
+    class function NewCommandsContainerItem(const AName:String; const ARttiMethod:TRttiMethod): IioCommandContainerItem; overload;
+    class function NewCommandsContainerItem(const AName:String; const AAnonimousMethod:TioCommandAnonimousMethod): IioCommandContainerItem; overload;
   end;
 
 implementation
@@ -64,7 +64,7 @@ uses
 { TioMVVMFactory }
 
 class function TioMVVMFactory.NewCommandsContainerItem(const AName:String;
-  const ACommandType: TioCommandType): IioCommandsContainerItem;
+  const ACommandType: TioCommandType): IioCommandContainerItem;
 begin
   Result := nil;
   case ACommandType of
@@ -79,18 +79,18 @@ begin
   end;
 end;
 
-class function TioMVVMFactory.NewCommandsContainerItem(const AName:String; const AAction: TioAction): IioCommandsContainerItem;
+class function TioMVVMFactory.NewCommandsContainerItem(const AName:String; const AAction: TioAction): IioCommandContainerItem;
 begin
   Result := TioCommandsContainerItemAction.Create(AName, AAction);
 end;
 
-class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioCommandsContainer;
+class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioCommandContainer;
 begin
   Result := TioCommandsContainer.Create(AOwner);
 end;
 
 class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
-  const AAnonimousMethod: TioCommandAnonimousMethod): IioCommandsContainerItem;
+  const AAnonimousMethod: TioCommandAnonimousMethod): IioCommandContainerItem;
 begin
   Result := TioCommandsContainerItemAnonimousMethod.Create(AName, AAnonimousMethod);
 end;
@@ -101,7 +101,7 @@ begin
 end;
 
 class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
-  const ARttiMethod: TRttiMethod): IioCommandsContainerItem;
+  const ARttiMethod: TRttiMethod): IioCommandContainerItem;
 begin
   Result := TioCommandsContainerItemMethod.Create(AName, ARttiMethod);
 end;
