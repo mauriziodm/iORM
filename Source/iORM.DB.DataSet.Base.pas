@@ -87,9 +87,11 @@ type
     // other
     procedure InternalHandleException; override;
     function GetRecordInfo: TioRecInfo;
-  published
+  public
     // redeclared data set properties
     property Active;
+  published
+    // redeclared data set properties
     property BeforeOpen;
     property AfterOpen;
     property BeforeClose;
