@@ -33,9 +33,15 @@ begin
 
   // LiveBindings components
   RegisterComponents('iORM', [TioPrototypeBindSourceMaster]);
+  UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoActivate');
+  UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoEdit');
+  UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoPost');
+  UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'OnCreateAdapter');
   RegisterComponents('iORM', [TioPrototypeBindSourceDetail]);
-  RegisterPropertyEditor(TypeInfo(Boolean), TioPrototypeBindSourceMaster, 'AutoEdit', nil); // Hide property in the ObjectInspector
-  RegisterPropertyEditor(TypeInfo(Boolean), TioPrototypeBindSourceMaster, 'AutoPost', nil); // Hide property in the ObjectInspector
+  UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoActivate');
+  UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoEdit');
+  UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoPost');
+  UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'OnCreateAdapter');
 
   // MVVM components
   RegisterComponents('iORM', [TioViewModelBridge]);
