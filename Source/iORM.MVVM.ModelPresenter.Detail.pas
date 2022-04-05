@@ -19,6 +19,7 @@ type
     property MasterPresenter; // published: Detail
     property MasterPropertyName; // published: Detail
     property AutoRefreshOnNotification default True; // published: Master+Detail
+    property TypeOfCollection; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     // Published properties: selectors
     property SelectorFor;
     // Published Events: selectors

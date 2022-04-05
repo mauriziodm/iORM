@@ -51,7 +51,7 @@ type
   end;
 
   TioSmartUpdateDetectionStateLess = class(TioSmartUpdateDetectionBase)
-  public
+   public
     function IsToBePersisted(const ACurrentObj: TObject; const AMasterPropertyPath: String): Boolean; override;
     procedure NotifyEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String); override;
     procedure NotifyPost(const ACurrentObj: TObject; const AMasterPropertyPath: String); override;

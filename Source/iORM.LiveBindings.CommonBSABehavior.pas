@@ -124,15 +124,29 @@ uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUti
 
 class procedure TioCommonBSABehavior.InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T);
 var
+  LMasterBindSourceAdapter: IioActiveBindSourceAdapter;
   LMasterObj: TObject;
   LMasterProperty: IioProperty;
   LValue: TValue;
 begin
-  LMasterObj := AActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current;
+  // Extract the master bind source adapter
+  LMasterBindSourceAdapter := AActiveBindSourceAdapter.GetMasterBindSourceAdapter;
+  // Extract the master object from che master bind source adapter
+  LMasterObj := LMasterBindSourceAdapter.Current;
+  // Extract the master property (of the master object)
   LMasterProperty := TioMapContainer.GetMap(LMasterObj.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
+  // Encapsulate (in a TValue) the new instance to be set as new DataObject
   TValue.Make(@ADataObject, LMasterProperty.GetTypeInfo, LValue);
+  // It puts the master bind source adapter in the editing state because
+  //  we are assigning the new object to the master property of the master
+  //  object (BelongsTo relation) so the latter (the master object) must be
+  //  put in editing because it has changed (it also activates the Smart
+  //  Update System (SUD) appropriately)
+  LMasterBindSourceAdapter.Edit;
+  // Set the TValue containing the new instance to be set in the master property of the master object
   LMasterProperty.SetValue(LMasterObj, LValue);
-  AActiveBindSourceAdapter.GetMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
+  // Propagate everything to any detail BindSource
+  LMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
 end;
 
 class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;

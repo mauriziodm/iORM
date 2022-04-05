@@ -386,7 +386,7 @@ end;
 
 class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
-  // If enabled then set che bjStatus property of the object to Dirty
+  // If enabled then set che objStatus property of the object to Dirty
   if AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntObjStatusSetDirty)) then
     AActiveBindSourceAdapter.SetObjStatus(osDirty);
   // Notification to register the current object into the SmartUpdateDetection system
