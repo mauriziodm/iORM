@@ -44,7 +44,7 @@ uses
   iORM.MVVM.Interfaces, iORM.Utilities, System.Rtti;
 
 const
-  VIEW_DATA_TYPE = TioTypeOfCollection.tcList;
+  TYPE_OF_COLLECTION = TioTypeOfCollection.tcList;
 
 type
 
@@ -84,7 +84,7 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
-    function GetIoViewDataType: TioTypeOfCollection;
+    function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     // State
@@ -510,9 +510,9 @@ begin
   Result := Self.AutoPost;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetIoViewDataType: TioTypeOfCollection;
+function TioActiveInterfaceListBindSourceAdapter.GetTypeOfCollection: TioTypeOfCollection;
 begin
-  Result := VIEW_DATA_TYPE;
+  Result := TYPE_OF_COLLECTION;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetioWhere: IioWhere;

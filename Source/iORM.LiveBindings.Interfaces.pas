@@ -82,6 +82,13 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    // Selector related properties
+    procedure SetOnReceiveSelectionCloneObject(const Value: Boolean);
+    function GetOnReceiveSelectionCloneObject: Boolean;
+    property OnReceiveSelectionCloneObject: Boolean read GetOnReceiveSelectionCloneObject write SetOnReceiveSelectionCloneObject; // published: Master+Detail
+    procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
+    function GetOnReceiveSelectionFreeObject: Boolean;
+    property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject; // published: Master+Detail
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
@@ -158,8 +165,6 @@ type
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure ClearDataObject;
-    procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
-    procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function GetCurrentOID: Integer;
     function HasMasterBSA: Boolean;
     function IsMasterBSA: Boolean;
@@ -171,6 +176,9 @@ type
     function GetMasterPropertyPath: String;
     function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
+    // Selection related pethond
+    procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     // TypeName
     procedure SetTypeName(const AValue: String);
     function GetTypeName: String;
@@ -203,7 +211,7 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
-    function GetIoViewDataType: TioTypeOfCollection;
+    function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     // State
@@ -251,7 +259,7 @@ type
     property ioTypeName: String read GetTypeName write SetTypeName;
     property ioWhere: IioWhere read GetioWhere write SetIoWhere;
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
-    property ioViewDataType: TioTypeOfCollection read GetIoViewDataType;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
     property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;

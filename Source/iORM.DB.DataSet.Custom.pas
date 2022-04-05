@@ -80,6 +80,12 @@ type
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
+    // OnReceiveSelectionCloneObject
+    function GetOnReceiveSelectionCloneObject: Boolean;
+    procedure SetOnReceiveSelectionCloneObject(const Value: Boolean);
+    // GetOnReceiveSelectionFreeObject
+    function GetOnReceiveSelectionFreeObject: Boolean;
+    procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Paging
@@ -143,8 +149,8 @@ type
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
+    property OnReceiveSelectionCloneObject: Boolean read GetOnReceiveSelectionCloneObject write SetOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True; // published: Master+Detail
     // Published Events: selectors
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
@@ -425,6 +431,16 @@ begin
   Result := FMasterPropertyName;
 end;
 
+function TioDataSetCustom.GetOnReceiveSelectionCloneObject: Boolean;
+begin
+  Result := FOnReceiveSelectionCloneObject;
+end;
+
+function TioDataSetCustom.GetOnReceiveSelectionFreeObject: Boolean;
+begin
+  Result := FOnReceiveSelectionFreeObject;
+end;
+
 function TioDataSetCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
@@ -615,18 +631,32 @@ begin
 end;
 
 procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   inherited;
+  LActiveBSA := GetActiveBindSourceAdapter;
   // Init the BSA
-  GetActiveBindSourceAdapter.ioAsync := FAsync;
-  GetActiveBindSourceAdapter.ioAutoPost := FAutoPost;
-  GetActiveBindSourceAdapter.LoadType := FLoadType;
-  GetActiveBindSourceAdapter.Lazy := FLazy;
-  GetActiveBindSourceAdapter.LazyProps := FLazyProps;
-  GetActiveBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
-  GetActiveBindSourceAdapter.ioWhere := FWhere;
+  LActiveBSA.ioAsync := FAsync;
+  LActiveBSA.ioAutoPost := FAutoPost;
+  LActiveBSA.LoadType := FLoadType;
+  LActiveBSA.Lazy := FLazy;
+  LActiveBSA.LazyProps := FLazyProps;
+  LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
+  LActiveBSA.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
-  GetActiveBindSourceAdapter.SetBindSource(Self);
+  LActiveBSA.SetBindSource(Self);
+  FTypeOfCollection := LActiveBSA.TypeOfCollection;
+end;
+
+procedure TioDataSetCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);
+begin
+  FOnReceiveSelectionCloneObject := Value;
+end;
+
+procedure TioDataSetCustom.SetOnReceiveSelectionFreeObject(const Value: Boolean);
+begin
+  FOnReceiveSelectionFreeObject := Value;
 end;
 
 procedure TioDataSetCustom.SetOrderBy(const Value: String);
@@ -714,12 +744,12 @@ begin
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
   if Assigned(MasterDataSet) then
-    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterDataSet.GetActiveBindSourceAdapter, MasterPropertyName))
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterDataSet.GetActiveBindSourceAdapter, MasterPropertyName))
     // else create the BSA from TypeName & TypeAlias
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

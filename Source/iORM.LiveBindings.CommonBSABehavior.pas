@@ -95,7 +95,7 @@ type
     // NB: Common code for ABSA to manage notifications
     class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
     // NB: Generic type for this methods must be only TObject or IInterface
-    class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T); overload;
+    class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T);
     // ObjectStatus
     class procedure SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
     class function UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
@@ -138,10 +138,10 @@ begin
   // Encapsulate (in a TValue) the new instance to be set as new DataObject
   TValue.Make(@ADataObject, LMasterProperty.GetTypeInfo, LValue);
   // It puts the master bind source adapter in the editing state because
-  //  we are assigning the new object to the master property of the master
-  //  object (BelongsTo relation) so the latter (the master object) must be
-  //  put in editing because it has changed (it also activates the Smart
-  //  Update System (SUD) appropriately)
+  // we are assigning the new object to the master property of the master
+  // object (BelongsTo relation) so the latter (the master object) must be
+  // put in editing because it has changed (it also activates the Smart
+  // Update System (SUD) appropriately)
   LMasterBindSourceAdapter.Edit;
   // Set the TValue containing the new instance to be set in the master property of the master object
   LMasterProperty.SetValue(LMasterObj, LValue);

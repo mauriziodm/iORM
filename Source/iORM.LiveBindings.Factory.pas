@@ -49,10 +49,11 @@ type
       : IioContainedBindSourceAdapter;
     class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
       : IioContainedBindSourceAdapter;
-    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
+      : IioActiveBindSourceAdapter;
     class function GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-    class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioTypeOfCollection;
+    class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     class function GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
@@ -101,10 +102,12 @@ class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOw
 begin
   // If the master property type is an interface...
   if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
-    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere, AOwner, nil) // AObject:TObject;
-  // else if the master property type is a class...
+    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
+      AOwner, nil) // AObject:TObject;
+    // else if the master property type is a class...
   else
-    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil); // AObject:TObject;
+    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil);
+  // AObject:TObject;
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;
@@ -114,14 +117,14 @@ begin
   Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
 end;
 
-class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioTypeOfCollection;
-      const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
+  const ATypeOfCollection: TioTypeOfCollection; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
   LDataObject: TObject;
 begin
   // Depending of the DataType (list or single object)...
-  case AViewDataType of
+  case ATypeOfCollection of
 
     // LIST
     TioTypeOfCollection.tcList:
@@ -142,7 +145,8 @@ begin
             LDataObject := ADataObject
           else
             LDataObject := TObjectList<TObject>.Create(True);
-          Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, TObjectList<TObject>(LDataObject), AOwnsObject);
+          Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, TObjectList<TObject>(LDataObject),
+            AOwnsObject);
         end;
       end;
 
@@ -193,7 +197,8 @@ begin
   end;
 end;
 
-class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
+  : IioActiveBindSourceAdapter;
 begin
   Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
 end;

@@ -129,6 +129,12 @@ type
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
+    // OnReceiveSelectionCloneObject
+    function GetOnReceiveSelectionCloneObject: Boolean;
+    procedure SetOnReceiveSelectionCloneObject(const Value: Boolean);
+    // GetOnReceiveSelectionFreeObject
+    function GetOnReceiveSelectionFreeObject: Boolean;
+    procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Paging
@@ -189,8 +195,8 @@ type
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True; // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True; // published: Master+Detail
+    property OnReceiveSelectionCloneObject: Boolean read GetOnReceiveSelectionCloneObject write SetOnReceiveSelectionCloneObject default True; // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True; // published: Master+Detail
     // Published Events: selectors
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
@@ -629,6 +635,16 @@ begin
   Result := FMasterPropertyName;
 end;
 
+function TioModelPresenterCustom.GetOnReceiveSelectionCloneObject: Boolean;
+begin
+  Result := FOnReceiveSelectionCloneObject;
+end;
+
+function TioModelPresenterCustom.GetOnReceiveSelectionFreeObject: Boolean;
+begin
+  Result := FOnReceiveSelectionFreeObject;
+end;
+
 function TioModelPresenterCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
@@ -972,6 +988,16 @@ end;
 procedure TioModelPresenterCustom.SetMasterPropertyName(const Value: String);
 begin
   FMasterPropertyName := Trim(Value);
+end;
+
+procedure TioModelPresenterCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);
+begin
+  FOnReceiveSelectionCloneObject := Value;
+end;
+
+procedure TioModelPresenterCustom.SetOnReceiveSelectionFreeObject(const Value: Boolean);
+begin
+  FOnReceiveSelectionFreeObject := Value;
 end;
 
 procedure TioModelPresenterCustom.SetOrderBy(const Value: String);

@@ -124,6 +124,12 @@ type
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
+    // OnReceiveSelectionCloneObject
+    function GetOnReceiveSelectionCloneObject: Boolean;
+    procedure SetOnReceiveSelectionCloneObject(const Value: Boolean);
+    // GetOnReceiveSelectionFreeObject
+    function GetOnReceiveSelectionFreeObject: Boolean;
+    procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     // OrderBy
     procedure SetOrderBy(const Value: String);
     // Paging
@@ -187,9 +193,8 @@ type
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
-    property OnReceiveSelectionCloneObject: Boolean read FOnReceiveSelectionCloneObject write FOnReceiveSelectionCloneObject default True;
-    // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read FOnReceiveSelectionFreeObject write FOnReceiveSelectionFreeObject default True;
+    property OnReceiveSelectionCloneObject: Boolean read GetOnReceiveSelectionCloneObject write SetOnReceiveSelectionCloneObject default True;
+    property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True;
     // published: Master+Detail
     // Published Events: selectors
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
@@ -649,6 +654,16 @@ begin
   Result := FMasterPropertyName;
 end;
 
+function TioPrototypeBindSourceCustom.GetOnReceiveSelectionCloneObject: Boolean;
+begin
+  Result := FOnReceiveSelectionCloneObject;
+end;
+
+function TioPrototypeBindSourceCustom.GetOnReceiveSelectionFreeObject: Boolean;
+begin
+  Result := FOnReceiveSelectionFreeObject;
+end;
+
 function TioPrototypeBindSourceCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
@@ -878,6 +893,16 @@ begin
   (FWhereStr as TStringList).OnChange := WhereOnChangeEventHandler;
   // Update the adapter where property
   WhereOnChangeEventHandler(Self);
+end;
+
+procedure TioPrototypeBindSourceCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);
+begin
+  FOnReceiveSelectionCloneObject := Value;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetOnReceiveSelectionFreeObject(const Value: Boolean);
+begin
+  FOnReceiveSelectionFreeObject := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetOrderBy(const Value: String);

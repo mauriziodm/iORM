@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.LiveBindings.ActiveListBindSourceAdapter;
 
@@ -46,7 +44,7 @@ uses
   iORM.MVVM.Interfaces, System.Rtti;
 
 const
-  VIEW_DATA_TYPE = TioTypeOfCollection.tcList;
+  TYPE_OF_COLLECTION = TioTypeOfCollection.tcList;
 
 type
 
@@ -55,8 +53,8 @@ type
     FAsync: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
-//    FClassRef: TioClassRef;
-    FTypeName, FTypeAlias: String;  // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
+    // FClassRef: TioClassRef;
+    FTypeName, FTypeAlias: String; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
     FReloading: Boolean;
     FLazy: Boolean;
@@ -74,10 +72,10 @@ type
     FInterfacedList: IInterface;
     procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
-    procedure SetTypeName(const AValue:String);
+    procedure SetTypeName(const AValue: String);
     function GetTypeName: String;
     // TypeAlias
-    procedure SetTypeAlias(const AValue:String);
+    procedure SetTypeAlias(const AValue: String);
     function GetTypeAlias: String;
     // Async property
     function GetIoAsync: Boolean;
@@ -92,7 +90,7 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
-    function GetIoViewDataType: TioTypeOfCollection;
+    function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     // State
@@ -115,8 +113,8 @@ type
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
     // Reloading
-    function GetReloading: boolean;
-    procedure SetReloading(const Value: boolean);
+    function GetReloading: Boolean;
+    procedure SetReloading(const Value: Boolean);
     // BSPersistenceDeleting
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
@@ -128,7 +126,7 @@ type
     procedure AddFields; override;
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
-    //  because is not implementing IInterface (NB: RefCount DISABLED)
+    // because is not implementing IInterface (NB: RefCount DISABLED)
     function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
@@ -147,47 +145,49 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
-    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
-    procedure DoSelection(var ASelected: TObject; var ASelectionType:TioSelectionType; var ADone:Boolean);
-    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType:TioSelectionType);
+    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+    procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     function GetBaseObjectClassName: String;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
-    //  <TObject> (for non interfaced list such as TList<IInterface>)
-    procedure _InternalSetDataObject<T>(const ADataObject:TObject; const AOwnsObject:Boolean); overload;
-    procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
-    procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
-    constructor InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True); overload;
+    // <TObject> (for non interfaced list such as TList<IInterface>)
+    procedure _InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean); overload;
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    constructor InternalCreate(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const AOwnsObject: Boolean = True); overload;
-    constructor Create(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>;
+      const AOwnsObject: Boolean = True); overload;
+    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
+      const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
-    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
-    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer:IioDetailBindSourceAdaptersContainer);
+    function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
-    procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+    procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
-    function HasBindSource: boolean;
+    function HasBindSource: Boolean;
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
-    function NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    function DetailAdaptersContainer:IioDetailBindSourceAdaptersContainer;
-    procedure Append(AObject:TObject); reintroduce; overload;
-    procedure Append(AObject:IInterface); reintroduce; overload;
-    procedure Insert(AObject:TObject); reintroduce; overload;
-    procedure Insert(AObject:IInterface); reintroduce; overload;
+    function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    procedure Append(AObject: TObject); reintroduce; overload;
+    procedure Append(AObject: IInterface); reintroduce; overload;
+    procedure Insert(AObject: TObject); reintroduce; overload;
+    procedure Insert(AObject: IInterface); reintroduce; overload;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure Refresh(const ANotify:Boolean=True); reintroduce; overload;
+    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
     procedure Reload;
     procedure LoadPage;
     function DataObject: TObject;
-    procedure SetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
-    procedure SetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure ClearDataObject;
     function GetCurrentOID: Integer;
 
@@ -198,10 +198,10 @@ type
     function GetMasterPropertyName: String;
     function GetMasterPropertyPath: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    procedure DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer=100);
+    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     function AsTBindSourceAdapter: TBindSourceAdapter;
-    procedure ReceiveSelection(ASelected:TObject; ASelectionType:TioSelectionType); overload;
-    procedure ReceiveSelection(ASelected:IInterface; ASelectionType:TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
   end;
 
@@ -215,10 +215,12 @@ uses
 { TioActiveListBindSourceAdapter<T> }
 
 {$IFDEF AUTOREFCOUNT}
+
 function TioActiveListBindSourceAdapter.__ObjAddRef: Integer;
 begin
   // Nothing (event the "inherited")
 end;
+
 function TioActiveListBindSourceAdapter.__ObjRelease: Integer;
 begin
   // Nothing (event the "inherited")
@@ -242,8 +244,8 @@ begin
   // inherited; // NB: Don't inherit from ancestor
   LType := GetObjectType;
   LIntf := TBindSourceAdapterGetMemberObject.Create(Self);
-//  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
-//  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
+  // AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
+  // AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
   TioCommonBSABehavior.AddFields(LType, Self, LIntf, ''); // To support iORM nested fields on child objects
 end;
 
@@ -267,23 +269,25 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
+  const AOwnsObject: Boolean);
 var
   LDataObject: TObject;
 begin
   LDataObject := ADataObject as TObject;
   inherited Create(AOwner, TList<TObject>(LDataObject), AClassRef, AOwnsObject);
   InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
-  FInterfacedList := ADataObject;  // To keep che interfaced list live
+  FInterfacedList := ADataObject; // To keep che interfaced list live
 end;
 
-constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>; const AOwnsObject: Boolean);
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent;
+  const ADataObject: TList<TObject>; const AOwnsObject: Boolean);
 begin
   inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
   InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
 end;
 
-procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex:Integer; const ADelayMilliseconds:integer);
+procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer);
 var
   LTimer: TioTimer;
 begin
@@ -313,13 +317,13 @@ end;
 procedure TioActiveListBindSourceAdapter.DoAfterPost;
 begin
   inherited;
-    TioCommonBSAPersistence.Post(Self);
+  TioCommonBSAPersistence.Post(Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>);
 begin
   inherited;
-    TioCommonBSAPersistence.Post(Self);
+  TioCommonBSAPersistence.Post(Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterScroll;
@@ -372,7 +376,7 @@ begin
   TioCommonBSAPersistence.Load(Self);
 end;
 
-procedure TioActiveListBindSourceAdapter.Refresh(const ANotify:Boolean=True);
+procedure TioActiveListBindSourceAdapter.Refresh(const ANotify: Boolean = True);
 begin
   TioCommonBSAPersistence.Refresh(Self, ANotify);
 end;
@@ -388,8 +392,7 @@ begin
     FBindSource.DoBeforeSelection(ASelected, ASelectionType);
 end;
 
-procedure TioActiveListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean;
-  out AInstance: TObject);
+procedure TioActiveListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean; out AInstance: TObject);
 begin
   inherited;
   if AHandled then
@@ -407,8 +410,7 @@ begin
   end;
 end;
 
-procedure TioActiveListBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType;
-  var ADone: Boolean);
+procedure TioActiveListBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoSelection(ASelected, ASelectionType, ADone);
@@ -424,10 +426,10 @@ begin
   LDetailObj := nil;
   LDetailIntf := nil;
   // Check parameter, if the MasterObject is not assigned
-  //  then close the BSA
+  // then close the BSA
   if not Assigned(AMasterObj) then
   begin
-    Self.InternalSetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(nil, False); // 2° parameter false ABSOLUTELY!!!!!!!
     Exit;
   end;
   // Extract master property value
@@ -441,23 +443,23 @@ begin
       LDetailObj := LValue.AsObject;
   end;
   // If is a LazyLoadable list then set the internal List (GetInternalObject is always as TObject)
-  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
-  //       normali dava dei problemi (non dava errori ma non usciva nulla)
+  // NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
+  // normali dava dei problemi (non dava errori ma non usciva nulla)
   if Supports(LDetailObj, IioLazyLoadable, LLazyLoadableObj) then
   begin
     LDetailObj := LLazyLoadableObj.GetInternalObject;
-    Self.InternalSetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    Self.InternalSetDataObject(LDetailObj, False); // 2° parameter false ABSOLUTELY!!!!!!!
   end
   else
-  // else if it isn't a LazyLoadable list but the MasterProperty is an interface...
-  if FMasterProperty.IsInterface then
-  begin
-    LDetailIntf := LValue.AsInterface;
-    Self.InternalSetDataObject(LDetailIntf, False);  // 2° parameter false ABSOLUTELY!!!!!!!
-  end
-  // else it's a normal List object (not an interface)
-  else
-    Self.InternalSetDataObject(LDetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
+    // else if it isn't a LazyLoadable list but the MasterProperty is an interface...
+    if FMasterProperty.IsInterface then
+    begin
+      LDetailIntf := LValue.AsInterface;
+      Self.InternalSetDataObject(LDetailIntf, False); // 2° parameter false ABSOLUTELY!!!!!!!
+    end
+    // else it's a normal List object (not an interface)
+    else
+      Self.InternalSetDataObject(LDetailObj, False); // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
 function TioActiveListBindSourceAdapter.GetLazy: Boolean;
@@ -510,8 +512,7 @@ begin
   Result := FDataSetLinkContainer;
 end;
 
-function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(
-  const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   Result := FDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(AMasterPropertyName);
 end;
@@ -526,9 +527,10 @@ begin
   Result := FAsync;
 end;
 
-function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:TComponent; const AMasterPropertyName:String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
+function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
+  : IioActiveBindSourceAdapter;
 begin
-//  Result := nil;
+  // Result := nil;
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
@@ -539,15 +541,15 @@ begin
   Result := Self.AutoPost;
 end;
 
-function TioActiveListBindSourceAdapter.GetIoViewDataType: TioTypeOfCollection;
+function TioActiveListBindSourceAdapter.GetTypeOfCollection: TioTypeOfCollection;
 begin
-  Result := VIEW_DATA_TYPE;
+  Result := TYPE_OF_COLLECTION;
 end;
 
 function TioActiveListBindSourceAdapter.GetioWhere: IioWhere;
 begin
   // Fill the WhereDetails from the DetailAdapters container if enabled
-  //  NB: Create it if not assigned
+  // NB: Create it if not assigned
   if FWhereDetailsFromDetailAdapters then
   begin
     if not Assigned(FWhere) then
@@ -567,8 +569,7 @@ begin
   Result := inherited ItemIndex;
 end;
 
-function TioActiveListBindSourceAdapter.GetItems(
-  const AIndex: Integer): TObject;
+function TioActiveListBindSourceAdapter.GetItems(const AIndex: Integer): TObject;
 begin
   Result := Self.List.Items[AIndex] as TObject;
 end;
@@ -598,7 +599,7 @@ begin
   Result := FLocalOwnsObject;
 end;
 
-function TioActiveListBindSourceAdapter.GetReloading: boolean;
+function TioActiveListBindSourceAdapter.GetReloading: Boolean;
 begin
   Result := FReloading;
 end;
@@ -618,7 +619,7 @@ begin
   Result := FTypeName;
 end;
 
-function TioActiveListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner:TComponent): IioActiveBindSourceAdapter;
+function TioActiveListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
   Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
 end;
@@ -637,7 +638,8 @@ begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
-constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef:TioClassRef; const AWhere:IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True);
+constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent;
+  const AOwnsObject: Boolean = True);
 begin
   FInterfacedList := nil;
   FLoadType := ltAuto;
@@ -646,7 +648,7 @@ begin
   FAsync := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
-//  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+  // inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
   FWhereDetailsFromDetailAdapters := False;
@@ -661,7 +663,7 @@ begin
   FInsertObj_NewObj := nil;
 end;
 
-function TioActiveListBindSourceAdapter.HasBindSource: boolean;
+function TioActiveListBindSourceAdapter.HasBindSource: Boolean;
 begin
   Result := Assigned(FBindSource);
 end;
@@ -686,8 +688,7 @@ begin
   Result := not HasMasterBSA;
 end;
 
-procedure TioActiveListBindSourceAdapter.ListViewDeletingTimerEventHandler(
-  Sender: TObject);
+procedure TioActiveListBindSourceAdapter.ListViewDeletingTimerEventHandler(Sender: TObject);
 var
   LTimer: TioTimer;
   CurrItemIndex: Integer;
@@ -731,8 +732,7 @@ begin
   TioCommonBSAPersistence.PersistCurrent(Self);
 end;
 
-function TioActiveListBindSourceAdapter.QueryInterface(const IID: TGUID;
-  out Obj): HResult;
+function TioActiveListBindSourceAdapter.QueryInterface(const IID: TGUID; out Obj): HResult;
 begin
   // RefCount disabled
   if GetInterface(IID, Obj) then
@@ -750,8 +750,10 @@ begin
   DoSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     case ASelectionType of
-      TioSelectionType.stAppend: Self.Append(ASelected);
-      TioSelectionType.stInsert: Self.Insert(ASelected);
+      stAppend:
+        Append(ASelected);
+      stInsert:
+        Insert(ASelected);
     end;
   DoAfterSelection(ASelected, ASelectionType);
 end;
@@ -759,8 +761,8 @@ end;
 procedure TioActiveListBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
 begin
   // Questo ActiveBindSourceAdapter funziona solo con gli oggetti (no interfacce)
-  //  quindi chiama l'altra versione di metodo più adatta. IN questo modo
-  //  è possibile gestire la selezione anche se il selettore non è concorde
+  // quindi chiama l'altra versione di metodo più adatta. IN questo modo
+  // è possibile gestire la selezione anche se il selettore non è concorde
   ReceiveSelection(ASelected as TObject, ASelectionType);
 end;
 
@@ -779,7 +781,7 @@ begin
   FLoadType := Value;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+procedure TioActiveListBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
 begin
   FBindSource := ANotifiableBindSource;
 end;
@@ -810,7 +812,7 @@ begin
   Self._InternalSetDataObject<IInterface>(ADataObject as TObject, AOwnsObject);
 end;
 
-procedure TioActiveListBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject:Boolean);
+procedure TioActiveListBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   Self._InternalSetDataObject<TObject>(ADataObject, AOwnsObject);
 end;
@@ -830,8 +832,7 @@ begin
   FWhere := Value;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetioWhereDetailsFromDetailAdapters(
-  const Value: Boolean);
+procedure TioActiveListBindSourceAdapter.SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
 end;
@@ -841,20 +842,17 @@ begin
   inherited ItemIndex := Value;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetItems(const AIndex: Integer;
-  const Value: TObject);
+procedure TioActiveListBindSourceAdapter.SetItems(const AIndex: Integer; const Value: TObject);
 begin
   Self.List.Items[AIndex] := Value;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetMasterAdaptersContainer(
-  AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
+procedure TioActiveListBindSourceAdapter.SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
 begin
   FMasterAdaptersContainer := AMasterAdaptersContainer;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetMasterProperty(
-  AMasterProperty: IioProperty);
+procedure TioActiveListBindSourceAdapter.SetMasterProperty(AMasterProperty: IioProperty);
 begin
   FMasterProperty := AMasterProperty;
 end;
@@ -864,7 +862,7 @@ begin
   TioCommonBSABehavior.SetObjStatus(Self, AObjStatus);
 end;
 
-procedure TioActiveListBindSourceAdapter.SetReloading(const Value: boolean);
+procedure TioActiveListBindSourceAdapter.SetReloading(const Value: Boolean);
 begin
   FReloading := Value;
 end;
@@ -882,7 +880,7 @@ end;
 function TioActiveListBindSourceAdapter.SupportsNestedFields: Boolean;
 begin
   // Disable support for NestedFields because iORM implements its own way of managing them
-  //  in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
+  // in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
   Result := False;
 end;
 
@@ -904,21 +902,21 @@ begin
   // Init
   FInterfacedList := nil;
   // Disable the adapter
-  First;  // Bug
+  First; // Bug
   Active := False;
   // AObj is assigned then set it as DataObject
-  //  else set DataObject to nil and set MasterObject to nil
-  //  to disable all Details adapters also
+  // else set DataObject to nil and set MasterObject to nil
+  // to disable all Details adapters also
   if Assigned(ADataObject) then
   begin
     // Set the provided DataObject (always as TList<IInterface>)
     SetList(TList<TObject>(ADataObject), AOwnsObject);
     // If the DataObject (List) is an interface referenced object then
-    //  set the FInterfacedList field to it to keep alive the list itself
+    // set the FInterfacedList field to it to keep alive the list itself
     if TioUtilities.IsAnInterface<T> then
       Supports(ADataObject, IInterface, FInterfacedList);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
-    //  then restore the original value of the "AutoLoadData" property.
+    // then restore the original value of the "AutoLoadData" property.
     LPrecLoadType := FLoadType;
     try
       FLoadType := ltManual;
@@ -937,12 +935,12 @@ begin
 
   // -------------------------------------------------------------------------------------------------------
   // If is a LazyLoadable list then set the internal List
-  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
-  //       normali dava dei problemi (non dava errori ma non usciva nulla)
-//  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
-//    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
-//  Self.SetList(AObj as TList<IInterface>, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
-//// -------------------------------------------------------------------------------------------------------
+  // NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
+  // normali dava dei problemi (non dava errori ma non usciva nulla)
+  // if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
+  // then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
+  // Self.SetList(AObj as TList<IInterface>, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
+  /// / -------------------------------------------------------------------------------------------------------
 end;
 
 function TioActiveListBindSourceAdapter._Release: Integer;

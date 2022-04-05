@@ -42,7 +42,7 @@ uses
   System.Rtti;
 
 const
-  VIEW_DATA_TYPE = TioTypeOfCollection.tcSingleObject;
+  TYPE_OF_COLLECTION = TioTypeOfCollection.tcSingleObject;
 
 type
 
@@ -85,7 +85,7 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
-    function GetIoViewDataType: TioTypeOfCollection;
+    function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     // State
@@ -149,14 +149,15 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+      const AOwnsObject: Boolean = True); overload;
     destructor Destroy; override;
-    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
+    function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
     function GetBindSource: IioNotifiableBindSource;
-    function HasBindSource: boolean;
+    function HasBindSource: Boolean;
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
@@ -229,8 +230,8 @@ begin
   // inherited; // NB: Don't inherit from ancestor
   LType := GetObjectType;
   LIntf := TBindSourceAdapterGetMemberObject.Create(Self);
-//  AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
-//  AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
+  // AddFieldsToList(LType, Self, Self.Fields, LIntf); // Original code
+  // AddPropertiesToList(LType, Self, Self.Fields, LIntf); // Original code
   TioCommonBSABehavior.AddFields(LType, Self, LIntf, ''); // To support iORM nested fields on child objects
 end;
 
@@ -254,7 +255,8 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const AOwnsObject: Boolean = True);
+constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+  const AOwnsObject: Boolean = True);
 begin
   FLoadType := ltAuto;
   FLazy := False;
@@ -355,8 +357,7 @@ begin
     FBindSource.DoBeforeSelection(ASelected, ASelectionType);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType;
-  var ADone: Boolean);
+procedure TioActiveObjectBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FBindSource) then
     FBindSource.DoSelection(ASelected, ASelectionType, ADone);
@@ -473,8 +474,7 @@ begin
   Result := FDataSetLinkContainer;
 end;
 
-function TioActiveObjectBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String)
-  : IioActiveBindSourceAdapter;
+function TioActiveObjectBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   Result := FDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(AMasterPropertyName);
 end;
@@ -489,7 +489,8 @@ begin
   Result := FAsync;
 end;
 
-function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
+function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
+  : IioActiveBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
@@ -501,9 +502,9 @@ begin
   Result := Self.AutoPost;
 end;
 
-function TioActiveObjectBindSourceAdapter.GetIoViewDataType: TioTypeOfCollection;
+function TioActiveObjectBindSourceAdapter.GetTypeOfCollection: TioTypeOfCollection;
 begin
-  Result := VIEW_DATA_TYPE;
+  Result := TYPE_OF_COLLECTION;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetIoWhere: IioWhere;
@@ -594,7 +595,7 @@ begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
-function TioActiveObjectBindSourceAdapter.HasBindSource: boolean;
+function TioActiveObjectBindSourceAdapter.HasBindSource: Boolean;
 begin
   Result := Assigned(FBindSource);
 end;
@@ -662,7 +663,7 @@ begin
   DoBeforeSelection(ASelected, ASelectionType);
   DoSelection(ASelected, ASelectionType, LDone);
   if not LDone then
-    Self.SetDataObject(ASelected);
+    SetDataObject(ASelected);
   DoAfterSelection(ASelected, ASelectionType);
 end;
 
@@ -719,14 +720,12 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'SetDataObject',
-    'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+  raise EioException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'InternalSetDataObject',
-    'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+  raise EioException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
@@ -825,7 +824,7 @@ end;
 function TioActiveObjectBindSourceAdapter.SupportsNestedFields: Boolean;
 begin
   // Disable support for NestedFields because iORM implements its own way of managing them
-  //  in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
+  // in the unit "iORM.LiveBindings.CommonBSABehavior" with relative changes also in the ActivebindSourceAdapters
   Result := False;
 end;
 
