@@ -127,8 +127,15 @@ begin
 end;
 
 class function TioUtilities.CloneObject(const ASourceObj: TObject): TObject;
+var
+  LSourceJSON: String;
 begin
-  Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
+  Result := nil;
+  LSourceJSON := io.Mapper.From(ASourceObj).byFields.TypeAnnotationsON.ToString;
+  Result := io.Mapper.FromJSON(LSourceJSON).byFields.TypeAnnotationsON.ToObject;
+// ----- OLD CODE -----
+//  Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
+// ----- OLD CODE -----
 end;
 
 class function TioUtilities.ExtractOID(const AObj: Tobject): Integer;
