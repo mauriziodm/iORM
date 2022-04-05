@@ -664,16 +664,19 @@ begin
   //  OnReceiveSelectionFreeObject property of the BindSource is True
   LDone := False;
   LPreviousCurrentObj := Current;
+
   // Clone the selected object if the OnReceiveSelectionCloneObject property
   //  of the BindSource is true
   if FBindSource.OnReceiveSelectionCloneObject then
     ASelected := TioUtilities.CloneObject(ASelected);
+
   // Do the selection
   DoBeforeSelection(ASelected, ASelectionType);
   DoSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);
   DoAfterSelection(ASelected, ASelectionType);
+
   // Free the previous current object if OnReceiveSelectionFreeObject property
   //  of the BindSource is True
   if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) then

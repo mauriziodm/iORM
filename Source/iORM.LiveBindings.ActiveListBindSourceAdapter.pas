@@ -747,10 +747,12 @@ var
 begin
   // Initialization
   LDone := False;
+
   // Clone the selected object if the OnReceiveSelectionCloneObject property
   //  of the BindSource is true
   if FBindSource.OnReceiveSelectionCloneObject then
     ASelected := TioUtilities.CloneObject(ASelected);
+
   // Do the selection
   DoBeforeSelection(ASelected, ASelectionType);
   DoSelection(ASelected, ASelectionType, LDone);
@@ -762,6 +764,7 @@ begin
         Insert(ASelected);
     end;
   DoAfterSelection(ASelected, ASelectionType);
+
   // NB: OnReceiveSelectionFreeObject property of the BindSource is not
   //  useful in a list bind source adapter (only for single object BSA)
 end;
