@@ -55,7 +55,7 @@ type
     property LoadType default ltAuto;
     property Lazy default False;
     property LazyProps;
-    property ViewDataType; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property TypeOfCollection; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr; // published: Master
     property OrderBy;
     property AutoRefreshOnNotification default True;

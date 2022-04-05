@@ -52,7 +52,7 @@ type
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
     class function GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-    class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioViewDataType;
+    class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     class function GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
@@ -114,7 +114,7 @@ begin
   Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
 end;
 
-class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioViewDataType;
+class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AViewDataType: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
@@ -124,7 +124,7 @@ begin
   case AViewDataType of
 
     // LIST
-    TioViewDataType.dtListOfObjects:
+    TioTypeOfCollection.tcList:
       begin
         // Interfaced
         if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
@@ -147,7 +147,7 @@ begin
       end;
 
     // SINGLE OBJECT
-    TioViewDataType.dtSingleObject:
+    TioTypeOfCollection.tcSingleObject:
       begin
         // Interfaced
         if TioUtilities.IsAnInterfaceTypeName(ATypeName) then

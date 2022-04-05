@@ -22,7 +22,7 @@ type
     FLazy: Boolean;
     FLazyProps: String;
     FAsync: Boolean;
-    FViewDataType: TioViewDataType; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
+    FTypeOfCollection: TioTypeOfCollection; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
     FMasterDataSet: TioMasterDataSet;
     FMasterPropertyName: String;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
@@ -130,7 +130,7 @@ type
     property LoadType: TioLoadType read FLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType default dtListOfObjects; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
@@ -222,7 +222,7 @@ begin
   FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
-  FViewDataType := TioViewDataType.dtListOfObjects;
+  FTypeOfCollection := TioTypeOfCollection.tcList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
   // Selectors
@@ -364,7 +364,7 @@ begin
     ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
-  if FOnReceiveSelectionFreeObject and (FViewDataType = TioViewDataType.dtSingleObject) and (LPreviousCurrentObj <> nil) then
+  if FOnReceiveSelectionFreeObject and (FTypeOfCollection = TioTypeOfCollection.tcSingleObject) and (LPreviousCurrentObj <> nil) then
     LPreviousCurrentObj.Free;
 end;
 
@@ -719,7 +719,7 @@ begin
   else
   begin
     // Get the ActiveBindSourceAdapter
-    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, ViewDataType, ADataObject, AOwnsObject));
+    SetActiveBindSOurceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

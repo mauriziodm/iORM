@@ -55,7 +55,7 @@ type
     FLazy: Boolean;
     FLazyProps: String;
     FAsync: Boolean;
-    FViewDataType: TioViewDataType;
+    FTypeOfCollection: TioTypeOfCollection;
     FMasterBindSource: TioMasterBindSource;
     FMasterPropertyName: String;
     FWhereStr: TStrings;
@@ -174,7 +174,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
-    property ViewDataType: TioViewDataType read FViewDataType write FViewDataType default dtListOfObjects; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
@@ -338,7 +338,7 @@ begin
   FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
-  FViewDataType := dtListOfObjects;
+  FTypeOfCollection := tcList;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
@@ -429,7 +429,7 @@ begin
       if TypeName.IsEmpty then
         raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
       ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-        ._OrderBy(FOrderBy), FViewDataType, nil, True).AsTBindSourceAdapter;
+        ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
     end
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
     else
@@ -468,7 +468,7 @@ begin
     ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
-  if FOnReceiveSelectionFreeObject and (FViewDataType = TioViewDataType.dtSingleObject) and (LPreviousCurrentObj <> nil) then
+  if FOnReceiveSelectionFreeObject and (FTypeOfCollection = TioTypeOfCollection.tcSingleObject) and (LPreviousCurrentObj <> nil) then
     LPreviousCurrentObj.Free;
 end;
 

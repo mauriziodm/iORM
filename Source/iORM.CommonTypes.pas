@@ -82,7 +82,7 @@ type
   TioShowWaitProc = reference to procedure;
   TioHideWaitProc = reference to procedure;
 
-  TioViewDataType = (dtSingleObject, dtListOfObjects);
+  TioTypeOfCollection = (tcSingleObject, tcList);
 
   // Selection Type (for selector ActiveBindSourceAdapters)
   TioSelectionType = (stAppend, stInsert);

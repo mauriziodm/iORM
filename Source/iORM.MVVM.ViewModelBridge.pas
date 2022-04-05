@@ -215,14 +215,18 @@ begin
     AutoSetClientComponentsOnCreate;
   // ===========================================================================
   // ===========================================================================
-  // If the ViewModel is assigned then try
-  // to Bind the View (Owner) components to ViewModel's actions
-  // and register the view into the VMVoews container of the VM
-  // ---------------------------------------------------------------------------
   if Assigned(FViewModel) then
+  begin
+    // If the ViewModel is assigned then try
+    // to Bind the View (Owner) components to ViewModel's actions
+    // and register the view into the VMVoews container of the VM
     (FViewModel as IioViewModelInternal).BindView(Owner);
-  // ===========================================================================
-  if Assigned(FViewModel) then
+    // These lines set a timer to postpone the firing of the "OnViewPairing"
+    //  event on the ViewModel until after all the ConnectionDefs possibly
+    //  present on the view have been registered in the appropriate register,
+    //  otherwise if the ModelPresenters were Opened in the OnCreate event
+    //  they could be of sequence problems (the ConnectionDefs were not
+    //  registered yet so a connection was not found).
     TioAnonymousTimer.Create(10,
       function: Boolean
       var
@@ -237,6 +241,8 @@ begin
             Exit(True);
         (FViewModel as IioViewModelInternal).DoOnViewPairing;
       end);
+  end;
+  // ===========================================================================
 end;
 
 procedure TioViewModelBridge.SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);

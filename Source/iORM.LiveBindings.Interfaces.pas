@@ -203,7 +203,7 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
-    function GetIoViewDataType: TioViewDataType;
+    function GetIoViewDataType: TioTypeOfCollection;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     // State
@@ -251,7 +251,7 @@ type
     property ioTypeName: String read GetTypeName write SetTypeName;
     property ioWhere: IioWhere read GetioWhere write SetIoWhere;
     property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
-    property ioViewDataType: TioViewDataType read GetIoViewDataType;
+    property ioViewDataType: TioTypeOfCollection read GetIoViewDataType;
     property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;

@@ -122,7 +122,7 @@ begin
     GetModelPresenterInstance.SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
       FCrossView_MasterBindSource.GetActiveBindSourceAdapter, FCrossView_MasterPropertyName, nil)  );
   SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
-  if (GetActiveBindSourceAdapter <> nil) then
+  if GetActiveBindSourceAdapter <> nil then
     GetActiveBindSourceAdapter.Active := True;
   inherited;
 end;

@@ -43,7 +43,7 @@ uses
   System.Generics.Collections, System.Rtti;
 
 const
-  VIEW_DATA_TYPE = TioViewDataType.dtSingleObject;
+  VIEW_DATA_TYPE = TioTypeOfCollection.tcSingleObject;
 
 type
 
@@ -79,7 +79,7 @@ type
     function GetioWhereDetailsFromDetailAdapters: Boolean;
     procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
-    function GetIoViewDataType: TioViewDataType;
+    function GetIoViewDataType: TioTypeOfCollection;
     // ioOwnsObjects
     function GetOwnsObjects: Boolean;
     // State
@@ -481,7 +481,7 @@ begin
   Result := Self.AutoPost;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.GetIoViewDataType: TioViewDataType;
+function TioActiveInterfaceObjectBindSourceAdapter.GetIoViewDataType: TioTypeOfCollection;
 begin
   Result := VIEW_DATA_TYPE;
 end;
