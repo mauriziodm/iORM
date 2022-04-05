@@ -718,7 +718,13 @@ procedure TioActiveInterfaceListBindSourceAdapter.ReceiveSelection(ASelected: II
 var
   LDone: Boolean;
 begin
+  // Initialization
   LDone := False;
+
+  // NB: OnReceiveSelectionCloneObject property of the BindSource is not
+  //  useful in an interface bindsource adapter
+
+  // Do the selection
   DoBeforeSelection(ASelected, ASelectionType);
   DoSelection(ASelected, ASelectionType, LDone);
   if not LDone then
@@ -729,6 +735,9 @@ begin
         Self.Insert(ASelected);
     end;
   DoAfterSelection(ASelected, ASelectionType);
+
+  // NB: OnReceiveSelectionFreeObject property of the BindSource is not
+  //  useful in an interface bindsource adapter
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetLazy(const Value: Boolean);

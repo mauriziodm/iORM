@@ -641,12 +641,21 @@ procedure TioActiveInterfaceObjectBindSourceAdapter.ReceiveSelection(ASelected: 
 var
   LDone: Boolean;
 begin
+  // Initialization
   LDone := False;
+
+  // NB: OnReceiveSelectionCloneObject property of the BindSource is not
+  //  useful in an interface bindsource adapter
+
+  // Do the selection
   DoBeforeSelection(ASelected, ASelectionType);
   DoSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);
   DoAfterSelection(ASelected, ASelectionType);
+
+  // NB: OnReceiveSelectionFreeObject property of the BindSource is not
+  //  useful in an interface bindsource adapter
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetLazy(const Value: Boolean);

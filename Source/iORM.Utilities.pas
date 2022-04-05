@@ -73,6 +73,7 @@ type
     class function HasAttribute<T: class>(ARTTIType: TRttiType): boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class procedure ClearList(const AList: TObject);
+    class function CloneObject(const ASourceObj: TObject): TObject;
   end;
 
 implementation
@@ -123,6 +124,11 @@ begin
   if not Assigned(AList) then
     raise EioException.Create(ClassName, 'ClearList', '"AList" parameter not assigned');
   TioDuckTypedFactory.DuckTypedList(AList).Clear;
+end;
+
+class function TioUtilities.CloneObject(const ASourceObj: TObject): TObject;
+begin
+  Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
 end;
 
 class function TioUtilities.ExtractOID(const AObj: Tobject): Integer;

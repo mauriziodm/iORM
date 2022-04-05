@@ -362,16 +362,9 @@ begin
 end;
 
 procedure TioDataSetCustom.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-var
-  LPreviousCurrentObj: TObject;
 begin
-  LPreviousCurrentObj := Current;
-  if FOnReceiveSelectionCloneObject then
-    ASelected := io.Load(ASelected.ClassName).ByID(TioUtilities.ExtractOID(ASelected)).ToObject;
   if Assigned(FonSelectionObject) then
     FonSelectionObject(Self, ASelected, ASelectionType, ADone);
-  if FOnReceiveSelectionFreeObject and (FTypeOfCollection = TioTypeOfCollection.tcSingleObject) and (LPreviousCurrentObj <> nil) then
-    LPreviousCurrentObj.Free;
 end;
 
 procedure TioDataSetCustom.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
