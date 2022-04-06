@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.MVVM.ViewModelBase;
+unit iORM.MVVM.ViewModel;
 
 interface
 

@@ -20,7 +20,7 @@ uses
   V.Main in 'View\V.Main.pas' {ViewMain: TFrame},
   FViewContext in 'FViewContext.pas' {ViewContextForm},
   FWait in 'FWait.pas' {WaitForm},
-  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   VM.Person in 'ViewModel\VM.Person.pas' {PersonViewModel: TDataModule},
   SampleData in 'SampleData.pas';
 

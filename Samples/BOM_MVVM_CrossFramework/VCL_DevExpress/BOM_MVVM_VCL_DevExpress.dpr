@@ -19,7 +19,7 @@ uses
   V.ArticleList in 'View\V.ArticleList.pas' {ArticleListView: TFrame},
   V.Material in 'View\V.Material.pas' {MaterialView: TFrame},
   V.Process in 'View\V.Process.pas' {ProcessView: TFrame},
-  iORM.MVVM.ViewModelBase in '..\..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   Model.BOMItems in '..\Commons\Model\Model.BOMItems.pas',
   Model.Product in '..\Commons\Model\Model.Product.pas',
   VM.BOMItem in '..\Commons\ViewModel\VM.BOMItem.pas',

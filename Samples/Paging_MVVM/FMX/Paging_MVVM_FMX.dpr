@@ -4,7 +4,7 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   Form.Start in 'Form.Start.pas' {StartForm},
-  iORM.MVVM.ViewModelBase in '..\..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   ViewModel in '..\Common\ViewModel.pas' {VM: TDataModule},
   SampleData in '..\Common\SampleData.pas',
   Model in '..\Common\Model.pas',

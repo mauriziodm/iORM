@@ -11,7 +11,7 @@ uses
   V.Micro.Material in 'View\V.Micro.Material.pas' {MicroMaterialView: TFrame},
   V.Micro.Process in 'View\V.Micro.Process.pas' {MicroProcessView: TFrame},
   V.Micro.Product in 'View\V.Micro.Product.pas' {MicroProductView: TFrame},
-  iORM.MVVM.ViewModelBase in '..\..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   Model.Product in '..\Commons\Model\Model.Product.pas',
   Model.Process in '..\Commons\Model\Model.Process.pas',
   Model.Material in '..\Commons\Model\Model.Material.pas',

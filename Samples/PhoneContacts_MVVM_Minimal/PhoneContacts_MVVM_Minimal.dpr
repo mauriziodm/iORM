@@ -8,7 +8,7 @@ uses
   ViewModel in 'ViewModel.pas' {ViewModelMain: TDataModule},
   Interfaces in 'Interfaces.pas',
   View in 'View.pas' {ViewMain: TFrame},
-  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   SampleData in 'SampleData.pas';
 
 {$R *.res}

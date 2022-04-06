@@ -135,7 +135,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="UModel.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModelBase.pas">
+        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.pas">
             <Form>ioViewModel</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>

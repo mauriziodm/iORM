@@ -176,7 +176,7 @@ begin
     'interface' + sLineBreak +
     sLineBreak +
     'uses' + sLineBreak +
-    '  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase;' + sLineBreak +
+    '  System.SysUtils, System.Classes, iORM.MVVM.ViewModel;' + sLineBreak +
     sLineBreak +
     'type' + sLineBreak +
     sLineBreak +

@@ -4,7 +4,7 @@ uses
   Vcl.Forms,
   FormStart in 'FormStart.pas' {StartForm},
   UModel in 'UModel.pas',
-  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   UViewModel in 'UViewModel.pas' {ViewModel: TDataModule},
   FormViewContext in 'FormViewContext.pas' {ViewContextForm},
   UViewLiveBindings in 'UViewLiveBindings.pas' {LiveBindingsView},

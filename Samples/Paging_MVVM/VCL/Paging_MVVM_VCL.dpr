@@ -5,7 +5,7 @@ uses
   Form.Start in 'Form.Start.pas' {StartForm},
   Model in '..\Common\Model.pas',
   SampleData in '..\Common\SampleData.pas',
-  iORM.MVVM.ViewModelBase in '..\..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   ViewModel in '..\Common\ViewModel.pas' {VM: TDataModule},
   View.Dataset.Grid in 'View.Dataset.Grid.pas' {ViewDatasetGrid: TFrame},
   View.BindSource.Grid in 'View.BindSource.Grid.pas' {ViewBindSourceGrid: TFrame};

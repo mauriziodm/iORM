@@ -85,7 +85,7 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
   iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Utilities,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ModelPresenter.Custom,
-  iORM.Where.Interfaces, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewModelBase;
+  iORM.Where.Interfaces, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewModel;
 
 { TioObjectMakerIntf }
 

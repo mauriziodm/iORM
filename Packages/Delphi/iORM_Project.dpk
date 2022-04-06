@@ -211,7 +211,7 @@ contains
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas',
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartUpdateDetection.pas',
   iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas',
-  iORM.MVVM.ViewModelBase in '..\..\Source\iORM.MVVM.ViewModelBase.pas',
+  iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas',
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas';
 
 end.

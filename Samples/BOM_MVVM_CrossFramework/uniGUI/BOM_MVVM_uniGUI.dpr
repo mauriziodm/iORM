@@ -13,7 +13,7 @@ uses
   V.Micro.Material in 'View\V.Micro.Material.pas' {MicroMaterialView: TUniFrame},
   V.Micro.Process in 'View\V.Micro.Process.pas' {MicroProcessView: TUniFrame},
   V.Micro.Product in 'View\V.Micro.Product.pas' {MicroProductView: TUniFrame},
-  iORM.MVVM.ViewModelBase in '..\..\..\Source\iORM.MVVM.ViewModelBase.pas' {ioViewModel: TDataModule},
+  iORM.MVVM.ViewModel in '..\..\..\Source\iORM.MVVM.ViewModel.pas' {ioViewModel: TDataModule},
   U.SampleData in '..\Commons\U.SampleData.pas',
   VM.Product in '..\Commons\ViewModel\VM.Product.pas' {ProductViewModel: TDataModule},
   VM.BOMItem in '..\Commons\ViewModel\VM.BOMItem.pas' {BOMItemVM: TDataModule},
