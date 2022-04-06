@@ -6,11 +6,13 @@ uses
   Classes, ToolsAPI;
 
 resourcestring
-  SName = 'iORM ViewModel Wizard';
-  SComment = 'Create a new ViewModel in the project';
-  SAuthor = 'Maurizio Del Magno';
-  SGalleryCategory = 'iORM';
-  SIDString = 'iORM.Wizards';
+  SioGalleryCategoryName = 'iORM';  // the visible name of the category/page in the gallery in the File->New->Other form
+  SioGalleryCategoryID = 'iORM.Wizard'; // the unique ID (not visible) of the category/page of the gallery in the File->New->Other form
+  SioWizardID = 'iORM.Wizard.ViewModel'; // the unique ID of the wizard into the category/page of the gallery in File->New->Other->iORM
+  SioWizardName = 'iORM ViewModel'; // the visible name of the wizard into the category/page of the gallery in the File->New->Other->iORM
+  SioWizardComment = 'Create a new ViewModel in the project'; // the comment of the wizard into the category/page of the gallery in the File->New->Other->iORM
+  SioWizardAuthor = 'Maurizio Del Magno'; // the author of the wizard into the category/page of the gallery in the File->New->Other->iORM
+  SioAncestorClassName = 'TioViewModel'; // the name of the ancestor class
 
 type
 
@@ -36,78 +38,38 @@ type
 implementation
 
 uses
-  WinApi.Windows, iORM.DT.ViewModel.Wizard.Creator, System.SysUtils;
+  WinApi.Windows, iORM.DT.ViewModel.Wizard.Creator, System.SysUtils,
+  iORM.DT.Wizard.Utils;
 
 { TioViewModelWizard }
 
 constructor TioViewModelWizard.Create;
-var
-  LCategoryServices: IOTAGalleryCategoryManager;
-  LCategoryRoot: IOTAGalleryCategory;
-  LCategory: IOTAGalleryCategory;
 begin
   inherited Create;
-
-  LCategoryServices := (BorlandIDEServices as IOTAGalleryCategoryManager);
-  Assert(Assigned(LCategoryServices), 'LCategoryServices is not assigned!!!');
-
-  LCategoryRoot := LCategoryServices.FindCategory(sCategoryDelphiNew);
-  Assert(Assigned(LCategoryRoot), 'LCategoryRoot is not assigned!!!');
-
-  LCategory := LCategoryServices.AddCategory(LCategoryRoot, SIDString, SGalleryCategory);
-  Assert(Assigned(LCategory), 'LCategory is not assigned!!!');
-
-  Exit;
-
-
-
-  if Supports(BorlandIDEServices, IOTAGalleryCategoryManager, LCategoryServices) then
-  begin
-    LCategoryServices.AddCategory(LCategoryServices.FindCategory(sCategoryRoot), SIDString, SGalleryCategory);
-  end;
+  // Add the wizard gallery category
+  TioOTAUtils.AddGalleryCategory(SioGalleryCategoryID, SioGalleryCategoryName);
 end;
 
 function TioViewModelWizard.GetGalleryCategory: IOTAGalleryCategory;
-var
-  LCategory: IOTAGalleryCategory;
-  LCatManager: IOTAGalleryCategoryManager;
 begin
-  LCatManager := (BorlandIDEServices as IOTAGalleryCategoryManager);
-  Assert(Assigned(LCatManager));
-
-  LCategory := LCatManager.FindCategory(SIDString);
-  Assert(Assigned(LCategory));
-
-  Result := LCategory;
-
-  // OLD CODE: Result := (BorlandIDEServices as IOTAGalleryCategoryManager).FindCategory(SIDString);
+  // Get the wizard gallery category
+  Result := TioOTAUtils.GetGalleryCategory(SioGalleryCategoryID);
 end;
 
 procedure TioViewModelWizard.Execute;
-var
-  LModuleServices: IOTAModuleServices;
-  LProject: IOTAProject;
 begin
-  if Assigned(BorlandIDEServices) and Supports(BorlandIDEServices, IOTAModuleServices, LModuleServices) then
-  begin
-    // Check if there is an active project
-    LProject := LModuleServices.GetActiveProject;
-    if Assigned(LProject) then
-    begin
-      { Given the Creator, create a new module of the implied type }
-      LModuleServices.CreateModule(TioViewModelWizardCreator.Create);
-    end;
-  end;
+  // Given the Creator, create a new module of the implied type
+  TioOTAUtils.CreateWizardModule(TioViewModelWizardCreator.Create(SioAncestorClassName));
 end;
 
 function TioViewModelWizard.GetAuthor: string;
 begin
-  Result := SAuthor;
+  Result := SioWizardAuthor;
 end;
 
 function TioViewModelWizard.GetComment: string;
 begin
-  Result := SComment;
+  Result := SioWizardComment;
 end;
 
 function TioViewModelWizard.GetDesigner: string;
@@ -122,17 +84,17 @@ end;
 
 function TioViewModelWizard.GetIDString: string;
 begin
-  Result := SIDString + '.ViewModel';
+  Result := SioWizardID;
 end;
 
 function TioViewModelWizard.GetName: string;
 begin
-  Result := SName;
+  Result := SioWizardName;
 end;
 
 function TioViewModelWizard.GetPage: string;
 begin
-  Result := SGalleryCategory;
+  Result := SioGalleryCategoryName;
 end;
 
 function TioViewModelWizard.GetPersonality: string;
