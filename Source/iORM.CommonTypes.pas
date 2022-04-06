@@ -1,37 +1,35 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
+{ *************************************************************************** }
+{ }
+{ iORM - (interfaced ORM) }
+{ }
+{ Copyright (C) 2015-2016 Maurizio Del Magno }
+{ }
+{ mauriziodm@levantesw.it }
+{ mauriziodelmagno@gmail.com }
+{ https://github.com/mauriziodm/iORM.git }
+{ }
+{ }
+{ *************************************************************************** }
+{ }
+{ This file is part of iORM (Interfaced Object Relational Mapper). }
+{ }
+{ Licensed under the GNU Lesser General Public License, Version 3; }
+{ you may not use this file except in compliance with the License. }
+{ }
+{ iORM is free software: you can redistribute it and/or modify }
+{ it under the terms of the GNU Lesser General Public License as published }
+{ by the Free Software Foundation, either version 3 of the License, or }
+{ (at your option) any later version. }
+{ }
+{ iORM is distributed in the hope that it will be useful, }
+{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
+{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
+{ GNU Lesser General Public License for more details. }
+{ }
+{ You should have received a copy of the GNU Lesser General Public License }
+{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
+{ }
+{ *************************************************************************** }
 
 unit iORM.CommonTypes;
 
@@ -87,7 +85,12 @@ type
   // Selection Type (for selector ActiveBindSourceAdapters)
   TioSelectionType = (stAppend, stInsert);
 
-  // LoadType property for BindSources
+  // LoadType property for BindSources:
+  // ltManual:                  loading of the objects into the bind sources is fully manual, call the "SetDataObject" of a master bind source
+  // ltAuto:                    iORM automatically generates all calls to the ORM to load objects and assign them to bind source
+  // ltFromBSAsIs:              the bind source receive the object to bind from a source bind source AS IS, the object isn't reloaded
+  // ltFromBSReload:            the bind source receive the object to bind from a source bind source and reload it for any changes or lazy load
+  // ltFromBSReloadNewInstance: the bind source receive the object to bind from a source bind source and reload it AS A NEW INSTANCE for any changes or lazy load
   TioLoadType = (ltManual, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
   // Some pointers to TValue
@@ -106,10 +109,11 @@ type
     function GetIsNull: Boolean;
   public
     procedure Clear;
-    property Value:T read GetValue write SetValue;
-    property IsNull:Boolean read GetIsNull;
-    property HasValue:Boolean read GetHasValue;
+    property Value: T read GetValue write SetValue;
+    property IsNull: Boolean read GetIsNull;
+    property HasValue: Boolean read GetHasValue;
   end;
+
   TioNullableString = TioNullable<String>;
   TioNullableInteger = TioNullable<Integer>;
   TioNullableFloat = TioNullable<Extended>;
@@ -135,14 +139,14 @@ end;
 
 function TioNullable<T>.GetIsNull: Boolean;
 begin
-  Result := (Length(FIsNull) = 0);
+  result := (Length(FIsNull) = 0);
 end;
 
 function TioNullable<T>.GetValue: T;
 begin
   if IsNull then
     raise EioException.Create('ioNullable: The value is null.');
-  Result := FValue;
+  result := FValue;
 end;
 
 procedure TioNullable<T>.SetValue(const Value: T);
@@ -151,6 +155,4 @@ begin
   FIsNull := ISNULL_VALUE;
 end;
 
-
 end.
-
