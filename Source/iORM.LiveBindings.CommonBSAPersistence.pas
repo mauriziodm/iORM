@@ -70,6 +70,7 @@ type
     // Refresh/ Reload
     class procedure Refresh(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean); static;
     class procedure Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure ReloadNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter); static;
     // Delete
     class procedure BSPersistenceDelete(const ABindSource: IioBSPersistenceClient); static;
     class procedure BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -106,8 +107,8 @@ type
     class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
       : TioCommonBSAPersistenceThreadExecute;
     class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
-    // Refresh
-    class function GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
+    // Refresh/Reload
+    class function GetReloadTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
       : TioCommonBSAPersistenceThreadOnTerminate;
     // LoadPage (progressive)
     class function GetProgressiveLoadPageTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
@@ -245,8 +246,8 @@ begin
       _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
-        AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+        LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
   end;
@@ -268,8 +269,8 @@ begin
     // If the pagination is progressive then it loads the next page and adds it to the
     // internal list of the BSA and then does a Refresh(False)
     LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(AActiveBindSourceAdapter);
-    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
-      AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
+    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+      AActiveBindSourceAdapter.DataObject, LTerminateMethod);
   end
   else
     // If, on the other hand, the pagination is not progressive then it performs a normal Refresh(True)
@@ -333,7 +334,7 @@ begin
   if Assigned(AActiveBindSourceAdapter.DataObject) then
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
   // Set the OnTerminate method
-  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetRefreshTerminateMethod(AActiveBindSourceAdapter, False); // Notify = false (verificare)
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(AActiveBindSourceAdapter, False); // Notify = false (verificare)
   // Extract the paging obj from the where obj and prepare it for an HardRefresh
   LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
   LPagingObj.PrepareForRefresh;
@@ -343,10 +344,42 @@ begin
       _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
         LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias,
-        AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
+        LTargetClass, LTerminateMethod);
   else
-    raise EioException.Create('TioCommonBSAPersistence._Reload: wrong ViewDataType.');
+    raise EioException.Create(ClassName, 'Reload', Format('Wrong "TypeOfCollection" property value (TypeName = "%s", TypeAlias = "%s")',
+      [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
+  end;
+end;
+
+class procedure TioCommonBSAPersistence.ReloadNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
+var
+  LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+begin
+  // Extract the IioActiveBindSourceAdapter interface
+  if not Supports(ANaturalBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBindSourceAdapter) then
+    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', 'ANaturalBindSourceAdapter does not implement IioActiveBindSOurceAdapter interface');
+  // Checks
+  if LActiveBindSourceAdapter.GetBindSource = nil then
+    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
+      [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
+  if not LActiveBindSourceAdapter.GetBindSource.IsMasterBS then
+    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
+      Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
+      [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
+
+  // Reload
+  case LActiveBindSourceAdapter.LoadType of
+    // Reload to the same instance
+    ltFromBSAsIs, ltFromBSReload:
+      _LoadToObject(LActiveBindSourceAdapter.ioAsync, LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias,
+        LActiveBindSourceAdapter.ioWhere, LActiveBindSourceAdapter.Current, nil); // ATerminatedMethod := nil (no terminated method)
+    // Reload on a new instance
+    ltFromBSReloadNewInstance:
+      Reload(LActiveBindSourceAdapter);
+  else
+    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Wrong "LoadType" property value (TypeName = "%s", TypeAlias = "%s")',
+      [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
   end;
 end;
 
@@ -421,8 +454,8 @@ begin
   end;
 end;
 
-class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
-  ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
+  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -441,8 +474,10 @@ begin
     end, ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
-ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+// Load objects into an existing List
+// Note: This isn't a reload for lazy loading purposes but for paging (used in LoadPage method)
+class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetList: TObject;
+ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -462,8 +497,10 @@ begin
     end, ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence._LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
-  ATargetObject: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+// Load object into an existing instance
+// Note: This isn't a reload for lazy loading purposes
+class procedure TioCommonBSAPersistence._LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetObject: TObject;
+ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -617,7 +654,7 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetRefreshTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
+class function TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
   : TioCommonBSAPersistenceThreadOnTerminate;
 begin
   Result := procedure(AResultValue: TObject)
