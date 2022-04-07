@@ -107,6 +107,7 @@ type
     procedure SetAsync(const Value: Boolean);
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -176,7 +177,7 @@ type
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
-    property LoadType: TioLoadType read FLoadType write SetLoadType default ltManual; // published: Master
+    property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
@@ -642,6 +643,11 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
+function TioPrototypeBindSourceCustom.GetLoadType: TioLoadType;
+begin
+  Result := FLoadType;
+end;
+
 function TioPrototypeBindSourceCustom.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
@@ -833,6 +839,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
+  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
@@ -850,6 +857,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
+  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject

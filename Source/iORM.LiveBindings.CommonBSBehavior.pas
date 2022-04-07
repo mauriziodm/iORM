@@ -11,10 +11,13 @@ type
   // Methods and functionalities common to all BindSouces (ioDataSet also)
   TioCommonBSBehavior = class
   public
-    // NB: Common code for ABSA to manage notifications
+    // Common code for ABSA to manage notifications
     class procedure Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
+    // Common code for selection
     class procedure Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    // Common code for some checks by the bind sources
+    class procedure CheckForSetDataObject(const ALoadType: TioLoadType);
   end;
 
 implementation
@@ -24,6 +27,14 @@ uses
   iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions;
 
 { TioCommonBSBehavior }
+
+class procedure TioCommonBSBehavior.CheckForSetDataObject(const ALoadType: TioLoadType);
+begin
+  // Set data object from a bind source is possible only is ALoadType is set to ftManual
+  if ALoadType <> ltManual then
+    raise EioException.Create(ClassName, 'CheckForSetDataObject',
+      'Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source (maybe a DataSet or BindSource) to "ltManual" and try again.');
+end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
 var
@@ -66,7 +77,7 @@ begin
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the deleted object to perform a delete query when persist the MasterBS.
     // It return true (Response field of the notification) if the smart delete system is enabled and the
-    //  operation is succesfull
+    // operation is succesfull
     ntDeleteSmart:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
       begin

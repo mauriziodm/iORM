@@ -61,6 +61,7 @@ type
     procedure SetAsync(const Value: Boolean);
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -133,7 +134,7 @@ type
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
-    property LoadType: TioLoadType read FLoadType write SetLoadType default ltManual; // published: Master
+    property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -419,6 +420,11 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
+function TioDataSetCustom.GetLoadType: TioLoadType;
+begin
+  Result := FLoadType;
+end;
+
 function TioDataSetCustom.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
@@ -591,6 +597,7 @@ end;
 
 procedure TioDataSetCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
+  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -604,6 +611,7 @@ end;
 
 procedure TioDataSetCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
+  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it

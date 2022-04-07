@@ -103,6 +103,7 @@ type
     procedure SetAsync(const Value: Boolean);
     // LoadType
     procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -183,7 +184,7 @@ type
     property Eof: Boolean read GetEOF; // Public: Master+Detail
     // Published properties
     property Async: Boolean read FAsync write SetAsync default False; // Published: Master
-    property LoadType: TioLoadType read FLoadType write SetLoadType default ltManual; // Published: Master
+    property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // Published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
@@ -623,6 +624,11 @@ begin
     Result := -1;
 end;
 
+function TioModelPresenterCustom.GetLoadType: TioLoadType;
+begin
+  Result := FLoadType;
+end;
+
 function TioModelPresenterCustom.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
@@ -938,6 +944,7 @@ end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
+  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -951,6 +958,7 @@ end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
+  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it

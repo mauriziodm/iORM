@@ -6,7 +6,7 @@ uses
   iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  ObjMapper.Attributes;
+  ObjMapper.Attributes, iORM.CommonTypes;
 
 type
 
@@ -33,6 +33,10 @@ type
     procedure Insert; overload;
     procedure Insert(AObject: TObject); overload;
     procedure Insert(AObject: IInterface); overload;
+    // LoadType property
+    procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
+    property LoadType: TioLoadType read GetLoadType write SetLoadType;
     // Persistence property
     function GetPersistence: TioBSPersistence;
     property Persistence: TioBSPersistence read GetPersistence;
@@ -61,8 +65,10 @@ type
 
   TioBSPersistence = class
   private
-    [DoNotSerializeAttribute] FBindSource: IioBSPersistenceClient;
-    [DoNotSerializeAttribute] FSavedState: String;
+    [DoNotSerializeAttribute]
+    FBindSource: IioBSPersistenceClient;
+    [DoNotSerializeAttribute]
+    FSavedState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
     FSmartUpdateDetection: IioSmartUpdateDetection;
     FIsInserting: Boolean;
@@ -328,8 +334,7 @@ procedure TioBSPersistence.NotifySaveRevertPoint;
 begin
   if (FBindSource.OnEditAction = eaSaveRevertPoint) and IsClear then
     SaveRevertPoint
-  else
-  if (FBindSource.OnEditAction = eaAbortIfNotSaved) and IsClear then
+  else if (FBindSource.OnEditAction = eaAbortIfNotSaved) and IsClear then
     Abort;
 end;
 
@@ -337,11 +342,9 @@ procedure TioBSPersistence.NotifyBeforeScroll;
 begin
   if ((FBindSource.OnRecordChangeAction = rcPersistAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcPersistIfChanged) and IsChanged) then
     Persist
-  else
-  if ((FBindSource.OnRecordChangeAction = rcAbortAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcAbortIfChanged) and IsChanged) then
+  else if ((FBindSource.OnRecordChangeAction = rcAbortAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcAbortIfChanged) and IsChanged) then
     Abort
-  else
-  if IsSaved then
+  else if IsSaved then
     Clear(False);
 end;
 
@@ -349,8 +352,7 @@ function TioBSPersistence.GetState: TioBSPersistenceState;
 begin
   if (FBindSource = nil) or (not FBindSource.IsActive) or (FBindSource.Current = nil) then
     Result := osUnassigned
-  else
-  if FSavedState.IsEmpty then
+  else if FSavedState.IsEmpty then
     Result := osUnsaved
   else if GetCurrentAsString <> FSavedState then
     Result := osChanged
@@ -375,6 +377,10 @@ end;
 
 procedure TioBSPersistence.Reload(const ARaiseIfSaved: Boolean; const ARaiseIfChangesExists: Boolean);
 begin
+  // Reload from a bind source is possible only is ALoadType is NOT set to ftManual
+  if FBindSource.LoadType = ltManual then
+    raise EioException.Create(ClassName, 'Reload',
+      'Invoking the "Reload" method is allowed only if the "LoadType" property IS NOT set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source (maybe a DataSet or BindSource) to a value other than "ltManual" and try again.');
   CheckUnassigned('Reload');
   CheckRaiseIfSavedOrChengesExists('Reload', ARaiseIfSaved, ARaiseIfChangesExists);
   FBindSource.GetActiveBindSourceAdapter.Reload;
