@@ -101,9 +101,6 @@ type
     procedure InitAsDefaultOnCreate;
     // Async
     procedure SetAsync(const Value: Boolean);
-    // LoadType
-    procedure SetLoadType(const Value: TioLoadType);
-    function GetLoadType: TioLoadType;
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -160,6 +157,7 @@ type
     procedure Loaded; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
+    function GetName: String;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
     // Active
     function GetActive: Boolean;
@@ -174,6 +172,9 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType); virtual;
+    function GetLoadType: TioLoadType;
     // Public properties
     property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
@@ -634,6 +635,11 @@ begin
   Result := FMasterPropertyName;
 end;
 
+function TioModelPresenterCustom.GetName: String;
+begin
+  Result := Name;
+end;
+
 function TioModelPresenterCustom.GetOnReceiveSelectionCloneObject: Boolean;
 begin
   Result := FOnReceiveSelectionCloneObject;
@@ -944,7 +950,7 @@ end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -958,7 +964,7 @@ end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it

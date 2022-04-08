@@ -33,6 +33,7 @@ type
     procedure Insert; overload;
     procedure Insert(AObject: TObject); overload;
     procedure Insert(AObject: IInterface); overload;
+    function GetName: String;
     // LoadType property
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
@@ -380,7 +381,8 @@ begin
   // Reload from a bind source is possible only is ALoadType is NOT set to ftManual
   if FBindSource.LoadType = ltManual then
     raise EioException.Create(ClassName, 'Reload',
-      'Invoking the "Reload" method is allowed only if the "LoadType" property IS NOT set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source (maybe a DataSet or BindSource) to a value other than "ltManual" and try again.');
+      Format('Invoking the "Reload" method is NOT allowed if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to a value other than "ltManual" and try again.',
+      [FBindSource.GetName]));
   CheckUnassigned('Reload');
   CheckRaiseIfSavedOrChengesExists('Reload', ARaiseIfSaved, ARaiseIfChangesExists);
   FBindSource.GetActiveBindSourceAdapter.Reload;

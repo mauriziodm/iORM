@@ -74,6 +74,7 @@ type
     function IsMasterBS: boolean;
     function IsDetailBS: boolean;
     procedure Refresh(const ANotify: Boolean = True);
+    function GetName: String;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;

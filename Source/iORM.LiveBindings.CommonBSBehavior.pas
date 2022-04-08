@@ -17,7 +17,9 @@ type
     class procedure Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Common code for some checks by the bind sources
-    class procedure CheckForSetDataObject(const ALoadType: TioLoadType);
+    class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
   end;
 
 implementation
@@ -28,12 +30,28 @@ uses
 
 { TioCommonBSBehavior }
 
-class procedure TioCommonBSBehavior.CheckForSetDataObject(const ALoadType: TioLoadType);
+class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
 begin
-  // Set data object from a bind source is possible only is ALoadType is set to ftManual
   if ALoadType <> ltManual then
     raise EioException.Create(ClassName, 'CheckForSetDataObject',
-      'Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source (maybe a DataSet or BindSource) to "ltManual" and try again.');
+      Format('Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to "ltManual" and try again.',
+      [ABindSource.GetName]));
+end;
+
+class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+begin
+  if Assigned(ASourceBS) and not(ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) then
+    raise EioException.Create(ClassName, 'CheckForSetLoadType',
+      Format('In order to set the "LoadType" property to a value other than "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance", you must first set the "SourceXXX" property to blank (nil).'
+      + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.', [ABindSource.GetName]));
+end;
+
+class procedure TioCommonBSBehavior.CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+begin
+  if Assigned(ASourceBS) and not(ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) then
+    raise EioException.Create(ClassName, 'CheckForSetSourceBS',
+      Format('In order to set the "SourceXXX" property, you must first set the "LoadType" property to one of the values "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance".'
+      + #13#13'Please set the "LoadType" property of the bind source "%s" (maybe a DataSet or BindSource) to one of the above values and then try again.', [ABindSource.GetName]));
 end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);

@@ -42,6 +42,8 @@ type
     function IsDetailBS: boolean; override;
     procedure SetActive(const Value: Boolean); override; // In TioDataSetMaster is DoBeforeOpen/DoAfterOpen/DoBeforeClose but here is SetActive
     procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioDataSetMaster is DoBeforeScroll but here is PosChanging
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -96,7 +98,7 @@ implementation
 
 uses
   System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.Notification;
+  iORM.LiveBindings.Notification, iORM.LiveBindings.CommonBSBehavior;
 
 { TioPrototypeBindSourceMaster }
 
@@ -179,6 +181,12 @@ begin
     Persistence.Clear(False);
 end;
 
+procedure TioPrototypeBindSourceMaster.SetLoadType(const Value: TioLoadType);
+begin
+  TioCommonBSBehavior.CheckForSetLoadType(Self, SourcePBS, Value);
+  inherited;
+end;
+
 procedure TioPrototypeBindSourceMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);
 begin
   FOnDeleteAction := Value;
@@ -210,6 +218,9 @@ end;
 
 procedure TioPrototypeBindSourceMaster.SetSourcePBS(const Value: TioPrototypeBindSourceCustom);
 begin
+  if Value = SourcePBS then
+    Exit;
+  TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterBindSource := Value;
 end;
 

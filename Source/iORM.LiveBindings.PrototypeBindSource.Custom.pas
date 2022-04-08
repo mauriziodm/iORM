@@ -105,9 +105,6 @@ type
     function IsActive: Boolean; // IioStdActionTargetBindSource
     // Async
     procedure SetAsync(const Value: Boolean);
-    // LoadType
-    procedure SetLoadType(const Value: TioLoadType);
-    function GetLoadType: TioLoadType;
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -159,6 +156,7 @@ type
     function CheckActiveAdapter: Boolean;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
+    function GetName: String;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -167,6 +165,9 @@ type
     procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType); virtual;
+    function GetLoadType: TioLoadType;
     // Public properties
     // property Editing; // NB: this property is already declared as public in TBaseObjectBindSource ancestor class
     property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
@@ -653,6 +654,11 @@ begin
   Result := FMasterPropertyName;
 end;
 
+function TioPrototypeBindSourceCustom.GetName: String;
+begin
+  Result := Name;
+end;
+
 function TioPrototypeBindSourceCustom.GetOnReceiveSelectionCloneObject: Boolean;
 begin
   Result := FOnReceiveSelectionCloneObject;
@@ -839,7 +845,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
@@ -857,7 +863,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject

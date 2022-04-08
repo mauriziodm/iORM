@@ -47,6 +47,8 @@ type
     function IsDetailBS: Boolean; override;
     // procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
     // procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -95,7 +97,8 @@ type
 implementation
 
 uses
-  iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
+  iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
+  iORM.LiveBindings.CommonBSBehavior;
 
 { TioModelPresenterMaster }
 
@@ -195,6 +198,12 @@ begin
   inherited;
 end;
 
+procedure TioModelPresenterMaster.SetLoadType(const Value: TioLoadType);
+begin
+  TioCommonBSBehavior.CheckForSetLoadType(Self, SourcePresenter, Value);
+  inherited;
+end;
+
 procedure TioModelPresenterMaster.SetMasterPresenter(const Value: TioModelPresenterCustom);
 begin
   inherited;
@@ -204,6 +213,9 @@ end;
 
 procedure TioModelPresenterMaster.SetSourcePresenter(const Value: TioModelPresenterCustom);
 begin
+  if Value = SourcePresenter then
+    Exit;
+  TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterPresenter := Value;
 end;
 
