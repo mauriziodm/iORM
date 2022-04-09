@@ -431,6 +431,7 @@ begin
   // retrieve a BindSourceAdapter automagically by iORM
   if ADataObject = nil then
   begin
+// ----- OLD CODE -----
 //    // If this is a master bind source then retrieve the ABSA from the factory
 //    if IsMasterBS then
 //    begin
@@ -449,6 +450,7 @@ begin
 //      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
 //        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
 //    end;
+// ----- OLD CODE -----
 
     // If the property MasterModelPresenter is assigned then retrieve
     // the DetailBindSourceAdapter from it

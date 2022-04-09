@@ -51,8 +51,26 @@ type
       : IioContainedBindSourceAdapter;
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
       : IioActiveBindSourceAdapter;
+
+
+
+
+
+
     class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioNotifiableBindSource;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+
+    class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource): IioActiveBindSourceAdapter;
+
+    class function GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource;
+      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+
+
+
+
+
+
+
     class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
@@ -171,6 +189,26 @@ begin
   end;
 end;
 
+class function TioLiveBindingsFactory.GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
+begin
+  case APagingType of
+    ptHardPaging:
+      Result := TioCommonBSAPageManagerStrategy_HardPaging.Create;
+    ptProgressiveManual:
+      Result := TioCommonBSAPageManagerStrategy_ProgressiveManual.Create;
+    ptProgressiveAuto:
+      Result := TioCommonBSAPageManagerStrategy_ProgressiveAuto.Create;
+  else
+    Result := nil;
+  end;
+end;
+
+class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
+  : IioActiveBindSourceAdapter;
+begin
+  Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
+end;
+
 class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent;
   const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 begin
@@ -192,24 +230,35 @@ begin
   end;
 end;
 
-class function TioLiveBindingsFactory.GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
+class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource): IioActiveBindSourceAdapter;
 begin
-  case APagingType of
-    ptHardPaging:
-      Result := TioCommonBSAPageManagerStrategy_HardPaging.Create;
-    ptProgressiveManual:
-      Result := TioCommonBSAPageManagerStrategy_ProgressiveManual.Create;
-    ptProgressiveAuto:
-      Result := TioCommonBSAPageManagerStrategy_ProgressiveAuto.Create;
-  else
-    Result := nil;
-  end;
+  // Check if the MasterBS property is set
+  if not Assigned(AMasterBS) then
+    raise EioException.Create(ClassName, 'GetNaturalBSAfromMasterBindSource',
+      Format('In bind source "%s" the "LoadType" property has been set to one of his values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property has been left blank.'
+      + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
+      [ASenderBSName, ASenderBSName]));
+  // Return the requested natural bind source adapter
+  Result := AMasterBS.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
 end;
 
-class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
-  : IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource;
+      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 begin
-  Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
+  // Check if the MasterBS property is set
+  if not Assigned(AMasterBS) then
+    raise EioException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
+      Format('The "MasterBindSource" property (it could also be "MasterDataSet" or "MasterPresenter") has not been set in the Bind source "%s".'
+      + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
+     [ASenderBSName]));
+  // Check if the MasterPropertyName property is set
+  if not Assigned(AMasterBS) then
+   raise EioException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
+     Format('The "MasterPropertyName" property has not been set in the Bind source "%s".'
+      + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
+     [ASenderBSName]));
+  // Return the requested bind source adapter
+  Result := AMasterBS.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
 end;
 
 end.
