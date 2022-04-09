@@ -155,8 +155,6 @@ type
     procedure Open; virtual;
     procedure Close; virtual;
     procedure Loaded; override;
-    function IsMasterBS: Boolean; virtual; abstract;
-    function IsDetailBS: Boolean; virtual; abstract;
     function GetName: String;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
     // Active
@@ -213,6 +211,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function IsMasterBS: Boolean; virtual; abstract;
+    function IsDetailBS: Boolean; virtual; abstract;
     class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom;
       const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     procedure SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
@@ -745,8 +745,15 @@ begin
 
   // REGISTER ITSELF AS DETAIL MODEL PRESENTER (IF IT IS A DETAIL) INTO THE MASTER PRESENTER
   // ===========================================================================
-  if IsDetailBS then
+  if IsDetailBS and not(csDesigning in ComponentState) then
+  begin
+    if not Assigned(FMasterPresenter) then
+      raise EioException.Create(ClassName, 'Loaded',
+        Format('The "MasterBindSource" property (it could also be "MasterDataSet" or "MasterPresenter") has not been set in the Bind source "%s",'
+        + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
+       [Name]));
     MasterPresenter.RegisterDetailPresenter(Self);
+  end;
   // ===========================================================================
 
   inherited;
@@ -1154,15 +1161,37 @@ begin
   // if the TypeName is empty then set it
   if IsMasterBS and TypeName.IsEmpty then
     raise EioException.Create(ClassName, '_CreateAdapter', 'ModelPresenter.TypeName value is not valid.');
-  // If the property MasterModelPresenter is assigned then retrieve
-  // the DetailBindSourceAdapter from it
-  // else create the BSA from TypeName & TypeAlias
-  if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
-    // Get the BindSourceAdapter
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, nil, MasterPresenter, MasterPropertyName))
+
+// ----- OLD CODE -----
+//  // If the property MasterModelPresenter is assigned then retrieve
+//  // the DetailBindSourceAdapter from it
+//  // else create the BSA from TypeName & TypeAlias
+//  if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
+//    // Get the BindSourceAdapter
+//    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, nil, MasterPresenter, MasterPropertyName))
+//  else
+//  begin
+//    // Get the ActiveBindSourceAdapter
+//    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+//    // Force the creation of all the detail adapters (if exists)
+//    // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
+//    // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
+//    // stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
+//    // del Master.
+//    ForceDetailAdaptersCreation;
+//  end;
+// ----- OLD CODE -----
+
+  // If it is a detail bind source then get the detail BSA from the master bind source,
+  //   else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
+  //   then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
+  if IsDetailBS then
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterPresenter, MasterPropertyName))
+  else
+  if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterPresenter))
   else
   begin
-    // Get the ActiveBindSourceAdapter
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
@@ -1171,6 +1200,7 @@ begin
     // del Master.
     ForceDetailAdaptersCreation;
   end;
+
   // Init the BSA
   FBindSourceAdapter.ioAutoPost := FAutoPost;
 end;

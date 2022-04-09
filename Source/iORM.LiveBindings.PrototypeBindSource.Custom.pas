@@ -154,8 +154,6 @@ type
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
-    function IsMasterBS: Boolean; virtual; abstract;
-    function IsDetailBS: Boolean; virtual; abstract;
     function GetName: String;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
@@ -209,6 +207,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function IsMasterBS: Boolean; virtual; abstract;
+    function IsDetailBS: Boolean; virtual; abstract;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure PostIfEditing;
@@ -452,18 +452,14 @@ begin
 //    end;
 // ----- OLD CODE -----
 
-    // If the property MasterModelPresenter is assigned then retrieve
-    // the DetailBindSourceAdapter from it
-    // else create the BSA from TypeName & TypeAlias
-    if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
-    begin
-      if FMasterBindSource = nil then
-        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
-      if FMasterPropertyName.IsEmpty then
-        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
-      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, Self, MasterBindSource, MasterPropertyName,
-        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
-    end
+    // If it is a detail bind source then get the detail BSA from the master bind source,
+    //   else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
+    //   then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
+    if IsDetailBS then
+      ADataObject := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName, TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
+    else
+    if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+      ADataObject := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource).AsTBindSourceAdapter
     else
     begin
       if TypeName.IsEmpty then
@@ -716,8 +712,15 @@ begin
 
   // REGISTER ITSELF AS DETAIL MODEL PRESENTER (IF IT IS A DETAIL) INTO THE MASTER PRESENTER
   // ===========================================================================
-  if IsDetailBS then
+  if IsDetailBS and not(csDesigning in ComponentState) then
+  begin
+    if not Assigned(FMasterBindSource) then
+      raise EioException.Create(ClassName, 'Loaded',
+        Format('The "MasterBindSource" property (it could also be "MasterDataSet" or "MasterPresenter") has not been set in the Bind source "%s",'
+        + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
+       [Name]));
     MasterBindSource.RegisterDetailBindSource(Self);
+  end;
   // ===========================================================================
 
   // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!

@@ -107,6 +107,8 @@ begin
 end;
 
 procedure TioModelDataSet.InternalPreOpen;
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Checks
   if not Assigned(FViewModelBridge) then
@@ -115,15 +117,34 @@ begin
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
   if FModelPresenter.IsEmpty then
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
-  // Get the BindSourceAdapter from ViewModel and open it
-  // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
-  // from it (for cross view with microviews)
+
+// ----- OLD CODE -----
+//  // Get the BindSourceAdapter from ViewModel and open it
+//  // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
+//  // from it (for cross view with microviews)
+//  if Assigned(FCrossView_MasterBindSource) then
+//    GetModelPresenterInstance.SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name ,Self,
+//      FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)  );
+//  SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
+//  if GetActiveBindSourceAdapter <> nil then
+//    GetActiveBindSourceAdapter.Active := True;
+// ----- OLD CODE -----
+
+  // If it's a master or detail bind source
   if Assigned(FCrossView_MasterBindSource) then
-    GetModelPresenterInstance.SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name ,Self,
-      FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)  );
-  SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
-  if GetActiveBindSourceAdapter <> nil then
-    GetActiveBindSourceAdapter.Active := True;
+  begin
+    // If here it means that it's a detail (crossview detail)
+    if GetModelPresenterInstance.IsDetailBS then
+      LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)
+    else
+      LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance);
+  end
+  else
+    // Get the BSA from the presenter
+    LActiveBSA := GetModelPresenterInstance.GetActiveBindSourceAdapter;
+  // Set the retrieved BSA as adapter for this Presenter
+  GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+  // Inherit
   inherited;
 end;
 
