@@ -148,8 +148,8 @@ begin
     if Assigned(FCrossView_MasterBindSource) then
     begin
       // Get the BSA from the MasterModelPresenter
-      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self,
-        FCrossView_MasterBindSource.GetModelPresenterInstance.GetActiveBindSourceAdapter, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
+      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, Self,
+        FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
       // Set the retrieved BSA as adapter for this Presenter
       GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
     end

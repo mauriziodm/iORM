@@ -105,8 +105,8 @@ type
     procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
     procedure Loaded; override;
-    function IsMasterBS: boolean; virtual; abstract;
-    function IsDetailBS: boolean; virtual; abstract;
+    function IsMasterBS: Boolean; virtual; abstract;
+    function IsDetailBS: Boolean; virtual; abstract;
     function GetName: String;
     procedure DoAfterOpen; override;
     procedure DoBeforeCLose; override;
@@ -138,9 +138,11 @@ type
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
-    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
+    // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False; // published: Nascondere e default = false
+    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
+    // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
@@ -151,8 +153,10 @@ type
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
-    property OnReceiveSelectionCloneObject: Boolean read GetOnReceiveSelectionCloneObject write SetOnReceiveSelectionCloneObject default True; // published: Master+Detail
-    property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True; // published: Master+Detail
+    property OnReceiveSelectionCloneObject: Boolean read GetOnReceiveSelectionCloneObject write SetOnReceiveSelectionCloneObject default True;
+    // published: Master+Detail
+    property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True;
+    // published: Master+Detail
     // Published Events: selectors
     property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
@@ -336,7 +340,7 @@ end;
 procedure TioDataSetCustom.DoAfterOpen;
 begin
   inherited;
-  OpenCloseDetails(True);
+  OpenCLoseDetails(True);
 end;
 
 procedure TioDataSetCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -348,7 +352,7 @@ end;
 procedure TioDataSetCustom.DoBeforeCLose;
 begin
   inherited;
-  OpenCloseDetails(False);
+  OpenCLoseDetails(False);
 end;
 
 procedure TioDataSetCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -678,9 +682,9 @@ end;
 procedure TioDataSetCustom.SetPaging(const Value: TioCommonBSAPageManager);
 begin
   // In reality this property would be read-only but if I left it read-only
-  //  then it no longer writes me the values of the sub-properties in the DFM file.
-  //  So I also put the set method where, however, I raise an exception if someone
-  //  tries to set a value.
+  // then it no longer writes me the values of the sub-properties in the DFM file.
+  // So I also put the set method where, however, I raise an exception if someone
+  // tries to set a value.
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
@@ -745,14 +749,11 @@ begin
   // If an adapter already exists then raise an exception
   if CheckAdapter then
     raise EioException.Create(ClassName, '_CreateAdapter', 'ActiveBindSourceAdapter already exists.');
-  // if the TypeName is empty then set it
-//  if TypeName.IsEmpty then
-//    raise EioException.Create(ClassName, '_CreateAdapter', '"TypeName" value is not valid.');
   // If the property MasterModelPresenter is assigned then retrieve
   // the DetailBindSourceAdapter from it
-  if Assigned(MasterDataSet) then
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(nil, MasterDataSet.GetActiveBindSourceAdapter, MasterPropertyName))
-    // else create the BSA from TypeName & TypeAlias
+  // else create the BSA from TypeName & TypeAlias
+  if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, nil, MasterDataSet, MasterPropertyName))
   else
   begin
     // Get the ActiveBindSourceAdapter

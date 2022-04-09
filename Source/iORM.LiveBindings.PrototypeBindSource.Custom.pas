@@ -182,7 +182,8 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
-    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
+    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
+    // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
@@ -430,23 +431,42 @@ begin
   // retrieve a BindSourceAdapter automagically by iORM
   if ADataObject = nil then
   begin
-    // If this is a master bind source then retrieve the ABSA from the factory
-    if IsMasterBS then
-    begin
-      if TypeName.IsEmpty then
-        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-        ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
-    end
-    // If this is a detail BindSource then retrieve the adapter from the master BindSource
-    else
+//    // If this is a master bind source then retrieve the ABSA from the factory
+//    if IsMasterBS then
+//    begin
+//      if TypeName.IsEmpty then
+//        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
+//      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
+//        ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
+//    end
+//    // If this is a detail BindSource then retrieve the adapter from the master BindSource
+//    else
+//    begin
+//      if FMasterBindSource = nil then
+//        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
+//      if FMasterPropertyName.IsEmpty then
+//        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
+//      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
+//        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
+//    end;
+
+    // If the property MasterModelPresenter is assigned then retrieve
+    // the DetailBindSourceAdapter from it
+    // else create the BSA from TypeName & TypeAlias
+    if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
     begin
       if FMasterBindSource = nil then
         raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
       if FMasterPropertyName.IsEmpty then
         raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
-      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
+      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, Self, MasterBindSource, MasterPropertyName,
         TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
+    end
+    else
+    begin
+      if TypeName.IsEmpty then
+        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -796,7 +816,7 @@ end;
 procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
 begin
   inherited;
-  if not (csDesigning in ComponentState) then
+  if not(csDesigning in ComponentState) then
     OpenCloseDetails(Value);
 end;
 

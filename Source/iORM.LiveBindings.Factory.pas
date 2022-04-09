@@ -51,7 +51,7 @@ type
       : IioContainedBindSourceAdapter;
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
       : IioActiveBindSourceAdapter;
-    class function GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioNotifiableBindSource;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
@@ -171,16 +171,25 @@ begin
   end;
 end;
 
-class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const AOwner: TComponent; const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-  const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent;
+  const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 begin
   // If the MasterPropertyName property is empty then get a NaturalActiveBindSourceAdapter
   // from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the
   // MasterBindSource.
-  if (AMasterPropertyName <> '') then
-    Result := AMasterBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere)
+  if AMasterPropertyName.IsEmpty then
+  begin
+    if not Assigned(AMasterBindSource) then
+      raise EioException.Create(ClassName, 'GetBSAfromMasterBindSourceAdapter',
+        Format('In bind source "%s" the "LoadType" property has been set to one of his values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property has been left blank.'
+        + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
+        [ASenderBSName, ASenderBSName]));
+    Result := AMasterBindSource.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
+  end
   else
-    Result := AMasterBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
+  begin
+    Result := AMasterBindSource.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
+  end;
 end;
 
 class function TioLiveBindingsFactory.GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
