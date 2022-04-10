@@ -130,7 +130,9 @@ begin
 //    GetActiveBindSourceAdapter.Active := True;
 // ----- OLD CODE -----
 
-  // If it's a master or detail bind source
+  // Get the BindSourceAdapter from ViewModel and open it
+  // Note: If the 'CrossViewMasterSource' property is assigned then get the BindSourceAdapter
+  // from it (for cross view with microviews)
   if Assigned(FCrossView_MasterBindSource) then
   begin
     // If here it means that it's a detail (crossview detail)
@@ -138,12 +140,12 @@ begin
       LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)
     else
       LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance);
-  end
-  else
-    // Get the BSA from the presenter
-    LActiveBSA := GetModelPresenterInstance.GetActiveBindSourceAdapter;
-  // Set the retrieved BSA as adapter for this Presenter
-  GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+    // Set the retrieved BSA as adapter in the connected ModelPresenter
+    GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+  end;
+  // Get the BSA for this ModelDataSet from the connected ModelPresenter
+  SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
+
   // Inherit
   inherited;
 end;
