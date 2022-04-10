@@ -507,8 +507,8 @@ begin
   begin
     if not Assigned(FMasterDataSet) then
       raise EioException.Create(ClassName, 'Loaded',
-        Format('The "MasterBindSource" property (it could also be "MasterDataSet" or "MasterPresenter") has not been set in the Bind source "%s",'
-        + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
+        Format('The "MasterDataSet" property has not been set in the component "%s".'
+        + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
        [Name]));
     MasterDataSet.RegisterDetailDataSet(Self);
   end;

@@ -235,8 +235,8 @@ begin
   // Check if the MasterBS property is set
   if not Assigned(AMasterBS) then
     raise EioException.Create(ClassName, 'GetNaturalBSAfromMasterBindSource',
-      Format('In bind source "%s" the "LoadType" property has been set to one of his values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property has been left blank.'
-      + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
+      Format('In bind source "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property has been left blank.'
+      + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
       [ASenderBSName, ASenderBSName]));
   // Return the requested natural bind source adapter
   Result := AMasterBS.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
