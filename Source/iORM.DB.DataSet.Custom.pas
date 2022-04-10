@@ -584,11 +584,17 @@ end;
 procedure TioDataSetCustom.SetLazy(const Value: Boolean);
 begin
   FLazy := Value;
+  // Update the adapter
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.Lazy := Value;
 end;
 
 procedure TioDataSetCustom.SetLazyProps(const Value: String);
 begin
   FLazyProps := Value;
+  // Update the adapter
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.LazyProps := Value;
 end;
 
 procedure TioDataSetCustom.SetLoadType(const Value: TioLoadType);

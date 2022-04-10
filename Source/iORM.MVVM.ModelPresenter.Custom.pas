@@ -912,11 +912,17 @@ end;
 procedure TioModelPresenterCustom.SetLazy(const Value: Boolean);
 begin
   FLazy := Value;
+  // Update the adapter
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.Lazy := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLazyProps(const Value: String);
 begin
   FLazyProps := Value;
+  // Update the adapter
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.LazyProps := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLoadType(const Value: TioLoadType);
