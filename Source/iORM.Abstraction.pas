@@ -105,6 +105,7 @@ type
     procedure OnTimerEventHandler(Sender: TObject);
   public
     constructor Create(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
+    destructor Destroy; override;
   end;
 
   TioActionRef = class of TioAction;
@@ -329,6 +330,12 @@ begin
     raise EioException.Create(Self.ClassName, 'Constructor', '"AExecuteMethod" parameter must be assigned');
   FExecuteMethod := AExecuteMethod;
   FTimer.Enabled := True;
+end;
+
+destructor TioAnonymousTimer.Destroy;
+begin
+  FTimer.Free;
+  inherited;
 end;
 
 procedure TioAnonymousTimer.OnTimerEventHandler(Sender: TObject);
