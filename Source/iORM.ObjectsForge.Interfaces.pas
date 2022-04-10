@@ -421,8 +421,10 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyHasMany', Format('Child collection object not assigned on property "%s", class "%s"',
-      [AProperty.GetName, AContext.Map.GetClassName]));
+    raise EioException.Create(Self.ClassName, 'LoadPropertyHasMany',
+      Format('iORM attempted to load an instance of the "%s" class but its "%s" property collection was not created.' +
+      #13#13'Please make sure that the collection of type "%s" is created in the constructor of the "%s" class or has not been destroyed and try again.',
+      [AContext.Map.GetClassName, AProperty.GetName, AProperty.GetTypeName, AContext.Map.GetClassName]));
   // Get the where conditions for the details if exists (nil if not exists)
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // It set the first part of the load operation
@@ -448,8 +450,10 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyEmbeddedHasMany', Format('Child collection object non assigned on property "%s", class "%s"',
-      [AProperty.GetName, AContext.Map.GetClassName]));
+    raise EioException.Create(Self.ClassName, 'LoadPropertyEmbeddedHasMany',
+      Format('iORM attempted to load an instance of the "%s" class but its "%s" property collection was not created.' +
+      #13#13'Please make sure that the collection of type "%s" is created in the constructor of the "%s" class or has not been destroyed and try again.',
+      [AContext.Map.GetClassName, AProperty.GetName, AProperty.GetTypeName, AContext.Map.GetClassName]));
   // Get the JSONObject
   LJSONValueString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   LJSONValue := TJSONObject.ParseJSONValue(LJSONValueString);
