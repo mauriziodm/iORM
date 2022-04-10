@@ -26,7 +26,8 @@ implementation
 
 uses
   Data.Bind.ObjectScope, System.SysUtils,
-  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions;
+  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions,
+  System.Classes;
 
 { TioCommonBSBehavior }
 
@@ -139,9 +140,15 @@ var
 begin
   // Some checks
   if not Assigned(ATargetBS) then
-    raise EioException.Create(ClassName, 'Select<T>', '"SelectorFor" property not assigned.');
-  if not ATargetBS.AdapterExists then
-    raise EioException.Create(ClassName, 'Select<T>', 'Selection destination ActiveBindSourceAdapter, non present.');
+    raise EioException.Create(ClassName, 'Select<T>',
+      Format('You have tried to make a selection by invoking the "SelectCurrent" method of the "%s" component but its "SelectorFor" property was left blank.' +
+      #13#13'iORM does not know which target component to forward the selection to.'#13#13'Please set the property and try again.',
+      [(ASender as TComponent).Name]));
+  if not ATargetBS.IsActive then
+    raise EioException.Create(ClassName, 'Select<T>',
+      Format('You have tried to make a selection by invoking the "SelectCurrent" method of component "%s" but the target component of the selection ("%s") is not active.' +
+      #13#13'iORM cannot forward the selection.'#13#13'Please make sure that the target component of the selection is active as well and try again.',
+      [(ASender as TComponent).Name, ATargetBS.GetName]));
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
   // If the selection is allowed then send a ntSaveRevertPoint notification
