@@ -52,15 +52,15 @@ type
     class procedure _SyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
     class procedure _AsyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
     // Load object
-    class procedure _LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
+    class procedure _LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
       ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-    class procedure _LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetObject: TObject;
-      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    class procedure _LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
+      ATargetObject: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     // Load list
-    class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
-      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-    class procedure _LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetList: TObject;
-      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
+      ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+    class procedure _LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
+      ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
     // Page manager
     class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
   public
@@ -243,11 +243,11 @@ begin
   // Load
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
-      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-        LTerminateMethod);
+      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-        LTargetClass, LTerminateMethod);
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
   end;
@@ -269,8 +269,8 @@ begin
     // If the pagination is progressive then it loads the next page and adds it to the
     // internal list of the BSA and then does a Refresh(False)
     LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(AActiveBindSourceAdapter);
-    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-      AActiveBindSourceAdapter.DataObject, LTerminateMethod);
+    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+      AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
   end
   else
     // If, on the other hand, the pagination is not progressive then it performs a normal Refresh(True)
@@ -341,11 +341,11 @@ begin
   // Load
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
-      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-        LTerminateMethod);
+      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.ioWhere,
-        LTargetClass, LTerminateMethod);
+      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create(ClassName, 'Reload', Format('Wrong "TypeOfCollection" property value (TypeName = "%s", TypeAlias = "%s")',
       [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
@@ -372,8 +372,9 @@ begin
   case LActiveBindSourceAdapter.LoadType of
     // Reload to the same instance
     ltFromBSAsIs, ltFromBSReload:
-      _LoadToObject(LActiveBindSourceAdapter.ioAsync, LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias,
-        LActiveBindSourceAdapter.ioWhere, LActiveBindSourceAdapter.Current, nil); // ATerminatedMethod := nil (no terminated method)
+      _LoadToObject(LActiveBindSourceAdapter.ioAsync, LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias, LActiveBindSourceAdapter.Lazy,
+        LActiveBindSourceAdapter.LazyProps, LActiveBindSourceAdapter.ioWhere, LActiveBindSourceAdapter.Current, nil);
+      // ATerminatedMethod := nil (no terminated method)
     // Reload on a new instance
     ltFromBSReloadNewInstance:
       Reload(LActiveBindSourceAdapter);
@@ -454,8 +455,8 @@ begin
   end;
 end;
 
-class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetClass: TioClassRef;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;
+  AWhere: IioWhere; ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -463,7 +464,7 @@ begin
       io.StartTransaction;
       try
         // Load list
-        Result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetClass);
+        Result := io.Load(ATypeName, ATypeAlias).Lazy(ALazy).LazyProps(ALazyProps)._Where(AWhere).ToList(ATargetClass);
         // Load count
         _SetItemCountToPageManager(ATypeName, ATypeAlias, AWhere);
         io.CommitTransaction;
@@ -476,8 +477,8 @@ end;
 
 // Load objects into an existing List
 // Note: This isn't a reload for lazy loading purposes but for paging (used in LoadPage method)
-class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetList: TObject;
-ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;
+AWhere: IioWhere; ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
@@ -486,7 +487,7 @@ begin
       try
         // Load to list
         Result := nil;
-        io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToList(ATargetList);
+        io.Load(ATypeName, ATypeAlias).Lazy(ALazy).LazyProps(ALazyProps)._Where(AWhere).ToList(ATargetList);
         // Load count
         _SetItemCountToPageManager(ATypeName, ATypeAlias, AWhere);
         io.CommitTransaction;
@@ -499,24 +500,24 @@ end;
 
 // Load object into an existing instance
 // Note: This isn't a reload for lazy loading purposes
-class procedure TioCommonBSAPersistence._LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere; ATargetObject: TObject;
-ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean;
+const ALazyProps: String; AWhere: IioWhere; ATargetObject: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
     begin
       Result := nil;
-      io.Load(ATypeName, ATypeAlias)._Where(AWhere).ClearListBefore.ToObject(ATargetObject);
+      io.Load(ATypeName, ATypeAlias).Lazy(ALazy).LazyProps(ALazyProps)._Where(AWhere).ClearListBefore.ToObject(ATargetObject);
     end, ATerminateMethod);
 end;
 
-class procedure TioCommonBSAPersistence._LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; AWhere: IioWhere;
-ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+class procedure TioCommonBSAPersistence._LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;
+AWhere: IioWhere; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
 begin
   _Execute(AASync,
     function: TObject
     begin
-      Result := io.Load(ATypeName, ATypeAlias)._Where(AWhere).ToObject;
+      Result := io.Load(ATypeName, ATypeAlias).Lazy(ALazy).LazyProps(ALazyProps)._Where(AWhere).ToObject;
     end, ATerminateMethod);
 end;
 
