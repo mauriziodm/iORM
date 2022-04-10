@@ -51,27 +51,14 @@ type
       : IioContainedBindSourceAdapter;
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
       : IioActiveBindSourceAdapter;
-
-
-
-
-
-
+// ----- OLD CODE -----
 //    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioNotifiableBindSource;
 //      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-
+// ----- OLD CODE -----
     class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource): IioActiveBindSourceAdapter;
-
     class function GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-
-
-
-
-
-
-
-    class function GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
+    class function GetBSA(const AOwner: TComponent; const ASenderBSName, ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     class function GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
@@ -135,12 +122,19 @@ begin
   Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
 end;
 
-class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ATypeName, ATypeAlias: String; const AWhere: IioWhere;
-  const ATypeOfCollection: TioTypeOfCollection; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ASenderBSName, ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
+      const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
   LDataObject: TObject;
 begin
+  // Check for type name
+  if ATypeName.IsEmpty then
+    raise EioException.Create(ClassName, 'GetBSA',
+      Format('In component "%s" the "LoadType" property has been set to "ltAuto" but the "TypeName" property has been left blank.'
+      + #13#13'iORM is therefore unable to load (from the RDBMS) the instance to expose for binding.'#13#13'Please set the property and then try again.',
+      [ASenderBSName]));
+
   // Depending of the DataType (list or single object)...
   case ATypeOfCollection of
 
@@ -209,6 +203,7 @@ begin
   Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
 end;
 
+// ----- OLD CODE -----
 //class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent;
 //  const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 //begin
@@ -229,6 +224,7 @@ end;
 //    Result := AMasterBindSource.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
 //  end;
 //end;
+// ----- OLD CODE -----
 
 class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource): IioActiveBindSourceAdapter;
 begin

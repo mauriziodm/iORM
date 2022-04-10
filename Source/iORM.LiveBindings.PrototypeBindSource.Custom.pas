@@ -461,11 +461,7 @@ begin
     if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
       ADataObject := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource).AsTBindSourceAdapter
     else
-    begin
-      if TypeName.IsEmpty then
-        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
-    end;
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, Name, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself

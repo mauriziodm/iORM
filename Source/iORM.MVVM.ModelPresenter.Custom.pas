@@ -1157,10 +1157,7 @@ procedure TioModelPresenterCustom._CreateAdapter(const ADataObject: TObject; con
 begin
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
-    raise EioException.Create(ClassName, '_CreateAdapter', 'Active bind source adapter already exists.');
-  // if the TypeName is empty then set it
-  if IsMasterBS and TypeName.IsEmpty then
-    raise EioException.Create(ClassName, '_CreateAdapter', 'ModelPresenter.TypeName value is not valid.');
+    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
 
 // ----- OLD CODE -----
 //  // If the property MasterModelPresenter is assigned then retrieve
@@ -1192,7 +1189,7 @@ begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterPresenter))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

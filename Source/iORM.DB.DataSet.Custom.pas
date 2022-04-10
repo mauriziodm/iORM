@@ -755,7 +755,7 @@ procedure TioDataSetCustom._CreateAdapter(const ADataObject: TObject; const AOwn
 begin
   // If an adapter already exists then raise an exception
   if CheckAdapter then
-    raise EioException.Create(ClassName, '_CreateAdapter', 'ActiveBindSourceAdapter already exists.');
+    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
   // If it is a detail bind source then get the detail BSA from the master bind source,
   //   else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   //   then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
@@ -766,7 +766,7 @@ begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterDataSet))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
