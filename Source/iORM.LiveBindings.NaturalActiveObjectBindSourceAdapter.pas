@@ -48,6 +48,7 @@ type
   private
     FSourceAdapter: IioNaturalBindSourceAdapterSource;
   protected
+    procedure DoBeforeOpen; override;
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
     // AutoLoad
@@ -55,12 +56,13 @@ type
   public
     constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+    procedure Reload; override;
   end;
 
 implementation
 
 uses
-  Data.Bind.ObjectScope;
+  Data.Bind.ObjectScope, iORM.LiveBindings.CommonBSAPersistence;
 
 
 
@@ -118,6 +120,16 @@ begin
      TBindSourceAdapter(FSourceAdapter).Delete;
 end;
 
+procedure TioNaturalActiveObjectBindSourceAdapter.DoBeforeOpen;
+var
+  FLoadType: TioLoadType;
+begin
+  // If it's to be realoaded then reload che DataObject
+  FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
+  if (FLoadType = ltFromBSReload) or (FLoadType = ltFromBSReloadNewInstance) then
+    Reload;
+end;
+
 procedure TioNaturalActiveObjectBindSourceAdapter.ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   if Assigned(FSourceAdapter)
@@ -128,6 +140,12 @@ function TioNaturalActiveObjectBindSourceAdapter.GetAutoLoad: Boolean;
 begin
   // NaturalBindSourceAdapter is always a not AutoLoad adapter by definition
   Result := False;
+end;
+
+procedure TioNaturalActiveObjectBindSourceAdapter.Reload;
+begin
+  // Do not inherit
+  TioCommonBSAPersistence.ReloadNaturalBindSourceAdapter(Self);
 end;
 
 end.

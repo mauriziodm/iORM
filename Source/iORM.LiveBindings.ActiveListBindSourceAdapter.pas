@@ -183,7 +183,7 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
-    procedure Reload;
+    procedure Reload; virtual;
     procedure LoadPage;
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
