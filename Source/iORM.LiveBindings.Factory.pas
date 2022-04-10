@@ -235,7 +235,7 @@ begin
   // Check if the MasterBS property is set
   if not Assigned(AMasterBS) then
     raise EioException.Create(ClassName, 'GetNaturalBSAfromMasterBindSource',
-      Format('In bind source "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property has been left blank.'
+      Format('In component "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property (maybe SourceDataSet, SourcePBS or SourcePresenter) has been left blank.'
       + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
       [ASenderBSName, ASenderBSName]));
   // Return the requested natural bind source adapter
@@ -245,17 +245,11 @@ end;
 class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 begin
-//  // Check if the MasterBS property is set
-//  if not Assigned(AMasterBS) then
-//    raise EioException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
-//      Format('The "MasterBindSource" property (it could also be "MasterDataSet" or "MasterPresenter") has not been set in the Bind source "%s".'
-//      + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
-//     [ASenderBSName]));
   // Check if the MasterPropertyName property is set
-  if not Assigned(AMasterBS) then
+  if AMasterPropertyName.IsEmpty then
    raise EioException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
-     Format('The "MasterPropertyName" property has not been set in the Bind source "%s".'
-      + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
+     Format('The "MasterPropertyName" property has not been set in the component "%s".'
+      + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
      [ASenderBSName]));
   // Return the requested bind source adapter
   Result := AMasterBS.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
