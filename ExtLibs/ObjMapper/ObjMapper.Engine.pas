@@ -406,6 +406,11 @@ begin
   // ---------- Stream ----------
   if Assigned(AChildObj) and (AChildObj is TStream) then
   begin
+    // Checks
+    if (not Assigned(AJSONValue))
+    or (AJSONValue is TJSONNull)
+    then
+      Exit;
     if AJSONValue is TJSONString then
     begin
       SerStreamASString := TJSONString(AJSONValue).Value;
