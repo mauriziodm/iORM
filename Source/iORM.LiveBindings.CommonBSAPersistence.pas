@@ -355,6 +355,7 @@ end;
 class procedure TioCommonBSAPersistence.ReloadNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
 var
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
 begin
   // Extract the IioActiveBindSourceAdapter interface
   if not Supports(ANaturalBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBindSourceAdapter) then
@@ -367,14 +368,14 @@ begin
     raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
       [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
-
+  // Set anonimous methods then execute
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(LActiveBindSourceAdapter);
   // Reload
   case LActiveBindSourceAdapter.LoadType of
     // Reload to the same instance
     ltFromBSAsIs, ltFromBSReload:
       _LoadToObject(LActiveBindSourceAdapter.ioAsync, LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias, LActiveBindSourceAdapter.Lazy,
-        LActiveBindSourceAdapter.LazyProps, LActiveBindSourceAdapter.ioWhere, LActiveBindSourceAdapter.Current, nil);
-      // ATerminatedMethod := nil (no terminated method)
+        LActiveBindSourceAdapter.LazyProps, LActiveBindSourceAdapter.ioWhere, LActiveBindSourceAdapter.Current, LTerminateMethod);
     // Reload on a new instance
     ltFromBSReloadNewInstance:
       Reload(LActiveBindSourceAdapter);

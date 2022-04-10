@@ -55,6 +55,7 @@ type
     function GetAutoLoad: Boolean; override;
   public
     constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
+    destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
   end;
@@ -80,6 +81,18 @@ begin
                    False
                   );
   FSourceAdapter := ASourceAdapter;
+end;
+
+destructor TioNaturalActiveObjectBindSourceAdapter.Destroy;
+var
+  FLoadType: TioLoadType;
+begin
+  // If the LoadType is ltFromBSReloadNewInstance and it is inherited from TioActiveObjectBindSourceAdapter
+  //  (it is'n an interfaced bind source) then free che DataObject (owns it)
+  FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
+  if (FLoadType = ltFromBSReloadNewInstance) and (Self is TioActiveObjectBindSourceAdapter) then
+    DataObject.Free;
+  inherited;
 end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.DoAfterDelete;
