@@ -94,7 +94,8 @@ implementation
 uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
   iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification,
-  iORM.Utilities, iORM.LiveBindings.BSPersistence.SmartDeleteSystem;
+  iORM.Utilities, iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
+  iORM.Where.Factory;
 
 type
 
@@ -356,6 +357,8 @@ class procedure TioCommonBSAPersistence.ReloadNaturalBindSourceAdapter(const ANa
 var
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
   LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LDataObject: TObject;
+  LWhere: IioWhere;
 begin
   // Extract the IioActiveBindSourceAdapter interface
   if not Supports(ANaturalBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBindSourceAdapter) then
@@ -368,17 +371,26 @@ begin
     raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
       [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
-  // Set anonimous methods then execute
-  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(LActiveBindSourceAdapter);
+  // Extract the current DataObject and the where condition to reload it
+  LDataObject := LActiveBindSourceAdapter.Current;
+  LWhere := TioWhereFactory.NewWhere.ByID( TioUtilities.ExtractOID(LDataObject) );
   // Reload
   case LActiveBindSourceAdapter.LoadType of
     // Reload to the same instance
     ltFromBSAsIs, ltFromBSReload:
-      _LoadToObject(LActiveBindSourceAdapter.ioAsync, LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias, LActiveBindSourceAdapter.Lazy,
-        LActiveBindSourceAdapter.LazyProps, LActiveBindSourceAdapter.ioWhere, LActiveBindSourceAdapter.Current, LTerminateMethod);
+      begin
+        LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(LActiveBindSourceAdapter);
+        _LoadToObject(LActiveBindSourceAdapter.ioAsync, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
+          LDataObject, LTerminateMethod);
+      end;
     // Reload on a new instance
     ltFromBSReloadNewInstance:
-      Reload(LActiveBindSourceAdapter);
+      begin
+        LActiveBindSourceAdapter.Reloading := True;
+        LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(LActiveBindSourceAdapter, False); // Notify = false (verificare)
+        _LoadObject(LActiveBindSourceAdapter.ioAsync, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
+          LTerminateMethod);
+      end
   else
     raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Wrong "LoadType" property value (TypeName = "%s", TypeAlias = "%s")',
       [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));

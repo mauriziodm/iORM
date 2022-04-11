@@ -139,7 +139,7 @@ var
 begin
   // If it's to be realoaded then reload che DataObject
   FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
-  if (FLoadType = ltFromBSReload) or (FLoadType = ltFromBSReloadNewInstance) then
+  if (FLoadType = ltFromBSReload)  or (FLoadType = ltFromBSReloadNewInstance) then
     Reload;
 end;
 
