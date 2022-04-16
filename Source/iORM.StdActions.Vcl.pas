@@ -3,11 +3,50 @@ unit iORM.StdActions.Vcl;
 interface
 
 uses
-  Vcl.ActnList, iORM.LiveBindings.BSPersistence, System.Classes;
+  Vcl.ActnList, iORM.LiveBindings.BSPersistence, System.Classes,
+  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
 
 type
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
+
+  // =================================================================================================
+  // BEGIN: VCL STANDARD ACTIONS FOR BIND SOURCES
+  // =================================================================================================
+
+  // Base class for all BindSource standard actions
+  TioBSStdActionVcl = class(Vcl.ActnList.TAction)
+  strict private
+    FTargetBindSource: IioStdActionTargetBindSource;
+    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+  end;
+
+  // SelectCurrent action to make a selection for a Selector BindSource
+  TioBSSelectCurrent = class(TioBSStdActionVcl)
+  strict private
+    FSelectionType: TioSelectionType;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
+    property TargetBindSource;
+  end;
+
+  // =================================================================================================
+  // END: VCL STANDARD ACTIONS FOR BIND SOURCES
+  // =================================================================================================
+
+  // =================================================================================================
+  // BEGIN: VCL STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
 
   // Base class for all BinsDourceObjState standard actions
   TioBSPersistenceStdActionVcl = class(Vcl.ActnList.TAction)
@@ -144,6 +183,10 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  // =================================================================================================
+  // ENS: VCL STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
+
 implementation
 
 uses
@@ -165,7 +208,7 @@ end;
 
 function TioBSPersistenceStdActionVcl.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(Target) and FTargetBindSource.Persistence.IsActive;
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioBSPersistenceClient) and FTargetBindSource.isActive;
 end;
 
 procedure TioBSPersistenceStdActionVcl.Notification(AComponent: TComponent; Operation: TOperation);
@@ -375,6 +418,56 @@ begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioBSStdActionVcl }
+
+constructor TioBSStdActionVcl.Create(AOwner: TComponent);
+begin
+  inherited;
+  FTargetBindSource := nil;
+end;
+
+function TioBSStdActionVcl.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioStdActionTargetBindSource) and FTargetBindSource.isActive;
+end;
+
+procedure TioBSStdActionVcl.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
+    TargetBindSource := nil;
+end;
+
+procedure TioBSStdActionVcl.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+begin
+  if Value <> FTargetBindSource then
+  begin
+    FTargetBindSource := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+{ TioBSSelectCurrent }
+
+constructor TioBSSelectCurrent.Create(AOwner: TComponent);
+begin
+  inherited;
+  FSelectionType := stAppend;
+end;
+
+procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  TargetBindSource.SelectCurrent(FSelectionType);
+end;
+
+procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := TargetBindSource.CanDoSelection;
 end;
 
 end.

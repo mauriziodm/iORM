@@ -73,11 +73,11 @@ begin
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
         LBSPersistenceClient.Persistence.NotifySaveRevertPoint;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
-    ntCanDoSelection:
+    ntCanReceiveSelection:
       if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
-        LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDoSelection;
+        LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanReceiveSelection;
       end;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
     ntCanInsertDetail:
@@ -152,7 +152,7 @@ begin
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
   // If the selection is allowed then send a ntSaveRevertPoint notification
-  if LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntCanDoSelection)) then
+  if LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection)) then
     LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
     raise EioException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');

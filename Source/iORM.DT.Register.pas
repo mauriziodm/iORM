@@ -54,6 +54,7 @@ begin
   RegisterComponents('iORM', [TioModelBindSource]);
 
   // VCL standard actions
+  RegisterActions('iORM-BS', [iORM.StdActions.VCL.TioBSSelectCurrent], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceAppend], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceDelete], nil);
@@ -64,6 +65,7 @@ begin
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceSaveRevertPoint], nil);
 
   // FMX standard actions
+  RegisterActions('iORM-BS', [iORM.StdActions.FMX.TioBSSelectCurrent], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceAppend], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceDelete], nil);

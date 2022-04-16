@@ -99,7 +99,7 @@ type
     function CanClear: Boolean;
     function CanDelete: Boolean;
     function CanDeleteDetail: Boolean;
-    function CanDoSelection: Boolean;
+    function CanReceiveSelection: Boolean;
     function CanReload: Boolean;
     function CanRevert: Boolean;
     function CanSave: Boolean;
@@ -182,7 +182,7 @@ begin
   Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eaAbortIfNotSaved);
 end;
 
-function TioBSPersistence.CanDoSelection: Boolean;
+function TioBSPersistence.CanReceiveSelection: Boolean;
 begin
   Result := (GetState >= osSaved) or (FBindSource.OnEditAction < eaAbortIfNotSaved);
 end;

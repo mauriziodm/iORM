@@ -256,6 +256,7 @@ type
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
     function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+    function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
@@ -340,6 +341,12 @@ procedure TioModelPresenterCustom.CancelIfEditing;
 begin
   if CheckAdapter and Editing then
     Cancel;
+end;
+
+function TioModelPresenterCustom.CanDoSelection: Boolean;
+begin
+  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and FSelectorFor.GetActiveBindSourceAdapter.Notify(Self,
+    TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
 end;
 
 function TioModelPresenterCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;

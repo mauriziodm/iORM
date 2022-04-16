@@ -4,7 +4,7 @@ interface
 
 uses
   FMX.ActnList, iORM.LiveBindings.BSPersistence, System.Classes,
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -27,20 +27,25 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
   end;
 
-//  TioBSMakeSelection = class(TioBSStdActionFmx)
-//  public
-//    procedure ExecuteTarget(Target: TObject); override;
-//    procedure UpdateTarget (Target: TObject); override;
-//  published
-//    property TargetBindSource;
-//  end;
+  // SelectCurrent action to make a selection for a Selector BindSource
+  TioBSSelectCurrent = class(TioBSStdActionFmx)
+  strict private
+    FSelectionType: TioSelectionType;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
+    property TargetBindSource;
+  end;
 
   // =================================================================================================
   // END: FMX STANDARD ACTIONS FOR BIND SOURCES
   // =================================================================================================
 
   // =================================================================================================
-  // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
+  // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE (MASTER BIND SOURCES ONLY)
   // =================================================================================================
 
   // Base class for all BinsDourceObjState standard actions
@@ -179,13 +184,13 @@ type
   end;
 
   // =================================================================================================
-  // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES WITH OBJSTATE MANAGER (MASTER BIND SOURCES ONLY)
+  // END: FMX STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE (MASTER BIND SOURCES ONLY)
   // =================================================================================================
 
 implementation
 
 uses
-  iORM.Abstraction, iORM.Exceptions;
+  iORM.Abstraction, iORM.Exceptions, System.SysUtils;
 
 { TioBSObjStateStdActionFmx }
 
@@ -202,7 +207,7 @@ end;
 
 function TioBSPersistenceStdActionFmx.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(Target) and FTargetBindSource.Persistence.IsActive;
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioBSPersistenceClient) and FTargetBindSource.isActive;
 end;
 
 procedure TioBSPersistenceStdActionFmx.Notification(AComponent: TComponent; Operation: TOperation);
@@ -277,7 +282,7 @@ end;
 
 function TioBSStdActionFmx.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(Target) and FTargetBindSource.isActive;
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioStdActionTargetBindSource) and FTargetBindSource.isActive;
 end;
 
 procedure TioBSStdActionFmx.Notification(AComponent: TComponent; Operation: TOperation);
@@ -435,6 +440,26 @@ begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioBSSelectCurrent }
+
+constructor TioBSSelectCurrent.Create(AOwner: TComponent);
+begin
+  inherited;
+  FSelectionType := stAppend;
+end;
+
+procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  TargetBindSource.SelectCurrent(FSelectionType);
+end;
+
+procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := TargetBindSource.CanDoSelection;
 end;
 
 end.

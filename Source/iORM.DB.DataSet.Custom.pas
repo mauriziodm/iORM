@@ -180,6 +180,7 @@ type
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
+    function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // DataObject
     procedure ClearDataObject;
@@ -208,6 +209,12 @@ procedure TioDataSetCustom.CancelIfEditing;
 begin
   if CheckAdapter and Editing then
     Cancel;
+end;
+
+function TioDataSetCustom.CanDoSelection: Boolean;
+begin
+  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and FSelectorFor.GetActiveBindSourceAdapter.Notify(Self,
+    TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
 end;
 
 function TioDataSetCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
@@ -506,10 +513,8 @@ begin
   if IsDetailBS and not(csDesigning in ComponentState) then
   begin
     if not Assigned(FMasterDataSet) then
-      raise EioException.Create(ClassName, 'Loaded',
-        Format('The "MasterDataSet" property has not been set in the component "%s".'
-        + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
-       [Name]));
+      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterDataSet" property has not been set in the component "%s".' +
+        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
     MasterDataSet.RegisterDetailDataSet(Self);
   end;
   // ===========================================================================
@@ -763,12 +768,11 @@ begin
   if CheckAdapter then
     raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
   // If it is a detail bind source then get the detail BSA from the master bind source,
-  //   else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
-  //   then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
+  // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
+  // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterDataSet, MasterPropertyName))
-  else
-  if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+  else if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterDataSet))
   else
   begin

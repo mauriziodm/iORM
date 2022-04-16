@@ -108,6 +108,8 @@ type
   IioStdActionTargetBindSource = interface
     ['{6E442DF5-154E-4253-9AFB-E5CCFDF32209}']
     function IsActive: Boolean;
+    function CanDoSelection: Boolean;
+    procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   end;
 
   // The common ancestor for all PrototypeBindSource components

@@ -238,6 +238,7 @@ type
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+    function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   published
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
@@ -312,6 +313,12 @@ procedure TioPrototypeBindSourceCustom.CancelIfEditing;
 begin
   if Editing then
     Cancel;
+end;
+
+function TioPrototypeBindSourceCustom.CanDoSelection: Boolean;
+begin
+  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and FSelectorFor.GetActiveBindSourceAdapter.Notify(Self,
+    TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
 end;
 
 function TioPrototypeBindSourceCustom.CheckActiveAdapter: Boolean;
