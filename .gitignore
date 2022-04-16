@@ -167,3 +167,4 @@ Samples/Paging_MVVM/VCL/__history/
 Samples/PagingFmx/__recovery/
 Samples/Paging_MVVM/FMX/__history/
 Samples/PagingVcl/__history/
+*.bak

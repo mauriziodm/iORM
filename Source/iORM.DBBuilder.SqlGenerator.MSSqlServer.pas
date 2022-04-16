@@ -17,6 +17,7 @@ type
 
   TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   private
+    FFirstField: boolean;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
     function ReplaceSpecialWords(const ASql: string): string;
     function TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
@@ -60,7 +61,14 @@ uses
 
 procedure TioDBBuilderSqlGenMSSqlServer.AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
-  ScriptAdd(Format('%sADD %s', [ACommaBefore, InternalCreateField(AField)]));
+  // M.M. 12/11/21
+  if FFirstField then
+  begin
+    ScriptAdd(Format('%sADD %s', [ACommaBefore, InternalCreateField(AField)]));
+    FFirstField := False;
+  end
+  else
+    ScriptAdd(Format('%s %s', [ACommaBefore, InternalCreateField(AField)]));
 end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
@@ -71,7 +79,8 @@ begin
   IncIndentationLevel;
   ScriptAdd(Format(' ADD CONSTRAINT %s', [ClearSquareBrackets(AForeignKey.Name)]));
   IncIndentationLevel;
-  ScriptAdd(Format('FOREIGN KEY (%s)', [ClearSquareBrackets(AForeignKey.DependentFieldName)]));
+  // M.M. 12/11/21
+  ScriptAdd(Format('FOREIGN KEY ([%s])', [ClearSquareBrackets(AForeignKey.DependentFieldName)]));
   ScriptAdd(Format('REFERENCES  [%s] (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
   if AForeignKey.OnUpdateAction > fkUnspecified then
     ScriptAdd(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
@@ -115,6 +124,8 @@ end;
 
 procedure TioDBBuilderSqlGenMSSqlServer.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
+  // M.M. 12/11/21
+  FFirstField := True;
   ScriptAdd(Format('ALTER TABLE [%s]', [ATable.TableName]));
   IncIndentationLevel;
 end;
