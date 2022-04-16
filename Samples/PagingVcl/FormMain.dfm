@@ -115,9 +115,8 @@ object Form1: TForm1
   end
   object DSArticles: TioDataSetMaster
     TypeName = 'TArticle'
-    ViewDataType = dtList
     Paging.PageSize = 10
-    Paging.PagingType = ptProgressiveAuto
+    Paging.PagingType = ptHardPaging
     Left = 192
     Top = 240
   end
@@ -125,5 +124,11 @@ object Form1: TForm1
     DataSet = DSArticles
     Left = 272
     Top = 240
+  end
+  object Timer1: TTimer
+    Interval = 250
+    OnTimer = Timer1Timer
+    Left = 328
+    Top = 176
   end
 end
