@@ -74,8 +74,8 @@ type
   strict protected
     function GetCurrentPage: Integer;
     function GetEnabled: Boolean;
-    function GetFirstPage: Boolean;
-    function GetLastPage: Boolean;
+    function GetIsFirstPage: Boolean;
+    function GetIsLastPage: Boolean;
     function GetNextPageStartOffset: Integer;
     function GetPageCount: Integer;
     function GetPageSize: Integer;
@@ -97,8 +97,8 @@ type
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
     property Enabled: Boolean read GetEnabled;
-    property FirstPage: Boolean read GetFirstPage;
-    property LastPage: Boolean read GetFirstPage;
+    property IsFirstPage: Boolean read GetIsFirstPage;
+    property IsLastPage: Boolean read GetIsFirstPage;
     property PageCount: Integer read GetPageCount;
   published
     property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
@@ -117,8 +117,8 @@ type
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
     function GetEnabled: Boolean;
-    function GetFirstPage: Boolean;
-    function GetLastPage: Boolean;
+    function GetIsFirstPage: Boolean;
+    function GetIsLastPage: Boolean;
     procedure CheckStrategy;
     procedure InvokeLoadPageMethod;
     procedure SetCurrentPage(const Value: Integer);
@@ -136,8 +136,8 @@ type
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
     property Enabled: Boolean read GetEnabled;
-    property FirstPage: Boolean read GetFirstPage;
-    property LastPage: Boolean read GetFirstPage;
+    property IsFirstPage: Boolean read GetIsFirstPage;
+    property IsLastPage: Boolean read GetIsFirstPage;
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset;
     property PageCount: Integer read FPageCount;
     property PageSize: Integer read FPageSize write FPageSize;
@@ -204,21 +204,21 @@ begin
   end;
 end;
 
-function TioCommonBSAPageManager.GetFirstPage: Boolean;
+function TioCommonBSAPageManager.GetIsFirstPage: Boolean;
 begin
   _Lock;
   try
-    Result := FConcretePageManager.FirstPage;
+    Result := FConcretePageManager.IsFirstPage;
   finally
     _Unlock;
   end;
 end;
 
-function TioCommonBSAPageManager.GetLastPage: Boolean;
+function TioCommonBSAPageManager.GetIsLastPage: Boolean;
 begin
   _Lock;
   try
-    Result := FConcretePageManager.LastPage;
+    Result := FConcretePageManager.IsLastPage;
   finally
     _Unlock;
   end;
@@ -543,12 +543,12 @@ begin
   Result := FPagingType > ptDisabled;
 end;
 
-function TioCommonBSAPageManagerConcrete.GetFirstPage: Boolean;
+function TioCommonBSAPageManagerConcrete.GetIsFirstPage: Boolean;
 begin
   Result := FCurrentPage = 1;
 end;
 
-function TioCommonBSAPageManagerConcrete.GetLastPage: Boolean;
+function TioCommonBSAPageManagerConcrete.GetIsLastPage: Boolean;
 begin
   Result := FCurrentPage = FPageCount;
 end;
