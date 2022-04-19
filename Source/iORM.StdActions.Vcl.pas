@@ -27,8 +27,21 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
   end;
 
+  // Base class for all BindSource standard actions
+  TioBSStdActionVcl<T: IioStdActionTargetBindSource> = class(Vcl.ActnList.TAction)
+  strict private
+    FTargetBindSource: T;
+    procedure SetTargetBindSource(const Value: T);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+  end;
+
   // SelectCurrent action to make a selection for a Selector BindSource
-  TioBSSelectCurrent = class(TioBSStdActionVcl)
+  TioBSSelectCurrent = class(TioBSStdActionVcl<IioStdActionTargetBindSource>)
   strict private
     FSelectionType: TioSelectionType;
   public
@@ -190,7 +203,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction, System.SysUtils, iORM.Exceptions;
+  iORM.Abstraction, System.SysUtils, iORM.Exceptions, iORM.Utilities;
 
 { TioBSObjStateStdAction }
 
@@ -468,6 +481,36 @@ procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.CanDoSelection;
+end;
+
+{ TioBSStdActionVcl<T> }
+
+constructor TioBSStdActionVcl<T>.Create(AOwner: TComponent);
+begin
+  inherited;
+  FTargetBindSource := nil;
+end;
+
+function TioBSStdActionVcl<T>.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target) and Supports(FTargetBindSource, TioUtilities.TypeInfoToGUID(TypeInfo(T))) and FTargetBindSource.isActive;
+end;
+
+procedure TioBSStdActionVcl<T>.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
+    TargetBindSource := nil;
+end;
+
+procedure TioBSStdActionVcl<T>.SetTargetBindSource(const Value: T);
+begin
+  if @Value <> @FTargetBindSource then
+  begin
+    FTargetBindSource := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
 end;
 
 end.
