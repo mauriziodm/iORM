@@ -35,18 +35,16 @@ object Form1: TForm1
     Top = 16
     Width = 73
     Height = 22
-    Caption = 'Prev page'
+    Action = ioBSPrevPage1
     Flat = True
-    OnClick = SpeedButton1Click
   end
   object SpeedButton2: TSpeedButton
     Left = 527
     Top = 16
     Width = 73
     Height = 22
-    Caption = 'Next page'
+    Action = ioBSNextPage1
     Flat = True
-    OnClick = SpeedButton2Click
   end
   object SpeedButton3: TSpeedButton
     Left = 448
@@ -99,6 +97,15 @@ object Form1: TForm1
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
   end
+  object Button2: TButton
+    Left = 8
+    Top = 41
+    Width = 91
+    Height = 25
+    Caption = 'Open/Close'
+    TabOrder = 3
+    OnClick = Button2Click
+  end
   object ioVCL1: TioVCL
     Left = 192
     Top = 104
@@ -130,5 +137,19 @@ object Form1: TForm1
     OnTimer = Timer1Timer
     Left = 328
     Top = 176
+  end
+  object ActionList1: TActionList
+    Left = 384
+    Top = 248
+    object ioBSNextPage1: TioBSNextPage
+      Category = 'iORM-BSPaging'
+      Caption = 'Next page'
+      TargetBindSource = DSArticles
+    end
+    object ioBSPrevPage1: TioBSPrevPage
+      Category = 'iORM-BSPaging'
+      Caption = 'Prev page'
+      TargetBindSource = DSArticles
+    end
   end
 end

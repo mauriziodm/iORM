@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioDataSetMaster = class(TioDataSetCustom, IioBSPersistenceClient)
+  TioDataSetMaster = class(TioDataSetCustom, IioBSPersistenceClient, IioStdActionTargetMasterBindSource)
   private
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;

@@ -40,6 +40,23 @@ type
     property TargetBindSource;
   end;
 
+  // Paging NextPage action
+  TioBSNextPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property TargetBindSource;
+  end;
+  // Paging PreviousPage action
+  TioBSPrevPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
+  public
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property TargetBindSource;
+  end;
+
   // =================================================================================================
   // END: VCL STANDARD ACTIONS FOR BIND SOURCES
   // =================================================================================================
@@ -468,6 +485,33 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
+end;
+
+{ TioBSNextPage }
+
+procedure TioBSNextPage.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  TargetBindSource.Paging.NextPage;
+end;
+
+procedure TioBSNextPage.UpdateTarget(Target: TObject);
+begin
+  Enabled := TargetBindSource.IsActive and not TargetBindSource.Paging.IsLastPage;
+end;
+
+{ TioBSPreviousPage }
+
+procedure TioBSPrevPage.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  TargetBindSource.Paging.PrevPage;
+end;
+
+procedure TioBSPrevPage.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := TargetBindSource.IsActive and not TargetBindSource.Paging.IsFirstPage;
 end;
 
 end.

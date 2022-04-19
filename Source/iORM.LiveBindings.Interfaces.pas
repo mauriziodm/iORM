@@ -111,6 +111,13 @@ type
     function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   end;
+  // Interface for standard action target master bind source
+  IioStdActionTargetMasterBindSource = interface(IioStdActionTargetBindSource)
+    ['{758D5C34-B4CF-4530-86FF-F8ED5E99E2E8}']
+    // Paging
+    function GetPaging: TioCommonBSAPageManager;
+    property Paging: TioCommonBSAPageManager read GetPaging;
+  end;
 
   // The common ancestor for all PrototypeBindSource components
   TioBaseBindSource = TBaseObjectBindSource;

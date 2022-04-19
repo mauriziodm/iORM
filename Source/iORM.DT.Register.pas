@@ -55,6 +55,8 @@ begin
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.VCL.TioBSSelectCurrent], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.VCL.TioBSNextPage], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.VCL.TioBSPrevPage], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceAppend], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceDelete], nil);

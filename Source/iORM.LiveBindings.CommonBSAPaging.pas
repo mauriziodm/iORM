@@ -98,7 +98,7 @@ type
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
     property Enabled: Boolean read GetEnabled;
     property IsFirstPage: Boolean read GetIsFirstPage;
-    property IsLastPage: Boolean read GetIsFirstPage;
+    property IsLastPage: Boolean read GetIsLastPage;
     property PageCount: Integer read GetPageCount;
   published
     property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
@@ -137,7 +137,7 @@ type
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
     property Enabled: Boolean read GetEnabled;
     property IsFirstPage: Boolean read GetIsFirstPage;
-    property IsLastPage: Boolean read GetIsFirstPage;
+    property IsLastPage: Boolean read GetIsLastPage;
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset;
     property PageCount: Integer read FPageCount;
     property PageSize: Integer read FPageSize write FPageSize;

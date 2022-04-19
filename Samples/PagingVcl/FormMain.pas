@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Data.DB, Vcl.Grids, Vcl.DBGrids,
-  System.Classes, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, iORM.DB.ConnectionDef, iORM.Abstraction.VCL, Vcl.ExtCtrls;
+  System.Classes, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, iORM.DB.ConnectionDef, iORM.Abstraction.VCL, Vcl.ExtCtrls,
+  iORM.StdActions.Vcl, System.Actions, Vcl.ActnList;
 
 type
   TForm1 = class(TForm)
@@ -23,13 +24,16 @@ type
     DSArticles: TioDataSetMaster;
     SourceArticles: TDataSource;
     Timer1: TTimer;
+    ActionList1: TActionList;
+    ioBSNextPage1: TioBSNextPage;
+    ioBSPrevPage1: TioBSPrevPage;
+    Button2: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton4Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -51,19 +55,14 @@ begin
   TSampleData.CreateSampleData(StrToInt(Edit1.Text));
 end;
 
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  DSArticles.Active :=  not DSArticles.Active;
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  DSArticles.Open;
-end;
-
-procedure TForm1.SpeedButton1Click(Sender: TObject);
-begin
-  DSArticles.Paging.PrevPage;
-end;
-
-procedure TForm1.SpeedButton2Click(Sender: TObject);
-begin
-  DSArticles.Paging.NextPage;
+//  DSArticles.Open;
 end;
 
 procedure TForm1.SpeedButton3Click(Sender: TObject);

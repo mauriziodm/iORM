@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioPrototypeBindSourceMaster = class(TioPrototypeBindSourceCustom, IioBSPersistenceClient)
+  TioPrototypeBindSourceMaster = class(TioPrototypeBindSourceCustom, IioBSPersistenceClient, IioStdActionTargetMasterBindSource)
   private
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;

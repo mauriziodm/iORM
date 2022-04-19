@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioModelPresenterMaster = class(TioModelPresenterCustom, IioBSPersistenceClient)
+  TioModelPresenterMaster = class(TioModelPresenterCustom, IioBSPersistenceClient, IioStdActionTargetMasterBindSource)
   private
     FWannaBeActive: Boolean;
     FPersistence: TioBSPersistence;
