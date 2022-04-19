@@ -68,6 +68,8 @@ begin
 
   // FMX standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.FMX.TioBSSelectCurrent], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.FMX.TioBSNextPage], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.FMX.TioBSPrevPage], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceAppend], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceDelete], nil);

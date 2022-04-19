@@ -4,11 +4,12 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, iORM.DB.Components.ConnectionDef,
-  iORM.AbstractionLayer.Framework.FMX, FMX.StdCtrls, FMX.Edit, FMX.Controls.Presentation, System.Rtti, FMX.Grid.Style,
-  Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource, FMX.ScrollBox, FMX.Grid, Data.Bind.GenData,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
+  FMX.StdCtrls, FMX.Edit, FMX.Controls.Presentation, System.Rtti, FMX.Grid.Style,
+  Data.Bind.Components, Data.Bind.ObjectScope, FMX.ScrollBox, FMX.Grid, Data.Bind.GenData,
   Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Grid,
-  System.Actions, FMX.ActnList, Fmx.Bind.Navigator;
+  System.Actions, FMX.ActnList, Fmx.Bind.Navigator, iORM.DB.ConnectionDef, iORM.Abstraction.FMX, iORM.LiveBindings.PrototypeBindSource.Custom,
+  iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx;
 
 type
   TMainForm = class(TForm)
@@ -21,8 +22,6 @@ type
     SpeedButton2: TSpeedButton;
     ioFMX1: TioFMX;
     SQLIteConn: TioSQLiteConnectionDef;
-    PBSArticles: TioPrototypeBindSource;
-    LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
     LabelPageCount: TLabel;
     TimerPageCount: TTimer;
     ActionList1: TActionList;
@@ -32,9 +31,11 @@ type
     ActionList2: TActionList;
     Action1: TAction;
     LiveBindingsBindNavigateNext1: TFMXBindNavigateNext;
+    PBSArticles: TioPrototypeBindSourceMaster;
+    LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
+    ioBSNextPage1: TioBSNextPage;
+    ioBSPrevPage1: TioBSPrevPage;
     procedure Button1Click(Sender: TObject);
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
     procedure TimerPageCountTimer(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton4Click(Sender: TObject);
@@ -59,29 +60,19 @@ begin
   TSampleData.CreateSampleData(Edit1.Text.ToInteger);
 end;
 
-procedure TMainForm.SpeedButton1Click(Sender: TObject);
-begin
-  PBSArticles.ioPaging.NextPage;
-end;
-
-procedure TMainForm.SpeedButton2Click(Sender: TObject);
-begin
-  PBSArticles.ioPaging.PrevPage;
-end;
-
 procedure TMainForm.SpeedButton3Click(Sender: TObject);
 begin
-  PBSArticles.Refresh(True);
+//  PBSArticles.Refresh(True);
 end;
 
 procedure TMainForm.SpeedButton4Click(Sender: TObject);
 begin
-  PBSArticles.Refresh(False);
+//  PBSArticles.Refresh(False);
 end;
 
 procedure TMainForm.TimerPageCountTimer(Sender: TObject);
 begin
-  LabelPageCount.Text := Format('Page %d of %d', [PBSArticles.ioPaging.CurrentPage, PBSArticles.ioPaging.PageCount]);
+//  LabelPageCount.Text := Format('Page %d of %d', [PBSArticles.ioPaging.CurrentPage, PBSArticles.ioPaging.PageCount]);
 end;
 
 end.

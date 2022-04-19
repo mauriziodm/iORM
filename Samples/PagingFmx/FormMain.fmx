@@ -41,33 +41,35 @@ object MainForm: TMainForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     CanFocus = True
     ClipChildren = True
-    Position.X = 16.000000000000000000
-    Position.Y = 72.000000000000000000
+    Position.X = 23.000000000000000000
+    Position.Y = 77.000000000000000000
     Size.Width = 609.000000000000000000
     Size.Height = 393.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 7
     RowCount = 200
-    Viewport.Width = 605.000000000000000000
+    Viewport.Width = 589.000000000000000000
     Viewport.Height = 368.000000000000000000
   end
   object SpeedButton1: TSpeedButton
+    Action = ioBSNextPage1
+    Enabled = True
+    ImageIndex = -1
     Position.X = 540.000000000000000000
     Position.Y = 14.000000000000000000
     Size.Width = 69.000000000000000000
     Size.Height = 23.000000000000000000
     Size.PlatformDefault = False
-    Text = 'Next page'
-    OnClick = SpeedButton1Click
   end
   object SpeedButton2: TSpeedButton
+    Action = ioBSPrevPage1
+    Enabled = True
+    ImageIndex = -1
     Position.X = 452.000000000000000000
     Position.Y = 14.000000000000000000
     Size.Width = 69.000000000000000000
     Size.Height = 23.000000000000000000
     Size.PlatformDefault = False
-    Text = 'Prev page'
-    OnClick = SpeedButton2Click
   end
   object LabelPageCount: TLabel
     Position.X = 192.000000000000000000
@@ -125,29 +127,22 @@ object MainForm: TMainForm
     Left = 256
     Top = 152
   end
-  object PBSArticles: TioPrototypeBindSource
-    AutoActivate = True
-    AutoPost = False
-    FieldDefs = <>
-    ScopeMappings = <>
-    ioTypeName = 'TArticle'
-    ioAsync = False
-    ioAutoLoadData = True
-    ioAutoPersist = True
-    ioViewDataType = dtList
-    ioWhereDetailsFromDetailAdapters = False
-    ioAutoRefreshOnNotification = arEnabledNoReload
-    ioPaging.PageSize = 10
-    ioPaging.PagingType = ptProgressiveAuto
-    Left = 256
-    Top = 216
-  end
   object ActionList1: TActionList
     Left = 384
     Top = 192
     object LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior
       Category = 'LiveBindings'
       Text = 'Prior'
+    end
+    object ioBSNextPage1: TioBSNextPage
+      Category = 'iORM-BSPaging'
+      Text = 'Next page'
+      TargetBindSource = PBSArticles
+    end
+    object ioBSPrevPage1: TioBSPrevPage
+      Category = 'iORM-BSPaging'
+      Text = 'Prev page'
+      TargetBindSource = PBSArticles
     end
   end
   object ActionList2: TActionList
@@ -160,5 +155,33 @@ object MainForm: TMainForm
       Category = 'LiveBindings'
       Text = 'Next'
     end
+  end
+  object PBSArticles: TioPrototypeBindSourceMaster
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Description'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Price'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    TypeName = 'TArticle'
+    Paging.PageSize = 10
+    Paging.PagingType = ptHardPaging
+    Left = 256
+    Top = 216
   end
 end
