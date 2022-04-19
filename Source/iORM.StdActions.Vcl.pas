@@ -15,19 +15,6 @@ type
   // =================================================================================================
 
   // Base class for all BindSource standard actions
-  TioBSStdActionVcl = class(Vcl.ActnList.TAction)
-  strict private
-    FTargetBindSource: IioStdActionTargetBindSource;
-    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
-  strict protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
-  public
-    constructor Create(AOwner: TComponent); override;
-    function HandlesTarget(Target: TObject): Boolean; override;
-  end;
-
-  // Base class for all BindSource standard actions
   TioBSStdActionVcl<T: IioStdActionTargetBindSource> = class(Vcl.ActnList.TAction)
   strict private
     FTargetBindSource: T;
@@ -431,36 +418,6 @@ begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
-end;
-
-{ TioBSStdActionVcl }
-
-constructor TioBSStdActionVcl.Create(AOwner: TComponent);
-begin
-  inherited;
-  FTargetBindSource := nil;
-end;
-
-function TioBSStdActionVcl.HandlesTarget(Target: TObject): Boolean;
-begin
-  Result := Assigned(Target) and Supports(FTargetBindSource, IioStdActionTargetBindSource) and FTargetBindSource.isActive;
-end;
-
-procedure TioBSStdActionVcl.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
-    TargetBindSource := nil;
-end;
-
-procedure TioBSStdActionVcl.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
-begin
-  if Value <> FTargetBindSource then
-  begin
-    FTargetBindSource := Value;
-    if Value <> nil then
-      (Value as TComponent).FreeNotification(Self);
-  end;
 end;
 
 { TioBSSelectCurrent }
