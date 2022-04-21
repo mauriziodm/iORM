@@ -102,6 +102,10 @@ type
     // BindSourceAdapter state
     function GetState: TBindSourceAdapterState;
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
+    // ItemIndex
+    function GetItemIndex: Integer;
+    procedure SetItemIndex(const Value: Integer);
+    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
   end;
 
   // Interface for standard action target bind source

@@ -498,7 +498,7 @@ end;
 procedure TioBSNextPage.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := TargetBindSource.IsActive and not TargetBindSource.Paging.IsLastPage;
+  Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
 end;
 
 { TioBSPreviousPage }
@@ -512,7 +512,7 @@ end;
 procedure TioBSPrevPage.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := TargetBindSource.IsActive and not TargetBindSource.Paging.IsFirstPage;
+  Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
 end;
 
 end.

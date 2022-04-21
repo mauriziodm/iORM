@@ -123,6 +123,7 @@ type
     procedure InvokeLoadPageMethod;
     procedure SetCurrentPage(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
+    procedure SetPageSize(const Value: Integer);
     procedure Reset;
   public
     constructor Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
@@ -140,7 +141,7 @@ type
     property IsLastPage: Boolean read GetIsLastPage;
     property NextPageStartOffset: Integer read FNextPageStartOffset write FNextPageStartOffset;
     property PageCount: Integer read FPageCount;
-    property PageSize: Integer read FPageSize write FPageSize;
+    property PageSize: Integer read FPageSize write SetPageSize;
     property PagingType: TioBSAPagingType read FPagingType write SetPagingType;
   end;
 
@@ -600,6 +601,14 @@ end;
 procedure TioCommonBSAPageManagerConcrete.SetItemCount(const AItemCount: Integer);
 begin
   FPageCount := (AItemCount div FPageSize);
+end;
+
+procedure TioCommonBSAPageManagerConcrete.SetPageSize(const Value: Integer);
+begin
+  if Value > 0 then
+    FPageSize := Value
+  else
+    raise EioException.Create(Self.ClassName, 'SetPageSize', '"PageSize" property must be greater than zero.');
 end;
 
 procedure TioCommonBSAPageManagerConcrete.SetPagingType(const Value: TioBSAPagingType);

@@ -75,6 +75,9 @@ type
     function GetIsInterfacePresenting: Boolean;
     // ItemCount
     function GetCount: Integer;
+    // ItemIndex
+    function GetItemIndex: Integer;
+    procedure SetItemIndex(const Value: Integer);
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
@@ -129,6 +132,7 @@ type
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail
+    property ItemIndex: Integer read GetItemIndex write SetItemIndex; // Public: Master+Detail
     // Published properties
     property TypeName: String read FTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
@@ -432,6 +436,14 @@ begin
     Result := TioUtilities.IsAnInterfaceTypeName(TypeName);
 end;
 
+function TioDataSetCustom.GetItemIndex: Integer;
+begin
+  if CheckAdapter then
+    Result := GetActiveBindSourceAdapter.ItemIndex
+  else
+    Result := 0;
+end;
+
 function TioDataSetCustom.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
@@ -652,6 +664,14 @@ begin
   else
     // Set the data object into the BSA
     GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
+end;
+
+procedure TioDataSetCustom.SetItemIndex(const Value: Integer);
+begin
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.ItemIndex := Value
+  else
+    raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
 end;
 
 procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);

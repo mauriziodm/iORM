@@ -4,6 +4,7 @@ object ViewBindSourceGrid: TViewBindSourceGrid
   Width = 300
   Height = 500
   TabOrder = 0
+  PixelsPerInch = 96
   DesignSize = (
     300
     500)

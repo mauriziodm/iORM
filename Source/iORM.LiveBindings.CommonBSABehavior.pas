@@ -68,6 +68,14 @@ type
     constructor Create(const AMasterGetMemberObject: IGetMemberObject; const AMasterProperty: IioProperty);
     function GetMemberObject: TObject;
   end;
+  // Implementation of IGetMemberObject for simple objects, used for Paging properties, ItemCount and similar
+  TioBindSourceAdapterSimpleGetMemberObject = class(TInterfacedObject, IGetMemberObject)
+  private
+    FMemberObject: TObject;
+  public
+    constructor Create(const AMemberObject: TObject);
+    function GetMemberObject: TObject;
+  end;
 
   // Use RTTI to read the value of a property
   // The ValueReader classes are used to read the value of a property relating to a field of a BindSourceAdapter
@@ -91,6 +99,9 @@ type
 
   // Methods and functionalities common to all ActiveBindSouceAdapters
   TioCommonBSABehavior = class
+  private
+    class procedure _AddBSProperty<T>(const AClassRef: TioClassRef; const APropName, ABSFUllPathPropName: String; const ABindSourceAdapter: TBindSourceAdapter;
+    const AGetMemberObject: IGetMemberObject; const AMemberType: TScopeMemberType; const AFieldsList: TList<TBindSourceAdapterField>);
   public
     // NB: Common code for ABSA to manage notifications
     class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
@@ -103,22 +114,24 @@ type
     // Changes to the BindSourceAdapters to make it possible to create fields that access nested properties/fields
     // (eg: "Customer.Payment.Description")
     // --------------------------------------------------------------------------------------------------------------------------
+    class procedure AddBSProperties(const ABindSourceAdapter: TBindSourceAdapter; const AFieldsList: TList<TBindSourceAdapterField>);
     class procedure AddFields(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject; const APath: String);
     class procedure AddPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; AFieldsList: TList<TBindSourceAdapterField>;
       const AGetMemberObject: IGetMemberObject; const APath: String);
     class procedure AddChildPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; AFieldsList: TList<TBindSourceAdapterField>;
       const AMasterGetMemberObject: IGetMemberObject; const AMasterPath: String);
     class function CreateRttiPropertyField<T>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;
-      AMemberType: TScopeMemberType; const APath: String): TBindSourceAdapterField;
+      AMemberType: TScopeMemberType; const AFullPathPropName: String): TBindSourceAdapterField;
     class function CreateRttiObjectPropertyField<T: class>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter;
-      const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const APath: String): TBindSourceAdapterField;
+      const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const AFullPathPropName: String): TBindSourceAdapterField;
     // ==========================================================================================================================
   end;
 
 implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container,
-  iORM.Context.Factory, iORM.LiveBindings.BSPersistence;
+  iORM.Context.Factory, iORM.LiveBindings.BSPersistence,
+  iORM.LiveBindings.CommonBSAPaging;
 
 { TioCommonBSABehavior }
 
@@ -194,6 +207,8 @@ begin
   // AddFieldsToList(LType, Self, Self.Fields, LIntf); // Per ora ho deciso di non considerare gli eventuali public fields ma solo proprietà (sempre pubbliche)
   AddPropertiesToList(AType, ABindSourceAdapter, ABindSourceAdapter.Fields, AGetMemberObject, APath);
   AddChildPropertiesToList(AType, ABindSourceAdapter, ABindSourceAdapter.Fields, AGetMemberObject, APath);
+  // Add Paging.CurrentPage and other BindSource related properties as fields for the BindSource
+  AddBSProperties(ABindSourceAdapter, ABindSourceAdapter.Fields);
 end;
 
 class procedure TioCommonBSABehavior.AddPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter; AFieldsList: TList<TBindSourceAdapterField>;
@@ -233,67 +248,67 @@ begin
           case LProperty.PropertyType.TypeKind of
             tkEnumeration:
               if SameText(LTypeName, 'boolean') or SameText(LTypeName, 'bool') then // 'bool' for C++
-                LCollectionEditorField := CreateRttiPropertyField<Boolean>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBoolean, APath);
+                LCollectionEditorField := CreateRttiPropertyField<Boolean>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBoolean, APath+LProperty.Name);
             tkInteger:
               begin
                 case LTypeData.OrdType of
                   otSByte: // Int8
-                    LCollectionEditorField := CreateRttiPropertyField<Int8>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath);
+                    LCollectionEditorField := CreateRttiPropertyField<Int8>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath+LProperty.Name);
                   otSWord: // Int16
-                    LCollectionEditorField := CreateRttiPropertyField<Int16>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath);
+                    LCollectionEditorField := CreateRttiPropertyField<Int16>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath+LProperty.Name);
                   otSLong: // Int32
-                    LCollectionEditorField := CreateRttiPropertyField<Int32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath);
+                    LCollectionEditorField := CreateRttiPropertyField<Int32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath+LProperty.Name);
                   otUByte: // UInt8
-                    LCollectionEditorField := CreateRttiPropertyField<UInt8>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath);
+                    LCollectionEditorField := CreateRttiPropertyField<UInt8>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name);
                   otUWord: // UInt16
-                    LCollectionEditorField := CreateRttiPropertyField<UInt16>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath);
+                    LCollectionEditorField := CreateRttiPropertyField<UInt16>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name);
                   otULong: // UInt32
-                    LCollectionEditorField := CreateRttiPropertyField<UInt32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath);
+                    LCollectionEditorField := CreateRttiPropertyField<UInt32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name);
                 else
-                  LCollectionEditorField := CreateRttiPropertyField<Integer>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath);
+                  LCollectionEditorField := CreateRttiPropertyField<Integer>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath+LProperty.Name);
                 end
               end;
             tkWChar:
-              LCollectionEditorField := CreateRttiPropertyField<Char>(LProperty, ABindSourceAdapter, AGetMemberObject, mtChar, APath);
+              LCollectionEditorField := CreateRttiPropertyField<Char>(LProperty, ABindSourceAdapter, AGetMemberObject, mtChar, APath+LProperty.Name);
             tkUString:
-              LCollectionEditorField := CreateRttiPropertyField<string>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath);
+              LCollectionEditorField := CreateRttiPropertyField<string>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath+LProperty.Name);
 {$IFNDEF NEXTGEN}
             tkChar:
-              LCollectionEditorField := CreateRttiPropertyField<AnsiChar>(LProperty, ABindSourceAdapter, AGetMemberObject, mtChar, APath);
+              LCollectionEditorField := CreateRttiPropertyField<AnsiChar>(LProperty, ABindSourceAdapter, AGetMemberObject, mtChar, APath+LProperty.Name);
             tkString:
-              LCollectionEditorField := CreateRttiPropertyField<ShortString>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath);
+              LCollectionEditorField := CreateRttiPropertyField<ShortString>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath+LProperty.Name);
             tkLString:
-              LCollectionEditorField := CreateRttiPropertyField<AnsiString>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath);
+              LCollectionEditorField := CreateRttiPropertyField<AnsiString>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath+LProperty.Name);
 {$ENDIF}
             tkFloat:
               case LTypeData^.FloatType of
                 System.TypInfo.ftSingle:
-                  LCollectionEditorField := CreateRttiPropertyField<single>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath);
+                  LCollectionEditorField := CreateRttiPropertyField<single>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath+LProperty.Name);
                 System.TypInfo.ftDouble:
                   begin
                     if LTypeInfo = System.TypeInfo(TDate) then
-                      LCollectionEditorField := CreateRttiPropertyField<TDate>(LProperty, ABindSourceAdapter, AGetMemberObject, mtDate, APath)
+                      LCollectionEditorField := CreateRttiPropertyField<TDate>(LProperty, ABindSourceAdapter, AGetMemberObject, mtDate, APath+LProperty.Name)
                     else if LTypeInfo = System.TypeInfo(TTime) then
-                      LCollectionEditorField := CreateRttiPropertyField<TTime>(LProperty, ABindSourceAdapter, AGetMemberObject, mtTime, APath)
+                      LCollectionEditorField := CreateRttiPropertyField<TTime>(LProperty, ABindSourceAdapter, AGetMemberObject, mtTime, APath+LProperty.Name)
                     else if LTypeInfo = System.TypeInfo(TDateTime) then
-                      LCollectionEditorField := CreateRttiPropertyField<TDateTime>(LProperty, ABindSourceAdapter, AGetMemberObject, mtDateTime, APath)
+                      LCollectionEditorField := CreateRttiPropertyField<TDateTime>(LProperty, ABindSourceAdapter, AGetMemberObject, mtDateTime, APath+LProperty.Name)
                     else
-                      LCollectionEditorField := CreateRttiPropertyField<double>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath);
+                      LCollectionEditorField := CreateRttiPropertyField<double>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath+LProperty.Name);
                   end;
                 ftExtended:
-                  LCollectionEditorField := CreateRttiPropertyField<Extended>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath);
+                  LCollectionEditorField := CreateRttiPropertyField<Extended>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath+LProperty.Name);
                 ftCurr:
-                  LCollectionEditorField := CreateRttiPropertyField<currency>(LProperty, ABindSourceAdapter, AGetMemberObject, mtCurrency, APath);
+                  LCollectionEditorField := CreateRttiPropertyField<currency>(LProperty, ABindSourceAdapter, AGetMemberObject, mtCurrency, APath+LProperty.Name);
                 // ftComp:  // Not supported
               else
                 Assert(False);
-                LCollectionEditorField := CreateRttiPropertyField<Extended>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath);
+                LCollectionEditorField := CreateRttiPropertyField<Extended>(LProperty, ABindSourceAdapter, AGetMemberObject, mtFloat, APath+LProperty.Name);
               end;
             tkInt64:
               if LTypeData.MinInt64Value > LTypeData.MaxInt64Value then
-                LCollectionEditorField := CreateRttiPropertyField<UInt64>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath)
+                LCollectionEditorField := CreateRttiPropertyField<UInt64>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name)
               else
-                LCollectionEditorField := CreateRttiPropertyField<Int64>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath);
+                LCollectionEditorField := CreateRttiPropertyField<Int64>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath+LProperty.Name);
             tkClass:
               begin
                 if LProperty.PropertyType.IsInstance then
@@ -310,11 +325,11 @@ begin
                   end;
                 end;
                 if LAncestor = sTStrings then
-                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtMemo, APath)
+                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtMemo, APath+LProperty.Name)
                 else if LAncestor = sTPersistent then
-                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBitmap, APath)
+                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBitmap, APath+LProperty.Name)
                 else
-                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtObject, APath)
+                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtObject, APath+LProperty.Name)
               end;
           end;
           if LCollectionEditorField <> nil then
@@ -330,6 +345,64 @@ begin
     end;
 
   end;
+end;
+
+class procedure TioCommonBSABehavior._AddBSProperty<T>(const AClassRef: TioClassRef; const APropName, ABSFUllPathPropName: String;
+  const ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject; const AMemberType: TScopeMemberType;
+  const AFieldsList: TList<TBindSourceAdapterField>);
+var
+  LPropertyType: TRttiProperty;
+  LCollectionEditorField: TBindSourceAdapterField;
+begin
+    LPropertyType := TioUtilities.GetRttiProperty(AClassRef, APropName);
+    LCollectionEditorField := CreateRttiPropertyField<T>(LPropertyType, ABindSourceAdapter, AGetMemberObject, AMemberType, ABSFUllPathPropName);
+    if LCollectionEditorField <> nil then
+    begin
+      // LCollectionEditorField.FGetMemberObject := AGetMemberObject; // Original
+      LCollectionEditorField.GetMemberObjectIntf := AGetMemberObject;
+      // LCollectionEditorField.FIndex := AFieldsList.Add(LCollectionEditorField);  // Original
+      LCollectionEditorField.SetIndex(AFieldsList.Add(LCollectionEditorField));
+      // Using class helper hack to access FIndex private field in the original class
+    end;
+end;
+
+class procedure TioCommonBSABehavior.AddBSProperties(const ABindSourceAdapter: TBindSourceAdapter; const AFieldsList: TList<TBindSourceAdapterField>);
+var
+  LBindSource: IioNotifiableBindSource;
+  LObject: TObject;
+  LGetMemberObject: IGetMemberObject;
+begin
+  // Get the bind source and exit if not assigned
+  LBindSource := (ABindSourceAdapter as IioActiveBindSourceAdapter).GetBindSource;
+  if not Assigned(LBindSource) then
+    Exit;
+
+  // Master & Detail bind source properties
+  // BindSource related properties
+  // NOTE: Mauri 21/03/2022: Ho eliminato queste proprietà virtuali automatiche relative al BindSOurce
+  //       perchè davano problemi inizialmente nei DataSet ma poi sono riuscito a risolvere, poi nel
+  //       TioPrototypeBindSource... e non sono più riuscito a risolvere. Allora visto che non sono
+  //       poi così importanti ho deciso di soprassedere almeno per ora. Rimangono cmq le proprietà
+  //       relative al Paging
+//  LObject := LBindSource as TObject;
+//  LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LObject);
+//  _AddBSProperty<Boolean>(LObject.ClassType, 'Bof', '%Bof', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+//  _AddBSProperty<Boolean>(LObject.ClassType, 'Eof', '%Eof', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+
+  // Master bind sources properties only (not detail BS)
+  if LBindSource.IsMasterBS then
+  begin
+//    // continue with BindSource related properties
+//    _AddBSProperty<Integer>(LObject.ClassType, 'ItemCount', 'ItemCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+//    _AddBSProperty<Integer>(LObject.ClassType, 'ItemIndex', 'ItemIndex', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+    // Paging relatied properties
+    LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LBindSource.Paging);
+    _AddBSProperty<Integer>(TioCommonBSAPageManager, 'CurrentPage', '%Paging.CurrentPage', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+    _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageCount', '%Paging.PageCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+    _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageSize', '%Paging.PageSize', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+    _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsFirstPage', '%Paging.IsFirstPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+    _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsLastPage', '%Paging.IsLastPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+  end
 end;
 
 class procedure TioCommonBSABehavior.AddChildPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter;
@@ -353,32 +426,32 @@ begin
   end;
 end;
 
-class function TioCommonBSABehavior.CreateRttiPropertyField<T>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter;
-  const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const APath: String): TBindSourceAdapterField;
+class function TioCommonBSABehavior.CreateRttiPropertyField<T>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter; const AGetMemberObject: IGetMemberObject;
+      AMemberType: TScopeMemberType; const AFullPathPropName: String): TBindSourceAdapterField;
 begin
   Result := nil;
   if AProperty.IsReadable then
     if AProperty.IsWritable then
-      Result := TBindSourceAdapterReadWriteField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
+      Result := TBindSourceAdapterReadWriteField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
         TioPropertyValueWriter<T>.Create, AMemberType)
     else
-      Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
+      Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
         AMemberType);
 end;
 
 class function TioCommonBSABehavior.CreateRttiObjectPropertyField<T>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter;
-  const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const APath: String): TBindSourceAdapterField;
+      const AGetMemberObject: IGetMemberObject; AMemberType: TScopeMemberType; const AFullPathPropName: String): TBindSourceAdapterField;
 begin
   Result := nil;
   if AProperty.IsReadable then
     if AProperty.IsWritable then
-      Result := TBindSourceAdapterReadWriteObjectField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
+      Result := TBindSourceAdapterReadWriteObjectField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
         TPropertyValueWriter<T>.Create, AMemberType)
     else
-      Result := TBindSourceAdapterReadObjectField<T>.Create(ABindSourceAdapter, APath + AProperty.Name,
+      Result := TBindSourceAdapterReadObjectField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
         AMemberType);
 end;
@@ -437,7 +510,6 @@ var
   LCtxt: TRTTIContext;
   LRttiType: TRttiType;
   LRttiField: TRttiProperty;
-
 begin
   // Do not inherit
   // LObject := FField.GetMemberObject; // original code
@@ -466,6 +538,13 @@ var
   LRttiType: TRttiType;
   LRttiField: TRttiProperty;
 begin
+  // NB: If it's a property relative to the BindSource then raise an exception because
+  //      these type of properties are ReadOnly
+  if FField.MemberName.StartsWith('%') then
+    raise EioException.Create(Self.ClassName, 'SetValue',
+      Format('Ooops, I see that you have used virtual fields related to some property of some bind source component (it could also be a DataSet), they are the ones whose name starts with the character "%%".' +
+      #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
+      #13#13'Please, try to Assign value to the bind source property directly by code.', [FField.MemberName]));
   // Do not inherit
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
   if LObject <> nil then
@@ -481,6 +560,18 @@ begin
   else
     raise EioException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [FField.MemberName]));
+end;
+
+{ TioBindSourceAdapterSimpleGetMemberObject }
+
+constructor TioBindSourceAdapterSimpleGetMemberObject.Create(const AMemberObject: TObject);
+begin
+  FMemberObject := AMemberObject;
+end;
+
+function TioBindSourceAdapterSimpleGetMemberObject.GetMemberObject: TObject;
+begin
+  Result := FMemberObject;
 end;
 
 end.

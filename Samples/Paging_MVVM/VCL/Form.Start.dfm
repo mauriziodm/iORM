@@ -10,7 +10,6 @@ object StartForm: TStartForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
   object PanelTop: TPanel
@@ -51,6 +50,7 @@ object StartForm: TStartForm
         'n click on the "Create items" button '
       LabelPosition = lpLeft
       TabOrder = 0
+      Text = ''
     end
   end
   object ScrollBoxClientArea: TScrollBox

@@ -7,6 +7,7 @@ object MainForm: TMainForm
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnActivate = FormActivate
   DesignerMasterStyle = 0
   object Button1: TButton
     Position.X = 296.000000000000000000
@@ -71,46 +72,77 @@ object MainForm: TMainForm
     Size.Height = 23.000000000000000000
     Size.PlatformDefault = False
   end
-  object LabelPageCount: TLabel
-    Position.X = 192.000000000000000000
-    Position.Y = 40.000000000000000000
-    Text = 'LabelPageCount'
-    TabOrder = 16
-  end
   object TimerPageCount: TTimer
     Interval = 250
-    OnTimer = TimerPageCountTimer
     Left = 352
     Top = 104
   end
-  object SpeedButton3: TSpeedButton
-    Position.X = 452.000000000000000000
-    Position.Y = 46.000000000000000000
-    Size.Width = 69.000000000000000000
-    Size.Height = 23.000000000000000000
+  object LabelCurrentPage: TLabel
+    Position.X = 81.000000000000000000
+    Position.Y = 48.000000000000000000
+    Size.Width = 32.000000000000000000
+    Size.Height = 17.000000000000000000
     Size.PlatformDefault = False
-    Text = 'Hard refresh'
-    OnClick = SpeedButton3Click
+    Text = '-33'
+    TabOrder = 16
   end
-  object SpeedButton4: TSpeedButton
-    Position.X = 540.000000000000000000
-    Position.Y = 46.000000000000000000
-    Size.Width = 69.000000000000000000
-    Size.Height = 23.000000000000000000
-    Size.PlatformDefault = False
-    Text = 'Soft refresh'
-    OnClick = SpeedButton4Click
+  object EditCUrrentPage: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 24
+    Text = '-33'
+    Position.X = 240.000000000000000000
+    Position.Y = 47.000000000000000000
+    object Label2: TLabel
+      Position.X = 140.000000000000000000
+      Position.Y = -4.000000000000000000
+      Size.Width = 32.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 16
+    end
+  end
+  object Button2: TButton
+    Position.X = 529.000000000000000000
+    Position.Y = 47.000000000000000000
+    TabOrder = 32
+    Text = 'Button2'
+    OnClick = Button2Click
   end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 44
     Top = 125
+    object LinkPropertyToFieldText: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = PBSArticles
+      FieldName = '%Paging.CurrentPage'
+      Component = LabelCurrentPage
+      ComponentProperty = 'Text'
+    end
     object LinkGridToDataSourcePBSArticles: TLinkGridToDataSource
       Category = 'Quick Bindings'
       DataSource = PBSArticles
       GridControl = Grid1
-      Columns = <>
+      Columns = <
+        item
+          MemberName = 'ID'
+        end
+        item
+          MemberName = 'Description'
+          Width = 200
+        end
+        item
+          MemberName = 'Price'
+          Width = 200
+        end>
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = PBSArticles
+      FieldName = '%Paging.CurrentPage'
+      Control = EditCUrrentPage
+      Track = False
     end
   end
   object ioFMX1: TioFMX
@@ -176,6 +208,12 @@ object MainForm: TMainForm
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
+      end
+      item
+        Name = '%Paging.CurrentPage'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = True
       end>
     ScopeMappings = <>
     TypeName = 'TArticle'

@@ -4,6 +4,7 @@ object ViewDatasetGrid: TViewDatasetGrid
   Width = 300
   Height = 500
   TabOrder = 0
+  PixelsPerInch = 96
   DesignSize = (
     300
     500)
@@ -57,8 +58,8 @@ object ViewDatasetGrid: TViewDatasetGrid
     TabOrder = 1
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
-    TitleFont.Height = -11
-    TitleFont.Name = 'Tahoma'
+    TitleFont.Height = -12
+    TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
     Columns = <
       item

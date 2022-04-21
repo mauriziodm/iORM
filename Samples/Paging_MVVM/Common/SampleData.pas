@@ -21,8 +21,7 @@ class procedure TSampleData.CheckSampleData;
 var
   LHowManyExists: Integer;
 begin
-  LHowManyExists := io.RefTo<TArticle>.GetCount;
-  if LHowManyExists = 0 then
+  if io.NotExists<TArticle> then
     CreateSampleData(1000);
 end;
 

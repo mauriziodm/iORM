@@ -14,6 +14,7 @@ type
     function IsDetailBS: boolean; override;
   public
     property ItemCount;
+    property ItemIndex;
   published
     // Published properties
     property MasterDataSet; // published: Detail

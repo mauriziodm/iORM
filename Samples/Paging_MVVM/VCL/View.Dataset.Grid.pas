@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.ExtCtrls, iORM.MVVM.Components.ViewModelBridge, Data.DB,
-  iORM.DB.Components.DataSet.Base, iORM.DB.Components.DataSet.ModelDataSet, Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids,
-  iORM.Attributes, Model;
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.ExtCtrls, Data.DB,
+  Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids,
+  iORM.Attributes, Model, iORM.MVVM.ViewModelBridge, iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet;
 
 type
 

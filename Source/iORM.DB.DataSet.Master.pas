@@ -48,6 +48,7 @@ type
     destructor Destroy; override;
     property Where;
     property ItemCount;
+    property ItemIndex;
     // Added properties
     property Persistence: TioBSPersistence read GetPersistence;
   published

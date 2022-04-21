@@ -51,6 +51,7 @@ type
     class function CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T; overload; static;
     class function GenericToString<T>(const AQualified: Boolean = False): String; static;
     class function ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType; static;
+    class function GetRttiProperty(const AClassRef: TioClassRef; APropName: String): TRttiProperty; static;
     class function ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject; static;
     class function TypeInfoToTypeName(const ATypeInfo: PTypeInfo; const AQualified: Boolean = False): String; static;
     class function SameObject(const AObj1, AObj2: Tobject): Boolean; static;
@@ -117,6 +118,11 @@ end;
 class function TioUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;
 begin
   Result := TioRttiFactory.GetRttiContext.GetType(AClassRef).AsInstance;
+end;
+
+class function TioUtilities.GetRttiProperty(const AClassRef: TioClassRef; APropName: String): TRttiProperty;
+begin
+  Result := TioRttiFactory.GetRttiContext.GetType(AClassRef).AsInstance.GetProperty(APropName);
 end;
 
 class procedure TioUtilities.ClearList(const AList: TObject);

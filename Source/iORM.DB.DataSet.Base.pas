@@ -189,8 +189,9 @@ type
   strict private
     class function _ExtractPropName(var AFullPathPropName: String): String;
     class function _ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
+    class function _GetValueForBSProp(const ADataSet: TioBSABaseDataSet; APropName: String): TValue;
   public
-    class function GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
+    class function GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String): TValue;
     class procedure SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
   end;
 
@@ -907,7 +908,7 @@ begin
     Exit;
   // Get Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and returns the value
-  LValue := TioFullPathPropertyReadWrite.GetValue(FBindSourceAdapter.Items[LRecordIndex], Field.FieldName);
+  LValue := TioFullPathPropertyReadWrite.GetValue(Self, FBindSourceAdapter.Items[LRecordIndex], Field.FieldName);
   // ---------- DATA FROM THE OBJECTS ----------
   // Move the value to the buffer
   case Field.DataType of
@@ -1345,12 +1346,48 @@ end;
 //  else
 //    Result := TValue.Empty;
 //end;
-class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
+class function TioFullPathPropertyReadWrite.GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String): TValue;
 var
   LProperty: TRttiProperty;
 begin
+  // In case of special bind source related property
+  if AFullPathPropName.StartsWith('%') then
+    Result := _GetValueForBSProp(ADataSet, AFullPathPropName)
+  // In case of normal property of the current object (cirrent record)
+  else
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
     Result := LProperty.GetValue(AObj)
+  // Else return an empty value
+  else
+    Result := TValue.Empty;
+end;
+
+class function TioFullPathPropertyReadWrite._GetValueForBSProp(const ADataSet: TioBSABaseDataSet; APropName: String): TValue;
+var
+  LProperty: TRttiProperty;
+  LBindSource: IioNotifiableBindSource;
+  LInstance: TObject;
+begin
+  // Get the bind source as IioNotifiableBindSource (return an empty value is ADataSet don't implement the interface)
+  if not Supports(ADataSet, IioNotifiableBindSource, LBindSource) then
+    Result := TValue.Empty;
+  // In case of paging related property
+  if APropName.StartsWith('%Paging.') then
+  begin
+    APropName := APropName.Replace('%Paging.', '');
+    LInstance := LBindSource.Paging as TObject;
+  end
+  else
+  // In case of bind source related property
+  if APropName.StartsWith('%') then
+  begin
+    APropName := APropName.Replace('%', '');
+    LInstance := LBindSource as TObject;
+  end;
+  // Extract the value for the specified property and instance
+  LProperty := TioUtilities.GetRttiProperty(LInstance.ClassType, APropName);
+  if Assigned(LProperty) then
+    Result := LProperty.GetValue(LInstance)
   else
     Result := TValue.Empty;
 end;
@@ -1369,6 +1406,14 @@ class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFull
 var
   LProperty: TRttiProperty;
 begin
+  // NB: If it's a property relative to the BindSource then raise an exception because
+  //      these type of properties are ReadOnly
+  if AFullPathPropName.StartsWith('%') then
+    raise EioException.Create(Self.ClassName, 'SetValue',
+      Format('Ooops, I see that you have used virtual fields related to some property of some DataSet component, they are the ones whose name starts with the character "%%".' +
+      #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
+      #13#13'Please, try to Assign the value to the DataSet property directly by code.', [AFullPathPropName]));
+
   if _ResolvePath(AObj, LProperty, AFullPathPropName) then
     LProperty.SetValue(AObj, AValue)
   else

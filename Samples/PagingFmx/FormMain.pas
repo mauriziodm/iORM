@@ -22,23 +22,25 @@ type
     SpeedButton2: TSpeedButton;
     ioFMX1: TioFMX;
     SQLIteConn: TioSQLiteConnectionDef;
-    LabelPageCount: TLabel;
     TimerPageCount: TTimer;
     ActionList1: TActionList;
     LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior;
-    SpeedButton3: TSpeedButton;
-    SpeedButton4: TSpeedButton;
     ActionList2: TActionList;
     Action1: TAction;
     LiveBindingsBindNavigateNext1: TFMXBindNavigateNext;
     PBSArticles: TioPrototypeBindSourceMaster;
-    LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
     ioBSNextPage1: TioBSNextPage;
     ioBSPrevPage1: TioBSPrevPage;
+    LabelCurrentPage: TLabel;
+    LinkPropertyToFieldText: TLinkPropertyToField;
+    EditCUrrentPage: TEdit;
+    Label2: TLabel;
+    LinkGridToDataSourcePBSArticles: TLinkGridToDataSource;
+    LinkControlToField1: TLinkControlToField;
+    Button2: TButton;
     procedure Button1Click(Sender: TObject);
-    procedure TimerPageCountTimer(Sender: TObject);
-    procedure SpeedButton3Click(Sender: TObject);
-    procedure SpeedButton4Click(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -60,19 +62,14 @@ begin
   TSampleData.CreateSampleData(Edit1.Text.ToInteger);
 end;
 
-procedure TMainForm.SpeedButton3Click(Sender: TObject);
+procedure TMainForm.Button2Click(Sender: TObject);
 begin
-//  PBSArticles.Refresh(True);
+  PBSArticles.Post;
 end;
 
-procedure TMainForm.SpeedButton4Click(Sender: TObject);
+procedure TMainForm.FormActivate(Sender: TObject);
 begin
-//  PBSArticles.Refresh(False);
-end;
-
-procedure TMainForm.TimerPageCountTimer(Sender: TObject);
-begin
-//  LabelPageCount.Text := Format('Page %d of %d', [PBSArticles.ioPaging.CurrentPage, PBSArticles.ioPaging.PageCount]);
+  PBSArticles.Active := True;
 end;
 
 end.

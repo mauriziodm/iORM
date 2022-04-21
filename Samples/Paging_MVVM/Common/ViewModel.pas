@@ -3,14 +3,13 @@ unit ViewModel;
 interface
 
 uses
-  System.SysUtils, System.Classes, iORM.MVVM.ViewModelBase, iORM.MVVM.Components.ModelPresenter, iORM.Attributes,
+  System.SysUtils, System.Classes, iORM.MVVM.ViewModel, iORM.Attributes,
   Model;
 
 type
 
   [diViewModelFor(TArticle)]
   TVM = class(TioViewModel)
-    MPArticles: TioModelPresenter;
   private
     { Private declarations }
   public
@@ -31,12 +30,12 @@ implementation
 
 procedure TVM.acNextPageExecute(Sender: TObject);
 begin
-  MPArticles.ioPaging.NextPage;
+//  MPArticles.Paging.NextPage;
 end;
 
 procedure TVM.acPrevPageExecute(Sender: TObject);
 begin
-  MPArticles.ioPaging.PrevPage;
+//  MPArticles.Paging.PrevPage;
 end;
 
 end.
