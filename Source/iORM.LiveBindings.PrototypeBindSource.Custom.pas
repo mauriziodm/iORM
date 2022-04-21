@@ -105,6 +105,9 @@ type
     function IsActive: Boolean; // IioStdActionTargetBindSource
     // Async
     procedure SetAsync(const Value: Boolean);
+    // AutoActivate
+    function GetAutoActivate: Boolean;
+    procedure SetAutoActivate(const Value: Boolean);
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -148,8 +151,6 @@ type
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
-    procedure Open;
-    procedure Close;
     procedure SetActive(const Value: Boolean); override;
     procedure Loaded; override;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
@@ -207,6 +208,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Open;
+    procedure Close;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
@@ -241,6 +244,7 @@ type
     function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   published
+    property AutoActivate: Boolean read GetAutoActivate write SetAutoActivate default False;
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
   end;
 
@@ -346,6 +350,7 @@ end;
 constructor TioPrototypeBindSourceCustom.Create(AOwner: TComponent);
 begin
   inherited;
+  AutoActivate := False;
   FAutoPost := True;
   FioLoaded := False;
   FAutoRefreshOnNotification := True;
@@ -553,6 +558,11 @@ begin
   if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
     raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter',
       Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
+end;
+
+function TioPrototypeBindSourceCustom.GetAutoActivate: Boolean;
+begin
+  Result := inherited AutoActivate;
 end;
 
 function TioPrototypeBindSourceCustom.GetAutoPost: Boolean;
@@ -862,6 +872,11 @@ begin
   // Update the adapter
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
     LActiveBSA.LoadType := Value;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetAutoActivate(const Value: Boolean);
+begin
+  inherited AutoActivate := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAutoPost(const Value: Boolean);
