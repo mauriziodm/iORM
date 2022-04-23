@@ -62,6 +62,7 @@ type
     FAutoRefreshOnNotification: Boolean;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
+    FVirtualFields: Boolean;
     // Selectors
     FSelectorFor: TioModelPresenterCustom;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -144,6 +145,8 @@ type
     procedure SetTypeAlias(const Value: String);
     // TypeName
     procedure SetTypeName(const Value: String);
+    // VirtualFields
+    function GetVirtualFields: Boolean;
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
@@ -188,6 +191,7 @@ type
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True;
+    property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
     property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
@@ -382,6 +386,7 @@ begin
   FTypeOfCollection := tcList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
+  FVirtualFields := False;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
@@ -673,6 +678,11 @@ begin
     Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
+end;
+
+function TioModelPresenterCustom.GetVirtualFields: Boolean;
+begin
+  Result := FVirtualFields;
 end;
 
 function TioModelPresenterCustom.GetWhere: IioWhere;

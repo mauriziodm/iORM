@@ -83,10 +83,13 @@ type
   // properties of also child objects of the current master object (the current object of the BindSourceAdapter);
   // eg: "Customer.Address" field name.
   TioPropertyValueReader<T> = class(TPropertyValueReader<T>)
+//  private
+//    FActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+//    procedure _CheckVirtualFields;
   public
+//    constructor Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
     function GetValue: T; override;
   end;
-
   // Use RTTI to write the value into a property
   // The ValueReader classes are used to write a value into a property relating to a field of a BindSourceAdapter
   // in the current object of the adapter itself. This particular implementation in iORM is used to access the
@@ -374,35 +377,35 @@ var
 begin
   // Get the bind source and exit if not assigned
   LBindSource := (ABindSourceAdapter as IioActiveBindSourceAdapter).GetBindSource;
-  if not Assigned(LBindSource) then
-    Exit;
-
-  // Master & Detail bind source properties
-  // BindSource related properties
-  // NOTE: Mauri 21/03/2022: Ho eliminato queste proprietà virtuali automatiche relative al BindSOurce
-  //       perchè davano problemi inizialmente nei DataSet ma poi sono riuscito a risolvere, poi nel
-  //       TioPrototypeBindSource... e non sono più riuscito a risolvere. Allora visto che non sono
-  //       poi così importanti ho deciso di soprassedere almeno per ora. Rimangono cmq le proprietà
-  //       relative al Paging
-//  LObject := LBindSource as TObject;
-//  LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LObject);
-//  _AddBSProperty<Boolean>(LObject.ClassType, 'Bof', '%Bof', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
-//  _AddBSProperty<Boolean>(LObject.ClassType, 'Eof', '%Eof', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
-
-  // Master bind sources properties only (not detail BS)
-  if LBindSource.IsMasterBS then
+  if Assigned(LBindSource) and LBindSource.VirtualFields then
   begin
-//    // continue with BindSource related properties
-//    _AddBSProperty<Integer>(LObject.ClassType, 'ItemCount', 'ItemCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
-//    _AddBSProperty<Integer>(LObject.ClassType, 'ItemIndex', 'ItemIndex', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
-    // Paging relatied properties
-    LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LBindSource.Paging);
-    _AddBSProperty<Integer>(TioCommonBSAPageManager, 'CurrentPage', '%Paging.CurrentPage', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
-    _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageCount', '%Paging.PageCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
-    _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageSize', '%Paging.PageSize', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
-    _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsFirstPage', '%Paging.IsFirstPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
-    _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsLastPage', '%Paging.IsLastPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
-  end
+    // Master & Detail bind source properties
+    // BindSource related properties
+    // NOTE: Mauri 21/03/2022: Ho eliminato queste proprietà virtuali automatiche relative al BindSOurce
+    //       perchè davano problemi inizialmente nei DataSet ma poi sono riuscito a risolvere, poi nel
+    //       TioPrototypeBindSource... e non sono più riuscito a risolvere. Allora visto che non sono
+    //       poi così importanti ho deciso di soprassedere almeno per ora. Rimangono cmq le proprietà
+    //       relative al Paging
+//    LObject := LBindSource as TObject;
+//    LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LObject);
+//    _AddBSProperty<Boolean>(LObject.ClassType, 'Bof', '%Bof', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+//    _AddBSProperty<Boolean>(LObject.ClassType, 'Eof', '%Eof', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+
+    // Master bind sources properties only (not detail BS)
+    if LBindSource.IsMasterBS then
+    begin
+//      // continue with BindSource related properties
+//      _AddBSProperty<Integer>(LObject.ClassType, 'ItemCount', 'ItemCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+//      _AddBSProperty<Integer>(LObject.ClassType, 'ItemIndex', 'ItemIndex', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+      // Paging relatied properties
+      LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LBindSource.Paging);
+      _AddBSProperty<Integer>(TioCommonBSAPageManager, 'CurrentPage', '%Paging.CurrentPage', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+      _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageCount', '%Paging.PageCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+      _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageSize', '%Paging.PageSize', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+      _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsFirstPage', '%Paging.IsFirstPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+      _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsLastPage', '%Paging.IsLastPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
+    end
+  end;
 end;
 
 class procedure TioCommonBSABehavior.AddChildPropertiesToList(AType: TRttiType; ABindSourceAdapter: TBindSourceAdapter;
@@ -504,6 +507,11 @@ end;
 
 { TioPropertyValueReader<T> }
 
+//constructor TioPropertyValueReader<T>.Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+//begin
+//  FActiveBindSourceAdapter := AActiveBindSourceAdapter;
+//end;
+
 function TioPropertyValueReader<T>.GetValue: T;
 var
   LObject: TObject;
@@ -513,6 +521,15 @@ var
 begin
   // Do not inherit
   // LObject := FField.GetMemberObject; // original code
+
+  // NB: Il codice qui sotto è stato commentato perchè in pratica non serviva a nulla visto che
+  //      se la proprietà "VirtualFields" del BindsSource era impostata a False qua non passava
+  //      per niente e passava invece se i VirtualFields erano abilitati. Di fatto quindi il controllo
+  //      non serviva a nulla e cmq se i VirtualFields sono disabilitati e ho dei campi virtuali
+  //      cmq i valori di tali campi non vengono visualizzati (NULL).
+//  if FField.MemberName.StartsWith('%') then
+//    _CheckVirtualFields;
+
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
   if LObject <> nil then
   begin
@@ -529,8 +546,16 @@ begin
     Result := TValue.Empty.AsType<T>;
 end;
 
-{ TioPropertyValueWriter<T> }
+//procedure TioPropertyValueReader<T>._CheckVirtualFields;
+//begin
+//  if FActiveBindSourceAdapter.HasBindSource and not FActiveBindSourceAdapter.GetBindSource.VirtualFields then
+//    raise EioException.Create(Self.ClassName, 'GetValue',
+//      Format('iORM trying to read the value of the "%s" virtual field declared in the component "%s".' +
+//      #13#13'I''m sorry but the "VirtualFields" property of that component is set to "False" so they are disabled.' +
+//      #13#13'Set the property to "True" and try again, it will work.', [FField.MemberName, FActiveBindSourceAdapter.GetBindSource.GetName]));
+//end;
 
+{ TioPropertyValueWriter<T> }
 procedure TioPropertyValueWriter<T>.SetValue(const AValue: T);
 var
   LObject: TObject;
@@ -542,7 +567,7 @@ begin
   //      these type of properties are ReadOnly
   if FField.MemberName.StartsWith('%') then
     raise EioException.Create(Self.ClassName, 'SetValue',
-      Format('Ooops, I see that you have used virtual fields related to some property of some bind source component (it could also be a DataSet), they are the ones whose name starts with the character "%%".' +
+      Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".' +
       #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
       #13#13'Please, try to Assign value to the bind source property directly by code.', [FField.MemberName]));
   // Do not inherit

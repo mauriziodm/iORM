@@ -32,6 +32,7 @@ type
     FAutoRefreshOnNotification: Boolean;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
+    FVirtualFields: Boolean;
     // Selectors
     FSelectorFor: TioDataSetCustom;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -98,6 +99,8 @@ type
     procedure SetTypeAlias(const Value: String);
     // TypeName
     procedure SetTypeName(const Value: String);
+    // VirtualFields
+    function GetVirtualFields: Boolean;
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
@@ -141,6 +144,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
+    property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
@@ -248,6 +252,7 @@ begin
   FTypeOfCollection := TioTypeOfCollection.tcList;
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
+  FVirtualFields := False;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
@@ -480,6 +485,11 @@ begin
     Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
+end;
+
+function TioDataSetCustom.GetVirtualFields: Boolean;
+begin
+  Result := FVirtualFields;
 end;
 
 function TioDataSetCustom.GetWhere: IioWhere;

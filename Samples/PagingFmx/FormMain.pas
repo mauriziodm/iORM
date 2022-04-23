@@ -25,9 +25,6 @@ type
     TimerPageCount: TTimer;
     ActionList1: TActionList;
     LiveBindingsBindNavigatePrior1: TFMXBindNavigatePrior;
-    ActionList2: TActionList;
-    Action1: TAction;
-    LiveBindingsBindNavigateNext1: TFMXBindNavigateNext;
     PBSArticles: TioPrototypeBindSourceMaster;
     ioBSNextPage1: TioBSNextPage;
     ioBSPrevPage1: TioBSPrevPage;

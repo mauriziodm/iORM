@@ -1371,6 +1371,12 @@ begin
   // Get the bind source as IioNotifiableBindSource (return an empty value is ADataSet don't implement the interface)
   if not Supports(ADataSet, IioNotifiableBindSource, LBindSource) then
     Result := TValue.Empty;
+  // Check if the VirtualFields are enabled
+  if not LBindSource.VirtualFields then
+    raise EioException.Create(Self.ClassName, '_GetValueForBSProp',
+      Format('iORM trying to read the value of the "%s" virtual field declared in the component "%s".' +
+      #13#13'I''m sorry but the "VirtualFields" property of that component is set to "False" so they are disabled.' +
+      #13#13'Set the property to "True" and try again, it will work.', [APropName, LBindSource.GetName]));
   // In case of paging related property
   if APropName.StartsWith('%Paging.') then
   begin
@@ -1410,7 +1416,7 @@ begin
   //      these type of properties are ReadOnly
   if AFullPathPropName.StartsWith('%') then
     raise EioException.Create(Self.ClassName, 'SetValue',
-      Format('Ooops, I see that you have used virtual fields related to some property of some DataSet component, they are the ones whose name starts with the character "%%".' +
+      Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".' +
       #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
       #13#13'Please, try to Assign the value to the DataSet property directly by code.', [AFullPathPropName]));
 

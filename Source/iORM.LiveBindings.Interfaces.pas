@@ -106,6 +106,9 @@ type
     function GetItemIndex: Integer;
     procedure SetItemIndex(const Value: Integer);
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
+    // VirtualFields
+    function GetVirtualFields: Boolean;
+    property VirtualFields: Boolean read GetVirtualFields;
   end;
 
   // Interface for standard action target bind source

@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 441
+  ClientHeight = 403
   ClientWidth = 624
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,7 +14,7 @@ object Form1: TForm1
   PixelsPerInch = 96
   DesignSize = (
     624
-    441)
+    403)
   TextHeight = 15
   object Label1: TLabel
     Left = 16
@@ -98,7 +98,7 @@ object Form1: TForm1
     Left = 8
     Top = 72
     Width = 608
-    Height = 352
+    Height = 323
     Anchors = [akLeft, akTop, akRight, akBottom]
     Ctl3D = False
     DataSource = SourceArticles
@@ -170,6 +170,7 @@ object Form1: TForm1
   end
   object DSArticles: TioDataSetMaster
     TypeName = 'TArticle'
+    VirtualFields = True
     Paging.PageSize = 10
     Paging.PagingType = ptHardPaging
     OnRecordChangeAction = rcPersistAlways

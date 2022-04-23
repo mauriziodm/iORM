@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'Form2'
-  ClientHeight = 480
+  ClientHeight = 444
   ClientWidth = 640
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -42,15 +42,15 @@ object MainForm: TMainForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     CanFocus = True
     ClipChildren = True
-    Position.X = 23.000000000000000000
+    Position.X = 8.000000000000000000
     Position.Y = 77.000000000000000000
-    Size.Width = 609.000000000000000000
-    Size.Height = 393.000000000000000000
+    Size.Width = 617.000000000000000000
+    Size.Height = 359.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 7
     RowCount = 200
-    Viewport.Width = 589.000000000000000000
-    Viewport.Height = 368.000000000000000000
+    Viewport.Width = 597.000000000000000000
+    Viewport.Height = 334.000000000000000000
   end
   object SpeedButton1: TSpeedButton
     Action = ioBSNextPage1
@@ -177,17 +177,6 @@ object MainForm: TMainForm
       TargetBindSource = PBSArticles
     end
   end
-  object ActionList2: TActionList
-    Left = 448
-    Top = 312
-    object Action1: TAction
-      Text = 'Action1'
-    end
-    object LiveBindingsBindNavigateNext1: TFMXBindNavigateNext
-      Category = 'LiveBindings'
-      Text = 'Next'
-    end
-  end
   object PBSArticles: TioPrototypeBindSourceMaster
     AutoActivate = True
     AutoPost = False
@@ -217,6 +206,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     TypeName = 'TArticle'
+    VirtualFields = True
     Paging.PageSize = 10
     Paging.PagingType = ptHardPaging
     Left = 256

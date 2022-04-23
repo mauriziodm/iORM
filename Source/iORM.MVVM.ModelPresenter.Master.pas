@@ -71,6 +71,7 @@ type
     property WhereStr; // published: Master
     property OrderBy;
     property AutoRefreshOnNotification default True;
+    property VirtualFields;
     // Published properties: selectors
     property SelectorFor;
     // Published properties: paging
