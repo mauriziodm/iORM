@@ -21,11 +21,11 @@ begin
   RegisterComponents('iORM', [TioFMX]);
 
   // Connection components
-  RegisterComponents('iORM', [TioRESTConnectionDef]);
+  RegisterComponents('iORM', [TioRemoteConnectionDef]);
   RegisterComponents('iORM', [TioSQLiteConnectionDef]);
   RegisterComponents('iORM', [TioFirebirdConnectionDef]);
   RegisterComponents('iORM', [TioSQLServerConnectionDef]);
-  RegisterSelectionEditor(TioRESTConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterSelectionEditor(TioRemoteConnectionDef, TioConnectionDefSelectionEditor);
   RegisterSelectionEditor(TioSQLiteConnectionDef, TioConnectionDefSelectionEditor);
   RegisterSelectionEditor(TioFirebirdConnectionDef, TioConnectionDefSelectionEditor);
   RegisterSelectionEditor(TioSQLServerConnectionDef, TioConnectionDefSelectionEditor);

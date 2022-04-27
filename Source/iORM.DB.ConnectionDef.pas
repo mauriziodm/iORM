@@ -139,7 +139,7 @@ type
   end;
 
   // Class for REST remoted connection
-  TioRESTConnectionDef = class(TioCustomConnectionDef)
+  TioRemoteConnectionDef = class(TioCustomConnectionDef)
   public
     constructor Create(AOwner: TComponent); override;
     procedure RegisterConnectionDef; override;
@@ -381,13 +381,13 @@ end;
 
 { TioRESTConnectionDef }
 
-constructor TioRESTConnectionDef.Create(AOwner: TComponent);
+constructor TioRemoteConnectionDef.Create(AOwner: TComponent);
 begin
   inherited;
   Persistent := True;
 end;
 
-procedure TioRESTConnectionDef.RegisterConnectionDef;
+procedure TioRemoteConnectionDef.RegisterConnectionDef;
 begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
