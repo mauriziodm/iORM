@@ -176,7 +176,14 @@ begin
     'interface' + sLineBreak +
     sLineBreak +
     'uses' + sLineBreak +
-    '  System.SysUtils, System.Classes, iORM.MVVM.ViewModel;' + sLineBreak +
+    '  System.SysUtils,' + sLineBreak +
+    '  System.Classes,' + sLineBreak +
+    '  iORM,' + sLineBreak +
+    '  iORM.Attributes,' + sLineBreak +
+    '  iORM.CommonTypes,' + sLineBreak +
+    '  iORM.Where.Interfaces,' + sLineBreak +
+    '  iORM.MVVM.Interfaces,' + sLineBreak +
+    '  iORM.MVVM.ViewModel;' + sLineBreak +
     sLineBreak +
     'type' + sLineBreak +
     sLineBreak +

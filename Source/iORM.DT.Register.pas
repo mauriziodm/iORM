@@ -11,7 +11,8 @@ uses
   iORM.DB.DataSet.Detail, iORM.DB.MemTable, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
-  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors;
+  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors,
+  iORM.DT.CompAutoUses;
 
 procedure Register;
 begin
@@ -20,16 +21,22 @@ begin
   RegisterComponents('iORM', [TioFMX]);
 
   // Connection components
-  RegisterComponents('iORM', [TioSQLMonitor]);
   RegisterComponents('iORM', [TioRESTConnectionDef]);
   RegisterComponents('iORM', [TioSQLiteConnectionDef]);
   RegisterComponents('iORM', [TioFirebirdConnectionDef]);
   RegisterComponents('iORM', [TioSQLServerConnectionDef]);
+  RegisterSelectionEditor(TioRESTConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterSelectionEditor(TioSQLiteConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterSelectionEditor(TioFirebirdConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterSelectionEditor(TioSQLServerConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterComponents('iORM', [TioSQLMonitor]);
 
   // DataSet components
+  RegisterComponents('iORM', [TioMemTable]);
   RegisterComponents('iORM', [TioDataSetMaster]);
   RegisterComponents('iORM', [TioDataSetDetail]);
-  RegisterComponents('iORM', [TioMemTable]);
+  RegisterSelectionEditor(TioDataSetMaster, TioBindSourceSelectionEditor);
+  RegisterSelectionEditor(TioDataSetDetail, TioBindSourceSelectionEditor);
 
   // LiveBindings components
   RegisterComponents('iORM', [TioPrototypeBindSourceMaster]);
@@ -44,6 +51,8 @@ begin
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoPost');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'RecordCount');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'OnCreateAdapter');
+  RegisterSelectionEditor(TioPrototypeBindSourceMaster, TioBindSourceSelectionEditor);
+  RegisterSelectionEditor(TioPrototypeBindSourceDetail, TioBindSourceSelectionEditor);
 
   // MVVM components
   RegisterComponents('iORM', [TioViewModelBridge]);
@@ -52,6 +61,10 @@ begin
   RegisterComponents('iORM', [TioModelPresenterDetail]);
   RegisterComponents('iORM', [TioModelDataSet]);
   RegisterComponents('iORM', [TioModelBindSource]);
+  RegisterSelectionEditor(TioViewModelBridge, TioMVVMSelectionEditor);
+  RegisterSelectionEditor(TioViewContextProvider, TioMVVMSelectionEditor);
+  RegisterSelectionEditor(TioModelPresenterMaster, TioBindSourceSelectionEditor);
+  RegisterSelectionEditor(TioModelPresenterDetail, TioBindSourceSelectionEditor);
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.VCL.TioBSSelectCurrent], nil);

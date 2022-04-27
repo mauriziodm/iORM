@@ -115,10 +115,6 @@ type
     property ChildTypeAlias: String read FChildTypeAlias;
   end;
 
-  // Standard AttributeLabel
-  ioMarker = class(TioCustomStringAttribute)
-  end;
-
   TioCustomForTargetModel = class(TioCustomAttribute)
   strict private
     FTargetTypeName: String;
@@ -129,6 +125,10 @@ type
     constructor Create(ATargetIID: TGUID; const AAlias: String = ''); overload;
     property TargetTypeName: String read FTargetTypeName;
     property TargetTypeAlias: String read FTargetTypeAlias;
+  end;
+
+  // Standard AttributeLabel
+  ioMarker = class(TioCustomStringAttribute)
   end;
 
   // ---------------------------------------------------------------------------
@@ -219,6 +219,7 @@ type
   // Skip attribute
   ioSkip = class(TioCustomAttribute)
   end;
+
   ioTransient = ioSkip;
 
   // ID attribute
@@ -229,6 +230,7 @@ type
     constructor Create(const ASkipOnInsert: Boolean = True);
     property SkipOnInsert: Boolean read FSkipOnInsert;
   end;
+
   ioOID = ioID; // Deprecated
 
   // FieldName attribute
@@ -250,8 +252,7 @@ type
     FIsUnicode: Boolean;
     FLength: Integer;
   public
-    constructor Create(const ALength: Integer = 255; const AIsUnicode: Boolean = True);
-      overload;
+    constructor Create(const ALength: Integer = 255; const AIsUnicode: Boolean = True); overload;
     property IsUnicode: Boolean read FIsUnicode;
     property Length: Integer read FLength;
   end;
@@ -364,6 +365,7 @@ type
   // LazyLoad attribute
   ioLazyLoad = class(TioCustomAttribute)
   end;
+
   ioLazy = ioLazyLoad;
 
   // ReadOnly attribute
@@ -414,7 +416,8 @@ type
   // TrueClass
   ioTrueClass = class(TioCustomAttribute)
   end;
-  ioClassFromField = ioTrueClass;  // DEPRECATED
+
+  ioClassFromField = ioTrueClass; // DEPRECATED
 
   // GroupBy
   ioGroupBy = class(TioCustomStringAttribute)
@@ -443,8 +446,7 @@ type
   public
     constructor Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
       const AUnique: Boolean = False); overload;
-    constructor Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
-      const AUnique: Boolean = False); overload;
+    constructor Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
     constructor Create(const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
     property IndexName: String read FIndexName;
     property CommaSepFieldList: String read FCommaSepFieldList write FCommaSepFieldList;
@@ -489,9 +491,6 @@ type
   // ---------------------------------------------------------------------------
   // END CLASS ATTRIBUTES
   // ===========================================================================
-
-
-
 
   // ===========================================================================
   // START EMBEDDED ATTRIBUTES
@@ -618,8 +617,7 @@ end;
 
 { ioIndex }
 
-constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
-  const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   inherited Create;
   FIndexName := AIndexName;
@@ -801,4 +799,3 @@ begin
 end;
 
 end.
-

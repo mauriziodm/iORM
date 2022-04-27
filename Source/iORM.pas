@@ -49,9 +49,159 @@ uses
   System.SysUtils, iORM.DependencyInjection.Interfaces,
   iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces,
   iORM.MVVM.ModelPresenter.Custom, iORM.DBBuilder.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.Attributes;
+
+const
+{$region 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+
+  // TioTypeOfCollection
+  tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
+  tcList = iORM.CommonTypes.TioTypeOfCollection.tcList;
+
+  // TioLoadType
+  ltManual = iORM.CommonTypes.TioLoadType.ltManual;
+  ltFromBSAsIs = iORM.CommonTypes.TioLoadType.ltFromBSAsIs;
+  ltFromBSReload = iORM.CommonTypes.TioLoadType.ltFromBSReload;
+  ltFromBSReloadNewInstance = iORM.CommonTypes.TioLoadType.ltFromBSReloadNewInstance;
+  ltAuto = iORM.CommonTypes.TioLoadType.ltAuto;
+
+  // TioObjStatus
+  osDirty = iORM.CommonTypes.TioObjStatus.osDirty;
+  osClean = iORM.CommonTypes.TioObjStatus.osClean;
+  osDeleted = iORM.CommonTypes.TioObjStatus.osDeleted;
+
+  // TioCompareOp
+  coEqual = iORM.CommonTypes.TioCompareOp.coEqual;
+  coNotEqual = iORM.CommonTypes.TioCompareOp.coNotEqual;
+  coGreater = iORM.CommonTypes.TioCompareOp.coGreater;
+  coLower = iORM.CommonTypes.TioCompareOp.coLower;
+  coGreaterOrEqual = iORM.CommonTypes.TioCompareOp.coGreaterOrEqual;
+  coLowerOrEqual = iORM.CommonTypes.TioCompareOp.coLowerOrEqual;
+  coLike = iORM.CommonTypes.TioCompareOp.coLike;
+  coNotLike = iORM.CommonTypes.TioCompareOp.coNotLike;
+  coIsNull = iORM.CommonTypes.TioCompareOp.coIsNull;
+  coIsNotNull = iORM.CommonTypes.TioCompareOp.coIsNotNull;
+
+  // TioLogicOp
+  loAnd = iORM.CommonTypes.TioLogicOp.loAnd;
+  loOr = iORM.CommonTypes.TioLogicOp.loOr;
+  loNot = iORM.CommonTypes.TioLogicOp.loNot;
+  loOpenPar = iORM.CommonTypes.TioLogicOp.loOpenPar;
+  loClosePar = iORM.CommonTypes.TioLogicOp.loClosePar;
+
+  // TioIndexOrientation
+  ioAscending = iORM.CommonTypes.TioIndexOrientation.ioAscending;
+  ioDescending = iORM.CommonTypes.TioIndexOrientation.ioDescending;
+
+  // TioMonitorMode
+  mmDisabled = iORM.CommonTypes.TioMonitorMode.mmDisabled;
+  mmRemote = iORM.CommonTypes.TioMonitorMode.mmRemote;
+  mmFlatFile = iORM.CommonTypes.TioMonitorMode.mmFlatFile;
+
+  // TioSelectionType
+  stAppend = iORM.CommonTypes.TioSelectionType.stAppend;
+  stInsert = iORM.CommonTypes.TioSelectionType.stInsert;
+
+{$endregion}
 
 type
+
+{$region 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+  TioCompareOp = iORM.CommonTypes.TioCompareOp;
+  TioHideWaitProc = iORM.CommonTypes.TioHideWaitProc;
+  TioIndexOrientation = iORM.CommonTypes.TioIndexOrientation;
+  TioLoadType = iORM.CommonTypes.TioLoadType;
+  TioLogicOp = iORM.CommonTypes.TioLogicOp;
+  TioObjStatus = iORM.CommonTypes.TioObjStatus;
+  TioObjVersion = iORM.CommonTypes.TioObjVersion;
+  TioSelectionType = iORM.CommonTypes.TioSelectionType;
+  TioShowWaitProc = iORM.CommonTypes.TioShowWaitProc;
+  TioTypeOfCollection = iORM.CommonTypes.TioTypeOfCollection;
+
+  IioWhere = iORM.Where.Interfaces.IioWhere;
+
+  TioActionEvent = iORM.Attributes.TioActionEvent;
+  TioMapModeType = iORM.Attributes.TioMapModeType;
+  TioRelationType = iORM.Attributes.TioRelationType;
+  TioFKAction = iORM.Attributes.TioFKAction;
+  TioFKCreate = iORM.Attributes.TioFKCreate;
+  TioJoinType = iORM.Attributes.TioJoinType;
+{$endregion}
+
+{$region 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+
+  ioMarker = iORM.Attributes.ioMarker;
+
+  // MVVM attributes
+  ioAction = iORM.Attributes.ioAction;
+  ioBindAction = iORM.Attributes.ioBindAction;
+  ioUniBindAction = iORM.Attributes.ioUniBindAction;
+  ioCommand = iORM.Attributes.ioCommand;
+  ioDisabled = iORM.Attributes.ioDisabled;
+  ioChecked = iORM.Attributes.ioChecked;
+  ioGroupIndex = iORM.Attributes.ioGroupIndex;
+  ioHint = iORM.Attributes.ioHint;
+  ioImageIndex = iORM.Attributes.ioImageIndex;
+  ioInvisible = iORM.Attributes.ioInvisible;
+  ioNotificationTarget = iORM.Attributes.ioNotificationTarget;
+
+  // Property attributes
+  ioSkip = iORM.Attributes.ioSkip;
+  ioTransient = iORM.Attributes.ioTransient;
+  ioID = iORM.Attributes.ioID;
+  ioOID = iORM.Attributes.ioOID;
+  ioField = iORM.Attributes.ioField;
+  ioNotNull = iORM.Attributes.ioNotNull;
+  ioLoadSQL = iORM.Attributes.ioLoadSQL;
+  ioFieldType = iORM.Attributes.ioFieldType;
+  ioVarchar = iORM.Attributes.ioVarchar;
+  ioChar = iORM.Attributes.ioChar;
+  ioInteger = iORM.Attributes.ioInteger;
+  ioFloat = iORM.Attributes.ioFloat;
+  ioDate = iORM.Attributes.ioDate;
+  ioTime = iORM.Attributes.ioTime;
+  ioDateTime = iORM.Attributes.ioDateTime;
+  ioBoolean = iORM.Attributes.ioBoolean;
+  ioDecimal = iORM.Attributes.ioDecimal;
+  ioNumeric = iORM.Attributes.ioNumeric;
+  ioBinary = iORM.Attributes.ioBinary;
+  ioDefault = iORM.Attributes.ioDefault;
+  ioFTCustom = iORM.Attributes.ioFTCustom;
+  ioForeignKey = iORM.Attributes.ioForeignKey;
+  ioLazyLoad = iORM.Attributes.ioLazyLoad;
+  ioLazy = iORM.Attributes.ioLazy;
+  ioLoadOnly = iORM.Attributes.ioLoadOnly;
+  ioPersistOnly = iORM.Attributes.ioPersistOnly;
+  ioTypeAlias = iORM.Attributes.ioTypeAlias;
+  ioBelongsTo = iORM.Attributes.ioBelongsTo;
+  ioHasMany = iORM.Attributes.ioHasMany;
+  ioHasOne = iORM.Attributes.ioHasOne;
+  ioEmbeddedHasMany = iORM.Attributes.ioEmbeddedHasMany;
+  ioEmbeddedHasOne = iORM.Attributes.ioEmbeddedHasOne;
+  ioDisableRelationAutodetect = iORM.Attributes.ioDisableRelationAutodetect;
+
+  // Class attributes
+  ioEntity = iORM.Attributes.ioEntity;
+  ioKeyGenerator = iORM.Attributes.ioKeyGenerator;
+  ioKeySequence = iORM.Attributes.ioKeySequence;
+  ioConnectionDefName = iORM.Attributes.ioConnectionDefName;
+  ioTrueClass = iORM.Attributes.ioTrueClass;
+  ioGroupBy = iORM.Attributes.ioGroupBy;
+  ioJoin = iORM.Attributes.ioJoin;
+  ioIndex = iORM.Attributes.ioIndex;
+  ioDisableAutoCreateOnDB = iORM.Attributes.ioDisableAutoCreateOnDB;
+
+  // Dependency Injection attributes
+  diRegister = iORM.Attributes.diRegister;
+  diImplements = iORM.Attributes.diImplements;
+  diDoNotRegisterAsInterfacedEntity = iORM.Attributes.diDoNotRegisterAsInterfacedEntity;
+  diAsSingleton = iORM.Attributes.diAsSingleton;
+  diViewFor = iORM.Attributes.diViewFor;
+  diViewModelFor = iORM.Attributes.diViewModelFor;
+  ioInject = iORM.Attributes.ioInject;
+
+{$endregion}
+
 
   io = class
   public
@@ -288,7 +438,6 @@ uses
   iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory,
   iORM.DuckTyped.StreamObject,
-  iORM.Attributes,
   iORM.Exceptions,
   iORM.DB.Factory,
   iORM.Utilities,
