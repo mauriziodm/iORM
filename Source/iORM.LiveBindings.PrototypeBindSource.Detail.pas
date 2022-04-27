@@ -8,10 +8,9 @@ uses
 type
 
   TioPrototypeBindSourceDetail = class(TioPrototypeBindSourceCustom)
-  protected
+  public
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
-  public
     property ItemCount;
   published
     // Published properties

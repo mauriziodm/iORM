@@ -126,7 +126,7 @@ class procedure TioObjectMakerWithIioListLazy.LoadPropertyHasManyWithIioListLazy
 var
   LChildObject: TObject;
   LLazyLoadableObj: IioLazyLoadable;
-  LWhere, LDetailWhere: IioWhere;
+  LDetailWhere: IioWhere;
 begin
   // Get the child object if already assigned
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);

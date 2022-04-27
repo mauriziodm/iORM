@@ -8,10 +8,9 @@ uses
 type
 
   TioModelPresenterDetail = class(TioModelPresenterCustom)
-  protected
+  public
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
-  public
     property Active;
     property ItemCount;
   published

@@ -113,7 +113,7 @@ type
     procedure Loaded; override;
     function GetName: String;
     procedure DoAfterOpen; override;
-    procedure DoBeforeCLose; override;
+    procedure DoBeforeClose; override;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Selectors related event for TObject selection
@@ -365,7 +365,7 @@ begin
     FonAfterSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
-procedure TioDataSetCustom.DoBeforeCLose;
+procedure TioDataSetCustom.DoBeforeClose;
 begin
   inherited;
   OpenCLoseDetails(False);

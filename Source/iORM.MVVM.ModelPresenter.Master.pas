@@ -17,8 +17,6 @@ type
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
-    // MasterPresenter
-    procedure SetMasterPresenter(const Value: TioModelPresenterCustom); override;
     // SourceModelPresenter
     function GetSourcePresenter: TioModelPresenterCustom;
     procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
@@ -43,17 +41,19 @@ type
     function PostPonedActivation_CanOpen(const ANewDataObject: TObject): Boolean;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); override;
     procedure SetActive(const Value: Boolean); override;
-    function IsMasterBS: Boolean; override;
-    function IsDetailBS: Boolean; override;
     // procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
     // procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
     // LoadType
     procedure SetLoadType(const Value: TioLoadType); override;
+    // MasterPresenter
+    procedure SetMasterPresenter(const Value: TioModelPresenterCustom); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Open; override;
     procedure Close; override;
+    function IsMasterBS: Boolean; override;
+    function IsDetailBS: Boolean; override;
     property Active;
     property Where;
     property ItemCount;

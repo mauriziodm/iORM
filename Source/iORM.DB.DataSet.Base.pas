@@ -1368,6 +1368,7 @@ var
   LBindSource: IioNotifiableBindSource;
   LInstance: TObject;
 begin
+  LInstance := nil;
   // Get the bind source as IioNotifiableBindSource (return an empty value is ADataSet don't implement the interface)
   if not Supports(ADataSet, IioNotifiableBindSource, LBindSource) then
     Result := TValue.Empty;
@@ -1389,7 +1390,10 @@ begin
   begin
     APropName := APropName.Replace('%', '');
     LInstance := LBindSource as TObject;
-  end;
+  end
+  // Else return an empty value
+  else
+    Result := TValue.Empty;
   // Extract the value for the specified property and instance
   LProperty := TioUtilities.GetRttiProperty(LInstance.ClassType, APropName);
   if Assigned(LProperty) then

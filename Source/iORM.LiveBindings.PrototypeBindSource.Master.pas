@@ -38,8 +38,6 @@ type
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
     // procedure DoBeforeOpen; // In TioDataSetMaster is DoBeforeOpen but here is SetActive
   protected
-    function IsMasterBS: boolean; override;
-    function IsDetailBS: boolean; override;
     procedure SetActive(const Value: Boolean); override; // In TioDataSetMaster is DoBeforeOpen/DoAfterOpen/DoBeforeClose but here is SetActive
     procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioDataSetMaster is DoBeforeScroll but here is PosChanging
     // LoadType
@@ -47,6 +45,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function IsMasterBS: boolean; override;
+    function IsDetailBS: boolean; override;
     property Where;
     property ItemCount;
     // Added properties

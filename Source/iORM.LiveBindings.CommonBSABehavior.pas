@@ -372,7 +372,7 @@ end;
 class procedure TioCommonBSABehavior.AddBSProperties(const ABindSourceAdapter: TBindSourceAdapter; const AFieldsList: TList<TBindSourceAdapterField>);
 var
   LBindSource: IioNotifiableBindSource;
-  LObject: TObject;
+//  LObject: TObject;
   LGetMemberObject: IGetMemberObject;
 begin
   // Get the bind source and exit if not assigned

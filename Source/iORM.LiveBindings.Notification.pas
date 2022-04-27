@@ -57,7 +57,8 @@ type
     constructor Create(const ANotificationType: TioBSNotificationType);
     constructor CreateDeleteSmartNotification(const ADeletedObj: TObject);
     constructor CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);
-    constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
+    constructor CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String;
+      const ADummyParamToAvoidDuplicateIdenticalParametersWarning: Boolean = False);
   end;
 
 implementation
@@ -194,7 +195,8 @@ begin
   PayloadAsString := AMasterPropertyPath;
 end;
 
-constructor TioBSNotification.CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String);
+constructor TioBSNotification.CreateSUDRegisterObjOnPost(const ACurrentObj: TObject; const AMasterPropertyPath: String;
+  const ADummyParamToAvoidDuplicateIdenticalParametersWarning: Boolean = False);
 begin
   // Initialization
   NotificationType := ntSUD_RegisterObjOnPost;

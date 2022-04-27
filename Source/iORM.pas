@@ -678,7 +678,6 @@ end;
 class procedure io.ReloadList(const AListObject: TObject; const ALazy: boolean; const ALazyProps: String);
 var
   LDuckList: IioDuckTypedList;
-  LItem: TObject;
   I: Integer;
 begin
   LDuckList := TioDuckTypedFactory.DuckTypedList(AListObject);

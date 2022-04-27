@@ -9,10 +9,9 @@ uses
 type
 
   TioDataSetDetail = class(TioDataSetCustom)
-  protected
+  public
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
-  public
     property ItemCount;
     property ItemIndex;
   published
