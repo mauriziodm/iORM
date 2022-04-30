@@ -357,29 +357,40 @@ class function omEngine.DeserializeClass(const AJSONValue: TJSONValue; const AVa
   const AParams: IomParams): TValue;
 var
   LChildObj: TObject;
+  LJustCreated: Boolean;
 begin
   // Init
   LChildObj := nil;
+  LJustCreated := False;
   // If the Property/Field is valid then try to get the value (Object) from the
-  // master object else the MasterObject itself is the destination of the deserialization
+  //  master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
     if TDuckPropField.IsValidPropField(APropField) then
-      LChildObj := TioUtilities.TValueToObject(TDuckPropField.GetValue(AMasterObj, APropField))
+      LChildObj := TioUtilities.TValueToObject(   TDuckPropField.GetValue(AMasterObj, APropField)   )
     else
       LChildObj := AMasterObj;
   // If the LChildObj is not assigned and the AValueType is assigned then
-  // create the LChildObj of the type specified by the AValueType parameter,
-  // PS: normally used by DeserializeList or other collection deserialization
+  //  create the LChildObj of the type specified by the AValueType parameter,
+  //  PS: normally used by DeserializeList or other collection deserialization
   if Assigned(AValueType) and (not Assigned(LChildObj)) then // and (not AParams.TypeAnnotations) then
+  begin
     LChildObj := TRTTIUtils.CreateObject(AValueType.QualifiedName);
+    LJustCreated := True;
+  end;
   // Deserialize
   DeserializeClassCommon(LChildObj, AJSONValue, APropField, AParams);
   // Make the result TValue
-  // NB: If the MasterObj is assigned return an empty TValue because if the
-  // deserialized object is a detail of a MasterObject the creation of the
-  // child object is responsibility of the Master object itself, so the
-  // child object is already assigned to the master object property.
-  if Assigned(AMasterObj) then
+  //  NB: If the MasterObj is assigned return an empty TValue because if the
+  //       deserialized object is a detail of a MasterObject the creation of the
+  //       child object is responsibility of the Master object itself, so the
+  //       child object is already assigned to the master object property.
+//  if Assigned(AMasterObj) then
+  // Code modified to resolve the issue of Maxim Sysoev when trying to deserialize
+  //  an instance of a class like TMyClass<T> where T maybe every type (no constraint)
+  //  and the class don't create itself the internal field of type <T> (when T is a class).
+  if (Assigned(AMasterObj) and not Assigned(LChildObj))
+  or not LJustCreated
+  then
     Result := TValue.Empty
   else
     TValue.Make(@LChildObj, LChildObj.ClassInfo, Result);

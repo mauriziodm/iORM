@@ -145,7 +145,7 @@ begin
   // Get the IioRESTRequestBody
   LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body);
   // Execute iORM call
-  LCount := io.RefTo(LRequestBody.Where).GetCount;
+  LCount := io.RefTo(LRequestBody.Where).Count;
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRESTFactory.NewResponseBody;
   LResponseBody.JSONDataValue := TJSONNumber.Create(LCount);
@@ -270,8 +270,7 @@ begin
   // Get the IioRESTRequestBody
   LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
   // Execute iORM call
-  io.PersistCollection(LRequestBody.DataObject,
-                       LRequestBody.BlindInsert);
+  io.PersistCollection(LRequestBody.DataObject, LRequestBody.BlindInsert);
   // Return the updated/inserted DataObject back to the client for new IDs
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRESTFactory.NewResponseBody;
@@ -288,10 +287,11 @@ begin
   // Get the IioRESTRequestBody
   LRequestBody := TioRESTFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
   // Execute iORM call
-  io.Persist(LRequestBody.DataObject,
-             LRequestBody.RelationPropertyName,
-             LRequestBody.RelationOID,
-             LRequestBody.BlindInsert);  // ConnectionName
+  // NB: Gli ultimi 3 parametri (quelli aggiunti per lo Smart Update Detection S.U.D.) li passo vuoti
+  //      perchè il sistema SUD serve per capire se l'oggetto deve effettivamente essere persistito o no
+  //      ma se arriva qui è già stato controllato ed è già stato deciso che deve essere persistito;
+  //      passandolo vuoto semplicemente, a destinazione, sarà persistito senza più ulteriori controlli.
+  io._PersistInternal(LRequestBody.DataObject, LRequestBody.RelationPropertyName, LRequestBody.RelationOID, LRequestBody.BlindInsert, nil, '', '');
   // Return the updated/inserted DataObject back to the client for new IDs
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRESTFactory.NewResponseBody;
