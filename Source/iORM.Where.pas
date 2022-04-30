@@ -70,8 +70,10 @@ type
     // del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
     // M.M. 12/06/21
     // Aggiunto attributo per non serializzare l'oggetto TioCommonBSAPageManager
-    [DoNotSerializeAttribute]
-    FPagingObj: TioCommonBSAPageManager;
+    // Mauri 30/04/22 aggiunto campo FPagingObjExists per risolvere un problema con RemoteConnection
+    //        (dopo la deserializzazione lato server era in uno stato non ben definito)
+    [DoNotSerializeAttribute] FPagingObj: TioCommonBSAPageManager;
+    [DoNotSerializeAttribute] FPagingObjExists: Boolean;
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
@@ -668,7 +670,6 @@ end;
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
-
   FDisableTrueClass := False;
   FLazyLoad := False;
   FLazyProps := '';
@@ -678,6 +679,7 @@ begin
   FLimitRows := 0;
   FLimitOffset := 0;
   FPagingObj := nil;
+  FPagingObjExists := False;
   FClearListBefore := False;
 end;
 
@@ -821,7 +823,7 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
-  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.Enabled then
+  if FPagingObjExists and (Result = 0) and (FPagingObj <> nil) and FPagingObj.Enabled then
     Result := FPagingObj.GetSqlLimitOffset;
 end;
 
@@ -831,7 +833,7 @@ begin
   // Eventuali parametri limit e offset specificati manualmente hanno la precedenza
   // se però non ci sono e un PagingObj (TioCommonBSAPageManager) è assegnato e
   // attivo allora chiede a lui
-  if (Result = 0) and Assigned(FPagingObj) and FPagingObj.Enabled then
+  if FPagingObjExists and (Result = 0) and (FPagingObj <> nil) and FPagingObj.Enabled then
     Result := FPagingObj.GetSqlLimit;
 end;
 
@@ -916,6 +918,7 @@ end;
 procedure TioWhere.SetPagingObj(const APagingObj: TObject);
 begin
   FPagingObj := APagingObj as TioCommonBSAPageManager;
+  FPagingObjExists := Assigned(FPagingObj);
 end;
 
 function TioWhere.IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
@@ -1367,7 +1370,7 @@ begin
   if Assigned(AWhereCond) then
     for AItem in AWhereCond.GetWhereItems do
       Self.FWhereItems.Add(AItem);
-  FPagingObj := AWhereCond.GetPagingObj as TioCommonBSAPageManager;
+  SetPagingObj(AWhereCond.GetPagingObj);
   FDetailsContainer := AWhereCond.Details;
   FOrderBy := AWhereCond.GetOrderByInstance;
 end;

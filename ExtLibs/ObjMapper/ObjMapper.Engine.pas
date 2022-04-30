@@ -714,7 +714,8 @@ begin
   begin
     if AJSONValue is TJSONTrue then
       Result := True
-    else if AJSONValue is TJSONFalse then
+    else
+    if (AJSONValue = nil) or (AJSONValue is TJSONFalse) then
       Result := False
     else
       raise EMapperException.Create('Invalid value for boolean value ');
