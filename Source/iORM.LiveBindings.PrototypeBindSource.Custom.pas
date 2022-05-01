@@ -325,8 +325,8 @@ end;
 
 function TioPrototypeBindSourceCustom.CanDoSelection: Boolean;
 begin
-  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and FSelectorFor.GetActiveBindSourceAdapter.Notify(Self,
-    TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
+  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and
+    FSelectorFor.GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
 end;
 
 function TioPrototypeBindSourceCustom.CheckActiveAdapter: Boolean;
@@ -448,37 +448,38 @@ begin
   // retrieve a BindSourceAdapter automagically by iORM
   if ADataObject = nil then
   begin
-// ----- OLD CODE -----
-//    // If this is a master bind source then retrieve the ABSA from the factory
-//    if IsMasterBS then
-//    begin
-//      if TypeName.IsEmpty then
-//        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
-//      ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-//        ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
-//    end
-//    // If this is a detail BindSource then retrieve the adapter from the master BindSource
-//    else
-//    begin
-//      if FMasterBindSource = nil then
-//        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
-//      if FMasterPropertyName.IsEmpty then
-//        raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
-//      ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
-//        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
-//    end;
-// ----- OLD CODE -----
+    // ----- OLD CODE -----
+    // // If this is a master bind source then retrieve the ABSA from the factory
+    // if IsMasterBS then
+    // begin
+    // if TypeName.IsEmpty then
+    // raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
+    // ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
+    // ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
+    // end
+    // // If this is a detail BindSource then retrieve the adapter from the master BindSource
+    // else
+    // begin
+    // if FMasterBindSource = nil then
+    // raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
+    // if FMasterPropertyName.IsEmpty then
+    // raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
+    // ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
+    // TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
+    // end;
+    // ----- OLD CODE -----
 
     // If it is a detail bind source then get the detail BSA from the master bind source,
-    //   else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
-    //   then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
+    // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
+    // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
     if IsDetailBS then
-      ADataObject := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName, TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
-    else
-    if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+      ADataObject := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName,
+        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
+    else if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
       ADataObject := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource).AsTBindSourceAdapter
     else
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, Name, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
+      ADataObject := TioLiveBindingsFactory.GetBSA(Self, Name, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
+        ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
@@ -727,6 +728,9 @@ procedure TioPrototypeBindSourceCustom.Loaded;
 var
   LAdapter: TBindSourceAdapter;
 begin
+  // Qui forzo l'AutoPost a True perchè ridichiarare la proprietà con default = True
+  //  non è stato sufficiente anche perchè il getter e setter sono privati e statici nell'antenato.
+  AutoPost := True;
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
   if not(csDesigning in ComponentState) then
@@ -738,10 +742,8 @@ begin
   if IsDetailBS and not(csDesigning in ComponentState) then
   begin
     if not Assigned(FMasterBindSource) then
-      raise EioException.Create(ClassName, 'Loaded',
-        Format('The "MasterBindSource" property has not been set in the component "%s".'
-        + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
-       [Name]));
+      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterBindSource" property has not been set in the component "%s".' +
+        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
     MasterBindSource.RegisterDetailBindSource(Self);
   end;
   // ===========================================================================
