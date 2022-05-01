@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Data.DB, Vcl.Grids, Vcl.DBGrids,
   System.Classes, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, iORM.DB.ConnectionDef, iORM.Abstraction.VCL, Vcl.ExtCtrls,
-  iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Vcl.DBCtrls, Vcl.Mask, iORM, iORM.DBBuilder.Interfaces;
+  iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Vcl.DBCtrls, Vcl.Mask, iORM, iORM.DBBuilder.Interfaces, iORM.Attributes, iORM.CommonTypes,
+  iORM.Where.Interfaces;
 
 type
   TForm1 = class(TForm)

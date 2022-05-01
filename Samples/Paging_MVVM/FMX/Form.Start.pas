@@ -4,8 +4,9 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, iORM.AbstractionLayer.Framework.FMX,
-  iORM.DB.ConnectionDef, FMX.TabControl, iORM.DBBuilder.Interfaces, iORM.Abstraction.FMX;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
+  iORM.DB.ConnectionDef, FMX.TabControl, iORM.DBBuilder.Interfaces,
+  iORM.Abstraction.FMX, iORM, iORM.Attributes, iORM.CommonTypes;
 
 type
   TStartForm = class(TForm)
@@ -30,7 +31,7 @@ var
 implementation
 
 uses
-  SampleData, Model, iORM, iORM.MVVM.Interfaces;
+  SampleData, Model, iORM.MVVM.Interfaces;
 
 {$R *.fmx}
 

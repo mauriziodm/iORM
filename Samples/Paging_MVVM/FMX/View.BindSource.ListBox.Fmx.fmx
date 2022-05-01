@@ -246,8 +246,8 @@ object ViewBindSourceListBoxFmx: TViewBindSourceListBoxFmx
     DefaultItemStyles.ItemStyle = ''
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
-    Viewport.Width = 280.000000000000000000
-    Viewport.Height = 456.000000000000000000
+    Viewport.Width = 300.000000000000000000
+    Viewport.Height = 460.000000000000000000
   end
   object VMBridge: TioViewModelBridge
     Left = 136

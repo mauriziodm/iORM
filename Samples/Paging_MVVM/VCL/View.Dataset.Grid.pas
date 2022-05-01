@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.ExtCtrls, Data.DB,
   Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids,
-  iORM.Attributes, Model, iORM.MVVM.ViewModelBridge, iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet;
+  iORM.Attributes, Model, iORM.MVVM.ViewModelBridge, iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet, iORM, iORM.CommonTypes, iORM.MVVM.Interfaces;
 
 type
 
@@ -29,7 +29,6 @@ type
     { Private declarations }
   public
     { Public declarations }
-    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
@@ -37,11 +36,5 @@ implementation
 {$R *.dfm}
 
 { TFrameDatasetBase }
-
-constructor TViewDatasetGrid.Create(AOwner: TComponent);
-begin
-  inherited;
-  MDSArticles.Open;
-end;
 
 end.

@@ -179,7 +179,6 @@ object MainForm: TMainForm
   end
   object PBSArticles: TioPrototypeBindSourceMaster
     AutoActivate = True
-    AutoPost = False
     FieldDefs = <
       item
         Name = 'ID'
@@ -207,8 +206,7 @@ object MainForm: TMainForm
     ScopeMappings = <>
     TypeName = 'TArticle'
     VirtualFields = True
-    Paging.PageSize = 10
-    Paging.PagingType = ptHardPaging
+    Paging.PagingType = ptProgressiveAuto
     Left = 256
     Top = 216
   end

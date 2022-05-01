@@ -9,7 +9,7 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, FMX.ScrollBox, FMX.Grid, Data.Bind.GenData,
   Fmx.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Grid,
   System.Actions, FMX.ActnList, Fmx.Bind.Navigator, iORM.DB.ConnectionDef, iORM.Abstraction.FMX, iORM.LiveBindings.PrototypeBindSource.Custom,
-  iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx;
+  iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.Where.Interfaces;
 
 type
   TMainForm = class(TForm)

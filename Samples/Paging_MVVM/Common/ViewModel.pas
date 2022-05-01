@@ -4,12 +4,14 @@ interface
 
 uses
   System.SysUtils, System.Classes, iORM.MVVM.ViewModel, iORM.Attributes,
-  Model;
+  Model, iORM, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master;
 
 type
 
   [diViewModelFor(TArticle)]
   TVM = class(TioViewModel)
+    MPArticles: TioModelPresenterMaster;
+    procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
     { Private declarations }
   public
@@ -30,12 +32,18 @@ implementation
 
 procedure TVM.acNextPageExecute(Sender: TObject);
 begin
-//  MPArticles.Paging.NextPage;
+  MPArticles.Paging.NextPage;
 end;
 
 procedure TVM.acPrevPageExecute(Sender: TObject);
 begin
-//  MPArticles.Paging.PrevPage;
+  MPArticles.Paging.PrevPage;
+end;
+
+procedure TVM.ioViewModelViewPairing(const Sender: TioViewModel);
+begin
+  inherited;
+  MPArticles.Open;
 end;
 
 end.
