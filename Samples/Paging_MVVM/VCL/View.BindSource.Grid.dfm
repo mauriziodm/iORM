@@ -1,17 +1,16 @@
 object ViewBindSourceGrid: TViewBindSourceGrid
   Left = 0
   Top = 0
-  Width = 300
-  Height = 500
+  Width = 528
+  Height = 804
   TabOrder = 0
-  PixelsPerInch = 96
   DesignSize = (
-    300
-    500)
+    528
+    804)
   object ViewPanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 300
+    Width = 528
     Height = 50
     Align = alTop
     BevelOuter = bvNone
@@ -33,7 +32,7 @@ object ViewBindSourceGrid: TViewBindSourceGrid
     object LabelTitle: TLabel
       Left = 0
       Top = 0
-      Width = 300
+      Width = 528
       Height = 20
       Align = alTop
       Alignment = taCenter
@@ -46,18 +45,19 @@ object ViewBindSourceGrid: TViewBindSourceGrid
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlBottom
+      ExplicitWidth = 300
     end
   end
   object StringGrid1: TStringGrid
     Tag = 3
     Left = 3
     Top = 50
-    Width = 294
-    Height = 447
+    Width = 522
+    Height = 751
     Anchors = [akLeft, akTop, akRight, akBottom]
     ColCount = 3
     FixedCols = 0
-    RowCount = 201
+    RowCount = 2
     TabOrder = 1
     ColWidths = (
       40
@@ -69,8 +69,8 @@ object ViewBindSourceGrid: TViewBindSourceGrid
       1)
   end
   object MBSArticles: TioModelBindSource
-    AutoActivate = True
-    AutoPost = False
+    AutoActivate = False
+    AutoPost = True
     FieldDefs = <
       item
         Name = 'ID'
@@ -93,7 +93,7 @@ object ViewBindSourceGrid: TViewBindSourceGrid
     ViewModelBridge = VMBridge
     ModelPresenter = 'MPArticles'
     Left = 224
-    Top = 128
+    Top = 184
   end
   object VMBridge: TioViewModelBridge
     Left = 224
@@ -103,7 +103,7 @@ object ViewBindSourceGrid: TViewBindSourceGrid
     Methods = <>
     OutputConverters = <>
     Left = 220
-    Top = 189
+    Top = 293
     object LinkGridToDataSourceMBSArticles: TLinkGridToDataSource
       Category = 'Quick Bindings'
       DataSource = MBSArticles

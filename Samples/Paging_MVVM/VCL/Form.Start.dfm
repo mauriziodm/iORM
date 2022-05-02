@@ -10,7 +10,6 @@ object StartForm: TStartForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  PixelsPerInch = 96
   TextHeight = 13
   object PanelTop: TPanel
     Left = 0

@@ -191,6 +191,9 @@ procedure TioModelBindSource.Loaded;
 var
   LAdapter: TBindSourceAdapter;
 begin
+  // Qui forzo l'AutoPost a True perchè ridichiarare la proprietà con default = True
+  //  non è stato sufficiente anche perchè il getter e setter sono privati e statici nell'antenato.
+  AutoPost := True;
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
   if not(csDesigning in ComponentState) then
@@ -264,8 +267,11 @@ var
   LBSPersistenceClient: IioBSPersistenceClient;
 begin
   inherited;
-  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
-    LBSPersistenceClient.Persistence.Clear(False);
+  if not (csDesigning in ComponentState) then
+  begin
+    if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+      LBSPersistenceClient.Persistence.Clear(False);
+  end;
 end;
 
 procedure TioModelBindSource.SetViewModelBridge(const AVMBridge: TioViewModelBridge);

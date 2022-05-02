@@ -1,14 +1,14 @@
 object VM: TVM
   OnViewPairing = ioViewModelViewPairing
-  Height = 201
-  Width = 389
-  PixelsPerInch = 96
+  Height = 402
+  Width = 778
+  PixelsPerInch = 192
   object MPArticles: TioModelPresenterMaster
     AsDefault = True
     TypeName = 'TArticle'
     Paging.PageSize = 10
     Paging.PagingType = ptHardPaging
-    Left = 144
-    Top = 56
+    Left = 288
+    Top = 112
   end
 end

@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Buttons,
   Vcl.StdCtrls, Vcl.ExtCtrls, SampleData, System.Classes, System.Actions, iORM.MVVM.ViewContextProvider,
-  iORM.DB.ConnectionDef, iORM.Abstraction.VCL, Vcl.Mask;
+  iORM.DB.ConnectionDef, iORM.Abstraction.VCL, Vcl.Mask, iORM, iORM.Attributes,
+  iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.MVVM.Interfaces;
 
 type
   TStartForm = class(TForm)
