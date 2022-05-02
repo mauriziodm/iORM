@@ -206,6 +206,7 @@ object MainForm: TMainForm
     ScopeMappings = <>
     TypeName = 'TArticle'
     VirtualFields = True
+    Paging.PageSize = 10
     Paging.PagingType = ptProgressiveAuto
     Left = 256
     Top = 216
