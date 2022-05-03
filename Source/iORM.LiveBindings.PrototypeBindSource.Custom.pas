@@ -49,6 +49,7 @@ type
 
   TioPrototypeBindSourceCustom = class abstract(TPrototypeBindSource, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
+    FBindSourceAdapter: IioActiveBindSourceAdapter;
     FTypeName: String;
     FTypeAlias: String;
     FLoadType: TioLoadType;
@@ -65,6 +66,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
+    FPreview: Boolean;
     // Selectors
     FSelectorFor: TioPrototypeBindSourceCustom;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -102,7 +104,7 @@ type
     function __ObjRelease: Integer; override;
 {$ENDIF}
     // =========================================================================
-    function AdapterExists: Boolean; // IioNotifiableBindSource
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean; // IioStdActionTargetBindSource
     // Async
     procedure SetAsync(const Value: Boolean);
@@ -137,6 +139,8 @@ type
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
+    // Preview
+    procedure SetPreview(const Value: Boolean);
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -156,7 +160,6 @@ type
   protected
     procedure SetActive(const Value: Boolean); override;
     procedure Loaded; override;
-    procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     function CheckActiveAdapter: Boolean;
     function GetName: String;
     // Selectors related event for TObject selection
@@ -250,6 +253,7 @@ type
   published
     property AutoActivate: Boolean read GetAutoActivate write SetAutoActivate default False;
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
+    property Preview: Boolean read FPreview write SetPreview default False;
   end;
 
 implementation
@@ -276,7 +280,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.Append;
 begin
-  if CheckAdapter then
+  if CheckActiveAdapter then
     GetInternalAdapter.Append;
 end;
 
@@ -294,11 +298,6 @@ begin
   end
   else
     raise EioException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
-end;
-
-function TioPrototypeBindSourceCustom.AdapterExists: Boolean;
-begin
-  Result := CheckAdapter;
 end;
 
 procedure TioPrototypeBindSourceCustom.Append(AObject: IInterface);
@@ -331,12 +330,7 @@ end;
 
 function TioPrototypeBindSourceCustom.CheckActiveAdapter: Boolean;
 begin
-  // ------------- prima era così -------------
-  // Result := (not (csDesigning in ComponentState))
-  // and CheckAdapter
-  // and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
-  // ------------- prima era così -------------
-  Result := CheckAdapter and Supports(GetInternalAdapter, IioActiveBindSourceAdapter);
+  Result := Assigned(FBindSourceAdapter);
 end;
 
 procedure TioPrototypeBindSourceCustom.ClearDataObject;
@@ -354,6 +348,7 @@ end;
 constructor TioPrototypeBindSourceCustom.Create(AOwner: TComponent);
 begin
   inherited;
+  FBindSourceAdapter := nil;
   AutoActivate := False;
   FAutoPost := True;
   FioLoaded := False;
@@ -364,6 +359,7 @@ begin
   FLazyProps := '';
   FTypeOfCollection := tcList;
   FVirtualFields := False;
+  FPreview := False;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
@@ -432,72 +428,6 @@ begin
     FonBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
 
-procedure TioPrototypeBindSourceCustom.DoCreateAdapter(var ADataObject: TBindSourceAdapter);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
-begin
-  // Inherited
-  inherited;
-  // If in DesignTime then Exit
-  // FioLoaded flag for iORM DoCreateAdapter internal use only just before
-  // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
-  if (csDesigning in ComponentState) or (not FioLoaded) then
-    Exit;
-  // -------------------------------------------------------------------------------------------------------------------------------
-  // If AdataObject is NOT already assigned (by onCreateAdapter event handler) then
-  // retrieve a BindSourceAdapter automagically by iORM
-  if ADataObject = nil then
-  begin
-    // ----- OLD CODE -----
-    // // If this is a master bind source then retrieve the ABSA from the factory
-    // if IsMasterBS then
-    // begin
-    // if TypeName.IsEmpty then
-    // raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"TypeName" property is not specified for "%s" bind source', [Name]));
-    // ADataObject := TioLiveBindingsFactory.GetBSA(Self, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-    // ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
-    // end
-    // // If this is a detail BindSource then retrieve the adapter from the master BindSource
-    // else
-    // begin
-    // if FMasterBindSource = nil then
-    // raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterBindSource" property is not specified for "%s" bind source', [Name]));
-    // if FMasterPropertyName.IsEmpty then
-    // raise EioException.Create(ClassName, 'DoCreateAdapter', Format('"MasterPropertyName" property is not specified for "%s" bind source', [Name]));
-    // ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Self, FMasterBindSource.GetActiveBindSourceAdapter, MasterPropertyName,
-    // TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
-    // end;
-    // ----- OLD CODE -----
-
-    // If it is a detail bind source then get the detail BSA from the master bind source,
-    // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
-    // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
-    if IsDetailBS then
-      ADataObject := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName,
-        TioWhereFactory.NewWhere.Add(WhereStr.Text)._OrderBy(FOrderBy)).AsTBindSourceAdapter
-    else if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
-      ADataObject := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource).AsTBindSourceAdapter
-    else
-      ADataObject := TioLiveBindingsFactory.GetBSA(Self, Name, FTypeName, FTypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
-        ._OrderBy(FOrderBy), FTypeOfCollection, nil, True).AsTBindSourceAdapter;
-  end;
-  // -------------------------------------------------------------------------------------------------------------------------------
-  // If Self is a Notifiable bind source then register a reference to itself
-  // in the ActiveBindSourceAdapter
-  // PS: Set ioAsync also (and other properties)
-  if Assigned(ADataObject) and Supports(ADataObject, IioActiveBindSourceAdapter, LActiveBSA) then
-  begin
-    LActiveBSA.ioAsync := FAsync;
-    LActiveBSA.ioAutoPost := FAutoPost;
-    LActiveBSA.LoadType := FLoadType;
-    LActiveBSA.Lazy := FLazy;
-    LActiveBSA.LazyProps := FLazyProps;
-    LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
-    LActiveBSA.SetBindSource(Self);
-  end;
-  // -------------------------------------------------------------------------------------------------------------------------------
-end;
-
 procedure TioPrototypeBindSourceCustom.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FonSelectionObject) then
@@ -530,7 +460,7 @@ end;
 function TioPrototypeBindSourceCustom.Current: TObject;
 begin
   Result := nil;
-  if CheckAdapter then
+  if CheckActiveAdapter then
     Result := Self.InternalAdapter.Current;
 end;
 
@@ -544,7 +474,7 @@ end;
 
 function TioPrototypeBindSourceCustom.CurrentMasterObject: TObject;
 begin
-  if CheckAdapter and IsDetailBS then
+  if CheckActiveAdapter and IsDetailBS then
     Result := GetActiveBindSourceAdapter.GetMasterBindSourceAdapter.Current
   else
     Result := nil;
@@ -725,12 +655,11 @@ begin
 end;
 
 procedure TioPrototypeBindSourceCustom.Loaded;
-var
-  LAdapter: TBindSourceAdapter;
 begin
   // Qui forzo l'AutoPost a True perchè ridichiarare la proprietà con default = True
   //  non è stato sufficiente anche perchè il getter e setter sono privati e statici nell'antenato.
   AutoPost := True;
+
   // CONNECTIONDEF REGISTRATION (IF NEEDED) MUST BE BEFORE THE DOCREATEADAPTER
   // ===========================================================================
   if not(csDesigning in ComponentState) then
@@ -748,19 +677,15 @@ begin
   end;
   // ===========================================================================
 
-  // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
-  // ===========================================================================
+  // Qui siamo subito dopo il caricamento dei valori delle proprietà dal file DFM
+  //  e se la proprietà Preview = True scatena il relativo metodo set per far si
+  //  che venga posta a true anche la proprietà AutoActivate e rendere visibile
+  //  i dati a desig-time
+  SetPreview(Preview);
+
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
   // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
-  // ---------------------------------------------------------------------------
   FioLoaded := True;
-  if not Assigned(OnCreateAdapter) then
-  begin
-    DoCreateAdapter(LAdapter);
-    if LAdapter <> nil then
-      SetRuntimeAdapter(LAdapter);
-  end;
-  // ===========================================================================
 
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;
@@ -817,15 +742,9 @@ begin
 end;
 
 procedure TioPrototypeBindSourceCustom.Refresh(const ANotify: Boolean = True);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if not CheckAdapter then
-    Exit;
-  if Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-    AnActiveBSA.Refresh(ANotify)
-  else
-    GetInternalAdapter.Refresh;
+  if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.Refresh(ANotify);
 end;
 
 procedure TioPrototypeBindSourceCustom.RegisterDetailBindSource(const ADetailBindSource: TioPrototypeBindSourceCustom);
@@ -845,7 +764,14 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
 begin
+  // If we are in the opening of the bind source and we are at design-time then
+  //  create the active bind source adapter
+  if Value and (not Assigned(FBindSourceAdapter)) and (not(csDesigning in ComponentState)) then
+    _CreateAdapter(Current, False);
+
   inherited;
+
+  // It also opens any detail bind sources
   if not(csDesigning in ComponentState) then
     OpenCloseDetails(Value);
 end;
@@ -856,7 +782,7 @@ var
 begin
   FAsync := Value;
   // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  if CheckActiveAdapter then
     LActiveBSA.ioAsync := Value;
 end;
 
@@ -864,7 +790,7 @@ procedure TioPrototypeBindSourceCustom.SetLazy(const Value: Boolean);
 begin
   FLazy := Value;
   // Update the adapter
-  if CheckAdapter then
+  if CheckActiveAdapter then
     GetActiveBindSourceAdapter.Lazy := Value;
 end;
 
@@ -872,7 +798,7 @@ procedure TioPrototypeBindSourceCustom.SetLazyProps(const Value: String);
 begin
   FLazyProps := Value;
   // Update the adapter
-  if CheckAdapter then
+  if CheckActiveAdapter then
     GetActiveBindSourceAdapter.LazyProps := Value;
 end;
 
@@ -993,6 +919,14 @@ begin
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
+procedure TioPrototypeBindSourceCustom.SetPreview(const Value: Boolean);
+begin
+  // Se stiamo abilitando la preview e siamo a design time attiva
+  //  la proprietà "AutoActivate" per mostrare i dati anche a design-time
+  FPreview := Value;
+  AutoActivate := FPreview and (csDesigning in ComponentState);
+end;
+
 procedure TioPrototypeBindSourceCustom.SetTypeAlias(const Value: String);
 begin
   FTypeAlias := Value;
@@ -1030,6 +964,45 @@ function TioPrototypeBindSourceCustom._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
   Result := -1;
+end;
+
+procedure TioPrototypeBindSourceCustom._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  // If in DesignTime then Exit
+  // FioLoaded flag for iORM DoCreateAdapter internal use only just before
+  // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
+  if (csDesigning in ComponentState) or (not FioLoaded) then
+    Exit;
+  // If an adapter already exists then raise an exception
+  if Assigned(FBindSourceAdapter) then
+    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
+  // If it is a detail bind source then get the detail BSA from the master bind source,
+  // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
+  // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
+  if IsDetailBS then
+    LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName)
+  else if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
+  else
+    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),
+      TypeOfCollection, ADataObject, True);
+  // If Self is a Notifiable bind source then register a reference to itself
+  // in the ActiveBindSourceAdapter
+  // PS: Set ioAsync also (and other properties)
+  if Assigned(LActiveBSA) then
+  begin
+    LActiveBSA.ioAsync := FAsync;
+    LActiveBSA.ioAutoPost := FAutoPost;
+    LActiveBSA.LoadType := FLoadType;
+    LActiveBSA.Lazy := FLazy;
+    LActiveBSA.LazyProps := FLazyProps;
+    LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
+    LActiveBSA.SetBindSource(Self);
+    SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
+    FBindSourceAdapter := LActiveBSA;
+  end;
 end;
 
 function TioPrototypeBindSourceCustom._Release: Integer;

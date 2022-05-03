@@ -68,7 +68,7 @@ type
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
 //    procedure Open;
 //    procedure Close;
-    function AdapterExists: Boolean;
+//    function AdapterExists: Boolean;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetMasterPropertyName: String;
     function IsMasterBS: boolean;

@@ -94,7 +94,6 @@ type
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Methods
     procedure WhereOnChangeEventHandler(Sender: TObject);
-    function AdapterExists: Boolean; // IioNotifiableBindSource
     procedure OpenCloseViewBindSources(const AActive: Boolean);
     procedure OpenCloseDetails(const AActive: Boolean);
     // AsDefault
@@ -316,11 +315,6 @@ procedure TioModelPresenterCustom.Append;
 begin
   if CheckAdapter then
     (GetActiveBindSourceAdapter as TBindSourceAdapter).Append;
-end;
-
-function TioModelPresenterCustom.AdapterExists: Boolean;
-begin
-  Result := CheckAdapter(False);
 end;
 
 procedure TioModelPresenterCustom.Append(AObject: IInterface);

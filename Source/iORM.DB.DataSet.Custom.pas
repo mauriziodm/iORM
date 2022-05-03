@@ -55,7 +55,6 @@ type
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
-    function AdapterExists: Boolean; // IioNotifiableBindSource
     function IsActive: Boolean; // IioStdActionTargetBindSource
     procedure OpenCLoseDetails(const AActive: Boolean);
     // Async
@@ -207,11 +206,6 @@ uses
   iORM.LiveBindings.CommonBSBehavior;
 
 { TioDataSet }
-
-function TioDataSetCustom.AdapterExists: Boolean;
-begin
-  Result := CheckAdapter(False);
-end;
 
 procedure TioDataSetCustom.CancelIfEditing;
 begin
