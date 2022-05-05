@@ -707,21 +707,23 @@ end;
 
 class function omEngine.DeserializeEnumeration(const AJSONValue: TJSONValue; const AValueType: TRttiType): TValue;
 begin
-  // if not Assigned(AJSONValue) then   // JSONKey not present
-  // raise EMapperException.Create(APropField.Name + ' key field is not present in the JSONObject');
-
-  if AValueType.QualifiedName = 'System.Boolean' then
+  if Assigned(AJSONValue) then
   begin
-    if AJSONValue is TJSONTrue then
-      Result := True
-    else
-    if (AJSONValue = nil) or (AJSONValue is TJSONFalse) then
-      Result := False
-    else
-      raise EMapperException.Create('Invalid value for boolean value ');
+    if AValueType.QualifiedName = 'System.Boolean' then
+    begin
+      if AJSONValue is TJSONTrue then
+        Result := True
+      else
+      if (AJSONValue = nil) or (AJSONValue is TJSONFalse) then
+        Result := False
+      else
+        raise EMapperException.Create('Invalid value for boolean value ');
+    end
+    else // it is an enumerated value but it's not a boolean.
+      TValue.Make((AJSONValue as TJSONNumber).AsInt, AValueType.Handle, Result);
   end
-  else // it is an enumerated value but it's not a boolean.
-    TValue.Make((AJSONValue as TJSONNumber).AsInt, AValueType.Handle, Result);
+  else
+    Result := TValue.Empty;
 end;
 
 class function omEngine.DeserializeFloat(const AJSONValue: TJSONValue; const AValueType: TRttiType): TValue;
