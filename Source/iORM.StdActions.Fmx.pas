@@ -274,6 +274,7 @@ end;
 
 procedure TioBSPersistencePersist.ExecuteTarget(Target: TObject);
 begin
+  TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
   TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
 end;
 
