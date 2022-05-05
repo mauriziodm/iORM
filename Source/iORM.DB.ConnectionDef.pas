@@ -474,6 +474,11 @@ begin
     TioSQLDialect.sqlDialect1:
       ConnectionDef.Params.Values['SQLDialect'] := '1';
   end;
+  // OpenMode
+  if AutoCreateDB.Enabled then
+    ConnectionDef.Params.Values['OpenMode'] := 'OpenOrCreate'
+  else
+    ConnectionDef.Params.Values['OpenMode'] := 'Open';
   // NB: Inherited must be the last line (set FIsRegistered)
   inherited;
 end;
