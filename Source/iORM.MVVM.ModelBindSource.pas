@@ -44,19 +44,24 @@ type
 
   TioModelBindSource = class(TPrototypeBindSource, IioVMBridgeClientComponent, IioCrossViewMasterSource)
   private
+    FBindSourceAdapter: IioActiveBindSourceAdapter;
     FViewModelBridge: TioViewModelBridge;
     FModelPresenter: String;
     FCrossView_MasterBindSource: IioCrossViewMasterSource;
     FCrossView_MasterPropertyName: String;
+    FPreview: Boolean;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
+    procedure _CreateAdapter;
     procedure PreventBindSourceAdapterDestruction;
+    // Preview
+    procedure SetPreview(const Value: Boolean);
   protected
     procedure Open;
     procedure Close;
+    function CheckActiveAdapter: Boolean;
     procedure Loaded; override;
-    procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
 //    procedure DoBeforeOpen; override; // NB:  In TioCustomModelPresenter is DoBeforeOpen but here is SetActive
 //    procedure DoBeforeScroll; override; // NB: In TioCustomModelPresenter is DoBeforeScroll but here is PosChanging
     procedure SetActive(const Value: Boolean); override; // In TioCustomModelPresenter is DoBeforeOpen but here is SetActive
@@ -76,6 +81,7 @@ type
     property ModelPresenter: String read FModelPresenter write FModelPresenter;
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
+    property Preview: Boolean read FPreview write SetPreview default False;
   end;
 
 implementation
@@ -88,6 +94,11 @@ uses
 
 { TioModelBindSource }
 
+function TioModelBindSource.CheckActiveAdapter: Boolean;
+begin
+  Result := Assigned(FBindSourceAdapter);
+end;
+
 procedure TioModelBindSource.Close;
 begin
   if Active then
@@ -97,7 +108,9 @@ end;
 constructor TioModelBindSource.Create(AOwner: TComponent);
 begin
   inherited;
+  FBindSourceAdapter := nil;
   FioLoaded := False;
+  FPreview := False;
   FViewModelBridge := nil;
   FCrossView_MasterBindSource := nil;
   FCrossView_MasterPropertyName := '';
@@ -127,48 +140,6 @@ begin
 
   // ===========================================================================
   inherited;
-end;
-
-procedure TioModelBindSource.DoCreateAdapter(var ADataObject: TBindSourceAdapter);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
-begin
-  // Inherited
-  inherited;
-  // If in DesignTime then Exit
-  // FioLoaded flag for iORM DoCreateAdapter internal use only just before
-  // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
-  if (csDesigning in ComponentState) or (not FioLoaded) then
-    Exit;
-  // Get the BindSourceAdapter from the ModelPresenter from the ViewModel
-  // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
-  // from it (for cross view with microviews)
-  if (not ModelPresenter.IsEmpty) and Assigned(ViewModelBridge) and ViewModelBridge.ViewModelIsAssigned then
-  begin
-    if Assigned(FCrossView_MasterBindSource) then
-    begin
-// ----- OLD CODE -----
-//      // Get the BSA from the MasterModelPresenter
-//      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, Self,
-//        FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
-//      // Set the retrieved BSA as adapter for this Presenter
-//      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
-// ----- OLD CODE -----
-
-      // If here it means that it's a detail (crossview detail)
-      if GetModelPresenterInstance.IsDetailBS then
-        LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)
-      else
-        LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance);
-      // Set the retrieved BSA as adapter for this Presenter
-      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
-    end
-    else
-      // Get the BSA from the presenter
-      LActiveBSA := GetModelPresenterInstance.GetActiveBindSourceAdapter;
-    // Assign the BindSourceAdapter
-    ADataObject := LActiveBSA as TBindSourceAdapter;
-  end;
 end;
 
 function TioModelBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -212,19 +183,15 @@ begin
   end;
   // ===========================================================================
 
-  // DOCREATEADAPTER CALL MUST BE BEFORE THE INHERITED LINE !!!!!!
-  // ===========================================================================
+  // Qui siamo subito dopo il caricamento dei valori delle proprietà dal file DFM
+  //  e se la proprietà Preview = True scatena il relativo metodo set per far si
+  //  che venga posta a true anche la proprietà AutoActivate e rendere visibile
+  //  i dati a desig-time
+  SetPreview(Preview);
+
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
   // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
-  // ---------------------------------------------------------------------------
   FioLoaded := True;
-  if not Assigned(Self.OnCreateAdapter) then
-  begin
-    Self.DoCreateAdapter(LAdapter);
-    if LAdapter <> nil then
-      SetRuntimeAdapter(LAdapter);
-  end;
-  // ===========================================================================
 
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;
@@ -266,12 +233,37 @@ procedure TioModelBindSource.SetActive(const Value: Boolean);
 var
   LBSPersistenceClient: IioBSPersistenceClient;
 begin
+  // If we are in the opening of the bind source and we are at design-time then
+  //  create the active bind source adapter
+  if Value and (not Assigned(FBindSourceAdapter)) and (not(csDesigning in ComponentState)) then
+    _CreateAdapter;
+
   inherited;
+
+  // If the ModelPresenter is a master model presenter then clear the
+  //  relative Persistence layer
   if not (csDesigning in ComponentState) then
   begin
     if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
       LBSPersistenceClient.Persistence.Clear(False);
   end;
+
+// ----- OLD CODE -----
+//  inherited;
+//  if not (csDesigning in ComponentState) then
+//  begin
+//    if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+//      LBSPersistenceClient.Persistence.Clear(False);
+//  end;
+// ----- OLD CODE -----
+end;
+
+procedure TioModelBindSource.SetPreview(const Value: Boolean);
+begin
+  // Se stiamo abilitando la preview e siamo a design time attiva
+  //  la proprietà "AutoActivate" per mostrare i dati anche a design-time
+  FPreview := Value;
+  AutoActivate := FPreview and (csDesigning in ComponentState);
 end;
 
 procedure TioModelBindSource.SetViewModelBridge(const AVMBridge: TioViewModelBridge);
@@ -279,6 +271,53 @@ begin
   FViewModelBridge := AVMBridge;
   if AVMBridge <> nil then
     AVMBridge.FreeNotification(Self);
+end;
+
+procedure TioModelBindSource._CreateAdapter;
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  // If in DesignTime then Exit
+  // FioLoaded flag for iORM DoCreateAdapter internal use only just before
+  // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
+  if (csDesigning in ComponentState) or (not FioLoaded) then
+    Exit;
+  // If an adapter already exists then raise an exception
+  if Assigned(FBindSourceAdapter) then
+    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
+  // Get the BindSourceAdapter from the ModelPresenter from the ViewModel
+  // NB: If the 'CrossViewMasterSource' property is assigned the take the BindSourceAdapter
+  // from it (for cross view with microviews)
+  if (not ModelPresenter.IsEmpty) and Assigned(ViewModelBridge) and ViewModelBridge.ViewModelIsAssigned then
+  begin
+    if Assigned(FCrossView_MasterBindSource) then
+    begin
+// ----- OLD CODE -----
+//      // Get the BSA from the MasterModelPresenter
+//      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, Self,
+//        FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
+//      // Set the retrieved BSA as adapter for this Presenter
+//      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+// ----- OLD CODE -----
+
+      // If here it means that it's a detail (crossview detail)
+      if GetModelPresenterInstance.IsDetailBS then
+        LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)
+      else
+        LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance);
+      // Set the retrieved BSA as adapter for this Presenter
+      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+    end
+    else
+      // Get the BSA from the presenter
+      LActiveBSA := GetModelPresenterInstance.GetActiveBindSourceAdapter;
+    // Assign the BindSourceAdapter
+    if Assigned(LActiveBSA) then
+    begin
+      SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
+      FBindSourceAdapter := LActiveBSA;
+    end;
+  end;
 end;
 
 end.
