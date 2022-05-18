@@ -61,6 +61,11 @@ begin
   RegisterComponents('iORM', [TioModelPresenterDetail]);
   RegisterComponents('iORM', [TioModelDataSet]);
   RegisterComponents('iORM', [TioModelBindSource]);
+  UnlistPublishedProperty(TioModelBindSource, 'AutoActivate');
+  UnlistPublishedProperty(TioModelBindSource, 'AutoEdit');
+  UnlistPublishedProperty(TioModelBindSource, 'AutoPost');
+  UnlistPublishedProperty(TioModelBindSource, 'RecordCount');
+  UnlistPublishedProperty(TioModelBindSource, 'OnCreateAdapter');
   RegisterSelectionEditor(TioViewModelBridge, TioMVVMSelectionEditor);
   RegisterSelectionEditor(TioViewContextProvider, TioMVVMSelectionEditor);
   RegisterSelectionEditor(TioModelPresenterMaster, TioBindSourceSelectionEditor);
