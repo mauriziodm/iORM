@@ -42,6 +42,7 @@ const
   CURRENT_PAGE_DEFAULT = 1;
   NEXT_PAGE_START_OFFSET = 0;
   PAGE_SIZE_DEFAULT = 100;
+  PAGEOF_FORMAT_DEFAULT = '%d/%d';
 
 type
 
@@ -73,6 +74,8 @@ type
     procedure _Unlock;
   strict protected
     function GetCurrentPage: Integer;
+    function GetCurrentPageOf: String;
+    function GetCurrentPageOfFormat: String;
     function GetEnabled: Boolean;
     function GetIsFirstPage: Boolean;
     function GetIsLastPage: Boolean;
@@ -81,6 +84,7 @@ type
     function GetPageSize: Integer;
     function GetPagingType: TioBSAPagingType;
     procedure SetCurrentPage(const Value: Integer);
+    procedure SetCurrentPageOfFormat(const Value: String);
     procedure SetNextPageStartOffset(const Value: Integer);
     procedure SetPageSize(const Value: Integer);
     procedure SetPagingType(const Value: TioBSAPagingType);
@@ -96,11 +100,13 @@ type
     procedure PrepareForRefresh;
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read GetCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
+    property CurrentPageOf: String read GetCurrentPageOf;
     property Enabled: Boolean read GetEnabled;
     property IsFirstPage: Boolean read GetIsFirstPage;
     property IsLastPage: Boolean read GetIsLastPage;
     property PageCount: Integer read GetPageCount;
   published
+    property CurrentPageOfFormat: String read GetCurrentPageOfFormat write SetCurrentPageOfFormat;
     property NextPageStartOffset: Integer read GetNextPageStartOffset write SetNextPageStartOffset default NEXT_PAGE_START_OFFSET;
     property PageSize: Integer read GetPageSize write SetPageSize default PAGE_SIZE_DEFAULT;
     property PagingType: TioBSAPagingType read GetPagingType write SetPagingType default ptDisabled;
@@ -109,6 +115,7 @@ type
   TioCommonBSAPageManagerConcrete = class
   strict private
     FCurrentPage: Integer;
+    FCurrentPageOfFormat: String;
     FLoadPageMethod: TioBSAPagingLoadMethod;
     FNextPageStartOffset: Integer;
     FPageCount: Integer;
@@ -116,6 +123,7 @@ type
     FPagingType: TioBSAPagingType;
     FStrategy: IioBSAPageManagerStrategy;
   strict protected
+    function GetCurrentPageOf: String;
     function GetEnabled: Boolean;
     function GetIsFirstPage: Boolean;
     function GetIsLastPage: Boolean;
@@ -136,6 +144,8 @@ type
     procedure PrepareForRefresh;
     procedure SetItemCount(const AItemCount: Integer);
     property CurrentPage: Integer read FCurrentPage write SetCurrentPage default CURRENT_PAGE_DEFAULT;
+    property CurrentPageOf: String read GetCurrentPageOf;
+    property CurrentPageOfFormat: String read FCurrentPageOfFormat write FCurrentPageOfFormat;
     property Enabled: Boolean read GetEnabled;
     property IsFirstPage: Boolean read GetIsFirstPage;
     property IsLastPage: Boolean read GetIsLastPage;
@@ -351,6 +361,26 @@ begin
   end;
 end;
 
+function TioCommonBSAPageManager.GetCurrentPageOf: String;
+begin
+  _Lock;
+  try
+    Result := FConcretePageManager.CurrentPageOf;
+  finally
+    _Unlock;
+  end;
+end;
+
+function TioCommonBSAPageManager.GetCurrentPageOfFormat: String;
+begin
+  _Lock;
+  try
+    Result := FConcretePageManager.CurrentPageOfFormat;
+  finally
+    _Unlock;
+  end;
+end;
+
 function TioCommonBSAPageManager.GetNextPageStartOffset: Integer;
 begin
   _Lock;
@@ -366,6 +396,16 @@ begin
   _Lock;
   try
     FConcretePageManager.CurrentPage := Value;
+  finally
+    _Unlock;
+  end;
+end;
+
+procedure TioCommonBSAPageManager.SetCurrentPageOfFormat(const Value: String);
+begin
+  _Lock;
+  try
+    FConcretePageManager.CurrentPageOfFormat := Value;
   finally
     _Unlock;
   end;
@@ -517,6 +557,7 @@ begin
   FPagingType := ptDisabled;
   FPageSize := PAGE_SIZE_DEFAULT;
   FNextPageStartOffset := NEXT_PAGE_START_OFFSET;
+  FCurrentPageOfFormat := PAGEOF_FORMAT_DEFAULT;
   FLoadPageMethod := ALoadPageMethod;
   Reset;
 end;
@@ -537,6 +578,11 @@ procedure TioCommonBSAPageManagerConcrete.InvokeLoadPageMethod;
 begin
   if Assigned(FLoadPageMethod) then
     FLoadPageMethod;
+end;
+
+function TioCommonBSAPageManagerConcrete.GetCurrentPageOf: String;
+begin
+  Result := Format(FCurrentPageOfFormat, [CurrentPage, PageCount]);
 end;
 
 function TioCommonBSAPageManagerConcrete.GetEnabled: Boolean;

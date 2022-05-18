@@ -159,8 +159,6 @@ begin
 end;
 
 procedure TioModelBindSource.Loaded;
-var
-  LAdapter: TBindSourceAdapter;
 begin
   // Qui forzo l'AutoPost a True perchè ridichiarare la proprietà con default = True
   //  non è stato sufficiente anche perchè il getter e setter sono privati e statici nell'antenato.

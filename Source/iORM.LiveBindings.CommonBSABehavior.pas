@@ -400,6 +400,7 @@ begin
       // Paging relatied properties
       LGetMemberObject := TioBindSourceAdapterSimpleGetMemberObject.Create(LBindSource.Paging);
       _AddBSProperty<Integer>(TioCommonBSAPageManager, 'CurrentPage', '%Paging.CurrentPage', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
+      _AddBSProperty<String>(TioCommonBSAPageManager, 'CurrentPageOf', '%Paging.CurrentPageOf', ABindSourceAdapter, LGetMemberObject, mtText, AFieldsList);
       _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageCount', '%Paging.PageCount', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
       _AddBSProperty<Integer>(TioCommonBSAPageManager, 'PageSize', '%Paging.PageSize', ABindSourceAdapter, LGetMemberObject, mtInteger, AFieldsList);
       _AddBSProperty<Boolean>(TioCommonBSAPageManager, 'IsFirstPage', '%Paging.IsFirstPage', ABindSourceAdapter, LGetMemberObject, mtBoolean, AFieldsList);
