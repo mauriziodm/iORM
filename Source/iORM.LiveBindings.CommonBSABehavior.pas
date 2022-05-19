@@ -113,6 +113,8 @@ type
     // ObjectStatus
     class procedure SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
     class function UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
+    // Common code to delete ListViewItem
+    class procedure DeleteListViewItem(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AItemIndex: Integer; const ADelayMilliseconds: Integer);
     // ==========================================================================================================================
     // Changes to the BindSourceAdapters to make it possible to create fields that access nested properties/fields
     // (eg: "Customer.Payment.Description")
@@ -134,7 +136,7 @@ implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container,
   iORM.Context.Factory, iORM.LiveBindings.BSPersistence,
-  iORM.LiveBindings.CommonBSAPaging;
+  iORM.LiveBindings.CommonBSAPaging, iORM;
 
 { TioCommonBSABehavior }
 
@@ -443,6 +445,30 @@ begin
       Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
         AMemberType);
+end;
+
+class procedure TioCommonBSABehavior.DeleteListViewItem(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AItemIndex,
+  ADelayMilliseconds: Integer);
+begin
+  // Delayed deletion of the current object for ListView
+  io.AnonymousTimer(ADelayMilliseconds,
+    function: Boolean
+    var
+      LBindSource: IioBSPersistenceClient;
+    begin
+      try
+        if AActiveBindSourceAdapter.IsMasterBSA then
+        begin
+          if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBindSource) and LBindSource.Persistence.CanDelete then
+            LBindSource.Persistence.Delete;
+        end
+        else
+          AActiveBindSourceAdapter.Delete;
+      finally
+        AActiveBindSourceAdapter.ItemIndex := AItemIndex;
+      end;
+    end
+  );
 end;
 
 class function TioCommonBSABehavior.CreateRttiObjectPropertyField<T>(AProperty: TRttiProperty; ABindSourceAdapter: TBindSourceAdapter;

@@ -70,7 +70,6 @@ type
     FBSPersistenceDeleting: Boolean;
     // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FInterfacedList: IInterface;
-    procedure ListViewDeletingTimerEventHandler(Sender: TObject);
     // TypeName
     procedure SetTypeName(const AValue: String);
     function GetTypeName: String;
@@ -288,15 +287,8 @@ begin
 end;
 
 procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer);
-var
-  LTimer: TioTimer;
 begin
-  LTimer := TioTimer.CreateNewTimer;
-  LTimer.Enabled := False;
-  LTimer.OnTimer := ListViewDeletingTimerEventHandler;
-  LTimer.Interval := ADelayMilliseconds;
-  LTimer.Tag := AItemIndex;
-  LTimer.Enabled := True;
+  TioCommonBSABehavior.DeleteListViewItem(Self, AItemIndex, ADelayMilliseconds);
 end;
 
 destructor TioActiveListBindSourceAdapter.Destroy;
@@ -686,24 +678,6 @@ end;
 function TioActiveListBindSourceAdapter.IsMasterBSA: Boolean;
 begin
   Result := not HasMasterBSA;
-end;
-
-procedure TioActiveListBindSourceAdapter.ListViewDeletingTimerEventHandler(Sender: TObject);
-var
-  LTimer: TioTimer;
-  CurrItemIndex: Integer;
-begin
-  LTimer := (Sender as TioTimer);
-  LTimer.Enabled := False;
-  // Delayed deletion of the current object for ListView
-  CurrItemIndex := ItemIndex;
-  try
-    ItemIndex := LTimer.Tag;
-    Delete;
-  finally
-    ItemIndex := CurrItemIndex;
-    Sender.Free;
-  end;
 end;
 
 procedure TioActiveListBindSourceAdapter.LoadPage;
