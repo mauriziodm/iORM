@@ -530,7 +530,7 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyStreamable', Format('Streamable child object non assigned on property "%s", class "%s"',
+    raise EioException.Create(Self.ClassName, 'LoadPropertyStreamable', Format('Streamable child object not assigned on property "%s", class "%s"',
       [AProperty.GetName, AContext.Map.GetClassName]));
   // Wrap the object into a DuckTypedStreamObject
   LDuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LChildObject);
