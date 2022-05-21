@@ -456,6 +456,7 @@ begin
     var
       LBindSource: IioBSPersistenceClient;
     begin
+      Result := False; // After the execution disable the timer and destroy it
       try
         if AActiveBindSourceAdapter.IsMasterBSA then
         begin
