@@ -687,16 +687,6 @@ begin
   FName := AName;
 end;
 
-{ ioSkip }
-
-{ ioOID }
-
-constructor ioOID.Create(const ASkipOnInsert: Boolean);
-begin
-  inherited Create;
-  FSkipOnInsert := ASkipOnInsert;
-end;
-
 { diImplements }
 
 constructor diImplements.Create(AIID: TGUID; const AAlias: String);
@@ -796,6 +786,14 @@ end;
 constructor ioForeignKey.Create(const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
   Self.Create(fkCreate, AOnDeleteAction, AOnUpdateAction);
+end;
+
+{ ioID }
+
+constructor ioID.Create(const ASkipOnInsert: Boolean);
+begin
+  inherited Create;
+  FSkipOnInsert := ASkipOnInsert;
 end;
 
 end.
