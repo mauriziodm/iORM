@@ -93,6 +93,8 @@ type
     procedure Insert(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
     procedure Insert(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
     procedure Insert(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
+    function CanAppend: Boolean;
+    function CanAppendDetail: Boolean;
     function CanInsert: Boolean;
     function CanInsertDetail: Boolean;
     function CanPersist: Boolean;
@@ -165,6 +167,16 @@ begin
     SaveRevertPoint;
     FIsInserting := True;
   end;
+end;
+
+function TioBSPersistence.CanAppend: Boolean;
+begin
+  Result := CanInsert;
+end;
+
+function TioBSPersistence.CanAppendDetail: Boolean;
+begin
+  Result := CanInsertDetail;
 end;
 
 function TioBSPersistence.CanClear: Boolean;
