@@ -44,6 +44,7 @@ type
 
   TioModelBindSource = class(TPrototypeBindSource, IioVMBridgeClientComponent, IioCrossViewMasterSource)
   private
+    FAutoPost: Boolean;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     FViewModelBridge: TioViewModelBridge;
     FModelPresenter: String;
@@ -55,6 +56,9 @@ type
     FioLoaded: Boolean;
     procedure _CreateAdapter;
     procedure PreventBindSourceAdapterDestruction;
+    // AutoPost
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
     // Preview
     procedure SetPreview(const Value: Boolean);
   protected
@@ -82,6 +86,7 @@ type
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
     property Preview: Boolean read FPreview write SetPreview default False;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
   end;
 
 implementation
@@ -108,6 +113,7 @@ end;
 constructor TioModelBindSource.Create(AOwner: TComponent);
 begin
   inherited;
+  FAutoPost := True;
   FBindSourceAdapter := nil;
   FioLoaded := False;
   FPreview := False;
@@ -146,6 +152,14 @@ function TioModelBindSource.GetActiveBindSourceAdapter: IioActiveBindSourceAdapt
 begin
   Result := nil;
   if CheckAdapter and Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
+end;
+
+function TioModelBindSource.GetAutoPost: Boolean;
+begin
+  if CheckAdapter then
+    Result := Self.InternalAdapter.AutoPost
+  else
+    Result := FAutoPost;
 end;
 
 function TioModelBindSource.GetModelPresenterInstance: TioModelPresenterCustom;
@@ -256,6 +270,14 @@ begin
 // ----- OLD CODE -----
 end;
 
+procedure TioModelBindSource.SetAutoPost(const Value: Boolean);
+begin
+  FAutoPost := Value;
+  // Update the adapter
+  if CheckAdapter then
+    Self.InternalAdapter.AutoPost := Value;
+end;
+
 procedure TioModelBindSource.SetPreview(const Value: Boolean);
 begin
   // Se stiamo abilitando la preview e siamo a design time attiva
@@ -312,6 +334,7 @@ begin
     // Assign the BindSourceAdapter
     if Assigned(LActiveBSA) then
     begin
+      LActiveBSA.ioAutoPost := FAutoPost;
       SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
       FBindSourceAdapter := LActiveBSA;
     end;
