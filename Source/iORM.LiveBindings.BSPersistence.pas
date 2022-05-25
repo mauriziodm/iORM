@@ -110,6 +110,8 @@ type
     function IsSaved: Boolean;
     function IsClear: Boolean;
     function IsSmartUpdateDetectionEnabled: Boolean;
+    function IsInserting: Boolean;
+    function IsAppending: Boolean;
     procedure NotifyBeforeScroll;
     procedure NotifySaveRevertPoint;
     property SavedObjState: string read FSavedState;
@@ -323,6 +325,11 @@ begin
   Result := GetState > osUnassigned;
 end;
 
+function TioBSPersistence.IsAppending: Boolean;
+begin
+  Result := FIsInserting;
+end;
+
 function TioBSPersistence.IsChanged: Boolean;
 begin
   Result := GetState = osChanged;
@@ -331,6 +338,11 @@ end;
 function TioBSPersistence.IsClear: Boolean;
 begin
   Result := GetState = osUnsaved;
+end;
+
+function TioBSPersistence.IsInserting: Boolean;
+begin
+  Result := FIsInserting;
 end;
 
 function TioBSPersistence.IsSaved: Boolean;
