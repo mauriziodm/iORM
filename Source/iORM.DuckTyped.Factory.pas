@@ -46,6 +46,7 @@ type
     class function DuckTypedStreamObject(const AObj: TObject): IioDuckTypedStreamObject;
     class function DuckTypedList(const AListObject: TObject): IioDuckTypedList;
     class function TryGetHasManyRelationChildTypeName(const ARttiType: TRttiType): String;
+    class function IsList(const AObj: TObject): Boolean;
   end;
 
 implementation
@@ -63,6 +64,11 @@ end;
 class function TioDuckTypedFactory.TryGetHasManyRelationChildTypeName(const ARttiType: TRttiType): String;
 begin
   Result := TioDuckTypedList.TryGetHasManyRelationChildTypeName(ARttiType);
+end;
+
+class function TioDuckTypedFactory.IsList(const AObj: TObject): Boolean;
+begin
+  Result := TioDuckTypedList.IsList(AObj);
 end;
 
 class function TioDuckTypedFactory.DuckTypedStreamObject(const AObj: TObject): IioDuckTypedStreamObject;

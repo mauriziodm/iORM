@@ -56,6 +56,7 @@ type
     function GetOwnsObjects: Boolean;
   public
     class function TryGetHasManyRelationChildTypeName(const ARttiType: TRttiType): String;
+    class function IsList(const AObj: TObject): Boolean;
     constructor Create(AListObject: TObject);
     procedure Add(AObject: TObject);
     procedure Clear;
@@ -203,6 +204,18 @@ begin
     Result := LItemsProperty.PropertyType.Name
   else
     Result := '';
+end;
+
+class function TioDuckTypedList.IsList(const AObj: TObject): Boolean;
+var
+  LRttiType: TRttiInstanceType;
+begin
+  Result := False;
+  LRttiType := TioUtilities.ClassRefToRttiType(AObj.ClassType);
+  if not Assigned(LRttiType) then
+    Exit;
+  Result := (LRttiType.GetProperty('Count') <> nil) and (LRttiType.GetMethod('Add') <> nil) and (LRttiType.GetMethod('Clear') <> nil) and
+    (LRttiType.GetMethod('Delete') <> nil) and (LRttiType.GetIndexedProperty('Items') <> nil);
 end;
 
 { TioDuckTypedListEnumerator }

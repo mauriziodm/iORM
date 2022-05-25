@@ -641,7 +641,7 @@ end;
 
 procedure TioDataSetCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -655,7 +655,7 @@ end;
 
 procedure TioDataSetCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it

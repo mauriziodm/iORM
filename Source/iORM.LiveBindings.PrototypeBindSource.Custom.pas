@@ -832,7 +832,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
@@ -850,7 +850,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType);
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
   // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
   // si faceva un SetDataObject dava un errore perchè la funzione
   // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject

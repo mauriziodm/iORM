@@ -131,7 +131,7 @@ begin
   // Check for type name
   if ATypeName.IsEmpty then
     raise EioException.Create(ClassName, 'GetBSA',
-      Format('In component "%s" the "LoadType" property has been set to "ltAuto" but the "TypeName" property has been left blank.'
+      Format('In component "%s" the "LoadType" property has been set to "ltAuto" or "ltManual" but the "TypeName" property has been left blank.'
       + #13#13'iORM is therefore unable to load (from the RDBMS) the instance to expose for binding.'#13#13'Please set the property and then try again.',
       [ASenderBSName]));
 

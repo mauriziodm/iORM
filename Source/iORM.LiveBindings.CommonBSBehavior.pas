@@ -17,7 +17,7 @@ type
     class procedure Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Common code for some checks by the bind sources
-    class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
   end;
@@ -27,15 +27,24 @@ implementation
 uses
   Data.Bind.ObjectScope, System.SysUtils,
   iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions,
-  System.Classes;
+  System.Classes, iORM.DuckTyped.Factory;
 
 { TioCommonBSBehavior }
 
-class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
+class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
 begin
+  // Accept the new data object only if LoadType is ltManual
   if ALoadType <> ltManual then
     raise EioException.Create(ClassName, 'CheckForSetDataObject',
       Format('Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to "ltManual" and try again.',
+      [ABindSource.GetName]));
+  // If the property "TypeOfCollection" of the ActiveBindSourceAdapter is tvList then accept some type of list (ListDuckType wrappable)
+  if (ABindSource.GetActiveBindSourceAdapter.TypeOfCollection = TioTypeOfCollection.tcList) and not TioDuckTypedFactory.IsList(ADataObject) then
+    raise EioException.Create(ClassName, 'CheckForSetDataObject',
+      Format('You are trying to set the DataObject of the BindSource "%s" (it could also be a DataSet) but there is a problem:' +
+      #13#13'the "TypeOfCollection" property of the BindSource itself is set to "tcList", this means that iORM expects a list but the object you are trying to set does not appear to have the characteristics of a list.' +
+      #13#13'You''ve probably just forgotten to set the BindSource''s "TypeOfCollection" property to "tcSingleObject" or are trying to set the wrong DataObject.' +
+      #13#13'Please fix either of these two things and try again, it will work.',
       [ABindSource.GetName]));
 end;
 
