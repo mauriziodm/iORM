@@ -780,6 +780,8 @@ begin
     // set the FInterfacedList field to it to keep alive the list itself
     if TioUtilities.IsAnInterface<T> then
       Supports(ADataObject, IInterface, FInterfacedList);
+    // Set details BSA
+    FDetailAdaptersContainer.SetMasterObject(Current);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     // then restore the original value of the "AutoLoadData" property.
     LPrecLoadType := FLoadType;

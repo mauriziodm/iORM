@@ -758,6 +758,8 @@ begin
   begin
     // Set the provided DataObject
     inherited SetDataObject(ADataObject, AOwnsObject);
+    // Set details BSA
+    FDetailAdaptersContainer.SetMasterObject(Current);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     // then restore the original value of the "AutoLoadData" property.
     LPrecLoadType := FLoadType;
