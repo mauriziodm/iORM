@@ -83,6 +83,9 @@ type
     destructor Destroy; override;
     procedure SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean = True);
     procedure Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
+
+    procedure RevertOrDelete;
+
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);

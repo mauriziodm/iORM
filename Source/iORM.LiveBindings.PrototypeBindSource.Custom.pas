@@ -219,6 +219,7 @@ type
     procedure Close;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
+    function IsFromBSLoadType: boolean;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure PostIfEditing;
@@ -585,6 +586,11 @@ end;
 function TioPrototypeBindSourceCustom.IsActive: Boolean;
 begin
   Result := Active;
+end;
+
+function TioPrototypeBindSourceCustom.IsFromBSLoadType: boolean;
+begin
+  Result := TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(FLoadType);
 end;
 
 procedure TioPrototypeBindSourceCustom.Insert(AObject: TObject);
@@ -983,7 +989,7 @@ begin
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS then
     LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName)
-  else if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+  else if IsFromBSLoadType then
     LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
   else
     LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),

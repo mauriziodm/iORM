@@ -174,6 +174,7 @@ type
     destructor Destroy; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
+    function IsFromBSLoadType: boolean;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
     procedure RegisterDetailDataSet(const ADetailDataSet: TioDataSetCustom);
     procedure ForceDetailAdaptersCreation;
@@ -514,6 +515,11 @@ end;
 function TioDataSetCustom.IsActive: Boolean;
 begin
   Result := Active;
+end;
+
+function TioDataSetCustom.IsFromBSLoadType: boolean;
+begin
+  Result := TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(FLoadType);
 end;
 
 procedure TioDataSetCustom.Loaded;

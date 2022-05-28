@@ -20,6 +20,7 @@ type
     class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+    class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
   end;
 
 implementation
@@ -50,7 +51,7 @@ end;
 
 class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
 begin
-  if Assigned(ASourceBS) and not(ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) then
+  if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioException.Create(ClassName, 'CheckForSetLoadType',
       Format('In order to set the "LoadType" property to a value other than "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance", you must first set the "SourceXXX" property to blank (nil).'
       + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.', [ABindSource.GetName]));
@@ -58,10 +59,15 @@ end;
 
 class procedure TioCommonBSBehavior.CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
 begin
-  if Assigned(ASourceBS) and not(ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) then
+  if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioException.Create(ClassName, 'CheckForSetSourceBS',
       Format('In order to set the "SourceXXX" property, you must first set the "LoadType" property to one of the values "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance".'
       + #13#13'Please set the "LoadType" property of the bind source "%s" (maybe a DataSet or BindSource) to one of the above values and then try again.', [ABindSource.GetName]));
+end;
+
+class function TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
+begin
+  Result := ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance];
 end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);

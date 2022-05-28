@@ -76,6 +76,7 @@ type
     procedure Refresh(const ANotify: Boolean = True);
     function GetName: String;
     function IsActive: Boolean;
+    function IsFromBSLoadType: boolean;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;

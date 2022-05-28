@@ -216,8 +216,8 @@ type
     destructor Destroy; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
-    class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom;
-      const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
+    function IsFromBSLoadType: boolean;
+    class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     procedure SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
@@ -1202,7 +1202,7 @@ begin
   if IsDetailBS then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterPresenter, MasterPropertyName))
   else
-  if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+  if IsFromBSLoadType then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterPresenter))
   else
   begin
@@ -1239,6 +1239,11 @@ end;
 function TioModelPresenterCustom.IsActive: Boolean;
 begin
   Result := Active;
+end;
+
+function TioModelPresenterCustom.IsFromBSLoadType: boolean;
+begin
+  Result := TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(FLoadType);
 end;
 
 class function TioModelPresenterCustom.IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom;
