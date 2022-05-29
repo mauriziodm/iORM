@@ -153,6 +153,13 @@ begin
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;
 
+class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
+begin
+  if Assigned(AIntf) then
+    raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
+  Result := ExtractOID(AIntf as Tobject);
+end;
+
 class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;
 begin
   Result := TRttiEnumerationType.GetName<T>(AEnumValue);
@@ -169,13 +176,6 @@ begin
     Result := LGetItemMethod.ReturnType
   else
     raise EioException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
-end;
-
-class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
-begin
-  if Assigned(AIntf) then
-    raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
-  Result := ExtractOID(AIntf as Tobject);
 end;
 
 class function TioUtilities.ExtractPropertyName(const AFullPathPropertyName: String): String;

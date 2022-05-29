@@ -47,6 +47,7 @@ type
     destructor Destroy; override;
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
+    function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
     property Where;
     property ItemCount;
     // Added properties
@@ -149,6 +150,11 @@ end;
 function TioPrototypeBindSourceMaster.GetOnRecordChangeAction: TioBSOnRecordChangeAction;
 begin
   Result := FOnRecordChangeAction;
+end;
+
+function TioPrototypeBindSourceMaster.GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
+begin
+  Result := SourcePBS as IioNotifiableBindSource;
 end;
 
 function TioPrototypeBindSourceMaster.GetSourcePBS: TioPrototypeBindSourceCustom;

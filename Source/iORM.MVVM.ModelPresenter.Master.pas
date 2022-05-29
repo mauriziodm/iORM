@@ -54,6 +54,7 @@ type
     procedure Close; override;
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
+    function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
     property Active;
     property Where;
     property ItemCount;
@@ -156,6 +157,11 @@ end;
 function TioModelPresenterMaster.GetPersistence: TioBSPersistence;
 begin
   Result := FPersistence;
+end;
+
+function TioModelPresenterMaster.GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
+begin
+  Result := SourcePresenter as IioNotifiableBindSource;
 end;
 
 function TioModelPresenterMaster.GetSourcePresenter: TioModelPresenterCustom;
