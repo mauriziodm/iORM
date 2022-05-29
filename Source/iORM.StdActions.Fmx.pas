@@ -75,7 +75,8 @@ type
     FDisableIfSaved: Boolean;
     FRaiseIfChangesDoesNotExists: Boolean;
     FRaiseIfChangesExists: Boolean;
-    FRaiseIfSaved: Boolean;
+    FRaiseIfRevertPointSaved: Boolean;
+    FRaiseIfRevertPointNotSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   strict protected
@@ -86,7 +87,8 @@ type
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
     property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
-    property RaiseIfSaved: Boolean read FRaiseIfSaved write FRaiseIfSaved default False;
+    property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
+    property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
     property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -130,6 +132,7 @@ type
     property ClearAfterExecute;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
+    property RaiseIfRevertPointNotSaved;
     property TargetBindSource;
   end;
 
@@ -141,7 +144,7 @@ type
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
-    property RaiseIfSaved;
+    property RaiseIfRevertPointSaved;
     property TargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -155,7 +158,7 @@ type
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
-    property RaiseIfSaved;
+    property RaiseIfRevertPointSaved;
     property TargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -172,7 +175,7 @@ type
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
-    property RaiseIfSaved;
+    property RaiseIfRevertPointSaved;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -192,7 +195,7 @@ type
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
-    property RaiseIfSaved;
+    property RaiseIfRevertPointSaved;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -220,7 +223,8 @@ begin
   FDisableIfChangesExists := False;
   FRaiseIfChangesDoesNotExists := False;
   FRaiseIfChangesExists := True;
-  FRaiseIfSaved := False;
+  FRaiseIfRevertPointSaved := False;
+  FRaiseIfRevertPointNotSaved := False;
 end;
 
 function TioBSPersistenceStdActionFmx.HandlesTarget(Target: TObject): Boolean;
@@ -288,7 +292,7 @@ end;
 
 procedure TioBSPersistenceRevert.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.Persistence.Revert(RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
 end;
 
 procedure TioBSPersistenceRevert.UpdateTarget(Target: TObject);
@@ -307,7 +311,7 @@ end;
 
 procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.Persistence.Delete(RaiseIfSaved, RaiseIfChangesExists);
+  TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
 procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
@@ -327,7 +331,7 @@ end;
 
 procedure TioBSPersistenceReload.ExecuteTarget(Target: TObject);
 begin
-  TargetBindSource.Persistence.Reload(RaiseIfSaved, RaiseIfChangesExists);
+  TargetBindSource.Persistence.Reload(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
 procedure TioBSPersistenceReload.UpdateTarget(Target: TObject);
@@ -357,7 +361,7 @@ begin
     FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
     if LNewInstanceAsObject <> nil then
     begin
-      TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfSaved, RaiseIfChangesExists);
+      TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
       Exit;
     end
     else
@@ -369,14 +373,14 @@ begin
     FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
     if LNewInstanceAsInterface <> nil then
     begin
-      TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfSaved, RaiseIfChangesExists);
+      TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
       Exit;
     end
     else
       raise EioException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
   end;
   // New instance not provided (created by the ABSAdapter itself)
-  TargetBindSource.Persistence.Append(RaiseIfSaved, RaiseIfChangesExists);
+  TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
 procedure TioBSPersistenceAppend.UpdateTarget(Target: TObject);
@@ -407,7 +411,7 @@ begin
     FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
     if LNewInstanceAsObject <> nil then
     begin
-      TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfSaved, RaiseIfChangesExists);
+      TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
       Exit;
     end
     else
@@ -419,14 +423,14 @@ begin
     FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
     if LNewInstanceAsInterface <> nil then
     begin
-      TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfSaved, RaiseIfChangesExists);
+      TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
       Exit;
     end
     else
       raise EioException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
   end;
   // New instance not provided (created by the ABSAdapter itself)
-  TargetBindSource.Persistence.Insert(RaiseIfSaved, RaiseIfChangesExists);
+  TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
 procedure TioBSPersistenceInsert.UpdateTarget(Target: TObject);

@@ -82,19 +82,19 @@ type
     function GetState: TioBSPersistenceState;
     function GetStateAsString: String;
     procedure CheckUnassigned(const AMethodName: String);
-    procedure CheckRaiseIfSavedOrChengesExists(const AMethodName: String; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+    procedure CheckRaiseIfSavedOrChangesExists(const AMethodName: String; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
     procedure _InternalRevert(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
     procedure _InternalRevertWhenFromBSLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
   public
     constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
     destructor Destroy; override;
-    procedure SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean = True);
-    procedure Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False);
+    procedure SaveRevertPoint(const ARaiseIfAlreadySavedRevertPoint: Boolean = True);
+    procedure Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
-    procedure Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
-    procedure Reload(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
-    procedure Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
+    procedure Delete(const ARaiseIfSavedRevertPointExists: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure Reload(const ARaiseIfSavedRevertPointExists: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure Append(const ARaiseIfSavedRevertPointExists: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
     procedure Append(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
     procedure Append(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
     procedure Insert(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
@@ -136,10 +136,10 @@ uses
 
 { TioBindSourceObjState }
 
-procedure TioBSPersistence.Append(const ARaiseIfSaved: Boolean; const ARaiseIfChangesExists: Boolean);
+procedure TioBSPersistence.Append(const ARaiseIfSavedRevertPointExists: Boolean; const ARaiseIfChangesExists: Boolean);
 begin
   CheckUnassigned('Append');
-  CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Append', ARaiseIfSavedRevertPointExists, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Append;
   FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
@@ -153,7 +153,7 @@ end;
 procedure TioBSPersistence.Append(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Append');
-  CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Append(AObject);
   FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
@@ -167,7 +167,7 @@ end;
 procedure TioBSPersistence.Append(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Append');
-  CheckRaiseIfSavedOrChengesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Append', ARaiseIfSaved, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Append(AObject);
   FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
@@ -238,7 +238,7 @@ begin
   Result := GetState = osUnsaved;
 end;
 
-procedure TioBSPersistence.CheckRaiseIfSavedOrChengesExists(const AMethodName: String; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+procedure TioBSPersistence.CheckRaiseIfSavedOrChangesExists(const AMethodName: String; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
 begin
   if ARaiseIfSaved and (State > osUnsaved) then
     raise EioBindSourceObjStateException.Create(ClassName, AMethodName, 'A previously saved revert point exists, it must be cleared before');
@@ -272,10 +272,10 @@ begin
   Clear(False);
 end;
 
-procedure TioBSPersistence.Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+procedure TioBSPersistence.Delete(const ARaiseIfSavedRevertPointExists: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Delete');
-  CheckRaiseIfSavedOrChengesExists('Delete', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Delete', ARaiseIfSavedRevertPointExists, ARaiseIfChangesExists);
   TioCommonBSAPersistence.BSPersistenceDelete(FBindSource);
 end;
 
@@ -288,7 +288,7 @@ end;
 procedure TioBSPersistence.Insert(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Insert');
-  CheckRaiseIfSavedOrChengesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Insert;
   FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
@@ -302,7 +302,7 @@ end;
 procedure TioBSPersistence.Insert(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Insert');
-  CheckRaiseIfSavedOrChengesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Insert(AObject);
   FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
@@ -316,7 +316,7 @@ end;
 procedure TioBSPersistence.Insert(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
 begin
   CheckUnassigned('Insert');
-  CheckRaiseIfSavedOrChengesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Insert', ARaiseIfSaved, ARaiseIfChangesExists);
   NotifyBeforeScroll; // Check if you can leave the current record
   FBindSource.Insert(AObject);
   FBindSource.Refresh; // Otherwise in some cases (insert / append without object) with the datasets it was not displayed
@@ -407,7 +407,7 @@ begin
     Clear(False);
 end;
 
-procedure TioBSPersistence.Reload(const ARaiseIfSaved: Boolean; const ARaiseIfChangesExists: Boolean);
+procedure TioBSPersistence.Reload(const ARaiseIfSavedRevertPointExists: Boolean; const ARaiseIfChangesExists: Boolean);
 begin
   // Reload from a bind source is possible only is ALoadType is NOT set to ftManual
   if FBindSource.LoadType = ltManual then
@@ -415,7 +415,7 @@ begin
       Format('Invoking the "Reload" method is NOT allowed if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to a value other than "ltManual" and try again.',
       [FBindSource.GetName]));
   CheckUnassigned('Reload');
-  CheckRaiseIfSavedOrChengesExists('Reload', ARaiseIfSaved, ARaiseIfChangesExists);
+  CheckRaiseIfSavedOrChangesExists('Reload', ARaiseIfSavedRevertPointExists, ARaiseIfChangesExists);
   FBindSource.GetActiveBindSourceAdapter.Reload;
   Clear(ARaiseIfChangesExists);
 end;
@@ -437,7 +437,7 @@ end;
 //  FBindSource.Refresh(True);
 //end;
 // --- OLD CODE ---
-procedure TioBSPersistence.Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False);
+procedure TioBSPersistence.Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
 begin
   CheckUnassigned('Revert');
   if FBindSource.IsFromBSLoadType then
@@ -447,14 +447,15 @@ begin
     Delete
   else
     _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
-  Clear(False);
+  if AClearAfterExecute then
+    Clear(False);
   FBindSource.Refresh(True);
 end;
 
-procedure TioBSPersistence.SaveRevertPoint(const ARaiseIfAlreadySaved: Boolean);
+procedure TioBSPersistence.SaveRevertPoint(const ARaiseIfAlreadySavedRevertPoint: Boolean);
 begin
   CheckUnassigned('Save');
-  if ARaiseIfAlreadySaved and (State > osUnsaved) then
+  if ARaiseIfAlreadySavedRevertPoint and (State > osUnsaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Save', 'A previously saved revert point exists, it must be cleared before');
   FSavedState := GetCurrentAsString
 end;
