@@ -85,6 +85,7 @@ type
     procedure CheckRaiseIfSavedOrChangesExists(const AMethodName: String; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
     procedure _InternalRevert(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
     procedure _InternalRevertWhenFromBSLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
+    procedure _InternalRevertWhenManualLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
   public
     constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
     destructor Destroy; override;
@@ -443,13 +444,17 @@ begin
   if FBindSource.IsFromBSLoadType then
     _InternalRevertWhenFromBSLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
   else
+  if FBindSource.LoadType = ltManual then
+    _InternalRevertWhenManualLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
+  else
   if IsInserting then
     Delete
   else
     _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
   if AClearAfterExecute then
     Clear(False);
-  FBindSource.Refresh(True);
+  if FBindSource.Current <> nil then
+    FBindSource.Refresh(True);
 end;
 
 procedure TioBSPersistence.SaveRevertPoint(const ARaiseIfAlreadySavedRevertPoint: Boolean);
@@ -486,12 +491,20 @@ begin
         Format('In component "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property (maybe SourceDataSet, SourcePBS or SourcePresenter) has been left blank.'
         + #13#13'iORM is therefore unable to continue.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
         [FBindSource.GetName, FBindSource.GetName]));
-    FBindSource.ClearDataObject;
+    FBindSource.ClearDataObject; // In this case (FromBSLoadType) we are always with an ObjectBindSourceAdapter
     if LSourceBS.IsMasterBS then
       (LSourceBS as IioBSPersistenceClient).Persistence.Delete
     else
       (LSourceBS as IioBSPersistenceClient).Delete;
   end
+  else
+    _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
+end;
+
+procedure TioBSPersistence._InternalRevertWhenManualLoadType(const ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges: Boolean);
+begin
+  if IsInserting then
+    FBindSource.ClearDataObject
   else
     _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
 end;

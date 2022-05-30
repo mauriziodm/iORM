@@ -595,7 +595,8 @@ begin
   Result := function: TObject
     begin
       Result := nil;
-      io.RefTo(LClassName).ByID(LID).Delete;
+      if LID <> 0 then
+        io.RefTo(LClassName).ByID(LID).Delete;
     end;
 end;
 
