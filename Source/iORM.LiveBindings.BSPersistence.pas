@@ -92,6 +92,7 @@ type
     destructor Destroy; override;
     procedure SaveRevertPoint(const ARaiseIfAlreadySavedRevertPoint: Boolean = True);
     procedure Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
+    procedure RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Delete(const ARaiseIfSavedRevertPointExists: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -439,7 +440,19 @@ end;
 //  FBindSource.Refresh(True);
 //end;
 // --- OLD CODE ---
-procedure TioBSPersistence.Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
+procedure TioBSPersistence.Revert(const ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges, AClearAfterExecute: Boolean);
+begin
+  CheckUnassigned('Revert');
+  // Execute the revert
+  _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
+  // Clear saved state and refresh
+  if AClearAfterExecute then
+    Clear(False);
+  if FBindSource.Current <> nil then
+    FBindSource.Refresh(True);
+end;
+
+procedure TioBSPersistence.RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
 begin
   CheckUnassigned('Revert');
   // Depending on LoadType property...
@@ -468,6 +481,7 @@ end;
 
 procedure TioBSPersistence._InternalRevert(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
 begin
+  // Check if a revert point exists
   if State < osSaved then
   begin
     if ARaiseIfRevertPointNotSaved then
@@ -475,8 +489,10 @@ begin
     else
       Exit;
   end;
+  // Check for changes
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
+  // Execute the revert
   om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
 end;
 
