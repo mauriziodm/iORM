@@ -142,9 +142,9 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     property ClearAfterExecute;
-//    property DisableIfChangesDoesNotExists;
-//    property RaiseIfChangesDoesNotExists;
-//    property RaiseIfRevertPointNotSaved;
+    property DisableIfChangesDoesNotExists;
+    property RaiseIfChangesDoesNotExists;
+    property RaiseIfRevertPointNotSaved;
     property TargetBindSource;
   end;
 
@@ -317,14 +317,13 @@ end;
 
 procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
 begin
-  inherited;
-
+  TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
 end;
 
 procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
 begin
-  inherited;
-
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
 end;
 
 { TioBSPersistenceDelete }

@@ -82,6 +82,7 @@ begin
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistencePersist], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceReload], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceRevert], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceSaveRevertPoint], nil);
 
   // FMX standard actions
@@ -95,6 +96,7 @@ begin
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistencePersist], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceReload], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceRevert], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceSaveRevertPoint], nil);
 
   // IDE Wizards

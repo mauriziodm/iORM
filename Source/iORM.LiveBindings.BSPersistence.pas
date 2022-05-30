@@ -114,6 +114,7 @@ type
     function CanReceiveSelection: Boolean;
     function CanReload: Boolean;
     function CanRevert: Boolean;
+    function CanRevertOrDelete: Boolean;
     function CanSave: Boolean;
     function IsActive: Boolean;
     function IsChanged: Boolean;
@@ -236,6 +237,11 @@ begin
   Result := GetState >= osSaved;
 end;
 
+function TioBSPersistence.CanRevertOrDelete: Boolean;
+begin
+  Result := (GetState >= osSaved) or IsInserting;
+end;
+
 function TioBSPersistence.CanSave: Boolean;
 begin
   Result := GetState = osUnsaved;
@@ -337,7 +343,7 @@ end;
 
 function TioBSPersistence.IsAppending: Boolean;
 begin
-  Result := FIsInserting;
+  Result := IsInserting;
 end;
 
 function TioBSPersistence.IsChanged: Boolean;
