@@ -170,7 +170,7 @@ type
     class function DeserializeInteger(const AJSONValue: TJSONValue): TValue; static;
     class function DeserializeString(const AJSONValue: TJSONValue): TValue; static;
     class function DeserializeRecord(const AJSONValue: TJSONValue; const AValueType: TRttiType; const AParams: IomParams): TValue; static;
-    class procedure DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
+    class procedure DeserializeClassCommon(var AMasterObj, AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
       const AParams: IomParams); static;
     class function DeserializeClass(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject;
       const AParams: IomParams): TValue; static;
@@ -378,7 +378,7 @@ begin
     LJustCreated := True;
   end;
   // Deserialize
-  DeserializeClassCommon(LChildObj, AJSONValue, APropField, AParams);
+  DeserializeClassCommon(AMasterObj, LChildObj, AJSONValue, APropField, AParams);
   // Make the result TValue
   //  NB: If the MasterObj is assigned return an empty TValue because if the
   //       deserialized object is a detail of a MasterObject the creation of the
@@ -396,8 +396,8 @@ begin
     TValue.Make(@LChildObj, LChildObj.ClassInfo, Result);
 end;
 
-class procedure omEngine.DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
-  const AParams: IomParams);
+class procedure omEngine.DeserializeClassCommon(var AMasterObj, AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject;
+      const AParams: IomParams);
 var
   _attrser: MapperSerializeAsString;
   SerStreamASString: string;
@@ -495,7 +495,10 @@ begin
       AChildObj := DeserializeObject(TJSONObject(AJSONValue), AChildObj, AParams);
     end
     else if AJSONValue is TJSONNull then
-      FreeAndNil(AChildObj)
+    begin
+      FreeAndNil(AChildObj);
+      TDuckPropField.SetValue(AMasterObj, APropField, TValue.Empty);
+    end
     else
       raise EMapperException.Create('Deserialize Class: Cannot deserialize as object.');
   end;
@@ -795,7 +798,7 @@ begin
   if Assigned(AValueType) and (not Assigned(LChildObj)) and (not AParams.TypeAnnotations) then
     LChildObj := TRTTIUtils.CreateObject(AValueType.QualifiedName);
   // Deserialize
-  DeserializeClassCommon(LChildObj, AJSONValue, APropField, AParams);
+  DeserializeClassCommon(AMasterObj, LChildObj, AJSONValue, APropField, AParams);
   // Make the result TValue
   // NB: If the MasterObj is assigned return an empty TValue because if the
   // deserialized object is a detail of a MasterObject the creation of the

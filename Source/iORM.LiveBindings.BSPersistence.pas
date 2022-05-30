@@ -500,6 +500,7 @@ begin
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
   // Execute the revert
   om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
+  FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSource.Current);
 end;
 
 procedure TioBSPersistence._InternalRevertWhenFromBSLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
