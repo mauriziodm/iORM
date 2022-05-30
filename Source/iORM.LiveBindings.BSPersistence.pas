@@ -86,6 +86,7 @@ type
     procedure _InternalRevert(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
     procedure _InternalRevertWhenFromBSLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
     procedure _InternalRevertWhenManualLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
+    procedure _InternalRevertWhenAutoLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
   public
     constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
     destructor Destroy; override;
@@ -441,16 +442,16 @@ end;
 procedure TioBSPersistence.Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
 begin
   CheckUnassigned('Revert');
+  // Depending on LoadType property...
   if FBindSource.IsFromBSLoadType then
     _InternalRevertWhenFromBSLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
   else
   if FBindSource.LoadType = ltManual then
     _InternalRevertWhenManualLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
   else
-  if IsInserting then
-    Delete
-  else
-    _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
+  if FBindSource.LoadType = ltAuto then
+    _InternalRevertWhenAutoLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
+  // Clear saved state and refresh
   if AClearAfterExecute then
     Clear(False);
   if FBindSource.Current <> nil then
@@ -505,6 +506,14 @@ procedure TioBSPersistence._InternalRevertWhenManualLoadType(const ARaiseIfRever
 begin
   if IsInserting then
     FBindSource.ClearDataObject
+  else
+    _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
+end;
+
+procedure TioBSPersistence._InternalRevertWhenAutoLoadType(const ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges: Boolean);
+begin
+  if IsInserting then
+    Delete
   else
     _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
 end;
