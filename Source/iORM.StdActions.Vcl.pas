@@ -4,11 +4,54 @@ interface
 
 uses
   Vcl.ActnList, iORM.LiveBindings.BSPersistence, System.Classes,
-  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
+  iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.ViewModelBridge,
+  iORM.MVVM.Actions.Interfaces, iORM.Exceptions;
 
 type
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
+
+  // =================================================================================================
+  // BEGIN: VCL MVVM STANDARD ACTIONS
+  // =================================================================================================
+
+  // Standard action for MVVM view use
+  TioViewAction = class(Vcl.ActnList.TAction, IioViewAction)
+  strict private
+    FVMAction: IioVMAction;
+    FVMActionName: String;
+    FOnBeforeExecute: TNotifyEvent;
+    FOnAfterExecute: TNotifyEvent;
+    FOnBeforeUpdate: TNotifyEvent;
+    FOnAfterUpdate: TNotifyEvent;
+  strict protected
+    procedure CheckVMAction(const CallingMethod: String);
+    procedure DoBeforeExecute;
+    procedure DoAfterExecute;
+    procedure DoBeforeUpdate;
+    procedure DoAfterUpdate;
+    // Enabled property
+    procedure SetEnabled(Value: Boolean); override;
+    function GetEnabled: Boolean;
+    // Visible property
+    procedure SetVisible(Value: Boolean); override;
+    function GetVisible: Boolean;
+    // VMActionName property
+    procedure SetVMActionName(Value: String);
+    function GetVMActionName: String;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function Execute: Boolean; override;
+    function Update: Boolean; override;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
+    property Visible: Boolean read GetVisible write SetVisible;
+  published
+    property VMActionName: String read FVMActionName write FVMActionName;
+  end;
+
+  // =================================================================================================
+  // END: VCL MVVM STANDARD ACTIONS
+  // =================================================================================================
 
   // =================================================================================================
   // BEGIN: VCL STANDARD ACTIONS FOR BIND SOURCES
@@ -222,7 +265,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction, System.SysUtils, iORM.Exceptions, iORM.Utilities;
+  iORM.Abstraction, System.SysUtils, iORM.Utilities;
 
 { TioBSObjStateStdAction }
 
@@ -543,6 +586,104 @@ procedure TioBSPrevPage.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
+end;
+
+{ TioViewAction }
+
+procedure TioViewAction.CheckVMAction(const CallingMethod: String);
+begin
+  if not Assigned(FVMAction) then
+    raise EioException.Create(ClassName, Format('CheckVMAction', [CallingMethod]),
+      Format('ViewAction "%s" is not linked to corresponding VMAction named "%s".'#13#13'iORM is unable to execute the requested method ("%s").', [Name, 'XXX', CallingMethod]));
+end;
+
+constructor TioViewAction.Create(AOwner: TComponent);
+begin
+  inherited;
+  FVMAction := nil;
+  FVMActionName := '';
+end;
+
+procedure TioViewAction.DoAfterExecute;
+begin
+  if Assigned(FOnAfterExecute) then
+    FOnAfterExecute(Self);
+end;
+
+procedure TioViewAction.DoAfterUpdate;
+begin
+  if Assigned(FOnAfterUpdate) then
+    FOnAfterUpdate(Self);
+end;
+
+procedure TioViewAction.DoBeforeExecute;
+begin
+  if Assigned(FOnBeforeExecute) then
+    FOnBeforeExecute(Self);
+end;
+
+procedure TioViewAction.DoBeforeUpdate;
+begin
+  if Assigned(FOnBeforeUpdate) then
+    FOnBeforeUpdate(Self);
+end;
+
+function TioViewAction.Execute: Boolean;
+begin
+  CheckVMAction('Execute');
+  Result := FVMAction.Execute;
+end;
+
+function TioViewAction.Update: Boolean;
+begin
+  CheckVMAction('Update');
+  Result := FVMAction.Update;
+end;
+
+function TioViewAction.GetEnabled: Boolean;
+begin
+  Result := inherited Enabled;
+end;
+
+function TioViewAction.GetVisible: Boolean;
+begin
+  Result := inherited Visible;
+end;
+
+procedure TioViewAction.SetEnabled(Value: Boolean);
+begin
+  if Value <> GetEnabled then
+  begin
+    CheckVMAction('SetEnabled');
+    inherited SetEnabled(Value);
+    FVMAction.Enabled := Value;
+  end;
+end;
+
+procedure TioViewAction.SetVisible(Value: Boolean);
+begin
+  if Value <> GetVisible then
+  begin
+    CheckVMAction('SetVisible');
+    inherited SetVisible(Value);
+    FVMAction.Visible := Value;
+  end;
+end;
+
+function TioViewAction.GetVMActionName: String;
+begin
+  if FVMActionName.IsEmpty then
+    Result := Name
+  else
+    Result := FVMActionName;
+end;
+
+procedure TioViewAction.SetVMActionName(Value: String);
+begin
+  if UpperCase(Value.Trim) = UpperCase(Name) then
+    FVMActionName := ''
+  else
+    FVMActionName := Value.Trim;
 end;
 
 end.

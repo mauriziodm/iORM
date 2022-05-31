@@ -295,6 +295,9 @@
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.InterfacedDataModule.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Actions.VM.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Actions.View.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.Actions.Interfaces.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
