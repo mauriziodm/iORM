@@ -213,7 +213,6 @@ contains
   iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas',
   iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas',
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
-  iORM.MVVM.Actions.VM in '..\..\Source\iORM.MVVM.Actions.VM.pas',
   iORM.MVVM.Actions.View in '..\..\Source\iORM.MVVM.Actions.View.pas',
   iORM.MVVM.Actions.Interfaces in '..\..\Source\iORM.MVVM.Actions.Interfaces.pas';
 
