@@ -36,20 +36,9 @@ unit iORM;
 interface
 
 uses
-  iORM.DependencyInjection,
-  iORM.Context.Properties.Interfaces,
-  iORM.Context.Interfaces,
-  iORM.Context.Factory,
-  iORM.CommonTypes,
-  iORM.DB.Interfaces,
-  iORM.LiveBindings.Interfaces,
-  iORM.Global.Factory,
-  iORM.DB.ConnectionContainer, iORM.Where.Interfaces, iORM.Where.Factory,
-  System.TypInfo, System.Classes, Data.Bind.ObjectScope, ObjMapper,
-  System.SysUtils, iORM.DependencyInjection.Interfaces,
-  iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces,
-  iORM.MVVM.ModelPresenter.Custom, iORM.DBBuilder.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.Attributes;
+  System.Classes, System.SysUtils, System.TypInfo, ObjMapper, iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
+  iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
+  iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom;
 
 const
 {$region 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
@@ -120,7 +109,6 @@ type
 
   IioWhere = iORM.Where.Interfaces.IioWhere;
 
-  TioActionEvent = iORM.Attributes.TioActionEvent;
   TioMapModeType = iORM.Attributes.TioMapModeType;
   TioRelationType = iORM.Attributes.TioRelationType;
   TioFKAction = iORM.Attributes.TioFKAction;
@@ -131,19 +119,6 @@ type
 {$region 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
 
   ioMarker = iORM.Attributes.ioMarker;
-
-  // MVVM attributes
-  ioAction = iORM.Attributes.ioAction;
-  ioBindAction = iORM.Attributes.ioBindAction;
-  ioUniBindAction = iORM.Attributes.ioUniBindAction;
-  ioCommand = iORM.Attributes.ioCommand;
-  ioDisabled = iORM.Attributes.ioDisabled;
-  ioChecked = iORM.Attributes.ioChecked;
-  ioGroupIndex = iORM.Attributes.ioGroupIndex;
-  ioHint = iORM.Attributes.ioHint;
-  ioImageIndex = iORM.Attributes.ioImageIndex;
-  ioInvisible = iORM.Attributes.ioInvisible;
-  ioNotificationTarget = iORM.Attributes.ioNotificationTarget;
 
   // Property attributes
   ioSkip = iORM.Attributes.ioSkip;
@@ -433,19 +408,23 @@ type
 
 implementation
 
+//uses
+//  System.Rtti,
+//  iORM.DuckTyped.Interfaces,
+//  iORM.DuckTyped.Factory,
+//  iORM.DuckTyped.StreamObject,
+//  iORM.Exceptions,
+//  iORM.DB.Factory,
+//  iORM.Utilities,
+//  iORM.Strategy.Factory,
+//  iORM.Context.Container,
+//  iORM.Abstraction,
+//  iORM.DBBuilder.Factory,
+//  iORM.Context.Map.Interfaces;
+
 uses
-  System.Rtti,
-  iORM.DuckTyped.Interfaces,
-  iORM.DuckTyped.Factory,
-  iORM.DuckTyped.StreamObject,
-  iORM.Exceptions,
-  iORM.DB.Factory,
-  iORM.Utilities,
-  iORM.Strategy.Factory,
-  iORM.Context.Container,
-  iORM.Abstraction,
-  iORM.DBBuilder.Factory,
-  iORM.Context.Map.Interfaces;
+  System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Context.Container, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
+  iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject;
 
 { io }
 
@@ -1241,19 +1220,19 @@ end;
 
 initialization
 
-// Initialize the dependency injection container
-// NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
-TioDependencyInjectionContainer.Build;
+  // Initialize the dependency injection container
+  // NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
+  TioDependencyInjectionContainer.Build;
 
-// Register as default DuckTypedStreamObject invoker
-// NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
-// venive eseguito
-// NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
-io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
+  // Register as default DuckTypedStreamObject invoker
+  // NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
+  // venive eseguito
+  // NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
+  io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
 
-// Create the ContextContainer Instance and Init it by loading
-// all entities declarated in the application
-// NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
-TioMapContainer.Build;
+  // Create the ContextContainer Instance and Init it by loading
+  // all entities declarated in the application
+  // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
+  TioMapContainer.Build;
 
 end.

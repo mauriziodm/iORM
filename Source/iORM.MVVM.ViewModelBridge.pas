@@ -21,11 +21,10 @@ type
     FOnNeedViewModel: TioNeedViewModelEvent;
     procedure AutoSetClientComponentsOnCreate;
     procedure DoNeedViewModel;
-    // Commands
-    function GetCommands: IioVMActionContainer;
-    // Command
-    function GetCommand(const ACmdName: String): IioCommandContainerItem;
-    procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
+    // VMActions
+    function GetVMActions: IioVMActionContainer;
+    // VMAction
+    function GetVMAction(const AName: String): IioVMAction;
     // Default presenter
     function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
@@ -43,8 +42,8 @@ type
     function ViewModelAs<T: IInterface>: T;
     // Properties
     property ViewModel: IioViewModel read GetViewModel;
-    property Commands: IioVMActionContainer read GetCommands;
-    property Command[const ACmdName: String]: IioCommandContainerItem read GetCommand write SetCommand; default;
+    property VMActions: IioVMActionContainer read GetVMActions;
+    property VMAction[const AName: String]: IioVMAction read GetVMAction; default;
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
     property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
   published
@@ -60,8 +59,8 @@ implementation
 
 uses
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Utilities,
-  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces, iORM,
-  iORM.Abstraction, iORM.DB.ConnectionDef;
+  System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces,
+  iORM, iORM.Abstraction, iORM.DB.ConnectionDef;
 
 { TioViewModelBridge }
 
@@ -146,20 +145,20 @@ begin
       Exit(TioViewModelBridge(AView.Components[I]));
 end;
 
-function TioViewModelBridge.GetCommand(const ACmdName: String): IioCommandContainerItem;
+function TioViewModelBridge.GetVMAction(const AName: String): IioVMAction;
 begin
   if Assigned(FViewModel) then
-    Result := FViewModel.Command[ACmdName]
+    Result := FViewModel.VMAction[AName]
   else
-    raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
+    raise EioException.Create(Self.Name, 'GetVMAction', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetCommands: IioVMActionContainer;
+function TioViewModelBridge.GetVMActions: IioVMActionContainer;
 begin
   if Assigned(FViewModel) then
-    Result := FViewModel.Commands
+    Result := FViewModel.VMActions
   else
-    raise EioException.Create(Self.Name, 'GetCommands', '"FViewModel" not assigned.');
+    raise EioException.Create(Self.Name, 'GetVMActions', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetDefaultPresenter: TioModelPresenterCustom;
@@ -243,14 +242,6 @@ begin
       end);
   end;
   // ===========================================================================
-end;
-
-procedure TioViewModelBridge.SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
-begin
-  if Assigned(FViewModel) then
-    FViewModel.SetCommand(ACmdName, Value)
-  else
-    raise EioException.Create(Self.Name, 'SetCommand', '"FViewModel" not assigned.');
 end;
 
 end.

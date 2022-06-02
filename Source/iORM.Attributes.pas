@@ -36,12 +36,9 @@ unit iORM.Attributes;
 interface
 
 uses
-  iORM.CommonTypes, System.UITypes, ObjMapper.Attributes, System.Rtti;
+  System.Rtti, iORM.CommonTypes;
 
 type
-
-  // destination event for VM action
-  TioActionEvent = (Null, OnExecute, OnUpdate, OnHint);
 
   // Type of class mapping
   TioMapModeType = (mmHybrid, mmProperties, mmFields);
@@ -133,79 +130,6 @@ type
 
   // ---------------------------------------------------------------------------
   // END BASE ATTRIBUTES
-  // ===========================================================================
-
-
-
-
-
-  // ===========================================================================
-  // START MVVM ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  ioBindAction = class(TioCustomStringAttribute)
-  end;
-
-  // NB: Questo metodo è stato aggiunto (con il relativo attributo "ioUniBindAction" perchè
-  // si è visto che nel caso delle TUniForm e TUniFrame gli attributi relativi ai campi
-  // non vengono creati e quindi l'attributo "ioBindAction" era inefficace. Però
-  // si era notato che invece gli attributi della classe (non del campo) venivano creati
-  // e quindi si è aggiunto l'attributo "ioUniBindAction" da usare appunto sulla classe
-  // invece che sul controllo.
-  ioUniBindAction = class(TioCustomAttribute)
-  strict private
-    FControlName: String;
-    FCommandName: String;
-  public
-    constructor Create(const AControlName, ACommandName: String);
-    property ControlName: String read FControlName;
-    property CommandName: String read FCommandName;
-  end;
-
-  ioAction = class(TioCustomAttribute)
-  private
-    FName: String;
-    FCaption: String;
-    FEvent: TioActionEvent;
-  public
-    constructor Create(const AName, ACaption: String; const AEvent: TioActionEvent = TioActionEvent.Null); overload;
-    constructor Create(const AName: String; const AEvent: TioActionEvent = TioActionEvent.Null); overload;
-    property Name: String read FName;
-    property Caption: String read FCaption;
-    property Event: TioActionEvent read FEvent;
-  end;
-
-  ioCommand = class(TioCustomAttribute)
-  private
-    FName: String;
-  public
-    constructor Create(const AName: String);
-    property Name: String read FName;
-  end;
-
-  ioDisabled = class(TioCustomAttribute)
-  end;
-
-  ioChecked = class(TioCustomAttribute)
-  end;
-
-  ioGroupIndex = class(TioCustomIntegerAttribute)
-  end;
-
-  ioHint = class(TioCustomStringAttribute)
-  end;
-
-  ioImageIndex = class(TioCustomIntegerAttribute)
-  end;
-
-  ioInvisible = class(TioCustomAttribute)
-  end;
-
-  ioNotificationTarget = class(TioCustomAttribute)
-  end;
-
-  // ---------------------------------------------------------------------------
-  // END MVVM ATTRIBUTES
   // ===========================================================================
 
 
@@ -532,7 +456,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Utilities;
+  iORM.Utilities;
 
 { TioStringAttribute }
 
@@ -665,28 +589,6 @@ begin
   FValue := AValue;
 end;
 
-{ ioAction }
-
-constructor ioAction.Create(const AName, ACaption: String; const AEvent: TioActionEvent);
-begin
-  inherited Create;
-  FName := AName;
-  FCaption := ACaption;
-  FEvent := AEvent;
-end;
-
-constructor ioAction.Create(const AName: String; const AEvent: TioActionEvent);
-begin
-  Self.Create(AName, '', AEvent);
-end;
-
-{ ioCommand }
-
-constructor ioCommand.Create(const AName: String);
-begin
-  FName := AName;
-end;
-
 { diImplements }
 
 constructor diImplements.Create(AIID: TGUID; const AAlias: String);
@@ -710,15 +612,6 @@ begin
   inherited Create;
   FTargetTypeName := ATargetClass.ClassName;
   FTargetTypeAlias := AAlias;
-end;
-
-{ ioUniBindAction }
-
-constructor ioUniBindAction.Create(const AControlName, ACommandName: String);
-begin
-  inherited Create;
-  FControlName := AControlName;
-  FCommandName := ACommandName;
 end;
 
 { ioVarchar }

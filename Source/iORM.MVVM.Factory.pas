@@ -40,70 +40,31 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.Where.Interfaces, System.Rtti, System.Classes,
-  iORM.CommonTypes, iORM.Abstraction;
+  System.Classes, iORM.MVVM.Interfaces;
 
 type
 
   TioMVVMFactory = class
   public
     class function NewViewRegister: IioViewRegister;
-    class function NewCommandsContainer(const AOwner:TComponent): IioVMActionContainer;
-    class function NewCommandsContainerItem(const AName:String; const ACommandType:TioCommandType): IioCommandContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const AAction:TioAction): IioCommandContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const ARttiMethod:TRttiMethod): IioCommandContainerItem; overload;
-    class function NewCommandsContainerItem(const AName:String; const AAnonimousMethod:TioCommandAnonimousMethod): IioCommandContainerItem; overload;
+    class function NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer;
   end;
 
 implementation
 
 uses
-  iORM.MVVM.Commands, System.SysUtils,
-  iORM.Exceptions, iORM.MVVM.ViewRegister;
+  iORM.MVVM.ViewRegister, iORM.MVVM.VMActionContainer;
 
 { TioMVVMFactory }
-
-class function TioMVVMFactory.NewCommandsContainerItem(const AName:String;
-  const ACommandType: TioCommandType): IioCommandContainerItem;
-begin
-  Result := nil;
-  case ACommandType of
-    TioCommandType.ctAction:
-      Result := TioCommandsContainerItemAction.Create(AName);
-    TioCommandType.ctMethod:
-      Result := TioCommandsContainerItemMethod.Create(AName);
-    TioCommandType.ctAnonimousMethod:
-      Result := TioCommandsContainerItemAnonimousMethod.Create(AName);
-  else
-    raise EioException.Create(Self.ClassName + ': Invalid command type.');
-  end;
-end;
-
-class function TioMVVMFactory.NewCommandsContainerItem(const AName:String; const AAction: TioAction): IioCommandContainerItem;
-begin
-  Result := TioCommandsContainerItemAction.Create(AName, AAction);
-end;
-
-class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioVMActionContainer;
-begin
-  Result := TioVMActionContainer.Create(AOwner);
-end;
-
-class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
-  const AAnonimousMethod: TioCommandAnonimousMethod): IioCommandContainerItem;
-begin
-  Result := TioCommandsContainerItemAnonimousMethod.Create(AName, AAnonimousMethod);
-end;
 
 class function TioMVVMFactory.NewViewRegister: IioViewRegister;
 begin
   Result := TioViewRegister.Create;
 end;
 
-class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
-  const ARttiMethod: TRttiMethod): IioCommandContainerItem;
+class function TioMVVMFactory.NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer;
 begin
-  Result := TioCommandsContainerItemMethod.Create(AName, ARttiMethod);
+  Result := TioVMActionContainer.Create(AOwner);
 end;
 
 end.

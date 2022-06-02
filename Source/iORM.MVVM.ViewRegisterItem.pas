@@ -99,7 +99,7 @@ begin
     Exit;
   if Assigned(FViewContextProvider) then
     FViewContextProvider.ReleaseViewContext(FView, FViewContext);
-  // NB: Ho sostituito il test Assigned con una apposita variabile "FViewContextFreeMethodIsPresent" settata nle costruttore
+  // NB: Ho sostituito il test Assigned con una apposita variabile "FViewContextFreeMethodIsPresent" settata nel costruttore
   //      perchè altrimenti capitava che su android 10 "FViewContextFreeMethod" cambiasse senza apparente mitovo e da nil
   //      assumesse un altro valore non nil che poi causava un AV (perchè l'anonimous method in realtà non c'era.
 //  if Assigned(FViewContextFreeMethod) then

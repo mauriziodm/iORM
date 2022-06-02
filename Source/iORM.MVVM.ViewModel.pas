@@ -38,9 +38,8 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  System.Classes, iORM.MVVM.Interfaces, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, System.Rtti, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.ModelPresenter.Custom, System.SysUtils, iORM.Abstraction,
-  iORM.Components.InterfacedDataModule;
+  System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.MVVM.VMActionContainer, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
+  iORM.MVVM.ModelPresenter.Custom;
 
 type
 
@@ -50,8 +49,7 @@ type
 
   TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel, IioViewModelInternal) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
-    { Private declarations }
-    FCommands: IioVMActionContainer;
+    FVMActionContainer: IioVMActionContainer;
     FViewRegister: IioViewRegister;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
@@ -62,19 +60,17 @@ type
     function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
     function GetPresenter(const AName: String): TioModelPresenterCustom;
-    // Command
-    function GetCommand(const ACmdName: String): IioCommandContainerItem;
-    procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
+    // VMAction
+    function GetVMAction(const AName: String): IioVMAction;
   public
-    { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    function Commands: IioVMActionContainer;
+    function VMActions: IioVMActionContainer;
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;
     procedure TerminateApplication;
     // Properties
-    property Command[const ACmdName: String]: IioCommandContainerItem read GetCommand write SetCommand;
+    property VMAction[const AName: String]: IioVMAction read GetVMAction;
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
     property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
   published
@@ -84,20 +80,18 @@ type
 
 implementation
 
-uses iORM.Exceptions, iORM.RttiContext.Factory,
-  iORM.MVVM.Factory, Data.Bind.ObjectScope,
-  iORM.LiveBindings.Factory, iORM;
+uses
+  iORM, iORM.Exceptions, iORM.MVVM.Factory;
 
 procedure TioViewModel.BindView(const AView: TComponent);
 begin
-  Commands.BindView(AView);
+  VMActions.BindView(AView);
 end;
 
 
-function TioViewModel.GetCommand(const ACmdName: String): IioCommandContainerItem;
+function TioViewModel.GetVMAction(const AName: String): IioVMAction;
 begin
-  // Get the CommandItem if exist
-  Result := Commands.Get(ACmdName, False);
+  Result := FVMActionContainer.Get(AName, False);
 end;
 
 function TioViewModel.GetDefaultPresenter: TioModelPresenterCustom;
@@ -134,11 +128,6 @@ begin
   FViewRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
 end;
 
-procedure TioViewModel.SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
-begin
-  Commands.AddOrUpdate(ACmdName, Value);
-end;
-
 procedure TioViewModel.ShowViews;
 begin
   FViewRegister.ShowAllViewContexts;
@@ -150,16 +139,16 @@ begin
 end;
 
 
-function TioViewModel.Commands: IioVMActionContainer;
+function TioViewModel.VMActions: IioVMActionContainer;
 begin
-  Result := FCommands;
+  Result := FVMActionContainer;
 end;
 
 constructor TioViewModel.Create(AOwner: TComponent);
 begin
    inherited;
    // Init
-   FCommands := TioMVVMFactory.NewCommandsContainer(Self);
+   FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self);
    FViewRegister := TioMVVMFactory.NewViewRegister;
 end;
 

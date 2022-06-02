@@ -31,15 +31,14 @@
 { }
 { *************************************************************************** }
 
-unit iORM.MVVM.Commands;
+unit iORM.MVVM.VMActionContainer;
 
 interface
 
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  System.Rtti, iORM.MVVM.Interfaces, System.Generics.Collections, System.Classes, System.UITypes, iORM.Attributes, iORM.CommonTypes,
-  iORM.Abstraction, iORM.MVVM.Actions.Interfaces;
+  System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces;
 
 type
 
@@ -55,8 +54,8 @@ type
     procedure Remove(AName: String);
     function Get(const AName: String; const ANoException: Boolean = False): IioVMAction;
     function Contains(const AName: String): Boolean;
-    procedure CopyCommands(const ADestVMActionContainer: IioVMActionContainer);
-    procedure CopyCommand(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
+    procedure CopyVMActions(const ADestVMActionContainer: IioVMActionContainer);
+    procedure CopyVMAction(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure BindView(const AView: TComponent);
   end;
@@ -64,10 +63,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.MVVM.Factory,
-  iORM.RttiContext.Factory,
-  System.SysUtils, iORM.Utilities,
-  iORM.MVVM.Actions.VM;
+  System.SysUtils, iORM.Exceptions;
 
 { TioVMNotifyContainer }
 
@@ -94,17 +90,17 @@ begin
       [AViewAction.Name, AViewAction.VMActionName, FOwner.Name]));
 end;
 
-procedure TioVMActionContainer.CopyCommand(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
+procedure TioVMActionContainer.CopyVMAction(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
 begin
   ADestVMActionContainer.Add(Get(Uppercase(AName), True)); // Note: raise exception if VMAction not found
 end;
 
-procedure TioVMActionContainer.CopyCommands(const ADestVMActionContainer: IioVMActionContainer);
+procedure TioVMActionContainer.CopyVMActions(const ADestVMActionContainer: IioVMActionContainer);
 var
   LName: String;
 begin
   for LName in FContainer.Keys do
-    CopyCommand(LName, ADestVMActionContainer);
+    CopyVMAction(LName, ADestVMActionContainer);
 end;
 
 constructor TioVMActionContainer.Create(const AOwner: TComponent);
@@ -155,6 +151,9 @@ var
   I: Integer;
   LViewAction: IioViewAction;
 begin
+  // Capture any VMAction present in the view.
+  LoadVMActionsFromView(AView);
+  // Bind any ViewAction to the related VMAction registered on the ViewModel
   for I := 0 to AView.ComponentCount - 1 do
     if Supports(AView.Components[i], IioViewAction, LViewAction) then
       BindViewAction(LViewAction);

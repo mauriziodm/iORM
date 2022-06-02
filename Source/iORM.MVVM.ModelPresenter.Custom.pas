@@ -36,10 +36,8 @@ unit iORM.MVVM.ModelPresenter.Custom;
 interface
 
 uses
-  System.Classes, iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
-  iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.ObjectScope,
-  System.Generics.Collections, iORM.MVVM.ViewContextProvider,
-  System.Rtti, iORM.LiveBindings.CommonBSAPaging, System.SysUtils;
+  System.Classes, System.SysUtils, Data.Bind.ObjectScope, System.Generics.Collections, iORM.CommonTypes, iORM.LiveBindings.Interfaces,
+  iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -292,10 +290,8 @@ type
 implementation
 
 uses
-  iORM.Where.Factory, iORM.LiveBindings.Factory,
-  iORM.Exceptions, iORM.Utilities, iORM, iORM.Components.Common,
-  iORM.LiveBindings.CommonBSBehavior, iORM.LiveBindings.BSPersistence,
-  iORM.Components.Common.Interfaces;
+  iORM, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.LiveBindings.BSPersistence, iORM.Components.Common, iORM.LiveBindings.CommonBSBehavior,
+  iORM.Components.Common.Interfaces, iORM.LiveBindings.Factory;
 
 { TioModelProvider }
 

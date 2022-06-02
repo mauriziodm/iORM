@@ -40,7 +40,7 @@ unit iORM.Abstraction;
 interface
 
 uses
-  System.Classes, System.Rtti, System.SysUtils;
+  System.Classes, System.SysUtils, System.Rtti;
 
 type
   TioApplicationRef = class of TioApplication;

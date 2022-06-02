@@ -137,7 +137,7 @@ contains
   iORM.DB.SQL.Destination in '..\..\Source\iORM.DB.SQL.Destination.pas',
   iORM.DB.MemTable in '..\..\Source\iORM.DB.MemTable.pas',
   iORM.DependencyInjection.Implementers in '..\..\Source\iORM.DependencyInjection.Implementers.pas',
-  iORM.MVVM.Commands in '..\..\Source\iORM.MVVM.Commands.pas',
+  iORM.MVVM.VMActionContainer in '..\..\Source\iORM.MVVM.VMActionContainer.pas',
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
   iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
   iORM.REST.Connection in '..\..\Source\iORM.REST.Connection.pas',
@@ -213,8 +213,7 @@ contains
   iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas',
   iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas',
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
-  iORM.MVVM.Actions.Interfaces in '..\..\Source\iORM.MVVM.Actions.Interfaces.pas',
-  iORM.MVVM.Actions.VM in '..\..\Source\iORM.MVVM.Actions.VM.pas';
+  iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas';
 
 end.
 

@@ -1,9 +1,9 @@
-unit iORM.MVVM.Actions.VM;
+unit iORM.MVVM.VMAction;
 
 interface
 
 uses
-  System.Classes, iORM.MVVM.Actions.Interfaces, System.Generics.Collections;
+  System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces;
 
 type
 
@@ -31,6 +31,9 @@ type
     // Name property
     function GetName: TComponentName;
     property Name: TComponentName read GetName write SetName;
+    // Owner
+    function GetOwnerComponent: TComponent;
+    property Owner: TComponent read GetOwnerComponent;
     // Visible property
     procedure SetVisible(const Value: Boolean);
     function GetVisible: Boolean;
@@ -104,6 +107,11 @@ end;
 function TioVMActionCustom.GetName: TComponentName;
 begin
   Result := inherited Name;
+end;
+
+function TioVMActionCustom.GetOwnerComponent: TComponent;
+begin
+  Result := inherited Owner;
 end;
 
 function TioVMActionCustom.GetVisible: Boolean;

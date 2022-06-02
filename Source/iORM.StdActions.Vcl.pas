@@ -3,9 +3,7 @@ unit iORM.StdActions.Vcl;
 interface
 
 uses
-  Vcl.ActnList, iORM.LiveBindings.BSPersistence, System.Classes,
-  iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.ViewModelBridge,
-  iORM.MVVM.Actions.Interfaces, iORM.Exceptions;
+  System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence;
 
 type
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
@@ -49,7 +47,7 @@ type
     function GetEnabledLinkedToVMAction: Boolean;
     // Name property
     function GetName: TComponentName;
-    property Name: TComponentName read GetName write SetName;
+    property Name: TComponentName read GetName write SetName stored False;
     // Visible property
     procedure SetVisible(Value: Boolean); override;
     function GetVisible: Boolean;
@@ -294,7 +292,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction, System.SysUtils, iORM.Utilities;
+  System.SysUtils, iORM.Exceptions, iORM.Utilities;
 
 { TioBSObjStateStdAction }
 

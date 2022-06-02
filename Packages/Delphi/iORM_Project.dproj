@@ -219,7 +219,7 @@
         <DCCReference Include="..\..\Source\iORM.DB.SQL.Destination.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MemTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Implementers.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Commands.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.VMActionContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\iORM.REST.Connection.pas"/>
@@ -295,8 +295,7 @@
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.InterfacedDataModule.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Actions.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Actions.VM.pas"/>
+        <DCCReference Include="..\..\Source\iORM.MVVM.VMAction.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

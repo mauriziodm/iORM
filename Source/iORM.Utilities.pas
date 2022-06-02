@@ -36,8 +36,7 @@ unit iORM.Utilities;
 interface
 
 uses
-  iORM.CommonTypes, System.Rtti, System.Classes, iORM.Exceptions,
-  System.TypInfo, iORM.MVVM.Interfaces, System.Types;
+  System.Classes, System.TypInfo, System.Rtti, iORM.CommonTypes, iORM.MVVM.Interfaces;
 
 type
 
@@ -80,9 +79,8 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.RttiContext.Factory, System.StrUtils, iORM, iORM.DependencyInjection.Implementers,
-  iORM.Context.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Container,
-  iORM.DuckTyped.Factory;
+  System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
+  iORM.DependencyInjection.Implementers;
 
 { TioRttiUtilities }
 
@@ -112,7 +110,7 @@ end;
 
 class function TioUtilities.ClassNameToClassRef(const AClassName: String): TioClassRef;
 begin
-  Result := TioMapCOntainer.GetMap(AClassName).GetClassRef;
+  Result := TioMapContainer.GetMap(AClassName).GetClassRef;
 end;
 
 class function TioUtilities.ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType;
