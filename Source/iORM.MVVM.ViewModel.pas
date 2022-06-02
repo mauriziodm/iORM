@@ -51,7 +51,7 @@ type
   TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel, IioViewModelInternal) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     { Private declarations }
-    FCommands: IioCommandContainer;
+    FCommands: IioVMActionContainer;
     FViewRegister: IioViewRegister;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
@@ -68,7 +68,7 @@ type
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    function Commands: IioCommandContainer;
+    function Commands: IioVMActionContainer;
     procedure FreeViews;
     procedure HideViews;
     procedure ShowViews;
@@ -150,7 +150,7 @@ begin
 end;
 
 
-function TioViewModel.Commands: IioCommandContainer;
+function TioViewModel.Commands: IioVMActionContainer;
 begin
   Result := FCommands;
 end;

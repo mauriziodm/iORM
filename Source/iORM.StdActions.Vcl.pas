@@ -27,7 +27,9 @@ type
     FOnAfterExecute: TNotifyEvent;
     FOnBeforeUpdate: TNotifyEvent;
     FOnAfterUpdate: TNotifyEvent;
-  strict protected
+  strict
+  private
+    procedure SetName(const Value: TComponentName); protected
     procedure CheckVMAction(const CallingMethod: String);
     procedure DoBeforeExecute;
     procedure DoAfterExecute;
@@ -45,6 +47,9 @@ type
     // EnabledLinkedToAction property
     procedure SetEnabledLinkedToVMAction(Value: Boolean);
     function GetEnabledLinkedToVMAction: Boolean;
+    // Name property
+    function GetName: TComponentName;
+    property Name: TComponentName read GetName write SetName;
     // Visible property
     procedure SetVisible(Value: Boolean); override;
     function GetVisible: Boolean;
@@ -70,7 +75,7 @@ type
     property Visible: Boolean read GetVisible write SetVisible;
     property VisibleLinkedToVMAction: Boolean read GetVisibleLinkedToVMAction write SetVisibleLinkedToVMAction default True;
   published
-    property VMActionName: String read FVMActionName write FVMActionName;
+    property VMActionName: String read GetVMActionName write SetVMActionName;
   end;
 
   // =================================================================================================
@@ -694,6 +699,11 @@ begin
   Result := FEnabledLinkedToVMAction;
 end;
 
+function TioViewAction.GetName: TComponentName;
+begin
+  Result := inherited Name;
+end;
+
 function TioViewAction.GetVisible: Boolean;
 begin
   Result := inherited Visible;
@@ -738,6 +748,11 @@ end;
 procedure TioViewAction.SetEnabledLinkedToVMAction(Value: Boolean);
 begin
   FEnabledLinkedToVMAction := Value;
+end;
+
+procedure TioViewAction.SetName(const Value: TComponentName);
+begin
+
 end;
 
 procedure TioViewAction.SetVisible(Value: Boolean);

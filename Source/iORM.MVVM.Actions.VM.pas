@@ -9,12 +9,13 @@ type
 
   TioVMActionCustom = class(TComponent, IioVMAction)
   private
-    FBindedViewActions: TList<IioViewAction>;
+    FBindedViewActionsContainer: TList<IioViewAction>;
     FCaption: String;
     FEnabled: Boolean;
     FVisible: Boolean;
     FOnExecute: TNotifyEvent;
     FOnUpdate: TNotifyEvent;
+    procedure SetName(const Value: TComponentName);
   protected
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
@@ -27,6 +28,9 @@ type
     procedure SetEnabled(const Value: Boolean);
     function GetEnabled: Boolean;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
+    // Name property
+    function GetName: TComponentName;
+    property Name: TComponentName read GetName write SetName;
     // Visible property
     procedure SetVisible(const Value: Boolean);
     function GetVisible: Boolean;
@@ -60,13 +64,13 @@ begin
   inherited;
   FEnabled := True;
   FVisible := True;
-  FBindedViewActions := TList<IioViewAction>.Create;
+  FBindedViewActionsContainer := TList<IioViewAction>.Create;
 end;
 
 destructor TioVMActionCustom.Destroy;
 begin
   UnbindAllViewActions;
-  FBindedViewActions.Free;
+  FBindedViewActionsContainer.Free;
   inherited;
 end;
 
@@ -75,13 +79,13 @@ var
   LViewAction: IioViewAction;
 begin
    // Execute the ViewAction.onBeforeExecute event
-  for LViewAction in FBindedViewActions do
+  for LViewAction in FBindedViewActionsContainer do
     LViewAction.DoBeforeExecute;
   // Execute the VMAction.onExecute event
   if Assigned(FOnExecute) then
     FOnExecute(Self);
   // Execute the ViewAction.onAfterExecute event
-  for LViewAction in FBindedViewActions do
+  for LViewAction in FBindedViewActionsContainer do
     LViewAction.DoAfterExecute;
   // It's all right
   Result := True;
@@ -97,6 +101,11 @@ begin
   Result := FEnabled;
 end;
 
+function TioVMActionCustom.GetName: TComponentName;
+begin
+  Result := inherited Name;
+end;
+
 function TioVMActionCustom.GetVisible: Boolean;
 begin
   Result := FVisible;
@@ -107,13 +116,13 @@ var
   LViewAction: IioViewAction;
 begin
   // Execute the ViewAction.onBeforeUpdate event
-  for LViewAction in FBindedViewActions do
+  for LViewAction in FBindedViewActionsContainer do
     LViewAction.DoBeforeUpdate;
   // Execute the VMAction.onUpdate event
   if Assigned(FOnUpdate) then
     FOnUpdate(Self);
   // Execute the ViewAction.onAfterUpdatee event
-  for LViewAction in FBindedViewActions do
+  for LViewAction in FBindedViewActionsContainer do
     LViewAction.DoAfterUpdate;
   // It's all right
   Result := True;
@@ -121,7 +130,7 @@ end;
 
 procedure TioVMActionCustom.BindViewAction(const AViewAction: IioViewAction);
 begin
-  FBindedViewActions.Add(AViewAction);
+  FBindedViewActionsContainer.Add(AViewAction);
   AViewAction.VMAction := Self;
   // Propagate Caption/Enabled/Visible to the new registered ViewAction if linked
   if AViewAction.CaptionLinkedToVMAction then
@@ -134,7 +143,7 @@ end;
 
 procedure TioVMActionCustom.UnbindViewAction(const AViewAction: IioViewAction);
 begin
-  FBindedViewActions.Remove(AViewAction);
+  FBindedViewActionsContainer.Remove(AViewAction);
   AViewAction.VMAction := nil;
 end;
 
@@ -142,8 +151,8 @@ procedure TioVMActionCustom.UnbindAllViewActions;
 var
   I: Integer;
 begin
-  for I := FBindedViewActions.Count-1 downto 0 do
-    UnbindViewAction(FBindedViewActions[I]);
+  for I := FBindedViewActionsContainer.Count-1 downto 0 do
+    UnbindViewAction(FBindedViewActionsContainer[I]);
 end;
 
 procedure TioVMActionCustom.SetCaption(const Value: String);
@@ -153,7 +162,7 @@ begin
   if Value <> FCaption then
   begin
     FCaption := Value;
-    for LViewAction in FBindedViewActions do
+    for LViewAction in FBindedViewActionsContainer do
       if LViewAction.CaptionLinkedToVMAction then
         LViewAction.Caption := Value;
   end;
@@ -166,10 +175,15 @@ begin
   if Value <> FEnabled then
   begin
     FEnabled := Value;
-    for LViewAction in FBindedViewActions do
+    for LViewAction in FBindedViewActionsContainer do
       if LViewAction.EnabledLinkedToVMAction then
         LViewAction.Enabled := Value;
   end;
+end;
+
+procedure TioVMActionCustom.SetName(const Value: TComponentName);
+begin
+
 end;
 
 procedure TioVMActionCustom.SetVisible(const Value: Boolean);
@@ -179,7 +193,7 @@ begin
   if Value <> FVisible then
   begin
     FVisible := Value;
-    for LViewAction in FBindedViewActions do
+    for LViewAction in FBindedViewActionsContainer do
       if LViewAction.VisibleLinkedToVMAction then
         LViewAction.Visible := Value;
   end;

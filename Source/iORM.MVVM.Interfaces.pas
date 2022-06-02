@@ -46,14 +46,14 @@ type
 
   TioCommandType = (ctNull, ctAction, ctMethod, ctAnonimousMethod);
 
-  IioCommandContainer = interface;
+  IioVMActionContainer = interface;
   IioCommandContainerItem = interface;
   IioViewRegister = interface;
 
   // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    function Commands: IioCommandContainer;
+    function Commands: IioVMActionContainer;
     // Command property
     procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
     function GetCommand(const ACmdName: String): IioCommandContainerItem;
@@ -162,13 +162,13 @@ type
     property IsNotificationTarget: Boolean read GetIsNotificationTarget write SetIsNotificationTarget;
   end;
 
-  IioCommandContainer = interface
+  IioVMActionContainer = interface
     ['{E20F72CB-9F84-44B4-A6DD-DFF73B53F0AC}']
     procedure Add(const AName: String; const ACommandItem: IioCommandContainerItem);
     procedure AddOrUpdate(const AName: String; const ACommandItem: IioCommandContainerItem);
     procedure LoadCommands(const AOwner: TComponent);
-    procedure CopyCommands(const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
-    procedure CopyCommand(const ACommandName: String; const ADestinationCommandsContainer: IioCommandContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommands(const ADestinationCommandsContainer: IioVMActionContainer; const AUpdateIfExists: Boolean = False);
+    procedure CopyCommand(const ACommandName: String; const ADestinationCommandsContainer: IioVMActionContainer; const AUpdateIfExists: Boolean = False);
     procedure Delete(AName: String);
     // procedure RegisterAction(const AName:String; const AOwner:TComponent; const AAction:TAction; const AIsNotificationTarget:Boolean=False);
     // procedure RegisterMethod(const AName:String; const AOwner:TComponent; const ARttiMethod:TRttiMethod; const AIsNotificationTarget:Boolean=False);

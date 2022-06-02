@@ -22,7 +22,7 @@ type
     procedure AutoSetClientComponentsOnCreate;
     procedure DoNeedViewModel;
     // Commands
-    function GetCommands: IioCommandContainer;
+    function GetCommands: IioVMActionContainer;
     // Command
     function GetCommand(const ACmdName: String): IioCommandContainerItem;
     procedure SetCommand(const ACmdName: String; const Value: IioCommandContainerItem);
@@ -43,7 +43,7 @@ type
     function ViewModelAs<T: IInterface>: T;
     // Properties
     property ViewModel: IioViewModel read GetViewModel;
-    property Commands: IioCommandContainer read GetCommands;
+    property Commands: IioVMActionContainer read GetCommands;
     property Command[const ACmdName: String]: IioCommandContainerItem read GetCommand write SetCommand; default;
     property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
     property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
@@ -154,7 +154,7 @@ begin
     raise EioException.Create(Self.Name, 'GetCommand', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetCommands: IioCommandContainer;
+function TioViewModelBridge.GetCommands: IioVMActionContainer;
 begin
   if Assigned(FViewModel) then
     Result := FViewModel.Commands

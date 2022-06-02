@@ -48,7 +48,7 @@ type
   TioMVVMFactory = class
   public
     class function NewViewRegister: IioViewRegister;
-    class function NewCommandsContainer(const AOwner:TComponent): IioCommandContainer;
+    class function NewCommandsContainer(const AOwner:TComponent): IioVMActionContainer;
     class function NewCommandsContainerItem(const AName:String; const ACommandType:TioCommandType): IioCommandContainerItem; overload;
     class function NewCommandsContainerItem(const AName:String; const AAction:TioAction): IioCommandContainerItem; overload;
     class function NewCommandsContainerItem(const AName:String; const ARttiMethod:TRttiMethod): IioCommandContainerItem; overload;
@@ -84,9 +84,9 @@ begin
   Result := TioCommandsContainerItemAction.Create(AName, AAction);
 end;
 
-class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioCommandContainer;
+class function TioMVVMFactory.NewCommandsContainer(const AOwner:TComponent): IioVMActionContainer;
 begin
-  Result := TioCommandsContainer.Create(AOwner);
+  Result := TioVMActionContainer.Create(AOwner);
 end;
 
 class function TioMVVMFactory.NewCommandsContainerItem(const AName: String;
