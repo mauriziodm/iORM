@@ -50,8 +50,12 @@ type
 
   TioVMAction = class(TioVMActionCustom)
   public
+    property Owner: TComponent read GetOwnerComponent;
+  published
     // Properties
+    property Caption;
     property Enabled;
+    property Name;
     property Visible;
     // Events
     property OnExecute;

@@ -12,7 +12,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
   iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors,
-  iORM.DT.CompAutoUses;
+  iORM.DT.CompAutoUses, iORM.MVVM.VMAction;
 
 procedure Register;
 begin
@@ -55,12 +55,12 @@ begin
   RegisterSelectionEditor(TioPrototypeBindSourceDetail, TioBindSourceSelectionEditor);
 
   // MVVM components
-  RegisterComponents('iORM', [TioViewModelBridge]);
-  RegisterComponents('iORM', [TioViewContextProvider]);
-  RegisterComponents('iORM', [TioModelPresenterMaster]);
-  RegisterComponents('iORM', [TioModelPresenterDetail]);
-  RegisterComponents('iORM', [TioModelDataSet]);
-  RegisterComponents('iORM', [TioModelBindSource]);
+  RegisterComponents('iORM-MVVM', [TioViewModelBridge]);
+  RegisterComponents('iORM-MVVM', [TioViewContextProvider]);
+  RegisterComponents('iORM-MVVM', [TioModelPresenterMaster]);
+  RegisterComponents('iORM-MVVM', [TioModelPresenterDetail]);
+  RegisterComponents('iORM-MVVM', [TioModelDataSet]);
+  RegisterComponents('iORM-MVVM', [TioModelBindSource]);
   UnlistPublishedProperty(TioModelBindSource, 'AutoActivate');
   UnlistPublishedProperty(TioModelBindSource, 'AutoEdit');
   UnlistPublishedProperty(TioModelBindSource, 'AutoPost');
@@ -70,6 +70,7 @@ begin
   RegisterSelectionEditor(TioViewContextProvider, TioMVVMSelectionEditor);
   RegisterSelectionEditor(TioModelPresenterMaster, TioBindSourceSelectionEditor);
   RegisterSelectionEditor(TioModelPresenterDetail, TioBindSourceSelectionEditor);
+  RegisterComponents('iORM-MVVM', [TioVMAction]);
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.VCL.TioBSSelectCurrent], nil);
@@ -84,6 +85,7 @@ begin
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceRevert], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceSaveRevertPoint], nil);
+  RegisterActions('iORM-MVVM', [iORM.StdActions.VCL.TioViewAction], nil);
 
   // FMX standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.FMX.TioBSSelectCurrent], nil);
