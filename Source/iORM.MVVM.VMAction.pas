@@ -15,7 +15,6 @@ type
     FVisible: Boolean;
     FOnExecute: TNotifyEvent;
     FOnUpdate: TNotifyEvent;
-    procedure SetName(const Value: TComponentName); reintroduce;
   protected
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
@@ -29,6 +28,7 @@ type
     function GetEnabled: Boolean;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
     // Name property
+    procedure SetName(const Value: TComponentName); reintroduce;
     function GetName: TComponentName;
     property Name: TComponentName read GetName write SetName;
     // Owner
@@ -195,7 +195,7 @@ end;
 
 procedure TioVMActionCustom.SetName(const Value: TComponentName);
 begin
-
+  inherited SetName(Value);
 end;
 
 procedure TioVMActionCustom.SetVisible(const Value: Boolean);

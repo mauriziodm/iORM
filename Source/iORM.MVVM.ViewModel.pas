@@ -154,8 +154,8 @@ end;
 
 constructor TioViewModel.Create(AOwner: TComponent);
 begin
+   FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self); // NOTE: IT MUST BE BEFORE INHERITED
    inherited;
-   FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self);
    FViewRegister := TioMVVMFactory.NewViewRegister;
 end;
 

@@ -3,13 +3,89 @@ unit iORM.StdActions.Fmx;
 interface
 
 uses
-  FMX.ActnList, iORM.LiveBindings.BSPersistence, System.Classes,
-  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
+  FMX.ActnList, iORM.LiveBindings.BSPersistence, System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.Interfaces;
 
 type
 
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
+
+  // =================================================================================================
+  // BEGIN: FMX MVVM STANDARD ACTIONS
+  // =================================================================================================
+
+
+  // =================================================================================================
+  // END: FMX MVVM STANDARD ACTIONS
+  // =================================================================================================
+
+  // Standard action for MVVM view use
+  TioViewAction = class(FMX.ActnList.TAction, IioViewAction)
+  strict private
+    FCaptionLinkedToVMAction: Boolean;
+    FEnabledLinkedToVMAction: Boolean;
+    FVisibleLinkedToVMAction: Boolean;
+    FVMAction: IioVMAction;
+    FVMActionName: String;
+    FOnBeforeExecute: TNotifyEvent;
+    FOnAfterExecute: TNotifyEvent;
+    FOnBeforeUpdate: TNotifyEvent;
+    FOnAfterUpdate: TNotifyEvent;
+  strict protected
+    procedure CheckVMAction(const CallingMethod: String);
+    procedure DoBeforeExecute;
+    procedure DoAfterExecute;
+    procedure DoBeforeUpdate;
+    procedure DoAfterUpdate;
+    // Caption property
+    procedure SetCaption(const Value: string); override;
+    function GetCaption: String;
+    // CaptionLinkedToAction property
+    procedure SetCaptionLinkedToVMAction(Value: Boolean);
+    function GetCaptionLinkedToVMAction: Boolean;
+    // Enabled property
+    procedure SetEnabled(Value: Boolean); override;
+    function GetEnabled: Boolean;
+    // EnabledLinkedToAction property
+    procedure SetEnabledLinkedToVMAction(Value: Boolean);
+    function GetEnabledLinkedToVMAction: Boolean;
+    // Name property
+    procedure SetName(const Value: TComponentName); reintroduce;
+    function GetName: TComponentName;
+    property Name: TComponentName read GetName write SetName stored False;
+    // Visible property
+    procedure SetVisible(Value: Boolean); override;
+    function GetVisible: Boolean;
+    // EnabledLinkedToAction property
+    procedure SetVisibleLinkedToVMAction(Value: Boolean);
+    function GetVisibleLinkedToVMAction: Boolean;
+    // VMAction property
+    procedure SetVMAction(Value: IioVMAction);
+    function GetVMAction: IioVMAction;
+    property VMAction: IioVMAction read GetVMAction write SetVMAction;
+    // VMActionName property
+    procedure SetVMActionName(Value: String);
+    function GetVMActionName: String;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function Execute: Boolean; override;
+    function Update: Boolean; override;
+  published
+    // Properties
+    property Caption: string read GetCaption write SetCaption;
+    property CaptionLinkedToVMAction: Boolean read GetCaptionLinkedToVMAction write SetCaptionLinkedToVMAction default False;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
+    property EnabledLinkedToVMAction: Boolean read GetEnabledLinkedToVMAction write SetEnabledLinkedToVMAction default True;
+    property Visible: Boolean read GetVisible write SetVisible;
+    property VisibleLinkedToVMAction: Boolean read GetVisibleLinkedToVMAction write SetVisibleLinkedToVMAction default True;
+    property VMActionName: String read GetVMActionName write SetVMActionName;
+    // Events
+    property OnAfterExecute: TNotifyEvent read FOnAfterExecute write FOnAfterExecute;
+    property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
+    property OnBeforeExecute: TNotifyEvent read FOnBeforeExecute write FOnBeforeExecute;
+    property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
+  end;
 
   // =================================================================================================
   // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES
@@ -542,6 +618,188 @@ procedure TioBSPrevPage.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
+end;
+
+{ TioViewAction }
+
+procedure TioViewAction.CheckVMAction(const CallingMethod: String);
+begin
+  if not Assigned(FVMAction) then
+    raise EioException.Create(ClassName, Format('CheckVMAction', [CallingMethod]),
+      Format('ViewAction "%s" is not linked to corresponding VMAction named "%s".'#13#13'iORM is unable to execute the requested method ("%s").', [Name, 'XXX', CallingMethod]));
+end;
+
+constructor TioViewAction.Create(AOwner: TComponent);
+begin
+  inherited;
+  FCaptionLinkedToVMAction := False;
+  FEnabledLinkedToVMAction := True;
+  FVisibleLinkedToVMAction := True;
+  FVMAction := nil;
+  FVMActionName := '';
+end;
+
+destructor TioViewAction.Destroy;
+begin
+  if Assigned(FVMAction) then
+    FVMAction.UnbindViewAction(Self);
+  inherited;
+end;
+
+procedure TioViewAction.DoAfterExecute;
+begin
+  if Assigned(FOnAfterExecute) then
+    FOnAfterExecute(Self);
+end;
+
+procedure TioViewAction.DoAfterUpdate;
+begin
+  if Assigned(FOnAfterUpdate) then
+    FOnAfterUpdate(Self);
+end;
+
+procedure TioViewAction.DoBeforeExecute;
+begin
+  if Assigned(FOnBeforeExecute) then
+    FOnBeforeExecute(Self);
+end;
+
+procedure TioViewAction.DoBeforeUpdate;
+begin
+  if Assigned(FOnBeforeUpdate) then
+    FOnBeforeUpdate(Self);
+end;
+
+function TioViewAction.Execute: Boolean;
+begin
+  CheckVMAction('Execute');
+  Result := FVMAction.Execute;
+end;
+
+function TioViewAction.GetCaption: String;
+begin
+  Result := inherited Caption;
+end;
+
+function TioViewAction.GetCaptionLinkedToVMAction: Boolean;
+begin
+  Result := FCaptionLinkedToVMAction;
+end;
+
+function TioViewAction.GetEnabled: Boolean;
+begin
+  Result := inherited Enabled;
+end;
+
+function TioViewAction.GetEnabledLinkedToVMAction: Boolean;
+begin
+  Result := FEnabledLinkedToVMAction;
+end;
+
+function TioViewAction.GetName: TComponentName;
+begin
+  Result := inherited Name;
+end;
+
+function TioViewAction.GetVisible: Boolean;
+begin
+  Result := inherited Visible;
+end;
+
+function TioViewAction.GetVisibleLinkedToVMAction: Boolean;
+begin
+  Result := FVisibleLinkedToVMAction;
+end;
+
+function TioViewAction.GetVMAction: IioVMAction;
+begin
+  Result := FVmAction;
+end;
+
+function TioViewAction.GetVMActionName: String;
+begin
+  if FVMActionName.IsEmpty then
+    Result := Name
+  else
+    Result := FVMActionName;
+end;
+
+procedure TioViewAction.SetCaption(const Value: string);
+begin
+  if Value <> GetCaption then
+  begin
+    inherited SetCaption(Value);
+    if FCaptionLinkedToVMAction and not (csDesigning in ComponentState) then
+    begin
+      CheckVMAction('SetCaption');
+      FVMAction.Caption := Value;
+    end;
+  end;
+end;
+
+procedure TioViewAction.SetCaptionLinkedToVMAction(Value: Boolean);
+begin
+  FCaptionLinkedToVMAction := Value;
+end;
+
+procedure TioViewAction.SetEnabled(Value: Boolean);
+begin
+  if Value <> GetEnabled then
+  begin
+    inherited SetEnabled(Value);
+    if FEnabledLinkedToVMAction and not (csDesigning in ComponentState) then
+    begin
+      CheckVMAction('SetEnabled');
+      FVMAction.Enabled := Value;
+    end;
+  end;
+end;
+
+procedure TioViewAction.SetEnabledLinkedToVMAction(Value: Boolean);
+begin
+  FEnabledLinkedToVMAction := Value;
+end;
+
+procedure TioViewAction.SetName(const Value: TComponentName);
+begin
+  inherited SetName(Value);
+end;
+
+procedure TioViewAction.SetVisible(Value: Boolean);
+begin
+  if Value <> GetVisible then
+  begin
+    inherited SetVisible(Value);
+    if FVisibleLinkedToVMAction and not (csDesigning in ComponentState) then
+    begin
+      CheckVMAction('SetVisible');
+      FVMAction.Visible := Value;
+    end;
+  end;
+end;
+
+procedure TioViewAction.SetVisibleLinkedToVMAction(Value: Boolean);
+begin
+  FVisibleLinkedToVMAction := Value;
+end;
+
+procedure TioViewAction.SetVMAction(Value: IioVMAction);
+begin
+  FVMAction := Value;
+end;
+
+procedure TioViewAction.SetVMActionName(Value: String);
+begin
+  if UpperCase(Value.Trim) = UpperCase(Name) then
+    FVMActionName := ''
+  else
+    FVMActionName := Value.Trim;
+end;
+
+function TioViewAction.Update: Boolean;
+begin
+  CheckVMAction('Update');
+  Result := FVMAction.Update;
 end;
 
 end.

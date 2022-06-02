@@ -73,33 +73,39 @@ begin
   RegisterComponents('iORM-MVVM', [TioVMAction]);
 
   // VCL standard actions
-  RegisterActions('iORM-BS', [iORM.StdActions.VCL.TioBSSelectCurrent], nil);
-  RegisterActions('iORM-BSPaging', [iORM.StdActions.VCL.TioBSNextPage], nil);
-  RegisterActions('iORM-BSPaging', [iORM.StdActions.VCL.TioBSPrevPage], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceAppend], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceClear], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceDelete], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceInsert], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistencePersist], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceReload], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceRevert], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceRevertOrDelete], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.VCL.TioBSPersistenceSaveRevertPoint], nil);
-  RegisterActions('iORM-MVVM', [iORM.StdActions.VCL.TioViewAction], nil);
+  RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceAppend], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceClear], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceDelete], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceInsert], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistencePersist], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceReload], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceRevert], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceRevertOrDelete], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceSaveRevertPoint], nil);
+  RegisterActions('iORM-MVVM', [iORM.StdActions.Vcl.TioViewAction], nil);
+  UnlistPublishedProperty(iORM.StdActions.Vcl.TioViewAction, 'OnExecute');
+  UnlistPublishedProperty(iORM.StdActions.Vcl.TioViewAction, 'OnUpdate');
 
   // FMX standard actions
-  RegisterActions('iORM-BS', [iORM.StdActions.FMX.TioBSSelectCurrent], nil);
-  RegisterActions('iORM-BSPaging', [iORM.StdActions.FMX.TioBSNextPage], nil);
-  RegisterActions('iORM-BSPaging', [iORM.StdActions.FMX.TioBSPrevPage], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceAppend], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceClear], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceDelete], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceInsert], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistencePersist], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceReload], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceRevert], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceRevertOrDelete], nil);
-  RegisterActions('iORM-BSPersistence', [iORM.StdActions.FMX.TioBSPersistenceSaveRevertPoint], nil);
+  RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
+  RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceAppend], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceClear], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceDelete], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceInsert], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistencePersist], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceReload], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceRevert], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceRevertOrDelete], nil);
+  RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceSaveRevertPoint], nil);
+  RegisterActions('iORM-MVVM', [iORM.StdActions.Fmx.TioViewAction], nil);
+  UnlistPublishedProperty(iORM.StdActions.Fmx.TioViewAction, 'Text');
+  UnlistPublishedProperty(iORM.StdActions.Fmx.TioViewAction, 'OnExecute');
+  UnlistPublishedProperty(iORM.StdActions.Fmx.TioViewAction, 'OnUpdate');
 
   // IDE Wizards
   RegisterPackageWizard(TioViewModelWizard.Create);

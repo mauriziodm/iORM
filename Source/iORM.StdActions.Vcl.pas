@@ -26,7 +26,6 @@ type
     FOnBeforeUpdate: TNotifyEvent;
     FOnAfterUpdate: TNotifyEvent;
   strict protected
-    procedure SetName(const Value: TComponentName); reintroduce;
     procedure CheckVMAction(const CallingMethod: String);
     procedure DoBeforeExecute;
     procedure DoAfterExecute;
@@ -45,6 +44,7 @@ type
     procedure SetEnabledLinkedToVMAction(Value: Boolean);
     function GetEnabledLinkedToVMAction: Boolean;
     // Name property
+    procedure SetName(const Value: TComponentName); reintroduce;
     function GetName: TComponentName;
     property Name: TComponentName read GetName write SetName stored False;
     // Visible property
@@ -65,14 +65,20 @@ type
     destructor Destroy; override;
     function Execute: Boolean; override;
     function Update: Boolean; override;
+  published
+    // Properties
     property Caption: string read GetCaption write SetCaption;
     property CaptionLinkedToVMAction: Boolean read GetCaptionLinkedToVMAction write SetCaptionLinkedToVMAction default False;
     property Enabled: Boolean read GetEnabled write SetEnabled;
     property EnabledLinkedToVMAction: Boolean read GetEnabledLinkedToVMAction write SetEnabledLinkedToVMAction default True;
     property Visible: Boolean read GetVisible write SetVisible;
     property VisibleLinkedToVMAction: Boolean read GetVisibleLinkedToVMAction write SetVisibleLinkedToVMAction default True;
-  published
     property VMActionName: String read GetVMActionName write SetVMActionName;
+    // Events
+    property OnAfterExecute: TNotifyEvent read FOnAfterExecute write FOnAfterExecute;
+    property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
+    property OnBeforeExecute: TNotifyEvent read FOnBeforeExecute write FOnBeforeExecute;
+    property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
   end;
 
   // =================================================================================================
@@ -749,7 +755,7 @@ end;
 
 procedure TioViewAction.SetName(const Value: TComponentName);
 begin
-
+  inherited SetName(Value);
 end;
 
 procedure TioViewAction.SetVisible(Value: Boolean);
