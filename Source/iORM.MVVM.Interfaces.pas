@@ -160,6 +160,7 @@ type
 
   IioVMActionContainer = interface
     ['{E20F72CB-9F84-44B4-A6DD-DFF73B53F0AC}']
+    procedure _InternalLoadVMActions(const AViewOrViewModel: TComponent);
     procedure Add(const AVMAction: IioVMAction);
     procedure Remove(AName: String);
     function Get(const AName: String; const ANoException: Boolean = False): IioVMAction;

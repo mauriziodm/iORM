@@ -46,7 +46,7 @@ type
   strict private
     FContainer: TDictionary<String, IioVMAction>;
     FOwner: TComponent;
-    procedure LoadVMActionsFromView(const AView: TComponent);
+    procedure _InternalLoadVMActions(const AViewOrViewModel: TComponent);
   public
     constructor Create(const AOwner: TComponent);
     destructor Destroy; override;
@@ -136,13 +136,13 @@ begin
   raise EioException.Create(Self.ClassName, 'Get', Format('I''m sorry, I can''t find any VMAction named "%s" on ViewModel "%s".', [AName, FOwner.Name]));
 end;
 
-procedure TioVMActionContainer.LoadVMActionsFromView(const AView: TComponent);
+procedure TioVMActionContainer._InternalLoadVMActions(const AViewOrViewModel: TComponent);
 var
   I: Integer;
   LVMAction: IioVMAction;
 begin
-  for I := 0 to AView.ComponentCount - 1 do
-    if Supports(AView.Components[i], IioVMAction, LVMAction) then
+  for I := 0 to AViewOrViewModel.ComponentCount - 1 do
+    if Supports(AViewOrViewModel.Components[i], IioVMAction, LVMAction) then
       Add(LVMAction);
 end;
 
@@ -152,7 +152,7 @@ var
   LViewAction: IioViewAction;
 begin
   // Capture any VMAction present in the view.
-  LoadVMActionsFromView(AView);
+  _InternalLoadVMActions(AView);
   // Bind any ViewAction to the related VMAction registered on the ViewModel
   for I := 0 to AView.ComponentCount - 1 do
     if Supports(AView.Components[i], IioViewAction, LViewAction) then

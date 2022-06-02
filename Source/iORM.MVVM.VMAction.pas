@@ -15,7 +15,7 @@ type
     FVisible: Boolean;
     FOnExecute: TNotifyEvent;
     FOnUpdate: TNotifyEvent;
-    procedure SetName(const Value: TComponentName);
+    procedure SetName(const Value: TComponentName); reintroduce;
   protected
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);

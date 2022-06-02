@@ -25,9 +25,8 @@ type
     FOnAfterExecute: TNotifyEvent;
     FOnBeforeUpdate: TNotifyEvent;
     FOnAfterUpdate: TNotifyEvent;
-  strict
-  private
-    procedure SetName(const Value: TComponentName); protected
+  strict protected
+    procedure SetName(const Value: TComponentName); reintroduce;
     procedure CheckVMAction(const CallingMethod: String);
     procedure DoBeforeExecute;
     procedure DoAfterExecute;

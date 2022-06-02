@@ -56,6 +56,7 @@ type
     procedure BindView(const AView: TComponent);
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
   protected
+    procedure Loaded; override;
     // DefaultPresenter
     function GetDefaultPresenter: TioModelPresenterCustom;
     // Presenter
@@ -122,6 +123,13 @@ begin
   FViewRegister.HideAllViewContexts;
 end;
 
+procedure TioViewModel.Loaded;
+begin
+  inherited;
+  // Load all VMActions
+  FVMActionContainer._InternalLoadVMActions(Self);
+end;
+
 procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
   const AViewContextFreeMethod: TProc);
 begin
@@ -147,7 +155,6 @@ end;
 constructor TioViewModel.Create(AOwner: TComponent);
 begin
    inherited;
-   // Init
    FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self);
    FViewRegister := TioMVVMFactory.NewViewRegister;
 end;
