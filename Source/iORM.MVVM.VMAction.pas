@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -136,11 +136,168 @@ type
   // END: MVVM STANDARD VMACTIONS FOR BIND SOURCES
   // =================================================================================================
 
+  // =================================================================================================
+  // BEGIN: MVVM STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
+
+  // Base class for all BinsDourceObjState standard actions
+  TioVMActionBSPersistenceCustom = class(TioVMActionCustom)
+  strict private
+    FClearAfterExecute: Boolean;
+    FDisableIfChangesDoesNotExists: Boolean;
+    FDisableIfChangesExists: Boolean;
+    FDisableIfSaved: Boolean;
+    FRaiseIfChangesDoesNotExists: Boolean;
+    FRaiseIfChangesExists: Boolean;
+    FRaiseIfRevertPointSaved: Boolean;
+    FRaiseIfRevertPointNotSaved: Boolean;
+    FTargetBindSource: IioBSPersistenceClient;
+    procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
+    property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
+    property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
+    property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
+    property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
+    property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
+    property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
+    property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
+    property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+  end;
+
+  TioVMActionBSPersistenceSaveRevertPoint = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property TargetBindSource;
+  end;
+
+  TioVMActionBSPersistenceClear = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property DisableIfChangesExists;
+    property RaiseIfChangesExists;
+    property TargetBindSource;
+  end;
+
+  TioVMActionBSPersistencePersist = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property ClearAfterExecute;
+    property DisableIfChangesDoesNotExists;
+    property RaiseIfChangesDoesNotExists;
+    property TargetBindSource;
+  end;
+
+  TioVMActionBSPersistenceRevert = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property ClearAfterExecute;
+    property DisableIfChangesDoesNotExists;
+    property RaiseIfChangesDoesNotExists;
+    property RaiseIfRevertPointNotSaved;
+    property TargetBindSource;
+  end;
+
+  TioVMActionBSPersistenceRevertOrDelete = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property ClearAfterExecute;
+    property DisableIfChangesDoesNotExists;
+    property RaiseIfChangesDoesNotExists;
+    property RaiseIfRevertPointNotSaved;
+    property TargetBindSource;
+  end;
+
+  TioVMActionBSPersistenceDelete = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TioVMActionBSPersistenceReload = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TioVMActionBSPersistenceAppend = class(TioVMActionBSPersistenceCustom)
+  private
+    FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
+    FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+    // events
+    property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
+    property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TioVMActionBSPersistenceInsert = class(TioVMActionBSPersistenceCustom)
+  private
+    FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
+    FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  published
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+    // events
+    property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
+    property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  // =================================================================================================
+  // END: MVVM STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
 
 implementation
 
 uses
-  System.SysUtils, iORM.Utilities;
+  System.SysUtils, iORM.Utilities, iORM.Exceptions;
 
 { TioVMActionCustom }
 
@@ -396,6 +553,249 @@ procedure TioVMActionBSPrevPage._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
+end;
+
+{ TioVMActionBSPersistenceCustom }
+
+constructor TioVMActionBSPersistenceCustom.Create(AOwner: TComponent);
+begin
+  inherited;
+  FClearAfterExecute := True;
+  FDisableIfChangesDoesNotExists := False;
+  FDisableIfChangesExists := False;
+  FDisableIfSaved := False;
+  FRaiseIfChangesDoesNotExists := False;
+  FRaiseIfChangesExists := True;
+  FRaiseIfRevertPointSaved := False;
+  FRaiseIfRevertPointNotSaved := False;
+end;
+
+function TioVMActionBSPersistenceCustom.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioBSPersistenceClient) and FTargetBindSource.isActive;
+end;
+
+procedure TioVMActionBSPersistenceCustom.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
+    TargetBindSource := nil;
+end;
+
+procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioBSPersistenceClient);
+begin
+  if Value <> FTargetBindSource then
+  begin
+    FTargetBindSource := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+{ TioVMActionBSPersistenceSaveRevertPoint }
+
+procedure TioVMActionBSPersistenceSaveRevertPoint._InternalExecuteStdAction;
+begin
+  TargetBindSource.Persistence.SaveRevertPoint(True);
+end;
+
+procedure TioVMActionBSPersistenceSaveRevertPoint._InternalUpdateStdAction;
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSave;
+end;
+
+{ TioVMActionBSPersistenceClear }
+
+procedure TioVMActionBSPersistenceClear._InternalExecuteStdAction;
+begin
+  TargetBindSource.Persistence.Clear(RaiseIfChangesExists);
+end;
+
+procedure TioVMActionBSPersistenceClear._InternalUpdateStdAction;
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+end;
+
+{ TioBSPersistencePersist }
+
+procedure TioVMActionBSPersistencePersist._InternalExecuteStdAction;
+begin
+  TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
+  TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
+end;
+
+procedure TioVMActionBSPersistencePersist._InternalUpdateStdAction;
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
+end;
+
+{ TioVMActionBSPersistenceRevert }
+
+procedure TioVMActionBSPersistenceRevert._InternalExecuteStdAction;
+begin
+  TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
+end;
+
+procedure TioVMActionBSPersistenceRevert._InternalUpdateStdAction;
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
+end;
+
+{ TioVMActionBSPersistenceRevertOrDelete }
+
+procedure TioVMActionBSPersistenceRevertOrDelete._InternalExecuteStdAction;
+begin
+  TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
+end;
+
+procedure TioVMActionBSPersistenceRevertOrDelete._InternalUpdateStdAction;
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
+end;
+
+{ TioVMActionBSPersistenceDelete }
+
+constructor TioVMActionBSPersistenceDelete.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioVMActionBSPersistenceDelete._InternalExecuteStdAction;
+begin
+  TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+end;
+
+procedure TioVMActionBSPersistenceDelete._InternalUpdateStdAction;
+begin
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioVMActionBSPersistenceReload }
+
+constructor TioVMActionBSPersistenceReload.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioVMActionBSPersistenceReload._InternalExecuteStdAction;
+begin
+  TargetBindSource.Persistence.Reload(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+end;
+
+procedure TioVMActionBSPersistenceReload._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioVMActionBSPersistenceAppend }
+
+constructor TioVMActionBSPersistenceAppend.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioVMActionBSPersistenceAppend._InternalExecuteStdAction;
+var
+  LNewInstanceAsObject: TObject;
+  LNewInstanceAsInterface: IInterface;
+begin
+  inherited;
+  // New instance as object (OnNewInstanceAsObject event handler)
+  if Assigned(FOnNewInstanceAsObject) then
+  begin
+    FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
+    if LNewInstanceAsObject <> nil then
+    begin
+      TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+  end;
+  // New instance as Interface (OnNewInstanceAsInterface event handler)
+  if Assigned(FOnNewInstanceAsInterface) then
+  begin
+    FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
+    if LNewInstanceAsInterface <> nil then
+    begin
+      TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+  end;
+  // New instance not provided (created by the ABSAdapter itself)
+  TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+end;
+
+procedure TioVMActionBSPersistenceAppend._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioVMActionBSPersistenceInsert }
+
+constructor TioVMActionBSPersistenceInsert.Create(AOwner: TComponent);
+begin
+  inherited;
+  RaiseIfChangesExists := False;
+end;
+
+procedure TioVMActionBSPersistenceInsert._InternalExecuteStdAction;
+var
+  LNewInstanceAsObject: TObject;
+  LNewInstanceAsInterface: IInterface;
+begin
+  inherited;
+  // New instance as object (OnNewInstanceAsObject event handler)
+  if Assigned(FOnNewInstanceAsObject) then
+  begin
+    FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
+    if LNewInstanceAsObject <> nil then
+    begin
+      TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+  end;
+  // New instance as Interface (OnNewInstanceAsInterface event handler)
+  if Assigned(FOnNewInstanceAsInterface) then
+  begin
+    FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
+    if LNewInstanceAsInterface <> nil then
+    begin
+      TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+      Exit;
+    end
+    else
+      raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+  end;
+  // New instance not provided (created by the ABSAdapter itself)
+  TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+end;
+
+procedure TioVMActionBSPersistenceInsert._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
 end;
 
 end.

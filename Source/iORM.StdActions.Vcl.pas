@@ -6,8 +6,6 @@ uses
   System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence;
 
 type
-  TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
-  TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
 
   // =================================================================================================
   // BEGIN: VCL MVVM STANDARD ACTIONS
@@ -463,7 +461,7 @@ begin
       Exit;
     end
     else
-      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsObject event handler', 'Invalid new instance (nil)');
+      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
   end;
   // New instance as Interface (OnNewInstanceAsInterface event handler)
   if Assigned(FOnNewInstanceAsInterface) then
@@ -475,7 +473,7 @@ begin
       Exit;
     end
     else
-      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
+      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
   end;
   // New instance not provided (created by the ABSAdapter itself)
   TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
@@ -513,7 +511,7 @@ begin
       Exit;
     end
     else
-      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsObject event handler', 'Invalid new instance (nil)');
+      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
   end;
   // New instance as Interface (OnNewInstanceAsInterface event handler)
   if Assigned(FOnNewInstanceAsInterface) then
@@ -525,7 +523,7 @@ begin
       Exit;
     end
     else
-      raise EioException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
+      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
   end;
   // New instance not provided (created by the ABSAdapter itself)
   TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);

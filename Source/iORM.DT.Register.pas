@@ -22,43 +22,47 @@ begin
 
   // Connection components
   RegisterComponents('iORM', [TioRemoteConnectionDef]);
-  RegisterComponents('iORM', [TioSQLiteConnectionDef]);
-  RegisterComponents('iORM', [TioFirebirdConnectionDef]);
-  RegisterComponents('iORM', [TioSQLServerConnectionDef]);
   RegisterSelectionEditor(TioRemoteConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterComponents('iORM', [TioSQLiteConnectionDef]);
   RegisterSelectionEditor(TioSQLiteConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterComponents('iORM', [TioFirebirdConnectionDef]);
   RegisterSelectionEditor(TioFirebirdConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterComponents('iORM', [TioSQLServerConnectionDef]);
   RegisterSelectionEditor(TioSQLServerConnectionDef, TioConnectionDefSelectionEditor);
   RegisterComponents('iORM', [TioSQLMonitor]);
 
   // DataSet components
   RegisterComponents('iORM', [TioMemTable]);
   RegisterComponents('iORM', [TioDataSetMaster]);
-  RegisterComponents('iORM', [TioDataSetDetail]);
   RegisterSelectionEditor(TioDataSetMaster, TioBindSourceSelectionEditor);
+  RegisterComponents('iORM', [TioDataSetDetail]);
   RegisterSelectionEditor(TioDataSetDetail, TioBindSourceSelectionEditor);
 
   // LiveBindings components
   RegisterComponents('iORM', [TioPrototypeBindSourceMaster]);
+  RegisterSelectionEditor(TioPrototypeBindSourceMaster, TioBindSourceSelectionEditor);
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoActivate');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoEdit');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'AutoPost');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'RecordCount');
   UnlistPublishedProperty(TioPrototypeBindSourceMaster, 'OnCreateAdapter');
   RegisterComponents('iORM', [TioPrototypeBindSourceDetail]);
+  RegisterSelectionEditor(TioPrototypeBindSourceDetail, TioBindSourceSelectionEditor);
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoActivate');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoEdit');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'AutoPost');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'RecordCount');
   UnlistPublishedProperty(TioPrototypeBindSourceDetail, 'OnCreateAdapter');
-  RegisterSelectionEditor(TioPrototypeBindSourceMaster, TioBindSourceSelectionEditor);
-  RegisterSelectionEditor(TioPrototypeBindSourceDetail, TioBindSourceSelectionEditor);
 
   // MVVM components
   RegisterComponents('iORM-MVVM', [TioViewModelBridge]);
+  RegisterSelectionEditor(TioViewModelBridge, TioMVVMSelectionEditor);
   RegisterComponents('iORM-MVVM', [TioViewContextProvider]);
+  RegisterSelectionEditor(TioViewContextProvider, TioMVVMSelectionEditor);
   RegisterComponents('iORM-MVVM', [TioModelPresenterMaster]);
+  RegisterSelectionEditor(TioModelPresenterMaster, TioBindSourceSelectionEditor);
   RegisterComponents('iORM-MVVM', [TioModelPresenterDetail]);
+  RegisterSelectionEditor(TioModelPresenterDetail, TioBindSourceSelectionEditor);
   RegisterComponents('iORM-MVVM', [TioModelDataSet]);
   RegisterComponents('iORM-MVVM', [TioModelBindSource]);
   UnlistPublishedProperty(TioModelBindSource, 'AutoActivate');
@@ -66,14 +70,24 @@ begin
   UnlistPublishedProperty(TioModelBindSource, 'AutoPost');
   UnlistPublishedProperty(TioModelBindSource, 'RecordCount');
   UnlistPublishedProperty(TioModelBindSource, 'OnCreateAdapter');
-  RegisterSelectionEditor(TioViewModelBridge, TioMVVMSelectionEditor);
-  RegisterSelectionEditor(TioViewContextProvider, TioMVVMSelectionEditor);
-  RegisterSelectionEditor(TioModelPresenterMaster, TioBindSourceSelectionEditor);
-  RegisterSelectionEditor(TioModelPresenterDetail, TioBindSourceSelectionEditor);
+
+  // MVVM - VMActions
   RegisterComponents('iORM-MVVM-VMActions', [TioVMAction]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSNextPage]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPrevPage]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSSelectCurrent]);
+  RegisterSelectionEditor(TioVMActionBSSelectCurrent, TioMVVMSelectionEditor);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceSaveRevertPoint]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceClear]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistencePersist]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceRevert]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceRevertOrDelete]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceDelete]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceReload]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceAppend]);
+  RegisterSelectionEditor(TioVMActionBSPersistenceAppend, TioMVVMSelectionEditor);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceInsert]);
+  RegisterSelectionEditor(TioVMActionBSPersistenceInsert, TioMVVMSelectionEditor);
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
