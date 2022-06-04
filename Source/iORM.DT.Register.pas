@@ -70,7 +70,10 @@ begin
   RegisterSelectionEditor(TioViewContextProvider, TioMVVMSelectionEditor);
   RegisterSelectionEditor(TioModelPresenterMaster, TioBindSourceSelectionEditor);
   RegisterSelectionEditor(TioModelPresenterDetail, TioBindSourceSelectionEditor);
-  RegisterComponents('iORM-MVVM', [TioVMAction]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMAction]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSNextPage]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPrevPage]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSSelectCurrent]);
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);

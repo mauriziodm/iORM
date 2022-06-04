@@ -87,6 +87,7 @@ type
 
   IioVMAction = interface
     ['{B4D9E2D3-3B43-490E-AD58-2D7584B87A3A}']
+    function HandlesTarget(Target: TObject): Boolean;
     // Methods
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
