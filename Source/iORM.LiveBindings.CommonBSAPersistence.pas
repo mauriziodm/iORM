@@ -439,6 +439,8 @@ begin
   // Notification to register the current object into the SmartUpdateDetection system
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnPost(AActiveBindSourceAdapter.Current,
     AActiveBindSourceAdapter.GetMasterPropertyPath));
+  // Refresh
+  AActiveBindSourceAdapter.Refresh;
 end;
 
 class procedure TioCommonBSAPersistence._SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
