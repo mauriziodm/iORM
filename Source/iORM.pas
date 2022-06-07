@@ -465,7 +465,7 @@ end;
 
 class function io.LoadList<T>(const AItemAlias: String): T;
 begin
-  Result := Self.LoadList<T>('ATypeAlias', Self.Where);
+  Result := Self.LoadList<T>(AItemAlias, Self.Where);
 end;
 
 class function io.Load<T>(const AID: Integer): T;

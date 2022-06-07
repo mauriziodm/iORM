@@ -95,11 +95,10 @@ type
     procedure SetTargetBindSource(const Value: T);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
-  published
-    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -112,6 +111,7 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
+    property TargetBindSource;
   end;
 
   // Paging NextPage action
@@ -119,12 +119,16 @@ type
   public
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
+  published
+    property TargetBindSource;
   end;
   // Paging PreviousPage action
   TioBSPrevPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   public
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
+  published
+    property TargetBindSource;
   end;
 
   // =================================================================================================
