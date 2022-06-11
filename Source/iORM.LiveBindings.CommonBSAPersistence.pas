@@ -151,12 +151,22 @@ begin
 end;
 
 class procedure TioCommonBSAPersistence.BeforeEdit(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateSUDRegisterObjOnEdit(AActiveBindSourceAdapter.Current,
     AActiveBindSourceAdapter.GetMasterPropertyPath));
+  // Loop for all the upper BSA details up to the BSA Master (included) and for each level register the instance in the SUD
+  //  (Smart Update Detection system) to cause the persistence of each level when the pe is performed.
+  LActiveBSA := AActiveBindSourceAdapter;
+  while LActiveBSA.IsDetailBSA do
+  begin
+    LActiveBSA := LActiveBSA.GetMasterBindSourceAdapter;
+    LActiveBSA.Notify(TObject(LActiveBSA), TioBSNotification.CreateSUDRegisterObjOnEdit(LActiveBSA.Current, LActiveBSA.GetMasterPropertyPath));
+  end;
 end;
 
 class procedure TioCommonBSAPersistence.BeforeInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
