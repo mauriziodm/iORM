@@ -34,7 +34,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Attributes;
+  System.SysUtils, iORM.Attributes, System.Classes;
 
 { TioDBBuilderStrategyBase }
 
