@@ -72,7 +72,7 @@ begin
       begin
         LDependentProperty := LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
         ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddForeignKey(AMap, LResolvedTypeMap, LDependentProperty,
-          LDependentProperty.GetMetadata_FKOnDeleteAction, LDependentProperty.GetMetadata_FKOnUpdateAction);
+          LProperty.GetMetadata_FKOnDeleteAction, LProperty.GetMetadata_FKOnUpdateAction);
       end;
     end;
   end;
