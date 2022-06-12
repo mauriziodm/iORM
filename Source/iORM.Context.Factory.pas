@@ -261,6 +261,7 @@ var
     LRttiField: TRttiField;
     LAttribute: TCustomAttribute;
     LNewProperty: IioProperty;
+    LForeignKeyAttributeExists: boolean;
     // DB field metadata (DBBuilder)
     LDB_FieldType: TioMetadataFieldType;
     LDB_FieldSubType: string;
@@ -321,6 +322,7 @@ var
       if (LMember_FieldName = 'RefCount') or (LMember_FieldName = 'Disposed') or Result.PropertyExists(LMember_FieldName) then
         Continue;
       // DB metadata initialization
+      LForeignKeyAttributeExists := False;
       LDB_FieldLength := IO_DEFAULT_FIELD_LENGTH;
       LDB_FieldPrecision := IO_DEFAULT_FIELD_PRECISION;
       LDB_FieldScale := IO_DEFAULT_FIELD_SCALE;
@@ -493,6 +495,7 @@ var
           LDB_Default := ioDefault(LAttribute).Value;
         if LAttribute is ioForeignKey then
         begin
+          LForeignKeyAttributeExists := True;
           LDB_FKAutoCreate := ioForeignKey(LAttribute).AutoCreate;
           LDB_FKOnDeleteAction := ioForeignKey(LAttribute).OnDeleteAction;
           LDB_FKOnUpdateAction := ioForeignKey(LAttribute).OnUpdateAction;
@@ -518,6 +521,14 @@ var
             LMember_RelationChildTypeName := LMember_FieldValueType.Name;
             LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
           end;
+      end;
+
+      // If the current member has an HasMany relation and an "ioForeignKey" attribute has not been explicitly specified,
+      //  then set by default the "CASCADE" value for both the update and the delete
+      if (LMember_RelationType = rtHasMany) and not LForeignKeyAttributeExists then
+      begin
+        LDB_FKOnDeleteAction := fkCascade;
+        LDB_FKOnUpdateAction := fkCascade;
       end;
 
       // If the current member is a ReadOnly TRttiProperty then force it as PersistOnly
