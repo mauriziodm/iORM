@@ -52,7 +52,8 @@ type
     //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
     //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
     class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType; override;
-    class function Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAllDistinctByConnectionAndTable): IioResolvedTypeList; override;
+    class function Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAllDistinctByConnectionAndTable;
+      const AUseMapInfo: Boolean = True): IioResolvedTypeList; override;
   end;
 
 implementation
@@ -63,10 +64,11 @@ uses
 { TioResolverByDependencyInjection }
 
 // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
-class function TioResolverByDependencyInjection.Resolve(const ATypeName:String; const AAlias: String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
+class function TioResolverByDependencyInjection.Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAllDistinctByConnectionAndTable;
+  const AUseMapInfo: Boolean = True): IioResolvedTypeList;
 begin
   inherited;
-  Result := TioDependencyInjectionResolverBase.Resolve(ATypeName, AAlias, AResolverMode);
+  Result := TioDependencyInjectionResolverBase.Resolve(ATypeName, AAlias, AResolverMode, AUseMapInfo);
 end;
 
 // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY

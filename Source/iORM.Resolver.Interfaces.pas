@@ -62,7 +62,8 @@ type
     //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
     //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
     class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType; virtual; abstract;
-    class function Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAllDistinctByConnectionAndTable): IioResolvedTypeList; virtual; abstract;
+    class function Resolve(const ATypeName:String; const AAlias:String=''; const AResolverMode:TioResolverMode=rmAllDistinctByConnectionAndTable;
+      const AUseMapInfo: Boolean = True): IioResolvedTypeList; virtual; abstract;
   end;
 
 implementation

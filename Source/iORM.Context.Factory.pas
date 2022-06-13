@@ -57,6 +57,7 @@ type
     class function Joins: IioJoins;
     class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
     class function GroupBy(const ASqlText: String): IioGroupBy;
+    class function HasBelongsToRelation(const AMasterPropertyType: TRttiType): Boolean;
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
     class function GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
@@ -99,6 +100,28 @@ begin
   until not Assigned(Typ);
   // Create
   Result := TioTrueClass.Create(ASqlFieldName);
+end;
+
+class function TioContextFactory.HasBelongsToRelation(const AMasterPropertyType: TRttiType): Boolean;
+var
+  AResolvedTypeList: IioResolvedTypeList;
+begin
+  // If the MasterProperty is of a class type (not an interface) then check if it has the "ioEntity" attribute
+  if AMasterPropertyType.IsInstance then
+    Result := TioUtilities.HasAttribute<ioEntity>(AMasterPropertyType)
+  else
+  // else if it isn't a class (so it is an interface) then use die DIC to verify if there are some
+  //  class (entity) registered on it
+  if AMasterPropertyType is TRttiInterfaceType then
+  begin
+    // Resolve the type and alias (if the RelationChildTypeName is relative to a class then the resolver return the class itself)
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterPropertyType.Name, '', rmAll, False);
+    // Returns True if there is at least one resolved type that is an entity
+    Result := AResolvedTypeList.Count > 0;
+  end
+  // else return False (not a class nor interface master property type)
+  else
+    Result := False;
 end;
 
 class function TioContextFactory.HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
@@ -515,7 +538,7 @@ var
         end
         else
           // BelongsTo relation autodetect
-          if TioUtilities.HasAttribute<ioEntity>(LMember_FieldValueType) then
+          if HasBelongsToRelation(LMember_FieldValueType) then
           begin
             LMember_RelationType := rtBelongsTo;
             LMember_RelationChildTypeName := LMember_FieldValueType.Name;

@@ -278,7 +278,7 @@ type
     //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
     //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
     class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType;
-    class function Resolve(const ATypeName:String; const AAlias:String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
+    class function Resolve(const ATypeName:String; const AAlias:String; const AResolverMode:TioResolverMode; const AUseMapInfo: Boolean): IioResolvedTypeList;
   end;
 
   // Main Dependency Injection Class (and relative class reference)
@@ -1741,7 +1741,8 @@ end;
 { TioDependencyInjectionResolverBase }
 
 // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
-class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String; const AAlias: String; const AResolverMode:TioResolverMode): IioResolvedTypeList;
+class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String; const AAlias: String; const AResolverMode:TioResolverMode;
+  const AUseMapInfo: Boolean): IioResolvedTypeList;
   procedure _NestedResolveInterface;
   var
     LImplementer: TioDIContainerImplementersItem;
@@ -1760,10 +1761,19 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
         if not LImplementer.IsEntity then
           Continue;
-        // Get the map for the current implementer
-        LMap := TioMapContainer.GetMap(LImplementer.ClassName);
-        // Compose connection name and table name to void duplicated
-        LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName;
+        // If the Use of maps info are enabled (default) then retreive ConnectionDefName and TableNamenfrom the map
+        //  and compose it together to avoid duplicate.
+        //  Else if the use of maps info are not enabled then return an empty string as ConnectionAndTable name
+        //  (this mode is called by iORM.ContectFactory.HasBelongsToRelation method because the mapping is
+        //  not completed at that time
+        if AUseMapInfo then
+        begin
+          LMap := TioMapContainer.GetMap(LImplementer.ClassName);
+          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName;
+        end
+        else
+          LCurrentConnectionAndTable := '';
+        // Add the the implementer class to the result ConnectionAndTableList
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
           Result.Add(LImplementer.ClassName);
@@ -1801,7 +1811,7 @@ var
   LFirstResolvedClassMap: IioMap;
 begin
   // Resolve the type and alias
-  LResolvedTypeList := Self.Resolve(ATypeName, AAlias, TioResolverMode.rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := Self.Resolve(ATypeName, AAlias, TioResolverMode.rmAllDistinctByConnectionAndTable, True);
   // Se non trova nemmeno una classe solleva un'eccezione
   if LResolvedTypeList.Count = 0 then
     raise EioException.Create(Self.ClassName, 'ResolveInaccurateAsRttiType', Format('No class was found that implements the interface ("%s" alias "%s").', [ATypeName, AAlias]));
