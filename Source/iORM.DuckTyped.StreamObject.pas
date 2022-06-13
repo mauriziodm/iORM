@@ -63,7 +63,7 @@ type
 implementation
 
 uses
-  iORM.RttiContext.Factory, iORM.Exceptions, iORM;
+  iORM.RttiContext.Factory, iORM.Exceptions, iORM, System.SysUtils;
 
 { TioDuckTypedStreamObject }
 
@@ -80,11 +80,11 @@ begin
   // LoadFromStreamMethod method
   FLoadFromStreamMethod := Typ.GetMethod('LoadFromStream');
   if not Assigned(FLoadFromStreamMethod) then
-    raise EioException.Create('DuckTypedStreamObject: "LoadFromStream" method not found in the object');
+    raise EioException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"LoadFromStream" method not found in the object of "%s" class.', [AObj.ClassName]));
   // SaveFromStreamMethod method
   FSaveToStreamMethod := Typ.GetMethod('SaveToStream');
   if not Assigned(FSaveToStreamMethod) then
-    raise EioException.Create('DuckTypedStreamObject: "SaveToStream" method not found in the object');
+    raise EioException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"SaveToStream" method not found in the object of "%s" class.', [AObj.ClassName]));
   // IsEmpty method
   FIsEmptyMethod := Typ.GetMethod('IsEmpty');
   // Count property method
