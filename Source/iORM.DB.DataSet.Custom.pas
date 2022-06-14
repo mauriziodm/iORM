@@ -594,6 +594,12 @@ end;
 
 procedure TioDataSetCustom.SelectCurrent(ASelectionType: TioSelectionType);
 begin
+  // C'era un problema se il target è un BS che espone un singolo oggetto e in
+  //  precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
+  //  ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
+  //  il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
+  if not FSelectorFor.IsActive then
+    FSelectorFor.Open;
   if IsInterfacePresenting then
     TioCommonBSBehavior.Select<IInterface>(Self, FSelectorFor, CurrentAs<IInterface>, ASelectionType)
   else
