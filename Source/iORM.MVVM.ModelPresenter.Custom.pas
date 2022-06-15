@@ -367,7 +367,7 @@ end;
 constructor TioModelPresenterCustom.Create(AOwner: TComponent);
 begin
   inherited;
-  FAutoPost := False;
+  FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsync := False;
   FLoadType := ltManual;
