@@ -726,7 +726,6 @@ begin
   begin
     inherited SetDataObject(nil, AOwnsObject);
     FDetailAdaptersContainer.SetMasterObject(nil);
-    Active := True;
   end;
   // DataSet synchro
   GetDataSetLinkContainer.Refresh;
