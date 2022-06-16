@@ -52,16 +52,13 @@ type
   TioDIContainerImplementersKey = String;
   TioDIContainerImplementers = class
   strict private
-    FClassesList: String;
     FInternalContainer: TObjectDictionary<TioDIContainerImplementersKey, TioDIContainerImplementersItem>;
-    procedure BuildClassesList;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Add(const AAlias:TioDIContainerImplementersKey; const AImplementerItem:TioDIContainerImplementersItem);
     function GetItem(const AAlias: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
     function Contains(const AAlias: TioDIContainerImplementersKey): Boolean;
-    function ContainsClass(const AClassName:String): Boolean;
     function GetEnumerator: TEnumerator<TioDIContainerImplementersItem>;
   end;
   // Dependency injection container INTERFACES (MasterContainer)
@@ -108,6 +105,7 @@ type
   public
     constructor Create(const AContainerValue:TioDIContainerImplementersItem);
     procedure Execute;
+    function _SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
     function Implements<T: IInterface>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
     function Implements(const IID:TGUID; const AAlias:String=''): TioDependencyInjectionRegister; overload;
     function Alias(const AAlias:String): TioDependencyInjectionRegister;
@@ -619,10 +617,10 @@ end;
 constructor TioDependencyInjectionRegister.Create(const AContainerValue:TioDIContainerImplementersItem);
 begin
   inherited Create;
-  Self.FSetMapImplementersRef := True;
-  Self.FContainerValue := AContainerValue;
-  Self.FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
-  Self.FAlias := '';
+  FSetMapImplementersRef := True;
+  FContainerValue := AContainerValue;
+  FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
+  FAlias := '';
 end;
 
 function TioDependencyInjectionRegister.DefaultConstructorMarker(const AValue: String): TioDependencyInjectionRegister;
@@ -881,6 +879,12 @@ begin
   FContainerValue.PresenterSettings[I].SettingsType := TioDIPresenterSettingsType.pstSelectorFor;
   FContainerValue.PresenterSettings[I].Name  := ASourcePresenterName;
   FContainerValue.PresenterSettings[I].Obj  := ASelectionDest;
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister._SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
+begin
+  FContainerValue.FarAncestorClassNameImplementingTheSameInterface := AValue;
   Result := Self;
 end;
 
@@ -1764,7 +1768,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         // If the Use of maps info are enabled (default) then retreive ConnectionDefName and TableNamenfrom the map
         //  and compose it together to avoid duplicate.
         //  Else if the use of maps info are not enabled then return an empty string as ConnectionAndTable name
-        //  (this mode is called by iORM.ContectFactory.HasBelongsToRelation method because the mapping is
+        //  (this mode is called by iORM.ContextFactory.HasBelongsToRelation method because the mapping is
         //  not completed at that time
         if AUseMapInfo then
         begin
@@ -1776,7 +1780,8 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         // Add the the implementer class to the result ConnectionAndTableList
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
-          Result.Add(LImplementer.ClassName);
+//          Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
+          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterface);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
       end;
@@ -1828,26 +1833,11 @@ end;
 procedure TioDIContainerImplementers.Add(const AAlias: String; const AImplementerItem: TioDIContainerImplementersItem);
 begin
   FInternalContainer.AddOrSetValue(AAlias, AImplementerItem);
-  Self.BuildClassesList;
-end;
-
-procedure TioDIContainerImplementers.BuildClassesList;
-var
-  AImplementersItem: TioDIContainerImplementersItem;
-begin
-  FClassesList := '';
-  for AImplementersItem in FInternalContainer.Values do
-    FClassesList := FClassesList + '<' + AImplementersItem.ClassName + '>';
 end;
 
 function TioDIContainerImplementers.Contains(const AAlias: TioDIContainerImplementersKey): Boolean;
 begin
   Result := FInternalContainer.ContainsKey(AAlias);
-end;
-
-function TioDIContainerImplementers.ContainsClass(const AClassName: String): Boolean;
-begin
-  Result := FClassesList.Contains('<'+AClassName+'>');
 end;
 
 constructor TioDIContainerImplementers.Create;

@@ -74,6 +74,7 @@ type
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class procedure ClearList(const AList: TObject);
     class function CloneObject(const ASourceObj: TObject): TObject;
+    class function GetTheFarAncestorClassNameImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): string;
   end;
 
 implementation
@@ -207,6 +208,15 @@ end;
 class function TioUtilities.GetQualifiedTypeName(const ATypeInfo: Pointer): String;
 begin
   Result := TioRttiFactory.GetRttiContext.GetType(ATypeInfo).QualifiedName;
+end;
+
+class function TioUtilities.GetTheFarAncestorClassNameImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): string;
+begin
+  while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
+  begin
+    Result := ARttiInstanceType.Name;
+    ARttiInstanceType := ARttiInstanceType.BaseType;
+  end;
 end;
 
 class function TioUtilities.GetThreadID: TThreadID;
