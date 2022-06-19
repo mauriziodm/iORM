@@ -45,6 +45,7 @@ var
   LResolvedTypeList: IioList<string>;
   LResolvedTypeName: String;
   LResolvedTypeMap: IioMap;
+  LSchemaTable: IioDBBuilderSchemaTable;
 begin
   for LProperty in AMap.GetProperties do
   begin
@@ -65,14 +66,18 @@ begin
       if LProperty.GetRelationType in [rtBelongsTo] then
       begin
         LDependentProperty := LProperty;
-        ASchema.FindTable(AMap.GetTable.TableName).AddForeignKey(LResolvedTypeMap, AMap, LProperty,
-          LDependentProperty.GetMetadata_FKOnDeleteAction, LDependentProperty.GetMetadata_FKOnUpdateAction)
+        LSchemaTable := ASchema.FindTable(AMap.GetTable.TableName);
+        if LSchemaTable <> nil then
+          LSchemaTable.AddForeignKey(LResolvedTypeMap, AMap, LProperty, LDependentProperty.GetMetadata_FKOnDeleteAction,
+            LDependentProperty.GetMetadata_FKOnUpdateAction);
       end
       else
       begin
         LDependentProperty := LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
-        ASchema.FindTable(LResolvedTypeMap.GetTable.TableName).AddForeignKey(AMap, LResolvedTypeMap, LDependentProperty,
-          LProperty.GetMetadata_FKOnDeleteAction, LProperty.GetMetadata_FKOnUpdateAction);
+        LSchemaTable := ASchema.FindTable(LResolvedTypeMap.GetTable.TableName);
+        if LSchemaTable <> nil then
+          LSchemaTable.AddForeignKey(AMap, LResolvedTypeMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
+            LProperty.GetMetadata_FKOnUpdateAction);
       end;
     end;
   end;

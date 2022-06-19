@@ -92,10 +92,10 @@ end;
 
 function TioDBBuilderSchema.FindTable(const ATableName: String): IioDBBuilderSchemaTable;
 begin
-  if not FTables.ContainsKey(ATableName) then
-    raise EioException.Create(ClassName, 'FindTable', Format('Table "%s" not found on "%s" connection def.',
-      [ATableName, FConnectionDefName]));
-  Result := FTables.Items[ATableName];
+  if FTables.ContainsKey(ATableName) then
+    Result := FTables.Items[ATableName]
+  else
+    Result := nil;
 end;
 
 function TioDBBuilderSchema.ForeignKeysEnabled: Boolean;
