@@ -1,0 +1,269 @@
+inherited ViewCustomer: TViewCustomer
+  inherited RectangleTitle: TRectangle
+    inherited LabelTitle: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Customer'
+    end
+  end
+  object ListBox: TListBox [2]
+    Align = Client
+    Size.Width = 400.000000000000000000
+    Size.Height = 520.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    DisableFocusEffect = True
+    DefaultItemStyles.ItemStyle = ''
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 396.000000000000000000
+    Viewport.Height = 516.000000000000000000
+    object ListBoxItemName: TListBoxItem
+      Size.Width = 396.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object EditID: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        StyleLookup = 'transparentedit'
+        TabOrder = 40
+        Text = '-33'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 5.000000000000000000
+        Position.Y = 15.000000000000000000
+        Margins.Left = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 52.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'ID here'
+        StyledSettings = [Family, Size, FontColor]
+        object Label1: TLabel
+          Position.Y = -16.000000000000000000
+          Text = 'ID'
+          TabOrder = 0
+        end
+      end
+      object EditName: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Anchors = [akLeft, akTop, akRight]
+        StyleLookup = 'transparentedit'
+        TabOrder = 39
+        Text = 'Mark Anderson'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 56.000000000000000000
+        Position.Y = 15.000000000000000000
+        Margins.Left = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 334.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'Type the name here'
+        StyledSettings = [Family, Size, FontColor]
+        object Label2: TLabel
+          Position.Y = -16.000000000000000000
+          Text = 'Name'
+          TabOrder = 0
+        end
+      end
+    end
+    object ListBoxItemPhoneNumber: TListBoxItem
+      Position.Y = 50.000000000000000000
+      Size.Width = 396.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object EditPhoneNumber: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        StyleLookup = 'transparentedit'
+        TabOrder = 39
+        Text = '-33'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 5.000000000000000000
+        Position.Y = 15.000000000000000000
+        Margins.Left = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 365.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'ID here'
+        StyledSettings = [Family, Size, FontColor]
+        object Label3: TLabel
+          Position.Y = -16.000000000000000000
+          Text = 'Phone number'
+          TabOrder = 0
+        end
+      end
+    end
+    object ListBoxItemCity: TListBoxItem
+      Position.Y = 100.000000000000000000
+      Size.Width = 396.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object EditCity: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        StyleLookup = 'transparentedit'
+        TabOrder = 39
+        Text = 
+          'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+          'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+          'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+          'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+          'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+          'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+          ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+          'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+          ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+          ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+          'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+          'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+          'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+          'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+          'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+          'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+          'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+          'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+          'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+          'por, velit sit'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 5.000000000000000000
+        Position.Y = 15.000000000000000000
+        Margins.Left = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 365.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'ID here'
+        StyledSettings = [Family, Size, FontColor]
+        object Label4: TLabel
+          Position.Y = -16.000000000000000000
+          Text = 'City'
+          TabOrder = 0
+        end
+      end
+    end
+    object ListBoxItemAddress: TListBoxItem
+      Position.Y = 150.000000000000000000
+      Size.Width = 396.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object EditAddress: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        StyleLookup = 'transparentedit'
+        TabOrder = 39
+        Text = 
+          'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+          'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+          'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+          'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+          'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+          'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+          ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+          'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+          ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+          ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+          'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+          'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+          'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+          'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+          'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+          'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+          'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+          'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+          'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+          'por, velit sit'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 5.000000000000000000
+        Position.Y = 15.000000000000000000
+        Margins.Left = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 365.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'ID here'
+        StyledSettings = [Family, Size, FontColor]
+        object Label5: TLabel
+          Position.Y = -16.000000000000000000
+          Text = 'Address'
+          TabOrder = 0
+        end
+      end
+    end
+  end
+  inherited MBSMaster: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'City'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Address'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'Integers'
+        ReadOnly = False
+      end>
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'ID'
+      Control = EditID
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'Name'
+      Control = EditName
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'PhoneNumber'
+      Control = EditPhoneNumber
+      Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'City'
+      Control = EditCity
+      Track = False
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'Address'
+      Control = EditAddress
+      Track = False
+    end
+  end
+end
