@@ -80,7 +80,6 @@ type
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
     procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: Integer);
-    function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
     procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
@@ -112,11 +111,6 @@ end;
 procedure TioQuery.Close;
 begin
   FSqlQuery.Close;
-end;
-
-function TioQuery.Connection: IioConnection;
-begin
-  Result := FSqlConnection;
 end;
 
 constructor TioQuery.Create(const AConnection: IioConnection; const ASQLQuery: TioInternalSqlQuery);
@@ -334,7 +328,7 @@ var
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
-  if Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
     ParamByProp(LProp).AsFloat := AContext.TransactionTimestamp
   else
     ParamByProp(LProp).AsDateTime := AContext.TransactionTimestamp;
@@ -346,7 +340,7 @@ var
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
-  if Connection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
     WhereParamByProp(LProp).AsFloat := LProp.GetValue(AContext.DataObject).AsVariant
   else
     WhereParamByProp(LProp).AsDateTime := LProp.GetValue(AContext.DataObject).AsVariant;

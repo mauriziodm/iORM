@@ -180,7 +180,6 @@ type
     procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
     procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: integer);
-    function Connection: IioConnection;
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
     procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
