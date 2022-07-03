@@ -67,7 +67,7 @@ begin
   if (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) then
   begin
     AQuery.ParamByProp(AProp).AsDateTime := AProp.GetValue(AContext.DataObject).AsType<TDateTime>;
-    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    if AQuery.ParamByProp(AProp).AsDateTime = 0 then
     begin
       AQuery.ParamByProp(AProp).Clear;
       AQuery.ParamByProp(AProp).DataType := TFieldType.ftDateTime;
@@ -78,7 +78,7 @@ begin
   if (AProp.GetTypeInfo = System.TypeInfo(TDate)) then
   begin
     AQuery.ParamByProp(AProp).AsDate := AProp.GetValue(AContext.DataObject).AsType<TDate>;
-    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    if AQuery.ParamByProp(AProp).AsDate = 0 then
     begin
       AQuery.ParamByProp(AProp).Clear;
       AQuery.ParamByProp(AProp).DataType := TFieldType.ftDate;
@@ -89,7 +89,7 @@ begin
   if (AProp.GetTypeInfo = System.TypeInfo(TTime)) then
   begin
     AQuery.ParamByProp(AProp).AsTime := AProp.GetValue(AContext.DataObject).AsType<TTime>;
-    if AQuery.ParamByProp(AProp).AsExtended = 0 then
+    if AQuery.ParamByProp(AProp).AsTime = 0 then
     begin
       AQuery.ParamByProp(AProp).Clear;
       AQuery.ParamByProp(AProp).DataType := TFieldType.ftTime;

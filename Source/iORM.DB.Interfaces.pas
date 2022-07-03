@@ -63,23 +63,26 @@ type
   TioInternalSqlConnection = TFDConnection;
   TioInternalSqlQuery = TFDQuery;
   TioFields = TFields;
-  TioParam = TFDParam;
-  TioParams = TFDParams;
+  TioParam = TParam;
+  TioParams = TParams;
 
   // Strategy class reference
   TioStrategyRef = class of TioStrategyIntf;
 
   TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
 
+  TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
+
   TioConnectionInfo = record
+    BaseURL: String;
     ConnectionName: String;
     ConnectionType: TioConnectionType;
+    KeyGenerationTime: TioKeyGenerationTime;
+    Password: String;
     Persistent: Boolean;
     Strategy: TioStrategyRef;
-    BaseURL: String;
     UserName: String;
-    Password: String;
-    constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean);
+    constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean; const AKeyGenerationTime: TioKeyGenerationTime);
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -553,10 +556,11 @@ end;
 
 { TioConnectionInfo }
 
-constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean);
+constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean; const AKeyGenerationTime: TioKeyGenerationTime);
 begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;
+  KeyGenerationTime := AKeyGenerationTime;
   Persistent := APersistent;
   Strategy := TioStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
 end;

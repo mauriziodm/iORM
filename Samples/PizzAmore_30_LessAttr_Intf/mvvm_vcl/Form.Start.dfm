@@ -8521,7 +8521,6 @@ object StartForm: TStartForm
         Color = clNavy
         ParentBackground = False
         TabOrder = 1
-        ExplicitLeft = 367
         DesignSize = (
           415
           511)

@@ -443,7 +443,7 @@ begin
     if ACharSet <> '' then
       Result.Params.Values['CharacterSet'] := ACharSet;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtFirebird, APersistent, kgtBeforeInsert));
   finally
     _Unlock
   end;
@@ -463,7 +463,7 @@ begin
     if ACharSet <> '' then
       Result.Params.Values['CharacterSet'] := ACharSet;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtMySQL, APersistent, kgtUndefined));
   finally
     _Unlock;
   end;
@@ -481,7 +481,7 @@ begin
     if AAsDefault or (Self.FCurrentConnectionName = '') then
       Self.FCurrentConnectionName := AConnectionName;
     // Setup the connection info
-    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent);
+    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent, kgtUndefined);
     LConnectionInfo.BaseURL := ABaseURL;
     // Add the connection type to the internal container
     FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
@@ -500,7 +500,7 @@ begin
     Result.Params.Database := ADatabase;
     Result.Params.Values['FailIfMissing'] := 'False';
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLite, APersistent, kgtAfterInsert));
   finally
     _Unlock;
   end;
@@ -518,7 +518,7 @@ begin
     Result.Params.UserName := AUserName;
     Result.Params.Password := APassword;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, cdtSQLServer, APersistent, kgtAfterInsert));
   finally
     _Unlock;
   end;

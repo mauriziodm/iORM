@@ -233,12 +233,12 @@ end;
 
 function TioQuery.ParamByName(const AParamName: String): TioParam;
 begin
-  Result := Self.FSqlQuery.ParamByName(AParamName);
+  Result := (FSqlQuery as IProviderSupportNG).PSGetParams.ParamByName(AParamName);
 end;
 
 function TioQuery.ParamByProp(const AProp: IioProperty): TioParam;
 begin
-  Result := Self.ParamByName(AProp.GetSqlParamName);
+  Result := ParamByName(AProp.GetSqlParamName);
 end;
 
 procedure TioQuery.Prior;
@@ -255,7 +255,7 @@ begin
   // First prepare the query in it is not
   // Self.FSqlQuery.Prepare;
   // Get the param
-  AParam := Self.FSqlQuery.Params.ParamByName(AProperty.GetSqlParamName);
+  AParam := (FSqlQuery as IProviderSupportNG).PSGetParams.ParamByName(AProperty.GetSqlParamName);
   if not Assigned(AParam) then
     raise EioException.Create(Self.ClassName + ': ' + AProperty.GetSqlParamName + ' Sql parameter not found');
 
