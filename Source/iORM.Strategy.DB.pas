@@ -277,7 +277,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtFirebird) and AContext.IDIsNull
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
   then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -300,8 +300,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
-  if (not ABlindInsert) and ((TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtSQLite) or
-    (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).ConnectionType = cdtSQLServer)) and AContext.IDIsNull then
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try

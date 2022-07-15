@@ -429,34 +429,56 @@ begin
   // -----------------------------------------------------------------
 end;
 
+//class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
+//var
+//  LComma: Char;
+//  LProp: IioProperty;
+//begin
+//  // Build the query text
+//  // -----------------------------------------------------------------
+//  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
+//  AQuery.SQL.Add('(');
+//  AQuery.SQL.Add(AContext.GetProperties.GetSQL(ioInsert));
+//  // Add the TrueClass if enabled
+//  if AContext.IsTrueClass then
+//    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
+//  // -----------------------------------------------------------------
+//  AQuery.SQL.Add(') VALUES (');
+//  // -----------------------------------------------------------------
+//  // Iterate for all properties
+//  LComma := ' ';
+//  for LProp in AContext.GetProperties do
+//  begin
+//    // If the current property is ReadOnly then skip it
+//    // If the current property RelationType is HasMany then skip it
+//    if (not LProp.IsSqlRequestCompliant(ioInsert)) or (LProp.GetRelationType = rtHasMany) or (LProp.GetRelationType = rtHasOne) then
+//      Continue;
+//    // Add the field param
+//    AQuery.SQL.Add(LComma + ':' + LProp.GetSqlParamName);
+//    LComma := ',';
+//  end;
+//  // Add the TrueClass if enabled
+//  if AContext.IsTrueClass then
+//    AQuery.SQL.Add(',:' + AContext.TrueClass.GetSqlParamName);
+//  AQuery.SQL.Add(')');
+//  // -----------------------------------------------------------------
+//end;
 class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
-var
-  LComma: Char;
-  LProp: IioProperty;
 begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
   AQuery.SQL.Add('(');
-  AQuery.SQL.Add(AContext.GetProperties.GetSQL(ioInsert));
+  // Add field name list
+  AQuery.SQL.Add(AContext.GetProperties.GetSqlForInsert);
   // Add the TrueClass if enabled
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
   // -----------------------------------------------------------------
   AQuery.SQL.Add(') VALUES (');
   // -----------------------------------------------------------------
-  // Iterate for all properties
-  LComma := ' ';
-  for LProp in AContext.GetProperties do
-  begin
-    // If the current property is ReadOnly then skip it
-    // If the current property RelationType is HasMany then skip it
-    if (not LProp.IsSqlRequestCompliant(ioInsert)) or (LProp.GetRelationType = rtHasMany) or (LProp.GetRelationType = rtHasOne) then
-      Continue;
-    // Add the field param
-    AQuery.SQL.Add(LComma + ':' + LProp.GetSqlParamName);
-    LComma := ',';
-  end;
+  // Add values
+  AQuery.SQL.Add(AContext.GetProperties.GetSqlForInsertValues);
   // Add the TrueClass if enabled
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',:' + AContext.TrueClass.GetSqlParamName);

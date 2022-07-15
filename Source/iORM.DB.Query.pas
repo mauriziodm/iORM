@@ -348,11 +348,11 @@ end;
 
 procedure TioQuery.SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
 var
-  AObj: TObject;
-  ADuckTypedStreamObject: IioDuckTypedStreamObject;
-  AStream: TStream;
-  AParam: TioParam;
-  AJSONValue: TJSONValue;
+  LObj: TObject;
+  LDuckTypedStreamObject: IioDuckTypedStreamObject;
+  LStream: TStream;
+  LParam: TioParam;
+  LJSONValue: TJSONValue;
 begin
   // AObj := nil;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -367,34 +367,34 @@ begin
   // check if the Object is assigned and if it isn't clear
   // the parameter
   // If a RelationChildPropertyPath is assigned then resolve it
-  AObj := AProp.GetValueAsObject(AContext.DataObject);
+  LObj := AProp.GetValueAsObject(AContext.DataObject);
   if AProp.RelationChildPropertyPathAssigned then
-    AObj := TioUtilities.ResolveChildPropertyPath(AObj, AProp.GetRelationChildPropertyPath);
-  if not Assigned(AObj) then
+    LObj := TioUtilities.ResolveChildPropertyPath(LObj, AProp.GetRelationChildPropertyPath);
+  if not Assigned(LObj) then
   begin
-    Self.SetParamValueToNull(AProp);
+    SetParamValueToNull(AProp, ftBlob);
     Exit;
   end;
   // Get a Param reference
-  AParam := Self.ParamByProp(AProp);
+  LParam := Self.ParamByProp(AProp);
   // -------------------------------------------------------------------------------------------------------------------------------
   // Embedded property (ioRTEmbeddedHasMany & ioRTEmbeddedHasOne relation type)
   // -------------------------------------------------------------------------------------------------------------------------------
-  if (AProp.GetRelationType = rtEmbeddedHasMany) or (AProp.GetRelationType = rtEmbeddedHasOne) then
+  if AProp.GetRelationType in [rtEmbeddedHasMany, rtEmbeddedHasOne] then
   begin
     case AProp.GetRelationType of
       rtEmbeddedHasMany:
-        AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(AObj);
+        LJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(LObj);
       rtEmbeddedHasOne:
-        AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(AObj);
+        LJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(LObj);
     else
-      AJSONValue := nil;
+      LJSONValue := nil;
     end;
     try
-      AParam.AsString := AJSONValue.ToString;
+      LParam.AsString := LJSONValue.ToString;
       Exit;
     finally
-      AJSONValue.Free;
+      LJSONValue.Free;
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -402,40 +402,40 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if AProp.IsStream then
   begin
-    AStream := TStream(AObj);
+    LStream := TStream(LObj);
     // If the Stream is empty or nil then set the Param value to NULL and exit
-    if (not Assigned(AStream)) or (AStream.Size = 0) then
+    if (not Assigned(LStream)) or (LStream.Size = 0) then
     begin
-      AParam.DataType := ftBlob;
-      AParam.Clear;
+      LParam.DataType := ftBlob;
+      LParam.Clear;
       Exit;
     end;
     // Load the stream content into the Param
-    AParam.LoadFromStream(AStream, ftBlob);
+    LParam.LoadFromStream(LStream, ftBlob);
     Exit;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // NOT TStream or descendant, wrap into a DuckTypedStreamObject  (BLOB)
   // -------------------------------------------------------------------------------------------------------------------------------
   // Wrap the object into a DuckTypedStreamObject
-  ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(AObj);
+  LDuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LObj);
   // If the wrapped object IsEmpty set the Param value to NULL then exit
-  if ADuckTypedStreamObject.IsEmpty then
+  if LDuckTypedStreamObject.IsEmpty then
   begin
-    AParam.DataType := ftBlob;
-    AParam.Clear;
+    LParam.DataType := ftBlob;
+    LParam.Clear;
     Exit;
   end;
   // Create the MemoryStream
-  AStream := TMemoryStream.Create;
+  LStream := TMemoryStream.Create;
   try
     // Save the object content into the stream
-    ADuckTypedStreamObject.SaveToStream(AStream);
+    LDuckTypedStreamObject.SaveToStream(LStream);
     // Load the stream content into the Param
-    AParam.LoadFromStream(AStream, ftBlob);
+    LParam.LoadFromStream(LStream, ftBlob);
   finally
     // CleanUp
-    AStream.Free;
+    LStream.Free;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
 end;

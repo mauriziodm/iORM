@@ -71,7 +71,8 @@ implementation
 uses
   iORM.DB.Factory, FireDac.Stan.Param, System.Rtti,
   iORM.Attributes, Data.DB, iORM.Interfaces, SysUtils,
-  iORM.Where.SqlItems.Interfaces, iORM.DB.ConnectionContainer;
+  iORM.Where.SqlItems.Interfaces, iORM.DB.ConnectionContainer,
+  System.ioUtils;
 
 { TioQueryEngine }
 
@@ -148,6 +149,8 @@ begin
   Result := LQuery;
   if LQuery.IsSqlEmpty then
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlInsert(LQuery, AContext);
+//  LQuery.GetQuery.SQL.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'sql.txt'));
+//  LQuery.GetQuery.Prepare;
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin

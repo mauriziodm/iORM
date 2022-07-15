@@ -42,7 +42,7 @@ uses
   iORM.SqlItems,
   System.Rtti,
   System.Generics.Collections, iORM.Context.Table.Interfaces, System.Classes,
-  System.TypInfo;
+  System.TypInfo, iORM.Context.Interfaces;
 
 type
 
@@ -133,6 +133,9 @@ type
     function IDSkipOnInsert: Boolean;
 
     function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
+    function IsSqlSelectRequestCompliant: Boolean;
+    function IsSqlInsertRequestCompliant: Boolean;
+    function IsSqlUpdateRequestCompliant: Boolean;
     function IsID: Boolean;
     function IsInterface: Boolean;
     function IsDBWriteEnabled: Boolean;
@@ -238,6 +241,10 @@ type
     function GetEnumerator: TEnumerator<IioProperty>;
     function GetSql: String; reintroduce; overload;
     function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
+    function GetSqlForSelect: String;
+    function GetSqlForInsert: String;
+    function GetSqlForInsertValues: String;
+    function GetSqlForUpdate: String;
     procedure Add(const AProperty: IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
@@ -259,7 +266,6 @@ type
 implementation
 
 uses
-  iORM.Context.Interfaces,
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
   System.StrUtils, iORM.Context.Map.Interfaces, iORM.Utilities,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container,
@@ -657,6 +663,23 @@ begin
   end;
 end;
 
+function TioProperty.IsSqlSelectRequestCompliant: Boolean;
+begin
+  Result := (FReadWrite <= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and not (FRelationType in [rtHasMany, rtHasOne]);
+end;
+
+function TioProperty.IsSqlUpdateRequestCompliant: Boolean;
+begin
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and not (FRelationType in [rtHasMany, rtHasOne]);
+end;
+
+function TioProperty.IsSqlInsertRequestCompliant: Boolean;
+begin
+//  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and (not (FRelationType in [rtHasMany, rtHasOne])) and
+//    ((not FIsID) or (TioConnectionManager.GetConnectionInfo(FTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert));
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and not (FRelationType in [rtHasMany, rtHasOne]);
+end;
+
 function TioProperty.IsStream: Boolean;
 begin
   Result := (Self.GetRttiType.IsInstance) and (Self.GetRttiType.AsInstance.MetaclassType.InheritsFrom(TStream));
@@ -947,6 +970,66 @@ begin
       Result := Result + ', ';
     Result := Result + AFunc(Prop);
   end;
+end;
+
+function TioProperties.GetSqlForSelect: String;
+var
+  LProp: IioProperty;
+  LComma: String;
+begin
+  LComma := '';
+  for LProp in FPropertyItems do
+    if LProp.IsSqlSelectRequestCompliant then
+    begin
+      if LProp.LoadSqlExist then
+        Result := Result + LComma + LProp.GetLoadSql
+      else
+        Result := Result + LComma + LProp.GetSqlFullQualifiedFieldName;
+      LComma := ', ';
+    end;
+end;
+
+function TioProperties.GetSqlForInsert: String;
+var
+  LProp: IioProperty;
+  LComma: String;
+begin
+  LComma := '';
+  for LProp in FPropertyItems do
+    if LProp.IsSqlInsertRequestCompliant then
+    begin
+      Result := Result + LComma + LProp.GetSqlFieldName;
+      LComma := ', ';
+    end;
+end;
+
+function TioProperties.GetSqlForInsertValues: String;
+var
+  LProp: IioProperty;
+  LComma: String;
+begin
+  LComma := ':';
+  for LProp in FPropertyItems do
+    if LProp.IsSqlInsertRequestCompliant then
+    begin
+//      Result := Result + LComma + ':' + LProp.GetSqlParamName;
+      Result := Result + LComma + LProp.GetSqlParamName;
+      LComma := ', :';
+    end;
+end;
+
+function TioProperties.GetSqlForUpdate: String;
+var
+  LProp: IioProperty;
+  LComma: String;
+begin
+  LComma := '';
+  for LProp in FPropertyItems do
+    if LProp.IsSqlUpdateRequestCompliant then
+    begin
+      Result := Result + LComma + LProp.GetSqlFieldName + ' = :' + LProp.GetSqlParamName;
+      LComma := ', ';
+    end;
 end;
 
 function TioProperties.IsObjVersionProperty(const AProperty: IioProperty): Boolean;
