@@ -79,7 +79,8 @@ uses
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
   iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
   iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
-  iORM.REST.Connection, iORM.DB.MSSqlServer.SqlDataConverter, iORM.DB.Script;
+  iORM.REST.Connection, iORM.DB.MSSqlServer.SqlDataConverter, iORM.DB.Script,
+  iORM.DB.Query.FireDAC;
 
 { TioDbBuilder }
 
@@ -191,7 +192,8 @@ begin
     Exit(LQuery);
   // Else create a new query and insert it in the QueryContainer of the connection
   // for future use if AConnectionDefName is valid
-  Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
+//  Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
+  Result := TioFDQuery.Create(LConnection);
   if not AQueryIdentity.IsEmpty then
     LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
 end;

@@ -96,7 +96,7 @@ begin
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
   else
-    LQuery.SetObjIDWhereParam(AContext);
+    LQuery.WhereParamObjID_SetValue(AContext);
 end;
 
 class function TioQueryEngine.GetQueryCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
@@ -135,7 +135,7 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlExists(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
-  LQuery.SetObjIDWhereParam(AContext);
+  LQuery.WhereParamObjID_SetValue(AContext);
 end;
 
 class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
@@ -149,8 +149,6 @@ begin
   Result := LQuery;
   if LQuery.IsSqlEmpty then
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlInsert(LQuery, AContext);
-//  LQuery.GetQuery.SQL.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'sql.txt'));
-//  LQuery.GetQuery.Prepare;
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
@@ -161,13 +159,13 @@ begin
     // then skip its value (always NULL)
     if LProp.IsID and AContext.IDIsNull then
     begin
-      LQuery.SetParamValueToNull(LProp, ftLargeInt);
+      LQuery.ParamByProp_Clear(LProp, ftLargeInt);
       Continue;
     end;
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
-      LQuery.SetObjVersionParam(AContext);
+      LQuery.ParamObjVer_SetValue(AContext);
       Continue;
     end;
     // Relation type
@@ -175,10 +173,10 @@ begin
       // If RelationType = ioRTNone save the current property value normally
       // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
       rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
-        LQuery.SetParamValueByContext(LProp, AContext);
+       LQuery.ParamByProp_SetValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
       rtBelongsTo:
-        LQuery.SetIntegerParamNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
+        LQuery.ParamByProp_SetValueAsIntegerNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
       rtHasOne: { Nothing }
         ;
@@ -189,7 +187,7 @@ begin
   end;
   // Add the TrueClass value if enabled
   if AContext.IsTrueClass then
-    LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
+    LQuery.ParamByName_SetValue(AContext.TrueClass.GetSqlParamName, AContext.TrueClass.GetValue);
 end;
 
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
@@ -235,7 +233,7 @@ begin
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
   else
-    LQuery.SetObjIDWhereParam(AContext);
+    LQuery.WhereParamObjID_SetValue(AContext);
 end;
 
 class function TioQueryEngine.GetQuerySelectList(const AContext: IioContext): IioQuery;
@@ -253,7 +251,7 @@ begin
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
   else
-    LQuery.SetObjIDWhereParam(AContext);
+    LQuery.WhereParamObjID_SetValue(AContext);
 end;
 
 class function TioQueryEngine.GetQuerySelectObject(const AContext: IioContext): IioQuery;
@@ -271,7 +269,7 @@ begin
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
   else
-    LQuery.SetObjIDWhereParam(AContext);
+    LQuery.WhereParamObjID_SetValue(AContext);
 end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
@@ -294,7 +292,7 @@ begin
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
-      LQuery.SetObjVersionParam(AContext);
+      LQuery.ParamObjVer_SetValue(AContext);
       Continue;
     end;
     // Relation type
@@ -302,10 +300,10 @@ begin
       // If RelationType = ioRTNone save the current property value normally
       // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
       rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
-        LQuery.SetParamValueByContext(LProp, AContext);
+        LQuery.ParamByProp_SetValueByContext(LProp, AContext);
       // else if RelationType = ioRTBelongsTo then save the ID
       rtBelongsTo:
-        LQuery.SetIntegerParamNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
+        LQuery.ParamByProp_SetValueAsIntegerNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
       // else if RelationType = ioRTHasOne
       rtHasOne: { Nothing }
         ;
@@ -316,12 +314,11 @@ begin
   end;
   // Add the TrueClass value if enabled
   if AContext.IsTrueClass then
-    LQuery.ParamByName(AContext.TrueClass.GetSqlParamName).Value := AContext.TrueClass.GetValue;
+    LQuery.ParamByName_SetValue(AContext.TrueClass.GetSqlParamName, AContext.TrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
-  LQuery.SetObjIDWhereParam(AContext);
-  LQuery.WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  LQuery.WhereParamObjID_SetValue(AContext);
   if AContext.ObjVersionExist then
-    LQuery.SetObjVersionWhereParam(AContext);
+    LQuery.WhereParamObjVer_SetValue(AContext);
 end;
 
 end.

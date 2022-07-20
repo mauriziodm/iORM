@@ -62,38 +62,37 @@ uses
 class procedure TioSqlDataConverterFirebird.SetQueryParamByContext(
   const AQuery: IioQuery; const AProp: IioProperty;
   const AContext: IioContext);
+var
+  LValueAsDouble: Double;
 begin
   // TDateTime (NULL is zero)
   if (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) then
   begin
-    AQuery.ParamByProp(AProp).AsDateTime := AProp.GetValue(AContext.DataObject).AsType<TDateTime>;
-    if AQuery.ParamByProp(AProp).AsDateTime = 0 then
-    begin
-      AQuery.ParamByProp(AProp).Clear;
-      AQuery.ParamByProp(AProp).DataType := TFieldType.ftDateTime;
-    end;
+    LValueAsDouble := AProp.GetValue(AContext.DataObject).AsType<TDateTime>;
+    if LValueAsDouble = 0 then
+      AQuery.ParamByProp_Clear(AProp, TFieldType.ftDateTime)
+    else
+      AQuery.ParamByProp_SetValueAsDateTime(AProp, LValueAsDouble);
   end
   // TDate (NULL is zero)
   else
   if (AProp.GetTypeInfo = System.TypeInfo(TDate)) then
   begin
-    AQuery.ParamByProp(AProp).AsDate := AProp.GetValue(AContext.DataObject).AsType<TDate>;
-    if AQuery.ParamByProp(AProp).AsDate = 0 then
-    begin
-      AQuery.ParamByProp(AProp).Clear;
-      AQuery.ParamByProp(AProp).DataType := TFieldType.ftDate;
-    end;
+    LValueAsDouble := AProp.GetValue(AContext.DataObject).AsType<TDate>;
+    if LValueAsDouble = 0 then
+      AQuery.ParamByProp_Clear(AProp, TFieldType.ftDate)
+    else
+      AQuery.ParamByProp_SetValueAsDate(AProp, LValueAsDouble);
   end
   // TTime (NULL is zero)
   else
   if (AProp.GetTypeInfo = System.TypeInfo(TTime)) then
   begin
-    AQuery.ParamByProp(AProp).AsTime := AProp.GetValue(AContext.DataObject).AsType<TTime>;
-    if AQuery.ParamByProp(AProp).AsTime = 0 then
-    begin
-      AQuery.ParamByProp(AProp).Clear;
-      AQuery.ParamByProp(AProp).DataType := TFieldType.ftTime;
-    end;
+    LValueAsDouble := AProp.GetValue(AContext.DataObject).AsType<TTime>;
+    if LValueAsDouble = 0 then
+      AQuery.ParamByProp_Clear(AProp, TFieldType.ftTime)
+    else
+      AQuery.ParamByProp_SetValueAsTime(AProp, LValueAsDouble);
   end
   // Other value types inherits from ancestor
   else

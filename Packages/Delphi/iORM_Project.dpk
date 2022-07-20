@@ -213,7 +213,8 @@ contains
   iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas',
   iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas',
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
-  iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas';
+  iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
+  iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas';
 
 end.
 

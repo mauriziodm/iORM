@@ -296,6 +296,7 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.InterfacedDataModule.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.VMAction.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Query.FireDAC.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

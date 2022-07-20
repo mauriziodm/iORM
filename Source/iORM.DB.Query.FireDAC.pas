@@ -1,67 +1,26 @@
-{ *************************************************************************** }
-{ }
-{ iORM - (interfaced ORM) }
-{ }
-{ Copyright (C) 2015-2016 Maurizio Del Magno }
-{ }
-{ mauriziodm@levantesw.it }
-{ mauriziodelmagno@gmail.com }
-{ https://github.com/mauriziodm/iORM.git }
-{ }
-{ }
-{ *************************************************************************** }
-{ }
-{ This file is part of iORM (Interfaced Object Relational Mapper). }
-{ }
-{ Licensed under the GNU Lesser General Public License, Version 3; }
-{ you may not use this file except in compliance with the License. }
-{ }
-{ iORM is free software: you can redistribute it and/or modify }
-{ it under the terms of the GNU Lesser General Public License as published }
-{ by the Free Software Foundation, either version 3 of the License, or }
-{ (at your option) any later version. }
-{ }
-{ iORM is distributed in the hope that it will be useful, }
-{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
-{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
-{ GNU Lesser General Public License for more details. }
-{ }
-{ You should have received a copy of the GNU Lesser General Public License }
-{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
-{ }
-{ *************************************************************************** }
-
-unit iORM.DB.Query;
+unit iORM.DB.Query.FireDAC;
 
 interface
 
 uses
-  iORM.Context.Properties.Interfaces,
-  System.Classes,
-  System.Rtti,
-  FireDAC.Comp.Client,
-  Data.DB, iORM.Context.Interfaces, iORM.DB.Interfaces;
+  FireDAC.Comp.Client, iORM.Context.Properties.Interfaces,
+  FireDAC.Stan.Param, iORM.Context.Interfaces, System.Rtti, iORM.DB.Interfaces,
+  System.Classes, Data.DB;
 
 type
 
-  // Classe che incapsula una query
-  TioQuery = class(TInterfacedObject, IioQuery)
-  strict private
+  TioFDQuery = class(TInterfacedObject, IioQuery)
+  private
     FSqlConnection: IioConnection;
-    FSqlQuery: TioInternalSqlQuery;
-    function ParamByName(const AParamName: String): TioParam;
-    function ParamByProp(const AProp: IioProperty): TioParam;
-    function WhereParamByProp(const AProp: IioProperty): TioParam;
-    function GetValueByFieldIndexAsVariant(Idx: Integer): Variant;
-  strict protected
+    FSqlQuery: TFDQuery;
+    function _ParamByName(const AParamName: String): TFDParam;
+    function _ParamByProp(const AProp: IioProperty): TFDParam;
+    function _WhereParamByProp(const AProp: IioProperty): TFDParam;
   public
-    constructor Create(const AConnection: IioConnection; const ASQLQuery: TioInternalSqlQuery);
+    constructor Create(const AConnection: IioConnection);
     destructor Destroy; override;
     function GetQuery: TioInternalSqlQuery;
-    procedure First;
-    procedure Last;
     procedure Next;
-    procedure Prior;
     function Eof: Boolean;
     function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
     function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
@@ -73,7 +32,6 @@ type
     function ExecSQL: integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
-    procedure SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
     procedure FillQueryWhereParams(const AContext: IioContext);
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
@@ -102,15 +60,14 @@ type
 implementation
 
 uses
-  System.TypInfo, iORM.Exceptions, iORM.Attributes, FireDAC.Stan.Param,
-  iORM.ObjectsForge.Factory, iORM.DuckTyped.Interfaces,
-  iORM.DuckTyped.Factory, iORM.DB.Factory, System.JSON,
-  iORM.Utilities, iORM.Interfaces, iORM.Where.SqlItems.Interfaces,
-  System.SysUtils;
+  iORM.Attributes, iORM.DB.Factory, iORM.Interfaces,
+  iORM.Where.SqlItems.Interfaces, System.SysUtils, iORM.DuckTyped.Interfaces,
+  iORM.Exceptions, iORM.DuckTyped.Factory, System.JSON, iORM.Utilities,
+  iORM.ObjectsForge.Factory;
 
-{ TioQuerySqLite }
+{ TioFDQuery }
 
-procedure TioQuery.CleanConnectionRef;
+procedure TioFDQuery.CleanConnectionRef;
 begin
   // Remove the reference to the connection
   // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
@@ -121,26 +78,26 @@ begin
   FSqlConnection := nil;
 end;
 
-procedure TioQuery.Close;
+procedure TioFDQuery.Close;
 begin
   FSqlQuery.Close;
 end;
 
-constructor TioQuery.Create(const AConnection: IioConnection; const ASQLQuery: TioInternalSqlQuery);
+constructor TioFDQuery.Create(const AConnection: IioConnection);
 begin
   inherited Create;
-  FSqlQuery := ASQLQuery;
-  FSqlConnection := AConnection; // Per utilizzare il reference counting
+  FSqlQuery := TFDQuery.Create(nil);
+  FSqlConnection := AConnection; // For reference counting
   if Assigned(AConnection) and AConnection.IsDBConnection then
     FSqlQuery.Connection := AConnection.AsDBConnection.GetConnection;
 end;
 
-function TioQuery.CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
+function TioFDQuery.CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
 begin
   Result := FSqlQuery.CreateBlobStream(Fields.FieldByName(AProperty.GetSqlFieldAlias), Mode);
 end;
 
-destructor TioQuery.Destroy;
+destructor TioFDQuery.Destroy;
 begin
   if FSqlQuery.Active then
     FSqlQuery.Close;
@@ -148,23 +105,23 @@ begin
   inherited;
 end;
 
-function TioQuery.Eof: Boolean;
+function TioFDQuery.Eof: Boolean;
 begin
   Result := FSqlQuery.Eof;
 end;
 
-function TioQuery.ExecSQL: integer;
+function TioFDQuery.ExecSQL: integer;
 begin
   FSqlQuery.ExecSQL;
   Result := FSqlQuery.RowsAffected;
 end;
 
-function TioQuery.Fields: TioFields;
+function TioFDQuery.Fields: TioFields;
 begin
   Result := FSqlQuery.Fields;
 end;
 
-procedure TioQuery.FillQueryWhereParams(const AContext: IioContext);
+procedure TioFDQuery.FillQueryWhereParams(const AContext: IioContext);
 var
   ASqlItem: IioSqlItem;
   ASqlItemWhere: IioSqlItemWhere;
@@ -172,28 +129,23 @@ begin
   for ASqlItem in AContext.Where.GetWhereItems do
   begin
     if Supports(ASqlItem, IioSqlItemWhere, ASqlItemWhere) and ASqlItemWhere.HasParameter then
-      ParamByName(ASqlItemWhere.GetSqlParamName(AContext.Map)).Value := ASqlItemWhere.GetValue(AContext.Map).AsVariant;
+      ParamByName_SetValue(ASqlItemWhere.GetSqlParamName(AContext.Map), ASqlItemWhere.GetValue(AContext.Map).AsVariant);
   end;
   if AContext.IsTrueClass then
-    ParamByName(AContext.TrueClass.GetSqlParamName).Value := '%' + AContext.TrueClass.GetClassName + '%';
+    ParamByName_SetValue(AContext.TrueClass.GetSqlParamName, '%' + AContext.TrueClass.GetClassName + '%');
 end;
 
-procedure TioQuery.First;
-begin
-  FSqlQuery.First;
-end;
-
-function TioQuery.GetQuery: TioInternalSqlQuery;
+function TioFDQuery.GetQuery: TioInternalSqlQuery;
 begin
   Result := FSqlQuery;
 end;
 
-function TioQuery.GetSQL: TStrings;
+function TioFDQuery.GetSQL: TStrings;
 begin
   Result := FSqlQuery.SQL;
 end;
 
-function TioQuery.GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
+function TioFDQuery.GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
 begin
   // If the property is a BelongsTo relation then return data as Integer
   // (the type for ID)
@@ -204,129 +156,89 @@ begin
   Result := TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).QueryToTValue(Self, AProperty);
 end;
 
-function TioQuery.GetValueByFieldIndexAsVariant(Idx: Integer): Variant;
-begin
-  Result := FSqlQuery.Fields[Idx].Value;
-end;
-
-function TioQuery.GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
+function TioFDQuery.GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
 begin
   Result := FSqlQuery.FieldByName(AFieldName).Value;
 end;
 
-function TioQuery.IsSqlEmpty: Boolean;
-begin
-  Result := (FSqlQuery.SQL.Count = 0);
-end;
-
-function TioQuery.IsActive: Boolean;
+function TioFDQuery.IsActive: Boolean;
 begin
   Result := FSqlQuery.Active;
 end;
 
-function TioQuery.IsEmpty: Boolean;
+function TioFDQuery.IsEmpty: Boolean;
 begin
   Result := FSqlQuery.IsEmpty;
 end;
 
-procedure TioQuery.Last;
+function TioFDQuery.IsSqlEmpty: Boolean;
 begin
-  FSqlQuery.Last;
+  Result := (FSqlQuery.SQL.Count = 0);
 end;
 
-procedure TioQuery.Next;
+procedure TioFDQuery.Next;
 begin
   FSqlQuery.Next;
 end;
 
-procedure TioQuery.Open;
+procedure TioFDQuery.Open;
 begin
   FSqlQuery.Open;
 end;
 
-function TioQuery.ParamByName(const AParamName: String): TioParam;
+procedure TioFDQuery.ParamByName_SetValue(const AParamName: String; const AValue: Variant);
 begin
-  Result := Self.FSqlQuery.ParamByName(AParamName);
-//  Result := (FSqlQuery as IProviderSupportNG).PSGetParams.ParamByName(AParamName);
+  _ParamByName(AParamName).Value := AValue;
 end;
 
-procedure TioQuery.ParamByName_SetValue(const AParamName: String; const AValue: Variant);
+procedure TioFDQuery.ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
 begin
-  // To be implemented
+  _ParamByProp(AProp).Clear;
+  _ParamByProp(AProp).DataType := ADataType;
 end;
 
-procedure TioQuery.ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
+procedure TioFDQuery.ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
 begin
-  // To be implemented
+  _ParamByProp(AProp).Value := AValue;
 end;
 
-procedure TioQuery.ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
+procedure TioFDQuery.ParamByProp_SetValueAsDate(const AProp: IioProperty; const AValue: TDate);
 begin
-  // To be implemented
+  _ParamByProp(AProp).AsDate := AValue;
 end;
 
-procedure TioQuery.ParamByProp_SetValueAsDate(const AProp: IioProperty; const AValue: TDate);
+procedure TioFDQuery.ParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
 begin
-  // To be implemented
+  _ParamByProp(AProp).AsDateTime := AValue;
 end;
 
-procedure TioQuery.ParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
+procedure TioFDQuery.ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
 begin
-  // To be implemented
+  _ParamByProp(AProp).AsFloat := AValue;
 end;
 
-procedure TioQuery.ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+procedure TioFDQuery.ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
 begin
-  // To be implemented
+  _ParamByProp(AProp).AsString := AValue;
 end;
 
-procedure TioQuery.ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
+procedure TioFDQuery.ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
 begin
-  // To be implemented
+  _ParamByProp(AProp).AsTime := AValue;
 end;
 
-procedure TioQuery.ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
-begin
-  // To be implemented
-end;
-
-procedure TioQuery.WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-begin
-  // To be implemented
-end;
-
-procedure TioQuery.WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
-begin
-  // To be implemented
-end;
-
-procedure TioQuery.WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
-begin
-  // To be implemented
-end;
-
-function TioQuery.ParamByProp(const AProp: IioProperty): TioParam;
-begin
-  Result := ParamByName(AProp.GetSqlParamName);
-end;
-
-procedure TioQuery.Prior;
-begin
-  FSqlQuery.Prior;
-end;
-
-procedure TioQuery.ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
+procedure TioFDQuery.ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
 var
-  LParam: TioParam;
-  LDuckTypedStreamObject: IioDuckTypedStreamObject;
-  LStream: TStream;
+  AParam: TioParam;
+  ADuckTypedStreamObject: IioDuckTypedStreamObject;
+  AStream: TStream;
 begin
   // First prepare the query in it is not
   // Self.FSqlQuery.Prepare;
   // Get the param
-  LParam := FSqlQuery.ParamByName(AProperty.GetSqlParamName);
+  AParam := Self.FSqlQuery.ParamByName(AProperty.GetSqlParamName);
 //  AParam := (FSqlQuery as IProviderSupportNG).PSGetParams.ParamByName(AProperty.GetSqlParamName);
-  if not Assigned(LParam) then
+  if not Assigned(AParam) then
     raise EioException.Create(Self.ClassName + ': ' + AProperty.GetSqlParamName + ' Sql parameter not found');
 
   // If AObj is a TStream then use it directly else wrap it with a
@@ -336,16 +248,16 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if AObj is TStream then
   begin
-    LStream := TStream(AObj);
+    AStream := TStream(AObj);
     // If the Stream is empty or nil then set the Param value to NULL and exit
-    if (not Assigned(LStream)) or (LStream.Size = 0) then
+    if (not Assigned(AStream)) or (AStream.Size = 0) then
     begin
-      LParam.DataType := ftBlob;
-      LParam.Clear;
+      AParam.DataType := ftBlob;
+      AParam.Clear;
       Exit;
     end;
     // Load the stream content into the Param
-    LParam.LoadFromStream(LStream, ftBlob);
+    AParam.LoadFromStream(AStream, ftBlob);
   end
   // -------------------------------------------------------------------------------------------------------------------------------
   // NOT TStream or descendant, wrap into a DuckTypedStreamObject
@@ -353,75 +265,71 @@ begin
   else
   begin
     // Wrap the object into a DuckTypedStreamObject
-    LDuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(AObj);
+    ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(AObj);
     // If the wrapped object IsEmpty set the Param value to NULL then exit
-    if LDuckTypedStreamObject.IsEmpty then
+    if ADuckTypedStreamObject.IsEmpty then
     begin
-      LParam.DataType := ftBlob;
-      LParam.Clear;
+      AParam.DataType := ftBlob;
+      AParam.Clear;
       Exit;
     end;
     // Create the MemoryStream
-    LStream := TMemoryStream.Create;
+    AStream := TMemoryStream.Create;
     try
       // Save the object content into the stream
-      LDuckTypedStreamObject.SaveToStream(LStream);
+      ADuckTypedStreamObject.SaveToStream(AStream);
       // Load the stream content into the Param
-      LParam.LoadFromStream(LStream, ftBlob);
+      AParam.LoadFromStream(AStream, ftBlob);
     finally
       // CleanUp
-      LStream.Free;
+      AStream.Free;
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioQuery.ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: Integer);
+procedure TioFDQuery.ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: Integer);
 begin
   if AValue <> 0 then
-    ParamByProp(AProp).Value := AValue
+    ParamByProp_SetValue(AProp, AValue)
   else
-  begin
-    ParamByProp(AProp).Clear;
-    ParamByProp(AProp).DataType := ftInteger; // Thanks to Marco Mottadelli
-  end;
+    ParamByProp_Clear(AProp, ftInteger);
 end;
 
-procedure TioQuery.WhereParamObjID_SetValue(const AContext: IioContext);
+procedure TioFDQuery.WhereParamObjID_SetValue(const AContext: IioContext);
 begin
-  WhereParamByProp(AContext.GetProperties.GetIdProperty).Value := AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant;
+  WhereParamByProp_SetValue(AContext.GetProperties.GetIdProperty, AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant);
 end;
 
-procedure TioQuery.ParamObjVer_SetValue(const AContext: IioContext);
+procedure TioFDQuery.ParamObjVer_SetValue(const AContext: IioContext);
 var
   LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
   if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
-    ParamByProp(LProp).AsFloat := AContext.TransactionTimestamp
+    ParamByProp_SetValueAsFloat(LProp, AContext.TransactionTimestamp)
   else
-    ParamByProp(LProp).AsDateTime := AContext.TransactionTimestamp;
+    ParamByProp_SetValueAsDateTime(LProp, AContext.TransactionTimestamp);
 end;
 
-procedure TioQuery.WhereParamObjVer_SetValue(const AContext: IioContext);
+procedure TioFDQuery.WhereParamObjVer_SetValue(const AContext: IioContext);
 var
   LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
   if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
-    WhereParamByProp(LProp).AsFloat := LProp.GetValue(AContext.DataObject).AsVariant
+    WhereParamByProp_SetValueAsFloat(LProp, LProp.GetValue(AContext.DataObject).AsVariant)
   else
-    WhereParamByProp(LProp).AsDateTime := LProp.GetValue(AContext.DataObject).AsVariant;
+    WhereParamByProp_SetValueAsDateTime(LProp, LProp.GetValue(AContext.DataObject).AsVariant);
 end;
 
-procedure TioQuery.ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
+procedure TioFDQuery.ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
 var
   LObj: TObject;
   LDuckTypedStreamObject: IioDuckTypedStreamObject;
   LStream: TStream;
-  LParam: TioParam;
   LJSONValue: TJSONValue;
 begin
   // AObj := nil;
@@ -442,11 +350,9 @@ begin
     LObj := TioUtilities.ResolveChildPropertyPath(LObj, AProp.GetRelationChildPropertyPath);
   if not Assigned(LObj) then
   begin
-    SetParamValueToNull(AProp, ftBlob);
+    ParamByProp_Clear(AProp, ftBlob);
     Exit;
   end;
-  // Get a Param reference
-  LParam := Self.ParamByProp(AProp);
   // -------------------------------------------------------------------------------------------------------------------------------
   // Embedded property (ioRTEmbeddedHasMany & ioRTEmbeddedHasOne relation type)
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -461,7 +367,7 @@ begin
       LJSONValue := nil;
     end;
     try
-      LParam.AsString := LJSONValue.ToString;
+      ParamByProp_SetValueAsString(AProp, LJSONValue.ToString);
       Exit;
     finally
       LJSONValue.Free;
@@ -476,12 +382,11 @@ begin
     // If the Stream is empty or nil then set the Param value to NULL and exit
     if (not Assigned(LStream)) or (LStream.Size = 0) then
     begin
-      LParam.DataType := ftBlob;
-      LParam.Clear;
+      ParamByProp_Clear(AProp, ftBlob);
       Exit;
     end;
     // Load the stream content into the Param
-    LParam.LoadFromStream(LStream, ftBlob);
+    _ParamByProp(AProp).LoadFromStream(LStream, ftBlob);
     Exit;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -492,8 +397,7 @@ begin
   // If the wrapped object IsEmpty set the Param value to NULL then exit
   if LDuckTypedStreamObject.IsEmpty then
   begin
-    LParam.DataType := ftBlob;
-    LParam.Clear;
+    ParamByProp_Clear(AProp, ftBlob);
     Exit;
   end;
   // Create the MemoryStream
@@ -502,7 +406,7 @@ begin
     // Save the object content into the stream
     LDuckTypedStreamObject.SaveToStream(LStream);
     // Load the stream content into the Param
-    LParam.LoadFromStream(LStream, ftBlob);
+    _ParamByProp(AProp).LoadFromStream(LStream, ftBlob);
   finally
     // CleanUp
     LStream.Free;
@@ -510,18 +414,34 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioQuery.SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
+procedure TioFDQuery.WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
 begin
-  // Set the parameter to NULL
-  ParamByProp(AProp).Clear;
-  // If a DataType is specified then set the parameter DataType
-  if AForceDataType <> ftUnknown then
-    ParamByProp(AProp).DataType := AForceDataType;
+  _WhereParamByProp(AProp).Value := AValue;
 end;
 
-function TioQuery.WhereParamByProp(const AProp: IioProperty): TioParam;
+procedure TioFDQuery.WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
 begin
-  Result := Self.ParamByName(AProp.GetSqlWhereParamName);
+  _WhereParamByProp(AProp).AsDateTime := AValue;
+end;
+
+procedure TioFDQuery.WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+begin
+  _WhereParamByProp(AProp).AsFloat := AValue;
+end;
+
+function TioFDQuery._ParamByName(const AParamName: String): TFDParam;
+begin
+  Result := FSqlQuery.ParamByName(AParamName);
+end;
+
+function TioFDQuery._ParamByProp(const AProp: IioProperty): TFDParam;
+begin
+  Result := FSqlQuery.ParamByName(AProp.GetSqlParamName);
+end;
+
+function TioFDQuery._WhereParamByProp(const AProp: IioProperty): TFDParam;
+begin
+  Result := FSqlQuery.ParamByName(AProp.GetSqlWhereParamName);
 end;
 
 end.

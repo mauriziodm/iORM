@@ -143,18 +143,15 @@ begin
   if(   (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))   ) then
   begin
     if AProp.GetValue(AContext.DataObject).AsExtended = 0 then
-    begin
-      AQuery.ParamByProp(AProp).Clear;
-      AQuery.ParamByProp(AProp).DataType := TFieldType.ftFloat;
-    end
+      AQuery.ParamByProp_Clear(AProp, TFieldType.ftFloat)
     else
-      AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsType<TDate>;
+      AQuery.ParamByProp_SetValue(AProp, AProp.GetValue(AContext.DataObject).AsType<TDate>);
   end
   else
   if AProp.isHasManyChildVirtualProperty then
-    AQuery.ParamByProp(AProp).Value := AContext.RelationOID
+    AQuery.ParamByProp_SetValue(AProp, AContext.RelationOID)
   else
-    AQuery.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
+    AQuery.ParamByProp_SetValue(AProp, AProp.GetValue(AContext.DataObject).AsVariant);
 
 
 // ATTENZIONE!!! - Ho modificato il codice come sopra, in pratica facendo in modo che le proprietà di

@@ -670,14 +670,15 @@ end;
 
 function TioProperty.IsSqlUpdateRequestCompliant: Boolean;
 begin
-  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and not (FRelationType in [rtHasMany, rtHasOne]);
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and not (FRelationType in [rtHasMany, rtHasOne]);
 end;
 
 function TioProperty.IsSqlInsertRequestCompliant: Boolean;
 begin
-//  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and (not (FRelationType in [rtHasMany, rtHasOne])) and
+//  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not (FRelationType in [rtHasMany, rtHasOne])) and
 //    ((not FIsID) or (TioConnectionManager.GetConnectionInfo(FTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert));
-  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and not (FRelationType in [rtHasMany, rtHasOne]);
+
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and not (FRelationType in [rtHasMany, rtHasOne]);
 end;
 
 function TioProperty.IsStream: Boolean;

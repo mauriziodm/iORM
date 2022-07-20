@@ -63,8 +63,8 @@ type
   TioInternalSqlConnection = TFDConnection;
   TioInternalSqlQuery = TFDQuery;
   TioFields = TFields;
-  TioParam = TParam;
-  TioParams = TParams;
+  TioParam = TFDParam;
+  TioParams = TFDParams;
 
   // Strategy class reference
   TioStrategyRef = class of TioStrategyIntf;
@@ -158,10 +158,10 @@ type
   IioQuery = interface
     ['{E8CFB984-2572-4D6F-BC4B-A4454F1EEDAA}']
     function GetQuery: TioInternalSqlQuery;
-    procedure First;
-    procedure Last;
+//    procedure First;
+//    procedure Last;
     procedure Next;
-    procedure Prior;
+//    procedure Prior;
     function Eof: Boolean;
     function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
     function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
@@ -173,19 +173,36 @@ type
     function ExecSQL: integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
-    function ParamByName(const AParamName: String): TioParam;
-    function ParamByProp(const AProp: IioProperty): TioParam;
-    procedure SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
-    procedure SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
-    procedure SetObjVersionParam(const AContext: IioContext);
-    function WhereParamByProp(const AProp: IioProperty): TioParam;
-    procedure SetObjIDWhereParam(const AContext: IioContext);
-    procedure SetObjVersionWhereParam(const AContext: IioContext);
+//    function ParamByName(const AParamName: String): TioParam;
+//    function ParamByProp(const AProp: IioProperty): TioParam;
+//    function WhereParamByProp(const AProp: IioProperty): TioParam;
+//    procedure SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
+//    procedure SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
+//    procedure SetObjVersionParam(const AContext: IioContext);
+//    procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
-    procedure SetIntegerParamNullIfZero(const AProp: IioProperty; const AValue: integer);
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
-    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
+//    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
+
+    procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
+    procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
+    procedure ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
+    procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
+    procedure ParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
+    procedure ParamByProp_SetValueAsDate(const AProp: IioProperty; const AValue: TDate);
+    procedure ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
+    procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+    procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
+    procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: integer);
+    procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
+    procedure ParamObjVer_SetValue(const AContext: IioContext);
+    procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
+    procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
+    procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+    procedure WhereParamObjID_SetValue(const AContext: IioContext);
+    procedure WhereParamObjVer_SetValue(const AContext: IioContext);
+
     property SQL: TStrings read GetSQL;
   end;
 
@@ -573,7 +590,7 @@ begin
   // Load query parameters from context
   for Prop in AContext.GetProperties do
     if Prop.IsBlob then
-      AQuery.SaveStreamObjectToSqlParam(Prop.GetValue(AContext.DataObject).AsObject, Prop);
+      AQuery.ParamByProp_LoadAsStreamObj(Prop.GetValue(AContext.DataObject).AsObject, Prop);
 end;
 
 { TioConnectionInfo }
