@@ -161,7 +161,6 @@ type
     procedure Next;
     function Eof: Boolean;
     function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
-    function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
     procedure Open;
     procedure Close;
     function IsEmpty: Boolean;

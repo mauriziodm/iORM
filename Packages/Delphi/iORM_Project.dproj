@@ -150,7 +150,6 @@
         <DCCReference Include="..\..\Source\iORM.DB.Connection.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Query.pas"/>
         <DCCReference Include="..\..\Source\iORM.DuckTyped.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.DuckTyped.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.DuckTyped.List.pas"/>

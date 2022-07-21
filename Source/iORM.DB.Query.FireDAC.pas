@@ -23,7 +23,6 @@ type
     procedure Next;
     function Eof: Boolean;
     function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
-    function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
     procedure Open;
     procedure Close;
     function IsEmpty: Boolean;
@@ -154,11 +153,6 @@ begin
 
   // Else return the value for the field related to the AProperty as TValue
   Result := TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).QueryToTValue(Self, AProperty);
-end;
-
-function TioFDQuery.GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
-begin
-  Result := FSqlQuery.FieldByName(AFieldName).Value;
 end;
 
 function TioFDQuery.IsActive: Boolean;

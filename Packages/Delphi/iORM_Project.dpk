@@ -68,7 +68,6 @@ contains
   iORM.DB.Connection in '..\..\Source\iORM.DB.Connection.pas',
   iORM.DB.Factory in '..\..\Source\iORM.DB.Factory.pas',
   iORM.DB.Interfaces in '..\..\Source\iORM.DB.Interfaces.pas',
-  iORM.DB.Query in '..\..\Source\iORM.DB.Query.pas',
   iORM.DuckTyped.Factory in '..\..\Source\iORM.DuckTyped.Factory.pas',
   iORM.DuckTyped.Interfaces in '..\..\Source\iORM.DuckTyped.Interfaces.pas',
   iORM.DuckTyped.List in '..\..\Source\iORM.DuckTyped.List.pas',
