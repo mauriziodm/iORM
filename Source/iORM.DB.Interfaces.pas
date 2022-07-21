@@ -176,18 +176,18 @@ type
     procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
     procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
     procedure ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-    procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
+//    procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
     procedure ParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     procedure ParamByProp_SetValueAsDate(const AProp: IioProperty; const AValue: TDate);
     procedure ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
-    procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+//    procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
     procedure ParamObjVer_SetValue(const AContext: IioContext);
-    procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-    procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
-    procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+//    procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
+//    procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
+//    procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
     procedure WhereParamObjVer_SetValue(const AContext: IioContext);
 

@@ -73,7 +73,7 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.Connection, iORM.DB.Query,
+  System.IOUtils, iORM.DB.Connection,
   iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator,
   iORM.Where.SqlItems, System.SysUtils, iORM.DB.QueryContainer,
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
