@@ -48,7 +48,7 @@ type
   TioQueryEngine = class
   private
   protected
-    class function ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String; const AIdentity: String = ''): String;
+    class function ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String): String;
     // class procedure PersistRelationChildObject(AMasterContext: IioContext;
     // AMasterProperty: IioContextProperty);
   public
@@ -76,9 +76,9 @@ uses
 
 { TioQueryEngine }
 
-class function TioQueryEngine.ComposeQueryIdentity(const AContext: IioContext; const APreIdentity: String; const AIdentity: String = ''): String;
+class function TioQueryEngine.ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String): String;
 begin
-  Result := AContext.GetClassRef.QualifiedClassName + ':' + APreIdentity + ':' + AIdentity;
+  Result := AContext.GetClassRef.QualifiedClassName + ':' + AIdentity;
 end;
 
 class function TioQueryEngine.GetQueryDelete(const AContext: IioContext): IioQuery;
@@ -142,10 +142,17 @@ class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQue
 var
   LProp: IioProperty;
   LQuery: IioQuery;
+  LIDIsNull: Boolean;
+  LIdentity: String;
 begin
+  LIDIsNull := AContext.IdIsNull;
+  if LIDIsNull then
+    LIdentity := 'INS'
+  else
+    LIdentity := 'INS_ID';
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'INS'));
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, LIdentity));
   Result := LQuery;
   if LQuery.IsSqlEmpty then
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlInsert(LQuery, AContext);
@@ -153,15 +160,8 @@ begin
   for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not LProp.IsSqlRequestCompliant(ioInsert) then
+    if not LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
       Continue;
-    // If current property is the ID property and its value is null (0)
-    // then skip its value (always NULL)
-    if LProp.IsID and AContext.IDIsNull then
-    begin
-      LQuery.ParamByProp_Clear(LProp, ftLargeInt);
-      Continue;
-    end;
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
@@ -287,7 +287,7 @@ begin
   for LProp in AContext.GetProperties do
   begin
     // If the current property is ReadOnly then skip it
-    if not LProp.IsSqlRequestCompliant(ioUpdate) then
+    if not LProp.IsSqlUpdateRequestCompliant then
       Continue;
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then

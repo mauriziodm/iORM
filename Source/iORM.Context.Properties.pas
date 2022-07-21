@@ -132,9 +132,8 @@ type
     procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
     function IDSkipOnInsert: Boolean;
 
-    function IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
     function IsSqlSelectRequestCompliant: Boolean;
-    function IsSqlInsertRequestCompliant: Boolean;
+    function IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;
     function IsSqlUpdateRequestCompliant: Boolean;
     function IsID: Boolean;
     function IsInterface: Boolean;
@@ -228,7 +227,6 @@ type
     FObjVersionProperty: IioProperty;
     FBlobFieldExists: Boolean;
   private
-    function InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
     // ObjStatus property
     function GetObjStatusProperty: IioProperty;
     procedure SetObjStatusProperty(const AValue: IioProperty);
@@ -240,11 +238,6 @@ type
     destructor Destroy; override;
     function GetEnumerator: TEnumerator<IioProperty>;
     function GetSql: String; reintroduce; overload;
-    function GetSql(const ASqlRequestType: TioSqlRequestType = ioAll): String; reintroduce; overload;
-    function GetSqlForSelect: String;
-    function GetSqlForInsert: String;
-    function GetSqlForInsertValues: String;
-    function GetSqlForUpdate: String;
     procedure Add(const AProperty: IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
@@ -642,27 +635,6 @@ begin
   Result := FTransient;
 end;
 
-function TioProperty.IsSqlRequestCompliant(const ASqlRequestType: TioSqlRequestType): Boolean;
-begin
-  case ASqlRequestType of
-    ioSelect:
-      Result := (FReadWrite <= lpLoadAndPersist) and (not isHasManyChildVirtualProperty) and (not FTransient);
-    ioInsert:
-      begin
-        Result := (FReadWrite >= lpLoadAndPersist) and not FTransient;
-        // NB: Se la proprietà è l'ID e stiamo utilizzando una connessione a SQLServer
-        // e il flag IDSkipOnInsert = True evita di inserire anche questa proprietà
-        // nell'elenco (della query insert).
-        if Self.IsID and Self.IDSkipOnInsert and (TioConnectionManager.GetConnectionInfo(FTable.GetConnectionDefName).ConnectionType = cdtSQLServer) then
-          Result := False;
-      end;
-    ioUpdate:
-      Result := (FReadWrite >= lpLoadAndPersist) and not FTransient;
-  else
-    Result := True;
-  end;
-end;
-
 function TioProperty.IsSqlSelectRequestCompliant: Boolean;
 begin
   Result := (FReadWrite <= lpLoadAndPersist) and (not FTransient) and (not isHasManyChildVirtualProperty) and not (FRelationType in [rtHasMany, rtHasOne]);
@@ -673,12 +645,10 @@ begin
   Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and not (FRelationType in [rtHasMany, rtHasOne]);
 end;
 
-function TioProperty.IsSqlInsertRequestCompliant: Boolean;
+function TioProperty.IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;
 begin
-//  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not (FRelationType in [rtHasMany, rtHasOne])) and
-//    ((not FIsID) or (TioConnectionManager.GetConnectionInfo(FTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert));
-
-  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and not (FRelationType in [rtHasMany, rtHasOne]);
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not (FRelationType in [rtHasMany, rtHasOne]))
+    and ((not FIsID) or (not AIDIsNull));
 end;
 
 function TioProperty.IsStream: Boolean;
@@ -922,115 +892,7 @@ end;
 
 function TioProperties.GetSql: String;
 begin
-  // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(ioAll,
-    function(AProp: IioProperty): String
-    begin
-      Result := AProp.GetSqlFieldName;
-    end);
-end;
-
-function TioProperties.GetSql(const ASqlRequestType: TioSqlRequestType): String;
-var
-  AFunc: TioPropertiesGetSqlFunction;
-begin
-  // Get the function by ASqlRequestType value
-  case ASqlRequestType of
-    ioSelect:
-      AFunc := function(AProp: IioProperty): String
-      begin
-        if AProp.LoadSqlExist then
-          Result := AProp.GetLoadSql
-        else
-          Result := AProp.GetSqlFullQualifiedFieldName;
-      end;
-  else
-    AFunc := function(AProp: IioProperty): String
-    begin
-      Result := AProp.GetSqlFieldName;
-    end;
-  end;
-  // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(ASqlRequestType, AFunc);
-end;
-
-function TioProperties.InternalGetSql(const ASqlRequestType: TioSqlRequestType; const AFunc: TioPropertiesGetSqlFunction): String;
-var
-  Prop: IioProperty;
-begin
-  for Prop in FPropertyItems do
-  begin
-    // If the property is not compliant with the request then skip it
-    if not Prop.IsSqlRequestCompliant(ASqlRequestType) then
-      Continue;
-    // If current prop is a list of HasMany or HasOne related objects skip this property
-    if (Prop.GetRelationType = rtHasMany) or (Prop.GetRelationType = rtHasOne) then
-      Continue;
-    // Add the current property
-    if Result <> '' then
-      Result := Result + ', ';
-    Result := Result + AFunc(Prop);
-  end;
-end;
-
-function TioProperties.GetSqlForSelect: String;
-var
-  LProp: IioProperty;
-  LComma: String;
-begin
-  LComma := '';
-  for LProp in FPropertyItems do
-    if LProp.IsSqlSelectRequestCompliant then
-    begin
-      if LProp.LoadSqlExist then
-        Result := Result + LComma + LProp.GetLoadSql
-      else
-        Result := Result + LComma + LProp.GetSqlFullQualifiedFieldName;
-      LComma := ', ';
-    end;
-end;
-
-function TioProperties.GetSqlForInsert: String;
-var
-  LProp: IioProperty;
-  LComma: String;
-begin
-  LComma := '';
-  for LProp in FPropertyItems do
-    if LProp.IsSqlInsertRequestCompliant then
-    begin
-      Result := Result + LComma + LProp.GetSqlFieldName;
-      LComma := ', ';
-    end;
-end;
-
-function TioProperties.GetSqlForInsertValues: String;
-var
-  LProp: IioProperty;
-  LComma: String;
-begin
-  LComma := ':';
-  for LProp in FPropertyItems do
-    if LProp.IsSqlInsertRequestCompliant then
-    begin
-//      Result := Result + LComma + ':' + LProp.GetSqlParamName;
-      Result := Result + LComma + LProp.GetSqlParamName;
-      LComma := ', :';
-    end;
-end;
-
-function TioProperties.GetSqlForUpdate: String;
-var
-  LProp: IioProperty;
-  LComma: String;
-begin
-  LComma := '';
-  for LProp in FPropertyItems do
-    if LProp.IsSqlUpdateRequestCompliant then
-    begin
-      Result := Result + LComma + LProp.GetSqlFieldName + ' = :' + LProp.GetSqlParamName;
-      LComma := ', ';
-    end;
+  raise EioException.Create(ClassName, 'GetSql', 'Method not to be called on this class');
 end;
 
 function TioProperties.IsObjVersionProperty(const AProperty: IioProperty): Boolean;

@@ -77,7 +77,6 @@ type
     procedure FillQueryWhereParams(const AContext: IioContext);
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
-
     procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
     procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
     procedure ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
@@ -95,7 +94,6 @@ type
     procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
     procedure WhereParamObjVer_SetValue(const AContext: IioContext);
-
     property SQL: TStrings read GetSQL;
   end;
 

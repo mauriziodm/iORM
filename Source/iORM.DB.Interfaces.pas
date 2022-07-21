@@ -158,10 +158,7 @@ type
   IioQuery = interface
     ['{E8CFB984-2572-4D6F-BC4B-A4454F1EEDAA}']
     function GetQuery: TioInternalSqlQuery;
-//    procedure First;
-//    procedure Last;
     procedure Next;
-//    procedure Prior;
     function Eof: Boolean;
     function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
     function GetValueByFieldNameAsVariant(const AFieldName: String): Variant;
@@ -173,18 +170,9 @@ type
     function ExecSQL: integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
-//    function ParamByName(const AParamName: String): TioParam;
-//    function ParamByProp(const AProp: IioProperty): TioParam;
-//    function WhereParamByProp(const AProp: IioProperty): TioParam;
-//    procedure SetParamValueByContext(const AProp: IioProperty; const AContext: IioContext);
-//    procedure SetParamValueToNull(const AProp: IioProperty; const AForceDataType: TFieldType = ftUnknown);
-//    procedure SetObjVersionParam(const AContext: IioContext);
-//    procedure SetObjVersionWhereParam(const AContext: IioContext);
     procedure FillQueryWhereParams(const AContext: IioContext);
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
-//    procedure SaveStreamObjectToSqlParam(const AObj: TObject; const AProperty: IioProperty);
-
     procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
     procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
     procedure ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
@@ -481,25 +469,95 @@ end;
 //  // -----------------------------------------------------------------
 //end;
 class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
+var
+  LInsertFields, LInsertValues: String;
+  LComma: String;
+  LIDIsNull: Boolean;
+  LProp: IioProperty;
 begin
+  // Prepare fields and values
+  LComma := '';
+  LInsertFields := '';
+  LInsertValues := '';
+  LIDIsNull := AContext.IdIsNull;
+  for LProp in AContext.GetProperties do
+    if LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
+    begin
+      LInsertFields := LInsertFields + LComma + LProp.GetSqlFieldName;
+      LInsertValues := LInsertValues + LComma + ':' + LProp.GetSqlParamName;
+      LComma := ', ';
+    end;
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
   AQuery.SQL.Add('(');
-  // Add field name list
-  AQuery.SQL.Add(AContext.GetProperties.GetSqlForInsert);
-  // Add the TrueClass if enabled
+  // Add field list (TrueClass if enabled)
+  AQuery.SQL.Add(LInsertFields);
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
   // -----------------------------------------------------------------
   AQuery.SQL.Add(') VALUES (');
   // -----------------------------------------------------------------
-  // Add values
-  AQuery.SQL.Add(AContext.GetProperties.GetSqlForInsertValues);
-  // Add the TrueClass if enabled
+  // Add values (TrueClass if enabled)
+  AQuery.SQL.Add(LInsertValues);
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',:' + AContext.TrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
+  // -----------------------------------------------------------------
+end;
+
+//class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext);
+//var
+//  Comma: Char;
+//  Prop: IioProperty;
+//begin
+//  // Build the query text
+//  // -----------------------------------------------------------------
+//  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSQL + ' SET');
+//  // Iterate for all properties
+//  Comma := ' ';
+//  for Prop in AContext.GetProperties do
+//  begin
+//    // If the current property is ReadOnly then skip it
+//    // If the current property RelationType is HasMany then skip it
+//    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = rtHasMany) or (Prop.GetRelationType = rtHasOne) then
+//      Continue;
+//    // Add the field param
+//    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
+//    Comma := ',';
+//  end;
+//  // Add the ioTrueClass if enabled
+//  if AContext.IsTrueClass then
+//    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
+//  // Where conditions (with ObjVersion if exists for this entity type)
+//  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
+//  if AContext.ObjVersionExist then
+//    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+//  // -----------------------------------------------------------------
+//end;
+class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext);
+var
+  LProp: IioProperty;
+  LComma: String;
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSQL + ' SET');
+  // Add properties
+  LComma := '';
+  for LProp in AContext.GetProperties do
+    if LProp.IsSqlUpdateRequestCompliant then
+    begin
+      AQuery.SQL.Add(LComma + LProp.GetSqlFieldName + ' = :' + LProp.GetSqlParamName);
+      LComma := ', ';
+    end;
+  // Add the ioTrueClass if enabled
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
+  // Where conditions (with ObjVersion if exists for this entity type)
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
+  if AContext.ObjVersionExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 
@@ -528,13 +586,26 @@ begin
 end;
 
 class procedure TioSqlGenerator.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);
+var
+  LProp: IioProperty;
+  LComma: String;
 begin
   // Build the query text
   // -----------------------------------------------------------------
   // Select
   AQuery.SQL.Add('SELECT');
   // Field list
-  AQuery.SQL.Add(AContext.GetProperties.GetSQL(ioSelect));
+  LComma := '';
+  for LProp in AContext.GetProperties do
+    if LProp.IsSqlSelectRequestCompliant then
+    begin
+      if LProp.LoadSqlExist then
+        AQuery.SQL.Add(LComma + LProp.GetLoadSql)
+      else
+        AQuery.SQL.Add(LComma + LProp.GetSqlFullQualifiedFieldName);
+      LComma := ', ';
+    end;
+  // TrueClass
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
   // From
@@ -551,36 +622,6 @@ begin
   AQuery.SQL.Add(AContext.GetGroupBySql);
   // OrderBy
   AQuery.SQL.Add(AContext.GetOrderBySql);
-end;
-
-class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext);
-var
-  Comma: Char;
-  Prop: IioProperty;
-begin
-  // Build the query text
-  // -----------------------------------------------------------------
-  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSQL + ' SET');
-  // Iterate for all properties
-  Comma := ' ';
-  for Prop in AContext.GetProperties do
-  begin
-    // If the current property is ReadOnly then skip it
-    // If the current property RelationType is HasMany then skip it
-    if (not Prop.IsSqlRequestCompliant(ioInsert)) or (Prop.GetRelationType = rtHasMany) or (Prop.GetRelationType = rtHasOne) then
-      Continue;
-    // Add the field param
-    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
-    Comma := ',';
-  end;
-  // Add the ioTrueClass if enabled
-  if AContext.IsTrueClass then
-    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
-  // Where conditions (with ObjVersion if exists for this entity type)
-  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-  if AContext.ObjVersionExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
-  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);
