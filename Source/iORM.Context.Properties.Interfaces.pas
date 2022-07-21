@@ -96,8 +96,6 @@ type
     function IsSqlUpdateRequestCompliant: Boolean;
     procedure SetIsID(const AValue:Boolean);
     function IsID: Boolean;
-    procedure SetIDSkipOnInsert(const AIDSkipOnInsert: Boolean);
-    function IDSkipOnInsert: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;

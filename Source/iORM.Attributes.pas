@@ -148,11 +148,6 @@ type
 
   // ID attribute
   ioID = class(TioCustomAttribute)
-  strict private
-    FSkipOnInsert: Boolean;
-  public
-    constructor Create(const ASkipOnInsert: Boolean = True);
-    property SkipOnInsert: Boolean read FSkipOnInsert;
   end;
 
   ioOID = ioID; // Deprecated
@@ -679,14 +674,6 @@ end;
 constructor ioForeignKey.Create(const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
   Self.Create(fkCreate, AOnDeleteAction, AOnUpdateAction);
-end;
-
-{ ioID }
-
-constructor ioID.Create(const ASkipOnInsert: Boolean);
-begin
-  inherited Create;
-  FSkipOnInsert := ASkipOnInsert;
 end;
 
 end.
