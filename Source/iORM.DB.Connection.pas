@@ -69,9 +69,9 @@ type
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     function IsDBConnection: Boolean;
-    function IsRESTConnection: Boolean;
+    function IsRemoteConnection: Boolean;
     function AsDBConnection: IioConnectionDB; virtual;
-    function AsRESTConnection: IioConnectionREST; virtual;
+    function AsRemoteConnection: IioConnectionRemote; virtual;
     function GetConnectionInfo: TioConnectionInfo;
     function InTransaction: Boolean; virtual; abstract;
     procedure StartTransaction;
@@ -115,10 +115,10 @@ begin
     raise EioException.Create(Self.ClassName + '.AsDBConnection: Operation not allowed by this connection type.');
 end;
 
-function TioConnectionBase.AsRESTConnection: IioConnectionREST;
+function TioConnectionBase.AsRemoteConnection: IioConnectionRemote;
 begin
-  if not Self.IsRESTConnection then
-    raise EioException.Create(Self.ClassName + '.AsRESTConnection: Operation not allowed by this connection type.');
+  if not Self.IsRemoteConnection then
+    raise EioException.Create(Self.ClassName + '.AsRemoteConnection: Operation not allowed by this connection type.');
 end;
 
 procedure TioConnectionBase.Commit;
@@ -146,12 +146,12 @@ end;
 
 function TioConnectionBase.IsDBConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.cdtREST);
+  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.cdtRemote);
 end;
 
-function TioConnectionBase.IsRESTConnection: Boolean;
+function TioConnectionBase.IsRemoteConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType = TioConnectionType.cdtREST);
+  Result := (FConnectionInfo.ConnectionType = TioConnectionType.cdtRemote);
 end;
 
 procedure TioConnectionBase.Rollback;

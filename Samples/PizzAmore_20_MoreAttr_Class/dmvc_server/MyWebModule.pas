@@ -34,7 +34,7 @@ uses
   System.IOUtils, 
   MVCFramework.Commons, 
   MVCFramework.Middleware.StaticFiles, 
-  MVCFramework.Middleware.Compression, iORM.REST.DMVC.Controller,
+  MVCFramework.Middleware.Compression, iORM.Remote.DMVC.Controller,
   Utils.SampleData;
 
 procedure TioDMVCServerTest.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

@@ -94,12 +94,12 @@
             <FormType>dfm</FormType>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\..\..\iorm\Source\iORM.REST.DMVC.Controller.pas"/>
         <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
         <DCCReference Include="..\common_model\Model.Pizza.pas"/>
         <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
         <DCCReference Include="..\common_model\Model.Order.pas"/>
         <DCCReference Include="..\common_model\Model.Customer.pas"/>
+        <DCCReference Include="..\..\..\Source\iORM.Remote.DMVC.Controller.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

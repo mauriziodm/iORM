@@ -221,7 +221,7 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.VMActionContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.REST.Connection.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Remote.Connection.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckDictionary.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckList.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckObj.pas"/>
@@ -233,11 +233,11 @@
         <DCCReference Include="..\..\Source\iORM.Strategy.DB.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Strategy.REST.pas"/>
-        <DCCReference Include="..\..\Source\iORM.REST.Body.Request.pas"/>
-        <DCCReference Include="..\..\Source\iORM.REST.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.REST.Body.Response.pas"/>
-        <DCCReference Include="..\..\Source\iORM.REST.Factory.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Strategy.Remote.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Remote.Body.Request.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Remote.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Remote.Body.Response.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Remote.Factory.pas"/>
         <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.pas"/>

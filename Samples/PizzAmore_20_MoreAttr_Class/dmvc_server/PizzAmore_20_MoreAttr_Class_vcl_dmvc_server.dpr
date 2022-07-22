@@ -14,12 +14,12 @@ uses
   IdHTTPWebBrokerBridge,
   MyController in 'MyController.pas',
   MyWebModule in 'MyWebModule.pas' {ioDMVCServerTest: TWebModule},
-  iORM.REST.DMVC.Controller in '..\..\..\..\iorm\Source\iORM.REST.DMVC.Controller.pas',
   Utils.SampleData in '..\common_model\Utils.SampleData.pas',
   Model.Pizza in '..\common_model\Model.Pizza.pas',
   Model.OrderRow in '..\common_model\Model.OrderRow.pas',
   Model.Order in '..\common_model\Model.Order.pas',
-  Model.Customer in '..\common_model\Model.Customer.pas';
+  Model.Customer in '..\common_model\Model.Customer.pas',
+  iORM.Remote.DMVC.Controller in '..\..\..\Source\iORM.Remote.DMVC.Controller.pas';
 
 {$R *.res}
 

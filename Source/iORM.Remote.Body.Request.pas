@@ -35,17 +35,17 @@
 
 
 
-unit iORM.REST.Body.Request;
+unit iORM.Remote.Body.Request;
 
 interface
 
 uses
-  iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.REST.Interfaces,
+  iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.Remote.Interfaces,
   iORM.DB.Interfaces;
 
 type
 
-  TioRESTRequestBody = class(TInterfacedObject, IioRESTRequestBody)
+  TioRemoteRequestBody = class(TInterfacedObject, IioRemoteRequestBody)
   private
     FWhere: IioWhere;
     FSQLDestination: IioSQLDestination;
@@ -80,16 +80,16 @@ implementation
 uses
   System.SysUtils, iORM;
 
-{ TioRESTRequestBody }
+{ TioRemoteRequestBody }
 
-constructor TioRESTRequestBody.Create(const AOwnDataObject:Boolean);
+constructor TioRemoteRequestBody.Create(const AOwnDataObject:Boolean);
 begin
   inherited Create;
   Self.Clear;
   FOwnDataObject := AOwnDataObject;
 end;
 
-constructor TioRESTRequestBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
+constructor TioRemoteRequestBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
 var
   LJSONValue: TJSONValue;
 begin
@@ -126,14 +126,14 @@ begin
     FDataObject := io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
 end;
 
-procedure TioRESTRequestBody.Clear;
+procedure TioRemoteRequestBody.Clear;
 begin
   FWhere := nil;
   FSQLDestination := nil;
   FDataObject := nil;
 end;
 
-constructor TioRESTRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
+constructor TioRemoteRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
 var
   LJSONObject: TJSONObject;
 begin
@@ -145,7 +145,7 @@ begin
   end;
 end;
 
-destructor TioRESTRequestBody.Destroy;
+destructor TioRemoteRequestBody.Destroy;
 begin
   // Clean up
   if FOwnDataObject and Assigned(FDataObject) then
@@ -153,67 +153,67 @@ begin
   inherited;
 end;
 
-function TioRESTRequestBody.GetBlindInsert: Boolean;
+function TioRemoteRequestBody.GetBlindInsert: Boolean;
 begin
   Result := FBlindInsert.Value;
 end;
 
-function TioRESTRequestBody.GetDataObject: TObject;
+function TioRemoteRequestBody.GetDataObject: TObject;
 begin
   Result := FDataObject;
 end;
 
-function TioRESTRequestBody.GetRelationOID: Integer;
+function TioRemoteRequestBody.GetRelationOID: Integer;
 begin
   Result := FRelationOID.Value;
 end;
 
-function TioRESTRequestBody.GetRelationPropertyName: String;
+function TioRemoteRequestBody.GetRelationPropertyName: String;
 begin
   Result := FRelationPropertyName.Value;
 end;
 
-function TioRESTRequestBody.GetSQLDestination: IioSQLDestination;
+function TioRemoteRequestBody.GetSQLDestination: IioSQLDestination;
 begin
   Result := FSQLDestination;
 end;
 
-function TioRESTRequestBody.GetWhere: IioWhere;
+function TioRemoteRequestBody.GetWhere: IioWhere;
 begin
   Result := FWhere;
 end;
 
-procedure TioRESTRequestBody.SetBlindInsert(const Value: Boolean);
+procedure TioRemoteRequestBody.SetBlindInsert(const Value: Boolean);
 begin
   FBlindInsert.Value := Value;
 end;
 
-procedure TioRESTRequestBody.SetDataObject(const Value: TObject);
+procedure TioRemoteRequestBody.SetDataObject(const Value: TObject);
 begin
   FDataObject := Value;
 end;
 
-procedure TioRESTRequestBody.SetRelationOID(const Value: Integer);
+procedure TioRemoteRequestBody.SetRelationOID(const Value: Integer);
 begin
   FRelationOID.Value := Value;
 end;
 
-procedure TioRESTRequestBody.SetRelationPropertyName(const Value: String);
+procedure TioRemoteRequestBody.SetRelationPropertyName(const Value: String);
 begin
   FRelationPropertyName.Value := Value;
 end;
 
-procedure TioRESTRequestBody.SetSQLDestination(const Value: IioSQLDestination);
+procedure TioRemoteRequestBody.SetSQLDestination(const Value: IioSQLDestination);
 begin
   FSQLDestination := Value;
 end;
 
-procedure TioRESTRequestBody.SetWhere(const Value: IioWhere);
+procedure TioRemoteRequestBody.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-function TioRESTRequestBody.ToJSONObject: TJSONObject;
+function TioRemoteRequestBody.ToJSONObject: TJSONObject;
 var
   LJSONValue: TJSONValue;
 begin

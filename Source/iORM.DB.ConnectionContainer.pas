@@ -106,7 +106,7 @@ type
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class procedure NewRESTConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
+    class procedure NewRemoteConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
       const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
     class function GetCurrentConnectionDef: IIoConnectionDef;
     class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
@@ -469,7 +469,7 @@ begin
   end;
 end;
 
-class procedure TioConnectionManager.NewRESTConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
+class procedure TioConnectionManager.NewRemoteConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
   const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
 var
   LConnectionInfo: TioConnectionInfo;
@@ -481,7 +481,7 @@ begin
     if AAsDefault or (Self.FCurrentConnectionName = '') then
       Self.FCurrentConnectionName := AConnectionName;
     // Setup the connection info
-    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtREST, APersistent, kgtUndefined);
+    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtRemote, APersistent, kgtUndefined);
     LConnectionInfo.BaseURL := ABaseURL;
     // Add the connection type to the internal container
     FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);

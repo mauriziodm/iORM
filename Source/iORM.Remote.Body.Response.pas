@@ -35,7 +35,7 @@
 
 
 
-unit iORM.REST.Body.Response;
+unit iORM.Remote.Body.Response;
 
 interface
 
@@ -44,7 +44,7 @@ uses
 
 type
 
-  TioRESTResponseBody = class(TInterfacedObject, IioRESTResponseBody)
+  TioRemoteResponseBody = class(TInterfacedObject, IioRemoteResponseBody)
   private
     FDataObject: TObject;
     FOwnDataObject: Boolean;
@@ -68,9 +68,9 @@ implementation
 uses
   iORM, System.NetEncoding, iORM.Exceptions;
 
-{ TioRESTResponseBody }
+{ TioRemoteResponseBody }
 
-constructor TioRESTResponseBody.Create(const AOwnDataObject:Boolean);
+constructor TioRemoteResponseBody.Create(const AOwnDataObject:Boolean);
 begin
   inherited Create;
   FDataObject := nil;
@@ -79,7 +79,7 @@ begin
   FOwnDataObject := AOwnDataObject;
 end;
 
-constructor TioRESTResponseBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
+constructor TioRemoteResponseBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
 var
   LJSONValue: TJSONValue;
   LStreamWriter: TStreamWriter;
@@ -112,7 +112,7 @@ begin
   end;
 end;
 
-constructor TioRESTResponseBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
+constructor TioRemoteResponseBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
 var
   LJSONObject: TJSONObject;
 begin
@@ -124,7 +124,7 @@ begin
   end;
 end;
 
-destructor TioRESTResponseBody.Destroy;
+destructor TioRemoteResponseBody.Destroy;
 begin
   // Clean up
   FStream.Free;
@@ -135,32 +135,32 @@ begin
   inherited;
 end;
 
-function TioRESTResponseBody.GetDataObject: TObject;
+function TioRemoteResponseBody.GetDataObject: TObject;
 begin
   Result := FDataObject;
 end;
 
-function TioRESTResponseBody.GetJSONDataValue: TJSONValue;
+function TioRemoteResponseBody.GetJSONDataValue: TJSONValue;
 begin
   Result := FJSONDataValue;
 end;
 
-function TioRESTResponseBody.GetStream: TStream;
+function TioRemoteResponseBody.GetStream: TStream;
 begin
   Result := FStream;
 end;
 
-procedure TioRESTResponseBody.SetDataObject(const Value: TObject);
+procedure TioRemoteResponseBody.SetDataObject(const Value: TObject);
 begin
   FDataObject := Value;
 end;
 
-procedure TioRESTResponseBody.SetJSONDataValue(const Value: TJSONValue);
+procedure TioRemoteResponseBody.SetJSONDataValue(const Value: TJSONValue);
 begin
   FJSONDataValue := Value;
 end;
 
-function TioRESTResponseBody.ToJSONObject: TJSONObject;
+function TioRemoteResponseBody.ToJSONObject: TJSONObject;
 var
   LJSONValue: TJSONValue;
   LStringStream: TStringStream;

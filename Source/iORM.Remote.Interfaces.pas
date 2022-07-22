@@ -35,50 +35,13 @@
 
 
 
-unit iORM.REST.Factory;
+unit iORM.Remote.Interfaces;
 
 interface
 
-uses
-  iORM.DB.Interfaces;
-
-type
-
-  TioRESTFactory = class
-  public
-    class function NewRequestBody(const AOwnDataObject:Boolean=True): IioRESTRequestBody; overload;
-    class function NewRequestBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioRESTRequestBody; overload;
-    class function NewResponseBody(const AOwnDataObject:Boolean=True): IioRESTResponseBody; overload;
-    class function NewResponseBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioRESTResponseBody; overload;
-  end;
+  // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi
+  //  a circular reference error (IioRemoteRequestBody, IioRemoteResponseBody)
 
 implementation
-
-uses
-  iORM.REST.Body.Request, iORM.REST.Body.Response;
-
-{ TioRESTFactory }
-
-class function TioRESTFactory.NewRequestBody(const AOwnDataObject:Boolean): IioRESTREquestBody;
-begin
-  Result := TioRESTRequestBody.Create(AOwnDataObject);
-end;
-
-class function TioRESTFactory.NewRequestBody(
-  const AJSONString: String; const AOwnDataObject:Boolean): IioRESTREquestBody;
-begin
-  Result := TioRESTRequestBody.Create(AJSONString, AOwnDataObject);
-end;
-
-class function TioRESTFactory.NewResponseBody(const AOwnDataObject:Boolean): IioRESTResponseBody;
-begin
-  Result := TioRESTResponseBody.Create(AOwnDataObject);
-end;
-
-class function TioRESTFactory.NewResponseBody(
-  const AJSONString: String; const AOwnDataObject:Boolean): IioRESTResponseBody;
-begin
-  Result := TioRESTResponseBody.Create(AJSONString, AOwnDataObject);
-end;
 
 end.

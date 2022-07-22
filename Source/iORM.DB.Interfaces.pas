@@ -69,7 +69,7 @@ type
   // Strategy class reference
   TioStrategyRef = class of TioStrategyIntf;
 
-  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtREST);
+  TioConnectionType = (cdtFirebird, cdtSQLite, cdtSQLServer, cdtMySQL, cdtRemote);
 
   TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
 
@@ -114,15 +114,15 @@ type
   // Interfaccia per il componente connection da fornire alla query per la
   // connessione al database
   IioConnectionDB = interface;
-  IioConnectionREST = interface;
+  IioConnectionRemote = interface;
 
   IioConnection = interface
     ['{FF5D54D7-7EBE-4E6E-830E-E091BA7AE929}']
     procedure Free;
     function IsDBConnection: Boolean;
-    function IsRESTConnection: Boolean;
+    function IsRemoteConnection: Boolean;
     function AsDBConnection: IioConnectionDB;
-    function AsRESTConnection: IioConnectionREST;
+    function AsRemoteConnection: IioConnectionRemote;
     function GetConnectionInfo: TioConnectionInfo;
     function InTransaction: Boolean;
     procedure StartTransaction;
@@ -138,18 +138,18 @@ type
     procedure TransactionTimestampReset;
   end;
 
-  IioRESTRequestBody = interface;
-  IioRESTResponseBody = interface;
+  IioRemoteRequestBody = interface;
+  IioRemoteResponseBody = interface;
 
-  IioConnectionREST = interface(IioConnection)
+  IioConnectionRemote = interface(IioConnection)
     ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
     procedure Execute(const AResource: String);
     // ioRequestBody property
-    function GetRequestBody: IioRESTRequestBody;
-    property RequestBody: IioRESTRequestBody read GetRequestBody;
+    function GetRequestBody: IioRemoteRequestBody;
+    property RequestBody: IioRemoteRequestBody read GetRequestBody;
     // ioResponseBody property
-    function GetResponseBody: IioRESTResponseBody;
-    property ResponseBody: IioRESTResponseBody read GetResponseBody;
+    function GetResponseBody: IioRemoteResponseBody;
+    property ResponseBody: IioRemoteResponseBody read GetResponseBody;
   end;
 
   // Interfaccia per il componente Query, cioè del componente che si
@@ -290,7 +290,7 @@ type
     function GetSQL: String;
   end;
 
-  IioRESTRequestBody = interface
+  IioRemoteRequestBody = interface
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
     procedure Clear;
     function ToJSONObject: TJSONObject;
@@ -320,7 +320,7 @@ type
     property BlindInsert: Boolean read GetBlindInsert write SetBlindInsert;
   end;
 
-  IioRESTResponseBody = interface
+  IioRemoteResponseBody = interface
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ToJSONObject: TJSONObject;
     // JSONDataValue

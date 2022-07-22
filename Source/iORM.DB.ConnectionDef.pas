@@ -138,7 +138,7 @@ type
     property OnBeforeRegister: TNotifyEvent read FOnBeforeRegister write FOnBeforeRegister;
   end;
 
-  // Class for REST remoted connection
+  // Class for remote connection
   TioRemoteConnectionDef = class(TioCustomConnectionDef)
   public
     constructor Create(AOwner: TComponent); override;
@@ -379,7 +379,7 @@ begin
   end;
 end;
 
-{ TioRESTConnectionDef }
+{ TioRemoteConnectionDef }
 
 constructor TioRemoteConnectionDef.Create(AOwner: TComponent);
 begin
@@ -392,7 +392,7 @@ begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
   // Register the ConnectionDef
-  TioConnectionManager.NewRESTConnection(BaseURL, DefaultConnection, Persistent, Name);
+  TioConnectionManager.NewRemoteConnection(BaseURL, DefaultConnection, Persistent, Name);
   // NB: Inherited must be the last line (set FIsRegistered)
   inherited;
 end;

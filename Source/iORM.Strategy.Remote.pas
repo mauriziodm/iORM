@@ -31,7 +31,7 @@
 { }
 { *************************************************************************** }
 
-unit iORM.Strategy.REST;
+unit iORM.Strategy.Remote;
 
 interface
 
@@ -42,7 +42,7 @@ uses
 type
 
   // Strategy class for database
-  TioStrategyREST = class(TioStrategyIntf)
+  TioStrategyRemote = class(TioStrategyIntf)
   private
     // class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
     // class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
@@ -74,26 +74,26 @@ implementation
 uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
-  iORM.DuckTyped.Interfaces, iORM.REST.Interfaces, iORM.REST.Factory,
+  iORM.DuckTyped.Interfaces, iORM.Remote.Interfaces, iORM.Remote.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
   iORM.Context.Container;
 
-{ TioStrategyREST }
+{ TioStrategyRemote }
 
-class procedure TioStrategyREST.CommitTransaction(const AConnectionName: String);
+class procedure TioStrategyRemote.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
-class function TioStrategyREST.Count(const AWhere: IioWhere): Integer;
+class function TioStrategyRemote.Count(const AWhere: IioWhere): Integer;
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   Result := 0;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -114,13 +114,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.Delete(const AWhere: IioWhere);
+class procedure TioStrategyRemote.Delete(const AWhere: IioWhere);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -138,16 +138,16 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.DeleteCollection(const ACollection: TObject);
+class procedure TioStrategyRemote.DeleteCollection(const ACollection: TObject);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Check
   if not Assigned(ACollection) then
     Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -165,10 +165,10 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.DeleteObject(const AObj: TObject);
+class procedure TioStrategyRemote.DeleteObject(const AObj: TObject);
 var
   LConnectionDefName: String;
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Check
@@ -176,7 +176,7 @@ begin
     Exit;
   // Get the connection, set the request and execute it
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -194,7 +194,7 @@ begin
   end;
 end;
 
-class function TioStrategyREST.InTransaction(const AConnectionName: String): boolean;
+class function TioStrategyRemote.InTransaction(const AConnectionName: String): boolean;
 begin
   inherited;
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
@@ -209,13 +209,13 @@ end;
 // Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
 // end;
 
-class procedure TioStrategyREST.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioStrategyRemote.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -235,13 +235,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.LoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyRemote.LoadList(const AWhere: IioWhere; const AList: TObject);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -261,14 +261,14 @@ begin
   end;
 end;
 
-class function TioStrategyREST.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyRemote.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   Result := nil;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -291,7 +291,7 @@ begin
   end;
 end;
 
-class function TioStrategyREST.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyRemote.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
@@ -307,17 +307,17 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyREST.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+class procedure TioStrategyRemote.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Check
   if not Assigned(ACollection) then
     Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -342,11 +342,11 @@ begin
 end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyREST.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyRemote.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Check
@@ -354,7 +354,7 @@ begin
     Exit;
   // Get the connection, set the request and execute it
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -378,20 +378,20 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.RollbackTransaction(const AConnectionName: String);
+class procedure TioStrategyRemote.RollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TioStrategyREST.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioStrategyRemote.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
   LJSONValue: TJSONValue;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsRESTConnection;
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -416,13 +416,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioStrategyRemote.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
-  LConnection: IioConnectionREST;
+  LConnection: IioConnectionRemote;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRESTConnection;
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -443,7 +443,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyREST.StartTransaction(const AConnectionName: String);
+class procedure TioStrategyRemote.StartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;

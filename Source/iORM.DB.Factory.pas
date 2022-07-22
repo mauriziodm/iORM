@@ -79,7 +79,7 @@ uses
   iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
   iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
   iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
-  iORM.REST.Connection, iORM.DB.MSSqlServer.SqlDataConverter, iORM.DB.Script,
+  iORM.Remote.Connection, iORM.DB.MSSqlServer.SqlDataConverter, iORM.DB.Script,
   iORM.DB.Query.FireDAC;
 
 { TioDbBuilder }
@@ -152,16 +152,16 @@ var
     // Create the ioConnection and his QueryContainer and return it
     Result := TioConnectionDB.Create(LConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
   end;
-  function NewConnectionREST: IioConnectionREST;
+  function NewConnectionRemote: IioConnectionRemote;
   begin
-    Result := TioConnectionREST.Create(LConnectionInfo);
+    Result := TioConnectionRemote.Create(LConnectionInfo);
   end;
 
 begin
   // Get connection info
   LConnectionInfo := TioConnectionManager.GetConnectionInfo(AConnectionName);
-  if LConnectionInfo.ConnectionType = TioConnectionType.cdtREST then
-    Result := NewConnectionREST
+  if LConnectionInfo.ConnectionType = TioConnectionType.cdtRemote then
+    Result := NewConnectionRemote
   else
     Result := NewConnectionDB;
 end;
