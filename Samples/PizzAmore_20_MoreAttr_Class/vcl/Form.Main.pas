@@ -72,7 +72,7 @@ end;
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
   AWarnings: TStrings);
 begin
-  TSampleData.CheckForSampleDataCreation;
+//  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TMainForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
