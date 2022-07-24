@@ -46,7 +46,7 @@ uses
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
-  ObjMapper.Attributes, iORM.Context.Interfaces;
+  DJSON.Attributes, iORM.Context.Interfaces;
 
 type
 
@@ -72,8 +72,8 @@ type
     // Aggiunto attributo per non serializzare l'oggetto TioCommonBSAPageManager
     // Mauri 30/04/22 aggiunto campo FPagingObjExists per risolvere un problema con RemoteConnection
     //        (dopo la deserializzazione lato server era in uno stato non ben definito)
-    [DoNotSerializeAttribute] FPagingObj: TioCommonBSAPageManager;
-    [DoNotSerializeAttribute] FPagingObjExists: Boolean;
+    [djSkip] FPagingObj: TioCommonBSAPageManager;
+    [djSkip] FPagingObjExists: Boolean;
 
     procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;

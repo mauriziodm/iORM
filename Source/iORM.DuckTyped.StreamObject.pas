@@ -38,14 +38,13 @@ unit iORM.DuckTyped.StreamObject;
 interface
 
 uses
-  iORM.DuckTyped.Interfaces, System.Classes, System.Rtti,
-  iORM.DMVC.ObjectsMappersAdapter, iORM.Attributes;
+  iORM.DuckTyped.Interfaces, System.Classes, System.Rtti, iORM.Attributes;
 
 type
 
   // DuckTypedStreamObject
   //  NB: IWrappedObject interface is for DMVC ObjectsMappers adapter
-  TioDuckTypedStreamObject = class(TInterfacedObject, IioDuckTypedStreamObject, IWrappedObject)
+  TioDuckTypedStreamObject = class(TInterfacedObject, IioDuckTypedStreamObject)
   strict
   private
     FObj: TObject;

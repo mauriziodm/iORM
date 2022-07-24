@@ -200,7 +200,7 @@ implementation
 uses
   iORM.Exceptions, System.SysUtils, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
-  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, ObjMapper, iORM.Utilities, System.StrUtils,
+  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
   iORM.RttiContext.Factory;
 
 /// //////////////////////////////////////////////

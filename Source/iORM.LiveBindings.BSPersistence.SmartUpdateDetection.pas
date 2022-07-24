@@ -26,7 +26,7 @@ type
 implementation
 
 uses
-  iORM.Utilities, System.SysUtils, ObjMapper;
+  iORM.Utilities, System.SysUtils, DJSON;
 
 type
 
@@ -220,7 +220,7 @@ end;
 
 function TioSmartUpdateDetectionStateFull.EncodeValue(const ACurrentObj: TObject): string;
 begin
-  Result := om.From(ACurrentObj).byFields.IgnoreObjStatus.TypeAnnotationsON.ToString;
+  Result := dj.From(ACurrentObj).byFields.IgnoreObjStatus.TypeAnnotationsON.ToString;
 end;
 
 { TioSmartUpdateDetectionFaxtory }

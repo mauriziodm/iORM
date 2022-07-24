@@ -76,7 +76,7 @@ uses
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.Remote.Interfaces, iORM.Remote.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  iORM.Context.Container;
+  iORM.Context.Container, DJSON;
 
 { TioStrategyRemote }
 
@@ -252,7 +252,7 @@ begin
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('LoadList');
     // Deserialize  the JSONDataValue to the result object
-    io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearListBefore.TypeAnnotationsON.&To(AList);
+    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except
@@ -280,9 +280,9 @@ begin
     LConnection.Execute('LoadObject');
     // Deserialize  the JSONDataValue to the result object
     if Assigned(AObj) then
-      io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearListBefore.TypeAnnotationsON.&To(AObj)
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj)
     else
-      Result := io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearListBefore.TypeAnnotationsON.ToObject;
+      Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
     // Commit
     LConnection.Commit;
   except
@@ -332,7 +332,7 @@ begin
     LConnection.Execute('PersistCollection');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if not ABlindInsert then
-      io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearListBefore.TypeAnnotationsON.&To(ACollection);
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(ACollection);
     // Commit
     LConnection.Commit;
   except
@@ -369,7 +369,7 @@ begin
     LConnection.Execute('PersistObject');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if not ABlindInsert then
-      io.Mapper.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearListBefore.TypeAnnotationsON.&To(AObj);
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
     // Commit
     LConnection.Commit;
   except

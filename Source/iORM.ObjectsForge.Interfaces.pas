@@ -440,8 +440,7 @@ end;
 class procedure TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
 var
   LChildObject: TObject;
-  LJSONValue: TJSONValue;
-  LJSONValueString: String;
+  LJSONString: String;
 begin
   // If the field is null then exit
   if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
@@ -455,20 +454,14 @@ begin
       #13#13'Please make sure that the collection of type "%s" is created in the constructor of the "%s" class or has not been destroyed and try again.',
       [AContext.Map.GetClassName, AProperty.GetName, AProperty.GetTypeName, AContext.Map.GetClassName]));
   // Get the JSONObject
-  LJSONValueString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-  LJSONValue := TJSONObject.ParseJSONValue(LJSONValueString);
-  try
-    // Deserialize
-    TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedList(LJSONValue, LChildObject);
-  finally
-    LJSONValue.Free;
-  end;
+  LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+  // Deserialize
+  TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedList(LJSONString, LChildObject);
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
 var
-  LJSONObject: TJSONObject;
-  LJSONObjectString: String;
+  LJSONString: String;
 begin
   Result := nil; // NB: Altrimenti non veniva inizializzato a nil
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
@@ -483,14 +476,9 @@ begin
   // Create the instance if not assigned
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // Get the JSONObject
-  LJSONObjectString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-  LJSONObject := TJSONObject.ParseJSONValue(LJSONObjectString) as TJSONObject;
-  try
-    // Deserialize
-    Result := TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedObject(LJSONObject, Result);
-  finally
-    LJSONObject.Free;
-  end;
+  LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+  // Deserialize
+  TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedObject(LJSONString, Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);

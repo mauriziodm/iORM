@@ -190,7 +190,6 @@
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMapper.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DMVC.ObjectsMappersAdapter.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.QueryContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.QueryEngine.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.SqlItems.Interfaces.pas"/>
@@ -222,14 +221,6 @@
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\iORM.Remote.Connection.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckDictionary.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckList.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckObj.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.DuckPropField.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.Engine.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.RTTIUtils.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjMapper.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.DB.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Factory.pas"/>
@@ -238,7 +229,6 @@
         <DCCReference Include="..\..\Source\iORM.Remote.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Remote.Body.Response.pas"/>
         <DCCReference Include="..\..\Source\iORM.Remote.Factory.pas"/>
-        <DCCReference Include="..\..\ExtLibs\ObjMapper\ObjectsMappers.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas"/>

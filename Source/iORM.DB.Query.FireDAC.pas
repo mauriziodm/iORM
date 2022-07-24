@@ -62,7 +62,7 @@ uses
   iORM.Attributes, iORM.DB.Factory, iORM.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.SysUtils, iORM.DuckTyped.Interfaces,
   iORM.Exceptions, iORM.DuckTyped.Factory, System.JSON, iORM.Utilities,
-  iORM.ObjectsForge.Factory;
+  iORM.ObjectsForge.Factory, DJSON;
 
 { TioFDQuery }
 
@@ -324,7 +324,7 @@ var
   LObj: TObject;
   LDuckTypedStreamObject: IioDuckTypedStreamObject;
   LStream: TStream;
-  LJSONValue: TJSONValue;
+  LJsonString: String;
 begin
   // AObj := nil;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -354,18 +354,17 @@ begin
   begin
     case AProp.GetRelationType of
       rtEmbeddedHasMany:
-        LJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(LObj);
+        LJsonString := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(LObj);
       rtEmbeddedHasOne:
-        LJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(LObj);
+        LJsonString := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(LObj);
     else
-      LJSONValue := nil;
+      LJsonString := '';
     end;
-    try
-      ParamByProp_SetValueAsString(AProp, LJSONValue.ToString);
-      Exit;
-    finally
-      LJSONValue.Free;
-    end;
+    // Set the param
+    if LJsonString.IsEmpty then
+      ParamByProp_Clear(AProp, ftBlob)
+    else
+      ParamByProp_SetValueAsString(AProp, LJsonString);
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // TStream or descendant (BLOB)

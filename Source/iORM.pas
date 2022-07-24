@@ -36,7 +36,7 @@ unit iORM;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.TypInfo, ObjMapper, iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
+  System.Classes, System.SysUtils, System.TypInfo, DJSON, iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
   iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom;
 
@@ -294,7 +294,6 @@ type
     class function ExtractOID(const AIntfObj: IInterface): Integer; overload;
     class function GlobalFactory: TioGlobalFactoryRef;
     class procedure HandleException(Sender: TObject);
-    class function Mapper: omRef;
     class procedure ShowMessage(const AMessage: String);
     class function TerminateApplication: boolean;
 
@@ -544,11 +543,6 @@ end;
 class function io.Where<T>: IioWhere<T>;
 begin
   Result := TioWhereFactory.NewWhere<T>;
-end;
-
-class function io.Mapper: omRef;
-begin
-  Result := ObjMapper.om;
 end;
 
 class function io.NotExists<T>(const ATypeAlias: String): boolean;

@@ -49,17 +49,17 @@ type
   TioObjectMapperIntf = class
   public
     // Object
-    class function SerializeEmbeddedObject(AObj:TObject): TJSONObject;
-    class function DeserializeEmbeddedObject(AJObj:TJSONObject; AObj:TObject=nil): TObject;
+    class function SerializeEmbeddedObject(const AObj:TObject): String;
+    class procedure DeserializeEmbeddedObject(const AJsonString: String; AObj:TObject = nil);
     // List
-    class function SerializeEmbeddedList(AList:TObject): TJSONValue;
-    class function DeserializeEmbeddedList(AJValue:TJSONValue; AList:TObject=nil): TObject;
+    class function SerializeEmbeddedList(const AList: TObject): String;
+    class procedure DeserializeEmbeddedList(const AJsonString: String; AList:TObject = nil);
   end;
 
 implementation
 
 uses
-  ObjMapper.Engine;
+  DJSON;
 
 
 { TioObjectMapper }
@@ -67,24 +67,24 @@ uses
 
 { TioObjectMapperIntf }
 
-class function TioObjectMapperIntf.DeserializeEmbeddedList(AJValue: TJSONValue; AList: TObject): TObject;
+class procedure TioObjectMapperIntf.DeserializeEmbeddedList(const AJsonString: String; AList: TObject);
 begin
-  Result := omEngine.DeserializeList(AList, AJValue, nil, omEngine.DefaultByFields).AsObject;
+  dj.FromJson(AJsonString).byFields.TypeAnnotationsON.&To(AList);
 end;
 
-class function TioObjectMapperIntf.DeserializeEmbeddedObject(AJObj:TJSONObject; AObj:TObject): TObject;
+class procedure TioObjectMapperIntf.DeserializeEmbeddedObject(const AJsonString: String; AObj:TObject);
 begin
-  Result := omEngine.DeserializeObject(AJObj, AObj, omEngine.DefaultByFields);
+  dj.FromJson(AJsonString).byFields.TypeAnnotationsON.&To(AObj);
 end;
 
-class function TioObjectMapperIntf.SerializeEmbeddedObject(AObj: TObject): TJSONObject;
+class function TioObjectMapperIntf.SerializeEmbeddedObject(const AObj:TObject): String;
 begin
-  Result := omEngine.SerializeObject(AObj, omEngine.DefaultByFields);
+  Result := dj.From(AObj).byFields.TypeAnnotationsON.ToJson;
 end;
 
-class function TioObjectMapperIntf.SerializeEmbeddedList(AList: TObject): TJSONValue;
+class function TioObjectMapperIntf.SerializeEmbeddedList(const AList: TObject): String;
 begin
-  Result := omEngine.SerializeList(AList, nil, omEngine.DefaultByFields);
+  Result := dj.From(AList).byFields.TypeAnnotationsON.ToJson;
 end;
 
 

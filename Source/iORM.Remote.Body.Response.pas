@@ -66,7 +66,7 @@ type
 implementation
 
 uses
-  iORM, System.NetEncoding, iORM.Exceptions;
+  iORM, System.NetEncoding, iORM.Exceptions, DJSON;
 
 { TioRemoteResponseBody }
 
@@ -88,7 +88,7 @@ begin
   // DataObject
   LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
   if Assigned(LJSONValue) then
-    FDataObject := io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
+    FDataObject := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
   // JSONDataValue
   LJSONValue := AJSONObject.GetValue(KEY_JSONDATAVALUE);
   if Assigned(LJSONValue) then
@@ -172,7 +172,7 @@ begin
   // DataOject
   if Assigned(FDataObject) then
   begin
-    LJSONValue := io.Mapper.From(FDataObject).byFields.TypeAnnotationsON.ToJSON;
+    LJSONValue := dj.From(FDataObject).byFields.TypeAnnotationsON.ToJsonValue;
     Result.AddPair(KEY_DATAOBJECT, LJSONValue);
   end;
   // Stream

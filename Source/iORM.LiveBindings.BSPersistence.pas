@@ -6,7 +6,7 @@ uses
   iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  ObjMapper.Attributes, iORM.CommonTypes;
+  DJSON.Attributes, iORM.CommonTypes;
 
 type
 
@@ -71,10 +71,8 @@ type
 
   TioBSPersistence = class
   private
-    [DoNotSerializeAttribute]
-    FBindSource: IioBSPersistenceClient;
-    [DoNotSerializeAttribute]
-    FSavedState: String;
+    [djSkip] FBindSource: IioBSPersistenceClient;
+    [djSkip] FSavedState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
     FSmartUpdateDetection: IioSmartUpdateDetection;
     FIsInserting: Boolean;
@@ -135,7 +133,7 @@ type
 implementation
 
 uses
-  ObjMapper, iORM.Exceptions, System.SysUtils, iORM.Utilities,
+  DJSON, iORM.Exceptions, System.SysUtils, iORM.Utilities,
   iORM.LiveBindings.CommonBSAPersistence;
 
 { TioBindSourceObjState }
@@ -499,7 +497,7 @@ begin
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
   // Execute the revert
-  om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
+  dj.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearCollection.&To(FBindSource.Current);
   FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSource.Current);
 end;
 
@@ -544,7 +542,7 @@ end;
 function TioBSPersistence.GetCurrentAsString: String;
 begin
   if FBindSource.Current <> nil then
-    Result := om.From(FBindSource.Current).byFields.TypeAnnotationsON.ToString
+    Result := dj.From(FBindSource.Current).byFields.TypeAnnotationsON.ToString
   else
     Result := '';
 end;

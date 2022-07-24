@@ -81,7 +81,7 @@ implementation
 
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
-  iORM.DependencyInjection.Implementers;
+  iORM.DependencyInjection.Implementers, DJSON;
 
 { TioRttiUtilities }
 
@@ -135,8 +135,8 @@ class function TioUtilities.CloneObject(const ASourceObj: TObject): TObject;
 var
   LSourceJSON: String;
 begin
-  LSourceJSON := io.Mapper.From(ASourceObj).byFields.TypeAnnotationsON.ToString;
-  Result := io.Mapper.FromJSON(LSourceJSON).byFields.TypeAnnotationsON.ToObject;
+  LSourceJSON := dj.From(ASourceObj).byFields.TypeAnnotationsON.ToString;
+  Result := dj.FromJSON(LSourceJSON).byFields.TypeAnnotationsON.ToObject;
 // ----- OLD CODE -----
 //  Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
 // ----- OLD CODE -----

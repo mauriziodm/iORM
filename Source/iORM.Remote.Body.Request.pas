@@ -78,7 +78,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM;
+  System.SysUtils, iORM, DJSON;
 
 { TioRemoteRequestBody }
 
@@ -97,33 +97,33 @@ begin
   // RelationPropertyName
   LJSONValue := AJSONObject.GetValue(KEY_RELATIONPROPERTYNAME);
   if Assigned(LJSONValue) then
-    FRelationPropertyName.Value := io.Mapper.FromJSON(LJSONValue).&To<String>;
+    FRelationPropertyName.Value := dj.FromJSON(LJSONValue).&To<String>;
   // RelationOID
   LJSONValue := AJSONObject.GetValue(KEY_RELATIONOID);
   if Assigned(LJSONValue) then
-    FRelationOID.Value := io.Mapper.FromJSON(LJSONValue).&To<Integer>;
+    FRelationOID.Value := dj.FromJSON(LJSONValue).&To<Integer>;
   // BlindInsert
   LJSONValue := AJSONObject.GetValue(KEY_BLINDINSERT);
   if Assigned(LJSONValue) then
-    FBlindInsert.Value := io.Mapper.FromJSON(LJSONValue).&To<Boolean>;
+    FBlindInsert.Value := dj.FromJSON(LJSONValue).&To<Boolean>;
   // IioWhere
   LJSONValue := AJSONObject.GetValue(KEY_WHERE);
   if Assigned(LJSONValue) then
   begin
     FWhere := io.GlobalFactory.WhereFactory.NewWhere;
-    io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FWhere);
+    dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FWhere);
   end;
   // IioSQLDestination
   LJSONValue := AJSONObject.GetValue(KEY_SQLDESTINATION);
   if Assigned(LJSONValue) then
   begin
     FSQLDestination := io.GlobalFactory.DBFactory.SQLDestination('');
-    io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FSQLDestination);
+    dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FSQLDestination);
   end;
   // DataObject
   LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
   if Assigned(LJSONValue) then
-    FDataObject := io.Mapper.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
+    FDataObject := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
 end;
 
 procedure TioRemoteRequestBody.Clear;
@@ -239,19 +239,19 @@ begin
   // IioWhere
   if Assigned(FWhere) then
   begin
-    LJSONValue := io.Mapper.From(FWhere).byFields.TypeAnnotationsON.ToJSON;
+    LJSONValue := dj.From(FWhere).byFields.TypeAnnotationsON.ToJsonValue;
     Result.AddPair(KEY_WHERE, LJSONValue);
   end;
   // SQLDestination
   if Assigned(FSQLDestination) then
   begin
-    LJSONValue := io.Mapper.From(FSQLDestination).byFields.TypeAnnotationsON.ToJSON;
+    LJSONValue := dj.From(FSQLDestination).byFields.TypeAnnotationsON.ToJsonValue;
     Result.AddPair(KEY_SQLDESTINATION, LJSONValue);
   end;
   // DataOject
   if Assigned(FDataObject) then
   begin
-    LJSONValue := io.Mapper.From(FDataObject).byFields.TypeAnnotationsON.ToJSON;
+    LJSONValue := dj.From(FDataObject).byFields.TypeAnnotationsON.ToJsonValue;
     Result.AddPair(KEY_DATAOBJECT, LJSONValue);
   end;
 end;
