@@ -189,7 +189,6 @@
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMapper.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.QueryContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.QueryEngine.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.SqlItems.Interfaces.pas"/>

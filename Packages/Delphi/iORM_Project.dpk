@@ -107,7 +107,6 @@ contains
   iORM.DependencyInjection in '..\..\Source\iORM.DependencyInjection.pas',
   iORM.DependencyInjection.Interfaces in '..\..\Source\iORM.DependencyInjection.Interfaces.pas',
   iORM.MVVM.Factory in '..\..\Source\iORM.MVVM.Factory.pas',
-  iORM.ObjectsForge.ObjectMapper in '..\..\Source\iORM.ObjectsForge.ObjectMapper.pas',
   iORM.DB.QueryContainer in '..\..\Source\iORM.DB.QueryContainer.pas',
   iORM.DB.QueryEngine in '..\..\Source\iORM.DB.QueryEngine.pas',
   iORM.Where.SqlItems.Interfaces in '..\..\Source\iORM.Where.SqlItems.Interfaces.pas',

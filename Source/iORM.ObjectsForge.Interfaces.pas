@@ -85,7 +85,8 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
   iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Utilities,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ModelPresenter.Custom,
-  iORM.Where.Interfaces, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewModel;
+  iORM.Where.Interfaces, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewModel,
+  DJSON;
 
 { TioObjectMakerIntf }
 
@@ -456,7 +457,7 @@ begin
   // Get the JSONObject
   LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   // Deserialize
-  TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedList(LJSONString, LChildObject);
+  dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(LChildObject);
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
@@ -478,7 +479,7 @@ begin
   // Get the JSONObject
   LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   // Deserialize
-  TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedObject(LJSONString, Result);
+  dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);

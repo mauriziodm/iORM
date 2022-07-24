@@ -38,15 +38,13 @@ unit iORM.ObjectsForge.Factory;
 interface
 
 uses
-  iORM.ObjectsForge.Interfaces, iORM.ObjectsForge.ObjectMapper,
-  iORM.Context.Interfaces;
+  iORM.ObjectsForge.Interfaces, iORM.Context.Interfaces;
 
 type
 
   TioObjectMakerFactory = class
   public
     class function GetObjectMaker(const AContext: IioContext): TioObjectMakerRef;
-    class function GetObjectMapper: TioObjectMapperRef;
   end;
 
 implementation
@@ -66,11 +64,6 @@ begin
     Result := TioObjectMakerWithIioListLazy
   else
     Result := TioObjectMaker;
-end;
-
-class function TioObjectMakerFactory.GetObjectMapper: TioObjectMapperRef;
-begin
-  Result := TioObjectMapperIntf;
 end;
 
 end.

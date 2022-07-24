@@ -352,14 +352,8 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if AProp.GetRelationType in [rtEmbeddedHasMany, rtEmbeddedHasOne] then
   begin
-    case AProp.GetRelationType of
-      rtEmbeddedHasMany:
-        LJsonString := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(LObj);
-      rtEmbeddedHasOne:
-        LJsonString := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(LObj);
-    else
-      LJsonString := '';
-    end;
+    // Serialize
+    LJsonString := dj.From(LObj).byFields.TypeAnnotationsON.ToJson.Trim;
     // Set the param
     if LJsonString.IsEmpty then
       ParamByProp_Clear(AProp, ftBlob)
