@@ -457,7 +457,7 @@ begin
   // Get the JSONObject
   LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   // Deserialize
-  dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(LChildObject);
+  dj.FromJson(LJSONString).byFields.&To(LChildObject);
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
@@ -479,7 +479,7 @@ begin
   // Get the JSONObject
   LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   // Deserialize
-  dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(Result);
+  dj.FromJson(LJSONString).byFields.&To(Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);

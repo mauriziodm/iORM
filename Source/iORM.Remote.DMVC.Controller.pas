@@ -132,7 +132,8 @@ implementation
 { TioDMVCController }
 
 uses iORM, iORM.Remote.Factory, System.Generics.Collections, iORM.DB.Interfaces,
-  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON, System.JSON;
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON, System.JSON,
+  DJSON;
 
 // M.M. 12/06/21
 procedure TioDMVCController.Count;
@@ -221,7 +222,7 @@ begin
     io.Load(LRequestBody.Where).ToList(LObj);
     // Create the IioRESTResponseBody and return it to the client
     LResponseBody := TioRemoteFactory.NewResponseBody;
-    LResponseBody.JSONDataValue := io.Mapper.From(LObj).byFields.TypeAnnotationsON.ToJSON;
+    LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
     Render(LResponseBody.ToJSONObject, False);
   finally
     // Clean up
@@ -241,7 +242,7 @@ begin
   LObj := io.Load(LRequestBody.Where).ToObject;
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRemoteFactory.NewResponseBody;
-  LResponseBody.JSONDataValue := io.Mapper.From(LObj).byFields.TypeAnnotationsON.ToJSON;
+  LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
   Render(LResponseBody.ToJSONObject, False);
 end;
 
@@ -274,7 +275,7 @@ begin
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRemoteFactory.NewResponseBody;
   if not LRequestBody.BlindInsert then
-    LResponseBody.JSONDataValue := io.Mapper.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJSON;
+    LResponseBody.JSONDataValue := dj.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJsonValue;
   Render(LResponseBody.ToJSONObject, False);
 end;
 
@@ -295,7 +296,7 @@ begin
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioRemoteFactory.NewResponseBody;
   if not LRequestBody.BlindInsert then
-    LResponseBody.JSONDataValue := io.Mapper.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJSON;
+    LResponseBody.JSONDataValue := dj.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJsonValue;
   Render(LResponseBody.ToJSONObject, False);
 end;
 

@@ -202,7 +202,26 @@ contains
   iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas',
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
   iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
-  iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas';
+  iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas',
+  DJSON.Utils.RTTI in '..\..\ExtLibs\djson\Sources\DJSON.Utils.RTTI.pas',
+  DJSON.Utils in '..\..\ExtLibs\djson\Sources\DJSON.Utils.pas',
+  DJSON.TypeInfoCache in '..\..\ExtLibs\djson\Sources\DJSON.TypeInfoCache.pas',
+  DJSON.Serializers in '..\..\ExtLibs\djson\Sources\DJSON.Serializers.pas',
+  DJSON in '..\..\ExtLibs\djson\Sources\DJSON.pas',
+  DJSON.Params in '..\..\ExtLibs\djson\Sources\DJSON.Params.pas',
+  DJSON.ISO8601Processor in '..\..\ExtLibs\djson\Sources\DJSON.ISO8601Processor.pas',
+  DJSON.Factory in '..\..\ExtLibs\djson\Sources\DJSON.Factory.pas',
+  DJSON.Exceptions in '..\..\ExtLibs\djson\Sources\DJSON.Exceptions.pas',
+  DJSON.Engine.Stream in '..\..\ExtLibs\djson\Sources\DJSON.Engine.Stream.pas',
+  DJSON.Engine.Stream.BSON in '..\..\ExtLibs\djson\Sources\DJSON.Engine.Stream.BSON.pas',
+  DJSON.Engine.DOM in '..\..\ExtLibs\djson\Sources\DJSON.Engine.DOM.pas',
+  DJSON.Duck.PropField in '..\..\ExtLibs\djson\Sources\DJSON.Duck.PropField.pas',
+  DJSON.Duck.Obj in '..\..\ExtLibs\djson\Sources\DJSON.Duck.Obj.pas',
+  DJSON.Duck.List in '..\..\ExtLibs\djson\Sources\DJSON.Duck.List.pas',
+  DJSON.Duck.Interfaces in '..\..\ExtLibs\djson\Sources\DJSON.Duck.Interfaces.pas',
+  DJSON.Duck.Dictionary in '..\..\ExtLibs\djson\Sources\DJSON.Duck.Dictionary.pas',
+  DJSON.Constants in '..\..\ExtLibs\djson\Sources\DJSON.Constants.pas',
+  DJSON.Attributes in '..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas';
 
 end.
 

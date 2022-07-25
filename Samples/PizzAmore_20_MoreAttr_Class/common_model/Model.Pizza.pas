@@ -10,7 +10,7 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM, ObjMapper.Attributes;
+  iORM;
 
 type
 
@@ -24,7 +24,7 @@ type
     FName: String;
     [ioField('UNIT_PRICE'), ioNotNull]
     FPrice: Currency;
-    [ioBinary, MapperStreamable]
+    [ioBinary]
     FImage: TBitmap;
   public
     constructor Create;

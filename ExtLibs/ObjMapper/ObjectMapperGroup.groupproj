@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{069250D2-3DD8-40FE-BF38-C6851799756F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ObjectMapper.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Samples\Mapper_Phonebook\MapperPhonebookExample.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Samples\Mapper_Phonebook_Dictionary\MapperPhonebookDictionaryExample.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ObjectMapper">
+        <MSBuild Projects="ObjectMapper.dproj"/>
+    </Target>
+    <Target Name="ObjectMapper:Clean">
+        <MSBuild Projects="ObjectMapper.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ObjectMapper:Make">
+        <MSBuild Projects="ObjectMapper.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MapperPhonebookExample">
+        <MSBuild Projects="Samples\Mapper_Phonebook\MapperPhonebookExample.dproj"/>
+    </Target>
+    <Target Name="MapperPhonebookExample:Clean">
+        <MSBuild Projects="Samples\Mapper_Phonebook\MapperPhonebookExample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MapperPhonebookExample:Make">
+        <MSBuild Projects="Samples\Mapper_Phonebook\MapperPhonebookExample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MapperPhonebookDictionaryExample">
+        <MSBuild Projects="Samples\Mapper_Phonebook_Dictionary\MapperPhonebookDictionaryExample.dproj"/>
+    </Target>
+    <Target Name="MapperPhonebookDictionaryExample:Clean">
+        <MSBuild Projects="Samples\Mapper_Phonebook_Dictionary\MapperPhonebookDictionaryExample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MapperPhonebookDictionaryExample:Make">
+        <MSBuild Projects="Samples\Mapper_Phonebook_Dictionary\MapperPhonebookDictionaryExample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MapperPizzaImageExample">
+        <MSBuild Projects="Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj"/>
+    </Target>
+    <Target Name="MapperPizzaImageExample:Clean">
+        <MSBuild Projects="Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MapperPizzaImageExample:Make">
+        <MSBuild Projects="Samples\Mapper_Pizza_Image\MapperPizzaImageExample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ObjectMapper;MapperPhonebookExample;MapperPhonebookDictionaryExample;MapperPizzaImageExample"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ObjectMapper:Clean;MapperPhonebookExample:Clean;MapperPhonebookDictionaryExample:Clean;MapperPizzaImageExample:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ObjectMapper:Make;MapperPhonebookExample:Make;MapperPhonebookDictionaryExample:Make;MapperPizzaImageExample:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

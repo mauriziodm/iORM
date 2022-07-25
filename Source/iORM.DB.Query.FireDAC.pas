@@ -353,7 +353,7 @@ begin
   if AProp.GetRelationType in [rtEmbeddedHasMany, rtEmbeddedHasOne] then
   begin
     // Serialize
-    LJsonString := dj.From(LObj).byFields.TypeAnnotationsON.ToJson.Trim;
+    LJsonString := dj.From(LObj).byFields.ToJson.Trim;
     // Set the param
     if LJsonString.IsEmpty then
       ParamByProp_Clear(AProp, ftBlob)

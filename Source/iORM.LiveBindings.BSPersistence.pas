@@ -35,7 +35,7 @@ type
     procedure Insert(AObject: TObject); overload;
     procedure Insert(AObject: IInterface); overload;
     function GetName: String;
-    function IsFromBSLoadType: boolean;
+    function IsFromBSLoadType: Boolean;
     function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
     // LoadType property
     procedure SetLoadType(const Value: TioLoadType);
@@ -66,13 +66,15 @@ type
     procedure SetOnInsertAction(const Value: TioOnInsertAction);
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction;
     // MasterDataSet (SourceBS) property
-//    property MasterDataSet: TioMasterDataSet read GetMasterDataSet write SetMasterDataSet; // published: Detail
+    // property MasterDataSet: TioMasterDataSet read GetMasterDataSet write SetMasterDataSet; // published: Detail
   end;
 
   TioBSPersistence = class
   private
-    [djSkip] FBindSource: IioBSPersistenceClient;
-    [djSkip] FSavedState: String;
+    [djSkip]
+    FBindSource: IioBSPersistenceClient;
+    [djSkip]
+    FSavedState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
     FSmartUpdateDetection: IioSmartUpdateDetection;
     FIsInserting: Boolean;
@@ -90,7 +92,8 @@ type
     destructor Destroy; override;
     procedure SaveRevertPoint(const ARaiseIfAlreadySavedRevertPoint: Boolean = True);
     procedure Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
-    procedure RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
+    procedure RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False;
+      const AClearAfterExecute: Boolean = True);
     procedure Clear(const ARaiseIfChangesExists: Boolean = True);
     procedure Persist(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
     procedure Delete(const ARaiseIfSavedRevertPointExists: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -428,21 +431,21 @@ begin
 end;
 
 // --- OLD CODE ---
-//procedure TioBSPersistence.Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
-//begin
-//  CheckUnassigned('Revert');
-//  if State < osSaved then
-//    raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There isn''t a saved state you can revert to. (call "Save" method before)');
-//  if ARaiseIfNoChanges and (State < osChanged) then
-//    raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
-//  if IsInserting then
-//    Delete
-//  else
-//    om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
-//  if AClear then
-//    Clear(False);
-//  FBindSource.Refresh(True);
-//end;
+// procedure TioBSPersistence.Revert(const ARaiseIfNoChanges: Boolean = False; const AClear: Boolean = True);
+// begin
+// CheckUnassigned('Revert');
+// if State < osSaved then
+// raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There isn''t a saved state you can revert to. (call "Save" method before)');
+// if ARaiseIfNoChanges and (State < osChanged) then
+// raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
+// if IsInserting then
+// Delete
+// else
+// om.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearListBefore.&To(FBindSource.Current);
+// if AClear then
+// Clear(False);
+// FBindSource.Refresh(True);
+// end;
 // --- OLD CODE ---
 procedure TioBSPersistence.Revert(const ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges, AClearAfterExecute: Boolean);
 begin
@@ -456,17 +459,16 @@ begin
     FBindSource.Refresh(True);
 end;
 
-procedure TioBSPersistence.RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
+procedure TioBSPersistence.RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False;
+  const AClearAfterExecute: Boolean = True);
 begin
   CheckUnassigned('Revert');
   // Depending on LoadType property...
   if FBindSource.IsFromBSLoadType then
     _InternalRevertWhenFromBSLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
-  else
-  if FBindSource.LoadType = ltManual then
+  else if FBindSource.LoadType = ltManual then
     _InternalRevertWhenManualLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
-  else
-  if FBindSource.LoadType = ltAuto then
+  else if FBindSource.LoadType = ltAuto then
     _InternalRevertWhenAutoLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);
   // Clear saved state and refresh
   if AClearAfterExecute then
@@ -542,7 +544,7 @@ end;
 function TioBSPersistence.GetCurrentAsString: String;
 begin
   if FBindSource.Current <> nil then
-    Result := dj.From(FBindSource.Current).byFields.TypeAnnotationsON.ToString
+    Result := dj.From(FBindSource.Current).byFields.TypeAnnotationsON.ToJson
   else
     Result := '';
 end;
