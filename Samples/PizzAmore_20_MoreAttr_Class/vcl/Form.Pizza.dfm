@@ -244,6 +244,7 @@ object PizzaForm: TPizzaForm
     TypeName = 'TPizza'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
+    OrderBy = '[TPizza.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 32
     Top = 224

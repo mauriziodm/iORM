@@ -995,7 +995,8 @@ begin
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS then
     LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName)
-  else if IsFromBSLoadType then
+  else
+  if IsFromBSLoadType then
     LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
   else
     LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),

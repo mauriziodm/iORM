@@ -955,7 +955,7 @@ begin
   // Set some properties
   FBindSourceAdapter.ioAsync := FAsync;
   FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
-  FBindSourceAdapter.ioWhere := FWhere;
+  FBindSourceAdapter.ioWhere := GetWhere; // Do not directly access to the FWhere field here
   FBindSourceAdapter.LoadType := FLoadType;
   FBindSourceAdapter.Lazy := FLazy;
   FBindSourceAdapter.LazyProps := FLazyProps;

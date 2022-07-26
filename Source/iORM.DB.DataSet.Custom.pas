@@ -708,7 +708,8 @@ begin
   LActiveBSA.Lazy := FLazy;
   LActiveBSA.LazyProps := FLazyProps;
   LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
-  LActiveBSA.ioWhere := FWhere;
+  LActiveBSA.ioWhere := GetWhere; // Do not directly access to the FWhere field here
+//  LActiveBSA.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
   LActiveBSA.SetBindSource(Self);
   FTypeOfCollection := LActiveBSA.TypeOfCollection;
@@ -808,11 +809,14 @@ begin
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterDataSet, MasterPropertyName))
-  else if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
+  else
+  if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterDataSet))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+//    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),
+      TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

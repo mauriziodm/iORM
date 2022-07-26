@@ -4,7 +4,7 @@ interface
 
 uses
   iORM, Model.Customer, Model.OrderRow, System.Generics.Collections, Model.Pizza,
-  iORM.LazyLoad.Generics.ObjectList, ObjMapper.Attributes;
+  iORM.LazyLoad.Generics.ObjectList;
 
 type
 
