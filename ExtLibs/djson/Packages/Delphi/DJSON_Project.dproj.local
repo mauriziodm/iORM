@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2022/07/24 18:43:32.000.452,C:\delphi\tools\iorm\ExtLibs\djson\Sources\DJSON.Engine.JDO.pas=</Transaction>
+    <Transaction>2022/07/24 18:43:46.000.423,C:\delphi\tools\iorm\ExtLibs\djson\Sources\DJSON.Engine.JDO.Turbo.pas=</Transaction>
+    <Transaction>2022/07/24 18:50:47.000.988,C:\delphi\tools\iorm\ExtLibs\djson\Sources\JsonDataObjects.pas=</Transaction>
+  </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="..\..\..\djson"/>
+    <File Path="..\..\Sources"/>
+    <File Path="..\..\Sources\DJSON.Attributes.pas"/>
+    <File Path="..\..\Sources\DJSON.Constants.pas"/>
+    <File Path="..\..\Sources\DJSON.Duck.Dictionary.pas"/>
+    <File Path="..\..\Sources\DJSON.Duck.Interfaces.pas"/>
+    <File Path="..\..\Sources\DJSON.Duck.List.pas"/>
+    <File Path="..\..\Sources\DJSON.Duck.Obj.pas"/>
+    <File Path="..\..\Sources\DJSON.Duck.PropField.pas"/>
+    <File Path="..\..\Sources\DJSON.Engine.DOM.pas"/>
+    <File Path="..\..\Sources\DJSON.Engine.Stream.BSON.pas"/>
+    <File Path="..\..\Sources\DJSON.Engine.Stream.pas"/>
+    <File Path="..\..\Sources\DJSON.Exceptions.pas"/>
+    <File Path="..\..\Sources\DJSON.Factory.pas"/>
+    <File Path="..\..\Sources\DJSON.ISO8601Processor.pas"/>
+    <File Path="..\..\Sources\DJSON.Params.pas"/>
+    <File Path="..\..\Sources\DJSON.pas"/>
+    <File Path="..\..\Sources\DJSON.Serializers.pas"/>
+    <File Path="..\..\Sources\DJSON.TypeInfoCache.pas"/>
+    <File Path="..\..\Sources\DJSON.Utils.pas"/>
+    <File Path="..\..\Sources\DJSON.Utils.RTTI.pas"/>
+    <File Path="RESTComponents.dcp"/>
+    <File Path="rtl.dcp"/>
+  </ProjectSortOrder>
+</BorlandProject>
