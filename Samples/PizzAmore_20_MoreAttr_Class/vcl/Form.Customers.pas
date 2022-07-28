@@ -81,14 +81,14 @@ begin
   else
   begin
     Application.CreateForm(TCustomerForm, CustomerForm);
-    CustomerForm.DSCustomer.SourceDataSet := DSCustomers;
+    CustomerForm.DSCustomer.SourceBS := DSCustomers;
     CustomerForm.Show;
   end;
 end;
 
 procedure TCustomersForm.acShowOrSelectUpdate(Sender: TObject);
 begin
-  if Assigned(DSCustomers.SourceDataSet) then
+  if Assigned(DSCustomers.SourceBS) then
     acShowOrSelect.Caption := 'Select'
   else
     acShowOrSelect.Caption := 'Show';

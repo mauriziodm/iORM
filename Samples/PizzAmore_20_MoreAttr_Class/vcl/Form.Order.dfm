@@ -568,7 +568,7 @@ object OrderForm: TOrderForm
     Top = 312
   end
   object DSCustomer: TioDataSetDetail
-    MasterDataSet = DSOrder
+    MasterBindSource = DSOrder
     MasterPropertyName = 'Customer'
     Left = 56
     Top = 376
@@ -595,7 +595,7 @@ object OrderForm: TOrderForm
     Top = 376
   end
   object DSRows: TioDataSetDetail
-    MasterDataSet = DSOrder
+    MasterBindSource = DSOrder
     MasterPropertyName = 'Rows'
     Left = 56
     Top = 440
