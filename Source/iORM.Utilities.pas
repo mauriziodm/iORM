@@ -135,7 +135,7 @@ class function TioUtilities.CloneObject(const ASourceObj: TObject): TObject;
 var
   LSourceJSON: String;
 begin
-  LSourceJSON := dj.From(ASourceObj).byFields.TypeAnnotationsON.ToString;
+  LSourceJSON := dj.From(ASourceObj).byFields.TypeAnnotationsON.ToJSON;
   Result := dj.FromJSON(LSourceJSON).byFields.TypeAnnotationsON.ToObject;
 // ----- OLD CODE -----
 //  Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
