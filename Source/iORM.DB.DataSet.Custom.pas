@@ -10,10 +10,6 @@ uses
 
 type
 
-  TioDataSetCustom = class;
-
-  TioMasterDataSet = TioDataSetCustom;
-
   TioDataSetCustom = class abstract(TioBSABaseDataSet, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
     FTypeName: String;
@@ -23,7 +19,7 @@ type
     FLazyProps: String;
     FAsync: Boolean;
     FTypeOfCollection: TioTypeOfCollection; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
-    FMasterDataSet: TioMasterDataSet;
+    FMasterBindSource: IioNotifiableBindSource;
     FMasterPropertyName: String;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
@@ -34,7 +30,7 @@ type
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
     // Selectors
-    FSelectorFor: TioDataSetCustom;
+    FSelectorFor: IioNotifiableBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali DataSet di dettaglio
@@ -46,7 +42,7 @@ type
     // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
     // Ad esempio capitava che i filtri dei presenters di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
-    FDetailDatasetContainer: TList<TioDataSetCustom>;
+    FDetailBindSourceContainer: TList<IioNotifiableBindSource>;
     // Selection related events
     FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
     FonSelectionObject: TioBSASelectionObjectEvent;
@@ -78,6 +74,8 @@ type
     // ItemIndex
     function GetItemIndex: Integer;
     procedure SetItemIndex(const Value: Integer);
+    // MasterDataSet
+    procedure SetMasterBindSource(const Value: IioNotifiableBindSource); virtual;
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
@@ -98,6 +96,7 @@ type
     procedure SetTypeAlias(const Value: String);
     // TypeName
     procedure SetTypeName(const Value: String);
+    function GetTypeName: String;
     // VirtualFields
     function GetVirtualFields: Boolean;
     // Where
@@ -108,6 +107,8 @@ type
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
+    // SelectorFor
+    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
   protected
     procedure Loaded; override;
     function GetName: String;
@@ -136,7 +137,7 @@ type
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     property ItemIndex: Integer read GetItemIndex write SetItemIndex; // Public: Master+Detail
     // Published properties
-    property TypeName: String read FTypeName write SetTypeName; // published: Master
+    property TypeName: String read GetTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
@@ -149,12 +150,12 @@ type
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
-    property MasterDataSet: TioMasterDataSet read FMasterDataSet write FMasterDataSet; // published: Detail
+    property MasterBindSource: IioNotifiableBindSource read FMasterBindSource write SetMasterBindSource; // published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
-    property SelectorFor: TioDataSetCustom read FSelectorFor write FSelectorFor; // published: Master
+    property SelectorFor: IioNotifiableBindSource read FSelectorFor write SetSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
@@ -175,8 +176,9 @@ type
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
     function IsFromBSLoadType: boolean;
-    function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
-    procedure RegisterDetailDataSet(const ADetailDataSet: TioDataSetCustom);
+    function CheckAdapter: Boolean; overload;
+    function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
     procedure ForceDetailAdaptersCreation;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
@@ -220,6 +222,11 @@ begin
     TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
 end;
 
+function TioDataSetCustom.CheckAdapter: Boolean;
+begin
+  Result := CheckAdapter(False);
+end;
+
 function TioDataSetCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // if the adapter is not already assigned then create it
@@ -261,7 +268,7 @@ begin
   // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
   // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
   // DesignTime (WhereStr property) non funzionassero per questo motivo.
-  FDetailDatasetContainer := nil;
+  FDetailBindSourceContainer := nil;
   // Page manager
   FPaging := TioCommonBSAPageManager.Create(
     procedure
@@ -332,8 +339,8 @@ destructor TioDataSetCustom.Destroy;
 begin
   FWhereStr.Free;
   // If the DetailDataSetContainer was created then destroy it
-  if Assigned(FDetailDatasetContainer) then
-    FDetailDatasetContainer.Free;
+  if Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer.Free;
   // Destroy paging object
   FPaging.Free;
   // Destroy the internal adapter
@@ -392,11 +399,11 @@ end;
 
 procedure TioDataSetCustom.ForceDetailAdaptersCreation;
 var
-  LDetailDataSet: TioDataSetCustom;
+  LDetailBindSource: IioNotifiableBindSource;
 begin
-  if Assigned(FDetailDatasetContainer) then
-    for LDetailDataSet in FDetailDatasetContainer do
-      LDetailDataSet.CheckAdapter(True);
+  if Assigned(FDetailBindSourceContainer) then
+    for LDetailBindSource in FDetailBindSourceContainer do
+      LDetailBindSource.CheckAdapter(True);
 end;
 
 function TioDataSetCustom.GetAutoPost: Boolean;
@@ -482,6 +489,11 @@ begin
     Result := TBindSourceAdapterState.seInactive
 end;
 
+function TioDataSetCustom.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
 function TioDataSetCustom.GetVirtualFields: Boolean;
 begin
   Result := FVirtualFields;
@@ -534,10 +546,10 @@ begin
   // ===========================================================================
   if IsDetailBS and not(csDesigning in ComponentState) then
   begin
-    if not Assigned(FMasterDataSet) then
+    if not Assigned(FMasterBindSource) then
       raise EioException.Create(ClassName, 'Loaded', Format('The "MasterDataSet" property has not been set in the component "%s".' +
         #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
-    MasterDataSet.RegisterDetailDataSet(Self);
+    MasterBindSource.RegisterDetailBindSource(Self);
   end;
   // ===========================================================================
 
@@ -551,14 +563,14 @@ end;
 
 procedure TioDataSetCustom.OpenCLoseDetails(const AActive: Boolean);
 var
-  LDetailDataSet: TioDataSetCustom;
+  LBindSource: IioNotifiableBindSource;
 begin
-  if Assigned(FDetailDatasetContainer) then
-    for LDetailDataSet in FDetailDatasetContainer do
+  if Assigned(FDetailBindSourceContainer) then
+    for LBindSource in FDetailBindSourceContainer do
       if AActive then
-        LDetailDataSet.Open
+        LBindSource.Open
       else
-        LDetailDataSet.Close;
+        LBindSource.Close;
 end;
 
 procedure TioDataSetCustom.PersistAll;
@@ -585,11 +597,11 @@ begin
     GetActiveBindSourceAdapter.Refresh(ANotify);
 end;
 
-procedure TioDataSetCustom.RegisterDetailDataSet(const ADetailDataSet: TioDataSetCustom);
+procedure TioDataSetCustom.RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
 begin
-  if not Assigned(FDetailDatasetContainer) then
-    FDetailDatasetContainer := TList<TioDataSetCustom>.Create;
-  FDetailDatasetContainer.Add(ADetailDataSet);
+  if not Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer := TList<IioNotifiableBindSource>.Create;
+  FDetailBindSourceContainer.Add(ADetailBindSource);
 end;
 
 procedure TioDataSetCustom.SelectCurrent(ASelectionType: TioSelectionType);
@@ -690,6 +702,11 @@ begin
     raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
 end;
 
+procedure TioDataSetCustom.SetMasterBindSource(const Value: IioNotifiableBindSource);
+begin
+  FMasterBindSource:= Value;
+end;
+
 procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);
 begin
   FMasterPropertyName := Trim(Value);
@@ -741,6 +758,11 @@ begin
   // So I also put the set method where, however, I raise an exception if someone
   // tries to set a value.
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
+end;
+
+procedure TioDataSetCustom.SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+begin
+  FSelectorFor := ATargetBindSource;
 end;
 
 procedure TioDataSetCustom.SetTypeAlias(const Value: String);
@@ -808,10 +830,10 @@ begin
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS then
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterDataSet, MasterPropertyName))
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName))
   else
   if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterDataSet))
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin
 //    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));

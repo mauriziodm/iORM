@@ -17,8 +17,8 @@ type
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourcePrototypeBindSource
-    function GetSourcePBS: TioPrototypeBindSourceCustom;
-    procedure SetSourcePBS(const Value: TioPrototypeBindSourceCustom);
+    function GetSourceBS: IioNotifiableBindSource;
+    procedure SetSourceBS(const Value: IioNotifiableBindSource);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnDeleteAction property
@@ -47,7 +47,6 @@ type
     destructor Destroy; override;
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
-    function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
     property Where;
     property ItemCount;
     // Added properties
@@ -83,7 +82,7 @@ type
     property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourcePBS: TioPrototypeBindSourceCustom read GetSourcePBS write SetSourcePBS;
+    property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -152,12 +151,7 @@ begin
   Result := FOnRecordChangeAction;
 end;
 
-function TioPrototypeBindSourceMaster.GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
-begin
-  Result := SourcePBS as IioNotifiableBindSource;
-end;
-
-function TioPrototypeBindSourceMaster.GetSourcePBS: TioPrototypeBindSourceCustom;
+function TioPrototypeBindSourceMaster.GetSourceBS: IioNotifiableBindSource;
 begin
   Result := MasterBindSource;
 end;
@@ -190,7 +184,7 @@ end;
 
 procedure TioPrototypeBindSourceMaster.SetLoadType(const Value: TioLoadType);
 begin
-  TioCommonBSBehavior.CheckForSetLoadType(Self, SourcePBS, Value);
+  TioCommonBSBehavior.CheckForSetLoadType(Self, SourceBS, Value);
   inherited;
 end;
 
@@ -223,9 +217,9 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioPrototypeBindSourceMaster.SetSourcePBS(const Value: TioPrototypeBindSourceCustom);
+procedure TioPrototypeBindSourceMaster.SetSourceBS(const Value: IioNotifiableBindSource);
 begin
-  if Value = SourcePBS then
+  if Value = SourceBS then
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterBindSource := Value;

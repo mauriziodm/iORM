@@ -21,6 +21,8 @@ type
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
+
+    class function IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
   end;
 
 implementation
@@ -68,6 +70,28 @@ end;
 class function TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
 begin
   Result := ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance];
+end;
+
+class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj,
+  ARaiseExceptions: Boolean): Boolean;
+begin
+  // Init
+  Result := True;
+  // Check the ModelPresenter
+  Result := Result and Assigned(ABindSource);
+  if ARaiseExceptions and not Result then
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
+  // Check the bind source adapter
+  Result := Result and ABindSource.CheckAdapter;
+  if ARaiseExceptions and not Result then
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator',
+      'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
+  // Check the ModelPresenter.Current object
+  if not ACheckCurrentObj then
+    Exit;
+  Result := Result and (ABindSource.Current <> nil);
+  if ARaiseExceptions and not Result then
+    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
 end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);

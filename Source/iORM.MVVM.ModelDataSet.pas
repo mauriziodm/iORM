@@ -71,7 +71,7 @@ begin
     ViewModelBridge.CheckForViewModel;
     // Register itself as ModelDataSet/ModelBindSource (IioVMBridgeClientComponent)
     //  connected to a ModelPresenter for remoted open/close by ModelPresenter
-    ViewModelBridge.Presenter[ModelPresenter].UnregisterViewBindSource(Self);
+    GetModelPresenterInstance.UnregisterViewBindSource(Self);
   end;
   // ===========================================================================
 
@@ -97,8 +97,14 @@ begin
 end;
 
 function TioModelDataSet.GetModelPresenterInstance: TioModelPresenterCustom;
+var
+  LBindSource: IioNotifiableBindSource;
 begin
-  Result := ViewModelBridge.Presenter[ModelPresenter];
+  LBindSource := ViewModelBridge.Presenter[ModelPresenter];
+  if LBindSource is TioModelPresenterCustom then
+    Result := LBindSource as TioModelPresenterCustom
+  else
+    EioException.Create(ClassName, 'GetModelPresenterInstance', 'The requested BindSource is not a ModelPresenter');
 end;
 
 function TioModelDataSet.GetViewModelBridge: TioViewModelBridge;
@@ -166,7 +172,7 @@ begin
     ViewModelBridge.CheckForViewModel;
     // Register itself as ModelDataSet/ModelBindSource (IioVMBridgeClientComponent)
     //  connected to a ModelPresenter for remoted open/close by ModelPresenter
-    ViewModelBridge.Presenter[ModelPresenter].RegisterViewBindSource(Self);
+    GetModelPresenterInstance.RegisterViewBindSource(Self);
     // open itself if the ModelPresenter is already active
     Active := ViewModelBridge.Presenter[ModelPresenter].IsActive;
   end;

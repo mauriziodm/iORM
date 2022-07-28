@@ -39,7 +39,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.MVVM.VMActionContainer, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom;
+  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces;
 
 type
 
@@ -58,9 +58,9 @@ type
   protected
     procedure Loaded; override;
     // DefaultPresenter
-    function GetDefaultPresenter: TioModelPresenterCustom;
+    function GetDefaultPresenter: IioNotifiableBindSource;
     // Presenter
-    function GetPresenter(const AName: String): TioModelPresenterCustom;
+    function GetPresenter(const AName: String): IioNotifiableBindSource;
     // VMAction
     function GetVMAction(const AName: String): IioVMAction;
   public
@@ -72,8 +72,8 @@ type
     procedure TerminateApplication;
     // Properties
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
-    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
-    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
+    property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
+    property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
   published
     // Events
     property OnViewPairing: TioVMOnViewPairingEvent read FOnViewPairing write FOnViewPairing;
@@ -95,7 +95,7 @@ begin
   Result := FVMActionContainer.Get(AName, False);
 end;
 
-function TioViewModel.GetDefaultPresenter: TioModelPresenterCustom;
+function TioViewModel.GetDefaultPresenter: IioNotifiableBindSource;
 var
   I: Integer;
 begin
@@ -105,7 +105,7 @@ begin
       Exit(TioModelPresenterCustom(Components[I]));
 end;
 
-function TioViewModel.GetPresenter(const AName: String): TioModelPresenterCustom;
+function TioViewModel.GetPresenter(const AName: String): IioNotifiableBindSource;
 var
   LComponent: TComponent;
 begin

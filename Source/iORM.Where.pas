@@ -1040,7 +1040,7 @@ begin
     LList := Self.ToList(TList<IInterface>)
   else
     LList := Self.ToList(TList<TObject>);
-  io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(LList).Show;
+  io.di.LocateViewVMFor(TypeName, AVVMAlias).SetBindSource(LList).Show;
 end;
 
 procedure TioWhere.ToList(const AList: TObject);
@@ -1268,13 +1268,13 @@ begin
   if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and io.di.LocateVMFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and not AForceTypeNameUse then
-    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetPresenter(ADataObject).Show
+    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetBindSource(ADataObject).Show
   else
     // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
     if (not TypeName.IsEmpty) and io.di.LocateViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
       and io.di.LocateVMFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     then
-      io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(ADataObject).Show
+      io.di.LocateViewVMFor(TypeName, AVVMAlias).SetBindSource(ADataObject).Show
     else
       raise EioException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
@@ -1290,13 +1290,13 @@ begin
   if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and io.di.LocateVMFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and not AForceTypeNameUse then
-    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetPresenter(ADataObject).Show
+    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetBindSource(ADataObject).Show
   else
     // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
     if (not TypeName.IsEmpty) and io.di.LocateViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
       and io.di.LocateVMFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     then
-      io.di.LocateViewVMFor(TypeName, AVVMAlias).SetPresenter(ADataObject).Show
+      io.di.LocateViewVMFor(TypeName, AVVMAlias).SetBindSource(ADataObject).Show
     else
       raise EioException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',

@@ -36,7 +36,8 @@ unit iORM.MVVM.Interfaces;
 interface
 
 uses
-  System.Classes, System.SysUtils, iORM.CommonTypes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ViewContextProvider, iORM.MVVM.ViewRegisterItem;
+  System.Classes, System.SysUtils, iORM.CommonTypes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ViewContextProvider, iORM.MVVM.ViewRegisterItem,
+  iORM.LiveBindings.Interfaces;
 
 {$I ioGlobalDef.inc}   // io global definitions
 
@@ -55,11 +56,11 @@ type
     function GetVMAction(const AName: String): IioVMAction;
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
     // Presenter property
-    function GetPresenter(const AName: String): TioModelPresenterCustom;
-    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
+    function GetPresenter(const AName: String): IioNotifiableBindSource;
+    property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
     // DefaultPresenter property
-    function GetDefaultPresenter: TioModelPresenterCustom;
-    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
+    function GetDefaultPresenter: IioNotifiableBindSource;
+    property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
   end;
 
   // Private interface of ViewModels for INTERNAL USE ONLY

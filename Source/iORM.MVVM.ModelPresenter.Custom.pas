@@ -55,14 +55,14 @@ type
     FWhereStr: TStrings;
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
-    FMasterPresenter: TioModelPresenterCustom;
+    FMasterBindSource: IioNotifiableBindSource;
     FMasterPropertyName: String;
     FAutoRefreshOnNotification: Boolean;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
     // Selectors
-    FSelectorFor: TioModelPresenterCustom;
+    FSelectorFor: IioNotifiableBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali ModelPresenter di dettaglio
@@ -74,7 +74,7 @@ type
     // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
     // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
-    FDetailPresentersContainer: TList<TioModelPresenterCustom>;
+    FDetailBindSourceContainer: TList<IioNotifiableBindSource>;
     // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
     // la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
     // parte del ModelPresenter al quale sono collegati
@@ -142,6 +142,7 @@ type
     procedure SetTypeAlias(const Value: String);
     // TypeName
     procedure SetTypeName(const Value: String);
+    function GetTypeName: String;
     // VirtualFields
     function GetVirtualFields: Boolean;
     // Where
@@ -151,17 +152,19 @@ type
     procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
+    // SelectorFor
+    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
   protected
     procedure Open; virtual;
     procedure Close; virtual;
     procedure Loaded; override;
     function GetName: String;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
+    // MasterPresenter
+    procedure SetMasterBindSource(const Value: IioNotifiableBindSource); virtual;
     // Active
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean); virtual;
-    // MasterPresenter
-    procedure SetMasterPresenter(const Value: TioModelPresenterCustom); virtual;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -214,14 +217,16 @@ type
     destructor Destroy; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
-    function IsFromBSLoadType: boolean;
-    class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
+    function IsFromBSLoadType: Boolean;
+    class function IsValidForDependencyInjectionLocator(const AModelPresenter: TioModelPresenterCustom;
+      const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     procedure SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function CheckAdapter(const ACreateIfNotAssigned: Boolean = False): Boolean;
+    function CheckAdapter: Boolean; overload;
+    function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
-    procedure RegisterDetailPresenter(const ADetailPresenter: TioModelPresenterCustom);
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
 
     // ViewBindSource remote open/close management (ModelBindSource/ModelDataSet)
     procedure RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
@@ -278,13 +283,13 @@ type
     // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
     property AsDefault: Boolean read FAsDefault write SetAsDefault; // Published: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail
-    property MasterPresenter: TioModelPresenterCustom read FMasterPresenter write SetMasterPresenter; // Published: Detail
+    property MasterBindSource: IioNotifiableBindSource read FMasterBindSource write SetMasterBindSource; // Published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // Published: Detail
     property OrderBy: String read FOrderBy Write SetOrderBy; // Published: Master
-    property TypeName: String read FTypeName write SetTypeName; // Published: Master
+    property TypeName: String read GetTypeName write SetTypeName; // Published: Master
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
     // Published properties: selectors (NB: lasciata public perchè usata da qualche parte nel codice)
-    property SelectorFor: TioModelPresenterCustom read FSelectorFor write FSelectorFor; // published: Master
+    property SelectorFor: IioNotifiableBindSource read FSelectorFor write SetSelectorFor; // published: Master
   end;
 
 implementation
@@ -339,8 +344,13 @@ end;
 
 function TioModelPresenterCustom.CanDoSelection: Boolean;
 begin
-  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and FSelectorFor.GetActiveBindSourceAdapter.Notify(Self,
-    TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
+  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and
+    FSelectorFor.GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
+end;
+
+function TioModelPresenterCustom.CheckAdapter: Boolean;
+begin
+  Result := CheckAdapter(False);
 end;
 
 function TioModelPresenterCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
@@ -390,7 +400,7 @@ begin
   // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
   // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
   // DesignTime (WhereStr property) non funzionassero per questo motivo.
-  FDetailPresentersContainer := nil;
+  FDetailBindSourceContainer := nil;
   // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
   // la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
   // parte del ModelPresenter al quale sono collegati
@@ -449,8 +459,8 @@ begin
   // parte del ModelPresenter al quale sono collegati
   FViewBindSourceContainer.Free;
   // If the DetailPresenterContainer was created then destroy it
-  if Assigned(FDetailPresentersContainer) then
-    FDetailPresentersContainer.Free;
+  if Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer.Free;
   // Destroy paging object
   FPaging.Free;
   inherited;
@@ -506,11 +516,11 @@ end;
 
 procedure TioModelPresenterCustom.ForceDetailAdaptersCreation;
 var
-  LPresenter: TioModelPresenterCustom;
+  LDetailBindSource: IioNotifiableBindSource;
 begin
-  if Assigned(FDetailPresentersContainer) then
-    for LPresenter in FDetailPresentersContainer do
-      LPresenter.CheckAdapter(True);
+  if Assigned(FDetailBindSourceContainer) then
+    for LDetailBindSource in FDetailBindSourceContainer do
+      LDetailBindSource.CheckAdapter(True);
 end;
 
 procedure TioModelPresenterCustom.ForEach(const AForEachMethod: TProc);
@@ -670,6 +680,11 @@ begin
     Result := TBindSourceAdapterState.seInactive
 end;
 
+function TioModelPresenterCustom.GetTypeName: String;
+begin
+ Result := FTypeName;
+end;
+
 function TioModelPresenterCustom.GetVirtualFields: Boolean;
 begin
   Result := FVirtualFields;
@@ -754,12 +769,10 @@ begin
   // ===========================================================================
   if IsDetailBS and not(csDesigning in ComponentState) then
   begin
-    if not Assigned(FMasterPresenter) then
-      raise EioException.Create(ClassName, 'Loaded',
-        Format('The "MasterPresenter" property has not been set in the component "%s".'
-        + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
-       [Name]));
-    MasterPresenter.RegisterDetailPresenter(Self);
+    if not Assigned(FMasterBindSource) then
+      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterPresenter" property has not been set in the component "%s".' +
+        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
+    MasterBindSource.RegisterDetailBindSource(Self);
   end;
   // ===========================================================================
 
@@ -769,9 +782,9 @@ end;
 procedure TioModelPresenterCustom.SelectCurrent(ASelectionType: TioSelectionType);
 begin
   // C'era un problema se il target è un BS che espone un singolo oggetto e in
-  //  precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
-  //  ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
-  //  il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
+  // precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
+  // ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
+  // il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
   if not FSelectorFor.IsActive then
     FSelectorFor.Open;
   if IsInterfacePresenting then
@@ -815,14 +828,14 @@ end;
 
 procedure TioModelPresenterCustom.OpenCloseDetails(const AActive: Boolean);
 var
-  LDetailModelPresenter: TioModelPresenterCustom;
+  LDetailBindSource: IioNotifiableBindSource;
 begin
-  if Assigned(FDetailPresentersContainer) then
-    for LDetailModelPresenter in FDetailPresentersContainer do
+  if Assigned(FDetailBindSourceContainer) then
+    for LDetailBindSource in FDetailBindSourceContainer do
       if AActive then
-        LDetailModelPresenter.Open
+        LDetailBindSource.Open
       else
-        LDetailModelPresenter.Close;
+        LDetailBindSource.Close;
 end;
 
 procedure TioModelPresenterCustom.OpenCloseViewBindSources(const AActive: Boolean);
@@ -872,11 +885,11 @@ begin
     FBindSourceAdapter.Refresh(ANotify);
 end;
 
-procedure TioModelPresenterCustom.RegisterDetailPresenter(const ADetailPresenter: TioModelPresenterCustom);
+procedure TioModelPresenterCustom.RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
 begin
-  if not Assigned(FDetailPresentersContainer) then
-    FDetailPresentersContainer := TList<TioModelPresenterCustom>.Create;
-  FDetailPresentersContainer.Add(ADetailPresenter);
+  if not Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer := TList<IioNotifiableBindSource>.Create;
+  FDetailBindSourceContainer.Add(ADetailBindSource);
 end;
 
 procedure TioModelPresenterCustom.RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
@@ -1019,9 +1032,9 @@ begin
     raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
 end;
 
-procedure TioModelPresenterCustom.SetMasterPresenter(const Value: TioModelPresenterCustom);
+procedure TioModelPresenterCustom.SetMasterBindSource(const Value: IioNotifiableBindSource);
 begin
-  FMasterPresenter := Value;
+  FMasterBindSource := Value;
 end;
 
 procedure TioModelPresenterCustom.SetMasterPropertyName(const Value: String);
@@ -1059,6 +1072,11 @@ begin
   // So I also put the set method where, however, I raise an exception if someone
   // tries to set a value.
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
+end;
+
+procedure TioModelPresenterCustom.SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+begin
+  FSelectorFor := ATargetBindSource;
 end;
 
 procedure TioModelPresenterCustom.SetTypeAlias(const Value: String);
@@ -1178,34 +1196,33 @@ begin
   if Assigned(FBindSourceAdapter) then
     raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
 
-// ----- OLD CODE -----
-//  // If the property MasterModelPresenter is assigned then retrieve
-//  // the DetailBindSourceAdapter from it
-//  // else create the BSA from TypeName & TypeAlias
-//  if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
-//    // Get the BindSourceAdapter
-//    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, nil, MasterPresenter, MasterPropertyName))
-//  else
-//  begin
-//    // Get the ActiveBindSourceAdapter
-//    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
-//    // Force the creation of all the detail adapters (if exists)
-//    // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
-//    // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
-//    // stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
-//    // del Master.
-//    ForceDetailAdaptersCreation;
-//  end;
-// ----- OLD CODE -----
+  // ----- OLD CODE -----
+  // // If the property MasterModelPresenter is assigned then retrieve
+  // // the DetailBindSourceAdapter from it
+  // // else create the BSA from TypeName & TypeAlias
+  // if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
+  // // Get the BindSourceAdapter
+  // SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, nil, MasterPresenter, MasterPropertyName))
+  // else
+  // begin
+  // // Get the ActiveBindSourceAdapter
+  // SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
+  // // Force the creation of all the detail adapters (if exists)
+  // // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
+  // // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
+  // // stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
+  // // del Master.
+  // ForceDetailAdaptersCreation;
+  // end;
+  // ----- OLD CODE -----
 
   // If it is a detail bind source then get the detail BSA from the master bind source,
-  //   else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
-  //   then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
+  // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
+  // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS then
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterPresenter, MasterPropertyName))
-  else
-  if IsFromBSLoadType then
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterPresenter))
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName))
+  else if IsFromBSLoadType then
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
@@ -1243,7 +1260,7 @@ begin
   Result := Active;
 end;
 
-function TioModelPresenterCustom.IsFromBSLoadType: boolean;
+function TioModelPresenterCustom.IsFromBSLoadType: Boolean;
 begin
   Result := TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(FLoadType);
 end;

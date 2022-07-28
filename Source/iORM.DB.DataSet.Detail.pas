@@ -16,7 +16,7 @@ type
     property ItemIndex;
   published
     // Published properties
-    property MasterDataSet; // published: Detail
+    property MasterBindSource; // published: Detail
     property MasterPropertyName; // published: Detail
     property AutoRefreshOnNotification default True; // published: Master+Detail
     // Published properties: selectors

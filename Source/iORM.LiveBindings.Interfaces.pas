@@ -66,9 +66,14 @@ type
 
   IioNotifiableBindSource = interface(IioNotifiable)
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
-//    procedure Open;
-//    procedure Close;
+    procedure Open;
+    procedure Close;
 //    function AdapterExists: Boolean;
+    procedure First;
+    procedure Next;
+    function CheckAdapter: Boolean; overload;
+    function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
+    function Current: TObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetMasterPropertyName: String;
     function IsMasterBS: boolean;
@@ -77,6 +82,14 @@ type
     function GetName: String;
     function IsActive: Boolean;
     function IsFromBSLoadType: boolean;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure SetMasterBindSource(const Value: IioNotifiableBindSource);
+    procedure SetMasterPropertyName(const Value: String);
+    procedure SetWhere(const AWhere: IioWhere);
+    procedure SetOrderBy(const Value: String);
+    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -92,6 +105,8 @@ type
     procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     function GetOnReceiveSelectionFreeObject: Boolean;
     property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject; // published: Master+Detail
+    // TypeName
+    function GetTypeName: String;
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
@@ -110,6 +125,9 @@ type
     // VirtualFields
     function GetVirtualFields: Boolean;
     property VirtualFields: Boolean read GetVirtualFields;
+    // ItemCount
+    function GetCount: Integer;
+    property ItemCount: Integer read GetCount; // Public: Master+Detail
   end;
 
   // Interface for standard action target bind source

@@ -3,7 +3,8 @@ unit iORM.MVVM.ViewModelBridge;
 interface
 
 uses
-  System.Classes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.Interfaces;
+  System.Classes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.Interfaces,
+  iORM.LiveBindings.Interfaces;
 
 type
 
@@ -26,9 +27,9 @@ type
     // VMAction
     function GetVMAction(const AName: String): IioVMAction;
     // Default presenter
-    function GetDefaultPresenter: TioModelPresenterCustom;
+    function GetDefaultPresenter: IioNotifiableBindSource;
     // Presenter
-    function GetPresenter(const AName: String): TioModelPresenterCustom;
+    function GetPresenter(const AName: String): IioNotifiableBindSource;
     // ViewModel
     function GetViewModel: IioViewModel;
   protected
@@ -44,8 +45,8 @@ type
     property ViewModel: IioViewModel read GetViewModel;
     property VMActions: IioVMActionContainer read GetVMActions;
     property VMAction[const AName: String]: IioVMAction read GetVMAction; default;
-    property DefaultPresenter: TioModelPresenterCustom read GetDefaultPresenter;
-    property Presenter[const AName: String]: TioModelPresenterCustom read GetPresenter;
+    property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
+    property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
   published
     // Events
     property OnNeedViewModel: TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
@@ -161,7 +162,7 @@ begin
     raise EioException.Create(Self.Name, 'GetVMActions', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetDefaultPresenter: TioModelPresenterCustom;
+function TioViewModelBridge.GetDefaultPresenter: IioNotifiableBindSource;
 begin
   CheckForViewModel;
   if Assigned(FViewModel) then
@@ -170,7 +171,7 @@ begin
     raise EioException.Create(Self.Name, 'GetDefaultPresenter', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetPresenter(const AName: String): TioModelPresenterCustom;
+function TioViewModelBridge.GetPresenter(const AName: String): IioNotifiableBindSource;
 begin
   CheckForViewModel;
   if Assigned(FViewModel) then

@@ -17,8 +17,8 @@ type
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FOnInsertAction: TioOnInsertAction;
     // SourceDataSet
-    function GetSourceDataSet: TioDataSetCustom;
-    procedure SetSourceDataSet(const Value: TioDataSetCustom);
+    function GetSourceBS: IioNotifiableBindSource;
+    procedure SetSourceBS(const Value: IioNotifiableBindSource);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnDeleteAction property
@@ -46,7 +46,6 @@ type
     destructor Destroy; override;
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
-    function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
     property Where;
     property ItemCount;
     property ItemIndex;
@@ -74,7 +73,7 @@ type
     property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourceDataSet: TioDataSetCustom read GetSourceDataSet write SetSourceDataSet;
+    property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -156,14 +155,9 @@ begin
   Result := FOnRecordChangeAction;
 end;
 
-function TioDataSetMaster.GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
+function TioDataSetMaster.GetSourceBS: IioNotifiableBindSource;
 begin
-  Result := SourceDataSet as IioNotifiableBindSource;
-end;
-
-function TioDataSetMaster.GetSourceDataSet: TioDataSetCustom;
-begin
-  Result := MasterDataSet;
+  Result := MasterBindSource;
 end;
 
 function TioDataSetMaster.IsDetailBS: boolean;
@@ -180,7 +174,7 @@ end;
 
 procedure TioDataSetMaster.SetLoadType(const Value: TioLoadType);
 begin
-  TioCommonBSBehavior.CheckForSetLoadType(Self, SourceDataSet, Value);
+  TioCommonBSBehavior.CheckForSetLoadType(Self, SourceBS, Value);
   inherited;
 end;
 
@@ -213,12 +207,12 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioDataSetMaster.SetSourceDataSet(const Value: TioDataSetCustom);
+procedure TioDataSetMaster.SetSourceBS(const Value: IioNotifiableBindSource);
 begin
-  if Value = SourceDataSet then
+  if Value = SourceBS then
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
-  MasterDataSet := Value;
+  MasterBindSource := Value;
 end;
 
 end.

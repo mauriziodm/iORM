@@ -18,8 +18,8 @@ type
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     // SourceModelPresenter
-    function GetSourcePresenter: TioModelPresenterCustom;
-    procedure SetSourcePresenter(const Value: TioModelPresenterCustom);
+    function GetSourceBS: IioNotifiableBindSource;
+    procedure SetSourceBS(const Value: IioNotifiableBindSource);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnDeleteAction property
@@ -46,7 +46,7 @@ type
     // LoadType
     procedure SetLoadType(const Value: TioLoadType); override;
     // MasterPresenter
-    procedure SetMasterPresenter(const Value: TioModelPresenterCustom); override;
+    procedure SetMasterBindSource(const Value: IioNotifiableBindSource); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -54,7 +54,6 @@ type
     procedure Close; override;
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
-    function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
     property Active;
     property Where;
     property ItemCount;
@@ -83,7 +82,7 @@ type
     property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourcePresenter: TioModelPresenterCustom read GetSourcePresenter write SetSourcePresenter;
+    property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -159,14 +158,9 @@ begin
   Result := FPersistence;
 end;
 
-function TioModelPresenterMaster.GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
+function TioModelPresenterMaster.GetSourceBS: IioNotifiableBindSource;
 begin
-  Result := SourcePresenter as IioNotifiableBindSource;
-end;
-
-function TioModelPresenterMaster.GetSourcePresenter: TioModelPresenterCustom;
-begin
-  Result := MasterPresenter;
+  Result := MasterBindSource;
 end;
 
 function TioModelPresenterMaster.IsDetailBS: Boolean;
@@ -193,7 +187,7 @@ begin
     ltManual:
       Result := FWannaBeActive and ((DataObject <> nil) or (ANewDataObject <> nil));
     ltFromBSAsIs .. ltFromBSReloadNewInstance:
-      Result := FWannaBeActive and Assigned(SourcePresenter);
+      Result := FWannaBeActive and Assigned(SourceBS);
   else
     Result := FWannaBeActive;
   end;
@@ -207,23 +201,23 @@ end;
 
 procedure TioModelPresenterMaster.SetLoadType(const Value: TioLoadType);
 begin
-  TioCommonBSBehavior.CheckForSetLoadType(Self, SourcePresenter, Value);
+  TioCommonBSBehavior.CheckForSetLoadType(Self, SourceBS, Value);
   inherited;
 end;
 
-procedure TioModelPresenterMaster.SetMasterPresenter(const Value: TioModelPresenterCustom);
+procedure TioModelPresenterMaster.SetMasterBindSource(const Value: IioNotifiableBindSource);
 begin
   inherited;
   if FWannaBeActive and not Active then
     Open;
 end;
 
-procedure TioModelPresenterMaster.SetSourcePresenter(const Value: TioModelPresenterCustom);
+procedure TioModelPresenterMaster.SetSourceBS(const Value: IioNotifiableBindSource);
 begin
-  if Value = SourcePresenter then
+  if Value = SourceBS then
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
-  MasterPresenter := Value;
+  MasterBindSource := Value;
 end;
 
 procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);

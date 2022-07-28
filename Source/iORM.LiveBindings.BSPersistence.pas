@@ -36,7 +36,7 @@ type
     procedure Insert(AObject: IInterface); overload;
     function GetName: String;
     function IsFromBSLoadType: Boolean;
-    function GetSourceBSAsNotifiableBindSource: IioNotifiableBindSource;
+    function GetSourceBS: IioNotifiableBindSource;
     // LoadType property
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
@@ -509,7 +509,7 @@ var
 begin
   if IsInserting then
   begin
-    LSourceBS := FBindSource.GetSourceBSAsNotifiableBindSource;
+    LSourceBS := FBindSource.GetSourceBS;
     if not Assigned(LSourceBS) then
       raise EioException.Create(ClassName, '_InternalRevertWhenFromBSLoadType',
         Format('In component "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property (maybe SourceDataSet, SourcePBS or SourcePresenter) has been left blank.'
