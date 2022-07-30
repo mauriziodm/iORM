@@ -218,6 +218,7 @@ var
     LdiVVMforItems: array of TdiVVMforItem;
     LdiImplementedInterfaces: TArray<TRttiInterfaceType>;
     Index: Integer;
+    LFarAncestorClassRefImplementingInterface: TRttiInstanceType;
   begin
     // Init
     LIsAnEntity := False;
@@ -273,8 +274,17 @@ var
       LdiImplementedInterfaces := AType.GetImplementedInterfaces;
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
+        begin
+          LFarAncestorClassRefImplementingInterface := TioUtilities.GetTheFarAncestorClassRefImplementingInterface(AType, LdiImplementedInterfaces[Index].GUID);
           io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
-            (TioUtilities.GetTheFarAncestorClassNameImplementingInterface(AType, LdiImplementedInterfaces[Index].GUID)).AsEntity.Execute;
+            (LFarAncestorClassRefImplementingInterface.Name).AsEntity.Execute;
+          // NB: Mauri 30/07/2022: Registro automaticamente come entità anche la classe più possibile in alto nella gararchia
+          //   (più vicina a TObject) della classe che sto registrando che implementa la stessa interfaccia perchè altrimenti, nel caso
+          //   che quella classe base non avesse l'attributo ioEntity (quindi se non venisse registrata) poi mi darebbe un errore
+          //   perchè quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
+          //   come entity (nel Map/ContextContainer) darebbe un errore.
+          Add(LFarAncestorClassRefImplementingInterface.MetaclassType);
+        end;
     end;
     // Dependency Injection Container - Register the class as is without any interface
     if LdiRegister then

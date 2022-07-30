@@ -1759,7 +1759,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
     LConnectionAndTableList := TStringList.Create;
     try
       // Get the collection of the classes implementing the interface
-      LImplementerCollection := Self.Container.GetInterfaceImplementers(ATypeName);
+      LImplementerCollection := Container.GetInterfaceImplementers(ATypeName);
       // Loop for all the implementers
       for LImplementer in LImplementerCollection do
       begin
@@ -1778,7 +1778,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         end
         else
           LCurrentConnectionAndTable := '';
-        // Add the the implementer class to the result ConnectionAndTableList
+        // Add the implementer class to the result ConnectionAndTableList
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
 //          Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
@@ -1809,15 +1809,14 @@ begin
 end;
 
 // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
-class function TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(
-  const ATypeName, AAlias: String): TRttiType;
+class function TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(const ATypeName, AAlias: String): TRttiType;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LFirstResolvedClassName: String;
   LFirstResolvedClassMap: IioMap;
 begin
   // Resolve the type and alias
-  LResolvedTypeList := Self.Resolve(ATypeName, AAlias, TioResolverMode.rmAllDistinctByConnectionAndTable, True);
+  LResolvedTypeList := Resolve(ATypeName, AAlias, TioResolverMode.rmAllDistinctByConnectionAndTable, True);
   // Se non trova nemmeno una classe solleva un'eccezione
   if LResolvedTypeList.Count = 0 then
     raise EioException.Create(Self.ClassName, 'ResolveInaccurateAsRttiType', Format('No class was found that implements the interface ("%s" alias "%s").', [ATypeName, AAlias]));

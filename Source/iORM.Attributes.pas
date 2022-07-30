@@ -39,10 +39,13 @@ uses
   System.Rtti, iORM.CommonTypes;
 
 type
-
   // Type of class mapping
   TioMapModeType = (mmHybrid, mmProperties, mmFields);
 
+const
+  DEFAULT_MAP_MODE = mmHybrid;
+
+type
   // Relation types
   TioRelationType = (rtNone, rtBelongsTo, rtHasMany, rtHasOne, rtEmbeddedHasMany, rtEmbeddedHasOne);
 
@@ -314,7 +317,7 @@ type
   strict private
     FMapMode: TioMapModeType;
   public
-    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = mmHybrid); overload;
+    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = DEFAULT_MAP_MODE); overload;
     constructor Create(const AMapMode: TioMapModeType); overload;
     property MapMode: TioMapModeType read FMapMode;
   end;

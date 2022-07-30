@@ -602,7 +602,7 @@ begin
     LJoins := Self.Joins;
     LTrueClass := nil;
     LGroupBy := nil;
-    LMapMode := mmProperties;
+    LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
     LAutoCreateDB := True;
     // Check attributes
