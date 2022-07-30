@@ -1,4 +1,4 @@
-{***************************************************************************}
+ï»¿{***************************************************************************}
 {                                                                           }
 {           iORM - (interfaced ORM)                                         }
 {                                                                           }
@@ -274,7 +274,7 @@ type
   TioDependencyInjectionResolverBase = class(TioDependencyInjectionBase)
   public
     // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
-    //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
+    //  Se l'alias Ã¨ vuoto e non c'Ã¨ una classe registrata che implementa l'interfaccia senza Alias (ma
     //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
     class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType;
     class function Resolve(const ATypeName:String; const AAlias:String; const AResolverMode:TioResolverMode; const AUseMapInfo: Boolean): IioResolvedTypeList;
@@ -329,7 +329,7 @@ type
     class function GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
     class function GetViewLocatorFor(const ATargetMP:IioNotifiableBindSource; const AAlias:String): IioDependencyInjectionLocator; overload;
     class function GetViewVMLocatorFor(const ATargetMP:IioNotifiableBindSource; const AAlias:String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator; overload;
-// NB: IL codice del metodo sotto commentato è anch'esso commentato
+// NB: IL codice del metodo sotto commentato Ã¨ anch'esso commentato
 //    class function GetVMLocatorFor(const AModelPresenter:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
   end;
 
@@ -620,7 +620,7 @@ begin
   inherited Create;
   FSetMapImplementersRef := True;
   FContainerValue := AContainerValue;
-  FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
+  FInterfaceName := AContainerValue.ClassName;  // CosÃ¬ si possono registrare anche direttamente le classi senza interfaccia
   FAlias := '';
 end;
 
@@ -640,7 +640,7 @@ function TioDependencyInjectionRegister.DefaultConstructorParams(const AParams: 
 var
   i: Integer;
 begin
-  // Solo così sembra andare bene
+  // Solo cosÃ¬ sembra andare bene
   SetLength(FContainerValue.DefaultConstructorParams, Length(AParams));
   for i := 0 to High(AParams) do FContainerValue.DefaultConstructorParams[i] := AParams[i];
   Result := Self;
@@ -885,7 +885,7 @@ end;
 
 function TioDependencyInjectionRegister._SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
 begin
-  FContainerValue.FarAncestorClassNameImplementingTheSameInterface := AValue;
+  FContainerValue.FarAncestorClassNameImplementingTheSameInterfaceTableAndConnection := AValue;
   Result := Self;
 end;
 
@@ -1012,7 +1012,7 @@ begin
   begin
     FConstructorMethod := AContainerItem.DefaultConstructorMethod;
     FConstructorMarker := AContainerItem.DefaultConstructorMarker;
-    // Solo così sembra andare bene
+    // Solo cosÃ¬ sembra andare bene
     SetLength(FConstructorParams, Length(AContainerItem.DefaultConstructorParams));
     for i := 0 to High(AContainerItem.DefaultConstructorParams) do
       FConstructorParams[i] := AContainerItem.DefaultConstructorParams[i];
@@ -1040,7 +1040,7 @@ function TioDependencyInjectionLocator.ConstructorParams(const AParams: TioConst
 var
   i: Integer;
 begin
-  // Solo così sembra andare bene
+  // Solo cosÃ¬ sembra andare bene
   SetLength(FConstructorParams, Length(AParams));
   for i := 0 to High(AParams) do FConstructorParams[i] := AParams[i];
   Result := Self;
@@ -1335,7 +1335,7 @@ begin
       //  If a specific VCProvider is already assigned then use it else try
       //  to retrieve the global default one, if not exist then do none
       //  (no ViewContext assigned to the view).
-      //  NB: Se è stato specificato un ViewContext esplicito (SetViewContext), usa quello
+      //  NB: Se Ã¨ stato specificato un ViewContext esplicito (SetViewContext), usa quello
       //       e considera il tutto come con AutoOwner e AutoParent = True
       if FVCProviderEnabled and (not Assigned(FViewContext))
       and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent)
@@ -1373,8 +1373,8 @@ begin
       //  apply it
       //  NB: Il codice commentato a dx della riga sotto poteva causare un errore dovuto alla
       //       morte prematura del ViewModel appena creato per via del reference count, sostituito
-      //       con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
-      //       perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
+      //       con la condizione (Result is TioViewModel) il problema si Ã¨ risolto e mi va bene cosÃ¬
+      //       perchÃ¨ tanto un ViewModel deve per forza ereditare da TioViewModel.
       if PresenterSettingsExists and (Result is TioViewModel) then //Supports(Result, IioViewModel) then
         TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
       // If it is a new instance of a singleton then add it to the SingletonsContainer
@@ -1545,7 +1545,7 @@ begin
 //      Format('There are no Views registered for "%s" or "%s" alias "%s".',
 //      [ATargetMP.Current.ClassName, ATargetMP.TypeName, AAlias]));
 //  // Set the locator
-////  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia più necessaria questa riga
+////  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia piÃ¹ necessaria questa riga
 //  Result._SetForEachModelPresenter(ATargetMP, True);
 // ---------- OLD CODE -----------
 end;
@@ -1782,7 +1782,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
 //          Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
-          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterface);
+          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterfaceTableAndConnection);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
       end;

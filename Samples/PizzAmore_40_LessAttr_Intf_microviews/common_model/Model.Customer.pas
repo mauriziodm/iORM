@@ -43,7 +43,8 @@ type
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
-  [ioEntity('Customer'), diImplements(IVipCustomer), ioTrueClass]
+//  [ioEntity('Customer'), diImplements(IVipCustomer), ioTrueClass]
+  [ioEntity, diImplements(IVipCustomer), ioTrueClass, ioKeyGenerator('Customer')]
   TVipCustomer = class(TCustomer, IVipCustomer)
    private
     FVipCardCode: String;
