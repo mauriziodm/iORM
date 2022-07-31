@@ -7,9 +7,7 @@ uses
 
 type
 
-//  [ioEntity, diImplements(ICustomer), ioTrueClass]
-  [ioEntity]
-  [diImplements(ICustomer), ioTrueClass]
+  [ioEntity, diImplements(ICustomer), ioTrueClass]
   TCustomer = class(TInterfacedObject, ICustomer)
   private
     FID: Integer;
@@ -43,8 +41,7 @@ type
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
-//  [ioEntity('Customer'), diImplements(IVipCustomer), ioTrueClass]
-  [ioEntity, diImplements(IVipCustomer), ioTrueClass, ioKeyGenerator('Customer')]
+  [ioEntity('Customer'), diImplements(IVipCustomer), ioTrueClass]
   TVipCustomer = class(TCustomer, IVipCustomer)
    private
     FVipCardCode: String;

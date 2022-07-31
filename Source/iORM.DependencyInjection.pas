@@ -1,4 +1,4 @@
-ï»¿{***************************************************************************}
+{***************************************************************************}
 {                                                                           }
 {           iORM - (interfaced ORM)                                         }
 {                                                                           }
@@ -41,7 +41,8 @@ uses
   iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.Interfaces, System.SyncObjs, iORM.DependencyInjection.Interfaces, System.Rtti,
   iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces,  iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers,  iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, System.SysUtils;
+  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes,
+  System.SysUtils;
 
 type
 
@@ -75,11 +76,12 @@ type
   public
     class procedure Build;
     class procedure CleanUp;
-    class procedure Add(const AKey:TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey; const AValue:TioDIContainerImplementersItem);
-    class function Exists(const AKey:TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey): Boolean; overload;
-    class function ImplementersExists(const AKey:TioDIContainerKey): Boolean; overload;
-    class function Get(const AKey:TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey): TioDIContainerImplementersItem;
-    class function GetInterfaceImplementers(const AKey:TioDIContainerKey): TioDIContainerValue;
+    class procedure Add(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey; const AValue:TioDIContainerImplementersItem);
+    class function Exists(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey): Boolean; overload;
+    class function ImplementersExists(AKey:TioDIContainerKey): Boolean; overload;
+    class function Get(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey): TioDIContainerImplementersItem;
+    class function GetInterfaceImplementers(AKey:TioDIContainerKey): TioDIContainerValue;
+    class procedure FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
   end;
 
   // Base class for Dependency Injection Register and Locator classes
@@ -274,7 +276,7 @@ type
   TioDependencyInjectionResolverBase = class(TioDependencyInjectionBase)
   public
     // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
-    //  Se l'alias Ã¨ vuoto e non c'Ã¨ una classe registrata che implementa l'interfaccia senza Alias (ma
+    //  Se l'alias è vuoto e non c'è una classe registrata che implementa l'interfaccia senza Alias (ma
     //  ne esiste almeno una registrata anche se con un alias) ritorna quella.
     class function ResolveInaccurateAsRttiType(const ATypeName:String; const AAlias:String): TRttiType;
     class function Resolve(const ATypeName:String; const AAlias:String; const AResolverMode:TioResolverMode; const AUseMapInfo: Boolean): IioResolvedTypeList;
@@ -329,7 +331,7 @@ type
     class function GetLocator<TI>(const AAlias:String; const AOwnerRequested, AVCProviderEnabled:Boolean): IioDependencyInjectionLocator<TI>; overload;
     class function GetViewLocatorFor(const ATargetMP:IioNotifiableBindSource; const AAlias:String): IioDependencyInjectionLocator; overload;
     class function GetViewVMLocatorFor(const ATargetMP:IioNotifiableBindSource; const AAlias:String; const ACreateViewModel:Boolean): IioDependencyInjectionLocator; overload;
-// NB: IL codice del metodo sotto commentato Ã¨ anch'esso commentato
+// NB: IL codice del metodo sotto commentato è anch'esso commentato
 //    class function GetVMLocatorFor(const AModelPresenter:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
   end;
 
@@ -620,7 +622,7 @@ begin
   inherited Create;
   FSetMapImplementersRef := True;
   FContainerValue := AContainerValue;
-  FInterfaceName := AContainerValue.ClassName;  // CosÃ¬ si possono registrare anche direttamente le classi senza interfaccia
+  FInterfaceName := AContainerValue.ClassName;  // Così si possono registrare anche direttamente le classi senza interfaccia
   FAlias := '';
 end;
 
@@ -640,7 +642,7 @@ function TioDependencyInjectionRegister.DefaultConstructorParams(const AParams: 
 var
   i: Integer;
 begin
-  // Solo cosÃ¬ sembra andare bene
+  // Solo così sembra andare bene
   SetLength(FContainerValue.DefaultConstructorParams, Length(AParams));
   for i := 0 to High(AParams) do FContainerValue.DefaultConstructorParams[i] := AParams[i];
   Result := Self;
@@ -661,8 +663,7 @@ begin
   Self.Free;
 end;
 
-function TioDependencyInjectionRegister.Implements(const IID:TGUID;
-  const AAlias: String): TioDependencyInjectionRegister;
+function TioDependencyInjectionRegister.Implements(const IID:TGUID; const AAlias: String): TioDependencyInjectionRegister;
 begin
   // Set the InterfaceName
   Self.FInterfaceName := TioUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
@@ -678,12 +679,12 @@ end;
 function TioDependencyInjectionRegister.Implements<T>(const AAlias:String): TioDependencyInjectionRegister;
 begin
   // Set the InterfaceName
-  Self.FInterfaceName := TioUtilities.GenericToString<T>;
+  FInterfaceName := TioUtilities.GenericToString<T>;
   // Set the interface GUID
   FContainerValue.InterfaceGUID := TioUtilities.TypeInfoToGUID(TypeInfo(T));
   // Set the Alias
   if not AAlias.IsEmpty then
-    Self.FAlias := AAlias;
+    FAlias := AAlias;
   // Return itself
   Result := Self;
 end;
@@ -885,7 +886,7 @@ end;
 
 function TioDependencyInjectionRegister._SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
 begin
-  FContainerValue.FarAncestorClassNameImplementingTheSameInterfaceTableAndConnection := AValue;
+  FContainerValue.FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection := AValue;
   Result := Self;
 end;
 
@@ -951,8 +952,10 @@ end;
 
 { TioDependencyInjectionContainer }
 
-class procedure TioDependencyInjectionContainer.Add(const AKey: TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey; const AValue: TioDIContainerImplementersItem);
+class procedure TioDependencyInjectionContainer.Add(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey; const AValue:TioDIContainerImplementersItem);
 begin
+  AKey := Uppercase(Akey);
+  ASubKey := Uppercase(ASubKey);
   // If the Key not exist then create the SubContainer and add it to the MasterContainer
   if not Self.FContainer.ContainsKey(AKey) then
     Self.FContainer.Add(AKey, TioDIContainerValue.Create);
@@ -970,28 +973,81 @@ begin
   Self.FContainer.Free;
 end;
 
-class function TioDependencyInjectionContainer.Exists(const AKey: TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey): Boolean;
+class function TioDependencyInjectionContainer.Exists(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey): Boolean;
 begin
+  AKey := Uppercase(Akey);
+  ASubKey := Uppercase(ASubKey);
   Result := Self.FContainer.ContainsKey(AKey) and Self.FContainer.Items[AKey].Contains(ASubKey);
 end;
 
-class function TioDependencyInjectionContainer.Get(const AKey: TioDIContainerKey; const ASubKey:TioDIContainerImplementersKey): TioDIContainerImplementersItem;
+class procedure TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
+var
+  LInterfaceName: String;
+  LImplementersItem: TioDIContainerImplementersItem;
+  LFarAncestorType: TRttiInstanceType;
+  // Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la
+  // stessa interfaccia, che è persistita sulla stessa tabella e sulla stessa connessione
+  function _GetFarAncestorClassRefImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+  var
+    LMap: IIoMap;
+    LCurrentMap: IioMap;
+  begin
+    Result := ARttiInstanceType;
+    LMap := TioMapContainer.GetMap(ARttiInstanceType.Name);
+    // Cicla finchè c'è una classe antenata che implementa la stessa interfaccia
+    while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
+    begin
+      if TioMapContainer.Exist(ARttiInstanceType.Name) then
+      begin
+        LCurrentMap := TioMapContainer.GetMap(ARttiInstanceType.Name, False);
+        if (LCurrentMap.GetTable.TableName = LMap.GetTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = LMap.GetTable.GetConnectionDefName) then
+          Result := ARttiInstanceType;
+      end;
+      ARttiInstanceType := ARttiInstanceType.BaseType;
+    end;
+  end;
 begin
+  // Loop for all interfaces in the internal container (tenere presente che posso essere registrate anche direttamente della classi)
+  for LInterfaceName in FContainer.Keys do
+    // Interfaces only
+    if TioUtilities.IsAnInterfaceTypeName(LInterfaceName) then
+      // Loop for all implementers of the current interface
+      for LImplementersItem in FContainer.Items[LInterfaceName] do
+        // Enties only
+        if LImplementersItem.IsEntity then
+        begin
+          LFarAncestorType := _GetFarAncestorClassRefImplementingInterfaceSameTableAndConnection(LImplementersItem.RttiType, LImplementersItem.InterfaceGUID);
+          LImplementersItem.FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection := LFarAncestorType.Name;
+          // NB: Mauri 30/07/2022: Registro automaticamente come entità anche la classe più possibile in alto nella gararchia
+          //   (più vicina a TObject) della classe che sto registrando che implementa la stessa interfaccia perchè altrimenti, nel caso
+          //   che quella classe base non avesse l'attributo ioEntity (quindi se non venisse registrata) poi mi darebbe un errore
+          //   perchè quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
+          //   come entity (nel Map/ContextContainer) darebbe un errore.
+          TioMapContainer.Add(LFarAncestorType.MetaclassType);
+        end;
+end;
+
+class function TioDependencyInjectionContainer.Get(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey): TioDIContainerImplementersItem;
+begin
+  AKey := Uppercase(Akey);
+  ASubKey := Uppercase(ASubKey);
   if not Self.Exists(AKey, ASubKey) then
     raise EioException.Create(Self.ClassName, 'Get', Format('Implementer for "%s" alias "%s" not found.', [AKey, ASubKey]));
   Result := Self.FContainer.Items[AKey].GetItem(ASubKey);
 end;
 
-class function TioDependencyInjectionContainer.GetInterfaceImplementers(const AKey: TioDIContainerKey): TioDIContainerValue;
+class function TioDependencyInjectionContainer.GetInterfaceImplementers(AKey:TioDIContainerKey): TioDIContainerValue;
 begin
+  AKey := Uppercase(Akey);
   if not Self.ImplementersExists(AKey) then
     raise EioException.Create(Self.ClassName + ': implementers for interface "' + AKey + '" not found.');
   Result := Self.FContainer.Items[AKey];
 end;
 
-class function TioDependencyInjectionContainer.ImplementersExists(const AKey: TioDIContainerKey): Boolean;
+class function TioDependencyInjectionContainer.ImplementersExists(AKey:TioDIContainerKey): Boolean;
 begin
-  Result := Self.FContainer.ContainsKey(AKey);
+  AKey := Uppercase(Akey);
+  Result := FContainer.ContainsKey(AKey);
 end;
 
 { TioDependencyInjectionLocator }
@@ -1012,7 +1068,7 @@ begin
   begin
     FConstructorMethod := AContainerItem.DefaultConstructorMethod;
     FConstructorMarker := AContainerItem.DefaultConstructorMarker;
-    // Solo cosÃ¬ sembra andare bene
+    // Solo così sembra andare bene
     SetLength(FConstructorParams, Length(AContainerItem.DefaultConstructorParams));
     for i := 0 to High(AContainerItem.DefaultConstructorParams) do
       FConstructorParams[i] := AContainerItem.DefaultConstructorParams[i];
@@ -1040,7 +1096,7 @@ function TioDependencyInjectionLocator.ConstructorParams(const AParams: TioConst
 var
   i: Integer;
 begin
-  // Solo cosÃ¬ sembra andare bene
+  // Solo così sembra andare bene
   SetLength(FConstructorParams, Length(AParams));
   for i := 0 to High(AParams) do FConstructorParams[i] := AParams[i];
   Result := Self;
@@ -1335,7 +1391,7 @@ begin
       //  If a specific VCProvider is already assigned then use it else try
       //  to retrieve the global default one, if not exist then do none
       //  (no ViewContext assigned to the view).
-      //  NB: Se Ã¨ stato specificato un ViewContext esplicito (SetViewContext), usa quello
+      //  NB: Se è stato specificato un ViewContext esplicito (SetViewContext), usa quello
       //       e considera il tutto come con AutoOwner e AutoParent = True
       if FVCProviderEnabled and (not Assigned(FViewContext))
       and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent)
@@ -1373,8 +1429,8 @@ begin
       //  apply it
       //  NB: Il codice commentato a dx della riga sotto poteva causare un errore dovuto alla
       //       morte prematura del ViewModel appena creato per via del reference count, sostituito
-      //       con la condizione (Result is TioViewModel) il problema si Ã¨ risolto e mi va bene cosÃ¬
-      //       perchÃ¨ tanto un ViewModel deve per forza ereditare da TioViewModel.
+      //       con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
+      //       perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
       if PresenterSettingsExists and (Result is TioViewModel) then //Supports(Result, IioViewModel) then
         TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
       // If it is a new instance of a singleton then add it to the SingletonsContainer
@@ -1545,7 +1601,7 @@ begin
 //      Format('There are no Views registered for "%s" or "%s" alias "%s".',
 //      [ATargetMP.Current.ClassName, ATargetMP.TypeName, AAlias]));
 //  // Set the locator
-////  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia piÃ¹ necessaria questa riga
+////  Result.SetPresenter(ATargetMP, ''); // NB: Non credo sia più necessaria questa riga
 //  Result._SetForEachModelPresenter(ATargetMP, True);
 // ---------- OLD CODE -----------
 end;
@@ -1774,7 +1830,8 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         if AUseMapInfo then
         begin
           LMap := TioMapContainer.GetMap(LImplementer.ClassName);
-          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName;
+          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName + '.' +
+            LImplementer.FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
         end
         else
           LCurrentConnectionAndTable := '';
@@ -1782,7 +1839,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName:String
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
 //          Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
-          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterfaceTableAndConnection);
+          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
       end;

@@ -1,4 +1,4 @@
-Ôªø{ *************************************************************************** }
+{ *************************************************************************** }
 { }
 { iORM - (interfaced ORM) }
 { }
@@ -66,7 +66,6 @@ type
     class var FAutodetectedHasManyRelationCollection: TList<IioProperty>;
     class function IsAnEntity(const AType: TRttiInstanceType): Boolean;
     class procedure DIC_AutoregisterClassesByAttributes;
-    class procedure FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
     // // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     // class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
     class procedure Init;
@@ -87,7 +86,7 @@ implementation
 uses
   iORM.Context.Factory, iORM.Exceptions,
   iORM.RttiContext.Factory, iORM.Attributes, iORM, System.SysUtils,
-  iORM.Utilities;
+  iORM.Utilities, iORM.DependencyInjection;
 
 { TioContextContainer }
 
@@ -148,11 +147,6 @@ begin
     raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
 
-class procedure TioMapContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
-begin
-
-end;
-
 class procedure TioMapContainer.Init;
 var
   LRttiContext: TRttiContext;
@@ -173,16 +167,19 @@ begin
       // Only classes with explicit ioTable attribute
       if LRttiType.IsInstance and IsAnEntity(LRttiType.AsInstance) then
         // Load the current class (entity) into the ContextContainer
-        // NB: Mauri 30/07/2022: Nel metodo "DIC_AutoregisterClassesByAttributes" registro automaticamente come entit√† anche la classe pi√π possibile in alto nella gararchia
-        //   (pi√π vicina a TObject) della classe che sto registrando che implementa la stessa interfaccia perch√® altrimenti, nel caso
-        //   che quella classe base non avesse l'attributo ioEntity (quindi se non venisse registrata) poi mi darebbe un errore
-        //   perch√® quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
-        //   come entity (nel Map/ContextContainer) darebbe un errore.
         Add(LRttiType.AsInstance.MetaclassType);
     end;
 
     // Generate childs virtual properties related to autodetected HasMany relations
     TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
+
+    // NB: Mauri 30/07/2022: Nel metodo "TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection"
+    //    registro automaticamente come entit‡ anche la classe pi˘ possibile in alto nella gararchia
+    //   (pi˘ vicina a TObject) della classe che sto registrando che implementa la stessa interfaccia perchË altrimenti, nel caso
+    //   che quella classe base non avesse l'attributo ioEntity (quindi se non venisse registrata) poi mi darebbe un errore
+    //   perchË quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
+    //   come entity (nel Map/ContextContainer) darebbe un errore.
+    TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
   finally
     FreeAndNil(FAutodetectedHasManyRelationCollection);
   end;
@@ -284,17 +281,11 @@ var
     begin
       LdiImplementedInterfaces := AType.GetImplementedInterfaces;
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
-        if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perch√® non ha un suo GUID
+        if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchË non ha un suo GUID
         begin
           LFarAncestorClassRefImplementingInterface := TioUtilities.GetTheFarAncestorClassRefImplementingInterface(AType, LdiImplementedInterfaces[Index].GUID);
           io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
             (LFarAncestorClassRefImplementingInterface.Name).AsEntity.Execute;
-          // NB: Mauri 30/07/2022: Registro automaticamente come entit√† anche la classe pi√π possibile in alto nella gararchia
-          //   (pi√π vicina a TObject) della classe che sto registrando che implementa la stessa interfaccia perch√® altrimenti, nel caso
-          //   che quella classe base non avesse l'attributo ioEntity (quindi se non venisse registrata) poi mi darebbe un errore
-          //   perch√® quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
-          //   come entity (nel Map/ContextContainer) darebbe un errore.
-          Add(LFarAncestorClassRefImplementingInterface.MetaclassType);
         end;
     end;
     // Dependency Injection Container - Register the class as is without any interface
@@ -402,7 +393,7 @@ end;
 // begin
 // LdiImplementedInterfaces := AType.GetImplementedInterfaces;
 // for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
-// if (LdiImplementedInterfaces[Index].GUID <> IInterface) then  // NB: Controllare per IInvokable ho visto che non serve perch√® non ha un suo GUID
+// if (LdiImplementedInterfaces[Index].GUID <> IInterface) then  // NB: Controllare per IInvokable ho visto che non serve perchË non ha un suo GUID
 // io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name).AsEntity.Execute;
 // end;
 // // Dependency Injection Container - Register the class as is without any interface

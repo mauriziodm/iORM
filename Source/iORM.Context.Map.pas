@@ -51,7 +51,6 @@ type
     FProperties: IioProperties;
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
-    FAncestorMap: IioMap;
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
   public
     constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioTable; AProperties:IioProperties); overload;
@@ -63,9 +62,6 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function BlobFieldExists: Boolean;
-    function AncestorMap: Iiomap;
-    // True if the class has a mapped ancestor (the ancestor is even an entity)
-    function HasMappedAncestor: Boolean;
     // DIContainerImplementersItem reference
     function GetDIContainerImplementersItem: TioDIContainerImplementersItem;
     procedure SetDIContainerImplementersItem(const AValue:TioDIContainerImplementersItem);
@@ -77,11 +73,6 @@ uses
   iORM.Context.Container;
 
 { TioMap }
-
-function TioMap.AncestorMap: Iiomap;
-begin
-  Result := FAncestorMap;
-end;
 
 function TioMap.BlobFieldExists: Boolean;
 begin
@@ -105,9 +96,6 @@ begin
   // Set properties
   FProperties := AProperties;
   FProperties.SetTable(FTable);
-  // Reference to a map of the ancestor if the ancestor itself is mapped (is an entity)
-  //  NB: The second parameter must be False
-  FAncestorMap := TioMapContainer.GetMap(ARttiType.BaseType.Name, False);
 end;
 
 function TioMap.GetClassName: String;
@@ -133,11 +121,6 @@ end;
 function TioMap.GetTable: IioTable;
 begin
   Result := FTable;
-end;
-
-function TioMap.HasMappedAncestor: Boolean;
-begin
-  Result := Assigned(FAncestorMap);
 end;
 
 function TioMap.RttiContext: TRttiContext;

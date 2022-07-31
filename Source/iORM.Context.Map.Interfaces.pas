@@ -56,10 +56,6 @@ type
     function RttiType: TRttiInstanceType;
     // Blob field present
     function BlobFieldExists: Boolean;
-    // Reference to a map of the ancestor if the ancestor itself is mapped (is an entity)
-    function AncestorMap: Iiomap;
-    // True if the class has a mapped ancestor (the ancestor is even an entity)
-    function HasMappedAncestor: Boolean;
     // DIContainerImplementersItem reference
     //  NB: Non li metto perchè altrimenti ho una "Unit Circular Reference" quindi al momento
     //       risolvo in altro modo
