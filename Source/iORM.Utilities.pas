@@ -36,7 +36,8 @@ unit iORM.Utilities;
 interface
 
 uses
-  System.Classes, System.TypInfo, System.Rtti, iORM.CommonTypes, iORM.MVVM.Interfaces;
+  System.Classes, System.TypInfo, System.Rtti, iORM.CommonTypes, iORM.MVVM.Interfaces,
+  iORM.LiveBindings.Interfaces;
 
 type
 
@@ -75,6 +76,8 @@ type
     class procedure ClearList(const AList: TObject);
     class function CloneObject(const ASourceObj: TObject): TObject;
     class function GetTheFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+    class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
+    class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
   end;
 
 implementation
@@ -193,6 +196,30 @@ end;
 class function TioUtilities.GenericToString<T>(const AQualified: Boolean = False): String;
 begin
   Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
+end;
+
+class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
+var
+  LComponent: TComponent;
+begin
+  // If the AName param is empty then return de default presenter
+  if AName.IsEmpty then
+    Exit(GetDefaultBindSource(AViewOrViewModel));
+  LComponent := AViewOrViewModel.FindComponent(AName);
+  if Assigned(LComponent) and Supports(LComponent, IioNotifiableBindSource, Result) then
+    Exit
+  else
+    raise EioException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
+end;
+
+class function TioUtilities.GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
+var
+  I: Integer;
+begin
+  for I := 0 to AViewOrViewModel.ComponentCount - 1 do
+    if Supports(AViewOrViewModel.Components[I], IioNotifiableBindSource, Result) and Result.IsMasterBS and Result.AsDefault then
+      Exit;
+  Result := nil;
 end;
 
 class function TioUtilities.GetImplementedInterfaceName(const AClassType: TRttiInstanceType; const IID: TGUID): String;
