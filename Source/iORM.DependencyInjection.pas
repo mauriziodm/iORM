@@ -88,6 +88,7 @@ type
   TioDependencyInjectionBase = class abstract(TInterfacedObject)
   strict protected
     class function Container: TioDependencyInjectionContainerRef;
+    class function ModelToSimpleViewContainerKey(const ATargetTypeName:String): String;
     class function ModelToViewContainerKey(const ATargetTypeName:String): String;
     class function ModelToViewModelContainerKey(const ATargetTypeName:String): String;
   end;
@@ -129,6 +130,11 @@ type
     function SetBindSource(const AName:String; const AOrderBy:String): TioDependencyInjectionRegister; overload;
 
     function SetBindSourceAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:IioNotifiableBindSource): TioDependencyInjectionRegister;
+
+    function AsSimpleViewFor(const ATargetTypeName:String; const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function AsSimpleViewFor(const ATargetClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function AsSimpleViewFor(const ATargetIID:TGUID; const AAlias:String=''): TioDependencyInjectionRegister; overload;
+    function AsSimpleViewFor<T>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
 
     function AsViewFor(const ATargetTypeName:String; const AAlias:String=''): TioDependencyInjectionRegister; overload;
     function AsViewFor(const ATargetClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
@@ -348,6 +354,11 @@ uses
 class function TioDependencyInjectionBase.Container: TioDependencyInjectionContainerRef;
 begin
   Result := TioDependencyInjectionContainer;
+end;
+
+class function TioDependencyInjectionBase.ModelToSimpleViewContainerKey(const ATargetTypeName: String): String;
+begin
+  Result := '<SV>' + ATargetTypeName;
 end;
 
 class function TioDependencyInjectionBase.ModelToViewContainerKey(
@@ -609,6 +620,32 @@ function TioDependencyInjectionRegister.AsEntity: TioDependencyInjectionRegister
 begin
   Self.FContainerValue.IsEntity := True;
   Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetTypeName, AAlias: String): TioDependencyInjectionRegister;
+begin
+  // Set the InterfaceName
+  FInterfaceName := ModelToSimpleViewContainerKey(ATargetTypeName);
+  // Set the Alias
+  if not AAlias.IsEmpty then
+    Self.FAlias := AAlias;
+  // Return itself
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetClassRef: TioClassRef; const AAlias: String): TioDependencyInjectionRegister;
+begin
+  Result := Self.AsSimpleViewFor(ATargetClassRef.ClassName, AAlias);
+end;
+
+function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetIID: TGUID; const AAlias: String): TioDependencyInjectionRegister;
+begin
+  Result := Self.AsSimpleViewFor(TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
+end;
+
+function TioDependencyInjectionRegister.AsSimpleViewFor<T>(const AAlias: String): TioDependencyInjectionRegister;
+begin
+  Result := Self.AsSimpleViewFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 function TioDependencyInjectionRegister.AsSingleton(const AIsSingleton:Boolean): TioDependencyInjectionRegister;
