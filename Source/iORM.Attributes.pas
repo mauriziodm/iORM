@@ -403,6 +403,10 @@ type
   diAsSingleton = class(TioCustomAttribute)
   end;
 
+  // DIC - diSimpleViewFor(TargetModelClassName) (register the calss as SimpleView for the TargetModelClassName)
+  diSimpleViewFor = class(TioCustomForTargetModel)
+  end;
+
   // DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
   diViewFor = class(TioCustomForTargetModel)
   end;
