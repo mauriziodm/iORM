@@ -12,6 +12,7 @@ type
 
   TioDataSetCustom = class abstract(TioBSABaseDataSet, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
+    FAsDefault: Boolean;
     FTypeName: String;
     FTypeAlias: String;
     FLoadType: TioLoadType;
@@ -53,6 +54,10 @@ type
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean; // IioStdActionTargetBindSource
     procedure OpenCLoseDetails(const AActive: Boolean);
+    // AsDefault
+    function GetAsDefault: Boolean;
+    procedure SetAsDefault(const Value: Boolean);
+    procedure InitAsDefaultOnCreate;
     // Async
     procedure SetAsync(const Value: Boolean);
     // Lazy
@@ -137,6 +142,7 @@ type
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     property ItemIndex: Integer read GetItemIndex write SetItemIndex; // Public: Master+Detail
     // Published properties
+    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
     property TypeName: String read GetTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
@@ -269,6 +275,10 @@ begin
   // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
   // DesignTime (WhereStr property) non funzionassero per questo motivo.
   FDetailBindSourceContainer := nil;
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  // first ModelPresenter inserted (no other presenters presents).
+  // NB: At Runtime set False as initial value (load real value from dfm file)
+  InitAsDefaultOnCreate;
   // Page manager
   FPaging := TioCommonBSAPageManager.Create(
     procedure
@@ -406,6 +416,11 @@ begin
       LDetailBindSource.CheckAdapter(True);
 end;
 
+function TioDataSetCustom.GetAsDefault: Boolean;
+begin
+  Result := FAsDefault;
+end;
+
 function TioDataSetCustom.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
@@ -516,6 +531,15 @@ begin
   Result := FWhere;
 end;
 
+procedure TioDataSetCustom.InitAsDefaultOnCreate;
+begin
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  // first ModelPresenter inserted (no other presenters presents).
+  // NB: At Runtime set False as initial value (load real value from dfm file)
+  // NB: The second parameter is FAsDefault private field to avoid deadlock
+  TioCommonBSBehavior.InitAsDefaultOnCreate(Self, FAsDefault);
+end;
+
 procedure TioDataSetCustom.InternalPreOpen;
 begin
   if not CheckAdapter(True) then
@@ -616,6 +640,12 @@ begin
     TioCommonBSBehavior.Select<IInterface>(Self, FSelectorFor, CurrentAs<IInterface>, ASelectionType)
   else
     TioCommonBSBehavior.Select<TObject>(Self, FSelectorFor, Current, ASelectionType);
+end;
+
+procedure TioDataSetCustom.SetAsDefault(const Value: Boolean);
+begin
+  TioCommonBSBehavior.SetAsDefaultPropertyOfAllBindSourcesToFalse(Owner, Value);
+  FAsDefault := Value;
 end;
 
 procedure TioDataSetCustom.SetAsync(const Value: Boolean);

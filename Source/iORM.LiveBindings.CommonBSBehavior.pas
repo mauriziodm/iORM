@@ -4,7 +4,7 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
-  iORM.CommonTypes;
+  iORM.CommonTypes, System.Classes;
 
 type
 
@@ -21,6 +21,9 @@ type
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
+    // Common code for AsDefaulr property (for master BindSources)
+    class procedure SetAsDefaultPropertyOfAllBindSourcesToFalse(const AOwner: TComponent; const AValue: Boolean);
+    class procedure InitAsDefaultOnCreate(const ABindSource: TComponent; var AAsDefaultValue: Boolean);
 
     class function IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
   end;
@@ -29,8 +32,7 @@ implementation
 
 uses
   Data.Bind.ObjectScope, System.SysUtils,
-  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions,
-  System.Classes, iORM.DuckTyped.Factory;
+  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions, iORM.DuckTyped.Factory;
 
 { TioCommonBSBehavior }
 
@@ -70,6 +72,38 @@ end;
 class function TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
 begin
   Result := ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance];
+end;
+
+class procedure TioCommonBSBehavior.InitAsDefaultOnCreate(const ABindSource: TComponent; var AAsDefaultValue: Boolean);
+var
+  I: Integer;
+  LCurrentComponent: TObject;
+  LCurrentBindSource: IioNotifiableBindSource;
+begin
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  // first ModelPresenter inserted (no other presenters presents).
+  // NB: At Runtime set False as initial value (load real value from dfm file)
+  // -----
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  // first ModelPresenter inserted (no other presenters presents).
+  // NB: At Runtime set False as initial value (load real value from dfm file)
+  if (csDesigning in ABindSource.ComponentState) then
+  begin
+    AAsDefaultValue := True;
+    for I := 0 to ABindSource.Owner.ComponentCount - 1 do
+    begin
+      LCurrentComponent := ABindSource.Owner.Components[I];
+      // Ovviamente salta se stesso
+      if (LCurrentComponent <> ABindSource) and Supports(LCurrentComponent, IioNotifiableBindSource, LCurrentBindSource) and LCurrentBindSource.IsMasterBS
+        and LCurrentBindSource.AsDefault then
+      begin
+        AAsDefaultValue := False;
+        Exit;
+      end;
+    end;
+  end
+  else
+    AAsDefaultValue := False;
 end;
 
 class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj,
@@ -206,6 +240,18 @@ begin
     LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
   else
     raise EioException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
+end;
+
+class procedure TioCommonBSBehavior.SetAsDefaultPropertyOfAllBindSourcesToFalse(const AOwner: TComponent; const AValue: Boolean);
+var
+  I: Integer;
+  LBindSource: IioNotifiableBindSource;
+begin
+  // Uncheck AsDefault property for all bin sources
+  if AValue then
+    for I := 0 to AOwner.ComponentCount - 1 do
+      if Supports(AOwner.Components[I], IioNotifiableBindSource, LBindSource) then
+        LBindSource.SetAsDefault(False);
 end;
 
 end.

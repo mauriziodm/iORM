@@ -95,6 +95,7 @@ type
     procedure OpenCloseViewBindSources(const AActive: Boolean);
     procedure OpenCloseDetails(const AActive: Boolean);
     // AsDefault
+    function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
     procedure InitAsDefaultOnCreate;
     // Async
@@ -281,7 +282,7 @@ type
     function DataObjectAssigned: Boolean;
     // ----------------------------------------------------------------------------------------------------------------------------
     // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
-    property AsDefault: Boolean read FAsDefault write SetAsDefault; // Published: Master
+    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     property MasterBindSource: IioNotifiableBindSource read FMasterBindSource write SetMasterBindSource; // Published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // Published: Detail
@@ -565,6 +566,11 @@ begin
     Result := FBindSourceAdapter;
 end;
 
+function TioModelPresenterCustom.GetAsDefault: Boolean;
+begin
+  Result := FAsDefault;
+end;
+
 function TioModelPresenterCustom.GetBOF: Boolean;
 begin
   if CheckAdapter then
@@ -714,29 +720,12 @@ begin
 end;
 
 procedure TioModelPresenterCustom.InitAsDefaultOnCreate;
-var
-  I: Integer;
-  LComponent: TObject;
 begin
   // At DesignTime initialize the "AsDefault" property at True if it is the
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
-  if (csDesigning in ComponentState) then
-  begin
-    FAsDefault := True;
-    for I := 0 to Owner.ComponentCount - 1 do
-    begin
-      LComponent := Owner.Components[I];
-      // If the current component supports the IioBSPersistenceClient then it's a ModelPresenterMaster
-      if (LComponent is TioModelPresenterCustom) and Supports(LComponent, IioBSPersistenceClient) and (LComponent <> Self) then
-      begin
-        FAsDefault := False;
-        Exit;
-      end;
-    end;
-  end
-  else
-    FAsDefault := False;
+  // NB: The second parameter is FAsDefault private field to avoid deadlock
+  TioCommonBSBehavior.InitAsDefaultOnCreate(Self, FAsDefault);
 end;
 
 procedure TioModelPresenterCustom.Insert(AObject: TObject);
@@ -914,15 +903,8 @@ begin
 end;
 
 procedure TioModelPresenterCustom.SetAsDefault(const Value: Boolean);
-var
-  I: Integer;
 begin
-  // Uncheck AsDefault property for all presenters
-  if Value then
-    for I := 0 to Owner.ComponentCount - 1 do
-      if (Owner.Components[I] is TioModelPresenterCustom) then
-        TioModelPresenterCustom(Owner.Components[I]).AsDefault := False;
-  // Set the value
+  TioCommonBSBehavior.SetAsDefaultPropertyOfAllBindSourcesToFalse(Owner, Value);
   FAsDefault := Value;
 end;
 

@@ -2,18 +2,19 @@ inherited VMOrder: TVMOrder
   inherited MPMaster: TioModelPresenterMaster
     TypeName = 'IOrder'
     OnSelectionObject = MPMasterSelectionObject
+    Left = 56
   end
   object MPCustomer: TioModelPresenterDetail
-    MasterPresenter = MPMaster
+    MasterBindSource = MPMaster
     MasterPropertyName = 'Customer'
     Left = 56
-    Top = 112
+    Top = 104
   end
   object MPRows: TioModelPresenterDetail
-    MasterPresenter = MPMaster
+    MasterBindSource = MPMaster
     MasterPropertyName = 'Rows'
     Left = 56
-    Top = 176
+    Top = 168
   end
   object acDeleteRow: TioVMAction
     Name = 'acDeleteRow'

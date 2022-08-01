@@ -105,6 +105,10 @@ type
     procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     function GetOnReceiveSelectionFreeObject: Boolean;
     property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject; // published: Master+Detail
+    //  AsDefault
+    function GetAsDefault: Boolean;
+    procedure SetAsDefault(const Value: Boolean);
+    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
     // TypeName
     function GetTypeName: String;
     // Paging

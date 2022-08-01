@@ -45,6 +45,7 @@ type
 
   TioPrototypeBindSourceCustom = class abstract(TPrototypeBindSource, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
+    FAsDefault: Boolean;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     FTypeName: String;
     FTypeAlias: String;
@@ -102,6 +103,10 @@ type
     // =========================================================================
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean; // IioStdActionTargetBindSource
+    // AsDefault
+    function GetAsDefault: Boolean;
+    procedure SetAsDefault(const Value: Boolean);
+    procedure InitAsDefaultOnCreate;
     // Async
     procedure SetAsync(const Value: Boolean);
     // AutoActivate
@@ -181,6 +186,7 @@ type
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     // Published properties
+    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
     property TypeName: String read GetTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master
@@ -387,6 +393,10 @@ begin
   // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
   // DesignTime (WhereStr property) non funzionassero per questo motivo.
   FDetailBindSourceContainer := nil;
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  // first ModelPresenter inserted (no other presenters presents).
+  // NB: At Runtime set False as initial value (load real value from dfm file)
+  InitAsDefaultOnCreate;
   // Page manager
   FPaging := TioCommonBSAPageManager.Create(
     procedure
@@ -505,6 +515,11 @@ begin
       Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
 end;
 
+function TioPrototypeBindSourceCustom.GetAsDefault: Boolean;
+begin
+  Result := FAsDefault;
+end;
+
 function TioPrototypeBindSourceCustom.GetAutoActivate: Boolean;
 begin
   Result := inherited AutoActivate;
@@ -573,6 +588,15 @@ begin
     Result := LActiveBSA.ioWhere
   else
     Result := nil;
+end;
+
+procedure TioPrototypeBindSourceCustom.InitAsDefaultOnCreate;
+begin
+  // At DesignTime initialize the "AsDefault" property at True if it is the
+  // first ModelPresenter inserted (no other presenters presents).
+  // NB: At Runtime set False as initial value (load real value from dfm file)
+  // NB: The second parameter is FAsDefault private field to avoid deadlock
+  TioCommonBSBehavior.InitAsDefaultOnCreate(Self, FAsDefault);
 end;
 
 procedure TioPrototypeBindSourceCustom.Insert(AObject: IInterface);
@@ -799,6 +823,12 @@ begin
   // It also opens any detail bind sources
   if not(csDesigning in ComponentState) then
     OpenCloseDetails(Value);
+end;
+
+procedure TioPrototypeBindSourceCustom.SetAsDefault(const Value: Boolean);
+begin
+  TioCommonBSBehavior.SetAsDefaultPropertyOfAllBindSourcesToFalse(Owner, Value);
+  FAsDefault := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAsync(const Value: Boolean);

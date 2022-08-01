@@ -61,6 +61,7 @@ type
 //    property ScopeMappings;
 //    property OnCreateAdapter;
     // properties redeclared from TioCUstomPrototypeBindSource
+    property AsDefault;
     property TypeName;
     property TypeAlias;
     property Async default False;

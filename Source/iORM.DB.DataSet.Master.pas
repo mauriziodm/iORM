@@ -52,6 +52,7 @@ type
     // Added properties
     property Persistence: TioBSPersistence read GetPersistence;
   published
+    property AsDefault;
     property TypeName;
     property TypeAlias;
     property Async default False;
