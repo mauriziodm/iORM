@@ -701,11 +701,11 @@ end;
 
 class procedure TioStrategyDB.LoadList(const AWhere: IioWhere; const AList: TObject);
 var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
-  ADuckTypedList: IioDuckTypedList;
+  LResolvedTypeList: IioResolvedTypeList;
+  LResolvedTypeName: String;
+  LContext: IioContext;
+  LTransactionCollection: IioTransactionCollection;
+  LDuckTypedList: IioDuckTypedList;
   // Nested
   procedure NestedLoadToList;
   var
@@ -713,18 +713,18 @@ var
     AObj: TObject;
   begin
     // Create & open query
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectList(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQuerySelectList(LContext);
     AQuery.Open;
     try
       // Loop
       while not AQuery.Eof do
       begin
         // Clean the DataObject (it contains the previous)
-        AContext.DataObject := nil;
+        LContext.DataObject := nil;
         // Create the object as TObject
-        AObj := TioObjectMakerFactory.GetObjectMaker(AContext).MakeObject(AContext, AQuery);
+        AObj := TioObjectMakerFactory.GetObjectMaker(LContext).MakeObject(LContext, AQuery);
         // Add current object to the list
-        ADuckTypedList.Add(AObj);
+        LDuckTypedList.Add(AObj);
         // Next
         AQuery.Next;
       end;
@@ -737,27 +737,27 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Wrap the list into a DuckTypedList
-  ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
+  LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
   // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
+  LTransactionCollection := TioDBFactory.TransactionCollection;
   try
     // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
+    for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, nil, '', '');
+      LContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '');
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedLoadToList;
     end;
     // Commit ALL transactions
-    ATransactionCollection.CommitAll;
+    LTransactionCollection.CommitAll;
   except
     // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
+    LTransactionCollection.RollbackAll;
     raise;
   end;
 end;

@@ -61,6 +61,7 @@ type
     function GetItem(const AAlias: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
     function Contains(const AAlias: TioDIContainerImplementersKey): Boolean;
     function GetEnumerator: TEnumerator<TioDIContainerImplementersItem>;
+    function RemoveAndCheckIfEmpty(ASubKey: String): Boolean;
   end;
   // Dependency injection container INTERFACES (MasterContainer)
   TioDIContainerKey = String;
@@ -82,6 +83,7 @@ type
     class function Get(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey): TioDIContainerImplementersItem;
     class function GetInterfaceImplementers(AKey:TioDIContainerKey): TioDIContainerValue;
     class procedure FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
+    class procedure Remove(AKey:TioDIContainerKey; ASubKey:TioDIContainerImplementersKey);
   end;
 
   // Base class for Dependency Injection Register and Locator classes
@@ -100,7 +102,7 @@ type
   TioDependencyInjectionRegister = class(TioDependencyInjectionBase)
   strict private
     FContainerValue: TioDIContainerImplementersItem;
-    FInterfaceName: String;
+    FInterfaceName, FInterfaceNameOriginal: String;
     FAlias: String;
     FSetMapImplementersRef: Boolean;
     procedure LoadInjectAttributes;
@@ -626,6 +628,7 @@ function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetTypeName, A
 begin
   // Set the InterfaceName
   FInterfaceName := ModelToSimpleViewContainerKey(ATargetTypeName);
+  FInterfaceNameOriginal := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -938,6 +941,7 @@ function TioDependencyInjectionRegister.AsViewFor(const ATargetTypeName,
 begin
   // Set the InterfaceName
   FInterfaceName := ModelToViewContainerKey(ATargetTypeName);
+  FInterfaceNameOriginal := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -969,6 +973,7 @@ function TioDependencyInjectionRegister.AsViewModelFor(const ATargetTypeName,
 begin
   // Set the InterfaceName
   FInterfaceName := ModelToViewModelContainerKey(ATargetTypeName);
+  FInterfaceNameOriginal := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -1085,6 +1090,14 @@ class function TioDependencyInjectionContainer.ImplementersExists(AKey:TioDICont
 begin
   AKey := Uppercase(Akey);
   Result := FContainer.ContainsKey(AKey);
+end;
+
+class procedure TioDependencyInjectionContainer.Remove(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey);
+begin
+  AKey := Uppercase(Akey);
+  ASubKey := Uppercase(ASubKey);
+  if Exists(AKey, ASubKey) and FContainer.Items[Akey].RemoveAndCheckIfEmpty(ASubKey) then
+    FContainer.Remove(Akey);
 end;
 
 { TioDependencyInjectionLocator }
@@ -1954,6 +1967,12 @@ end;
 function TioDIContainerImplementers.GetItem(const AAlias: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
 begin
   Result := FInternalContainer.Items[AAlias];
+end;
+
+function TioDIContainerImplementers.RemoveAndCheckIfEmpty(ASubKey: String): Boolean;
+begin
+  FInternalContainer.Remove(ASubKey);
+  Result := FInternalContainer.Count = 0;
 end;
 
 //function TioDependencyInjectionLocator<TI>.SetBindSource(

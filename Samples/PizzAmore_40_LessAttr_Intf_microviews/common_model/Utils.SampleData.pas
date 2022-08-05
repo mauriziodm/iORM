@@ -82,7 +82,7 @@ begin
   LVipCustomer.VipCardCode := 'VIP001';
   io.Persist(LVipCustomer);
   // Mr. Omar Bossoni
-  LCustomer := io.Create<ICustomer>;
+  LCustomer := io.Create<ICustomer>('ANOTHER');
   LCustomer.Name := 'Omar Bossoni';
   LCustomer.City := 'New York';
   LCustomer.Address := '111 E 48th St';
