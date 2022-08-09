@@ -23,6 +23,9 @@ type
     procedure Next;
     function Eof: Boolean;
     function GetValue(const AProperty: IioProperty; const AContext: IioContext): TValue;
+    /// Extract the name of the class from the ClassInfo field if the AContext is
+    ///  with TrueClass else return the AContext.Map.ClassName
+    function ExtractTrueClassName(const AContext: IioContext): String;
     procedure Open;
     procedure Close;
     function IsEmpty: Boolean;
@@ -113,6 +116,19 @@ function TioFDQuery.ExecSQL: integer;
 begin
   FSqlQuery.ExecSQL;
   Result := FSqlQuery.RowsAffected;
+end;
+
+/// Extract the name of the class from the ClassInfo field if the AContext is
+///  with TrueClass else return the AContext.Map.ClassName
+function TioFDQuery.ExtractTrueClassName(const AContext: IioContext): String;
+begin
+  if AContext.IsTrueClass then
+  begin
+    Result := FSqlQuery.FieldByName(AContext.TrueClass.GetFieldName).Value;
+    Result := AContext.TrueClass.ClassNameFromClassInfoFieldValue(Result);
+  end
+  else
+    Result := AContext.Map.GetClassName;
 end;
 
 function TioFDQuery.Fields: TioFields;

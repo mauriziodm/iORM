@@ -9,8 +9,8 @@ type
 
 //  [ioEntity, diImplements(ICustomer), ioTrueClass]
 //  [diImplements(ICustomer)]
-  [ioEntity, ioTrueClass]
-//  [ioEntity]
+//  [ioEntity, ioTrueClass]
+  [ioEntity]
   TCustomer = class(TInterfacedObject, ICustomer)
   strict private
     FID: Integer;

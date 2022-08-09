@@ -38,9 +38,10 @@ interface
 uses
   iORM.Context.Properties.Interfaces,
   iORM.Context.Interfaces,
+  iORM.Context.Table.Interfaces,
   iORM.Interfaces,
   System.Classes,
-  System.Rtti, iORM.Context.Table.Interfaces,
+  System.Rtti,
   FireDAC.Comp.Client, FireDAC.Stan.Param,
   Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes,
   System.JSON, iORM.Where.Interfaces,
@@ -169,6 +170,7 @@ type
     function ExecSQL: integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
+    function ExtractTrueClassName(const AContext: IioContext): String;
     procedure FillQueryWhereParams(const AContext: IioContext);
     procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;

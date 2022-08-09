@@ -122,8 +122,8 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
-  iORM.Context.Container, System.SysUtils, iORM.Exceptions, iORM.DB.Interfaces,
-  System.StrUtils;
+  iORM.Context.Container, System.SysUtils, iORM.Exceptions,
+  System.StrUtils, iORM.DB.Interfaces;
 
 { TioContext }
 
@@ -226,7 +226,7 @@ end;
 
 function TioContext.GetOrderBySql: String;
 begin
-  Result := Self.Where.GetOrderBySql(FMap);
+  Result := FWhere.GetOrderBySql(FMap);
 end;
 
 function TioContext.GetProperties: IioProperties;

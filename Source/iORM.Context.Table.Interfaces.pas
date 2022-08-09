@@ -77,7 +77,8 @@ type
     function GetSqlValue: string;
     function GetClassName: String;
     function GetQualifiedClassName: String;
-    function QualifiedClassNameFromClassInfoFieldValue(AValue:String): String;
+    function QualifiedClassNameFromClassInfoFieldValue(const AValue:String): String;
+    function ClassNameFromClassInfoFieldValue(const AValue: String): String;
   end;
 
   TioIndexList = TList<ioIndex>;

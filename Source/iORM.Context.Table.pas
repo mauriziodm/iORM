@@ -116,7 +116,8 @@ type
     function GetSqlValue: string;
     function GetClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
     function GetQualifiedClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
-    function QualifiedClassNameFromClassInfoFieldValue(AValue: String): String;
+    function QualifiedClassNameFromClassInfoFieldValue(const AValue: String): String;
+    function ClassNameFromClassInfoFieldValue(const AValue: String): String;
   end;
 
   // Classe che incapsula le info sulla tabella
@@ -312,6 +313,15 @@ end;
 
 { TioTrueClass }
 
+function TioTrueClass.ClassNameFromClassInfoFieldValue(const AValue: String): String;
+var
+  LLastDelimiterPos: Integer;
+begin
+  Result := QualifiedClassNameFromClassInfoFieldValue(AValue);
+  LLastDelimiterPos := LastDelimiter('.', Result);
+  Result := Copy(Result, LLastDelimiterPos+1, 999);
+end;
+
 constructor TioTrueClass.Create(ASqlFieldName: String);
 begin
   FSqlFieldName := ASqlFieldName;
@@ -353,7 +363,7 @@ begin
   Result := Table.GetQualifiedClassName + ';' + Self.FAncestors;
 end;
 
-function TioTrueClass.QualifiedClassNameFromClassInfoFieldValue(AValue: String): String;
+function TioTrueClass.QualifiedClassNameFromClassInfoFieldValue(const AValue: String): String;
 begin
   Result := Copy(AValue, 0, Pos(';', AValue) - 1);
 end;
