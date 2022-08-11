@@ -133,7 +133,6 @@ type
     FIndexList: TioIndexList;
     FAutoCreateDB: Boolean;
     FContainsSomeIioListProperty: Boolean;
-  private
     // ContainsSomeIioListProperty
     function GetContainsSomeIioListLazyProperty: Boolean;
     procedure SetContainsSomeIioListLazyProperty(const Value: Boolean);
@@ -142,6 +141,7 @@ type
       const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType; const AAutoCreateDB: Boolean;
       const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
+    function DuplicateForTrueClassMap: IioTable;
     function GetSql: String; override;
     function GetTrueClass: IioTrueClass;
     function IsTrueClass: Boolean;
@@ -201,6 +201,11 @@ begin
   if Self.IndexListExists then
     FIndexList.Free;
   inherited;
+end;
+
+function TioTable.DuplicateForTrueClassMap: IioTable;
+begin
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FAutoCreateDB, FRttiType);
 end;
 
 function TioTable.GetAutoCreateDB: Boolean;
@@ -308,7 +313,7 @@ end;
 
 function TioTable.TableName: String;
 begin
-  Result := Self.FSqlText;
+  Result := FSqlText;
 end;
 
 { TioTrueClass }

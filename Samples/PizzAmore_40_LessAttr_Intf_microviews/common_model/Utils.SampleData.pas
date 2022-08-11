@@ -72,6 +72,7 @@ class procedure TSampleData.CreateRealCustomers;
 var
   LCustomer: ICustomer;
   LVipCustomer: IVipCustomer;
+  LEmployee: IEmployee;
 begin
   // Mr. Maurizio Del Magno
   LVipCustomer := io.Create<IVipCustomer>;
@@ -95,6 +96,14 @@ begin
   LCustomer.Address := '3501 Bergenline Ave';
   LCustomer.PhoneNumber := '(333) 333-1234';
   io.Persist(LCustomer);
+  // Mr. Fabio Codebue
+  LEmployee := io.Create<IEmployee>;
+  LEmployee.Name := 'Fabio Codebue';
+  LEmployee.City := 'Tavernola Bergamasca City';
+  LEmployee.Address := '150 Lake Corniche';
+  LEmployee.PhoneNumber := '(666) 666-1234';
+  LEmployee.BranchOffice := 'Philadelphia';
+  io.Persist(LEmployee);
 end;
 
 class procedure TSampleData.CreateOtherCustomers;

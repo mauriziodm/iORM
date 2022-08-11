@@ -227,7 +227,7 @@ type
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
     function IsFromBSLoadType: boolean;
-    function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
+    function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; reintroduce;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure PostIfEditing;
@@ -345,7 +345,7 @@ end;
 function TioPrototypeBindSourceCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
 begin
   // NB: Questo l'ho dovuto aggiungere ma in pratica non fa nulla (vedere se da problemi)
-  Result := CheckAdapter;
+  Result := inherited CheckAdapter;
 end;
 
 procedure TioPrototypeBindSourceCustom.ClearDataObject;
@@ -527,7 +527,7 @@ end;
 
 function TioPrototypeBindSourceCustom.GetAutoPost: Boolean;
 begin
-  if CheckAdapter then
+  if CheckAdapter(False) then
     Result := Self.InternalAdapter.AutoPost
   else
     Result := FAutoPost;
@@ -876,7 +876,7 @@ procedure TioPrototypeBindSourceCustom.SetAutoPost(const Value: Boolean);
 begin
   FAutoPost := Value;
   // Update the adapter
-  if CheckAdapter then
+  if CheckAdapter(False) then
     Self.InternalAdapter.AutoPost := Value;
 end;
 

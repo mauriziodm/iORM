@@ -233,6 +233,7 @@ type
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
+    function DuplicateForTrueClassMap: IioProperties;
     function GetEnumerator: TEnumerator<IioProperty>;
     function GetSql: String; reintroduce; overload;
     procedure Add(const AProperty: IioProperty);
@@ -834,6 +835,17 @@ destructor TioProperties.Destroy;
 begin
   FPropertyItems.Free;
   inherited;
+end;
+
+function TioProperties.DuplicateForTrueClassMap: IioProperties;
+var
+  LProperty: IioProperty;
+begin
+  Result := TioProperties.Create;
+  for LProperty in FPropertyItems do
+    Result.Add(LProperty);
+  Result.ObjStatusProperty := FObjStatusProperty;
+  Result.ObjVersionProperty := FObjVersionProperty;
 end;
 
 function TioProperties.PropertyExists(const APropertyName: String): Boolean;

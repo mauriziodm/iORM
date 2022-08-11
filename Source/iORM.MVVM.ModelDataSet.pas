@@ -100,6 +100,7 @@ function TioModelDataSet.GetModelPresenterInstance: TioModelPresenterCustom;
 var
   LBindSource: IioNotifiableBindSource;
 begin
+  Result := nil;
   LBindSource := ViewModelBridge.Presenter[ModelPresenter];
   if LBindSource is TioModelPresenterCustom then
     Result := LBindSource as TioModelPresenterCustom

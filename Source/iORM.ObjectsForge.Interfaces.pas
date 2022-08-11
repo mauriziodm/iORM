@@ -185,7 +185,7 @@ class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(cons
   const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
 var
   LViewModel: TioViewModel;
-  LBSA: IioActiveBindSourceAdapter;
+//  LBSA: IioActiveBindSourceAdapter;
   LWhere: IioWhere;
   LName: String;
   LBindSource: IioNotifiableBindSource;

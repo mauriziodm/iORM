@@ -1039,6 +1039,9 @@ var
     // Cicla finchè c'è una classe antenata che implementa la stessa interfaccia
     while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
     begin
+      // Se la classe attuale è mappata (quindi è una entity) allora la considera altrimenti la salta e passa alla prossima
+      //  (in pratica considera solo le entity quindi se c'è ad esempmio una classe astratta come antenato comune ma questa
+      //  giustamente non è uan entità (in quanto astratta non c'è l'attributo ioEntity) questa non viene considerata.
       if TioMapContainer.Exist(ARttiInstanceType.Name) then
       begin
         LCurrentMap := TioMapContainer.GetMap(ARttiInstanceType.Name, False);

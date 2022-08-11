@@ -239,6 +239,7 @@ end;
 
 class function TioUtilities.GetTheFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
 begin
+  Result := nil;
   while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
   begin
     Result := ARttiInstanceType;

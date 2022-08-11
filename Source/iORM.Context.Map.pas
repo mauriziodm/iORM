@@ -54,6 +54,7 @@ type
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
   public
     constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioTable; AProperties:IioProperties); overload;
+    function DuplicateToTrueClassMap: IioMap;
     function GetClassRef: TioClassRef;
     function GetClassName: String;
     function GetTable: IioTable;
@@ -84,9 +85,7 @@ begin
   Result := FTable.GetTrueClass;
 end;
 
-constructor TioMap.Create(AClassRef: TioClassRef; ARttiContext: TRttiContext;
-  ARttiType: TRttiInstanceType; ATable: IioTable;
-  AProperties: IioProperties);
+constructor TioMap.Create(AClassRef: TioClassRef; ARttiContext: TRttiContext; ARttiType: TRttiInstanceType; ATable: IioTable; AProperties: IioProperties);
 begin
   inherited Create;
   FClassRef := AClassRef;
@@ -96,6 +95,12 @@ begin
   // Set properties
   FProperties := AProperties;
   FProperties.SetTable(FTable);
+end;
+
+function TioMap.DuplicateToTrueClassMap: IioMap;
+begin
+  Result := TioMap.Create(FClassRef, FRttiContext, FRttiType, FTable.DuplicateForTrueClassMap, FProperties.DuplicateForTrueClassMap);
+  Result.SetDIContainerImplementersItem(FDIContainerImplementersItem);
 end;
 
 function TioMap.GetClassName: String;

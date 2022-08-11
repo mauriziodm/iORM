@@ -10,7 +10,7 @@ type
 //  [ioEntity, diImplements(ICustomer), ioTrueClass]
 //  [diImplements(ICustomer)]
 //  [ioEntity, ioTrueClass]
-  [ioEntity]
+//  [ioEntity]
   TCustomer = class(TInterfacedObject, ICustomer)
   strict private
     FID: Integer;
@@ -53,6 +53,17 @@ type
     function GetVipCardCode: String;
    public
     property VipCardCode: String read GetVipCardCode write SetVipCardCode;
+  end;
+
+  [ioEntity('Customer'), diImplements(ICustomer, 'EMPLOYEE'), diImplements(IEmployee), ioTrueClass]
+  TEmployee = class(TCustomer, IEmployee)
+   strict private
+    FBranchOffice: String;
+    // end property
+    procedure SetBranchOffice(const AValue: String);
+    function GetBranchOffice: String;
+   public
+    property BranchOffice: String read GetBranchOffice write SetBranchOffice;
   end;
 
   [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
@@ -212,6 +223,18 @@ end;
 procedure TAnotherCustomer.SetPhoneNumber(const AValue: String);
 begin
   FPhoneNumber := AValue;
+end;
+
+{ TEmployee }
+
+function TEmployee.GetBranchOffice: String;
+begin
+  Result := FBranchOffice;
+end;
+
+procedure TEmployee.SetBranchOffice(const AValue: String);
+begin
+  FBranchOffice := AValue;
 end;
 
 end.

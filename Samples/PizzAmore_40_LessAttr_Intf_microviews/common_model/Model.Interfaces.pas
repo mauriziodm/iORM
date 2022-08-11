@@ -48,6 +48,14 @@ type
     property VipCardCode: String read GetVipCardCode write SetVipCardCode;
   end;
 
+  IEmployee = interface(ICustomer)
+    ['{83B3F0BD-1919-4AFF-8D8E-B388FD33A18F}']
+    // PhoneNumber property
+    procedure SetBranchOffice(const AValue: String);
+    function GetBranchOffice: String;
+    property BranchOffice: String read GetBranchOffice write SetBranchOffice;
+  end;
+
   IPizza = interface
     ['{3D0E488C-A965-4CFF-B50B-71F38240710C}']
     // ID property

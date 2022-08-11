@@ -132,6 +132,7 @@ type
 
   IioProperties = interface(IioSqlItem)
     ['{AB30A3A2-640C-4BEF-B301-2CB7C855037B}']
+    function DuplicateForTrueClassMap: IioProperties;
     function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioProperty>;
     procedure Add(const AProperty:IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
