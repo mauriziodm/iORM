@@ -68,7 +68,6 @@ type
       const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
       const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function DuplicateMapToTrueClassMap(const ASourceMap: IioMap): IioMap;
     class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
@@ -136,11 +135,6 @@ begin
   // Get the Context from the ContextContainer
   Result := TioContext.Create(AClassName, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName,
     AMasterPropertyPath);
-end;
-
-class function TioContextFactory.DuplicateMapToTrueClassMap(const ASourceMap: IioMap): IioMap;
-begin
-
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;

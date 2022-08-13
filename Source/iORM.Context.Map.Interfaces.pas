@@ -47,6 +47,7 @@ type
   // IioMap interface
   IioMap = interface
     ['{874979DB-BE8E-40CE-89DC-C265302D8E16}']
+    function DuplicateToTrueClassMap: IioMap;
     function GetClassRef: TioClassRef;
     function GetClassName: String;
     function GetTable: IioTable;

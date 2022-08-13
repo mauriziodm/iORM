@@ -48,7 +48,8 @@ type
     FClassRef: TioClassRef;
     FMap: IioMap;
   public
-    constructor Create(const AClassRef: TioClassRef); overload;
+    constructor CreateByClassRef(const AClassRef: TioClassRef);
+    constructor CreateByMap(const AMap: IioMap);
     function GetClassRef: TioClassRef;
     function GetMap: IioMap;
   end;
@@ -72,7 +73,10 @@ type
   public
     class procedure Build;
     class procedure CleanUp;
-    class procedure Add(const AClassRef: TioClassRef);
+    class procedure AddClassRef(const AClassRef: TioClassRef);
+    /// This function create and add (to the MapContainer and only if not already present) the TrueTypeVirtualMap for the base class map received as parameter
+    ///  and return its name
+    class function AddTrueTypeVirtualMapIfNotExists(const AMap: IioMap): String;
     class function GetContainer: TioMapContainerInstance;
     class function Exist(const AClassName: String): Boolean;
     class function GetClassRef(const AClassName: String): TioClassRef;
@@ -90,10 +94,22 @@ uses
 
 { TioContextContainer }
 
-class procedure TioMapContainer.Add(const AClassRef: TioClassRef);
+class procedure TioMapContainer.AddClassRef(const AClassRef: TioClassRef);
 begin
   if not Exist(AClassRef.ClassName) then
-    FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.Create(AClassRef));
+    FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.CreateByClassRef(AClassRef));
+end;
+
+// // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
+// class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
+class function TioMapContainer.AddTrueTypeVirtualMapIfNotExists(const AMap: IioMap): String;
+begin
+  // Compose the TrueTypeVirtualMap name
+  //  Note: TCVM stands for  "True Class Virtual Map"
+  Result := '<TCVM>' + AMap.GetClassName;
+  // If the virtual map is non already present then create and register it
+  if not Exist(Result) then
+    FInternalContainer.Add(Result, TioMapSlot.CreateByMap(AMap.DuplicateToTrueClassMap));
 end;
 
 class procedure TioMapContainer.Build;
@@ -167,7 +183,7 @@ begin
       // Only classes with explicit ioTable attribute
       if LRttiType.IsInstance and IsAnEntity(LRttiType.AsInstance) then
         // Load the current class (entity) into the ContextContainer
-        Add(LRttiType.AsInstance.MetaclassType);
+        AddClassRef(LRttiType.AsInstance.MetaclassType);
     end;
 
     // Generate childs virtual properties related to autodetected HasMany relations
@@ -430,6 +446,20 @@ end;
 
 { TioContextSlot }
 
+constructor TioMapSlot.CreateByClassRef(const AClassRef: TioClassRef);
+begin
+  inherited Create;
+  FClassRef := AClassRef;
+  FMap := TioContextFactory.Map(FClassRef);
+end;
+
+constructor TioMapSlot.CreateByMap(const AMap: IioMap);
+begin
+  inherited Create;
+  FClassRef := AMap.GetClassRef;
+  FMap := AMap;
+end;
+
 function TioMapSlot.GetClassRef: TioClassRef;
 begin
   Result := FClassRef;
@@ -438,13 +468,6 @@ end;
 function TioMapSlot.GetMap: IioMap;
 begin
   Result := FMap;
-end;
-
-constructor TioMapSlot.Create(const AClassRef: TioClassRef);
-begin
-  inherited Create;
-  FClassRef := AClassRef;
-  FMap := TioContextFactory.Map(FClassRef);
 end;
 
 initialization
