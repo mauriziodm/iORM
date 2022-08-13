@@ -1047,7 +1047,7 @@ begin
         // Enties only
         if LImplementersItem.IsEntity then
           LImplementersItem.FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection :=
-            LImplementersItem.FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
+            _GetFarAncestorClassRefImplementingInterfaceSameTableAndConnection(LImplementersItem.RttiType, LImplementersItem.InterfaceGUID);
 end;
 
 class function TioDependencyInjectionContainer.Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
