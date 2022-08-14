@@ -198,6 +198,12 @@ begin
 
     // Init ContextContainer loading all ClassRef relative to the entities (classes)
     // in the application
+
+// *******************************************
+// NB: PROBABILMENTE QUESTO CICLO QUI SOTTO POTREBBE ESSERE ELIMINATO E INGLOBATO NELLA PROCEDURE "DIC_AutoregisterClassesByAttributes"
+//      PERCHE TANTO ANCHE QUELLA CICLA PER TUTTE LE CLASSI E GIA ADESSO CONTROLLA ANCHE SE UNA CLASSE HA L'ATTRIBUTO "ioEntity/ioTable"
+//      PERTANTO PUUO FARE TUTTO QUELLA OTTIMIZZANDO IL TUTTO, ALMENO CREDO
+// *******************************************
     LRttiContext := TioRttiFactory.GetRttiContext;
     for LRttiType in LRttiContext.GetTypes do
     begin
