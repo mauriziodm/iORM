@@ -31,8 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
 unit iORM.Containers.List;
 
 interface
@@ -82,7 +80,7 @@ implementation
 {$IFNDEF AUTOREFCOUNT}
 procedure TioInterfacedList<T>.AfterConstruction;
 begin
-// Release the constructor's implicit refcount
+// Release constructor's implicit refcount
   AtomicDecrement(FRefCount);
 end;
 
