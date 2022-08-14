@@ -40,6 +40,10 @@ uses
   iORM.CommonTypes,
   iORM.Context.Map.Interfaces, System.Generics.Collections, iORM.Context.Properties.Interfaces;
 
+const
+  //  Note: TCVM stands for  "True Class Virtual Map"
+  TRUECLASSVIRTUALMAP_NAME_PREFIX = '<TCVM>';
+
 type
 
   // Class representing a slot for a Context (ioContexts) (lazy)
@@ -70,6 +74,7 @@ type
     // // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     // class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
     class procedure Init;
+    class procedure FillTrueClassVirtualMapProperties;
   public
     class procedure Build;
     class procedure CleanUp;
@@ -106,7 +111,7 @@ class function TioMapContainer.AddTrueTypeVirtualMapIfNotExists(const AMap: IioM
 begin
   // Compose the TrueTypeVirtualMap name
   //  Note: TCVM stands for  "True Class Virtual Map"
-  Result := '<TCVM>' + AMap.GetClassName;
+  Result := TRUECLASSVIRTUALMAP_NAME_PREFIX + AMap.GetClassName;
   // If the virtual map is non already present then create and register it
   if not Exist(Result) then
     FInternalContainer.Add(Result, TioMapSlot.CreateByMap(AMap.DuplicateToTrueClassMap));
@@ -126,6 +131,23 @@ end;
 class function TioMapContainer.Exist(const AClassName: String): Boolean;
 begin
   Result := FInternalContainer.ContainsKey(AClassName);
+end;
+
+class procedure TioMapContainer.FillTrueClassVirtualMapProperties;
+var
+  LClassName: String;
+  LCurrentMap: IioMap;
+  LTrueClassVirtualMap: IioMap;
+begin
+  // Loop for all maps skipping TrueClassVirtualMaps
+  for LClassName in FInternalContainer.Keys do
+  begin
+    if not LClassName.StartsWith(TRUECLASSVIRTUALMAP_NAME_PREFIX) then
+    begin
+//      LCurrentMap := GetMap(LClassName);
+//      LCurrentMap
+    end;
+  end;
 end;
 
 class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
@@ -196,6 +218,9 @@ begin
     //   perchè quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
     //   come entity (nel Map/ContextContainer) darebbe un errore.
     TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
+
+    // A questo punto copie nelle "TrueClassVirtualMap" tutte le proprietà delle classi che sono ad esse relative
+    // FillTrueClassVirtualMapProperties;
   finally
     FreeAndNil(FAutodetectedHasManyRelationCollection);
   end;

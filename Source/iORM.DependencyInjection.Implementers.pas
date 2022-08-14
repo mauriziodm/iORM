@@ -76,7 +76,7 @@ type
     RttiType: TRttiInstanceType;
     InterfaceGUID: TGUID;
     // Nome della classe antenata più lontana (più vicina a TObject possibile) che implementa la stessa interfaccia
-    FarAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection: String;
+    TrueClassVirtualMapName: String;
     PropertiesOnCreate: TArray<TioDIPropFieldOnCreate>;
     DefaultConstructorMethod: String;
     DefaultConstructorMarker: String;
