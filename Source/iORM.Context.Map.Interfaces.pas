@@ -72,6 +72,8 @@ type
     function IsTrueClassVirtualMap: Boolean;
     /// Get the relative TrueClassVirtualMap mapped on the same table and connection
     function GetTrueClassVirtualMap: IioMap;
+    /// This method build the part of the true class virtual map related to this class
+    procedure BuildTrueClassVirtualMap;
   end;
 
 implementation

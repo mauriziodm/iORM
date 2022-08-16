@@ -65,12 +65,18 @@ type
   private
     class var FInternalContainer: TioMapContainerInstance;
     class var FAutodetectedHasManyRelationCollection: TList<IioProperty>;
-    class function IsAnEntity(const AType: TRttiInstanceType): Boolean;
-    class procedure DIC_AutoregisterClassesByAttributes;
-    // // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
-    // class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
+    /// This method is the starting point from where iORM, at the start of the application,
+    ///  begins to detect and register the classes (both the entities but not only the classes
+    ///  that must only be registered in the Dependency Injection Container) to be able to perform its functions
     class procedure Init;
+    /// This method registers the classes in the MapContainer (entities only) and also
+    ///  in the Dependency Injection Container (also non entities) based on the attributes
+    ///   with which the classes have been decorated.
+    class procedure RegisterClassesInMapContanierAndDependencyInjectionContainerByAttributes;
+    /// This method build all TrueClassVirtualMaps for all entities
+    class procedure BuildTrueClassVirtualMaps;
   public
+    /// This method creates the internal container instance and initiates its initialization
     class procedure Build;
     class procedure CleanUp;
     class procedure AddClassRef(const AClassRef: TioClassRef);
@@ -100,8 +106,6 @@ begin
     FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.CreateByClassRef(AClassRef));
 end;
 
-// // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
-// class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
 class function TioMapContainer.AddTrueClassVirtualMap(const AMap: IioMap): IioMap;
 var
   LMapName: String;
@@ -124,6 +128,14 @@ class procedure TioMapContainer.Build;
 begin
   FInternalContainer := TioMapContainerInstance.Create([doOwnsValues]);
   TioMapContainer.Init;
+end;
+
+class procedure TioMapContainer.BuildTrueClassVirtualMaps;
+var
+  LMapSlot: TioMapSlot;
+begin
+  for LMapSlot in FInternalContainer.Values do
+    LMapSlot.GetMap.BuildTrueClassVirtualMap;
 end;
 
 class procedure TioMapContainer.CleanUp;
@@ -171,68 +183,31 @@ begin
     raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
 
+/// This method is the starting point from where iORM, at the start of the application,
+///  begins to detect and register the classes (both the entities but not only the classes
+///  that must only be registered in the Dependency Injection Container) to be able to perform its functions
 class procedure TioMapContainer.Init;
-var
-  LRttiContext: TRttiContext;
-  LRttiType: TRttiType;
 begin
   // Create the temporary collection of autodetected hasmany relation virtual properties
   FAutodetectedHasManyRelationCollection := TList<IioProperty>.Create;
   try
-    // Autoregister classes (even not entities) into the Dependency Injection Container by attributes
-    DIC_AutoregisterClassesByAttributes;
-
-    // Init ContextContainer loading all ClassRef relative to the entities (classes)
-    // in the application
-
-// *******************************************
-// NB: PROBABILMENTE QUESTO CICLO QUI SOTTO POTREBBE ESSERE ELIMINATO E INGLOBATO NELLA PROCEDURE "DIC_AutoregisterClassesByAttributes"
-//      PERCHE TANTO ANCHE QUELLA CICLA PER TUTTE LE CLASSI E GIA ADESSO CONTROLLA ANCHE SE UNA CLASSE HA L'ATTRIBUTO "ioEntity/ioTable"
-//      PERTANTO PUUO FARE TUTTO QUELLA OTTIMIZZANDO IL TUTTO, ALMENO CREDO
-// *******************************************
-{ TODO : ELIMINARE QUESTA PARTE? (VEDI COMMENTO SOPRA) }
-    LRttiContext := TioRttiFactory.GetRttiContext;
-    for LRttiType in LRttiContext.GetTypes do
-    begin
-      // Only instance type
-      // Only classes with explicit ioTable attribute
-      if LRttiType.IsInstance and IsAnEntity(LRttiType.AsInstance) then
-        // Load the current class (entity) into the ContextContainer
-        AddClassRef(LRttiType.AsInstance.MetaclassType);
-    end;
-
+    // This method registers the classes in the MapContainer (entities only) and also
+    //  in the Dependency Injection Container (also non entities) based on the attributes
+    //   with which the classes have been decorated.
+    RegisterClassesInMapContanierAndDependencyInjectionContainerByAttributes;
     // Generate childs virtual properties related to autodetected HasMany relations
     TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
-
-    // NB: Mauri 30/07/2022: Nel metodo "TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection"
-    //    registro automaticamente come entità anche la classe più possibile in alto nella gararchia
-    //   (più vicina a TObject) della classe che sto registrando che implementa la stessa interfaccia perchè altrimenti, nel caso
-    //   che quella classe base non avesse l'attributo ioEntity (quindi se non venisse registrata) poi mi darebbe un errore
-    //   perchè quando rivolve l'interfaccia ai fini del persisting ritornerebbe quella classe base che non essendo registrata
-    //   come entity (nel Map/ContextContainer) darebbe un errore.
-    TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
-
-    // A questo punto copie nelle "TrueClassVirtualMap" tutte le proprietà delle classi che sono ad esse relative
-    // FillTrueClassVirtualMapProperties;
+    // This method build all TrueClassVirtualMaps for all entities
+    BuildTrueClassVirtualMaps;
   finally
     FreeAndNil(FAutodetectedHasManyRelationCollection);
   end;
 end;
 
-class function TioMapContainer.IsAnEntity(const AType: TRttiInstanceType): Boolean;
-var
-  LAttr: TCustomAttribute;
-begin
-  Result := False;
-  for LAttr in AType.GetAttributes do
-  begin
-    // ioEntity attribute (it means it is an entity class)
-    if LAttr is ioTable then
-      Result := True;
-  end;
-end;
-
-class procedure TioMapContainer.DIC_AutoregisterClassesByAttributes;
+/// This method registers the classes in the MapContainer (entities only) and also
+///  in the Dependency Injection Container (also non entities) based on the attributes
+///   with which the classes have been decorated.
+class procedure TioMapContainer.RegisterClassesInMapContanierAndDependencyInjectionContainerByAttributes;
 type
   TdiImplementsItem = record
     IID: TGUID;
@@ -247,9 +222,8 @@ type
     Alias: String;
   end;
 var
-  LRttiContext: TRttiContext;
   LRttiType: TRttiType;
-  procedure _DIC_AutoregisterClass(const AType: TRttiInstanceType);
+  procedure _DIC_AutoregisterClass(const ACurrentRttiInstanceType: TRttiInstanceType);
   var
     LAttr: TCustomAttribute;
     LIsAnEntity: Boolean;
@@ -269,7 +243,7 @@ var
     LdiAsSingleton := False;
     SetLength(LdiImplements, 0);
     // Loop for attributes
-    for LAttr in AType.GetAttributes do
+    for LAttr in ACurrentRttiInstanceType.GetAttributes do
     begin
       // ioEntity attribute (it means it is an entity class)
       if LAttr is ioTable then
@@ -310,158 +284,47 @@ var
         LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
       end;
     end;
+    // Map Container: If the current class is an entity then create the relative map and register it into the MapContainer
+    if LIsAnEntity then
+      AddClassRef(ACurrentRttiInstanceType.MetaclassType);
     // Dependency Injection Container - Auto register the class for the resolver (persistance only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
     begin
-      LdiImplementedInterfaces := AType.GetImplementedInterfaces;
+      LdiImplementedInterfaces := ACurrentRttiInstanceType.GetImplementedInterfaces;
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
         begin
-          { TODO : E' ANCORA CORRETTO CHE IL FARANCESTORCLASSREF...... SIA ANCORA IMPOSTATO QUI? PERCHE ORMAI DOVREBBE ESSERE IMPOSTATO GIA ALTROVE, O FORSE E' GIUSTO QUI PERO IN UN MODO DIVERSO OPPURE ADDIRITTURA LO TOGLIAMO DEL TUTTO (IL RIFERIMENTO) E LO FACCIAMO CALOLARE OGNI VOLTA DALLA FUNZIONE DELLE UTILITIES }
-          LFarAncestorClassRefImplementingInterface := TioUtilities.GetTheFarAncestorClassRefImplementingInterface(AType, LdiImplementedInterfaces[Index].GUID);
-          io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
+          LFarAncestorClassRefImplementingInterface := TioUtilities.GetFarAncestorClassRefImplementingInterface(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID);
+          io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplementedInterfaces[Index].GUID, ACurrentRttiInstanceType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
             (LFarAncestorClassRefImplementingInterface.Name).AsEntity.Execute;
         end;
     end;
     // Dependency Injection Container - Register the class as is without any interface
     if LdiRegister then
-      io.di.RegisterClass(AType).AsSingleton(LdiAsSingleton).Execute;
+      io.di.RegisterClass(ACurrentRttiInstanceType).AsSingleton(LdiAsSingleton).Execute;
     // Dependency Injection Container - Register the class as implenter of the interfaces
     if Length(LdiImplements) > 0 then
       for Index := Low(LdiImplements) to High(LdiImplements) do
-        io.di.RegisterClass(AType).Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+        io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
     // Dependency Injection Container - Register the class as View or ViewModel for som other classes
     if Length(LdiVVMforItems) > 0 then
       for Index := Low(LdiVVMforItems) to High(LdiVVMforItems) do
       begin
         case LdiVVMforItems[Index].ItemType of
           vvmitView:
-            io.di.RegisterClass(AType).AsViewFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+            io.di.RegisterClass(ACurrentRttiInstanceType).AsViewFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitViewModel:
-            io.di.RegisterClass(AType).AsViewModelFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+            io.di.RegisterClass(ACurrentRttiInstanceType).AsViewModelFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
         end;
       end;
   end;
 
 begin
-  // Loop for all classes detecting attributes to register the current class into the DIC
-  LRttiContext := TioRttiFactory.GetRttiContext;
-  for LRttiType in LRttiContext.GetTypes do
+  // Loop for all classes detecting attributes to register the current class into the MapContainer and into the DIC
+  for LRttiType in TioRttiFactory.GetRttiContext.GetTypes do
     if LRttiType.IsInstance then
       _DIC_AutoregisterClass(LRttiType.AsInstance);
 end;
-
-// NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
-// class function TioMapContainer.IsValidEntity_diAutoRegister(const AType: TRttiInstanceType): Boolean;
-// type
-// TdiImplementsItem = record
-// IID: TGUID;
-// Alias: String;
-// end;
-// TdiVVMforItemType = (vvmitView, vvmitViewModel);
-// TdiVVMforItem = record
-// ItemType: TdiVVMforItemType;
-// Target: String;
-// Alias: String;
-// end;
-// var
-// LAttr: TCustomAttribute;
-// LdiRegister: Boolean;
-// LdiRegisterAsInterfacedEntity: Boolean;
-// LdiAsSingleton: Boolean;
-// LdiImplements: array of TdiImplementsItem;
-// LdiVVMforItems: array of TdiVVMforItem;
-// LdiImplementedInterfaces: TArray<TRttiInterfaceType>;
-// Index: Integer;
-// begin
-// // Init
-// Result := False;
-/// /  Index := 0;
-// LdiRegister := False;
-// LdiRegisterAsInterfacedEntity := True;
-// LdiAsSingleton := False;
-// SetLength(LdiImplements, 0);
-// // Loop for attributes
-// for LAttr in AType.GetAttributes do
-// begin
-// // ioEntity attribute (it means it is an entity class)
-// if LAttr is ioTable then
-// Result := True;
-// // DIC - diRegister
-// if LAttr is diRegister then
-// LdiRegister := True;
-// // DIC - diDoNotRegisterAsInterfacedEntity
-// if LAttr is diDoNotRegisterAsInterfacedEntity then
-// LdiRegisterAsInterfacedEntity := False;
-// // DIC - diIsSingleton
-// if LAttr is diAsSingleton then
-// LdiAsSingleton := True;
-// // DIC - diRegister
-// if LAttr is diImplements then
-// begin
-// Index := Length(LdiImplements);
-// SetLength(LdiImplements, Index+1);
-// LdiImplements[Index].IID := diImplements(LAttr).IID;
-// LdiImplements[Index].Alias := diImplements(LAttr).Alias;
-// end;
-// // DIC - diViewFor
-// if LAttr is diViewFor then
-// begin
-// Index := Length(LdiVVMforItems);
-// SetLength(LdiVVMforItems, Index+1);
-// LdiVVMforItems[Index].ItemType := vvmitView;
-// LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetTypeName;
-// LdiVVMforItems[Index].Alias := diViewFor(LAttr).TargetTypeAlias;
-// end;
-// // DIC - diViewModelFor
-// if LAttr is diViewModelFor then
-// begin
-// Index := Length(LdiVVMforItems);
-// SetLength(LdiVVMforItems, Index+1);
-// LdiVVMforItems[Index].ItemType := vvmitViewModel;
-// LdiVVMforItems[Index].Target := diViewModelFor(LAttr).TargetTypeName;
-// LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
-// end;
-// end;
-// // Dependency Injection Container - Auto register the class for the resolver (persistance only) to use for load, persist, delete only
-// if Result and LdiRegisterAsInterfacedEntity then
-// begin
-// LdiImplementedInterfaces := AType.GetImplementedInterfaces;
-// for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
-// if (LdiImplementedInterfaces[Index].GUID <> IInterface) then  // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
-// io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name).AsEntity.Execute;
-// end;
-// // Dependency Injection Container - Register the class as is without any interface
-// if LdiRegister then
-// io.di.RegisterClass(AType).AsSingleton(LdiAsSingleton).Execute;
-// // Dependency Injection Container - Register the class as implenter of the interfaces
-// if Length(LdiImplements) > 0 then
-// for Index := Low(LdiImplements) to High(LdiImplements) do
-// io.di
-// .RegisterClass(AType)
-// .Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias)
-// .AsSingleton(LdiAsSingleton)
-// .Execute;
-// // Dependency Injection Container - Register the class as View or ViewModel for som other classes
-// if Length(LdiVVMforItems) > 0 then
-// for Index := Low(LdiVVMforItems) to High(LdiVVMforItems) do
-// begin
-// case LdiVVMforItems[Index].ItemType of
-// vvmitView:
-// io.di
-// .RegisterClass(AType)
-// .AsViewFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias)
-// .AsSingleton(LdiAsSingleton)
-// .Execute;
-// vvmitViewModel:
-// io.di
-// .RegisterClass(AType)
-// .AsViewModelFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias)
-// .AsSingleton(LdiAsSingleton)
-// .Execute;
-// end;
-// end;
-// end;
 
 { TioContextSlot }
 

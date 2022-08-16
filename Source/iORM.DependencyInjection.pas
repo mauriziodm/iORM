@@ -83,7 +83,6 @@ type
     class function ImplementersExists(AKey: TioDIContainerKey): Boolean; overload;
     class function Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
     class function GetInterfaceImplementers(AKey: TioDIContainerKey): TioDIContainerValue;
-    class procedure FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
     class procedure Remove(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey);
   end;
 
@@ -998,35 +997,6 @@ begin
   AKey := Uppercase(AKey);
   ASubKey := Uppercase(ASubKey);
   Result := Self.FContainer.ContainsKey(AKey) and Self.FContainer.Items[AKey].Contains(ASubKey);
-end;
-
-class procedure TioDependencyInjectionContainer.FillAncestorClassNameImplementingTheSameInterfaceSameTableAndConnection;
-var
-  LInterfaceName: String;
-  LImplementersItem: TioDIContainerImplementersItem;
-  // Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
-  // Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
-  //  ai vincoli di ereditarietà.
-  function _GetFarAncestorClassNameImplementingTheSameInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): String;
-  begin
-    Result := '';
-    while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
-    begin
-      Result := ARttiInstanceType.Name;
-      ARttiInstanceType := ARttiInstanceType.BaseType;
-    end;
-  end;
-begin
-  // Loop for all interfaces in the internal container (tenere presente che posso essere registrate anche direttamente della classi)
-  for LInterfaceName in FContainer.Keys do
-    // Interfaces only
-    if TioUtilities.IsAnInterfaceTypeName(LInterfaceName) then
-      // Loop for all implementers of the current interface
-      for LImplementersItem in FContainer.Items[LInterfaceName] do
-        // Enties only
-        if LImplementersItem.IsEntity then
-          LImplementersItem.FarAncestorClassNameImplementingTheSameInterface :=
-            _GetFarAncestorClassNameImplementingTheSameInterface(LImplementersItem.RttiType, LImplementersItem.InterfaceGUID);
 end;
 
 class function TioDependencyInjectionContainer.Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem;

@@ -75,7 +75,10 @@ type
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class procedure ClearList(const AList: TObject);
     class function CloneObject(const ASourceObj: TObject): TObject;
-    class function GetTheFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+    /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
+    /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
+    ///  ai vincoli di ereditarietà.
+    class function GetFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
   end;
@@ -237,9 +240,9 @@ begin
   Result := TioRttiFactory.GetRttiContext.GetType(ATypeInfo).QualifiedName;
 end;
 
-class function TioUtilities.GetTheFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+class function TioUtilities.GetFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
 begin
-  Result := nil;
+  Result := ARttiInstanceType;
   while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
   begin
     Result := ARttiInstanceType;

@@ -158,7 +158,7 @@ begin
       LMasterProperty.ClearRelationData;
       Continue;
     end;
-    // Loop for all classes in the sesolved type list
+    // Loop for all classes in the resolved type list
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // If the ChildTypeName is directly on indirectly (through an interface) relative to an entity then
