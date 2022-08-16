@@ -233,7 +233,8 @@ type
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
-    function DuplicateForTrueClassMap: IioProperties;
+    /// This method add to the TrueClassVirtualMap it's properties (if not already exists)
+    procedure CopyPropertiesToTrueClassVirtualMap(const ATrueClassVirtualMapProperties: IioProperties);
     function GetEnumerator: TEnumerator<IioProperty>;
     function GetSql: String; reintroduce; overload;
     procedure Add(const AProperty: IioProperty);
@@ -258,9 +259,9 @@ implementation
 
 uses
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
-  System.StrUtils, iORM.Context.Map.Interfaces, iORM.Utilities,
+  System.StrUtils, iORM.Utilities,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container,
-  iORM.RttiContext.Factory;
+  iORM.RttiContext.Factory, iORM.Context.Map.Interfaces;
 
 { TioProperty }
 
@@ -837,15 +838,20 @@ begin
   inherited;
 end;
 
-function TioProperties.DuplicateForTrueClassMap: IioProperties;
+procedure TioProperties.CopyPropertiesToTrueClassVirtualMap(const ATrueClassVirtualMapProperties: IioProperties);
 var
   LProperty: IioProperty;
 begin
-  Result := TioProperties.Create;
+  // Copy owned properties to TrueClassVirtualMap.Properties if not already exists
   for LProperty in FPropertyItems do
-    Result.Add(LProperty);
-  Result.ObjStatusProperty := FObjStatusProperty;
-  Result.ObjVersionProperty := FObjVersionProperty;
+    if not ATrueClassVirtualMapProperties.PropertyExists(LProperty.GetName) then
+      ATrueClassVirtualMapProperties.Add(LProperty);
+  // Copy ObjStatus property to TrueClassVirtualMap.Properties if not already exists
+  if ObjStatusExist and not ATrueClassVirtualMapProperties.ObjStatusExist then
+    ATrueClassVirtualMapProperties.ObjStatusProperty := ObjStatusProperty;
+  // Copy ObjVersion property to TrueClassVirtualMap.Properties if not already exists
+  if ObjVersionExist and not ATrueClassVirtualMapProperties.ObjVersionExist then
+    ATrueClassVirtualMapProperties.ObjVersionProperty := ObjVersionProperty;
 end;
 
 function TioProperties.PropertyExists(const APropertyName: String): Boolean;

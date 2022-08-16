@@ -42,6 +42,10 @@ uses
   iORM.Context.Properties.Interfaces, System.Rtti,
   iORM.DependencyInjection.Implementers;
 
+const
+  //  Note: TCVM stands for  "True Class Virtual Map"
+  TRUECLASSVIRTUALMAP_NAME_PREFIX = '<TCVM>';
+
 type
 
   // IioMap interface
@@ -62,6 +66,12 @@ type
     //       risolvo in altro modo
     function GetDIContainerImplementersItem: TioDIContainerImplementersItem;
     procedure SetDIContainerImplementersItem(const AValue:TioDIContainerImplementersItem);
+    /// This method return true if it's a TrueClassVirtualMap, false otherwise.
+    ///  Note: I could not simply check if the private field FTrueClassVirtualMap was assigned or not because
+    ///         at the point where I need this functionality it could be a nil also in the parent base class.
+    function IsTrueClassVirtualMap: Boolean;
+    /// Get the relative TrueClassVirtualMap mapped on the same table and connection
+    function GetTrueClassVirtualMap: IioMap;
   end;
 
 implementation

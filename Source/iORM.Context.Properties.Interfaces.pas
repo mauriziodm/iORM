@@ -132,7 +132,8 @@ type
 
   IioProperties = interface(IioSqlItem)
     ['{AB30A3A2-640C-4BEF-B301-2CB7C855037B}']
-    function DuplicateForTrueClassMap: IioProperties;
+    /// This method add to the TrueClassVirtualMap it's properties (if not already exists)
+    procedure CopyPropertiesToTrueClassVirtualMap(const ATrueClassVirtualMapProperties: IioProperties);
     function GetEnumerator: TEnumerator<iORM.Context.Properties.Interfaces.IioProperty>;
     procedure Add(const AProperty:IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;

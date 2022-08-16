@@ -141,6 +141,7 @@ type
       const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType; const AAutoCreateDB: Boolean;
       const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
+    /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetSql: String; override;
     function GetTrueClass: IioTrueClass;

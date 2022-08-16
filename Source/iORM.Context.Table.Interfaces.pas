@@ -85,6 +85,7 @@ type
 
   IioTable = interface(IioSqlItem)
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']
+    /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetTrueClass: IioTrueClass;
     function IsTrueClass: Boolean;

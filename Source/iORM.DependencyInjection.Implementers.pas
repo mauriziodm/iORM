@@ -75,8 +75,10 @@ type
     ClassName: String;
     RttiType: TRttiInstanceType;
     InterfaceGUID: TGUID;
-    // Nome della classe antenata più lontana (più vicina a TObject possibile) che implementa la stessa interfaccia
-    TrueClassVirtualMapName: String;
+    // Nome della classe antenata più lontana (più vicina a TObject possibile) che implementa la stessa interfaccia.
+    // Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
+    //  ai vincoli di ereditarietà.
+    FarAncestorClassNameImplementingTheSameInterface: String;
     PropertiesOnCreate: TArray<TioDIPropFieldOnCreate>;
     DefaultConstructorMethod: String;
     DefaultConstructorMarker: String;

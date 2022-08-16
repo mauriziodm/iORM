@@ -40,10 +40,6 @@ uses
   iORM.CommonTypes,
   iORM.Context.Map.Interfaces, System.Generics.Collections, iORM.Context.Properties.Interfaces;
 
-const
-  //  Note: TCVM stands for  "True Class Virtual Map"
-  TRUECLASSVIRTUALMAP_NAME_PREFIX = '<TCVM>';
-
 type
 
   // Class representing a slot for a Context (ioContexts) (lazy)
@@ -74,14 +70,13 @@ type
     // // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
     // class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
     class procedure Init;
-    class procedure FillTrueClassVirtualMapProperties;
   public
     class procedure Build;
     class procedure CleanUp;
     class procedure AddClassRef(const AClassRef: TioClassRef);
-    /// This function create and add (to the MapContainer and only if not already present) the TrueTypeVirtualMap for the base class map received as parameter
-    ///  and return its name
-    class function AddTrueTypeVirtualMapIfNotExists(const AMap: IioMap): String;
+    /// This function create and add (to the MapContainer) the TrueTypeVirtualMap for the base class map received as parameter
+    ///  and return it as result
+    class function AddTrueClassVirtualMap(const AMap: IioMap): IioMap;
     class function GetContainer: TioMapContainerInstance;
     class function Exist(const AClassName: String): Boolean;
     class function GetClassRef(const AClassName: String): TioClassRef;
@@ -107,14 +102,22 @@ end;
 
 // // NB: IsValidEntity_diAutoRegister attualmente effettua anche la registrazione delle classi al DIC (magari meglio separare le cose?)
 // class function IsValidEntity_diAutoRegister(const AType:TRttiInstanceType): Boolean;
-class function TioMapContainer.AddTrueTypeVirtualMapIfNotExists(const AMap: IioMap): String;
+class function TioMapContainer.AddTrueClassVirtualMap(const AMap: IioMap): IioMap;
+var
+  LMapName: String;
 begin
+  Result := nil;
   // Compose the TrueTypeVirtualMap name
   //  Note: TCVM stands for  "True Class Virtual Map"
-  Result := TRUECLASSVIRTUALMAP_NAME_PREFIX + AMap.GetClassName;
+  LMapName := TRUECLASSVIRTUALMAP_NAME_PREFIX + AMap.GetClassName;
   // If the virtual map is non already present then create and register it
-  if not Exist(Result) then
-    FInternalContainer.Add(Result, TioMapSlot.CreateByMap(AMap.DuplicateToTrueClassMap));
+  if Exist(LMapName) then
+    Result := GetMap(LMapName)
+  else
+  begin
+    Result := AMap.DuplicateToTrueClassMap;
+    FInternalContainer.Add(LMapName, TioMapSlot.CreateByMap(Result));
+  end;
 end;
 
 class procedure TioMapContainer.Build;
@@ -131,23 +134,6 @@ end;
 class function TioMapContainer.Exist(const AClassName: String): Boolean;
 begin
   Result := FInternalContainer.ContainsKey(AClassName);
-end;
-
-class procedure TioMapContainer.FillTrueClassVirtualMapProperties;
-var
-  LClassName: String;
-  LCurrentMap: IioMap;
-  LTrueClassVirtualMap: IioMap;
-begin
-  // Loop for all maps skipping TrueClassVirtualMaps
-  for LClassName in FInternalContainer.Keys do
-  begin
-    if not LClassName.StartsWith(TRUECLASSVIRTUALMAP_NAME_PREFIX) then
-    begin
-//      LCurrentMap := GetMap(LClassName);
-//      LCurrentMap
-    end;
-  end;
 end;
 
 class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
@@ -204,6 +190,7 @@ begin
 //      PERCHE TANTO ANCHE QUELLA CICLA PER TUTTE LE CLASSI E GIA ADESSO CONTROLLA ANCHE SE UNA CLASSE HA L'ATTRIBUTO "ioEntity/ioTable"
 //      PERTANTO PUUO FARE TUTTO QUELLA OTTIMIZZANDO IL TUTTO, ALMENO CREDO
 // *******************************************
+{ TODO : ELIMINARE QUESTA PARTE? (VEDI COMMENTO SOPRA) }
     LRttiContext := TioRttiFactory.GetRttiContext;
     for LRttiType in LRttiContext.GetTypes do
     begin
@@ -330,6 +317,7 @@ var
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
         begin
+          { TODO : E' ANCORA CORRETTO CHE IL FARANCESTORCLASSREF...... SIA ANCORA IMPOSTATO QUI? PERCHE ORMAI DOVREBBE ESSERE IMPOSTATO GIA ALTROVE, O FORSE E' GIUSTO QUI PERO IN UN MODO DIVERSO OPPURE ADDIRITTURA LO TOGLIAMO DEL TUTTO (IL RIFERIMENTO) E LO FACCIAMO CALOLARE OGNI VOLTA DALLA FUNZIONE DELLE UTILITIES }
           LFarAncestorClassRefImplementingInterface := TioUtilities.GetTheFarAncestorClassRefImplementingInterface(AType, LdiImplementedInterfaces[Index].GUID);
           io.di.RegisterClass(AType).Implements(LdiImplementedInterfaces[Index].GUID, AType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
             (LFarAncestorClassRefImplementingInterface.Name).AsEntity.Execute;

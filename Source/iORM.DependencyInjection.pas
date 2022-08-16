@@ -910,7 +910,7 @@ end;
 
 function TioDependencyInjectionRegister._SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
 begin
-  FContainerValue.TrueClassVirtualMapName := AValue;
+  FContainerValue.FarAncestorClassNameImplementingTheSameInterface := AValue;
   Result := Self;
 end;
 
@@ -1004,39 +1004,18 @@ class procedure TioDependencyInjectionContainer.FillAncestorClassNameImplementin
 var
   LInterfaceName: String;
   LImplementersItem: TioDIContainerImplementersItem;
-  LFarAncestorType: TRttiInstanceType;
-  // Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la
-  // stessa interfaccia, che è persistita sulla stessa tabella e sulla stessa connessione
-  function _GetTrueClassVirtualMapName(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): String;
-  var
-    LStartMap: IioMap;
-    LCurrMap: IioMap;
-    LResultMap: IioMap;
+  // Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
+  // Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
+  //  ai vincoli di ereditarietà.
+  function _GetFarAncestorClassNameImplementingTheSameInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): String;
   begin
-    LStartMap := TioMapContainer.GetMap(ARttiInstanceType.Name);
-    LResultMap := LStartMap;
-    // Cicla finchè c'è una classe antenata che implementa la stessa interfaccia
+    Result := '';
     while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
     begin
-      // Se la classe attuale è mappata (quindi è una entity) allora la considera altrimenti la salta e passa alla prossima
-      // (in pratica considera solo le entity quindi se c'è ad esempmio una classe astratta come antenato comune ma questa
-      // giustamente non è uan entità (in quanto astratta non c'è l'attributo ioEntity) questa non viene considerata.
-      if TioMapContainer.Exist(ARttiInstanceType.Name) then
-      begin
-        LCurrMap := TioMapContainer.GetMap(ARttiInstanceType.Name, False);
-        if (LCurrMap.GetTable.TableName = LStartMap.GetTable.TableName) and (LCurrMap.GetTable.GetConnectionDefName = LStartMap.GetTable.GetConnectionDefName)
-        then
-          LResultMap := LCurrMap;
-      end;
+      Result := ARttiInstanceType.Name;
       ARttiInstanceType := ARttiInstanceType.BaseType;
     end;
-    // Quando arriva qui Result contiene il riferimento alla classe più in alto nella gerarchia (più vicino a TObject) mappata sulla stessa
-    // tabella e connessione, a questo punto crea (se non già esistente) la TrueClassVirtualMap relativa (una specie di supermappa che
-    // poi conterrà tutti i campi relativi a tutte le proprietà di tutte le classi che derivano) e la registra.
-    // Note: "AddTrueTypeVirtualMapIfNotExists" ritorna il nome della mappa
-    Result := TioMapContainer.AddTrueTypeVirtualMapIfNotExists(LResultMap);
   end;
-
 begin
   // Loop for all interfaces in the internal container (tenere presente che posso essere registrate anche direttamente della classi)
   for LInterfaceName in FContainer.Keys do
@@ -1046,7 +1025,8 @@ begin
       for LImplementersItem in FContainer.Items[LInterfaceName] do
         // Enties only
         if LImplementersItem.IsEntity then
-          LImplementersItem.TrueClassVirtualMapName := _GetTrueClassVirtualMapName(LImplementersItem.RttiType, LImplementersItem.InterfaceGUID);
+          LImplementersItem.FarAncestorClassNameImplementingTheSameInterface :=
+            _GetFarAncestorClassNameImplementingTheSameInterface(LImplementersItem.RttiType, LImplementersItem.InterfaceGUID);
 end;
 
 class function TioDependencyInjectionContainer.Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
@@ -1831,7 +1811,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
         if AUseMapInfo then
         begin
           LMap := TioMapContainer.GetMap(LImplementer.ClassName);
-          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName + '.' + LImplementer.TrueClassVirtualMapName;
+          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName + '.' + LImplementer.FarAncestorClassNameImplementingTheSameInterface;
         end
         else
           LCurrentConnectionAndTable := '';
@@ -1839,7 +1819,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
           // Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
-          Result.Add(LImplementer.TrueClassVirtualMapName);
+          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterface);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
       end;

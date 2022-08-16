@@ -52,9 +52,11 @@ type
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
+    FTrueClassVirtualMap: IioMap; // Ancestor map mapped on the same table and connection
+    /// Find the progenitor class map mapped on the same table and connection (for TrueClassVirtualMap creation purposes)
+    function _FindProgenitorOrTrueClassVirtualMapIfExists: IioMap;
   public
     constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioTable; AProperties:IioProperties); overload;
-    function DuplicateToTrueClassMap: IioMap;
     function GetClassRef: TioClassRef;
     function GetClassName: String;
     function GetTable: IioTable;
@@ -66,12 +68,28 @@ type
     // DIContainerImplementersItem reference
     function GetDIContainerImplementersItem: TioDIContainerImplementersItem;
     procedure SetDIContainerImplementersItem(const AValue:TioDIContainerImplementersItem);
+    /// This method build the part of the true class virtual map related to this class
+    procedure BuildTrueClassVirtualMap;
+    /// Duplicate itself as a new TrueClassVirtualMap
+    function DuplicateToTrueClassMap: IioMap;
+    /// Get the relative TrueClassVirtualMap mapped on the same table and connection
+    function GetTrueClassVirtualMap: IioMap;
+    /// This method return true if it's a TrueClassVirtualMap, false otherwise.
+    ///  Note: I could not simply check if the private field FTrueClassVirtualMap was assigned or not because
+    ///         at the point where I need this functionality it could be a nil also in the parent base class.
+    function IsTrueClassVirtualMap: Boolean; virtual;
+  end;
+
+  TioTrueClassVirtualMap = class(TioMap)
+  public
+    /// This method return true if it's a TrueClassVirtualMap, false otherwise
+    function IsTrueClassVirtualMap: Boolean; override;
   end;
 
 implementation
 
 uses
-  iORM.Context.Container;
+  iORM.Context.Container, iORM.Context.Properties;
 
 { TioMap }
 
@@ -85,9 +103,54 @@ begin
   Result := FTable.GetTrueClass;
 end;
 
+function TioMap._FindProgenitorOrTrueClassVirtualMapIfExists: IioMap;
+var
+  LCurrentRttiInstanceType: TRttiInstanceType;
+  LCurrentMap: IioMap;
+begin
+  Result := Self;
+  LCurrentRttiInstanceType := FRttiType.BaseType;
+  // Cicla finchè c'è una classe antenata (in pratica fino al TObject)
+  while (LCurrentRttiInstanceType <> nil) do
+  begin
+    // Se la classe attuale è mappata (quindi è una entity) allora la considera altrimenti la salta e passa alla prossima
+    // (in pratica considera solo le entity quindi se c'è ad esempmio una classe astratta come antenato comune ma questa
+    // giustamente non è uan entità (in quanto astratta non c'è l'attributo ioEntity) questa non viene considerata.
+    if TioMapContainer.Exist(LCurrentRttiInstanceType.Name) then
+    begin
+      LCurrentMap := TioMapContainer.GetMap(LCurrentRttiInstanceType.Name, False);
+      // Se la mappa corrente ha già la TrueClassVirtualMap assegnata significa che questa è già stata creata quindi è inutile
+      //  continuare la ricerca della classe capostipite per poi creare la TrueClassVirtualMap perchè appunto esiste già, in questo
+      //  caso quindi è meglio interrompere la risalita nelle classi della gerarchia e ritornare direttamente la TrueClassVirtualMap.
+      //    Il codice chiamante sarà comportarsi di consegnenza in base alla situazione.
+      if Assigned(LCurrentMap.GetTrueClassVirtualMap) then
+        Exit(LCurrentMap.GetTrueClassVirtualMap);
+      // Se la classe corrente è mappata sulla stessa tabella/connessione...
+      if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = FTable.GetConnectionDefName)
+      then
+        Result := LCurrentMap;
+    end;
+    // Go to the next next ancestor class
+    LCurrentRttiInstanceType := LCurrentRttiInstanceType.BaseType;
+  end;
+end;
+
+procedure TioMap.BuildTrueClassVirtualMap;
+begin
+  // Find the progenitor class map mapped on the same table and connection then
+  //  create the TrueClassVirtualMap and add it to the TioMapContainer (if not already exists)
+  //  then copy into it the owned properties (if not already exists).
+  //  Note: If a TrueClassVirtualMap is returned (optimization) then CopyProperties into it without create a nre TrueClassVirtualMap (obviously)
+  FTrueClassVirtualMap := _FindProgenitorOrTrueClassVirtualMapIfExists;
+  if not FTrueClassVirtualMap.IsTrueClassVirtualMap then
+    FTrueClassVirtualMap := TioMapContainer.AddTrueClassVirtualMap(FTrueClassVirtualMap);
+  FProperties.CopyPropertiesToTrueClassVirtualMap(FTrueClassVirtualMap.GetProperties);
+end;
+
 constructor TioMap.Create(AClassRef: TioClassRef; ARttiContext: TRttiContext; ARttiType: TRttiInstanceType; ATable: IioTable; AProperties: IioProperties);
 begin
   inherited Create;
+  FTrueClassVirtualMap := nil;
   FClassRef := AClassRef;
   FRttiContext := ARttiContext;
   FRttiType := ARttiType;
@@ -99,7 +162,7 @@ end;
 
 function TioMap.DuplicateToTrueClassMap: IioMap;
 begin
-  Result := TioMap.Create(FClassRef, FRttiContext, FRttiType, FTable.DuplicateForTrueClassMap, FProperties.DuplicateForTrueClassMap);
+  Result := TioTrueClassVirtualMap.Create(FClassRef, FRttiContext, FRttiType, FTable.DuplicateForTrueClassMap, TioProperties.Create);
   Result.SetDIContainerImplementersItem(FDIContainerImplementersItem);
 end;
 
@@ -128,6 +191,16 @@ begin
   Result := FTable;
 end;
 
+function TioMap.GetTrueClassVirtualMap: IioMap;
+begin
+  Result := FTrueClassVirtualMap;
+end;
+
+function TioMap.IsTrueClassVirtualMap: Boolean;
+begin
+  Result := False;
+end;
+
 function TioMap.RttiContext: TRttiContext;
 begin
   Result := FRttiContext;
@@ -138,10 +211,16 @@ begin
   Result := FRttiType;
 end;
 
-procedure TioMap.SetDIContainerImplementersItem(
-  const AValue: TioDIContainerImplementersItem);
+procedure TioMap.SetDIContainerImplementersItem(const AValue: TioDIContainerImplementersItem);
 begin
   FDIContainerImplementersItem := AValue;
+end;
+
+{ TioTrueClassVirtualMap }
+
+function TioTrueClassVirtualMap.IsTrueClassVirtualMap: Boolean;
+begin
+  Result := True;
 end;
 
 end.

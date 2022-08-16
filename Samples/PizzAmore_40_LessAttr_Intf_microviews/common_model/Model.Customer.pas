@@ -44,7 +44,8 @@ type
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
-  [ioEntity('Customer'), diImplements(ICustomer, 'VIP'), diImplements(IVipCustomer), ioTrueClass]
+//  [ioEntity('Customer'), diImplements(ICustomer, 'VIP'), diImplements(IVipCustomer), ioTrueClass]
+  [ioEntity('Customer'), ioTrueClass]
   TVipCustomer = class(TCustomer, IVipCustomer)
    strict private
     FVipCardCode: String;
@@ -55,7 +56,8 @@ type
     property VipCardCode: String read GetVipCardCode write SetVipCardCode;
   end;
 
-  [ioEntity('Customer'), diImplements(ICustomer, 'EMPLOYEE'), diImplements(IEmployee), ioTrueClass]
+//  [ioEntity('Customer'), diImplements(ICustomer, 'EMPLOYEE'), diImplements(IEmployee), ioTrueClass]
+  [ioEntity('Customer'), ioTrueClass]
   TEmployee = class(TCustomer, IEmployee)
    strict private
     FBranchOffice: String;
@@ -66,7 +68,8 @@ type
     property BranchOffice: String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
+//  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
+  [ioEntity('Customer'), ioTrueClass]
   TAnotherCustomer = class(TInterfacedObject, ICustomer)
   strict private
     FID: Integer;
