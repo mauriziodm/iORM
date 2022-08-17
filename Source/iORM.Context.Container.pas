@@ -180,7 +180,11 @@ begin
   if Exist(AClassName) then
     Result := FInternalContainer.Items[AClassName].GetMap
   else if RaiseAnExceptionIfNotFound then
-    raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
+    raise EioException.Create(ClassName, 'GetMap', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
+      #13#13'I would need the map of class "%s" but can''t find it in my collection of mapped classes/entities.' +
+      #13#13'May be that you forgot to decorate the class with the "[ioEntity]" attribute or that it is an abstract class/entity and you did not put the "[ioAbstractEntity]" attribute on it.' +
+      #13#13'Also make sure that you have put "iORM.Attributes" in the "uses" section of the unit.' +
+      #13#13'Check and try again please, it will work.', [AClassName]));
 end;
 
 /// This method is the starting point from where iORM, at the start of the application,
