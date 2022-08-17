@@ -65,14 +65,16 @@ begin
         Continue;
       if LProperty.GetRelationType in [rtBelongsTo] then
       begin
-        if LResolvedTypeList.Count > 1 then
-          raise EioException.Create(ClassName, 'BuildSchemaFK', Format('Hi, I''m iORM.' +
-            #13#13'Trying to define the DB schema I realized that in class "%s" (mapped on table "%s", connection "%s") there is property "%s" (mapped on field "%s" on the DB) on which there is a BelongsTo relationship with the type "%s".' +
-            #13#13'The problem is that this type is mapped to more than one table and it is not possible to set referential integrity constraints to multiple tables at once, it would almost never work correctly.' +
-            #13#13'You can disable the creation of the Foreign Key for this property by decorating it with the attribute "[ioForeignKey (fkDoNotCreate)]"' +
-            'or completely disable the automatic creation of ForeignKeys for the entire database by setting the property "AutoCreateDB.ForeignKeys" to False in the ConnectionDef component.' +
-            #13#13'I hope this information can be useful to you.',
-            [AMap.GetClassName, AMap.GetTable.TableName, AMap.GetTable.GetConnectionDefName, LProperty.GetName, LProperty.GetSqlFieldName(True), LProperty.GetRelationChildTypeName]));
+// ----------------------- ALLA FINE HO DECISO DI NON METTERLO ----------------------------------
+//        if LResolvedTypeList.Count > 1 then
+//          raise EioException.Create(ClassName, 'BuildSchemaFK', Format('Hi, I''m iORM.' +
+//            #13#13'Trying to define the DB schema I realized that in class "%s" (mapped on table "%s", connection "%s") there is property "%s" (mapped on field "%s" on the DB) on which there is a BelongsTo relationship with the type "%s".' +
+//            #13#13'The problem is that this type is mapped to more than one table and it is not possible to set referential integrity constraints to multiple tables at once, it would almost never work correctly.' +
+//            #13#13'You can disable the creation of the Foreign Key for this property by decorating it with the attribute "[ioForeignKey (fkDoNotCreate)]"' +
+//            'or completely disable the automatic creation of ForeignKeys for the entire database by setting the property "AutoCreateDB.ForeignKeys" to False in the ConnectionDef component.' +
+//            #13#13'I hope this information can be useful to you.',
+//            [AMap.GetClassName, AMap.GetTable.TableName, AMap.GetTable.GetConnectionDefName, LProperty.GetName, LProperty.GetSqlFieldName(True), LProperty.GetRelationChildTypeName]));
+// ----------------------- ALLA FINE HO DECISO DI NON METTERLO ----------------------------------
         LDependentProperty := LProperty;
         LSchemaTable := ASchema.FindTable(AMap.GetTable.TableName);
         if LSchemaTable <> nil then

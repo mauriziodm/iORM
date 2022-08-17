@@ -158,6 +158,7 @@ type
 
   // Class attributes
   ioEntity = iORM.Attributes.ioEntity;
+  ioAbstractEntity = iORM.Attributes.ioAbstractEntity;
   ioKeyGenerator = iORM.Attributes.ioKeyGenerator;
   ioKeySequence = iORM.Attributes.ioKeySequence;
   ioConnectionDefName = iORM.Attributes.ioConnectionDefName;

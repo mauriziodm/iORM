@@ -595,11 +595,11 @@ begin
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
-      if (LAttr is ioTable) then
+      if (LAttr is ioEntity) then
       begin
-        if not ioTable(LAttr).Value.IsEmpty then
-          LTableName := ioTable(LAttr).Value;
-        LMapMode := ioTable(LAttr).MapMode;
+        if not ioEntity(LAttr).Value.IsEmpty then
+          LTableName := ioEntity(LAttr).Value;
+        LMapMode := ioEntity(LAttr).MapMode;
       end;
       if LAttr is ioKeyGenerator then
         LKeyGenerator := ioKeyGenerator(LAttr).Value;

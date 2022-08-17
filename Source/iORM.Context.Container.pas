@@ -183,7 +183,7 @@ begin
     raise EioException.Create(ClassName, 'GetMap', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
       #13#13'I would need the map of class "%s" but can''t find it in my collection of mapped classes/entities.' +
       #13#13'May be that you forgot to decorate the class with the "[ioEntity]" attribute or that it is an abstract class/entity and you did not put the "[ioAbstractEntity]" attribute on it.' +
-      #13#13'Also make sure that you have put "iORM.Attributes" in the "uses" section of the unit.' +
+      #13#13'Also make sure that you have put "iORM" and / or "iORM.Attributes" in the "uses" section of the unit where the class is declared.' +
       #13#13'Check and try again please, it will work.', [AClassName]));
 end;
 
@@ -250,7 +250,7 @@ var
     for LAttr in ACurrentRttiInstanceType.GetAttributes do
     begin
       // ioEntity attribute (it means it is an entity class)
-      if LAttr is ioTable then
+      if LAttr is ioEntity then
         LIsAnEntity := True;
       // DIC - diRegister
       if LAttr is diRegister then
