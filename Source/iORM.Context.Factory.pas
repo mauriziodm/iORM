@@ -53,7 +53,7 @@ type
     class function Table(const Typ: TRttiInstanceType): IioTable;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
     class function HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
-    class function TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String = IO_TRUECLASS_FIELDNAME): IioTrueClass;
+    class function TrueClass(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String): IioTrueClass;
     class function Joins: IioJoins;
     class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
     class function GroupBy(const ASqlText: String): IioGroupBy;
@@ -84,22 +84,10 @@ uses
 
 { TioBuilderProperties }
 
-class function TioContextFactory.TrueClass(Typ: TRttiInstanceType; const ASqlFieldName: String): IioTrueClass;
-var
-  Ancestors, QualifiedClassName, ClassName: String;
+class function TioContextFactory.TrueClass(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String): IioTrueClass;
 begin
-  // ClassName
-  ClassName := Typ.MetaclassType.ClassName;
-  QualifiedClassName := Typ.QualifiedName;
-  // Loop for all ancestors
-  repeat
-  begin
-    Ancestors := Ancestors + '<' + Typ.Name + '>';
-    Typ := Typ.BaseType;
-  end;
-  until not Assigned(Typ);
   // Create
-  Result := TioTrueClass.Create(ASqlFieldName);
+  Result := TioTrueClass.Create(ATrueClassMode, ASqlFieldName);
 end;
 
 class function TioContextFactory.HasBelongsToRelation(const AMasterPropertyType: TRttiType): Boolean;
@@ -587,7 +575,7 @@ begin
     LConnectionDefName := '';
     LKeyGenerator := '';
     LJoins := Self.Joins;
-    LTrueClass := nil;
+    LTrueClass := Self.TrueClass(DEFAULT_TRUE_CLASS_MODE, IO_TRUECLASS_FIELDNAME);
     LGroupBy := nil;
     LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
@@ -605,14 +593,15 @@ begin
         LKeyGenerator := ioKeyGenerator(LAttr).Value;
       if LAttr is ioConnectionDefName then
         LConnectionDefName := ioConnectionDefName(LAttr).Value;
-      if LAttr is ioTrueClass then
-        LTrueClass := Self.TrueClass(Typ);
       if LAttr is ioJoin then
         LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
       if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
         LGroupBy := Self.GroupBy(ioGroupBy(LAttr).Value);
       if LAttr is ioDisableAutoCreateOnDB then
         LAutoCreateDB := False;
+      // TrueClass attribute
+      if LAttr is ioTrueClass then
+        LTrueClass.Mode := ioTrueClass(LAttr).TrueClassMode;
       // Index attribute (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
       if LAttr is ioIndex then
       begin

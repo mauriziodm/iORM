@@ -65,8 +65,8 @@ var
   AClassName: String;
 begin
   // Get full qualified class name
-  AClassName := AQuery.Fields.FieldByName(AContext.TrueClass.GetFieldName).Value;
-  AClassName := AContext.TrueClass.QualifiedClassNameFromClassInfoFieldValue(AClassName);
+  AClassName := AQuery.Fields.FieldByName(AContext.GetTrueClass.GetFieldName).Value;
+  AClassName := AContext.GetTrueClass.QualifiedClassNameFromClassInfoFieldValue(AClassName);
   // Get rtti class type for classref
   Ctx := TioRttiFactory.GetRttiContext;
   Typ := Ctx.FindType(AClassName) as TRttiInstanceType;

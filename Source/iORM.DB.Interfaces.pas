@@ -413,7 +413,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.GetTrueClass))
   else
     AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlWhereParamName]));
   // GroupBy
@@ -429,7 +429,7 @@ begin
   // is an internal query.
   if AContext.WhereExist then
     // AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
-    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.GetTrueClass))
   else
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
@@ -495,14 +495,14 @@ begin
   // Add field list (TrueClass if enabled)
   AQuery.SQL.Add(LInsertFields);
   if AContext.IsTrueClass then
-    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
+    AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName);
   // -----------------------------------------------------------------
   AQuery.SQL.Add(') VALUES (');
   // -----------------------------------------------------------------
   // Add values (TrueClass if enabled)
   AQuery.SQL.Add(LInsertValues);
   if AContext.IsTrueClass then
-    AQuery.SQL.Add(',:' + AContext.TrueClass.GetSqlParamName);
+    AQuery.SQL.Add(',:' + AContext.GetTrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
   // -----------------------------------------------------------------
 end;
@@ -554,7 +554,7 @@ begin
     end;
   // Add the ioTrueClass if enabled
   if AContext.IsTrueClass then
-    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName + '=:' + AContext.TrueClass.GetSqlParamName);
+    AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + '=:' + AContext.GetTrueClass.GetSqlParamName);
   // Where conditions (with ObjVersion if exists for this entity type)
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   if AContext.ObjVersionExist then
@@ -608,7 +608,7 @@ begin
     end;
   // TrueClass
   if AContext.IsTrueClass then
-    AQuery.SQL.Add(',' + AContext.TrueClass.GetSqlFieldName);
+    AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName);
   // From
   AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSQL);
   // Join
@@ -616,7 +616,7 @@ begin
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
-    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.TrueClass))
+    AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.GetTrueClass))
   else
     AQuery.SQL.Add(Format('WHERE %s := %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlWhereParamName]));
   // GroupBy

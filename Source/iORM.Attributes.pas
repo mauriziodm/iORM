@@ -42,8 +42,12 @@ type
   // Type of class mapping
   TioMapModeType = (mmHybrid, mmProperties, mmFields);
 
+  // TrueClassMode
+  TioTrueClassMode = (tcDisabled, tcSmart, tcmStrictly);
+
 const
   DEFAULT_MAP_MODE = mmHybrid;
+  DEFAULT_TRUE_CLASS_MODE = tcDisabled;
 
 type
   // Relation types
@@ -335,11 +339,14 @@ type
   ioConnectionDefName = class(TioCustomStringAttribute)
   end;
 
-  // TrueClass
+  // TrueClass mode
   ioTrueClass = class(TioCustomAttribute)
+  strict private
+    FTrueClassMode: TioTrueClassMode;
+  public
+    constructor Create(const ATrueClassMode: TioTrueClassMode = DEFAULT_TRUE_CLASS_MODE);
+    property TrueClassMode: TioTrueClassMode read FTrueClassMode;
   end;
-
-  ioClassFromField = ioTrueClass; // DEPRECATED
 
   // GroupBy
   ioGroupBy = class(TioCustomStringAttribute)
@@ -681,6 +688,13 @@ end;
 constructor ioForeignKey.Create(const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
   Self.Create(fkCreate, AOnDeleteAction, AOnUpdateAction);
+end;
+
+{ ioTrueClass }
+
+constructor ioTrueClass.Create(const ATrueClassMode: TioTrueClassMode);
+begin
+  FTrueClassMode := ATrueClassMode;
 end;
 
 end.

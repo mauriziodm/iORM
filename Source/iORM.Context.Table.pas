@@ -106,8 +106,12 @@ type
   strict private
     FAncestors: String;
     FSqlFieldName: String;
+    FMode: TioTrueClassMode;
+    // Mode property
+    procedure SetMode(const AValue: TioTrueClassMode);
+    function GetMode: TioTrueClassMode;
   public
-    constructor Create(ASqlFieldName: String);
+    constructor Create(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String);
     procedure SetTable(const ATable: IioTable); override;
     function GetFieldName: string;
     function GetSqlFieldName: string;
@@ -118,6 +122,7 @@ type
     function GetQualifiedClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
     function QualifiedClassNameFromClassInfoFieldValue(const AValue: String): String;
     function ClassNameFromClassInfoFieldValue(const AValue: String): String;
+    property Mode: TioTrueClassMode read GetMode write SetMode;
   end;
 
   // Classe che incapsula le info sulla tabella
@@ -284,7 +289,7 @@ end;
 
 function TioTable.IsTrueClass: Boolean;
 begin
-  Result := Assigned(FTrueClass);
+  Result := FTrueClass.Mode > tcDisabled;
 end;
 
 function TioTable.IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
@@ -328,8 +333,9 @@ begin
   Result := Copy(Result, LLastDelimiterPos+1, 999);
 end;
 
-constructor TioTrueClass.Create(ASqlFieldName: String);
+constructor TioTrueClass.Create(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String);
 begin
+  FMode := ATrueClassMode;
   FSqlFieldName := ASqlFieldName;
   FAncestors := '';
 end;
@@ -364,6 +370,11 @@ begin
   Result := TioDBFActory.SqlDataConverter(Table.GetConnectionDefName).StringToSQL(Self.GetValue);
 end;
 
+function TioTrueClass.GetMode: TioTrueClassMode;
+begin
+  Result := FMode;
+end;
+
 function TioTrueClass.GetValue: String;
 begin
   Result := Table.GetQualifiedClassName + ';' + Self.FAncestors;
@@ -372,6 +383,11 @@ end;
 function TioTrueClass.QualifiedClassNameFromClassInfoFieldValue(const AValue: String): String;
 begin
   Result := Copy(AValue, 0, Pos(';', AValue) - 1);
+end;
+
+procedure TioTrueClass.SetMode(const AValue: TioTrueClassMode);
+begin
+  FMode := AValue;
 end;
 
 procedure TioTrueClass.SetTable(const ATable: IioTable);

@@ -78,7 +78,7 @@ type
     function GetClassRef: TioClassRef;
     function GetTable: IioTable;
     function GetProperties: IioProperties;
-    function TrueClass: IioTrueClass;
+    function GetTrueClass: IioTrueClass;
     function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
@@ -143,7 +143,7 @@ begin
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
-function TioContext.TrueClass: IioTrueClass;
+function TioContext.GetTrueClass: IioTrueClass;
 begin
   Result := Self.Map.GetTable.GetTrueClass;
 end;

@@ -50,7 +50,7 @@ type
     function GetClassRef: TioClassRef;
     function GetTable: IioTable;
     function GetProperties: IioProperties;
-    function TrueClass: IioTrueClass;
+    function GetTrueClass: IioTrueClass;
     function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;

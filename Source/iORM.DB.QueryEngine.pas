@@ -187,7 +187,7 @@ begin
   end;
   // Add the TrueClass value if enabled
   if AContext.IsTrueClass then
-    LQuery.ParamByName_SetValue(AContext.TrueClass.GetSqlParamName, AContext.TrueClass.GetValue);
+    LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
 end;
 
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
@@ -314,7 +314,7 @@ begin
   end;
   // Add the TrueClass value if enabled
   if AContext.IsTrueClass then
-    LQuery.ParamByName_SetValue(AContext.TrueClass.GetSqlParamName, AContext.TrueClass.GetValue);
+    LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
   if AContext.ObjVersionExist then

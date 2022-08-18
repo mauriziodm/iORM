@@ -124,8 +124,8 @@ function TioFDQuery.ExtractTrueClassName(const AContext: IioContext): String;
 begin
   if AContext.IsTrueClass then
   begin
-    Result := FSqlQuery.FieldByName(AContext.TrueClass.GetFieldName).Value;
-    Result := AContext.TrueClass.ClassNameFromClassInfoFieldValue(Result);
+    Result := FSqlQuery.FieldByName(AContext.GetTrueClass.GetFieldName).Value;
+    Result := AContext.GetTrueClass.ClassNameFromClassInfoFieldValue(Result);
   end
   else
     Result := AContext.Map.GetClassName;
@@ -147,7 +147,7 @@ begin
       ParamByName_SetValue(ASqlItemWhere.GetSqlParamName(AContext.Map), ASqlItemWhere.GetValue(AContext.Map).AsVariant);
   end;
   if AContext.IsTrueClass then
-    ParamByName_SetValue(AContext.TrueClass.GetSqlParamName, '%' + AContext.TrueClass.GetClassName + '%');
+    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.GetTrueClass.GetClassName + '%');
 end;
 
 function TioFDQuery.GetQuery: TioInternalSqlQuery;

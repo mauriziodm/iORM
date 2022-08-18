@@ -79,6 +79,10 @@ type
     function GetQualifiedClassName: String;
     function QualifiedClassNameFromClassInfoFieldValue(const AValue:String): String;
     function ClassNameFromClassInfoFieldValue(const AValue: String): String;
+    // Mode property
+    procedure SetMode(const AValue: TioTrueClassMode);
+    function GetMode: TioTrueClassMode;
+    property Mode: TioTrueClassMode read GetMode write SetMode;
   end;
 
   TioIndexList = TList<ioIndex>;
