@@ -674,6 +674,7 @@ function TioViewAction.Execute: Boolean;
 begin
   CheckVMAction('Execute');
   Result := FVMAction.Execute;
+  inherited;
 end;
 
 function TioViewAction.GetCaption: String;
