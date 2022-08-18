@@ -89,7 +89,7 @@ type
 implementation
 
 uses
-  iORM.Context.Container, iORM.Context.Properties;
+  iORM.Context.Container, iORM.Context.Properties, Winapi.Windows;
 
 { TioMap }
 

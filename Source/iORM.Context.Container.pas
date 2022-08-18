@@ -135,7 +135,8 @@ var
   LMapSlot: TioMapSlot;
 begin
   for LMapSlot in FInternalContainer.Values do
-    LMapSlot.GetMap.BuildTrueClassVirtualMap;
+    if not LMapSlot.GetMap.IsTrueClassVirtualMap then
+      LMapSlot.GetMap.BuildTrueClassVirtualMap;
 end;
 
 class procedure TioMapContainer.CleanUp;
