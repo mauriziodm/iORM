@@ -674,7 +674,6 @@ var
     LQuery: IioQuery;
     LObj: TObject;
     LCurrentContext: IioContext;
-    LCurrentClassName: String;
   begin
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectList(LOriginalContext);
@@ -683,9 +682,12 @@ var
       // Loop for all records (objects) of the query
       while not LQuery.Eof do
       begin
-        // It extracts the correct IioContext whether it is a class with "TrueClass" attribute or not
-        LCurrentClassName := LQuery.ExtractTrueClassName(LOriginalContext);
-        LCurrentContext := LContextCache.GetContext(LCurrentClassName, AWhere);
+        // If TrueClassMode is tvSmart then get the specific context for the current record/object else
+        //  use the original context
+        if LOriginalContext.GetTrueClass.Mode = tcSmart then
+          LCurrentContext := LContextCache.GetContext(LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
+        else
+          LCurrentContext := LOriginalContext;
         // Clean the DataObject (it contains the previous)
         LCurrentContext.DataObject := nil;
         // Create the object as TObject

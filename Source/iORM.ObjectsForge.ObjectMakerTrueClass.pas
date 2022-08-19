@@ -60,20 +60,17 @@ uses
 
 class function TioObjectMakerTrueClass.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
 var
-  Ctx: TRttiContext;
-  Typ: TRttiInstanceType;
-  AClassName: String;
+  LRttiInstanceType: TRttiInstanceType;
+  LClassName: String;
 begin
   // Get full qualified class name
-  AClassName := AQuery.Fields.FieldByName(AContext.GetTrueClass.GetFieldName).Value;
-  AClassName := AContext.GetTrueClass.QualifiedClassNameFromClassInfoFieldValue(AClassName);
+  LClassName := AQuery.ExtractTrueClassName(AContext);
   // Get rtti class type for classref
-  Ctx := TioRttiFactory.GetRttiContext;
-  Typ := Ctx.FindType(AClassName) as TRttiInstanceType;
-  if not Assigned(Typ) then
-    raise EioException.Create(Self.ClassName + ': RttiType not found (' + AClassName + ')');
+  LRttiInstanceType := TioRttiFactory.GetRttiContext.FindType(LClassName) as TRttiInstanceType;
+  if not Assigned(LRttiInstanceType) then
+    raise EioException.Create(Self.ClassName + ': RttiType not found (' + LClassName + ')');
   // Load object
-  Result := io.Load(Typ.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
+  Result := io.Load(LRttiInstanceType.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
                                            .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
                                            .DisableTrueClass
                                            ._ToObjectInternalByClassOnly(AContext.DataObject);
