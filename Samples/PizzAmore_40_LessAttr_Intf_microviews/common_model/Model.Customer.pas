@@ -11,7 +11,8 @@ type
 //  [diImplements(ICustomer)]
 //  [ioEntity, ioTrueClass]
 //  [ioEntity]
-  [ioAbstractEntity, diImplements(ICustomer), ioTrueClass]
+//  [ioAbstractEntity, diImplements(ICustomer), ioTrueClass]
+  [ioAbstractEntity]
   TCustomer = class(TInterfacedObject, ICustomer)
   strict private
     FID: Integer;
@@ -69,7 +70,7 @@ type
     property BranchOffice: String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
+//  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
 //  [ioEntity('Customer'), ioTrueClass]
   TAnotherCustomer = class(TInterfacedObject, ICustomer)
   strict private

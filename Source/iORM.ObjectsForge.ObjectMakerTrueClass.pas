@@ -64,7 +64,8 @@ var
   LClassName: String;
 begin
   // Get full qualified class name
-  LClassName := AQuery.ExtractTrueClassName(AContext);
+  LClassName := AQuery.Fields.FieldByName(AContext.GetTrueClass.GetFieldName).Value;
+  LClassName := AContext.GetTrueClass.QualifiedClassNameFromClassInfoFieldValue(LClassName);
   // Get rtti class type for classref
   LRttiInstanceType := TioRttiFactory.GetRttiContext.FindType(LClassName) as TRttiInstanceType;
   if not Assigned(LRttiInstanceType) then
