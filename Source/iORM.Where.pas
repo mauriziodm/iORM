@@ -379,7 +379,7 @@ implementation
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Containers.Factory,
-  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.LazyLoad.Generics.List, iORM.Containers.List,
+  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.Containers.List,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
   iORM.ObjectsForge.Interfaces;
 

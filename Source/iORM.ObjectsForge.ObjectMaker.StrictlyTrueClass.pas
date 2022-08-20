@@ -33,7 +33,7 @@
 
 
 
-unit iORM.ObjectsForge.ObjectMakerTrueClass;
+unit iORM.ObjectsForge.ObjectMaker.StrictlyTrueClass;
 
 interface
 
@@ -45,7 +45,7 @@ uses
 type
 
   // Standard Object Maker
-  TioObjectMakerTrueClass = class(TioObjectMakerIntf)
+  TioObjectMakerStrictlyTrueClass = class(TioObjectMakerIntf)
   public
     class function MakeObject(const AContext:IioContext; const AQuery:IioQuery): TObject; override;
   end;
@@ -58,7 +58,7 @@ uses
 
 { TioObjectMakerTrueClass }
 
-class function TioObjectMakerTrueClass.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
+class function TioObjectMakerStrictlyTrueClass.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
 var
   LRttiInstanceType: TRttiInstanceType;
   LClassName: String;

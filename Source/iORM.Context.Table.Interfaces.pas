@@ -108,10 +108,6 @@ type
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;
     procedure SetIndexList(AIndexList:TioIndexList);
-    // ContainsSomeIioListLazyProperty
-    procedure SetContainsSomeIioListLazyProperty(const Value: Boolean);
-    function GetContainsSomeIioListLazyProperty: Boolean;
-    property ContainsSomeIioListLazyProperty: Boolean read GetContainsSomeIioListLazyProperty write SetContainsSomeIioListLazyProperty;
   end;
 
 implementation

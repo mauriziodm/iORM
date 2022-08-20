@@ -158,7 +158,7 @@
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMaker.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMakerTrueClass.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMaker.StrictlyTrueClass.pas"/>
         <DCCReference Include="..\..\Source\iORM.pas"/>
         <DCCReference Include="..\..\Source\iORM.RttiContext.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.SqlItems.pas"/>
@@ -177,10 +177,6 @@
         <DCCReference Include="..\..\Source\iORM.Context.Map.pas"/>
         <DCCReference Include="..\..\Source\iORM.Context.Map.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.ConnectionContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.Generics.List.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.Generics.ObjectList.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoader.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.Notification.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas"/>
@@ -280,7 +276,6 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Detail.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.SmartUpdateDetection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.pas"/>
         <DCCReference Include="..\..\Source\iORM.Components.InterfacedDataModule.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.VMAction.pas"/>
@@ -304,6 +299,7 @@
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Duck.Dictionary.pas"/>
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Constants.pas"/>
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas"/>
+        <DCCReference Include="..\..\Source\iORM.LazyLoad.Interfaces.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -48,17 +48,6 @@ type
     function GetInternalObject: TObject;
   end;
 
-  IioLazyLoader<T:class,constructor> = interface
-    ['{CBF57EB9-CD85-412D-97EA-C9F46943B1B8}']
-    function GetInternalObj: T;
-//    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer; const ARelationChildWhereStr:);
-    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer; const ARelationChildWhere:IioWhere);
-    // OwnsObject property
-    procedure SetOwnsObjects(Value: Boolean);
-    function GetOwnsObjects: Boolean;
-    property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
-  end;
-
 implementation
 
 end.

@@ -38,29 +38,21 @@ unit iORM.LazyLoad.Factory;
 interface
 
 uses
-  iORM.LazyLoad.LazyLoader, iORM.LazyLoad.Interfaces,
-  iORM.Where.Interfaces, System.TypInfo;
+  System.TypInfo, iORM.Where.Interfaces;
 
 type
 
   TioLazyLoadFactory = class
   public
-    class function LazyLoader<T:class,constructor>(AOwnsObjects:Boolean=True): IioLazyLoader<T>;
     class function LazyLoadObject(const ATypeInfo:PTypeInfo; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer; const ARelationChildWhere:IioWhere): TObject;
   end;
 
 implementation
 
 uses
-  iORM.LazyLoad.LazyLoadObject, iORM.Utilities, iORM.Exceptions;
+  iORM.LazyLoad.Interfaces, iORM.LazyLoad.LazyLoadObject;
 
 { TioLazyLoadFactory }
-
-class function TioLazyLoadFactory.LazyLoader<T>(
-  AOwnsObjects: Boolean): IioLazyLoader<T>;
-begin
-  Result := TioLazyLoader<T>.Create(AOwnsObjects);
-end;
 
 class function TioLazyLoadFactory.LazyLoadObject(const ATypeInfo:PTypeInfo; const ARelationChildTypeName,
   ARelationChildTypeAlias, ARelationChildPropertyName: String;

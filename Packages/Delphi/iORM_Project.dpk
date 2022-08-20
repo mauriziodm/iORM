@@ -76,7 +76,7 @@ contains
   iORM.ObjectsForge.Factory in '..\..\Source\iORM.ObjectsForge.Factory.pas',
   iORM.ObjectsForge.Interfaces in '..\..\Source\iORM.ObjectsForge.Interfaces.pas',
   iORM.ObjectsForge.ObjectMaker in '..\..\Source\iORM.ObjectsForge.ObjectMaker.pas',
-  iORM.ObjectsForge.ObjectMakerTrueClass in '..\..\Source\iORM.ObjectsForge.ObjectMakerTrueClass.pas',
+  iORM.ObjectsForge.ObjectMaker.StrictlyTrueClass in '..\..\Source\iORM.ObjectsForge.ObjectMaker.StrictlyTrueClass.pas',
   iORM in '..\..\Source\iORM.pas',
   iORM.RttiContext.Factory in '..\..\Source\iORM.RttiContext.Factory.pas',
   iORM.SqlItems in '..\..\Source\iORM.SqlItems.pas',
@@ -95,10 +95,6 @@ contains
   iORM.Context.Map in '..\..\Source\iORM.Context.Map.pas',
   iORM.Context.Map.Interfaces in '..\..\Source\iORM.Context.Map.Interfaces.pas',
   iORM.DB.ConnectionContainer in '..\..\Source\iORM.DB.ConnectionContainer.pas',
-  iORM.LazyLoad.Generics.List in '..\..\Source\iORM.LazyLoad.Generics.List.pas',
-  iORM.LazyLoad.Generics.ObjectList in '..\..\Source\iORM.LazyLoad.Generics.ObjectList.pas',
-  iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas',
-  iORM.LazyLoad.LazyLoader in '..\..\Source\iORM.LazyLoad.LazyLoader.pas',
   iORM.LazyLoad.Factory in '..\..\Source\iORM.LazyLoad.Factory.pas',
   iORM.LiveBindings.Notification in '..\..\Source\iORM.LiveBindings.Notification.pas',
   iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas',
@@ -198,7 +194,6 @@ contains
   iORM.MVVM.ModelPresenter.Detail in '..\..\Source\iORM.MVVM.ModelPresenter.Detail.pas',
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas',
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection in '..\..\Source\iORM.LiveBindings.BSPersistence.SmartUpdateDetection.pas',
-  iORM.ObjectsForge.ObjectMakerWithIoListLazy in '..\..\Source\iORM.ObjectsForge.ObjectMakerWithIoListLazy.pas',
   iORM.MVVM.ViewModel in '..\..\Source\iORM.MVVM.ViewModel.pas',
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
   iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
@@ -221,7 +216,8 @@ contains
   DJSON.Duck.Interfaces in '..\..\ExtLibs\djson\Sources\DJSON.Duck.Interfaces.pas',
   DJSON.Duck.Dictionary in '..\..\ExtLibs\djson\Sources\DJSON.Duck.Dictionary.pas',
   DJSON.Constants in '..\..\ExtLibs\djson\Sources\DJSON.Constants.pas',
-  DJSON.Attributes in '..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas';
+  DJSON.Attributes in '..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas',
+  iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas';
 
 end.
 

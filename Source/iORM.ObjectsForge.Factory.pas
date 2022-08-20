@@ -50,18 +50,16 @@ type
 implementation
 
 uses
-  iORM.ObjectsForge.ObjectMakerTrueClass,
-  iORM.ObjectsForge.ObjectMaker, iORM.ObjectsForge.ObjectMakerWithIoListLazy;
+  iORM.ObjectsForge.ObjectMaker.StrictlyTrueClass,
+  iORM.ObjectsForge.ObjectMaker,
+  iORM.Attributes;
 
 { TioObjectMakerFactory }
 
 class function TioObjectMakerFactory.GetObjectMaker(const AContext: IioContext): TioObjectMakerRef;
 begin
-  if AContext.IsTrueClass then
-    Result := TioObjectMakerTrueClass
-  else
-  if AContext.Map.GetTable.ContainsSomeIioListLazyProperty then
-    Result := TioObjectMakerWithIioListLazy
+  if AContext.GetTrueClass.Mode = tcmStrictly then
+    Result := TioObjectMakerStrictlyTrueClass
   else
     Result := TioObjectMaker;
 end;

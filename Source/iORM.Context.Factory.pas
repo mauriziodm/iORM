@@ -306,9 +306,6 @@ var
         LMember_FieldValueType := LRttiField.FieldType;
         LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
         LMember_FieldName := TioField.Remove_F_FromName(LMember.Name);
-        // Detect is the current member is an autoloadable IioList lazy prop/field
-        if StartsText('iORM.Lazy', LRttiField.FieldType.QualifiedName) then
-          ATable.ContainsSomeIioListLazyProperty := True;
       end
       else if LMember is TRttiProperty then
       begin
@@ -316,9 +313,6 @@ var
         LMember_FieldValueType := LRttiProperty.PropertyType;
         LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
         LMember_FieldName := LMember.Name;
-        // Detect is the current member is an autoloadable IioList lazy prop/field
-        if StartsText('iORM.Lazy', LRttiProperty.PropertyType.QualifiedName) then
-          ATable.ContainsSomeIioListLazyProperty := True;
       end
       else
         raise EioException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');
