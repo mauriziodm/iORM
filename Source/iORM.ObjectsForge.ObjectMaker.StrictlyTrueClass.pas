@@ -73,7 +73,7 @@ begin
   // Load object
   Result := io.Load(LRttiInstanceType.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
                                            .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
-                                           .DisableTrueClass
+                                           .DisableStrictlyTrueClass
                                            ._ToObjectInternalByClassOnly(AContext.DataObject);
 end;
 

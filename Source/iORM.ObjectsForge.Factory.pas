@@ -58,10 +58,10 @@ uses
 
 class function TioObjectMakerFactory.GetObjectMaker(const AContext: IioContext): TioObjectMakerRef;
 begin
-  if AContext.GetTrueClass.Mode = tcmStrictly then
-    Result := TioObjectMakerStrictlyTrueClass
+  if (AContext.GetTrueClass.Mode < tcmStrictly) or AContext.Where.GetDisableStrictlyTrueClass then
+    Result := TioObjectMaker
   else
-    Result := TioObjectMaker;
+    Result := TioObjectMakerStrictlyTrueClass;
 end;
 
 end.

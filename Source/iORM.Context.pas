@@ -306,7 +306,7 @@ end;
 
 function TioContext.IsTrueClass: Boolean;
 begin
-  Result := Self.GetTable.IsTrueClass and ((not Assigned(FWhere)) or (not FWhere.GetDisableTrueClass));
+  Result := Self.GetTable.IsTrueClass and ((not Assigned(FWhere)) or (not FWhere.GetDisableStrictlyTrueClass));
 end;
 
 function TioContext.Map: IioMap;

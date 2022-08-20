@@ -70,9 +70,6 @@ type
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function Count(const AWhere: IioWhere): Integer; override;
-
-    class procedure LoadListNew(const AWhere: IioWhere; const AList: TObject);
-
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
@@ -341,24 +338,24 @@ end;
 
 class function TioStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
-  AContext: IioContext;
-  AQuery: IioQuery;
+  LContext: IioContext;
+  LQuery: IioQuery;
 begin
   inherited;
   // Init
   Result := AObj;
   // Get the Context
-  AContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result, nil, '', '');
+  LContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result, nil, '', '');
   // Create & open query
-  AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
-  AQuery.Open;
+  LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LContext);
+  LQuery.Open;
   try
     // Create the object as TObject
-    if not AQuery.IsEmpty then
-      Result := TioObjectMakerFactory.GetObjectMaker(AContext).MakeObject(AContext, AQuery);
+    if not LQuery.IsEmpty then
+      Result := TioObjectMakerFactory.GetObjectMaker(LContext).MakeObject(LContext, LQuery);
   finally
     // Close query
-    AQuery.Close;
+    LQuery.Close;
   end;
 end;
 
@@ -717,7 +714,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '', True);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
       // Start transaction
       LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -732,94 +729,42 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.LoadListNew(const AWhere: IioWhere; const AList: TObject);
+class function TioStrategyDB.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
-  LContext: IioContext;
+  LOriginalContext: IioContext;
+  LContextCache: IioContextCache;
   LTransactionCollection: IioTransactionCollection;
-  LDuckTypedList: IioDuckTypedList;
-  // Nested
-  procedure NestedLoadToList;
-  var
-    AQuery: IioQuery;
-    AObj: TObject;
-  begin
-    // Create & open query
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectList(LContext);
-    AQuery.Open;
-    try
-      // Loop
-      while not AQuery.Eof do
-      begin
-        // Clean the DataObject (it contains the previous)
-        LContext.DataObject := nil;
-        // Create the object as TObject
-        AObj := TioObjectMakerFactory.GetObjectMaker(LContext).MakeObject(LContext, AQuery);
-        // Add current object to the list
-        LDuckTypedList.Add(AObj);
-        // Next
-        AQuery.Next;
-      end;
-    finally
-      // Close query
-      AQuery.Close;
-    end;
-  end;
-
-begin
-  inherited;
-  // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
-  // Wrap the list into a DuckTypedList
-  LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
-  // Get the transaction collection
-  LTransactionCollection := TioDBFactory.TransactionCollection;
-  try
-    // Loop for all classes in the sesolved type list
-    for LResolvedTypeName in LResolvedTypeList do
-    begin
-      // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '');
-      // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
-      // Load the current class data into the list
-      NestedLoadToList;
-    end;
-    // Commit ALL transactions
-    LTransactionCollection.CommitAll;
-  except
-    // Rollback ALL transactions
-    LTransactionCollection.RollbackAll;
-    raise;
-  end;
-end;
-
-class function TioStrategyDB.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
-var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
   // Nested
   function NestedLoadToObject: TObject;
   var
-    AQuery: IioQuery;
+    LQuery: IioQuery;
+    LCurrentContext: IioContext;
   begin
     // Init
     Result := nil;
     // Create & open query
-    // AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext); // NB: Prima era così ma probabilmente era una svista
-    AQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(AContext);
-    AQuery.Open;
+    LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LOriginalContext);
+    LQuery.Open;
     try
       // If a record is fuìound then load the object and return True
-      if not AQuery.Eof then
+      if not LQuery.Eof then
+      begin
+        // If TrueClassMode is tvSmart then get the specific context for the current record/object else
+        //  use the original context
+        if LOriginalContext.GetTrueClass.Mode = tcSmart then
+          LCurrentContext := LContextCache.GetContext(LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
+        else
+          LCurrentContext := LOriginalContext;
+        // Clean the DataObject (it contains the previous)
+        LCurrentContext.DataObject := nil;
         // Create the object as TObject
-        Result := TioObjectMakerFactory.GetObjectMaker(AContext).MakeObject(AContext, AQuery);
+        Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+      end;
     finally
       // Close query
-      AQuery.Close;
+      LQuery.Close;
     end;
   end;
 
@@ -827,17 +772,19 @@ begin
   inherited;
   Result := nil;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  // Create the IioContext cache (optimization)
+  LContextCache := TioContextCache.Create;
   // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
+  LTransactionCollection := TioDBFactory.TransactionCollection;
   try
     // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
+    for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, AObj, nil, '', '');
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class object is founded
       Result := NestedLoadToObject;
       // If there is a result (an object) then exit;
@@ -845,10 +792,10 @@ begin
         Break;
     end;
     // Commit ALL transactions
-    ATransactionCollection.CommitAll;
+    LTransactionCollection.CommitAll;
   except
     // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
+    LTransactionCollection.RollbackAll;
     raise;
   end;
 end;

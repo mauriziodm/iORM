@@ -77,7 +77,7 @@ type
     function GetOrderBySql(const AMap:IioMap): String;
     function GetOrderByInstance: IioSqlItemWhere;
     procedure SetOrderBySql(const AOrderByText:String);
-    function GetDisableTrueClass: Boolean;
+    function GetDisableStrictlyTrueClass: Boolean;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
     function GetPagingObj: TObject;  // TObject to avoid circular reference
@@ -115,7 +115,7 @@ type
     function Add(const AWhereCond:IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere; overload;
-    function DisableTrueClass: IioWhere;
+    function DisableStrictlyTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
     function LazyProps(const ALazyProps: String): IioWhere;
@@ -254,7 +254,7 @@ type
     function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere<T>; overload;
-    function DisableTrueClass: IioWhere<T>;
+    function DisableStrictlyTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
     function LazyProps(const ALazyProps: String): IioWhere<T>;

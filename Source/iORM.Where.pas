@@ -55,7 +55,7 @@ type
   strict protected
     FTypeName, FTypeAlias: String;
     FTypeInfo: PTypeInfo;
-    FDisableTrueClass: Boolean;
+    FDisableStrictlyTrueClass: Boolean;
     FLazyLoad: Boolean;
     FLazyProps: String;
     FLimitRows, FLimitOffset: Integer;
@@ -106,7 +106,7 @@ type
     function GetWhereItems: TWhereItems;
     function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
     function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
-    function GetDisableTrueClass: Boolean;
+    function GetDisableStrictlyTrueClass: Boolean;
     function GetOrderByInstance: IioSqlItemWhere;
     function GetOrderBySql(const AMap: IioMap): String;
     function GetLimitRows: Integer;
@@ -150,7 +150,7 @@ type
     function Add(const AWhereCond: IioWhere): IioWhere; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere; overload;
-    function DisableTrueClass: IioWhere;
+    function DisableStrictlyTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
     function LazyProps(const ALazyProps: String): IioWhere;
@@ -278,7 +278,7 @@ type
     function Add(const AWhereCond: IioWhere): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
     function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere<T>; overload;
-    function DisableTrueClass: IioWhere<T>;
+    function DisableStrictlyTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
     function LazyProps(const ALazyProps: String): IioWhere<T>;
@@ -670,7 +670,7 @@ end;
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
-  FDisableTrueClass := False;
+  FDisableStrictlyTrueClass := False;
   FLazyLoad := False;
   FLazyProps := '';
   FWhereItems := TioWhereFactory.NewWhereItems;
@@ -740,10 +740,10 @@ begin
   inherited;
 end;
 
-function TioWhere.DisableTrueClass: IioWhere;
+function TioWhere.DisableStrictlyTrueClass: IioWhere;
 begin
   Result := Self;
-  FDisableTrueClass := True;
+  FDisableStrictlyTrueClass := True;
 end;
 
 procedure TioWhere.DropIndex(const AIndexName: String);
@@ -807,9 +807,9 @@ begin
   Result := FDetailsContainer;
 end;
 
-function TioWhere.GetDisableTrueClass: Boolean;
+function TioWhere.GetDisableStrictlyTrueClass: Boolean;
 begin
-  Result := FDisableTrueClass;
+  Result := FDisableStrictlyTrueClass;
 end;
 
 function TioWhere.GetItems: TWhereItems;
@@ -1459,10 +1459,10 @@ begin
   TioWhere(Self).ClearListBefore(AClearListBefore);
 end;
 
-function TioWhere<T>.DisableTrueClass: IioWhere<T>;
+function TioWhere<T>.DisableStrictlyTrueClass: IioWhere<T>;
 begin
   Result := Self;
-  TioWhere(Self).DisableTrueClass;
+  TioWhere(Self).DisableStrictlyTrueClass;
 end;
 
 function TioWhere<T>.Lazy(const ALazyEnabled: Boolean): IioWhere<T>;
