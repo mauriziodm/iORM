@@ -73,8 +73,8 @@ type
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence;
   public
-    constructor Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
+    constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String); overload;
     function GetClassRef: TioClassRef;
     function GetTable: IioTable;
     function GetProperties: IioProperties;
@@ -148,8 +148,8 @@ begin
   Result := Self.Map.GetTable.GetTrueClass;
 end;
 
-constructor TioContext.Create(const AClassName: String; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+constructor TioContext.Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+  const AMasterPropertyName, AMasterPropertyPath: String);
 begin
   inherited Create;
   FMap := AMap;

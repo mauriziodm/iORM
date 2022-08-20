@@ -113,7 +113,7 @@ begin
   Result := nil;
   // Compose the TrueTypeVirtualMap name
   //  Note: TCVM stands for  "True Class Virtual Map"
-  LMapName := TRUECLASSVIRTUALMAP_NAME_PREFIX + AMap.GetClassName;
+  LMapName := TRUECLASS_VIRTUALMAP_NAME_PREFIX + AMap.GetClassName;
   // If the virtual map is non already present then create and register it
   if Exist(LMapName) then
     Result := GetMap(LMapName)

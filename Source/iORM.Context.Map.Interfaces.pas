@@ -44,7 +44,7 @@ uses
 
 const
   //  Note: TCVM stands for  "True Class Virtual Map"
-  TRUECLASSVIRTUALMAP_NAME_PREFIX = '<TCVM>';
+  TRUECLASS_VIRTUALMAP_NAME_PREFIX = '<TCVM>';
 
 type
 

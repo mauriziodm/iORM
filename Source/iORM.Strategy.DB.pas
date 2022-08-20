@@ -708,7 +708,7 @@ begin
   LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Wrap the list into a DuckTypedList
   LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
-  // Create the IioContext cache
+  // Create the IioContext cache (optimization)
   LContextCache := TioContextCache.Create;
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
@@ -717,7 +717,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := LContextCache.GetContext(LResolvedTypeName, AWhere);
+      LOriginalContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '', True);
       // Start transaction
       LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -882,8 +882,10 @@ end;
 
 function TioContextCache.GetContext(const AClassName: String; const AWhere: IioWhere): IioContext;
 begin
+  // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
     FContainer.Add(AClassName, TioContextFactory.Context(AClassName, AWhere, nil, nil, '', ''));
+  // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;
 end;
