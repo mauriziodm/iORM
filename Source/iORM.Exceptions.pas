@@ -63,12 +63,12 @@ implementation
 
 constructor EioException.Create(const AClassName, AMethodName, AMsg: string);
 begin
-  inherited Create(Format('iORM exception on "%s.%s":'#13#13'%s', [AClassName, AMethodName, AMsg]));
+  inherited Create(Format(#13'iORM exception on "%s.%s":'#13#13'%s', [AClassName, AMethodName, AMsg]));
 end;
 
 constructor EioException.Create(const AClassName, AMsg: string);
 begin
-  inherited Create(Format('iORM exception on "%s":'#13#13'%s', [AClassName, AMsg]));
+  inherited Create(Format(#13'iORM exception on "%s":'#13#13'%s', [AClassName, AMsg]));
 end;
 
 { EioConcurrencyConflictException }

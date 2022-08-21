@@ -1003,9 +1003,80 @@ class function TioDependencyInjectionContainer.Get(AKey: TioDIContainerKey; ASub
 begin
   AKey := Uppercase(AKey);
   ASubKey := Uppercase(ASubKey);
-  if not Self.Exists(AKey, ASubKey) then
-    raise EioException.Create(Self.ClassName, 'Get', Format('Implementer for "%s" alias "%s" not found.', [AKey, ASubKey]));
-  Result := Self.FContainer.Items[AKey].GetItem(ASubKey);
+  if Self.Exists(AKey, ASubKey) then
+    Result := Self.FContainer.Items[AKey].GetItem(ASubKey)
+  else
+  begin
+    // ViewModel
+    if AKey.StartsWith('<VM>') then
+    begin
+      AKey := Copy(AKey, 5, 99);
+      if ASubKey.IsEmpty then
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'A ViewModel for "%s" is required but I cannot find any registered.' +
+          #13#13'Perhaps you forgot to register it, to do so you can decorate the ViewModel class with the attribute "[diViewModelFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewModelFor<%s>.Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, AKey, AKey]))
+      else
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'A ViewModel for "%s" (alias "%s") is required but I cannot find any registered.' +
+          #13#13'Perhaps you forgot to register it, to do so you can decorate the ViewModel class with the attribute "[diViewModelFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewModelFor<%s>("%s").Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, ASubKey, AKey, ASubKey, AKey, ASubKey]));
+    end
+    else
+    // View
+    if AKey.StartsWith('<V>') then
+    begin
+      AKey := Copy(AKey, 4, 99);
+      if ASubKey.IsEmpty then
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'A View for "%s" is required but I cannot find any registered.' +
+          #13#13'Perhaps you forgot to register it, to do so you can decorate the View class with the attribute "[diViewFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewFor<%s>.Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, AKey, AKey]))
+      else
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'A View for "%s" (alias "%s") is required but I cannot find any registered.' +
+          #13#13'Perhaps you forgot to register it, to do so you can decorate the View class with the attribute "[diViewFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewFor<%s>("%s").Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, ASubKey, AKey, ASubKey, AKey, ASubKey]));
+    end
+    else
+    // SimpleView
+    if AKey.StartsWith('<SV>') then
+    begin
+      AKey := Copy(AKey, 5, 99);
+      if ASubKey.IsEmpty then
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'A SimpleView for "%s" is required but I cannot find any registered.' +
+          #13#13'Perhaps you forgot to register it, to do so you can decorate the SimpleView class with the attribute "[diSimpleViewFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsSimpleViewFor<%s>.Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, AKey, AKey]))
+      else
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'A SimpleView for "%s" (alias "%s") is required but I cannot find any registered.' +
+          #13#13'Perhaps you forgot to register it, to do so you can decorate the SimpleView class with the attribute "[diSimpleViewFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsSimpleViewFor<%s>("%s").Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, ASubKey, AKey, ASubKey, AKey, ASubKey]));
+    end
+    // Normal interface implementer
+    else
+    begin
+      if ASubKey.IsEmpty then
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'The services of the "%s" interface are required but I cannot find any registered class that implements it.' +
+          #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s)]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, AKey, AKey]))
+      else
+        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+          #13#13'The services of the "%s" interface (alias "%s") are required but I cannot find any registered class that implements it.' +
+          #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s, ''%s'')]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>(''%s'').Execute".' +
+          #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+          #13#13'This will work.', [AKey, ASubKey, AKey, ASubKey, AKey, ASubKey]));
+    end;
+  end;
 end;
 
 class function TioDependencyInjectionContainer.GetInterfaceImplementers(AKey: TioDIContainerKey): TioDIContainerValue;

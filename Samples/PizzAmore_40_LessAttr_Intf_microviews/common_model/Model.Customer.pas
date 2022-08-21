@@ -8,7 +8,7 @@ uses
 type
 
 //  [ioEntity, diImplements(ICustomer), ioTrueClass]
-//  [diImplements(ICustomer)]
+  [diImplements(ICustomer)]
 //  [ioEntity, ioTrueClass]
 //  [ioEntity]
 //  [ioAbstractEntity, diImplements(ICustomer), ioTrueClass]
@@ -70,8 +70,9 @@ type
     property BranchOffice: String read GetBranchOffice write SetBranchOffice;
   end;
 
-//  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
+  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
 //  [ioEntity('Customer'), ioTrueClass]
+//  [ioEntity('Customer')]
   TAnotherCustomer = class(TInterfacedObject, ICustomer)
   strict private
     FID: Integer;

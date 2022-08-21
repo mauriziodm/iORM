@@ -34,6 +34,7 @@ begin
       io.CommitTransaction;
     except
       io.RollbackTransaction;
+      raise;
     end;
   end;
 end;
