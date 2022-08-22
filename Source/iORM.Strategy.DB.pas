@@ -734,7 +734,6 @@ var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
   LOriginalContext: IioContext;
-  LContextCache: IioContextCache;
   LTransactionCollection: IioTransactionCollection;
   // Nested
   function NestedLoadToObject: TObject;
@@ -754,11 +753,9 @@ var
         // If TrueClassMode is tvSmart then get the specific context for the current record/object else
         //  use the original context
         if LOriginalContext.GetTrueClass.Mode = tcSmart then
-          LCurrentContext := LContextCache.GetContext(LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
+          LCurrentContext := TioContextFactory.Context(LQuery.ExtractTrueClassName(LOriginalContext), AWhere, AObj, nil, '', '')
         else
           LCurrentContext := LOriginalContext;
-        // Clean the DataObject (it contains the previous)
-        LCurrentContext.DataObject := nil;
         // Create the object as TObject
         Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
       end;
@@ -773,8 +770,6 @@ begin
   Result := nil;
   // Resolve the type and alias
   LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
-  // Create the IioContext cache (optimization)
-  LContextCache := TioContextCache.Create;
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
