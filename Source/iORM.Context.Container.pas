@@ -69,10 +69,12 @@ type
     ///  begins to detect and register the classes (both the entities but not only the classes
     ///  that must only be registered in the Dependency Injection Container) to be able to perform its functions
     class procedure Init;
+    /// This method map all entities in the MapContainer
+    class procedure RegisterClassesInMapContainer;
     /// This method registers the classes in the MapContainer (entities only) and also
     ///  in the Dependency Injection Container (also non entities) based on the attributes
     ///   with which the classes have been decorated.
-    class procedure RegisterClassesInMapContanierAndDependencyInjectionContainerByAttributes;
+    class procedure RegisterClassesInDependencyInjectionContainerByAttributes;
     /// This method build all TrueClassVirtualMaps for all entities
     class procedure BuildTrueClassVirtualMaps;
   public
@@ -199,7 +201,9 @@ begin
     // This method registers the classes in the MapContainer (entities only) and also
     //  in the Dependency Injection Container (also non entities) based on the attributes
     //   with which the classes have been decorated.
-    RegisterClassesInMapContanierAndDependencyInjectionContainerByAttributes;
+    RegisterClassesInDependencyInjectionContainerByAttributes;
+    // This method map all entities in the MapContainer
+    RegisterClassesInMapContainer;
     // Generate childs virtual properties related to autodetected HasMany relations
     TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
     // This method build all TrueClassVirtualMaps for all entities
@@ -212,7 +216,7 @@ end;
 /// This method registers the classes in the MapContainer (entities only) and also
 ///  in the Dependency Injection Container (also non entities) based on the attributes
 ///   with which the classes have been decorated.
-class procedure TioMapContainer.RegisterClassesInMapContanierAndDependencyInjectionContainerByAttributes;
+class procedure TioMapContainer.RegisterClassesInDependencyInjectionContainerByAttributes;
 type
   TdiImplementsItem = record
     IID: TGUID;
@@ -289,9 +293,6 @@ var
         LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
       end;
     end;
-    // Map Container: If the current class is an entity then create the relative map and register it into the MapContainer
-    if LIsAnEntity then
-      AddClassRef(ACurrentRttiInstanceType.MetaclassType);
     // Dependency Injection Container - Auto register the class for the resolver (persistance only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
     begin
@@ -329,6 +330,17 @@ begin
   for LRttiType in TioRttiFactory.GetRttiContext.GetTypes do
     if LRttiType.IsInstance then
       _DIC_AutoregisterClass(LRttiType.AsInstance);
+end;
+
+/// This method map all entities in the MapContainer
+class procedure TioMapContainer.RegisterClassesInMapContainer;
+var
+  LRttiType: TRttiType;
+begin
+  // Loop for all classes detecting attributes to register the current class into the MapContainer and into the DIC
+  for LRttiType in TioRttiFactory.GetRttiContext.GetTypes do
+    if LRttiType.IsInstance and TioUtilities.HasAttribute<ioEntity>(LRttiType) then
+      AddClassRef(LRttiType.AsInstance.MetaclassType);
 end;
 
 { TioContextSlot }

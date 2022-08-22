@@ -3,8 +3,7 @@ unit Model.Order;
 interface
 
 uses
-  iORM, Model.Customer, Model.OrderRow, System.Generics.Collections, Model.Pizza,
-  iORM.LazyLoad.Generics.ObjectList;
+  iORM, Model.Customer, Model.OrderRow, System.Generics.Collections, Model.Pizza;
 
 type
 

@@ -17,6 +17,7 @@ type
     FIsTrueClass: Boolean;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
+    function FieldExists(const AFieldName: String): boolean;
     // IsTrueClass
     function GetIsTrueClass: Boolean;
     procedure SetIsTrueClass(const AValue: Boolean);
@@ -37,7 +38,6 @@ type
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
-
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
@@ -52,8 +52,8 @@ uses
 procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
   // Add field if not already exists
-  if not FFields.ContainsKey(ASchemaField.FieldName) then
-    FFields.Add(ASchemaField.FieldName, ASchemaField);
+  if not FieldExists(ASchemaField.FieldName) then
+    FFields.Add(ASchemaField);
   // If this field is the primary key field
   if ASchemaField.PrimaryKey then
     FPrimaryKeyField := ASchemaField;
@@ -75,6 +75,16 @@ begin
   FForeignKeys.Free;
   FIndexes.Free;
   inherited;
+end;
+
+function TioDBBuilderSchemaTable.FieldExists(const AFieldName: String): boolean;
+var
+  LField: IioDBBuilderSchemaField;
+begin
+  for LField in FFields do
+    if LField.FieldName.Equals(AFieldName) then
+      Exit(True);
+  Result := False;
 end;
 
 function TioDBBuilderSchemaTable.Fields: TioDBBuilderSchemaFields;

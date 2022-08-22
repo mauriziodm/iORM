@@ -202,7 +202,7 @@ begin
   ScriptAdd(Format('INSERT INTO %s (', [ATable.TableName]));
   IncIndentationLevel;
   LComma := ' ';
-  for LField in ATable.Fields.Values do
+  for LField in ATable.Fields do
   begin
     if LField.Status = stCreate then
       Continue;
@@ -213,7 +213,7 @@ begin
   ScriptAdd(') SELECT');
   IncIndentationLevel;
   LComma := ' ';
-  for LField in ATable.Fields.Values do
+  for LField in ATable.Fields do
   begin
     if LField.Status = stCreate then
       Continue;

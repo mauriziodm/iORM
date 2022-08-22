@@ -3,7 +3,7 @@ unit Model.Customer;
 interface
 
 uses
-  iORM, Model.Interfaces;
+  iORM, iORM.Attributes, Model.Interfaces;
 
 type
 

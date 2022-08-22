@@ -1083,7 +1083,11 @@ class function TioDependencyInjectionContainer.GetInterfaceImplementers(AKey: Ti
 begin
   AKey := Uppercase(AKey);
   if not Self.ImplementersExists(AKey) then
-    raise EioException.Create(Self.ClassName + ': implementers for interface "' + AKey + '" not found.');
+    raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+      #13#13'I was looking for a list of all registered classes implementing "%s" but couldn''t find any.' +
+      #13#13'I remind you that you can register a class as an implementer of an interface by decorating it with the attribute "[diImplements (%s)]" or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
+      #13#13'If you decide to use the attribute, make sure you put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
+      #13#13'I hope this information will be useful to you.', [AKey, AKey, AKey]));
   Result := Self.FContainer.Items[AKey];
 end;
 

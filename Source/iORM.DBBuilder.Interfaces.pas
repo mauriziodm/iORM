@@ -46,7 +46,7 @@ type
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
-  TioDBBuilderSchemaFields = TDictionary<String, IioDBBuilderSchemaField>;
+  TioDBBuilderSchemaFields = TList<IioDBBuilderSchemaField>;
   TioDBBuilderSchemaIndexes = TioIndexList;
   TioDBBuilderSchemaForeignKeys = TDictionary<String, IioDBBuilderSchemaFK>;
 

@@ -94,7 +94,7 @@ var
   LField: IioDBBuilderSchemaField;
 begin
   // Loop for all fields in the table
-  for LField in ATable.Fields.Values do
+  for LField in ATable.Fields do
   begin
     // Analyze the field and set it's status
     if not FSqlGenerator.FieldExists(ATable, LField) then

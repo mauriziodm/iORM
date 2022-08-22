@@ -55,7 +55,7 @@ var
   LField: IioDBBuilderSchemaField;
 begin
   LComma := ' ';
-  for LField in ATable.Fields.Values do
+  for LField in ATable.Fields do
   begin
     FSqlGenerator.CreateField(LField, LComma);
     LComma := ',';
@@ -102,7 +102,7 @@ var
   LField: IioDBBuilderSchemaField;
 begin
   LComma := ' ';
-  for LField in ATable.Fields.Values do
+  for LField in ATable.Fields do
   begin
     case LField.Status of
       stCreate:
