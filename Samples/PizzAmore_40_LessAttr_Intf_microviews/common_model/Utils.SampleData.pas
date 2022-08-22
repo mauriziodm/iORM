@@ -17,7 +17,7 @@ type
 implementation
 
 uses
-  iORM, Model.Interfaces, SysUtils;
+  iORM, Model.Interfaces, SysUtils, Model.Customer;
 
 { TSampleData }
 
@@ -76,7 +76,8 @@ var
   LEmployee: IEmployee;
 begin
   // Mr. Maurizio Del Magno
-  LVipCustomer := io.Create<IVipCustomer>;
+//  LVipCustomer := io.Create<IVipCustomer>;
+  LVipCustomer := TVipCustomer.Create;
   LVipCustomer.Name := 'Maurizio Del Magno';
   LVipCustomer.City := 'New York';
   LVipCustomer.Address := '301 Park Ave';
@@ -84,21 +85,24 @@ begin
   LVipCustomer.VipCardCode := 'VIP001';
   io.Persist(LVipCustomer);
   // Mr. Omar Bossoni
-  LCustomer := io.Create<ICustomer>('ANOTHER');
+//  LCustomer := io.Create<ICustomer>('ANOTHER');
+  LCustomer := TAnotherCustomer.Create;
   LCustomer.Name := 'Omar Bossoni';
   LCustomer.City := 'New York';
   LCustomer.Address := '111 E 48th St';
   LCustomer.PhoneNumber := '(444) 444-1234';
   io.Persist(LCustomer);
   // Mr. Marco Mottadelli
-  LCustomer := io.Create<ICustomer>;
+//  LCustomer := io.Create<ICustomer>;
+  LCustomer := TCustomer.Create;
   LCustomer.Name := 'Marco Mottadelli';
   LCustomer.City := 'Union City';
   LCustomer.Address := '3501 Bergenline Ave';
   LCustomer.PhoneNumber := '(333) 333-1234';
   io.Persist(LCustomer);
   // Mr. Fabio Codebue
-  LEmployee := io.Create<IEmployee>;
+//  LEmployee := io.Create<IEmployee>;
+  LEmployee := TEmployee.Create;
   LEmployee.Name := 'Fabio Codebue';
   LEmployee.City := 'Tavernola Bergamasca City';
   LEmployee.Address := '150 Lake Corniche';

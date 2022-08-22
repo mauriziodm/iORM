@@ -7,7 +7,8 @@ uses
 
 type
 
-  [ioEntity, diImplements(ICustomer)]
+//  [ioEntity, diImplements(ICustomer)]
+  [ioEntity]
   TCustomer = class(TInterfacedObject, ICustomer)
   private
     FID: Integer;
