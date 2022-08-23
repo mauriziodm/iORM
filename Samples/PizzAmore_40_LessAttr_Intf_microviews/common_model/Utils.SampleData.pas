@@ -17,7 +17,8 @@ type
 implementation
 
 uses
-  iORM, Model.Interfaces, SysUtils, Model.Customer;
+  iORM, Model.Interfaces, SysUtils, Model.Customer, Model.Pizza,
+  Model.OrderRow, Model.Order;
 
 { TSampleData }
 
@@ -44,25 +45,25 @@ var
   LPizza: IPizza;
 begin
   // Margherita pizza
-  LPizza := io.Create<IPizza>;
+  LPizza := TPizza.Create;
   LPizza.Name := 'Margherita pizza';
   LPizza.Price := 4.5;
   LPizza.Image.LoadFromFile('..\..\..\..\common_images\MargheritaPizza.bmp');
   io.Persist(LPizza);
   //  Capricciosa pizza
-  LPizza := io.Create<IPizza>;
+  LPizza := TPizza.Create;
   LPizza.Name := 'Capricciosa pizza';
   LPizza.Price := 7;
   LPizza.Image.LoadFromFile('..\..\..\..\common_images\CapricciosaPizza.bmp');
   io.Persist(LPizza);
   // Pepperoni pizza
-  LPizza := io.Create<IPizza>;
+  LPizza := TPizza.Create;
   LPizza.Name := 'Pepperoni pizza';
   LPizza.Price := 6.5;
   LPizza.Image.LoadFromFile('..\..\..\..\common_images\PepperoniPizza.bmp');
   io.Persist(LPizza);
   // Love pizza
-  LPizza := io.Create<IPizza>;
+  LPizza := TPizza.Create;
   LPizza.Name := 'Love pizza';
   LPizza.Price := 5;
   LPizza.Image.LoadFromFile('..\..\..\..\common_images\LovePizza.bmp');
@@ -76,7 +77,6 @@ var
   LEmployee: IEmployee;
 begin
   // Mr. Maurizio Del Magno
-//  LVipCustomer := io.Create<IVipCustomer>;
   LVipCustomer := TVipCustomer.Create;
   LVipCustomer.Name := 'Maurizio Del Magno';
   LVipCustomer.City := 'New York';
@@ -85,7 +85,6 @@ begin
   LVipCustomer.VipCardCode := 'VIP001';
   io.Persist(LVipCustomer);
   // Mr. Omar Bossoni
-//  LCustomer := io.Create<ICustomer>('ANOTHER');
   LCustomer := TAnotherCustomer.Create;
   LCustomer.Name := 'Omar Bossoni';
   LCustomer.City := 'New York';
@@ -93,7 +92,6 @@ begin
   LCustomer.PhoneNumber := '(444) 444-1234';
   io.Persist(LCustomer);
   // Mr. Marco Mottadelli
-//  LCustomer := io.Create<ICustomer>;
   LCustomer := TCustomer.Create;
   LCustomer.Name := 'Marco Mottadelli';
   LCustomer.City := 'Union City';
@@ -101,7 +99,6 @@ begin
   LCustomer.PhoneNumber := '(333) 333-1234';
   io.Persist(LCustomer);
   // Mr. Fabio Codebue
-//  LEmployee := io.Create<IEmployee>;
   LEmployee := TEmployee.Create;
   LEmployee.Name := 'Fabio Codebue';
   LEmployee.City := 'Tavernola Bergamasca City';
@@ -132,27 +129,27 @@ var
   LOrder: IOrder;
 begin
   // First order
-  LOrder := io.Create<IOrder>;
+  LOrder := TOrder.Create;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.Load<ICustomer>(1);
   LOrder.Note := 'Well done';
-  LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 3]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([2, 'Capricciosa pizza', 7, 2]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
+  LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 3) );
+  LOrder.Rows.Add( TOrderRow.Create(2, 'Capricciosa pizza', 7, 2) );
+  LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
   io.Persist(LOrder);
   // Second order
-  LOrder := io.Create<IOrder>;
+  LOrder := TOrder.Create;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.Load<ICustomer>(2);
   LOrder.Note := 'Double cheese please';
-  LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 1]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([2, 'Pepperoni pizza', 6.5, 1]) );
+  LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 1) );
+  LOrder.Rows.Add( TOrderRow.Create(2, 'Pepperoni pizza', 6.5, 1) );
   io.Persist(LOrder);
   // Third order
-  LOrder := io.Create<IOrder>;
+  LOrder := TOrder.Create;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.Load<ICustomer>(3);
-  LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
+  LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
   io.Persist(LOrder);
 end;
 

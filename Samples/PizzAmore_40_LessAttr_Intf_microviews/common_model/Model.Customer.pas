@@ -8,7 +8,7 @@ uses
 type
 
 //  [ioEntity, diImplements(ICustomer), ioTrueClass]
-  [diImplements(ICustomer)]
+//  [diImplements(ICustomer)]
 //  [ioEntity, ioTrueClass]
 //  [ioEntity]
 //  [ioAbstractEntity, diImplements(ICustomer), ioTrueClass]

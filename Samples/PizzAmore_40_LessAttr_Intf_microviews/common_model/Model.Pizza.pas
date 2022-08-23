@@ -14,7 +14,7 @@ uses
 
 type
 
-  [ioEntity, diImplements(IPizza)]
+  [ioEntity]
   TPizza = class(TInterfacedObject, IPizza)
   private
     FID: Integer;
