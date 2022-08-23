@@ -159,6 +159,15 @@ object CustomersForm: TCustomersForm
       Font.Style = [fsBold]
       ParentFont = False
     end
+    object Button1: TButton
+      Left = 152
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Button1'
+      TabOrder = 0
+      OnClick = Button1Click
+    end
   end
   object GridCustomers: TDBGrid
     Left = 0
@@ -214,6 +223,7 @@ object CustomersForm: TCustomersForm
       end>
   end
   object DSCustomers: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TCustomer'
     OrderBy = '[.Name]'
     VirtualFields = True

@@ -199,12 +199,32 @@ type
     class function Load(const AWhere: IioWhere): IioWhere; overload;
     class function Load<T>(const ATypeAlias: String = ''): IioWhere<T>; overload;
     // Load (returning result instance directly)
-    class function Load<T>(const AID: Integer): T; overload;
-    class function Load<T>(const ATypeAlias: String; const AID: Integer): T; overload;
+    class function LoadObject<T>(const AID: Integer): T; overload;
+    class function LoadObject<T>(const ATypeAlias: String; const AID: Integer): T; overload;
+    class function LoadObject<T>(const ATypeAlias: String = ''; const AWhere: IioWhere = nil): T; overload;
+    class function LoadObject<T>(const AWhere: IioWhere): T; overload;
+    // LoadToObject (fill existing object)
+    class procedure LoadToObject<T>(const AObj: TObject; const AID: Integer); overload;
+    class procedure LoadToObject<T>(const AObj: TObject; const ATypeAlias: String; const AID: Integer); overload;
+    class procedure LoadToObject<T>(const AObj: TObject; const ATypeAlias: String = ''; const AWhere: IioWhere = nil); overload;
+    class procedure LoadToObject<T>(const AObj: TObject; const AWhere: IioWhere); overload;
+    // LoadToObject (fill existing object)
+    class procedure LoadToObject<T>(const AIntfObj: IInterface; const AID: Integer); overload;
+    class procedure LoadToObject<T>(const AIntfObj: IInterface; const ATypeAlias: String; const AID: Integer); overload;
+    class procedure LoadToObject<T>(const AIntfObj: IInterface; const ATypeAlias: String = ''; const AWhere: IioWhere = nil); overload;
+    class procedure LoadToObject<T>(const AIntfObj: IInterface; const AWhere: IioWhere); overload;
     // LoadList (returning result instance directly)
-    class function LoadList<T: class, constructor>(const AItemAlias: String = ''): T; overload;
-    class function LoadList<T: class, constructor>(const AWhere: IioWhere): T; overload;
-    class function LoadList<T: class, constructor>(const AItemAlias: String; const AWhere: IioWhere): T; overload;
+    class function LoadList<TListType: class, constructor>(const AItemAlias: String = ''): TListType; overload;
+    class function LoadList<TListType: class, constructor>(const AWhere: IioWhere): TListType; overload;
+    class function LoadList<TListType: class, constructor>(const AItemAlias: String; const AWhere: IioWhere): TListType; overload;
+    // LoadToList as class (fill the list passed as parameter)
+    class procedure LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String = ''); overload;
+    class procedure LoadToList<TItemType>(const AListObj: TObject; const AWhere: IioWhere); overload;
+    class procedure LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String; const AWhere: IioWhere); overload;
+    // LoadToList as interface (fill the list passed as parameter)
+    class procedure LoadToList<TItemType>(const AListIntf: IInterface; const AItemAlias: String = ''); overload;
+    class procedure LoadToList<TItemType>(const AListIntf: IInterface; const AWhere: IioWhere); overload;
+    class procedure LoadToList<TItemType>(const AListIntf: IInterface; const AItemAlias: String; const AWhere: IioWhere); overload;
 
     // Reload object as class
     class procedure Reload(const AObj: TObject; const ALazy: boolean; const ALazyProps: String); overload;
@@ -215,19 +235,19 @@ type
     class procedure Reload(const AIntfObj: IInterface; const ALazy: boolean = False); overload;
     class procedure Reload(const AIntfObj: IInterface; const ALazyProps: String); overload;
     // Reload list as class
-    class procedure ReloadList(const AListObject: TObject; const ALazy: boolean; const ALazyProps: String); overload;
-    class procedure ReloadList(const AListObject: TObject; const ALazy: boolean = False); overload;
-    class procedure ReloadList(const AListObject: TObject; const ALazyProps: String); overload;
+    class procedure ReloadList(const AListObj: TObject; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure ReloadList(const AListObj: TObject; const ALazy: boolean = False); overload;
+    class procedure ReloadList(const AListObj: TObject; const ALazyProps: String); overload;
     // Reload list as interface
-    class procedure ReloadList(const AListIntfObject: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
-    class procedure ReloadList(const AListIntfObject: IInterface; const ALazy: boolean = False); overload;
-    class procedure ReloadList(const AListIntfObject: IInterface; const ALazyProps: String); overload;
+    class procedure ReloadList(const AListIntf: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure ReloadList(const AListIntf: IInterface; const ALazy: boolean = False); overload;
+    class procedure ReloadList(const AListIntf: IInterface; const ALazyProps: String); overload;
 
     // Delete (accepting instance to delete directly)
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
-    class procedure DeleteList(const ACollection: TObject); overload;
-    class procedure DeleteList(const AIntfCollection: IInterface); overload;
+    class procedure DeleteList(const AListObj: TObject); overload;
+    class procedure DeleteList(const AListIntf: IInterface); overload;
     // Delete (accepting generic type to delete and ciriteria)
     class procedure Delete<T>(const AID: Integer); overload;
     class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
@@ -452,34 +472,57 @@ begin
   Result := AWhere;
 end;
 
-class function io.Load<T>(const ATypeAlias: String; const AID: Integer): T;
+class function io.LoadObject<T>(const ATypeAlias: String; const AID: Integer): T;
 begin
   Result := io.Load<T>(ATypeAlias).ByID(AID).ToObject;
 end;
 
-class function io.LoadList<T>(const AWhere: IioWhere): T;
+class function io.LoadList<TListType>(const AWhere: IioWhere): TListType;
 begin
-  Result := Self.LoadList<T>('', AWhere);
+  Result := Self.LoadList<TListType>('', AWhere);
 end;
 
-class function io.LoadList<T>(const AItemAlias: String; const AWhere: IioWhere): T;
+class function io.LoadList<TListType>(const AItemAlias: String; const AWhere: IioWhere): TListType;
 var
   LItemRttiType: TRttiType;
 begin
-  LItemRttiType := TioUtilities.ExtractItemRttiType<T>;
-  Result := T.Create;
+  LItemRttiType := TioUtilities.ExtractItemRttiType<TListType>;
+  Result := TListType.Create;
   AWhere.TypeName := LItemRttiType.Name;
   AWhere.TypeAlias := AItemAlias;
   AWhere.TypeInfo := LItemRttiType.Handle;
   AWhere.ToList(Result);
 end;
 
-class function io.LoadList<T>(const AItemAlias: String): T;
+class function io.LoadObject<T>(const AWhere: IioWhere): T;
 begin
-  Result := Self.LoadList<T>(AItemAlias, Self.Where);
+  Result := io.Load<T>._Where(AWhere).ToObject;
 end;
 
-class function io.Load<T>(const AID: Integer): T;
+class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String);
+begin
+  Self.LoadToList<TItemType>(AListObj, AItemAlias, Self.Where);
+end;
+
+class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AWhere: IioWhere);
+begin
+  Self.LoadToList<TItemType>(AListObj, '', AWhere);
+end;
+
+class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String; const AWhere: IioWhere);
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<TItemType>;
+  AWhere.TypeAlias := AItemAlias;
+//  AWhere.TypeInfo := TypeInfo(TItemType);
+  AWhere.ToList(AListObj);
+end;
+
+class function io.LoadList<TListType>(const AItemAlias: String): TListType;
+begin
+  Result := Self.LoadList<TListType>(AItemAlias, Self.Where);
+end;
+
+class function io.LoadObject<T>(const AID: Integer): T;
 begin
   Result := io.Load<T>.ByID(AID).ToObject;
 end;
@@ -652,37 +695,37 @@ begin
   io.Reload(AIntfObj as TObject, False, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListObject: TObject; const ALazy: boolean);
+class procedure io.ReloadList(const AListObj: TObject; const ALazy: boolean);
 begin
-  io.ReloadList(AListObject, ALazy, '');
+  io.ReloadList(AListObj, ALazy, '');
 end;
 
-class procedure io.ReloadList(const AListObject: TObject; const ALazyProps: String);
+class procedure io.ReloadList(const AListObj: TObject; const ALazyProps: String);
 begin
-  io.ReloadList(AListObject, False, ALazyProps);
+  io.ReloadList(AListObj, False, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazy: boolean);
+class procedure io.ReloadList(const AListIntf: IInterface; const ALazy: boolean);
 begin
-  io.ReloadList(AListIntfObject as TObject, ALazy, '');
+  io.ReloadList(AListIntf as TObject, ALazy, '');
 end;
 
-class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazyProps: String);
+class procedure io.ReloadList(const AListIntf: IInterface; const ALazyProps: String);
 begin
-  io.ReloadList(AListIntfObject as TObject, False, ALazyProps);
+  io.ReloadList(AListIntf as TObject, False, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListIntfObject: IInterface; const ALazy: boolean; const ALazyProps: String);
+class procedure io.ReloadList(const AListIntf: IInterface; const ALazy: boolean; const ALazyProps: String);
 begin
-  io.ReloadList(AListIntfObject as TObject, ALazy, ALazyProps);
+  io.ReloadList(AListIntf as TObject, ALazy, ALazyProps);
 end;
 
-class procedure io.ReloadList(const AListObject: TObject; const ALazy: boolean; const ALazyProps: String);
+class procedure io.ReloadList(const AListObj: TObject; const ALazy: boolean; const ALazyProps: String);
 var
   LDuckList: IioDuckTypedList;
   I: Integer;
 begin
-  LDuckList := TioDuckTypedFactory.DuckTypedList(AListObject);
+  LDuckList := TioDuckTypedFactory.DuckTypedList(AListObj);
   io.StartTransaction;
   try
     for I := 0 to LDuckList.Count - 1 do
@@ -1161,17 +1204,17 @@ begin
   AWhere.Delete;
 end;
 
-class procedure io.DeleteList(const AIntfCollection: IInterface);
+class procedure io.DeleteList(const AListIntf: IInterface);
 begin
-  Self.DeleteList(AIntfCollection as TObject);
+  Self.DeleteList(AListIntf as TObject);
 end;
 
-class procedure io.DeleteList(const ACollection: TObject);
+class procedure io.DeleteList(const AListObj: TObject);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteCollection(ACollection);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteCollection(AListObj);
 end;
 
 class function io.di: TioDependencyInjectionRef;
@@ -1274,6 +1317,66 @@ end;
 class function io.RefTo(const AWhere: IioWhere): IioWhere;
 begin
   Result := Self.Load(AWhere);
+end;
+
+class procedure io.LoadToList<TItemType>(const AListIntf: IInterface; const AItemAlias: String);
+begin
+  Self.LoadToList<TItemType>(AListIntf as TObject, AItemAlias);
+end;
+
+class procedure io.LoadToList<TItemType>(const AListIntf: IInterface; const AWhere: IioWhere);
+begin
+  Self.LoadToList<TItemType>(AListIntf as TObject, AWhere);
+end;
+
+class procedure io.LoadToList<TItemType>(const AListIntf: IInterface; const AItemAlias: String; const AWhere: IioWhere);
+begin
+  Self.LoadToList<TItemType>(AListIntf as TObject, AItemAlias, AWhere);
+end;
+
+class procedure io.LoadToObject<T>(const AObj: TObject; const AID: Integer);
+begin
+  io.Load<T>.ByID(AID).ToObject(AObj);
+end;
+
+class procedure io.LoadToObject<T>(const AObj: TObject; const ATypeAlias: String; const AID: Integer);
+begin
+  io.Load<T>(ATypeAlias).ByID(AID).ToObject(AObj);
+end;
+
+class procedure io.LoadToObject<T>(const AObj: TObject; const ATypeAlias: String; const AWhere: IioWhere);
+begin
+  io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AObj);
+end;
+
+class procedure io.LoadToObject<T>(const AObj: TObject; const AWhere: IioWhere);
+begin
+  io.Load<T>._Where(AWhere).ToObject(AObj);
+end;
+
+class function io.LoadObject<T>(const ATypeAlias: String; const AWhere: IioWhere): T;
+begin
+  Result := io.Load<T>(ATypeAlias)._Where(AWhere).ToObject;
+end;
+
+class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const AID: Integer);
+begin
+  io.Load<T>.ByID(AID).ToObject(AIntfObj);
+end;
+
+class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const ATypeAlias: String; const AID: Integer);
+begin
+  io.Load<T>(ATypeAlias).ByID(AID).ToObject(AIntfObj);
+end;
+
+class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const ATypeAlias: String; const AWhere: IioWhere);
+begin
+  io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AIntfObj);
+end;
+
+class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const AWhere: IioWhere);
+begin
+  io.Load<T>._Where(AWhere).ToObject(AIntfObj);
 end;
 
 initialization
