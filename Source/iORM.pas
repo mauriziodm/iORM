@@ -226,8 +226,8 @@ type
     // Delete (accepting instance to delete directly)
     class procedure Delete(const AObj: TObject); overload;
     class procedure Delete(const AIntfObj: IInterface); overload;
-    class procedure DeleteCollection(const ACollection: TObject); overload;
-    class procedure DeleteCollection(const AIntfCollection: IInterface); overload;
+    class procedure DeleteList(const ACollection: TObject); overload;
+    class procedure DeleteList(const AIntfCollection: IInterface); overload;
     // Delete (accepting generic type to delete and ciriteria)
     class procedure Delete<T>(const AID: Integer); overload;
     class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
@@ -1161,12 +1161,12 @@ begin
   AWhere.Delete;
 end;
 
-class procedure io.DeleteCollection(const AIntfCollection: IInterface);
+class procedure io.DeleteList(const AIntfCollection: IInterface);
 begin
-  Self.DeleteCollection(AIntfCollection as TObject);
+  Self.DeleteList(AIntfCollection as TObject);
 end;
 
-class procedure io.DeleteCollection(const ACollection: TObject);
+class procedure io.DeleteList(const ACollection: TObject);
 var
   LConnectionDefName: String;
 begin

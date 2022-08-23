@@ -10,13 +10,13 @@ inherited VMCustomers: TVMCustomers
   object acNextPage: TioVMActionBSNextPage
     Name = 'acNextPage'
     TargetBindSource = MPMaster
-    Left = 232
-    Top = 16
+    Left = 312
+    Top = 48
   end
   object acPrevPage: TioVMActionBSPrevPage
     Name = 'acPrevPage'
     TargetBindSource = MPMaster
-    Left = 232
-    Top = 80
+    Left = 312
+    Top = 112
   end
 end
