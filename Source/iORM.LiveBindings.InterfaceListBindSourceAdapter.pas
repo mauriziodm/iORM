@@ -168,7 +168,6 @@ begin
     FTypeName := TioUtilities.GenericToString<T>;
   FTypeAlias := ATypeAlias;
 
-//  FBaseObjectRttiType := io.di.Locate(FTypeName).Alias(FTypeAlias).GetItem.RttiType;
   FBaseObjectRttiType := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(FTypeName, FTypeAlias);
 
   // Set the list

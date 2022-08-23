@@ -91,7 +91,6 @@ var
   LConnection: IioConnectionRemote;
 begin
   inherited;
-  Result := 0;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
@@ -111,6 +110,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -135,6 +135,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -162,6 +163,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -191,6 +193,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -232,6 +235,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -258,6 +262,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -288,6 +293,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -338,6 +344,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 
@@ -375,6 +382,7 @@ begin
   except
     // Rollback
     LConnection.Rollback;
+    raise;
   end;
 end;
 

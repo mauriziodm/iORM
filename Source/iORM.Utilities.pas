@@ -63,7 +63,6 @@ type
     class function GUIDtoInterfaceName(const IID: TGUID): String; static;
     class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
     class function ExtractPropertyName(const AFullPathPropertyName: String): String;
-    class function ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass; static;
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
     class function ExtractOID(const AObj: Tobject): Integer; overload; static;
     class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
@@ -87,7 +86,8 @@ implementation
 
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
-  iORM.DependencyInjection.Implementers, DJSON;
+  iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
+  iORM.Resolver.Interfaces;
 
 { TioRttiUtilities }
 
@@ -359,24 +359,17 @@ begin
   end;
 end;
 
-class function TioUtilities.ResolveRttiTypeToClassRef(const ARttiType: TRttiType): TClass;
-var
-  LResolvedRttiType: TRttiType;
-begin
-  LResolvedRttiType := ResolveRttiTypeToRttiType(ARttiType);
-  Result := LResolvedRttiType.AsInstance.MetaclassType; // Note: the resolved type is always a TRttiInstamceType
-end;
-
 class function TioUtilities.ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
-var
-  LContainerImplementersItem: TioDIContainerImplementersItem;
+//var
+//  LContainerImplementersItem: TioDIContainerImplementersItem;
 begin
   if ARttiType.IsInstance then
-    Exit(ARttiType)
+    Result := ARttiType
   else if ARttiType is TRttiInterfaceType then
   begin
-    LContainerImplementersItem := io.di.Locate(ARttiType.Name).GetItem;
-    Exit(LContainerImplementersItem.RttiType);
+//    LContainerImplementersItem := io.di.Locate(ARttiType.Name).GetItem;
+//    Exit(LContainerImplementersItem.RttiType);
+    Result := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(ARttiType.Name, '');
   end
   else
     raise EioException.Create(Self.ClassName, 'RttiTypeToClassRef', '"ARttiType" parameter must be a TRttiInstanceType or TRttiInterfaceType.');

@@ -8,7 +8,7 @@ uses
 type
 
 //  [ioEntity, diImplements(ICustomer), ioTrueClass]
-//  [diImplements(ICustomer)]
+  [diImplements(ICustomer)]
 //  [ioEntity, ioTrueClass]
 //  [ioEntity]
 //  [ioAbstractEntity, diImplements(ICustomer), ioTrueClass]
@@ -38,6 +38,7 @@ type
     function GetPhoneNumber: String;
   public
     constructor Create;
+    destructor Destroy; override;
     property ID: Integer read GetID;  // ReadOnly
     property Name: String read GetName write SetName;
     property City: String read GetCity write SetCity;
@@ -117,6 +118,12 @@ uses
 constructor TCustomer.Create;
 begin
 //  Sleep(5);
+end;
+
+destructor TCustomer.Destroy;
+begin
+  Sleep(1);
+  inherited;
 end;
 
 function TCustomer.GetAddress: String;

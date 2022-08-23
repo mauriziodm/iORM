@@ -49,7 +49,7 @@ type
   // ObjectMaker interface
   TioObjectMakerIntf = class abstract
   strict protected
-    class function CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
+//    class function CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
     class procedure InitializeObjectAfterCreate(const AObj: TObject; const AContainerItem: TioDIContainerImplementersItem);
     class procedure LoadPropertyHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
     class procedure LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
@@ -94,29 +94,29 @@ uses
 // la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
 // "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
 // la ChildProperty destinazione.
-class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
-begin
-  // Get the child object if already assigned
-  Result := AProperty.GetRelationChildObject(AContext.DataObject);
-  // If the AProperty is of interface type...
-  if AProperty.IsInterface then
-  begin
-    // Create the child object/list if it isn't not already created by the master class constructor
-    if not Assigned(Result) then
-      Result := io.di.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
-    TioUtilities.ObjectAsIInterface(Result)._AddRef;
-  end
-  else
-  // If the AProperty is of instance (class) type...
-  begin
-    // Create the child object/list if it isn't not already created by the master class constructor
-    if not Assigned(Result) then
-      if AProperty.GetRelationType = rtHasMany then
-        Result := Self.CreateListByRttiType(AProperty.GetRttiType)
-      else
-        Result := Self.CreateObjectByRttiType(AProperty.GetRttiType);
-  end;
-end;
+//class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
+//begin
+//  // Get the child object if already assigned
+//  Result := AProperty.GetRelationChildObject(AContext.DataObject);
+//  // If the AProperty is of interface type...
+//  if AProperty.IsInterface then
+//  begin
+//    // Create the child object/list if it isn't not already created by the master class constructor
+//    if not Assigned(Result) then
+//      Result := io.di.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
+//    TioUtilities.ObjectAsIInterface(Result)._AddRef;
+//  end
+//  else
+//  // If the AProperty is of instance (class) type...
+//  begin
+//    // Create the child object/list if it isn't not already created by the master class constructor
+//    if not Assigned(Result) then
+//      if AProperty.GetRelationType = rtHasMany then
+//        Result := Self.CreateListByRttiType(AProperty.GetRttiType)
+//      else
+//        Result := Self.CreateObjectByRttiType(AProperty.GetRttiType);
+//  end;
+//end;
 
 class function TioObjectMakerIntf.CreateListByClassRef(AClassRef: TClass; AOwnsObjects: Boolean): TObject;
 begin
@@ -371,48 +371,58 @@ begin
 end;
 
 class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
+var
+  LWhere: IioWhere;
 begin
-  // Prima di tutto verifica se esiste un oggetto di dettaglio sul DB
-  // per farlo, al momento, non ho trovato altro modo che farlo caricare
-  // in una variabile e poi verificare se il risulytato è nil o meno
-  if io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._Where
-  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
-    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).ToObject = nil then
-    Exit(nil);
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  // then create it
+  // Build where conditions
+  LWhere := io.Where(AProperty.GetRelationChildPropertyName, coEqual, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger);
+  LWhere.TypeName := AProperty.GetRelationChildTypeName;
+  LWhere.TypeAlias := AProperty.GetRelationChildTypeAlias;
+  // Check if there is a detail object on the DB, if it finds it it loads it otherwise it returns nil
   // NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  // la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  // "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  // la ChildProperty destinazione.
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
-  // Load the relation child object
-  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._Where
-  // Essendo una relazione HasOne non ha senso che utilizzi anche eventuali condizioni where di dettaglio
-    ._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).ToObject(Result);
+  //      la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
+  //      "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
+  //      la ChildProperty destinazione.
+  if LWhere.Exists then
+  begin
+    // Extract the child relation object (if assigned) and load values on it or load creating a new instance (if not assigned)
+    // Note: If the property is an interface then artificially increment the RefCount to avoid premature destruction of the instance
+    Result := AProperty.GetRelationChildObject(AContext.DataObject);
+    Result := LWhere.ToObject(Result);
+    if AProperty.IsInterface then
+      TioUtilities.ObjectAsIInterface(Result)._AddRef;
+  end
+  else
+    Result := nil;
 end;
 
 class function TioObjectMakerIntf.LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
 var
   LChildID: Integer;
 begin
-  Result := nil; // NB: Altrimenti non veniva inizializzato a nil
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  // then create it
-  // NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  // la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  // "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  // la ChildProperty destinazione.
-  // NB: Se l'ID dell'oggetto dettaglio = 0 significa che quando è stato
-  // persistito tale propriet in realtà era a nil (problema assenza nullable)
-  // quindi in questo caso è meglio non caricare nulla
+  // If the ID of the detail object is equal to zero it means that when it was persisted this
+  //  property was nil then it exits returning nil otherwise it loads the object from the DB
   LChildID := AQuery.GetValue(AProperty, AContext).AsInteger;
-  if LChildID = 0 then
-    Exit;
-  // Create the instance if not assigned
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
-  // Load the relation child object
-  io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).ToObject(Result);
+  if LChildID <> 0 then
+  begin
+    // Extract the child relation object (if assigned) and load values on it or load creating a new instance (if not assigned)
+    // Note: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
+    //        la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
+    //        "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
+    //        la ChildProperty destinazione.
+    // Note: If the property is an interface then artificially increment the RefCount to avoid premature destruction of the instance
+    Result := AProperty.GetRelationChildObject(AContext.DataObject);
+    Result := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).ToObject(Result);
+    if not Assigned(Result) then
+      raise EioException.Create(ClassName, 'LoadPropertyBelongsTo', Format('Houston we have a problem.' +
+        #13#13'I am loading an object of class "%s" with ID = %d.' +
+        #13#13'The property "%s" of type "%s", on which a "BelongsTo" relationship exists, contains the value %d but I cannot find any object of this type and with this ID on the DB.' +
+        #13#13'How could this have happened?', [AContext.GetTable.GetClassName, AContext.GetID, AProperty.GetName, AProperty.GetTypeName, LChildID]));
+    if AProperty.IsInterface and Assigned(Result) then
+      TioUtilities.ObjectAsIInterface(Result)._AddRef;
+  end
+  else
+    Result := nil;
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
@@ -424,10 +434,12 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyHasMany',
-      Format('iORM attempted to load an instance of the "%s" class but its "%s" property collection was not created.' +
-      #13#13'Please make sure that the collection of type "%s" is created in the constructor of the "%s" class or has not been destroyed and try again.',
-      [AContext.Map.GetClassName, AProperty.GetName, AProperty.GetTypeName, AContext.Map.GetClassName]));
+    raise EioException.Create(ClassName, 'LoadPropertyHasMany', Format('Houston we have a problem.' +
+        #13#13'I am loading an object of class "%s" with ID = %d.' +
+        #13#13'The object of type "%s" in property "%s", on which there is an "HasMany" relationship, was not created.' +
+        #13#13'This instance is usually created by the constructor method, in this case in the "%s" class.' +
+        #13#13'If you are sure that the object is created but the problem remains then check that it is not destroyed somewhere before running this code.' +
+        #13#13'It will work.', [AContext.GetTable.GetClassName, AContext.GetID, AProperty.GetTypeName, AProperty.GetName, AContext.GetTable.GetClassName]));
   // Get the where conditions for the details if exists (nil if not exists)
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // It set the first part of the load operation
@@ -452,10 +464,12 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyEmbeddedHasMany',
-      Format('iORM attempted to load an instance of the "%s" class but its "%s" property collection was not created.' +
-      #13#13'Please make sure that the collection of type "%s" is created in the constructor of the "%s" class or has not been destroyed and try again.',
-      [AContext.Map.GetClassName, AProperty.GetName, AProperty.GetTypeName, AContext.Map.GetClassName]));
+    raise EioException.Create(ClassName, 'LoadPropertyEmbeddedHasMany', Format('Houston we have a problem.' +
+        #13#13'I am loading an object of class "%s" with ID = %d.' +
+        #13#13'The object of type "%s" in property "%s", on which there is an "EmbeddedHasMany" relationship, was not created.' +
+        #13#13'This instance is usually created by the constructor method, in this case in the "%s" class.' +
+        #13#13'If you are sure that the object is created but the problem remains then check that it is not destroyed somewhere before running this code.' +
+        #13#13'It will work.', [AContext.GetTable.GetClassName, AContext.GetID, AProperty.GetTypeName, AProperty.GetName, AContext.GetTable.GetClassName]));
   // Get the JSONObject
   LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   // Deserialize
@@ -466,22 +480,25 @@ class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContex
 var
   LJSONString: String;
 begin
-  Result := nil; // NB: Altrimenti non veniva inizializzato a nil
-  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
-  // then create it
-  // NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-  // la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-  // "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-  // la ChildProperty destinazione.
-  // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
-    Exit;
-  // Create the instance if not assigned
-  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
-  // Get the JSONObject
-  LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-  // Deserialize
-  dj.FromJson(LJSONString).byFields.&To(Result);
+  Result := nil;
+  // If the field is null then exit and return nil
+  if not AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
+  begin
+    // Get the JSONObject
+    LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString.Trim;
+    if not LJSONString.IsEmpty then
+    begin
+      // Extract the child relation object (if assigned) and load values on it or load creating a new instance (if not assigned)
+      // Note: If the property is an interface then artificially increment the RefCount to avoid premature destruction of the instance
+      Result := AProperty.GetRelationChildObject(AContext.DataObject);
+      if Assigned(Result) then
+        dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(Result)
+      else
+        Result := dj.FromJson(LJSONString).byFields.TypeAnnotationsON.ToObject;
+      if AProperty.IsInterface and Assigned(Result) then
+        TioUtilities.ObjectAsIInterface(Result)._AddRef;
+    end;
+  end;
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);

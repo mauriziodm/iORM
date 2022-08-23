@@ -419,7 +419,6 @@ var
   LChildPath: String;
   LChildGetMemberObject: IGetMemberObject;
 begin
-  // LMap := TioContextFactory.Map(TioUtilities.ResolveRttiTypeToClassRef(AType));
   LMap := TioMapContainer.GetMap(TioUtilities.ResolveRttiTypeToRttiType(AType).Name);
   for LProperty in LMap.GetProperties do
   begin

@@ -236,14 +236,23 @@ type
     class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
     // Count (accepting generic type and ciriteria)
+    class function Count(const ATypeName: String; const ATypeAlias: String = ''): integer; overload;
+    class function Count(const ATypeName: String; const AWhere: IioWhere): integer; overload;
+    class function Count(const ATypeName: String; const ATypeAlias: String; const AWhere: IioWhere): integer; overload;
     class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
     // Exists (accepting generic type and ciriteria)
+    class function Exists(const ATypeName: String; const ATypeAlias: String = ''): boolean; overload;
+    class function Exists(const ATypeName: String; const AWhere: IioWhere): boolean; overload;
+    class function Exists(const ATypeName: String; const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
     class function Exists<T>(const ATypeAlias: String = ''): boolean; overload;
     class function Exists<T>(const AWhere: IioWhere): boolean; overload;
     class function Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
     // Exists (accepting generic type and ciriteria)
+    class function NotExists(const ATypeName: String; const ATypeAlias: String = ''): boolean; overload;
+    class function NotExists(const ATypeName: String; const AWhere: IioWhere): boolean; overload;
+    class function NotExists(const ATypeName: String; const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
     class function NotExists<T>(const ATypeAlias: String = ''): boolean; overload;
     class function NotExists<T>(const AWhere: IioWhere): boolean; overload;
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
@@ -558,6 +567,23 @@ begin
   Result := Self.NotExists<T>('', AWhere);
 end;
 
+class function io.NotExists(const ATypeName, ATypeAlias: String): boolean;
+begin
+  Result := Self.RefTo(ATypeName, ATypeAlias).NotExists;
+end;
+
+class function io.NotExists(const ATypeName: String; const AWhere: IioWhere): boolean;
+begin
+  Result := Self.NotExists(ATypeName, '', AWhere);
+end;
+
+class function io.NotExists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;
+begin
+  AWhere.TypeName := ATypeName;
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.NotExists;
+end;
+
 class function io.NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean;
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>(False);
@@ -664,6 +690,7 @@ begin
     io.CommitTransaction;
   except
     io.RollbackTransaction;
+    raise;
   end;
 end;
 
@@ -864,6 +891,23 @@ end;
 class function io.Count<T>(const AWhere: IioWhere): Integer;
 begin
   Result := Self.Count<T>('', AWhere);
+end;
+
+class function io.Count(const ATypeName, ATypeAlias: String): integer;
+begin
+  Result := Self.RefTo(ATypeName, ATypeAlias).Count;
+end;
+
+class function io.Count(const ATypeName: String; const AWhere: IioWhere): integer;
+begin
+  Result := Self.Count(ATypeName, '', AWhere);
+end;
+
+class function io.Count(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): integer;
+begin
+  AWhere.TypeName := ATypeName;
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Count;
 end;
 
 class function io.Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer;
@@ -1143,6 +1187,23 @@ end;
 class function io.Exists<T>(const AWhere: IioWhere): boolean;
 begin
   Result := Self.Exists<T>('', AWhere);
+end;
+
+class function io.Exists(const ATypeName, ATypeAlias: String): boolean;
+begin
+  Result := Self.RefTo(ATypeName, ATypeAlias).Exists;
+end;
+
+class function io.Exists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;
+begin
+  AWhere.TypeName := ATypeName;
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Exists;
+end;
+
+class function io.Exists(const ATypeName: String; const AWhere: IioWhere): boolean;
+begin
+  Result := Self.Exists(ATypeName, '', AWhere);
 end;
 
 class function io.Exists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean;

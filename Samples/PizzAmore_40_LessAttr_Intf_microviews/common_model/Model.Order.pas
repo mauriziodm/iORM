@@ -3,7 +3,7 @@ unit Model.Order;
 interface
 
 uses
-  iORM, iORM.Attributes, Model.Interfaces, System.Generics.Collections;
+  iORM.Attributes, Model.Interfaces, System.Generics.Collections;
 
 type
 
@@ -12,7 +12,6 @@ type
   private
     FID: Integer;
     FOrderDate: TDate;
-//    [ioForeignKey (fkDoNotCreate)]
     FCustomer: ICustomer;
     FRows: TList<IOrderRow>;
     FNote: String;
@@ -46,7 +45,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Rtti;
+  System.SysUtils, System.Rtti, iORM;
 
 { TOrder }
 
