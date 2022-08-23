@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
-  <Default.Personality>
-    <Projects ActiveProject="C:\delphi\tools\iorm\ExtLibs\djson\Samples\Mapper_Phonebook\MapperPhonebookExample.dproj"/>
-  </Default.Personality>
+	<Default.Personality>
+		<Projects ActiveProject="C:\delphi\tools\iorm\ExtLibs\djson\Packages\Delphi\DJSON_Project.dproj"/>
+	</Default.Personality>
 </BorlandProject>

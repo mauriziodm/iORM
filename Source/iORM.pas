@@ -496,7 +496,12 @@ end;
 
 class function io.LoadObject<T>(const AWhere: IioWhere): T;
 begin
-  Result := io.Load<T>._Where(AWhere).ToObject;
+  AWhere.TypeName := TioUtilities.GenericToString<T>;
+//  AWhere.TypeInfo := TypeInfo(TItemType);
+  Result := TioUtilities.CastObjectToGeneric<T>(AWhere.ToObject);
+// ----- OLD CODE -----
+//  Result := io.Load<T>._Where(AWhere).ToObject;
+// ----- OLD CODE -----
 end;
 
 class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String);
@@ -1346,37 +1351,54 @@ end;
 
 class procedure io.LoadToObject<T>(const AObj: TObject; const ATypeAlias: String; const AWhere: IioWhere);
 begin
-  io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AObj);
+  AWhere.TypeName := TioUtilities.GenericToString<T>;
+  AWhere.TypeAlias := ATypeAlias;
+//  AWhere.TypeInfo := TypeInfo(TItemType);
+  AWhere.ToObject(AObj);
+// ----- OLD CODE -----
+//  io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AObj);
+// ----- OLD CODE -----
 end;
 
 class procedure io.LoadToObject<T>(const AObj: TObject; const AWhere: IioWhere);
 begin
-  io.Load<T>._Where(AWhere).ToObject(AObj);
+  AWhere.TypeName := TioUtilities.GenericToString<T>;
+//  AWhere.TypeInfo := TypeInfo(TItemType);
+  AWhere.ToObject(AObj);
+// ----- OLD CODE -----
+//  io.Load<T>._Where(AWhere).ToObject(AObj);
+// ----- OLD CODE -----
 end;
 
 class function io.LoadObject<T>(const ATypeAlias: String; const AWhere: IioWhere): T;
 begin
-  Result := io.Load<T>(ATypeAlias)._Where(AWhere).ToObject;
+  AWhere.TypeName := TioUtilities.GenericToString<T>;
+  AWhere.TypeAlias := ATypeAlias;
+//  AWhere.TypeInfo := TypeInfo(TItemType);
+  Result := TioUtilities.CastObjectToGeneric<T>(AWhere.ToObject);
+// ----- OLD CODE -----
+//  Result := io.Load<T>(ATypeAlias)._Where(AWhere).ToObject;
+// ----- OLD CODE -----
 end;
 
 class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const AID: Integer);
 begin
-  io.Load<T>.ByID(AID).ToObject(AIntfObj);
+  Self.LoadToObject<T>(AIntfObj as TObject, AID);
 end;
 
 class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const ATypeAlias: String; const AID: Integer);
 begin
-  io.Load<T>(ATypeAlias).ByID(AID).ToObject(AIntfObj);
+  Self.LoadToObject<T>(AIntfObj as TObject, ATypeAlias, AID);
 end;
 
 class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const ATypeAlias: String; const AWhere: IioWhere);
 begin
-  io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AIntfObj);
+  Self.LoadToObject<T>(AIntfObj as TObject, ATypeAlias, AWhere);
 end;
 
 class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const AWhere: IioWhere);
 begin
-  io.Load<T>._Where(AWhere).ToObject(AIntfObj);
+  Self.LoadToObject<T>(AIntfObj as TObject, AWhere);
 end;
 
 initialization
