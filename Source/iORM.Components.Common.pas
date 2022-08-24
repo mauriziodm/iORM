@@ -31,10 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
-
-
 unit iORM.Components.Common;
 
 interface
@@ -63,7 +59,7 @@ var
   I: Integer;
   LConnectionDef: TioCustomConnectionDef;
 begin
-  // Loop for Owner's components
+  // Loop Owner's components
   for I := 0 to AOwner.ComponentCount-1 do
   begin
     // If the current component is a ConnectionDef then register it
@@ -95,7 +91,7 @@ var
     ViewModelBridgeAutosetting(AVMBridgeClientComponent, AOwner);
   end;
 begin
-  // Loop for Owner's components
+  // Loop Owner's components
   for I := 0 to AOwner.ComponentCount-1 do
     // If the current component is a ViewModelBridge then set it as ViewModelBridge
     //  for the AVMBridgeClientComponent recevied as parameter
