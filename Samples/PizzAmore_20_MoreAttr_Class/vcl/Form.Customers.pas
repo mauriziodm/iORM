@@ -53,7 +53,7 @@ var
 implementation
 
 uses
-  Form.Customer, System.Generics.Collections, Model.Customer;
+  Form.Customer, Model.Customer, System.Generics.Collections;
 
 {$R *.dfm}
 
@@ -100,10 +100,10 @@ procedure TCustomersForm.Button1Click(Sender: TObject);
 var
   LList: TObjectList<TCustomer>;
 begin
-  LList := TObjectList<TCustomer>.Create;
-  io.LoadToList<TCustomer>(LList, io.Where('ID', coLowerOrEqual, 3));
+//  LList := TObjectList<TCustomer>.Create;
+//  io.LoadToList<TCustomer>(LList, io.Where('ID', coLowerOrEqual, 3));
 
-//  LList := io.LoadList<TObjectList<TCustomer>>(io.Where('ID', coLowerOrEqual, 3));
+  LList := io.LoadList<TObjectList<TCustomer>>(io.Where('ID', coLowerOrEqual, 3));
 
   ShowMessage(LList.Count.ToString);
   LList.Free;

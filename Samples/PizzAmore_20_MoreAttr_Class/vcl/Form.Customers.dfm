@@ -225,7 +225,6 @@ object CustomersForm: TCustomersForm
   object DSCustomers: TioDataSetMaster
     AsDefault = True
     TypeName = 'TCustomer'
-    OrderBy = '[.Name]'
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
