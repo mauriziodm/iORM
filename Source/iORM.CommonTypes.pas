@@ -39,8 +39,8 @@ uses
   System.Rtti, System.Generics.Collections, System.SysUtils;
 
 const
-  // M.M. 11/08/18 Se non vengono specificati gli attributi portiamo a 50 la lunghezza perchè Firebird ha un limite nella generazione degli indici su campi lunghi 255;
-  // Mauri 04/08/20: Vero ma con un PageSize = 4096 (il più diffuso) il limite massimo sarebbe 253
+  // M.M. 11/08/18 Default length to 50 if no attribute is specified because Firebird has a length limit on index generation for columns of length 255.
+  // Mauri 04/08/20 True, but if PageSize = 4096 (most common) the limit is 253.
   IO_DEFAULT_FIELD_LENGTH = 250;
   IO_DEFAULT_FIELD_PRECISION = 10;
   IO_DEFAULT_FIELD_SCALE = 3;
@@ -61,7 +61,7 @@ type
   // Compare operators
   TioCompareOp = (coEqual, coNotEqual, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
 
-  // Logic relations
+  // Logical relations
   TioLogicOp = (loAnd, loOr, loNot, loOpenPar, loClosePar);
 
   // Object Status
@@ -73,7 +73,7 @@ type
   // Common ClassRef
   TioClassRef = class of TObject;
 
-  // Orientation of  DB index
+  // DB index orientation
   TioIndexOrientation = (ioAscending = 0, ioDescending);
 
   // FD monitor and trace mode
@@ -85,15 +85,15 @@ type
 
   TioTypeOfCollection = (tcSingleObject, tcList);
 
-  // Selection Type (for selector ActiveBindSourceAdapters)
+  // Selection Type for selector ActiveBindSourceAdapters
   TioSelectionType = (stAppend, stInsert);
 
   // LoadType property for BindSources:
   // ltManual:                  loading of the objects into the bind sources is fully manual, call the "SetDataObject" of a master bind source
   // ltAuto:                    iORM automatically generates all calls to the ORM to load objects and assign them to bind source
-  // ltFromBSAsIs:              the bind source receive the object to bind from a source bind source AS IS, the object isn't reloaded
-  // ltFromBSReload:            the bind source receive the object to bind from a source bind source and reload it for any changes or lazy load
-  // ltFromBSReloadNewInstance: the bind source receive the object to bind from a source bind source and reload it AS A NEW INSTANCE for any changes or lazy load
+  // ltFromBSAsIs:              the bind source receives the object to bind from a source bind source AS IS, the object isn't reloaded
+  // ltFromBSReload:            the bind source receives the object to bind from a source bind source and reloads it for any changes or lazy load
+  // ltFromBSReloadNewInstance: the bind source receives the object to bind from a source bind source and reloads it AS A NEW INSTANCE for any changes or lazy load
   TioLoadType = (ltManual, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
   // Some pointers to TValue
@@ -148,7 +148,7 @@ end;
 function TioNullable<T>.GetValue: T;
 begin
   if IsNull then
-    raise EioException.Create('ioNullable: The value is null.');
+    raise EioException.Create('ioNullable: Value is null.');
   result := FValue;
 end;
 
