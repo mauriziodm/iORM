@@ -31,14 +31,15 @@
 {                                                                           }
 {***************************************************************************}
 
-
-{NB: This unit is based on code published by Jeroen Wiert Pluimers in his
-     blog "The Viert Corner" (https://wiert.me/2009/08/10/delphi-using-fastmm4-part-2-tdatamodule-descendants- exposing-interfaces-or-the-introduction-of-a-tinterfaceddatamodule /).
-     The only change I had to make was in the "_AddRef" and "_Release" methods,
-     in my variant if we are at design time in practice it disables the reference
-     counting (which therefore works only at runtime) because otherwise I could
-     not make it work well the wizard that creates new ViewModels.
-     Thanks Jeroen.}
+{
+  Thanks to Jeroen Wiert Pluimers for providing the initial code in his post( "The Wiert Corner" blog):
+  https://wiert.me/2009/08/10/delphi-using-fastmm4-part-2-tdatamodule-descendants- exposing-interfaces-or-the-introduction-of-a-tinterfaceddatamodule/
+  Changes to the original code:
+  _AddRef and _Release methods
+  Reason:
+  Refcounting is disabled at design time because it was causing issues with the wizard creating new ViewModels.
+  RefCounting will therefore *ONLY WORK AT RUNTIME*. 
+}
 
 unit iORM.Components.InterfacedDataModule;
 
@@ -95,7 +96,7 @@ begin
     else
     begin
       WarningMessage := Format(
-        'Trying to destroy an Owned TInterfacedDataModule of class %s named %s that still has %d interface references left',
+        'Trying to destroy an owned TInterfacedDataModule of class %s named %s that still has %d interface references left',
         [ClassName, Name, RefCount]);
       OutputDebugString(PChar(WarningMessage));
     end;
@@ -122,8 +123,7 @@ end;
 
 class function TioInterfacedDataModule.NewInstance: TObject;
 begin
-  // Set an implicit refcount so that refcounting
-  // during construction won't destroy the object.
+  // Set implicit refcount so that refcounting during construction won't destroy the object.
   Result := inherited NewInstance;
   TioInterfacedDataModule(Result).FRefCount := 1;
 end;

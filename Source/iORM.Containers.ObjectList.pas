@@ -31,8 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
 unit iORM.Containers.ObjectList;
 
 interface
@@ -88,7 +86,7 @@ end;
 
 procedure TioInterfacedObjectList<T>.AfterConstruction;
 begin
-// Release the constructor's implicit refcount
+// Release constructor's implicit refcount
   AtomicDecrement(FRefCount);
 end;
 

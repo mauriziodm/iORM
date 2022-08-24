@@ -39,7 +39,7 @@ uses
   System.Rtti, iORM.CommonTypes;
 
 type
-  // Type of class mapping
+  // Class mapping types
   TioMapModeType = (mmHybrid, mmProperties, mmFields);
 
   // TrueClassMode
@@ -106,7 +106,7 @@ type
     property Value: TValue read FValue;
   end;
 
-  // Base class for relation attribute
+  // Relation attributes base class
   TioCustomRelationAttribute = class(TioCustomAttribute)
   strict private
     FChildTypeName: String;
@@ -187,7 +187,7 @@ type
   ioChar = class(ioVarchar)
   end;
 
-  // Define Integer Type (SmallInt, Integer, BigInt)
+  // Define Integer Types (SmallInt, Integer, BigInt)
   ioInteger = class(TioCustomAttribute)
   strict private
     FPrecision: Integer;
@@ -218,7 +218,7 @@ type
 
   // Define Decimal Or Numeric Type
   // DECIMAL(p,s) --> DECIMAL(13,2) 11 Digits Before the decimal and 2 Digits after decimal
-  // NUMERIC(p,s) --> NUMERIC(13,2) Treated in the same way of Decimal
+  // NUMERIC(p,s) --> NUMERIC(13,2) Treated the same as Decimal
   ioDecimal = class(TioCustomAttribute)
   strict private
     FPrecision: Integer;
@@ -281,7 +281,7 @@ type
     property ChildPropertyName: String read FChildPropertyName;
   end;
 
-  // Disable the automatic detection for HasMany relation
+  // Disable automatic detection for HasMany relation(s)
   ioDisableRelationAutodetect = class(TioCustomAttribute);
 
   // Relation BelongsTo attribute
@@ -418,7 +418,7 @@ type
   diViewFor = class(TioCustomForTargetModel)
   end;
 
-  // DIC - diViewModelFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  // DIC - diViewModelFor(TargetModelClassName) (register the calls as Views for the TargetModelClassName)
   diViewModelFor = class(TioCustomForTargetModel)
   end;
   // ---------------------------------------------------------------------------
