@@ -851,37 +851,37 @@ end;
 class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AVVMAlias, AVCProviderName: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
-    io.di.LocateViewVMfor(ATargetBindSource.GetTypeName, AVVMAlias).VCProvider(AVCProviderName).SetBindSource(ATargetBindSource).Get;
+    io.di.LocateViewVMfor(ATargetBindSource.GetTypeName, AVVMAlias).VCProvider(AVCProviderName).SetBindSourceAsSelectorFor(ATargetBindSource).Get;
 end;
 
 class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
-    io.di.LocateViewVMfor(ATargetBindSource.GetTypeName, AVVMAlias).VCProvider(AVCProvider).SetBindSource(ATargetBindSource).Get;
+    io.di.LocateViewVMfor(ATargetBindSource.GetTypeName, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Get;
 end;
 
 class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
-    io.di.LocateViewVMfor(ATargetBindSource.GetTypeName, AVVMAlias).SetViewContext(AViewContext).SetBindSource(ATargetBindSource).Get;
+    io.di.LocateViewVMfor(ATargetBindSource.GetTypeName, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetBindSource).Get;
 end;
 
 class procedure io.ShowAsSelector<T>(const ATargetMP: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
-    io.di.LocateViewVMfor<T>(AVVMAlias).SetViewContext(AViewContext).SetBindSource(ATargetMP).Get;
+    io.di.LocateViewVMfor<T>(AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector<T>(const ATargetMP: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
-    io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).SetBindSource(ATargetMP).Get;
+    io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowAsSelector<T>(const ATargetMP: IioNotifiableBindSource; const AVVMAlias, AVCProviderName: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, False, False) then
-    io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).SetBindSource(ATargetMP).Get;
+    io.di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).SetBindSourceAsSelectorFor(ATargetMP).Get;
 end;
 
 class procedure io.ShowEach(const AModelPresenter: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
