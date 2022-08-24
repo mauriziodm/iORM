@@ -143,7 +143,6 @@ function TdjDuckList.GetItem(Index: Integer): TObject;
 var
   AValue: TValue;
 begin
-{ TODO : Possibile ottimizzazione se si trova il modo di richiamare il metodo Add più direttamente (noR RTTI) }
   AValue := FGetItemMethod.Invoke(FObjAsDuck, [index]);
   case AValue.Kind of
     tkClass:

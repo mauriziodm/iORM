@@ -77,7 +77,6 @@ begin
     // If even one table is to be altered then all of them are to be altered
     //  (even those that have not actually changed). Instead those that are new
     //  (to be created) obviously remain to be created.
-    //TODO: MM 12/06/21
     SQLite_AllOrNothingPostProcess;
     // Commit or rollback the transaction (if in transaction)
     if FSchema.Status <> stCreate then
