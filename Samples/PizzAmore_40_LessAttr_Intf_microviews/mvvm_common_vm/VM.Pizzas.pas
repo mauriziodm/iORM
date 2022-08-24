@@ -10,6 +10,7 @@ uses
 type
 
   TVMPizzas = class(TVMBaseForList)
+    procedure acAddExecute(Sender: TObject);
   private
     FEmbedded: Boolean;
     procedure SetEmbedded(const Value: Boolean);
@@ -19,9 +20,18 @@ type
 
 implementation
 
+uses
+  Model.Pizza;
+
 {$R *.dfm}
 
 { TVMPizzas }
+
+procedure TVMPizzas.acAddExecute(Sender: TObject);
+begin
+  MPMaster.Persistence.Append( TPizza.Create as IPizza );
+  inherited;
+end;
 
 procedure TVMPizzas.SetEmbedded(const Value: Boolean);
 begin

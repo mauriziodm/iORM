@@ -24,6 +24,8 @@ type
     FOnBeforeUpdate: TNotifyEvent;
     FOnAfterUpdate: TNotifyEvent;
   strict protected
+    procedure _ExecuteEmbeddedEvendHandler(Sender: TObject);
+    procedure _UpdateEmbeddedEvendHandler(Sender: TObject);
     procedure CheckVMAction(const CallingMethod: String);
     procedure DoBeforeExecute;
     procedure DoAfterExecute;
@@ -62,8 +64,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; override;
-    function Execute: Boolean; override;
-    function Update: Boolean; override;
   published
     // Properties
     property Caption: string read GetCaption write SetCaption;
@@ -625,7 +625,8 @@ procedure TioViewAction.CheckVMAction(const CallingMethod: String);
 begin
   if not Assigned(FVMAction) then
     raise EioException.Create(ClassName, Format('CheckVMAction', [CallingMethod]),
-      Format('ViewAction "%s" is not linked to corresponding VMAction named "%s".'#13#13'iORM is unable to execute the requested method ("%s").', [Name, 'XXX', CallingMethod]));
+      Format('ViewAction "%s" is not linked to corresponding VMAction named "%s".'#13#13'iORM is unable to execute the requested method ("%s").',
+      [Name, GetVMActionName, CallingMethod]));
 end;
 
 constructor TioViewAction.Create(AOwner: TComponent);
@@ -636,6 +637,7 @@ begin
   FVisibleLinkedToVMAction := True;
   FVMAction := nil;
   FVMActionName := '';
+  OnExecute := _ExecuteEmbeddedEvendHandler;
 end;
 
 destructor TioViewAction.Destroy;
@@ -669,17 +671,16 @@ begin
     FOnBeforeUpdate(Self);
 end;
 
-function TioViewAction.Execute: Boolean;
+procedure TioViewAction._ExecuteEmbeddedEvendHandler(Sender: TObject);
 begin
   CheckVMAction('Execute');
-  Result := FVMAction.Execute;
-  inherited;
+  FVMAction.Execute;
 end;
 
-function TioViewAction.Update: Boolean;
+procedure TioViewAction._UpdateEmbeddedEvendHandler(Sender: TObject);
 begin
   CheckVMAction('Update');
-  Result := FVMAction.Update;
+  FVMAction.Update;
 end;
 
 function TioViewAction.GetCaption: String;

@@ -11,6 +11,7 @@ type
 
   [diViewModelFor(IOrder)]
   TVMOrders = class(TVMBaseForList)
+    procedure acAddExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -19,6 +20,15 @@ type
 
 implementation
 
+uses
+  Model.Order;
+
 {$R *.dfm}
+
+procedure TVMOrders.acAddExecute(Sender: TObject);
+begin
+  MPMaster.Persistence.Append( TOrder.Create as IOrder );
+  inherited;
+end;
 
 end.

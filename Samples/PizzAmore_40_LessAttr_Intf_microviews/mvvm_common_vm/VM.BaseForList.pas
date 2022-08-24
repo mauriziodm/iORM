@@ -39,7 +39,7 @@ implementation
 
 procedure TVMBaseForList.acAddExecute(Sender: TObject);
 begin
-  MPMaster.Persistence.Append(io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface>);
+  // Note: In the descendants write the code that creates the new instance and then, AFTER, put "inherited" to call "ShowOrSelect"
   acShowOrSelect.Execute;
 end;
 

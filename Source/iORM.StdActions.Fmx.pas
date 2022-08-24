@@ -32,6 +32,8 @@ type
     FOnBeforeUpdate: TNotifyEvent;
     FOnAfterUpdate: TNotifyEvent;
   strict protected
+    procedure _ExecuteEmbeddedEvendHandler(Sender: TObject);
+    procedure _UpdateEmbeddedEvendHandler(Sender: TObject);
     procedure CheckVMAction(const CallingMethod: String);
     procedure DoBeforeExecute;
     procedure DoAfterExecute;
@@ -69,8 +71,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function Execute: Boolean; override;
-    function Update: Boolean; override;
   published
     // Properties
     property Caption: string read GetCaption write SetCaption;
@@ -626,7 +626,8 @@ procedure TioViewAction.CheckVMAction(const CallingMethod: String);
 begin
   if not Assigned(FVMAction) then
     raise EioException.Create(ClassName, Format('CheckVMAction', [CallingMethod]),
-      Format('ViewAction "%s" is not linked to corresponding VMAction named "%s".'#13#13'iORM is unable to execute the requested method ("%s").', [Name, 'XXX', CallingMethod]));
+      Format('ViewAction "%s" is not linked to corresponding VMAction named "%s".'#13#13'iORM is unable to execute the requested method ("%s").',
+      [Name, GetVMActionName, CallingMethod]));
 end;
 
 constructor TioViewAction.Create(AOwner: TComponent);
@@ -668,13 +669,6 @@ procedure TioViewAction.DoBeforeUpdate;
 begin
   if Assigned(FOnBeforeUpdate) then
     FOnBeforeUpdate(Self);
-end;
-
-function TioViewAction.Execute: Boolean;
-begin
-  CheckVMAction('Execute');
-  Result := FVMAction.Execute;
-  inherited;
 end;
 
 function TioViewAction.GetCaption: String;
@@ -797,10 +791,16 @@ begin
     FVMActionName := Value.Trim;
 end;
 
-function TioViewAction.Update: Boolean;
+procedure TioViewAction._ExecuteEmbeddedEvendHandler(Sender: TObject);
+begin
+  CheckVMAction('Execute');
+  FVMAction.Execute;
+end;
+
+procedure TioViewAction._UpdateEmbeddedEvendHandler(Sender: TObject);
 begin
   CheckVMAction('Update');
-  Result := FVMAction.Update;
+  FVMAction.Update;
 end;
 
 end.

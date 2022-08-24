@@ -92,8 +92,8 @@ type
     // Methods
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
-    function Execute: Boolean;
-    function Update: Boolean;
+    procedure Execute;
+    procedure Update;
     // Caption property
     procedure SetCaption(const Value: string);
     function GetCaption: String;

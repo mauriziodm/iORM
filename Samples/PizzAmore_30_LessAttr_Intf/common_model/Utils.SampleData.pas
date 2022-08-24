@@ -123,7 +123,7 @@ begin
   // First order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
-  LOrder.Customer := io.Load<ICustomer>(1);
+  LOrder.Customer := io.LoadObject<ICustomer>(1);
   LOrder.Note := 'Well done';
   LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 3]) );
   LOrder.Rows.Add( io.Create<IOrderRow>([2, 'Capricciosa pizza', 7, 2]) );
@@ -132,7 +132,7 @@ begin
   // Second order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
-  LOrder.Customer := io.Load<ICustomer>(2);
+  LOrder.Customer := io.LoadObject<ICustomer>(2);
   LOrder.Note := 'Double cheese please';
   LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 1]) );
   LOrder.Rows.Add( io.Create<IOrderRow>([2, 'Pepperoni pizza', 6.5, 1]) );
@@ -140,7 +140,7 @@ begin
   // Third order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
-  LOrder.Customer := io.Load<ICustomer>(3);
+  LOrder.Customer := io.LoadObject<ICustomer>(3);
   LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
   io.Persist(LOrder);
 end;

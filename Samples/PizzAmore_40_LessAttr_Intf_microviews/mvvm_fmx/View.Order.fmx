@@ -266,8 +266,8 @@ inherited ViewOrder: TViewOrder
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 380.000000000000000000
-      Viewport.Height = 319.000000000000000000
+      Viewport.Width = 376.000000000000000000
+      Viewport.Height = 294.000000000000000000
     end
   end
   inherited VMBridge: TioViewModelBridge
@@ -424,7 +424,6 @@ inherited ViewOrder: TViewOrder
       FieldName = 'Name'
       Control = EditCustName
       Track = False
-      CustomFormat = '%s + '#39' ('#39' + Owner.PhoneNumber.Value + '#39')'#39
     end
     object LinkControlToField6: TLinkControlToField
       Category = 'Quick Bindings'

@@ -54,8 +54,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; virtual;
-    function Execute: Boolean;
-    function Update: Boolean;
+    procedure Execute;
+    procedure Update;
   end;
 
   TioVMAction = class(TioVMActionCustom)
@@ -316,7 +316,7 @@ begin
   inherited;
 end;
 
-function TioVMActionCustom.Execute: Boolean;
+procedure TioVMActionCustom.Execute;
 var
   LViewAction: IioViewAction;
 begin
@@ -328,8 +328,20 @@ begin
   // Execute the ViewAction.onAfterExecute event
   for LViewAction in FBindedViewActionsContainer do
     LViewAction.DoAfterExecute;
-  // It's all right
-  Result := True;
+end;
+
+procedure TioVMActionCustom.Update;
+var
+  LViewAction: IioViewAction;
+begin
+  // Execute the ViewAction.onBeforeUpdate event
+  for LViewAction in FBindedViewActionsContainer do
+    LViewAction.DoBeforeUpdate;
+  // Execute the VMAction.onUpdate event if assigned (or a standard action)
+  _InternalUpdate;
+  // Execute the ViewAction.onAfterUpdatee event ia assigned or standard action
+  for LViewAction in FBindedViewActionsContainer do
+    LViewAction.DoAfterUpdate;
 end;
 
 function TioVMActionCustom.GetCaption: String;
@@ -360,22 +372,6 @@ end;
 function TioVMActionCustom.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := False;
-end;
-
-function TioVMActionCustom.Update: Boolean;
-var
-  LViewAction: IioViewAction;
-begin
-  // Execute the ViewAction.onBeforeUpdate event
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoBeforeUpdate;
-  // Execute the VMAction.onUpdate event if assigned (or a standard action)
-  _InternalUpdate;
-  // Execute the ViewAction.onAfterUpdatee event ia assigned or standard action
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoAfterUpdate;
-  // It's all right
-  Result := True;
 end;
 
 procedure TioVMActionCustom._InternalExecute;

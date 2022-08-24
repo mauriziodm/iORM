@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Rtti, iORM;
+  System.SysUtils, System.Rtti, iORM, Model.OrderRow;
 
 { TOrder }
 
@@ -64,7 +64,7 @@ begin
     end;
   end;
   // Else create a new OrderRow
-  Rows.Add( io.Create<IOrderRow>([TValue.From<IPizza>(APizza)]) );
+  Rows.Add( TOrderRow.Create(APizza) );
 end;
 
 constructor TOrder.Create;
