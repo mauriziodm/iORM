@@ -31,8 +31,6 @@
 {                                                                           }
 {***************************************************************************}
 
-
-
 unit iORM.Containers.Interfaces;
 
 interface
@@ -42,7 +40,7 @@ uses
 
 type
 
-  // Interfaces for generic lists
+  // Generic lists' interfaces
   IioList<T> = interface
     ['{4493AF3A-ECD6-4754-B56E-23FFAB4BDF33}']
     function Add(const Value: T): Integer;
@@ -58,7 +56,6 @@ type
     procedure InsertRange(Index: Integer; const Collection: TEnumerable<T>); overload;
 
     procedure Pack; overload;
-//    procedure Pack(const IsEmpty: TEmptyFunc); overload;
 
     function Remove(const Value: T): Integer;
     function RemoveItem(const Value: T; Direction: TDirection): Integer;
