@@ -21,6 +21,9 @@ type
 
 implementation
 
+uses
+  Model.Customer;
+
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}

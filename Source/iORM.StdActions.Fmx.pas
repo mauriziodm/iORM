@@ -638,6 +638,8 @@ begin
   FVisibleLinkedToVMAction := True;
   FVMAction := nil;
   FVMActionName := '';
+  OnExecute := _ExecuteEmbeddedEvendHandler;
+  OnUpdate := _UpdateEmbeddedEvendHandler;
 end;
 
 destructor TioViewAction.Destroy;

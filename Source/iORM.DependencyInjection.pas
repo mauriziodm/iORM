@@ -430,10 +430,6 @@ begin
   // Get & set the ViewModel instance into the ViewLocator
   LViewModel := io.di.LocateVMfor(ATargetObj, AAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel);
-
-  // ===== OLD CODE =====
-  // Result := LocateViewVMfor(ATargetObj.ClassName, AAlias);
-  // ===== OLD CODE =====
 end;
 
 class function TioDependencyInjection.LocateViewVMfor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
@@ -445,10 +441,6 @@ begin
   // Get & set the ViewModel instance into the ViewLocator
   LViewModel := io.di.LocateVMfor(ATargetIntf, AAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel);
-
-  // ===== OLD CODE =====
-  // Result := LocateViewVMfor((ATargetIntf as TObject).ClassName, AAlias);
-  // ===== OLD CODE =====
 end;
 
 class function TioDependencyInjection.LocateViewVMfor<T>(const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
@@ -1065,13 +1057,13 @@ begin
     begin
       if ASubKey.IsEmpty then
         raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
-          #13#13'The services of the "%s" interface are required but I cannot find any registered class that implements it.' +
+          #13#13'Services of the "%s" interface are required but I cannot find any registered class that implements it.' +
           #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s)]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
         raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
-          #13#13'The services of the "%s" interface (alias "%s") are required but I cannot find any registered class that implements it.' +
+          #13#13'Services of the "%s" interface (alias "%s") are required but I cannot find any registered class that implements it.' +
           #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s, ''%s'')]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>(''%s'').Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, ASubKey, AKey, ASubKey, AKey, ASubKey]));

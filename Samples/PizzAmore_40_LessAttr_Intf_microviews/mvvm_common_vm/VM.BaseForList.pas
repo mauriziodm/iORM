@@ -39,7 +39,9 @@ implementation
 
 procedure TVMBaseForList.acAddExecute(Sender: TObject);
 begin
-  // Note: In the descendants write the code that creates the new instance and then, AFTER, put "inherited" to call "ShowOrSelect"
+  // NOTE!!! In the descendants write the code that creates the new instance and then, AFTER, put "inherited" to call "ShowOrSelect"
+  // NOTE!!! In the descendants write the code that creates the new instance and then, AFTER, put "inherited" to call "ShowOrSelect"
+  // NOTE!!! In the descendants write the code that creates the new instance and then, AFTER, put "inherited" to call "ShowOrSelect"
   acShowOrSelect.Execute;
 end;
 

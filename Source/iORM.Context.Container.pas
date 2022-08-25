@@ -301,7 +301,7 @@ var
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
         begin
           LFarAncestorClassRefImplementingInterface := TioUtilities.GetFarAncestorClassRefImplementingInterface(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID);
-          io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplementedInterfaces[Index].GUID, ACurrentRttiInstanceType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
+          io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplementedInterfaces[Index].GUID, '<E>' + ACurrentRttiInstanceType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
             (LFarAncestorClassRefImplementingInterface.Name).AsEntity.Execute;
         end;
     end;

@@ -39,7 +39,7 @@ implementation
 
 procedure TVMBaseForList.acAddExecute(Sender: TObject);
 begin
-  MPMaster.Persistence.Append(io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface>);
+  MPMaster.Persistence.Append( io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface> );
   acShowOrSelect.Execute;
 end;
 
