@@ -42,6 +42,12 @@ uses
   iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes,
   System.SysUtils;
 
+const
+  DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX = '<E>';
+  DI_SIMPLEVIEW_KEY_PREFIX = '<SV>';
+  DI_VIEW_KEY_PREFIX = '<V>';
+  DI_VIEWMODEL_KEY_PREFIX = '<VM>';
+
 type
 
   // ===============================================================================================================================
@@ -53,6 +59,11 @@ type
   TioDIContainerImplementers = class
   strict private
     FInternalContainer: TObjectDictionary<TioDIContainerImplementersKey, TioDIContainerImplementersItem>;
+    FEntityAutoRegisteredCount: Integer;
+    procedure _IncCounter(const AAlias: String);
+    procedure _DecCounter(const AAlias: String);
+    function GetCount: Integer;
+    function GetRegularRegisteredCount: Integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -60,7 +71,12 @@ type
     function GetItem(const AAlias: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
     function Contains(const AAlias: TioDIContainerImplementersKey): Boolean;
     function GetEnumerator: TEnumerator<TioDIContainerImplementersItem>;
-    function RemoveAndCheckIfEmpty(ASubKey: String): Boolean;
+    function RemoveAndCheckIfEmpty(AAlias: String): Boolean;
+    function GetFirstAlias: String;
+    property Count: Integer read GetCount;
+    property EntityAutoRegisteredCount: Integer read FEntityAutoRegisteredCount;
+    /// This property equals to Count-EntityPersistenceOnlyCount-SimpleViewCount-ViewCount-ViewModelCount
+    property RegularRegisteredCount: Integer read GetRegularRegisteredCount;
   end;
 
   // Dependency injection container INTERFACES (MasterContainer)
@@ -75,6 +91,7 @@ type
   TioDependencyInjectionContainer = class abstract
   strict private
     class var FContainer: TioDIContainerInstance;
+    class function _SubKeyResolver(const AKey, ASubKey: String): String;
   public
     class procedure Build;
     class procedure CleanUp;
@@ -90,6 +107,7 @@ type
   TioDependencyInjectionBase = class abstract(TInterfacedObject)
   strict protected
     class function Container: TioDependencyInjectionContainerRef;
+    class function ModelToEntityDefaultContainerSubKey(const ATargetTypeName: String): String;
     class function ModelToSimpleViewContainerKey(const ATargetTypeName: String): String;
     class function ModelToViewContainerKey(const ATargetTypeName: String): String;
     class function ModelToViewModelContainerKey(const ATargetTypeName: String): String;
@@ -102,7 +120,7 @@ type
   TioDependencyInjectionRegister = class(TioDependencyInjectionBase)
   strict private
     FContainerValue: TioDIContainerImplementersItem;
-    FInterfaceName, FInterfaceNameOriginal: String;
+    FInterfaceName: String;
     FAlias: String;
     FSetMapImplementersRef: Boolean;
     procedure LoadInjectAttributes;
@@ -286,7 +304,7 @@ type
   // ===========================================================================
 
   // Class for ResolverByDependencyInjection
-  // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+  // NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
   TioDependencyInjectionResolverBase = class(TioDependencyInjectionBase)
   public
     // ResolveInaccurate in pratica per cercare almeno una classe che implementa l'interfaccia.
@@ -372,19 +390,24 @@ begin
   Result := TioDependencyInjectionContainer;
 end;
 
+class function TioDependencyInjectionBase.ModelToEntityDefaultContainerSubKey(const ATargetTypeName: String): String;
+begin
+  Result := DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX + ATargetTypeName;
+end;
+
 class function TioDependencyInjectionBase.ModelToSimpleViewContainerKey(const ATargetTypeName: String): String;
 begin
-  Result := '<SV>' + ATargetTypeName;
+  Result := DI_SIMPLEVIEW_KEY_PREFIX + ATargetTypeName;
 end;
 
 class function TioDependencyInjectionBase.ModelToViewContainerKey(const ATargetTypeName: String): String;
 begin
-  Result := '<V>' + ATargetTypeName;
+  Result := DI_VIEW_KEY_PREFIX + ATargetTypeName;
 end;
 
 class function TioDependencyInjectionBase.ModelToViewModelContainerKey(const ATargetTypeName: String): String;
 begin
-  Result := '<VM>' + ATargetTypeName;
+  Result := DI_VIEWMODEL_KEY_PREFIX + ATargetTypeName;
 end;
 
 { TioDependencyInjection }
@@ -610,7 +633,6 @@ function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetTypeName, A
 begin
   // Set the InterfaceName
   FInterfaceName := ModelToSimpleViewContainerKey(ATargetTypeName);
-  FInterfaceNameOriginal := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -914,7 +936,6 @@ function TioDependencyInjectionRegister.AsViewFor(const ATargetTypeName, AAlias:
 begin
   // Set the InterfaceName
   FInterfaceName := ModelToViewContainerKey(ATargetTypeName);
-  FInterfaceNameOriginal := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -942,7 +963,6 @@ function TioDependencyInjectionRegister.AsViewModelFor(const ATargetTypeName, AA
 begin
   // Set the InterfaceName
   FInterfaceName := ModelToViewModelContainerKey(ATargetTypeName);
-  FInterfaceNameOriginal := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -995,12 +1015,15 @@ class function TioDependencyInjectionContainer.Get(AKey: TioDIContainerKey; ASub
 begin
   AKey := Uppercase(AKey);
   ASubKey := Uppercase(ASubKey);
+  // Resolve the subkey if needed
+  ASubKey := _SubKeyResolver(AKey, ASubKey);
+  // If exists then return the implementer class else raise an exception
   if Self.Exists(AKey, ASubKey) then
     Result := Self.FContainer.Items[AKey].GetItem(ASubKey)
   else
   begin
     // ViewModel
-    if AKey.StartsWith('<VM>') then
+    if AKey.StartsWith(DI_VIEWMODEL_KEY_PREFIX) then
     begin
       AKey := Copy(AKey, 5, 99);
       if ASubKey.IsEmpty then
@@ -1018,7 +1041,7 @@ begin
     end
     else
     // View
-    if AKey.StartsWith('<V>') then
+    if AKey.StartsWith(DI_VIEW_KEY_PREFIX) then
     begin
       AKey := Copy(AKey, 4, 99);
       if ASubKey.IsEmpty then
@@ -1036,7 +1059,7 @@ begin
     end
     else
     // SimpleView
-    if AKey.StartsWith('<SV>') then
+    if AKey.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
     begin
       AKey := Copy(AKey, 5, 99);
       if ASubKey.IsEmpty then
@@ -1095,6 +1118,27 @@ begin
   ASubKey := Uppercase(ASubKey);
   if Exists(AKey, ASubKey) and FContainer.Items[AKey].RemoveAndCheckIfEmpty(ASubKey) then
     FContainer.Remove(AKey);
+end;
+
+class function TioDependencyInjectionContainer._SubKeyResolver(const AKey, ASubKey: String): String;
+begin
+  // 1) Verifica che almeno la chiave principale esista, se non esiste esce subito senza fare nulla
+  //     e non solleva nemmeno una eccezione perchè ci pensa il codcie chiamante.
+  // 2) Poi controlla se lo specificoco implementer esiste esattamente come lo si sta cercando compreso l'alias
+  //     (quindi nel caso la classe implementatrice fosse stata registrata eslicitamente nel DIC), se lo trova
+  //     anche in questo caso lascia tutto così com'è.
+  // 3) A Questo punto se nell'elenco degli implementers dell'interfaccia c'è più di un elemento,
+  //     indipendentemente da  fatto che sia una registrazione normale o automatica della entità (quella
+  //     solo per la persistenza) allora ci può essere una ambiguità quindi lascia stare tutto in modo
+  //     che il codice chiamante sollevi l'eccezione.
+  if (not ImplementersExists(AKey)) or Exists(AKey, ASubKey) or (GetInterfaceImplementers(AKey).Count > 1) then
+    Result := ASubKey
+  // Altrimenti se arriva qui significa che non si è trovata la classe specifica che si stava cercando
+  //  (Key + SubKey) e che c'è una sola classe registrata come implementatrice (che dovrebbe essere
+  //  per forza quella registrata automaticamnete come entità solo per la persistenza) ed essendo
+  //  l'unica non c'è ambiguità quindi modifica la SubKey in modo che usi questa.
+  else
+    Result := GetInterfaceImplementers(AKey).GetFirstAlias;
 end;
 
 { TioDependencyInjectionLocator }
@@ -1819,7 +1863,7 @@ end;
 
 { TioDependencyInjectionResolverBase }
 
-// NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+// NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
 class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: String; const AAlias: String; const AResolverMode: TioResolverMode;
   const AUseMapInfo: Boolean): IioResolvedTypeList;
   procedure _NestedResolveInterface;
@@ -1837,7 +1881,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
       // Loop for all the implementers
       for LImplementer in LImplementerCollection do
       begin
-        // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+        // NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
         if not LImplementer.IsEntity then
           Continue;
         // If the Use of maps info are enabled (default) then retreive ConnectionDefName and TableNamenfrom the map
@@ -1883,7 +1927,7 @@ begin
     Result.Add(Self.Container.Get(ATypeName, AAlias).ClassName);
 end;
 
-// NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+// NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
 class function TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(const ATypeName, AAlias: String): TRttiType;
 var
   LResolvedTypeList: IioResolvedTypeList;
@@ -1908,7 +1952,14 @@ end;
 
 procedure TioDIContainerImplementers.Add(const AAlias: String; const AImplementerItem: TioDIContainerImplementersItem);
 begin
-  FInternalContainer.AddOrSetValue(AAlias, AImplementerItem);
+  // Increment counters only if it's a new element
+  if FInternalContainer.ContainsKey(AAlias) then
+    FInternalContainer.AddOrSetValue(AAlias, AImplementerItem)
+  else
+  begin
+    FInternalContainer.Add(AAlias, AImplementerItem);
+    _IncCounter(AAlias);
+  end;
 end;
 
 function TioDIContainerImplementers.Contains(const AAlias: TioDIContainerImplementersKey): Boolean;
@@ -1920,6 +1971,7 @@ constructor TioDIContainerImplementers.Create;
 begin
   inherited;
   FInternalContainer := TObjectDictionary<string, TioDIContainerImplementersItem>.Create([doOwnsValues]);
+  FEntityAutoRegisteredCount := 0;
 end;
 
 destructor TioDIContainerImplementers.Destroy;
@@ -1928,9 +1980,29 @@ begin
   inherited;
 end;
 
+function TioDIContainerImplementers.GetCount: Integer;
+begin
+  Result := FInternalContainer.Count;
+end;
+
 function TioDIContainerImplementers.GetEnumerator: TEnumerator<TioDIContainerImplementersItem>;
 begin
   Result := FInternalContainer.Values.GetEnumerator;
+end;
+
+function TioDIContainerImplementers.GetFirstAlias: String;
+var
+  LKeyEnumerator: TEnumerator<String>;
+begin
+  LKeyEnumerator := FInternalContainer.Keys.GetEnumerator;
+  try
+    if LKeyEnumerator.MoveNext then
+      Result := LKeyEnumerator.Current
+    else
+      raise EioException.Create(ClassName, 'GetFirstAlias', 'There are no implementing classes registered.');
+  finally
+    LKeyEnumerator.Free;
+  end;
 end;
 
 function TioDIContainerImplementers.GetItem(const AAlias: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
@@ -1938,10 +2010,28 @@ begin
   Result := FInternalContainer.Items[AAlias];
 end;
 
-function TioDIContainerImplementers.RemoveAndCheckIfEmpty(ASubKey: String): Boolean;
+function TioDIContainerImplementers.GetRegularRegisteredCount: Integer;
 begin
-  FInternalContainer.Remove(ASubKey);
+  Result := FInternalContainer.Count - FEntityAutoRegisteredCount;
+end;
+
+function TioDIContainerImplementers.RemoveAndCheckIfEmpty(AAlias: String): Boolean;
+begin
+  FInternalContainer.Remove(AAlias);
+  _DecCounter(AAlias);
   Result := FInternalContainer.Count = 0;
+end;
+
+procedure TioDIContainerImplementers._DecCounter(const AAlias: String);
+begin
+  if AAlias.StartsWith(DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX) then
+    Dec(FEntityAutoRegisteredCount);
+end;
+
+procedure TioDIContainerImplementers._IncCounter(const AAlias: String);
+begin
+  if AAlias.StartsWith(DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX) then
+    Inc(FEntityAutoRegisteredCount);
 end;
 
 // function TioDependencyInjectionLocator<TI>.SetBindSource(

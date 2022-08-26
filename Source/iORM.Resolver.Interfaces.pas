@@ -54,7 +54,7 @@ type
   IioResolvedTypeList = IioList<String>;
 
   // Interface for the resolvers
-  // NB: FOR ENTITY PERSISTANCE PURPOSES ONLY
+  // NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
   TioResolverRef = class of TioResolver;
   TioResolver = class abstract
   public

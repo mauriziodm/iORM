@@ -293,7 +293,7 @@ var
         LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
       end;
     end;
-    // Dependency Injection Container - Auto register the class for the resolver (persistance only) to use for load, persist, delete only
+    // Dependency Injection Container - Auto register the class for the resolver (persistence only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
     begin
       LdiImplementedInterfaces := ACurrentRttiInstanceType.GetImplementedInterfaces;
@@ -301,7 +301,7 @@ var
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
         begin
           LFarAncestorClassRefImplementingInterface := TioUtilities.GetFarAncestorClassRefImplementingInterface(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID);
-          io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplementedInterfaces[Index].GUID, '<E>' + ACurrentRttiInstanceType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
+          io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplementedInterfaces[Index].GUID, DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX + ACurrentRttiInstanceType.Name)._SetFarAncestorClassNameImplementingTheSameInterface
             (LFarAncestorClassRefImplementingInterface.Name).AsEntity.Execute;
         end;
     end;
