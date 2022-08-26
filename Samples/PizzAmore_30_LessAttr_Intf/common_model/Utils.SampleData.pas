@@ -74,24 +74,21 @@ var
   LCustomer: ICustomer;
 begin
   // Mr. Maurizio Del Magno
-//  LCustomer := io.Create<ICustomer>;
-  LCustomer := TCustomer.Create;
+  LCustomer := io.Create<ICustomer>;
   LCustomer.Name := 'Maurizio Del Magno';
   LCustomer.City := 'New York';
   LCustomer.Address := '301 Park Ave';
   LCustomer.PhoneNumber := '(555) 555-1234';
   io.Persist(LCustomer);
   // Mr. Omar Bossoni
-//  LCustomer := io.Create<ICustomer>;
-  LCustomer := TCustomer.Create;
+  LCustomer := io.Create<ICustomer>;
   LCustomer.Name := 'Omar Bossoni';
   LCustomer.City := 'New York';
   LCustomer.Address := '111 E 48th St';
   LCustomer.PhoneNumber := '(444) 444-1234';
   io.Persist(LCustomer);
   // Mr. Marco Mottadelli
-//  LCustomer := io.Create<ICustomer>;
-  LCustomer := TCustomer.Create;
+  LCustomer := io.Create<ICustomer>;
   LCustomer.Name := 'Marco Mottadelli';
   LCustomer.City := 'Union City';
   LCustomer.Address := '3501 Bergenline Ave';
@@ -106,8 +103,7 @@ var
 begin
   for LCounter := 4 to 1000 do
   begin
-//    LCustomer := io.Create<ICustomer>;
-    LCustomer := TCustomer.Create;
+    LCustomer := io.Create<ICustomer>;
     LCustomer.Name := Format('other customer %d', [LCounter]);
     LCustomer.City := Format('city %d', [LCounter]);
     LCustomer.Address := Format('address %d', [LCounter]);

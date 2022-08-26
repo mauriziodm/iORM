@@ -38,8 +38,11 @@ implementation
 {$R *.dfm}
 
 procedure TVMBaseForList.acAddExecute(Sender: TObject);
+var
+  LNewInstance: IInterface;
 begin
-  MPMaster.Persistence.Append( io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface> );
+  LNewInstance := io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface>;
+  MPMaster.Persistence.Append(LNewInstance);
   acShowOrSelect.Execute;
 end;
 

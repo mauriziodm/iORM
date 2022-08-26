@@ -1131,7 +1131,7 @@ begin
   //     indipendentemente da  fatto che sia una registrazione normale o automatica della entità (quella
   //     solo per la persistenza) allora ci può essere una ambiguità quindi lascia stare tutto in modo
   //     che il codice chiamante sollevi l'eccezione.
-  if (not ImplementersExists(AKey)) or Exists(AKey, ASubKey) or (GetInterfaceImplementers(AKey).Count > 1) then
+  if (not ImplementersExists(AKey)) or Exists(AKey, ASubKey) or (GetInterfaceImplementers(AKey).RegularRegisteredCount > 0) then
     Result := ASubKey
   // Altrimenti se arriva qui significa che non si è trovata la classe specifica che si stava cercando
   //  (Key + SubKey) e che c'è una sola classe registrata come implementatrice (che dovrebbe essere
