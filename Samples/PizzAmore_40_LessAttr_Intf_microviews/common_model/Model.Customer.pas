@@ -52,7 +52,7 @@ type
     property FidelityCardCode: String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('CONTACTS')]
+  [ioEntity('EMP')]
   TVipCustomer = class(TCustomer, IVipCustomer)
    strict private
     FVipCardCode: String;
@@ -63,7 +63,7 @@ type
     property VipCardCode: String read GetVipCardCode write SetVipCardCode;
   end;
 
-  [ioEntity('CONTACTS')]
+  [ioEntity('EMP')]
   TEmployee = class(TContact, IEmployee)
    strict private
     FBranchOffice: String;

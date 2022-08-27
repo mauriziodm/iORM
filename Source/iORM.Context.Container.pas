@@ -306,7 +306,8 @@ var
     // Dependency Injection Container - Auto register the class for the resolver (persistence only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
     begin
-//      LdiImplementedInterfaces := ACurrentRttiInstanceType.GetDeclaredImplementedInterfaces;
+      // NB: Ho provato anche con il metodo "GetDeclaredImplementedInterfaces" ma non venivano gestine bene
+      //      alcune situazioni particolari e perdeva dei pezzi
       LdiImplementedInterfaces := ACurrentRttiInstanceType.GetImplementedInterfaces;
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
