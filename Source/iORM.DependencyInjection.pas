@@ -381,7 +381,7 @@ uses
   iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker, iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
   iORM.Context.Map.Interfaces, iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces, iORM.MVVM.ViewModelBridge, iORM.Abstraction,
-  iORM.MVVM.ViewModel, iORM.LiveBindings.CommonBSBehavior;
+  iORM.MVVM.ViewModel, iORM.LiveBindings.CommonBSBehavior, DJSON;
 
 { TioDependencyInjectionBase }
 
@@ -1123,15 +1123,18 @@ end;
 class function TioDependencyInjectionContainer._SubKeyResolver(const AKey, ASubKey: String): String;
 begin
   // 1) Verifica che almeno la chiave principale esista, se non esiste esce subito senza fare nulla
-  //     e non solleva nemmeno una eccezione perchè ci pensa il codcie chiamante.
+  //     e non solleva nemmeno una eccezione perchè ci pensa il codice chiamante.
   // 2) Poi controlla se lo specificoco implementer esiste esattamente come lo si sta cercando compreso l'alias
   //     (quindi nel caso la classe implementatrice fosse stata registrata eslicitamente nel DIC), se lo trova
   //     anche in questo caso lascia tutto così com'è.
-  // 3) A Questo punto se nell'elenco degli implementers dell'interfaccia c'è più di un elemento,
-  //     indipendentemente da  fatto che sia una registrazione normale o automatica della entità (quella
-  //     solo per la persistenza) allora ci può essere una ambiguità quindi lascia stare tutto in modo
-  //     che il codice chiamante sollevi l'eccezione.
-  if (not ImplementersExists(AKey)) or Exists(AKey, ASubKey) or (GetInterfaceImplementers(AKey).RegularRegisteredCount > 0) then
+  // 3) Se c'è anche solo una registrazione esplicita (RegularRegisteredCount > 0), cioè fatta con l'attributo [diImplements(...)]
+  //     o anche con del codice tipo "io.RegisterClass<...>.Implements..." allora iORM presume che il programmatore voglia gestire
+  //     "manualmente" la cosa per cui non tocca nulla e lascia che il codice chiamante faccia il suo lavoro.
+  // 4) Se c'è più di una autoregistrazione come entità significa che ci sono più classi registrate
+  //     che implementano la stessa interfaccia quindi c'è una possibile ambiguità e quindi, anche
+  //     in questo caso lascia stare tutto così e lascia che il codice chiamante faccia il suo lavoro.
+  if (not ImplementersExists(AKey)) or Exists(AKey, ASubKey) or (GetInterfaceImplementers(AKey).RegularRegisteredCount > 0)
+    or (GetInterfaceImplementers(AKey).EntityAutoRegisteredCount > 1) then
     Result := ASubKey
   // Altrimenti se arriva qui significa che non si è trovata la classe specifica che si stava cercando
   //  (Key + SubKey) e che c'è una sola classe registrata come implementatrice (che dovrebbe essere

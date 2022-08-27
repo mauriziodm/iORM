@@ -209,8 +209,7 @@ begin
   // Create the temporary collection of autodetected hasmany relation virtual properties
   FAutodetectedHasManyRelationCollection := TList<IioProperty>.Create;
   try
-    // This method registers the classes in the MapContainer (entities only) and also
-    //  in the Dependency Injection Container (also non entities) based on the attributes
+    // This method registers the classes in the Dependency Injection Container (also non entities) based on the attributes
     //   with which the classes have been decorated.
     RegisterClassesInDependencyInjectionContainerByAttributes;
     // This method map all entities in the MapContainer
@@ -307,6 +306,7 @@ var
     // Dependency Injection Container - Auto register the class for the resolver (persistence only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
     begin
+//      LdiImplementedInterfaces := ACurrentRttiInstanceType.GetDeclaredImplementedInterfaces;
       LdiImplementedInterfaces := ACurrentRttiInstanceType.GetImplementedInterfaces;
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID

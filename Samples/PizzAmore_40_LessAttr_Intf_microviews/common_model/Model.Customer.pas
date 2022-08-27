@@ -7,7 +7,8 @@ uses
 
 type
 
-//  [ioAbstractEntity]
+//  [ioAbstractEntity, diDoNotRegisterAsInterfacedEntity, ioDisableAutoCreateOnDB]
+  [ioAbstractEntity('CONTACT')]
   TContact = class(TInterfacedObject, IContact)
   strict private
     FID: Integer;
@@ -40,7 +41,7 @@ type
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
-  [ioEntity('CONTACTS')]
+  [ioEntity('CONTACT'), diImplements(ICustomer)]
   TCustomer = class(TContact, ICustomer)
    strict private
     FFidelityCardCode: String;
@@ -51,7 +52,7 @@ type
     property FidelityCardCode: String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('CONTACTS')]
+  [ioEntity('CONTACT')]
   TVipCustomer = class(TCustomer, IVipCustomer)
    strict private
     FVipCardCode: String;
@@ -73,7 +74,7 @@ type
     property BranchOffice: String read GetBranchOffice write SetBranchOffice;
   end;
 
-  [ioEntity('CONTACTS')]
+//  [ioEntity('CONTACTS')]
   TAnotherCustomer = class(TInterfacedObject, IContact)
   strict private
     FID: Integer;

@@ -402,7 +402,7 @@ type
     property Alias: String read FAlias;
   end;
 
-  // DIC - diAsSingleton attribute
+  // DIC - diAsSingleton diDoNotRegisterAsInterfacedEntity
   diDoNotRegisterAsInterfacedEntity = class(TioCustomAttribute)
   end;
 
