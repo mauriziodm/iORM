@@ -14,8 +14,8 @@ uses
 
 type
 
-  ICustomer = interface
-    ['{28219347-5122-48BC-B735-3063FCFAE2B8}']
+  IContact = interface
+    ['{FBDA76DE-F8B7-40C4-8508-C65F716F33AC}']
     // ID property
     function GetID: Integer;
     property ID: Integer read GetID;  // ReadOnly
@@ -40,15 +40,23 @@ type
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
+  ICustomer = interface(IContact)
+    ['{28219347-5122-48BC-B735-3063FCFAE2B8}']
+    // FidelityCardCode property
+    procedure SetFidelityCardCode(const AValue: String);
+    function GetFidelityCardCode: String;
+    property FidelityCardCode: String read GetFidelityCardCode write SetFidelityCardCode;
+  end;
+
   IVipCustomer = interface(ICustomer)
     ['{83B3F0BD-1919-4AFF-8D8E-B388FD33A18F}']
-    // PhoneNumber property
+    // VipCardCode property
     procedure SetVipCardCode(const AValue: String);
     function GetVipCardCode: String;
     property VipCardCode: String read GetVipCardCode write SetVipCardCode;
   end;
 
-  IEmployee = interface(ICustomer)
+  IEmployee = interface(IContact)
     ['{83B3F0BD-1919-4AFF-8D8E-B388FD33A18F}']
     // PhoneNumber property
     procedure SetBranchOffice(const AValue: String);

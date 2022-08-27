@@ -3,17 +3,12 @@ unit Model.Customer;
 interface
 
 uses
-  iORM, Model.Interfaces;
+  iORM, iORM.Attributes, Model.Interfaces;
 
 type
 
-//  [ioEntity, diImplements(ICustomer), ioTrueClass]
-//  [diImplements(ICustomer)]
-//  [ioEntity, ioTrueClass]
-//  [ioEntity]
-//  [ioAbstractEntity, diImplements(ICustomer), ioTrueClass]
-  [ioAbstractEntity]
-  TCustomer = class(TInterfacedObject, ICustomer)
+//  [ioAbstractEntity]
+  TContact = class(TInterfacedObject, IContact)
   strict private
     FID: Integer;
     FName: String;
@@ -37,8 +32,6 @@ type
     procedure SetPhoneNumber(const AValue: String);
     function GetPhoneNumber: String;
   public
-    constructor Create;
-    destructor Destroy; override;
     property ID: Integer read GetID;  // ReadOnly
     property Name: String read GetName write SetName;
     property City: String read GetCity write SetCity;
@@ -47,23 +40,30 @@ type
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
-//  [ioEntity('Customer'), diImplements(ICustomer, 'VIP'), diImplements(IVipCustomer), ioTrueClass]
-//  [ioEntity('Customer'), diImplements(IVipCustomer), ioTrueClass]
-  [ioEntity('Customer')]
+  [ioEntity('CONTACTS')]
+  TCustomer = class(TContact, ICustomer)
+   strict private
+    FFidelityCardCode: String;
+    // FidelityCardCode property
+    procedure SetFidelityCardCode(const AValue: String);
+    function GetFidelityCardCode: String;
+   public
+    property FidelityCardCode: String read GetFidelityCardCode write SetFidelityCardCode;
+  end;
+
+  [ioEntity('CONTACTS')]
   TVipCustomer = class(TCustomer, IVipCustomer)
    strict private
     FVipCardCode: String;
-    // PhoneNumber property
+    // VipCardCode property
     procedure SetVipCardCode(const AValue: String);
     function GetVipCardCode: String;
    public
     property VipCardCode: String read GetVipCardCode write SetVipCardCode;
   end;
 
-//  [ioEntity('Customer'), diImplements(ICustomer, 'EMPLOYEE'), diImplements(IEmployee), ioTrueClass]
-//  [ioEntity('Customer'),  diImplements(IEmployee), ioTrueClass]
-  [ioEntity('Customer')]
-  TEmployee = class(TCustomer, IEmployee)
+  [ioEntity('CONTACTS')]
+  TEmployee = class(TContact, IEmployee)
    strict private
     FBranchOffice: String;
     // end property
@@ -73,10 +73,8 @@ type
     property BranchOffice: String read GetBranchOffice write SetBranchOffice;
   end;
 
-//  [ioEntity('Customer'), diImplements(ICustomer, 'ANOTHER'), ioTrueClass]
-//  [ioEntity('Customer'), ioTrueClass]
-  [ioEntity('Customer')]
-  TAnotherCustomer = class(TInterfacedObject, ICustomer)
+  [ioEntity('CONTACTS')]
+  TAnotherCustomer = class(TInterfacedObject, IContact)
   strict private
     FID: Integer;
     FName: String;
@@ -113,67 +111,68 @@ implementation
 uses
   System.SysUtils;
 
-{ TCustomer }
+{ TBaseContact }
 
-constructor TCustomer.Create;
-begin
-//  Sleep(5);
-end;
-
-destructor TCustomer.Destroy;
-begin
-  Sleep(1);
-  inherited;
-end;
-
-function TCustomer.GetAddress: String;
+function TContact.GetAddress: String;
 begin
   Result := FAddress;
 end;
 
-function TCustomer.GetCity: String;
+function TContact.GetCity: String;
 begin
   Result := FCity;
 end;
 
-function TCustomer.GetFullAddress: String;
+function TContact.GetFullAddress: String;
 begin
   Result := Format('%s, %s', [FCity, FAddress]);
 end;
 
-function TCustomer.GetID: Integer;
+function TContact.GetID: Integer;
 begin
   Result := FID;
 end;
 
-function TCustomer.GetName: String;
+function TContact.GetName: String;
 begin
   Result := FName;
 end;
 
-function TCustomer.GetPhoneNumber: String;
+function TContact.GetPhoneNumber: String;
 begin
   Result := FPhoneNumber;
 end;
 
-procedure TCustomer.SetAddress(const AValue: String);
+procedure TContact.SetAddress(const AValue: String);
 begin
   FAddress := AValue;
 end;
 
-procedure TCustomer.SetCity(const AValue: String);
+procedure TContact.SetCity(const AValue: String);
 begin
   FCity := AValue;
 end;
 
-procedure TCustomer.SetName(const AValue: String);
+procedure TContact.SetName(const AValue: String);
 begin
   FName := AValue;
 end;
 
-procedure TCustomer.SetPhoneNumber(const AValue: String);
+procedure TContact.SetPhoneNumber(const AValue: String);
 begin
   FPhoneNumber := AValue;
+end;
+
+{ TCustomer }
+
+function TCustomer.GetFidelityCardCode: String;
+begin
+  Result := FFidelityCardCode;
+end;
+
+procedure TCustomer.SetFidelityCardCode(const AValue: String);
+begin
+  FFidelityCardCode := AValue;
 end;
 
 { TVipCustomer }
@@ -186,6 +185,18 @@ end;
 procedure TVipCustomer.SetVipCardCode(const AValue: String);
 begin
   FVipCardCode := AValue;
+end;
+
+{ TEmployee }
+
+function TEmployee.GetBranchOffice: String;
+begin
+  Result := FBranchOffice;
+end;
+
+procedure TEmployee.SetBranchOffice(const AValue: String);
+begin
+  FBranchOffice := AValue;
 end;
 
 { TAnotherCustomer }
@@ -238,18 +249,6 @@ end;
 procedure TAnotherCustomer.SetPhoneNumber(const AValue: String);
 begin
   FPhoneNumber := AValue;
-end;
-
-{ TEmployee }
-
-function TEmployee.GetBranchOffice: String;
-begin
-  Result := FBranchOffice;
-end;
-
-procedure TEmployee.SetBranchOffice(const AValue: String);
-begin
-  FBranchOffice := AValue;
 end;
 
 end.

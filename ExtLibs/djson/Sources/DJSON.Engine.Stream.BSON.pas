@@ -69,6 +69,7 @@ uses
 {$REGION 'System'}
   System.JSON.BSON,
   System.JSON.Types,
+  System.TypInfo,
 {$ENDREGION}
 {$REGION 'DJSON'}
   DJSON.Exceptions

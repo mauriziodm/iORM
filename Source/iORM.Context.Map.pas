@@ -119,12 +119,6 @@ begin
     if TioMapContainer.Exist(LCurrentRttiInstanceType.Name) then
     begin
       LCurrentMap := TioMapContainer.GetMap(LCurrentRttiInstanceType.Name, False);
-      // Se la mappa corrente ha già la TrueClassVirtualMap assegnata significa che questa è già stata creata quindi è inutile
-      //  continuare la ricerca della classe capostipite per poi creare la TrueClassVirtualMap perchè appunto esiste già, in questo
-      //  caso quindi è meglio interrompere la risalita nelle classi della gerarchia e ritornare direttamente la TrueClassVirtualMap.
-      //    Il codice chiamante sarà comportarsi di consegnenza in base alla situazione.
-      if Assigned(LCurrentMap.GetTrueClassVirtualMap) then
-        Exit(LCurrentMap.GetTrueClassVirtualMap);
       // Se la classe corrente è mappata sulla stessa tabella/connessione...
       if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = FTable.GetConnectionDefName)
       then

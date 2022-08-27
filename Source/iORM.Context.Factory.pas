@@ -129,8 +129,8 @@ class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AClassNa
 var
   LMap: IioMap;
 begin
-  // Get the map from the MapContainer and if the AGetTrueClassVirtualMap is True and TrueClass is enabled then
-  //  return the TrueClassVirtualMap
+  // Retrieve the map from the MapContainer and if it is in some TrueClass mode then return
+  //  the TrueClassVirtualMap
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
     LMap := LMap.GetTrueClassVirtualMap;

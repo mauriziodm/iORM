@@ -112,6 +112,7 @@ uses
   System.JSON.Types,
   System.JSON.BSON,
   System.NetEncoding,
+  System.TypInfo,
 {$ENDREGION}
 {$REGION 'DJSON'}
   DJSON.Constants,

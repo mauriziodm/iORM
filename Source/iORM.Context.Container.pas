@@ -134,11 +134,22 @@ end;
 
 class procedure TioMapContainer.BuildTrueClassVirtualMaps;
 var
+  LKey: String;
+  LKeyArray: TArray<String>;
   LMapSlot: TioMapSlot;
 begin
-  for LMapSlot in FInternalContainer.Values do
+  // ATT/NE: Prima estraggo l'elenco delle chiavi (array) e poi ciclo su quello, faccio così
+  //          perchè se ciclavo direttamente sul dictionary (FInternalContainer) c'erano
+  //          problemi perchè aggiungendo le TrueClassVirtualMap si sballava l'ordine
+  //          del ciclo, passava più volte sulla stessa mappa e magari non passava per niente in altre.
+  //          Facendo così invece va bene
+  LKeyArray := FInternalContainer.Keys.ToArray;
+  for LKey in LKeyArray do
+  begin
+    LMapSlot := FInternalContainer.Items[LKey];
     if not LMapSlot.GetMap.IsTrueClassVirtualMap then
       LMapSlot.GetMap.BuildTrueClassVirtualMap;
+  end;
 end;
 
 class procedure TioMapContainer.CleanUp;

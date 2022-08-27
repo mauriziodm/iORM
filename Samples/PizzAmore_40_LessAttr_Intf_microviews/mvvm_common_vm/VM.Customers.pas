@@ -13,7 +13,6 @@ type
   TVMCustomers = class(TVMBaseForList)
     acNextPage: TioVMActionBSNextPage;
     acPrevPage: TioVMActionBSPrevPage;
-    procedure acAddExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -28,11 +27,5 @@ uses
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
-
-procedure TVMCustomers.acAddExecute(Sender: TObject);
-begin
-  MPMaster.Persistence.Append( TCustomer.Create as ICustomer );
-  inherited;
-end;
 
 end.

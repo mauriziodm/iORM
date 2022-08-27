@@ -106,6 +106,7 @@ uses
   System.DateUtils,
   System.NetEncoding,
   System.Classes,
+  System.TypInfo,
 {$ENDREGION}
 {$REGION 'DJSON'}
   DJSON.Duck.PropField,

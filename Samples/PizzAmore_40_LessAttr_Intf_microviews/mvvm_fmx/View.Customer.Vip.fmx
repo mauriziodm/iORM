@@ -5,8 +5,8 @@ inherited ViewVipCustomer: TViewVipCustomer
     end
   end
   inherited ListBox: TListBox
-    Viewport.Width = 396.000000000000000000
-    Viewport.Height = 516.000000000000000000
+    Viewport.Width = 376.000000000000000000
+    Viewport.Height = 500.000000000000000000
     inherited ListBoxItemName: TListBoxItem
       inherited EditID: TEdit
         TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -32,7 +32,7 @@ inherited ViewVipCustomer: TViewVipCustomer
     end
     object ListBoxItemVipCardCode: TListBoxItem
       Position.Y = 200.000000000000000000
-      Size.Width = 396.000000000000000000
+      Size.Width = 376.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4

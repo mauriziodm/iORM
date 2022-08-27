@@ -41,8 +41,18 @@ procedure TVMBaseForList.acAddExecute(Sender: TObject);
 var
   LNewInstance: IInterface;
 begin
+  // Requires the creation of the new instance to the Dependency Injection Container
+  //   passing the value of the ModelPresenter "TypeName" property as a class/interface type.
+  // However, this ViewModel is an ancestor from which the other ViewModels tpresenting
+  //   a list will derive and is at a level of abstraction that does not allow to know
+  //   the specific type of class of which the new instance must be created;
+  //   for this reason it requires the new object as "IInterface" in order to pass it
+  //   as a parameter to the "Persistence.Append" method of the ModelPresenter.
+  // This way I was able to write this code in an absolutely abstract way from
+  //  the real type which will only be known in the derived ViewModels.
   LNewInstance := io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface>;
   MPMaster.Persistence.Append(LNewInstance);
+  // Executes the action which will show the new instance on the screen.
   acShowOrSelect.Execute;
 end;
 
