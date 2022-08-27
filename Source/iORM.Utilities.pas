@@ -78,6 +78,7 @@ type
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     ///  ai vincoli di ereditarietà.
     class function GetFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+    class function GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
   end;
@@ -246,6 +247,46 @@ begin
   while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
   begin
     Result := ARttiInstanceType;
+    ARttiInstanceType := ARttiInstanceType.BaseType;
+  end;
+end;
+
+class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType;
+  const IID: TGUID): TRttiInstanceType;
+var
+  LCurrentTableAndConnection, LOriginalTableAndConnection: String;
+  function _ExtractAttributeInfoSign: String;
+  var
+    LAttribute: TCustomAttribute;
+    LAttributes: TArray<TCustomAttribute>;
+    LTableName: String;
+    LConnectionDefName: String;
+  begin
+    LTableName := ARttiInstanceType.MetaclassType.ClassName.Substring(1);
+    LConnectionDefName := '';
+    LAttributes := ARttiInstanceType.GetAttributes;
+    for LAttribute in LAttributes do
+    begin
+      if LAttribute is ioEntity then
+        LTableName := ioEntity(LAttribute).Value;
+      if LAttribute is ioConnectionDefName then
+        LConnectionDefName := ioConnectionDefName(LAttribute).Value;
+    end;
+    // Se Table è vuota singifica che la classe attuale non è una entità (non è marcata con
+    //  l'attributo ioEntity), in questo caso restituisce una stringa vuota.
+    if not LTableName.IsEmpty then
+      Result := LTableName + ',' + LConnectionDefName
+    else
+      Result := '';
+  end;
+begin
+  Result := ARttiInstanceType;
+  LOriginalTableAndConnection := _ExtractAttributeInfoSign;
+  while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
+  begin
+    LCurrentTableAndConnection := _ExtractAttributeInfoSign;
+    if (LCurrentTableAndConnection = LOriginalTableAndConnection) then
+      Result := ARttiInstanceType;
     ARttiInstanceType := ARttiInstanceType.BaseType;
   end;
 end;
