@@ -54,7 +54,7 @@ type
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
     FTrueClassVirtualMap: IioMap;
     /// Find the progenitor class map mapped on the same table and connection (for TrueClassVirtualMap creation purposes)
-    function _FindProgenitorOrTrueClassVirtualMapIfExists: IioMap;
+    function _FindProgenitorSameTableAndConnection: IioMap;
   public
     constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioTable; AProperties:IioProperties); overload;
     function GetClassRef: TioClassRef;
@@ -103,7 +103,7 @@ begin
   Result := FTable.GetTrueClass;
 end;
 
-function TioMap._FindProgenitorOrTrueClassVirtualMapIfExists: IioMap;
+function TioMap._FindProgenitorSameTableAndConnection: IioMap;
 var
   LCurrentRttiInstanceType: TRttiInstanceType;
   LCurrentMap: IioMap;
@@ -120,9 +120,10 @@ begin
     begin
       LCurrentMap := TioMapContainer.GetMap(LCurrentRttiInstanceType.Name, False);
       // Se la classe corrente è mappata sulla stessa tabella/connessione...
-      if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = FTable.GetConnectionDefName)
-      then
+      if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = FTable.GetConnectionDefName) then
+      begin
         Result := LCurrentMap;
+      end;
     end;
     // Go to the next next ancestor class
     LCurrentRttiInstanceType := LCurrentRttiInstanceType.BaseType;
@@ -134,8 +135,7 @@ begin
   // Find the progenitor class map mapped on the same table and connection then
   //  create the TrueClassVirtualMap and add it to the TioMapContainer (if not already exists)
   //  then copy into it the owned properties (if not already exists).
-  //  Note: If a TrueClassVirtualMap is returned (optimization) then CopyProperties into it without create a nre TrueClassVirtualMap (obviously)
-  FTrueClassVirtualMap := _FindProgenitorOrTrueClassVirtualMapIfExists;
+  FTrueClassVirtualMap := _FindProgenitorSameTableAndConnection;
   if not FTrueClassVirtualMap.IsTrueClassVirtualMap then
     FTrueClassVirtualMap := TioMapContainer.AddTrueClassVirtualMap(FTrueClassVirtualMap);
   FProperties.CopyPropertiesToTrueClassVirtualMap(FTrueClassVirtualMap.GetProperties);

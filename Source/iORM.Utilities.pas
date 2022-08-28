@@ -265,6 +265,18 @@ begin
     Result := AContext.OriginalNonTrueClassMap.GetClassName;
 
 
+// ---------------------------------
+
+
+//  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
+//  begin
+//    LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
+//    Result := GetFarAncestorClassImplementingInterface(AContext.OriginalNonTrueClassMap.RttiType, LImplementerItem.InterfaceGUID).Name;
+//  end
+//  else
+//    Result := AContext.OriginalNonTrueClassMap.GetClassName;
+
+// ---------------------------------
 
 //  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
 //  begin
