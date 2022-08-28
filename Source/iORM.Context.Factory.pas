@@ -130,12 +130,15 @@ var
   LMap: IioMap;
 begin
   // Retrieve the map from the MapContainer and if it is in some TrueClass mode then return
-  //  the TrueClassVirtualMap
+  //  the TrueClassVirtualMap passing the original resolved tur class virtual map also
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
-    LMap := LMap.GetTrueClassVirtualMap;
-  // Get the Context
-  Result := TioContext.Create(LMap, AWhere, nil, nil, '', '');
+  begin
+   Result := TioContext.Create(LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '');
+   Result.OriginalNonTrueClassMap := LMap;
+  end
+  else
+    Result := TioContext.Create(LMap, AWhere, nil, nil, '', '');
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;

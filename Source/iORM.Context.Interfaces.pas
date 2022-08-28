@@ -100,6 +100,10 @@ type
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
+    // OriginalResolvedTypeNameNonTrueClass
+    procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
+    function GetOriginalNonTrueClassMap: IioMap;
+    property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
   end;
 
 implementation

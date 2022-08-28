@@ -259,12 +259,22 @@ begin
   if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
   begin
     LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
-    Result := GetFarAncestorClassImplementingInterface(LImplementerItem.RttiType, LImplementerItem.InterfaceGUID).Name;
+    Result := GetFarAncestorClassImplementingInterface(AContext.OriginalNonTrueClassMap.RttiType, LImplementerItem.InterfaceGUID).Name;
   end
   else
-    // NB: LO prendo dal Where perchè nel Context ci potrebbe essere la TrueClassVirtualMap
-    //      (quindi con una classe antenata) e non andava bene in certi contesti
-    Result := AContext.Where.TypeName;
+    Result := AContext.OriginalNonTrueClassMap.GetClassName;
+
+
+
+//  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
+//  begin
+//    LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
+//    Result := GetFarAncestorClassImplementingInterface(LImplementerItem.RttiType, LImplementerItem.InterfaceGUID).Name;
+//  end
+//  else
+//    // NB: LO prendo dal Where perchè nel Context ci potrebbe essere la TrueClassVirtualMap
+//    //      (quindi con una classe antenata) e non andava bene in certi contesti
+//    Result := AContext.Where.TypeName;
 end;
 
 class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType;

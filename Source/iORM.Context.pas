@@ -53,6 +53,7 @@ type
     FWhere: IioWhere;
     FMasterPropertyPath: String;
     FMasterBSPersistence: TioBSPersistence;
+    FOriginalNonTrueClassMap: IioMap;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -72,6 +73,9 @@ type
     procedure SetWhere(const AWhere: IioWhere);
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence;
+    // OriginalResolvedTypeNameNonTrueClass
+    procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
+    function GetOriginalNonTrueClassMap: IioMap;
   public
     constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
@@ -116,6 +120,10 @@ type
     property MasterPropertyPath: String read GetMasterPropertyPath;
     // MasterBSPersistence
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
+    /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
+    ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
+    ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
+    property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
   end;
 
 implementation
@@ -158,6 +166,7 @@ begin
   FHasManyChildVirtualPropertyValue := 0;
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
   FMasterBSPersistence := AMasterBSPersistence;
+  FOriginalNonTrueClassMap := nil;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -229,6 +238,14 @@ begin
   Result := FWhere.GetOrderBySql(FMap);
 end;
 
+function TioContext.GetOriginalNonTrueClassMap: IioMap;
+begin
+  if Assigned(FOriginalNonTrueClassMap) then
+    Result := FOriginalNonTrueClassMap
+  else
+    Result := FMap;
+end;
+
 function TioContext.GetProperties: IioProperties;
 begin
   Result := Self.Map.GetProperties;
@@ -272,6 +289,11 @@ begin
     Exit;
   LPropValue := TValue.From<TioObjVersion>(AValue);
   GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
+end;
+
+procedure TioContext.SetOriginalNonTrueClassMap(const AMap: IioMap);
+begin
+  FOriginalNonTrueClassMap := AMap;
 end;
 
 procedure TioContext.SetWhere(const AWhere: IioWhere);

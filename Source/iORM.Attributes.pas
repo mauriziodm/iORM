@@ -47,7 +47,7 @@ type
 
 const
   DEFAULT_MAP_MODE = mmHybrid;
-  DEFAULT_TRUE_CLASS_MODE = tcSmart;
+  DEFAULT_TRUE_CLASS_MODE = tcmStrictly;
 
 type
   // Relation types

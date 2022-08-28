@@ -110,7 +110,7 @@ begin
   LEmployee.BranchOffice := 'Philadelphia';
   io.Persist(LEmployee);
   // Mrs. Federica Fortini
-  LContact := io.Create<IContact>;
+  LContact := io.Create<IContact>('ANOTHER');
   LContact.Name := 'Federica Fortini (ANOTHER)';
   LContact.City := 'Riccione';
   LContact.Address := 'Viale Napoli 24';
