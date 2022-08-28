@@ -65,7 +65,7 @@ uses
   iORM.Attributes, iORM.DB.Factory, iORM.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.SysUtils, iORM.DuckTyped.Interfaces,
   iORM.Exceptions, iORM.DuckTyped.Factory, System.JSON, iORM.Utilities,
-  iORM.ObjectsForge.Factory, DJSON;
+  iORM.ObjectsForge.Factory, DJSON, iORM.DependencyInjection;
 
 { TioFDQuery }
 
@@ -147,7 +147,11 @@ begin
       ParamByName_SetValue(ASqlItemWhere.GetSqlParamName(AContext.Map), ASqlItemWhere.GetValue(AContext.Map).AsVariant);
   end;
   if AContext.IsTrueClass then
-    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.GetTrueClass.GetClassName + '%');
+    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + TioUtilities.GetFarAncestorClassNameForTrueClassQueryCriteria(AContext) + '%')
+// ----- OLD CODE ----
+//  if AContext.IsTrueClass then
+//    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.GetTrueClass.GetClassName + '%');
+// ----- OLD CODE ----
 end;
 
 function TioFDQuery.GetQuery: TioInternalSqlQuery;

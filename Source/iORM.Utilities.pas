@@ -37,7 +37,7 @@ interface
 
 uses
   System.Classes, System.TypInfo, System.Rtti, iORM.CommonTypes, iORM.MVVM.Interfaces,
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, iORM.Context.Interfaces;
 
 type
 
@@ -77,7 +77,8 @@ type
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     ///  ai vincoli di ereditarietà.
-    class function GetFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+    class function GetFarAncestorClassImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+    class function GetFarAncestorClassNameForTrueClassQueryCriteria(const AContext: IioContext): String;
     class function GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
@@ -88,7 +89,7 @@ implementation
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
-  iORM.Resolver.Interfaces;
+  iORM.Resolver.Interfaces, iORM.DependencyInjection;
 
 { TioRttiUtilities }
 
@@ -241,7 +242,7 @@ begin
   Result := TioRttiFactory.GetRttiContext.GetType(ATypeInfo).QualifiedName;
 end;
 
-class function TioUtilities.GetFarAncestorClassRefImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+class function TioUtilities.GetFarAncestorClassImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
 begin
   Result := ARttiInstanceType;
   while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
@@ -249,6 +250,21 @@ begin
     Result := ARttiInstanceType;
     ARttiInstanceType := ARttiInstanceType.BaseType;
   end;
+end;
+
+class function TioUtilities.GetFarAncestorClassNameForTrueClassQueryCriteria(const AContext: IioContext): String;
+var
+  LImplementerItem: TioDIContainerImplementersItem;
+begin
+  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
+  begin
+    LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
+    Result := GetFarAncestorClassImplementingInterface(LImplementerItem.RttiType, LImplementerItem.InterfaceGUID).Name;
+  end
+  else
+    // NB: LO prendo dal Where perchè nel Context ci potrebbe essere la TrueClassVirtualMap
+    //      (quindi con una classe antenata) e non andava bene in certi contesti
+    Result := AContext.Where.TypeName;
 end;
 
 class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType;
