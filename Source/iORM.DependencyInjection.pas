@@ -128,7 +128,7 @@ type
   public
     constructor Create(const AContainerValue: TioDIContainerImplementersItem);
     procedure Execute;
-    function _SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
+    function _SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDependencyInjectionRegister;
     function Implements<T: IInterface>(const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function Implements(const IID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function Alias(const AAlias: String): TioDependencyInjectionRegister;
@@ -921,9 +921,9 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionRegister._SetFarAncestorClassNameImplementingTheSameInterface(const AValue: String): TioDependencyInjectionRegister;
+function TioDependencyInjectionRegister._SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDependencyInjectionRegister;
 begin
-  FContainerValue.FarAncestorClassNameImplementingTheSameInterface := AValue;
+  FContainerValue.FarAncestorClassSameInterfaceAndTableAndConnection := AValue;
   Result := Self;
 end;
 
@@ -1895,7 +1895,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
         if AUseMapInfo then
         begin
           LMap := TioMapContainer.GetMap(LImplementer.ClassName);
-          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName + '.' + LImplementer.FarAncestorClassNameImplementingTheSameInterface;
+          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName + '.' + LImplementer.FarAncestorClassSameInterfaceAndTableAndConnection;
         end
         else
           LCurrentConnectionAndTable := '';
@@ -1903,7 +1903,7 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
           // Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
-          Result.Add(LImplementer.FarAncestorClassNameImplementingTheSameInterface);
+          Result.Add(LImplementer.FarAncestorClassSameInterfaceAndTableAndConnection);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
       end;

@@ -52,7 +52,7 @@ type
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
     FDIContainerImplementersItem: TioDIContainerImplementersItem;
-    FTrueClassVirtualMap: IioMap; // Ancestor map mapped on the same table and connection
+    FTrueClassVirtualMap: IioMap;
     /// Find the progenitor class map mapped on the same table and connection (for TrueClassVirtualMap creation purposes)
     function _FindProgenitorOrTrueClassVirtualMapIfExists: IioMap;
   public
