@@ -1902,7 +1902,6 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
         // Add the implementer class to the result ConnectionAndTableList
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
-          // Result.Add(LImplementer.ClassName); // Mauri: 16/06/2022
           Result.Add(LImplementer.FarAncestorClassSameInterfaceAndTableAndConnection);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
