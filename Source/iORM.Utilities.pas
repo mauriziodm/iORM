@@ -78,7 +78,6 @@ type
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     ///  ai vincoli di ereditarietà.
     class function GetFarAncestorClassImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
-    class function GetFarAncestorClassNameForTrueClassQueryCriteria(const AContext: IioContext): String;
     class function GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
@@ -250,43 +249,6 @@ begin
     Result := ARttiInstanceType;
     ARttiInstanceType := ARttiInstanceType.BaseType;
   end;
-end;
-
-class function TioUtilities.GetFarAncestorClassNameForTrueClassQueryCriteria(const AContext: IioContext): String;
-var
-  LImplementerItem: TioDIContainerImplementersItem;
-begin
-  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
-  begin
-    LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
-    Result := GetFarAncestorClassImplementingInterface(AContext.OriginalNonTrueClassMap.RttiType, LImplementerItem.InterfaceGUID).Name;
-  end
-  else
-    Result := AContext.OriginalNonTrueClassMap.GetClassName;
-
-
-// ---------------------------------
-
-
-//  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
-//  begin
-//    LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
-//    Result := GetFarAncestorClassImplementingInterface(AContext.OriginalNonTrueClassMap.RttiType, LImplementerItem.InterfaceGUID).Name;
-//  end
-//  else
-//    Result := AContext.OriginalNonTrueClassMap.GetClassName;
-
-// ---------------------------------
-
-//  if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) then
-//  begin
-//    LImplementerItem := TioDependencyInjectionContainer.Get(AContext.Where.TypeName, AContext.Where.TypeAlias);
-//    Result := GetFarAncestorClassImplementingInterface(LImplementerItem.RttiType, LImplementerItem.InterfaceGUID).Name;
-//  end
-//  else
-//    // NB: LO prendo dal Where perchè nel Context ci potrebbe essere la TrueClassVirtualMap
-//    //      (quindi con una classe antenata) e non andava bene in certi contesti
-//    Result := AContext.Where.TypeName;
 end;
 
 class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType;

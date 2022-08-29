@@ -147,11 +147,7 @@ begin
       ParamByName_SetValue(ASqlItemWhere.GetSqlParamName(AContext.Map), ASqlItemWhere.GetValue(AContext.Map).AsVariant);
   end;
   if AContext.IsTrueClass then
-    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + TioUtilities.GetFarAncestorClassNameForTrueClassQueryCriteria(AContext) + '%')
-// ----- OLD CODE ----
-//  if AContext.IsTrueClass then
-//    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.GetTrueClass.GetClassName + '%');
-// ----- OLD CODE ----
+    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.OriginalNonTrueClassMap.GetClassName + '%')
 end;
 
 function TioFDQuery.GetQuery: TioInternalSqlQuery;
