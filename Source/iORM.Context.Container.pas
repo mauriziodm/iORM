@@ -75,8 +75,9 @@ type
     ///  in the Dependency Injection Container (also non entities) based on the attributes
     ///   with which the classes have been decorated.
     class procedure RegisterClassesInDependencyInjectionContainerByAttributes;
-    /// This method build all TrueClassVirtualMaps for all entities
-    class procedure BuildTrueClassVirtualMaps;
+    /// This method build all TrueClassVirtualMaps for all entities and register
+    ///  the current map as descendant of all it's ancestor entities
+    class procedure BuildTrueClassVirtualMapsAndRegisterAsDescendant;
   public
     /// This method creates the internal container instance and initiates its initialization
     class procedure Build;
@@ -132,7 +133,7 @@ begin
   TioMapContainer.Init;
 end;
 
-class procedure TioMapContainer.BuildTrueClassVirtualMaps;
+class procedure TioMapContainer.BuildTrueClassVirtualMapsAndRegisterAsDescendant;
 var
   LKey: String;
   LKeyArray: TArray<String>;
@@ -166,10 +167,12 @@ begin
   for LKey in LKeyArray do
   begin
     LMap := FInternalContainer.Items[LKey].GetMap;
+    // Evita di elaborare le TrueClassVirtualMaps
     if not LMap.IsTrueClassVirtualMap then
     begin
+      // Crea a registra una nuova TrueClassVirtualMap
       LMap.BuildTrueClassVirtualMap;
-      { TODO : XXX }
+      // Autoregister the current LMap as descendant of all it's ancestor entities
       _AutoregisterAsDescendantClass;
     end;
   end;
@@ -240,7 +243,7 @@ begin
     // Generate childs virtual properties related to autodetected HasMany relations
     TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
     // This method build all TrueClassVirtualMaps for all entities
-    BuildTrueClassVirtualMaps;
+    BuildTrueClassVirtualMapsAndRegisterAsDescendant;
   finally
     FreeAndNil(FAutodetectedHasManyRelationCollection);
   end;
@@ -289,7 +292,6 @@ var
     begin
       // ioEntity attribute (it means it is an entity class)
       if LAttr is ioEntity then
-      { TODO : XXX }
         LIsAnEntity := True;
       // DIC - diRegister
       if LAttr is diRegister then

@@ -1930,18 +1930,9 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
 begin
   // Create the ResolvedTypeList
   Result := TioResolverFactory.GetResolvedTypeList;
-  // If ATypeName is not an interface (is a class) then
-  // return it and exit;
-{ TODO : XXX }
-//  if not TioUtilities.IsAnInterfaceTypeName(ATypeName) then
-//  begin
-//    Result.Add(ATypeName);
-//    Exit;
-//  end;
-  // If ResolverMode = rmAll and Alias is NOT specified
+  // If ResolverMode = rmAll and Alias is NOT specified...
   if (AResolverMode <= rmAllDistinctByConnectionAndTable) and AAlias.IsEmpty then
     _NestedResolveInterface
-    // If Alias IS specified
   else
     Result.Add(Self.Container.Get(ATypeName, AAlias).ClassName);
 end;
