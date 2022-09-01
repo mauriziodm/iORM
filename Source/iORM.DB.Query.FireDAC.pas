@@ -65,7 +65,7 @@ uses
   iORM.Attributes, iORM.DB.Factory, iORM.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.SysUtils, iORM.DuckTyped.Interfaces,
   iORM.Exceptions, iORM.DuckTyped.Factory, System.JSON, iORM.Utilities,
-  iORM.ObjectsForge.Factory, DJSON, iORM.DependencyInjection;
+  iORM.ObjectsForge.Factory, DJSON, iORM.DependencyInjection, iORM;
 
 { TioFDQuery }
 
@@ -140,6 +140,7 @@ procedure TioFDQuery.FillQueryWhereParams(const AContext: IioContext);
 var
   ASqlItem: IioSqlItem;
   ASqlItemWhere: IioSqlItemWhere;
+  LOriginalClassName, LFarAncestorClassName: String;
 begin
   for ASqlItem in AContext.Where.GetWhereItems do
   begin
@@ -147,7 +148,14 @@ begin
       ParamByName_SetValue(ASqlItemWhere.GetSqlParamName(AContext.Map), ASqlItemWhere.GetValue(AContext.Map).AsVariant);
   end;
   if AContext.IsTrueClass then
-    ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.OriginalNonTrueClassMap.GetClassName + '%')
+  begin
+    LOriginalClassName := AContext.OriginalNonTrueClassMap.GetClassName;
+    LFarAncestorClassName := io.di.Locate(AContext.OriginalNonTrueClassMap.GetClassName).GetItem.FarAncestorClassSameInterfaceAndTableAndConnection;
+    if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) or (LOriginalClassName = LFarAncestorClassName) then
+      ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + LOriginalClassName + '%')
+    else
+      ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.Where.TypeName + '%');
+  end;
 end;
 
 function TioFDQuery.GetQuery: TioInternalSqlQuery;

@@ -152,6 +152,8 @@ type
 
     function SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioNotifiableBindSource): TioDependencyInjectionRegister;
 
+    function AsDescendantClassOf(const AAncestorClassName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
+
     function AsSimpleViewFor(const ATargetTypeName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsSimpleViewFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsSimpleViewFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
@@ -717,6 +719,17 @@ begin
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
+  // Return itself
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsDescendantClassOf(const AAncestorClassName, AAlias: String): TioDependencyInjectionRegister;
+begin
+  // Set the InterfaceName
+  FInterfaceName := AAncestorClassName;
+  // Set the Alias
+  if not AAlias.IsEmpty then
+    FAlias := AAlias;
   // Return itself
   Result := Self;
 end;
@@ -1902,7 +1915,10 @@ class function TioDependencyInjectionResolverBase.Resolve(const ATypeName: Strin
         // Add the implementer class to the result ConnectionAndTableList
         if (AResolverMode = rmAll) or (LConnectionAndTableList.IndexOf(LCurrentConnectionAndTable) = -1) then
         begin
-          Result.Add(LImplementer.FarAncestorClassSameInterfaceAndTableAndConnection);
+          if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
+            Result.Add(LImplementer.FarAncestorClassSameInterfaceAndTableAndConnection)
+          else
+            Result.Add(LImplementer.ClassName);
           LConnectionAndTableList.Add(LCurrentConnectionAndTable);
         end;
       end;
@@ -1916,11 +1932,12 @@ begin
   Result := TioResolverFactory.GetResolvedTypeList;
   // If ATypeName is not an interface (is a class) then
   // return it and exit;
-  if not TioUtilities.IsAnInterfaceTypeName(ATypeName) then
-  begin
-    Result.Add(ATypeName);
-    Exit;
-  end;
+{ TODO : XXX }
+//  if not TioUtilities.IsAnInterfaceTypeName(ATypeName) then
+//  begin
+//    Result.Add(ATypeName);
+//    Exit;
+//  end;
   // If ResolverMode = rmAll and Alias is NOT specified
   if (AResolverMode <= rmAllDistinctByConnectionAndTable) and AAlias.IsEmpty then
     _NestedResolveInterface

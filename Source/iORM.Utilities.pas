@@ -42,6 +42,8 @@ uses
 type
 
   TioUtilities = class
+  private
+    class function _ExtractAttributeInfoSign(const ARttiInstanceType: TRttiInstanceType): String;
   public
     class function ObjectAsIInterface(const AObj: Tobject): IInterface; static;
     class function ObjectAsIioViewModel(const AObj: Tobject): IioViewModel; static;
@@ -79,6 +81,7 @@ type
     ///  ai vincoli di ereditarietà.
     class function GetFarAncestorClassImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
+    class function GetFarAncestorEntityWithSameTableAndConnection(AStartRttiInstanceType: TRttiInstanceType): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
   end;
@@ -255,39 +258,30 @@ class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAn
   const IID: TGUID): TRttiInstanceType;
 var
   LCurrentTableAndConnection, LOriginalTableAndConnection: String;
-  function _ExtractAttributeInfoSign: String;
-  var
-    LAttribute: TCustomAttribute;
-    LAttributes: TArray<TCustomAttribute>;
-    LTableName: String;
-    LConnectionDefName: String;
-  begin
-    LTableName := ARttiInstanceType.MetaclassType.ClassName.Substring(1);
-    LConnectionDefName := '';
-    LAttributes := ARttiInstanceType.GetAttributes;
-    for LAttribute in LAttributes do
-    begin
-      if LAttribute is ioEntity then
-        LTableName := ioEntity(LAttribute).Value;
-      if LAttribute is ioConnectionDefName then
-        LConnectionDefName := ioConnectionDefName(LAttribute).Value;
-    end;
-    // Se Table è vuota singifica che la classe attuale non è una entità (non è marcata con
-    //  l'attributo ioEntity), in questo caso restituisce una stringa vuota.
-    if not LTableName.IsEmpty then
-      Result := LTableName + ',' + LConnectionDefName
-    else
-      Result := '';
-  end;
 begin
   Result := ARttiInstanceType;
-  LOriginalTableAndConnection := _ExtractAttributeInfoSign;
+  LOriginalTableAndConnection := _ExtractAttributeInfoSign(ARttiInstanceType);
   while (ARttiInstanceType <> nil) and Supports(ARttiInstanceType.MetaclassType, IID) do
   begin
-    LCurrentTableAndConnection := _ExtractAttributeInfoSign;
+    LCurrentTableAndConnection := _ExtractAttributeInfoSign(ARttiInstanceType);
     if (LCurrentTableAndConnection = LOriginalTableAndConnection) then
       Result := ARttiInstanceType;
     ARttiInstanceType := ARttiInstanceType.BaseType;
+  end;
+end;
+
+class function TioUtilities.GetFarAncestorEntityWithSameTableAndConnection(AStartRttiInstanceType: TRttiInstanceType): TRttiInstanceType;
+var
+  LCurrentTableAndConnection, LOriginalTableAndConnection: String;
+begin
+  Result := AStartRttiInstanceType;
+  LOriginalTableAndConnection := _ExtractAttributeInfoSign(AStartRttiInstanceType);
+  while (AStartRttiInstanceType <> nil) do
+  begin
+    LCurrentTableAndConnection := _ExtractAttributeInfoSign(AStartRttiInstanceType);
+    if (LCurrentTableAndConnection = LOriginalTableAndConnection) then
+      Result := AStartRttiInstanceType;
+    AStartRttiInstanceType := AStartRttiInstanceType.BaseType;
   end;
 end;
 
@@ -476,6 +470,31 @@ begin
 {$ELSE  NEXTGEN}
   Result := String(ATypeInfo.Name);
 {$ENDIF NEXTGEN}
+end;
+
+class function TioUtilities._ExtractAttributeInfoSign(const ARttiInstanceType: TRttiInstanceType): String;
+var
+  LAttribute: TCustomAttribute;
+  LAttributes: TArray<TCustomAttribute>;
+  LTableName: String;
+  LConnectionDefName: String;
+begin
+  LTableName := ARttiInstanceType.MetaclassType.ClassName.Substring(1); // Exclude first character (usually "T")
+  LConnectionDefName := '';
+  LAttributes := ARttiInstanceType.GetAttributes;
+  for LAttribute in LAttributes do
+  begin
+    if LAttribute is ioEntity then
+      LTableName := ioEntity(LAttribute).Value;
+    if LAttribute is ioConnectionDefName then
+      LConnectionDefName := ioConnectionDefName(LAttribute).Value;
+  end;
+  // Se Table è vuota singifica che la classe attuale non è una entità (non è marcata con
+  //  l'attributo ioEntity), in questo caso restituisce una stringa vuota.
+  if not LTableName.IsEmpty then
+    Result := LTableName + ',' + LConnectionDefName
+  else
+    Result := '';
 end;
 
 class function TioUtilities.IsAnInterface<T>: Boolean;

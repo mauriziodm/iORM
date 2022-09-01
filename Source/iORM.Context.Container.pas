@@ -136,8 +136,27 @@ class procedure TioMapContainer.BuildTrueClassVirtualMaps;
 var
   LKey: String;
   LKeyArray: TArray<String>;
-  LMapSlot: TioMapSlot;
+  LMap: IioMap;
+  procedure _AutoregisterAsDescendantClass;
+  var
+    LCurrentRttiType: TRttiInstanceType;
+    LFarAncestorClass: TRttiInstanceType;
+  begin
+    LCurrentRttiType := LMap.RttiType.BaseType;
+    while Assigned(LCurrentRttiType) do
+    begin
+      // If the current class is an entity then register the original map (LMap) as descendant of it
+      if Exist(LCurrentRttiType.Name) then
+      begin
+        LFarAncestorClass := TioUtilities.GetFarAncestorEntityWithSameTableAndConnection(LMap.RttiType);
+        io.di.RegisterClass(LMap.RttiType).AsDescendantClassOf(LCurrentRttiType.Name, DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX + LMap.RttiType.Name).AsEntity.
+        _SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).Execute;
+      end;
+      LCurrentRttiType := LCurrentRttiType.BaseType;
+    end;
+  end;
 begin
+  // Cicla per tutte le mappe (tutte le entities mappate)
   // ATT/NE: Prima estraggo l'elenco delle chiavi (array) e poi ciclo su quello, faccio così
   //          perchè se ciclavo direttamente sul dictionary (FInternalContainer) c'erano
   //          problemi perchè aggiungendo le TrueClassVirtualMap si sballava l'ordine
@@ -146,9 +165,13 @@ begin
   LKeyArray := FInternalContainer.Keys.ToArray;
   for LKey in LKeyArray do
   begin
-    LMapSlot := FInternalContainer.Items[LKey];
-    if not LMapSlot.GetMap.IsTrueClassVirtualMap then
-      LMapSlot.GetMap.BuildTrueClassVirtualMap;
+    LMap := FInternalContainer.Items[LKey].GetMap;
+    if not LMap.IsTrueClassVirtualMap then
+    begin
+      LMap.BuildTrueClassVirtualMap;
+      { TODO : XXX }
+      _AutoregisterAsDescendantClass;
+    end;
   end;
 end;
 
@@ -253,7 +276,7 @@ var
     LdiVVMforItems: array of TdiVVMforItem;
     LdiImplementedInterfaces: TArray<TRttiInterfaceType>;
     Index: Integer;
-    LFarAncestorClassImplementingInterface: TRttiInstanceType;
+    LFarAncestorClass: TRttiInstanceType;
   begin
     // Init
     LIsAnEntity := False;
@@ -266,6 +289,7 @@ var
     begin
       // ioEntity attribute (it means it is an entity class)
       if LAttr is ioEntity then
+      { TODO : XXX }
         LIsAnEntity := True;
       // DIC - diRegister
       if LAttr is diRegister then
@@ -303,6 +327,12 @@ var
         LdiVVMforItems[Index].Alias := diViewModelFor(LAttr).TargetTypeAlias;
       end;
     end;
+    // If it is an entity then register itself in the DIC
+    if LIsAnEntity then
+    begin
+      LFarAncestorClass := TioUtilities.GetFarAncestorEntityWithSameTableAndConnection(ACurrentRttiInstanceType);
+      io.di.RegisterClass(ACurrentRttiInstanceType)._SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).AsEntity.Execute;
+    end;
     // Dependency Injection Container - Auto register the class for the resolver (persistence only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
     begin
@@ -312,9 +342,9 @@ var
       for Index := Low(LdiImplementedInterfaces) to High(LdiImplementedInterfaces) do
         if (LdiImplementedInterfaces[Index].GUID <> IInterface) then // NB: Controllare per IInvokable ho visto che non serve perchè non ha un suo GUID
         begin
-          LFarAncestorClassImplementingInterface := TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID);
+          LFarAncestorClass := TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID);
           io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplementedInterfaces[Index].GUID, DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX + ACurrentRttiInstanceType.Name)._SetFarAncestorClassSameInterfaceAndTableAndConnection
-            (LFarAncestorClassImplementingInterface.Name).AsEntity.Execute;
+            (LFarAncestorClass.Name).AsEntity.Execute;
         end;
     end;
     // Dependency Injection Container - Register the class as is without any interface
