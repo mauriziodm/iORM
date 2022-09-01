@@ -11,7 +11,7 @@ uses
 
 type
 
-  [diViewFor(TPizza)]
+  [diViewFor(TPizza, 'List')]
   TViewPizzas = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;

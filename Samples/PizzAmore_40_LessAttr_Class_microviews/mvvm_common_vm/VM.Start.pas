@@ -47,17 +47,17 @@ end;
 
 procedure TVMStart.acShowCustomersExecute(Sender: TObject);
 begin
-  io.Show<TCustomer>;
+  io.Show<TCustomer>('List');
 end;
 
 procedure TVMStart.acShowOrdersExecute(Sender: TObject);
 begin
-  io.Show<TOrder>;
+  io.Show<TOrder>('List');
 end;
 
 procedure TVMStart.acShowPizzasExecute(Sender: TObject);
 begin
-  io.Show<TPizza>;
+  io.Show<TPizza>('List');
 end;
 
 end.

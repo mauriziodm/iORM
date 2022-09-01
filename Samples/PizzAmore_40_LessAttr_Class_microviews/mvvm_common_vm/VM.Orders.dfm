@@ -1,5 +1,5 @@
 inherited VMOrders: TVMOrders
   inherited MPMaster: TioModelPresenterMaster
-    TypeName = 'IOrder'
+    TypeName = 'TOrder'
   end
 end

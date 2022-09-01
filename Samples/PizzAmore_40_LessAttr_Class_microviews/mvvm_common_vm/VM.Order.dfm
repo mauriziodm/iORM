@@ -2,7 +2,6 @@ inherited VMOrder: TVMOrder
   inherited MPMaster: TioModelPresenterMaster
     TypeName = 'TOrder'
     OnSelectionObject = MPMasterSelectionObject
-    Left = 56
   end
   object MPCustomer: TioModelPresenterDetail
     MasterBindSource = MPMaster

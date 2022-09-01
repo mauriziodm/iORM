@@ -9,7 +9,7 @@ uses
 
 type
 
-  [diViewModelFor(TOrder)]
+  [diViewModelFor(TOrder, 'List')]
   TVMOrders = class(TVMBaseForList)
     procedure acAddExecute(Sender: TObject);
   private

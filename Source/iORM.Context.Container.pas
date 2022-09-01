@@ -105,7 +105,7 @@ uses
 class procedure TioMapContainer.AddClassRef(const AClassRef: TioClassRef);
 begin
   if not Exist(AClassRef.ClassName) then
-    FInternalContainer.Add(AClassRef.ClassName, TioMapSlot.CreateByClassRef(AClassRef));
+    FInternalContainer.Add(AClassRef.ClassName.ToUpper, TioMapSlot.CreateByClassRef(AClassRef));
 end;
 
 class function TioMapContainer.AddTrueClassVirtualMap(const AMap: IioMap): IioMap;
@@ -122,7 +122,7 @@ begin
   else
   begin
     Result := AMap.DuplicateToTrueClassMap;
-    FInternalContainer.Add(LMapName, TioMapSlot.CreateByMap(Result));
+    FInternalContainer.Add(LMapName.ToUpper, TioMapSlot.CreateByMap(Result));
   end;
 end;
 
@@ -182,7 +182,7 @@ end;
 
 class function TioMapContainer.Exist(const AClassName: String): Boolean;
 begin
-  Result := FInternalContainer.ContainsKey(AClassName);
+  Result := FInternalContainer.ContainsKey(AClassName.ToUpper);
 end;
 
 class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
@@ -193,7 +193,7 @@ end;
 class function TioMapContainer.GetClassRef(const AClassName: String): TioClassRef;
 begin
   if Self.Exist(AClassName) then
-    Result := FInternalContainer.Items[AClassName].GetClassRef
+    Result := FInternalContainer.Items[AClassName.ToUpper].GetClassRef
   else
     raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
@@ -201,7 +201,7 @@ end;
 class function TioMapContainer.GetConnectionDefName(const AClassName: String): String;
 begin
   if Self.Exist(AClassName) then
-    Result := FInternalContainer.Items[AClassName].GetMap.GetTable.GetConnectionDefName
+    Result := FInternalContainer.Items[AClassName.ToUpper].GetMap.GetTable.GetConnectionDefName
   else
     raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
@@ -215,7 +215,7 @@ class function TioMapContainer.GetMap(const AClassName: String; const RaiseAnExc
 begin
   Result := nil;
   if Exist(AClassName) then
-    Result := FInternalContainer.Items[AClassName].GetMap
+    Result := FInternalContainer.Items[AClassName.ToUpper].GetMap
   else if RaiseAnExceptionIfNotFound then
     raise EioException.Create(ClassName, 'GetMap', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
       #13#13'I would need the map of class "%s" but can''t find it in my collection of mapped classes/entities.' +

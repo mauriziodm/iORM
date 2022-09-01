@@ -293,7 +293,8 @@ begin
   if Assigned(FMasterAdaptersContainer) then
     FMasterAdaptersContainer.RemoveBindSourceAdapter(Self);
   // Free the DetailAdaptersContainer
-  FDetailAdaptersContainer.Free;
+  if Assigned(FDetailAdaptersContainer) then
+    FDetailAdaptersContainer.Free;
   inherited;
 end;
 

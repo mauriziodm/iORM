@@ -11,7 +11,7 @@ uses
 
 type
 
-  [diViewFor(TCustomer)]
+  [diViewFor(TCustomer, 'List')]
   TViewCustomers = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;

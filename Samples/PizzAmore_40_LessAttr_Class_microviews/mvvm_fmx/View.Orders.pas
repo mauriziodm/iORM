@@ -11,7 +11,7 @@ uses
 
 type
 
-  [diViewFor(TOrder)]
+  [diViewFor(TOrder, 'List')]
   TViewOrders = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;

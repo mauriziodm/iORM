@@ -1178,26 +1178,6 @@ begin
   if Assigned(FBindSourceAdapter) then
     raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
 
-  // ----- OLD CODE -----
-  // // If the property MasterModelPresenter is assigned then retrieve
-  // // the DetailBindSourceAdapter from it
-  // // else create the BSA from TypeName & TypeAlias
-  // if (FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance]) or IsDetailBS then
-  // // Get the BindSourceAdapter
-  // SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, nil, MasterPresenter, MasterPropertyName))
-  // else
-  // begin
-  // // Get the ActiveBindSourceAdapter
-  // SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));
-  // // Force the creation of all the detail adapters (if exists)
-  // // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
-  // // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
-  // // stati creati) forzo la creazione anche di tutti gli adapters di dettaglio al momento della creazione
-  // // del Master.
-  // ForceDetailAdaptersCreation;
-  // end;
-  // ----- OLD CODE -----
-
   // If it is a detail bind source then get the detail BSA from the master bind source,
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.

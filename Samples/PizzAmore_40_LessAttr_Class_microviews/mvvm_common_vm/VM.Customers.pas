@@ -9,7 +9,7 @@ uses
 
 type
 
-  [diViewModelFor(TCustomer)]
+  [diViewModelFor(TCustomer, 'List')]
   TVMCustomers = class(TVMBaseForList)
     acNextPage: TioVMActionBSNextPage;
     acPrevPage: TioVMActionBSPrevPage;

@@ -41,25 +41,20 @@ end;
 procedure TVMOrder.acShowCustomerSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<TCustomer>(MPCustomer);
+  io.ShowAsSelector<TCustomer>(MPCustomer, 'List');
 end;
 
 procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<TPizza>(MPMaster);
+  io.ShowAsSelector<TPizza>(MPMaster, 'List');
 end;
 
 procedure TVMOrder.MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-var
-  LPizza: TPizza;
 begin
-  if ASelected is TPizza then
-  begin
-    MPMaster.CurrentAs<TOrder>.AddPizza(LPizza);
-    MPMaster.Refresh;
-    ADone := True;
-  end;
+  MPMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
+  MPMaster.Refresh;
+  ADone := True;
 end;
 
 end.

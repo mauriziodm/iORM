@@ -1,7 +1,7 @@
 inherited VMCustomers: TVMCustomers
   Width = 541
   inherited MPMaster: TioModelPresenterMaster
-    TypeName = 'TContact'
+    TypeName = 'TCustomer'
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
