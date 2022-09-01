@@ -1,0 +1,461 @@
+inherited ViewOrder: TViewOrder
+  inherited RectangleTitle: TRectangle
+    inherited LabelTitle: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Order'
+    end
+  end
+  object LayoutOrderData: TLayout [1]
+    Align = Top
+    Position.Y = 40.000000000000000000
+    Size.Width = 380.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    object EditID: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      StyleLookup = 'transparentedit'
+      TabOrder = 42
+      Text = '-33'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Position.X = 5.000000000000000000
+      Position.Y = 20.000000000000000000
+      Margins.Left = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'ID here'
+      StyledSettings = [Family, Size, FontColor]
+      object Label1: TLabel
+        Position.Y = -16.000000000000000000
+        Text = 'ID'
+        TabOrder = 0
+      end
+    end
+    object EditDate: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      StyleLookup = 'transparentedit'
+      TabOrder = 41
+      Text = '01/11/2022'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Position.X = 50.000000000000000000
+      Position.Y = 20.000000000000000000
+      Margins.Left = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'Type the name here'
+      StyledSettings = [Family, Size, FontColor]
+      object Label2: TLabel
+        Position.Y = -16.000000000000000000
+        Text = 'Date'
+        TabOrder = 0
+      end
+    end
+    object EditNote: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
+      StyleLookup = 'transparentedit'
+      TabOrder = 40
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Position.X = 135.000000000000000000
+      Position.Y = 20.000000000000000000
+      Margins.Left = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Size.Width = 235.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'Type the name here'
+      StyledSettings = [Family, Size, FontColor]
+      object Label6: TLabel
+        Position.Y = -16.000000000000000000
+        Text = 'Note'
+        TabOrder = 0
+      end
+    end
+  end
+  object LayoutCustomer: TLayout [2]
+    Align = Top
+    Position.Y = 90.000000000000000000
+    Size.Width = 380.000000000000000000
+    Size.Height = 75.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    object EditCustName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      StyleLookup = 'transparentedit'
+      TabOrder = 41
+      Text = 'Mark Anderson (-33)'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Position.X = 5.000000000000000000
+      Position.Y = 15.000000000000000000
+      Margins.Left = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Size.Width = 340.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'ID here'
+      StyledSettings = [Family, Size, FontColor]
+      object Label3: TLabel
+        Position.Y = -16.000000000000000000
+        Text = 'Customer'
+        TabOrder = 0
+      end
+    end
+    object EditCustAddress: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      StyleLookup = 'transparentedit'
+      TabOrder = 40
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Position.X = 5.000000000000000000
+      Position.Y = 40.000000000000000000
+      Margins.Left = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Size.Width = 340.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'ID here'
+      StyledSettings = [Family, Size, FontColor]
+    end
+    object ButtonSelectCustomer: TSpeedButton
+      Action = acShowCustomerSelector
+      Align = MostRight
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 350.000000000000000000
+      Size.Width = 30.000000000000000000
+      Size.Height = 75.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'arrowrighttoolbutton'
+    end
+  end
+  object LayoutGrandTotal: TLayout [3]
+    Align = Bottom
+    Position.Y = 514.000000000000000000
+    Size.Width = 380.000000000000000000
+    Size.Height = 30.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    object EditGrandTotal: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Right
+      StyleLookup = 'transparentedit'
+      TabOrder = 41
+      ReadOnly = True
+      Text = '67,67 '#8364
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Trailing
+      Position.X = 295.000000000000000000
+      Position.Y = 5.000000000000000000
+      Margins.Left = 5.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 20.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'ID here'
+      StyledSettings = [Family, FontColor]
+      object Label4: TLabel
+        Position.X = -85.000000000000000000
+        Position.Y = -2.000000000000000000
+        Size.Width = 73.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Trailing
+        Text = 'Grand total'
+        TabOrder = 0
+      end
+    end
+  end
+  object LayoutRows: TLayout [4]
+    Align = Client
+    Size.Width = 380.000000000000000000
+    Size.Height = 349.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    object Label5: TLabel
+      Align = Top
+      Margins.Left = 5.000000000000000000
+      Position.X = 5.000000000000000000
+      Size.Width = 375.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Rows'
+      TabOrder = 0
+      object ButtonSelectPizza: TSpeedButton
+        Action = acShowPizzaSelector
+        Align = MostRight
+        Enabled = True
+        ImageIndex = -1
+        Position.X = 345.000000000000000000
+        Size.Width = 30.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'additembutton'
+      end
+      object ButtonDeleteRow: TSpeedButton
+        Action = acDeleteRow
+        Align = Right
+        Enabled = True
+        ImageIndex = -1
+        Position.X = 315.000000000000000000
+        Size.Width = 30.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'deleteitembutton'
+      end
+    end
+    object StringGrid1: TStringGrid
+      Align = Client
+      CanFocus = True
+      ClipChildren = True
+      Size.Width = 380.000000000000000000
+      Size.Height = 319.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      RowCount = 200
+      Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
+      Viewport.Width = 376.000000000000000000
+      Viewport.Height = 294.000000000000000000
+    end
+  end
+  inherited VMBridge: TioViewModelBridge
+    Top = 224
+  end
+  inherited MBSMaster: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'OrderDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'GrandTotal'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    Top = 280
+  end
+  inherited ActionList1: TActionList
+    Left = 160
+    Top = 280
+    object acShowCustomerSelector: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'acShowCustomerSelector'
+      Enabled = True
+      Visible = True
+      Caption = 'acShowCustomerSelector'
+      VMActionName = 'acShowCustomerSelector'
+    end
+    object acShowPizzaSelector: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'acShowPizzaSelector'
+      Enabled = True
+      Visible = True
+      Caption = 'acShowPizzaSelector'
+      VMActionName = 'acShowPizzaSelector'
+    end
+    object acDeleteRow: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'acDeleteRow'
+      Enabled = True
+      Visible = True
+      Caption = 'acDeleteRow'
+      VMActionName = 'acDeleteRow'
+    end
+  end
+  object MBSCustomer: TioModelBindSource
+    AutoActivate = False
+    FieldDefs = <
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'FullAddress'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'Integers'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'MPCustomer'
+    Left = 56
+    Top = 336
+  end
+  object MBSRows: TioModelBindSource
+    AutoActivate = False
+    FieldDefs = <
+      item
+        Name = 'Description'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'Price'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'Qty'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'RowTotal'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'MPRows'
+    Left = 56
+    Top = 392
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 159
+    Top = 225
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'ID'
+      Control = EditID
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'OrderDate'
+      Control = EditDate
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'Note'
+      Control = EditNote
+      Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'GrandTotal'
+      Control = EditGrandTotal
+      Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSCustomer
+      FieldName = 'Name'
+      Control = EditCustName
+      Track = False
+    end
+    object LinkControlToField6: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSCustomer
+      FieldName = 'FullAddress'
+      Control = EditCustAddress
+      Track = False
+    end
+    object LinkGridToDataSourceMBSRows: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = MBSRows
+      GridControl = StringGrid1
+      Columns = <
+        item
+          MemberName = 'Description'
+          Width = 180
+        end
+        item
+          MemberName = 'Price'
+          Width = 70
+          CustomFormat = 'Format('#39'%%m'#39', Value)'
+        end
+        item
+          MemberName = 'Qty'
+          Width = 40
+          Alignment = taCenter
+        end
+        item
+          MemberName = 'RowTotal'
+          Width = 80
+          CustomFormat = 'Format('#39'%%m'#39', Value)'
+        end>
+    end
+  end
+end

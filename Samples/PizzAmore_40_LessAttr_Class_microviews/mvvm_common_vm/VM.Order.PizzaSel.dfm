@@ -1,0 +1,2 @@
+inherited VMOrderPizzaSel: TVMOrderPizzaSel
+end
