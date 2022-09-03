@@ -375,7 +375,7 @@ var
   LWhere: IioWhere;
 begin
   // Build where conditions
-  LWhere := io.Where(AProperty.GetRelationChildPropertyName, coEqual, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger);
+  LWhere := io.Where(AProperty.GetRelationChildPropertyName, coEqual, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger).Cacheable;
   LWhere.TypeName := AProperty.GetRelationChildTypeName;
   LWhere.TypeAlias := AProperty.GetRelationChildTypeAlias;
   // Check if there is a detail object on the DB, if it finds it it loads it otherwise it returns nil
@@ -412,7 +412,7 @@ begin
     //        la ChildProperty destinazione.
     // Note: If the property is an interface then artificially increment the RefCount to avoid premature destruction of the instance
     Result := AProperty.GetRelationChildObject(AContext.DataObject);
-    Result := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).ToObject(Result);
+    Result := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).Cacheable.ToObject(Result);
     if not Assigned(Result) then
       raise EioException.Create(ClassName, 'LoadPropertyBelongsTo', Format('Houston we have a problem.' +
         #13#13'I am loading an object of class "%s" with ID = %d.' +
@@ -444,7 +444,7 @@ begin
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // It set the first part of the load operation
   LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._PropertyEqualsTo(AProperty.GetRelationChildPropertyName,
-    AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).ClearListBefore(AContext.Where.GetClearListBefore);
+    AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).ClearListBefore(AContext.Where.GetClearListBefore).Cacheable;
   // If a Details Where conditions (for the details) is present then add it to the load operation
   if Assigned(LDetailWhere) then
     LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance); // Eventuale DetailWhere & OrderBy

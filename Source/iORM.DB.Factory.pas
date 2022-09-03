@@ -179,23 +179,20 @@ end;
 class function TioDbFactory.Query(const AConnectionDefName: String; const AQueryIdentity: String): IioQuery;
 var
   LConnection: IioConnection;
-  LQuery: IioQuery;
 begin
   // Get the proper connection
-  LConnection := Self.Connection(AConnectionDefName);
+  LConnection := Connection(AConnectionDefName);
   // Operation allowed only for DB connections
   if not LConnection.IsDBConnection then
-    raise EioException.Create(Self.ClassName + ': "Query" method: Operation not allowed by this type of connection.');
-  // Else if the query is already present in the QueryContainer of the connection then
-  // get it and return
-  if LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, LQuery) then
-    Exit(LQuery);
-  // Else create a new query and insert it in the QueryContainer of the connection
-  // for future use if AConnectionDefName is valid
-//  Result := TioQuery.Create(LConnection, TioInternalSqlQuery.Create(nil));
-  Result := TioFDQuery.Create(LConnection);
-  if not AQueryIdentity.IsEmpty then
+    raise EioException.Create(ClassName, 'Query', 'Operation not allowed by this type of connection.');
+  // If the query is already present in the QueryContainer of the connection then get it and return...
+  //   ...else create a new query and insert it in the QueryContainer of the connection
+  if not LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, Result) then
+  begin
+    Result := TioFDQuery.Create(LConnection);
     LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
+  end;
+
 end;
 
 class function TioDbFactory.Script(const AConnectionDefName: String; const AScript: TStrings): IioScript;

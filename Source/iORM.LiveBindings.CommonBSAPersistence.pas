@@ -608,7 +608,7 @@ begin
     begin
       Result := nil;
       if LID <> 0 then
-        io.RefTo(LClassName).ByID(LID).Delete;
+        io.RefTo(LClassName).ByID(LID).Cacheable.Delete;
     end;
 end;
 
@@ -661,7 +661,7 @@ begin
         LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
           procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
           begin
-            io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Delete;
+            io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Cacheable.Delete;
           end);
         // commit
         io.CommitTransaction;

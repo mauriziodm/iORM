@@ -53,7 +53,7 @@ type
     TioInternalQueryContainerType = TObjectDictionary<String, TioInternalQueryContainerItemType>;
   strict private
     FContainer: TioInternalQueryContainerType;
-    function ExistQueryIdentity(AQueryIdentity:String): Boolean;
+    function _ExistQueryIdentity(AQueryIdentity:String): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -68,14 +68,41 @@ uses System.SysUtils;
 
 { TioQueryContainer }
 
+function TioQueryContainer.TryGetQuery(AQueryIdentity: String; out ResultQuery: IioQuery): Boolean;
+var
+  LQuery: IioQuery;
+begin
+  // Init
+  Result := False;
+  ResultQuery := nil;
+  // Try to find an already registered query with the same identity and return it, else return nil
+  // Note: Return the first inactive query for this query identity to resolve the recursion problem
+  if _ExistQueryIdentity(AQueryIdentity) then
+    for LQuery in FContainer.Items[AQueryIdentity] do
+      if not LQuery.IsActive then
+      begin
+        ResultQuery := LQuery;
+        Exit(True);
+      end;
+end;
+
 procedure TioQueryContainer.AddQuery(AQueryIdentity:String; AQuery: IioQuery);
 begin
-  // If the Query (QueryIdentity) does not exist then create it in the container
-  if not ExistQueryIdentity(AQueryIdentity) then
-    FContainer.Add(AQueryIdentity, TioInternalQueryContainerItemType.Create);
-  // Add a new element that holds all queries for this identities
-  //  and insert the received Query (new query) in this list
-  FContainer.Items[AQueryIdentity].Add(AQuery);
+  // If is not empty then add it in the container
+  if not AQueryIdentity.IsEmpty then
+  begin
+    // If the Query (QueryIdentity) does not exist then create it in the container
+    if not _ExistQueryIdentity(AQueryIdentity) then
+      FContainer.Add(AQueryIdentity, TioInternalQueryContainerItemType.Create);
+    // Add a new element that holds all queries for this identities
+    //  and insert the received sQuery (new query) in this list
+    FContainer.Items[AQueryIdentity].Add(AQuery);
+  end;
+end;
+
+function TioQueryContainer._ExistQueryIdentity(AQueryIdentity:String): Boolean;
+begin
+  Result := (not AQueryIdentity.IsEmpty) and FContainer.ContainsKey(AQueryIdentity);
 end;
 
 procedure TioQueryContainer.CleanQueryConnectionsRef;
@@ -90,7 +117,7 @@ begin
   //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
   //       a vicenda e rendevano inefficace il Reference Count
   // NB: Loop for all query container items (for all query identities)
-  for LQueryContainerItem in Self.FContainer.Values do
+  for LQueryContainerItem in FContainer.Values do
     // Loop for all queries in the current query identities array
     for AQuery in LQueryContainerItem do
       AQuery.CleanConnectionRef;
@@ -106,35 +133,6 @@ destructor TioQueryContainer.Destroy;
 begin
   FContainer.Free;
   inherited;
-end;
-
-function TioQueryContainer.ExistQueryIdentity(AQueryIdentity:String): Boolean;
-begin
-  Result := (not AQueryIdentity.IsEmpty)
-    and FContainer.ContainsKey(AQueryIdentity);
-end;
-
-function TioQueryContainer.TryGetQuery(AQueryIdentity: String;
-  out ResultQuery: IioQuery): Boolean;
-var
-  LQuery: IioQuery;
-begin
-  // Init
-  Result := False;
-  ResultQuery := nil;
-  // If the query identity is empty then exit
-  if not ExistQueryIdentity(AQueryIdentity) then
-    Exit;
-  // Return the first inactive query for this query identity
-  //  to resolve the recursion problem
-  for LQuery in FContainer.Items[AQueryIdentity] do
-  begin
-    if not LQuery.IsActive then
-    begin
-      ResultQuery := LQuery;
-      Exit(True);
-    end;
-  end;
 end;
 
 end.

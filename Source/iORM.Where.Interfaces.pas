@@ -122,6 +122,8 @@ type
     function IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
     function LimitExists: Boolean;
+    function Cacheable: IioWhere;
+    function IsCacheable: Boolean;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -259,6 +261,7 @@ type
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
     function LazyProps(const ALazyProps: String): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
+    function Cacheable: IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;

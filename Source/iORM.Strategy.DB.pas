@@ -166,7 +166,7 @@ var
     AQuery: IioQuery;
   begin
     // Create & execute query
-    AQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, False);
     AQuery.ExecSQL;
   end;
 
@@ -236,20 +236,6 @@ begin
   end;
 end;
 
-// class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
-// var
-// AContext: IioContext;
-// begin
-// inherited;
-// // Check
-// if not Assigned(AObj) then
-// Exit;
-// // Create Context
-// AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-// // Execute
-// Self.DeleteObject_Internal(AContext);
-// end;
-
 class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
 var
   LContext: IioContext;
@@ -282,7 +268,7 @@ begin
   // If the ID is not null (object not persisted) then delete it from the DB
   if not AContext.IDIsNull then
     // Create and execute query
-    TioDBFactory.QueryEngine.GetQueryDelete(AContext).ExecSQL;
+    TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
 end;
 
 class procedure TioStrategyDB.InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);

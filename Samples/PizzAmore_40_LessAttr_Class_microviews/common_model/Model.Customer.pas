@@ -51,7 +51,7 @@ type
     property FidelityCardCode: String read GetFidelityCardCode write SetFidelityCardCode;
   end;
 
-  [ioEntity('EMP')]
+  [ioEntity('CONTACTS')]
   TVipCustomer = class(TCustomer)
    strict private
     FVipCardCode: String;

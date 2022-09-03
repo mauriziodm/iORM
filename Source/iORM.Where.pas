@@ -61,6 +61,7 @@ type
     FLimitRows, FLimitOffset: Integer;
     FOrderBy: IioSqlItemWhere;
     FClearListBefore: Boolean;
+    FCacheable: Boolean;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: TWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
@@ -157,6 +158,8 @@ type
     function IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere;
     function LimitExists: Boolean;
+    function Cacheable: IioWhere;
+    function IsCacheable: Boolean;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -283,6 +286,7 @@ type
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
     function LazyProps(const ALazyProps: String): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
+    function Cacheable: IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;
@@ -654,6 +658,12 @@ begin
   Self._PropertyOIDEqualsTo(AID);
 end;
 
+function TioWhere.Cacheable: IioWhere;
+begin
+  Result := Self;
+  FCacheable := True;
+end;
+
 procedure TioWhere.Clear(const AClearWhereDetails: Boolean = True);
 begin
   FWhereItems.Clear;
@@ -681,6 +691,7 @@ begin
   FPagingObj := nil;
   FPagingObjExists := False;
   FClearListBefore := False;
+  FCacheable := False;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -919,6 +930,11 @@ procedure TioWhere.SetPagingObj(const APagingObj: TObject);
 begin
   FPagingObj := APagingObj as TioCommonBSAPageManager;
   FPagingObjExists := Assigned(FPagingObj);
+end;
+
+function TioWhere.IsCacheable: Boolean;
+begin
+  Result := FCacheable;
 end;
 
 function TioWhere.IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;
@@ -1451,6 +1467,12 @@ function TioWhere<T>.ByID(const AID: Integer): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).ByID(AID);
+end;
+
+function TioWhere<T>.Cacheable: IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self).Cacheable;
 end;
 
 function TioWhere<T>.ClearListBefore(const AClearListBefore: Boolean): IioWhere<T>;
