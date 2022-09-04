@@ -485,7 +485,7 @@ begin
   for LAttribute in LAttributes do
   begin
     if LAttribute is ioEntity then
-      LTableName := ioEntity(LAttribute).Value;
+      LTableName := ioEntity(LAttribute).TableName;
     if LAttribute is ioConnectionDefName then
       LConnectionDefName := ioConnectionDefName(LAttribute).Value;
   end;

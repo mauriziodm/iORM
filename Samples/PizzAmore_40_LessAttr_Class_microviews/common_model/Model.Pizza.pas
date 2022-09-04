@@ -14,7 +14,7 @@ uses
 
 type
 
-  [ioEntity]
+  [ioEntity('PIZZAS')]
   TPizza = class(TInterfacedObject)
   private
     FID: Integer;
