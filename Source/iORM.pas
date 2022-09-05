@@ -173,6 +173,7 @@ type
   diImplements = iORM.Attributes.diImplements;
   diDoNotRegisterAsInterfacedEntity = iORM.Attributes.diDoNotRegisterAsInterfacedEntity;
   diAsSingleton = iORM.Attributes.diAsSingleton;
+  diSimpleViewFor = iORM.Attributes.diSimpleViewFor;
   diViewFor = iORM.Attributes.diViewFor;
   diViewModelFor = iORM.Attributes.diViewModelFor;
   ioInject = iORM.Attributes.ioInject;
