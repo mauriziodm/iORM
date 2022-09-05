@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity]
+  [ioEntity('ORDERROWS')]
   TOrderRow = class(TInterfacedObject, IOrderRow)
   private
     FID: Integer;

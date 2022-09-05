@@ -8,7 +8,7 @@ uses
 type
 
 //  [ioConnectionDefName('FirebirdConn')]
-  [ioEntity]
+  [ioEntity('ORDERROWS')]
   TOrderRow = class(TInterfacedObject)
   private
     FID: Integer;
