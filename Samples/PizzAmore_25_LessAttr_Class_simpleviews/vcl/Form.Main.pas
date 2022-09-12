@@ -45,7 +45,10 @@ uses
 
 procedure TMainForm.Button1Click(Sender: TObject);
 begin
-  io.Show<TCustomer>;
+
+  io.Show<IInterface>;
+
+//  io.Show<TCustomer>;
 end;
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);

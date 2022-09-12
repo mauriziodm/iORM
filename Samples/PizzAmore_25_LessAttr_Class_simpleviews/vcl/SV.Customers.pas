@@ -8,6 +8,7 @@ uses
 
 type
 
+  [diImplements(IInterface)]
   [diSimpleViewFor(TCustomer)]
   TCustomersSimpleView = class(TFrame)
   private

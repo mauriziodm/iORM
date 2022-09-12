@@ -331,6 +331,8 @@ type
     class function RegisterClass(const ARttiType: TRttiInstanceType): TioDependencyInjectionRegister; overload;
     class function Locate(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function Locate<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
+    class function LocateSimpleView(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleView<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
     class function LocateView(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateView<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
     class function LocateVM(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
@@ -422,6 +424,16 @@ end;
 class function TioDependencyInjection.Locate<T>(const AAlias: String): IioDependencyInjectionLocator<T>;
 begin
   Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, False, False);
+end;
+
+class function TioDependencyInjection.LocateSimpleView(const AInterfaceName, AAlias: String): IioDependencyInjectionLocator;
+begin
+  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, True);
+end;
+
+class function TioDependencyInjection.LocateSimpleView<T>(const AAlias: String): IioDependencyInjectionLocator<T>;
+begin
+  Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, True);
 end;
 
 class function TioDependencyInjection.LocateView(const AInterfaceName, AAlias: String): IioDependencyInjectionLocator;
