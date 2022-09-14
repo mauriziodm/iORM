@@ -35,3 +35,6 @@ Samples/PizzAmore_40_LessAttr_Class_microviews/mvvm_common_vm/__history/
 Samples/PizzAmore_40_LessAttr_Class_microviews/mvvm_fmx/__history/
 Samples/PizzAmore_40_LessAttr_Class_microviews/mvvm_fmx/Win32/
 *.bak
+Samples/PizzAmore_25_LessAttr_Class_simpleviews/common_model/__history/
+Samples/PizzAmore_25_LessAttr_Class_simpleviews/vcl/__history/
+Samples/PizzAmore_25_LessAttr_Class_simpleviews/vcl/Win32/
