@@ -7,14 +7,11 @@ uses
 
 type
 
-//  [ioConnectionDefName('FirebirdConn')]
   [ioEntity('ORDERROWS')]
   TOrderRow = class(TInterfacedObject)
   private
     FID: Integer;
-    FOrderID: Integer; // ***
     FPizzaID: Integer;
-    [ioVarChar(30)]
     FDescription: String;
     FPrice: Currency;
     FQty: Integer;
@@ -27,7 +24,6 @@ type
     property Description: String read FDescription write FDescription;
     property Price: Currency read FPrice write FPrice;
     property Qty: Integer read FQty write FQty;
-    [ioField, ioPersistOnly]
     property RowTotal: Currency read GetRowTotal;  // ReadOnly
   end;
 

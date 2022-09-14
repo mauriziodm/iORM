@@ -259,7 +259,7 @@ type
     Alias: String;
   end;
 
-  TdiVVMforItemType = (vvmitView, vvmitViewModel);
+  TdiVVMforItemType = (vvmitSimpleView, vvmitView, vvmitViewModel);
 
   TdiVVMforItem = record
     ItemType: TdiVVMforItemType;
@@ -309,6 +309,15 @@ var
         SetLength(LdiImplements, Index + 1);
         LdiImplements[Index].IID := diImplements(LAttr).IID;
         LdiImplements[Index].Alias := diImplements(LAttr).Alias;
+      end;
+      // DIC - diSimpleViewFor
+      if LAttr is diSimpleViewFor then
+      begin
+        Index := Length(LdiVVMforItems);
+        SetLength(LdiVVMforItems, Index + 1);
+        LdiVVMforItems[Index].ItemType := vvmitSimpleView;
+        LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetTypeName;
+        LdiVVMforItems[Index].Alias := diViewFor(LAttr).TargetTypeAlias;
       end;
       // DIC - diViewFor
       if LAttr is diViewFor then
@@ -361,6 +370,8 @@ var
       for Index := Low(LdiVVMforItems) to High(LdiVVMforItems) do
       begin
         case LdiVVMforItems[Index].ItemType of
+          vvmitSimpleView:
+            io.di.RegisterClass(ACurrentRttiInstanceType).AsSimpleViewFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitView:
             io.di.RegisterClass(ACurrentRttiInstanceType).AsViewFor(LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitViewModel:

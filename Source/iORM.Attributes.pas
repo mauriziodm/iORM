@@ -317,17 +317,16 @@ type
   // ---------------------------------------------------------------------------
 
   // Entity attribute
-  ioEntity = class(TioCustomStringAttribute)
+  ioEntity = class(TioCustomAttribute)
   strict private
+    FTableName: String;
     FMapMode: TioMapModeType;
   public
-    constructor Create(const AValue: String = ''; const AMapMode: TioMapModeType = DEFAULT_MAP_MODE); overload;
-    constructor Create(const AMapMode: TioMapModeType); overload;
+    constructor Create(const ATableName: String; const AMapMode: TioMapModeType = DEFAULT_MAP_MODE);
+    property TableName: String read FTableName;
     property MapMode: TioMapModeType read FMapMode;
   end;
-
-  // Abstract Entity attribure
-  ioAbstractEntity = ioEntity;
+  ioTable = ioEntity;
 
   // KeyGeneratorName attribute
   ioKeyGenerator = class(TioCustomStringAttribute)
@@ -536,15 +535,9 @@ end;
 
 { ioTable }
 
-constructor ioEntity.Create(const AValue: String; const AMapMode: TioMapModeType);
+constructor ioEntity.Create(const ATableName: String; const AMapMode: TioMapModeType);
 begin
-  inherited Create(AValue);
-  FMapMode := AMapMode;
-end;
-
-constructor ioEntity.Create(const AMapMode: TioMapModeType);
-begin
-  inherited Create('');
+  FTableName := ATableName;
   FMapMode := AMapMode;
 end;
 

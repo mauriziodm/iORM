@@ -595,8 +595,8 @@ begin
     begin
       if (LAttr is ioEntity) then
       begin
-        if not ioEntity(LAttr).Value.IsEmpty then
-          LTableName := ioEntity(LAttr).Value;
+        if not ioEntity(LAttr).TableName.IsEmpty then
+          LTableName := ioEntity(LAttr).TableName;
         LMapMode := ioEntity(LAttr).MapMode;
       end;
       if LAttr is ioKeyGenerator then

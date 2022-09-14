@@ -253,7 +253,16 @@ begin
           case LProperty.PropertyType.TypeKind of
             tkEnumeration:
               if SameText(LTypeName, 'boolean') or SameText(LTypeName, 'bool') then // 'bool' for C++
-                LCollectionEditorField := CreateRttiPropertyField<Boolean>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBoolean, APath+LProperty.Name);
+                LCollectionEditorField := CreateRttiPropertyField<Boolean>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBoolean, APath+LProperty.Name)
+              else
+                case LProperty.PropertyType.TypeSize of
+                1:
+                  LCollectionEditorField := CreateRttiPropertyField<UInt8>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name);
+                2:
+                  LCollectionEditorField := CreateRttiPropertyField<UInt16>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name);
+                4:
+                  LCollectionEditorField := CreateRttiPropertyField<UInt32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtUInteger, APath+LProperty.Name);
+                end;
             tkInteger:
               begin
                 case LTypeData.OrdType of
@@ -564,7 +573,10 @@ begin
     LRttiField := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
     if LRttiField <> nil then
     begin
-      Result := LRttiField.GetValue(LObject).AsType<T>;
+      if (LRttiField.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiField.PropertyType.Handle) then
+        Result := T(LRttiField.GetValue(LObject).GetReferenceToRawData^)
+      else
+        Result := LRttiField.GetValue(LObject).AsType<T>
     end
     else
       Result := TValue.Empty.AsType<T>;
@@ -605,7 +617,14 @@ begin
     LRttiField := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
     if LRttiField <> nil then
     begin
-      LRttiField.SetValue(LObject, TValue.From<T>(AValue));
+      if (LRttiField.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiField.PropertyType.Handle) then
+      begin
+        var V: TValue;
+        TValue.Make(@AValue, LRttiField.PropertyType.Handle, V);
+        LRttiField.SetValue(LObject, V);
+      end
+      else
+        LRttiField.SetValue(LObject, TValue.From<T>(AValue));
       // RecordChanged;
     end;
   end

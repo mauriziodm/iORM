@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioAbstractEntity('CONTACTS')]
+  [ioEntity('CONTACTS')]
   TContact = class(TObject)
   strict private
     FID: Integer;

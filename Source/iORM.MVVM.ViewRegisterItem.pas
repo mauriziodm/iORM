@@ -97,6 +97,8 @@ begin
   FReleasingViewContext := True;
   if not Assigned(FViewContext) then
     Exit;
+  if Assigned(FView) then
+    FreeAndNil(FView);
   if Assigned(FViewContextProvider) then
     FViewContextProvider.ReleaseViewContext(FView, FViewContext);
   // NB: Ho sostituito il test Assigned con una apposita variabile "FViewContextFreeMethodIsPresent" settata nel costruttore
