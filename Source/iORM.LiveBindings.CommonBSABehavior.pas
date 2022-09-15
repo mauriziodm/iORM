@@ -601,6 +601,7 @@ var
   LCtxt: TRTTIContext;
   LRttiType: TRttiType;
   LRttiField: TRttiProperty;
+  LValue: TValue;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
   //      these type of properties are ReadOnly
@@ -619,9 +620,8 @@ begin
     begin
       if (LRttiField.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiField.PropertyType.Handle) then
       begin
-        var V: TValue;
-        TValue.Make(@AValue, LRttiField.PropertyType.Handle, V);
-        LRttiField.SetValue(LObject, V);
+        TValue.Make(@AValue, LRttiField.PropertyType.Handle, LValue);
+        LRttiField.SetValue(LObject, LValue);
       end
       else
         LRttiField.SetValue(LObject, TValue.From<T>(AValue));
