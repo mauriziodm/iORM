@@ -90,7 +90,8 @@ end;
 class function TioViewModelShuttleContainer.GetViewModel(const AMarker: string = ''): IioViewModel;
 begin
   Result := nil;
-  if not Assigned(FContainer) then Exit;  // If not assigned do not enter in the critical section (optimization)
+  if not Assigned(FContainer) then
+    Exit;  // If not assigned do not enter in the critical section (optimization)
   Self.CriticalSection.Acquire;
   try
     if Self.Container.ContainsKey(AMarker) then

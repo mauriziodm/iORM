@@ -82,6 +82,7 @@ begin
   LCustomer.City := 'New York';
   LCustomer.Address := '301 Park Ave';
   LCustomer.PhoneNumber := '(555) 555-1234';
+  LCustomer.Gender := gMale;
   io.Persist(LCustomer);
   FreeAndnil(LCustomer);
   // Mr. Omar Bossoni
@@ -90,6 +91,7 @@ begin
   LCustomer.City := 'New York';
   LCustomer.Address := '111 E 48th St';
   LCustomer.PhoneNumber := '(444) 444-1234';
+  LCustomer.Gender := gMale;
   io.Persist(LCustomer);
   FreeAndnil(LCustomer);
   // Mr. Marco Mottadelli
@@ -98,6 +100,7 @@ begin
   LCustomer.City := 'Union City';
   LCustomer.Address := '3501 Bergenline Ave';
   LCustomer.PhoneNumber := '(333) 333-1234';
+  LCustomer.Gender := gMale;
   io.Persist(LCustomer);
   FreeAndnil(LCustomer);
 end;
@@ -114,6 +117,7 @@ begin
     LCustomer.City := Format('city %d', [LCounter]);
     LCustomer.Address := Format('address %d', [LCounter]);
     LCustomer.PhoneNumber := Format('phone number %d', [LCounter]);
+    LCustomer.Gender := gFemale;
     io.Persist(LCustomer);
     FreeAndnil(LCustomer);
   end;

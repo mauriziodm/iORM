@@ -82,32 +82,68 @@ procedure TioViewModelBridge.CheckForViewModel;
 var
   LObj: TObject;
 begin
-  if (csDesigning in ComponentState) then
+  // If we are at DesignTime or the ViewModel already exists then Exit
+  if (csDesigning in ComponentState) or Assigned(FViewModel) then
     Exit;
-  // If a ViewModel is already assigned then exit
-  if Assigned(FViewModel) then
-    Exit;
-  // ===============================================================================================================================
-  // VIEW MODEL CREATION BY DI_VMINterface & DI_VMAlias property if not already created
-  // -------------------------------------------------------------------------------------------------------------------------------
-  if not FDI_VMInterface.IsEmpty then
-  begin
-    LObj := io.di.LocateVM(FDI_VMInterface, FDI_VMAlias).Get;
-    if not Supports(LObj, IioViewModel, FViewModel) then
-      raise EioException.Create(Self.ClassName, 'CheckForViewModel', '"IioViewModel" interface not implemented by object.');
-  end;
   // ===============================================================================================================================
   // LOCKED VIEW MODEL ALREADY CREATED IN THE DEPENDENCY INJECTION CONTAINER  (an external prepared ViewModel)
   // -------------------------------------------------------------------------------------------------------------------------------
   // If a LockedViewModel is present in the DIContainer (an external prepared ViewModel) and the BindSource is not
-  // a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
-  // and get the BindSourceAdapter from it.
-  if (not Assigned(FViewModel)) then
-    FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
+  //   a detail (is Master) then Get that ViewModel, assign it to itself (and to the View later during its creating),
+  //   and get the BindSourceAdapter from it.
+  FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
+  // ===============================================================================================================================
+  // VIEW MODEL CREATION BY DI_VMINterface & DI_VMAlias property if not already created
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // If the ViewModel is still unassigned...
+  if not FDI_VMInterface.IsEmpty then
+  begin
+    // If FDI_VMInterface property is not empty but the ViewModel is already assigned the raise an exception.
+    //   else try to locate the correct ViewModel through this property value
+    if Assigned(FViewModel) then
+      raise EioException.Create(ClassName, 'CheckForViewModel', Format('Hi, I am the ViewModelBridge component named "%s" on view "%s" and I have a problem.' +
+        #13#13'My property "DI_VMInterface" is set but a ViewModel was already found.' +
+        #13#13'I remind you that the "DI_VMInterface" property should normally be left empty, it can be used in the rare cases in which a ViewModel cannot be found normally.' +
+        #13#13'Through this property the ViewModelBridge can directly and autonomously request the ViewModel that implements the specified interface from the Dependency Injection Container (e.g. the main form of a Delphi application if you want to consider it a view).' +
+        #13#13'Try emptying this property (and the other related properties whose name starts with "DI_VM ..."), it will be fine.',
+        [Name, Owner.Name]))
+    else
+      LObj := io.di.LocateVM(FDI_VMInterface, FDI_VMAlias).Get;
+      if not Supports(LObj, IioViewModel, FViewModel) then
+        raise EioException.Create(Self.ClassName, 'CheckForViewModel', Format('"IioViewModel" interface is not implemented by the object of class "%s".', [LObj.ClassName]));
+  end;
   // ===============================================================================================================================
   // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
   // or for retrieve an external created ViewModel
-  Self.DoNeedViewModel;
+  DoNeedViewModel;
+
+// ======= OLD CODE =======
+//  if (csDesigning in ComponentState) then
+//    Exit;
+//  // If a ViewModel is already assigned then exit
+//  if Assigned(FViewModel) then
+//    Exit;
+//  // ===============================================================================================================================
+//  // VIEW MODEL CREATION BY DI_VMINterface & DI_VMAlias property if not already created
+//  // -------------------------------------------------------------------------------------------------------------------------------
+//  if not FDI_VMInterface.IsEmpty then
+//  begin
+//    LObj := io.di.LocateVM(FDI_VMInterface, FDI_VMAlias).Get;
+//    if not Supports(LObj, IioViewModel, FViewModel) then
+//      raise EioException.Create(Self.ClassName, 'CheckForViewModel', '"IioViewModel" interface not implemented.');
+//  end;
+//  // ===============================================================================================================================
+//  // LOCKED VIEW MODEL ALREADY CREATED IN THE DEPENDENCY INJECTION CONTAINER  (an external prepared ViewModel)
+//  // -------------------------------------------------------------------------------------------------------------------------------
+//  // If a LockedViewModel is present in the DIContainer (an external prepared ViewModel) and the BindSource is not
+//  // a detail (is Master) then Get that ViewModel  , assign it to itself (and to the View later during its creating),
+//  // and get the BindSourceAdapter from it.
+//  if (not Assigned(FViewModel)) then
+//    FViewModel := TioViewModelShuttleContainer.GetViewModel(FDI_VMMarker);
+//  // ===============================================================================================================================
+//  // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
+//  // or for retrieve an external created ViewModel
+//  DoNeedViewModel;
 end;
 
 constructor TioViewModelBridge.Create(AOwner: TComponent);

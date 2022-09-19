@@ -4,7 +4,7 @@ object CustomerForm: TCustomerForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 303
+  ClientHeight = 343
   ClientWidth = 584
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
@@ -90,6 +90,21 @@ object CustomerForm: TCustomerForm
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object Label6: TLabel
+    Left = 8
+    Top = 256
+    Width = 100
+    Height = 25
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Gender'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
   object PanelTop: TPanel
     Left = 0
     Top = 0
@@ -138,7 +153,7 @@ object CustomerForm: TCustomerForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 263
+    Top = 303
     Width = 584
     Height = 40
     Align = alBottom
@@ -146,6 +161,7 @@ object CustomerForm: TCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 263
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -264,7 +280,25 @@ object CustomerForm: TCustomerForm
     ParentFont = False
     TabOrder = 6
   end
+  object DBEditGender: TDBEdit
+    Left = 120
+    Top = 256
+    Width = 120
+    Height = 25
+    BorderStyle = bsNone
+    Color = clInactiveBorder
+    DataField = 'Gender'
+    DataSource = SourceCustomer
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 7
+  end
   object DSCustomer: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TCustomer'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
@@ -291,6 +325,9 @@ object CustomerForm: TCustomerForm
     object DSCustomerAddress: TStringField
       FieldName = 'Address'
       Size = 100
+    end
+    object DSCustomerGender: TIntegerField
+      FieldName = 'Gender'
     end
   end
   object SourceCustomer: TDataSource

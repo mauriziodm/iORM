@@ -36,6 +36,9 @@ type
     acPersist: TioBSPersistencePersist;
     acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
+    Label6: TLabel;
+    DBEditGender: TDBEdit;
+    DSCustomerGender: TIntegerField;
     procedure acBackExecute(Sender: TObject);
     procedure acBackUpdate(Sender: TObject);
     procedure FormShow(Sender: TObject);
