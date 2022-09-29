@@ -1,6 +1,7 @@
 inherited VMCustomers: TVMCustomers
   inherited MPMaster: TioModelPresenterMaster
     TypeName = 'ICustomer'
+    LoadType = ltManual
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
@@ -17,5 +18,11 @@ inherited VMCustomers: TVMCustomers
     TargetBindSource = MPMaster
     Left = 384
     Top = 104
+  end
+  object acSetDataObject: TioVMAction
+    Name = 'acSetDataObject'
+    OnExecute = acSetDataObjectExecute
+    Left = 384
+    Top = 176
   end
 end

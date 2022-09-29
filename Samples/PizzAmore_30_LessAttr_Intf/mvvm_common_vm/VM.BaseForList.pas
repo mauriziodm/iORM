@@ -50,8 +50,8 @@ begin
   //   as a parameter to the "Persistence.Append" method of the ModelPresenter.
   // This way I was able to write this code in an absolutely abstract way from
   //  the real type which will only be known in the derived ViewModels.
-  LNewInstance := io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface>;
-  MPMaster.Persistence.Append(LNewInstance);
+//  LNewInstance := io.di.Locate(MPMaster.TypeName).GetAsGeneric.OfType<IInterface>;
+//  MPMaster.Persistence.Append(LNewInstance);
   // Executes the action which will show the new instance on the screen.
   acShowOrSelect.Execute;
 end;

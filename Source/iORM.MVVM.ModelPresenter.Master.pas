@@ -184,8 +184,11 @@ end;
 function TioModelPresenterMaster.PostPonedActivation_CanOpen(const ANewDataObject: TObject): Boolean;
 begin
   case LoadType of
-    ltManual:
-      Result := FWannaBeActive and ((DataObject <> nil) or (ANewDataObject <> nil));
+// Note: Ho commentato queste due righe per risolvere un problema portato a galla da Carlo Marona il 29/09/2022
+//        in pratica se in un ModelPresenter con  LoadType = ltManual facevo un SetDataObject mi andava in errore
+//        in questo modo funziona.
+//    ltManual:
+//      Result := FWannaBeActive and ((DataObject <> nil) or (ANewDataObject <> nil));
     ltFromBSAsIs .. ltFromBSReloadNewInstance:
       Result := FWannaBeActive and Assigned(SourceBS);
   else

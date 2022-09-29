@@ -27,6 +27,8 @@ type
     MDSMasterPhoneNumber: TStringField;
     MDSMasterCity: TStringField;
     MDSMasterAddress: TStringField;
+    Button1: TButton;
+    acNew: TioViewAction;
   private
     { Private declarations }
   public

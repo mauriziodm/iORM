@@ -5,12 +5,16 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VM.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.VMAction,
-  iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master, Model.Customer;
+  iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master, Model.Customer,
+  iORM.MVVM.ViewModel;
 
 type
 
   [diViewModelFor(TCustomer)]
   TVMCustomer = class(TVMBaseForForm)
+    acNew: TioVMAction;
+    procedure acNewExecute(Sender: TObject);
+    procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
     { Private declarations }
   public
@@ -19,6 +23,26 @@ type
 
 implementation
 
+uses
+  Model.Interfaces;
+
 {$R *.dfm}
+
+procedure TVMCustomer.acNewExecute(Sender: TObject);
+var
+  LCustomer: ICustomer;
+begin
+  inherited;
+  LCustomer := TCustomer.Create;
+  MPMaster.Open;
+  MPMaster.SetDataObject(LCustomer);
+//  MPMaster.Open;
+end;
+
+procedure TVMCustomer.ioViewModelViewPairing(const Sender: TioViewModel);
+begin
+//  inherited;
+
+end;
 
 end.

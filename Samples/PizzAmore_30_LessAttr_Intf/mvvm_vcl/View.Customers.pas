@@ -23,6 +23,8 @@ type
     DBTextPageOf: TDBText;
     acNextPage: TioViewAction;
     acPrevPage: TioViewAction;
+    Button1: TButton;
+    acSetDataObject: TioViewAction;
     procedure GridCustomersDblClick(Sender: TObject);
   private
     { Private declarations }

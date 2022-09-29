@@ -13,7 +13,9 @@ type
   TVMCustomers = class(TVMBaseForList)
     acNextPage: TioVMActionBSNextPage;
     acPrevPage: TioVMActionBSPrevPage;
+    acSetDataObject: TioVMAction;
     procedure acShowOrSelectExecute(Sender: TObject);
+    procedure acSetDataObjectExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -23,11 +25,24 @@ type
 implementation
 
 uses
-  Model.Customer;
+  Model.Customer, System.Generics.Collections;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
+
+procedure TVMCustomers.acSetDataObjectExecute(Sender: TObject);
+var
+  LList: TList<ICustomer>;
+begin
+  inherited;
+  LList := TList<ICustomer>.Create;
+  LList.Add(TCustomer.Create);
+  LList[0].Name := 'Prova1';
+  LList.Add(TCustomer.Create);
+  LList[1].Name := 'Prova2';
+  MPMaster.SetDataObject(LList);
+end;
 
 procedure TVMCustomers.acShowOrSelectExecute(Sender: TObject);
 begin

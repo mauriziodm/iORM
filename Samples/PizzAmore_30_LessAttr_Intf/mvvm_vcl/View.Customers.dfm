@@ -55,6 +55,14 @@ inherited ViewCustomers: TViewCustomers
       ExplicitWidth = 176
       ExplicitHeight = 17
     end
+    object Button1: TButton
+      Left = 224
+      Top = 8
+      Width = 75
+      Height = 25
+      Action = acSetDataObject
+      TabOrder = 0
+    end
   end
   object GridCustomers: TDBGrid [2]
     Left = 0
@@ -136,6 +144,13 @@ inherited ViewCustomers: TViewCustomers
       Enabled = True
       Visible = True
       VMActionName = 'acPrevPage'
+    end
+    object acSetDataObject: TioViewAction
+      Category = 'iORM-MVVM'
+      Caption = 'acSetDataObject'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acSetDataObject'
     end
   end
   inherited MDSMaster: TioModelDataSet
