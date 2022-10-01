@@ -410,14 +410,21 @@ type
   end;
 
   // DIC - diSimpleViewFor(TargetModelClassName) (register the calss as SimpleView for the TargetModelClassName)
+  diSimpleViewImplements = class(diImplements)
+  end;
   diSimpleViewFor = class(TioCustomForTargetModel)
   end;
 
   // DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  diViewImplements = class(diImplements)
+  end;
   diViewFor = class(TioCustomForTargetModel)
   end;
 
   // DIC - diViewModelFor(TargetModelClassName) (register the calls as Views for the TargetModelClassName)
+  diViewModelImplements = class(diImplements)
+  end;
+  diVMImplements = diViewModelImplements;
   diViewModelFor = class(TioCustomForTargetModel)
   end;
   // ---------------------------------------------------------------------------

@@ -254,12 +254,13 @@ end;
 ///   with which the classes have been decorated.
 class procedure TioMapContainer.RegisterClassesInDependencyInjectionContainerByAttributes;
 type
+  TdiVVMforItemType = (vvmitRegular, vvmitSimpleView, vvmitView, vvmitViewModel);
+
   TdiImplementsItem = record
+    ItemType: TdiVVMforItemType;
     IID: TGUID;
     Alias: String;
   end;
-
-  TdiVVMforItemType = (vvmitSimpleView, vvmitView, vvmitViewModel);
 
   TdiVVMforItem = record
     ItemType: TdiVVMforItemType;
@@ -292,24 +293,60 @@ var
     begin
       // ioEntity attribute (it means it is an entity class)
       if LAttr is ioEntity then
-        LIsAnEntity := True;
+        LIsAnEntity := True
+      else
       // DIC - diRegister
       if LAttr is diRegister then
-        LdiRegister := True;
+        LdiRegister := True
+      else
       // DIC - diDoNotRegisterAsInterfacedEntity
       if LAttr is diDoNotRegisterAsInterfacedEntity then
-        LdiRegisterAsInterfacedEntity := False;
+        LdiRegisterAsInterfacedEntity := False
+      else
       // DIC - diIsSingleton
       if LAttr is diAsSingleton then
-        LdiAsSingleton := True;
-      // DIC - diRegister
+        LdiAsSingleton := True
+      else
+      // DIC - diSimpleViewImplements
+      if LAttr is diSimpleViewImplements then
+      begin
+        Index := Length(LdiImplements);
+        SetLength(LdiImplements, Index + 1);
+        LdiImplements[Index].ItemType := vvmitSimpleView;
+        LdiImplements[Index].IID := diImplements(LAttr).IID;
+        LdiImplements[Index].Alias := diImplements(LAttr).Alias;
+      end
+      else
+      // DIC - diViewImplements
+      if LAttr is diViewImplements then
+      begin
+        Index := Length(LdiImplements);
+        SetLength(LdiImplements, Index + 1);
+        LdiImplements[Index].ItemType := vvmitView;
+        LdiImplements[Index].IID := diImplements(LAttr).IID;
+        LdiImplements[Index].Alias := diImplements(LAttr).Alias;
+      end
+      else
+      // DIC - diViewModelImplements
+      if LAttr is diViewModelImplements then
+      begin
+        Index := Length(LdiImplements);
+        SetLength(LdiImplements, Index + 1);
+        LdiImplements[Index].ItemType := vvmitViewModel;
+        LdiImplements[Index].IID := diImplements(LAttr).IID;
+        LdiImplements[Index].Alias := diImplements(LAttr).Alias;
+      end
+      else
+      // DIC - diImplements (NB: Questo deve essere dopo diSimpleViewImplements, diViewImplements, diViewModelImplements)
       if LAttr is diImplements then
       begin
         Index := Length(LdiImplements);
         SetLength(LdiImplements, Index + 1);
+        LdiImplements[Index].ItemType := vvmitRegular;
         LdiImplements[Index].IID := diImplements(LAttr).IID;
         LdiImplements[Index].Alias := diImplements(LAttr).Alias;
-      end;
+      end
+      else
       // DIC - diSimpleViewFor
       if LAttr is diSimpleViewFor then
       begin
@@ -318,7 +355,8 @@ var
         LdiVVMforItems[Index].ItemType := vvmitSimpleView;
         LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetTypeName;
         LdiVVMforItems[Index].Alias := diViewFor(LAttr).TargetTypeAlias;
-      end;
+      end
+      else
       // DIC - diViewFor
       if LAttr is diViewFor then
       begin
@@ -327,7 +365,8 @@ var
         LdiVVMforItems[Index].ItemType := vvmitView;
         LdiVVMforItems[Index].Target := diViewFor(LAttr).TargetTypeName;
         LdiVVMforItems[Index].Alias := diViewFor(LAttr).TargetTypeAlias;
-      end;
+      end
+      else
       // DIC - diViewModelFor
       if LAttr is diViewModelFor then
       begin
@@ -364,7 +403,18 @@ var
     // Dependency Injection Container - Register the class as implenter of the interfaces
     if Length(LdiImplements) > 0 then
       for Index := Low(LdiImplements) to High(LdiImplements) do
-        io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+      begin
+        case LdiImplements[Index].ItemType of
+          vvmitSimpleView:
+            io.di.RegisterClass(ACurrentRttiInstanceType).AsSimpleView.Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+          vvmitView:
+            io.di.RegisterClass(ACurrentRttiInstanceType).AsView.Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+          vvmitViewModel:
+            io.di.RegisterClass(ACurrentRttiInstanceType).AsViewModel.Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+        else
+          io.di.RegisterClass(ACurrentRttiInstanceType).Implements(LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
+        end;
+     end;
     // Dependency Injection Container - Register the class as View or ViewModel for som other classes
     if Length(LdiVVMforItems) > 0 then
       for Index := Low(LdiVVMforItems) to High(LdiVVMforItems) do

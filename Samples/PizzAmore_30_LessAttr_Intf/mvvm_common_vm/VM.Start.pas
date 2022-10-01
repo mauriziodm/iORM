@@ -15,7 +15,7 @@ uses
 
 type
 
-  [diImplements(IVMStart)]
+  [diViewModelImplements(IVMStart)]
   TVMStart = class(TioViewModel, IVMStart)
     acQuit: TioVMAction;
     acShowCustomers: TioVMAction;

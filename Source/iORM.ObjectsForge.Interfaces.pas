@@ -63,7 +63,7 @@ type
     class function FindConstructor(ARttiType: TRttiType; const AParameters: Array of TValue; AMarkerText: String = ''; AMethodName: String = ''): TRttiMethod;
     class function FindMethod(ARttiType: TRttiType; AMethodName: String; const AParameters: Array of TValue; AMarkerText: String = ''): TRttiMethod;
   public
-    class procedure InitializeViewModelPresentersAfterCreate(const AViewModel: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
+    class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
     class function CreateObjectFromBlobField(AQuery: IioQuery; AProperty: IioProperty): TObject;
     class function CreateObjectByClassRef(AClassRef: TClass): TObject;
     class function CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams: array of TValue; AConstructorMarkerText: String = '';
@@ -175,20 +175,16 @@ begin
   if (not Assigned(AContainerItem)) and TioMapContainer.Exist(ARttiType.Name) then
     AContainerItem := TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem;
   if Assigned(AContainerItem) then
-  begin
     Self.InitializeObjectAfterCreate(Result, AContainerItem);
-    Self.InitializeViewModelPresentersAfterCreate(Result, AContainerItem.PresenterSettingsPointer);
-  end;
 end;
 
-class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(const AViewModel: TObject;
-  const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
+class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
 var
-  LViewModel: TioViewModel;
+  LViewModelOrSimpleView: TComponent;
 //  LBSA: IioActiveBindSourceAdapter;
   LWhere: IioWhere;
   LName: String;
-  LBindSource: IioNotifiableBindSource;
+  LTargetBindSource, LParamBindSource: IioNotifiableBindSource;
   LIntf: IInterface;
   I: Integer;
   LPresenterSettings: TioDIPresenterSettingsContainer;
@@ -200,43 +196,34 @@ begin
   // ***                                        ***
   // **********************************************
   // **********************************************
-  // Only for ViewModels
-  if not(AViewModel is TioViewModel) then
-    Exit;
-  LViewModel := TioViewModel(AViewModel);
+  if AViewModelOrSimpleView is TComponent then
+    LViewModelOrSimpleView := TComponent(AViewModelOrSimpleView)
+  else
+    raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('Class "%s" is not a TComponent descendant.', [AViewModelOrSimpleView.ClassName]));
   // Extract PresenterSettings
   LPresenterSettings := APresenterSettingsPointer^;
   // Loop for all settings
   for I := 0 to Length(LPresenterSettings) - 1 do
   begin
     LName := LPresenterSettings[I].Name;
+    LTargetBindSource := TioUtilities.GetBindSource(LViewModelOrSimpleView, LName);
     case LPresenterSettings[I].SettingsType of
       // DataObject
       TioDIPresenterSettingsType.pstDataObject:
-        LViewModel.Presenter[LName].SetDataObject(LPresenterSettings[I].Obj);
+        LTargetBindSource.SetDataObject(LPresenterSettings[I].Obj);
       // InterfacedObject
       TioDIPresenterSettingsType.pstInterfacedObj:
-        LViewModel.Presenter[LName].SetDataObject(LPresenterSettings[I].InterfacedObj);
-      // BindSourceAdapter
-//      TioDIPresenterSettingsType.pstBindSourceAdapter:
-//        begin
-//          LIntf := LPresenterSettings[I].InterfacedObj;
-//          if not Supports(LIntf, IioActiveBindSourceAdapter, LBSA) then
-//            raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate',
-//              'Interface "IioActiveBindSourceAdapter" not implemented by object.');
-//          LViewModel.Presenter[LName].SetActiveBindSourceAdapter(LBSA);
-//        end;
+        LTargetBindSource.SetDataObject(LPresenterSettings[I].InterfacedObj);
       // MasterModelPresenter
       TioDIPresenterSettingsType.pstMasterModelPresenter:
         begin
-          if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LBindSource) then
+          if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LParamBindSource) then
           begin
-            LViewModel.Presenter[LName].SetMasterBindSource(LBindSource);
-            LViewModel.Presenter[LName].SetMasterPropertyName(LPresenterSettings[I].StringParameter);
+            LTargetBindSource.SetMasterBindSource(LParamBindSource);
+            LTargetBindSource.SetMasterPropertyName(LPresenterSettings[I].StringParameter);
           end
           else
-            raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate',
-              'The object is not a TioModelPresenter instance (MasterModelPresenter).');
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // Where
       TioDIPresenterSettingsType.pstWhere:
@@ -244,19 +231,18 @@ begin
           LIntf := LPresenterSettings[I].InterfacedObj;
           if not Supports(LIntf, IioWhere, LWhere) then
             raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
-          LViewModel.Presenter[LName].SetWhere(LWhere);
+          LTargetBindSource.SetWhere(LWhere);
         end;
       // OrderBy
       TioDIPresenterSettingsType.pstOrderBy:
-        LViewModel.Presenter[LName].SetOrderBy(LPresenterSettings[I].StringParameter);
+        TioUtilities.GetBindSource(LViewModelOrSimpleView, LName).SetOrderBy(LPresenterSettings[I].StringParameter);
       // MasterModelPresenter
       TioDIPresenterSettingsType.pstSelectorFor:
         begin
-          if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LBindSource) then
-            LViewModel.Presenter[LName].SetSelectorFor(LBindSource)
+          if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LParamBindSource) then
+            LTargetBindSource.SetSelectorFor(LParamBindSource)
           else
-            raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate',
-              'The object is not a TioModelPresenter instance (SelectorFor).');
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
     end;
   end;

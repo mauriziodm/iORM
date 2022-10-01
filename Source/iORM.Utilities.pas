@@ -91,7 +91,7 @@ implementation
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
-  iORM.Resolver.Interfaces, iORM.DependencyInjection;
+  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel;
 
 { TioRttiUtilities }
 
@@ -206,27 +206,41 @@ begin
 end;
 
 class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
-var
-  LComponent: TComponent;
+  function _GetSimpleViewBindSource: IioNotifiableBindSource;
+  var
+    LComponent: TComponent;
+  begin
+    // If the AName param is empty then return de default presenter
+    if AName.IsEmpty then
+      Exit(GetDefaultBindSource(AViewOrViewModel));
+    LComponent := AViewOrViewModel.FindComponent(AName);
+    if Assigned(LComponent) and Supports(LComponent, IioNotifiableBindSource, Result) then
+      Exit
+    else
+      raise EioException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
+  end;
 begin
-  // If the AName param is empty then return de default presenter
-  if AName.IsEmpty then
-    Exit(GetDefaultBindSource(AViewOrViewModel));
-  LComponent := AViewOrViewModel.FindComponent(AName);
-  if Assigned(LComponent) and Supports(LComponent, IioNotifiableBindSource, Result) then
-    Exit
+  if AViewOrViewModel is TioViewModel then
+    Result := TioViewModel(AViewOrViewModel).DefaultPresenter
   else
-    raise EioException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
+    Result := _GetSimpleViewBindSource;
 end;
 
 class function TioUtilities.GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
-var
-  I: Integer;
+  function _GetSimpleViewDefaultBindSource: IioNotifiableBindSource;
+  var
+    I: Integer;
+  begin
+    for I := 0 to AViewOrViewModel.ComponentCount - 1 do
+      if Supports(AViewOrViewModel.Components[I], IioNotifiableBindSource, Result) and Result.IsMasterBS and Result.AsDefault then
+        Exit;
+    Result := nil;
+  end;
 begin
-  for I := 0 to AViewOrViewModel.ComponentCount - 1 do
-    if Supports(AViewOrViewModel.Components[I], IioNotifiableBindSource, Result) and Result.IsMasterBS and Result.AsDefault then
-      Exit;
-  Result := nil;
+  if AViewOrViewModel is TioViewModel then
+    Result := TioViewModel(AViewOrViewModel).DefaultPresenter
+  else
+    Result := _GetSimpleViewDefaultBindSource;
 end;
 
 class function TioUtilities.GetImplementedInterfaceName(const AClassType: TRttiInstanceType; const IID: TGUID): String;

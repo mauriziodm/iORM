@@ -193,7 +193,6 @@ type
   strict private
     FInterfaceName: String;
     FAlias: String;
-    FLocatingSimpleView: Boolean;
     FConstructorMethod: String;
     FConstructorMarker: String;
     FConstructorParams: TioConstructorParams;

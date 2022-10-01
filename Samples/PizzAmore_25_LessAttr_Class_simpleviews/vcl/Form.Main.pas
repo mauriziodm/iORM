@@ -77,7 +77,7 @@ begin
     LCustomer.City := 'Rieti';
     LView := io.di.LocateSimpleViewFor(LCustomer).Show;
   finally
-    LCustomer.Free;
+//    LCustomer.Free;
   end;
 
 end;
