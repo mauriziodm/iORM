@@ -117,12 +117,14 @@ type
   // CLASS REGISTER
   // ---------------------------------------------------------------------------
   // Register Class
+  TioDependencyInjectionRegisterType = (dirtRegular, dirtSimpleView, dirtView, dirtViewModel);
   TioDependencyInjectionRegister = class(TioDependencyInjectionBase)
   strict private
     FContainerValue: TioDIContainerImplementersItem;
     FInterfaceName: String;
     FAlias: String;
     FSetMapImplementersRef: Boolean;
+    FRegisterType: TioDependencyInjectionRegisterType;
     procedure LoadInjectAttributes;
     procedure SetMapImplementersRef;
   public
@@ -154,16 +156,19 @@ type
 
     function AsDescendantClassOf(const AAncestorClassName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
 
+    function AsSimpleView: TioDependencyInjectionRegister; overload;
     function AsSimpleViewFor(const ATargetTypeName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsSimpleViewFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsSimpleViewFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsSimpleViewFor<T>(const AAlias: String = ''): TioDependencyInjectionRegister; overload;
 
+    function AsView: TioDependencyInjectionRegister; overload;
     function AsViewFor(const ATargetTypeName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsViewFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsViewFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsViewFor<T>(const AAlias: String = ''): TioDependencyInjectionRegister; overload;
 
+    function AsViewModel: TioDependencyInjectionRegister; overload;
     function AsViewModelFor(const ATargetTypeName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsViewModelFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsViewModelFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
@@ -683,8 +688,9 @@ end;
 
 function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetTypeName, AAlias: String): TioDependencyInjectionRegister;
 begin
+  FRegisterType := dirtSimpleView;
   // Set the InterfaceName
-  FInterfaceName := ModelToSimpleViewContainerKey(ATargetTypeName);
+  FInterfaceName := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
@@ -695,6 +701,12 @@ end;
 function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetClassRef: TioClassRef; const AAlias: String): TioDependencyInjectionRegister;
 begin
   Result := Self.AsSimpleViewFor(ATargetClassRef.ClassName, AAlias);
+end;
+
+function TioDependencyInjectionRegister.AsSimpleView: TioDependencyInjectionRegister;
+begin
+  FRegisterType := dirtSimpleView;
+  Result := Self;
 end;
 
 function TioDependencyInjectionRegister.AsSimpleViewFor(const ATargetIID: TGUID; const AAlias: String): TioDependencyInjectionRegister;
@@ -720,6 +732,7 @@ begin
   FContainerValue := AContainerValue;
   FInterfaceName := AContainerValue.ClassName; // Così si possono registrare anche direttamente le classi senza interfaccia
   FAlias := '';
+  FRegisterType := dirtRegular;
 end;
 
 function TioDependencyInjectionRegister.DefaultConstructorMarker(const AValue: String): TioDependencyInjectionRegister;
@@ -752,18 +765,29 @@ begin
 end;
 
 procedure TioDependencyInjectionRegister.Execute;
+var
+  LInterfaceName: String;
 begin
-  Self.LoadInjectAttributes;
+  LoadInjectAttributes;
+
   if FSetMapImplementersRef then
     SetMapImplementersRef;
-  Self.Container.Add(FInterfaceName, FAlias, FContainerValue);
+
+  // Register into the DIC
+  case FRegisterType of
+    dirtSimpleView: LInterfaceName := ModelToSimpleViewContainerKey(FInterfaceName);
+    dirtView: LInterfaceName := ModelToViewContainerKey(FInterfaceName);
+    dirtViewModel: LInterfaceName := ModelToViewModelContainerKey(FInterfaceName);
+  end;
+  Self.Container.Add(LInterfaceName, FAlias, FContainerValue);
+
   Self.Free;
 end;
 
 function TioDependencyInjectionRegister.Implements(const IID: TGUID; const AAlias: String): TioDependencyInjectionRegister;
 begin
   // Set the InterfaceName
-  Self.FInterfaceName := TioUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
+  FInterfaceName := TioUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
   // Set the interface GUID
   FContainerValue.InterfaceGUID := IID;
   // Set the Alias
@@ -997,12 +1021,19 @@ end;
 
 function TioDependencyInjectionRegister.AsViewFor(const ATargetTypeName, AAlias: String): TioDependencyInjectionRegister;
 begin
+  FRegisterType := dirtView;
   // Set the InterfaceName
-  FInterfaceName := ModelToViewContainerKey(ATargetTypeName);
+  FInterfaceName := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
   // Return itself
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsView: TioDependencyInjectionRegister;
+begin
+  FRegisterType := dirtView;
   Result := Self;
 end;
 
@@ -1024,12 +1055,19 @@ end;
 
 function TioDependencyInjectionRegister.AsViewModelFor(const ATargetTypeName, AAlias: String): TioDependencyInjectionRegister;
 begin
+  FRegisterType := dirtViewModel;
   // Set the InterfaceName
-  FInterfaceName := ModelToViewModelContainerKey(ATargetTypeName);
+  FInterfaceName := ATargetTypeName;
   // Set the Alias
   if not AAlias.IsEmpty then
     Self.FAlias := AAlias;
   // Return itself
+  Result := Self;
+end;
+
+function TioDependencyInjectionRegister.AsViewModel: TioDependencyInjectionRegister;
+begin
+  FRegisterType := dirtViewModel;
   Result := Self;
 end;
 
