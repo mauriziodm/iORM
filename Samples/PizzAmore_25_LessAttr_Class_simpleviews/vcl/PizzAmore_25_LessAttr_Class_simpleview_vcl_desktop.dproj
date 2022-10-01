@@ -141,6 +141,15 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="Form.ViewContext.pas">
+            <Form>ViewContextForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="SVCustomer.pas">
+            <Form>CustomerSimpleView</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

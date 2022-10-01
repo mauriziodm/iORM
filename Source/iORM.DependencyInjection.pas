@@ -189,6 +189,7 @@ type
   strict private
     FInterfaceName: String;
     FAlias: String;
+    FLocatingSimpleView: Boolean;
     FConstructorMethod: String;
     FConstructorMarker: String;
     FConstructorParams: TioConstructorParams;
@@ -339,6 +340,12 @@ type
     class function LocateVM<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
     class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AViewAlias: String = ''; const AViewModelAlias: String = '';
       const AViewModelMarker: String = ''): IioDependencyInjectionLocator<TView>; overload;
+    // LocateFor SimpleView
+    class function LocateSimpleViewFor(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const AClassRef: TioClassRef; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor<T>(const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     // LocateFor View
     class function LocateViewFor(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewFor(const AClassRef: TioClassRef; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
@@ -434,6 +441,31 @@ end;
 class function TioDependencyInjection.LocateSimpleView<T>(const AAlias: String): IioDependencyInjectionLocator<T>;
 begin
   Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, True);
+end;
+
+class function TioDependencyInjection.LocateSimpleViewFor(const AClassRef: TioClassRef; const AAlias: String): IioDependencyInjectionLocator;
+begin
+  Result := LocateSimpleViewFor(AClassRef.ClassName, AAlias);
+end;
+
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetObj: TObject; const AAlias: String): IioDependencyInjectionLocator;
+begin
+  Result := LocateSimpleViewFor(ATargetObj.ClassName, AAlias).SetBindSource(ATargetObj);
+end;
+
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
+begin
+  Result := LocateSimpleViewFor((ATargetIntf as TObject).ClassName, AAlias).SetBindSource(ATargetIntf);
+end;
+
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+var
+  LDIContainerKey: String;
+begin
+  // Get the Dependency Injection Container Key then get the locator
+  LDIContainerKey := ModelToSimpleViewContainerKey(ATargetTypeName);
+  // Get the ViewLocator
+  Result := TioDependencyInjectionFactory.GetLocator(LDIContainerKey, AAlias, True, True);
 end;
 
 class function TioDependencyInjection.LocateView(const AInterfaceName, AAlias: String): IioDependencyInjectionLocator;
@@ -627,6 +659,12 @@ begin
   // Get & set the ViewModel instance into the ViewLocator
   LViewModel := io.di.LocateVMfor(ATargetTypeName, AAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
+end;
+
+class function TioDependencyInjection.LocateSimpleViewFor<T>(const AAlias: String): IioDependencyInjectionLocator;
+begin
+  // Get & set the locator
+  Result := LocateSimpleViewFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 { TioDependencyInjectionRegister }
@@ -1530,12 +1568,13 @@ begin
       // Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
       Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
       // If some PresenterSettings exists and the result object is a ViewModel then
-      // apply it
+      //   apply it
       // NB: Il codice commentato a dx della riga sotto poteva causare un errore dovuto alla
-      // morte prematura del ViewModel appena creato per via del reference count, sostituito
-      // con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
-      // perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
-      if PresenterSettingsExists and (Result is TioViewModel) then // Supports(Result, IioViewModel) then
+      //   morte prematura del ViewModel appena creato per via del reference count, sostituito
+      //   con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
+      //   perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
+      // NB: Anche se stiamo cercando una SimpleView
+      if PresenterSettingsExists and ((Result is TioViewModel) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX)) then // Supports(Result, IioViewModel) then
         TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
       // If it is a new instance of a singleton then add it to the SingletonsContainer
       if AContainerItem.IsSingleton then
@@ -1551,9 +1590,9 @@ begin
       if Assigned(FVCProvider) then
         FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);
       // If at this point the FViewModel is not already assigned then try to extract
-      // it from the View.VMBridge. Indeed it may have been that it was created by
-      // the VMBridge itself is its properties DI_VMInterface and DI_VMAlias are
-      // setted properly.
+      //   it from the View.VMBridge. Indeed it may have been that it was created by
+      //   the VMBridge itself is its properties DI_VMInterface and DI_VMAlias are
+      //   setted properly.
       if not Assigned(FViewModel) then
         FViewModel := ExtractVMFromView(TComponent(Result));
       // Register View, ViewContext and ViewContextProvider in the ViewRegister of the ViewModel

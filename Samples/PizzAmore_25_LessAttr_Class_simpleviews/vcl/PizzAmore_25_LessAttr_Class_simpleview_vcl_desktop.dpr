@@ -14,7 +14,9 @@ uses
   Form.Pizza in 'Form.Pizza.pas' {PizzaForm},
   Form.Orders in 'Form.Orders.pas' {OrdersForm},
   Form.Order in 'Form.Order.pas' {OrderForm},
-  SV.Customers in 'SV.Customers.pas' {CustomersSimpleView: TFrame};
+  SV.Customers in 'SV.Customers.pas' {CustomersSimpleView: TFrame},
+  Form.ViewContext in 'Form.ViewContext.pas' {ViewContextForm},
+  SVCustomer in 'SVCustomer.pas' {CustomerSimpleView: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

@@ -8554,9 +8554,18 @@ object MainForm: TMainForm
     Top = 8
     Width = 75
     Height = 25
-    Caption = 'Button1'
+    Caption = 'Customers'
     TabOrder = 3
     OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 81
+    Top = 8
+    Width = 75
+    Height = 25
+    Caption = 'Customer'
+    TabOrder = 4
+    OnClick = Button2Click
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8572,6 +8581,14 @@ object MainForm: TMainForm
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 64
+    Top = 272
+  end
+  object VCProviderForm: TioViewContextProvider
+    OnAfterRequest = VCProviderFormAfterRequest
+    OnRelease = VCProviderFormRelease
+    OnRequest = VCProviderFormRequest
+    RegisterAsDefault = True
+    Left = 145
     Top = 272
   end
 end
