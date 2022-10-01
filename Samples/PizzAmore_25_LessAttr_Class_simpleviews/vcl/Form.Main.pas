@@ -67,19 +67,12 @@ end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
 var
-  LView: IInterface;
   LCustomer: TCustomer;
 begin
-
   LCustomer := TCustomer.Create;
-  try
-    LCustomer.Name := 'Carlo Marona';
-    LCustomer.City := 'Rieti';
-    LView := io.di.LocateSimpleViewFor(LCustomer).Show;
-  finally
-//    LCustomer.Free;
-  end;
-
+  LCustomer.Name := 'Carlo Marona';
+  LCustomer.City := 'Rieti';
+  io.di.LocateSimpleViewFor(LCustomer).Show;
 end;
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);

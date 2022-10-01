@@ -1580,7 +1580,6 @@ begin
       //   con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
       //   perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
       // NB: Anche se stiamo cercando una SimpleView
-//      if PresenterSettingsExists and ((Result is TioViewModel) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX)) then // Supports(Result, IioViewModel) then
       if PresenterSettingsExists and (FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX)) then // Supports(Result, IioViewModel) then
         TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
       // If it is a new instance of a singleton then add it to the SingletonsContainer
