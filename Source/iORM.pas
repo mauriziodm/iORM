@@ -42,8 +42,7 @@ uses
   iORM.LiveBindings.Interfaces;
 
 const
-{$region 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
-
+{$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // TioTypeOfCollection
   tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
   tcList = iORM.CommonTypes.TioTypeOfCollection.tcList;
@@ -92,11 +91,11 @@ const
   stAppend = iORM.CommonTypes.TioSelectionType.stAppend;
   stInsert = iORM.CommonTypes.TioSelectionType.stInsert;
 
-{$endregion}
+{$ENDREGION}
 
 type
 
-{$region 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+{$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   TioCompareOp = iORM.CommonTypes.TioCompareOp;
   TioHideWaitProc = iORM.CommonTypes.TioHideWaitProc;
   TioIndexOrientation = iORM.CommonTypes.TioIndexOrientation;
@@ -115,10 +114,8 @@ type
   TioFKAction = iORM.Attributes.TioFKAction;
   TioFKCreate = iORM.Attributes.TioFKCreate;
   TioJoinType = iORM.Attributes.TioJoinType;
-{$endregion}
-
-{$region 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
-
+{$ENDREGION}
+{$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   ioMarker = iORM.Attributes.ioMarker;
 
   // Property attributes
@@ -171,15 +168,17 @@ type
   // Dependency Injection attributes
   diRegister = iORM.Attributes.diRegister;
   diImplements = iORM.Attributes.diImplements;
+  diSimpleViewImplements = iORM.Attributes.diSimpleViewImplements;
+  diSimpleViewFor = iORM.Attributes.diSimpleViewFor;
+  diViewImplements = iORM.Attributes.diViewImplements;
+  diViewFor = iORM.Attributes.diViewFor;
+  diViewModelImplements = iORM.Attributes.diViewModelImplements;
+  diViewModelFor = iORM.Attributes.diViewModelFor;
   diDoNotRegisterAsInterfacedEntity = iORM.Attributes.diDoNotRegisterAsInterfacedEntity;
   diAsSingleton = iORM.Attributes.diAsSingleton;
-  diSimpleViewFor = iORM.Attributes.diSimpleViewFor;
-  diViewFor = iORM.Attributes.diViewFor;
-  diViewModelFor = iORM.Attributes.diViewModelFor;
   ioInject = iORM.Attributes.ioInject;
 
-{$endregion}
-
+{$ENDREGION}
 
   io = class
   public
@@ -257,9 +256,9 @@ type
     class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
     // Count (accepting generic type and ciriteria)
-    class function Count(const ATypeName: String; const ATypeAlias: String = ''): integer; overload;
-    class function Count(const ATypeName: String; const AWhere: IioWhere): integer; overload;
-    class function Count(const ATypeName: String; const ATypeAlias: String; const AWhere: IioWhere): integer; overload;
+    class function Count(const ATypeName: String; const ATypeAlias: String = ''): Integer; overload;
+    class function Count(const ATypeName: String; const AWhere: IioWhere): Integer; overload;
+    class function Count(const ATypeName: String; const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
@@ -417,8 +416,7 @@ type
 
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AVVMAlias: String = ''; const AVCProviderName: String = ''); overload;
-    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider;
-      const AVVMAlias: String = ''); overload;
+    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
@@ -427,8 +425,10 @@ type
     class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show selector
-    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AVVMAlias: String = ''; const AVCProviderName: String = ''); overload;
-    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AVVMAlias: String = ''; const AVCProviderName: String = '');
+      overload;
+    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
     class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show selector (Generic version)
     class procedure ShowAsSelector<T>(const ATargetMP: IioNotifiableBindSource; const AVVMAlias: String = ''; const AVCProviderName: String = ''); overload;
@@ -439,19 +439,19 @@ type
 
 implementation
 
-//uses
-//  System.Rtti,
-//  iORM.DuckTyped.Interfaces,
-//  iORM.DuckTyped.Factory,
-//  iORM.DuckTyped.StreamObject,
-//  iORM.Exceptions,
-//  iORM.DB.Factory,
-//  iORM.Utilities,
-//  iORM.Strategy.Factory,
-//  iORM.Context.Container,
-//  iORM.Abstraction,
-//  iORM.DBBuilder.Factory,
-//  iORM.Context.Map.Interfaces;
+// uses
+// System.Rtti,
+// iORM.DuckTyped.Interfaces,
+// iORM.DuckTyped.Factory,
+// iORM.DuckTyped.StreamObject,
+// iORM.Exceptions,
+// iORM.DB.Factory,
+// iORM.Utilities,
+// iORM.Strategy.Factory,
+// iORM.Context.Container,
+// iORM.Abstraction,
+// iORM.DBBuilder.Factory,
+// iORM.Context.Map.Interfaces;
 
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Context.Container, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
@@ -498,11 +498,11 @@ end;
 class function io.LoadObject<T>(const AWhere: IioWhere): T;
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>;
-//  AWhere.TypeInfo := TypeInfo(TItemType);
+  // AWhere.TypeInfo := TypeInfo(TItemType);
   Result := TioUtilities.CastObjectToGeneric<T>(AWhere.ToObject);
-// ----- OLD CODE -----
-//  Result := io.Load<T>._Where(AWhere).ToObject;
-// ----- OLD CODE -----
+  // ----- OLD CODE -----
+  // Result := io.Load<T>._Where(AWhere).ToObject;
+  // ----- OLD CODE -----
 end;
 
 class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String);
@@ -519,7 +519,7 @@ class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAli
 begin
   AWhere.TypeName := TioUtilities.GenericToString<TItemType>;
   AWhere.TypeAlias := AItemAlias;
-//  AWhere.TypeInfo := TypeInfo(TItemType);
+  // AWhere.TypeInfo := TypeInfo(TItemType);
   AWhere.ToList(AListObj);
 end;
 
@@ -942,17 +942,17 @@ begin
   Result := Self.Count<T>('', AWhere);
 end;
 
-class function io.Count(const ATypeName, ATypeAlias: String): integer;
+class function io.Count(const ATypeName, ATypeAlias: String): Integer;
 begin
   Result := Self.RefTo(ATypeName, ATypeAlias).Count;
 end;
 
-class function io.Count(const ATypeName: String; const AWhere: IioWhere): integer;
+class function io.Count(const ATypeName: String; const AWhere: IioWhere): Integer;
 begin
   Result := Self.Count(ATypeName, '', AWhere);
 end;
 
-class function io.Count(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): integer;
+class function io.Count(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): Integer;
 begin
   AWhere.TypeName := ATypeName;
   AWhere.TypeAlias := ATypeAlias;
@@ -1354,32 +1354,32 @@ class procedure io.LoadToObject<T>(const AObj: TObject; const ATypeAlias: String
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>;
   AWhere.TypeAlias := ATypeAlias;
-//  AWhere.TypeInfo := TypeInfo(TItemType);
+  // AWhere.TypeInfo := TypeInfo(TItemType);
   AWhere.ToObject(AObj);
-// ----- OLD CODE -----
-//  io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AObj);
-// ----- OLD CODE -----
+  // ----- OLD CODE -----
+  // io.Load<T>(ATypeAlias)._Where(AWhere).ToObject(AObj);
+  // ----- OLD CODE -----
 end;
 
 class procedure io.LoadToObject<T>(const AObj: TObject; const AWhere: IioWhere);
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>;
-//  AWhere.TypeInfo := TypeInfo(TItemType);
+  // AWhere.TypeInfo := TypeInfo(TItemType);
   AWhere.ToObject(AObj);
-// ----- OLD CODE -----
-//  io.Load<T>._Where(AWhere).ToObject(AObj);
-// ----- OLD CODE -----
+  // ----- OLD CODE -----
+  // io.Load<T>._Where(AWhere).ToObject(AObj);
+  // ----- OLD CODE -----
 end;
 
 class function io.LoadObject<T>(const ATypeAlias: String; const AWhere: IioWhere): T;
 begin
   AWhere.TypeName := TioUtilities.GenericToString<T>;
   AWhere.TypeAlias := ATypeAlias;
-//  AWhere.TypeInfo := TypeInfo(TItemType);
+  // AWhere.TypeInfo := TypeInfo(TItemType);
   Result := TioUtilities.CastObjectToGeneric<T>(AWhere.ToObject);
-// ----- OLD CODE -----
-//  Result := io.Load<T>(ATypeAlias)._Where(AWhere).ToObject;
-// ----- OLD CODE -----
+  // ----- OLD CODE -----
+  // Result := io.Load<T>(ATypeAlias)._Where(AWhere).ToObject;
+  // ----- OLD CODE -----
 end;
 
 class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const AID: Integer);
@@ -1404,19 +1404,19 @@ end;
 
 initialization
 
-  // Initialize the dependency injection container
-  // NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
-  TioDependencyInjectionContainer.Build;
+// Initialize the dependency injection container
+// NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
+TioDependencyInjectionContainer.Build;
 
-  // Register as default DuckTypedStreamObject invoker
-  // NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
-  // venive eseguito
-  // NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
-  io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
+// Register as default DuckTypedStreamObject invoker
+// NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
+// venive eseguito
+// NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
+io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
 
-  // Create the ContextContainer Instance and Init it by loading
-  // all entities declarated in the application
-  // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
-  TioMapContainer.Build;
+// Create the ContextContainer Instance and Init it by loading
+// all entities declarated in the application
+// NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
+TioMapContainer.Build;
 
 end.

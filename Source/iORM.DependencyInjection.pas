@@ -597,13 +597,6 @@ begin
   Result := TioSingletonsFacade;
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
-begin
-  // NB: This method create the locator instance only (never create a VM like LocateViewVM methods)
-  // Get the ViewLocator
-  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView);
-end;
-
 class function TioDependencyInjection.LocateViewFor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
 begin
   Result := LocateViewFor((ATargetIntf as TObject).ClassName, AAlias);
@@ -613,6 +606,13 @@ class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: IioNotifi
 begin
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AAlias, False);
+end;
+
+class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+begin
+  // NB: This method create the locator instance only (never create a VM like LocateViewVM methods)
+  // Get the ViewLocator
+  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView);
 end;
 
 class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource;
