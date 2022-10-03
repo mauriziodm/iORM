@@ -47,6 +47,7 @@ type
     class procedure CloseView(const AView: TComponent);
     class procedure HideView(const AView: TComponent);
     class procedure ShowView(const AView: TComponent);
+    class function ContainsView(const AView:TComponent): Boolean;
   end;
 
 implementation
@@ -156,6 +157,11 @@ end;
 class procedure TioSimpleViewRegister.CloseView(const AView: TComponent);
 begin
   FInternalRegister.ItemByView[AView].ReleaseViewContext;
+end;
+
+class function TioSimpleViewRegister.ContainsView(const AView: TComponent): Boolean;
+begin
+  Result := FInternalRegister.ContainsView(AView);
 end;
 
 class procedure TioSimpleViewRegister.HideView(const AView: TComponent);

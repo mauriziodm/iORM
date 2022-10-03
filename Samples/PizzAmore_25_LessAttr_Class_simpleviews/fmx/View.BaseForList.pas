@@ -46,7 +46,8 @@ end;
 
 procedure TViewBaseForList.acBackExecute(Sender: TObject);
 begin
-  TioSimpleViewRegister.CloseView(Self);
+//  TioSimpleViewRegister.CloseView(Self);
+  Free;
 end;
 
 procedure TViewBaseForList.acShowOrSelectExecute(Sender: TObject);

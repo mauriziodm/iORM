@@ -1546,12 +1546,18 @@ begin
     if FOwnerRequested and (Length(FConstructorParams) = 0) then
     begin
       // If the use of the ViewContextProvider is enabled (Locating a View)
-      // then try to retrieve and set the ViewContext for the View.
-      // If a specific VCProvider is already assigned then use it else try
-      // to retrieve the global default one, if not exist then do none
-      // (no ViewContext assigned to the view, ad esempio per una Form).
+      //  then try to retrieve and set the ViewContext for the View.
+      //  If a specific VCProvider is already assigned then use it else try
+      //  to retrieve the global default one, if not exist then do none
+      //  (no ViewContext assigned to the view, ad esempio per una Form).
       // NB: Se è stato specificato un ViewContext esplicito (SetViewContext), usa quello
-      // e considera il tutto come con AutoOwner e AutoParent = True
+      //      e considera il tutto come con AutoOwner e AutoParent = True
+      // NB: Se si sta creando una SimpleView il parametro "owner" viene passato sempre a nil
+      //      anche se in realtà è stato creato un ViewContext, questo perchè altrimenti poi
+      //      quando si distruggerà la vista (una SimpleView si distrugge eseguendo il suo metodo
+      //      Free (non distruggendo il ViewContext come nel caso di MVVM) e ci sarebbero problemi
+      //      poi alla distruzione del ViewContext perchè poi cercherebbe di distruggere tutti
+      //      i componenti owned e tra questi anche la vista che però è già distrutta.
       if FVCProviderEnabled and (not Assigned(FViewContext)) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
       // and (Result is TComponent) then
       begin
@@ -1560,7 +1566,7 @@ begin
         if Assigned(FVCProvider) then
           FViewContext := FVCProvider.NewViewContext;
       end;
-      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
+      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and not FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else
         LValue := TValue.Empty;

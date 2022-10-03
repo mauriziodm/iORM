@@ -18,7 +18,7 @@ object StartForm: TStartForm
     TabHeight = 49.000000000000000000
     TabIndex = 0
     TabOrder = 0
-    TabPosition = None
+    TabPosition = Dots
     Sizes = (
       400s
       600s)

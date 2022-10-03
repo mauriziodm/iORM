@@ -43,7 +43,7 @@ procedure TioViewContextRegisterItem.CheckForLife;
 begin
   if (not Assigned(FView)) and (not FReleasingViewContext) then
     ReleaseViewContext;
-  if (not Assigned(FView)) and (not Assigned(FViewContext)) then
+  if (not Assigned(FView)) and (not Assigned(FViewContext)) and not (csDestroying in Self.ComponentState) then
     DisposeOf;
 end;
 

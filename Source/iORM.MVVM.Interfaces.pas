@@ -76,6 +76,8 @@ type
   IioViewRegisterBase = interface
     ['{7E0B50E8-B561-44E2-A8A0-6A13CA563875}']
     procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
+    function ContainsView(const AView:TComponent): Boolean;
+    function ContainsViewContext(const AViewContext:TComponent): Boolean;
     function GetItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function GetItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
     property ItemByView[const AView: TComponent]: TioViewContextRegisterItem read GetItemByView;
