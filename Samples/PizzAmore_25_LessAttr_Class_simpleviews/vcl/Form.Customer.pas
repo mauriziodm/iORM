@@ -80,7 +80,7 @@ end;
 
 procedure TCustomerForm.FormShow(Sender: TObject);
 begin
-  DSCustomer.Open;
+//  DSCustomer.Open;
 end;
 
 end.

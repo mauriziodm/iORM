@@ -14,7 +14,7 @@ uses
 
 type
 
-  [ioEntity]
+  [ioEntity('PIZZAS')]
   TPizza = class
   private
     FID: Integer;
