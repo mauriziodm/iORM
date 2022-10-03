@@ -1607,7 +1607,11 @@ begin
       //   setted properly.
       if not Assigned(FViewModel) then
         FViewModel := ExtractVMFromView(TComponent(Result));
-      // Register View, ViewContext and ViewContextProvider in the ViewRegister of the ViewModel
+      // Register View, ViewContext and ViewContextProvider in the ViewRegister of the ViewModel or in the SimpleViewRegster
+      //  if a SimpleView was required
+      if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
+        TioSimpleViewRegister.Add(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod)
+      else
       if Assigned(FViewModel) then
         (FViewModel as IioViewModelInternal).RegisterView(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
     end

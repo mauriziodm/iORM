@@ -28,6 +28,7 @@ type
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
+    procedure acBackExecute(Sender: TObject);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -41,6 +42,11 @@ procedure TViewBaseForList.acAddExecute(Sender: TObject);
 begin
   BSMaster.Persistence.Append;
   acShowOrSelect.Execute;
+end;
+
+procedure TViewBaseForList.acBackExecute(Sender: TObject);
+begin
+  TioSimpleViewRegister.CloseView(Self);
 end;
 
 procedure TViewBaseForList.acShowOrSelectExecute(Sender: TObject);

@@ -8,12 +8,9 @@ uses
 
 type
 
-  TioViewRegister = class(TInterfacedObject, IioViewRegister)
+  TioViewRegisterBase = class(TInterfacedObject, IioViewRegisterBase)
   private
     FInternalContainer: TList<TioViewContextRegisterItem>;
-    FFreeViewsTimer: TioTimer;
-    procedure _FreeViewTimerEventHandler(Sender: TObject);
-    procedure _PostponedReleaseAllViewContexts;
     function FindItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function FindItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
     function ContainsView(const AView:TComponent): Boolean;
@@ -24,21 +21,42 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
+    property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
+    property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
+  end;
+
+  TioViewRegisterMVVM = class(TioViewRegisterBase, IioViewRegisterMVVM)
+  private
+    FFreeViewsTimer: TioTimer;
+    procedure _FreeViewTimerEventHandler(Sender: TObject);
+    procedure _PostponedReleaseAllViewContexts;
+  public
+    constructor Create;
+    destructor Destroy; override;
     procedure ReleaseAllViewContexts;
     procedure HideAllViewContexts;
     procedure ShowAllViewContexts;
-    property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
-    property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
+  end;
+
+  TioSimpleViewRegister = class
+  private
+    class var FInternalRegister: IioViewRegisterBase;
+  public
+    class procedure _Build;
+    class procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
+    class procedure CloseView(const AView: TComponent);
+    class procedure HideView(const AView: TComponent);
+    class procedure ShowView(const AView: TComponent);
   end;
 
 implementation
 
 uses
-  iORM.Exceptions;
+  iORM.Exceptions, iORM.MVVM.Factory;
 
 { TioViewContextRegister }
 
-procedure TioViewRegister.Add(const AView, AViewContext: TComponent;
+procedure TioViewRegisterBase.Add(const AView, AViewContext: TComponent;
   const AViewContextProvider:TioViewContextProvider;
   const AViewContextFreeMethod:TProc);
 var
@@ -66,35 +84,30 @@ begin
   FInternalContainer.Add(LItem);
 end;
 
-function TioViewRegister.ContainsView(const AView: TComponent): Boolean;
+function TioViewRegisterBase.ContainsView(const AView: TComponent): Boolean;
 begin
   Result := Assigned(FindItemByView(AView));
 end;
 
-function TioViewRegister.ContainsViewContext(
+function TioViewRegisterBase.ContainsViewContext(
   const AViewContext: TComponent): Boolean;
 begin
   Result := Assigned(FindItemByViewContext(AViewContext));
 end;
 
-constructor TioViewRegister.Create;
+constructor TioViewRegisterBase.Create;
 begin
   inherited;
   FInternalContainer := TList<TioViewContextRegisterItem>.Create;
-  FFreeViewsTimer := TioTimer.CreateNewTimer;
-  FFreeViewsTimer.Enabled := False;
-  FFreeViewsTimer.OnTimer := _FreeViewTimerEventHandler;
-  FFreeViewsTimer.Interval := 100;
 end;
 
-destructor TioViewRegister.Destroy;
+destructor TioViewRegisterBase.Destroy;
 begin
   FInternalContainer.Free;
-  FFreeViewsTimer.Free;
   inherited;
 end;
 
-function TioViewRegister.FindItemByView(
+function TioViewRegisterBase.FindItemByView(
   const AView: TComponent): TioViewContextRegisterItem;
 var
   LItem: TioViewContextRegisterItem;
@@ -105,7 +118,7 @@ begin
       Exit(LItem);
 end;
 
-function TioViewRegister.FindItemByViewContext(
+function TioViewRegisterBase.FindItemByViewContext(
   const AViewContext: TComponent): TioViewContextRegisterItem;
 var
   LItem: TioViewContextRegisterItem;
@@ -116,7 +129,7 @@ begin
       Exit(LItem);
 end;
 
-function TioViewRegister.GetItemByView(
+function TioViewRegisterBase.GetItemByView(
   const AView: TComponent): TioViewContextRegisterItem;
 begin
   Result := FindItemByView(AView);
@@ -124,7 +137,7 @@ begin
     raise EioException.Create('TioViewContextRegister', 'GetItemByView', 'View not found.');
 end;
 
-function TioViewRegister.GetItemByViewContext(
+function TioViewRegisterBase.GetItemByViewContext(
   const AViewContext: TComponent): TioViewContextRegisterItem;
 begin
   Result := FindItemByViewContext(AViewContext);
@@ -132,7 +145,52 @@ begin
     raise EioException.Create('TioViewContextRegister', 'GetItemByViewContext', 'ViewContext not found.');
 end;
 
-procedure TioViewRegister.HideAllViewContexts;
+{ TioSimpleViewRegister }
+
+class procedure TioSimpleViewRegister.Add(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
+  const AViewContextFreeMethod: TProc);
+begin
+  FInternalRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
+end;
+
+class procedure TioSimpleViewRegister.CloseView(const AView: TComponent);
+begin
+  FInternalRegister.ItemByView[AView].ReleaseViewContext;
+end;
+
+class procedure TioSimpleViewRegister.HideView(const AView: TComponent);
+begin
+  FInternalRegister.ItemByView[AView].HideViewContext;
+end;
+
+class procedure TioSimpleViewRegister.ShowView(const AView: TComponent);
+begin
+  FInternalRegister.ItemByView[AView].ShowViewContext;
+end;
+
+class procedure TioSimpleViewRegister._Build;
+begin
+  FInternalRegister := TioMVVMFactory.NewViewRegisterBase;
+end;
+
+{ TioViewRegisterMVVM }
+
+constructor TioViewRegisterMVVM.Create;
+begin
+  inherited;
+  FFreeViewsTimer := TioTimer.CreateNewTimer;
+  FFreeViewsTimer.Enabled := False;
+  FFreeViewsTimer.OnTimer := _FreeViewTimerEventHandler;
+  FFreeViewsTimer.Interval := 100;
+end;
+
+destructor TioViewRegisterMVVM.Destroy;
+begin
+  FFreeViewsTimer.Free;
+  inherited;
+end;
+
+procedure TioViewRegisterMVVM.HideAllViewContexts;
 var
   I: Integer;
 begin
@@ -140,7 +198,7 @@ begin
     FInternalContainer.Items[I].HideViewContext;
 end;
 
-procedure TioViewRegister.ReleaseAllViewContexts;
+procedure TioViewRegisterMVVM.ReleaseAllViewContexts;
 begin
   // Avvia il timer per il release posticipato di tutti i ViewContexts
   //  e, di conseguenza, di tutte le viste.
@@ -149,7 +207,7 @@ begin
   FFreeViewsTimer.Enabled := True;
 end;
 
-procedure TioViewRegister.ShowAllViewContexts;
+procedure TioViewRegisterMVVM.ShowAllViewContexts;
 var
   I: Integer;
 begin
@@ -157,13 +215,13 @@ begin
     FInternalContainer.Items[I].ShowViewContext;
 end;
 
-procedure TioViewRegister._FreeViewTimerEventHandler(Sender: TObject);
+procedure TioViewRegisterMVVM._FreeViewTimerEventHandler(Sender: TObject);
 begin
   FFreeViewsTimer.Enabled := False;
   _PostponedReleaseAllViewContexts;
 end;
 
-procedure TioViewRegister._PostponedReleaseAllViewContexts;
+procedure TioViewRegisterMVVM._PostponedReleaseAllViewContexts;
 var
 //  LItem: TioViewContextRegisterItem;
   I: Integer;
@@ -177,6 +235,10 @@ begin
   for I := FInternalContainer.Count-1 downto 0 do
     FInternalContainer.Items[I].ReleaseViewContext;
 end;
+
+initialization
+
+TioSimpleViewRegister._Build;
 
 end.
 

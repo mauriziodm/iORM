@@ -50,7 +50,7 @@ type
   TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel, IioViewModelInternal) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     FVMActionContainer: IioVMActionContainer;
-    FViewRegister: IioViewRegister;
+    FViewRegister: IioViewRegisterMVVM;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
@@ -156,7 +156,7 @@ constructor TioViewModel.Create(AOwner: TComponent);
 begin
    FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self); // NOTE: IT MUST BE BEFORE INHERITED
    inherited;
-   FViewRegister := TioMVVMFactory.NewViewRegister;
+   FViewRegister := TioMVVMFactory.NewViewRegisterMVVM;
 end;
 
 procedure TioViewModel.DoOnViewPairing;

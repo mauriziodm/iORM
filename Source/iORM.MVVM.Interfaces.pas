@@ -46,7 +46,6 @@ type
   IioViewAction = interface;
   IioVMAction = interface;
   IioVMActionContainer = interface;
-  IioViewRegister = interface;
 
   // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
@@ -74,16 +73,20 @@ type
     procedure BindView(const AView: TComponent);
   end;
 
-  IioViewRegister = interface
+  IioViewRegisterBase = interface
     ['{7E0B50E8-B561-44E2-A8A0-6A13CA563875}']
     procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
-    procedure ReleaseAllViewContexts;
-    procedure HideAllViewContexts;
-    procedure ShowAllViewContexts;
     function GetItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function GetItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
     property ItemByView[const AView: TComponent]: TioViewContextRegisterItem read GetItemByView;
     property ItemByViewContext[const AViewContext: TComponent]: TioViewContextRegisterItem read GetItemByViewContext;
+  end;
+
+  IioViewRegisterMVVM = interface(IioViewRegisterBase)
+    ['{393A4A67-841A-4253-90AE-224FC8564615}']
+    procedure ReleaseAllViewContexts;
+    procedure HideAllViewContexts;
+    procedure ShowAllViewContexts;
   end;
 
   IioVMAction = interface

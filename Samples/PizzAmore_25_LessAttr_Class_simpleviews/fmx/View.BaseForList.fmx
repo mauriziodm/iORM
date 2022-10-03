@@ -97,6 +97,7 @@ object ViewBaseForList: TViewBaseForList
     Top = 163
     object acBack: TAction
       Text = 'Back'
+      OnExecute = acBackExecute
     end
     object acAdd: TAction
       Text = 'Add'
@@ -113,7 +114,6 @@ object ViewBaseForList: TViewBaseForList
     end
   end
   object BSMaster: TioPrototypeBindSourceMaster
-    AutoPost = False
     FieldDefs = <>
     ScopeMappings = <>
     AsDefault = True

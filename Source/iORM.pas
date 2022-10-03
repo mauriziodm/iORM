@@ -39,7 +39,7 @@ uses
   System.Classes, System.SysUtils, System.TypInfo, DJSON, iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
   iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom,
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister;
 
 const
 {$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
@@ -95,7 +95,10 @@ const
 
 type
 
+// Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+  TioSimpleViewRegister = iORM.MVVM.ViewRegister.TioSimpleViewRegister;
+
   TioCompareOp = iORM.CommonTypes.TioCompareOp;
   TioHideWaitProc = iORM.CommonTypes.TioHideWaitProc;
   TioIndexOrientation = iORM.CommonTypes.TioIndexOrientation;
@@ -115,6 +118,8 @@ type
   TioFKCreate = iORM.Attributes.TioFKCreate;
   TioJoinType = iORM.Attributes.TioJoinType;
 {$ENDREGION}
+
+// Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   ioMarker = iORM.Attributes.ioMarker;
 
@@ -180,6 +185,7 @@ type
 
 {$ENDREGION}
 
+  // iORM facade
   io = class
   public
     // AnonymousTimer
