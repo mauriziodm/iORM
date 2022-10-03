@@ -66,7 +66,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function VMActions: IioVMActionContainer;
-    procedure FreeViews;
+    procedure CloseViews;
     procedure HideViews;
     procedure ShowViews;
     procedure TerminateApplication;
@@ -165,7 +165,7 @@ begin
     FOnViewPairing(Self);
 end;
 
-procedure TioViewModel.FreeViews;
+procedure TioViewModel.CloseViews;
 begin
   FViewRegister.ReleaseAllViewContexts;
 end;

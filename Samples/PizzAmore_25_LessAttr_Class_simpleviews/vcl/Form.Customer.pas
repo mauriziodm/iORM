@@ -10,7 +10,7 @@ uses
 
 type
 
-  [diSimpleViewFor(TCustomer)]
+//  [diSimpleViewFor(TCustomer)]
   TCustomerForm = class(TForm)
     PanelTop: TPanel;
     ButtonBack: TSpeedButton;

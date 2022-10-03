@@ -10,19 +10,24 @@ uses
 type
 
 //  [diImplements(IInterface)]
-//  [diSimpleViewFor(TCustomer, 'LIST')]
+  [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomersSimpleView = class(TFrame)
     Label1: TLabel;
     Button1: TButton;
     DS: TioDataSetMaster;
     DataSource1: TDataSource;
     DBGrid1: TDBGrid;
+    Button2: TButton;
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
+
+uses
+  System.Generics.Collections;
 
 {$R *.dfm}
 
@@ -31,10 +36,22 @@ begin
   Owner.Free;
 end;
 
+procedure TCustomersSimpleView.Button2Click(Sender: TObject);
+var
+  LList: TObjectlist<TCustomer>;
+begin
+  LList := TObjectlist<TCustomer>.Create;
+  LList.Add(TCustomer.Create);
+  LList[0].Name := 'Maurizio';
+  LList.Add(TCustomer.Create);
+  LList[1].Name := 'Federica';
+  DS.SetDataObject(LList);
+end;
+
 constructor TCustomersSimpleView.Create(AOwner: TComponent);
 begin
   inherited;
-  DS.Open;
+//  DS.Open;
 end;
 
 end.

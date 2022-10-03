@@ -24,7 +24,9 @@ type
     DBEdit2: TDBEdit;
     Label4: TLabel;
     DBEdit3: TDBEdit;
+    Button2: TButton;
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -41,10 +43,20 @@ begin
   Owner.Free;
 end;
 
+procedure TCustomerSimpleView.Button2Click(Sender: TObject);
+var
+  LCustomer: TCustomer;
+begin
+  LCustomer := TCustomer.Create;
+  LCustomer.Name := 'Carlo Marona';
+  LCustomer.City := 'Rieti';
+  DS.SetDataObject(LCustomer);
+end;
+
 constructor TCustomerSimpleView.Create(AOwner: TComponent);
 begin
   inherited;
-  DS.Open;
+//  DS.Open;
 end;
 
 end.

@@ -704,7 +704,20 @@ end;
 
 procedure TioDataSetCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
+  // If the BindSource is not active it checks if the new DataObject is assigned,
+  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+  //  because it does not need to do anything (the BindSource is already closed and if the new
+  //  DataObject is being set to nil...)
+  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  if not IsActive then
+    if Assigned(ADataObject) then
+      Open
+    else
+      Exit;
+  // Some checks
   TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
+  // If the new Dataobject is nil then clear it into the BSA and close the BindSource
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -718,7 +731,20 @@ end;
 
 procedure TioDataSetCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
+  // If the BindSource is not active it checks if the new DataObject is assigned,
+  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+  //  because it does not need to do anything (the BindSource is already closed and if the new
+  //  DataObject is being set to nil...)
+  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  if not IsActive then
+    if Assigned(ADataObject) then
+      Open
+    else
+      Exit;
+  // Some checks
   TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
+  // If the new Dataobject is nil then clear it into the BSA and close the BindSource
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it

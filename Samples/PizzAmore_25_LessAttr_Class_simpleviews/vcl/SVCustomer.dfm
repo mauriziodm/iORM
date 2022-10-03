@@ -77,6 +77,15 @@ object CustomerSimpleView: TCustomerSimpleView
     DataSource = DataSource1
     TabOrder = 3
   end
+  object Button2: TButton
+    Left = 307
+    Top = 56
+    Width = 110
+    Height = 25
+    Caption = 'SetDataObjet'
+    TabOrder = 4
+    OnClick = Button2Click
+  end
   object DS: TioDataSetMaster
     AsDefault = True
     TypeName = 'TCustomer'

@@ -10,7 +10,7 @@ uses
 
 type
 
-  [diSimpleViewFor(TCustomer, 'LIST')]
+//  [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomersForm = class(TForm)
     DSCustomers: TioDataSetMaster;
     DSCustomersID: TIntegerField;

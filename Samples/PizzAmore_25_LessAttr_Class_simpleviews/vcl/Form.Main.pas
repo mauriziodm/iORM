@@ -69,10 +69,12 @@ procedure TMainForm.Button2Click(Sender: TObject);
 var
   LCustomer: TCustomer;
 begin
-  LCustomer := TCustomer.Create;
-  LCustomer.Name := 'Carlo Marona';
-  LCustomer.City := 'Rieti';
-  io.di.LocateSimpleViewFor(LCustomer).Show;
+//  LCustomer := TCustomer.Create;
+//  LCustomer.Name := 'Carlo Marona';
+//  LCustomer.City := 'Rieti';
+//  io.di.LocateSimpleViewFor(LCustomer).Show;
+
+  io.Show<TCustomer>;
 end;
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);

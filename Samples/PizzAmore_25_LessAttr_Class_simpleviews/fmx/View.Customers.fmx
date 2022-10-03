@@ -1,0 +1,58 @@
+inherited CustomersView: TCustomersView
+  inherited RectangleTitle: TRectangle
+    inherited LabelTitle: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Customers'
+    end
+  end
+  inherited ListView: TListView
+    ItemIndex = 0
+  end
+  inherited BSMaster: TioPrototypeBindSourceMaster
+    AutoActivate = True
+    AutoPost = True
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = '%Paging.CurrentPageOf'
+        Generator = 'Integers'
+        ReadOnly = False
+      end>
+    Preview = True
+    TypeName = 'TCustomer'
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'Name'
+      Control = ListView
+      FillExpressions = <
+        item
+          SourceMemberName = 'PhoneNumber'
+          ControlMemberName = 'Detail'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+end

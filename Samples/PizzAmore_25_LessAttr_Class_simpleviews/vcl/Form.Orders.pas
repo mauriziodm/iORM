@@ -10,7 +10,7 @@ uses
 
 type
 
-  [diViewFor(TOrder, 'LIST')]
+  [diSimpleViewFor(TOrder, 'LIST')]
   TOrdersForm = class(TForm)
     PanelTop: TPanel;
     ButtonSelect: TSpeedButton;

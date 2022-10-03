@@ -8587,7 +8587,7 @@ object MainForm: TMainForm
     OnAfterRequest = VCProviderFormAfterRequest
     OnRelease = VCProviderFormRelease
     OnRequest = VCProviderFormRequest
-    RegisterAsDefault = False
+    RegisterAsDefault = True
     Left = 145
     Top = 272
   end

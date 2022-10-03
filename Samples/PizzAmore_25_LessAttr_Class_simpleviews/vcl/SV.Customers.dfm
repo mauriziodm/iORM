@@ -43,9 +43,19 @@ object CustomersSimpleView: TCustomersSimpleView
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
   end
+  object Button2: TButton
+    Left = 323
+    Top = 56
+    Width = 94
+    Height = 25
+    Caption = 'SetDataObject'
+    TabOrder = 2
+    OnClick = Button2Click
+  end
   object DS: TioDataSetMaster
     AsDefault = True
     TypeName = 'TCustomer'
+    LoadType = ltManual
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 152
     Top = 56

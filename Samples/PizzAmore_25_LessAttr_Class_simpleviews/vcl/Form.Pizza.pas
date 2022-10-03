@@ -10,7 +10,7 @@ uses
 
 type
 
-  [diViewFor(TPizza)]
+  [diSimpleViewFor(TPizza)]
   TPizzaForm = class(TForm)
     PanelTop: TPanel;
     ButtonBack: TSpeedButton;
