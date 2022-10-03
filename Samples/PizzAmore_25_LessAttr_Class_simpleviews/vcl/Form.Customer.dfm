@@ -13,6 +13,8 @@ object CustomerForm: TCustomerForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  Visible = True
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
@@ -134,6 +136,15 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
+    end
+    object Button1: TButton
+      Left = 400
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Open'
+      TabOrder = 0
+      OnClick = Button1Click
     end
   end
   object PanelBottom: TPanel
@@ -265,6 +276,7 @@ object CustomerForm: TCustomerForm
     TabOrder = 6
   end
   object DSCustomer: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TCustomer'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject

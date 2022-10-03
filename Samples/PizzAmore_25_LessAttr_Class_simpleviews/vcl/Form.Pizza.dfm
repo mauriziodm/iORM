@@ -241,6 +241,7 @@ object PizzaForm: TPizzaForm
     TabOrder = 5
   end
   object DSPizza: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TPizza'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject

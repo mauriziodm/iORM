@@ -13,6 +13,8 @@ object CustomersForm: TCustomersForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  Visible = True
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 15
   object PanelBottom: TPanel

@@ -6,9 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids, iORM, iORM.Attributes,
   iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
-  iORM.DB.DataSet.Master;
+  iORM.DB.DataSet.Master, Model.Order;
 
 type
+
+  [diViewFor(TOrder, 'LIST')]
   TOrdersForm = class(TForm)
     PanelTop: TPanel;
     ButtonSelect: TSpeedButton;

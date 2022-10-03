@@ -777,47 +777,74 @@ end;
 
 class procedure io.Show(const ATargetObj: TObject; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(ATargetObj, AVVMAlias).SetViewContext(AViewContext).Show;
+  if di.LocateSimpleViewFor(ATargetObj, AVVMAlias).Exist then
+    di.LocateSimpleViewfor(ATargetObj, AVVMAlias).SetViewContext(AViewContext).Show
+  else
+    di.LocateViewVMfor(ATargetObj, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show(const ATargetObj: TObject; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(ATargetObj, AVVMAlias).VCProvider(AVCProvider).Show;
+  if di.LocateSimpleViewFor(ATargetObj, AVVMAlias).Exist then
+    di.LocateSimpleViewfor(ATargetObj, AVVMAlias).VCProvider(AVCProvider).Show
+  else
+    di.LocateViewVMfor(ATargetObj, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show(const ATargetObj: TObject; const AVVMAlias: String; const AVCProviderName: String);
 begin
-  di.LocateViewVMfor(ATargetObj, AVVMAlias).VCProvider(AVCProviderName).Show;
+  if di.LocateSimpleViewFor(ATargetObj, AVVMAlias).Exist then
+    di.LocateSimpleViewfor(ATargetObj, AVVMAlias).VCProvider(AVCProviderName).Show
+  else
+    di.LocateViewVMfor(ATargetObj, AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(ATargetIntf, AVVMAlias).SetViewContext(AViewContext).Show;
+  if di.LocateSimpleViewFor(ATargetIntf, AVVMAlias).Exist then
+    di.LocateSimpleViewfor(ATargetIntf, AVVMAlias).SetViewContext(AViewContext).Show
+  else
+    di.LocateViewVMfor(ATargetIntf, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show<T>(const AVVMAlias: String; const AVCProviderName: String);
 begin
-  di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).Show;
+  if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
+    di.LocateSimpleViewfor<T>(AVVMAlias).VCProvider(AVCProviderName).Show
+  else
+    di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.Show<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).Show;
+  if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
+    di.LocateSimpleViewfor<T>(AVVMAlias).VCProvider(AVCProvider).Show
+  else
+    di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show<T>(const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor<T>(AVVMAlias).SetViewContext(AViewContext).Show;
+  if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
+    di.LocateSimpleViewfor<T>(AVVMAlias).SetViewContext(AViewContext).Show
+  else
+    di.LocateViewVMfor<T>(AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProvider).Show;
+  if di.LocateSimpleViewFor(ATargetIntf, AVVMAlias).Exist then
+    di.LocateSimpleViewfor(ATargetIntf, AVVMAlias).VCProvider(AVCProvider).Show
+  else
+    di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AVVMAlias: String; const AVCProviderName: String);
 begin
-  di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProviderName).Show;
+  if di.LocateSimpleViewFor(ATargetIntf, AVVMAlias).Exist then
+    di.LocateSimpleViewfor(ATargetIntf, AVVMAlias).VCProvider(AVCProviderName).Show
+  else
+    di.LocateViewVMfor(ATargetIntf, AVVMAlias).VCProvider(AVCProviderName).Show;
 end;
 
 class procedure io.ShowCurrent(const ABindSource: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String);

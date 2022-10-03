@@ -77,8 +77,12 @@ end;
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);
 begin
-  Application.CreateForm(TCustomersForm, CustomersForm);
-  CustomersForm.Show;
+//  io.di.LocateSimpleViewFor<TCustomer>('LIST').Show;
+
+  io.Show<TCustomer>('LIST');
+
+  //  Application.CreateForm(TCustomersForm, CustomersForm);
+//  CustomersForm.Show;
 end;
 
 procedure TMainForm.ButtonOrdersClick(Sender: TObject);

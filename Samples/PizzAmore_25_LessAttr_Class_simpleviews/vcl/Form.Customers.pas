@@ -5,9 +5,12 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
-  iORM.DB.DataSet.Master, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.Buttons, Vcl.DBGrids, Vcl.DBCtrls, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList;
+  iORM.DB.DataSet.Master, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.Buttons, Vcl.DBGrids, Vcl.DBCtrls, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
+  Model.Customer;
 
 type
+
+  [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomersForm = class(TForm)
     DSCustomers: TioDataSetMaster;
     DSCustomersID: TIntegerField;
@@ -41,6 +44,7 @@ type
     procedure acAddExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -53,7 +57,7 @@ var
 implementation
 
 uses
-  Form.Customer, Model.Customer, System.Generics.Collections;
+  Form.Customer, System.Generics.Collections;
 
 {$R *.dfm}
 
@@ -82,9 +86,11 @@ begin
   end
   else
   begin
-    Application.CreateForm(TCustomerForm, CustomerForm);
-    CustomerForm.DSCustomer.SourceBS := DSCustomers;
-    CustomerForm.Show;
+    DSCustomers.ShowCurrent;
+
+//    Application.CreateForm(TCustomerForm, CustomerForm);
+//    CustomerForm.DSCustomer.SourceBS := DSCustomers;
+//    CustomerForm.Show;
   end;
 end;
 
@@ -107,6 +113,11 @@ begin
 
   ShowMessage(LList.Count.ToString);
   LList.Free;
+end;
+
+procedure TCustomersForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 procedure TCustomersForm.FormShow(Sender: TObject);

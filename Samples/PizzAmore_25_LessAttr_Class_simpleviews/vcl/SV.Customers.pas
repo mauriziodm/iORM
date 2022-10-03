@@ -10,7 +10,7 @@ uses
 type
 
 //  [diImplements(IInterface)]
-  [diSimpleViewFor(TCustomer, 'LIST')]
+//  [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomersSimpleView = class(TFrame)
     Label1: TLabel;
     Button1: TButton;

@@ -39,7 +39,7 @@ uses
   Data.Bind.ObjectScope, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
   System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces,
   System.SysUtils, iORM.LiveBindings.CommonBSAPaging,
-  System.Generics.Collections;
+  System.Generics.Collections, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -234,6 +234,14 @@ type
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
+    // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowCurrent(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
+    procedure ShowCurrent(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
+    procedure ShowCurrent(const AViewContext: TComponent; const AAlias: String = ''); overload;
+    // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowEach(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
+    procedure ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
+    procedure ShowEach(const AViewContext: TComponent; const AAlias: String = ''); overload;
     // DataObject
     procedure ClearDataObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -947,6 +955,36 @@ begin
   (FWhereStr as TStringList).OnChange := WhereOnChangeEventHandler;
   // Update the adapter where property
   WhereOnChangeEventHandler(Self);
+end;
+
+procedure TioPrototypeBindSourceCustom.ShowCurrent(const AViewContext: TComponent; const AAlias: String);
+begin
+  io.ShowCurrent(Self, AViewContext, AAlias);
+end;
+
+procedure TioPrototypeBindSourceCustom.ShowCurrent(const AVCProvider: TioViewContextProvider; const AAlias: String);
+begin
+  io.ShowCurrent(Self, AVCProvider, AAlias);
+end;
+
+procedure TioPrototypeBindSourceCustom.ShowCurrent(const AAlias, AVCProviderName: String);
+begin
+  io.ShowCurrent(Self, AAlias, AVCProviderName);
+end;
+
+procedure TioPrototypeBindSourceCustom.ShowEach(const AViewContext: TComponent; const AAlias: String);
+begin
+  io.ShowEach(Self, AViewContext, AAlias);
+end;
+
+procedure TioPrototypeBindSourceCustom.ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String);
+begin
+  io.ShowEach(Self, AVCProvider, AAlias);
+end;
+
+procedure TioPrototypeBindSourceCustom.ShowEach(const AAlias, AVCProviderName: String);
+begin
+  io.ShowEach(Self, AAlias, AVCProviderName);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);

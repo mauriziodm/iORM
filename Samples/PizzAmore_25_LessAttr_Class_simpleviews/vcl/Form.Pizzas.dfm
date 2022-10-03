@@ -169,6 +169,7 @@ object PizzasForm: TPizzasForm
     end
   end
   object DSPizzas: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TPizza'
     OrderBy = '[.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
