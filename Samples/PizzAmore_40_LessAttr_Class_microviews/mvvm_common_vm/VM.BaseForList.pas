@@ -58,7 +58,7 @@ end;
 
 procedure TVMBaseForList.acBackExecute(Sender: TObject);
 begin
-  FreeViews;
+  CloseViews;
 end;
 
 procedure TVMBaseForList.acShowOrSelectExecute(Sender: TObject);

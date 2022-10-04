@@ -1112,10 +1112,7 @@ begin
     LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName)
   else
   if IsFromBSLoadType then
-  begin
-    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource);
-    Open;
-  end
+    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
   else
     LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),
       TypeOfCollection, ADataObject, True);

@@ -69,9 +69,7 @@ end;
 
 procedure TPizzasForm.acShowExecute(Sender: TObject);
 begin
-    Application.CreateForm(TPizzaForm, PizzaForm);
-    PizzaForm.DSPizza.SourceBS := DSPizzas;
-    PizzaForm.Show;
+  DSPizzas.ShowCurrent;
 end;
 
 procedure TPizzasForm.DBCtrlGrid1DblClick(Sender: TObject);

@@ -46,7 +46,6 @@ end;
 
 procedure TViewBaseForList.acBackExecute(Sender: TObject);
 begin
-//  TioSimpleViewRegister.CloseView(Self);
   Free;
 end;
 

@@ -13,6 +13,8 @@ object OrderForm: TOrderForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  Visible = True
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
@@ -280,6 +282,8 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGrid1DblClick
+      ExplicitLeft = 3
+      ExplicitTop = -6
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -514,7 +518,7 @@ object OrderForm: TOrderForm
       end>
   end
   object DSPizzas: TioDataSetMaster
-    AsDefault = True
+    AsDefault = False
     TypeName = 'TPizza'
     SelectorFor = DSOrder
     Paging.CurrentPageOfFormat = '%d/%d'
@@ -539,7 +543,7 @@ object OrderForm: TOrderForm
     Top = 240
   end
   object DSOrder: TioDataSetMaster
-    AsDefault = False
+    AsDefault = True
     TypeName = 'TOrder'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject

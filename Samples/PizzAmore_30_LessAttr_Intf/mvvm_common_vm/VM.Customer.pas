@@ -14,7 +14,6 @@ type
   TVMCustomer = class(TVMBaseForForm)
     acNew: TioVMAction;
     procedure acNewExecute(Sender: TObject);
-    procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
     { Private declarations }
   public
@@ -37,12 +36,6 @@ begin
   MPMaster.Open;
   MPMaster.SetDataObject(LCustomer);
 //  MPMaster.Open;
-end;
-
-procedure TVMCustomer.ioViewModelViewPairing(const Sender: TioViewModel);
-begin
-//  inherited;
-
 end;
 
 end.

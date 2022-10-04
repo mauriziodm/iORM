@@ -1,4 +1,5 @@
 object VMBaseForForm: TVMBaseForForm
+  OnCreate = ioViewModelCreate
   OnViewPairing = ioViewModelViewPairing
   Height = 480
   Width = 640

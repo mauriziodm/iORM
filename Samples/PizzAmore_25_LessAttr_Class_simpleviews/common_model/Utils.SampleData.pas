@@ -139,7 +139,7 @@ begin
   LOrder.Customer := io.LoadObject<TCustomer>(2);
   LOrder.Note := 'Double cheese please';
   LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 1) );
-  LOrder.Rows.Add( TOrderRow.Create(2, 'Pepperoni pizza', 6.5, 1) );
+  LOrder.Rows.Add( TOrderRow.Create(3, 'Pepperoni pizza', 6.5, 1) );
   io.Persist(LOrder);
   FreeAndnil(LOrder);
   // Third order

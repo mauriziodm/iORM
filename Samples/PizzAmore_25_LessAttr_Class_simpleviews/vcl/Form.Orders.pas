@@ -65,9 +65,7 @@ end;
 
 procedure TOrdersForm.acShowExecute(Sender: TObject);
 begin
-    Application.CreateForm(TOrderForm, OrderForm);
-    OrderForm.DSOrder.SourceBS := DSOrders;
-    OrderForm.Show;
+  DSOrders.ShowCurrent;
 end;
 
 procedure TOrdersForm.FormCreate(Sender: TObject);

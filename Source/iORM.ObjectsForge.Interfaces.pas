@@ -221,6 +221,8 @@ begin
           begin
             LTargetBindSource.SetMasterBindSource(LParamBindSource);
             LTargetBindSource.SetMasterPropertyName(LPresenterSettings[I].StringParameter);
+            if LTargetBindSource.IsFromBSLoadType then
+              LTargetBindSource.Open;
           end
           else
             raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));

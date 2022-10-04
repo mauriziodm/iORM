@@ -10,7 +10,9 @@ uses
   Model.Order in '..\common_model\Model.Order.pas',
   Model.Customer in '..\common_model\Model.Customer.pas',
   View.BaseForList in 'View.BaseForList.pas' {ViewBaseForList: TFrame},
-  View.Customers in 'View.Customers.pas' {CustomersView: TFrame};
+  View.Customers in 'View.Customers.pas' {CustomersView: TFrame},
+  View.BaseForForm in 'View.BaseForForm.pas' {ViewBaseForForm: TFrame},
+  View.Customer in 'View.Customer.pas' {CustomerView: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

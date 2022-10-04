@@ -10,7 +10,7 @@ uses
 
 type
 
-//  [diSimpleViewFor(TCustomer)]
+  [diSimpleViewFor(TCustomer)]
   TCustomerForm = class(TForm)
     PanelTop: TPanel;
     ButtonBack: TSpeedButton;
@@ -39,12 +39,9 @@ type
     acPersist: TioBSPersistencePersist;
     acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
-    Button1: TButton;
     procedure acBackExecute(Sender: TObject);
     procedure acBackUpdate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -68,19 +65,9 @@ begin
   acBack.Enabled := not DSCustomer.Persistence.IsAppending;
 end;
 
-procedure TCustomerForm.Button1Click(Sender: TObject);
-begin
-  DSCustomer.Open;
-end;
-
 procedure TCustomerForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
-end;
-
-procedure TCustomerForm.FormShow(Sender: TObject);
-begin
-//  DSCustomer.Open;
 end;
 
 end.

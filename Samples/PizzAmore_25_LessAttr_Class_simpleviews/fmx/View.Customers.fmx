@@ -10,7 +10,6 @@ inherited CustomersView: TCustomersView
   end
   inherited BSMaster: TioPrototypeBindSourceMaster
     AutoActivate = True
-    AutoPost = True
     FieldDefs = <
       item
         Name = 'ID'

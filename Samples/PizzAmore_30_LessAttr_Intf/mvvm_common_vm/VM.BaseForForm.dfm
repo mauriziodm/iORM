@@ -1,5 +1,4 @@
 object VMBaseForForm: TVMBaseForForm
-  OnViewPairing = ioViewModelViewPairing
   Height = 480
   Width = 640
   object MPMaster: TioModelPresenterMaster

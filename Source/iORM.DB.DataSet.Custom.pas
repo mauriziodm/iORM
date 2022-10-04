@@ -928,10 +928,7 @@ begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName))
   else
   if FLoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance] then
-  begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource));
-    Open;
-  end
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin
 //    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, Where, TypeOfCollection, ADataObject, AOwnsObject));

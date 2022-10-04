@@ -15,7 +15,6 @@ object CustomerForm: TCustomerForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
-  OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
     Left = 10
@@ -136,15 +135,6 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-    end
-    object Button1: TButton
-      Left = 400
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = 'Open'
-      TabOrder = 0
-      OnClick = Button1Click
     end
   end
   object PanelBottom: TPanel

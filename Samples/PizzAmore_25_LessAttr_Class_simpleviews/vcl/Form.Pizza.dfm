@@ -13,7 +13,8 @@ object PizzaForm: TPizzaForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
-  OnShow = FormShow
+  Visible = True
+  OnClose = FormClose
   TextHeight = 15
   object Label1: TLabel
     Left = 10

@@ -887,7 +887,13 @@ begin
     raise EioException.Create(Self.ClassName, 'RegisterVewBindSource',
       '"AModelBindSourceOrModelDataSet" parameter must be a "IioVMBridgeClientComponent" implementer');
   if not FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
+  begin
     FViewBindSourceContainer.Add(AModelBindSourceOrModelDataSet);
+    if IsActive then
+      (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Open
+    else
+      (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Close;
+  end;
 end;
 
 procedure TioModelPresenterCustom.SetActive(const Value: Boolean);
@@ -1151,7 +1157,10 @@ begin
     raise EioException.Create(Self.ClassName, 'RegisterVewBindSource',
       '"AModelBindSourceOrModelDataSet" parameter must be a "IioVMBridgeClientComponent" implementer');
   if FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
+  begin
+    (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Close;
     FViewBindSourceContainer.Extract(AModelBindSourceOrModelDataSet);
+  end;
 end;
 
 procedure TioModelPresenterCustom.ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String);

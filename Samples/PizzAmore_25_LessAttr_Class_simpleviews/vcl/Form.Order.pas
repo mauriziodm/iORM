@@ -77,6 +77,7 @@ type
     procedure DBCtrlGrid1DblClick(Sender: TObject);
     procedure acSelectCustomerExecute(Sender: TObject);
     procedure acSelectPizza2Execute(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -122,9 +123,14 @@ begin
   ADone := True;
 end;
 
+procedure TOrderForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
 procedure TOrderForm.FormShow(Sender: TObject);
 begin
-  DSOrder.Open;
+//  DSOrder.Open;
   DSPizzas.Open;
 end;
 

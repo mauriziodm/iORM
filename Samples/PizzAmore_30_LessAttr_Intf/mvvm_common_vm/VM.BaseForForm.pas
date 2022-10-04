@@ -20,7 +20,6 @@ type
     acPersist: TioVMActionBSPersistencePersist;
     acRevert: TioVMActionBSPersistenceRevertOrDelete;
     procedure acBackExecute(Sender: TObject);
-    procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
     { Private declarations }
   public
@@ -36,11 +35,6 @@ implementation
 procedure TVMBaseForForm.acBackExecute(Sender: TObject);
 begin
   CloseViews;
-end;
-
-procedure TVMBaseForForm.ioViewModelViewPairing(const Sender: TioViewModel);
-begin
-  MPMaster.Open;
 end;
 
 end.

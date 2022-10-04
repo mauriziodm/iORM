@@ -9,7 +9,7 @@ uses
 
 type
 
-  [diSimpleViewFor(TCustomer)]
+//  [diSimpleViewFor(TCustomer)]
   TCustomerSimpleView = class(TFrame)
     Label1: TLabel;
     Button1: TButton;

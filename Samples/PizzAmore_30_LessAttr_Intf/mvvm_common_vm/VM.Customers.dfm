@@ -1,7 +1,6 @@
 inherited VMCustomers: TVMCustomers
   inherited MPMaster: TioModelPresenterMaster
     TypeName = 'ICustomer'
-    LoadType = ltManual
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50

@@ -10,7 +10,7 @@ uses
 
 type
 
-//  [diSimpleViewFor(TCustomer, 'LIST')]
+  [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomersForm = class(TForm)
     DSCustomers: TioDataSetMaster;
     DSCustomersID: TIntegerField;
@@ -87,10 +87,6 @@ begin
   else
   begin
     DSCustomers.ShowCurrent;
-
-//    Application.CreateForm(TCustomerForm, CustomerForm);
-//    CustomerForm.DSCustomer.SourceBS := DSCustomers;
-//    CustomerForm.Show;
   end;
 end;
 

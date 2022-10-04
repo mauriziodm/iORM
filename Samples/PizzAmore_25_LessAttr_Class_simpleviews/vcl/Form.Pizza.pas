@@ -41,7 +41,7 @@ type
     OpenPictureDialog: TOpenPictureDialog;
     procedure acBackExecute(Sender: TObject);
     procedure acLoadImageExecute(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -70,9 +70,9 @@ begin
   end;
 end;
 
-procedure TPizzaForm.FormShow(Sender: TObject);
+procedure TPizzaForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  DSPizza.Open;
+  Action := caFree;
 end;
 
 end.
