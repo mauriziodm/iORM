@@ -282,8 +282,6 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGrid1DblClick
-      ExplicitLeft = 3
-      ExplicitTop = -6
       object DBTextName: TDBText
         Left = 99
         Top = 20
