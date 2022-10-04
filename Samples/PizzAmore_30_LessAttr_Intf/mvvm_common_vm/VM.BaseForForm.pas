@@ -35,7 +35,7 @@ implementation
 
 procedure TVMBaseForForm.acBackExecute(Sender: TObject);
 begin
-  FreeViews;
+  CloseViews;
 end;
 
 procedure TVMBaseForForm.ioViewModelViewPairing(const Sender: TioViewModel);
