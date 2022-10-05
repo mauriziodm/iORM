@@ -49,6 +49,7 @@ type
     acShowPizzaSelector: TAction;
     procedure scShowCustomerSelectorExecute(Sender: TObject);
     procedure acShowPizzaSelectorExecute(Sender: TObject);
+    procedure BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public
@@ -60,12 +61,23 @@ var
 
 implementation
 
+uses
+  Model.Customer, Model.Pizza;
+
 {$R *.fmx}
 
 procedure TViewOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-//  io.ShowAsSelector<TPizza>(BSMaster, 'LIST');
+  io.ShowAsSelector<TPizza>(BSMaster, 'LIST');
+end;
+
+procedure TViewOrder.BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+begin
+  inherited;
+  BSMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
+  BSMaster.Refresh;
+  ADone := True;
 end;
 
 procedure TViewOrder.scShowCustomerSelectorExecute(Sender: TObject);

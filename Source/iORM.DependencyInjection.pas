@@ -362,12 +362,9 @@ type
     class function LocateVMfor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateVMfor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate View & ViewModel
-    class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AViewAlias: String = ''; const AViewModelAlias: String = '';
-      const AViewModelMarker: String = ''): IioDependencyInjectionLocator<TView>; overload;
-    class function LocateViewVMfor(const ATargetTypeName: String; const AAlias: String = ''; const AViewModelMarker: String = '')
-      : IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor(const AClassRef: TioClassRef; const AAlias: String = ''; const AViewModelMarker: String = '')
-      : IioDependencyInjectionLocator; overload;
+    class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AViewAlias: String = ''; const AViewModelAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator<TView>; overload;
+    class function LocateViewVMfor(const ATargetTypeName: String; const AAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor(const AClassRef: TioClassRef; const AAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor<T>(const AAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;

@@ -15,7 +15,9 @@ type
     FDescription: String;
     FPrice: Currency;
     FQty: Integer;
+    FObjStatus: TioObjStatus;
     function GetRowTotal: Currency;
+    procedure SetQty(const Value: Integer);
   public
     constructor Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer); overload;
     constructor Create(APizza: TPizza); overload;
@@ -23,7 +25,7 @@ type
     property PizzaID: Integer read FPizzaID;  // ReadOnly
     property Description: String read FDescription write FDescription;
     property Price: Currency read FPrice write FPrice;
-    property Qty: Integer read FQty write FQty;
+    property Qty: Integer read FQty write SetQty;
     property RowTotal: Currency read GetRowTotal;  // ReadOnly
   end;
 
@@ -50,6 +52,12 @@ end;
 function TOrderRow.GetRowTotal: Currency;
 begin
   Result := FPrice * FQty;
+end;
+
+procedure TOrderRow.SetQty(const Value: Integer);
+begin
+  FQty := Value;
+  FObjStatus := osDirty;
 end;
 
 end.

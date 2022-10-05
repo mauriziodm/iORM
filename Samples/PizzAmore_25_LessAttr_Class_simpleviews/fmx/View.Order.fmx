@@ -313,6 +313,7 @@ inherited ViewOrder: TViewOrder
       end>
     Preview = True
     TypeName = 'TOrder'
+    OnSelectionObject = BSMasterSelectionObject
     OnReceiveSelectionCloneObject = False
     OnReceiveSelectionFreeObject = False
   end

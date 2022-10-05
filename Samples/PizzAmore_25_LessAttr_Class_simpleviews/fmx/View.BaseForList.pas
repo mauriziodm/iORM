@@ -55,7 +55,12 @@ begin
   if Assigned(BSMaster.SelectorFor) then
   begin
     BSMaster.SelectCurrent;
-    acBack.Execute;
+    io.AnonymousTimer(100,
+      function: boolean
+      begin
+        acBack.Execute;
+      end
+    );
   end
   else
     BSMaster.ShowCurrent;
