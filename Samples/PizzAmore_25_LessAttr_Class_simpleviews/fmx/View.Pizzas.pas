@@ -1,4 +1,4 @@
-unit View.Customers;
+unit View.Pizzas;
 
 interface
 
@@ -7,13 +7,13 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls, View.BaseForList, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, Fmx.Bind.Navigator, System.Actions, FMX.ActnList, FMX.ListView,
-  FMX.Controls.Presentation, FMX.Objects, Model.Customer, Data.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt;
+  FMX.Controls.Presentation, FMX.Objects, Data.Bind.GenData, Fmx.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Model.Pizza, iORM.StdActions.Fmx;
 
 type
 
-  [diSimpleViewFor(TCustomer, 'LIST')]
-  TViewCustomers = class(TViewBaseForList)
+  [diSimpleViewFor(TPizza, 'LIST')]
+  TViewPizzas = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
   private
@@ -21,6 +21,9 @@ type
   public
     { Public declarations }
   end;
+
+var
+  ViewPizzas: TViewPizzas;
 
 implementation
 

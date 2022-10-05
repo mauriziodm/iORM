@@ -69,8 +69,11 @@ object ViewBaseForList: TViewBaseForList
         TextSettings.FontColor = claAliceblue
       end
       object ButtonSelect: TSpeedButton
+        Action = acShowOrSelect
         Align = Right
+        Enabled = True
         StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
         Position.X = 350.000000000000000000
         Size.Width = 50.000000000000000000
         Size.Height = 40.000000000000000000
@@ -106,11 +109,12 @@ object ViewBaseForList: TViewBaseForList
     object acShowOrSelect: TAction
       Text = '---'
       OnExecute = acShowOrSelectExecute
+      OnUpdate = acShowOrSelectUpdate
     end
-    object acDelete: TFMXBindNavigateDelete
-      Category = 'LiveBindings'
+    object acDelete: TioBSPersistenceDelete
+      Category = 'iORM-BSPersistence'
       Text = 'Delete'
-      DataSource = BSMaster
+      TargetBindSource = BSMaster
     end
   end
   object BSMaster: TioPrototypeBindSourceMaster

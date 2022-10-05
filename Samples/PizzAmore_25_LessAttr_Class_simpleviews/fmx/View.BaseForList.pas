@@ -24,11 +24,12 @@ type
     acAdd: TAction;
     acShowOrSelect: TAction;
     BSMaster: TioPrototypeBindSourceMaster;
-    acDelete: TFMXBindNavigateDelete;
+    acDelete: TioBSPersistenceDelete;
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
+    procedure acShowOrSelectUpdate(Sender: TObject);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -58,6 +59,14 @@ begin
   end
   else
     BSMaster.ShowCurrent;
+end;
+
+procedure TViewBaseForList.acShowOrSelectUpdate(Sender: TObject);
+begin
+  if Assigned(BSMaster.SelectorFor) then
+    acShowOrSelect.Caption := 'Select'
+  else
+    acShowOrSelect.Caption := 'Show';
 end;
 
 constructor TViewBaseForList.Create(AOwner: TComponent);

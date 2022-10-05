@@ -10,11 +10,12 @@ inherited ViewPizzas: TViewPizzas
     ItemEditAppearanceClassName = 'TImageListItemBottomDetailShowCheckAppearance'
     ItemIndex = 0
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioPrototypeBindSourceMaster
+    AutoActivate = True
     FieldDefs = <
       item
         Name = 'Name'
-        Generator = 'ColorsNames'
+        Generator = 'LoremIpsum'
         ReadOnly = False
       end
       item
@@ -26,18 +27,20 @@ inherited ViewPizzas: TViewPizzas
       item
         Name = 'Image'
         FieldType = ftBitmap
-        Generator = 'ContactBitmaps'
+        Generator = 'ContactBitmapsL'
         ReadOnly = False
       end>
+    Preview = True
+    TypeName = 'TPizza'
   end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 20
-    Top = 5
+    Left = 100
+    Top = 29
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Name'
       Control = ListView
       FillExpressions = <

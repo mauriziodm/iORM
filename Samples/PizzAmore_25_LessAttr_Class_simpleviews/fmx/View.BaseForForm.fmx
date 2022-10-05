@@ -89,7 +89,6 @@ object ViewBaseForForm: TViewBaseForForm
     end
   end
   object BSMaster: TioPrototypeBindSourceMaster
-    AutoPost = False
     FieldDefs = <>
     ScopeMappings = <>
     AsDefault = True

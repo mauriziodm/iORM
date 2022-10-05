@@ -5,41 +5,41 @@ Coordinates=224,141,70,33
 Coordinates=10,10,89,159
 
 [ButtonBack]
-Coordinates=10,179,72,51
+Coordinates=374,10,72,51
 
 [RectangleTitle]
-Coordinates=171,179,84,33
+Coordinates=310,195,84,33
 
 [acAdd]
 Coordinates=224,245,45,33
 
 [ButtonAdd]
-Coordinates=288,10,67,51
+Coordinates=113,195,67,51
 
 [Rectangle1]
-Coordinates=92,179,69,33
+Coordinates=420,195,69,33
 
 [VMBridge]
 Coordinates=76,267,62,33
 
 [LabelTitle]
-Coordinates=365,10,62,51
+Coordinates=286,10,62,51
 
 [acDelete]
 Coordinates=17,267,56,33
 
 [ButtonSelect]
-Coordinates=437,10,77,51
+Coordinates=10,195,77,51
 
 [MBSMaster]
-Coordinates=109,10,81,105
+Coordinates=180,20,81,105
 Visible=True
 
 [acShowOrSelect]
 Coordinates=346,1,95,33
 
 [ButtonDelete]
-Coordinates=200,10,78,51
+Coordinates=206,195,78,51
 
 [acBack]
 Coordinates=346,53,50,33

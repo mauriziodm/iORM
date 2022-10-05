@@ -1,8 +1,14 @@
-inherited ViewCustomers: TViewCustomers
+inherited ViewOrders: TViewOrders
+  inherited Rectangle1: TRectangle
+    inherited ButtonAdd: TSpeedButton [0]
+    end
+    inherited ButtonDelete: TSpeedButton [1]
+    end
+  end
   inherited RectangleTitle: TRectangle
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
-      Text = 'Customers'
+      Text = 'Orders'
     end
   end
   inherited ListView: TListView
@@ -18,22 +24,18 @@ inherited ViewCustomers: TViewCustomers
         ReadOnly = False
       end
       item
-        Name = 'Name'
+        Name = 'Customer.Name'
         Generator = 'ContactNames'
         ReadOnly = False
       end
       item
-        Name = 'PhoneNumber'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = '%Paging.CurrentPageOf'
-        Generator = 'Integers'
+        Name = 'GrandTotal'
+        FieldType = ftCurrency
+        Generator = 'Currency'
         ReadOnly = False
       end>
     Preview = True
-    TypeName = 'TCustomer'
+    TypeName = 'TOrder'
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -43,12 +45,14 @@ inherited ViewCustomers: TViewCustomers
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = BSMaster
-      FieldName = 'Name'
+      FieldName = 'Customer.Name'
       Control = ListView
+      CustomFormat = '%s + '#39'  (order ID: '#39' +Owner.ID.Value + '#39')'#39
       FillExpressions = <
         item
-          SourceMemberName = 'PhoneNumber'
+          SourceMemberName = 'GrandTotal'
           ControlMemberName = 'Detail'
+          CustomFormat = 'Format('#39'%%m'#39', Value)'
         end>
       FillHeaderExpressions = <>
       FillBreakGroups = <>
