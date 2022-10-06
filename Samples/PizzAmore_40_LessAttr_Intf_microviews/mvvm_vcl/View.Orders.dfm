@@ -61,7 +61,6 @@ inherited ViewOrders: TViewOrders
         Visible = True
       end
       item
-        Alignment = taRightJustify
         Expanded = False
         FieldName = 'GrandTotal'
         Title.Caption = 'Grand total'
@@ -105,6 +104,9 @@ inherited ViewOrders: TViewOrders
     object MDSMasterCustomerName: TStringField
       FieldName = 'Customer.Name'
       Size = 250
+    end
+    object MDSMasterGrandTotal: TCurrencyField
+      FieldName = 'GrandTotal'
     end
   end
 end

@@ -221,6 +221,25 @@ inherited ViewOrder: TViewOrder
           Visible = True
         end>
     end
+    object ScrollBoxOrderRows: TScrollBox
+      Left = 205
+      Top = 274
+      Width = 288
+      Height = 280
+      VertScrollBar.Smooth = True
+      VertScrollBar.Tracking = True
+      BevelInner = bvNone
+      BevelOuter = bvNone
+      BorderStyle = bsNone
+      TabOrder = 6
+      object ScrollBox2: TScrollBox
+        Left = 0
+        Top = 8
+        Width = 17
+        Height = 1
+        TabOrder = 0
+      end
+    end
   end
   object PanelPizzas: TPanel [1]
     Left = 449
@@ -248,17 +267,7 @@ inherited ViewOrder: TViewOrder
       CrossView_MasterPropertyName = 'Customer'
     end
   end
-  object PanelRows: TPanel [3]
-    Left = 255
-    Top = 188
-    Width = 449
-    Height = 357
-    BevelOuter = bvNone
-    Color = clYellow
-    ParentBackground = False
-    TabOrder = 3
-  end
-  inherited ActionList1: TActionList [4]
+  inherited ActionList1: TActionList [3]
     Left = 171
     Top = 315
     object acDeleteRow: TioViewAction
@@ -269,7 +278,7 @@ inherited ViewOrder: TViewOrder
       VMActionName = 'acDeleteRow'
     end
   end
-  inherited MDSMaster: TioModelDataSet [5]
+  inherited MDSMaster: TioModelDataSet [4]
     Left = 171
     Top = 426
     object MDSMasterID: TIntegerField
@@ -286,7 +295,7 @@ inherited ViewOrder: TViewOrder
       FieldName = 'GrandTotal'
     end
   end
-  inherited VMBridge: TioViewModelBridge [6]
+  inherited VMBridge: TioViewModelBridge [5]
     Left = 170
     Top = 370
   end

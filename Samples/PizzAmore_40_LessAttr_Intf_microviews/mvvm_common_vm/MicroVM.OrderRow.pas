@@ -11,13 +11,13 @@ uses
   iORM.Where.Interfaces,
   iORM.MVVM.Interfaces,
   iORM.MVVM.ViewModel,
-  Model.OrderRow, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Detail;
+  Model.OrderRow, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelPresenter.Master;
 
 type
 
   [diViewModelFor(TOrderRow)]
   TMicroVMOrderRows = class(TioViewModel)
-    MPOrderRow: TioModelPresenterDetail;
+    MPOrderRow: TioModelPresenterMaster;
   private
     { Private declarations }
   public

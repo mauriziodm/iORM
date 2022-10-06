@@ -35,8 +35,9 @@ type
     acDeleteRow: TioViewAction;
     VCProviderOrderPizzaSel: TioViewContextProvider;
     MicroViewCustomer1: TMicroViewCustomer;
-    PanelRows: TPanel;
     VCProviderOrderRows: TioViewContextProvider;
+    ScrollBoxOrderRows: TScrollBox;
+    ScrollBox2: TScrollBox;
     procedure VCProviderOrderPizzaSelRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderPizzaSelAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure FrameResize(Sender: TObject);
@@ -74,12 +75,13 @@ procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; cons
 begin
   inherited;
   (AView as TControl).Align := alTop;
+  (AView as TControl).Name := '';
 end;
 
 procedure TViewOrder.VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
 begin
   inherited;
-  ResultViewContext := PanelRows;
+  ResultViewContext := ScrollBoxOrderRows;
 end;
 
 end.
