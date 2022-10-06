@@ -10,15 +10,12 @@ uses
 type
 
   TVMOrder = class(TVMBaseForForm)
-    MPCustomer: TioModelPresenterDetail;
     MPRows: TioModelPresenterDetail;
     acDeleteRow: TioVMAction;
     acShowPizzaSelector: TioVMAction;
-    acShowCustomerSelector: TioVMAction;
     procedure acDeleteRowExecute(Sender: TObject);
     procedure acShowPizzaSelectorExecute(Sender: TObject);
     procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure acShowCustomerSelectorExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -26,6 +23,8 @@ type
   end;
 
 implementation
+
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
   Model.Interfaces;
@@ -36,12 +35,6 @@ procedure TVMOrder.acDeleteRowExecute(Sender: TObject);
 begin
   inherited;
   MPRows.Delete;
-end;
-
-procedure TVMOrder.acShowCustomerSelectorExecute(Sender: TObject);
-begin
-  inherited;
-  io.ShowAsSelector<ICustomer>(MPCustomer);
 end;
 
 procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);

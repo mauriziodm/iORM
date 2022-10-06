@@ -13,6 +13,7 @@ type
   TVMCustomers = class(TVMBaseForList)
     acNextPage: TioVMActionBSNextPage;
     acPrevPage: TioVMActionBSPrevPage;
+    procedure acShowOrSelectExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -27,5 +28,12 @@ uses
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
+
+procedure TVMCustomers.acShowOrSelectExecute(Sender: TObject);
+begin
+  inherited;
+  if Assigned(MPMaster.SelectorFor) then
+    acBack.Execute;
+end;
 
 end.

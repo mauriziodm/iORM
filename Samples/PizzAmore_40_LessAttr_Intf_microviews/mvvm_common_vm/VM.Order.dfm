@@ -3,17 +3,11 @@ inherited VMOrder: TVMOrder
     TypeName = 'IOrder'
     OnSelectionObject = MPMasterSelectionObject
   end
-  object MPCustomer: TioModelPresenterDetail
-    MasterBindSource = MPMaster
-    MasterPropertyName = 'Customer'
-    Left = 56
-    Top = 104
-  end
   object MPRows: TioModelPresenterDetail
     MasterBindSource = MPMaster
     MasterPropertyName = 'Rows'
     Left = 56
-    Top = 168
+    Top = 112
   end
   object acDeleteRow: TioVMAction
     Name = 'acDeleteRow'
@@ -26,11 +20,5 @@ inherited VMOrder: TVMOrder
     OnExecute = acShowPizzaSelectorExecute
     Left = 328
     Top = 176
-  end
-  object acShowCustomerSelector: TioVMAction
-    Name = 'acShowCustomerSelector'
-    OnExecute = acShowCustomerSelectorExecute
-    Left = 328
-    Top = 112
   end
 end

@@ -180,6 +180,13 @@ begin
   // ===========================================================================
 
   inherited;
+
+  // Se è stata impostata la proprietà "CrossView_MasterBindSource" allora significa che siamo
+  //  in una MicroEmbededView e l'accoppiamento con il MasterBS deve avvenire sulla vista e non
+  //  tra VM. La riga qui sotto registra il BS attuale come slave del MasterBS presente sulla
+  //  MasterView+MasterVM in modo che anchesso venga aperto.
+  if Assigned(FCrossView_MasterBindSource) and not(csDesigning in ComponentState) then
+    FCrossView_MasterBindSource.GetModelPresenterInstance.RegisterViewBindSource(Self);
 end;
 
 procedure TioModelDataSet.Notification(AComponent: TComponent; Operation: TOperation);
