@@ -31,7 +31,9 @@ uses
   RegisterClasses in 'RegisterClasses.pas',
   VM.Order.PizzaSel in '..\mvvm_common_vm\VM.Order.PizzaSel.pas' {VMOrderPizzaSel: TioViewModel},
   MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame},
-  MicroVM.Customer in 'MicroVM.Customer.pas' {tiovmac: TioViewModel};
+  MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel},
+  MicroVM.OrderRow in '..\mvvm_common_vm\MicroVM.OrderRow.pas' {MicroVMOrderRows: TioViewModel},
+  MicroView.OrderRow in 'MicroView.OrderRow.pas' {MicroViewOrderRow: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

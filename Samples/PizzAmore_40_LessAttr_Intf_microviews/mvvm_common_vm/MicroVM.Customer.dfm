@@ -1,6 +1,6 @@
-object tiovmac: Ttiovmac
-  Height = 410
-  Width = 542
+object MicroVMCustomer: TMicroVMCustomer
+  Height = 283
+  Width = 355
   object MPCustomer: TioModelPresenterDetail
     TypeOfCollection = tcSingleObject
     Left = 72

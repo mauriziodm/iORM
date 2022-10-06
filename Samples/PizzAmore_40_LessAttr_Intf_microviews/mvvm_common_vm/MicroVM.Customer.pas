@@ -15,7 +15,7 @@ uses
 type
 
   [diViewModelImplements(IioViewModel, 'MicroVMCustomer')]
-  Ttiovmac = class(TioViewModel)
+  TMicroVMCustomer = class(TioViewModel)
     MPCustomer: TioModelPresenterDetail;
     acSelectCustomer: TioVMAction;
     acShowCustomer: TioVMAction;
@@ -36,12 +36,12 @@ uses
 
 {$R *.dfm}
 
-procedure Ttiovmac.acSelectCustomerExecute(Sender: TObject);
+procedure TMicroVMCustomer.acSelectCustomerExecute(Sender: TObject);
 begin
   io.ShowAsSelector<ICustomer>(MPCustomer);
 end;
 
-procedure Ttiovmac.acShowCustomerExecute(Sender: TObject);
+procedure TMicroVMCustomer.acShowCustomerExecute(Sender: TObject);
 begin
   MPCustomer.ShowCurrent;
 end;

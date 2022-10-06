@@ -195,10 +195,20 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="MicroVM.Customer.pas">
-            <Form>tiovmac</Form>
+        <DCCReference Include="..\mvvm_common_vm\MicroVM.Customer.pas">
+            <Form>MicroVMCustomer</Form>
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\MicroVM.OrderRow.pas">
+            <Form>MicroVMOrderRows</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="MicroView.OrderRow.pas">
+            <Form>MicroViewOrderRow</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

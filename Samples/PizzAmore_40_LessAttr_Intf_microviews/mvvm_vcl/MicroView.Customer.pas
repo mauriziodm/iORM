@@ -8,6 +8,7 @@ uses
   iORM.MVVM.Interfaces, Data.DB, iORM.MVVM.ViewModelBridge, iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl;
 
 type
+
   TMicroViewCustomer = class(TFrame)
     Label3: TLabel;
     Label4: TLabel;

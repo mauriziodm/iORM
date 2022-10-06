@@ -248,7 +248,18 @@ inherited ViewOrder: TViewOrder
       CrossView_MasterPropertyName = 'Customer'
     end
   end
-  inherited ActionList1: TActionList [3]
+  object PanelRows: TPanel [3]
+    Left = 255
+    Top = 188
+    Width = 449
+    Height = 357
+    BevelOuter = bvNone
+    Color = clYellow
+    ParentBackground = False
+    TabOrder = 3
+  end
+  inherited ActionList1: TActionList [4]
+    Left = 171
     Top = 315
     object acDeleteRow: TioViewAction
       Category = 'iORM-MVVM'
@@ -258,7 +269,8 @@ inherited ViewOrder: TViewOrder
       VMActionName = 'acDeleteRow'
     end
   end
-  inherited MDSMaster: TioModelDataSet [4]
+  inherited MDSMaster: TioModelDataSet [5]
+    Left = 171
     Top = 426
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
@@ -274,7 +286,8 @@ inherited ViewOrder: TViewOrder
       FieldName = 'GrandTotal'
     end
   end
-  inherited VMBridge: TioViewModelBridge [5]
+  inherited VMBridge: TioViewModelBridge [6]
+    Left = 170
     Top = 370
   end
   inherited SourceMaster: TDataSource
@@ -284,7 +297,7 @@ inherited ViewOrder: TViewOrder
   object MDSRows: TioModelDataSet
     ViewModelBridge = VMBridge
     ModelPresenter = 'MPRows'
-    Left = 204
+    Left = 172
     Top = 482
     object MDSRowsDescription: TStringField
       FieldName = 'Description'
@@ -305,11 +318,18 @@ inherited ViewOrder: TViewOrder
     Left = 294
     Top = 482
   end
-  object VCProviderOrder: TioViewContextProvider
-    OnAfterRequest = VCProviderOrderAfterRequest
-    OnRequest = VCProviderOrderRequest
+  object VCProviderOrderPizzaSel: TioViewContextProvider
+    OnAfterRequest = VCProviderOrderPizzaSelAfterRequest
+    OnRequest = VCProviderOrderPizzaSelRequest
     RegisterAsDefault = False
     Left = 293
     Top = 314
+  end
+  object VCProviderOrderRows: TioViewContextProvider
+    OnAfterRequest = VCProviderOrderRowsAfterRequest
+    OnRequest = VCProviderOrderRowsRequest
+    RegisterAsDefault = False
+    Left = 293
+    Top = 370
   end
 end

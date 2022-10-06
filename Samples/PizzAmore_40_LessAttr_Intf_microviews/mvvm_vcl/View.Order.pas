@@ -33,11 +33,15 @@ type
     MDSRowsRowTotal: TCurrencyField;
     SourceRows: TDataSource;
     acDeleteRow: TioViewAction;
-    VCProviderOrder: TioViewContextProvider;
+    VCProviderOrderPizzaSel: TioViewContextProvider;
     MicroViewCustomer1: TMicroViewCustomer;
-    procedure VCProviderOrderRequest(const Sender: TObject; out ResultViewContext: TComponent);
-    procedure VCProviderOrderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+    PanelRows: TPanel;
+    VCProviderOrderRows: TioViewContextProvider;
+    procedure VCProviderOrderPizzaSelRequest(const Sender: TObject; out ResultViewContext: TComponent);
+    procedure VCProviderOrderPizzaSelAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure FrameResize(Sender: TObject);
+    procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
+    procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -54,16 +58,28 @@ begin
   GridRows.Height := Height - 280;
 end;
 
-procedure TViewOrder.VCProviderOrderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+procedure TViewOrder.VCProviderOrderPizzaSelAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
   inherited;
   (AView as TFrame).Align := alClient;
 end;
 
-procedure TViewOrder.VCProviderOrderRequest(const Sender: TObject; out ResultViewContext: TComponent);
+procedure TViewOrder.VCProviderOrderPizzaSelRequest(const Sender: TObject; out ResultViewContext: TComponent);
 begin
   inherited;
   ResultViewContext := PanelPizzas;
+end;
+
+procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+begin
+  inherited;
+  (AView as TControl).Align := alTop;
+end;
+
+procedure TViewOrder.VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
+begin
+  inherited;
+  ResultViewContext := PanelRows;
 end;
 
 end.
