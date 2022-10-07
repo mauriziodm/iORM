@@ -5,6 +5,16 @@ inherited ViewOrders: TViewOrders
       ExplicitWidth = 50
     end
   end
+  inherited PanelBottom: TPanel
+    object Button1: TButton
+      Left = 352
+      Top = 6
+      Width = 75
+      Height = 25
+      Action = acPersist
+      TabOrder = 0
+    end
+  end
   object GridOrders: TDBGrid [2]
     Left = 0
     Top = 40
@@ -89,6 +99,15 @@ inherited ViewOrders: TViewOrders
         Width = 300
         Visible = True
       end>
+  end
+  inherited ActionList1: TActionList
+    object acPersist: TioViewAction
+      Category = 'iORM-MVVM'
+      Caption = 'acPersist'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acPersist'
+    end
   end
   inherited MDSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField

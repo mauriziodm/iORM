@@ -20,6 +20,7 @@ type
     acShowOrSelect: TioVMAction;
     acAdd: TioVMAction;
     acDelete: TioVMActionBSPersistenceDelete;
+    acPersist: TioVMActionBSPersistencePersist;
     procedure acBackExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure acShowOrSelectUpdate(Sender: TObject);

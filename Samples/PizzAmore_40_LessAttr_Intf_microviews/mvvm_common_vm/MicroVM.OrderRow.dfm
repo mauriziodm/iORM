@@ -1,13 +1,9 @@
 object MicroVMOrderRows: TMicroVMOrderRows
   Height = 304
   Width = 414
-  object MPOrderRow: TioModelPresenterMaster
-    AsDefault = True
-    TypeName = 'IOrderRow'
-    LoadType = ltFromBSAsIs
+  object MPOrderRow: TioModelPresenterDetail
     TypeOfCollection = tcSingleObject
-    Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 48
-    Top = 24
+    Left = 56
+    Top = 32
   end
 end

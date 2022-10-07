@@ -34,4 +34,9 @@ object VMBaseForList: TVMBaseForList
     Left = 192
     Top = 240
   end
+  object acPersist: TioVMActionBSPersistencePersist
+    TargetBindSource = MPMaster
+    Left = 280
+    Top = 192
+  end
 end

@@ -222,10 +222,10 @@ inherited ViewOrder: TViewOrder
         end>
     end
     object ScrollBoxOrderRows: TScrollBox
-      Left = 205
-      Top = 274
+      Left = 140
+      Top = 290
       Width = 288
-      Height = 280
+      Height = 151
       VertScrollBar.Smooth = True
       VertScrollBar.Tracking = True
       BevelInner = bvNone
