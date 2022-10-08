@@ -221,7 +221,13 @@ class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; co
   end;
 begin
   if AViewOrViewModel is TioViewModel then
-    Result := TioViewModel(AViewOrViewModel).DefaultPresenter
+  begin
+    // If the AName param is empty then return de default presenter
+    if AName.IsEmpty then
+      Result := TioViewModel(AViewOrViewModel).DefaultPresenter
+    else
+      Result := TioViewModel(AViewOrViewModel).Presenter[AName];
+  end
   else
     Result := _GetSimpleViewBindSource;
 end;

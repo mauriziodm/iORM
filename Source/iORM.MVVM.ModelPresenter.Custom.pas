@@ -987,7 +987,20 @@ end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
+  // If the BindSource is not active it checks if the new DataObject is assigned,
+  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+  //  because it does not need to do anything (the BindSource is already closed and if the new
+  //  DataObject is being set to nil...)
+  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  if not IsActive then
+    if Assigned(ADataObject) then
+      Open
+    else
+      Exit;
+  // Some checks
   TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
+  // If the new Dataobject is nil then clear it into the BSA and close the BindSource
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -1001,7 +1014,20 @@ end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
+  // If the BindSource is not active it checks if the new DataObject is assigned,
+  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+  //  because it does not need to do anything (the BindSource is already closed and if the new
+  //  DataObject is being set to nil...)
+  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  if not IsActive then
+    if Assigned(ADataObject) then
+      Open
+    else
+      Exit;
+  // Some checks
   TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
+  // If the new Dataobject is nil then clear it into the BSA and close the BindSource
   if not Assigned(ADataObject) then
     ClearDataObject;
   // if the adapter is not already assigned then create it
@@ -1194,9 +1220,9 @@ begin
   // If it is a detail bind source then get the detail BSA from the master bind source,
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
-  if IsDetailBS then
+  if IsDetailBS and not MasterPropertyName.IsEmpty then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName))
-  else if IsFromBSLoadType then
+  else if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin

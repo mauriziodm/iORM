@@ -83,10 +83,7 @@ begin
   // At DesignTime initialize the "AsDefault" property at True if it is the
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
-  // -----
-  // At DesignTime initialize the "AsDefault" property at True if it is the
-  // first ModelPresenter inserted (no other presenters presents).
-  // NB: At Runtime set False as initial value (load real value from dfm file)
+  // NB: Is detail bind source initialize to false
   if (csDesigning in ABindSource.ComponentState) then
   begin
     AAsDefaultValue := True;

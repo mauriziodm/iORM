@@ -221,7 +221,7 @@ begin
           begin
             LTargetBindSource.SetMasterBindSource(LParamBindSource);
             LTargetBindSource.SetMasterPropertyName(LPresenterSettings[I].StringParameter);
-            if LTargetBindSource.IsFromBSLoadType then
+            if LParamBindSource.IsActive then
               LTargetBindSource.Open;
           end
           else

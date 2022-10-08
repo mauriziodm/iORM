@@ -1108,10 +1108,10 @@ begin
   // If it is a detail bind source then get the detail BSA from the master bind source,
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
-  if IsDetailBS then
+  if IsDetailBS and not MasterPropertyName.IsEmpty then
     LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName)
   else
-  if IsFromBSLoadType then
+  if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
     LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
   else
     LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),
