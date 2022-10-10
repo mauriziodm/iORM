@@ -3,107 +3,112 @@ unit Model.OrderRow;
 interface
 
 uses
-  iORM, Model.Interfaces;
+  iORM, Model.Interfaces, Model.BaseBO;
 
 type
 
   [ioEntity('ORDERROWS')]
-  TOrderRow = class(TInterfacedObject, IOrderRow)
+  TBaseOrderRow = class(TBaseBO, IOrderRow)
   private
-    FID: Integer;
-    FPizzaID: Integer;
-    FDescription: String;
-    FPrice: Currency;
+    FOrderID: Integer;
     FQty: Integer;
-    // ID property
-    function GetID: Integer;
-    // PizzaID property
-    function GetPizzaID: Integer;
-    // Description property
-    procedure SetDescription(const AValue: String);
-    function GetDescription: String;
-    // Price property
-    procedure SetPrice(const AValue: Currency);
-    function GetPrice: Currency;
-    // Qty property
+    FObjStatus: TioObjStatus;
     procedure SetQty(const AValue: Integer);
     function GetQty: Integer;
-    // RowTotal property
-    function GetRowTotal: Currency;
+  protected
+    function GetRowTotal: Currency; virtual; abstract;
   public
-    constructor Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer); overload;
-    constructor Create(APizza: IPizza); overload;
-    property ID: Integer read GetID;  // ReadOnly
-    property PizzaID: Integer read GetPizzaID;  // ReadOnly
-    property Description: String read GetDescription write SetDescription;
-    property Price: Currency read GetPrice write SetPrice;
-    property Qty: Integer read GetQty write SetQty;
-    property RowTotal: Currency read GetRowTotal;  // ReadOnly
+    constructor Create;
+    property Qty: Integer read getQty write SetQty;
+    property RowTotal: Currency read GetRowTotal;
+  end;
+
+  [ioEntity('ORDERROWS'), diImplements(IOrderRow, 'PizzaOrderRow')]
+  TPizzaOrderRow = class(TBaseOrderRow, IPizzaOrderRow)
+  private
+    FPizza: IPizza;
+  protected
+    function GetPizza: IPizza;
+    function GetRowTotal: Currency; override;
+  public
+    constructor Create(const APizza: IPizza; const AQty: Integer = 1); overload;
+    procedure AddOne;
+    property Pizza: IPizza read GetPizza;
+  end;
+
+  [ioEntity('ORDERROWS'), diImplements(IOrderRow, 'CustomOrderRow')]
+  TCustomOrderRow = class(TBaseOrderRow)
+  private
+    FDescription: String;
+    FPrice: Currency;
+  protected
+    function GetRowTotal: Currency; override;
+  public
+    constructor Create(const ADescription: String; const APrice: Currency; const AQty: Integer = 1); overload;
+    property Description: String read FDescription write FDescription;
+    property Price: Currency read FPrice write FPrice;
   end;
 
 implementation
 
-{ TOrderRow }
+{ TBaseOrderRow }
 
-constructor TOrderRow.Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer);
+constructor TBaseOrderRow.Create;
 begin
- FPizzaID := APizzaID;
- FDescription := ADescription;
- FPrice := AUnitPrice;
- FQty := AQty;
+  FQty := 1;
 end;
 
-constructor TOrderRow.Create(APizza: IPizza);
-begin
- FPizzaID := APizza.ID;
- FDescription := APizza.Name;
- FPrice := APizza.Price;
- FQty := 1;
-end;
-
-function TOrderRow.GetDescription: String;
-begin
-  Result := FDescription;
-end;
-
-function TOrderRow.GetID: Integer;
-begin
-  Result := FID;
-end;
-
-function TOrderRow.GetPizzaID: Integer;
-begin
-  Result := FPizzaID;
-end;
-
-function TOrderRow.GetPrice: Currency;
-begin
-  Result := FPrice;
-end;
-
-function TOrderRow.GetQty: Integer;
+function TBaseOrderRow.GetQty: Integer;
 begin
   Result := FQty;
 end;
 
-function TOrderRow.GetRowTotal: Currency;
+procedure TBaseOrderRow.SetQty(const AValue: Integer);
+begin
+  if AValue <> FQty then
+  begin
+    FQty := AValue;
+    FObjStatus := osDirty;
+  end;
+end;
+
+{ TPizzaOrderRow }
+
+procedure TPizzaOrderRow.AddOne;
+begin
+  Qty := Qty + 1;
+end;
+
+constructor TPizzaOrderRow.Create(const APizza: IPizza; const AQty: Integer = 1);
+begin
+  inherited Create;
+  FPizza := APizza;
+  FQty := AQty;
+end;
+
+function TPizzaOrderRow.GetPizza: IPizza;
+begin
+  Result := FPizza;
+end;
+
+function TPizzaOrderRow.GetRowTotal: Currency;
+begin
+  Result := FPizza.Price * FQty;
+end;
+
+{ TCustomOrderRow }
+
+constructor TCustomOrderRow.Create(const ADescription: String; const APrice: Currency; const AQty: Integer = 1);
+begin
+  inherited Create;
+  FDescription := ADescription;
+  FPrice := APrice;
+  FQty := AQty;
+end;
+
+function TCustomOrderRow.GetRowTotal: Currency;
 begin
   Result := FPrice * FQty;
-end;
-
-procedure TOrderRow.SetDescription(const AValue: String);
-begin
-  FDescription := AValue;
-end;
-
-procedure TOrderRow.SetPrice(const AValue: Currency);
-begin
-  FPrice := AValue;
-end;
-
-procedure TOrderRow.SetQty(const AValue: Integer);
-begin
-  FQty := AValue;
 end;
 
 end.

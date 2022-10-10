@@ -9,7 +9,7 @@ uses
 
 type
 
-  [diViewModelFor(ICustomer)]
+  [diViewModelFor(IGenericCustomer)]
   TVMCustomers = class(TVMBaseForList)
     acNextPage: TioVMActionBSNextPage;
     acPrevPage: TioVMActionBSPrevPage;
@@ -23,7 +23,7 @@ type
 implementation
 
 uses
-  Model.Customer;
+  Model.Customers;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 

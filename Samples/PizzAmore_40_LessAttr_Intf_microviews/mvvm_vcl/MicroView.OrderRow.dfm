@@ -26,8 +26,8 @@ object MicroViewOrderRow: TMicroViewOrderRow
     end
   end
   object OrderRowMicroVMBridge: TioViewModelBridge
-    Left = 272
-    Top = 24
+    Left = 152
+    Top = 80
   end
   object SourceOrderRow: TDataSource
     DataSet = MDSorderRow

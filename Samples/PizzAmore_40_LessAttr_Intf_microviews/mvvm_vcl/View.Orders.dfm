@@ -1,8 +1,10 @@
 inherited ViewOrders: TViewOrders
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
+      Width = 700
+      Height = 40
       Caption = 'Orders'
-      ExplicitWidth = 50
+      ExplicitWidth = 700
     end
   end
   inherited PanelBottom: TPanel

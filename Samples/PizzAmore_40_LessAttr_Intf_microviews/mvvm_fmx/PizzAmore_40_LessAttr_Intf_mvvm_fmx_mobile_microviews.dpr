@@ -9,7 +9,7 @@ uses
   Model.OrderRow in '..\common_model\Model.OrderRow.pas',
   Model.Order in '..\common_model\Model.Order.pas',
   Model.Interfaces in '..\common_model\Model.Interfaces.pas',
-  Model.Customer in '..\common_model\Model.Customer.pas',
+  Model.Customers in '..\common_model\Model.Customers.pas',
   VM.Start in '..\mvvm_common_vm\VM.Start.pas' {VMStart: TioViewModel},
   VM.Pizzas in '..\mvvm_common_vm\VM.Pizzas.pas' {VMPizzas: TioViewModel},
   VM.Pizza in '..\mvvm_common_vm\VM.Pizza.pas' {VMPizza: TioViewModel},

@@ -47,7 +47,7 @@ end;
 
 procedure TVMStart.acShowCustomersExecute(Sender: TObject);
 begin
-  io.Show<ICustomer>;
+  io.Show<IGenericCustomer>;
 end;
 
 procedure TVMStart.acShowOrdersExecute(Sender: TObject);

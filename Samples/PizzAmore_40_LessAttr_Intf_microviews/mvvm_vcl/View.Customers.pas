@@ -10,7 +10,7 @@ uses
 
 type
 
-  [diViewFor(ICustomer)]
+  [diViewFor(IGenericCustomer)]
   TViewCustomers = class(TViewBaseForList)
     GridCustomers: TDBGrid;
     MDSMasterID: TIntegerField;

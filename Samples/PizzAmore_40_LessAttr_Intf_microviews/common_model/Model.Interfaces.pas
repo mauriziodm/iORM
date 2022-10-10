@@ -14,61 +14,28 @@ uses
 
 type
 
-  IContact = interface
-    ['{FBDA76DE-F8B7-40C4-8508-C65F716F33AC}']
-    // ID property
+  IBaseBO = interface
+    ['{BCA1B62F-1AE4-4C6A-AEE4-C0FFE2A8198A}']
+    // ID property (Read Only)
     function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
-    // Name property
-    procedure SetName(const AValue: String);
-    function GetName: String;
-    property Name: String read GetName write SetName;
-    // City property
-    procedure SetCity(const AValue: String);
-    function GetCity: String;
-    property City: String read GetCity write SetCity;
-    // Address property
-    procedure SetAddress(const AValue: String);
-    function GetAddress: String;
-    property Address: String read GetAddress write SetAddress;
-    // FullAddress property
+    property ID: Integer read GetID;
+  end;
+
+  IGenericCustomer = interface(IBaseBO)
+    ['{7CF86B95-2E8C-4525-A2EA-752F777C3977}']
+    // Name property (Read Only)
+    function GetFullName: String;
+    property FullName: String read GetFullName;
+    // FullAddress property (Read Only)
     function GetFullAddress: String;
-    property FullAddress: String read GetFullAddress;  // ReadOnly
-    // PhoneNumber property
-    procedure SetPhoneNumber(const AValue: String);
+    property FullAddress: String read GetFullAddress;
+    // PhoneNumber property (Read Only)
     function GetPhoneNumber: String;
-    property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
+    property PhoneNumber: String read GetPhoneNumber;
   end;
 
-  ICustomer = interface(IContact)
-    ['{28219347-5122-48BC-B735-3063FCFAE2B8}']
-    // FidelityCardCode property
-    procedure SetFidelityCardCode(const AValue: String);
-    function GetFidelityCardCode: String;
-    property FidelityCardCode: String read GetFidelityCardCode write SetFidelityCardCode;
-  end;
-
-  IVipCustomer = interface(ICustomer)
-    ['{83B3F0BD-1919-4AFF-8D8E-B388FD33A18F}']
-    // VipCardCode property
-    procedure SetVipCardCode(const AValue: String);
-    function GetVipCardCode: String;
-    property VipCardCode: String read GetVipCardCode write SetVipCardCode;
-  end;
-
-  IEmployee = interface(IContact)
-    ['{83B3F0BD-1919-4AFF-8D8E-B388FD33A18F}']
-    // PhoneNumber property
-    procedure SetBranchOffice(const AValue: String);
-    function GetBranchOffice: String;
-    property BranchOffice: String read GetBranchOffice write SetBranchOffice;
-  end;
-
-  IPizza = interface
+  IPizza = interface(IBaseBO)
     ['{3D0E488C-A965-4CFF-B50B-71F38240710C}']
-    // ID property
-    function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
     // Name property
     procedure SetName(const AValue: String);
     function GetName: String;
@@ -77,58 +44,49 @@ type
     procedure SetPrice(const AValue: Currency);
     function GetPrice: Currency;
     property Price: Currency read GetPrice write SetPrice;
-    // Image property
+    // Image property (Read Only)
     function GetImage: TBitmap;
-    property Image: TBitmap read GetImage; // ReadOnly
+    property Image: TBitmap read GetImage;
   end;
 
-  IOrderRow = interface
+  IOrderRow = interface(IBaseBO)
     ['{5DC17439-9594-4CE9-A64A-585C32BA5903}']
-    // ID property
-    function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
-    // PizzaID property
-    function GetPizzaID: Integer;
-    property PizzaID: Integer read GetPizzaID;  // ReadOnly
-    // Description property
-    procedure SetDescription(const AValue: String);
-    function GetDescription: String;
-    property Description: String read GetDescription write SetDescription;
-    // Price property
-    procedure SetPrice(const AValue: Currency);
-    function GetPrice: Currency;
-    property Price: Currency read GetPrice write SetPrice;
-    // Qty property
+    // Qty
     procedure SetQty(const AValue: Integer);
     function GetQty: Integer;
-    property Qty: Integer read GetQty write SetQty;
-    // RowTotal property
+    property Qty: Integer read getQty write SetQty;
+    // RowTotal property (Read Only)
     function GetRowTotal: Currency;
-    property RowTotal: Currency read GetRowTotal;  // ReadOnly
+    property RowTotal: Currency read GetRowTotal;
   end;
 
-  IOrder = interface
+  IPizzaOrderRow = interface(IOrderRow)
+    ['{7ED56F3E-C41A-4FF8-9008-C4B4F2235C4E}']
+    procedure AddOne;
+    // Pizza
+    function GetPizza: IPizza;
+    property Pizza: IPizza read GetPizza;
+  end;
+
+  IOrder = interface(IBaseBO)
     ['{53E0D8FC-BCDC-43BB-814E-256F44C75305}']
-    procedure AddPizza(const APizza: IPizza);
-    // ID property
-    function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
+    function AddPizza(const APizza: IPizza): IOrderRow;
     // OrderDate property
     procedure SetOrderDate(const AValue: TDate);
     function GetOrderDate: TDate;
     property OrderDate: TDate read GetOrderDate Write SetOrderDate;
     // Customer property
-    procedure SetCustomer(const AValue: ICustomer);
-    function GetCustomer: ICustomer;
-    property Customer: ICustomer read GetCustomer write SetCustomer;
+    procedure SetCustomer(const AValue: IGenericCustomer);
+    function GetCustomer: IGenericCustomer;
+    property Customer: IGenericCustomer read GetCustomer write SetCustomer;
     // Rows property
     function GetRows: TList<IOrderRow>;
-    property Rows: TList<IOrderRow> read GetRows; // ReadOnly
+    property Rows: TList<IOrderRow> read GetRows;
     // Note property
     procedure SetNote(const AValue: String);
     function GetNote: String;
     property Note: String read GetNote write SetNote;
-    // GrandTotal property
+    // GrandTotal property (Read Only)
     function GetGrandTotal: Currency;
     property GrandTotal: Currency read GetGrandTotal; // ReadOnly
   end;

@@ -17,7 +17,8 @@ type
 implementation
 
 uses
-  iORM, Model.Interfaces, System.SysUtils;
+  iORM, System.SysUtils, Model.Interfaces, Model.Customers, Model.Order,
+  Model.OrderRow, Model.Pizza;
 
 { TSampleData }
 
@@ -29,7 +30,7 @@ begin
     try
       CreatePizzas;
       CreateRealCustomers;
-//      CreateOtherCustomers;
+      // CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except
@@ -44,124 +45,77 @@ var
   LPizza: IPizza;
 begin
   // Margherita pizza
-  LPizza := io.Create<IPizza>;
-  LPizza.Name := 'Margherita pizza';
-  LPizza.Price := 4.5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\MargheritaPizza.bmp');
+  LPizza := TPizza.Create('Margherita pizza', 4.50, '..\..\..\..\common_images\MargheritaPizza.bmp');
   io.Persist(LPizza);
-  //  Capricciosa pizza
-  LPizza := io.Create<IPizza>;
-  LPizza.Name := 'Capricciosa pizza';
-  LPizza.Price := 7;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\CapricciosaPizza.bmp');
+  // Capricciosa pizza
+  LPizza := TPizza.Create('Capricciosa pizza', 7.00, '..\..\..\..\common_images\CapricciosaPizza.bmp');
   io.Persist(LPizza);
   // Pepperoni pizza
-  LPizza := io.Create<IPizza>;
-  LPizza.Name := 'Pepperoni pizza';
-  LPizza.Price := 6.5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\PepperoniPizza.bmp');
+  LPizza := TPizza.Create('Pepperoni pizza', 6.50, '..\..\..\..\common_images\PepperoniPizza.bmp');
   io.Persist(LPizza);
   // Love pizza
-  LPizza := io.Create<IPizza>;
-  LPizza.Name := 'Love pizza';
-  LPizza.Price := 5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\LovePizza.bmp');
+  LPizza := TPizza.Create('Love pizza', 5.00, '..\..\..\..\common_images\LovePizza.bmp');
   io.Persist(LPizza);
 end;
 
 class procedure TSampleData.CreateRealCustomers;
 var
-  LContact: IContact;
-  LCustomer: ICustomer;
-  LVipCustomer: IVipCustomer;
-  LEmployee: IEmployee;
+  LCustomer: IGenericCustomer;
 begin
   // Mr. Maurizio Del Magno
-  LCustomer := io.Create<ICustomer>;
-  LCustomer.Name := 'Maurizio Del Magno';
-  LCustomer.City := 'New York';
-  LCustomer.Address := '301 Park Ave';
-  LCustomer.PhoneNumber := '(555) 555-1234';
-  LCustomer.FidelityCardCode := 'FC001';
+  LCustomer := TPrivateCustomer.Create('Maurizio', 'Del Magno', '301 Park Ave', 'New York', '(555) 555-1234');
   io.Persist(LCustomer);
   // Mr. Marco Mottadelli
-  LCustomer := io.Create<ICustomer>;
-  LCustomer.Name := 'Marco Mottadelli';
-  LCustomer.City := 'Union City';
-  LCustomer.Address := '3501 Bergenline Ave';
-  LCustomer.PhoneNumber := '(333) 333-1234';
-  LCustomer.FidelityCardCode := 'FC002';
+  LCustomer := TPrivateCustomer.Create('Marco', 'Mottadelli', '3501 Bergenline Ave', 'Union City', '(333) 333-1234');
   io.Persist(LCustomer);
   // Mr. Fabio Codebue
-  LVipCustomer := io.Create<IVipCustomer>;
-  LVipCustomer.Name := 'Fabio Codebue (VIP)';
-  LVipCustomer.City := 'Tavernola Bergamasca City';
-  LVipCustomer.Address := '150 Lake Corniche';
-  LVipCustomer.PhoneNumber := '(666) 666-1234';
-  LVipCustomer.FidelityCardCode := 'FC003';
-  LVipCustomer.VipCardCode := 'VIP001';
-  io.Persist(LVipCustomer);
-  // Mr. Omar Bossoni
-  LEmployee := io.Create<IEmployee>;
-  LEmployee.Name := 'Omar Bossoni (EMP)';
-  LEmployee.City := 'New York';
-  LEmployee.Address := '111 E 48th St';
-  LEmployee.PhoneNumber := '(444) 444-1234';
-  LEmployee.BranchOffice := 'Philadelphia';
-  io.Persist(LEmployee);
-  // Mrs. Federica Fortini
-  LContact := io.Create<IContact>('ANOTHER');
-  LContact.Name := 'Federica Fortini (ANOTHER)';
-  LContact.City := 'Riccione';
-  LContact.Address := 'Viale Napoli 24';
-  LContact.PhoneNumber := '0541/112233';
-  io.Persist(LContact);
+  LCustomer := TPrivateCustomer.Create('Fabio', 'Codebue', '150 Lake Corniche', 'Tavernola Bergamasca City', '(666) 666-1234');
+  io.Persist(LCustomer);
+  // Embarcadero Technologies
+  LCustomer := TBusinessCustomer.Create('Embarcadero Technologies Europe LTD', 'GB697737756', 'Easthampstead Road', 'Bracknell', '+44 (0) 1628 684400');
+  io.Persist(LCustomer);
+  // Idera
+  LCustomer := TBusinessCustomer.Create('Idera', 'US760662481', '10801 N Mopac', 'Austin', '+1 (512) 226-8080');
+  io.Persist(LCustomer);
 end;
 
 class procedure TSampleData.CreateOtherCustomers;
 var
   LCounter: Integer;
-  LCustomer: ICustomer;
+  LCustomer: IGenericCustomer;
 begin
-  for LCounter := 5 to 1000 do
+  for LCounter := 6 to 1000 do
   begin
-    LCustomer := io.Create<ICustomer>;
-    LCustomer.Name := Format('other customer %d', [LCounter]);
-    LCustomer.City := Format('city %d', [LCounter]);
-    LCustomer.Address := Format('address %d', [LCounter]);
-    LCustomer.PhoneNumber := Format('phone number %d', [LCounter]);
-    LCustomer.FidelityCardCode := Format('VC%d', [LCounter]);
+    LCustomer := TPrivateCustomer.Create('FirstName' + LCounter.ToString, 'LastName' + LCounter.ToString, 'Address' + LCounter.ToString,
+      'City' + LCounter.ToString, 'Phone' + LCounter.ToString);
     io.Persist(LCustomer);
   end;
 end;
 
 class procedure TSampleData.CreateOrders;
-var
-  LOrder: IOrder;
+ var
+ LOrder: IOrder;
 begin
-  // First order
-  LOrder := io.Create<IOrder>;
-  LOrder.OrderDate := Date;
-  LOrder.Customer := io.LoadObject<ICustomer>(1);
-  LOrder.Note := 'Well done';
-  LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 3]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([2, 'Capricciosa pizza', 7, 2]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
-  io.Persist(LOrder);
-  // Second order
-  LOrder := io.Create<IOrder>;
-  LOrder.OrderDate := Date;
-  LOrder.Customer := io.LoadObject<ICustomer>(2);
-  LOrder.Note := 'Double cheese please';
-  LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 1]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([3, 'Pepperoni pizza', 6.5, 1]) );
-  io.Persist(LOrder);
-  // Third order
-  LOrder := io.Create<IOrder>;
-  LOrder.OrderDate := Date;
-  LOrder.Customer := io.LoadObject<ICustomer>(3);
-  LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
-  io.Persist(LOrder);
+   // First order
+   LOrder := TOrder.Create;
+   LOrder.Customer := io.LoadObject<IGenericCustomer>(1);
+   LOrder.Note := 'Well done';
+   LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(1), 3) );
+   LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(2), 1) );
+   LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(3), 1) );
+   io.Persist(LOrder);
+   // Second order
+   LOrder := TOrder.Create;
+   LOrder.Customer := io.LoadObject<IGenericCustomer>(2);
+   LOrder.Note := 'Double cheese';
+   LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(1)) );
+   LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(3)) );
+   io.Persist(LOrder);
+   // Third order
+   LOrder := TOrder.Create;
+   LOrder.Customer := io.LoadObject<IGenericCustomer>(4);
+   LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(4)) );
+   io.Persist(LOrder);
 end;
 
 end.

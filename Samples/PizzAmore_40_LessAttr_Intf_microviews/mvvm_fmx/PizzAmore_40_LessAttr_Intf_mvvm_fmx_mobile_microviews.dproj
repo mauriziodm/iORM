@@ -205,7 +205,7 @@
         <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
         <DCCReference Include="..\common_model\Model.Order.pas"/>
         <DCCReference Include="..\common_model\Model.Interfaces.pas"/>
-        <DCCReference Include="..\common_model\Model.Customer.pas"/>
+        <DCCReference Include="..\common_model\Model.Customers.pas"/>
         <DCCReference Include="..\mvvm_common_vm\VM.Start.pas">
             <Form>VMStart</Form>
             <FormType>dfm</FormType>

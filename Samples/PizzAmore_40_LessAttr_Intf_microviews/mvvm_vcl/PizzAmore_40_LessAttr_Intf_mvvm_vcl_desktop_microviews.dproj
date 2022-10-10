@@ -127,10 +127,11 @@
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
         <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
+        <DCCReference Include="..\common_model\Model.BaseBO.pas"/>
         <DCCReference Include="..\common_model\Model.Pizza.pas"/>
         <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
         <DCCReference Include="..\common_model\Model.Order.pas"/>
-        <DCCReference Include="..\common_model\Model.Customer.pas"/>
+        <DCCReference Include="..\common_model\Model.Customers.pas"/>
         <DCCReference Include="..\common_model\Model.Interfaces.pas"/>
         <DCCReference Include="View.Customers.pas">
             <Form>ViewCustomers</Form>
@@ -187,27 +188,22 @@
         <DCCReference Include="RegisterClasses.pas"/>
         <DCCReference Include="..\mvvm_common_vm\VM.Order.PizzaSel.pas">
             <Form>VMOrderPizzaSel</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
         <DCCReference Include="MicroView.Customer.pas">
             <Form>MicroViewCustomer</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\mvvm_common_vm\MicroVM.Customer.pas">
             <Form>MicroVMCustomer</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
         <DCCReference Include="..\mvvm_common_vm\MicroVM.OrderRow.pas">
             <Form>MicroVMOrderRows</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
         <DCCReference Include="MicroView.OrderRow.pas">
             <Form>MicroViewOrderRow</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">

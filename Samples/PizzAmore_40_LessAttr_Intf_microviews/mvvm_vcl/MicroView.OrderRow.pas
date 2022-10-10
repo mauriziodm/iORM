@@ -9,7 +9,7 @@ uses
 
 type
 
-  [diViewFor(TOrderRow)]
+//  [diViewFor(TOrderRowCustom)]
   TMicroViewOrderRow = class(TFrame)
     OrderRowMicroVMBridge: TioViewModelBridge;
     MDSorderRow: TioModelDataSet;

@@ -504,16 +504,16 @@ begin
 end;
 
 class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
-// var
+//ar
 // LMasterProp: IioProperty;
 begin
-  inherited;
-  // // Loop for all properties
-  // for LMasterProp in AMasterContext.GetProperties do
-  // // If the property is write enabled and has a BelongsTo relation...
-  // if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
-  // PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-  // AMasterContext.MasterPropertyPath);
+//  inherited;
+//   // Loop for all properties
+//   for LMasterProp in AMasterContext.GetProperties do
+//     // If the property is write enabled and has a BelongsTo relation...
+//     if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
+//       PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
+//         AMasterContext.MasterPropertyPath);
 end;
 
 class procedure TioStrategyDB.RollbackTransaction(const AConnectionName: String);

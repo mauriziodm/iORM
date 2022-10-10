@@ -1,6 +1,7 @@
 inherited ViewCustomers: TViewCustomers
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
+      Width = 80
       Caption = 'Customers'
       ExplicitWidth = 80
     end

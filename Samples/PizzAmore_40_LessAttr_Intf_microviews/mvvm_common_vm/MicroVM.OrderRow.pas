@@ -15,7 +15,7 @@ uses
 
 type
 
-  [diViewModelFor(TOrderRow)]
+//  [diViewModelFor(TOrderRowCustom)]
   TMicroVMOrderRows = class(TioViewModel)
     MPOrderRow: TioModelPresenterDetail;
   private

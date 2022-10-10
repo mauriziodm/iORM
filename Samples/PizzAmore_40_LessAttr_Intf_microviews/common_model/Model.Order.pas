@@ -3,69 +3,43 @@ unit Model.Order;
 interface
 
 uses
-  iORM.Attributes, Model.Interfaces, System.Generics.Collections;
+  iORM.Attributes, Model.Interfaces, Model.BaseBO, System.Generics.Collections;
 
 type
 
-//  [ioEntity('Orders'), diImplements(IOrder)]
-  [ioEntity('Orders')]
-  TOrder = class(TInterfacedObject, IOrder)
+  [ioEntity('ORDERS')]
+  TOrder = class(TBaseBO, IOrder)
   private
-    FID: Integer;
+    FCustomer: IGenericCustomer;
     FOrderDate: TDate;
-    FCustomer: ICustomer;
+    [ioHasMany(IOrderRow, 'OrderID')]
     FRows: TList<IOrderRow>;
     FNote: String;
-    // ID property
-    function GetID: Integer;
-    // OrderDate property
+    procedure SetCustomer(const AValue: IGenericCustomer);
     procedure SetOrderDate(const AValue: TDate);
-    function GetOrderDate: TDate;
-    // Customer property
-    procedure SetCustomer(const AValue: ICustomer);
-    function GetCustomer: ICustomer;
-    // Rows property
-    function GetRows: TList<IOrderRow>;
-    // Note property
     procedure SetNote(const AValue: String);
+    function GetCustomer: IGenericCustomer;
+    function GetOrderDate: TDate;
+    function GetRows: TList<IOrderRow>;
     function GetNote: String;
-    // GrandTotal property
     function GetGrandTotal: Currency;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure AddPizza(const APizza: IPizza);
-    property ID: Integer read GetID;  // ReadOnly
+    function AddPizza(const APizza: IPizza): IOrderRow;
     property OrderDate: TDate read GetOrderDate Write SetOrderDate;
-    property Customer: ICustomer read GetCustomer write SetCustomer;
-    property Rows: TList<IOrderRow> read GetRows; // ReadOnly
+    property Customer: IGenericCustomer read GetCustomer write SetCustomer;
+    property Rows: TList<IOrderRow> read GetRows;
     property Note: String read GetNote write SetNote;
-    property GrandTotal: Currency read GetGrandTotal; // ReadOnly
+    property GrandTotal: Currency read GetGrandTotal;
   end;
 
 implementation
 
 uses
-  System.SysUtils, System.Rtti, iORM, Model.OrderRow;
+  System.SysUtils, Model.OrderRow;
 
 { TOrder }
-
-procedure TOrder.AddPizza(const APizza: IPizza);
-var
-  LRow: IOrderRow;
-begin
-  // If a row with the same pizza is present then increment its qty
-  for LRow in Rows do
-  begin
-    if LRow.PizzaID = APizza.ID then
-    begin
-      LRow.Qty := LRow.Qty + 1;
-      Exit;
-    end;
-  end;
-  // Else create a new OrderRow
-  Rows.Add( TOrderRow.Create(APizza) );
-end;
 
 constructor TOrder.Create;
 begin
@@ -80,9 +54,23 @@ begin
   inherited;
 end;
 
-function TOrder.GetCustomer: ICustomer;
+function TOrder.AddPizza(const APizza: IPizza): IOrderRow;
+var
+  LRow: IOrderRow;
+  LPizzaRow: IPizzaOrderRow;
 begin
-  Result := FCustomer;
+  // If a row with the same pizza is present then increment its qty
+  for LRow in Rows do
+  begin
+    if Supports(LRow, IPizzaOrderRow, LPizzaRow) and (LPizzaRow.Pizza.ID = APizza.ID) then
+    begin
+      LPizzaRow.AddOne;
+      Exit(nil);
+    end;
+  end;
+  // Else create a new OrderRow
+  Result := TPizzaOrderRow.Create(APizza);
+  Rows.Add( Result );
 end;
 
 function TOrder.GetGrandTotal: Currency;
@@ -94,9 +82,9 @@ begin
     Result := Result + LRow.RowTotal;
 end;
 
-function TOrder.GetID: Integer;
+function TOrder.GetCustomer: IGenericCustomer;
 begin
-  Result := FID;
+  Result := FCustomer;
 end;
 
 function TOrder.GetNote: String;
@@ -114,7 +102,7 @@ begin
   Result := FRows;
 end;
 
-procedure TOrder.SetCustomer(const AValue: ICustomer);
+procedure TOrder.SetCustomer(const AValue: IGenericCustomer);
 begin
   FCustomer := AValue;
 end;

@@ -10,35 +10,30 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM, Model.Interfaces;
+  iORM, Model.Interfaces, Model.BaseBO;
 
 type
 
   [ioEntity('PIZZAS')]
-  TPizza = class(TInterfacedObject, IPizza)
+  TPizza = class(TBaseBO, IPizza)
   private
-    FID: Integer;
     FName: String;
     FPrice: Currency;
     FImage: TBitmap;
-    // ID property
-    function GetID: Integer;
-    // Name property
     procedure SetName(const AValue: String);
-    function GetName: String;
-    // Price property
     procedure SetPrice(const AValue: Currency);
+    function GetName: String;
     function GetPrice: Currency;
-    // Image property
     function GetImage: TBitmap;
   public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(const AName: String; const APrice: Currency; const AImageFileName: String); overload;
     destructor Destroy; override;
-    property ID: Integer read GetID;  // ReadOnly
     property Name: String read GetName write SetName;
     property Price: Currency read GetPrice write SetPrice;
-    property Image: TBitmap read GetImage; // ReadOnly
+    property Image: TBitmap read GetImage;
   end;
+
 
 implementation
 
@@ -50,15 +45,18 @@ begin
   FImage := TBitmap.Create;
 end;
 
+constructor TPizza.Create(const AName: String; const APrice: Currency; const AImageFileName: String);
+begin
+  Create;
+  FName := AName;
+  FPrice := APrice;
+  FImage.LoadFromFile(AImageFileName);
+end;
+
 destructor TPizza.Destroy;
 begin
   FImage.Free;
   inherited;
-end;
-
-function TPizza.GetID: Integer;
-begin
-  Result := FID;
 end;
 
 function TPizza.GetImage: TBitmap;
