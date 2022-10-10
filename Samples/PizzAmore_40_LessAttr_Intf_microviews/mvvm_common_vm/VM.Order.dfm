@@ -6,7 +6,7 @@ inherited VMOrder: TVMOrder
   object MPRows: TioModelPresenterDetail
     MasterBindSource = MPMaster
     MasterPropertyName = 'Rows'
-    Left = 56
+    Left = 64
     Top = 112
   end
   object acDeleteRow: TioVMAction

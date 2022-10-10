@@ -26,7 +26,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function AddPizza(const APizza: IPizza): IOrderRow;
+    function TryAddPizzaToExistingRow(const APizza: IPizza): Boolean;
     property OrderDate: TDate read GetOrderDate Write SetOrderDate;
     property Customer: IGenericCustomer read GetCustomer write SetCustomer;
     property Rows: TList<IOrderRow> read GetRows;
@@ -54,23 +54,19 @@ begin
   inherited;
 end;
 
-function TOrder.AddPizza(const APizza: IPizza): IOrderRow;
+function TOrder.TryAddPizzaToExistingRow(const APizza: IPizza): Boolean;
 var
   LRow: IOrderRow;
   LPizzaRow: IPizzaOrderRow;
 begin
   // If a row with the same pizza is present then increment its qty
   for LRow in Rows do
-  begin
     if Supports(LRow, IPizzaOrderRow, LPizzaRow) and (LPizzaRow.Pizza.ID = APizza.ID) then
     begin
       LPizzaRow.AddOne;
-      Exit(nil);
+      Exit(True);
     end;
-  end;
-  // Else create a new OrderRow
-  Result := TPizzaOrderRow.Create(APizza);
-  Rows.Add( Result );
+  Result := False;
 end;
 
 function TOrder.GetGrandTotal: Currency;

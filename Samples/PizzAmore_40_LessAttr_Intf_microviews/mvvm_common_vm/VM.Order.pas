@@ -29,7 +29,7 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 uses
-  Model.Interfaces;
+  Model.Interfaces, System.Rtti;
 
 {$R *.dfm}
 
@@ -54,15 +54,17 @@ end;
 procedure TVMOrder.MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 var
   LPizza: IPizza;
-  LOrderRow: IOrderRow;
 begin
+  ADone := True;
   if Supports(ASelected, IPizza, LPizza) then
   begin
-    ADone := True;
-    LOrderRow := MPMaster.CurrentAs<IOrder>.AddPizza(LPizza);
-    if Assigned(LOrderRow) then
-      io.Show(LOrderRow, '', 'VCProviderOrderRows');
-    MPMaster.Refresh;
+    if MPMaster.CurrentAs<IOrder>.TryAddPizzaToExistingRow(LPizza) then
+      MPRows.Refresh
+    else
+    begin
+      MPRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza)]) );
+      MPRows.ShowCurrent('', 'VCProviderOrderRows');
+    end;
   end;
 end;
 

@@ -70,7 +70,7 @@ type
 
   IOrder = interface(IBaseBO)
     ['{53E0D8FC-BCDC-43BB-814E-256F44C75305}']
-    function AddPizza(const APizza: IPizza): IOrderRow;
+    function TryAddPizzaToExistingRow(const APizza: IPizza): Boolean;
     // OrderDate property
     procedure SetOrderDate(const AValue: TDate);
     function GetOrderDate: TDate;

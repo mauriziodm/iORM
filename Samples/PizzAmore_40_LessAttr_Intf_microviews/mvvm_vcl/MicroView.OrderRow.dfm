@@ -161,6 +161,14 @@ object MicroViewOrderRow: TMicroViewOrderRow
     ReadOnly = True
     TabOrder = 4
   end
+  object Button1: TButton
+    Left = 232
+    Top = 3
+    Width = 75
+    Height = 25
+    Action = acRefresh
+    TabOrder = 5
+  end
   object MDSorderRow: TioModelDataSet
     ViewModelBridge = OrderRowMicroVMBridge
     ModelPresenter = 'MPOrderRow'
@@ -192,5 +200,15 @@ object MicroViewOrderRow: TMicroViewOrderRow
     DataSet = MDSorderRow
     Left = 360
     Top = 32
+  end
+  object ActionList1: TActionList
+    Left = 320
+    object acRefresh: TioViewAction
+      Category = 'iORM-MVVM'
+      Caption = 'Refresh'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acRefresh'
+    end
   end
 end

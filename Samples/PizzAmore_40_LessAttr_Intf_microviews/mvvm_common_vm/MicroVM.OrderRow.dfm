@@ -7,4 +7,11 @@ object MicroVMOrderRows: TMicroVMOrderRows
     Left = 72
     Top = 24
   end
+  object acRefresh: TioVMAction
+    Name = 'acRefresh'
+    Caption = 'Refresh'
+    OnExecute = acRefreshExecute
+    Left = 176
+    Top = 56
+  end
 end
