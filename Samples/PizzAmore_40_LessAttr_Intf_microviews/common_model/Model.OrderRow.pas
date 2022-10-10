@@ -3,6 +3,13 @@ unit Model.OrderRow;
 interface
 
 uses
+// "ioFMX" is defined in project options to indicate that it is a firemonkey project (Project | Options | Delphi Compiler | Conditional defines).
+// Note: You need to build your project (Project | Build <ProjectName> or Shift + F9) for the changes to take effect.
+{$IFDEF ioFMX}
+  Fmx.Graphics,
+{$ELSE}
+  Vcl.Graphics,
+{$IFEND}
   iORM, Model.Interfaces, Model.BaseBO;
 
 type
@@ -30,10 +37,12 @@ type
   protected
     function GetPizza: IPizza;
     function GetRowTotal: Currency; override;
+    function GetImage: TBitmap;
   public
     constructor Create(const APizza: IPizza; const AQty: Integer = 1); overload;
     procedure AddOne;
     property Pizza: IPizza read GetPizza;
+    property Image: TBitmap read GetImage;
   end;
 
   [ioEntity('ORDERROWS'), diImplements(IOrderRow, 'CustomOrderRow')]
@@ -84,6 +93,11 @@ begin
   inherited Create;
   FPizza := APizza;
   FQty := AQty;
+end;
+
+function TPizzaOrderRow.GetImage: TBitmap;
+begin
+  Result := FPizza.Image;
 end;
 
 function TPizzaOrderRow.GetPizza: IPizza;

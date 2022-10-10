@@ -9,7 +9,7 @@ uses
 
 type
 
-//  [diViewModelFor(TCustomer), diViewModelFor(TVipCustomer), diViewModelFor(TEmployee), diViewModelFor(TAnotherCustomer)]
+  [diViewModelFor(TPrivateCustomer), diViewModelFor(TBusinessCustomer)]
   TVMCustomer = class(TVMBaseForForm)
   private
     { Private declarations }

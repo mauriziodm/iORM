@@ -95,7 +95,7 @@ end;
 
 function TPrivateCustomer.GetFullName: String;
 begin
-  Result := Format('%s %s (%s)', [FFirstName, FLastName, ID]).Trim;
+  Result := Format('%s %s (%d)', [FFirstName, FLastName, ID]).Trim;
 end;
 
 { TBusinessCustomer }
@@ -109,7 +109,7 @@ end;
 
 function TBusinessCustomer.GetFullName: String;
 begin
-  Result := Format('%s (%s)', [FBusinessName, ID]).Trim;
+  Result := Format('%s (%d)', [FBusinessName, ID]).Trim;
 end;
 
 end.

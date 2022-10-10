@@ -1,5 +1,4 @@
 inherited ViewOrder: TViewOrder
-  OnResize = FrameResize
   inherited PanelMain: TPanel
     Width = 449
     ExplicitWidth = 449
@@ -151,87 +150,18 @@ inherited ViewOrder: TViewOrder
       ParentFont = False
       TabOrder = 4
     end
-    object GridRows: TDBGrid
+    object ScrollBoxOrderRows: TScrollBox
       Left = 5
       Top = 234
-      Width = 423
+      Width = 438
       Height = 320
-      BorderStyle = bsNone
-      Ctl3D = False
-      DataSource = SourceRows
-      FixedColor = clInactiveBorder
-      GradientEndColor = clInactiveBorder
-      GradientStartColor = clInactiveBorder
-      ParentCtl3D = False
-      TabOrder = 5
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -12
-      TitleFont.Name = 'Segoe UI'
-      TitleFont.Style = []
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'Description'
-          Title.Alignment = taCenter
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clNavy
-          Title.Font.Height = -13
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Width = 180
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'UnitPrice'
-          Title.Alignment = taCenter
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clNavy
-          Title.Font.Height = -13
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Width = 70
-          Visible = True
-        end
-        item
-          Alignment = taCenter
-          Expanded = False
-          FieldName = 'Qty'
-          Title.Alignment = taCenter
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clNavy
-          Title.Font.Height = -13
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Width = 40
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'RowTotal'
-          Title.Alignment = taCenter
-          Title.Caption = 'Total'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clNavy
-          Title.Font.Height = -13
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Width = 80
-          Visible = True
-        end>
-    end
-    object ScrollBoxOrderRows: TScrollBox
-      Left = 140
-      Top = 290
-      Width = 288
-      Height = 151
       VertScrollBar.Smooth = True
       VertScrollBar.Tracking = True
+      Anchors = [akLeft, akTop, akRight, akBottom]
       BevelInner = bvNone
       BevelOuter = bvNone
       BorderStyle = bsNone
-      TabOrder = 6
+      TabOrder = 5
       object ScrollBox2: TScrollBox
         Left = 0
         Top = 8

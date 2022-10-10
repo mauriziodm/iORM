@@ -145,8 +145,8 @@
             <Form>VMBaseForForm</Form>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Customer.pas">
-            <Form>ViewCustomer</Form>
+        <DCCReference Include="View.CustomerPrivate.pas">
+            <Form>ViewCustomerPrivate</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\mvvm_common_vm\VM.Customer.pas">
@@ -204,6 +204,11 @@
         </DCCReference>
         <DCCReference Include="MicroView.OrderRow.pas">
             <Form>MicroViewOrderRow</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="View.CustomerBusiness.pas">
+            <Form>ViewCustomerBusiness</Form>
+            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">

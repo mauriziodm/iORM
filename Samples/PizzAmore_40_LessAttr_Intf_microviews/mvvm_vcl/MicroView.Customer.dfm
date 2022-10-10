@@ -108,7 +108,7 @@ object MicroViewCustomer: TMicroViewCustomer
     Anchors = [akLeft, akTop, akRight]
     BorderStyle = bsNone
     Color = clInactiveBorder
-    DataField = 'Name'
+    DataField = 'FullName'
     DataSource = SourceCustomer
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -163,7 +163,7 @@ object MicroViewCustomer: TMicroViewCustomer
       FieldName = 'ID'
     end
     object MDSCustomerName: TStringField
-      FieldName = 'Name'
+      FieldName = 'FullName'
       Size = 250
     end
     object MDSCustomerFullAddress: TStringField

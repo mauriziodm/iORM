@@ -10,7 +10,7 @@ uses
 
 type
 
-  [diViewFor(IPizza), diViewFor(IPizza, 'embedded')]
+  [diViewFor(IPizza), diViewFor(IPizza, 'EMBEDDED')]
   TViewPizzas = class(TViewBaseForList)
     CtrlGridPizzas: TDBCtrlGrid;
     DBTextName: TDBText;

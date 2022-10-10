@@ -1,8 +1,6 @@
 inherited ViewPizzas: TViewPizzas
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
-      Width = 700
-      Height = 40
       Caption = 'Pizzas'
       ExplicitWidth = 47
     end
@@ -21,7 +19,6 @@ inherited ViewPizzas: TViewPizzas
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = CtrlGridPizzasDblClick
-    ExplicitHeight = 416
     object DBTextName: TDBText
       Left = 99
       Top = 20

@@ -18,7 +18,6 @@ type
     DBEditID: TDBEdit;
     DBEditDate: TDBEdit;
     DBEditNote: TDBEdit;
-    GridRows: TDBGrid;
     Label6: TLabel;
     DBEditGrandTotal: TDBEdit;
     ButtonDeleteRow: TSpeedButton;
@@ -40,7 +39,6 @@ type
     ScrollBox2: TScrollBox;
     procedure VCProviderOrderPizzaSelRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderPizzaSelAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
-    procedure FrameResize(Sender: TObject);
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
   private
@@ -52,12 +50,6 @@ type
 implementation
 
 {$R *.dfm}
-
-procedure TViewOrder.FrameResize(Sender: TObject);
-begin
-  inherited;
-  GridRows.Height := Height - 280;
-end;
 
 procedure TViewOrder.VCProviderOrderPizzaSelAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
 begin

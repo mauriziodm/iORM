@@ -54,12 +54,15 @@ end;
 procedure TVMOrder.MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 var
   LPizza: IPizza;
+  LOrderRow: IOrderRow;
 begin
   if Supports(ASelected, IPizza, LPizza) then
   begin
-    MPMaster.CurrentAs<IOrder>.AddPizza(LPizza);
-    MPMaster.Refresh;
     ADone := True;
+    LOrderRow := MPMaster.CurrentAs<IOrder>.AddPizza(LPizza);
+    if Assigned(LOrderRow) then
+      io.Show(LOrderRow, '', 'VCProviderOrderRows');
+    MPMaster.Refresh;
   end;
 end;
 

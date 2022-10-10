@@ -19,7 +19,7 @@ uses
   View.Customers in 'View.Customers.pas' {ViewCustomers: TFrame},
   View.BaseForForm in 'View.BaseForForm.pas' {ViewBaseForForm: TFrame},
   VM.BaseForForm in '..\mvvm_common_vm\VM.BaseForForm.pas' {VMBaseForForm: TioViewModel},
-  View.Customer in 'View.Customer.pas' {ViewCustomer: TFrame},
+  View.CustomerPrivate in 'View.CustomerPrivate.pas' {ViewCustomerPrivate: TFrame},
   VM.Customer in '..\mvvm_common_vm\VM.Customer.pas' {VMCustomer: TioViewModel},
   View.Pizzas in 'View.Pizzas.pas' {ViewPizzas: TFrame},
   VM.Pizzas in '..\mvvm_common_vm\VM.Pizzas.pas' {VMPizzas: TioViewModel},
@@ -34,7 +34,8 @@ uses
   MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame},
   MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel},
   MicroVM.OrderRow in '..\mvvm_common_vm\MicroVM.OrderRow.pas' {MicroVMOrderRows: TioViewModel},
-  MicroView.OrderRow in 'MicroView.OrderRow.pas' {MicroViewOrderRow: TFrame};
+  MicroView.OrderRow in 'MicroView.OrderRow.pas' {MicroViewOrderRow: TFrame},
+  View.CustomerBusiness in 'View.CustomerBusiness.pas' {ViewCustomerBusiness: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

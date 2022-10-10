@@ -49,8 +49,8 @@ object ViewBaseForList: TViewBaseForList
     object LabelTitle: TLabel
       Left = 50
       Top = 0
-      Width = 700
-      Height = 40
+      Width = 34
+      Height = 21
       Align = alClient
       Alignment = taCenter
       Caption = 'Title'
@@ -61,8 +61,6 @@ object ViewBaseForList: TViewBaseForList
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 34
-      ExplicitHeight = 21
     end
   end
   object PanelBottom: TPanel

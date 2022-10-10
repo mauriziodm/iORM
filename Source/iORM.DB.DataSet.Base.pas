@@ -1369,7 +1369,7 @@ var
   LInstance: TObject;
 begin
   LInstance := nil;
-  // Get the bind source as IioNotifiableBindSource (return an empty value is ADataSet don't implement the interface)
+  // Get the bind source as IioNotifiableBindSource (return an empty value if ADataSet don't implement the interface)
   if not Supports(ADataSet, IioNotifiableBindSource, LBindSource) then
     Result := TValue.Empty;
   // Check if the VirtualFields are enabled

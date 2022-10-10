@@ -53,9 +53,6 @@ Coordinates=10,188,53,58
 [Label3]
 Coordinates=553,10,53,58
 
-[DBEditName]
-Coordinates=549,188,88,36
-
 [DBEditID]
 Coordinates=472,188,67,36
 
@@ -88,4 +85,7 @@ Coordinates=73,188,75,58
 
 []
 Coordinates=505,331,91,36
+
+[DBEditFirstName]
+Coordinates=549,188,88,36
 

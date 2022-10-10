@@ -14,7 +14,7 @@ type
   TViewCustomers = class(TViewBaseForList)
     GridCustomers: TDBGrid;
     MDSMasterID: TIntegerField;
-    MDSMasterName: TStringField;
+    MDSMasterFullName: TStringField;
     MDSMasterPhoneNumber: TStringField;
     MDSMasterFullAddress: TStringField;
     MDSMasterPagingCurrentPageOf: TStringField;

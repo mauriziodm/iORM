@@ -1,4 +1,4 @@
-unit View.Customer;
+unit View.CustomerPrivate;
 
 interface
 
@@ -10,15 +10,15 @@ uses
 
 type
 
-  [diViewFor(TGenericCustomer)]
-  TViewCustomer = class(TViewBaseForForm)
+  [diViewFor(TPrivateCustomer)]
+  TViewCustomerPrivate = class(TViewBaseForForm)
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     DBEditID: TDBEdit;
-    DBEditName: TDBEdit;
+    DBEditFirstName: TDBEdit;
     DBEditPhone: TDBEdit;
     DBEditCity: TDBEdit;
     DBEditAddress: TDBEdit;
@@ -27,6 +27,9 @@ type
     MDSMasterPhoneNumber: TStringField;
     MDSMasterCity: TStringField;
     MDSMasterAddress: TStringField;
+    Label6: TLabel;
+    DBEditLastName: TDBEdit;
+    MDSMasterLastName: TStringField;
   private
     { Private declarations }
   public

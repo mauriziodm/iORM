@@ -1,4 +1,4 @@
-inherited ViewCustomer: TViewCustomer
+inherited ViewCustomerPrivate: TViewCustomerPrivate
   inherited PanelMain: TPanel
     object Label1: TLabel [0]
       Left = 10
@@ -17,12 +17,12 @@ inherited ViewCustomer: TViewCustomer
     end
     object Label2: TLabel [1]
       Left = 10
-      Top = 101
+      Top = 117
       Width = 80
       Height = 25
       Alignment = taRightJustify
       AutoSize = False
-      Caption = 'Name'
+      Caption = 'First name'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -16
@@ -32,7 +32,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object Label3: TLabel [2]
       Left = 10
-      Top = 164
+      Top = 204
       Width = 80
       Height = 25
       Alignment = taRightJustify
@@ -47,7 +47,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object Label4: TLabel [3]
       Left = 10
-      Top = 227
+      Top = 259
       Width = 80
       Height = 25
       Alignment = taRightJustify
@@ -62,7 +62,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object Label5: TLabel [4]
       Left = 8
-      Top = 266
+      Top = 298
       Width = 80
       Height = 25
       Alignment = taRightJustify
@@ -75,9 +75,24 @@ inherited ViewCustomer: TViewCustomer
       Font.Style = [fsBold]
       ParentFont = False
     end
+    object Label6: TLabel [5]
+      Left = 10
+      Top = 149
+      Width = 80
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Last name'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     inherited PanelTop: TPanel
       inherited LabelTitle: TLabel
-        Caption = 'Customer'
+        Caption = 'Private customer'
       end
     end
     object DBEditID: TDBEdit
@@ -100,16 +115,16 @@ inherited ViewCustomer: TViewCustomer
       ParentFont = False
       TabOrder = 2
     end
-    object DBEditName: TDBEdit
+    object DBEditFirstName: TDBEdit
       Left = 110
-      Top = 101
+      Top = 117
       Width = 400
       Height = 25
       AutoSize = False
       BorderStyle = bsNone
       Color = clInactiveBorder
       Ctl3D = False
-      DataField = 'Name'
+      DataField = 'FirstName'
       DataSource = SourceMaster
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -122,7 +137,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object DBEditPhone: TDBEdit
       Left = 110
-      Top = 164
+      Top = 204
       Width = 400
       Height = 25
       AutoSize = False
@@ -142,7 +157,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object DBEditCity: TDBEdit
       Left = 110
-      Top = 227
+      Top = 259
       Width = 400
       Height = 25
       AutoSize = False
@@ -162,7 +177,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object DBEditAddress: TDBEdit
       Left = 110
-      Top = 266
+      Top = 298
       Width = 400
       Height = 25
       AutoSize = False
@@ -180,13 +195,37 @@ inherited ViewCustomer: TViewCustomer
       ParentFont = False
       TabOrder = 6
     end
+    object DBEditLastName: TDBEdit
+      Left = 110
+      Top = 149
+      Width = 400
+      Height = 25
+      AutoSize = False
+      BorderStyle = bsNone
+      Color = clInactiveBorder
+      Ctl3D = False
+      DataField = 'LastName'
+      DataSource = SourceMaster
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentCtl3D = False
+      ParentFont = False
+      TabOrder = 7
+    end
   end
   inherited MDSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
     end
     object MDSMasterName: TStringField
-      FieldName = 'Name'
+      FieldName = 'FirstName'
+      Size = 250
+    end
+    object MDSMasterLastName: TStringField
+      FieldName = 'LastName'
       Size = 250
     end
     object MDSMasterPhoneNumber: TStringField

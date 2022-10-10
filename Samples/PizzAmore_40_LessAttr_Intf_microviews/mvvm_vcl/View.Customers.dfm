@@ -1,9 +1,10 @@
 inherited ViewCustomers: TViewCustomers
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
-      Width = 80
+      Width = 700
+      Height = 40
       Caption = 'Customers'
-      ExplicitWidth = 80
+      ExplicitWidth = 700
     end
   end
   inherited PanelBottom: TPanel
@@ -86,8 +87,9 @@ inherited ViewCustomers: TViewCustomers
       end
       item
         Expanded = False
-        FieldName = 'Name'
+        FieldName = 'FullName'
         Title.Alignment = taCenter
+        Title.Caption = 'Name'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -113,7 +115,7 @@ inherited ViewCustomers: TViewCustomers
         Expanded = False
         FieldName = 'FullAddress'
         Title.Alignment = taCenter
-        Title.Caption = 'Full address'
+        Title.Caption = 'Address'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -143,16 +145,16 @@ inherited ViewCustomers: TViewCustomers
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterName: TStringField
-      FieldName = 'Name'
-      Size = 250
-    end
-    object MDSMasterPhoneNumber: TStringField
-      FieldName = 'PhoneNumber'
+    object MDSMasterFullName: TStringField
+      FieldName = 'FullName'
       Size = 250
     end
     object MDSMasterFullAddress: TStringField
       FieldName = 'FullAddress'
+      Size = 250
+    end
+    object MDSMasterPhoneNumber: TStringField
+      FieldName = 'PhoneNumber'
       Size = 250
     end
     object MDSMasterPagingCurrentPageOf: TStringField

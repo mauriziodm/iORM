@@ -1,20 +1,8 @@
 inherited ViewOrders: TViewOrders
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
-      Width = 700
-      Height = 40
       Caption = 'Orders'
-      ExplicitWidth = 700
-    end
-  end
-  inherited PanelBottom: TPanel
-    object Button1: TButton
-      Left = 352
-      Top = 6
-      Width = 75
-      Height = 25
-      Action = acPersist
-      TabOrder = 0
+      ExplicitWidth = 50
     end
   end
   object GridOrders: TDBGrid [2]
@@ -61,7 +49,7 @@ inherited ViewOrders: TViewOrders
       end
       item
         Expanded = False
-        FieldName = 'Customer.Name'
+        FieldName = 'Customer.FullName'
         Title.Alignment = taCenter
         Title.Caption = 'Customer'
         Title.Font.Charset = DEFAULT_CHARSET
@@ -102,15 +90,6 @@ inherited ViewOrders: TViewOrders
         Visible = True
       end>
   end
-  inherited ActionList1: TActionList
-    object acPersist: TioViewAction
-      Category = 'iORM-MVVM'
-      Caption = 'acPersist'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acPersist'
-    end
-  end
   inherited MDSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
@@ -123,7 +102,7 @@ inherited ViewOrders: TViewOrders
       Size = 250
     end
     object MDSMasterCustomerName: TStringField
-      FieldName = 'Customer.Name'
+      FieldName = 'Customer.FullName'
       Size = 250
     end
     object MDSMasterGrandTotal: TCurrencyField

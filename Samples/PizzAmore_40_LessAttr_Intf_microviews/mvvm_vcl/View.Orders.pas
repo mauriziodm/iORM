@@ -18,8 +18,6 @@ type
     MDSMasterNote: TStringField;
     MDSMasterCustomerName: TStringField;
     MDSMasterGrandTotal: TCurrencyField;
-    acPersist: TioViewAction;
-    Button1: TButton;
     procedure GridOrdersDblClick(Sender: TObject);
   private
     { Private declarations }
