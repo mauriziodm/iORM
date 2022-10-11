@@ -56,7 +56,7 @@ object MicroViewCustomer: TMicroViewCustomer
     ParentFont = False
   end
   object ButtonSelectCustomer: TSpeedButton
-    Left = 392
+    Left = 395
     Top = 6
     Width = 25
     Height = 25
@@ -88,8 +88,8 @@ object MicroViewCustomer: TMicroViewCustomer
     Top = 6
     Width = 30
     Height = 25
+    TabStop = False
     BorderStyle = bsNone
-    Color = clInactiveBorder
     DataField = 'ID'
     DataSource = SourceCustomer
     Font.Charset = DEFAULT_CHARSET
@@ -97,7 +97,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ParentColor = True
     ParentFont = False
+    ReadOnly = True
     TabOrder = 0
   end
   object DBEditCustName: TDBEdit
@@ -105,9 +107,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Top = 6
     Width = 217
     Height = 25
+    TabStop = False
     Anchors = [akLeft, akTop, akRight]
     BorderStyle = bsNone
-    Color = clInactiveBorder
     DataField = 'FullName'
     DataSource = SourceCustomer
     Font.Charset = DEFAULT_CHARSET
@@ -115,7 +117,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ParentColor = True
     ParentFont = False
+    ReadOnly = True
     TabOrder = 1
   end
   object DBEditCustAddress: TDBEdit
@@ -123,9 +127,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Top = 37
     Width = 325
     Height = 25
+    TabStop = False
     Anchors = [akLeft, akTop, akRight]
     BorderStyle = bsNone
-    Color = clInactiveBorder
     DataField = 'FullAddress'
     DataSource = SourceCustomer
     Font.Charset = DEFAULT_CHARSET
@@ -133,7 +137,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ParentColor = True
     ParentFont = False
+    ReadOnly = True
     TabOrder = 2
   end
   object DBECustPhone: TDBEdit
@@ -141,9 +147,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Top = 68
     Width = 325
     Height = 25
+    TabStop = False
     Anchors = [akLeft, akTop, akRight]
     BorderStyle = bsNone
-    Color = clInactiveBorder
     DataField = 'PhoneNumber'
     DataSource = SourceCustomer
     Font.Charset = DEFAULT_CHARSET
@@ -151,7 +157,9 @@ object MicroViewCustomer: TMicroViewCustomer
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ParentColor = True
     ParentFont = False
+    ReadOnly = True
     TabOrder = 3
   end
   object MDSCustomer: TioModelDataSet
@@ -160,6 +168,7 @@ object MicroViewCustomer: TMicroViewCustomer
     Left = 276
     Top = 48
     object MDSCustomerID: TIntegerField
+      Alignment = taCenter
       FieldName = 'ID'
     end
     object MDSCustomerName: TStringField
