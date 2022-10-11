@@ -55,6 +55,8 @@ type
   IioActiveBindSourceAdapter = interface;
   IioContainedBindSourceAdapter = interface;
   IioDetailBindSourceAdaptersContainer = interface;
+  IioNaturalBindSourceAdapterSource = interface;
+  IioNaturalActiveBindSourceAdapter = interface;
 
   // Interface (without RefCount) for ioBindSources detection
   // (useful for detect iORM bind sources to pass itself
@@ -314,10 +316,12 @@ type
     ['{B374E226-D7A9-4A44-9BB6-DF85AC283598}']
     procedure Free;
     procedure SetMasterObject(const AMasterObj: TObject);
-    function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
       : IioActiveBindSourceAdapter;
+    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
+    procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
+    procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function FillWhereDetails(const AWhereDetailsContainer: IioWhereDetailsContainer): IioWhereDetailsContainer;
@@ -344,15 +348,18 @@ type
     function GetCurrent: TObject;
     function UseObjStatus: Boolean;
     function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
+    function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
   end;
 
   IioNaturalActiveBindSourceAdapter = interface
     ['{9452A7CA-2C5F-43FB-BA63-DEE446B4FCC0}']
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+    function NotifyButDontForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
   end;
 
-  // BindSourceAdapter List
   TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
+
+  TioNaturalAdapters = TList<IioNaturalActiveBindSourceAdapter>;
 
 implementation
 

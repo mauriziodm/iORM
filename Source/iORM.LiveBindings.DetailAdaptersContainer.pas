@@ -48,13 +48,16 @@ type
   strict private
     FMasterAdapter: IioContainedBindSourceAdapter;
     FDetailAdapters: TioDetailAdapters;
+    FNaturalAdapters: TioNaturalAdapters;
   public
     constructor Create(const AMasterAdapter:IioContainedBindSourceAdapter); overload;
     destructor Destroy; override;
     procedure SetMasterObject(const AMasterObj: TObject);
-    function NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
+    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    procedure RemoveBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
+    procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
+    procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName:String): IioActiveBindSourceAdapter;
     function FillWhereDetails(const AWhereDetailsContainer: IioWhereDetailsContainer): IioWhereDetailsContainer;
@@ -99,15 +102,17 @@ begin
   inherited Create;
   FMasterAdapter := AMasterAdapter;
   FDetailAdapters := TioDetailAdapters.Create;
+  FNaturalAdapters := TioNaturalAdapters.Create;
 end;
 
 destructor TioDetailAdaptersContainer.Destroy;
 begin
   FDetailAdapters.Free;
+  FNaturalAdapters.Free;
   inherited;
 end;
 
-function TioDetailAdaptersContainer.NewBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
+function TioDetailAdaptersContainer.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere:IioWhere): IioActiveBindSourceAdapter;
 var
   LMap: IioMap;
   LMasterProperty: IioProperty;
@@ -132,6 +137,13 @@ begin
   FDetailAdapters.Add(AMasterPropertyName, LNewAdapter);
   // Return the new adapter
   Result := LNewAdapter.AsActiveBindSourceAdapter;
+end;
+
+function TioDetailAdaptersContainer.NewNaturalBindSourceAdapter(const AOwner: TComponent;
+  const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+begin
+  Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, ASourceAdapter);
+  FNaturalAdapters.Add(Result as IioNaturalActiveBindSourceAdapter);
 end;
 
 function TioDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(
@@ -163,15 +175,20 @@ end;
 
 procedure TioDetailAdaptersContainer.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 var
-  AAdapter: IioContainedBindSourceAdapter;
+  AContainedBSA: IioContainedBindSourceAdapter;
+  ANaturalBSA: IioNaturalActiveBindSourceAdapter;
 begin
   // Replicate notification to MasterBindSourceAdapter
-  if Sender <> TObject(FMasterAdapter)
-    then FMasterAdapter.Notify(Self, ANotification);
+  if Assigned(FMasterAdapter) and (Sender <> TObject(FMasterAdapter)) then
+    FMasterAdapter.Notify(Self, ANotification);
   // Replicate notification to DetailBindSourceAdapters
-  for AAdapter in FDetailAdapters.Values do
-    if Sender <> TObject(AAdapter) then
-      AAdapter.Notify(Self, ANotification);
+  for AContainedBSA in FDetailAdapters.Values do
+    if Sender <> TObject(AContainedBSA) then
+      AContainedBSA.Notify(Self, ANotification);
+  // Replicate notification to NaturalBindSourceAdapters
+  for ANaturalBSA in FNaturalAdapters do
+    if Sender <> TObject(ANaturalBSA) then
+      ANaturalBSA.NotifyButDontForwardNotificationToSourceAdapter(Self, ANotification);
 end;
 
 function TioDetailAdaptersContainer.QueryInterface(const IID: TGUID;
@@ -184,11 +201,16 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioDetailAdaptersContainer.RemoveBindSourceAdapter(
+procedure TioDetailAdaptersContainer.RemoveDetailBindSourceAdapter(
   const ABindSourceAdapter: IioContainedBindSourceAdapter);
 begin
 //  FDetailAdapters.Extract(ABindSourceAdapter);  // Questo era prima quando il container era una TList
   FDetailAdapters.Remove(ABindSourceAdapter.GetMasterPropertyName);
+end;
+
+procedure TioDetailAdaptersContainer.RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
+begin
+  FNaturalAdapters.Remove(ANaturalBindSourceAdapter);
 end;
 
 procedure TioDetailAdaptersContainer.SetMasterObject(const AMasterObj: TObject);

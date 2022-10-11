@@ -58,12 +58,14 @@ type
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
+    function NotifyButDontForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
   end;
 
 implementation
 
 uses
-  Data.Bind.ObjectScope, iORM.LiveBindings.CommonBSAPersistence;
+  Data.Bind.ObjectScope, iORM.LiveBindings.CommonBSAPersistence,
+  System.SysUtils, iORM.LiveBindings.CommonBSABehavior;
 
 
 
@@ -87,6 +89,8 @@ destructor TioNaturalActiveObjectBindSourceAdapter.Destroy;
 var
   FLoadType: TioLoadType;
 begin
+  // Unregister itself from the SourceBS.DetailAdaptersContainer
+  FSourceAdapter.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
   // If the LoadType is ltFromBSReloadNewInstance and it is inherited from TioActiveObjectBindSourceAdapter
   //  (it is'n an interfaced bind source) then free che DataObject (owns it)
   FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
@@ -145,14 +149,20 @@ end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
-  if Assigned(FSourceAdapter)
-    then FSourceAdapter.Notify(Self, ANotification);
+  if Assigned(FSourceAdapter) then
+    FSourceAdapter.Notify(Self, ANotification);
 end;
 
 function TioNaturalActiveObjectBindSourceAdapter.GetAutoLoad: Boolean;
 begin
   // NaturalBindSourceAdapter is always a not AutoLoad adapter by definition
   Result := False;
+end;
+
+function TioNaturalActiveObjectBindSourceAdapter.NotifyButDontForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
+begin
+  TioCommonBSABehavior.Notify(Sender, Self, ANotification, False);
+  Result := ANotification.Response;
 end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.Reload;

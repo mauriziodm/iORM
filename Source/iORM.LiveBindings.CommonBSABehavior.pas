@@ -107,7 +107,7 @@ type
     const AGetMemberObject: IGetMemberObject; const AMemberType: TScopeMemberType; const AFieldsList: TList<TBindSourceAdapterField>);
   public
     // NB: Common code for ABSA to manage notifications
-    class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification);
+    class procedure Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification; const AEnableNotificationToSourceAdapterForNaturalBSA: Boolean = True);
     // NB: Generic type for this methods must be only TObject or IInterface
     class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T);
     // ObjectStatus
@@ -167,8 +167,7 @@ begin
   LMasterBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LMasterObj);
 end;
 
-class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-  const [Ref] ANotification: TioBSNotification);
+class procedure TioCommonBSABehavior.Notify(const Sender: TObject; const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const [Ref] ANotification: TioBSNotification; const AEnableNotificationToSourceAdapterForNaturalBSA: Boolean = True);
 begin
   // Notify the BindSource
   // NB: First check if the BSA has a BindSource and if the message is not actually coming from it,
@@ -187,12 +186,11 @@ begin
     AActiveBindSourceAdapter.DetailAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
 
   // Replicate notification to the MasterAdaptersContainer
-  if ANotification.DirectionRoot and Assigned(AActiveBindSourceAdapter.MasterAdaptersContainer) and
-    (Sender <> TObject(AActiveBindSourceAdapter.MasterAdaptersContainer)) then
+  if ANotification.DirectionRoot and Assigned(AActiveBindSourceAdapter.MasterAdaptersContainer) and (Sender <> TObject(AActiveBindSourceAdapter.MasterAdaptersContainer)) then
     AActiveBindSourceAdapter.MasterAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
 
   // If the current BSA is a NaturalBindSourceAdapter then forward the notification to the source adapter
-  if ANotification.DirectionRoot and Supports(AActiveBindSourceAdapter, IioNaturalActiveBindSourceAdapter) then
+  if ANotification.DirectionRoot and AEnableNotificationToSourceAdapterForNaturalBSA and Supports(AActiveBindSourceAdapter, IioNaturalActiveBindSourceAdapter) then
     (AActiveBindSourceAdapter as IioNaturalActiveBindSourceAdapter).ForwardNotificationToSourceAdapter(AActiveBindSourceAdapter as TObject, ANotification);
 end;
 

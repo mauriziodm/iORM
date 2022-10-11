@@ -295,7 +295,7 @@ destructor TioActiveListBindSourceAdapter.Destroy;
 begin
   // Detach itself from MasterAdapterContainer (if it's contained)
   if Assigned(FMasterAdaptersContainer) then
-    FMasterAdaptersContainer.RemoveBindSourceAdapter(Self);
+    FMasterAdaptersContainer.RemoveDetailBindSourceAdapter(Self);
   // Free the DetailAdaptersContainer
   if Assigned(FDetailAdaptersContainer) then
     FDetailAdaptersContainer.Free;
@@ -525,7 +525,7 @@ function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner:
 begin
   // Result := nil;
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.NewBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
+  Result := FDetailAdaptersContainer.NewDetailBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
@@ -614,7 +614,7 @@ end;
 
 function TioActiveListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
 begin
-  Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
+  Result := FDetailAdaptersContainer.NewNaturalBindSourceAdapter(AOwner, Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.Insert(AObject: TObject);
