@@ -36,14 +36,12 @@ type
     acShowOrSelect: TAction;
     acBack: TAction;
     acAdd: TAction;
-    Button1: TButton;
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure acShowOrSelectUpdate(Sender: TObject);
     procedure GridCustomersDblClick(Sender: TObject);
     procedure acAddExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
@@ -96,19 +94,6 @@ begin
     acShowOrSelect.Caption := 'Select'
   else
     acShowOrSelect.Caption := 'Show';
-end;
-
-procedure TCustomersForm.Button1Click(Sender: TObject);
-var
-  LList: TObjectList<TCustomer>;
-begin
-//  LList := TObjectList<TCustomer>.Create;
-//  io.LoadToList<TCustomer>(LList, io.Where('ID', coLowerOrEqual, 3));
-
-  LList := io.LoadList<TObjectList<TCustomer>>(io.Where('ID', coLowerOrEqual, 3));
-
-  ShowMessage(LList.Count.ToString);
-  LList.Free;
 end;
 
 procedure TCustomersForm.FormClose(Sender: TObject; var Action: TCloseAction);

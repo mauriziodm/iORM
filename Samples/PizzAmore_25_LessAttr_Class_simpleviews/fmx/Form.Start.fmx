@@ -5264,7 +5264,7 @@ object StartForm: TStartForm
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
     RegisterAsDefault = True
-    Left = 160
+    Left = 96
     Top = 448
   end
 end

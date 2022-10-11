@@ -200,12 +200,6 @@
             <Form>StartForm</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
-        <DCCReference Include="..\common_model\Model.Pizza.pas"/>
-        <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
-        <DCCReference Include="..\common_model\Model.Order.pas"/>
-        <DCCReference Include="..\common_model\Model.Interfaces.pas"/>
-        <DCCReference Include="..\common_model\Model.Customers.pas"/>
         <DCCReference Include="..\mvvm_common_vm\VM.Start.pas">
             <Form>VMStart</Form>
             <FormType>dfm</FormType>
@@ -272,8 +266,8 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Customer.pas">
-            <Form>ViewCustomer</Form>
+        <DCCReference Include="View.CustomerPrivate.pas">
+            <Form>ViewCustomerPrivate</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -298,8 +292,15 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Customer.Vip.pas">
-            <Form>ViewVipCustomer</Form>
+        <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
+        <DCCReference Include="..\common_model\Model.Pizza.pas"/>
+        <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
+        <DCCReference Include="..\common_model\Model.Order.pas"/>
+        <DCCReference Include="..\common_model\Model.Interfaces.pas"/>
+        <DCCReference Include="..\common_model\Model.Customers.pas"/>
+        <DCCReference Include="..\common_model\Model.BaseBO.pas"/>
+        <DCCReference Include="View.CustomerBusiness.pas">
+            <Form>ViewCustomerBusiness</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>

@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 13
+          TabOrder = 14
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5435,8 +5435,8 @@ object MainForm: TMainForm
           StyledSettings = [Family, Style, FontColor]
           TabOrder = 11
           RowCount = 200
-          Viewport.Width = 522.000000000000000000
-          Viewport.Height = 288.000000000000000000
+          Viewport.Width = 542.000000000000000000
+          Viewport.Height = 313.000000000000000000
         end
         object Label5: TLabel
           StyledSettings = [Family]
@@ -6033,7 +6033,7 @@ object MainForm: TMainForm
       Size.Height = 607.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 2
+      TabIndex = 0
       TabOrder = 0
       TabStop = False
       TabPosition = Top
@@ -6051,7 +6051,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family, Style]
-        IsSelected = False
+        IsSelected = True
         Size.Width = 90.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6230,7 +6230,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family]
-        IsSelected = True
+        IsSelected = False
         Size.Width = 82.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False

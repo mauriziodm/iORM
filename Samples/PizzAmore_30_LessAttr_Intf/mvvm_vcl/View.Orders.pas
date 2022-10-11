@@ -17,6 +17,7 @@ type
     MDSMasterOrderDate: TDateTimeField;
     MDSMasterNote: TStringField;
     MDSMasterCustomerName: TStringField;
+    MDSMasterGrandTotal: TCurrencyField;
     procedure GridOrdersDblClick(Sender: TObject);
   private
     { Private declarations }

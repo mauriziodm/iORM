@@ -50,6 +50,7 @@ object ViewBaseForList: TViewBaseForList
     end
   end
   object ListView: TListView
+    OnTap = ListViewTap
     ItemAppearanceClassName = 'TListItemRightDetailAppearance'
     ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
     HeaderAppearanceClassName = 'TListHeaderObjects'
@@ -60,6 +61,7 @@ object ViewBaseForList: TViewBaseForList
     Size.PlatformDefault = False
     TabOrder = 3
     OnDblClick = ListViewDblClick
+    OnDeleteItem = ListViewDeleteItem
   end
   object Rectangle1: TRectangle
     Align = Bottom

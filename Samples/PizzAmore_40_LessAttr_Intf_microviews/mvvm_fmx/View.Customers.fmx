@@ -1,49 +1,43 @@
 inherited ViewCustomers: TViewCustomers
+  Size.Width = 400.000000000000000000
+  Size.Height = 600.000000000000000000
   inherited RectangleTitle: TRectangle
+    Size.Width = 400.000000000000000000
     inherited LabelTitle: TLabel
+      Size.Width = 400.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Customers'
+      inherited ButtonDelete: TSpeedButton
+        Position.X = 360.000000000000000000
+      end
+      inherited ButtonAdd: TSpeedButton
+        Position.X = 320.000000000000000000
+      end
     end
   end
   inherited ListView: TListView
     ItemIndex = 0
+    Size.Width = 400.000000000000000000
+    Size.Height = 560.000000000000000000
   end
-  inherited Rectangle1: TRectangle
-    object ButtonPrevPage: TSpeedButton
-      Action = acPrevPage
-      Align = Left
-      Enabled = True
-      StyledSettings = [Family, Size, Style]
-      ImageIndex = -1
-      Position.X = 40.000000000000000000
-      Size.Width = 40.000000000000000000
-      Size.Height = 40.000000000000000000
-      Size.PlatformDefault = False
-      StyleLookup = 'arrowdowntoolbutton'
-      TextSettings.FontColor = claAliceblue
-    end
-    object ButtonNextPage: TSpeedButton
-      Action = acNextPage
-      Align = Left
-      Enabled = True
-      StyledSettings = [Family, Size, Style]
-      ImageIndex = -1
-      Position.X = 80.000000000000000000
-      Size.Width = 40.000000000000000000
-      Size.Height = 40.000000000000000000
-      Size.PlatformDefault = False
-      StyleLookup = 'arrowuptoolbutton'
-      TextSettings.FontColor = claAliceblue
-    end
-    object LabelPageOf: TLabel
-      Align = Client
-      Size.Width = 240.000000000000000000
-      Size.Height = 40.000000000000000000
-      Size.PlatformDefault = False
-      TextSettings.HorzAlign = Center
-      Text = '4290283019'
-      TabOrder = 2
-    end
+  inherited MBSMaster: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'FullName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end
+      item
+        Name = '%Paging.CurrentPageOf'
+        FieldType = ftUInteger
+        Generator = 'AlphaColors'
+        ReadOnly = False
+      end>
   end
   inherited ActionList1: TActionList
     object acNextPage: TioViewAction
@@ -63,27 +57,6 @@ inherited ViewCustomers: TViewCustomers
       VMActionName = 'acPrevPage'
     end
   end
-  inherited MBSMaster: TioModelBindSource
-    AutoActivate = True
-    FieldDefs = <
-      item
-        Name = 'Name'
-        Generator = 'ContactNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'PhoneNumber'
-        Generator = 'ColorsNames'
-        ReadOnly = False
-      end
-      item
-        Name = '%Paging.CurrentPageOf'
-        FieldType = ftUInteger
-        Generator = 'AlphaColors'
-        ReadOnly = False
-      end>
-    Preview = True
-  end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
@@ -92,7 +65,7 @@ inherited ViewCustomers: TViewCustomers
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = MBSMaster
-      FieldName = 'Name'
+      FieldName = 'FullName'
       Control = ListView
       FillExpressions = <
         item
@@ -101,13 +74,6 @@ inherited ViewCustomers: TViewCustomers
         end>
       FillHeaderExpressions = <>
       FillBreakGroups = <>
-    end
-    object LinkPropertyToFieldText: TLinkPropertyToField
-      Category = 'Quick Bindings'
-      DataSource = MBSMaster
-      FieldName = '%Paging.CurrentPageOf'
-      Component = LabelPageOf
-      ComponentProperty = 'Text'
     end
   end
 end

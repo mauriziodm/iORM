@@ -9,7 +9,6 @@ inherited ViewOrders: TViewOrders
     ItemIndex = 0
   end
   inherited MBSMaster: TioModelBindSource
-    AutoActivate = True
     FieldDefs = <
       item
         Name = 'ID'
@@ -18,7 +17,7 @@ inherited ViewOrders: TViewOrders
         ReadOnly = False
       end
       item
-        Name = 'Customer.Name'
+        Name = 'Customer.FullName'
         Generator = 'ContactNames'
         ReadOnly = False
       end
@@ -28,7 +27,6 @@ inherited ViewOrders: TViewOrders
         Generator = 'Currency'
         ReadOnly = False
       end>
-    Preview = True
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -38,7 +36,7 @@ inherited ViewOrders: TViewOrders
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = MBSMaster
-      FieldName = 'Customer.Name'
+      FieldName = 'Customer.FullName'
       Control = ListView
       CustomFormat = '%s + '#39'  (order ID: '#39' +Owner.ID.Value + '#39')'#39
       FillExpressions = <

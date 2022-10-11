@@ -51,6 +51,7 @@ Coordinates=1468,935,97,51
 
 [ListViewOrders]
 Coordinates=1313,343,89,195
+Visible=True
 
 [Rectangle4]
 Coordinates=1511,1012,69,33
@@ -334,4 +335,13 @@ Coordinates=978,1,126,33
 
 [acCustomersPrevPage]
 Coordinates=978,53,126,33
+
+[acPizzaAdd]
+Coordinates=0,0,71,33
+
+[acOrderAdd]
+Coordinates=19,52,73,33
+
+[acCustomerAdd]
+Coordinates=268,1,93,33
 

@@ -10,6 +10,7 @@ Visible=True
 
 [ListView]
 Coordinates=10,10,89,159
+Visible=True
 
 [acDelete]
 Coordinates=335,78,56,33
@@ -58,4 +59,10 @@ Coordinates=424,195,94,51
 
 [LabelPageOf]
 Coordinates=10,195,77,51
+
+[acPrevPage]
+Coordinates=118,1,72,33
+
+[acNextPage]
+Coordinates=118,161,72,33
 

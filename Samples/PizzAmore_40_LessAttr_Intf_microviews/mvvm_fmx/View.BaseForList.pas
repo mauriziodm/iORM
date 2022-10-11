@@ -27,6 +27,8 @@ type
     VMBridge: TioViewModelBridge;
     MBSMaster: TioModelBindSource;
     procedure ListViewDblClick(Sender: TObject);
+    procedure ListViewDeleteItem(Sender: TObject; AIndex: Integer);
+    procedure ListViewTap(Sender: TObject; const Point: TPointF);
   private
     { Private declarations }
   public
@@ -40,6 +42,16 @@ implementation
 procedure TViewBaseForList.ListViewDblClick(Sender: TObject);
 begin
   VMBridge.VMAction['acShowOrSelect'].Execute;
+end;
+
+procedure TViewBaseForList.ListViewDeleteItem(Sender: TObject; AIndex: Integer);
+begin
+  // Do something
+end;
+
+procedure TViewBaseForList.ListViewTap(Sender: TObject; const Point: TPointF);
+begin
+  // Do something
 end;
 
 end.

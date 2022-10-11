@@ -8549,24 +8549,6 @@ object MainForm: TMainForm
     TabOrder = 2
     OnClick = ButtonPizzasClick
   end
-  object Button1: TButton
-    Left = 0
-    Top = 8
-    Width = 75
-    Height = 25
-    Caption = 'Customers'
-    TabOrder = 3
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Left = 81
-    Top = 8
-    Width = 75
-    Height = 25
-    Caption = 'Customer'
-    TabOrder = 4
-    OnClick = Button2Click
-  end
   object ioVCL1: TioVCL
     Left = 8
     Top = 272

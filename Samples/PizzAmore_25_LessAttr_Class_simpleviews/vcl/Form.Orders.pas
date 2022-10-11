@@ -36,6 +36,7 @@ type
     procedure acShowExecute(Sender: TObject);
     procedure acAddExecute(Sender: TObject);
     procedure GridCustomersDblClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -66,6 +67,11 @@ end;
 procedure TOrdersForm.acShowExecute(Sender: TObject);
 begin
   DSOrders.ShowCurrent;
+end;
+
+procedure TOrdersForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 procedure TOrdersForm.FormCreate(Sender: TObject);

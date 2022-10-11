@@ -2,16 +2,16 @@
 Coordinates=12,70,57,33
 
 [ButtonBack]
-Coordinates=755,10,72,51
+Coordinates=82,642,72,51
 
 [RectangleTitle]
-Coordinates=766,531,84,33
+Coordinates=10,719,84,33
 
 [Rectangle1]
 Coordinates=137,608,69,33
 
 [MBSMaster]
-Coordinates=10,187,72,141
+Coordinates=10,233,72,159
 Visible=True
 
 [acBack]
@@ -24,43 +24,37 @@ Coordinates=312,1,70,33
 Coordinates=312,53,62,33
 
 [ButtonSave]
-Coordinates=10,531,71,51
+Coordinates=252,642,71,51
 
 [acPersist]
 Coordinates=312,105,60,33
 
 [LabelTitle]
-Coordinates=107,531,62,51
+Coordinates=650,10,62,51
 
 [ButtonRevert]
 Coordinates=434,10,79,51
 
 [Label3]
-Coordinates=195,531,46,51
+Coordinates=434,10,46,51
 
 [EditPhoneNumber]
-Coordinates=162,121,104,51
-
-[EditName]
-Coordinates=184,343,61,51
+Coordinates=162,454,104,51
 
 [Label5]
-Coordinates=611,10,46,51
+Coordinates=578,10,46,51
 
 [EditCity]
-Coordinates=188,232,53,51
+Coordinates=188,343,53,51
 
 [Label2]
-Coordinates=539,10,46,51
+Coordinates=506,10,46,51
 
 [ListBoxItemAddress]
-Coordinates=626,531,114,33
-
-[Label1]
-Coordinates=683,10,46,51
+Coordinates=594,642,114,33
 
 [EditAddress]
-Coordinates=177,454,75,51
+Coordinates=177,232,75,51
 
 [EditID]
 Coordinates=192,10,44,51
@@ -69,20 +63,33 @@ Coordinates=192,10,44,51
 Coordinates=292,10,116,177
 
 [ListBoxItemCity]
-Coordinates=508,531,92,33
+Coordinates=476,642,92,33
 
 [Label4]
-Coordinates=267,531,46,51
+Coordinates=180,642,46,51
 
 [ListBoxItemPhoneNumber]
-Coordinates=339,531,143,33
+Coordinates=734,642,143,33
 
 [ListBoxItemName]
-Coordinates=10,608,101,33
+Coordinates=349,642,101,33
 
 []
-Coordinates=420,333,82,33
+Coordinates=683,10,46,51
 
 [BindingsList1]
 Coordinates=302,80,82,33
+
+[EditFirstName]
+Coordinates=172,121,84,51
+
+[Label6]
+Coordinates=738,10,46,51
+
+[Label1]
+Coordinates=10,642,46,51
+
+[EditLastName]
+Coordinates=173,565,83,51
+Visible=True
 

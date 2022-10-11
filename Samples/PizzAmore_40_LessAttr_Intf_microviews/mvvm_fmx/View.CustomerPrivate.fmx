@@ -1,31 +1,31 @@
-inherited ViewCustomer: TViewCustomer
+inherited ViewCustomerPrivate: TViewCustomerPrivate
   inherited RectangleTitle: TRectangle
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
-      Text = 'Customer'
+      Text = 'Private customer'
     end
   end
-  object ListBox: TListBox [1]
+  object ListBox: TListBox [2]
     Align = Client
-    Size.Width = 380.000000000000000000
-    Size.Height = 504.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 520.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
     DisableFocusEffect = True
     DefaultItemStyles.ItemStyle = ''
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
-    Viewport.Width = 376.000000000000000000
-    Viewport.Height = 500.000000000000000000
+    Viewport.Width = 396.000000000000000000
+    Viewport.Height = 516.000000000000000000
     object ListBoxItemName: TListBoxItem
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
       object EditID: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 41
+        TabOrder = 39
         Text = '-33'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 5.000000000000000000
@@ -44,11 +44,10 @@ inherited ViewCustomer: TViewCustomer
           TabOrder = 0
         end
       end
-      object EditName: TEdit
+      object EditFirstName: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        Anchors = [akLeft, akTop, akRight]
         StyleLookup = 'transparentedit'
-        TabOrder = 40
+        TabOrder = 38
         Text = 'Mark Anderson'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 56.000000000000000000
@@ -56,28 +55,51 @@ inherited ViewCustomer: TViewCustomer
         Margins.Left = 5.000000000000000000
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000
-        Size.Width = 314.000000000000000000
+        Size.Width = 161.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
         TextPrompt = 'Type the name here'
         StyledSettings = [Family, Size, FontColor]
         object Label2: TLabel
           Position.Y = -16.000000000000000000
-          Text = 'Name'
+          Text = 'First name'
+          TabOrder = 0
+        end
+      end
+      object EditLastName: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Anchors = [akLeft, akTop, akRight]
+        StyleLookup = 'transparentedit'
+        TabOrder = 37
+        Text = 'Mark Anderson'
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Position.X = 220.000000000000000000
+        Position.Y = 15.000000000000000000
+        Margins.Left = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 170.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'Type the name here'
+        StyledSettings = [Family, Size, FontColor]
+        object Label6: TLabel
+          Position.Y = -16.000000000000000000
+          Text = 'Last name'
           TabOrder = 0
         end
       end
     end
     object ListBoxItemPhoneNumber: TListBoxItem
       Position.Y = 50.000000000000000000
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       object EditPhoneNumber: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 40
+        TabOrder = 39
         Text = '-33'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 5.000000000000000000
@@ -99,14 +121,14 @@ inherited ViewCustomer: TViewCustomer
     end
     object ListBoxItemCity: TListBoxItem
       Position.Y = 100.000000000000000000
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
       object EditCity: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 40
+        TabOrder = 39
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -148,14 +170,14 @@ inherited ViewCustomer: TViewCustomer
     end
     object ListBoxItemAddress: TListBoxItem
       Position.Y = 150.000000000000000000
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
       object EditAddress: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 40
+        TabOrder = 39
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -205,7 +227,12 @@ inherited ViewCustomer: TViewCustomer
         ReadOnly = False
       end
       item
-        Name = 'Name'
+        Name = 'FirstName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'LastName'
         Generator = 'ContactNames'
         ReadOnly = False
       end
@@ -228,8 +255,8 @@ inherited ViewCustomer: TViewCustomer
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 20
-    Top = 5
+    Left = 228
+    Top = 65525
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = MBSMaster
@@ -240,8 +267,8 @@ inherited ViewCustomer: TViewCustomer
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = MBSMaster
-      FieldName = 'Name'
-      Control = EditName
+      FieldName = 'FirstName'
+      Control = EditFirstName
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
@@ -263,6 +290,13 @@ inherited ViewCustomer: TViewCustomer
       DataSource = MBSMaster
       FieldName = 'Address'
       Control = EditAddress
+      Track = False
+    end
+    object LinkControlToField6: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSMaster
+      FieldName = 'LastName'
+      Control = EditLastName
       Track = False
     end
   end

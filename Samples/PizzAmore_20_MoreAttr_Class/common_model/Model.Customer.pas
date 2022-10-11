@@ -19,7 +19,6 @@ type
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;
-    FGender: TGender;
     function GetFullAddress: String;
   public
     constructor Create;
@@ -35,7 +34,6 @@ type
     property FullAddress: String read GetFullAddress;  // ReadOnly - Not mapped
     [ioVarChar(30)]
     property PhoneNumber: String read FPhoneNumber write FPhoneNumber;
-    property Gender: TGender read FGender write FGender;
   end;
 
 implementation

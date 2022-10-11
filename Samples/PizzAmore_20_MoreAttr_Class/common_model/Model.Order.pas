@@ -16,7 +16,7 @@ type
     FOrderDate: TDate;
     [ioBelongsTo(TCustomer), ioForeignKey(TioFKAction.fkSetNull, TioFKAction.fkCascade)]
     FCustomer: TCustomer;
-    [ioHasMany(TOrderRowCustom, 'OrderID'), ioLazy]
+    [ioHasMany(TOrderRow, 'OrderID'), ioLazy]
     [ioForeignKey(TioFKAction.fkCascade, TioFKAction.fkCascade)]
     FRows: TObjectList<TOrderRow>;
     [ioVarChar(100)]

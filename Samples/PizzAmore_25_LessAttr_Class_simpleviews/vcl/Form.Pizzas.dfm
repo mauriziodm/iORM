@@ -13,6 +13,8 @@ object PizzasForm: TPizzasForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  Visible = True
+  OnClose = FormClose
   OnCreate = FormCreate
   TextHeight = 15
   object PanelTop: TPanel
