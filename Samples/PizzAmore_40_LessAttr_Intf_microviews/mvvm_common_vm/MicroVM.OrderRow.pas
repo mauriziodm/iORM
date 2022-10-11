@@ -34,7 +34,7 @@ implementation
 
 procedure TMicroVMOrderRows.acDeleteExecute(Sender: TObject);
 begin
-//  MPOrderRow.Delete;
+  MPOrderRow.Delete;
   CloseViews;
 end;
 

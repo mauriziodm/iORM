@@ -59,6 +59,7 @@ type
     function GetItem(Index: Integer): TObject;
     function GetItemTypeName: String;
     function GetItemTypeInfo: PTypeInfo;
+    function IndexOf(const AObjToFind: TObject): Integer;
     // OwnsObjects property
     procedure SetOwnsObjects(AValue:Boolean);
     function GetOwnsObjects: Boolean;

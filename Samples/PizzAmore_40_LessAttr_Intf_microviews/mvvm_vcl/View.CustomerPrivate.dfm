@@ -215,6 +215,23 @@ inherited ViewCustomerPrivate: TViewCustomerPrivate
       ParentFont = False
       TabOrder = 7
     end
+    object Button1: TButton
+      Left = 224
+      Top = 62
+      Width = 75
+      Height = 25
+      Action = acDelete
+      TabOrder = 8
+    end
+  end
+  inherited ActionList1: TActionList
+    object acDelete: TioViewAction
+      Category = 'iORM-MVVM'
+      Caption = 'Delete'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acDelete'
+    end
   end
   inherited MDSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField

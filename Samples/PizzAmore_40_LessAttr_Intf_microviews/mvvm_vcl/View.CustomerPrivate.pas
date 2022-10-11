@@ -30,6 +30,8 @@ type
     Label6: TLabel;
     DBEditLastName: TDBEdit;
     MDSMasterLastName: TStringField;
+    acDelete: TioViewAction;
+    Button1: TButton;
   private
     { Private declarations }
   public

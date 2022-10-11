@@ -32,7 +32,7 @@ implementation
 
 uses
   Data.Bind.ObjectScope, System.SysUtils,
-  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions, iORM.DuckTyped.Factory;
+  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions, iORM.Utilities;
 
 { TioCommonBSBehavior }
 
@@ -44,7 +44,7 @@ begin
       Format('Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to "ltManual" and try again.',
       [ABindSource.GetName]));
   // If the property "TypeOfCollection" of the ActiveBindSourceAdapter is tvList then accept some type of list (ListDuckType wrappable)
-  if (ABindSource.GetActiveBindSourceAdapter.TypeOfCollection = TioTypeOfCollection.tcList) and not TioDuckTypedFactory.IsList(ADataObject) then
+  if (ABindSource.GetActiveBindSourceAdapter.TypeOfCollection = TioTypeOfCollection.tcList) and not TioUtilities.IsList(ADataObject) then
     raise EioException.Create(ClassName, 'CheckForSetDataObject',
       Format('You are trying to set the DataObject of the BindSource "%s" (it could also be a DataSet) but there is a problem:' +
       #13#13'the "TypeOfCollection" property of the BindSource itself is set to "tcList", this means that iORM expects a list but the object you are trying to set does not appear to have the characteristics of a list.' +

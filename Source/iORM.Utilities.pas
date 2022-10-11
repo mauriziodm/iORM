@@ -74,6 +74,7 @@ type
     class function TryGetMemberAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
     class function HasAttribute<T: class>(ARTTIType: TRttiType): boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
+    class function IsList(const AObj: TObject): Boolean;
     class procedure ClearList(const AList: TObject);
     class function CloneObject(const ASourceObj: TObject): TObject;
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
@@ -361,6 +362,11 @@ end;
 class function TioUtilities.IsAnInterfaceTypeName(const ATypeName: String): Boolean;
 begin
   Result := ATypeName.StartsWith('I');
+end;
+
+class function TioUtilities.IsList(const AObj: TObject): Boolean;
+begin
+  Result := TioDuckTypedFactory.IsList(AObj);
 end;
 
 class function TioUtilities.ObjectAsIInterface(const AObj: Tobject): IInterface;

@@ -51,6 +51,7 @@ type
     FClearMethod: TRttiMethod;
     FGetItemMethod: TRttiMethod;
     FDelete: TRttiMethod;
+    FIndexOf: TRttiMethod;
   strict protected
     procedure SetOwnsObjects(AValue: Boolean);
     function GetOwnsObjects: Boolean;
@@ -66,6 +67,7 @@ type
     function GetItemTypeName: String;
     function GetItemTypeInfo: PTypeInfo;
     function GetEnumerator: IEnumerator;
+    function IndexOf(const AObjToFind: TObject): Integer;
     property OwnsObjects: Boolean read GetOwnsObjects write SetOwnsObjects;
   end;
 
@@ -139,6 +141,10 @@ begin
   FGetItemMethod := LItemsProperty.ReadMethod;
   if not Assigned(FGetItemMethod) then
     raise EioException.Create(Self.ClassName + ': "GetItem" method not found in the object');
+  // IndexOf
+  FIndexOf := LRttiType.GetMethod('IndexOf');
+  if not Assigned(FIndexOf) then
+    raise EioException.Create('DuckTypedList: "FIndexOf" method not found in the object');
 end;
 
 procedure TioDuckTypedList.Delete(Index: Integer);
@@ -200,10 +206,15 @@ begin
   // ad una entità sarà più avanti
   if (LItemsProperty <> nil) and ((LItemsProperty.PropertyType.IsInstance and TioUtilities.HasAttribute<ioEntity>(LItemsProperty.PropertyType)) or
     (LItemsProperty.PropertyType is TRttiInterfaceType)) and (ARttiType.GetProperty('Count') <> nil) and (ARttiType.GetMethod('Add') <> nil) and
-    (ARttiType.GetMethod('Clear') <> nil) and (ARttiType.GetMethod('Delete') <> nil) then
+    (ARttiType.GetMethod('Clear') <> nil) and (ARttiType.GetMethod('Delete') <> nil) and (ARttiType.GetMethod('IndexOf') <> nil) then
     Result := LItemsProperty.PropertyType.Name
   else
     Result := '';
+end;
+
+function TioDuckTypedList.IndexOf(const AObjToFind: TObject): Integer;
+begin
+  Result := FIndexOf.Invoke(FListObject, [TValue.From<TObject>(AObjToFind)]).AsInteger;
 end;
 
 class function TioDuckTypedList.IsList(const AObj: TObject): Boolean;
@@ -215,7 +226,7 @@ begin
   if not Assigned(LRttiType) then
     Exit;
   Result := (LRttiType.GetProperty('Count') <> nil) and (LRttiType.GetMethod('Add') <> nil) and (LRttiType.GetMethod('Clear') <> nil) and
-    (LRttiType.GetMethod('Delete') <> nil) and (LRttiType.GetIndexedProperty('Items') <> nil);
+    (LRttiType.GetMethod('Delete') <> nil) and (LRttiType.GetIndexedProperty('Items') <> nil) and (LRttiType.GetMethod('IndexOf') <> nil);
 end;
 
 { TioDuckTypedListEnumerator }

@@ -11,6 +11,8 @@ type
 
   [diViewModelFor(TPrivateCustomer), diViewModelFor(TBusinessCustomer)]
   TVMCustomer = class(TVMBaseForForm)
+    acDelete: TioVMAction;
+    procedure acDeleteExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -20,5 +22,12 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TVMCustomer.acDeleteExecute(Sender: TObject);
+begin
+  inherited;
+  MPMaster.Delete;
+  CloseViews;
+end;
 
 end.

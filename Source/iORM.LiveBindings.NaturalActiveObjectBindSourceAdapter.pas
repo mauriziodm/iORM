@@ -47,6 +47,7 @@ type
   TioNaturalActiveObjectBindSourceAdapter = class(TioActiveObjectBindSourceAdapter, IioNaturalActiveBindSourceAdapter)
   private
     FSourceAdapter: IioNaturalBindSourceAdapterSource;
+    procedure SynchronizeSourceAdapter;
   protected
     procedure DoBeforeOpen; override;
     procedure DoBeforeDelete; override;
@@ -65,7 +66,9 @@ implementation
 
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.CommonBSAPersistence,
-  System.SysUtils, iORM.LiveBindings.CommonBSABehavior;
+  System.SysUtils, iORM.LiveBindings.CommonBSABehavior,
+  iORM.LiveBindings.BSPersistence, iORM.Utilities, iORM.DuckTyped.Interfaces,
+  iORM.DuckTyped.Factory;
 
 
 
@@ -118,6 +121,9 @@ begin
 end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.DoBeforeDelete;
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+  LMasterBS: IioBSPersistenceClient;
 begin
   // Questo è un NaturalBindSourceAdapter quindi in realtà nella quasi totalità dei casi
   //  sta esponendo ad una form anagrafica l'oggetto selezionato in un altro BindSourceAdapter
@@ -134,7 +140,46 @@ begin
   //      però in questo modo in pratica disabilito l'eventuale event handler
   //inherited;
   if Assigned(FSourceAdapter) then
-     TBindSourceAdapter(FSourceAdapter).Delete;
+  begin
+    // Chiude il BindSource per evitare errori AV
+    if HasBindSource then
+      GetBindSource.Close;
+    // Se il SourceAdapter è un ListBindSourceAdapter allora lo sposta (ItemIndex)
+    //  sullo stesso oggetto a cui si riferisce il presente NaturalBSA in modo da
+    //  poter poi delegare al SourceAdapter stesso l'operazione di Delete
+    SynchronizeSourceAdapter;
+    // Riferimento al SourceAdapter come IioNaturalBindSourceAdapter
+    LActiveBSA := (FSourceAdapter as IioActiveBindSourceAdapter);
+    // Se il SourceAdapter ha un BindSource e se questo è un MasterBS e implementa quindi l'interfaccia
+    //   "IioBSPersistenceClient" estrae un riferimento di questo tipo (l'interfaccia) del suo
+    //   BindSouce (relativo a SourceAdapter) fa fare a lui un vero e proprio Persistence.Delete.
+    //   Se invece queste condizioni non sono soddisfatte procedete con il normale Delete del SourceAdapter (no persistence)
+    if LActiveBSA.HasBindSource and LActiveBSA.GetBindSource.IsMasterBS and Supports(LActiveBSA.GetBindSource, IioBSPersistenceClient, LMasterBS) then
+      LMasterBS.Persistence.Delete
+    else
+      LActiveBSA.Delete;
+  end;
+end;
+
+procedure TioNaturalActiveObjectBindSourceAdapter.SynchronizeSourceAdapter;
+var
+  LDataObject: TObject;
+  LActiveBSA: IioActiveBindSourceAdapter;
+  LDuckList: IioDuckTypedList;
+  LItemIndex: Integer;
+begin
+  // Estrazione di un pò di riferimenti per comodità
+  LActiveBSA := (FSourceAdapter as IioActiveBindSourceAdapter);
+  LDataObject := LActiveBSA.DataObject;
+  // Se il SourceAdapter è un ListBindSourceAdapter allora lo sposta (ItemIndex)
+  //  sullo stesso oggetto a cui si riferisce il presente NaturalBSA in modo da
+  //  poter poi delegare al SourceAdapter stesso l'operazione di Delete
+  if TioDuckTypedFactory.IsList( LDataObject ) then
+  begin
+    LDuckList := TioDuckTypedFactory.DuckTypedList(LDataObject);
+    LItemIndex := LDuckList.IndexOf(Self.Current);
+    LActiveBSA.ItemIndex := LItemIndex;
+  end;
 end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.DoBeforeOpen;
