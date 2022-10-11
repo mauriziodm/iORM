@@ -2,7 +2,7 @@ object MicroViewOrderRow: TMicroViewOrderRow
   Left = 0
   Top = 0
   Width = 430
-  Height = 75
+  Height = 82
   Color = clWhite
   Ctl3D = False
   ParentBackground = False
@@ -11,10 +11,10 @@ object MicroViewOrderRow: TMicroViewOrderRow
   TabOrder = 0
   DesignSize = (
     430
-    75)
+    82)
   object Label2: TLabel
     Left = 69
-    Top = 3
+    Top = 11
     Width = 51
     Height = 25
     Alignment = taRightJustify
@@ -29,7 +29,7 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object Label1: TLabel
     Left = 69
-    Top = 38
+    Top = 46
     Width = 51
     Height = 25
     Alignment = taRightJustify
@@ -44,7 +44,7 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object Label3: TLabel
     Left = 192
-    Top = 38
+    Top = 46
     Width = 40
     Height = 25
     Alignment = taRightJustify
@@ -59,10 +59,11 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object Label4: TLabel
     Left = 284
-    Top = 38
+    Top = 46
     Width = 39
     Height = 25
     Alignment = taRightJustify
+    Anchors = [akTop, akRight]
     AutoSize = False
     Caption = 'Total'
     Font.Charset = DEFAULT_CHARSET
@@ -72,9 +73,17 @@ object MicroViewOrderRow: TMicroViewOrderRow
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object Shape1: TShape
+    Left = 5
+    Top = 1
+    Width = 411
+    Height = 2
+    Anchors = [akLeft, akTop, akRight]
+    Pen.Color = clSilver
+  end
   object DBImage1: TDBImage
     Left = 3
-    Top = 3
+    Top = 11
     Width = 60
     Height = 60
     BorderStyle = bsNone
@@ -87,7 +96,7 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object DBEditNote: TDBEdit
     Left = 132
-    Top = 3
+    Top = 11
     Width = 285
     Height = 25
     TabStop = False
@@ -107,7 +116,7 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object DBEditPrice: TDBEdit
     Left = 132
-    Top = 38
+    Top = 46
     Width = 60
     Height = 25
     TabStop = False
@@ -126,7 +135,7 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object DBEditQty: TDBEdit
     Left = 244
-    Top = 38
+    Top = 46
     Width = 30
     Height = 25
     BorderStyle = bsNone
@@ -143,11 +152,11 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object DBEditRowTotal: TDBEdit
     Left = 328
-    Top = 38
+    Top = 46
     Width = 89
     Height = 25
     TabStop = False
-    Anchors = [akLeft, akTop, akRight]
+    Anchors = [akTop, akRight]
     BorderStyle = bsNone
     DataField = 'RowTotal'
     DataSource = SourceOrderRow
@@ -162,18 +171,18 @@ object MicroViewOrderRow: TMicroViewOrderRow
     TabOrder = 4
   end
   object Button1: TButton
-    Left = 232
-    Top = 3
+    Left = 341
+    Top = 15
     Width = 75
     Height = 25
-    Action = acRefresh
+    Action = acDelete
     TabOrder = 5
   end
   object MDSorderRow: TioModelDataSet
     ViewModelBridge = OrderRowMicroVMBridge
     ModelPresenter = 'MPOrderRow'
-    Left = 272
-    Top = 32
+    Left = 264
+    Top = 66
     object MDSorderRowDescription: TStringField
       FieldName = 'Pizza.Name'
     end
@@ -193,22 +202,23 @@ object MicroViewOrderRow: TMicroViewOrderRow
     end
   end
   object OrderRowMicroVMBridge: TioViewModelBridge
-    Left = 152
-    Top = 32
+    Left = 144
+    Top = 66
   end
   object SourceOrderRow: TDataSource
     DataSet = MDSorderRow
-    Left = 360
-    Top = 32
+    Left = 352
+    Top = 66
   end
   object ActionList1: TActionList
-    Left = 320
-    object acRefresh: TioViewAction
+    Left = 256
+    Top = 8
+    object acDelete: TioViewAction
       Category = 'iORM-MVVM'
-      Caption = 'Refresh'
+      Caption = 'Delete'
       Enabled = True
       Visible = True
-      VMActionName = 'acRefresh'
+      VMActionName = 'acDelete'
     end
   end
 end

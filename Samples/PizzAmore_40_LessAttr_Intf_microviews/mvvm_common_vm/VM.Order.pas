@@ -12,9 +12,7 @@ type
 
   TVMOrder = class(TVMBaseForForm)
     MPRows: TioModelPresenterDetail;
-    acDeleteRow: TioVMAction;
     acShowPizzaSelector: TioVMAction;
-    procedure acDeleteRowExecute(Sender: TObject);
     procedure acShowPizzaSelectorExecute(Sender: TObject);
     procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
@@ -32,12 +30,6 @@ uses
   Model.Interfaces, System.Rtti;
 
 {$R *.dfm}
-
-procedure TVMOrder.acDeleteRowExecute(Sender: TObject);
-begin
-  inherited;
-  MPRows.Delete;
-end;
 
 procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
@@ -62,7 +54,7 @@ begin
       MPRows.Refresh
     else
     begin
-      MPRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza)]) );
+      MPRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
       MPRows.ShowCurrent('', 'VCProviderOrderRows');
     end;
   end;

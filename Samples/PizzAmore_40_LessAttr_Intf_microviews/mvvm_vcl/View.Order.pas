@@ -20,7 +20,6 @@ type
     DBEditNote: TDBEdit;
     Label6: TLabel;
     DBEditGrandTotal: TDBEdit;
-    ButtonDeleteRow: TSpeedButton;
     MDSMasterID: TIntegerField;
     MDSMasterOrderDate: TDateField;
     MDSMasterNote: TStringField;
@@ -31,7 +30,6 @@ type
     MDSRowsQty: TIntegerField;
     MDSRowsRowTotal: TCurrencyField;
     SourceRows: TDataSource;
-    acDeleteRow: TioViewAction;
     VCProviderOrderPizzaSel: TioViewContextProvider;
     MicroViewCustomer1: TMicroViewCustomer;
     VCProviderOrderRows: TioViewContextProvider;

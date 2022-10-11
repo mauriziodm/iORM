@@ -18,8 +18,8 @@ type
   [diViewModelFor(TPizzaOrderRow), diViewModelFor(TCustomOrderRow)]
   TMicroVMOrderRows = class(TioViewModel)
     MPOrderRow: TioModelPresenterDetail;
-    acRefresh: TioVMAction;
-    procedure acRefreshExecute(Sender: TObject);
+    acDelete: TioVMAction;
+    procedure acDeleteExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -32,9 +32,10 @@ implementation
 
 {$R *.dfm}
 
-procedure TMicroVMOrderRows.acRefreshExecute(Sender: TObject);
+procedure TMicroVMOrderRows.acDeleteExecute(Sender: TObject);
 begin
-  MPOrderRow.Refresh;
+//  MPOrderRow.Delete;
+  CloseViews;
 end;
 
 end.

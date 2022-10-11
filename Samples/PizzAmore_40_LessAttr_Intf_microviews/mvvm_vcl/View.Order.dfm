@@ -65,20 +65,6 @@ inherited ViewOrder: TViewOrder
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object ButtonDeleteRow: TSpeedButton
-        Left = 50
-        Top = 0
-        Width = 79
-        Height = 40
-        Action = acDeleteRow
-        Align = alLeft
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -13
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-      end
       object DBEditGrandTotal: TDBEdit
         Left = 277
         Top = 7
@@ -200,13 +186,6 @@ inherited ViewOrder: TViewOrder
   inherited ActionList1: TActionList [3]
     Left = 171
     Top = 315
-    object acDeleteRow: TioViewAction
-      Category = 'iORM-MVVM'
-      Caption = 'Delete row'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acDeleteRow'
-    end
   end
   inherited MDSMaster: TioModelDataSet [4]
     Left = 171

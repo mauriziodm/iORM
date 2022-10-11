@@ -38,7 +38,8 @@ uses
 
 procedure TMicroVMCustomer.acSelectCustomerExecute(Sender: TObject);
 begin
-//  io.ShowAsSelector<ICustomer>(MPCustomer);
+//  io.ShowAsSelector(MPCustomer);
+  io.ShowAsSelector<ICustomer>(MPCustomer);
 end;
 
 procedure TMicroVMCustomer.acShowCustomerExecute(Sender: TObject);

@@ -29,9 +29,10 @@ type
     MDSorderRowPizzaImage: TGraphicField;
     MDSorderRowQty: TIntegerField;
     MDSorderRowRowTotal: TCurrencyField;
-    ActionList1: TActionList;
-    acRefresh: TioViewAction;
+    Shape1: TShape;
     Button1: TButton;
+    ActionList1: TActionList;
+    acDelete: TioViewAction;
   private
     { Private declarations }
   public
