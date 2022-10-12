@@ -4,7 +4,6 @@ inherited VMCustomer: TVMCustomer
   end
   object acNew: TioVMAction
     Name = 'acNew'
-    OnExecute = acNewExecute
     Left = 192
     Top = 248
   end

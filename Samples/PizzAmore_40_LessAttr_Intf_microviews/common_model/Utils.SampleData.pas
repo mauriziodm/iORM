@@ -102,6 +102,7 @@ begin
    LOrder.Note := 'Well done';
    LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(1), 3) );
    LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(2), 2) );
+   LOrder.Rows.Add( TCustomOrderRow.Create('Pizza with artichokes and blue cheese without mozzarella', 9.00, 1) );
    LOrder.Rows.Add( TPizzaOrderRow.Create(io.LoadObject<IPizza>(3), 1) );
    io.Persist(LOrder);
    // Second order

@@ -181,23 +181,6 @@ inherited ViewCustomer: TViewCustomer
       TabOrder = 6
     end
   end
-  object Button1: TButton [1]
-    Left = 248
-    Top = 62
-    Width = 75
-    Height = 25
-    Action = acNew
-    TabOrder = 1
-  end
-  inherited ActionList1: TActionList
-    object acNew: TioViewAction
-      Category = 'iORM-MVVM'
-      Caption = 'acNew'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acNew'
-    end
-  end
   inherited MDSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField
       FieldName = 'ID'

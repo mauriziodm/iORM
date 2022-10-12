@@ -34,7 +34,7 @@ uses
 procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(MPMaster);
+//  io.ShowAsSelector<IPizza>(MPMaster);
 end;
 
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);

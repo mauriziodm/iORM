@@ -202,12 +202,17 @@
             <Form>MicroVMOrderRows</Form>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="MicroView.OrderRow.pas">
-            <Form>MicroViewOrderRow</Form>
+        <DCCReference Include="MicroView.OrderRowPizza.pas">
+            <Form>MicroViewOrderRowPizza</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="View.CustomerBusiness.pas">
             <Form>ViewCustomerBusiness</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="MicroView.OrderRowCustom.pas">
+            <Form>MicroViewOrderRowCustom</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>

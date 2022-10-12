@@ -1,25 +1,23 @@
-object MicroViewOrderRow: TMicroViewOrderRow
+object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
   Left = 0
   Top = 0
   Width = 430
-  Height = 82
-  Color = clWhite
-  Ctl3D = False
+  Height = 123
+  Color = 14145535
   ParentBackground = False
   ParentColor = False
-  ParentCtl3D = False
   TabOrder = 0
   DesignSize = (
     430
-    82)
+    123)
   object Label2: TLabel
-    Left = 69
+    Left = 5
     Top = 11
-    Width = 51
+    Width = 88
     Height = 25
     Alignment = taRightJustify
     AutoSize = False
-    Caption = 'Pizza'
+    Caption = 'Description'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
     Font.Height = -16
@@ -28,8 +26,8 @@ object MicroViewOrderRow: TMicroViewOrderRow
     ParentFont = False
   end
   object Label1: TLabel
-    Left = 69
-    Top = 46
+    Left = 42
+    Top = 86
     Width = 51
     Height = 25
     Alignment = taRightJustify
@@ -43,8 +41,8 @@ object MicroViewOrderRow: TMicroViewOrderRow
     ParentFont = False
   end
   object Label3: TLabel
-    Left = 192
-    Top = 46
+    Left = 165
+    Top = 86
     Width = 40
     Height = 25
     Alignment = taRightJustify
@@ -58,8 +56,8 @@ object MicroViewOrderRow: TMicroViewOrderRow
     ParentFont = False
   end
   object Label4: TLabel
-    Left = 284
-    Top = 46
+    Left = 257
+    Top = 86
     Width = 39
     Height = 25
     Alignment = taRightJustify
@@ -81,61 +79,42 @@ object MicroViewOrderRow: TMicroViewOrderRow
     Anchors = [akLeft, akTop, akRight]
     Pen.Color = clSilver
   end
-  object DBImage1: TDBImage
-    Left = 3
+  object DBMemoDescription: TDBMemo
+    Left = 105
     Top = 11
-    Width = 60
-    Height = 60
-    BorderStyle = bsNone
-    Ctl3D = False
-    DataField = 'Image'
-    DataSource = SourceOrderRow
-    ParentCtl3D = False
-    Stretch = True
-    TabOrder = 0
-  end
-  object DBEditNote: TDBEdit
-    Left = 132
-    Top = 11
-    Width = 285
-    Height = 25
-    TabStop = False
-    Anchors = [akLeft, akTop, akRight]
-    BorderStyle = bsNone
-    DataField = 'Pizza.Name'
+    Width = 311
+    Height = 69
+    Color = clInactiveBorder
+    DataField = 'Description'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ParentColor = True
     ParentFont = False
-    ReadOnly = True
-    TabOrder = 1
+    TabOrder = 4
   end
   object DBEditPrice: TDBEdit
-    Left = 132
-    Top = 46
+    Left = 105
+    Top = 86
     Width = 60
     Height = 25
-    TabStop = False
     BorderStyle = bsNone
-    DataField = 'Pizza.Price'
+    Color = clInactiveBorder
+    DataField = 'Price'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ParentColor = True
     ParentFont = False
-    ReadOnly = True
-    TabOrder = 2
+    TabOrder = 0
   end
   object DBEditQty: TDBEdit
-    Left = 244
-    Top = 46
+    Left = 217
+    Top = 86
     Width = 30
     Height = 25
     BorderStyle = bsNone
@@ -148,11 +127,11 @@ object MicroViewOrderRow: TMicroViewOrderRow
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 1
   end
   object DBEditRowTotal: TDBEdit
-    Left = 328
-    Top = 46
+    Left = 301
+    Top = 86
     Width = 89
     Height = 25
     TabStop = False
@@ -168,26 +147,27 @@ object MicroViewOrderRow: TMicroViewOrderRow
     ParentColor = True
     ParentFont = False
     ReadOnly = True
-    TabOrder = 4
+    TabOrder = 2
   end
   object Button1: TButton
     Left = 341
-    Top = 15
+    Top = 9
     Width = 75
     Height = 25
     Action = acDelete
-    TabOrder = 5
+    TabOrder = 3
   end
   object MDSorderRow: TioModelDataSet
     ViewModelBridge = OrderRowMicroVMBridge
     ModelPresenter = 'MPOrderRow'
     Left = 264
-    Top = 66
+    Top = 94
     object MDSorderRowDescription: TStringField
-      FieldName = 'Pizza.Name'
+      FieldName = 'Description'
+      Size = 250
     end
-    object MDSorderRowPizzaPrice: TCurrencyField
-      FieldName = 'Pizza.Price'
+    object MDSorderRowPrice: TCurrencyField
+      FieldName = 'Price'
     end
     object MDSorderRowQty: TIntegerField
       Alignment = taCenter
@@ -203,16 +183,16 @@ object MicroViewOrderRow: TMicroViewOrderRow
   end
   object OrderRowMicroVMBridge: TioViewModelBridge
     Left = 144
-    Top = 66
+    Top = 94
   end
   object SourceOrderRow: TDataSource
     DataSet = MDSorderRow
     Left = 352
-    Top = 66
+    Top = 94
   end
   object ActionList1: TActionList
     Left = 256
-    Top = 8
+    Top = 48
     object acDelete: TioViewAction
       Category = 'iORM-MVVM'
       Caption = 'Delete'

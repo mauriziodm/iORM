@@ -1,4 +1,4 @@
-unit MicroView.OrderRow;
+unit MicroView.OrderRowPizza;
 
 interface
 
@@ -11,7 +11,7 @@ uses
 type
 
   [diViewFor(TPizzaOrderRow)]
-  TMicroViewOrderRow = class(TFrame)
+  TMicroViewOrderRowPizza = class(TFrame)
     OrderRowMicroVMBridge: TioViewModelBridge;
     MDSorderRow: TioModelDataSet;
     SourceOrderRow: TDataSource;

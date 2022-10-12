@@ -13,7 +13,6 @@ type
   [diViewModelFor(TCustomer)]
   TVMCustomer = class(TVMBaseForForm)
     acNew: TioVMAction;
-    procedure acNewExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -26,16 +25,5 @@ uses
   Model.Interfaces;
 
 {$R *.dfm}
-
-procedure TVMCustomer.acNewExecute(Sender: TObject);
-var
-  LCustomer: ICustomer;
-begin
-  inherited;
-  LCustomer := TCustomer.Create;
-  MPMaster.Open;
-  MPMaster.SetDataObject(LCustomer);
-//  MPMaster.Open;
-end;
 
 end.
