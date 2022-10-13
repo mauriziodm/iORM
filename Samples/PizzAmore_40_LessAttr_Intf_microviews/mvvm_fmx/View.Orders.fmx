@@ -5,9 +5,6 @@ inherited ViewOrders: TViewOrders
       Text = 'Orders'
     end
   end
-  inherited ListView: TListView
-    ItemIndex = 0
-  end
   inherited MBSMaster: TioModelBindSource
     FieldDefs = <
       item

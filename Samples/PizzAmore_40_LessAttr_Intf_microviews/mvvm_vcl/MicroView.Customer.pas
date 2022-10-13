@@ -18,14 +18,14 @@ type
     DBEditCustName: TDBEdit;
     DBEditCustAddress: TDBEdit;
     DBECustPhone: TDBEdit;
-    CustomerMicroVMBridge: TioViewModelBridge;
+    VMBridgeMView: TioViewModelBridge;
     MDSCustomer: TioModelDataSet;
     MDSCustomerID: TIntegerField;
     MDSCustomerName: TStringField;
     MDSCustomerFullAddress: TStringField;
     MDSCustomerPhoneNumber: TStringField;
     SourceCustomer: TDataSource;
-    ActionList1: TActionList;
+    ActionListCustMView: TActionList;
     acSelectCustomer: TioViewAction;
     ButtonViewCustomer: TSpeedButton;
     acShowCustomer: TioViewAction;

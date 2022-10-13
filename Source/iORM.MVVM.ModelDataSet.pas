@@ -124,19 +124,6 @@ begin
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
   if FModelPresenter.IsEmpty then
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
-
-// ----- OLD CODE -----
-//  // Get the BindSourceAdapter from ViewModel and open it
-//  // NB: If the 'CrossViewMasterSource' property is assigned the BindSourceAdapter
-//  // from it (for cross view with microviews)
-//  if Assigned(FCrossView_MasterBindSource) then
-//    GetModelPresenterInstance.SetActiveBindSourceAdapter(  TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name ,Self,
-//      FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)  );
-//  SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
-//  if GetActiveBindSourceAdapter <> nil then
-//    GetActiveBindSourceAdapter.Active := True;
-// ----- OLD CODE -----
-
   // Get the BindSourceAdapter from ViewModel and open it
   // Note: If the 'CrossViewMasterSource' property is assigned then get the BindSourceAdapter
   // from it (for cross view with microviews)

@@ -214,6 +214,14 @@ begin
 
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;
+
+
+  // Se è stata impostata la proprietà "CrossView_MasterBindSource" allora significa che siamo
+  //  in una MicroEmbededView e l'accoppiamento con il MasterBS deve avvenire sulla vista e non
+  //  tra VM. La riga qui sotto registra il BS attuale come slave del MasterBS presente sulla
+  //  MasterView+MasterVM in modo che anchesso venga aperto.
+  if Assigned(FCrossView_MasterBindSource) and not(csDesigning in ComponentState) then
+    FCrossView_MasterBindSource.GetModelPresenterInstance.RegisterViewBindSource(Self);
 end;
 
 procedure TioModelBindSource.Notification(AComponent: TComponent; Operation: TOperation);
@@ -319,14 +327,6 @@ begin
   begin
     if Assigned(FCrossView_MasterBindSource) then
     begin
-// ----- OLD CODE -----
-//      // Get the BSA from the MasterModelPresenter
-//      LActiveBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(Name, Self,
-//        FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil) as IioActiveBindSourceAdapter;
-//      // Set the retrieved BSA as adapter for this Presenter
-//      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
-// ----- OLD CODE -----
-
       // If here it means that it's a detail (crossview detail)
       if GetModelPresenterInstance.IsDetailBS then
         LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)

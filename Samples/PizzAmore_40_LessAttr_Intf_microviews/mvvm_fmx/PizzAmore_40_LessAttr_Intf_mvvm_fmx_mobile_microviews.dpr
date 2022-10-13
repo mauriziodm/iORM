@@ -31,7 +31,11 @@ uses
   Model.Interfaces in '..\common_model\Model.Interfaces.pas',
   Model.Customers in '..\common_model\Model.Customers.pas',
   Model.BaseBO in '..\common_model\Model.BaseBO.pas',
-  View.CustomerBusiness in 'View.CustomerBusiness.pas' {ViewCustomerBusiness: TFrame};
+  View.CustomerBusiness in 'View.CustomerBusiness.pas' {ViewCustomerBusiness: TFrame},
+  MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel},
+  MicroVM.OrderRowCustom in '..\mvvm_common_vm\MicroVM.OrderRowCustom.pas' {MicroVMOrderRowCustom: TioViewModel},
+  MicroVM.OrderRowPizza in '..\mvvm_common_vm\MicroVM.OrderRowPizza.pas' {MicroVMOrderRowPizza: TioViewModel},
+  MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

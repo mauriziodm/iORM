@@ -163,7 +163,7 @@ object MicroViewCustomer: TMicroViewCustomer
     TabOrder = 3
   end
   object MDSCustomer: TioModelDataSet
-    ViewModelBridge = CustomerMicroVMBridge
+    ViewModelBridge = VMBridgeMView
     ModelPresenter = 'MPCustomer'
     Left = 276
     Top = 48
@@ -184,7 +184,7 @@ object MicroViewCustomer: TMicroViewCustomer
       Size = 250
     end
   end
-  object CustomerMicroVMBridge: TioViewModelBridge
+  object VMBridgeMView: TioViewModelBridge
     DI_VMInterface = 'IioViewModel'
     DI_VMAlias = 'MicroVMCustomer'
     Left = 162
@@ -195,7 +195,7 @@ object MicroViewCustomer: TMicroViewCustomer
     Left = 366
     Top = 48
   end
-  object ActionList1: TActionList
+  object ActionListCustMView: TActionList
     Left = 276
     object acSelectCustomer: TioViewAction
       Category = 'iORM-MVVM'

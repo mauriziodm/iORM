@@ -34,7 +34,7 @@ uses
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-  MPRows.ShowEach('', 'VCProviderOrderRows');
+//  MPRows.ShowEach('', 'VCProviderOrderRows');
 end;
 
 procedure TVMOrder.MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);

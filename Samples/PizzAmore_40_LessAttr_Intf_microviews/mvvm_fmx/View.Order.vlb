@@ -1,122 +1,128 @@
-﻿[acBack]
-Coordinates=12,70,50,33
-
-[Rectangle1]
-Coordinates=366,574,69,33
-
-[ActionList1]
-Coordinates=119,159,70,33
-
-[MBSMaster]
-Coordinates=10,140,70,123
-Visible=True
+﻿[Rectangle1]
+Coordinates=414,464,69,33
 
 [RectangleTitle]
-Coordinates=132,574,84,33
+Coordinates=10,548,84,33
 
 [LabelTitle]
-Coordinates=10,497,62,51
+Coordinates=205,296,62,51
 
 [ButtonBack]
-Coordinates=346,497,72,51
+Coordinates=537,380,72,51
 
 [ButtonSave]
-Coordinates=98,497,71,51
+Coordinates=190,380,71,51
 
 [ButtonRevert]
-Coordinates=721,420,79,51
-
-[acRevert]
-Coordinates=315,1,57,33
-
-[acPersist]
-Coordinates=315,53,60,33
-
-[VMBridge]
-Coordinates=315,105,62,33
-
-[ButtonSelectCustomer]
-Coordinates=195,497,125,51
-
-[MBSCustomer]
-Coordinates=274,38,85,105
-Visible=True
+Coordinates=89,296,79,51
 
 [LayoutOrderData]
-Coordinates=242,574,98,33
+Coordinates=133,548,98,33
 
 [Label2]
-Coordinates=433,420,46,51
-
-[LayoutCustomer]
-Coordinates=10,574,96,33
+Coordinates=155,212,46,51
 
 [EditNote]
-Coordinates=176,343,56,51
+Coordinates=10,380,56,51
 
 [Label4]
-Coordinates=577,420,46,51
-
-[EditCustAddress]
-Coordinates=439,121,97,51
+Coordinates=643,380,46,51
 
 [EditDate]
-Coordinates=176,10,56,51
+Coordinates=100,380,56,51
 
 [EditGrandTotal]
-Coordinates=160,232,88,51
+Coordinates=586,296,88,51
 Visible=True
 
 [LayoutGrandTotal]
-Coordinates=733,497,103,33
+Coordinates=631,464,103,33
 
 [MBSRows]
-Coordinates=562,10,64,123
+Coordinates=297,380,64,51
 Visible=True
 
 [EditID]
-Coordinates=182,121,44,51
+Coordinates=341,212,44,51
 
 [Label1]
-Coordinates=505,420,46,51
-
-[Label3]
-Coordinates=444,497,46,51
-
-[EditCustName]
-Coordinates=445,10,84,51
-Visible=True
+Coordinates=10,464,46,51
 
 [Label6]
-Coordinates=649,420,46,51
+Coordinates=10,296,46,51
 
 []
-Coordinates=516,497,90,51
+Coordinates=760,10,70,51
+Visible=True
 
 [BindingsList1]
 Coordinates=287,80,82,33
 
 [Label5]
-Coordinates=10,420,46,51
-
-[StringGrid1]
-Coordinates=760,10,70,123
+Coordinates=302,296,46,51
 
 [LayoutRows]
-Coordinates=632,497,75,33
+Coordinates=520,464,75,33
 
 [ButtonDeleteRow]
-Coordinates=307,420,100,51
+Coordinates=397,380,100,51
 
 [ButtonSelectPizza]
-Coordinates=82,420,103,51
+Coordinates=10,212,103,51
 
 [acShowPizzaSelector]
 Coordinates=0,0,119,33
 
-[acShowCustomerSelector]
-Coordinates=397,80,141,33
+[LayoutCustomerData]
+Coordinates=252,464,118,33
 
-[acDeleteRow]
-Coordinates=88,52,78,33
+[acRevert]
+Coordinates=38,52,57,33
+
+[acBack]
+Coordinates=270,1,50,33
+
+[VMBridge]
+Coordinates=270,132,62,33
+
+[acPersist]
+Coordinates=113,141,60,33
+
+[MBSMaster]
+Coordinates=234,212,70,123
+Visible=True
+
+[ActionList1]
+Coordinates=34,141,70,33
+
+[MicroViewCustomer1]
+Coordinates=89,464,119,33
+
+[MicroViewCustomer1.MBSCustomer]
+Coordinates=10,36,192,105
+Visible=True
+
+[MicroViewCustomer1.EditCustAddress]
+Coordinates=313,128,205,51
+
+[MicroViewCustomer1.ButtonSelectCustomer]
+Coordinates=417,212,233,51
+
+[MicroViewCustomer1.ActionListCustMView]
+Coordinates=758,155,227,33
+
+[MicroViewCustomer1.Label3]
+Coordinates=381,296,154,51
+
+[MicroViewCustomer1.acSelectCustomer]
+Coordinates=758,210,211,33
+
+[MicroViewCustomer1.BindingsListCustMView]
+Coordinates=1065,1,239,33
+
+[MicroViewCustomer1.EditCustName]
+Coordinates=320,10,192,51
+
+[MicroViewCustomer1.CustomerMicroVMBridge]
+Coordinates=1065,56,245,33
 

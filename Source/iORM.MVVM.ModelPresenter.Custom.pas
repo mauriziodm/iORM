@@ -453,7 +453,7 @@ destructor TioModelPresenterCustom.Destroy;
 begin
   FWhereStr.Free;
   // Destroy the BindSourceAdapter was created then destroy it
-  if CheckAdapter then
+  if CheckAdapter and not (csDestroying in TComponent(FBindSourceAdapter).ComponentState) then
     FBindSourceAdapter.Free;
   // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
   // la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
