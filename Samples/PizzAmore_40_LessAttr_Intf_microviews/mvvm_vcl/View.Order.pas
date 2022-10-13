@@ -35,6 +35,8 @@ type
     VCProviderOrderRows: TioViewContextProvider;
     ScrollBoxOrderRows: TScrollBox;
     ScrollBox2: TScrollBox;
+    SpeedButton1: TSpeedButton;
+    acAddCustomPizza: TioViewAction;
     procedure VCProviderOrderPizzaSelRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderPizzaSelAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);

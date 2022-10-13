@@ -12,10 +12,10 @@ type
 
   TVMOrder = class(TVMBaseForForm)
     MPRows: TioModelPresenterDetail;
-    acShowPizzaSelector: TioVMAction;
-    procedure acShowPizzaSelectorExecute(Sender: TObject);
+    acAddCustomPizza: TioVMAction;
     procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
+    procedure acAddCustomPizzaExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -30,12 +30,6 @@ uses
   Model.Interfaces, System.Rtti;
 
 {$R *.dfm}
-
-procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);
-begin
-  inherited;
-//  io.ShowAsSelector<IPizza>(MPMaster);
-end;
 
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
@@ -58,6 +52,16 @@ begin
       MPRows.ShowCurrent('', 'VCProviderOrderRows');
     end;
   end;
+end;
+
+procedure TVMOrder.acAddCustomPizzaExecute(Sender: TObject);
+var
+  LNewOrderRow: IOrderRow;
+begin
+  inherited;
+  LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
+  MPRows.Append(LNewOrderRow);
+  MPRows.ShowCurrent('', 'VCProviderOrderRows');
 end;
 
 end.

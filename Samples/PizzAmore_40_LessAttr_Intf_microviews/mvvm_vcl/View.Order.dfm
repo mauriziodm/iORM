@@ -47,6 +47,12 @@ inherited ViewOrder: TViewOrder
     inherited PanelBottom: TPanel
       Width = 449
       ExplicitWidth = 449
+      inherited ButtonRevert: TSpeedButton
+        Width = 49
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 49
+      end
       inherited ButtonPersist: TSpeedButton
         Left = 399
         ExplicitLeft = 399
@@ -56,6 +62,7 @@ inherited ViewOrder: TViewOrder
         Top = 9
         Width = 96
         Height = 25
+        Anchors = [akTop, akRight]
         AutoSize = False
         Caption = 'Grand total'
         Font.Charset = DEFAULT_CHARSET
@@ -65,12 +72,26 @@ inherited ViewOrder: TViewOrder
         Font.Style = [fsBold]
         ParentFont = False
       end
+      object SpeedButton1: TSpeedButton
+        Left = 51
+        Top = 0
+        Width = 116
+        Height = 40
+        Action = acAddCustomPizza
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGreen
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+      end
       object DBEditGrandTotal: TDBEdit
         Left = 277
         Top = 7
         Width = 90
         Height = 25
         TabStop = False
+        Anchors = [akTop, akRight]
         BorderStyle = bsNone
         DataField = 'GrandTotal'
         DataSource = SourceMaster
@@ -185,18 +206,23 @@ inherited ViewOrder: TViewOrder
     ExplicitWidth = 438
     inherited ButtonSelectCustomer: TSpeedButton
       Left = 403
+      ExplicitLeft = 403
     end
     inherited ButtonViewCustomer: TSpeedButton
       Left = 355
+      ExplicitLeft = 355
     end
     inherited DBEditCustName: TDBEdit
       Width = 225
+      ExplicitWidth = 225
     end
     inherited DBEditCustAddress: TDBEdit
       Width = 333
+      ExplicitWidth = 333
     end
     inherited DBECustPhone: TDBEdit
       Width = 333
+      ExplicitWidth = 333
     end
     inherited MDSCustomer: TioModelDataSet
       CrossView_MasterBindSource = MDSMaster
@@ -206,6 +232,13 @@ inherited ViewOrder: TViewOrder
   inherited ActionList1: TActionList [3]
     Left = 171
     Top = 315
+    object acAddCustomPizza: TioViewAction
+      Category = 'iORM-MVVM'
+      Caption = 'Add custom pizza'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acAddCustomPizza'
+    end
   end
   inherited MDSMaster: TioModelDataSet [4]
     Left = 171
