@@ -1,4 +1,4 @@
-object MicroVMOrderRows: TMicroVMOrderRows
+object MicroVMOrderRowCustom: TMicroVMOrderRowCustom
   Height = 304
   Width = 414
   object MPOrderRow: TioModelPresenterDetail

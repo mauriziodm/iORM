@@ -33,10 +33,11 @@ uses
   VM.Order.PizzaSel in '..\mvvm_common_vm\VM.Order.PizzaSel.pas' {VMOrderPizzaSel: TioViewModel},
   MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame},
   MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel},
-  MicroVM.OrderRow in '..\mvvm_common_vm\MicroVM.OrderRow.pas' {MicroVMOrderRows: TioViewModel},
-  MicroView.OrderRowPizza in 'MicroView.OrderRowPizza.pas' {MicroViewOrderRowPizza: TFrame},
+  MicroVM.OrderRowCustom in '..\mvvm_common_vm\MicroVM.OrderRowCustom.pas' {MicroVMOrderRowCustom: TioViewModel},
   View.CustomerBusiness in 'View.CustomerBusiness.pas' {ViewCustomerBusiness: TFrame},
-  MicroView.OrderRowCustom in 'MicroView.OrderRowCustom.pas' {MicroViewOrderRowCustom: TFrame};
+  MicroView.OrderRowCustom in 'MicroView.OrderRowCustom.pas' {MicroViewOrderRowCustom: TFrame},
+  MicroView.OrderRowPizza in 'MicroView.OrderRowPizza.pas' {MicroViewOrderRowPizza: TFrame},
+  MicroVM.OrderRowPizza in '..\mvvm_common_vm\MicroVM.OrderRowPizza.pas' {MicroVMOrderRowPizza: TioViewModel};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

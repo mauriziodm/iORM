@@ -198,13 +198,9 @@
             <Form>MicroVMCustomer</Form>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\mvvm_common_vm\MicroVM.OrderRow.pas">
-            <Form>MicroVMOrderRows</Form>
+        <DCCReference Include="..\mvvm_common_vm\MicroVM.OrderRowCustom.pas">
+            <Form>MicroVMOrderRowCustom</Form>
             <DesignClass>TioViewModel</DesignClass>
-        </DCCReference>
-        <DCCReference Include="MicroView.OrderRowPizza.pas">
-            <Form>MicroViewOrderRowPizza</Form>
-            <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="View.CustomerBusiness.pas">
             <Form>ViewCustomerBusiness</Form>
@@ -215,6 +211,16 @@
             <Form>MicroViewOrderRowCustom</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="MicroView.OrderRowPizza.pas">
+            <Form>MicroViewOrderRowPizza</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\MicroVM.OrderRowPizza.pas">
+            <Form>MicroVMOrderRowPizza</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

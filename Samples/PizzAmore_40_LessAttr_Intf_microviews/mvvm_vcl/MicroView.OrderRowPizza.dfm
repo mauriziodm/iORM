@@ -3,7 +3,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
   Top = 0
   Width = 430
   Height = 82
-  Color = clWhite
+  Color = 16771818
   Ctl3D = False
   ParentBackground = False
   ParentColor = False
@@ -13,8 +13,8 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     430
     82)
   object Label2: TLabel
-    Left = 69
-    Top = 11
+    Left = 53
+    Top = 14
     Width = 51
     Height = 25
     Alignment = taRightJustify
@@ -22,14 +22,14 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Caption = 'Pizza'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Label1: TLabel
-    Left = 69
-    Top = 46
+    Left = 53
+    Top = 49
     Width = 51
     Height = 25
     Alignment = taRightJustify
@@ -37,14 +37,14 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Caption = 'Price'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Label3: TLabel
-    Left = 192
-    Top = 46
+    Left = 160
+    Top = 49
     Width = 40
     Height = 25
     Alignment = taRightJustify
@@ -52,14 +52,14 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Caption = 'Qty'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Label4: TLabel
-    Left = 284
-    Top = 46
+    Left = 276
+    Top = 49
     Width = 39
     Height = 25
     Alignment = taRightJustify
@@ -68,22 +68,52 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Caption = 'Total'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Shape1: TShape
-    Left = 5
-    Top = 1
-    Width = 411
-    Height = 2
-    Anchors = [akLeft, akTop, akRight]
-    Pen.Color = clSilver
+    Left = 0
+    Top = 0
+    Width = 430
+    Height = 3
+    Align = alTop
+    Pen.Color = clWhite
+  end
+  object ButtonShow: TSpeedButton
+    Left = 385
+    Top = 7
+    Width = 40
+    Height = 30
+    Action = acShow
+    Anchors = [akTop, akRight]
+    Flat = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clGreen
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object ButtonDelete: TSpeedButton
+    Left = 385
+    Top = 42
+    Width = 40
+    Height = 30
+    Action = acDelete
+    Anchors = [akTop, akRight]
+    Flat = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clRed
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
   end
   object DBImage1: TDBImage
-    Left = 3
-    Top = 11
+    Left = 6
+    Top = 12
     Width = 60
     Height = 60
     BorderStyle = bsNone
@@ -95,10 +125,10 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     TabOrder = 0
   end
   object DBEditNote: TDBEdit
-    Left = 132
-    Top = 11
-    Width = 285
-    Height = 25
+    Left = 116
+    Top = 14
+    Width = 264
+    Height = 20
     TabStop = False
     Anchors = [akLeft, akTop, akRight]
     BorderStyle = bsNone
@@ -106,7 +136,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentColor = True
@@ -115,17 +145,17 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     TabOrder = 1
   end
   object DBEditPrice: TDBEdit
-    Left = 132
-    Top = 46
-    Width = 60
-    Height = 25
+    Left = 116
+    Top = 49
+    Width = 50
+    Height = 20
     TabStop = False
     BorderStyle = bsNone
     DataField = 'Pizza.Price'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentColor = True
@@ -134,27 +164,27 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     TabOrder = 2
   end
   object DBEditQty: TDBEdit
-    Left = 244
-    Top = 46
+    Left = 212
+    Top = 49
     Width = 30
-    Height = 25
+    Height = 20
     BorderStyle = bsNone
-    Color = clInactiveBorder
+    Color = clWhite
     DataField = 'Qty'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
     TabOrder = 3
   end
   object DBEditRowTotal: TDBEdit
-    Left = 328
-    Top = 46
-    Width = 89
-    Height = 25
+    Left = 320
+    Top = 49
+    Width = 60
+    Height = 20
     TabStop = False
     Anchors = [akTop, akRight]
     BorderStyle = bsNone
@@ -162,21 +192,13 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentColor = True
     ParentFont = False
     ReadOnly = True
     TabOrder = 4
-  end
-  object Button1: TButton
-    Left = 341
-    Top = 15
-    Width = 75
-    Height = 25
-    Action = acDelete
-    TabOrder = 5
   end
   object MDSorderRow: TioModelDataSet
     ViewModelBridge = OrderRowMicroVMBridge
@@ -212,13 +234,20 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
   end
   object ActionList1: TActionList
     Left = 256
-    Top = 8
+    Top = 11
     object acDelete: TioViewAction
       Category = 'iORM-MVVM'
-      Caption = 'Delete'
+      Caption = 'Del'
       Enabled = True
       Visible = True
       VMActionName = 'acDelete'
+    end
+    object acShow: TioViewAction
+      Category = 'iORM-MVVM'
+      Caption = 'Show'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acShow'
     end
   end
 end

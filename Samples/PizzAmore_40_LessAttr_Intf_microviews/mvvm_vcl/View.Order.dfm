@@ -147,6 +147,8 @@ inherited ViewOrder: TViewOrder
       BevelInner = bvNone
       BevelOuter = bvNone
       BorderStyle = bsNone
+      Color = clMenu
+      ParentColor = False
       TabOrder = 5
       object ScrollBox2: TScrollBox
         Left = 0
@@ -169,15 +171,33 @@ inherited ViewOrder: TViewOrder
     TabOrder = 1
   end
   inline MicroViewCustomer1: TMicroViewCustomer [2]
-    Left = 0
-    Top = 120
-    Width = 430
+    Left = 5
+    Top = 123
+    Width = 438
     Height = 100
-    Color = clWhite
+    Anchors = [akLeft, akTop, akRight]
+    Color = 16056308
     ParentBackground = False
     ParentColor = False
     TabOrder = 2
-    ExplicitTop = 120
+    ExplicitLeft = 5
+    ExplicitTop = 123
+    ExplicitWidth = 438
+    inherited ButtonSelectCustomer: TSpeedButton
+      Left = 403
+    end
+    inherited ButtonViewCustomer: TSpeedButton
+      Left = 355
+    end
+    inherited DBEditCustName: TDBEdit
+      Width = 225
+    end
+    inherited DBEditCustAddress: TDBEdit
+      Width = 333
+    end
+    inherited DBECustPhone: TDBEdit
+      Width = 333
+    end
     inherited MDSCustomer: TioModelDataSet
       CrossView_MasterBindSource = MDSMaster
       CrossView_MasterPropertyName = 'Customer'

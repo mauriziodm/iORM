@@ -2,62 +2,62 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
   Left = 0
   Top = 0
   Width = 430
-  Height = 123
+  Height = 120
   Color = 14145535
   ParentBackground = False
   ParentColor = False
   TabOrder = 0
   DesignSize = (
     430
-    123)
+    120)
   object Label2: TLabel
-    Left = 5
-    Top = 11
+    Left = 16
+    Top = 14
     Width = 88
     Height = 25
     Alignment = taRightJustify
     AutoSize = False
     Caption = 'Description'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
+    Font.Color = clMaroon
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Label1: TLabel
-    Left = 42
-    Top = 86
+    Left = 53
+    Top = 89
     Width = 51
     Height = 25
     Alignment = taRightJustify
     AutoSize = False
     Caption = 'Price'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
+    Font.Color = clMaroon
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Label3: TLabel
-    Left = 165
-    Top = 86
+    Left = 160
+    Top = 89
     Width = 40
     Height = 25
     Alignment = taRightJustify
     AutoSize = False
     Caption = 'Qty'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
+    Font.Color = clMaroon
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Label4: TLabel
-    Left = 257
-    Top = 86
+    Left = 276
+    Top = 89
     Width = 39
     Height = 25
     Alignment = taRightJustify
@@ -65,75 +65,91 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     AutoSize = False
     Caption = 'Total'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
+    Font.Color = clMaroon
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
   end
   object Shape1: TShape
-    Left = 5
-    Top = 1
-    Width = 411
-    Height = 2
-    Anchors = [akLeft, akTop, akRight]
-    Pen.Color = clSilver
+    Left = 0
+    Top = 0
+    Width = 430
+    Height = 3
+    Align = alTop
+    Pen.Color = clWhite
+  end
+  object ButtonDelete: TSpeedButton
+    Left = 385
+    Top = 45
+    Width = 40
+    Height = 30
+    Action = acDelete
+    Anchors = [akTop, akRight]
+    Flat = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clRed
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
   end
   object DBMemoDescription: TDBMemo
-    Left = 105
-    Top = 11
-    Width = 311
+    Left = 116
+    Top = 14
+    Width = 264
     Height = 69
-    Color = clInactiveBorder
+    Anchors = [akLeft, akTop, akRight]
+    Color = clWhite
     DataField = 'Description'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 4
+    TabOrder = 3
   end
   object DBEditPrice: TDBEdit
-    Left = 105
-    Top = 86
-    Width = 60
-    Height = 25
+    Left = 116
+    Top = 89
+    Width = 50
+    Height = 20
     BorderStyle = bsNone
-    Color = clInactiveBorder
+    Color = clWhite
     DataField = 'Price'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
     TabOrder = 0
   end
   object DBEditQty: TDBEdit
-    Left = 217
-    Top = 86
+    Left = 212
+    Top = 89
     Width = 30
-    Height = 25
+    Height = 20
     BorderStyle = bsNone
-    Color = clInactiveBorder
+    Color = clWhite
     DataField = 'Qty'
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
     TabOrder = 1
   end
   object DBEditRowTotal: TDBEdit
-    Left = 301
-    Top = 86
-    Width = 89
-    Height = 25
+    Left = 320
+    Top = 89
+    Width = 60
+    Height = 20
     TabStop = False
     Anchors = [akTop, akRight]
     BorderStyle = bsNone
@@ -141,21 +157,13 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     DataSource = SourceOrderRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentColor = True
     ParentFont = False
     ReadOnly = True
     TabOrder = 2
-  end
-  object Button1: TButton
-    Left = 341
-    Top = 9
-    Width = 75
-    Height = 25
-    Action = acDelete
-    TabOrder = 3
   end
   object MDSorderRow: TioModelDataSet
     ViewModelBridge = OrderRowMicroVMBridge
@@ -195,7 +203,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     Top = 48
     object acDelete: TioViewAction
       Category = 'iORM-MVVM'
-      Caption = 'Delete'
+      Caption = 'Del'
       Enabled = True
       Visible = True
       VMActionName = 'acDelete'

@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces, System.Actions, Vcl.ActnList,
   iORM.StdActions.Vcl, Data.DB, iORM.MVVM.ViewModelBridge, iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls, Vcl.DBCtrls,
-  Model.OrderRow;
+  Model.OrderRow, Vcl.Buttons;
 
 type
 
@@ -20,7 +20,6 @@ type
     DBEditPrice: TDBEdit;
     DBEditQty: TDBEdit;
     DBEditRowTotal: TDBEdit;
-    Button1: TButton;
     MDSorderRow: TioModelDataSet;
     MDSorderRowQty: TIntegerField;
     MDSorderRowRowTotal: TCurrencyField;
@@ -32,6 +31,7 @@ type
     DBMemoDescription: TDBMemo;
     MDSorderRowDescription: TStringField;
     MDSorderRowPrice: TCurrencyField;
+    ButtonDelete: TSpeedButton;
   private
     { Private declarations }
   public

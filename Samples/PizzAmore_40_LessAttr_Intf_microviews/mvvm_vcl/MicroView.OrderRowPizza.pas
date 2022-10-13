@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Model.OrderRow, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces, Data.DB,
   iORM.MVVM.ViewModelBridge, iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.Samples.Spin, System.Actions,
-  Vcl.ActnList, iORM.StdActions.Vcl;
+  Vcl.ActnList, iORM.StdActions.Vcl, Vcl.Buttons;
 
 type
 
@@ -30,9 +30,11 @@ type
     MDSorderRowQty: TIntegerField;
     MDSorderRowRowTotal: TCurrencyField;
     Shape1: TShape;
-    Button1: TButton;
     ActionList1: TActionList;
     acDelete: TioViewAction;
+    ButtonShow: TSpeedButton;
+    ButtonDelete: TSpeedButton;
+    acShow: TioViewAction;
   private
     { Private declarations }
   public

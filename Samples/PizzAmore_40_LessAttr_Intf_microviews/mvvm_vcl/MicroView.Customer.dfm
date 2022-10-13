@@ -3,7 +3,7 @@ object MicroViewCustomer: TMicroViewCustomer
   Top = 0
   Width = 430
   Height = 100
-  Color = clWhite
+  Color = 16056308
   ParentBackground = False
   ParentColor = False
   TabOrder = 0
@@ -19,7 +19,7 @@ object MicroViewCustomer: TMicroViewCustomer
     AutoSize = False
     Caption = 'Customer'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
+    Font.Color = 28416
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
@@ -34,7 +34,7 @@ object MicroViewCustomer: TMicroViewCustomer
     AutoSize = False
     Caption = 'Address'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
+    Font.Color = 28416
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
@@ -49,7 +49,7 @@ object MicroViewCustomer: TMicroViewCustomer
     AutoSize = False
     Caption = 'Phone'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
+    Font.Color = 28416
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
@@ -84,7 +84,7 @@ object MicroViewCustomer: TMicroViewCustomer
     ParentFont = False
   end
   object DBEditCustID: TDBEdit
-    Left = 92
+    Left = 87
     Top = 6
     Width = 30
     Height = 25
@@ -103,7 +103,7 @@ object MicroViewCustomer: TMicroViewCustomer
     TabOrder = 0
   end
   object DBEditCustName: TDBEdit
-    Left = 128
+    Left = 123
     Top = 6
     Width = 217
     Height = 25
@@ -123,7 +123,7 @@ object MicroViewCustomer: TMicroViewCustomer
     TabOrder = 1
   end
   object DBEditCustAddress: TDBEdit
-    Left = 92
+    Left = 87
     Top = 37
     Width = 325
     Height = 25
@@ -143,7 +143,7 @@ object MicroViewCustomer: TMicroViewCustomer
     TabOrder = 2
   end
   object DBECustPhone: TDBEdit
-    Left = 92
+    Left = 87
     Top = 68
     Width = 325
     Height = 25

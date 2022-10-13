@@ -1,4 +1,4 @@
-unit MicroVM.OrderRow;
+unit MicroVM.OrderRowPizza;
 
 interface
 
@@ -15,11 +15,14 @@ uses
 
 type
 
-  [diViewModelFor(TPizzaOrderRow), diViewModelFor(TCustomOrderRow)]
-  TMicroVMOrderRows = class(TioViewModel)
+  [diViewModelFor(TPizzaOrderRow)]
+  TMicroVMOrderRowPizza = class(TioViewModel)
     MPOrderRow: TioModelPresenterDetail;
     acDelete: TioVMAction;
+    acShow: TioVMAction;
+    MPPizza: TioModelPresenterDetail;
     procedure acDeleteExecute(Sender: TObject);
+    procedure acShowExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -28,14 +31,22 @@ type
 
 implementation
 
+uses
+  Model.Interfaces;
+
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
 
-procedure TMicroVMOrderRows.acDeleteExecute(Sender: TObject);
+procedure TMicroVMOrderRowPizza.acDeleteExecute(Sender: TObject);
 begin
   MPOrderRow.Delete;
   CloseViews;
+end;
+
+procedure TMicroVMOrderRowPizza.acShowExecute(Sender: TObject);
+begin
+  MPPizza.ShowCurrent;
 end;
 
 end.
