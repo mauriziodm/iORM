@@ -156,23 +156,25 @@ inherited ViewOrder: TViewOrder
       Text = 'Rows'
       TabOrder = 0
       object ButtonSelectPizza: TSpeedButton
+        Action = acAddPizza
         Align = MostRight
+        Enabled = True
+        ImageIndex = -1
         Position.X = 365.000000000000000000
         Size.Width = 30.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'additembutton'
-        Text = 'acShowPizzaSelector'
       end
-      object ButtonDeleteRow: TSpeedButton
-        Align = Right
-        Position.X = 335.000000000000000000
-        Size.Width = 30.000000000000000000
-        Size.Height = 30.000000000000000000
-        Size.PlatformDefault = False
-        StyleLookup = 'deleteitembutton'
-        Text = 'acDeleteRow'
-      end
+    end
+    object ScrollBoxOrderRows: TScrollBox
+      Align = Client
+      Size.Width = 400.000000000000000000
+      Size.Height = 335.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 335.000000000000000000
     end
   end
   object LayoutCustomerData: TLayout [5]
@@ -186,11 +188,13 @@ inherited ViewOrder: TViewOrder
       Size.Width = 400.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      inherited EditCustName: TEdit
+      inherited EditCustName: TEdit [0]
         TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
-      inherited EditCustAddress: TEdit
+      inherited EditCustAddress: TEdit [1]
         TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+      inherited RectanglebackgroundRowMView: TRectangle [2]
       end
       inherited ActionListCustMView: TActionList
         Left = 276
@@ -212,6 +216,14 @@ inherited ViewOrder: TViewOrder
   end
   inherited ActionList1: TActionList
     Top = 171
+    object acAddPizza: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Add pizza'
+      Enabled = True
+      Visible = True
+      Caption = 'Add pizza'
+      VMActionName = 'acAddPizza'
+    end
   end
   inherited VMBridge: TioViewModelBridge
     Top = 226
@@ -286,5 +298,12 @@ inherited ViewOrder: TViewOrder
       Track = False
       CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
+  end
+  object VCProviderOrderRows: TioViewContextProvider
+    OnAfterRequest = VCProviderOrderRowsAfterRequest
+    OnRequest = VCProviderOrderRowsRequest
+    RegisterAsDefault = False
+    Left = 296
+    Top = 205
   end
 end

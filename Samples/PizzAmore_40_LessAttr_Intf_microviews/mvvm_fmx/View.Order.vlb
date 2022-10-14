@@ -52,7 +52,7 @@ Coordinates=10,464,46,51
 Coordinates=10,296,46,51
 
 []
-Coordinates=760,10,70,51
+Coordinates=397,380,100,51
 Visible=True
 
 [BindingsList1]
@@ -63,9 +63,6 @@ Coordinates=302,296,46,51
 
 [LayoutRows]
 Coordinates=520,464,75,33
-
-[ButtonDeleteRow]
-Coordinates=397,380,100,51
 
 [ButtonSelectPizza]
 Coordinates=10,212,103,51

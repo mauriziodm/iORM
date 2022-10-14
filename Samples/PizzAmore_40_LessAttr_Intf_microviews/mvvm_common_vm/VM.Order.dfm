@@ -16,4 +16,10 @@ inherited VMOrder: TVMOrder
     Left = 344
     Top = 40
   end
+  object acAddPizza: TioVMAction
+    Name = 'acAddPizza'
+    OnExecute = acAddPizzaExecute
+    Left = 344
+    Top = 112
+  end
 end

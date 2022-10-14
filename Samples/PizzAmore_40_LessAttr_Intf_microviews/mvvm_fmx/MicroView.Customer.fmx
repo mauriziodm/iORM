@@ -2,6 +2,25 @@ object MicroViewCustomer: TMicroViewCustomer
   Size.Width = 400.000000000000000000
   Size.Height = 75.000000000000000000
   Size.PlatformDefault = False
+  object RectanglebackgroundRowMView: TRectangle
+    Align = Client
+    Fill.Color = xFFEAFFEA
+    Size.Width = 400.000000000000000000
+    Size.Height = 75.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object ButtonSelectCustomer: TSpeedButton
+      Action = acSelectCustomer
+      Align = MostRight
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 370.000000000000000000
+      Size.Width = 30.000000000000000000
+      Size.Height = 75.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'arrowrighttoolbutton'
+    end
+  end
   object EditCustName: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     StyleLookup = 'transparentedit'
@@ -60,17 +79,6 @@ object MicroViewCustomer: TMicroViewCustomer
     Size.PlatformDefault = False
     TextPrompt = 'ID here'
     StyledSettings = [Family, Size, FontColor]
-  end
-  object ButtonSelectCustomer: TSpeedButton
-    Action = acSelectCustomer
-    Align = MostRight
-    Enabled = True
-    ImageIndex = -1
-    Position.X = 370.000000000000000000
-    Size.Width = 30.000000000000000000
-    Size.Height = 75.000000000000000000
-    Size.PlatformDefault = False
-    StyleLookup = 'arrowrighttoolbutton'
   end
   object ActionListCustMView: TActionList
     Left = 300

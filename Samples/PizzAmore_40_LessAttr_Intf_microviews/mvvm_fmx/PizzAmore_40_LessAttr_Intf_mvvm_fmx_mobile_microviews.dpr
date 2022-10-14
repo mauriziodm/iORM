@@ -35,7 +35,8 @@ uses
   MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel},
   MicroVM.OrderRowCustom in '..\mvvm_common_vm\MicroVM.OrderRowCustom.pas' {MicroVMOrderRowCustom: TioViewModel},
   MicroVM.OrderRowPizza in '..\mvvm_common_vm\MicroVM.OrderRowPizza.pas' {MicroVMOrderRowPizza: TioViewModel},
-  MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame};
+  MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame},
+  MicroView.OrderRowPizza in 'MicroView.OrderRowPizza.pas' {MicroViewOrderRowPizza: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

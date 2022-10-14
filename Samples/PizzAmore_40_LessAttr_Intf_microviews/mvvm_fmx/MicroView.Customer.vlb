@@ -5,9 +5,6 @@ Coordinates=337,78,104,33
 Coordinates=10,36,85,105
 Visible=True
 
-[ButtonSelectCustomer]
-Coordinates=10,212,125,51
-
 [EditCustName]
 Coordinates=195,128,84,51
 
@@ -18,7 +15,7 @@ Coordinates=179,212,46,51
 Coordinates=188,10,97,51
 
 []
-Coordinates=337,133,91,36
+Coordinates=10,212,125,51
 
 [ActionListCustMView]
 Coordinates=23,78,119,33

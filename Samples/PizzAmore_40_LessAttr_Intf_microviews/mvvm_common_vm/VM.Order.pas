@@ -13,9 +13,11 @@ type
   TVMOrder = class(TVMBaseForForm)
     MPRows: TioModelPresenterDetail;
     acAddCustomPizza: TioVMAction;
+    acAddPizza: TioVMAction;
     procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
     procedure acAddCustomPizzaExecute(Sender: TObject);
+    procedure acAddPizzaExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -31,10 +33,16 @@ uses
 
 {$R *.dfm}
 
+procedure TVMOrder.acAddPizzaExecute(Sender: TObject);
+begin
+  inherited;
+  io.ShowAsSelector<IPizza>(MPMaster);
+end;
+
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-//  MPRows.ShowEach('', 'VCProviderOrderRows');
+  MPRows.ShowEach('', 'VCProviderOrderRows');
 end;
 
 procedure TVMOrder.MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);

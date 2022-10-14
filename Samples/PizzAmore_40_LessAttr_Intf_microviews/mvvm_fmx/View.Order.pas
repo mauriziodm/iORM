@@ -8,7 +8,7 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, System.Actions, FMX.ActnList, iORM.StdActions.Fmx,
   FMX.Controls.Presentation, FMX.Objects, Data.Bind.GenData, System.Rtti, FMX.Grid.Style, Data.Bind.Controls, System.Bindings.Outputs, Fmx.Bind.Editors,
   Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Navigator, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts, Fmx.Bind.Grid, Data.Bind.Grid, Model.Order,
-  MicroView.Customer;
+  MicroView.Customer, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -29,13 +29,17 @@ type
     LayoutRows: TLayout;
     Label5: TLabel;
     ButtonSelectPizza: TSpeedButton;
-    ButtonDeleteRow: TSpeedButton;
     LayoutCustomerData: TLayout;
     MicroViewCustomer1: TMicroViewCustomer;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
+    VCProviderOrderRows: TioViewContextProvider;
+    ScrollBoxOrderRows: TScrollBox;
+    acAddPizza: TioViewAction;
+    procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
+    procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -45,5 +49,18 @@ type
 implementation
 
 {$R *.fmx}
+
+procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+begin
+  inherited;
+  (AView as TControl).Align := TAlignLayout.Top;
+  (AView as TControl).Name := String.Empty;
+end;
+
+procedure TViewOrder.VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
+begin
+  inherited;
+  ResultViewContext := ScrollBoxOrderRows;
+end;
 
 end.
