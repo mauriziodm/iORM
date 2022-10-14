@@ -29,9 +29,10 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     end
     object ButtonDelete: TSpeedButton
       Action = acDelete
+      Anchors = [akTop, akRight]
       Enabled = True
       ImageIndex = -1
-      Position.X = 364.000000000000000000
+      Position.X = 369.000000000000000000
       Position.Y = 30.000000000000000000
       Size.Width = 30.000000000000000000
       Size.Height = 30.000000000000000000
@@ -42,9 +43,9 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
       TabOrder = 42
-      ReadOnly = True
       Text = '67,67'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Trailing
       Position.X = 102.000000000000000000
       Position.Y = 64.000000000000000000
       Margins.Left = 5.000000000000000000
@@ -71,6 +72,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       TabOrder = 40
       Text = '-33'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
       Position.X = 189.000000000000000000
       Position.Y = 64.000000000000000000
       Margins.Left = 5.000000000000000000
@@ -99,6 +101,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       ReadOnly = True
       Text = '67,67'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Trailing
       Position.X = 286.000000000000000000
       Position.Y = 64.000000000000000000
       Margins.Left = 5.000000000000000000
@@ -125,14 +128,15 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       StyledSettings = [Family, Size, FontColor]
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.WordWrap = True
+      Anchors = [akLeft, akTop, akRight]
       Position.X = 102.000000000000000000
       Position.Y = 5.000000000000000000
       Size.Width = 254.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 43
-      Viewport.Width = 254.000000000000000000
-      Viewport.Height = 50.000000000000000000
+      Viewport.Width = 250.000000000000000000
+      Viewport.Height = 46.000000000000000000
     end
     object Label3: TLabel
       Position.X = 24.000000000000000000
@@ -150,7 +154,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     Size.Width = 400.000000000000000000
     Size.Height = 3.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
+    TabOrder = 0
   end
   object VMBridgeRowMView: TioViewModelBridge
     Left = 120
@@ -218,6 +222,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       FieldName = 'RowTotal'
       Control = EditTotal
       Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
@@ -225,6 +230,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       FieldName = 'Price'
       Control = EditPrice
       Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'

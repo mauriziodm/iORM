@@ -1,5 +1,5 @@
 ﻿[MBSRowPizza]
-Coordinates=10,140,84,123
+Coordinates=10,140,84,141
 Visible=True
 
 [EditTotal]
@@ -25,6 +25,7 @@ Coordinates=643,1,116,33
 
 [EditPrice]
 Coordinates=174,121,58,51
+Visible=True
 
 [EditPizza]
 Coordinates=174,10,59,51
@@ -59,4 +60,7 @@ Coordinates=10,420,74,51
 
 [ButtonDelete]
 Coordinates=110,420,78,51
+
+[Rectangle2]
+Coordinates=0,0,69,33
 

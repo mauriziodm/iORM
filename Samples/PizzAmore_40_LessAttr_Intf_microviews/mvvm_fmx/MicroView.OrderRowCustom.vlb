@@ -1,58 +1,59 @@
 ﻿[Label2]
-Coordinates=361,10,53,58
+Coordinates=361,10,46,51
 
 [Label1]
-Coordinates=282,10,53,58
+Coordinates=282,10,46,51
 
 [EditQty]
-Coordinates=195,246,57,58
+Coordinates=195,246,50,51
 
 [RectanglebackgroundRowMView]
-Coordinates=322,448,203,36
+Coordinates=322,448,176,33
 
 [Memo1]
-Coordinates=195,364,57,58
+Coordinates=195,364,49,51
 
 [Label4]
-Coordinates=440,10,53,58
+Coordinates=440,10,46,51
 
 [EditTotal]
-Coordinates=190,10,66,58
+Coordinates=190,10,58,51
 
 [LayoutTopBlankRowMView]
-Coordinates=125,448,171,36
+Coordinates=125,448,148,33
 
 [EditPrice]
-Coordinates=190,128,66,58
+Coordinates=190,128,58,51
+Visible=True
 
 [ButtonDelete]
-Coordinates=10,448,89,58
+Coordinates=10,448,78,51
 
 [Rectangle1]
-Coordinates=116,532,80,36
+Coordinates=116,532,69,33
 
 [VMBridgeRowMView]
-Coordinates=337,174,135,36
+Coordinates=337,174,116,33
 
 [Label3]
-Coordinates=519,10,53,58
+Coordinates=519,10,46,51
 
 [MBSOrderRow]
-Coordinates=10,143,100,146
+Coordinates=10,143,87,123
 Visible=True
 
 [acDelete]
-Coordinates=267,188,65,36
+Coordinates=267,188,56,33
 
 [Rectangle2]
-Coordinates=10,532,80,36
+Coordinates=10,532,69,33
 
 [ActionListRowMView]
-Coordinates=685,56,135,36
+Coordinates=685,56,118,33
 
 []
 Coordinates=685,1,91,36
 
 [BindingsList1]
-Coordinates=129,87,91,36
+Coordinates=129,87,82,33
 

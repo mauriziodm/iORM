@@ -23,6 +23,8 @@ type
     LinkControlToField2: TLinkControlToField;
     RectanglebackgroundRowMView: TRectangle;
     ButtonSelectCustomer: TSpeedButton;
+    acShowCustomer: TioViewAction;
+    ButtonShowCustomer: TSpeedButton;
   private
     { Private declarations }
   public

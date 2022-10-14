@@ -20,20 +20,23 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     end
     object ButtonShow: TSpeedButton
       Action = acShow
+      Anchors = [akTop, akRight]
       Enabled = True
       ImageIndex = -1
-      Position.X = 365.000000000000000000
+      Position.X = 369.000000000000000000
+      Position.Y = 3.000000000000000000
       Size.Width = 30.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      StyleLookup = 'playtoolbutton'
+      StyleLookup = 'arrowrighttoolbutton'
     end
     object ButtonDelete: TSpeedButton
       Action = acDelete
+      Anchors = [akTop, akRight]
       Enabled = True
       ImageIndex = -1
-      Position.X = 365.000000000000000000
-      Position.Y = 30.000000000000000000
+      Position.X = 369.000000000000000000
+      Position.Y = 33.000000000000000000
       Size.Width = 30.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
@@ -198,6 +201,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       ReadOnly = True
       Text = '67,67'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Trailing
       Position.X = 102.000000000000000000
       Position.Y = 35.000000000000000000
       Margins.Left = 5.000000000000000000
@@ -224,6 +228,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       TabOrder = 41
       Text = '-33'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Center
       Position.X = 189.000000000000000000
       Position.Y = 35.000000000000000000
       Margins.Left = 5.000000000000000000
@@ -252,6 +257,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       ReadOnly = True
       Text = '67,67'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.HorzAlign = Trailing
       Position.X = 286.000000000000000000
       Position.Y = 35.000000000000000000
       Margins.Left = 5.000000000000000000
@@ -329,6 +335,12 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
+      end
+      item
+        Name = 'Image'
+        FieldType = ftBitmap
+        Generator = 'ContactBitmaps'
+        ReadOnly = False
       end>
     ScopeMappings = <>
     ViewModelBridge = VMBridgeRowMView
@@ -354,6 +366,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       FieldName = 'Pizza.Price'
       Control = EditPrice
       Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
@@ -367,6 +380,14 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       DataSource = MBSRowPizza
       FieldName = 'RowTotal'
       Control = EditTotal
+      Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = MBSRowPizza
+      FieldName = 'Image'
+      Control = ImagePizza
       Track = False
     end
   end

@@ -166,6 +166,16 @@ inherited ViewOrder: TViewOrder
         Size.PlatformDefault = False
         StyleLookup = 'additembutton'
       end
+      object SpeedButton1: TSpeedButton
+        Action = acAddCustomPizza
+        Anchors = [akTop, akRight]
+        Enabled = True
+        ImageIndex = -1
+        Position.X = 221.000000000000000000
+        Size.Width = 127.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+      end
     end
     object ScrollBoxOrderRows: TScrollBox
       Align = Client
@@ -185,16 +195,15 @@ inherited ViewOrder: TViewOrder
     Size.PlatformDefault = False
     TabOrder = 6
     inline MicroViewCustomer1: TMicroViewCustomer
+      Align = Client
       Size.Width = 400.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      inherited EditCustName: TEdit [0]
+      inherited EditCustName: TEdit
         TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
-      inherited EditCustAddress: TEdit [1]
+      inherited EditCustAddress: TEdit
         TextSettings.Font.StyleExt = {00070000000000000004000000}
-      end
-      inherited RectanglebackgroundRowMView: TRectangle [2]
       end
       inherited ActionListCustMView: TActionList
         Left = 276
@@ -223,6 +232,14 @@ inherited ViewOrder: TViewOrder
       Visible = True
       Caption = 'Add pizza'
       VMActionName = 'acAddPizza'
+    end
+    object acAddCustomPizza: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Add custom pizza'
+      Enabled = True
+      Visible = True
+      Caption = 'Add custom pizza'
+      VMActionName = 'acAddCustomPizza'
     end
   end
   inherited VMBridge: TioViewModelBridge

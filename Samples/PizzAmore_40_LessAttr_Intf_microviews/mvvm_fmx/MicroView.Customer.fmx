@@ -11,12 +11,25 @@ object MicroViewCustomer: TMicroViewCustomer
     Stroke.Kind = None
     object ButtonSelectCustomer: TSpeedButton
       Action = acSelectCustomer
-      Align = MostRight
+      Anchors = [akTop, akRight]
       Enabled = True
       ImageIndex = -1
-      Position.X = 370.000000000000000000
+      Position.X = 369.000000000000000000
+      Position.Y = 37.000000000000000000
       Size.Width = 30.000000000000000000
-      Size.Height = 75.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'ellipseseditbutton'
+    end
+    object ButtonShowCustomer: TSpeedButton
+      Action = acShowCustomer
+      Anchors = [akTop, akRight]
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 369.000000000000000000
+      Position.Y = 7.000000000000000000
+      Size.Width = 30.000000000000000000
+      Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'arrowrighttoolbutton'
     end
@@ -81,7 +94,8 @@ object MicroViewCustomer: TMicroViewCustomer
     StyledSettings = [Family, Size, FontColor]
   end
   object ActionListCustMView: TActionList
-    Left = 300
+    Left = 292
+    Top = 65520
     object acSelectCustomer: TioViewAction
       Category = 'iORM-MVVM'
       Text = '...'
@@ -89,6 +103,14 @@ object MicroViewCustomer: TMicroViewCustomer
       Visible = True
       Caption = '...'
       VMActionName = 'acSelectCustomer'
+    end
+    object acShowCustomer: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Show customer'
+      Enabled = True
+      Visible = True
+      Caption = 'Show customer'
+      VMActionName = 'acShowCustomer'
     end
   end
   object VMBridgeCustMView: TioViewModelBridge
