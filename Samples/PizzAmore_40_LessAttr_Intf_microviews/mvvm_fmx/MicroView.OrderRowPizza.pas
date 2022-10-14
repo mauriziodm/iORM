@@ -36,6 +36,7 @@ type
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
+    Rectangle2: TRectangle;
   private
     { Private declarations }
   public
