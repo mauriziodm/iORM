@@ -1,0 +1,101 @@
+object ViewBaseForForm: TViewBaseForForm
+  Size.Width = 400.000000000000000000
+  Size.Height = 600.000000000000000000
+  Size.PlatformDefault = False
+  object Rectangle1: TRectangle
+    Align = Bottom
+    Fill.Color = xFFF2F2F2
+    Position.Y = 560.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object ButtonRevert: TSpeedButton
+      Action = acRevert
+      Align = Left
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'refreshtoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+    object ButtonSave: TSpeedButton
+      Action = acPersist
+      Align = Right
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Position.X = 360.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'organizetoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+  end
+  object RectangleTitle: TRectangle
+    Align = Top
+    Fill.Color = claOrange
+    Size.Width = 400.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object LabelTitle: TLabel
+      Align = Client
+      StyledSettings = [Family]
+      Size.Width = 400.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      TextSettings.HorzAlign = Center
+      Text = 'Title'
+      TabOrder = 0
+      object ButtonBack: TSpeedButton
+        Action = acBack
+        Align = Left
+        Enabled = True
+        StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
+        Size.Width = 40.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'priortoolbutton'
+        TextSettings.FontColor = claAliceblue
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 203
+    Top = 163
+    object acBack: TAction
+      Text = 'Back'
+      OnExecute = acBackExecute
+    end
+    object acPersist: TioBSPersistencePersist
+      Category = 'iORM-BSPersistence'
+      Text = 'Persist'
+      TargetBindSource = BSMaster
+    end
+    object acRevert: TioBSPersistenceRevert
+      Category = 'iORM-BSPersistence'
+      Text = 'Revert'
+      TargetBindSource = BSMaster
+    end
+  end
+  object BSMaster: TioPrototypeBindSourceMaster
+    FieldDefs = <>
+    ScopeMappings = <>
+    AsDefault = True
+    LoadType = ltFromBSReload
+    TypeOfCollection = tcSingleObject
+    Paging.CurrentPageOfFormat = '%d/%d'
+    Left = 64
+    Top = 162
+  end
+end

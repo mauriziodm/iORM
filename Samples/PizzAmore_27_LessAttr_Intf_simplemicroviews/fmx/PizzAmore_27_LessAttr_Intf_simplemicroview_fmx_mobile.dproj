@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{C33E88F5-1126-4BD2-9D7D-15C9A8F4EC9C}</ProjectGuid>
+        <ProjectGuid>{9017C8B9-40DC-4D71-B9A6-B2BCDB713799}</ProjectGuid>
         <ProjectVersion>19.4</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>32787</TargetedPlatforms>
         <AppType>Application</AppType>
-        <MainSource>PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dpr</MainSource>
+        <MainSource>PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.dpr</MainSource>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -86,7 +86,7 @@
         <AUP_READ_PHONE_STATE>true</AUP_READ_PHONE_STATE>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <SanitizedProjectName>PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile</SanitizedProjectName>
+        <SanitizedProjectName>PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile</SanitizedProjectName>
         <DCC_Define>ioFMX;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
@@ -263,7 +263,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dpr</Source>
+                    <Source Name="MainSource">PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -286,9 +286,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.exe</RemoteName>
+                        <RemoteName>PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
