@@ -300,6 +300,7 @@
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Constants.pas"/>
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

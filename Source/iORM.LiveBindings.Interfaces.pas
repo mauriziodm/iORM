@@ -349,6 +349,8 @@ type
     function UseObjStatus: Boolean;
     function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    function GetTypeName: String;
+    function GetTypeAlias: String;
   end;
 
   IioNaturalActiveBindSourceAdapter = interface

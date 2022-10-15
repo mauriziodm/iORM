@@ -217,7 +217,8 @@ contains
   DJSON.Duck.Dictionary in '..\..\ExtLibs\djson\Sources\DJSON.Duck.Dictionary.pas',
   DJSON.Constants in '..\..\ExtLibs\djson\Sources\DJSON.Constants.pas',
   DJSON.Attributes in '..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas',
-  iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas';
+  iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas',
+  iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas';
 
 end.
 
