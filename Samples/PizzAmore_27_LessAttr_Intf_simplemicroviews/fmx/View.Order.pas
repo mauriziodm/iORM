@@ -31,14 +31,14 @@ type
     ButtonSelectPizza: TSpeedButton;
     BindingsList1: TBindingsList;
     acShowPizzaSelector: TAction;
-    LinkControlToField1: TLinkControlToField;
-    LinkControlToField2: TLinkControlToField;
-    LinkControlToField3: TLinkControlToField;
     MicroViewCustomer1: TMicroViewCustomer;
     BSRows: TioPrototypeBindSourceDetail;
     ScrollBoxRows: TScrollBox;
     VCProviderOrderRows: TioViewContextProvider;
     Button1: TButton;
+    LinkControlToField1: TLinkControlToField;
+    LinkControlToField2: TLinkControlToField;
+    LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
     procedure acShowPizzaSelectorExecute(Sender: TObject);
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);

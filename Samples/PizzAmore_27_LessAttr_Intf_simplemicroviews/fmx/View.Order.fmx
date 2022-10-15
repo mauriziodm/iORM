@@ -30,18 +30,17 @@ inherited ViewOrder: TViewOrder
         TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
       inherited ActionListCustMView: TActionList
-        Left = 204
-        Top = 96
+        Left = 340
+        Top = 104
       end
       inherited BindingsListCustMView: TBindingsList
-        Left = 124
-        Top = 93
+        Top = 101
       end
       inherited BSCustomer: TioPrototypeBindSourceDetail
         MasterBindSource = BSMaster
         MasterPropertyName = 'Customer'
-        Left = 293
-        Top = 96
+        Left = 261
+        Top = 104
       end
     end
   end
@@ -218,6 +217,8 @@ inherited ViewOrder: TViewOrder
     end
   end
   inherited ActionList1: TActionList
+    Left = 168
+    Top = 208
     object acShowPizzaSelector: TAction
       Text = 'acShowPizzaSelector'
       OnExecute = acShowPizzaSelectorExecute
@@ -248,8 +249,8 @@ inherited ViewOrder: TViewOrder
         Generator = 'Currency'
         ReadOnly = False
       end>
-    TypeName = 'TOrder'
     OnSelectionInterface = BSMasterSelectionInterface
+    Top = 210
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -292,13 +293,13 @@ inherited ViewOrder: TViewOrder
     MasterBindSource = BSMaster
     MasterPropertyName = 'Rows'
     Left = 64
-    Top = 235
+    Top = 267
   end
   object VCProviderOrderRows: TioViewContextProvider
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
     RegisterAsDefault = False
-    Left = 205
-    Top = 234
+    Left = 165
+    Top = 274
   end
 end

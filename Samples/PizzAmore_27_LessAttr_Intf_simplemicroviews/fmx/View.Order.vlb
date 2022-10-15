@@ -133,3 +133,10 @@ Coordinates=953,105,239,33
 [MicroViewCustomer1.ButtonShowCustomer]
 Coordinates=652,386,230,51
 
+[VMBridge]
+Coordinates=279,1,62,33
+
+[MBSMaster]
+Coordinates=72,52,70,51
+Visible=True
+
