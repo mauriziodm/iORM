@@ -158,6 +158,8 @@ begin
       LMasterBS.Persistence.Delete
     else
       LActiveBSA.Delete;
+    // Abort to prevent an AVerror
+    Abort;
   end;
 end;
 

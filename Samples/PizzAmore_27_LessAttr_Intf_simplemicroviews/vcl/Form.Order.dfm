@@ -47,64 +47,6 @@ object OrderForm: TOrderForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label3: TLabel
-    Left = 5
-    Top = 137
-    Width = 75
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'Customer'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object Label4: TLabel
-    Left = 3
-    Top = 168
-    Width = 75
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'Address'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object Label5: TLabel
-    Left = 3
-    Top = 199
-    Width = 75
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'Phone'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object ButtonSelectCustomer: TSpeedButton
-    Left = 392
-    Top = 137
-    Width = 25
-    Height = 25
-    Action = acSelectCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
   object PanelTop: TPanel
     Left = 0
     Top = 0
@@ -222,20 +164,6 @@ object OrderForm: TOrderForm
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object ButtonDeleteRow: TSpeedButton
-      Left = 50
-      Top = 0
-      Width = 79
-      Height = 40
-      Action = acDeleteRow
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
     object DBEditGrandTotal: TDBEdit
       Left = 310
       Top = 7
@@ -270,7 +198,7 @@ object OrderForm: TOrderForm
       Left = 0
       Top = 0
       Width = 350
-      Height = 480
+      Height = 482
       Align = alClient
       AllowDelete = False
       AllowInsert = False
@@ -282,7 +210,6 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGrid1DblClick
-      ExplicitHeight = 482
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -380,141 +307,33 @@ object OrderForm: TOrderForm
     ParentFont = False
     TabOrder = 5
   end
-  object DBEditCustID: TDBEdit
-    Left = 92
-    Top = 137
-    Width = 30
-    Height = 25
-    BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'ID'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
+  inline MicroViewCustomer1: TMicroViewCustomer
+    Left = 0
+    Top = 128
+    Width = 430
+    Height = 100
+    Color = 16056308
+    ParentBackground = False
+    ParentColor = False
     TabOrder = 6
+    ExplicitTop = 128
+    inherited DSCustomer: TioDataSetDetail
+      AsDefault = False
+      MasterBindSource = DSOrder
+      MasterPropertyName = 'Customer'
+    end
   end
-  object DBEditCustName: TDBEdit
-    Left = 128
-    Top = 137
-    Width = 261
-    Height = 25
+  object ScrollBoxRows: TScrollBox
+    Left = 0
+    Top = 234
+    Width = 430
+    Height = 282
     BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'Name'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
+    Color = clMenu
+    Ctl3D = False
+    ParentColor = False
+    ParentCtl3D = False
     TabOrder = 7
-  end
-  object DBEditCustAddress: TDBEdit
-    Left = 92
-    Top = 168
-    Width = 325
-    Height = 25
-    BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'FullAddress'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 8
-  end
-  object DBECustPhone: TDBEdit
-    Left = 92
-    Top = 199
-    Width = 325
-    Height = 25
-    BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'PhoneNumber'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 9
-  end
-  object GridRows: TDBGrid
-    Left = 8
-    Top = 239
-    Width = 423
-    Height = 277
-    BorderStyle = bsNone
-    DataSource = SourceRows
-    FixedColor = clInactiveBorder
-    GradientEndColor = clInactiveBorder
-    GradientStartColor = clInactiveBorder
-    TabOrder = 10
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clWindowText
-    TitleFont.Height = -12
-    TitleFont.Name = 'Segoe UI'
-    TitleFont.Style = []
-    Columns = <
-      item
-        Expanded = False
-        FieldName = 'Description'
-        Title.Alignment = taCenter
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clNavy
-        Title.Font.Height = -13
-        Title.Font.Name = 'Segoe UI'
-        Title.Font.Style = [fsBold]
-        Width = 180
-        Visible = True
-      end
-      item
-        Expanded = False
-        FieldName = 'UnitPrice'
-        Title.Alignment = taCenter
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clNavy
-        Title.Font.Height = -13
-        Title.Font.Name = 'Segoe UI'
-        Title.Font.Style = [fsBold]
-        Width = 70
-        Visible = True
-      end
-      item
-        Alignment = taCenter
-        Expanded = False
-        FieldName = 'Qty'
-        Title.Alignment = taCenter
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clNavy
-        Title.Font.Height = -13
-        Title.Font.Name = 'Segoe UI'
-        Title.Font.Style = [fsBold]
-        Width = 40
-        Visible = True
-      end
-      item
-        Expanded = False
-        FieldName = 'RowTotal'
-        Title.Alignment = taCenter
-        Title.Caption = 'Total'
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clNavy
-        Title.Font.Height = -13
-        Title.Font.Name = 'Segoe UI'
-        Title.Font.Style = [fsBold]
-        Width = 80
-        Visible = True
-      end>
   end
   object DSPizzas: TioDataSetMaster
     AsDefault = False
@@ -572,57 +391,6 @@ object OrderForm: TOrderForm
     Left = 144
     Top = 312
   end
-  object DSCustomer: TioDataSetDetail
-    MasterBindSource = DSOrder
-    MasterPropertyName = 'Customer'
-    Left = 56
-    Top = 376
-    object DSCustomerID: TIntegerField
-      Alignment = taCenter
-      FieldName = 'ID'
-    end
-    object DSCustomerFullAddress: TStringField
-      FieldName = 'FullAddress'
-      Size = 100
-    end
-    object DSCustomerName: TStringField
-      FieldName = 'Name'
-      Size = 100
-    end
-    object DSCustomerPhoneNumber: TStringField
-      FieldName = 'PhoneNumber'
-      Size = 100
-    end
-  end
-  object SourceCustomer: TDataSource
-    DataSet = DSCustomer
-    Left = 144
-    Top = 376
-  end
-  object DSRows: TioDataSetDetail
-    MasterBindSource = DSOrder
-    MasterPropertyName = 'Rows'
-    Left = 56
-    Top = 440
-    object DSRowsDescription: TStringField
-      FieldName = 'Description'
-      Size = 100
-    end
-    object DSRowsPrice: TCurrencyField
-      FieldName = 'Price'
-    end
-    object DSRowsQty: TIntegerField
-      FieldName = 'Qty'
-    end
-    object DSRowsRowTotal: TCurrencyField
-      FieldName = 'RowTotal'
-    end
-  end
-  object SourceRows: TDataSource
-    DataSet = DSRows
-    Left = 144
-    Top = 440
-  end
   object ActionList1: TActionList
     Left = 256
     Top = 312
@@ -640,22 +408,24 @@ object OrderForm: TOrderForm
       Caption = 'Revert'
       TargetBindSource = DSOrder
     end
-    object acSelectCustomer: TAction
-      Category = 'iORM-BSPersistence'
-      Caption = '...'
-      OnExecute = acSelectCustomerExecute
-    end
     object acSelectPizza: TioBSSelectCurrent
       Category = 'iORM-BS'
       Caption = 'Add'
       TargetBindSource = DSPizzas
     end
-    object acDeleteRow: TDataSetDelete
-      Category = 'Dataset'
-      Caption = 'Delete row'
-      Hint = 'Delete'
-      ImageIndex = 5
-      DataSource = SourceRows
-    end
+  end
+  object VCProviderOrderRows: TioViewContextProvider
+    OnAfterRequest = VCProviderOrderRowsAfterRequest
+    OnRequest = VCProviderOrderRowsRequest
+    RegisterAsDefault = False
+    Left = 253
+    Top = 370
+  end
+  object DSRows: TioDataSetDetail
+    AfterOpen = DSRowsAfterOpen
+    MasterBindSource = DSOrder
+    MasterPropertyName = 'Rows'
+    Left = 56
+    Top = 370
   end
 end

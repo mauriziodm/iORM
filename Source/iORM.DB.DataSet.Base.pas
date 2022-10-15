@@ -93,7 +93,7 @@ type
   published
     // redeclared data set properties
 //    property BeforeOpen;
-//    property AfterOpen;
+    property AfterOpen;
 //    property BeforeClose;
 //    property AfterClose;
 //    property BeforeInsert;
@@ -129,6 +129,7 @@ type
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
     // dataset virtual methods
     procedure InternalPreOpen; override;
+    procedure InternalClose; override;
     // custom dataset virtual methods
     function InternalRecordCount: Integer; override;
     procedure InternalLoadCurrentRecord(Buffer: TRecordBuffer); override;
@@ -626,6 +627,13 @@ begin
   finally
     FBindSourceAdapter.GetDataSetLinkContainer.Enable;
   end;
+end;
+
+procedure TioBSABaseDataSet.InternalClose;
+begin
+  if CheckAdapter and FBindSourceAdapter.Active then
+    FBindSourceAdapter.Active := False;
+  inherited;
 end;
 
 procedure TioBSABaseDataSet.InternalDelete;

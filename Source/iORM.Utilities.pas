@@ -239,7 +239,7 @@ class function TioUtilities.GetDefaultBindSource(const AViewOrViewModel: TCompon
     I: Integer;
   begin
     for I := 0 to AViewOrViewModel.ComponentCount - 1 do
-      if Supports(AViewOrViewModel.Components[I], IioNotifiableBindSource, Result) and Result.IsMasterBS and Result.AsDefault then
+      if Supports(AViewOrViewModel.Components[I], IioNotifiableBindSource, Result) and Result.AsDefault then
         Exit;
     Result := nil;
   end;

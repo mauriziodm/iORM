@@ -154,7 +154,7 @@ object OrdersForm: TOrdersForm
       end
       item
         Expanded = False
-        FieldName = 'Customer.Name'
+        FieldName = 'Customer.FullName'
         Title.Alignment = taCenter
         Title.Caption = 'Customer'
         Title.Font.Charset = DEFAULT_CHARSET
@@ -194,7 +194,7 @@ object OrdersForm: TOrdersForm
       FieldName = 'OrderDate'
     end
     object DSOrdersCustomerName: TStringField
-      FieldName = 'Customer.Name'
+      FieldName = 'Customer.FullName'
       Size = 100
     end
     object DSOrdersGrandTotal: TCurrencyField

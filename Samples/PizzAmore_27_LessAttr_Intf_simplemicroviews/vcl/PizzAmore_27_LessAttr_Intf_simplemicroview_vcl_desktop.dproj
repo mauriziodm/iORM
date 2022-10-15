@@ -146,6 +146,21 @@
             <Form>BusinessCustomerForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="MicroView.Customer.pas">
+            <Form>MicroViewCustomer</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="MicroView.OrderRowCustom.pas">
+            <Form>MicroViewOrderRowCustom</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="MicroView.OrderRowPizza.pas">
+            <Form>MicroViewOrderRowPizza</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

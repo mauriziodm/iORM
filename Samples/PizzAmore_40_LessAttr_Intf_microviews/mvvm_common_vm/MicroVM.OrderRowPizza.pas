@@ -40,8 +40,15 @@ uses
 
 procedure TMicroVMOrderRowPizza.acDeleteExecute(Sender: TObject);
 begin
-  MPOrderRow.Delete;
-  CloseViews;
+  // Note: If you want to close the micro embeded view you have to call the
+  //        CloseViews/Free command after the Delete and inside a finally part
+  //        of a try-finally block because otherwise it would never be executed
+  //        due to an "Abort" within the code that manages the Delete in the NaturalBindSource.
+  try
+    MPOrderRow.Delete;
+  finally
+    CloseViews;
+  end;
 end;
 
 procedure TMicroVMOrderRowPizza.acShowExecute(Sender: TObject);

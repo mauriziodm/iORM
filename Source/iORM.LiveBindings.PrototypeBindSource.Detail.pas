@@ -14,6 +14,7 @@ type
     property ItemCount;
   published
     // Published properties
+    property AsDefault default False;
     property AutoRefreshOnNotification default True; // published: Master+Detail
     property MasterBindSource; // published: Detail
     property MasterPropertyName; // published: Detail

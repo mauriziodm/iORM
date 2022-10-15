@@ -37,12 +37,11 @@ type
   protected
     function GetPizza: IPizza;
     function GetRowTotal: Currency; override;
-    function GetImage: TBitmap;
   public
     constructor Create(const APizza: IPizza; const AQty: Integer = 1); overload;
     procedure AddOne;
     property Pizza: IPizza read GetPizza;
-    property Image: TBitmap read GetImage;
+//    property Image: TBitmap read GetImage;
   end;
 
   [ioEntity('ORDERROWS'), diImplements(IOrderRow, 'CustomOrderRow')]
@@ -59,6 +58,9 @@ type
   end;
 
 implementation
+
+uses
+  Winapi.Windows;
 
 { TBaseOrderRow }
 
@@ -93,11 +95,6 @@ begin
   inherited Create;
   FPizza := APizza;
   FQty := AQty;
-end;
-
-function TPizzaOrderRow.GetImage: TBitmap;
-begin
-  Result := FPizza.Image;
 end;
 
 function TPizzaOrderRow.GetPizza: IPizza;

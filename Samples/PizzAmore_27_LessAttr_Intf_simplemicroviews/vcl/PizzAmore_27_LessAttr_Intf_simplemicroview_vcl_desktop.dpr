@@ -17,7 +17,10 @@ uses
   Model.OrderRow in '..\common_model\Model.OrderRow.pas',
   Model.Pizza in '..\common_model\Model.Pizza.pas',
   Utils.SampleData in '..\common_model\Utils.SampleData.pas',
-  Form.CustomerBusiness in 'Form.CustomerBusiness.pas' {BusinessCustomerForm};
+  Form.CustomerBusiness in 'Form.CustomerBusiness.pas' {BusinessCustomerForm},
+  MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame},
+  MicroView.OrderRowCustom in 'MicroView.OrderRowCustom.pas' {MicroViewOrderRowCustom: TFrame},
+  MicroView.OrderRowPizza in 'MicroView.OrderRowPizza.pas' {MicroViewOrderRowPizza: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}
