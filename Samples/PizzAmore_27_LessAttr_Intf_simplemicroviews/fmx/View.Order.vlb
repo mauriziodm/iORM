@@ -71,11 +71,8 @@ Coordinates=10,247,46,51
 [Label4]
 Coordinates=76,186,46,51
 
-[StringGrid1]
-Coordinates=340,125,70,51
-
 []
-Coordinates=235,10,125,51
+Coordinates=340,125,70,51
 Visible=True
 
 [BindingsList1]

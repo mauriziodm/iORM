@@ -3,6 +3,13 @@ inherited ViewOrder: TViewOrder
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Order'
+      object Button1: TButton
+        Position.X = 296.000000000000000000
+        Position.Y = 16.000000000000000000
+        TabOrder = 41
+        Text = 'Button1'
+        OnClick = Button1Click
+      end
     end
   end
   object LayoutCustomer: TLayout [2]
@@ -201,18 +208,14 @@ inherited ViewOrder: TViewOrder
         StyleLookup = 'additembutton'
       end
     end
-    object StringGrid1: TStringGrid
+    object ScrollBoxRows: TScrollBox
       Align = Client
-      CanFocus = True
-      ClipChildren = True
       Size.Width = 400.000000000000000000
       Size.Height = 335.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
-      RowCount = 0
-      Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 396.000000000000000000
-      Viewport.Height = 310.000000000000000000
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 335.000000000000000000
     end
   end
   inherited ActionList1: TActionList
@@ -274,5 +277,21 @@ inherited ViewOrder: TViewOrder
         ReadOnly = False
       end>
     TypeName = 'TOrder'
+  end
+  object BSRows: TioPrototypeBindSourceDetail
+    AutoPost = False
+    FieldDefs = <>
+    ScopeMappings = <>
+    MasterBindSource = BSMaster
+    MasterPropertyName = 'Rows'
+    Left = 64
+    Top = 235
+  end
+  object VCProviderOrderRows: TioViewContextProvider
+    OnAfterRequest = VCProviderOrderRowsAfterRequest
+    OnRequest = VCProviderOrderRowsRequest
+    RegisterAsDefault = False
+    Left = 205
+    Top = 234
   end
 end

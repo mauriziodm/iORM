@@ -20,7 +20,9 @@ uses
   Model.Customers in '..\common_model\Model.Customers.pas',
   Model.BaseBO in '..\common_model\Model.BaseBO.pas',
   View.CustomerBusiness in 'View.CustomerBusiness.pas' {ViewCustomerBusiness: TFrame},
-  MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame};
+  MicroView.Customer in 'MicroView.Customer.pas' {MicroViewCustomer: TFrame},
+  MicroView.OrderRowCustom in 'MicroView.OrderRowCustom.pas' {MicroViewOrderRowCustom: TFrame},
+  MicroView.OrderRowPizza in 'MicroView.OrderRowPizza.pas' {MicroViewOrderRowPizza: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

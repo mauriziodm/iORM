@@ -8,7 +8,8 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx,
   System.Actions, FMX.ActnList, FMX.Controls.Presentation, FMX.Objects, System.Rtti, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts,
   Data.Bind.GenData, iORM.LiveBindings.PrototypeBindSource.Detail, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator, iORM.MVVM.Interfaces, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, MicroView.Customer;
+  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator, iORM.MVVM.Interfaces, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, MicroView.Customer,
+  iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -28,18 +29,24 @@ type
     LayoutRows: TLayout;
     Label5: TLabel;
     ButtonSelectPizza: TSpeedButton;
-    StringGrid1: TStringGrid;
     BindingsList1: TBindingsList;
     acShowPizzaSelector: TAction;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     MicroViewCustomer1: TMicroViewCustomer;
+    BSRows: TioPrototypeBindSourceDetail;
+    ScrollBoxRows: TScrollBox;
+    VCProviderOrderRows: TioViewContextProvider;
+    Button1: TButton;
     procedure acShowPizzaSelectorExecute(Sender: TObject);
+    procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
+    procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
-    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
@@ -53,6 +60,30 @@ procedure TViewOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
   io.ShowAsSelector<IPizza>(BSMaster);
+end;
+
+procedure TViewOrder.Button1Click(Sender: TObject);
+begin
+  inherited;
+  BSRows.ShowEach('', 'VCProviderOrderRows')
+end;
+
+constructor TViewOrder.Create(AOwner: TComponent);
+begin
+  inherited;
+  BSRows.ShowEach('', 'VCProviderOrderRows')
+end;
+
+procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+begin
+  inherited;
+  (AView as TControl).Align := TAlignLayout.Top;
+end;
+
+procedure TViewOrder.VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
+begin
+  inherited;
+  ResultViewContext := ScrollBoxRows;
 end;
 
 end.
