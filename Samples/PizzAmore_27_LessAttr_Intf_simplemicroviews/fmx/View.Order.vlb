@@ -78,9 +78,6 @@ Visible=True
 [BindingsList1]
 Coordinates=342,80,82,33
 
-[acShowPizzaSelector]
-Coordinates=0,0,119,33
-
 [BSMaster]
 Coordinates=10,94,61,123
 Visible=True
@@ -139,4 +136,7 @@ Coordinates=279,1,62,33
 [MBSMaster]
 Coordinates=72,52,70,51
 Visible=True
+
+[acAddPizza]
+Coordinates=0,0,119,33
 

@@ -30,7 +30,7 @@ type
     Label5: TLabel;
     ButtonSelectPizza: TSpeedButton;
     BindingsList1: TBindingsList;
-    acShowPizzaSelector: TAction;
+    acAddPizza: TAction;
     MicroViewCustomer1: TMicroViewCustomer;
     BSRows: TioPrototypeBindSourceDetail;
     ScrollBoxRows: TScrollBox;
@@ -40,11 +40,14 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
-    procedure acShowPizzaSelectorExecute(Sender: TObject);
+    SpeedButton1: TSpeedButton;
+    acAddCustomPizza: TAction;
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure Button1Click(Sender: TObject);
     procedure BSMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure acAddCustomPizzaExecute(Sender: TObject);
+    procedure acAddPizzaExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -58,7 +61,17 @@ uses
 
 {$R *.fmx}
 
-procedure TViewOrder.acShowPizzaSelectorExecute(Sender: TObject);
+procedure TViewOrder.acAddCustomPizzaExecute(Sender: TObject);
+var
+  LNewOrderRow: IOrderRow;
+begin
+  inherited;
+  LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
+  BSRows.Append(LNewOrderRow);
+  BSRows.ShowCurrent('', 'VCProviderOrderRows');
+end;
+
+procedure TViewOrder.acAddPizzaExecute(Sender: TObject);
 begin
   inherited;
   io.ShowAsSelector<IPizza>(BSMaster);
