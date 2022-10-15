@@ -12,6 +12,32 @@ inherited ViewOrder: TViewOrder
     Size.Height = 75.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
+    inline MicroViewCustomer1: TMicroViewCustomer
+      Size.Width = 400.000000000000000000
+      Size.Height = 75.000000000000000000
+      Size.PlatformDefault = False
+      inherited EditCustName: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+      inherited EditCustAddress: TEdit
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+      end
+      inherited ActionListCustMView: TActionList
+        Left = 204
+        Top = 96
+      end
+      inherited BindingsListCustMView: TBindingsList
+        Left = 124
+        Top = 93
+      end
+      inherited BSCustomer: TioPrototypeBindSourceDetail
+        AutoPost = True
+        MasterBindSource = BSMaster
+        MasterPropertyName = 'Customer'
+        Left = 293
+        Top = 96
+      end
+    end
   end
   object LayoutGrandTotal: TLayout [3]
     Align = Bottom
