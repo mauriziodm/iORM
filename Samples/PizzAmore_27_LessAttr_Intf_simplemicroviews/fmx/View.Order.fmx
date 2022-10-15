@@ -38,7 +38,6 @@ inherited ViewOrder: TViewOrder
         Top = 93
       end
       inherited BSCustomer: TioPrototypeBindSourceDetail
-        AutoPost = True
         MasterBindSource = BSMaster
         MasterPropertyName = 'Customer'
         Left = 293
@@ -219,18 +218,40 @@ inherited ViewOrder: TViewOrder
     end
   end
   inherited ActionList1: TActionList
-    inherited acPersist: TioBSPersistencePersist
-      TargetBindSource = nil
-    end
-    inherited acRevert: TioBSPersistenceRevert
-      TargetBindSource = nil
-    end
     object acShowPizzaSelector: TAction
       Text = 'acShowPizzaSelector'
       OnExecute = acShowPizzaSelectorExecute
     end
   end
-  object BindingsList1: TBindingsList [7]
+  inherited BSMaster: TioPrototypeBindSourceMaster
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'OrderDate'
+        FieldType = ftDateTime
+        Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'GrandTotal'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    TypeName = 'TOrder'
+    OnSelectionInterface = BSMasterSelectionInterface
+  end
+  object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -256,30 +277,16 @@ inherited ViewOrder: TViewOrder
       Control = EditNote
       Track = False
     end
-  end
-  inherited BSMaster: TioPrototypeBindSourceMaster
-    FieldDefs = <
-      item
-        Name = 'ID'
-        FieldType = ftInteger
-        Generator = 'Integers'
-        ReadOnly = False
-      end
-      item
-        Name = 'OrderDate'
-        FieldType = ftDateTime
-        Generator = 'DateTime'
-        ReadOnly = False
-      end
-      item
-        Name = 'Note'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end>
-    TypeName = 'TOrder'
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'GrandTotal'
+      Control = EditGrandTotal
+      Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
+    end
   end
   object BSRows: TioPrototypeBindSourceDetail
-    AutoPost = False
     FieldDefs = <>
     ScopeMappings = <>
     MasterBindSource = BSMaster

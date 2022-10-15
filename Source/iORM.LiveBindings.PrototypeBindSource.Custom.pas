@@ -721,10 +721,13 @@ begin
   // ===========================================================================
   if IsDetailBS and not(csDesigning in ComponentState) then
   begin
-    if not Assigned(FMasterBindSource) then
-      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterBindSource" property has not been set in the component "%s".' +
-        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
-    MasterBindSource.RegisterDetailBindSource(Self);
+    if Assigned(MasterBindSource) then
+      MasterBindSource.RegisterDetailBindSource(Self);
+// ----- OLD CODE -----
+//    if not Assigned(FMasterBindSource) then
+//      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterBindSource" property has not been set in the component "%s".' +
+//        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
+// ----- OLD CODE -----
   end;
   // ===========================================================================
 

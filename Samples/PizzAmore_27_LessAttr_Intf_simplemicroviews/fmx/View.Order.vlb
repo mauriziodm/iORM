@@ -5,71 +5,71 @@ Coordinates=191,71,50,33
 Coordinates=191,123,57,33
 
 [ButtonBack]
-Coordinates=198,186,72,51
+Coordinates=496,309,72,51
 
 [ButtonSave]
-Coordinates=462,186,71,51
+Coordinates=594,309,71,51
 
 [ActionList1]
 Coordinates=172,159,70,33
 
 [RectangleTitle]
-Coordinates=172,247,84,33
+Coordinates=187,463,84,33
 
 [Rectangle1]
-Coordinates=379,247,69,33
+Coordinates=92,463,69,33
 
 [acPersist]
 Coordinates=24,159,60,33
 
 [LabelTitle]
-Coordinates=336,186,62,51
+Coordinates=269,386,62,51
 
 [Label2]
-Coordinates=420,125,46,51
+Coordinates=319,309,46,51
 
 [EditID]
-Coordinates=408,186,44,51
+Coordinates=157,121,44,51
 
 [ButtonRevert]
-Coordinates=476,125,79,51
+Coordinates=391,309,79,51
 
 [LayoutCustomer]
-Coordinates=66,247,96,33
+Coordinates=125,540,96,33
 
 [LayoutOrderData]
-Coordinates=458,247,98,33
+Coordinates=348,540,98,33
 
 [LayoutGrandTotal]
-Coordinates=266,247,103,33
+Coordinates=297,463,103,33
 
 [ButtonSelectPizza]
-Coordinates=10,125,103,51
+Coordinates=190,309,103,51
 
 [LayoutRows]
-Coordinates=10,308,75,33
+Coordinates=247,540,75,33
 
 [Label1]
-Coordinates=464,10,46,51
+Coordinates=429,386,46,51
 
 [EditNote]
-Coordinates=132,186,56,51
+Coordinates=151,10,56,51
 
 [Label5]
-Coordinates=179,10,46,51
+Coordinates=501,386,46,51
 
 [EditGrandTotal]
-Coordinates=81,10,88,51
+Coordinates=691,309,88,51
 Visible=True
 
 [EditDate]
-Coordinates=10,186,56,51
+Coordinates=151,232,56,51
 
 [Label6]
-Coordinates=10,247,46,51
+Coordinates=805,309,46,51
 
 [Label4]
-Coordinates=76,186,46,51
+Coordinates=357,386,46,51
 
 []
 Coordinates=340,125,70,51
@@ -82,6 +82,54 @@ Coordinates=342,80,82,33
 Coordinates=0,0,119,33
 
 [BSMaster]
-Coordinates=10,10,61,105
+Coordinates=10,94,61,123
 Visible=True
+
+[MicroViewCustomer1.ButtonSelectCustomer]
+Coordinates=10,386,233,51
+
+[ScrollBoxRows]
+Coordinates=10,540,89,33
+
+[MicroViewCustomer1.acSelectCustomer]
+Coordinates=682,193,211,33
+
+[Button1]
+Coordinates=573,386,53,51
+
+[MicroViewCustomer1.ActionListCustMView]
+Coordinates=663,230,227,33
+
+[MicroViewCustomer1.Label3]
+Coordinates=10,309,154,51
+
+[VCProviderOrderRows]
+Coordinates=682,282,125,33
+
+[MicroViewCustomer1.RectanglebackgroundRowMView]
+Coordinates=571,463,283,33
+
+[MicroViewCustomer1]
+Coordinates=426,463,119,33
+
+[MicroViewCustomer1.BSCustomer]
+Coordinates=233,38,184,105
+
+[MicroViewCustomer1.EditCustName]
+Coordinates=503,121,192,51
+
+[BSRows]
+Coordinates=10,463,56,51
+
+[MicroViewCustomer1.acShowCustomer]
+Coordinates=953,53,208,33
+
+[MicroViewCustomer1.EditCustAddress]
+Coordinates=497,10,205,51
+
+[MicroViewCustomer1.BindingsListCustMView]
+Coordinates=953,105,239,33
+
+[MicroViewCustomer1.ButtonShowCustomer]
+Coordinates=652,386,230,51
 

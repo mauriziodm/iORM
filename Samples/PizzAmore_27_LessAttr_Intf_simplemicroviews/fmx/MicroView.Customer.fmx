@@ -127,7 +127,6 @@ object MicroViewCustomer: TMicroViewCustomer
   end
   object BSCustomer: TioPrototypeBindSourceDetail
     AutoActivate = True
-    AutoPost = False
     FieldDefs = <
       item
         Name = 'ID'

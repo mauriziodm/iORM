@@ -39,14 +39,16 @@ type
     ScrollBoxRows: TScrollBox;
     VCProviderOrderRows: TioViewContextProvider;
     Button1: TButton;
+    LinkControlToField4: TLinkControlToField;
     procedure acShowPizzaSelectorExecute(Sender: TObject);
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure Button1Click(Sender: TObject);
+    procedure BSMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public
-    constructor Create(AOwner: TComponent); override;
+    { Public declarations }
   end;
 
 implementation
@@ -62,13 +64,24 @@ begin
   io.ShowAsSelector<IPizza>(BSMaster);
 end;
 
-procedure TViewOrder.Button1Click(Sender: TObject);
+procedure TViewOrder.BSMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+var
+  LPizza: IPizza;
 begin
-  inherited;
-  BSRows.ShowEach('', 'VCProviderOrderRows')
+  ADone := True;
+  if Supports(ASelected, IPizza, LPizza) then
+  begin
+    if BSMaster.CurrentAs<IOrder>.TryAddPizzaToExistingRow(LPizza) then
+      BSRows.Refresh
+    else
+    begin
+      BSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
+      BSRows.ShowCurrent('', 'VCProviderOrderRows');
+    end;
+  end;
 end;
 
-constructor TViewOrder.Create(AOwner: TComponent);
+procedure TViewOrder.Button1Click(Sender: TObject);
 begin
   inherited;
   BSRows.ShowEach('', 'VCProviderOrderRows')

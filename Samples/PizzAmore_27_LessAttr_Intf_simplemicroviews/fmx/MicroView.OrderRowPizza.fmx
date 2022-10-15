@@ -179,7 +179,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       StyleLookup = 'transparentedit'
       TabOrder = 43
       ReadOnly = True
-      Text = '67,67'
+      Text = '67,67 '#8364
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Trailing
       Position.X = 102.000000000000000000
@@ -235,7 +235,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       StyleLookup = 'transparentedit'
       TabOrder = 42
       ReadOnly = True
-      Text = '67,67'
+      Text = '67,67 '#8364
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Trailing
       Position.X = 286.000000000000000000
@@ -296,11 +296,12 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       FieldName = 'Pizza.Price'
       Control = EditPrice
       Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = BSRowPizza
-      FieldName = 'Qry'
+      FieldName = 'Qty'
       Control = EditQty
       Track = False
     end
@@ -310,6 +311,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
       FieldName = 'RowTotal'
       Control = EditTotal
       Track = False
+      CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
@@ -321,7 +323,6 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
   end
   object BSRowPizza: TioPrototypeBindSourceDetail
     AutoActivate = True
-    AutoPost = False
     FieldDefs = <
       item
         Name = 'Pizza.Name'
@@ -335,7 +336,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
         ReadOnly = False
       end
       item
-        Name = 'Qry'
+        Name = 'Qty'
         FieldType = ftInteger
         Generator = 'Integers'
         ReadOnly = False
@@ -359,7 +360,6 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Top = 59
   end
   object BSPizza: TioPrototypeBindSourceDetail
-    AutoPost = False
     FieldDefs = <>
     ScopeMappings = <>
     MasterBindSource = BSRowPizza

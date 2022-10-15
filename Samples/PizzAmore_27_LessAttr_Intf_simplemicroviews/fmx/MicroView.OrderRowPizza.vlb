@@ -1,5 +1,5 @@
 ﻿[EditQty]
-Coordinates=183,121,50,51
+Coordinates=140,90,50,51
 
 [Rectangle2]
 Coordinates=10,608,69,33
@@ -52,4 +52,13 @@ Visible=True
 
 []
 Coordinates=10,187,84,141
+
+[acDelete]
+Coordinates=73,1,56,33
+
+[BSPizza]
+Coordinates=0,0,54,51
+
+[acShow]
+Coordinates=73,53,53,33
 
