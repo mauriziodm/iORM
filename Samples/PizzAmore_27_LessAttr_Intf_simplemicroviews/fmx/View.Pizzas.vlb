@@ -1,15 +1,5 @@
-﻿[acBack]
-Coordinates=18,70,50,33
-
-[acAdd]
-Coordinates=193,267,45,33
-
-[ListView]
+﻿[ListView]
 Coordinates=10,10,89,195
-
-[BSMaster]
-Coordinates=180,30,61,105
-Visible=True
 
 [LabelTitle]
 Coordinates=207,231,62,51
@@ -23,14 +13,8 @@ Coordinates=266,10,77,51
 [Rectangle1]
 Coordinates=295,231,69,33
 
-[ActionList1]
-Coordinates=322,53,70,33
-
 [ButtonDelete]
 Coordinates=103,231,78,51
-
-[acShowOrSelect]
-Coordinates=322,105,95,33
 
 [ButtonBack]
 Coordinates=369,10,72,51
@@ -39,8 +23,28 @@ Coordinates=369,10,72,51
 Coordinates=10,231,67,51
 
 []
-Coordinates=134,267,56,33
+Coordinates=322,53,70,33
+Visible=True
 
 [BindingsList1]
 Coordinates=118,134,82,33
+
+[BSMaster]
+Coordinates=160,30,61,105
+Visible=True
+
+[acBack]
+Coordinates=118,100,50,33
+
+[ActionList1]
+Coordinates=118,186,70,33
+
+[acAdd]
+Coordinates=259,80,45,33
+
+[acDelete]
+Coordinates=259,132,56,33
+
+[acShowOrSelect]
+Coordinates=259,184,95,33
 

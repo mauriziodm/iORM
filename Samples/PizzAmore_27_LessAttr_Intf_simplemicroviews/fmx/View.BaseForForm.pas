@@ -23,8 +23,9 @@ type
     BSMaster: TioPrototypeBindSourceMaster;
     procedure acBackExecute(Sender: TObject);
   private
+    { Private declarations }
   public
-    constructor Create(AOwner: TComponent); override;
+    { Public declarations }
   end;
 
 implementation
@@ -34,12 +35,6 @@ implementation
 procedure TViewBaseForForm.acBackExecute(Sender: TObject);
 begin
   Free;
-end;
-
-constructor TViewBaseForForm.Create(AOwner: TComponent);
-begin
-  inherited;
-//  BSMaster.Open;
 end;
 
 end.

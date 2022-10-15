@@ -52,7 +52,7 @@ inherited ViewPizza: TViewPizza
         Text = 'Darkgoldenrod'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 53.000000000000000000
-        Position.Y = 11.000000000000000000
+        Position.Y = 15.000000000000000000
         Margins.Left = 5.000000000000000000
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000

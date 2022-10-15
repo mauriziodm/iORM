@@ -57,7 +57,7 @@ var
 implementation
 
 uses
-  Utils.SampleData, System.IOUtils, Model.Customer, Model.Pizza, Model.Order;
+  Utils.SampleData, System.IOUtils, Model.Interfaces;
 
 {$R *.fmx}
 
@@ -68,17 +68,17 @@ end;
 
 procedure TStartForm.acShowCustomersExecute(Sender: TObject);
 begin
-  io.Show<TCustomer>('LIST');
+  io.Show<IGenericCustomer>;
 end;
 
 procedure TStartForm.acShowOrdersExecute(Sender: TObject);
 begin
-  io.Show<TOrder>('LIST');
+  io.Show<IOrder>;
 end;
 
 procedure TStartForm.acShowPizzasExecute(Sender: TObject);
 begin
-  io.Show<TPizza>('LIST');
+  io.Show<IPizza>;
 end;
 
 procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

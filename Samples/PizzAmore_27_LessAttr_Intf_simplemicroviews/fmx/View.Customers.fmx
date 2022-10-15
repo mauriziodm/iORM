@@ -8,34 +8,7 @@ inherited ViewCustomers: TViewCustomers
   inherited ListView: TListView
     ItemIndex = 0
   end
-  inherited BSMaster: TioPrototypeBindSourceMaster
-    AutoActivate = True
-    FieldDefs = <
-      item
-        Name = 'ID'
-        FieldType = ftInteger
-        Generator = 'Integers'
-        ReadOnly = False
-      end
-      item
-        Name = 'Name'
-        Generator = 'ContactNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'PhoneNumber'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = '%Paging.CurrentPageOf'
-        Generator = 'Integers'
-        ReadOnly = False
-      end>
-    Preview = True
-    TypeName = 'TCustomer'
-  end
-  object BindingsList1: TBindingsList
+  object BindingsList1: TBindingsList [3]
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -43,7 +16,7 @@ inherited ViewCustomers: TViewCustomers
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
       DataSource = BSMaster
-      FieldName = 'Name'
+      FieldName = 'FullName'
       Control = ListView
       FillExpressions = <
         item
@@ -53,5 +26,24 @@ inherited ViewCustomers: TViewCustomers
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
+  end
+  inherited BSMaster: TioPrototypeBindSourceMaster [4]
+    AutoActivate = True
+    AutoPost = True
+    FieldDefs = <
+      item
+        Name = 'FullName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    Preview = True
+    TypeName = 'IGenericCustomer'
+  end
+  inherited ActionList1: TActionList [5]
   end
 end

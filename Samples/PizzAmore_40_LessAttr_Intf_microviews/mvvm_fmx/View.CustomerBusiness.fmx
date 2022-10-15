@@ -304,8 +304,8 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    Left = 52
-    Top = 5
+    Left = 204
+    Top = 53
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = MBSMaster

@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, System.Actions, FMX.ActnList, iORM.StdActions.Fmx, iORM, iORM.Attributes,
   iORM.CommonTypes, iORM.Where.Interfaces, Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom,
-  iORM.LiveBindings.PrototypeBindSource.Master, Fmx.Bind.Navigator;
+  iORM.LiveBindings.PrototypeBindSource.Master, Fmx.Bind.Navigator, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master;
 
 type
   TViewBaseForList = class(TFrame)
@@ -23,8 +23,8 @@ type
     acBack: TAction;
     acAdd: TAction;
     acShowOrSelect: TAction;
-    BSMaster: TioPrototypeBindSourceMaster;
     acDelete: TioBSPersistenceDelete;
+    BSMaster: TioPrototypeBindSourceMaster;
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);

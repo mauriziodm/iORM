@@ -1,10 +1,4 @@
-﻿[acBack]
-Coordinates=12,70,50,33
-
-[ActionList1]
-Coordinates=190,141,70,33
-
-[RectangleTitle]
+﻿[RectangleTitle]
 Coordinates=121,258,84,33
 
 [Rectangle1]
@@ -16,16 +10,6 @@ Coordinates=477,10,62,51
 [ButtonRevert]
 Coordinates=334,10,79,51
 
-[acPersist]
-Coordinates=307,1,60,33
-
-[BSMaster]
-Coordinates=136,10,61,123
-Visible=True
-
-[acRevert]
-Coordinates=307,53,57,33
-
 [ButtonBack]
 Coordinates=203,197,72,51
 
@@ -36,7 +20,7 @@ Coordinates=10,197,71,51
 Coordinates=10,258,101,33
 
 [EditName]
-Coordinates=207,10,61,51
+Coordinates=220,120,61,51
 
 [EditUnitPrice]
 Coordinates=549,10,79,51
@@ -70,8 +54,32 @@ Coordinates=339,197,46,51
 Coordinates=278,10,46,51
 
 []
-Coordinates=313,105,82,33
+Coordinates=319,80,82,33
+Visible=True
+
+[VMBridge]
+Coordinates=313,267,62,33
+
+[MBSMaster]
+Coordinates=145,80,70,51
+Visible=True
+
+[BSMaster]
+Coordinates=145,1,61,123
+Visible=True
+
+[acRevert]
+Coordinates=145,71,57,33
+
+[acBack]
+Coordinates=265,80,50,33
+
+[acPersist]
+Coordinates=313,132,60,33
+
+[ActionList1]
+Coordinates=313,267,70,33
 
 [BindingsList1]
-Coordinates=145,152,82,33
+Coordinates=319,80,82,33
 

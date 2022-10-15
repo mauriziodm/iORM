@@ -8,17 +8,13 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx,
   System.Actions, FMX.ActnList, FMX.Controls.Presentation, FMX.Objects, System.Rtti, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts,
   Data.Bind.GenData, iORM.LiveBindings.PrototypeBindSource.Detail, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator;
+  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator, iORM.MVVM.Interfaces, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge;
 
 type
 
   [diSimpleViewFor(TOrder)]
   TViewOrder = class(TViewBaseForForm)
     LayoutCustomer: TLayout;
-    EditCustName: TEdit;
-    Label3: TLabel;
-    EditCustAddress: TEdit;
-    ButtonSelectCustomer: TSpeedButton;
     LayoutGrandTotal: TLayout;
     EditGrandTotal: TEdit;
     Label4: TLabel;
@@ -32,58 +28,30 @@ type
     LayoutRows: TLayout;
     Label5: TLabel;
     ButtonSelectPizza: TSpeedButton;
-    ButtonDeleteRow: TSpeedButton;
     StringGrid1: TStringGrid;
-    BSCustomer: TioPrototypeBindSourceDetail;
-    BSRows: TioPrototypeBindSourceDetail;
     BindingsList1: TBindingsList;
+    acShowPizzaSelector: TAction;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
-    LinkControlToField4: TLinkControlToField;
-    LinkControlToField5: TLinkControlToField;
-    LinkControlToField6: TLinkControlToField;
-    LinkGridToDataSourceBSRows: TLinkGridToDataSource;
-    acDeleteRow: TFMXBindNavigateDelete;
-    scShowCustomerSelector: TAction;
-    acShowPizzaSelector: TAction;
-    procedure scShowCustomerSelectorExecute(Sender: TObject);
     procedure acShowPizzaSelectorExecute(Sender: TObject);
-    procedure BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-var
-  ViewOrder: TViewOrder;
-
 implementation
 
 uses
-  Model.Customer, Model.Pizza;
+  Model.Interfaces;
 
 {$R *.fmx}
 
 procedure TViewOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<TPizza>(BSMaster, 'LIST');
-end;
-
-procedure TViewOrder.BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-begin
-  inherited;
-  BSMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
-  BSMaster.Refresh;
-  ADone := True;
-end;
-
-procedure TViewOrder.scShowCustomerSelectorExecute(Sender: TObject);
-begin
-  inherited;
-  io.ShowAsSelector<TCustomer>(BSCustomer, 'LIST');
+  io.ShowAsSelector<IPizza>(BSMaster);
 end;
 
 end.

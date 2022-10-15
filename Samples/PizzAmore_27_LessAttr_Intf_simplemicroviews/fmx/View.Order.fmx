@@ -12,76 +12,6 @@ inherited ViewOrder: TViewOrder
     Size.Height = 75.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
-    object EditCustName: TEdit
-      Touch.InteractiveGestures = [LongTap, DoubleTap]
-      StyleLookup = 'transparentedit'
-      TabOrder = 41
-      Text = 'Mark Anderson'
-      TextSettings.Font.StyleExt = {00070000000000000004000000}
-      Position.X = 5.000000000000000000
-      Position.Y = 15.000000000000000000
-      Margins.Left = 5.000000000000000000
-      Margins.Right = 5.000000000000000000
-      Margins.Bottom = 5.000000000000000000
-      Size.Width = 340.000000000000000000
-      Size.Height = 30.000000000000000000
-      Size.PlatformDefault = False
-      TextPrompt = 'ID here'
-      StyledSettings = [Family, Size, FontColor]
-      object Label3: TLabel
-        Position.Y = -16.000000000000000000
-        Text = 'Customer'
-        TabOrder = 0
-      end
-    end
-    object EditCustAddress: TEdit
-      Touch.InteractiveGestures = [LongTap, DoubleTap]
-      StyleLookup = 'transparentedit'
-      TabOrder = 40
-      Text = 
-        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-        'por, velit sit'
-      TextSettings.Font.StyleExt = {00070000000000000004000000}
-      Position.X = 5.000000000000000000
-      Position.Y = 40.000000000000000000
-      Margins.Left = 5.000000000000000000
-      Margins.Right = 5.000000000000000000
-      Margins.Bottom = 5.000000000000000000
-      Size.Width = 340.000000000000000000
-      Size.Height = 30.000000000000000000
-      Size.PlatformDefault = False
-      TextPrompt = 'ID here'
-      StyledSettings = [Family, Size, FontColor]
-    end
-    object ButtonSelectCustomer: TSpeedButton
-      Action = scShowCustomerSelector
-      Align = MostRight
-      Enabled = True
-      ImageIndex = -1
-      Position.X = 370.000000000000000000
-      Size.Width = 30.000000000000000000
-      Size.Height = 75.000000000000000000
-      Size.PlatformDefault = False
-      StyleLookup = 'arrowrighttoolbutton'
-    end
   end
   object LayoutGrandTotal: TLayout [3]
     Align = Bottom
@@ -244,17 +174,6 @@ inherited ViewOrder: TViewOrder
         Size.PlatformDefault = False
         StyleLookup = 'additembutton'
       end
-      object ButtonDeleteRow: TSpeedButton
-        Action = acDeleteRow
-        Align = Right
-        Enabled = True
-        ImageIndex = -1
-        Position.X = 335.000000000000000000
-        Size.Width = 30.000000000000000000
-        Size.Height = 30.000000000000000000
-        Size.PlatformDefault = False
-        StyleLookup = 'deleteitembutton'
-      end
     end
     object StringGrid1: TStringGrid
       Align = Client
@@ -264,118 +183,25 @@ inherited ViewOrder: TViewOrder
       Size.Height = 335.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
-      RowCount = 200
+      RowCount = 0
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 380.000000000000000000
+      Viewport.Width = 396.000000000000000000
       Viewport.Height = 310.000000000000000000
     end
   end
   inherited ActionList1: TActionList
-    object acDeleteRow: TFMXBindNavigateDelete
-      Category = 'LiveBindings'
-      Text = 'Delete'
-      DataSource = BSRows
+    inherited acPersist: TioBSPersistencePersist
+      TargetBindSource = nil
     end
-    object scShowCustomerSelector: TAction
-      Text = 'scShowCustomerSelector'
-      OnExecute = scShowCustomerSelectorExecute
+    inherited acRevert: TioBSPersistenceRevert
+      TargetBindSource = nil
     end
     object acShowPizzaSelector: TAction
       Text = 'acShowPizzaSelector'
       OnExecute = acShowPizzaSelectorExecute
     end
   end
-  inherited BSMaster: TioPrototypeBindSourceMaster
-    AutoActivate = True
-    FieldDefs = <
-      item
-        Name = 'ID'
-        FieldType = ftInteger
-        Generator = 'Integers'
-        ReadOnly = False
-      end
-      item
-        Name = 'OrderDate'
-        FieldType = ftDateTime
-        Generator = 'DateTime'
-        ReadOnly = False
-      end
-      item
-        Name = 'Note'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = 'GrandTotal'
-        FieldType = ftCurrency
-        Generator = 'Currency'
-        ReadOnly = False
-      end>
-    Preview = True
-    TypeName = 'TOrder'
-    OnSelectionObject = BSMasterSelectionObject
-    OnReceiveSelectionCloneObject = False
-    OnReceiveSelectionFreeObject = False
-  end
-  object BSCustomer: TioPrototypeBindSourceDetail
-    AutoActivate = True
-    FieldDefs = <
-      item
-        Name = 'Name'
-        Generator = 'ContactNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'FullAddress'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = 'PhoneNumber'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end>
-    ScopeMappings = <>
-    Preview = True
-    MasterBindSource = BSMaster
-    MasterPropertyName = 'Customer'
-    Left = 64
-    Top = 227
-  end
-  object BSRows: TioPrototypeBindSourceDetail
-    AutoActivate = True
-    FieldDefs = <
-      item
-        Name = 'Description'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = 'Price'
-        FieldType = ftCurrency
-        Generator = 'Currency'
-        ReadOnly = False
-      end
-      item
-        Name = 'Qty'
-        FieldType = ftInteger
-        Generator = 'Integers'
-        ReadOnly = False
-      end
-      item
-        Name = 'RowTotal'
-        FieldType = ftCurrency
-        Generator = 'Currency'
-        ReadOnly = False
-      end>
-    ScopeMappings = <>
-    Preview = True
-    MasterBindSource = BSMaster
-    MasterPropertyName = 'Rows'
-    Left = 64
-    Top = 291
-  end
-  object BindingsList1: TBindingsList
+  object BindingsList1: TBindingsList [7]
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -401,51 +227,26 @@ inherited ViewOrder: TViewOrder
       Control = EditNote
       Track = False
     end
-    object LinkControlToField4: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSMaster
-      FieldName = 'GrandTotal'
-      Control = EditGrandTotal
-      Track = False
-      CustomFormat = 'Format('#39'%%m'#39', Value)'
-    end
-    object LinkControlToField5: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSCustomer
-      FieldName = 'Name'
-      Control = EditCustName
-      Track = False
-    end
-    object LinkControlToField6: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSCustomer
-      FieldName = 'FullAddress'
-      Control = EditCustAddress
-      Track = False
-    end
-    object LinkGridToDataSourceBSRows: TLinkGridToDataSource
-      Category = 'Quick Bindings'
-      DataSource = BSRows
-      GridControl = StringGrid1
-      Columns = <
-        item
-          MemberName = 'Description'
-          Width = 180
-        end
-        item
-          MemberName = 'Price'
-          Width = 70
-          CustomFormat = 'Format('#39'%%m'#39', Value)'
-        end
-        item
-          MemberName = 'Qty'
-          Width = 40
-        end
-        item
-          MemberName = 'RowTotal'
-          Width = 80
-          CustomFormat = 'Format('#39'%%m'#39', Value)'
-        end>
-    end
+  end
+  inherited BSMaster: TioPrototypeBindSourceMaster
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'OrderDate'
+        FieldType = ftDateTime
+        Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    TypeName = 'TOrder'
   end
 end

@@ -8,7 +8,7 @@ uses
 type
 
   [ioEntity('ORDERROWS')]
-  TOrderRow = class(TInterfacedObject)
+  TOrderRow = class
   private
     FID: Integer;
     FPizzaID: Integer;

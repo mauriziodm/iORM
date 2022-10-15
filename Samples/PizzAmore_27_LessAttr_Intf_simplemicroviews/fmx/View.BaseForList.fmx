@@ -122,7 +122,7 @@ object ViewBaseForList: TViewBaseForList
     ScopeMappings = <>
     AsDefault = True
     Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 67
-    Top = 164
+    Left = 56
+    Top = 160
   end
 end
