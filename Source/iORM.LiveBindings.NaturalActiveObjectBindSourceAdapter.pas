@@ -70,10 +70,6 @@ uses
   iORM.LiveBindings.BSPersistence, iORM.Utilities, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory;
 
-
-
-
-
 { TioNaturalActiveObjectBindSourceAdapter }
 
 constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource);

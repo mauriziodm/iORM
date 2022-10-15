@@ -117,7 +117,6 @@ object BusinessCustomerForm: TBusinessCustomerForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 584
     DesignSize = (
       593
       40)
@@ -164,8 +163,6 @@ object BusinessCustomerForm: TBusinessCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 263
-    ExplicitWidth = 584
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0

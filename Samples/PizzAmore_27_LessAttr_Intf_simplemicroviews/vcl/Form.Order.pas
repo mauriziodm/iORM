@@ -59,7 +59,7 @@ type
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure DSRowsAfterOpen(DataSet: TDataSet);
-    procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure DSOrderSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public
@@ -91,7 +91,7 @@ begin
   acSelectPizza.Execute;
 end;
 
-procedure TOrderForm.DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TOrderForm.DSOrderSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 var
   LPizza: IPizza;
 begin

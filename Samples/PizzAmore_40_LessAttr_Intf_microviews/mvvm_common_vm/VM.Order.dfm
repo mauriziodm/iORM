@@ -1,8 +1,8 @@
 inherited VMOrder: TVMOrder
   Width = 453
   inherited MPMaster: TioModelPresenterMaster
-    TypeName = 'IOrder'
-    OnSelectionObject = MPMasterSelectionObject
+    TypeName = 'TOrder'
+    OnSelectionInterface = MPMasterSelectionInterface
   end
   object MPRows: TioModelPresenterDetail
     MasterBindSource = MPMaster

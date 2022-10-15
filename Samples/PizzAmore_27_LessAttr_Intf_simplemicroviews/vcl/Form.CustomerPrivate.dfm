@@ -162,7 +162,6 @@ object PrivateCustomerForm: TPrivateCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 263
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0

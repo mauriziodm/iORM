@@ -182,8 +182,10 @@ begin
     end;
 
   // Replicate notification to the details
-  if ANotification.DirectionLeaves and (Sender <> TObject(AActiveBindSourceAdapter.DetailAdaptersContainer)) then
-    AActiveBindSourceAdapter.DetailAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
+//  if ANotification.DirectionLeaves and (Sender <> TObject(AActiveBindSourceAdapter.DetailAdaptersContainer)) then
+  if ANotification.DirectionLeaves then
+    if  Assigned(AActiveBindSourceAdapter.DetailAdaptersContainer) then
+      AActiveBindSourceAdapter.DetailAdaptersContainer.Notify(AActiveBindSourceAdapter as TObject, ANotification);
 
   // Replicate notification to the MasterAdaptersContainer
   if ANotification.DirectionRoot and Assigned(AActiveBindSourceAdapter.MasterAdaptersContainer) and (Sender <> TObject(AActiveBindSourceAdapter.MasterAdaptersContainer)) then

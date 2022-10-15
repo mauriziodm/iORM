@@ -351,6 +351,7 @@ type
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function GetTypeName: String;
     function GetTypeAlias: String;
+    function IsInterfaceBSA: Boolean;
   end;
 
   IioNaturalActiveBindSourceAdapter = interface

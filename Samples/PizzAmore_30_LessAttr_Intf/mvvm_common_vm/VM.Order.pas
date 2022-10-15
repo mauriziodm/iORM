@@ -18,8 +18,8 @@ type
     acShowCustomerSelector: TioVMAction;
     procedure acDeleteRowExecute(Sender: TObject);
     procedure acShowPizzaSelectorExecute(Sender: TObject);
-    procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure acShowCustomerSelectorExecute(Sender: TObject);
+    procedure MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public
@@ -51,7 +51,7 @@ begin
   io.ShowAsSelector<IPizza>(MPMaster);
 end;
 
-procedure TVMOrder.MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 var
   LPizza: IPizza;
 begin

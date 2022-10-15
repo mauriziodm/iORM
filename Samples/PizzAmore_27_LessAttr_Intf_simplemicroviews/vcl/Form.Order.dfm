@@ -366,7 +366,7 @@ object OrderForm: TOrderForm
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
-    OnSelectionObject = DSOrderSelectionObject
+    OnSelectionInterface = DSOrderSelectionInterface
     OnReceiveSelectionCloneObject = False
     OnReceiveSelectionFreeObject = False
     Left = 56

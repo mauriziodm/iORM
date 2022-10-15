@@ -76,7 +76,8 @@ uses
   iORM.Resolver.Interfaces, iORM.Resolver.Factory, iORM.Context.Factory,
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
-  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink;
+  System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink,
+  iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter;
 
 { TioLiveBindingsFactory }
 
@@ -200,7 +201,10 @@ end;
 class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
   : IioActiveBindSourceAdapter;
 begin
-  Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
+  if ASourceAdapter.IsInterfaceBSA then
+    Result := TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(AOwner, ASourceAdapter)
+  else
+    Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
 end;
 
 // ----- OLD CODE -----
