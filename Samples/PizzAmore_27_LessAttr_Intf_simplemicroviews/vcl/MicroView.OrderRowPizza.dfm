@@ -218,7 +218,6 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
   end
   object DSOrderRow: TioDataSetDetail
     AsDefault = True
-    MasterPropertyName = 'Pizza'
     Left = 256
     Top = 64
     object DSOrderRowPizzaName: TStringField

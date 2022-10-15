@@ -165,48 +165,35 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     ReadOnly = True
     TabOrder = 2
   end
-  object MDSorderRow: TioModelDataSet
-    ViewModelBridge = OrderRowMicroVMBridge
-    ModelPresenter = 'MPOrderRow'
-    Left = 264
-    Top = 94
-    object MDSorderRowDescription: TStringField
-      FieldName = 'Description'
-      Size = 250
-    end
-    object MDSorderRowPrice: TCurrencyField
-      FieldName = 'Price'
-    end
-    object MDSorderRowQty: TIntegerField
-      Alignment = taCenter
-      FieldName = 'Qty'
-    end
-    object MDSorderRowRowTotal: TCurrencyField
-      FieldName = 'RowTotal'
-    end
-    object MDSorderRowPizzaImage: TGraphicField
-      FieldName = 'Image'
-      BlobType = ftGraphic
-    end
-  end
-  object OrderRowMicroVMBridge: TioViewModelBridge
-    Left = 144
-    Top = 94
-  end
   object SourceOrderRow: TDataSource
-    DataSet = MDSorderRow
+    DataSet = DSOrderRow
     Left = 352
     Top = 94
   end
   object ActionList1: TActionList
     Left = 256
     Top = 48
-    object acDelete: TioViewAction
-      Category = 'iORM-MVVM'
+    object acDelete: TAction
       Caption = 'Del'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acDelete'
+      OnExecute = acDeleteExecute
+    end
+  end
+  object DSOrderRow: TioDataSetDetail
+    AsDefault = True
+    Left = 256
+    Top = 96
+    object DSOrderRowDescription: TStringField
+      FieldName = 'Description'
+      Size = 250
+    end
+    object DSOrderRowPrice: TCurrencyField
+      FieldName = 'Price'
+    end
+    object DSOrderRowQty: TIntegerField
+      FieldName = 'Qty'
+    end
+    object DSOrderRowGrandTotal: TCurrencyField
+      FieldName = 'RowTotal'
     end
   end
 end

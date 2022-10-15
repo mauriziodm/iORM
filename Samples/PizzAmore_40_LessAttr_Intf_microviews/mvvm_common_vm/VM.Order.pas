@@ -14,10 +14,10 @@ type
     MPRows: TioModelPresenterDetail;
     acAddCustomPizza: TioVMAction;
     acAddPizza: TioVMAction;
-    procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
     procedure acAddCustomPizzaExecute(Sender: TObject);
     procedure acAddPizzaExecute(Sender: TObject);
+    procedure MPMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public

@@ -51,7 +51,6 @@ type
     ScrollBoxRows: TScrollBox;
     VCProviderOrderRows: TioViewContextProvider;
     DSRows: TioDataSetDetail;
-    procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure FormShow(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure DBCtrlGrid1DblClick(Sender: TObject);
@@ -60,6 +59,7 @@ type
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure DSRowsAfterOpen(DataSet: TDataSet);
+    procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
     { Private declarations }
   public
@@ -72,7 +72,7 @@ var
 implementation
 
 uses
-  Model.Pizza, Form.Customers;
+  Model.Pizza, Form.Customers, Model.Interfaces, System.Rtti;
 
 {$R *.dfm}
 
@@ -92,10 +92,20 @@ begin
 end;
 
 procedure TOrderForm.DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+var
+  LPizza: IPizza;
 begin
-//  DSOrder.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
-//  DSOrder.Refresh;
-//  ADone := True;
+  ADone := True;
+  if Supports(ASelected, IPizza, LPizza) then
+  begin
+    if DSOrder.CurrentAs<IOrder>.TryAddPizzaToExistingRow(LPizza) then
+      DSRows.Refresh
+    else
+    begin
+      DSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
+      DSRows.ShowCurrent('', 'VCProviderOrderRows');
+    end;
+  end;
 end;
 
 procedure TOrderForm.DSRowsAfterOpen(DataSet: TDataSet);

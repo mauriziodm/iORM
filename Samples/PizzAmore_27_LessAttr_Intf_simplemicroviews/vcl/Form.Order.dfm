@@ -337,7 +337,7 @@ object OrderForm: TOrderForm
   end
   object DSPizzas: TioDataSetMaster
     AsDefault = False
-    TypeName = 'TPizza'
+    TypeName = 'IPizza'
     SelectorFor = DSOrder
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 584
@@ -362,7 +362,7 @@ object OrderForm: TOrderForm
   end
   object DSOrder: TioDataSetMaster
     AsDefault = True
-    TypeName = 'TOrder'
+    TypeName = 'IOrder'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
