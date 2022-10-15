@@ -118,6 +118,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Height = 60
     BorderStyle = bsNone
     Ctl3D = False
+    DataField = 'Image'
     DataSource = SourceOrderRow
     ParentCtl3D = False
     Stretch = True
@@ -232,6 +233,10 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     end
     object DSOrderRowGrandTotal: TCurrencyField
       FieldName = 'RowTotal'
+    end
+    object DSOrderRowImage: TGraphicField
+      FieldName = 'Image'
+      BlobType = ftGraphic
     end
   end
   object DSPizza: TioDataSetDetail

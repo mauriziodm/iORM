@@ -34,6 +34,7 @@ type
     acDelete: TAction;
     acShow: TAction;
     DSPizza: TioDataSetDetail;
+    DSOrderRowImage: TGraphicField;
     procedure acDeleteExecute(Sender: TObject);
     procedure acShowExecute(Sender: TObject);
   private
