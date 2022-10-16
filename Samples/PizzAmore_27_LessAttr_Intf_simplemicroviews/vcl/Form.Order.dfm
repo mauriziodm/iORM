@@ -164,6 +164,19 @@ object OrderForm: TOrderForm
       Font.Style = [fsBold]
       ParentFont = False
     end
+    object SpeedButton1: TSpeedButton
+      Left = 51
+      Top = 0
+      Width = 116
+      Height = 40
+      Action = acAddCustomPizza
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGreen
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
     object DBEditGrandTotal: TDBEdit
       Left = 310
       Top = 7
@@ -324,10 +337,12 @@ object OrderForm: TOrderForm
     end
   end
   object ScrollBoxRows: TScrollBox
-    Left = 0
+    Left = -8
     Top = 234
     Width = 430
     Height = 282
+    VertScrollBar.Smooth = True
+    VertScrollBar.Tracking = True
     BorderStyle = bsNone
     Color = clMenu
     Ctl3D = False
@@ -392,7 +407,7 @@ object OrderForm: TOrderForm
     Top = 312
   end
   object ActionList1: TActionList
-    Left = 256
+    Left = 248
     Top = 312
     object acBack: TAction
       Caption = 'Back'
@@ -411,7 +426,12 @@ object OrderForm: TOrderForm
     object acSelectPizza: TioBSSelectCurrent
       Category = 'iORM-BS'
       Caption = 'Add'
+      OnExecute = acSelectPizzaExecute
       TargetBindSource = DSPizzas
+    end
+    object acAddCustomPizza: TAction
+      Caption = 'Add custom pizza'
+      OnExecute = acAddCustomPizzaExecute
     end
   end
   object VCProviderOrderRows: TioViewContextProvider
