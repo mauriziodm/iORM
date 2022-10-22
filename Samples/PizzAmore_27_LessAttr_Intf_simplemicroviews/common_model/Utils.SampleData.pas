@@ -30,7 +30,7 @@ begin
     try
       CreatePizzas;
       CreateRealCustomers;
-      CreateOtherCustomers;
+//      CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except

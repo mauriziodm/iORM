@@ -334,6 +334,7 @@ object OrderForm: TOrderForm
       AsDefault = False
       MasterBindSource = DSOrder
       MasterPropertyName = 'Customer'
+      Left = 275
     end
   end
   object ScrollBoxRows: TScrollBox
