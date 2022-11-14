@@ -113,7 +113,7 @@ begin
         raise EioException.Create(Self.ClassName, 'CheckForViewModel', Format('"IioViewModel" interface is not implemented by the object of class "%s".', [LObj.ClassName]));
   end;
   // ===============================================================================================================================
-  // onNeedViewModel just after it has be assigned (for any changes/additions to the ViewModel itself)
+  // onNeedViewModel just after it has been assigned (for any changes/additions to the ViewModel itself)
   // or for retrieve an external created ViewModel
   DoNeedViewModel;
 

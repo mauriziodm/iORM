@@ -31,11 +31,18 @@ type
     { Private declarations }
   public
     { Public declarations }
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
 
 {$R *.fmx}
+
+constructor TViewBaseForList.Create(AOwner: TComponent);
+begin
+  inherited;
+  Sleep(1);
+end;
 
 procedure TViewBaseForList.ListViewDblClick(Sender: TObject);
 begin

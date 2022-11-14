@@ -135,6 +135,7 @@ object ViewBaseForList: TViewBaseForList
     end
   end
   object VMBridge: TioViewModelBridge
+    OnNeedViewModel = VMBridgeNeedViewModel
     Left = 202
     Top = 218
   end

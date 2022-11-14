@@ -15,10 +15,6 @@ type
   TViewCustomers = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
-    ButtonPrevPage: TSpeedButton;
-    ButtonNextPage: TSpeedButton;
-    LabelPageOf: TLabel;
-    LinkPropertyToFieldText: TLinkPropertyToField;
     acNextPage: TioViewAction;
     acPrevPage: TioViewAction;
   private
