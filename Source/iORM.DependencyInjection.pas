@@ -264,8 +264,7 @@ type
     function SetBindSourceAsSelectorFor(const ASelectionDest: IioNotifiableBindSource): IioDependencyInjectionLocator; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator; overload;
-    function VCProvider(const AName: String): IioDependencyInjectionLocator; overload;
+    function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator;
     function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
@@ -302,8 +301,7 @@ type
     function SetBindSourceAsSelectorFor(const ASelectionDest: IioNotifiableBindSource): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
-    function VCProvider(const AName: String): IioDependencyInjectionLocator<TI>; overload;
+    function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator<TI>;
     function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
@@ -1555,14 +1553,8 @@ begin
       //      Free (non distruggendo il ViewContext come nel caso di MVVM) e ci sarebbero problemi
       //      poi alla distruzione del ViewContext perchè poi cercherebbe di distruggere tutti
       //      i componenti owned e tra questi anche la vista che però è già distrutta.
-      if FVCProviderEnabled and (not Assigned(FViewContext)) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
-      // and (Result is TComponent) then
-      begin
-        if not Assigned(FVCProvider) then
-          FVCProvider := TioViewContextProviderContainer.GetDefaultProvider;
-        if Assigned(FVCProvider) then
-          FViewContext := FVCProvider.NewViewContext;
-      end;
+      if FVCProviderEnabled and (not Assigned(FViewContext)) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and Assigned(FVCProvider) then
+        FViewContext := FVCProvider.NewViewContext;
       if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and not FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else
@@ -1686,12 +1678,6 @@ function TioDependencyInjectionLocator.VCProvider(const AVCProvider: TioViewCont
 begin
   Result := Self;
   FVCProvider := AVCProvider;
-end;
-
-function TioDependencyInjectionLocator.VCProvider(const AName: String): IioDependencyInjectionLocator;
-begin
-  Result := Self;
-  FVCProvider := TioViewContextProviderContainer.GetProviderByName(AName);
 end;
 
 function TioDependencyInjectionLocator.ViewModelExist: Boolean;
@@ -1918,12 +1904,6 @@ function TioDependencyInjectionLocator<TI>.SetBindSource(const AName: String; co
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSource(AName, AWhere);
-end;
-
-function TioDependencyInjectionLocator<TI>.VCProvider(const AName: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).VCProvider(AName);
 end;
 
 function TioDependencyInjectionLocator<TI>.VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator<TI>;

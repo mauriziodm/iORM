@@ -114,7 +114,7 @@ end;
 
 destructor TioViewContextProvider.Destroy;
 begin
-  TioViewContextProviderContainer.UnregisterProvider(Self);
+//#####  TioViewContextProviderContainer.UnregisterProvider(Self);
   inherited;
 end;
 
@@ -171,7 +171,7 @@ end;
 
 function TioViewContextProvider.IsDefault: Boolean;
 begin
-  Result := TioUtilities.SameObject(Self, TioViewContextProviderContainer.GetDefaultProvider);
+//#####  Result := TioUtilities.SameObject(Self, TioViewContextProviderContainer.GetDefaultProvider);
 end;
 
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;
@@ -204,7 +204,7 @@ begin
   // Register the provider into the container
   if not (csDesigning in ComponentState)
   then
-    TioViewContextProviderContainer.RegisterProvider(Self);
+//#####    TioViewContextProviderContainer.RegisterProvider(Self);
 end;
 
 procedure TioViewContextProvider.ReleaseViewContext(const AView, AViewContext: TComponent);
@@ -222,7 +222,7 @@ end;
 
 procedure TioViewContextProvider.SetAsDefault;
 begin
-  TioViewContextProviderContainer.SetDefaultProvider(Self);
+//#####  TioViewContextProviderContainer.SetDefaultProvider(Self);
 end;
 
 procedure TioViewContextProvider.SetRegisterAsDefault(const Value: Boolean);

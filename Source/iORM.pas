@@ -191,6 +191,10 @@ type
     // AnonymousTimer
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
 
+    // Global VCProvider register
+    function DefaultVCProvider: TioViewContextProvider;
+    function VCProviderByName(const AVcProviderName: String): TioViewContextProvider;
+
     // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
     class function RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere; overload;
@@ -459,7 +463,7 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Context.Container, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
 { io }
 
@@ -1226,6 +1230,11 @@ begin
   Result := GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
 end;
 
+function io.DefaultVCProvider: TioViewContextProvider;
+begin
+  Result := TioGlobalVCProviderRegister.GetInstance.DefaultProvider;
+end;
+
 class procedure io.Delete(const AIntfObj: IInterface);
 begin
   Self.Delete(AIntfObj as TObject);
@@ -1366,6 +1375,11 @@ end;
 class function io.TerminateApplication: boolean;
 begin
   Result := TioApplication.Terminate;
+end;
+
+function io.VCProviderByName(const AVcProviderName: String): TioViewContextProvider;
+begin
+  Result := TioGlobalVCProviderRegister.GetInstance.ProviderByName(AVcProviderName);
 end;
 
 class function io.RefTo(const AWhere: IioWhere): IioWhere;

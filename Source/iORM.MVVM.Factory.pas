@@ -49,7 +49,6 @@ type
     class function NewViewRegisterBase: IioViewRegisterBase; static;
     class function NewViewRegisterMVVM: IioViewRegisterMVVM; static;
     class function NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer; static;
-    class function NewGlobalVCProviderRegister: IioGlobalVCProviderRegister; static;
     class function NewLocalVCProviderRegister: IioLocalVCProviderRegister; static;
   end;
 
@@ -60,11 +59,6 @@ uses
   iORM.MVVM.ViewContextProviderContainer;
 
 { TioMVVMFactory }
-
-class function TioMVVMFactory.NewGlobalVCProviderRegister: IioGlobalVCProviderRegister;
-begin
-  Result := TioGlobalVCProviderRegister.Create;
-end;
 
 class function TioMVVMFactory.NewLocalVCProviderRegister: IioLocalVCProviderRegister;
 begin

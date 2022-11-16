@@ -91,8 +91,7 @@ type
     function SetBindSourceAsSelectorFor(const ASelectionDest:IioNotifiableBindSource): IioDependencyInjectionLocator; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator; overload;
-    function VCProvider(const AName:String): IioDependencyInjectionLocator; overload;
+    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator;
     function SetViewContext(const AViewContext:TComponent; const AViewContextFreeMethod:TProc=nil): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
@@ -124,8 +123,7 @@ type
     function SetBindSourceAsSelectorFor(const ASelectionDest:IioNotifiableBindSource): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>; overload;
-    function VCProvider(const AName:String): IioDependencyInjectionLocator<TI>; overload;
+    function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>;
     function SetViewContext(const AViewContext:TComponent; const AViewContextFreeMethod:TProc=nil): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
   end;
