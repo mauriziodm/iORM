@@ -210,7 +210,7 @@ begin
   inherited;
   // If the RegisterAsDefault property of the provider is set to True then set
   //  the provider as the new default provider
-  if AProvider.RegisterAsDefault then
+  if AProvider.AsDefault then
     FInternalActiveStack.Push(AProvider);
 end;
 

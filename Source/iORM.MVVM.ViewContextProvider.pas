@@ -50,7 +50,7 @@ type
   TioViewContextProvider = class(TComponent)
   private
     // Fields
-    FRegisterAsDefault: Boolean;
+    FAsDefault: Boolean;
     // Events
     FOnAfterRelease: TNotifyEvent;
     FOnAfterRequest: TioViewContextEvent;
@@ -93,7 +93,7 @@ type
     property OnRequest:TioRequestViewContextEvent read FOnRequest write FOnRequest;
     property OnShow:TioViewContextEvent read FOnShow write FOnShow;
     // Properties
-    property RegisterAsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
+    property AsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
   end;
 
 implementation
@@ -109,7 +109,7 @@ begin
   inherited;
   // Default values at design time
   if (csDesigning in ComponentState) then
-    FRegisterAsDefault := True;
+    FAsDefault := True;
 end;
 
 destructor TioViewContextProvider.Destroy;
@@ -176,7 +176,7 @@ end;
 
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;
 begin
-  Result := FRegisterAsDefault;
+  Result := FAsDefault;
 end;
 
 procedure TioViewContextProvider.HideViewContext(const AView, AViewContext: TComponent);
@@ -230,7 +230,7 @@ var
   I: Integer;
   LPrevDef: TioViewContextProvider;
 begin
-  FRegisterAsDefault := Value;
+  FAsDefault := Value;
   // Uncheck previous default
   if Value then
   begin
@@ -239,7 +239,7 @@ begin
       if (Owner.Components[I] is TioViewContextProvider) and (Owner.Components[I] <> Self) then
       begin
         LPrevDef := TioViewContextProvider(Owner.Components[I]);
-        LPrevDef.RegisterAsDefault := False;
+        LPrevDef.AsDefault := False;
       end;
     end;
   end;
