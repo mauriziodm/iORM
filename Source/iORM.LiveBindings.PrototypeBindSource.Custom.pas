@@ -235,11 +235,11 @@ type
     procedure ForEach(const AForEachMethod: TProc);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    procedure ShowCurrent(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
+    procedure ShowCurrent(const AAlias: String = ''); overload;
     procedure ShowCurrent(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
     procedure ShowCurrent(const AViewContext: TComponent; const AAlias: String = ''); overload;
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    procedure ShowEach(const AAlias: String = ''; const AVCProviderName: String = ''); overload;
+    procedure ShowEach(const AAlias: String = ''); overload;
     procedure ShowEach(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
     procedure ShowEach(const AViewContext: TComponent; const AAlias: String = ''); overload;
     // DataObject
@@ -994,9 +994,9 @@ begin
   io.ShowCurrent(Self, AVCProvider, AAlias);
 end;
 
-procedure TioPrototypeBindSourceCustom.ShowCurrent(const AAlias, AVCProviderName: String);
+procedure TioPrototypeBindSourceCustom.ShowCurrent(const AAlias: String);
 begin
-  io.ShowCurrent(Self, AAlias, AVCProviderName);
+  io.ShowCurrent(Self, AAlias);
 end;
 
 procedure TioPrototypeBindSourceCustom.ShowEach(const AViewContext: TComponent; const AAlias: String);
@@ -1009,9 +1009,9 @@ begin
   io.ShowEach(Self, AVCProvider, AAlias);
 end;
 
-procedure TioPrototypeBindSourceCustom.ShowEach(const AAlias, AVCProviderName: String);
+procedure TioPrototypeBindSourceCustom.ShowEach(const AAlias: String);
 begin
-  io.ShowEach(Self, AAlias, AVCProviderName);
+  io.ShowEach(Self, AAlias);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);
