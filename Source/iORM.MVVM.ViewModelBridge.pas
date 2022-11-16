@@ -3,8 +3,7 @@ unit iORM.MVVM.ViewModelBridge;
 interface
 
 uses
-  System.Classes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.Interfaces,
-  iORM.LiveBindings.Interfaces;
+  System.Classes, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces;
 
 type
 
