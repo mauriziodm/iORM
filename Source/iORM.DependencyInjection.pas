@@ -1559,7 +1559,7 @@ begin
       // and (Result is TComponent) then
       begin
         if not Assigned(FVCProvider) then
-          FVCProvider := TioViewContextProviderContainer.GetProvider;
+          FVCProvider := TioViewContextProviderContainer.GetDefaultProvider;
         if Assigned(FVCProvider) then
           FViewContext := FVCProvider.NewViewContext;
       end;
@@ -1691,7 +1691,7 @@ end;
 function TioDependencyInjectionLocator.VCProvider(const AName: String): IioDependencyInjectionLocator;
 begin
   Result := Self;
-  FVCProvider := TioViewContextProviderContainer.GetProvider(AName);
+  FVCProvider := TioViewContextProviderContainer.GetProviderByName(AName);
 end;
 
 function TioDependencyInjectionLocator.ViewModelExist: Boolean;

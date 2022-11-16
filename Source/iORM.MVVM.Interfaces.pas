@@ -178,6 +178,20 @@ type
     procedure BindView(const AView: TComponent);
   end;
 
+  IioLocalVCProviderRegister = interface
+    ['{1469D78D-00F7-418A-B7D6-CE6D1AE2635E}']
+    procedure RegisterProvider(const AProvider:TioViewContextProvider);
+    procedure UnregisterProvider(const AProvider:TioViewContextProvider);
+    function ProviderByName(const AName:String): TioViewContextProvider;
+  end;
+
+  IioGlobalVCProviderRegister = interface(IioLocalVCProviderRegister)
+    ['{2828166E-8D1A-42AE-9FF2-FD7BE8CD5CFE}']
+    procedure SetDefaultProvider(const AProvider:TioViewContextProvider);
+    procedure SetDefaultProviderByName(const AName:String);
+    function DefaultProvider: TioViewContextProvider;
+  end;
+
 implementation
 
 end.

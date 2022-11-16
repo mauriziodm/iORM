@@ -171,7 +171,7 @@ end;
 
 function TioViewContextProvider.IsDefault: Boolean;
 begin
-  Result := TioUtilities.SameObject(Self, TioViewContextProviderContainer.GetProvider);
+  Result := TioUtilities.SameObject(Self, TioViewContextProviderContainer.GetDefaultProvider);
 end;
 
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;
@@ -222,7 +222,7 @@ end;
 
 procedure TioViewContextProvider.SetAsDefault;
 begin
-  TioViewContextProviderContainer.SetActiveProvider(Self);
+  TioViewContextProviderContainer.SetDefaultProvider(Self);
 end;
 
 procedure TioViewContextProvider.SetRegisterAsDefault(const Value: Boolean);

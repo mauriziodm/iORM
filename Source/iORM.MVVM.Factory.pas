@@ -46,17 +46,30 @@ type
 
   TioMVVMFactory = class
   public
-    class function NewViewRegisterBase: IioViewRegisterBase;
-    class function NewViewRegisterMVVM: IioViewRegisterMVVM;
-    class function NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer;
+    class function NewViewRegisterBase: IioViewRegisterBase; static;
+    class function NewViewRegisterMVVM: IioViewRegisterMVVM; static;
+    class function NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer; static;
+    class function NewGlobalVCProviderRegister: IioGlobalVCProviderRegister; static;
+    class function NewLocalVCProviderRegister: IioLocalVCProviderRegister; static;
   end;
 
 implementation
 
 uses
-  iORM.MVVM.ViewRegister, iORM.MVVM.VMActionContainer;
+  iORM.MVVM.ViewRegister, iORM.MVVM.VMActionContainer,
+  iORM.MVVM.ViewContextProviderContainer;
 
 { TioMVVMFactory }
+
+class function TioMVVMFactory.NewGlobalVCProviderRegister: IioGlobalVCProviderRegister;
+begin
+  Result := TioGlobalVCProviderRegister.Create;
+end;
+
+class function TioMVVMFactory.NewLocalVCProviderRegister: IioLocalVCProviderRegister;
+begin
+  Result := TioLocalVCProviderRegister.Create;
+end;
 
 class function TioMVVMFactory.NewViewRegisterBase: IioViewRegisterBase;
 begin
