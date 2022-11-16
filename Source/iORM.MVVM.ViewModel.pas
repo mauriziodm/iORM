@@ -51,6 +51,7 @@ type
   private
     FVMActionContainer: IioVMActionContainer;
     FViewRegister: IioViewRegisterMVVM;
+    FLocalVCProviderRegister: IioLocalVCProviderRegister;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
@@ -70,6 +71,10 @@ type
     procedure HideViews;
     procedure ShowViews;
     procedure TerminateApplication;
+    // VCProvider local register
+    function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
+    procedure RegisterVCProvider(const AProvider:TioViewContextProvider);
+    procedure UnregisterVCProvider(const AProvider:TioViewContextProvider);
     // Properties
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
     property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
@@ -130,6 +135,11 @@ begin
   FVMActionContainer._InternalLoadVMActions(Self);
 end;
 
+procedure TioViewModel.RegisterVCProvider(const AProvider: TioViewContextProvider);
+begin
+  FLocalVCProviderRegister.RegisterProvider(AProvider);
+end;
+
 procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
   const AViewContextFreeMethod: TProc);
 begin
@@ -147,6 +157,16 @@ begin
 end;
 
 
+procedure TioViewModel.UnregisterVCProvider(const AProvider: TioViewContextProvider);
+begin
+  FLocalVCProviderRegister.UnregisterProvider(AProvider);
+end;
+
+function TioViewModel.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
+begin
+  Result := FLocalVCProviderRegister.ProviderByName(AVCProviderName);
+end;
+
 function TioViewModel.VMActions: IioVMActionContainer;
 begin
   Result := FVMActionContainer;
@@ -157,6 +177,7 @@ begin
    FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self); // NOTE: IT MUST BE BEFORE INHERITED
    inherited;
    FViewRegister := TioMVVMFactory.NewViewRegisterMVVM;
+   FLocalVCProviderRegister := TioMVVMFactory.NewLocalVCProviderRegister;
 end;
 
 procedure TioViewModel.DoOnViewPairing;

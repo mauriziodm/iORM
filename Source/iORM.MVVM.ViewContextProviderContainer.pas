@@ -127,6 +127,7 @@ function TioLocalVCProviderRegister.ProviderByName(const AName: String): TioView
 var
   LItemIndex: Integer;
 begin
+  // NB: Se non trova alcun pVCProvider deve ritornare nil (no exception)
   Result := nil;
   // Get the Index
   LItemIndex := ItemIndexByName(AName);
@@ -174,6 +175,7 @@ end;
 function TioGlobalVCProviderRegister.DefaultProvider: TioViewContextProvider;
 begin
   // Get the active provider
+  // NB: Se non trova alcun pVCProvider deve ritornare nil (no exception)
   if FInternalActiveStack.Count > 0 then
     Result := FInternalActiveStack.Peek
   else

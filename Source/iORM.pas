@@ -193,7 +193,7 @@ type
 
     // Global VCProvider register
     function DefaultVCProvider: TioViewContextProvider;
-    function VCProviderByName(const AVcProviderName: String): TioViewContextProvider;
+    function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 
     // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
@@ -1377,9 +1377,9 @@ begin
   Result := TioApplication.Terminate;
 end;
 
-function io.VCProviderByName(const AVcProviderName: String): TioViewContextProvider;
+function io.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 begin
-  Result := TioGlobalVCProviderRegister.GetInstance.ProviderByName(AVcProviderName);
+  Result := TioGlobalVCProviderRegister.GetInstance.ProviderByName(AVCProviderName);
 end;
 
 class function io.RefTo(const AWhere: IioWhere): IioWhere;

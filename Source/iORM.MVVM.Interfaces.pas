@@ -51,6 +51,10 @@ type
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     function VMActions: IioVMActionContainer;
+    // VCProvider local register
+    function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
+    procedure RegisterVCProvider(const AProvider:TioViewContextProvider);
+    procedure UnregisterVCProvider(const AProvider:TioViewContextProvider);
     // VMAction property
     function GetVMAction(const AName: String): IioVMAction;
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
