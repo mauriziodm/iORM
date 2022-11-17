@@ -41,7 +41,7 @@ interface
 
 uses
   iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.Interfaces;
+  iORM.MVVM.Interfaces, System.Classes;
 
 type
 
@@ -57,15 +57,16 @@ type
   TioLocalVCProviderRegister = class(TInterfacedObject, IioLocalVCProviderRegister)
   strict private
     FInternalContainer: TioViewContextProviderContainerInternal;
-    function ItemIndexByName(const AProviderName:String): Integer;
+    function ItemIndexByName(const AVCProviderName:String): Integer;
   strict protected
-    function IsRegistered(const AProvider:TioViewContextProvider): Boolean;
+    function IsRegistered(const AVCProvider:TioViewContextProvider): Boolean;
+    procedure BindView(const AView: TComponent); virtual;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure RegisterProvider(const AProvider:TioViewContextProvider); virtual;
-    procedure UnregisterProvider(const AProvider:TioViewContextProvider); virtual;
-    function ProviderByName(const AName:String): TioViewContextProvider; overload;
+    procedure RegisterVCProvider(const AVCProvider:TioViewContextProvider); virtual;
+    procedure UnregisterVCProvider(const AVCProvider:TioViewContextProvider); virtual;
+    function VCProviderByName(const AName:String): TioViewContextProvider; overload;
   end;
 
   TioGlobalVCProviderRegister = class(TioLocalVCProviderRegister, IioGlobalVCProviderRegister)
@@ -73,26 +74,38 @@ type
     class var FInstance: IioGlobalVCProviderRegister;
   strict private
     FInternalActiveStack: TioActiveViewContextProviderStack;
-    procedure CheckActiveProviderAfterUnregister(const AUnregisteredProvider:TioViewContextProvider);
-    function IsDefaultProvider(const AProvider:TioViewContextProvider): Boolean;
-    function DefaultProviderIsNotRegistered: Boolean;
+    procedure CheckActiveVCProviderAfterUnregister(const AUnregisteredProvider:TioViewContextProvider);
+    function IsDefaultVCProvider(const AVCProvider:TioViewContextProvider): Boolean;
+    function DefaultVCProviderIsNotRegistered: Boolean;
+  strict protected
+    procedure BindView(const AView: TComponent); override;
   public
     class function GetInstance: IioGlobalVCProviderRegister;
     constructor Create; override;
     destructor Destroy; override;
-    procedure RegisterProvider(const AProvider:TioViewContextProvider); override;
-    procedure UnregisterProvider(const AProvider:TioViewContextProvider); override;
-    procedure SetDefaultProvider(const AProvider:TioViewContextProvider);
-    procedure SetDefaultProviderByName(const AName:String);
-    function DefaultProvider: TioViewContextProvider;
+    procedure RegisterVCProvider(const AVCProvider:TioViewContextProvider); override;
+    procedure UnregisterVCProvider(const AVCProvider:TioViewContextProvider); override;
+    procedure SetDefaultVCProvider(const AVCProvider:TioViewContextProvider);
+    procedure SetDefaultVCProviderByName(const AName:String);
+    function DefaultVCProvider: TioViewContextProvider;
   end;
 
 implementation
 
 uses
-  iORM, System.Classes, iORM.Exceptions, System.SysUtils;
+  iORM, iORM.Exceptions, System.SysUtils;
 
 { TioViewContextProviderRegister }
+
+procedure TioLocalVCProviderRegister.BindView(const AView: TComponent);
+var
+  I: Integer;
+begin
+  // Bind any ViewAction to the related VMAction registered on the ViewModel
+  for I := 0 to AView.ComponentCount - 1 do
+    if AView.Components[i] is TioViewContextProvider then
+      RegisterVCProvider(TioViewContextProvider(AView.Components[i]));
+end;
 
 constructor TioLocalVCProviderRegister.Create;
 begin
@@ -105,12 +118,12 @@ begin
   inherited;
 end;
 
-function TioLocalVCProviderRegister.IsRegistered(const AProvider: TioViewContextProvider): Boolean;
+function TioLocalVCProviderRegister.IsRegistered(const AVCProvider: TioViewContextProvider): Boolean;
 begin
-  Result := FInternalContainer.Contains(AProvider);
+  Result := FInternalContainer.Contains(AVCProvider);
 end;
 
-function TioLocalVCProviderRegister.ItemIndexByName(const AProviderName: String): Integer;
+function TioLocalVCProviderRegister.ItemIndexByName(const AVCProviderName: String): Integer;
 var
   I : Integer;
 begin
@@ -119,11 +132,11 @@ begin
   //      stesso nome (es. viste ricorsive) ritorni sempre quello registrato
   //      più di recente.
   for I := FInternalContainer.Count-1 downto 0 do
-    if (FInternalContainer.Items[I] as TComponent).Name = AProviderName then
+    if (FInternalContainer.Items[I] as TComponent).Name = AVCProviderName then
       Exit(I);
 end;
 
-function TioLocalVCProviderRegister.ProviderByName(const AName: String): TioViewContextProvider;
+function TioLocalVCProviderRegister.VCProviderByName(const AName: String): TioViewContextProvider;
 var
   LItemIndex: Integer;
 begin
@@ -136,19 +149,26 @@ begin
     Result := FInternalContainer.Items[LItemIndex];
 end;
 
-procedure TioLocalVCProviderRegister.RegisterProvider(const AProvider: TioViewContextProvider);
+procedure TioLocalVCProviderRegister.RegisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
-  FInternalContainer.Add(AProvider);
+  if not IsRegistered(AVCProvider) then
+    FInternalContainer.Add(AVCProvider);
 end;
 
-procedure TioLocalVCProviderRegister.UnregisterProvider(const AProvider: TioViewContextProvider);
+procedure TioLocalVCProviderRegister.UnregisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
-  FInternalContainer.Remove(AProvider);
+  if IsRegistered(AVCProvider) then
+    FInternalContainer.Remove(AVCProvider);
 end;
 
 { TioGlobalVCProviderRegister }
 
-procedure TioGlobalVCProviderRegister.CheckActiveProviderAfterUnregister(const AUnregisteredProvider: TioViewContextProvider);
+procedure TioGlobalVCProviderRegister.BindView(const AView: TComponent);
+begin
+  raise EioException.Create(ClassName, 'BindView', 'This method should NOT be called on this class.');
+end;
+
+procedure TioGlobalVCProviderRegister.CheckActiveVCProviderAfterUnregister(const AUnregisteredProvider: TioViewContextProvider);
 var
   LSomeProviderExtracted: Boolean;
 begin
@@ -157,7 +177,7 @@ begin
   //  then remove it from the stack also.
   //  Make sure the new active provider is registered else remove it from the stack also
   LSomeProviderExtracted := False;
-  while IsDefaultProvider(AUnregisteredProvider) or DefaultProviderIsNotRegistered do
+  while IsDefaultVCProvider(AUnregisteredProvider) or DefaultVCProviderIsNotRegistered do
   begin
     FInternalActiveStack.Extract;
     LSomeProviderExtracted := True;
@@ -172,7 +192,7 @@ begin
   FInternalActiveStack := TioActiveViewContextProviderStack.Create;
 end;
 
-function TioGlobalVCProviderRegister.DefaultProvider: TioViewContextProvider;
+function TioGlobalVCProviderRegister.DefaultVCProvider: TioViewContextProvider;
 begin
   // Get the active provider
   // NB: Se non trova alcun pVCProvider deve ritornare nil (no exception)
@@ -182,7 +202,7 @@ begin
     Result := nil;
 end;
 
-function TioGlobalVCProviderRegister.DefaultProviderIsNotRegistered: Boolean;
+function TioGlobalVCProviderRegister.DefaultVCProviderIsNotRegistered: Boolean;
 begin
   Result := (FInternalActiveStack.Count > 0) and not IsRegistered(FInternalActiveStack.Peek);
 end;
@@ -200,39 +220,39 @@ begin
   Result := FInstance;
 end;
 
-function TioGlobalVCProviderRegister.IsDefaultProvider(const AProvider: TioViewContextProvider): Boolean;
+function TioGlobalVCProviderRegister.IsDefaultVCProvider(const AVCProvider: TioViewContextProvider): Boolean;
 begin
-  Result := (FInternalActiveStack.Count > 0) and (FInternalActiveStack.Peek = AProvider);
+  Result := (FInternalActiveStack.Count > 0) and (FInternalActiveStack.Peek = AVCProvider);
 end;
 
-procedure TioGlobalVCProviderRegister.RegisterProvider(const AProvider: TioViewContextProvider);
+procedure TioGlobalVCProviderRegister.RegisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
   inherited;
   // If the RegisterAsDefault property of the provider is set to True then set
   //  the provider as the new default provider
-  if AProvider.AsDefault then
-    FInternalActiveStack.Push(AProvider);
+  if AVCProvider.AsDefault then
+    FInternalActiveStack.Push(AVCProvider);
 end;
 
-procedure TioGlobalVCProviderRegister.SetDefaultProvider(const AProvider: TioViewContextProvider);
+procedure TioGlobalVCProviderRegister.SetDefaultVCProvider(const AVCProvider: TioViewContextProvider);
 begin
   // The provider must be registered
-  if not IsRegistered(AProvider) then
-    raise EioException.Create(Format('TioGlobalVCProviderRegister.SetDefaultProvider: Provider not registered (%s).', [AProvider.Name]));
+  if not IsRegistered(AVCProvider) then
+    raise EioException.Create(Format('TioGlobalVCProviderRegister.SetDefaultProvider: Provider not registered (%s).', [AVCProvider.Name]));
   // Activate the provider nly if the provider is not already the active provider
-  if not IsDefaultProvider(AProvider) then
-    FInternalActiveStack.Push(AProvider);
+  if not IsDefaultVCProvider(AVCProvider) then
+    FInternalActiveStack.Push(AVCProvider);
 end;
 
-procedure TioGlobalVCProviderRegister.SetDefaultProviderByName(const AName: String);
+procedure TioGlobalVCProviderRegister.SetDefaultVCProviderByName(const AName: String);
 begin
-  SetDefaultProvider(ProviderByName(AName));
+  SetDefaultVCProvider(VCProviderByName(AName));
 end;
 
-procedure TioGlobalVCProviderRegister.UnregisterProvider(const AProvider: TioViewContextProvider);
+procedure TioGlobalVCProviderRegister.UnregisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
   inherited;
-  CheckActiveProviderAfterUnregister(AProvider);
+  CheckActiveVCProviderAfterUnregister(AVCProvider);
 end;
 
 end.

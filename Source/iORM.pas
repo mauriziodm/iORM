@@ -1232,7 +1232,7 @@ end;
 
 function io.DefaultVCProvider: TioViewContextProvider;
 begin
-  Result := TioGlobalVCProviderRegister.GetInstance.DefaultProvider;
+  Result := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
 end;
 
 class procedure io.Delete(const AIntfObj: IInterface);
@@ -1379,7 +1379,7 @@ end;
 
 function io.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 begin
-  Result := TioGlobalVCProviderRegister.GetInstance.ProviderByName(AVCProviderName);
+  Result := TioGlobalVCProviderRegister.GetInstance.VCProviderByName(AVCProviderName);
 end;
 
 class function io.RefTo(const AWhere: IioWhere): IioWhere;

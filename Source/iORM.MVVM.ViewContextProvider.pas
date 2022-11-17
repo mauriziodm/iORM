@@ -114,7 +114,7 @@ end;
 
 destructor TioViewContextProvider.Destroy;
 begin
-//#####  TioViewContextProviderContainer.UnregisterProvider(Self);
+  TioGlobalVCProviderRegister.GetInstance.UnregisterVCProvider(Self);
   inherited;
 end;
 
@@ -171,7 +171,7 @@ end;
 
 function TioViewContextProvider.IsDefault: Boolean;
 begin
-//#####  Result := TioUtilities.SameObject(Self, TioViewContextProviderContainer.GetDefaultProvider);
+  Result := TioUtilities.SameObject(Self, TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider);
 end;
 
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;
@@ -202,9 +202,8 @@ procedure TioViewContextProvider.Loaded;
 begin
   inherited;
   // Register the provider into the container
-  if not (csDesigning in ComponentState)
-  then
-//#####    TioViewContextProviderContainer.RegisterProvider(Self);
+  if not (csDesigning in ComponentState) then
+    TioGlobalVCProviderRegister.GetInstance.RegisterVCProvider(Self);
 end;
 
 procedure TioViewContextProvider.ReleaseViewContext(const AView, AViewContext: TComponent);
@@ -222,7 +221,7 @@ end;
 
 procedure TioViewContextProvider.SetAsDefault;
 begin
-//#####  TioViewContextProviderContainer.SetDefaultProvider(Self);
+  TioGlobalVCProviderRegister.GetInstance.SetDefaultVCProvider(Self);
 end;
 
 procedure TioViewContextProvider.SetRegisterAsDefault(const Value: Boolean);

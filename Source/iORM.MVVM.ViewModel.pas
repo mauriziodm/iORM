@@ -73,8 +73,8 @@ type
     procedure TerminateApplication;
     // VCProvider local register
     function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
-    procedure RegisterVCProvider(const AProvider:TioViewContextProvider);
-    procedure UnregisterVCProvider(const AProvider:TioViewContextProvider);
+    procedure RegisterVCProvider(const AVCProvider:TioViewContextProvider);
+    procedure UnregisterVCProvider(const AVCProvider:TioViewContextProvider);
     // Properties
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
     property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
@@ -91,7 +91,8 @@ uses
 
 procedure TioViewModel.BindView(const AView: TComponent);
 begin
-  VMActions.BindView(AView);
+  FVMActionContainer.BindView(AView);
+  FLocalVCProviderRegister.BindView(AView);
 end;
 
 
@@ -132,12 +133,12 @@ procedure TioViewModel.Loaded;
 begin
   inherited;
   // Load all VMActions
-  FVMActionContainer._InternalLoadVMActions(Self);
+//  FVMActionContainer._InternalLoadVMActions(Self);
 end;
 
-procedure TioViewModel.RegisterVCProvider(const AProvider: TioViewContextProvider);
+procedure TioViewModel.RegisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
-  FLocalVCProviderRegister.RegisterProvider(AProvider);
+  FLocalVCProviderRegister.RegisterVCProvider(AVCProvider);
 end;
 
 procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
@@ -157,14 +158,14 @@ begin
 end;
 
 
-procedure TioViewModel.UnregisterVCProvider(const AProvider: TioViewContextProvider);
+procedure TioViewModel.UnregisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
-  FLocalVCProviderRegister.UnregisterProvider(AProvider);
+  FLocalVCProviderRegister.UnregisterVCProvider(AVCProvider);
 end;
 
 function TioViewModel.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 begin
-  Result := FLocalVCProviderRegister.ProviderByName(AVCProviderName);
+  Result := FLocalVCProviderRegister.VCProviderByName(AVCProviderName);
 end;
 
 function TioViewModel.VMActions: IioVMActionContainer;
@@ -175,9 +176,9 @@ end;
 constructor TioViewModel.Create(AOwner: TComponent);
 begin
    FVMActionContainer := TioMVVMFactory.NewVMActionContainer(Self); // NOTE: IT MUST BE BEFORE INHERITED
+   FLocalVCProviderRegister := TioMVVMFactory.NewLocalVCProviderRegister;
    inherited;
    FViewRegister := TioMVVMFactory.NewViewRegisterMVVM;
-   FLocalVCProviderRegister := TioMVVMFactory.NewLocalVCProviderRegister;
 end;
 
 procedure TioViewModel.DoOnViewPairing;

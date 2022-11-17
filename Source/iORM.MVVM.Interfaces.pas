@@ -184,16 +184,17 @@ type
 
   IioLocalVCProviderRegister = interface
     ['{1469D78D-00F7-418A-B7D6-CE6D1AE2635E}']
-    procedure RegisterProvider(const AProvider:TioViewContextProvider);
-    procedure UnregisterProvider(const AProvider:TioViewContextProvider);
-    function ProviderByName(const AName:String): TioViewContextProvider;
+    procedure BindView(const AView: TComponent);
+    procedure RegisterVCProvider(const AVCProvider:TioViewContextProvider);
+    procedure UnregisterVCProvider(const AVCProvider:TioViewContextProvider);
+    function VCProviderByName(const AName:String): TioViewContextProvider;
   end;
 
   IioGlobalVCProviderRegister = interface(IioLocalVCProviderRegister)
     ['{2828166E-8D1A-42AE-9FF2-FD7BE8CD5CFE}']
-    procedure SetDefaultProvider(const AProvider:TioViewContextProvider);
-    procedure SetDefaultProviderByName(const AName:String);
-    function DefaultProvider: TioViewContextProvider;
+    procedure SetDefaultVCProvider(const AVCProvider:TioViewContextProvider);
+    procedure SetDefaultVCProviderByName(const AName:String);
+    function DefaultVCProvider: TioViewContextProvider;
   end;
 
 implementation
