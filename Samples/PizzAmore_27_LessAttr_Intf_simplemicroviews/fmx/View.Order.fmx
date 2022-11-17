@@ -8,7 +8,6 @@ inherited ViewOrder: TViewOrder
         Position.Y = 16.000000000000000000
         TabOrder = 41
         Text = 'Button1'
-        OnClick = Button1Click
       end
     end
   end
@@ -306,6 +305,7 @@ inherited ViewOrder: TViewOrder
     ScopeMappings = <>
     MasterBindSource = BSMaster
     MasterPropertyName = 'Rows'
+    AfterOpen = BSRowsAfterOpen
     Left = 64
     Top = 267
   end

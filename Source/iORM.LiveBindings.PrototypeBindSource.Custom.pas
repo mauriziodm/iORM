@@ -89,6 +89,11 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    // Events
+    FAfterClose: TNotifyEvent;
+    FAfterOpen: TNotifyEvent;
+    FBeforeClose: TNotifyEvent;
+    FBeforeOpen: TNotifyEvent;
     procedure OpenCloseDetails(const AActive: Boolean);
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -168,6 +173,10 @@ type
     procedure Loaded; override;
     function CheckActiveAdapter: Boolean;
     function GetName: String;
+    procedure DoAfterClose;
+    procedure DoAfterOpen;
+    procedure DoBeforeClose;
+    procedure DoBeforeOpen;
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -219,6 +228,11 @@ type
     property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
+    // published events
+    property AfterClose: TNotifyEvent read FAfterClose write FAfterClose;
+    property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
+    property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
+    property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -431,6 +445,18 @@ begin
     GetActiveBindSourceAdapter.DeleteListViewItem(AItemIndex, ADelayMilliseconds);
 end;
 
+procedure TioPrototypeBindSourceCustom.DoAfterClose;
+begin
+  if Assigned(FAfterClose) then
+    FAfterClose(Self);
+end;
+
+procedure TioPrototypeBindSourceCustom.DoAfterOpen;
+begin
+  if Assigned(FAfterOpen) then
+    FAfteropen(Self);
+end;
+
 procedure TioPrototypeBindSourceCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
@@ -441,6 +467,18 @@ procedure TioPrototypeBindSourceCustom.DoAfterSelection(var ASelected: TObject; 
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
+end;
+
+procedure TioPrototypeBindSourceCustom.DoBeforeClose;
+begin
+  if Assigned(FBeforeClose) then
+    FBeforeClose(Self);
+end;
+
+procedure TioPrototypeBindSourceCustom.DoBeforeOpen;
+begin
+  if Assigned(FBeforeOpen) then
+    FBeforeOpen(Self);
 end;
 
 procedure TioPrototypeBindSourceCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -824,16 +862,34 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
 begin
-  // If we are in the opening of the bind source and we are at design-time then
-  //  create the active bind source adapter
-  if Value and (not Assigned(FBindSourceAdapter)) and (not(csDesigning in ComponentState)) then
-    _CreateAdapter(Current, False);
+  if Value = IsActive then
+    Exit;
+
+  if not (csDesigning in ComponentState) then
+  begin
+    if Value then
+    begin
+      // If we are in the opening of the bind source and we are at design-time then
+      //  create the active bind source adapter
+      if not Assigned(FBindSourceAdapter) then
+        _CreateAdapter(Current, False);
+      DoBeforeOpen;
+    end
+    else
+      DoBeforeClose;
+  end;
 
   inherited;
 
-  // It also opens any detail bind sources
-  if not(csDesigning in ComponentState) then
+  if not (csDesigning in ComponentState) then
+  begin
+    // It also opens any detail bind sources
     OpenCloseDetails(Value);
+    if Value then
+      DoAfterOpen
+    else
+      DoAfterClose;
+  end;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetAsDefault(const Value: Boolean);

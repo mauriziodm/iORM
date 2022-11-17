@@ -93,7 +93,7 @@ type
   published
     // redeclared data set properties
 //    property BeforeOpen;
-    property AfterOpen;
+//    property AfterOpen;
 //    property BeforeClose;
 //    property AfterClose;
 //    property BeforeInsert;

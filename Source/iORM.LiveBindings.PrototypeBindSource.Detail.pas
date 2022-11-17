@@ -30,6 +30,11 @@ type
     // Published properties: selectors
     property OnReceiveSelectionCloneObject;
     property OnReceiveSelectionFreeObject;
+    // Events
+    property AfterClose;
+    property AfterOpen;
+    property BeforeClose;
+    property BeforeOpen;
   end;
 
 implementation

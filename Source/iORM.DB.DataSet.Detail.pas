@@ -22,6 +22,9 @@ type
     property AutoRefreshOnNotification default True; // published: Master+Detail
     // Published properties: selectors
     property SelectorFor;
+    // Published properties: selectors
+    property OnReceiveSelectionCloneObject;
+    property OnReceiveSelectionFreeObject;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -29,9 +32,11 @@ type
     property OnBeforeSelectionInterface;
     property OnSelectionInterface;
     property OnAfterSelectionInterface;
-    // Published properties: selectors
-    property OnReceiveSelectionCloneObject;
-    property OnReceiveSelectionFreeObject;
+    // Published events
+    property AfterClose;
+    property AfterOpen;
+    property BeforeClose;
+    property BeforeOpen;
   end;
 
 implementation

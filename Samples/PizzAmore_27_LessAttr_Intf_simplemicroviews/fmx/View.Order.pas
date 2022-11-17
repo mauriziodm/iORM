@@ -44,10 +44,10 @@ type
     acAddCustomPizza: TAction;
     procedure VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
-    procedure Button1Click(Sender: TObject);
     procedure BSMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure acAddCustomPizzaExecute(Sender: TObject);
     procedure acAddPizzaExecute(Sender: TObject);
+    procedure BSRowsAfterOpen(Sender: TObject);
   private
     { Private declarations }
   public
@@ -94,10 +94,10 @@ begin
   end;
 end;
 
-procedure TViewOrder.Button1Click(Sender: TObject);
+procedure TViewOrder.BSRowsAfterOpen(Sender: TObject);
 begin
   inherited;
-  BSRows.ShowEach(VCProviderOrderRows)
+  BSRows.ShowEach(VCProviderOrderRows);
 end;
 
 procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);

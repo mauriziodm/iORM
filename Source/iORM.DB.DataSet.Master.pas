@@ -82,9 +82,13 @@ type
     property OnBeforeSelectionInterface;
     property OnSelectionInterface;
     property OnAfterSelectionInterface;
-    // Published properties: selectors
     property OnReceiveSelectionCloneObject;
     property OnReceiveSelectionFreeObject;
+    // Published events
+    property AfterClose;
+    property AfterOpen;
+    property BeforeClose;
+    property BeforeOpen;
   end;
 
 implementation
