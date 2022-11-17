@@ -8565,12 +8565,4 @@ object MainForm: TMainForm
     Left = 64
     Top = 272
   end
-  object VCProviderForm: TioViewContextProvider
-    OnAfterRequest = VCProviderFormAfterRequest
-    OnRelease = VCProviderFormRelease
-    OnRequest = VCProviderFormRequest
-    RegisterAsDefault = False
-    Left = 145
-    Top = 272
-  end
 end

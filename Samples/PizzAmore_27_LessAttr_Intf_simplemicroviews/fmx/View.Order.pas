@@ -68,7 +68,7 @@ begin
   inherited;
   LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
   BSRows.Append(LNewOrderRow);
-  BSRows.ShowCurrent('', 'VCProviderOrderRows');
+  BSRows.ShowCurrent(VCProviderOrderRows);
 end;
 
 procedure TViewOrder.acAddPizzaExecute(Sender: TObject);
@@ -89,7 +89,7 @@ begin
     else
     begin
       BSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
-      BSRows.ShowCurrent('', 'VCProviderOrderRows');
+      BSRows.ShowCurrent(VCProviderOrderRows);
     end;
   end;
 end;
@@ -97,13 +97,14 @@ end;
 procedure TViewOrder.Button1Click(Sender: TObject);
 begin
   inherited;
-  BSRows.ShowEach('', 'VCProviderOrderRows')
+  BSRows.ShowEach(VCProviderOrderRows)
 end;
 
 procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
   inherited;
   (AView as TControl).Align := TAlignLayout.Top;
+  (AView as TControl).Name := '';
 end;
 
 procedure TViewOrder.VCProviderOrderRowsRequest(const Sender: TObject; out ResultViewContext: TComponent);

@@ -1553,8 +1553,13 @@ begin
       //      Free (non distruggendo il ViewContext come nel caso di MVVM) e ci sarebbero problemi
       //      poi alla distruzione del ViewContext perchè poi cercherebbe di distruggere tutti
       //      i componenti owned e tra questi anche la vista che però è già distrutta.
-      if FVCProviderEnabled and (not Assigned(FViewContext)) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and Assigned(FVCProvider) then
-        FViewContext := FVCProvider.NewViewContext;
+      if FVCProviderEnabled and (not Assigned(FViewContext)) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
+      begin
+        if not Assigned(FVCProvider) then
+          FVCProvider := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
+        if Assigned(FVCProvider) then
+          FViewContext := FVCProvider.NewViewContext;
+      end;
       if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and not FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else

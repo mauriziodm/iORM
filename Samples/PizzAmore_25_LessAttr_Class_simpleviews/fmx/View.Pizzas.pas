@@ -22,9 +22,6 @@ type
     { Public declarations }
   end;
 
-var
-  ViewPizzas: TViewPizzas;
-
 implementation
 
 {$R *.fmx}

@@ -18,7 +18,6 @@ type
     Shape1: TShape;
     ioVCL1: TioVCL;
     SQLiteConn: TioSQLiteConnectionDef;
-    VCProviderForm: TioViewContextProvider;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -26,9 +25,6 @@ type
     procedure ButtonCustomersClick(Sender: TObject);
     procedure ButtonPizzasClick(Sender: TObject);
     procedure ButtonOrdersClick(Sender: TObject);
-    procedure VCProviderFormRequest(const Sender: TObject; out ResultViewContext: TComponent);
-    procedure VCProviderFormRelease(const Sender: TObject; const AView, AViewContext: TComponent);
-    procedure VCProviderFormAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
   private
     { Private declarations }
   public
@@ -71,21 +67,6 @@ procedure TMainForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConne
   AWarnings: TStrings; var AAbort: Boolean);
 begin
   AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_Script_SQLite.txt'));
-end;
-
-procedure TMainForm.VCProviderFormAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
-begin
-//  TControl(AView).Align := alClient;
-end;
-
-procedure TMainForm.VCProviderFormRelease(const Sender: TObject; const AView, AViewContext: TComponent);
-begin
-//  AViewContext.Free;
-end;
-
-procedure TMainForm.VCProviderFormRequest(const Sender: TObject; out ResultViewContext: TComponent);
-begin
-//  ResultViewContext := TViewContextForm.Create(Self);
 end;
 
 end.

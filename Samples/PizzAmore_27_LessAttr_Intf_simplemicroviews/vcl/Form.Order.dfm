@@ -438,7 +438,7 @@ object OrderForm: TOrderForm
   object VCProviderOrderRows: TioViewContextProvider
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 253
     Top = 370
   end

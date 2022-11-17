@@ -192,8 +192,8 @@ type
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
 
     // Global VCProvider register
-    function DefaultVCProvider: TioViewContextProvider;
-    function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
+    class function DefaultVCProvider: TioViewContextProvider;
+    class function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 
     // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
@@ -1230,7 +1230,7 @@ begin
   Result := GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
 end;
 
-function io.DefaultVCProvider: TioViewContextProvider;
+class function io.DefaultVCProvider: TioViewContextProvider;
 begin
   Result := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
 end;
@@ -1377,7 +1377,7 @@ begin
   Result := TioApplication.Terminate;
 end;
 
-function io.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
+class function io.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 begin
   Result := TioGlobalVCProviderRegister.GetInstance.VCProviderByName(AVCProviderName);
 end;

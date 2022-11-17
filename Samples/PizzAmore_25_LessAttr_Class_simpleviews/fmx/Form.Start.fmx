@@ -5263,7 +5263,7 @@ object StartForm: TStartForm
     OnBeforeRelease = VCProviderBeforeRelease
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
-    RegisterAsDefault = True
+    AsDefault = True
     Left = 96
     Top = 448
   end

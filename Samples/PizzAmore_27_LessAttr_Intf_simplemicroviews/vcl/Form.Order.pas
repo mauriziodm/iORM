@@ -86,7 +86,7 @@ begin
   inherited;
   LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
   DSRows.Append(LNewOrderRow);
-  DSRows.ShowCurrent('', 'VCProviderOrderRows');
+  DSRows.ShowCurrent(VCProviderOrderRows);
 end;
 
 procedure TOrderForm.acBackExecute(Sender: TObject);
@@ -116,14 +116,14 @@ begin
     else
     begin
       DSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
-      DSRows.ShowCurrent('', 'VCProviderOrderRows');
+      DSRows.ShowCurrent(VCProviderOrderRows);
     end;
   end;
 end;
 
 procedure TOrderForm.DSRowsAfterOpen(DataSet: TDataSet);
 begin
-  DSRows.ShowEach('', 'VCProviderOrderRows');
+  DSRows.ShowEach(VCProviderOrderRows);
 end;
 
 procedure TOrderForm.FormClose(Sender: TObject; var Action: TCloseAction);
