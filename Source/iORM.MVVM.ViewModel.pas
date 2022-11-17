@@ -67,9 +67,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function VMActions: IioVMActionContainer;
-    procedure CloseViews;
-    procedure HideViews;
-    procedure ShowViews;
+    procedure Close;
+    procedure Hide;
+    procedure Show;
     procedure TerminateApplication;
     // VCProvider local register
     function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
@@ -124,7 +124,7 @@ begin
   Result := TioModelPresenterCustom(LComponent);
 end;
 
-procedure TioViewModel.HideViews;
+procedure TioViewModel.Hide;
 begin
   FViewRegister.HideAllViewContexts;
 end;
@@ -147,7 +147,7 @@ begin
   FViewRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
 end;
 
-procedure TioViewModel.ShowViews;
+procedure TioViewModel.Show;
 begin
   FViewRegister.ShowAllViewContexts;
 end;
@@ -187,7 +187,7 @@ begin
     FOnViewPairing(Self);
 end;
 
-procedure TioViewModel.CloseViews;
+procedure TioViewModel.Close;
 begin
   FViewRegister.ReleaseAllViewContexts;
 end;

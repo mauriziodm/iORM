@@ -71,9 +71,9 @@ type
     ['{7DA6A783-6026-47C2-BFF7-83BF6FECFD2F}']
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
     procedure DoOnViewPairing;
-    procedure CloseViews;
-    procedure HideViews;
-    procedure ShowViews;
+    procedure Close;
+    procedure Hide;
+    procedure Show;
     procedure BindView(const AView: TComponent);
   end;
 
