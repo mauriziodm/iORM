@@ -90,6 +90,11 @@ type
     FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    // Events
+    FAfterClose: TNotifyEvent;
+    FAfterOpen: TNotifyEvent;
+    FBeforeClose: TNotifyEvent;
+    FBeforeOpen: TNotifyEvent;
     // Methods
     procedure WhereOnChangeEventHandler(Sender: TObject);
     procedure OpenCloseViewBindSources(const AActive: Boolean);
@@ -156,11 +161,15 @@ type
     // SelectorFor
     procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
   protected
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
     procedure Open; virtual;
     procedure Close; virtual;
     procedure Loaded; override;
     function GetName: String;
-    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
+    procedure DoAfterClose;
+    procedure DoAfterOpen;
+    procedure DoBeforeClose;
+    procedure DoBeforeOpen;
     // MasterPresenter
     procedure SetMasterBindSource(const Value: IioNotifiableBindSource); virtual;
     // Active
@@ -213,6 +222,11 @@ type
     property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
+    // published events
+    property AfterClose: TNotifyEvent read FAfterClose write FAfterClose;
+    property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
+    property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
+    property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -467,6 +481,18 @@ begin
   inherited;
 end;
 
+procedure TioModelPresenterCustom.DoAfterClose;
+begin
+  if Assigned(FAfterClose) then
+    FAfterClose(Self);
+end;
+
+procedure TioModelPresenterCustom.DoAfterOpen;
+begin
+  if Assigned(FAfterOpen) then
+    FAfterOpen(Self);
+end;
+
 procedure TioModelPresenterCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FonAfterSelectionInterface) then
@@ -477,6 +503,18 @@ procedure TioModelPresenterCustom.DoAfterSelection(var ASelected: TObject; var A
 begin
   if Assigned(FonAfterSelectionObject) then
     FonAfterSelectionObject(Self, ASelected, ASelectionType);
+end;
+
+procedure TioModelPresenterCustom.DoBeforeClose;
+begin
+  if Assigned(FBeforeClose) then
+    FBeforeClose(Self);
+end;
+
+procedure TioModelPresenterCustom.DoBeforeOpen;
+begin
+  if Assigned(FBeforeOpen) then
+    FBeforeOpen(Self);
 end;
 
 procedure TioModelPresenterCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -902,14 +940,47 @@ end;
 
 procedure TioModelPresenterCustom.SetActive(const Value: Boolean);
 begin
-  if CheckAdapter(True) then
+  if Value = IsActive then
+    Exit;
+
+  if not (csDesigning in ComponentState) then
   begin
-    GetActiveBindSourceAdapter.Active := Value;
-    // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
-    OpenCloseViewBindSources(Value);
+    if Value then
+    begin
+      // If we are in the opening of the bind source and we are NOT at design-time then
+      //  create the active bind source adapter
+      CheckAdapter(True);
+      DoBeforeOpen;
+    end
+    else
+      DoBeforeClose;
+  end;
+
+  // open/close ActiveBindSourceAdapter
+  GetActiveBindSourceAdapter.Active := Value;
+  // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
+  OpenCloseViewBindSources(Value);
+
+  if not (csDesigning in ComponentState) then
+  begin
     // Open/Close registered details model presenters
     OpenCloseDetails(Value);
+    if Value then
+      DoAfterOpen
+    else
+      DoAfterClose;
   end;
+
+  // ----- OLD CODE -----
+//  if CheckAdapter(True) then
+//  begin
+//    GetActiveBindSourceAdapter.Active := Value;
+//    // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
+//    OpenCloseViewBindSources(Value);
+//    // Open/Close registered details model presenters
+//    OpenCloseDetails(Value);
+//  end;
+// ----- OLD CODE -----
 end;
 
 procedure TioModelPresenterCustom.SetAsDefault(const Value: Boolean);

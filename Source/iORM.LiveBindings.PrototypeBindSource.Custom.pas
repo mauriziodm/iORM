@@ -869,7 +869,7 @@ begin
   begin
     if Value then
     begin
-      // If we are in the opening of the bind source and we are at design-time then
+      // If we are in the opening of the bind source and we are NOT at design-time then
       //  create the active bind source adapter
       if not Assigned(FBindSourceAdapter) then
         _CreateAdapter(Current, False);
