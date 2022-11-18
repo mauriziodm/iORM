@@ -27,7 +27,6 @@ type
     procedure acShowPizzasExecute(Sender: TObject);
   private
     { Private declarations }
-//    FVM: IIoViewModel;
   public
     { Public declarations }
   end;
@@ -49,10 +48,6 @@ end;
 procedure TVMStart.acShowCustomersExecute(Sender: TObject);
 begin
   io.Show<ICustomer>;
-
-//  FVM.VMAction['acBack'].Execute;
-//  io.Show<ICustomer>;
-
 end;
 
 procedure TVMStart.acShowOrdersExecute(Sender: TObject);
@@ -63,10 +58,6 @@ end;
 procedure TVMStart.acShowPizzasExecute(Sender: TObject);
 begin
   io.Show<IPizza>;
-
-//  FVM := io.CreateViewModelFor<IPizza>;
-//  io.CreateViewFor<IPizza>(FVM)
-
 end;
 
 end.

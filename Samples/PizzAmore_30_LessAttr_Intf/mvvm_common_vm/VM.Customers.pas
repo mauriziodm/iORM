@@ -48,7 +48,7 @@ procedure TVMCustomers.acShowOrSelectExecute(Sender: TObject);
 begin
   inherited;
   if Assigned(MPMaster.SelectorFor) then
-    CloseViews;
+    Close;
 end;
 
 end.

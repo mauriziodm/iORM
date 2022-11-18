@@ -8651,7 +8651,7 @@ object StartForm: TStartForm
     OnAfterRequest = VCProviderFormAfterRequest
     OnRelease = VCProviderFormRelease
     OnRequest = VCProviderFormRequest
-    RegisterAsDefault = True
+    AsDefault = True
     Left = 188
     Top = 398
   end
@@ -8714,7 +8714,7 @@ object StartForm: TStartForm
     OnAfterRequest = VCProviderTabAfterRequest
     OnRelease = VCProviderTabRelease
     OnRequest = VCProviderTabRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 284
     Top = 398
   end

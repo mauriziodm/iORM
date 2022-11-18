@@ -2,9 +2,7 @@ inherited ViewOrder: TViewOrder
   OnResize = FrameResize
   inherited PanelMain: TPanel
     Width = 449
-    ExplicitLeft = -6
     ExplicitWidth = 449
-    ExplicitHeight = 578
     object Label1: TLabel [0]
       Left = 5
       Top = 57
@@ -95,18 +93,22 @@ inherited ViewOrder: TViewOrder
     end
     inherited PanelTop: TPanel
       Width = 449
+      ExplicitWidth = 449
       DesignSize = (
         449
         40)
       inherited LabelTitle: TLabel
         Width = 340
         Caption = 'Order'
+        ExplicitWidth = 340
       end
     end
     inherited PanelBottom: TPanel
       Width = 449
+      ExplicitWidth = 449
       inherited ButtonPersist: TSpeedButton
         Left = 399
+        ExplicitLeft = 399
       end
       object Label6: TLabel
         Left = 173
@@ -356,7 +358,6 @@ inherited ViewOrder: TViewOrder
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitLeft = 455
   end
   inherited ActionList1: TActionList
     object acDeleteRow: TioViewAction
@@ -445,7 +446,7 @@ inherited ViewOrder: TViewOrder
   object VCProviderOrder: TioViewContextProvider
     OnAfterRequest = VCProviderOrderAfterRequest
     OnRequest = VCProviderOrderRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 293
     Top = 162
   end

@@ -152,7 +152,7 @@ var
   LViewAction: IioViewAction;
 begin
   // Capture any VMAction present in the view.
-  _InternalLoadVMActions(AView);
+//  _InternalLoadVMActions(AView);
   // Bind any ViewAction to the related VMAction registered on the ViewModel
   for I := 0 to AView.ComponentCount - 1 do
     if Supports(AView.Components[i], IioViewAction, LViewAction) then

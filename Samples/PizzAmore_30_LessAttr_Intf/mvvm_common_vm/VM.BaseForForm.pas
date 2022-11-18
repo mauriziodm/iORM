@@ -34,7 +34,7 @@ implementation
 
 procedure TVMBaseForForm.acBackExecute(Sender: TObject);
 begin
-  CloseViews;
+  Close;
 end;
 
 end.

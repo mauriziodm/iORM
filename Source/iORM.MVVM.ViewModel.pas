@@ -133,7 +133,7 @@ procedure TioViewModel.Loaded;
 begin
   inherited;
   // Load all VMActions
-//  FVMActionContainer._InternalLoadVMActions(Self);
+  FVMActionContainer._InternalLoadVMActions(Self);
 end;
 
 procedure TioViewModel.RegisterVCProvider(const AVCProvider: TioViewContextProvider);
