@@ -334,10 +334,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="Form.ViewContext.pas">
-            <Form>FormViewContext</Form>
-            <FormType>fmx</FormType>
-        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

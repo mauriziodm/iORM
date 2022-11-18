@@ -319,7 +319,7 @@ inherited ViewOrder: TViewOrder
   object VCProviderOrderRows: TioViewContextProvider
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 296
     Top = 205
   end

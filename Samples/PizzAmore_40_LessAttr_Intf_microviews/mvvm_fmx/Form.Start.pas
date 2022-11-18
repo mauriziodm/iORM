@@ -55,7 +55,7 @@ var
 implementation
 
 uses
-  Utils.SampleData, System.IOUtils, RegisterClasses, Form.ViewContext;
+  Utils.SampleData, System.IOUtils, RegisterClasses;
 
 {$R *.fmx}
 
@@ -74,27 +74,22 @@ end;
 procedure TStartForm.VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
   (AView as TFrame).Align := TAlignLayout.Client;
-//  (AViewContext as TForm).ShowModal;
-  (AViewContext as TForm).Show;
-//  NextTabAction1.Execute;
+  NextTabAction1.Execute;
 end;
 
 procedure TStartForm.VCProviderBeforeRelease(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
-//  PreviousTabAction1.Execute;
+  PreviousTabAction1.Execute;
 end;
 
 procedure TStartForm.VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
-//  TabControlStart.Delete((AViewCOntext as TTabItem).Index);
-//  (AViewContext as TForm).ModalResult := mrOK;
-  AViewContext.Free;
+  TabControlStart.Delete((AViewCOntext as TTabItem).Index);
 end;
 
 procedure TStartForm.VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
 begin
-//  ResultViewContext := TabControlStart.Add;
-Application.CreateForm(TFormViewContext, ResultViewContext);
+  ResultViewContext := TabControlStart.Add;
 end;
 
 initialization

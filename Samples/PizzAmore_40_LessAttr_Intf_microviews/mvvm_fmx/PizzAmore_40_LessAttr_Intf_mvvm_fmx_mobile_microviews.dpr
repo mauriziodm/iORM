@@ -37,8 +37,7 @@ uses
   VM.BaseForForm in '..\mvvm_common_vm\VM.BaseForForm.pas' {VMBaseForForm: TioViewModel},
   MicroVM.OrderRowPizza in '..\mvvm_common_vm\MicroVM.OrderRowPizza.pas' {MicroVMOrderRowPizza: TioViewModel},
   MicroVM.OrderRowCustom in '..\mvvm_common_vm\MicroVM.OrderRowCustom.pas' {MicroVMOrderRowCustom: TioViewModel},
-  MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel},
-  Form.ViewContext in 'Form.ViewContext.pas' {FormViewContext};
+  MicroVM.Customer in '..\mvvm_common_vm\MicroVM.Customer.pas' {MicroVMCustomer: TioViewModel};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

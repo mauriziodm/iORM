@@ -292,14 +292,14 @@ inherited ViewOrder: TViewOrder
   object VCProviderOrderPizzaSel: TioViewContextProvider
     OnAfterRequest = VCProviderOrderPizzaSelAfterRequest
     OnRequest = VCProviderOrderPizzaSelRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 293
     Top = 314
   end
   object VCProviderOrderRows: TioViewContextProvider
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 293
     Top = 370
   end

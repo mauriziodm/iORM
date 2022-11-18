@@ -44,7 +44,7 @@ begin
   try
     MPOrderRow.Delete;
   finally
-    CloseViews;
+    Close;
   end;
 end;
 

@@ -27,7 +27,7 @@ procedure TVMCustomer.acDeleteExecute(Sender: TObject);
 begin
   inherited;
   MPMaster.Delete;
-  CloseViews;
+  Close;
 end;
 
 end.

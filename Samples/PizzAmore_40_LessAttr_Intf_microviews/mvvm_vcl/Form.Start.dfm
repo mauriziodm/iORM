@@ -8636,10 +8636,10 @@ object StartForm: TStartForm
     Top = 398
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_40_mvvm_vcl.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
@@ -8651,7 +8651,7 @@ object StartForm: TStartForm
     OnAfterRequest = VCProviderFormAfterRequest
     OnRelease = VCProviderFormRelease
     OnRequest = VCProviderFormRequest
-    RegisterAsDefault = True
+    AsDefault = True
     Left = 188
     Top = 398
   end
@@ -8714,7 +8714,7 @@ object StartForm: TStartForm
     OnAfterRequest = VCProviderTabAfterRequest
     OnRelease = VCProviderTabRelease
     OnRequest = VCProviderTabRequest
-    RegisterAsDefault = False
+    AsDefault = False
     Left = 284
     Top = 398
   end

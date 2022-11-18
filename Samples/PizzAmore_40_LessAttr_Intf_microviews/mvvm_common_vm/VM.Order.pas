@@ -42,7 +42,7 @@ end;
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-  MPRows.ShowEach('', 'VCProviderOrderRows');
+  MPRows.ShowEach(VCProviderByName('VCProviderOrderRows'));
 end;
 
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -57,7 +57,7 @@ begin
     else
     begin
       MPRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
-      MPRows.ShowCurrent('', 'VCProviderOrderRows');
+      MPRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
     end;
   end;
 end;
@@ -69,7 +69,7 @@ begin
   inherited;
   LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
   MPRows.Append(LNewOrderRow);
-  MPRows.ShowCurrent('', 'VCProviderOrderRows');
+  MPRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
 end;
 
 end.
