@@ -5,10 +5,10 @@ object ioDMVCServerTest: TioDMVCServerTest
   Height = 280
   Width = 415
   object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_20_vcl.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB

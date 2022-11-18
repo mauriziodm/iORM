@@ -54,10 +54,10 @@ type
     property ConnectionDef;
   published
     // Properties
+    property AsDefault;
     property AutoCreateDB;
     property Database;
     property DatabaseStdFolder;
-    property DefaultConnection;
     property Encrypt;
     property OSAuthent;
     property Password;
@@ -87,7 +87,7 @@ procedure TioSQLServerConnectionDef.RegisterConnectionDef;
 begin
   inherited;
   ConnectionDef := TioConnectionManager.NewSQLServerConnectionDef(Server,
-    GetFullPathDatabase, UserName, Password, DefaultConnection,
+    GetFullPathDatabase, UserName, Password, AsDefault,
     Persistent, Pooled, Name);
   // Encript
   if not Encrypt.IsEmpty then

@@ -8554,10 +8554,10 @@ object MainForm: TMainForm
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_27_simplemicroview_vcl.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB

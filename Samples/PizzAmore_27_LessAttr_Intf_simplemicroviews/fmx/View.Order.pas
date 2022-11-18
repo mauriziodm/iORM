@@ -35,7 +35,6 @@ type
     BSRows: TioPrototypeBindSourceDetail;
     ScrollBoxRows: TScrollBox;
     VCProviderOrderRows: TioViewContextProvider;
-    Button1: TButton;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;

@@ -72,7 +72,7 @@ Coordinates=805,309,46,51
 Coordinates=357,386,46,51
 
 []
-Coordinates=340,125,70,51
+Coordinates=573,386,53,51
 Visible=True
 
 [BindingsList1]
@@ -90,9 +90,6 @@ Coordinates=10,540,89,33
 
 [MicroViewCustomer1.acSelectCustomer]
 Coordinates=682,193,211,33
-
-[Button1]
-Coordinates=573,386,53,51
 
 [MicroViewCustomer1.ActionListCustMView]
 Coordinates=663,230,227,33

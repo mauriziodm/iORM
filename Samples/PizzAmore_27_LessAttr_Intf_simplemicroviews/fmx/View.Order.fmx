@@ -3,12 +3,6 @@ inherited ViewOrder: TViewOrder
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Order'
-      object Button1: TButton
-        Position.X = 296.000000000000000000
-        Position.Y = 16.000000000000000000
-        TabOrder = 41
-        Text = 'Button1'
-      end
     end
   end
   object LayoutCustomer: TLayout [2]

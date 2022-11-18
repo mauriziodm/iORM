@@ -81,7 +81,7 @@ type
     FConnectionDef: IIoConnectionDef;
     FDatabase: String;
     FDatabaseStdFolder: TioDBStdFolder;
-    FDefaultConnection: Boolean;
+    FAsDefault: Boolean;
     FEncrypt: String;
     FIsRegistered: Boolean;
     FNewPassword: String;
@@ -94,7 +94,7 @@ type
     FServer: String;
     FSQLDialect: TioSQLDialect;
     FUserName: String;
-    procedure SetDefaultConnection(const Value: Boolean);
+    procedure SetAsDefault(const Value: Boolean);
   protected
     function DBBuilder: IioDBBuilderEngine; virtual;
     procedure DoAfterRegister;
@@ -128,8 +128,8 @@ type
     procedure CreateOrAlterDB(const AForce: Boolean = False); virtual;
     procedure RegisterConnectionDef; virtual;
     // Properties
+    property AsDefault: Boolean read FAsDefault write SetAsDefault;
     property ConnectionDef: IIoConnectionDef read FConnectionDef write FConnectionDef;
-    property DefaultConnection: Boolean read FDefaultConnection write SetDefaultConnection;
     property IsRegistered: Boolean read FIsRegistered;
     property Persistent: Boolean read FPersistent write FPersistent;
   published
@@ -144,8 +144,8 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure RegisterConnectionDef; override;
   published
+    property AsDefault;
     property BaseURL;
-    property DefaultConnection;
     property Persistent;
   end;
 
@@ -158,10 +158,10 @@ type
     property ConnectionDef;
   published
     // Properties
+    property AsDefault;
     property AutoCreateDB;
     property Database;
     property DatabaseStdFolder;
-    property DefaultConnection;
     property Encrypt;
     property NewPassword;
     property Password;
@@ -182,11 +182,11 @@ type
     property ConnectionDef;
   published
     // Properties
+    property AsDefault;
     property AutoCreateDB;
     property CharSet;
     property Database;
     property DatabaseStdFolder;
-    property DefaultConnection;
     property OSAuthent;
     property Password;
     property Persistent;
@@ -211,11 +211,11 @@ type
     property ConnectionDef;
   published
     // Properties
+    property AsDefault;
     property AutoCreateDB;
     property CharSet;
     property Database;
     property DatabaseStdFolder;
-    property DefaultConnection;
     property Password;
     property Persistent;
     property Pooled;
@@ -253,7 +253,7 @@ begin
   FCharSet := '';
   FDatabase := '';
   FDatabaseStdFolder := TioDBStdFolder.sfUndefined;
-  FDefaultConnection := True;
+  FAsDefault := True;
   FEncrypt := '';
   FIsRegistered := False;
   FNewPassword := '';
@@ -355,12 +355,12 @@ begin
   DoAfterRegister;
 end;
 
-procedure TioCustomConnectionDef.SetDefaultConnection(const Value: Boolean);
+procedure TioCustomConnectionDef.SetAsDefault(const Value: Boolean);
 var
   I: Integer;
   LConnectionDef: TioCustomConnectionDef;
 begin
-  FDefaultConnection := Value;
+  FAsDefault := Value;
   if Value then
   begin
     // Uncheck previous default connection
@@ -369,7 +369,7 @@ begin
       if (Owner.Components[I] is TioCustomConnectionDef) and (Owner.Components[I] <> Self) then
       begin
         LConnectionDef := TioCustomConnectionDef(Owner.Components[I]);
-        LConnectionDef.DefaultConnection := False;
+        LConnectionDef.AsDefault := False;
       end;
     end;
     // If not in design or load mode the
@@ -392,7 +392,7 @@ begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
   // Register the ConnectionDef
-  TioConnectionManager.NewRemoteConnection(BaseURL, DefaultConnection, Persistent, Name);
+  TioConnectionManager.NewRemoteConnection(BaseURL, AsDefault, Persistent, Name);
   // NB: Inherited must be the last line (set FIsRegistered)
   inherited;
 end;
@@ -410,7 +410,7 @@ begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
   // Register the ConnectionDef
-  ConnectionDef := TioConnectionManager.NewSQLiteConnectionDef(GetFullPathDatabase, DefaultConnection, Persistent, Pooled, Name);
+  ConnectionDef := TioConnectionManager.NewSQLiteConnectionDef(GetFullPathDatabase, AsDefault, Persistent, Pooled, Name);
   // Encript
   if not Encrypt.IsEmpty then
     ConnectionDef.Params.Values['Encrypt'] := Encrypt;
@@ -444,7 +444,7 @@ begin
   DoBeforeRegister;
   // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewFirebirdConnectionDef(Server, GetFullPathDatabase, UserName, Password, CharSet,
-    DefaultConnection, Persistent, Pooled, Name);
+    AsDefault, Persistent, Pooled, Name);
   // OSAuthent
   case OSAuthent of
     TioOSAuthent.oaNo:
@@ -503,7 +503,7 @@ begin
   DoBeforeRegister;
   // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewMySQLConnectionDef(Server, GetFullPathDatabase, UserName, Password, CharSet,
-    DefaultConnection, Persistent, Pooled, Name);
+    AsDefault, Persistent, Pooled, Name);
   // Port
   ConnectionDef.Params.Values['Port'] := Port.ToString;
   // NB: Inherited must be the last line (set FIsRegistered)

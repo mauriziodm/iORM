@@ -8554,9 +8554,9 @@ object MainForm: TMainForm
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = False
     Database = 'PizzAmore_20_vcl.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = False
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
@@ -8565,10 +8565,10 @@ object MainForm: TMainForm
     Top = 272
   end
   object FirebirdConn: TioFirebirdConnectionDef
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_20_vcl.fdb'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
     OSAuthent = oaNo
     Password = 'masterkey'
     Persistent = False
@@ -8583,8 +8583,8 @@ object MainForm: TMainForm
     Top = 272
   end
   object RemoteConn: TioRemoteConnectionDef
+    AsDefault = False
     BaseURL = 'http://localhost:8080'
-    DefaultConnection = False
     Persistent = True
     Left = 216
     Top = 272

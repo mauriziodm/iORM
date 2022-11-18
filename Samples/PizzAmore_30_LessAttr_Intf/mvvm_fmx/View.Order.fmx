@@ -5,10 +5,10 @@ inherited ViewOrder: TViewOrder
       Text = 'Order'
     end
   end
-  object LayoutOrderData: TLayout [1]
+  object LayoutOrderData: TLayout [2]
     Align = Top
     Position.Y = 40.000000000000000000
-    Size.Width = 380.000000000000000000
+    Size.Width = 400.000000000000000000
     Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 7
@@ -100,10 +100,10 @@ inherited ViewOrder: TViewOrder
       end
     end
   end
-  object LayoutCustomer: TLayout [2]
+  object LayoutCustomer: TLayout [3]
     Align = Top
     Position.Y = 90.000000000000000000
-    Size.Width = 380.000000000000000000
+    Size.Width = 400.000000000000000000
     Size.Height = 75.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
@@ -171,17 +171,17 @@ inherited ViewOrder: TViewOrder
       Align = MostRight
       Enabled = True
       ImageIndex = -1
-      Position.X = 350.000000000000000000
+      Position.X = 370.000000000000000000
       Size.Width = 30.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'arrowrighttoolbutton'
     end
   end
-  object LayoutGrandTotal: TLayout [3]
+  object LayoutGrandTotal: TLayout [4]
     Align = Bottom
-    Position.Y = 514.000000000000000000
-    Size.Width = 380.000000000000000000
+    Position.Y = 530.000000000000000000
+    Size.Width = 400.000000000000000000
     Size.Height = 30.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
@@ -195,7 +195,7 @@ inherited ViewOrder: TViewOrder
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Trailing
-      Position.X = 295.000000000000000000
+      Position.X = 315.000000000000000000
       Position.Y = 5.000000000000000000
       Margins.Left = 5.000000000000000000
       Margins.Top = 5.000000000000000000
@@ -218,17 +218,17 @@ inherited ViewOrder: TViewOrder
       end
     end
   end
-  object LayoutRows: TLayout [4]
+  object LayoutRows: TLayout [5]
     Align = Client
-    Size.Width = 380.000000000000000000
-    Size.Height = 349.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 365.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
     object Label5: TLabel
       Align = Top
       Margins.Left = 5.000000000000000000
       Position.X = 5.000000000000000000
-      Size.Width = 375.000000000000000000
+      Size.Width = 395.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       Text = 'Rows'
@@ -238,7 +238,7 @@ inherited ViewOrder: TViewOrder
         Align = MostRight
         Enabled = True
         ImageIndex = -1
-        Position.X = 345.000000000000000000
+        Position.X = 365.000000000000000000
         Size.Width = 30.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
@@ -249,7 +249,7 @@ inherited ViewOrder: TViewOrder
         Align = Right
         Enabled = True
         ImageIndex = -1
-        Position.X = 315.000000000000000000
+        Position.X = 335.000000000000000000
         Size.Width = 30.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
@@ -260,14 +260,42 @@ inherited ViewOrder: TViewOrder
       Align = Client
       CanFocus = True
       ClipChildren = True
-      Size.Width = 380.000000000000000000
-      Size.Height = 319.000000000000000000
+      Size.Width = 400.000000000000000000
+      Size.Height = 335.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 376.000000000000000000
-      Viewport.Height = 294.000000000000000000
+      Viewport.Width = 396.000000000000000000
+      Viewport.Height = 310.000000000000000000
+    end
+  end
+  inherited ActionList1: TActionList
+    Left = 160
+    Top = 280
+    object acShowCustomerSelector: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'acShowCustomerSelector'
+      Enabled = True
+      Visible = True
+      Caption = 'acShowCustomerSelector'
+      VMActionName = 'acShowCustomerSelector'
+    end
+    object acShowPizzaSelector: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'acShowPizzaSelector'
+      Enabled = True
+      Visible = True
+      Caption = 'acShowPizzaSelector'
+      VMActionName = 'acShowPizzaSelector'
+    end
+    object acDeleteRow: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'acDeleteRow'
+      Enabled = True
+      Visible = True
+      Caption = 'acDeleteRow'
+      VMActionName = 'acDeleteRow'
     end
   end
   inherited VMBridge: TioViewModelBridge
@@ -299,34 +327,6 @@ inherited ViewOrder: TViewOrder
         ReadOnly = False
       end>
     Top = 280
-  end
-  inherited ActionList1: TActionList
-    Left = 160
-    Top = 280
-    object acShowCustomerSelector: TioViewAction
-      Category = 'iORM-MVVM'
-      Text = 'acShowCustomerSelector'
-      Enabled = True
-      Visible = True
-      Caption = 'acShowCustomerSelector'
-      VMActionName = 'acShowCustomerSelector'
-    end
-    object acShowPizzaSelector: TioViewAction
-      Category = 'iORM-MVVM'
-      Text = 'acShowPizzaSelector'
-      Enabled = True
-      Visible = True
-      Caption = 'acShowPizzaSelector'
-      VMActionName = 'acShowPizzaSelector'
-    end
-    object acDeleteRow: TioViewAction
-      Category = 'iORM-MVVM'
-      Text = 'acDeleteRow'
-      Enabled = True
-      Visible = True
-      Caption = 'acDeleteRow'
-      VMActionName = 'acDeleteRow'
-    end
   end
   object MBSCustomer: TioModelBindSource
     AutoActivate = False

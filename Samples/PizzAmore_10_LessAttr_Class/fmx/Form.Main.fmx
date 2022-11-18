@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 14
+          TabOrder = 15
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5435,8 +5435,8 @@ object MainForm: TMainForm
           StyledSettings = [Family, Style, FontColor]
           TabOrder = 11
           RowCount = 200
-          Viewport.Width = 542.000000000000000000
-          Viewport.Height = 313.000000000000000000
+          Viewport.Width = 522.000000000000000000
+          Viewport.Height = 288.000000000000000000
         end
         object Label5: TLabel
           StyledSettings = [Family]
@@ -6392,10 +6392,10 @@ object MainForm: TMainForm
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_10_fmx.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB

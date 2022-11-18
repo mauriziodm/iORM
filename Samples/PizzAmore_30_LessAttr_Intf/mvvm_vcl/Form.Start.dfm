@@ -8636,10 +8636,10 @@ object StartForm: TStartForm
     Top = 398
   end
   object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_30_mvvm_vcl.db'
     DatabaseStdFolder = sfDocuments
-    DefaultConnection = True
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
