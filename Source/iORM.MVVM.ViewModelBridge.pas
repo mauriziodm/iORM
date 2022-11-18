@@ -19,6 +19,7 @@ type
     FDI_VMMarker: String;
     // Events
     FOnNeedViewModel: TioNeedViewModelEvent;
+    function Get_Version: String;
     procedure AutoSetClientComponentsOnCreate;
     procedure DoNeedViewModel;
     // VMActions
@@ -53,6 +54,7 @@ type
     property DI_VMInterface: String read FDI_VMInterface write FDI_VMInterface;
     property DI_VMAlias: String read FDI_VMAlias write FDI_VMAlias;
     property DI_VMMarker: String read FDI_VMMarker write FDI_VMMarker;
+    property _Version: String read Get_Version;
   end;
 
 implementation
@@ -195,6 +197,11 @@ begin
     Result := FViewModel.VMActions
   else
     raise EioException.Create(Self.Name, 'GetVMActions', '"FViewModel" not assigned.');
+end;
+
+function TioViewModelBridge.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 function TioViewModelBridge.GetDefaultPresenter: IioNotifiableBindSource;

@@ -54,6 +54,7 @@ type
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
+    function Get_Version: String;
     procedure _CreateAdapter;
     procedure PreventBindSourceAdapterDestruction;
     // AutoPost
@@ -81,12 +82,13 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
   published
-    property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
-    property ModelPresenter: String read FModelPresenter write FModelPresenter;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
+    property ModelPresenter: String read FModelPresenter write FModelPresenter;
     property Preview: Boolean read FPreview write SetPreview default False;
-    property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
+    property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
+    property _Version: String read Get_Version;
   end;
 
 implementation
@@ -95,7 +97,7 @@ uses
   System.SysUtils, iORM.Components.Common,
   iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.LiveBindings.Factory,
   iORM.Exceptions, System.Rtti, iORM.RttiContext.Factory,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM;
 
 { TioModelBindSource }
 
@@ -177,6 +179,11 @@ end;
 function TioModelBindSource.GetViewModelBridge: TioViewModelBridge;
 begin
   Result := FViewModelBridge;
+end;
+
+function TioModelBindSource.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioModelBindSource.Loaded;

@@ -42,7 +42,8 @@ uses
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister;
 
 const
-{$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+  IORM_VERSION = 'iORM 2 (beta 1.5)';
+{$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // TioTypeOfCollection
   tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
   tcList = iORM.CommonTypes.TioTypeOfCollection.tcList;
@@ -442,6 +443,9 @@ type
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AVVMAlias: String = ''); overload;
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+
+    // Version
+    class function Version: String;
   end;
 
 implementation
@@ -1380,6 +1384,11 @@ end;
 class function io.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 begin
   Result := TioGlobalVCProviderRegister.GetInstance.VCProviderByName(AVCProviderName);
+end;
+
+class function io.Version: String;
+begin
+  Result := IORM_VERSION;
 end;
 
 class function io.RefTo(const AWhere: IioWhere): IioWhere;

@@ -23,6 +23,7 @@ type
     FOnAfterExecute: TNotifyEvent;
     FOnBeforeUpdate: TNotifyEvent;
     FOnAfterUpdate: TNotifyEvent;
+    function Get_Version: String;
   strict protected
     procedure _ExecuteEmbeddedEvendHandler(Sender: TObject);
     procedure _UpdateEmbeddedEvendHandler(Sender: TObject);
@@ -73,6 +74,7 @@ type
     property Visible: Boolean read GetVisible write SetVisible;
     property VisibleLinkedToVMAction: Boolean read GetVisibleLinkedToVMAction write SetVisibleLinkedToVMAction default True;
     property VMActionName: String read GetVMActionName write SetVMActionName;
+    property _Version: String read Get_Version;
     // Events
     property OnAfterExecute: TNotifyEvent read FOnAfterExecute write FOnAfterExecute;
     property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
@@ -92,6 +94,7 @@ type
   TioBSStdActionVcl<T: IioStdActionTargetBindSource> = class(Vcl.ActnList.TAction)
   strict private
     FTargetBindSource: T;
+    function Get_Version: String;
     procedure SetTargetBindSource(const Value: T);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -99,6 +102,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+  published
+    property _Version: String read Get_Version;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -151,6 +156,7 @@ type
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
+    function Get_Version: String;
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -166,6 +172,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+  published
+    property _Version: String read Get_Version;
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl)
@@ -296,7 +304,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions, iORM.Utilities;
+  System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM;
 
 { TioBSObjStateStdAction }
 
@@ -311,6 +319,11 @@ begin
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
   FRaiseIfRevertPointNotSaved := False;
+end;
+
+function TioBSPersistenceStdActionVcl.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 function TioBSPersistenceStdActionVcl.HandlesTarget(Target: TObject): Boolean;
@@ -569,6 +582,11 @@ begin
   FTargetBindSource := nil;
 end;
 
+function TioBSStdActionVcl<T>.Get_Version: String;
+begin
+  Result := io.Version;
+end;
+
 function TioBSStdActionVcl<T>.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := Assigned(Target) and Supports(FTargetBindSource, TioUtilities.TypeInfoToGUID(TypeInfo(T))) and FTargetBindSource.isActive;
@@ -789,6 +807,11 @@ begin
     Result := Name
   else
     Result := FVMActionName;
+end;
+
+function TioViewAction.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 function TioViewAction.HandlesTarget(Target: TObject): Boolean;

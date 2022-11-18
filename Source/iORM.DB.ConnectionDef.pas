@@ -94,6 +94,7 @@ type
     FServer: String;
     FSQLDialect: TioSQLDialect;
     FUserName: String;
+    function Get_Version: String;
     procedure SetAsDefault(const Value: Boolean);
   protected
     function DBBuilder: IioDBBuilderEngine; virtual;
@@ -133,6 +134,7 @@ type
     property IsRegistered: Boolean read FIsRegistered;
     property Persistent: Boolean read FPersistent write FPersistent;
   published
+    property _Version: String read Get_Version;
     // Events
     property OnAfterRegister: TNotifyEvent read FOnAfterRegister write FOnAfterRegister;
     property OnBeforeRegister: TNotifyEvent read FOnBeforeRegister write FOnBeforeRegister;
@@ -231,11 +233,13 @@ type
   TioSQLMonitor = class(TComponent)
   strict private
     FMode: TioMonitorMode;
+    function Get_Version: String;
     procedure SetMode(const Value: TioMonitorMode);
   public
     constructor Create(AOwner: TComponent); override;
   published
     property Mode: TioMonitorMode read FMode write SetMode;
+    property _Version: String read Get_Version;
   end;
 
 implementation
@@ -331,6 +335,11 @@ begin
     Result := TPath.GetFullPath(TPath.Combine(LDBFolder, FDatabase))
   else
     Result := FDatabase;
+end;
+
+function TioCustomConnectionDef.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioCustomConnectionDef.Loaded;
@@ -516,6 +525,11 @@ constructor TioSQLMonitor.Create(AOwner: TComponent);
 begin
   inherited;
   FMode := TioMonitorMode.mmDisabled;
+end;
+
+function TioSQLMonitor.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioSQLMonitor.SetMode(const Value: TioMonitorMode);

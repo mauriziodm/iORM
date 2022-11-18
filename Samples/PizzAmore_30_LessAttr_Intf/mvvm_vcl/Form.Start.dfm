@@ -8648,10 +8648,10 @@ object StartForm: TStartForm
     Top = 463
   end
   object VCProviderForm: TioViewContextProvider
+    AsDefault = True
     OnAfterRequest = VCProviderFormAfterRequest
     OnRelease = VCProviderFormRelease
     OnRequest = VCProviderFormRequest
-    AsDefault = True
     Left = 188
     Top = 398
   end
@@ -8711,10 +8711,10 @@ object StartForm: TStartForm
     end
   end
   object VCProviderTab: TioViewContextProvider
+    AsDefault = False
     OnAfterRequest = VCProviderTabAfterRequest
     OnRelease = VCProviderTabRelease
     OnRequest = VCProviderTabRequest
-    AsDefault = False
     Left = 284
     Top = 398
   end

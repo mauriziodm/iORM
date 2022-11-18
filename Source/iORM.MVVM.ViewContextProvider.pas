@@ -61,6 +61,7 @@ type
     FOnRequest: TioRequestViewContextEvent;
     FOnShow: TioViewContextEvent;
     // Methods
+    function Get_Version: String;
     function GetRegisterAsDefault: Boolean;
     procedure SetRegisterAsDefault(const Value: Boolean);
     procedure DoOnAfterRelease;
@@ -83,6 +84,9 @@ type
     function IsDefault: Boolean;
     procedure SetAsDefault;
   published
+    // Properties
+    property AsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
+    property _Version: String read Get_Version;
     // Events
     property OnAfterRelease:TNotifyEvent read FOnAfterRelease write FOnAfterRelease;
     property OnAfterRequest:TioViewContextEvent read FOnAfterRequest write FOnAfterRequest;
@@ -92,15 +96,14 @@ type
     property OnRelease:TioViewContextEvent read FOnRelease write FOnRelease;
     property OnRequest:TioRequestViewContextEvent read FOnRequest write FOnRequest;
     property OnShow:TioViewContextEvent read FOnShow write FOnShow;
-    // Properties
-    property AsDefault:Boolean read GetRegisterAsDefault write SetRegisterAsDefault;
   end;
 
 implementation
 
 uses
   iORM.Exceptions,
-  iORM.MVVM.ViewContextProviderContainer, iORM.Utilities, iORM.MVVM.ViewRegister;
+  iORM.MVVM.ViewContextProviderContainer, iORM.Utilities, iORM.MVVM.ViewRegister,
+  iORM;
 
 { TioViewContextProvider }
 
@@ -177,6 +180,11 @@ end;
 function TioViewContextProvider.GetRegisterAsDefault: Boolean;
 begin
   Result := FAsDefault;
+end;
+
+function TioViewContextProvider.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioViewContextProvider.HideViewContext(const AView, AViewContext: TComponent);

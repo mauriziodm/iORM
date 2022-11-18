@@ -140,8 +140,8 @@ object ViewBaseForList: TViewBaseForList
     AutoActivate = False
     FieldDefs = <>
     ScopeMappings = <>
-    ViewModelBridge = VMBridge
     ModelPresenter = 'MPMaster'
+    ViewModelBridge = VMBridge
     Left = 200
     Top = 272
   end

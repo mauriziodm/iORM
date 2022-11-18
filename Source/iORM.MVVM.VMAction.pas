@@ -20,6 +20,7 @@ type
     FVisible: Boolean;
     FOnExecute: TNotifyEvent;
     FOnUpdate: TNotifyEvent;
+    function Get_Version: String;
     procedure _InternalExecute; virtual;
     procedure _InternalUpdate; virtual;
   strict protected
@@ -56,6 +57,8 @@ type
     function HandlesTarget(Target: TObject): Boolean; virtual;
     procedure Execute;
     procedure Update;
+  published
+    property _Version: String read Get_Version;
   end;
 
   TioVMAction = class(TioVMActionCustom)
@@ -84,6 +87,7 @@ type
   TioVMActionBSCustom<T: IioStdActionTargetBindSource> = class(TioVMActionCustom)
   strict private
     FTargetBindSource: T;
+    function Get_Version: String;
     procedure SetTargetBindSource(const Value: T);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -97,6 +101,7 @@ type
     property Enabled;
     property Name;
     property Visible;
+    property _Version: String read Get_Version;
     // Events
     property OnExecute;
     property OnUpdate;
@@ -152,6 +157,7 @@ type
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
+    function Get_Version: String;
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -167,6 +173,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+  published
+    property _Version: String read Get_Version;
   end;
 
   TioVMActionBSPersistenceSaveRevertPoint = class(TioVMActionBSPersistenceCustom)
@@ -297,7 +305,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Utilities, iORM.Exceptions;
+  System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM;
 
 { TioVMActionCustom }
 
@@ -367,6 +375,11 @@ end;
 function TioVMActionCustom.GetVisible: Boolean;
 begin
   Result := FVisible;
+end;
+
+function TioVMActionCustom.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 function TioVMActionCustom.HandlesTarget(Target: TObject): Boolean;
@@ -481,6 +494,11 @@ begin
   FTargetBindSource := nil;
 end;
 
+function TioVMActionBSCustom<T>.Get_Version: String;
+begin
+  Result := io.Version;
+end;
+
 function TioVMActionBSCustom<T>.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := Assigned(Target) and Supports(FTargetBindSource, TioUtilities.TypeInfoToGUID(TypeInfo(T))) and FTargetBindSource.isActive;
@@ -564,6 +582,11 @@ begin
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
   FRaiseIfRevertPointNotSaved := False;
+end;
+
+function TioVMActionBSPersistenceCustom.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 function TioVMActionBSPersistenceCustom.HandlesTarget(Target: TObject): Boolean;

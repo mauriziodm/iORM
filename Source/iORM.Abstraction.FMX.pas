@@ -47,6 +47,9 @@ uses
 type
 
   TioFMX = class(TComponent)
+    function Get_Version: String;
+  published
+    property _Version: String read Get_Version;
   end;
 
   TioApplicationFMX = class(TioApplication)
@@ -118,7 +121,7 @@ type
 implementation
 
 uses
-  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls;
+  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM;
 
 { TioTimerFMX }
 
@@ -360,6 +363,13 @@ begin
   if not (AControl is TControl) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
+end;
+
+{ TioFMX }
+
+function TioFMX.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 initialization

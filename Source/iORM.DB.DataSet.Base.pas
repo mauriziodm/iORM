@@ -123,6 +123,7 @@ type
     // the bind source adapter holding the data
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     // Methods
+    function Get_Version: String;
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
     function CheckAdapter: Boolean;
@@ -153,6 +154,8 @@ type
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     property Map: IioMap read FMap;
+  published
+    property _Version: String read Get_Version;
   end;
 
   TioAbstractBlobStream = class(TMemoryStream)
@@ -202,7 +205,7 @@ uses
   iORM.Exceptions, System.SysUtils, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
-  iORM.RttiContext.Factory;
+  iORM.RttiContext.Factory, iORM;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -868,6 +871,11 @@ begin
     and not(BOF and Eof) then
     Inc(Result);
   // -------------------------------------------
+end;
+
+function TioBSABaseDataSet.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 // Convert and load Data into the buffer (GetFieldData)

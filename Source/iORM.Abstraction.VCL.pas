@@ -45,6 +45,10 @@ uses
 type
 
   TioVCL = class(TComponent)
+  strict private
+    function Get_Version: String;
+  published
+    property _Version: String read Get_Version;
   end;
 
   TioApplicationVCL = class(TioApplication)
@@ -116,7 +120,7 @@ type
 implementation
 
 uses
-  Vcl.Forms, Vcl.Dialogs, Vcl.Controls, iORM.Exceptions;
+  Vcl.Forms, Vcl.Dialogs, Vcl.Controls, iORM.Exceptions, iORM;
 
 { TioApplicationVCL }
 
@@ -358,6 +362,13 @@ begin
   if not (AControl is TControl) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
+end;
+
+{ TioVCL }
+
+function TioVCL.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 initialization

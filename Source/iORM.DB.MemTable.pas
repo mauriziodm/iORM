@@ -54,6 +54,7 @@ type
     FioTypeName: String;
     FioLoadingData: Boolean;
     FioComponentLoaded: Boolean;
+    function Get_Version: String;
     procedure SetIoWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
@@ -72,6 +73,7 @@ type
     property ioAutoLoadDataWhenActivated:Boolean read FioAutoLoadDataWhenActivated write FioAutoLoadDataWhenActivated;
     property ioWhereStr:TStrings read FioWhereStr write SetIoWhereStr;
     property ioOrderBy:String read FioOrderBy Write FioOrderBy;
+    property _Version: String read Get_Version;
   end;
 
 implementation
@@ -109,6 +111,11 @@ procedure TioMemTable.DoBeforeOpen;
 begin
   inherited;
   ioLoadData;
+end;
+
+function TioMemTable.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioMemTable.ioLoadData;

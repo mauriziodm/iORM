@@ -96,6 +96,7 @@ type
     FBeforeClose: TNotifyEvent;
     FBeforeOpen: TNotifyEvent;
     // Methods
+    function Get_Version: String;
     procedure WhereOnChangeEventHandler(Sender: TObject);
     procedure OpenCloseViewBindSources(const AActive: Boolean);
     procedure OpenCloseDetails(const AActive: Boolean);
@@ -305,6 +306,8 @@ type
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
     // Published properties: selectors (NB: lasciata public perchè usata da qualche parte nel codice)
     property SelectorFor: IioNotifiableBindSource read FSelectorFor write SetSelectorFor; // published: Master
+  published
+    property _Version: String read Get_Version;
   end;
 
 implementation
@@ -749,6 +752,11 @@ begin
     FWhere := TioWhereFactory.NewWhereWithPaging(FPaging);
   // Return the Where instance
   Result := FWhere;
+end;
+
+function TioModelPresenterCustom.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioModelPresenterCustom.Insert;

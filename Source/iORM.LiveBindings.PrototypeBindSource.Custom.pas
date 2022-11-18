@@ -94,6 +94,7 @@ type
     FAfterOpen: TNotifyEvent;
     FBeforeClose: TNotifyEvent;
     FBeforeOpen: TNotifyEvent;
+    function Get_Version: String;
     procedure OpenCloseDetails(const AActive: Boolean);
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
@@ -285,6 +286,7 @@ type
     property AutoActivate: Boolean read GetAutoActivate write SetAutoActivate default False;
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property Preview: Boolean read FPreview write SetPreview default False;
+    property _Version: String read Get_Version;
   end;
 
 implementation
@@ -634,6 +636,11 @@ begin
     Result := LActiveBSA.ioWhere
   else
     Result := nil;
+end;
+
+function TioPrototypeBindSourceCustom.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioPrototypeBindSourceCustom.InitAsDefaultOnCreate;
