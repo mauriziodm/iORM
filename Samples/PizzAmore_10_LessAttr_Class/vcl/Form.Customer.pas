@@ -71,8 +71,8 @@ procedure TCustomerForm.ButtonManualSetDataObjectClick(Sender: TObject);
 var
   LCustomer: TCustomer;
 begin
-  DSCustomer.SourceDataSet := nil;
-  LCustomer := io.Load<TCustomer>(2);
+  DSCustomer.SourceBS := nil;
+  LCustomer := io.LoadObject<TCustomer>(2);
   DSCustomer.LoadType := ltManual;
   DSCustomer.Open;
   DSCustomer.SetDataObject(LCustomer);

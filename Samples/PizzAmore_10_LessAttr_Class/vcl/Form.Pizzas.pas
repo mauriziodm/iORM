@@ -67,7 +67,7 @@ end;
 procedure TPizzasForm.acShowExecute(Sender: TObject);
 begin
     Application.CreateForm(TPizzaForm, PizzaForm);
-    PizzaForm.DSPizza.SourceDataSet := DSPizzas;
+    PizzaForm.DSPizza.SourceBS := DSPizzas;
     PizzaForm.Show;
 end;
 

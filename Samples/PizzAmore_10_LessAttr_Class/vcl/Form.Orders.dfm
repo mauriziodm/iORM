@@ -176,6 +176,7 @@ object OrdersForm: TOrdersForm
       end>
   end
   object DSOrders: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TOrder'
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'

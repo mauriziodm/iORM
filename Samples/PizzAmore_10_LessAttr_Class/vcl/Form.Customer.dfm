@@ -282,6 +282,7 @@ object CustomerForm: TCustomerForm
     TabOrder = 6
   end
   object DSCustomer: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TCustomer'
     LoadType = ltFromBSAsIs
     TypeOfCollection = tcSingleObject

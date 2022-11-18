@@ -3,10 +3,10 @@
         <ProjectGuid>{39ABCB18-C20E-428C-9A69-8BA1BED36324}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj">
+        <Projects Include="PizzAmore_10_LessAttr_Class\fmx\PizzAmore_10_LessAttr_Class_fmx_tablet.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="PizzAmore_10_LessAttr_Class\fmx\PizzAmore_10_LessAttr_Class_fmx_tablet.dproj">
+        <Projects Include="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="PizzAmore_20_MoreAttr_Class\vcl\PizzAmore_20_MoreAttr_Class_vcl_desktop.dproj">
@@ -15,16 +15,28 @@
         <Projects Include="PizzAmore_20_MoreAttr_Class\dmvc_server\PizzAmore_20_MoreAttr_Class_vcl_dmvc_server.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="PizzAmore_30_LessAttr_Intf\vcl\PizzAmore_30_LessAttr_Intf_vcl_desktop.dproj">
+        <Projects Include="PizzAmore_25_LessAttr_Class_simpleviews\fmx\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj">
+        <Projects Include="PizzAmore_25_LessAttr_Class_simpleviews\vcl\PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PizzAmore_27_LessAttr_Intf_simplemicroviews\fmx\PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PizzAmore_27_LessAttr_Intf_simplemicroviews\vcl\PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="PizzAmore_30_LessAttr_Intf\mvvm_fmx\PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="PizzAmore_40_LessAttr_Intf_microviews\mvvm_fmx\PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PizzAmore_40_LessAttr_Intf_microviews\mvvm_vcl\PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -35,15 +47,6 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="PizzAmore_10_LessAttr_Class_vcl_desktop">
-        <MSBuild Projects="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj"/>
-    </Target>
-    <Target Name="PizzAmore_10_LessAttr_Class_vcl_desktop:Clean">
-        <MSBuild Projects="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="PizzAmore_10_LessAttr_Class_vcl_desktop:Make">
-        <MSBuild Projects="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj" Targets="Make"/>
-    </Target>
     <Target Name="PizzAmore_10_LessAttr_Class_fmx_tablet">
         <MSBuild Projects="PizzAmore_10_LessAttr_Class\fmx\PizzAmore_10_LessAttr_Class_fmx_tablet.dproj"/>
     </Target>
@@ -52,6 +55,15 @@
     </Target>
     <Target Name="PizzAmore_10_LessAttr_Class_fmx_tablet:Make">
         <MSBuild Projects="PizzAmore_10_LessAttr_Class\fmx\PizzAmore_10_LessAttr_Class_fmx_tablet.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_10_LessAttr_Class_vcl_desktop">
+        <MSBuild Projects="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_10_LessAttr_Class_vcl_desktop:Clean">
+        <MSBuild Projects="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_10_LessAttr_Class_vcl_desktop:Make">
+        <MSBuild Projects="PizzAmore_10_LessAttr_Class\vcl\PizzAmore_10_LessAttr_Class_vcl_desktop.dproj" Targets="Make"/>
     </Target>
     <Target Name="PizzAmore_20_MoreAttr_Class_vcl_desktop">
         <MSBuild Projects="PizzAmore_20_MoreAttr_Class\vcl\PizzAmore_20_MoreAttr_Class_vcl_desktop.dproj"/>
@@ -71,23 +83,41 @@
     <Target Name="PizzAmore_20_MoreAttr_Class_vcl_dmvc_server:Make">
         <MSBuild Projects="PizzAmore_20_MoreAttr_Class\dmvc_server\PizzAmore_20_MoreAttr_Class_vcl_dmvc_server.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PizzAmore_30_LessAttr_Intf_vcl_desktop">
-        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\vcl\PizzAmore_30_LessAttr_Intf_vcl_desktop.dproj"/>
+    <Target Name="PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile">
+        <MSBuild Projects="PizzAmore_25_LessAttr_Class_simpleviews\fmx\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dproj"/>
     </Target>
-    <Target Name="PizzAmore_30_LessAttr_Intf_vcl_desktop:Clean">
-        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\vcl\PizzAmore_30_LessAttr_Intf_vcl_desktop.dproj" Targets="Clean"/>
+    <Target Name="PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile:Clean">
+        <MSBuild Projects="PizzAmore_25_LessAttr_Class_simpleviews\fmx\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PizzAmore_30_LessAttr_Intf_vcl_desktop:Make">
-        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\vcl\PizzAmore_30_LessAttr_Intf_vcl_desktop.dproj" Targets="Make"/>
+    <Target Name="PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile:Make">
+        <MSBuild Projects="PizzAmore_25_LessAttr_Class_simpleviews\fmx\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop">
-        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj"/>
+    <Target Name="PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop">
+        <MSBuild Projects="PizzAmore_25_LessAttr_Class_simpleviews\vcl\PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop.dproj"/>
     </Target>
-    <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Clean">
-        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj" Targets="Clean"/>
+    <Target Name="PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop:Clean">
+        <MSBuild Projects="PizzAmore_25_LessAttr_Class_simpleviews\vcl\PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Make">
-        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj" Targets="Make"/>
+    <Target Name="PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop:Make">
+        <MSBuild Projects="PizzAmore_25_LessAttr_Class_simpleviews\vcl\PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile">
+        <MSBuild Projects="PizzAmore_27_LessAttr_Intf_simplemicroviews\fmx\PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile:Clean">
+        <MSBuild Projects="PizzAmore_27_LessAttr_Intf_simplemicroviews\fmx\PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile:Make">
+        <MSBuild Projects="PizzAmore_27_LessAttr_Intf_simplemicroviews\fmx\PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop">
+        <MSBuild Projects="PizzAmore_27_LessAttr_Intf_simplemicroviews\vcl\PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop:Clean">
+        <MSBuild Projects="PizzAmore_27_LessAttr_Intf_simplemicroviews\vcl\PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop:Make">
+        <MSBuild Projects="PizzAmore_27_LessAttr_Intf_simplemicroviews\vcl\PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop.dproj" Targets="Make"/>
     </Target>
     <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile">
         <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_fmx\PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile.dproj"/>
@@ -98,6 +128,15 @@
     <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile:Make">
         <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_fmx\PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop">
+        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Clean">
+        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Make">
+        <MSBuild Projects="PizzAmore_30_LessAttr_Intf\mvvm_vcl\PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop.dproj" Targets="Make"/>
+    </Target>
     <Target Name="PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews">
         <MSBuild Projects="PizzAmore_40_LessAttr_Intf_microviews\mvvm_fmx\PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.dproj"/>
     </Target>
@@ -107,14 +146,23 @@
     <Target Name="PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews:Make">
         <MSBuild Projects="PizzAmore_40_LessAttr_Intf_microviews\mvvm_fmx\PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews">
+        <MSBuild Projects="PizzAmore_40_LessAttr_Intf_microviews\mvvm_vcl\PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews:Clean">
+        <MSBuild Projects="PizzAmore_40_LessAttr_Intf_microviews\mvvm_vcl\PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews:Make">
+        <MSBuild Projects="PizzAmore_40_LessAttr_Intf_microviews\mvvm_vcl\PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="PizzAmore_10_LessAttr_Class_vcl_desktop;PizzAmore_10_LessAttr_Class_fmx_tablet;PizzAmore_20_MoreAttr_Class_vcl_desktop;PizzAmore_20_MoreAttr_Class_vcl_dmvc_server;PizzAmore_30_LessAttr_Intf_vcl_desktop;PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop;PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile;PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews"/>
+        <CallTarget Targets="PizzAmore_10_LessAttr_Class_fmx_tablet;PizzAmore_10_LessAttr_Class_vcl_desktop;PizzAmore_20_MoreAttr_Class_vcl_desktop;PizzAmore_20_MoreAttr_Class_vcl_dmvc_server;PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile;PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop;PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile;PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop;PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile;PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop;PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews;PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="PizzAmore_10_LessAttr_Class_vcl_desktop:Clean;PizzAmore_10_LessAttr_Class_fmx_tablet:Clean;PizzAmore_20_MoreAttr_Class_vcl_desktop:Clean;PizzAmore_20_MoreAttr_Class_vcl_dmvc_server:Clean;PizzAmore_30_LessAttr_Intf_vcl_desktop:Clean;PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Clean;PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile:Clean;PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews:Clean"/>
+        <CallTarget Targets="PizzAmore_10_LessAttr_Class_fmx_tablet:Clean;PizzAmore_10_LessAttr_Class_vcl_desktop:Clean;PizzAmore_20_MoreAttr_Class_vcl_desktop:Clean;PizzAmore_20_MoreAttr_Class_vcl_dmvc_server:Clean;PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile:Clean;PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop:Clean;PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile:Clean;PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop:Clean;PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile:Clean;PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Clean;PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews:Clean;PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="PizzAmore_10_LessAttr_Class_vcl_desktop:Make;PizzAmore_10_LessAttr_Class_fmx_tablet:Make;PizzAmore_20_MoreAttr_Class_vcl_desktop:Make;PizzAmore_20_MoreAttr_Class_vcl_dmvc_server:Make;PizzAmore_30_LessAttr_Intf_vcl_desktop:Make;PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Make;PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile:Make;PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews:Make"/>
+        <CallTarget Targets="PizzAmore_10_LessAttr_Class_fmx_tablet:Make;PizzAmore_10_LessAttr_Class_vcl_desktop:Make;PizzAmore_20_MoreAttr_Class_vcl_desktop:Make;PizzAmore_20_MoreAttr_Class_vcl_dmvc_server:Make;PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile:Make;PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop:Make;PizzAmore_27_LessAttr_Intf_simplemicroview_fmx_mobile:Make;PizzAmore_27_LessAttr_Intf_simplemicroview_vcl_desktop:Make;PizzAmore_30_LessAttr_Intf_mvvm_fmx_mobile:Make;PizzAmore_30_LessAttr_Intf_mvvm_vcl_desktop:Make;PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews:Make;PizzAmore_40_LessAttr_Intf_mvvm_vcl_desktop_microviews:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

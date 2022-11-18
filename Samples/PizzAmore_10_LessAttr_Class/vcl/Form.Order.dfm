@@ -514,6 +514,7 @@ object OrderForm: TOrderForm
       end>
   end
   object DSPizzas: TioDataSetMaster
+    AsDefault = False
     TypeName = 'TPizza'
     SelectorFor = DSOrder
     Paging.CurrentPageOfFormat = '%d/%d'
@@ -538,6 +539,7 @@ object OrderForm: TOrderForm
     Top = 240
   end
   object DSOrder: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TOrder'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
@@ -568,7 +570,7 @@ object OrderForm: TOrderForm
     Top = 312
   end
   object DSCustomer: TioDataSetDetail
-    MasterDataSet = DSOrder
+    MasterBindSource = DSOrder
     MasterPropertyName = 'Customer'
     Left = 56
     Top = 376
@@ -595,7 +597,7 @@ object OrderForm: TOrderForm
     Top = 376
   end
   object DSRows: TioDataSetDetail
-    MasterDataSet = DSOrder
+    MasterBindSource = DSOrder
     MasterPropertyName = 'Rows'
     OnReceiveSelectionCloneObject = False
     OnReceiveSelectionFreeObject = False

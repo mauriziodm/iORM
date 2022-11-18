@@ -213,6 +213,7 @@ object CustomersForm: TCustomersForm
       end>
   end
   object DSCustomers: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TCustomer'
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'

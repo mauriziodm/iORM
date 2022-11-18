@@ -69,7 +69,7 @@ end;
 procedure TOrdersForm.acShowExecute(Sender: TObject);
 begin
     Application.CreateForm(TOrderForm, OrderForm);
-    OrderForm.DSOrder.SourceDataSet := DSOrders;
+    OrderForm.DSOrder.SourceBS := DSOrders;
     OrderForm.Show;
 end;
 
