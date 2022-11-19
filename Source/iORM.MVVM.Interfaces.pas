@@ -50,6 +50,7 @@ type
   // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
+    function CloseQuery: Boolean;
     function VMActions: IioVMActionContainer;
     // VCProvider local register
     function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;

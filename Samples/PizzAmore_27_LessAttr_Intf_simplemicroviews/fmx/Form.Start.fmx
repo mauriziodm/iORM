@@ -5259,11 +5259,11 @@ object StartForm: TStartForm
     Top = 504
   end
   object VCProvider: TioViewContextProvider
+    AsDefault = True
     OnAfterRequest = VCProviderAfterRequest
     OnBeforeRelease = VCProviderBeforeRelease
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
-    AsDefault = True
     Left = 96
     Top = 448
   end

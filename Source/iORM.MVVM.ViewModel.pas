@@ -39,7 +39,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.MVVM.VMActionContainer, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces;
+  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces, Vcl.Forms;
 
 type
 
@@ -52,6 +52,7 @@ type
     FVMActionContainer: IioVMActionContainer;
     FViewRegister: IioViewRegisterMVVM;
     FLocalVCProviderRegister: IioLocalVCProviderRegister;
+    FOnCloseQuery: TCloseQueryEvent;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
@@ -67,6 +68,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function VMActions: IioVMActionContainer;
+    function CloseQuery: Boolean; virtual;
     procedure Close;
     procedure Hide;
     procedure Show;
@@ -81,6 +83,7 @@ type
     property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
   published
     // Events
+    property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
     property OnViewPairing: TioVMOnViewPairingEvent read FOnViewPairing write FOnViewPairing;
   end;
 
@@ -189,7 +192,15 @@ end;
 
 procedure TioViewModel.Close;
 begin
-  FViewRegister.ReleaseAllViewContexts;
+  if CloseQuery then
+    FViewRegister.ReleaseAllViewContexts;
+end;
+
+function TioViewModel.CloseQuery: Boolean;
+begin
+  Result := True;
+  if Assigned(FOnCloseQuery) then
+    FOnCloseQuery(Self, Result);
 end;
 
 end.
