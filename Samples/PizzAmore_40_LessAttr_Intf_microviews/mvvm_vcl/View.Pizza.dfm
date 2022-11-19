@@ -129,18 +129,18 @@ inherited ViewPizza: TViewPizza
       TabOrder = 5
     end
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterID: TIntegerField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterName: TStringField
+    object BSMasterName: TStringField
       FieldName = 'Name'
       Size = 250
     end
-    object MDSMasterPrice: TCurrencyField
+    object BSMasterPrice: TCurrencyField
       FieldName = 'Price'
     end
-    object MDSMasterImage: TGraphicField
+    object BSMasterImage: TGraphicField
       FieldName = 'Image'
       BlobType = ftGraphic
     end

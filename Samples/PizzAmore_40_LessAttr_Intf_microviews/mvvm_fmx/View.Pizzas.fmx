@@ -10,7 +10,7 @@ inherited ViewPizzas: TViewPizzas
     ItemEditAppearanceClassName = 'TImageListItemBottomDetailShowCheckAppearance'
     ItemIndex = 0
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     AutoActivate = True
     FieldDefs = <
       item
@@ -39,7 +39,7 @@ inherited ViewPizzas: TViewPizzas
     Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Name'
       Control = ListView
       FillExpressions = <

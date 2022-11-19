@@ -213,8 +213,8 @@ inherited ViewOrder: TViewOrder
         Left = 186
         Top = 95
       end
-      inherited MBSCustomer: TioModelBindSource
-        CrossView_MasterBindSource = MBSMaster
+      inherited BSCustomer: TioModelBindSource
+        CrossView_MasterBindSource = BSMaster
         CrossView_MasterPropertyName = 'Customer'
         Top = 128
       end
@@ -245,7 +245,7 @@ inherited ViewOrder: TViewOrder
   inherited VMBridge: TioViewModelBridge
     Top = 226
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     FieldDefs = <
       item
         Name = 'ID'
@@ -272,12 +272,12 @@ inherited ViewOrder: TViewOrder
       end>
     Top = 289
   end
-  object MBSRows: TioModelBindSource
+  object BSRows: TioModelBindSource
     AutoActivate = False
     FieldDefs = <>
     ScopeMappings = <>
+    ModelPresenter = 'BSRows'
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPRows'
     Left = 200
     Top = 376
   end
@@ -288,28 +288,28 @@ inherited ViewOrder: TViewOrder
     Top = 201
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'ID'
       Control = EditID
       Track = False
     end
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'OrderDate'
       Control = EditDate
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Note'
       Control = EditNote
       Track = False
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'GrandTotal'
       Control = EditGrandTotal
       Track = False
@@ -317,9 +317,9 @@ inherited ViewOrder: TViewOrder
     end
   end
   object VCProviderOrderRows: TioViewContextProvider
+    AsDefault = False
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
-    AsDefault = False
     Left = 296
     Top = 205
   end

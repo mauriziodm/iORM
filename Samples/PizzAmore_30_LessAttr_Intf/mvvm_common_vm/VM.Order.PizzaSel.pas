@@ -27,7 +27,7 @@ uses
 procedure TVMOrderPizzaSel.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(MPMaster, VCProviderByName('VCProviderOrder'), 'embedded');
+  io.ShowAsSelector<IPizza>(BSMaster, VCProviderByName('VCProviderOrder'), 'embedded');
 end;
 
 end.

@@ -30,7 +30,7 @@ type
     Label2: TLabel;
     EditTotal: TEdit;
     Label4: TLabel;
-    MBSRowPizza: TioModelBindSource;
+    BSOrderRow: TioModelBindSource;
     BindingsListPizzaRowMView: TBindingsList;
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;

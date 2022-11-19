@@ -25,7 +25,7 @@ type
     acAdd: TioViewAction;
     acShowOrSelect: TioViewAction;
     VMBridge: TioViewModelBridge;
-    MBSMaster: TioModelBindSource;
+    BSMaster: TioModelBindSource;
     procedure ListViewDblClick(Sender: TObject);
   private
     { Private declarations }

@@ -1,8 +1,4 @@
-﻿[MBSRowPizza]
-Coordinates=10,140,84,141
-Visible=True
-
-[EditTotal]
+﻿[EditTotal]
 Coordinates=174,232,58,51
 
 [Label2]
@@ -63,4 +59,8 @@ Coordinates=110,420,78,51
 
 [Rectangle2]
 Coordinates=0,0,69,33
+
+[BSOrderRow]
+Coordinates=10,140,76,141
+Visible=True
 

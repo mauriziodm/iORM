@@ -22,14 +22,14 @@ type
     DBEditPhone: TDBEdit;
     DBEditCity: TDBEdit;
     DBEditAddress: TDBEdit;
-    MDSMasterID: TIntegerField;
-    MDSMasterName: TStringField;
-    MDSMasterPhoneNumber: TStringField;
-    MDSMasterCity: TStringField;
-    MDSMasterAddress: TStringField;
+    BSMasterID: TIntegerField;
+    BSMasterName: TStringField;
+    BSMasterPhoneNumber: TStringField;
+    BSMasterCity: TStringField;
+    BSMasterAddress: TStringField;
+    BSMasterLastName: TStringField;
     Label6: TLabel;
     DBEditLastName: TDBEdit;
-    MDSMasterLastName: TStringField;
     acDelete: TioViewAction;
     Button1: TButton;
   private

@@ -29,7 +29,7 @@ type
     VMBridgeRowMView: TioViewModelBridge;
     ActionListRowMView: TActionList;
     acDelete: TioViewAction;
-    MBSOrderRow: TioModelBindSource;
+    BSOrderRow: TioModelBindSource;
     BindingsList1: TBindingsList;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;

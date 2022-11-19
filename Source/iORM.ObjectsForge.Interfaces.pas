@@ -168,7 +168,7 @@ begin
   if not Assigned(LMethod) then
     raise EioException.Create(Self.ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
   // Execute
-  Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
+   Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
   // Inject Properties/Fields: if the received ContainerItem is not assigned then
   // try to retrieve it from MapContainer
   // Inject ModelPresenters settings for ViewModels only.

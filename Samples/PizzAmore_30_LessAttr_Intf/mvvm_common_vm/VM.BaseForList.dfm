@@ -2,7 +2,7 @@ object VMBaseForList: TVMBaseForList
   OnViewPairing = ioViewModelViewPairing
   Height = 480
   Width = 640
-  object MPMaster: TioModelPresenterMaster
+  object BSMaster: TioModelPresenterMaster
     AsDefault = True
     Paging.CurrentPageOfFormat = '%d/%d'
     OnReceiveSelectionCloneObject = False
@@ -30,7 +30,7 @@ object VMBaseForList: TVMBaseForList
     Top = 176
   end
   object acDelete: TioVMActionBSPersistenceDelete
-    TargetBindSource = MPMaster
+    TargetBindSource = BSMaster
     Left = 192
     Top = 240
   end

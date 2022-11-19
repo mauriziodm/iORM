@@ -13,11 +13,11 @@ type
   [diViewFor(IOrder)]
   TViewOrders = class(TViewBaseForList)
     GridOrders: TDBGrid;
-    MDSMasterID: TIntegerField;
-    MDSMasterOrderDate: TDateTimeField;
-    MDSMasterNote: TStringField;
-    MDSMasterCustomerName: TStringField;
-    MDSMasterGrandTotal: TCurrencyField;
+    BSMasterID: TIntegerField;
+    BSMasterOrderDate: TDateTimeField;
+    BSMasterNote: TStringField;
+    BSMasterCustomerName: TStringField;
+    BSMasterGrandTotal: TCurrencyField;
     procedure GridOrdersDblClick(Sender: TObject);
   private
     { Private declarations }

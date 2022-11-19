@@ -55,8 +55,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; virtual;
-    procedure Execute;
-    procedure Update;
+    procedure Execute; virtual;
+    procedure Update; virtual;
   published
     property _Version: String read Get_Version;
   end;
@@ -96,6 +96,8 @@ type
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
     property Owner: TComponent read GetOwnerComponent;
+    procedure Execute; override;
+    procedure Update; override;
   published
     property Caption;
     property Enabled;
@@ -173,6 +175,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+    procedure Execute; override;
+    procedure Update; override;
   published
     property _Version: String read Get_Version;
   end;
@@ -494,6 +498,12 @@ begin
   FTargetBindSource := nil;
 end;
 
+procedure TioVMActionBSCustom<T>.Execute;
+begin
+  if Assigned(FTargetBindSource) then
+    inherited;
+end;
+
 function TioVMActionBSCustom<T>.Get_Version: String;
 begin
   Result := io.Version;
@@ -519,6 +529,14 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
+end;
+
+procedure TioVMActionBSCustom<T>.Update;
+begin
+  if Assigned(FTargetBindSource) then
+    inherited
+  else
+    Enabled := False;
 end;
 
 { TioBSSelectCurrentVMAction }
@@ -584,6 +602,12 @@ begin
   FRaiseIfRevertPointNotSaved := False;
 end;
 
+procedure TioVMActionBSPersistenceCustom.Execute;
+begin
+  if Assigned(FTargetBindSource) then
+    inherited;
+end;
+
 function TioVMActionBSPersistenceCustom.Get_Version: String;
 begin
   Result := io.Version;
@@ -609,6 +633,14 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
+end;
+
+procedure TioVMActionBSPersistenceCustom.Update;
+begin
+  if Assigned(FTargetBindSource) then
+    inherited
+  else
+    Enabled := False;
 end;
 
 { TioVMActionBSPersistenceSaveRevertPoint }

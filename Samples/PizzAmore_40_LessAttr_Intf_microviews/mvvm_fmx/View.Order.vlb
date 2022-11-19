@@ -38,10 +38,6 @@ Visible=True
 [LayoutGrandTotal]
 Coordinates=631,464,103,33
 
-[MBSRows]
-Coordinates=297,380,64,51
-Visible=True
-
 [EditID]
 Coordinates=341,212,44,51
 
@@ -85,10 +81,6 @@ Coordinates=270,132,62,33
 [acPersist]
 Coordinates=113,141,60,33
 
-[MBSMaster]
-Coordinates=234,212,70,123
-Visible=True
-
 [ActionList1]
 Coordinates=34,141,70,33
 
@@ -122,4 +114,43 @@ Coordinates=320,10,192,51
 
 [MicroViewCustomer1.CustomerMicroVMBridge]
 Coordinates=1065,56,245,33
+
+[MicroViewCustomer1.acShowCustomer]
+Coordinates=556,71,208,33
+
+[SpeedButton1]
+Coordinates=183,124,84,51
+
+[ScrollBoxOrderRows]
+Coordinates=556,123,117,33
+
+[MicroViewCustomer1.ButtonShowCustomer]
+Coordinates=556,1,230,51
+
+[MicroViewCustomer1.VMBridgeCustMView]
+Coordinates=1023,53,224,33
+
+[MicroViewCustomer1.BSCustomer]
+Coordinates=0,0,184,105
+Visible=True
+
+[acAddCustomPizza]
+Coordinates=407,80,109,33
+
+[acAddPizza]
+Coordinates=203,53,71,33
+
+[VCProviderOrderRows]
+Coordinates=550,175,125,33
+
+[MicroViewCustomer1.RectanglebackgroundRowMView]
+Coordinates=824,105,283,33
+
+[BSMaster]
+Coordinates=234,212,61,123
+Visible=True
+
+[BSRows]
+Coordinates=297,380,64,51
+Visible=True
 

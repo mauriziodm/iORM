@@ -301,7 +301,7 @@ inherited ViewOrder: TViewOrder
   inherited VMBridge: TioViewModelBridge
     Top = 224
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     FieldDefs = <
       item
         Name = 'ID'
@@ -326,9 +326,10 @@ inherited ViewOrder: TViewOrder
         Generator = 'Currency'
         ReadOnly = False
       end>
+    Left = 58
     Top = 280
   end
-  object MBSCustomer: TioModelBindSource
+  object BSCustomer: TioModelBindSource
     AutoActivate = False
     FieldDefs = <
       item
@@ -347,12 +348,12 @@ inherited ViewOrder: TViewOrder
         ReadOnly = False
       end>
     ScopeMappings = <>
+    ModelPresenter = 'BSCustomer'
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPCustomer'
     Left = 56
     Top = 336
   end
-  object MBSRows: TioModelBindSource
+  object BSRows: TioModelBindSource
     AutoActivate = False
     FieldDefs = <
       item
@@ -379,8 +380,8 @@ inherited ViewOrder: TViewOrder
         ReadOnly = False
       end>
     ScopeMappings = <>
+    ModelPresenter = 'BSRows'
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPRows'
     Left = 56
     Top = 392
   end
@@ -391,28 +392,28 @@ inherited ViewOrder: TViewOrder
     Top = 225
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'ID'
       Control = EditID
       Track = False
     end
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'OrderDate'
       Control = EditDate
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Note'
       Control = EditNote
       Track = False
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'GrandTotal'
       Control = EditGrandTotal
       Track = False
@@ -420,7 +421,7 @@ inherited ViewOrder: TViewOrder
     end
     object LinkControlToField5: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSCustomer
+      DataSource = BSCustomer
       FieldName = 'Name'
       Control = EditCustName
       Track = False
@@ -428,14 +429,14 @@ inherited ViewOrder: TViewOrder
     end
     object LinkControlToField6: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSCustomer
+      DataSource = BSCustomer
       FieldName = 'FullAddress'
       Control = EditCustAddress
       Track = False
     end
     object LinkGridToDataSourceMBSRows: TLinkGridToDataSource
       Category = 'Quick Bindings'
-      DataSource = MBSRows
+      DataSource = BSRows
       GridControl = StringGrid1
       Columns = <
         item

@@ -11,8 +11,8 @@ uses
 type
 
   TVMOrder = class(TVMBaseForForm)
-    MPCustomer: TioModelPresenterDetail;
-    MPRows: TioModelPresenterDetail;
+    BSCustomer: TioModelPresenterDetail;
+    BSRows: TioModelPresenterDetail;
     acDeleteRow: TioVMAction;
     acShowPizzaSelector: TioVMAction;
     acShowCustomerSelector: TioVMAction;
@@ -36,19 +36,19 @@ uses
 procedure TVMOrder.acDeleteRowExecute(Sender: TObject);
 begin
   inherited;
-  MPRows.Delete;
+  BSRows.Delete;
 end;
 
 procedure TVMOrder.acShowCustomerSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<ICustomer>(MPCustomer);
+  io.ShowAsSelector<ICustomer>(BSCustomer);
 end;
 
 procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(MPMaster);
+  io.ShowAsSelector<IPizza>(BSMaster);
 end;
 
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -57,8 +57,8 @@ var
 begin
   if Supports(ASelected, IPizza, LPizza) then
   begin
-    MPMaster.CurrentAs<IOrder>.AddPizza(LPizza);
-    MPMaster.Refresh;
+    BSMaster.CurrentAs<IOrder>.AddPizza(LPizza);
+    BSMaster.Refresh;
     ADone := True;
   end;
 end;

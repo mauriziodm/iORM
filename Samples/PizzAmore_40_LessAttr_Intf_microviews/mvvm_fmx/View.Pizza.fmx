@@ -220,7 +220,7 @@ inherited ViewPizza: TViewPizza
       end
     end
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     AutoActivate = True
     FieldDefs = <
       item
@@ -255,21 +255,21 @@ inherited ViewPizza: TViewPizza
     Top = 5
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'ID'
       Control = EditID
       Track = False
     end
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Name'
       Control = EditName
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Price'
       Control = EditUnitPrice
       Track = False
@@ -277,7 +277,7 @@ inherited ViewPizza: TViewPizza
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Image'
       Control = Image
       Track = False

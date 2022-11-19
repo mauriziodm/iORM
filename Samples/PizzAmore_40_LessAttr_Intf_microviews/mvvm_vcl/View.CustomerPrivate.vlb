@@ -16,30 +16,14 @@ Coordinates=100,256,90,36
 [PanelBottom]
 Coordinates=455,10,88,58
 
-[MDSMaster]
-Coordinates=10,10,86,168
-Visible=True
-
-[MDSMasterCity]
-Coordinates=363,276,104,36
-
-[MDSMasterAddress]
-Coordinates=505,1,129,36
-
 [VMBridge]
 Coordinates=363,331,71,36
 
 [ButtonBack]
 Coordinates=10,256,80,36
 
-[MDSMasterName]
-Coordinates=505,56,116,36
-
 [Label5]
 Coordinates=232,10,53,58
-
-[MDSMasterID]
-Coordinates=245,379,95,36
 
 [SourceMaster]
 Coordinates=105,1,94,36
@@ -58,9 +42,6 @@ Coordinates=472,188,67,36
 
 [ButtonPersist]
 Coordinates=371,188,91,36
-
-[MDSMasterPhoneNumber]
-Coordinates=491,166,164,36
 
 [Label4]
 Coordinates=169,10,53,58
@@ -88,4 +69,23 @@ Coordinates=505,331,91,36
 
 [DBEditFirstName]
 Coordinates=549,188,88,36
+
+[BSMaster]
+Coordinates=10,10,86,168
+Visible=True
+
+[BSMasterID]
+Coordinates=245,379,95,36
+
+[BSMasterName]
+Coordinates=505,56,116,36
+
+[BSMasterPhoneNumber]
+Coordinates=491,166,164,36
+
+[BSMasterCity]
+Coordinates=363,276,104,36
+
+[BSMasterAddress]
+Coordinates=505,1,129,36
 

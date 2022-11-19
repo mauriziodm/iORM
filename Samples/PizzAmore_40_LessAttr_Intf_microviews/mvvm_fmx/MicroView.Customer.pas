@@ -17,7 +17,7 @@ type
     ActionListCustMView: TActionList;
     acSelectCustomer: TioViewAction;
     VMBridgeCustMView: TioViewModelBridge;
-    MBSCustomer: TioModelBindSource;
+    BSCustomer: TioModelBindSource;
     BindingsListCustMView: TBindingsList;
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;

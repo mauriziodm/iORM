@@ -310,7 +310,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Left = 120
     Top = 50
   end
-  object MBSRowPizza: TioModelBindSource
+  object BSOrderRow: TioModelBindSource
     AutoActivate = False
     FieldDefs = <
       item
@@ -343,8 +343,8 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
         ReadOnly = False
       end>
     ScopeMappings = <>
+    ModelPresenter = 'BSOrderRow'
     ViewModelBridge = VMBridgeRowMView
-    ModelPresenter = 'MPOrderRow'
     Left = 352
     Top = 51
   end
@@ -355,14 +355,14 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Top = 53
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSRowPizza
+      DataSource = BSOrderRow
       FieldName = 'Pizza.Name'
       Control = EditPizza
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSRowPizza
+      DataSource = BSOrderRow
       FieldName = 'Pizza.Price'
       Control = EditPrice
       Track = False
@@ -370,14 +370,14 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSRowPizza
+      DataSource = BSOrderRow
       FieldName = 'Qty'
       Control = EditQty
       Track = False
     end
     object LinkControlToField5: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSRowPizza
+      DataSource = BSOrderRow
       FieldName = 'RowTotal'
       Control = EditTotal
       Track = False
@@ -385,7 +385,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     end
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSRowPizza
+      DataSource = BSOrderRow
       FieldName = 'Image'
       Control = ImagePizza
       Track = False

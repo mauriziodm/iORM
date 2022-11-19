@@ -4,10 +4,6 @@ Coordinates=336,195,62,51
 [acAdd]
 Coordinates=22,77,45,33
 
-[MBSMaster]
-Coordinates=179,37,119,105
-Visible=True
-
 [ListView]
 Coordinates=10,10,89,159
 Visible=True
@@ -65,4 +61,8 @@ Coordinates=118,1,72,33
 
 [acNextPage]
 Coordinates=118,161,72,33
+
+[BSMaster]
+Coordinates=179,37,119,105
+Visible=True
 

@@ -1,6 +1,6 @@
 inherited VMCustomers: TVMCustomers
   Width = 541
-  inherited MPMaster: TioModelPresenterMaster
+  inherited BSMaster: TioModelPresenterMaster
     TypeName = 'IGenericCustomer'
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
@@ -9,13 +9,13 @@ inherited VMCustomers: TVMCustomers
   end
   object acNextPage: TioVMActionBSNextPage
     Name = 'acNextPage'
-    TargetBindSource = MPMaster
+    TargetBindSource = BSMaster
     Left = 312
     Top = 48
   end
   object acPrevPage: TioVMActionBSPrevPage
     Name = 'acPrevPage'
-    TargetBindSource = MPMaster
+    TargetBindSource = BSMaster
     Left = 312
     Top = 112
   end

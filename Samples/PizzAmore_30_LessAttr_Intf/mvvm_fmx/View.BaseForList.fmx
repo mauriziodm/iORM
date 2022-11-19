@@ -136,11 +136,11 @@ object ViewBaseForList: TViewBaseForList
     Left = 202
     Top = 218
   end
-  object MBSMaster: TioModelBindSource
+  object BSMaster: TioModelBindSource
     AutoActivate = False
     FieldDefs = <>
     ScopeMappings = <>
-    ModelPresenter = 'MPMaster'
+    ModelPresenter = 'BSMaster'
     ViewModelBridge = VMBridge
     Left = 200
     Top = 272

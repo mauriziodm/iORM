@@ -31,10 +31,6 @@ Coordinates=339,53,50,33
 [acShowOrSelect]
 Coordinates=339,105,95,33
 
-[MBSMaster]
-Coordinates=109,10,70,105
-Visible=True
-
 [acDelete]
 Coordinates=339,157,56,33
 
@@ -49,4 +45,8 @@ Coordinates=115,234,82,33
 
 [BindingsList1]
 Coordinates=118,134,82,33
+
+[BSMaster]
+Coordinates=109,10,61,105
+Visible=True
 

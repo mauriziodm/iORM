@@ -64,15 +64,15 @@ inherited ViewPizzas: TViewPizzas
       OnDblClick = CtrlGridPizzasDblClick
     end
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterName: TStringField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterName: TStringField
       FieldName = 'Name'
       Size = 250
     end
-    object MDSMasterPrice: TCurrencyField
+    object BSMasterPrice: TCurrencyField
       FieldName = 'Price'
     end
-    object MDSMasterImage: TGraphicField
+    object BSMasterImage: TGraphicField
       FieldName = 'Image'
       BlobType = ftGraphic
     end

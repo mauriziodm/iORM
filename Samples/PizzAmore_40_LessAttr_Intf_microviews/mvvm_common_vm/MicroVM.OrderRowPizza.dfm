@@ -1,7 +1,7 @@
 object MicroVMOrderRowPizza: TMicroVMOrderRowPizza
   Height = 304
   Width = 414
-  object MPOrderRow: TioModelPresenterDetail
+  object BSOrderRow: TioModelPresenterDetail
     AsDefault = True
     TypeOfCollection = tcSingleObject
     Left = 72
@@ -19,8 +19,8 @@ object MicroVMOrderRowPizza: TMicroVMOrderRowPizza
     Left = 224
     Top = 104
   end
-  object MPPizza: TioModelPresenterDetail
-    MasterBindSource = MPOrderRow
+  object BSPizza: TioModelPresenterDetail
+    MasterBindSource = BSOrderRow
     MasterPropertyName = 'Pizza'
     TypeOfCollection = tcSingleObject
     Left = 72

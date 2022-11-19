@@ -1387,7 +1387,10 @@ begin
   LInstance := nil;
   // Get the bind source as IioNotifiableBindSource (return an empty value if ADataSet don't implement the interface)
   if not Supports(ADataSet, IioNotifiableBindSource, LBindSource) then
+  begin
     Result := TValue.Empty;
+    Exit;
+  end;
   // Check if the VirtualFields are enabled
   if not LBindSource.VirtualFields then
     raise EioException.Create(Self.ClassName, '_GetValueForBSProp',

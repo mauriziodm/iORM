@@ -28,10 +28,6 @@ Coordinates=300,53,60,33
 [acRevert]
 Coordinates=300,105,57,33
 
-[MBSMaster]
-Coordinates=10,233,75,159
-Visible=True
-
 [RectangleTitle]
 Coordinates=894,642,84,33
 
@@ -94,5 +90,9 @@ Coordinates=126,1,46,51
 
 [EditBusinessName]
 Coordinates=0,0,107,51
+Visible=True
+
+[BSMaster]
+Coordinates=10,233,75,159
 Visible=True
 

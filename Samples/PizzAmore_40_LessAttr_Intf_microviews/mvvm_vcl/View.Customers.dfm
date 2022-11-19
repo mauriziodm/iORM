@@ -1,10 +1,8 @@
 inherited ViewCustomers: TViewCustomers
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
-      Width = 700
-      Height = 40
       Caption = 'Customers'
-      ExplicitWidth = 700
+      ExplicitWidth = 80
     end
   end
   inherited PanelBottom: TPanel
@@ -45,6 +43,7 @@ inherited ViewCustomers: TViewCustomers
       Height = 40
       Align = alClient
       Alignment = taCenter
+      DataField = '%Paging.CurrentPageOf'
       DataSource = SourceMaster
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -141,23 +140,23 @@ inherited ViewCustomers: TViewCustomers
       VMActionName = 'acPrevPage'
     end
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterID: TIntegerField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterFullName: TStringField
+    object BSMasterFullName: TStringField
       FieldName = 'FullName'
       Size = 250
     end
-    object MDSMasterFullAddress: TStringField
+    object BSMasterFullAddress: TStringField
       FieldName = 'FullAddress'
       Size = 250
     end
-    object MDSMasterPhoneNumber: TStringField
+    object BSMasterPhoneNumber: TStringField
       FieldName = 'PhoneNumber'
       Size = 250
     end
-    object MDSMasterPagingCurrentPageOf: TStringField
+    object BSMasterPagingCurrentPageOf: TStringField
       FieldName = '%Paging.CurrentPageOf'
     end
   end

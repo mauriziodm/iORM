@@ -200,25 +200,25 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     ReadOnly = True
     TabOrder = 4
   end
-  object MDSorderRow: TioModelDataSet
+  object BSOrderRow: TioModelDataSet
     ViewModelBridge = OrderRowMicroVMBridge
-    ModelPresenter = 'MPOrderRow'
+    ModelPresenter = 'BSOrderRow'
     Left = 264
     Top = 58
-    object MDSorderRowDescription: TStringField
+    object BSOrderRowDescription: TStringField
       FieldName = 'Pizza.Name'
     end
-    object MDSorderRowPizzaPrice: TCurrencyField
+    object BSOrderRowPizzaPrice: TCurrencyField
       FieldName = 'Pizza.Price'
     end
-    object MDSorderRowQty: TIntegerField
+    object BSOrderRowQty: TIntegerField
       Alignment = taCenter
       FieldName = 'Qty'
     end
-    object MDSorderRowRowTotal: TCurrencyField
+    object BSOrderRowRowTotal: TCurrencyField
       FieldName = 'RowTotal'
     end
-    object MDSorderRowPizzaImage: TGraphicField
+    object BSOrderRowPizzaImage: TGraphicField
       FieldName = 'Image'
       BlobType = ftGraphic
     end
@@ -228,7 +228,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     Top = 58
   end
   object SourceOrderRow: TDataSource
-    DataSet = MDSorderRow
+    DataSet = BSOrderRow
     Left = 352
     Top = 58
   end

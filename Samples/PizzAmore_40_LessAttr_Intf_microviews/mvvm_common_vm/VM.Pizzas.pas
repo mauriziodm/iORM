@@ -29,7 +29,7 @@ uses
 
 procedure TVMPizzas.acAddExecute(Sender: TObject);
 begin
-  MPMaster.Persistence.Append( TPizza.Create as IPizza );
+  BSMaster.Persistence.Append( TPizza.Create as IPizza );
   inherited;
 end;
 

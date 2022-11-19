@@ -12,10 +12,10 @@ type
 
   [diViewFor(TPizza)]
   TViewPizza = class(TViewBaseForForm)
-    MDSMasterID: TIntegerField;
-    MDSMasterName: TStringField;
-    MDSMasterPrice: TCurrencyField;
-    MDSMasterImage: TGraphicField;
+    BSMasterID: TIntegerField;
+    BSMasterName: TStringField;
+    BSMasterPrice: TCurrencyField;
+    BSMasterImage: TGraphicField;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;

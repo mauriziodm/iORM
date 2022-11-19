@@ -1,13 +1,13 @@
 inherited VMOrder: TVMOrder
   Width = 453
-  inherited MPMaster: TioModelPresenterMaster
+  inherited BSMaster: TioModelPresenterMaster
     TypeName = 'TOrder'
     OnSelectionInterface = MPMasterSelectionInterface
   end
-  object MPRows: TioModelPresenterDetail
-    MasterBindSource = MPMaster
+  object BSRows: TioModelPresenterDetail
+    MasterBindSource = BSMaster
     MasterPropertyName = 'Rows'
-    Left = 64
+    Left = 56
     Top = 112
   end
   object acAddCustomPizza: TioVMAction

@@ -13,9 +13,9 @@ type
   [diViewFor(TPizzaOrderRow)]
   TMicroViewOrderRowPizza = class(TFrame)
     OrderRowMicroVMBridge: TioViewModelBridge;
-    MDSorderRow: TioModelDataSet;
+    BSOrderRow: TioModelDataSet;
     SourceOrderRow: TDataSource;
-    MDSorderRowDescription: TStringField;
+    BSOrderRowDescription: TStringField;
     DBImage1: TDBImage;
     Label2: TLabel;
     DBEditNote: TDBEdit;
@@ -25,10 +25,10 @@ type
     DBEditQty: TDBEdit;
     Label4: TLabel;
     DBEditRowTotal: TDBEdit;
-    MDSorderRowPizzaPrice: TCurrencyField;
-    MDSorderRowPizzaImage: TGraphicField;
-    MDSorderRowQty: TIntegerField;
-    MDSorderRowRowTotal: TCurrencyField;
+    BSOrderRowPizzaPrice: TCurrencyField;
+    BSOrderRowPizzaImage: TGraphicField;
+    BSOrderRowQty: TIntegerField;
+    BSOrderRowRowTotal: TCurrencyField;
     Shape1: TShape;
     ActionList1: TActionList;
     acDelete: TioViewAction;

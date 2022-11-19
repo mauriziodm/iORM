@@ -233,27 +233,27 @@ inherited ViewCustomerPrivate: TViewCustomerPrivate
       VMActionName = 'acDelete'
     end
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterID: TIntegerField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterName: TStringField
+    object BSMasterName: TStringField
       FieldName = 'FirstName'
       Size = 250
     end
-    object MDSMasterLastName: TStringField
+    object BSMasterLastName: TStringField
       FieldName = 'LastName'
       Size = 250
     end
-    object MDSMasterPhoneNumber: TStringField
+    object BSMasterPhoneNumber: TStringField
       FieldName = 'PhoneNumber'
       Size = 250
     end
-    object MDSMasterCity: TStringField
+    object BSMasterCity: TStringField
       FieldName = 'City'
       Size = 250
     end
-    object MDSMasterAddress: TStringField
+    object BSMasterAddress: TStringField
       FieldName = 'Address'
       Size = 250
     end

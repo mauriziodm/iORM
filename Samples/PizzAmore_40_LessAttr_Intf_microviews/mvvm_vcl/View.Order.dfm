@@ -224,8 +224,8 @@ inherited ViewOrder: TViewOrder
       Width = 333
       ExplicitWidth = 333
     end
-    inherited MDSCustomer: TioModelDataSet
-      CrossView_MasterBindSource = MDSMaster
+    inherited BSCustomer: TioModelDataSet
+      CrossView_MasterBindSource = BSMaster
       CrossView_MasterPropertyName = 'Customer'
     end
   end
@@ -240,20 +240,20 @@ inherited ViewOrder: TViewOrder
       VMActionName = 'acAddCustomPizza'
     end
   end
-  inherited MDSMaster: TioModelDataSet [4]
+  inherited BSMaster: TioModelDataSet [4]
     Left = 171
     Top = 426
-    object MDSMasterID: TIntegerField
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterOrderDate: TDateField
+    object BSMasterOrderDate: TDateField
       FieldName = 'OrderDate'
     end
-    object MDSMasterNote: TStringField
+    object BSMasterNote: TStringField
       FieldName = 'Note'
       Size = 250
     end
-    object MDSMasterGrandTotal: TCurrencyField
+    object BSMasterGrandTotal: TCurrencyField
       FieldName = 'GrandTotal'
     end
   end
@@ -265,41 +265,41 @@ inherited ViewOrder: TViewOrder
     Left = 294
     Top = 426
   end
-  object MDSRows: TioModelDataSet
+  object BSRows: TioModelDataSet
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPRows'
+    ModelPresenter = 'BSRows'
     Left = 172
     Top = 482
-    object MDSRowsDescription: TStringField
+    object BSRowsDescription: TStringField
       FieldName = 'Description'
       Size = 250
     end
-    object MDSRowsPrice: TCurrencyField
+    object BSRowsPrice: TCurrencyField
       FieldName = 'Price'
     end
-    object MDSRowsQty: TIntegerField
+    object BSRowsQty: TIntegerField
       FieldName = 'Qty'
     end
-    object MDSRowsRowTotal: TCurrencyField
+    object BSRowsRowTotal: TCurrencyField
       FieldName = 'RowTotal'
     end
   end
   object SourceRows: TDataSource
-    DataSet = MDSRows
+    DataSet = BSRows
     Left = 294
     Top = 482
   end
   object VCProviderOrderPizzaSel: TioViewContextProvider
+    AsDefault = False
     OnAfterRequest = VCProviderOrderPizzaSelAfterRequest
     OnRequest = VCProviderOrderPizzaSelRequest
-    AsDefault = False
     Left = 293
     Top = 314
   end
   object VCProviderOrderRows: TioViewContextProvider
+    AsDefault = False
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
-    AsDefault = False
     Left = 293
     Top = 370
   end

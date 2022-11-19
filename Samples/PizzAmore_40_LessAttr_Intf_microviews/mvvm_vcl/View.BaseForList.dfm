@@ -49,8 +49,8 @@ object ViewBaseForList: TViewBaseForList
     object LabelTitle: TLabel
       Left = 50
       Top = 0
-      Width = 34
-      Height = 21
+      Width = 700
+      Height = 40
       Align = alClient
       Alignment = taCenter
       Caption = 'Title'
@@ -61,6 +61,8 @@ object ViewBaseForList: TViewBaseForList
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
+      ExplicitWidth = 34
+      ExplicitHeight = 21
     end
   end
   object PanelBottom: TPanel
@@ -137,9 +139,9 @@ object ViewBaseForList: TViewBaseForList
       VMActionName = 'acShowOrSelect'
     end
   end
-  object MDSMaster: TioModelDataSet
+  object BSMaster: TioModelDataSet
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPMaster'
+    ModelPresenter = 'BSMaster'
     Left = 203
     Top = 274
   end
@@ -148,7 +150,7 @@ object ViewBaseForList: TViewBaseForList
     Top = 218
   end
   object SourceMaster: TDataSource
-    DataSet = MDSMaster
+    DataSet = BSMaster
     Left = 286
     Top = 274
   end

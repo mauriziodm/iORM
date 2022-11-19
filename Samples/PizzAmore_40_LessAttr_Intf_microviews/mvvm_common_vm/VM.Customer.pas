@@ -26,7 +26,7 @@ implementation
 procedure TVMCustomer.acDeleteExecute(Sender: TObject);
 begin
   inherited;
-  MPMaster.Delete;
+  BSMaster.Delete;
   Close;
 end;
 

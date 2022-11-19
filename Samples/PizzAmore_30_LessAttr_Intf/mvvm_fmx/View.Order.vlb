@@ -7,10 +7,6 @@ Coordinates=366,574,69,33
 [ActionList1]
 Coordinates=119,159,78,36
 
-[MBSMaster]
-Coordinates=10,140,81,146
-Visible=True
-
 [RectangleTitle]
 Coordinates=132,574,97,36
 
@@ -37,10 +33,6 @@ Coordinates=315,105,71,36
 
 [ButtonSelectCustomer]
 Coordinates=195,497,143,58
-
-[MBSCustomer]
-Coordinates=274,38,98,124
-Visible=True
 
 [LayoutOrderData]
 Coordinates=242,574,113,36
@@ -69,10 +61,6 @@ Visible=True
 
 [LayoutGrandTotal]
 Coordinates=733,497,117,36
-
-[MBSRows]
-Coordinates=562,10,74,146
-Visible=True
 
 [EditID]
 Coordinates=182,121,50,58
@@ -119,4 +107,16 @@ Coordinates=397,80,163,36
 
 [acDeleteRow]
 Coordinates=88,52,91,36
+
+[BSMaster]
+Coordinates=10,140,81,146
+Visible=True
+
+[BSCustomer]
+Coordinates=274,38,98,124
+Visible=True
+
+[BSRows]
+Coordinates=562,10,74,146
+Visible=True
 

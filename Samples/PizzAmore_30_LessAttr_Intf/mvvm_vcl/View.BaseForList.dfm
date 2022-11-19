@@ -139,9 +139,9 @@ object ViewBaseForList: TViewBaseForList
       VMActionName = 'acShowOrSelect'
     end
   end
-  object MDSMaster: TioModelDataSet
+  object BSMaster: TioModelDataSet
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPMaster'
+    ModelPresenter = 'BSMaster'
     Left = 203
     Top = 274
   end
@@ -150,7 +150,7 @@ object ViewBaseForList: TViewBaseForList
     Top = 218
   end
   object SourceMaster: TDataSource
-    DataSet = MDSMaster
+    DataSet = BSMaster
     Left = 286
     Top = 274
   end

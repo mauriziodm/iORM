@@ -13,17 +13,16 @@ type
   [diViewFor(ICustomer)]
   TViewCustomers = class(TViewBaseForList)
     GridCustomers: TDBGrid;
-    MDSMasterID: TIntegerField;
-    MDSMasterName: TStringField;
-    MDSMasterPhoneNumber: TStringField;
-    MDSMasterFullAddress: TStringField;
-    MDSMasterPagingCurrentPageOf: TStringField;
+    BSMasterID: TIntegerField;
+    BSMasterName: TStringField;
+    BSMasterPhoneNumber: TStringField;
+    BSMasterFullAddress: TStringField;
+    BSMasterPagingCurrentPageOf: TStringField;
     ButtonPageDown: TSpeedButton;
     ButtonPageUp: TSpeedButton;
     DBTextPageOf: TDBText;
     acNextPage: TioViewAction;
     acPrevPage: TioViewAction;
-    Button1: TButton;
     acSetDataObject: TioViewAction;
     procedure GridCustomersDblClick(Sender: TObject);
   private

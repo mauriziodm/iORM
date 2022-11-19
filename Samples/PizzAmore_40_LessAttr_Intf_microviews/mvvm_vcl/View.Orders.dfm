@@ -90,22 +90,22 @@ inherited ViewOrders: TViewOrders
         Visible = True
       end>
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterID: TIntegerField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterOrderDate: TDateTimeField
+    object BSMasterOrderDate: TDateTimeField
       FieldName = 'OrderDate'
     end
-    object MDSMasterNote: TStringField
+    object BSMasterNote: TStringField
       FieldName = 'Note'
       Size = 250
     end
-    object MDSMasterCustomerName: TStringField
+    object BSMasterCustomerName: TStringField
       FieldName = 'Customer.FullName'
       Size = 250
     end
-    object MDSMasterGrandTotal: TCurrencyField
+    object BSMasterGrandTotal: TCurrencyField
       FieldName = 'GrandTotal'
     end
   end

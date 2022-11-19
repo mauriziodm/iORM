@@ -1,7 +1,7 @@
 object MicroVMCustomer: TMicroVMCustomer
   Height = 283
   Width = 355
-  object MPCustomer: TioModelPresenterDetail
+  object BSCustomer: TioModelPresenterDetail
     AsDefault = True
     TypeOfCollection = tcSingleObject
     Left = 72

@@ -162,24 +162,24 @@ object MicroViewCustomer: TMicroViewCustomer
     ReadOnly = True
     TabOrder = 3
   end
-  object MDSCustomer: TioModelDataSet
+  object BSCustomer: TioModelDataSet
     ViewModelBridge = VMBridgeMView
-    ModelPresenter = 'MPCustomer'
+    ModelPresenter = 'BSCustomer'
     Left = 276
     Top = 48
-    object MDSCustomerID: TIntegerField
+    object BSCustomerID: TIntegerField
       Alignment = taCenter
       FieldName = 'ID'
     end
-    object MDSCustomerName: TStringField
+    object BSCustomerName: TStringField
       FieldName = 'FullName'
       Size = 250
     end
-    object MDSCustomerFullAddress: TStringField
+    object BSCustomerFullAddress: TStringField
       FieldName = 'FullAddress'
       Size = 250
     end
-    object MDSCustomerPhoneNumber: TStringField
+    object BSCustomerPhoneNumber: TStringField
       FieldName = 'PhoneNumber'
       Size = 250
     end
@@ -191,7 +191,7 @@ object MicroViewCustomer: TMicroViewCustomer
     Top = 47
   end
   object SourceCustomer: TDataSource
-    DataSet = MDSCustomer
+    DataSet = BSCustomer
     Left = 366
     Top = 48
   end

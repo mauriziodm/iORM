@@ -22,7 +22,7 @@ type
     acAdd: TioViewAction;
     acDelete: TioViewAction;
     VMBridge: TioViewModelBridge;
-    MDSMaster: TioModelDataSet;
+    BSMaster: TioModelDataSet;
     SourceMaster: TDataSource;
   private
     { Private declarations }

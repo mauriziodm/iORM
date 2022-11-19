@@ -13,8 +13,8 @@ type
 
   [diViewFor(TOrder)]
   TViewOrder = class(TViewBaseForForm)
-    MBSCustomer: TioModelBindSource;
-    MBSRows: TioModelBindSource;
+    BSCustomer: TioModelBindSource;
+    BSRows: TioModelBindSource;
     LayoutOrderData: TLayout;
     EditID: TEdit;
     Label1: TLabel;

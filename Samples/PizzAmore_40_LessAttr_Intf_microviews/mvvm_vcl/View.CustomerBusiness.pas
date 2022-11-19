@@ -12,12 +12,12 @@ type
 
   [diViewFor(TBusinessCustomer)]
   TViewCustomerBusiness = class(TViewBaseForForm)
-    MDSMasterID: TIntegerField;
-    MDSMasterPhoneNumber: TStringField;
-    MDSMasterAddress: TStringField;
-    MDSMasterCity: TStringField;
-    MDSMasterBusinessName: TStringField;
-    MDSMasterVAT: TStringField;
+    BSMasterID: TIntegerField;
+    BSMasterPhoneNumber: TStringField;
+    BSMasterAddress: TStringField;
+    BSMasterCity: TStringField;
+    BSMasterBusinessName: TStringField;
+    BSMasterVAT: TStringField;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;

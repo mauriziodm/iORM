@@ -8,7 +8,7 @@ inherited ViewOrders: TViewOrders
   inherited ListView: TListView
     ItemIndex = 0
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     AutoActivate = True
     FieldDefs = <
       item
@@ -37,7 +37,7 @@ inherited ViewOrders: TViewOrders
     Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Customer.Name'
       Control = ListView
       CustomFormat = '%s + '#39'  (order ID: '#39' +Owner.ID.Value + '#39')'#39

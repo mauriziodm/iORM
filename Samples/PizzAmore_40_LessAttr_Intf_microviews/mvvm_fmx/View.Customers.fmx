@@ -1,43 +1,9 @@
 inherited ViewCustomers: TViewCustomers
-  Size.Width = 400.000000000000000000
-  Size.Height = 600.000000000000000000
   inherited RectangleTitle: TRectangle
-    Size.Width = 400.000000000000000000
     inherited LabelTitle: TLabel
-      Size.Width = 400.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Customers'
-      inherited ButtonDelete: TSpeedButton
-        Position.X = 360.000000000000000000
-      end
-      inherited ButtonAdd: TSpeedButton
-        Position.X = 320.000000000000000000
-      end
     end
-  end
-  inherited ListView: TListView
-    ItemIndex = 0
-    Size.Width = 400.000000000000000000
-    Size.Height = 560.000000000000000000
-  end
-  inherited MBSMaster: TioModelBindSource
-    FieldDefs = <
-      item
-        Name = 'FullName'
-        Generator = 'ContactNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'PhoneNumber'
-        Generator = 'ColorsNames'
-        ReadOnly = False
-      end
-      item
-        Name = '%Paging.CurrentPageOf'
-        FieldType = ftUInteger
-        Generator = 'AlphaColors'
-        ReadOnly = False
-      end>
   end
   inherited ActionList1: TActionList
     object acNextPage: TioViewAction
@@ -57,6 +23,25 @@ inherited ViewCustomers: TViewCustomers
       VMActionName = 'acPrevPage'
     end
   end
+  inherited BSMaster: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'FullName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end
+      item
+        Name = '%Paging.CurrentPageOf'
+        FieldType = ftUInteger
+        Generator = 'AlphaColors'
+        ReadOnly = False
+      end>
+  end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
@@ -64,7 +49,7 @@ inherited ViewCustomers: TViewCustomers
     Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'FullName'
       Control = ListView
       FillExpressions = <

@@ -1,5 +1,5 @@
 inherited VMCustomer: TVMCustomer
-  inherited MPMaster: TioModelPresenterMaster
+  inherited BSMaster: TioModelPresenterMaster
     TypeName = 'IGenericCustomer'
   end
   object acDelete: TioVMAction

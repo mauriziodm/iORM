@@ -10,10 +10,6 @@ Coordinates=766,531,84,33
 [Rectangle1]
 Coordinates=137,608,69,33
 
-[MBSMaster]
-Coordinates=10,187,72,141
-Visible=True
-
 [acBack]
 Coordinates=52,159,50,33
 
@@ -85,4 +81,8 @@ Coordinates=420,333,82,33
 
 [BindingsList1]
 Coordinates=302,80,82,33
+
+[BSMaster]
+Coordinates=10,187,72,141
+Visible=True
 

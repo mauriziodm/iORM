@@ -216,27 +216,27 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
       TabOrder = 7
     end
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterID: TIntegerField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterBusinessName: TStringField
+    object BSMasterBusinessName: TStringField
       FieldName = 'BusinessName'
       Size = 250
     end
-    object MDSMasterPhoneNumber: TStringField
+    object BSMasterPhoneNumber: TStringField
       FieldName = 'PhoneNumber'
       Size = 250
     end
-    object MDSMasterCity: TStringField
+    object BSMasterCity: TStringField
       FieldName = 'City'
       Size = 250
     end
-    object MDSMasterAddress: TStringField
+    object BSMasterAddress: TStringField
       FieldName = 'Address'
       Size = 250
     end
-    object MDSMasterVAT: TStringField
+    object BSMasterVAT: TStringField
       FieldName = 'VAT'
       Size = 250
     end

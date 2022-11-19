@@ -23,7 +23,10 @@ type
     procedure DoBeforeScroll; override;
     // dataset virtual methods
     procedure InternalPreOpen; override;
-    /// ViewModelBridge
+    // ModelPresenter property
+    procedure SetModelPresenter(Value: String);
+    function GetModelPresenter: String;
+    // ViewModelBridge
     procedure SetViewModelBridge(const AVMBridge: TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;
   public
@@ -32,7 +35,7 @@ type
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
-    property ModelPresenter: String read FModelPresenter write FModelPresenter;
+    property ModelPresenter: String read GetModelPresenter write SetModelPresenter;
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
   end;
@@ -96,6 +99,14 @@ begin
     LBSPersistenceClient.Persistence.NotifyBeforeScroll;
 end;
 
+function TioModelDataSet.GetModelPresenter: String;
+begin
+  if FModelPresenter.IsEmpty then
+    Result := Name
+  else
+    Result := FModelPresenter;
+end;
+
 function TioModelDataSet.GetModelPresenterInstance: TioModelPresenterCustom;
 var
   LBindSource: IioNotifiableBindSource;
@@ -122,7 +133,7 @@ begin
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModelBridge not assigned.');
   if not FViewModelBridge.ViewModelIsAssigned then
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
-  if FModelPresenter.IsEmpty then
+  if ModelPresenter.IsEmpty then // Note: Do not use FModelPresenter here
     raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
   // Get the BindSourceAdapter from ViewModel and open it
   // Note: If the 'CrossViewMasterSource' property is assigned then get the BindSourceAdapter
@@ -181,6 +192,14 @@ begin
   inherited;
   if (Operation = opRemove) and (AComponent = FViewModelBridge) then
     FViewModelBridge := nil;
+end;
+
+procedure TioModelDataSet.SetModelPresenter(Value: String);
+begin
+  if UpperCase(Value.Trim) = UpperCase(Name) then
+    FModelPresenter := ''
+  else
+    FModelPresenter := Value.Trim;
 end;
 
 procedure TioModelDataSet.SetViewModelBridge(const AVMBridge: TioViewModelBridge);

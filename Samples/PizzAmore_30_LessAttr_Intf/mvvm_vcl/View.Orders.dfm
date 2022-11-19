@@ -1,8 +1,10 @@
 inherited ViewOrders: TViewOrders
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
+      Width = 700
+      Height = 40
       Caption = 'Orders'
-      ExplicitWidth = 50
+      ExplicitWidth = 700
     end
   end
   object GridOrders: TDBGrid [2]
@@ -90,22 +92,22 @@ inherited ViewOrders: TViewOrders
         Visible = True
       end>
   end
-  inherited MDSMaster: TioModelDataSet
-    object MDSMasterID: TIntegerField
+  inherited BSMaster: TioModelDataSet
+    object BSMasterID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSMasterOrderDate: TDateTimeField
+    object BSMasterOrderDate: TDateTimeField
       FieldName = 'OrderDate'
     end
-    object MDSMasterNote: TStringField
+    object BSMasterNote: TStringField
       FieldName = 'Note'
       Size = 250
     end
-    object MDSMasterCustomerName: TStringField
+    object BSMasterCustomerName: TStringField
       FieldName = 'Customer.Name'
       Size = 250
     end
-    object MDSMasterGrandTotal: TCurrencyField
+    object BSMasterGrandTotal: TCurrencyField
       FieldName = 'GrandTotal'
     end
   end

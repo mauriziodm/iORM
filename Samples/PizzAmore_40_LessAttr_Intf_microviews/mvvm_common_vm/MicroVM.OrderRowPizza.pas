@@ -17,10 +17,10 @@ type
 
   [diViewModelFor(TPizzaOrderRow)]
   TMicroVMOrderRowPizza = class(TioViewModel)
-    MPOrderRow: TioModelPresenterDetail;
+    BSOrderRow: TioModelPresenterDetail;
     acDelete: TioVMAction;
     acShow: TioVMAction;
-    MPPizza: TioModelPresenterDetail;
+    BSPizza: TioModelPresenterDetail;
     procedure acDeleteExecute(Sender: TObject);
     procedure acShowExecute(Sender: TObject);
   private
@@ -45,7 +45,7 @@ begin
   //        of a try-finally block because otherwise it would never be executed
   //        due to an "Abort" within the code that manages the Delete in the NaturalBindSource.
   try
-    MPOrderRow.Delete;
+    BSOrderRow.Delete;
   finally
     Close;
   end;
@@ -53,7 +53,7 @@ end;
 
 procedure TMicroVMOrderRowPizza.acShowExecute(Sender: TObject);
 begin
-  MPPizza.ShowCurrent;
+  BSPizza.ShowCurrent;
 end;
 
 end.

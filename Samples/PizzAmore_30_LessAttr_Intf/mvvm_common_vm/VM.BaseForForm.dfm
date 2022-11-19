@@ -1,7 +1,7 @@
 object VMBaseForForm: TVMBaseForForm
   Height = 480
   Width = 640
-  object MPMaster: TioModelPresenterMaster
+  object BSMaster: TioModelPresenterMaster
     AsDefault = True
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
@@ -18,12 +18,12 @@ object VMBaseForForm: TVMBaseForForm
     Top = 48
   end
   object acPersist: TioVMActionBSPersistencePersist
-    TargetBindSource = MPMaster
+    TargetBindSource = BSMaster
     Left = 192
     Top = 112
   end
   object acRevert: TioVMActionBSPersistenceRevertOrDelete
-    TargetBindSource = MPMaster
+    TargetBindSource = BSMaster
     Left = 192
     Top = 176
   end

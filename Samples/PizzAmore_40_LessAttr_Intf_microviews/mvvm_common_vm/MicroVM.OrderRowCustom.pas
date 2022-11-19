@@ -17,7 +17,7 @@ type
 
   [diViewModelFor(TCustomOrderRow)]
   TMicroVMOrderRowCustom = class(TioViewModel)
-    MPOrderRow: TioModelPresenterDetail;
+    BSOrderRow: TioModelPresenterDetail;
     acDelete: TioVMAction;
     procedure acDeleteExecute(Sender: TObject);
   private
@@ -42,7 +42,7 @@ begin
   //        of a try-finally block because otherwise it would never be executed
   //        due to an "Abort" within the code that manages the Delete in the NaturalBindSource.
   try
-    MPOrderRow.Delete;
+    BSOrderRow.Delete;
   finally
     Close;
   end;

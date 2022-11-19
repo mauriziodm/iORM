@@ -1,9 +1,6 @@
 ﻿[Label3]
 Coordinates=118,10,46,51
 
-[MDSCustomerName]
-Coordinates=247,78,113,33
-
 [SourceCustomer]
 Coordinates=0,0,97,33
 
@@ -13,27 +10,14 @@ Coordinates=10,212,125,33
 [DBEditCustName]
 Coordinates=228,166,99,33
 
-[MDSCustomerID]
-Coordinates=266,243,95,33
-
 [DBECustPhone]
 Coordinates=114,166,90,33
-
-[MDSCustomerPhoneNumber]
-Coordinates=428,1,155,33
 
 [DBEditCustID]
 Coordinates=10,166,81,33
 
-[MDSCustomer]
-Coordinates=10,10,85,123
-Visible=True
-
 [Label4]
 Coordinates=244,10,46,51
-
-[MDSCustomerFullAddress]
-Coordinates=428,111,144,33
 
 [DBEditCustAddress]
 Coordinates=307,10,112,33
@@ -46,4 +30,20 @@ Coordinates=428,221,91,36
 
 [VMBridgeMView]
 Coordinates=428,56,115,33
+
+[BSCustomer]
+Coordinates=10,10,85,123
+Visible=True
+
+[BSCustomerID]
+Coordinates=266,243,95,33
+
+[BSCustomerName]
+Coordinates=247,78,113,33
+
+[BSCustomerFullAddress]
+Coordinates=428,111,144,33
+
+[BSCustomerPhoneNumber]
+Coordinates=428,1,155,33
 

@@ -37,9 +37,9 @@ Coordinates=324,157,95,33
 [acDelete]
 Coordinates=324,209,56,33
 
-[MBSMaster]
-Coordinates=191,10,70,51
-
 [ActionList1]
 Coordinates=324,261,70,33
+
+[BSMaster]
+Coordinates=191,10,70,51
 

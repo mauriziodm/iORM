@@ -13,11 +13,11 @@ type
   [diViewFor(IGenericCustomer)]
   TViewCustomers = class(TViewBaseForList)
     GridCustomers: TDBGrid;
-    MDSMasterID: TIntegerField;
-    MDSMasterFullName: TStringField;
-    MDSMasterPhoneNumber: TStringField;
-    MDSMasterFullAddress: TStringField;
-    MDSMasterPagingCurrentPageOf: TStringField;
+    BSMasterID: TIntegerField;
+    BSMasterFullName: TStringField;
+    BSMasterPhoneNumber: TStringField;
+    BSMasterFullAddress: TStringField;
+    BSMasterPagingCurrentPageOf: TStringField;
     ButtonPageDown: TSpeedButton;
     ButtonPageUp: TSpeedButton;
     DBTextPageOf: TDBText;

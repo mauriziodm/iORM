@@ -1,7 +1,7 @@
 object MicroVMOrderRowCustom: TMicroVMOrderRowCustom
   Height = 304
   Width = 414
-  object MPOrderRow: TioModelPresenterDetail
+  object BSOrderRow: TioModelPresenterDetail
     AsDefault = True
     TypeOfCollection = tcSingleObject
     Left = 72

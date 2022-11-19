@@ -60,6 +60,9 @@ type
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
+    // ModelPresenter property
+    procedure SetModelPresenter(Value: String);
+    function GetModelPresenter: String;
     // Preview
     procedure SetPreview(const Value: Boolean);
   protected
@@ -85,7 +88,7 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property CrossView_MasterBindSource: IioCrossViewMasterSource read FCrossView_MasterBindSource write FCrossView_MasterBindSource;
     property CrossView_MasterPropertyName: String read FCrossView_MasterPropertyName write FCrossView_MasterPropertyName;
-    property ModelPresenter: String read FModelPresenter write FModelPresenter;
+    property ModelPresenter: String read GetModelPresenter write SetModelPresenter;
     property Preview: Boolean read FPreview write SetPreview default False;
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
     property _Version: String read Get_Version;
@@ -162,6 +165,14 @@ begin
     Result := Self.InternalAdapter.AutoPost
   else
     Result := FAutoPost;
+end;
+
+function TioModelBindSource.GetModelPresenter: String;
+begin
+  if FModelPresenter.IsEmpty then
+    Result := Name
+  else
+    Result := FModelPresenter;
 end;
 
 function TioModelBindSource.GetModelPresenterInstance: TioModelPresenterCustom;
@@ -298,6 +309,14 @@ begin
   // Update the adapter
   if CheckAdapter then
     Self.InternalAdapter.AutoPost := Value;
+end;
+
+procedure TioModelBindSource.SetModelPresenter(Value: String);
+begin
+  if UpperCase(Value.Trim) = UpperCase(Name) then
+    FModelPresenter := ''
+  else
+    FModelPresenter := Value.Trim;
 end;
 
 procedure TioModelBindSource.SetPreview(const Value: Boolean);

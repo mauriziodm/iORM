@@ -22,7 +22,7 @@ type
     acPersist: TioViewAction;
     acRevert: TioViewAction;
     VMBridge: TioViewModelBridge;
-    MBSMaster: TioModelBindSource;
+    BSMaster: TioModelBindSource;
   private
     { Private declarations }
   public

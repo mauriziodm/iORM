@@ -31,10 +31,6 @@ Coordinates=17,267,56,33
 [ButtonSelect]
 Coordinates=437,10,77,51
 
-[MBSMaster]
-Coordinates=180,10,97,105
-Visible=True
-
 [acShowOrSelect]
 Coordinates=346,1,95,33
 
@@ -49,4 +45,8 @@ Coordinates=346,105,82,33
 
 [BindingsList1]
 Coordinates=118,134,82,33
+
+[BSMaster]
+Coordinates=180,10,97,105
+Visible=True
 

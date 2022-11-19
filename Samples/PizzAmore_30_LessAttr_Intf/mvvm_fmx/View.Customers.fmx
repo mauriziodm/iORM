@@ -63,7 +63,7 @@ inherited ViewCustomers: TViewCustomers
       VMActionName = 'acPrevPage'
     end
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     AutoActivate = True
     FieldDefs = <
       item
@@ -91,7 +91,7 @@ inherited ViewCustomers: TViewCustomers
     Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Name'
       Control = ListView
       FillExpressions = <
@@ -104,7 +104,7 @@ inherited ViewCustomers: TViewCustomers
     end
     object LinkPropertyToFieldText: TLinkPropertyToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = '%Paging.CurrentPageOf'
       Component = LabelPageOf
       ComponentProperty = 'Text'

@@ -15,7 +15,7 @@ uses
 type
 
   TVMBaseForForm = class(TioViewModel)
-    MPMaster: TioModelPresenterMaster;
+    BSMaster: TioModelPresenterMaster;
     acBack: TioVMAction;
     acPersist: TioVMActionBSPersistencePersist;
     acRevert: TioVMActionBSPersistenceRevertOrDelete;

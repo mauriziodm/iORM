@@ -19,11 +19,11 @@ type
     DBEditCustAddress: TDBEdit;
     DBECustPhone: TDBEdit;
     VMBridgeMView: TioViewModelBridge;
-    MDSCustomer: TioModelDataSet;
-    MDSCustomerID: TIntegerField;
-    MDSCustomerName: TStringField;
-    MDSCustomerFullAddress: TStringField;
-    MDSCustomerPhoneNumber: TStringField;
+    BSCustomer: TioModelDataSet;
+    BSCustomerID: TIntegerField;
+    BSCustomerName: TStringField;
+    BSCustomerFullAddress: TStringField;
+    BSCustomerPhoneNumber: TStringField;
     SourceCustomer: TDataSource;
     ActionListCustMView: TActionList;
     acSelectCustomer: TioViewAction;

@@ -5,7 +5,7 @@ inherited ViewOrders: TViewOrders
       Text = 'Orders'
     end
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     FieldDefs = <
       item
         Name = 'ID'
@@ -32,7 +32,7 @@ inherited ViewOrders: TViewOrders
     Top = 5
     object LinkListControlToField1: TLinkListControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Customer.FullName'
       Control = ListView
       CustomFormat = '%s + '#39'  (order ID: '#39' +Owner.ID.Value + '#39')'#39

@@ -11,7 +11,7 @@ uses
 type
 
   TVMOrder = class(TVMBaseForForm)
-    MPRows: TioModelPresenterDetail;
+    BSRows: TioModelPresenterDetail;
     acAddCustomPizza: TioVMAction;
     acAddPizza: TioVMAction;
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
@@ -36,13 +36,13 @@ uses
 procedure TVMOrder.acAddPizzaExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(MPMaster);
+  io.ShowAsSelector<IPizza>(BSMaster);
 end;
 
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-  MPRows.ShowEach(VCProviderByName('VCProviderOrderRows'));
+  BSRows.ShowEach(VCProviderByName('VCProviderOrderRows'));
 end;
 
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -52,12 +52,12 @@ begin
   ADone := True;
   if Supports(ASelected, IPizza, LPizza) then
   begin
-    if MPMaster.CurrentAs<IOrder>.TryAddPizzaToExistingRow(LPizza) then
-      MPRows.Refresh
+    if BSMaster.CurrentAs<IOrder>.TryAddPizzaToExistingRow(LPizza) then
+      BSRows.Refresh
     else
     begin
-      MPRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
-      MPRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
+      BSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
+      BSRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
     end;
   end;
 end;
@@ -68,8 +68,8 @@ var
 begin
   inherited;
   LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
-  MPRows.Append(LNewOrderRow);
-  MPRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
+  BSRows.Append(LNewOrderRow);
+  BSRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
 end;
 
 end.

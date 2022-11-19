@@ -48,7 +48,7 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Anchors = [akLeft, akTop, akRight]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 'Mark Anderson'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 51.000000000000000000
@@ -77,7 +77,7 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
       object EditPhoneNumber: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -126,7 +126,7 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
       object EditCity: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -175,7 +175,7 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
       object EditAddress: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -224,7 +224,7 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
       object EditVAT: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -265,7 +265,7 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
       end
     end
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     AutoActivate = True
     FieldDefs = <
       item
@@ -308,42 +308,42 @@ inherited ViewCustomerBusiness: TViewCustomerBusiness
     Top = 53
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'ID'
       Control = EditID
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'PhoneNumber'
       Control = EditPhoneNumber
       Track = False
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'City'
       Control = EditCity
       Track = False
     end
     object LinkControlToField5: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Address'
       Control = EditAddress
       Track = False
     end
     object LinkControlToField6: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'VAT'
       Control = EditVAT
       Track = False
     end
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'BusinessName'
       Control = EditBusinessName
       Track = False

@@ -41,13 +41,13 @@ begin
   LList[0].Name := 'Prova1';
   LList.Add(TCustomer.Create);
   LList[1].Name := 'Prova2';
-  MPMaster.SetDataObject(LList);
+  BSMaster.SetDataObject(LList);
 end;
 
 procedure TVMCustomers.acShowOrSelectExecute(Sender: TObject);
 begin
   inherited;
-  if Assigned(MPMaster.SelectorFor) then
+  if Assigned(BSMaster.SelectorFor) then
     Close;
 end;
 

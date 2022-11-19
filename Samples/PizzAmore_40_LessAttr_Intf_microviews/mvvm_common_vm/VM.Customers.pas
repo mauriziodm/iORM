@@ -32,7 +32,7 @@ uses
 procedure TVMCustomers.acShowOrSelectExecute(Sender: TObject);
 begin
   inherited;
-  if Assigned(MPMaster.SelectorFor) then
+  if Assigned(BSMaster.SelectorFor) then
     acBack.Execute;
 end;
 

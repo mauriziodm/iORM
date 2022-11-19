@@ -38,10 +38,6 @@ Coordinates=337,174,116,33
 [Label3]
 Coordinates=519,10,46,51
 
-[MBSOrderRow]
-Coordinates=10,143,87,123
-Visible=True
-
 [acDelete]
 Coordinates=267,188,56,33
 
@@ -56,4 +52,8 @@ Coordinates=685,1,91,36
 
 [BindingsList1]
 Coordinates=129,87,82,33
+
+[BSOrderRow]
+Coordinates=10,143,78,123
+Visible=True
 

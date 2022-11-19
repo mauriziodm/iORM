@@ -5,20 +5,20 @@ inherited ViewCustomer: TViewCustomer
       Text = 'Customer'
     end
   end
-  object ListBox: TListBox [1]
+  object ListBox: TListBox [2]
     Align = Client
-    Size.Width = 380.000000000000000000
-    Size.Height = 504.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 520.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
     DisableFocusEffect = True
     DefaultItemStyles.ItemStyle = ''
     DefaultItemStyles.GroupHeaderStyle = ''
     DefaultItemStyles.GroupFooterStyle = ''
-    Viewport.Width = 376.000000000000000000
-    Viewport.Height = 500.000000000000000000
+    Viewport.Width = 396.000000000000000000
+    Viewport.Height = 516.000000000000000000
     object ListBoxItemName: TListBoxItem
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
@@ -56,7 +56,7 @@ inherited ViewCustomer: TViewCustomer
         Margins.Left = 5.000000000000000000
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000
-        Size.Width = 314.000000000000000000
+        Size.Width = 334.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
         TextPrompt = 'Type the name here'
@@ -70,7 +70,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object ListBoxItemPhoneNumber: TListBoxItem
       Position.Y = 50.000000000000000000
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
@@ -99,7 +99,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object ListBoxItemCity: TListBoxItem
       Position.Y = 100.000000000000000000
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
@@ -148,7 +148,7 @@ inherited ViewCustomer: TViewCustomer
     end
     object ListBoxItemAddress: TListBoxItem
       Position.Y = 150.000000000000000000
-      Size.Width = 376.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 3
@@ -196,7 +196,7 @@ inherited ViewCustomer: TViewCustomer
       end
     end
   end
-  inherited MBSMaster: TioModelBindSource
+  inherited BSMaster: TioModelBindSource
     FieldDefs = <
       item
         Name = 'ID'
@@ -232,35 +232,35 @@ inherited ViewCustomer: TViewCustomer
     Top = 5
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'ID'
       Control = EditID
       Track = False
     end
     object LinkControlToField2: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Name'
       Control = EditName
       Track = False
     end
     object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'PhoneNumber'
       Control = EditPhoneNumber
       Track = False
     end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'City'
       Control = EditCity
       Track = False
     end
     object LinkControlToField5: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = MBSMaster
+      DataSource = BSMaster
       FieldName = 'Address'
       Control = EditAddress
       Track = False

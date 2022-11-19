@@ -16,9 +16,9 @@ type
     DBTextName: TDBText;
     DBTextPrice: TDBText;
     DBImage: TDBImage;
-    MDSMasterName: TStringField;
-    MDSMasterPrice: TCurrencyField;
-    MDSMasterImage: TGraphicField;
+    BSMasterName: TStringField;
+    BSMasterPrice: TCurrencyField;
+    BSMasterImage: TGraphicField;
     procedure CtrlGridPizzasDblClick(Sender: TObject);
   private
     { Private declarations }

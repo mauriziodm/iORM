@@ -27,7 +27,7 @@ uses
 
 procedure TVMOrders.acAddExecute(Sender: TObject);
 begin
-  MPMaster.Persistence.Append( TOrder.Create as IOrder );
+  BSMaster.Persistence.Append( TOrder.Create as IOrder );
   inherited;
 end;
 

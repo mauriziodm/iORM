@@ -28,10 +28,6 @@ Coordinates=331,10,72,51
 [LabelTitle]
 Coordinates=512,10,62,51
 
-[MBSMaster]
-Coordinates=421,10,70,123
-Visible=True
-
 [Rectangle1]
 Coordinates=131,300,69,33
 
@@ -76,4 +72,8 @@ Coordinates=110,247,91,36
 
 [BindingsList1]
 Coordinates=145,80,82,33
+
+[BSMaster]
+Coordinates=421,10,61,123
+Visible=True
 

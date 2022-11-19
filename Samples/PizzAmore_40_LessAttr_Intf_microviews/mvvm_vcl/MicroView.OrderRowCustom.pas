@@ -20,17 +20,17 @@ type
     DBEditPrice: TDBEdit;
     DBEditQty: TDBEdit;
     DBEditRowTotal: TDBEdit;
-    MDSorderRow: TioModelDataSet;
-    MDSorderRowQty: TIntegerField;
-    MDSorderRowRowTotal: TCurrencyField;
-    MDSorderRowPizzaImage: TGraphicField;
+    BSorderRow: TioModelDataSet;
+    BSorderRowQty: TIntegerField;
+    BSorderRowRowTotal: TCurrencyField;
+    BSorderRowPizzaImage: TGraphicField;
     OrderRowMicroVMBridge: TioViewModelBridge;
     SourceOrderRow: TDataSource;
     ActionList1: TActionList;
     acDelete: TioViewAction;
     DBMemoDescription: TDBMemo;
-    MDSorderRowDescription: TStringField;
-    MDSorderRowPrice: TCurrencyField;
+    BSorderRowDescription: TStringField;
+    BSorderRowPrice: TCurrencyField;
     ButtonDelete: TSpeedButton;
   private
     { Private declarations }
