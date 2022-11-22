@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes, iORM.LiveBindings.BSPersistence;
+  iORM.CommonTypes, iORM.LiveBindings.BSPersistence, Vcl.Forms;
 
 type
 
@@ -308,9 +308,11 @@ type
   strict protected
     FExecuting: Boolean;
     FOnEditingAction: TioVMActionBSCloseQueryOnEditingAction;
+    FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+    function _CanClose: Boolean;
   protected
     procedure Loaded; override;
   public
@@ -319,6 +321,8 @@ type
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property OnEditingAction: TioVMActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
     property TargetBindSource;
+    // Events
+    property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
   end;
 
   // =================================================================================================
@@ -329,7 +333,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
-  iORM.RttiContext.Factory, Vcl.Forms;
+  iORM.RttiContext.Factory;
 
 { TioVMActionCustom }
 
@@ -933,13 +937,23 @@ begin
 end;
 
 procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;
+var
+  LEnabled: Boolean;
 begin
-  Enabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+  if Assigned(FOnCloseQuery) then
+    FOnCloseQuery(Self, LEnabled);
+  Enabled := LEnabled;
+end;
+
+function TioVMActionBSCloseQuery._CanClose: Boolean;
+begin
+  Result := Enabled;
 end;
 
 procedure TioVMActionBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := Enabled;
+  CanClose := _CanClose;
   if not FExecuting then
   begin
     CanClose := False;
