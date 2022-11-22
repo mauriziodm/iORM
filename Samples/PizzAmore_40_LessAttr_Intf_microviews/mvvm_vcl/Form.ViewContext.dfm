@@ -13,4 +13,8 @@ object ViewContextForm: TViewContextForm
   Position = poMainFormCenter
   Visible = True
   TextHeight = 15
+  object ioCloseQueryRepeater1: TioCloseQueryRepeater
+    Left = 72
+    Top = 72
+  end
 end

@@ -1,4 +1,5 @@
 inherited VMOrder: TVMOrder
+  OnViewPairing = ioViewModelViewPairing
   Width = 453
   inherited BSMaster: TioModelPresenterMaster
     TypeName = 'TOrder'

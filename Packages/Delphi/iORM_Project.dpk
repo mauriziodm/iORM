@@ -218,7 +218,8 @@ contains
   DJSON.Constants in '..\..\ExtLibs\djson\Sources\DJSON.Constants.pas',
   DJSON.Attributes in '..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas',
   iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas',
-  iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas';
+  iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas',
+  iORM.StdActions.CloseQueryRepeater in '..\..\Source\iORM.StdActions.CloseQueryRepeater.pas';
 
 end.
 

@@ -130,6 +130,7 @@ type
   published
     property TargetBindSource;
   end;
+
   // Paging PreviousPage action
   TioVMActionBSPrevPage = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
   strict protected
@@ -204,7 +205,7 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
-    property ClearAfterExecute;
+//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -215,7 +216,7 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
-    property ClearAfterExecute;
+//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -227,7 +228,7 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
-    property ClearAfterExecute;
+//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -302,6 +303,24 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TioVMActionBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
+  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom)
+  strict protected
+    FExecuting: Boolean;
+    FOnEditingAction: TioVMActionBSCloseQueryOnEditingAction;
+    procedure _InjectOnCloseEventHandler;
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  protected
+    procedure Loaded; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
+    property OnEditingAction: TioVMActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property TargetBindSource;
+  end;
+
   // =================================================================================================
   // END: MVVM STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
   // =================================================================================================
@@ -309,7 +328,8 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM;
+  System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
+  iORM.RttiContext.Factory, Vcl.Forms;
 
 { TioVMActionCustom }
 
@@ -319,6 +339,9 @@ begin
   FEnabled := True;
   FVisible := True;
   FBindedViewActionsContainer := TList<IioViewAction>.Create;
+  // Solleva una eccezione se non siamo su un ViewModel
+  if not Supports(Owner, IioViewModel) then
+    raise EioException.Create(ClassName, 'Create', Format('Component "%s" can only be used on class "TioViewModel" or its descendants.', [ClassName]));
 end;
 
 destructor TioVMActionCustom.Destroy;
@@ -847,6 +870,81 @@ begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+end;
+
+{ TioVMActionBSCloseQuery }
+
+constructor TioVMActionBSCloseQuery.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExecuting := False;
+  FOnEditingAction := eaDisable;
+end;
+
+procedure TioVMActionBSCloseQuery.Loaded;
+begin
+  inherited;
+  _InjectOnCloseEventHandler;
+end;
+
+procedure TioVMActionBSCloseQuery._InjectOnCloseEventHandler;
+var
+  LEventHandlerToInject: TMethod;
+  LEventProperty: TRttiProperty;
+begin
+  // On runtime only
+  if (csDesigning in ComponentState) then
+    Exit;
+  // Extract and check the event handler property of the owner (that is the view or the ViewContext)
+  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery');
+  if not Assigned(LEventProperty) then
+    Exit;
+  if LEventProperty.GetValue(Owner).IsEmpty then
+  begin
+    // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
+    LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
+    LEventHandlerToInject.Data := Self;
+    LEventProperty.SetValue(Owner, TValue.From<TCloseQueryEvent>(TCloseQueryEvent(LEventHandlerToInject)));
+  end
+  else
+    raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
+      Format('An "OnCloseQuery" event handler is already present in the class "%s".' +
+        #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.',
+        [Owner.ClassName, ClassName]));
+end;
+
+procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
+var
+  LViewModel: IioViewModelInternal;
+begin
+  FExecuting := True;
+  try
+    if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
+      TargetBindSource.Persistence.Persist;
+    if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
+      TargetBindSource.Persistence.Revert;
+    if Supports(Owner, IioViewModelInternal, LViewModel) then
+      LViewModel.Close
+    else
+      raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
+  finally
+    FExecuting := False;
+  end;
+end;
+
+procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;
+begin
+  Enabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+end;
+
+procedure TioVMActionBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := Enabled;
+  if not FExecuting then
+  begin
+    CanClose := False;
+    _InternalExecuteStdAction;
+  end;
 end;
 
 end.

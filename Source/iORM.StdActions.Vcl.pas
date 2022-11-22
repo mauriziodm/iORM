@@ -127,6 +127,7 @@ type
   published
     property TargetBindSource;
   end;
+
   // Paging PreviousPage action
   TioBSPrevPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   public

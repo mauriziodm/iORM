@@ -16,11 +16,10 @@ type
 
   TVMBaseForForm = class(TioViewModel)
     BSMaster: TioModelPresenterMaster;
-    acBack: TioVMAction;
     acPersist: TioVMActionBSPersistencePersist;
     acRevert: TioVMActionBSPersistenceRevertOrDelete;
-    procedure acBackExecute(Sender: TObject);
-    procedure ioViewModelViewPairing(const Sender: TioViewModel);
+    ioVMAction1: TioVMAction;
+    acBack: TioVMActionBSCloseQuery;
   private
     { Private declarations }
   public
@@ -32,15 +31,5 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
-
-procedure TVMBaseForForm.acBackExecute(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TVMBaseForForm.ioViewModelViewPairing(const Sender: TioViewModel);
-begin
-//  MPMaster.Open;
-end;
 
 end.

@@ -1,5 +1,4 @@
 object VMBaseForForm: TVMBaseForForm
-  OnViewPairing = ioViewModelViewPairing
   Height = 480
   Width = 640
   object BSMaster: TioModelPresenterMaster
@@ -12,12 +11,6 @@ object VMBaseForForm: TVMBaseForForm
     Left = 56
     Top = 48
   end
-  object acBack: TioVMAction
-    Name = 'acBack'
-    OnExecute = acBackExecute
-    Left = 192
-    Top = 48
-  end
   object acPersist: TioVMActionBSPersistencePersist
     TargetBindSource = BSMaster
     Left = 192
@@ -27,5 +20,15 @@ object VMBaseForForm: TVMBaseForForm
     TargetBindSource = BSMaster
     Left = 192
     Top = 176
+  end
+  object ioVMAction1: TioVMAction
+    Name = 'ioVMAction1'
+    Left = 304
+    Top = 224
+  end
+  object acBack: TioVMActionBSCloseQuery
+    TargetBindSource = BSMaster
+    Left = 192
+    Top = 56
   end
 end
