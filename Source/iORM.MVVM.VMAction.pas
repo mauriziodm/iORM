@@ -923,14 +923,17 @@ var
 begin
   FExecuting := True;
   try
-    if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
-      TargetBindSource.Persistence.Persist;
-    if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
-      TargetBindSource.Persistence.Revert;
-    if Supports(Owner, IioViewModelInternal, LViewModel) then
-      LViewModel.Close
-    else
-      raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
+    if _CanClose then
+    begin
+      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
+        TargetBindSource.Persistence.Persist;
+      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
+        TargetBindSource.Persistence.Revert;
+      if Supports(Owner, IioViewModelInternal, LViewModel) then
+        LViewModel.Close
+      else
+        raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
+    end;
   finally
     FExecuting := False;
   end;

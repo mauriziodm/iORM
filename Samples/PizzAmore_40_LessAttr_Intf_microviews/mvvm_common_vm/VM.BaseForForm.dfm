@@ -27,6 +27,7 @@ object VMBaseForForm: TVMBaseForForm
     Top = 224
   end
   object acBack: TioVMActionBSCloseQuery
+    OnEditingAction = eaAutoRevert
     TargetBindSource = BSMaster
     Left = 192
     Top = 56
