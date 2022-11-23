@@ -303,11 +303,10 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioVMActionBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom)
   strict protected
     FExecuting: Boolean;
-    FOnEditingAction: TioVMActionBSCloseQueryOnEditingAction;
+    FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
     procedure _InternalExecuteStdAction; override;
@@ -319,7 +318,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
-    property OnEditingAction: TioVMActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property OnEditingAction: TioActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
@@ -913,8 +912,9 @@ begin
   else
     raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
       Format('An "OnCloseQuery" event handler is already present in the class "%s".' +
-        #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.',
-        [Owner.ClassName, ClassName]));
+        #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
+        #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the ViewModel.',
+        [Owner.ClassName, ClassName, ClassName]));
 end;
 
 procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;

@@ -92,6 +92,7 @@ begin
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
+  RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSCloseQuery], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceAppend], nil);

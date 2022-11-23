@@ -3,7 +3,8 @@ unit iORM.StdActions.Vcl;
 interface
 
 uses
-  System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence;
+  System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence,
+  Vcl.Forms;
 
 type
 
@@ -298,6 +299,27 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TioBSCloseQuery = class(TioBSPersistenceStdActionVcl)
+  strict protected
+    FExecuting: Boolean;
+    FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
+    FOnCloseQuery: TCloseQueryEvent;
+    procedure _InjectOnCloseEventHandler;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+    function _CanClose: Boolean;
+  protected
+    procedure Loaded; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
+    property OnEditingAction: TioActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property TargetBindSource;
+    // Events
+    property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
+  end;
+
   // =================================================================================================
   // ENS: VCL STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
   // =================================================================================================
@@ -305,7 +327,8 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM;
+  System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
+  iORM.RttiContext.Factory;
 
 { TioBSObjStateStdAction }
 
@@ -832,6 +855,93 @@ begin
     FVMActionName := ''
   else
     FVMActionName := Value.Trim;
+end;
+
+{ TioBSCloseQuery }
+
+constructor TioBSCloseQuery.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExecuting := False;
+  FOnEditingAction := eaDisable;
+end;
+
+procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
+var
+  LViewModel: IioViewModelInternal;
+begin
+  FExecuting := True;
+  try
+    if _CanClose then
+    begin
+      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
+        TargetBindSource.Persistence.Persist;
+      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
+        TargetBindSource.Persistence.Revert;
+      if Owner is TForm then
+        TForm(Owner).Close;
+    end;
+  finally
+    FExecuting := False;
+  end;
+end;
+
+procedure TioBSCloseQuery.Loaded;
+begin
+  inherited;
+  _InjectOnCloseEventHandler;
+end;
+
+procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
+var
+  LEnabled: Boolean;
+begin
+  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+  if Assigned(FOnCloseQuery) then
+    FOnCloseQuery(Self, LEnabled);
+  Enabled := LEnabled;
+end;
+
+procedure TioBSCloseQuery._InjectOnCloseEventHandler;
+var
+  LEventHandlerToInject: TMethod;
+  LEventProperty: TRttiProperty;
+begin
+  // On runtime only
+  if (csDesigning in ComponentState) then
+    Exit;
+  // Extract and check the event handler property of the owner (that is the view or the ViewContext)
+  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery');
+  if not Assigned(LEventProperty) then
+    Exit;
+  if LEventProperty.GetValue(Owner).IsEmpty then
+  begin
+    // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
+    LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
+    LEventHandlerToInject.Data := Self;
+    LEventProperty.SetValue(Owner, TValue.From<TCloseQueryEvent>(TCloseQueryEvent(LEventHandlerToInject)));
+  end
+  else
+    raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
+      Format('An "OnCloseQuery" event handler is already present in the class "%s".' +
+        #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
+        #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the form.',
+        [Owner.ClassName, ClassName, ClassName]));
+end;
+
+function TioBSCloseQuery._CanClose: Boolean;
+begin
+  Result := Enabled;
+end;
+
+procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := _CanClose;
+  if not FExecuting then
+  begin
+    CanClose := False;
+    ExecuteTarget(Sender);
+  end;
 end;
 
 end.

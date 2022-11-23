@@ -35,11 +35,10 @@ type
     ButtonLoadImage: TSpeedButton;
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
-    acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
     acLoadImage: TAction;
     OpenPictureDialog: TOpenPictureDialog;
-    procedure acBackExecute(Sender: TObject);
+    acBack: TioBSCloseQuery;
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
@@ -51,11 +50,6 @@ type
 implementation
 
 {$R *.dfm}
-
-procedure TPizzaForm.acBackExecute(Sender: TObject);
-begin
-  Close;
-end;
 
 procedure TPizzaForm.acLoadImageExecute(Sender: TObject);
 begin

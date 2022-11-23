@@ -273,10 +273,6 @@ object PizzaForm: TPizzaForm
   object ActionList1: TActionList
     Left = 227
     Top = 208
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
@@ -290,6 +286,12 @@ object PizzaForm: TPizzaForm
     object acLoadImage: TAction
       Caption = '...'
       OnExecute = acLoadImageExecute
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      OnEditingAction = eaAutoPersist
+      TargetBindSource = DSPizza
     end
   end
   object OpenPictureDialog: TOpenPictureDialog
