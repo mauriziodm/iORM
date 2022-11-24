@@ -110,6 +110,7 @@ begin
 
   // FMX standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
+  RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSCloseQuery], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceAppend], nil);

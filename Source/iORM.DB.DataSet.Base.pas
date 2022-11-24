@@ -1348,7 +1348,7 @@ begin
   //  if it has been mapped for private fields it would not pass through the possible set method.
   else
   begin
-    AOutRttiProperty := TioRttiFactory.GetRttiPropertyByClass(AOutObj.ClassType, LPropName);
+    AOutRttiProperty := TioRttiFactory.GetRttiPropertyByClass(AOutObj.ClassType, LPropName, True);
     Result := True;
   end;
 end;

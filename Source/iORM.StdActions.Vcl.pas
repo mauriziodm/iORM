@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence,
-  Vcl.Forms;
+  Vcl.Forms, iORM.StdActions.Interfaces;
 
 type
 
@@ -201,7 +201,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
-    property ClearAfterExecute;
+//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -212,7 +212,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
-    property ClearAfterExecute;
+//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -224,7 +224,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
-    property ClearAfterExecute;
+//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -299,7 +299,7 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioBSCloseQuery = class(TioBSPersistenceStdActionVcl)
+  TioBSCloseQuery = class(TioBSPersistenceStdActionVcl, IioBSCloseQuery)
   strict protected
     FExecuting: Boolean;
     FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
@@ -911,7 +911,7 @@ begin
   if (csDesigning in ComponentState) then
     Exit;
   // Extract and check the event handler property of the owner (that is the view or the ViewContext)
-  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery');
+  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery', False);
   if not Assigned(LEventProperty) then
     Exit;
   if LEventProperty.GetValue(Owner).IsEmpty then

@@ -45,8 +45,8 @@ type
     class function GetRttiContext: TRttiContext;
     class function GetRttiTypeByTypeInfo(const ATypeInfo: Pointer): TRttiType;
     class function GetRttiTypeByClass(const AClass: TClass): TRttiType;
-    class function GetRttiPropertyByTypeInfo(const ATypeInfo: Pointer; const APropertyName: String): TRttiProperty;
-    class function GetRttiPropertyByClass(const AClass: TClass; const APropertyName: String): TRttiProperty;
+    class function GetRttiPropertyByTypeInfo(const ATypeInfo: Pointer; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;
+    class function GetRttiPropertyByClass(const AClass: TClass; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;
   end;
 
 implementation
@@ -68,28 +68,28 @@ class function TioRttiFactory.GetRttiTypeByClass(const AClass: TClass): TRttiTyp
 begin
   Result := ARttiContext.GetType(AClass);
   if Result = nil then
-    raise EioException.Create(ClassName, 'GetRttiType', Format('RttiType not found for "%s" class', [AClass.ClassName]));
+    raise EioException.Create(ClassName, 'GetRttiTypeByClass', Format('RttiType not found for "%s" class', [AClass.ClassName]));
 end;
 
 class function TioRttiFactory.GetRttiTypeByTypeInfo(const ATypeInfo: Pointer): TRttiType;
 begin
   Result := ARttiContext.GetType(ATypeInfo);
   if Result = nil then
-    raise EioException.Create(ClassName, 'GetRttiType', Format('RttiType not found for "%s" class', [TTypeInfo(ATypeInfo^).Name]));
+    raise EioException.Create(ClassName, 'GetRttiTypeByTypeInfo', Format('RttiType not found for "%s" class', [TTypeInfo(ATypeInfo^).Name]));
 end;
 
-class function TioRttiFactory.GetRttiPropertyByClass(const AClass: TClass; const APropertyName: String): TRttiProperty;
+class function TioRttiFactory.GetRttiPropertyByClass(const AClass: TClass; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;
 begin
   Result := GetRttiTypeByClass(AClass).GetProperty(APropertyName);
-  if Result = nil then
-    raise EioException.Create(ClassName, 'GetRttiProperty', Format('RttiProperty named "%s" not found for "%s" class', [APropertyName, AClass.ClassName]));
+  if (Result = nil) and ARaiseIfNotExists then
+    raise EioException.Create(ClassName, 'GetRttiPropertyByClass', Format('RttiProperty named "%s" not found for "%s" class', [APropertyName, AClass.ClassName]));
 end;
 
-class function TioRttiFactory.GetRttiPropertyByTypeInfo(const ATypeInfo: Pointer; const APropertyName: String): TRttiProperty;
+class function TioRttiFactory.GetRttiPropertyByTypeInfo(const ATypeInfo: Pointer; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;
 begin
   Result := GetRttiTypeByClass(ATypeInfo).GetProperty(APropertyName);
-  if Result = nil then
-    raise EioException.Create(ClassName, 'GetRttiProperty', Format('RttiProperty named "%s" not found for "%s" class',
+  if (Result = nil) and ARaiseIfNotExists then
+    raise EioException.Create(ClassName, 'GetRttiPropertyByTypeInfo', Format('RttiProperty named "%s" not found for "%s" class',
       [APropertyName, TTypeInfo(ATypeInfo^).Name]));
 end;
 

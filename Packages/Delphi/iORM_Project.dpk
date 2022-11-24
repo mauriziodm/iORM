@@ -219,7 +219,8 @@ contains
   DJSON.Attributes in '..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas',
   iORM.LazyLoad.Interfaces in '..\..\Source\iORM.LazyLoad.Interfaces.pas',
   iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas',
-  iORM.StdActions.CloseQueryRepeater in '..\..\Source\iORM.StdActions.CloseQueryRepeater.pas';
+  iORM.StdActions.CloseQueryRepeater in '..\..\Source\iORM.StdActions.CloseQueryRepeater.pas',
+  iORM.StdActions.Interfaces in '..\..\Source\iORM.StdActions.Interfaces.pas';
 
 end.
 

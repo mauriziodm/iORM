@@ -17,11 +17,10 @@ type
     RectangleTitle: TRectangle;
     LabelTitle: TLabel;
     ButtonBack: TSpeedButton;
-    acBack: TAction;
     acPersist: TioBSPersistencePersist;
     acRevert: TioBSPersistenceRevert;
     BSMaster: TioPrototypeBindSourceMaster;
-    procedure acBackExecute(Sender: TObject);
+    acBack: TioBSCloseQuery;
   private
     { Private declarations }
   public
@@ -31,10 +30,5 @@ type
 implementation
 
 {$R *.fmx}
-
-procedure TViewBaseForForm.acBackExecute(Sender: TObject);
-begin
-  Free;
-end;
 
 end.

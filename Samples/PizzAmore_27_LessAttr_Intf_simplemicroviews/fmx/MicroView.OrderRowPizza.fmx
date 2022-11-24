@@ -362,6 +362,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
   object BSPizza: TioPrototypeBindSourceDetail
     FieldDefs = <>
     ScopeMappings = <>
+    AsDefault = True
     MasterBindSource = BSRowPizza
     MasterPropertyName = 'Pizza'
     Left = 344

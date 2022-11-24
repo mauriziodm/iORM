@@ -220,14 +220,6 @@ inherited ViewPizza: TViewPizza
       end
     end
   end
-  inherited ActionList1: TActionList
-    inherited acPersist: TioBSPersistencePersist
-      TargetBindSource = nil
-    end
-    inherited acRevert: TioBSPersistenceRevert
-      TargetBindSource = nil
-    end
-  end
   inherited BSMaster: TioPrototypeBindSourceMaster
     AutoActivate = True
     FieldDefs = <

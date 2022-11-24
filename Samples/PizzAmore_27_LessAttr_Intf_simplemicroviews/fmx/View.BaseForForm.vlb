@@ -7,9 +7,6 @@ Coordinates=10,10,61,51
 [ButtonRevert]
 Coordinates=81,10,79,51
 
-[acBack]
-Coordinates=190,141,50,33
-
 [Rectangle1]
 Coordinates=163,71,69,33
 
@@ -30,4 +27,7 @@ Coordinates=307,105,60,33
 
 [ButtonSave]
 Coordinates=10,71,71,51
+
+[]
+Coordinates=190,141,50,33
 

@@ -899,9 +899,7 @@ begin
   if (csDesigning in ComponentState) then
     Exit;
   // Extract and check the event handler property of the owner (that is the view or the ViewContext)
-  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery');
-  if not Assigned(LEventProperty) then
-    Exit;
+  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery', True);
   if LEventProperty.GetValue(Owner).IsEmpty then
   begin
     // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
