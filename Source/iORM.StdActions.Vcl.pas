@@ -879,7 +879,14 @@ begin
       if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
         TargetBindSource.Persistence.Revert;
       if Owner is TForm then
-        TForm(Owner).Close;
+        TForm(Owner).Close
+      else
+      begin
+        // To avoid invalid pointer error
+        if Owner.ComponentIndex > -1 then
+          Owner.Owner.RemoveComponent(Owner);
+        Owner.Free;
+      end;
     end;
   finally
     FExecuting := False;
@@ -938,10 +945,7 @@ procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClos
 begin
   CanClose := _CanClose;
   if not FExecuting then
-  begin
-    CanClose := False;
     ExecuteTarget(Sender);
-  end;
 end;
 
 end.

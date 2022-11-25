@@ -1560,7 +1560,8 @@ begin
         if Assigned(FVCProvider) then
           FViewContext := FVCProvider.NewViewContext;
       end;
-      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and not FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
+//      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and not FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
+      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else
         LValue := TValue.Empty;

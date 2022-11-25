@@ -3,14 +3,12 @@ unit iORM.StdActions.CloseQueryRepeater;
 interface
 
 uses
-  System.Classes, iORM.MVVM.ViewModelBridge, iORM.StdActions.Interfaces,
-  Vcl.Forms;
+  System.Classes, iORM.MVVM.ViewModelBridge, iORM.StdActions.Interfaces, Fmx.Forms;
 
 type
 
   TioCloseQueryRepeater = class (TComponent)
   private
-    FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
     function _ExtractViewModelBridgeFromSubComponents: TioViewModelBridge;
     function _ExtractBSCloseQuerySimpleViewStdActionFromSubComponents: IioBSCloseQuery;
@@ -21,8 +19,6 @@ type
   public
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
-    // Events
-    property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
   end;
 
 
@@ -77,9 +73,6 @@ begin
   // Se viene rilevato un VMBridge lo gestisce come MVVM
   if not _OnCloseQueryEventHandler_TryAsMVVM(Sender, CanClose) then
     _OnCloseQueryEventHandler_AsSimpleView(Sender, CanClose);
-  // Se è impostato l'evento "OnCloseQuery" del componente stesso...
-  if Assigned(FOnCloseQuery) then
-    FOnCloseQuery(Sender, CanClose);
 end;
 
 procedure TioCloseQueryRepeater._OnCloseQueryEventHandler_AsSimpleView(Sender: TObject; var CanClose: Boolean);
