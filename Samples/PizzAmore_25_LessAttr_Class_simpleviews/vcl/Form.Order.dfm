@@ -625,10 +625,6 @@ object OrderForm: TOrderForm
   object ActionList1: TActionList
     Left = 256
     Top = 312
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
@@ -655,6 +651,11 @@ object OrderForm: TOrderForm
       Hint = 'Delete'
       ImageIndex = 5
       DataSource = SourceRows
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSOrder
     end
   end
 end

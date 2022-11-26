@@ -344,14 +344,14 @@ object PrivateCustomerForm: TPrivateCustomerForm
       Caption = 'Persist'
       TargetBindSource = DSCustomer
     end
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-      OnUpdate = acBackUpdate
-    end
     object acRevert: TioBSPersistenceRevertOrDelete
       Category = 'iORM-BSPersistence'
       Caption = 'Revert'
+      TargetBindSource = DSCustomer
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
       TargetBindSource = DSCustomer
     end
   end

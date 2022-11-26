@@ -1,0 +1,18 @@
+object FormViewContext: TFormViewContext
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 600
+  ClientWidth = 400
+  Position = DesktopCenter
+  Visible = True
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnClose = FormClose
+  DesignerMasterStyle = 0
+  object ioCloseQueryRepeater1: TioCloseQueryRepeater
+    Left = 80
+    Top = 56
+  end
+end

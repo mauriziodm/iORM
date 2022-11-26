@@ -290,7 +290,6 @@ object PizzaForm: TPizzaForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnEditingAction = eaAutoPersist
       TargetBindSource = DSPizza
     end
   end

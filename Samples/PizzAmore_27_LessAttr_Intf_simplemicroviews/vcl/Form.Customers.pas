@@ -33,9 +33,9 @@ type
     acNextPage: TioBSNextPage;
     acPrevPage: TioBSPrevPage;
     acShowOrSelect: TAction;
-    acBack: TAction;
     acAdd: TAction;
     DSCustomersFullName: TStringField;
+    acBack: TioBSCloseQuery;
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure acShowOrSelectUpdate(Sender: TObject);

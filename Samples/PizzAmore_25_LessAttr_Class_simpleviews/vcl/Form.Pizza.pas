@@ -35,10 +35,10 @@ type
     ButtonLoadImage: TSpeedButton;
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
-    acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
     acLoadImage: TAction;
     OpenPictureDialog: TOpenPictureDialog;
+    acBack: TioBSCloseQuery;
     procedure acBackExecute(Sender: TObject);
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

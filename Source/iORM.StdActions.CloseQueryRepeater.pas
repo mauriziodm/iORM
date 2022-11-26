@@ -3,7 +3,7 @@ unit iORM.StdActions.CloseQueryRepeater;
 interface
 
 uses
-  System.Classes, iORM.MVVM.ViewModelBridge, iORM.StdActions.Interfaces, Fmx.Forms;
+  System.Classes, iORM.MVVM.ViewModelBridge, iORM.StdActions.Interfaces;
 
 type
 
@@ -65,8 +65,6 @@ begin
 end;
 
 procedure TioCloseQueryRepeater._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
-var
-  LViewModelBridge: TioViewModelBridge;
 begin
   // Init
   CanClose := True;
@@ -109,6 +107,7 @@ procedure TioCloseQueryRepeater._InjectOnCloseEventHandler;
 var
   LEventHandlerToInject: TMethod;
   LEventProperty: TRttiProperty;
+  LEventHandlerAsTValue: TValue;
 begin
   // On runtime only
   if (csDesigning in ComponentState) then
@@ -120,7 +119,9 @@ begin
     // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
     LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
     LEventHandlerToInject.Data := Self;
-    LEventProperty.SetValue(Owner, TValue.From<TCloseQueryEvent>(TCloseQueryEvent(LEventHandlerToInject)));
+    // Put the method into a TValue and set as OnCloseQuery event handler
+    TValue.Make(@LEventHandlerToInject, LEventProperty.PropertyType.Handle, LEventHandlerAsTValue);
+    LEventProperty.SetValue(Owner, LEventHandlerAsTValue);
   end
   else
     raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',

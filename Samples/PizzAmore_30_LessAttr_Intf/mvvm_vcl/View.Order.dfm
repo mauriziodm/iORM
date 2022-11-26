@@ -375,7 +375,7 @@ inherited ViewOrder: TViewOrder
       VMActionName = 'acShowCustomerSelector'
     end
   end
-  inherited MDSMaster: TioModelDataSet
+  inherited BSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
     end
@@ -393,60 +393,60 @@ inherited ViewOrder: TViewOrder
   inherited SourceMaster: TDataSource
     Left = 294
   end
-  object MDSCustomer: TioModelDataSet
+  object BSCustomer: TioModelDataSet
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPCustomer'
+    ModelPresenter = 'BSCustomer'
     Left = 204
     Top = 330
-    object MDSCustomerID: TIntegerField
+    object BSCustomerID: TIntegerField
       FieldName = 'ID'
     end
-    object MDSCustomerName: TStringField
+    object BSCustomerName: TStringField
       FieldName = 'Name'
       Size = 250
     end
-    object MDSCustomerFullAddress: TStringField
+    object BSCustomerFullAddress: TStringField
       FieldName = 'FullAddress'
       Size = 250
     end
-    object MDSCustomerPhoneNumber: TStringField
+    object BSCustomerPhoneNumber: TStringField
       FieldName = 'PhoneNumber'
       Size = 250
     end
   end
-  object MDSRows: TioModelDataSet
+  object BSRows: TioModelDataSet
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPRows'
+    ModelPresenter = 'BSRows'
     Left = 204
     Top = 386
-    object MDSRowsDescription: TStringField
+    object BSRowsDescription: TStringField
       FieldName = 'Description'
       Size = 250
     end
-    object MDSRowsPrice: TCurrencyField
+    object BSRowsPrice: TCurrencyField
       FieldName = 'Price'
     end
-    object MDSRowsQty: TIntegerField
+    object BSRowsQty: TIntegerField
       FieldName = 'Qty'
     end
-    object MDSRowsRowTotal: TCurrencyField
+    object BSRowsRowTotal: TCurrencyField
       FieldName = 'RowTotal'
     end
   end
   object SourceCustomer: TDataSource
-    DataSet = MDSCustomer
+    DataSet = BSCustomer
     Left = 294
     Top = 330
   end
   object SourceRows: TDataSource
-    DataSet = MDSRows
+    DataSet = BSRows
     Left = 294
     Top = 386
   end
   object VCProviderOrder: TioViewContextProvider
+    AsDefault = False
     OnAfterRequest = VCProviderOrderAfterRequest
     OnRequest = VCProviderOrderRequest
-    AsDefault = False
     Left = 293
     Top = 162
   end

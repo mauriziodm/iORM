@@ -410,10 +410,6 @@ object OrderForm: TOrderForm
   object ActionList1: TActionList
     Left = 248
     Top = 312
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
@@ -434,18 +430,23 @@ object OrderForm: TOrderForm
       Caption = 'Add custom pizza'
       OnExecute = acAddCustomPizzaExecute
     end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSOrder
+    end
   end
   object VCProviderOrderRows: TioViewContextProvider
+    AsDefault = False
     OnAfterRequest = VCProviderOrderRowsAfterRequest
     OnRequest = VCProviderOrderRowsRequest
-    AsDefault = False
     Left = 253
     Top = 370
   end
   object DSRows: TioDataSetDetail
-    AfterOpen = DSRowsAfterOpen
     MasterBindSource = DSOrder
     MasterPropertyName = 'Rows'
+    AfterOpen = DSRowsAfterOpen
     Left = 56
     Top = 370
   end

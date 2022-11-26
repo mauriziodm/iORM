@@ -181,7 +181,7 @@ inherited ViewCustomer: TViewCustomer
       TabOrder = 6
     end
   end
-  inherited MDSMaster: TioModelDataSet
+  inherited BSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
     end

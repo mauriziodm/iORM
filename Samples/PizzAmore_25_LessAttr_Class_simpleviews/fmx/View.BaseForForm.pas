@@ -17,10 +17,10 @@ type
     RectangleTitle: TRectangle;
     LabelTitle: TLabel;
     ButtonBack: TSpeedButton;
-    acBack: TAction;
     acPersist: TioBSPersistencePersist;
     acRevert: TioBSPersistenceRevert;
     BSMaster: TioPrototypeBindSourceMaster;
+    acBack: TioBSCloseQuery;
     procedure acBackExecute(Sender: TObject);
   private
   public

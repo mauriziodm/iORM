@@ -24,13 +24,13 @@ type
     DSOrdersID: TIntegerField;
     SourceOrders: TDataSource;
     ActionList1: TActionList;
-    acBack: TAction;
     acDelete: TioBSPersistenceDelete;
     acShow: TAction;
     acAdd: TAction;
     DSOrdersOrderDate: TDateField;
     DSOrdersCustomerName: TStringField;
     DSOrdersGrandTotal: TCurrencyField;
+    acBack: TioBSCloseQuery;
     procedure FormCreate(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure acShowExecute(Sender: TObject);

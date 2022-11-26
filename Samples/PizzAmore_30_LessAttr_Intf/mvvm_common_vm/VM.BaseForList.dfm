@@ -10,12 +10,6 @@ object VMBaseForList: TVMBaseForList
     Left = 56
     Top = 48
   end
-  object acBack: TioVMAction
-    Name = 'acBack'
-    OnExecute = acBackExecute
-    Left = 192
-    Top = 48
-  end
   object acShowOrSelect: TioVMAction
     Name = 'acShowOrSelect'
     OnExecute = acShowOrSelectExecute
@@ -33,5 +27,10 @@ object VMBaseForList: TVMBaseForList
     TargetBindSource = BSMaster
     Left = 192
     Top = 240
+  end
+  object acBack: TioVMActionBSCloseQuery
+    TargetBindSource = BSMaster
+    Left = 192
+    Top = 48
   end
 end

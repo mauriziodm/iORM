@@ -131,9 +131,9 @@ object ViewBaseForForm: TViewBaseForForm
       VMActionName = 'acRevert'
     end
   end
-  object MDSMaster: TioModelDataSet
+  object BSMaster: TioModelDataSet
     ViewModelBridge = VMBridge
-    ModelPresenter = 'MPMaster'
+    ModelPresenter = 'BSMaster'
     Left = 203
     Top = 274
   end
@@ -142,7 +142,7 @@ object ViewBaseForForm: TViewBaseForForm
     Top = 218
   end
   object SourceMaster: TDataSource
-    DataSet = MDSMaster
+    DataSet = BSMaster
     Left = 286
     Top = 274
   end

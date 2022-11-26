@@ -301,17 +301,18 @@ type
 
   TioBSCloseQuery = class(TioBSPersistenceStdActionVcl, IioBSCloseQuery)
   strict protected
+    FEnabledForInternalUseOnly: Boolean;
     FExecuting: Boolean;
     FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
     function _CanClose: Boolean;
   protected
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property OnEditingAction: TioActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
@@ -867,8 +868,6 @@ begin
 end;
 
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
-var
-  LViewModel: IioViewModelInternal;
 begin
   FExecuting := True;
   try
@@ -907,6 +906,7 @@ begin
   if Assigned(FOnCloseQuery) then
     FOnCloseQuery(Self, LEnabled);
   Enabled := LEnabled;
+  FEnabledForInternalUseOnly := LEnabled;
 end;
 
 procedure TioBSCloseQuery._InjectOnCloseEventHandler;
@@ -938,7 +938,7 @@ end;
 
 function TioBSCloseQuery._CanClose: Boolean;
 begin
-  Result := Enabled;
+  Result := FEnabledForInternalUseOnly;
 end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);

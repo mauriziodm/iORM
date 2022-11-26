@@ -37,11 +37,11 @@ type
     DSCustomerAddress: TStringField;
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
-    acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
     Label6: TLabel;
     DBEditLastName: TDBEdit;
     DSCustomerLastName: TStringField;
+    acBack: TioBSCloseQuery;
     procedure acBackExecute(Sender: TObject);
     procedure acBackUpdate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

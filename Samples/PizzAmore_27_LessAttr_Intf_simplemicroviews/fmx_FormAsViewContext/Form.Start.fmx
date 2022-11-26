@@ -1,0 +1,292 @@
+object StartForm: TStartForm
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 600
+  ClientWidth = 400
+  Position = DesktopCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object TabControlStart: TTabControl
+    Align = Client
+    FullSize = True
+    Size.Width = 400.000000000000000000
+    Size.Height = 600.000000000000000000
+    Size.PlatformDefault = False
+    TabHeight = 49.000000000000000000
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = None
+    Sizes = (
+      400s
+      600s)
+    object TabItemStart: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 8.000000000000000000
+      Size.Height = 8.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'tabitemtoprated'
+      TabOrder = 0
+      Text = 'TabItemStart'
+      ExplicitSize.cx = 50.000000000000000000
+      ExplicitSize.cy = 49.000000000000000000
+      object RectangleTitle: TRectangle
+        Align = Top
+        Fill.Color = claOrange
+        Margins.Bottom = 5.000000000000000000
+        Size.Width = 400.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        object LabelTitle: TLabel
+          Align = Client
+          StyledSettings = [Family]
+          Size.Width = 400.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'toollabel'
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          TextSettings.FontColor = claDarkslategray
+          TextSettings.HorzAlign = Center
+          Text = ' Main men'#249
+          TabOrder = 0
+          object ButtonQuit: TSpeedButton
+            Action = acQuit
+            Align = Left
+            Enabled = True
+            StyledSettings = [Family, Size, Style]
+            ImageIndex = -1
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'escapetoolbutton'
+            TextSettings.FontColor = claAliceblue
+          end
+        end
+      end
+      object ButtonGoToOrderList: TButton
+        Action = acShowOrders
+        Align = Bottom
+        Enabled = True
+        StyledSettings = [Family, FontColor]
+        ImageIndex = -1
+        Margins.Left = 5.000000000000000000
+        Margins.Top = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Position.X = 5.000000000000000000
+        Position.Y = 365.000000000000000000
+        Size.Width = 390.000000000000000000
+        Size.Height = 70.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00060000000000000004000000}
+      end
+      object ButtonGoToPizzaList: TButton
+        Action = acShowPizzas
+        Align = Bottom
+        Enabled = True
+        StyledSettings = [Family, FontColor]
+        ImageIndex = -1
+        Margins.Left = 5.000000000000000000
+        Margins.Top = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Position.X = 5.000000000000000000
+        Position.Y = 525.000000000000000000
+        Size.Width = 390.000000000000000000
+        Size.Height = 70.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00060000000000000004000000}
+      end
+      object ButtonGoToCustomerList: TButton
+        Action = acShowCustomers
+        Align = Bottom
+        Enabled = True
+        StyledSettings = [Family, FontColor]
+        ImageIndex = -1
+        Margins.Left = 5.000000000000000000
+        Margins.Top = 5.000000000000000000
+        Margins.Right = 5.000000000000000000
+        Margins.Bottom = 5.000000000000000000
+        Position.X = 5.000000000000000000
+        Position.Y = 445.000000000000000000
+        Size.Width = 390.000000000000000000
+        Size.Height = 70.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00060000000000000004000000}
+      end
+      object LayoutMain: TLayout
+        Align = Client
+        Size.Width = 400.000000000000000000
+        Size.Height = 315.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        object Layout1: TLayout
+          Align = Center
+          Size.Width = 281.000000000000000000
+          Size.Height = 303.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          object Label2: TLabel
+            AutoSize = True
+            StyledSettings = [Family]
+            Position.X = 129.000000000000000000
+            Position.Y = 5.000000000000000000
+            Size.Width = 152.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 36.000000000000000000
+            TextSettings.Font.StyleExt = {00040000000100000004000000}
+            Text = 'Amore'
+            TabOrder = 0
+          end
+          object Label1: TLabel
+            AutoSize = True
+            StyledSettings = [Family]
+            Position.X = 21.000000000000000000
+            Position.Y = 4.000000000000000000
+            Size.Width = 108.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 36.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFFB80000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Pizz'#39
+            TabOrder = 2
+          end
+          object ImageLogo: TImage
+            MultiResBitmap.Height = 300
+            MultiResBitmap.Width = 300
+            MultiResBitmap.TransparentColor = 16777215
+            MultiResBitmap = <
+              item
+                Width = 300
+                Height = 300
+                PNG = {
+                  89504E470D0A1A0A0000000D494844520000012C0000012C0806000000797D8E
+                  75000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                  063B49444154785EEDD03101000000C2A0F54F6D0C1F884061C0800103060C18
+                  3060C0800103060C183060C0800103060C183060C0800103060C183060C08001
+                  03060C183060C0800103060C183060C0800103060C183060C0800103060C1830
+                  60C0800103060C183060C0800103060C183060C0800103060C183060C0800103
+                  060C183060C0800103060C183060C0800103060C183060C0800103060C183060
+                  C0800103060C183060C0800103060C183060C0800103060C183060C080010306
+                  0C183060C0800103060C183060C0800103060C183060C0800103060C183060C0
+                  800103060C183060C0800103060C183060C0800103060C183060C0800103060C
+                  183060C0800103060C183060C0800103060C183060C0800103060C183060C080
+                  0103060C183060C0800103060C183060C0800103060C183060C0800103060C18
+                  3060C0800103060C183060C0800103060C183060C0800103060C183060C08001
+                  03060C183060C0800103060C183060C0800103060C183060C0800103060C1830
+                  60C0800103060C183060C0800103060C183060C0800103060C183060C0800103
+                  060C183060C0800103060C183060C0800103060C183060C0800103060C183060
+                  C0800103060C183060C0800103060C183060C0800103060C183060C080010306
+                  0C183060C0800103060C183060C0800103060C183060C0800103060C183060C0
+                  800103060C183060C0800103060C183060C0800103060C183060C0800103060C
+                  183060C0800103060C183060C0800103060C183060C0800103060C183060C080
+                  0103060C183060C0800103060C183060C0800103060C183060C0800103060C18
+                  3060C0800103060C183060C0800103060C183060C0800103060C183060C08001
+                  03060C183060C0800103060C183060C0800103060C183060C0800103060C1830
+                  60C0800103060C183060C0800103060C183060C0800103060C183060C0800103
+                  060C183060C0800103060C183060C0800103060C183060C0800103060C183060
+                  C0800103060C183060C0800103060C183060C0800103060C183060C080010306
+                  0C183060C0800103060C183060C0800103060C183060C0800103060C183060C0
+                  800103060C183060C0800103060C183060C0800103060C183060C0800103060C
+                  183060C0800103060C183060C0800103060C183060C0800103060C183060C080
+                  0103060C183060C0800103060C183060C0800103060C183060C0800103060C18
+                  3060C0800103060C183060C0800103060C183060C0800103060C183060C08001
+                  03060C183060C0800103060C183060C0800103060C183060C0800103060C1830
+                  60C0800103060C183060C0800103060C183060C0800103060C183060C0800103
+                  060C183060C0800103060C183060C0800103060C183060C0800103060C183060
+                  C0800103060C183060C0800103060C183060C0800103060C183060C080010306
+                  0C183060C0800103060C183060C0800103060C183060C0800103060C183060C0
+                  800103060C183060C0800103060C183060C0800103060C183060C0800103060C
+                  183060C0800103060C183060C0800103060C183060C0800103060C183060C080
+                  0103060C183060C0800103060C183060C0800103060C183060C0800103060C18
+                  3060C0800103060C183060C0800103060C183060C0800103060C183060C08001
+                  03060C183060C0800103060C183060C0800103060C183060C0800103060C1830
+                  60C0800103060C183060C0800103060C183060C0800103060C183060C0800103
+                  060C183060C0800103060C183060C0800103060C183060C0800103060C183060
+                  C0800103060C183060C0800103060C183060C0800103060C183060C080010306
+                  0C183060C0800103060C183060C0800103060C183060C0800103060C183060C0
+                  800103060C183060C0800103060C183060C0800103060C183060C0800103060C
+                  183060C0800103060C183060C0800103060C183060C0800103060C183060C080
+                  0103060C183060C0800103060C183060C0800103060C183060C0800103060C18
+                  3060C0800103060C183060C0800103060C183060C0800103060C183060C08001
+                  03060C183060C0800103060C183060C0800103060C183060C0800103060C1830
+                  60C0800103060C183060C0800103060C183060C0800103060C183060C0800103
+                  060C183060C0800103060C183060C0800103060C183060C08081FFC0007FB700
+                  012F4C403A0000000049454E44AE426082}
+                FileName = 'C:\delphi\tools\iorm_dev\DDay2022\common_images\LovePizza.bmp'
+              end>
+            Position.X = 8.000000000000000000
+            Position.Y = 53.000000000000000000
+            Size.Width = 264.000000000000000000
+            Size.Height = 250.000000000000000000
+            Size.PlatformDefault = False
+          end
+        end
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 32
+    Top = 392
+    object acQuit: TAction
+      Category = 'Tab'
+      Text = 'Quit'
+      OnExecute = acQuitExecute
+    end
+    object acShowCustomers: TAction
+      Category = 'Tab'
+      Text = 'Customers'
+      OnExecute = acShowCustomersExecute
+    end
+    object acShowPizzas: TAction
+      Category = 'Tab'
+      Text = 'Pizzas'
+      OnExecute = acShowPizzasExecute
+    end
+    object acShowOrders: TAction
+      Category = 'Tab'
+      Text = 'Orders'
+      OnExecute = acShowOrdersExecute
+    end
+  end
+  object ioFMX1: TioFMX
+    Left = 32
+    Top = 448
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
+    AutoCreateDB.Enabled = True
+    Database = 'PizzAmore_27_simpleMicroview_fmx.db'
+    DatabaseStdFolder = sfDocuments
+    Persistent = False
+    Pooled = False
+    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
+    Left = 32
+    Top = 504
+  end
+  object VCProvider: TioViewContextProvider
+    AsDefault = True
+    OnAfterRequest = VCProviderAfterRequest
+    OnRelease = VCProviderRelease
+    OnRequest = VCProviderRequest
+    Left = 96
+    Top = 448
+  end
+end

@@ -20,7 +20,7 @@ type
     acBack: TioViewAction;
     acPersist: TioViewAction;
     acRevert: TioViewAction;
-    MDSMaster: TioModelDataSet;
+    BSMaster: TioModelDataSet;
     VMBridge: TioViewModelBridge;
     SourceMaster: TDataSource;
   private

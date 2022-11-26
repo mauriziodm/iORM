@@ -16,11 +16,10 @@ type
 
   TVMBaseForList = class(TioViewModel)
     BSMaster: TioModelPresenterMaster;
-    acBack: TioVMAction;
     acShowOrSelect: TioVMAction;
     acAdd: TioVMAction;
     acDelete: TioVMActionBSPersistenceDelete;
-    procedure acBackExecute(Sender: TObject);
+    acBack: TioVMActionBSCloseQuery;
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure acShowOrSelectUpdate(Sender: TObject);
     procedure acAddExecute(Sender: TObject);
@@ -54,11 +53,6 @@ begin
   BSMaster.Persistence.Append(LNewInstance);
   // Executes the action which will show the new instance on the screen.
   acShowOrSelect.Execute;
-end;
-
-procedure TVMBaseForList.acBackExecute(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TVMBaseForList.acShowOrSelectExecute(Sender: TObject);

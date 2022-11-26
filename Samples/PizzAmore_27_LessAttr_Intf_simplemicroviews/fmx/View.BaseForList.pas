@@ -20,11 +20,11 @@ type
     ButtonSelect: TSpeedButton;
     ListView: TListView;
     ActionList1: TActionList;
-    acBack: TAction;
     acAdd: TAction;
     acShowOrSelect: TAction;
     acDelete: TioBSPersistenceDelete;
     BSMaster: TioPrototypeBindSourceMaster;
+    acBack: TioBSCloseQuery;
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);

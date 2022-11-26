@@ -70,9 +70,6 @@ Coordinates=88,302,119,36
 [DSOrderID]
 Coordinates=654,551,78,36
 
-[acBack]
-Coordinates=654,661,57,36
-
 [DBImage]
 Coordinates=10,302,68,36
 
@@ -104,6 +101,6 @@ Coordinates=838,276,106,36
 Coordinates=407,10,88,58
 
 []
-Coordinates=0,0,87,36
+Coordinates=654,661,57,36
 Visible=True
 

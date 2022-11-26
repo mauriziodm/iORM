@@ -136,10 +136,6 @@
             <Form>OrderForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Form.ViewContext.pas">
-            <Form>ViewContextForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

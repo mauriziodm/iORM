@@ -30,9 +30,9 @@ type
     DSPizzasImage: TGraphicField;
     ActionList1: TActionList;
     acDelete: TioBSPersistenceDelete;
-    acBack: TAction;
     acAdd: TAction;
     acShow: TAction;
+    acBack: TioBSCloseQuery;
     procedure FormCreate(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure acAddExecute(Sender: TObject);

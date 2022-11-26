@@ -98,10 +98,6 @@ object ViewBaseForList: TViewBaseForList
   object ActionList1: TActionList
     Left = 203
     Top = 163
-    object acBack: TAction
-      Text = 'Back'
-      OnExecute = acBackExecute
-    end
     object acAdd: TAction
       Text = 'Add'
       OnExecute = acAddExecute
@@ -114,6 +110,11 @@ object ViewBaseForList: TViewBaseForList
     object acDelete: TioBSPersistenceDelete
       Category = 'iORM-BSPersistence'
       Text = 'Delete'
+      TargetBindSource = BSMaster
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Text = 'Back'
       TargetBindSource = BSMaster
     end
   end

@@ -201,10 +201,6 @@ object PizzasForm: TPizzasForm
       Caption = 'Add'
       OnExecute = acAddExecute
     end
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acDelete: TioBSPersistenceDelete
       Category = 'iORM-BSPersistence'
       Caption = 'Delete'
@@ -213,6 +209,11 @@ object PizzasForm: TPizzasForm
     object acShow: TAction
       Caption = 'Show'
       OnExecute = acShowExecute
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSPizzas
     end
   end
 end

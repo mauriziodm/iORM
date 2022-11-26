@@ -129,7 +129,7 @@ inherited ViewPizza: TViewPizza
       TabOrder = 5
     end
   end
-  inherited MDSMaster: TioModelDataSet
+  inherited BSMaster: TioModelDataSet
     object MDSMasterID: TIntegerField
       FieldName = 'ID'
     end

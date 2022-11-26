@@ -13,8 +13,7 @@ uses
   Form.Pizzas in 'Form.Pizzas.pas' {PizzasForm},
   Form.Pizza in 'Form.Pizza.pas' {PizzaForm},
   Form.Orders in 'Form.Orders.pas' {OrdersForm},
-  Form.Order in 'Form.Order.pas' {OrderForm},
-  Form.ViewContext in 'Form.ViewContext.pas' {ViewContextForm};
+  Form.Order in 'Form.Order.pas' {OrderForm};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

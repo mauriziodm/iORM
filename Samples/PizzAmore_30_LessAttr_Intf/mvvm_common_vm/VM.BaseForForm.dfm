@@ -11,12 +11,6 @@ object VMBaseForForm: TVMBaseForForm
     Left = 56
     Top = 48
   end
-  object acBack: TioVMAction
-    Name = 'acBack'
-    OnExecute = acBackExecute
-    Left = 192
-    Top = 48
-  end
   object acPersist: TioVMActionBSPersistencePersist
     TargetBindSource = BSMaster
     Left = 192
@@ -26,5 +20,10 @@ object VMBaseForForm: TVMBaseForForm
     TargetBindSource = BSMaster
     Left = 192
     Top = 176
+  end
+  object acBack: TioVMActionBSCloseQuery
+    TargetBindSource = BSMaster
+    Left = 192
+    Top = 48
   end
 end

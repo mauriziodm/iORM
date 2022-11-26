@@ -43,7 +43,6 @@ type
     SourceOrder: TDataSource;
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
-    acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
     ButtonAdd: TSpeedButton;
     acSelectPizza: TioBSSelectCurrent;
@@ -53,6 +52,7 @@ type
     DSRows: TioDataSetDetail;
     SpeedButton1: TSpeedButton;
     acAddCustomPizza: TAction;
+    acBack: TioBSCloseQuery;
     procedure FormShow(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure DBCtrlGrid1DblClick(Sender: TObject);

@@ -73,10 +73,6 @@ object ViewBaseForForm: TViewBaseForForm
   object ActionList1: TActionList
     Left = 203
     Top = 163
-    object acBack: TAction
-      Text = 'Back'
-      OnExecute = acBackExecute
-    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Text = 'Persist'
@@ -85,6 +81,11 @@ object ViewBaseForForm: TViewBaseForForm
     object acRevert: TioBSPersistenceRevert
       Category = 'iORM-BSPersistence'
       Text = 'Revert'
+      TargetBindSource = BSMaster
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Text = 'Back'
       TargetBindSource = BSMaster
     end
   end

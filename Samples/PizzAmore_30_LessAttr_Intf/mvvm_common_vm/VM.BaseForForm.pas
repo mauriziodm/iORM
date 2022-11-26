@@ -16,10 +16,9 @@ type
 
   TVMBaseForForm = class(TioViewModel)
     BSMaster: TioModelPresenterMaster;
-    acBack: TioVMAction;
     acPersist: TioVMActionBSPersistencePersist;
     acRevert: TioVMActionBSPersistenceRevertOrDelete;
-    procedure acBackExecute(Sender: TObject);
+    acBack: TioVMActionBSCloseQuery;
   private
     { Private declarations }
   public
@@ -31,10 +30,5 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
-
-procedure TVMBaseForForm.acBackExecute(Sender: TObject);
-begin
-  Close;
-end;
 
 end.
