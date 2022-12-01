@@ -299,7 +299,7 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioBSCloseQuery = class(TioBSPersistenceStdActionVcl, IioBSCloseQuery)
+  TioBSCloseQuery = class(TioBSPersistenceStdActionVcl, IioBSCloseQueryAction)
   strict protected
     FEnabledForInternalUseOnly: Boolean;
     FExecuting: Boolean;
@@ -943,7 +943,7 @@ end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := _CanClose;
+  CanClose := CanClose;
   if not FExecuting then
     ExecuteTarget(Sender);
 end;

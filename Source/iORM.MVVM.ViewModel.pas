@@ -39,7 +39,8 @@ interface
 
 uses
   System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.MVVM.VMActionContainer, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces, Vcl.Forms;
+  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces, Vcl.Forms,
+  iORM.StdActions.Interfaces;
 
 type
 
@@ -47,7 +48,7 @@ type
 
   TioVMOnViewPairingEvent = procedure(const Sender: TioViewModel) of object;
 
-  TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel, IioViewModelInternal) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
+  TioViewModel = class(TioInterfacedDataModule, IInterface, IioViewModel, IioViewModelInternal, IioBSCloseQueryAction) // NB: Esplicito l'implementazione di IInterface altrimenti ci sono problemi
   private
     FVMActionContainer: IioVMActionContainer;
     FViewRegister: IioViewRegisterMVVM;
@@ -57,6 +58,7 @@ type
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
     procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
+    function _CanClose: Boolean;
   protected
     procedure Loaded; override;
     // DefaultPresenter
@@ -174,6 +176,14 @@ end;
 function TioViewModel.VMActions: IioVMActionContainer;
 begin
   Result := FVMActionContainer;
+end;
+
+function TioViewModel._CanClose: Boolean;
+begin
+  if Assigned(FVMActionContainer.BSCloseQueryAction) then
+    Result := FVMActionContainer.BSCloseQueryAction._CanClose
+  else
+    Result := True;
 end;
 
 constructor TioViewModel.Create(AOwner: TComponent);

@@ -48,7 +48,7 @@ type
   public
     class function NewViewRegisterBase: IioViewRegisterBase; static;
     class function NewViewRegisterMVVM: IioViewRegisterMVVM; static;
-    class function NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer; static;
+    class function NewVMActionContainer(const AViewModel: IioViewModelInternal): IioVMActionContainer; static;
     class function NewLocalVCProviderRegister: IioLocalVCProviderRegister; static;
   end;
 
@@ -75,9 +75,9 @@ begin
   Result := TioViewRegisterMVVM.Create;
 end;
 
-class function TioMVVMFactory.NewVMActionContainer(const AOwner:TComponent): IioVMActionContainer;
+class function TioMVVMFactory.NewVMActionContainer(const AViewModel: IioViewModelInternal): IioVMActionContainer;
 begin
-  Result := TioVMActionContainer.Create(AOwner);
+  Result := TioVMActionContainer.Create(AViewModel);
 end;
 
 end.

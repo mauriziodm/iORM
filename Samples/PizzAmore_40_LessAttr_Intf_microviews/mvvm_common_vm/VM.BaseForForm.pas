@@ -18,7 +18,6 @@ type
     BSMaster: TioModelPresenterMaster;
     acPersist: TioVMActionBSPersistencePersist;
     acRevert: TioVMActionBSPersistenceRevertOrDelete;
-    ioVMAction1: TioVMAction;
     acBack: TioVMActionBSCloseQuery;
   private
     { Private declarations }

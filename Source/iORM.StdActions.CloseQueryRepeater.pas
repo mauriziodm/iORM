@@ -11,7 +11,7 @@ type
   private
     procedure _InjectOnCloseEventHandler;
     function _ExtractViewModelBridgeFromSubComponents: TioViewModelBridge;
-    function _ExtractBSCloseQuerySimpleViewStdActionFromSubComponents: IioBSCloseQuery;
+    function _ExtractBSCloseQuerySimpleViewStdActionFromSubComponents: IioBSCloseQueryAction;
     function _OnCloseQueryEventHandler_TryAsMVVM(Sender: TObject; var CanClose: Boolean): Boolean;
     procedure _OnCloseQueryEventHandler_AsSimpleView(Sender: TObject; var CanClose: Boolean);
   protected
@@ -36,10 +36,10 @@ begin
   _InjectOnCloseEventHandler;
 end;
 
-function TioCloseQueryRepeater._ExtractBSCloseQuerySimpleViewStdActionFromSubComponents: IioBSCloseQuery;
+function TioCloseQueryRepeater._ExtractBSCloseQuerySimpleViewStdActionFromSubComponents: IioBSCloseQueryAction;
 var
   I: Integer;
-  LBSCloseQueryAction: IioBSCloseQuery;
+  LBSCloseQueryAction: IioBSCloseQueryAction;
 begin
   Result := nil;
   for I := 0 to Owner.ComponentCount - 1 do
@@ -75,15 +75,15 @@ end;
 
 procedure TioCloseQueryRepeater._OnCloseQueryEventHandler_AsSimpleView(Sender: TObject; var CanClose: Boolean);
 var
-  LBSCloseQueryAction: IioBSCloseQuery;
+  LBSCloseQueryAction: IioBSCloseQueryAction;
 begin
   // Cerca una IioBSCloseQuery
   // NB: La cerca tra tutti i components dell'owner (per ognuno di essi cerca se contiene l'azione cercata)
   // NB: Solo primo livello
   LBSCloseQueryAction := _ExtractBSCloseQuerySimpleViewStdActionFromSubComponents;
   // Se ha trovato la action chiede a lei se si può chiudere
-  if Assigned(LBSCloseQueryAction) then
-    LBSCloseQueryAction._OnCloseQueryEventHandler(Sender, CanClose);
+//  if Assigned(LBSCloseQueryAction) then
+//    LBSCloseQueryAction._OnCloseQueryEventHandler(Sender, CanClose);
 end;
 
 function TioCloseQueryRepeater._OnCloseQueryEventHandler_TryAsMVVM(Sender: TObject; var CanClose: Boolean): Boolean;

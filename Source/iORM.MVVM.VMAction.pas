@@ -4,7 +4,8 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes, iORM.LiveBindings.BSPersistence, Vcl.Forms;
+  iORM.CommonTypes, iORM.LiveBindings.BSPersistence, Vcl.Forms,
+  iORM.StdActions.Interfaces;
 
 type
 
@@ -303,17 +304,16 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom)
+  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryVMAction)
   strict protected
     FExecuting: Boolean;
     FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
-    procedure _InjectOnCloseEventHandler;
+    procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
+    procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
     function _CanClose: Boolean;
-  protected
-    procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -884,35 +884,30 @@ begin
   FOnEditingAction := eaDisable;
 end;
 
-procedure TioVMActionBSCloseQuery.Loaded;
-begin
-  inherited;
-  _InjectOnCloseEventHandler;
-end;
-
-procedure TioVMActionBSCloseQuery._InjectOnCloseEventHandler;
+procedure TioVMActionBSCloseQuery._InjectEventHandlerOnView(const AView: TComponent);
 var
   LEventHandlerToInject: TMethod;
-  LEventProperty: TRttiProperty;
 begin
   // On runtime only
   if (csDesigning in ComponentState) then
     Exit;
-  // Extract and check the event handler property of the owner (that is the view or the ViewContext)
-  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery', True);
-  if LEventProperty.GetValue(Owner).IsEmpty then
-  begin
-    // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
-    LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
-    LEventHandlerToInject.Data := Self;
-    LEventProperty.SetValue(Owner, TValue.From<TCloseQueryEvent>(TCloseQueryEvent(LEventHandlerToInject)));
-  end
-  else
-    raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
-      Format('An "OnCloseQuery" event handler is already present in the class "%s".' +
-        #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
-        #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the ViewModel.',
-        [Owner.ClassName, ClassName, ClassName]));
+  // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
+  LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
+  LEventHandlerToInject.Data := Self;
+  TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(AView, LEventHandlerToInject, False);
+end;
+
+procedure TioVMActionBSCloseQuery._InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent);
+var
+  LEventHandlerToInject: TMethod;
+begin
+  // On runtime only
+  if (csDesigning in ComponentState) then
+    Exit;
+  // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
+  LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
+  LEventHandlerToInject.Data := Self;
+  TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(AViewModelAsTComponent, LEventHandlerToInject, True);
 end;
 
 procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;

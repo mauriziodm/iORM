@@ -21,11 +21,6 @@ object VMBaseForForm: TVMBaseForForm
     Left = 192
     Top = 176
   end
-  object ioVMAction1: TioVMAction
-    Name = 'ioVMAction1'
-    Left = 304
-    Top = 224
-  end
   object acBack: TioVMActionBSCloseQuery
     TargetBindSource = BSMaster
     Left = 192

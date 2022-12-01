@@ -5227,11 +5227,11 @@ object StartForm: TStartForm
     Top = 504
   end
   object VCProvider: TioViewContextProvider
+    AsDefault = True
     OnAfterRequest = VCProviderAfterRequest
     OnBeforeRelease = VCProviderBeforeRelease
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
-    AsDefault = True
     Left = 160
     Top = 448
   end
@@ -5283,5 +5283,9 @@ object StartForm: TStartForm
       Caption = 'Pizzas'
       VMActionName = 'acShowPizzas'
     end
+  end
+  object ioCloseQueryRepeater1: TioCloseQueryRepeater
+    Left = 325
+    Top = 397
   end
 end

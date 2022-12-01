@@ -37,7 +37,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, iORM.CommonTypes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ViewContextProvider, iORM.MVVM.ViewRegisterItem,
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, iORM.StdActions.Interfaces, Vcl.Forms;
 
 {$I ioGlobalDef.inc}   // io global definitions
 
@@ -181,6 +181,7 @@ type
     procedure CopyVMAction(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure BindView(const AView: TComponent);
+    function BSCloseQueryAction: IioBSCloseQueryVMAction;
   end;
 
   IioLocalVCProviderRegister = interface

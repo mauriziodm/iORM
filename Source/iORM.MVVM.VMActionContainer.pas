@@ -38,17 +38,19 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces;
+  System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces,
+  iORM.StdActions.Interfaces;
 
 type
 
   TioVMActionContainer = class(TInterfacedObject, IioVMActionContainer)
   strict private
     FContainer: TDictionary<String, IioVMAction>;
-    FOwner: TComponent;
-    procedure _InternalLoadVMActions(const AViewOrViewModel: TComponent);
+    [weak] FViewModel: IioViewModelInternal;
+    FBSCloseQueryAction: IioBSCloseQueryVMAction;
+    procedure _InternalLoadVMActions(const AViewModel: TComponent);
   public
-    constructor Create(const AOwner: TComponent);
+    constructor Create(const AViewModel: IioViewModelInternal);
     destructor Destroy; override;
     procedure Add(const AVMAction: IioVMAction);
     procedure Remove(AName: String);
@@ -58,12 +60,13 @@ type
     procedure CopyVMAction(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure BindView(const AView: TComponent);
+    function BSCloseQueryAction: IioBSCloseQueryVMAction;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions;
+  System.SysUtils, iORM.Exceptions, Vcl.Forms;
 
 { TioVMNotifyContainer }
 
@@ -76,7 +79,7 @@ begin
     raise EioException.Create(Self.ClassName, 'Add',
       Format('You are trying to register the VMAction named "%s" (owned by "%s") on the ViewModel "%s" but an action with the same name already exists (owned by "%s").'
       + #13#13'Have you considered the possibility of prefixing the name of the action with the name of the object that owns it? (ex: ''VMCustomer.acSave'')',
-      [AVMAction.Name, AVMAction.Owner.Name, FOwner.Name, Get(LName).Owner.Name]));
+      [AVMAction.Name, AVMAction.Owner.Name, (FViewModel as TComponent).Name, Get(LName).Owner.Name]));
   FContainer.Add(LName, AVMAction);
 end;
 
@@ -87,7 +90,12 @@ begin
   else
     raise EioException.Create(ClassName, 'BindViewAction',
       Format('Sorry, I can''t bind ViewAction "%s" with corresponding VMAction "%s" because I can''t find any VMAction with this name on ViewModel "%s".',
-      [AViewAction.Name, AViewAction.VMActionName, FOwner.Name]));
+      [AViewAction.Name, AViewAction.VMActionName, (FViewModel as TComponent).Name]));
+end;
+
+function TioVMActionContainer.BSCloseQueryAction: IioBSCloseQueryVMAction;
+begin
+  Result := FBSCloseQueryAction;
 end;
 
 procedure TioVMActionContainer.CopyVMAction(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
@@ -103,10 +111,10 @@ begin
     CopyVMAction(LName, ADestVMActionContainer);
 end;
 
-constructor TioVMActionContainer.Create(const AOwner: TComponent);
+constructor TioVMActionContainer.Create(const AViewModel: IioViewModelInternal);
 begin
   inherited Create;
-  FOwner := AOwner;
+  FViewModel := AViewModel;
   // Create the internal container
   FContainer := TDictionary<String, IioVMAction>.Create;
 end;
@@ -133,17 +141,33 @@ begin
   Result := nil;
   if FContainer.TryGetValue(Uppercase(AName), Result) or ANoException then
     Exit;
-  raise EioException.Create(Self.ClassName, 'Get', Format('I''m sorry, I can''t find any VMAction named "%s" on ViewModel "%s".', [AName, FOwner.Name]));
+  raise EioException.Create(Self.ClassName, 'Get', Format('I''m sorry, I can''t find any VMAction named "%s" on ViewModel "%s".', [AName, (FViewModel as TComponent).Name]));
 end;
 
-procedure TioVMActionContainer._InternalLoadVMActions(const AViewOrViewModel: TComponent);
+procedure TioVMActionContainer._InternalLoadVMActions(const AViewModel: TComponent);
 var
   I: Integer;
   LVMAction: IioVMAction;
+  LBSCloseQueryAction: IioBSCloseQueryVMAction;
 begin
-  for I := 0 to AViewOrViewModel.ComponentCount - 1 do
-    if Supports(AViewOrViewModel.Components[i], IioVMAction, LVMAction) then
+  for I := 0 to AViewModel.ComponentCount - 1 do
+  begin
+    // Register the current VMAction
+    if Supports(AViewModel.Components[i], IioVMAction, LVMAction) then
       Add(LVMAction);
+
+    // If the current VMAction is a IioBSCloseQueryAction...
+    if Supports(AViewModel.Components[i], IioBSCloseQueryAction, LBSCloseQueryAction) then
+    begin
+      if Assigned(FBSCloseQueryAction) then
+        raise EioException.Create(ClassName, '_InternalLoadVMActions', Format('Hi, I''m iORM.' +
+          #13#13'On ViewModel "%s" there can be only one "TioVMActionBSCloseQuery" action.' +
+          #13#13'Please make sure there''s only one left and you''ll see that everything will be fine.',
+          [(FViewModel as TComponent).Name]));
+      FBSCloseQueryAction := LBSCloseQueryAction; // Take e direct reference
+      LBSCloseQueryAction._InjectEventHandlerOnViewModel(FViewModel as TComponent); // Inject its OnCloseQuery event handler on ViewModel
+    end;
+  end;
 end;
 
 procedure TioVMActionContainer.BindView(const AView: TComponent);
@@ -151,12 +175,13 @@ var
   I: Integer;
   LViewAction: IioViewAction;
 begin
-  // Capture any VMAction present in the view.
-//  _InternalLoadVMActions(AView);
   // Bind any ViewAction to the related VMAction registered on the ViewModel
   for I := 0 to AView.ComponentCount - 1 do
     if Supports(AView.Components[i], IioViewAction, LViewAction) then
       BindViewAction(LViewAction);
+  // If a BSCloseQueryAction exists then inject its OnCloseQuery event handler on the View
+  if Assigned(FBSCloseQueryAction) then
+    FBSCloseQueryAction._InjectEventHandlerOnView(AView);
 end;
 
 end.
