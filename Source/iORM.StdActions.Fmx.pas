@@ -314,6 +314,7 @@ type
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
@@ -332,7 +333,8 @@ implementation
 
 uses
   iORM.Abstraction, iORM.Exceptions, System.SysUtils, iORM.Utilities, iORM,
-  System.Rtti, iORM.RttiContext.Factory;
+  System.Rtti, iORM.RttiContext.Factory,
+  iORM.StdActions.CloseQueryActionRegister;
 
 { TioBSObjStateStdActionFmx }
 
@@ -860,6 +862,13 @@ begin
   inherited;
   FExecuting := False;
   FOnEditingAction := eaDisable;
+  TioBSCloseQueryActionRegister.RegisterAction(Self as IioBSCloseQueryAction);
+end;
+
+destructor TioBSCloseQuery.Destroy;
+begin
+  TioBSCloseQueryActionRegister.UnregisterAction(Self as IioBSCloseQueryAction);
+  inherited;
 end;
 
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);

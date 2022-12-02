@@ -303,6 +303,7 @@
         <DCCReference Include="..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.CloseQueryRepeater.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

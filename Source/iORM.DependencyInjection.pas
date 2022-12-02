@@ -1614,7 +1614,7 @@ begin
         TioSimpleViewRegister.Add(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod)
       else
       if Assigned(FViewModel) then
-        (FViewModel as IioViewModelInternal).RegisterView(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
+        (FViewModel as IioViewModelInternal).ViewRegister.Add(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
     end
   finally
     // if the ViewModel is present then UnLock it (MVVM)

@@ -7,6 +7,8 @@ uses
 
 type
 
+  TioBSCloseQueryActionScope = (sOwnedStrictly, sOwnedRecursive, sGlobal);
+
   IioBSCloseQueryAction = interface
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']
     function _CanClose: Boolean;
@@ -14,12 +16,14 @@ type
 
   IioBSCloseQueryVMAction = interface(IioBSCloseQueryAction)
     ['{159EB42D-DBD9-44FA-A0C2-79E000634E20}']
+    procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsComponent: TComponent); // TComponent to avoid circular reference
   end;
 
   TioBSCloseQueryCommonBehaviour = class
   public
+    class function CanClose(const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
     class function CanClose_Owned(const AView: TComponent; const ARecursive: Boolean): Boolean;
     class function ExtractBSCloseQueryStdAction(const AView: TComponent): IioBSCloseQueryAction;
     class procedure InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
@@ -29,9 +33,23 @@ implementation
 
 uses
   System.SysUtils, System.Rtti, iORM.RttiContext.Factory, Vcl.Forms,
-  iORM.Exceptions, iORM.MVVM.ViewModelBridge;
+  iORM.Exceptions, iORM.MVVM.ViewModelBridge,
+  iORM.StdActions.CloseQueryActionRegister;
 
 { TioBSCloseQueryCommonBehaviour }
+
+class function TioBSCloseQueryCommonBehaviour.CanClose(const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
+begin
+  Result := True;
+  case AScope of
+    sOwnedStrictly:
+      Result := CanClose_Owned(AView, False);
+    sOwnedRecursive:
+      Result := CanClose_Owned(AView, True);
+    sGlobal:
+      Result := TioBSCloseQueryActionRegister.CanClose;
+  end;
+end;
 
 class function TioBSCloseQueryCommonBehaviour.CanClose_Owned(const AView: TComponent; const ARecursive: Boolean): Boolean;
 var

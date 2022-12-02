@@ -57,7 +57,6 @@ type
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
-    procedure RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
     function _CanClose: Boolean;
   protected
     procedure Loaded; override;
@@ -67,6 +66,8 @@ type
     function GetPresenter(const AName: String): IioNotifiableBindSource;
     // VMAction
     function GetVMAction(const AName: String): IioVMAction;
+    // ViewRegister
+    function ViewRegister: IioViewRegisterMVVM;
   public
     constructor Create(AOwner: TComponent); override;
     function VMActions: IioVMActionContainer;
@@ -146,12 +147,6 @@ begin
   FLocalVCProviderRegister.RegisterVCProvider(AVCProvider);
 end;
 
-procedure TioViewModel.RegisterView(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
-  const AViewContextFreeMethod: TProc);
-begin
-  FViewRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
-end;
-
 procedure TioViewModel.Show;
 begin
   FViewRegister.ShowAllViewContexts;
@@ -171,6 +166,11 @@ end;
 function TioViewModel.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
 begin
   Result := FLocalVCProviderRegister.VCProviderByName(AVCProviderName);
+end;
+
+function TioViewModel.ViewRegister: IioViewRegisterMVVM;
+begin
+  Result := FViewRegister;
 end;
 
 function TioViewModel.VMActions: IioVMActionContainer;

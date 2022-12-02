@@ -17,12 +17,16 @@ type
     function ContainsViewContext(const AViewContext:TComponent): Boolean;
     function GetItemByView(const AView: TComponent): TioViewContextRegisterItem;
     function GetItemByViewContext(const AViewContext: TComponent): TioViewContextRegisterItem;
+    function GetCount: Integer;
+    function GetView(const Index: Integer): TComponent;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
+    property Count: Integer read GetCount;
     property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
     property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
+    property View[const ViewIndex: integer]: TComponent read GetView;
   end;
 
   TioViewRegisterMVVM = class(TioViewRegisterBase, IioViewRegisterMVVM)
@@ -130,6 +134,11 @@ begin
       Exit(LItem);
 end;
 
+function TioViewRegisterBase.GetCount: Integer;
+begin
+  Result := FInternalContainer.Count;
+end;
+
 function TioViewRegisterBase.GetItemByView(
   const AView: TComponent): TioViewContextRegisterItem;
 begin
@@ -144,6 +153,11 @@ begin
   Result := FindItemByViewContext(AViewContext);
   if not Assigned(Result) then
     raise EioException.Create('TioViewContextRegister', 'GetItemByViewContext', 'ViewContext not found.');
+end;
+
+function TioViewRegisterBase.GetView(const Index: Integer): TComponent;
+begin
+  Result := FInternalContainer[Index].View;
 end;
 
 { TioSimpleViewRegister }
