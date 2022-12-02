@@ -61,7 +61,7 @@ begin
   begin
     // Se il componente è un ViewModelBridge
     if AView.Components[I] is TioViewModelBridge then
-      Result := TioViewModelBridge(AView.Components[I]).ViewModel.CloseQuery
+      Result := TioViewModelBridge(AView.Components[I]).ViewModel._CanClose
     else
     // Se il componente è una CloseQueryAction
     if Supports(AView.Components[I], IioBSCloseQueryAction, LBSCloseQueryAction) then
@@ -89,12 +89,16 @@ end;
 class procedure TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
 var
   LEventProperty: TRttiProperty;
+  LEventHandlerAsTValue: TValue;
 begin
   LEventProperty := TioRttiFactory.GetRttiPropertyByClass(ATarget.ClassType, 'OnCloseQuery', ARaiseIfOnCloseQueryEventNotExists);
   if not Assigned(LEventProperty) then
     Exit;
   if LEventProperty.GetValue(ATarget).IsEmpty then
-    LEventProperty.SetValue(ATarget, TValue.From<TCloseQueryEvent>(TCloseQueryEvent(AMethod)))
+  begin
+    TValue.Make(@AMethod, LEventProperty.PropertyType.Handle, LEventHandlerAsTValue); // Do not use the generic TValue.From<T> method
+    LEventProperty.SetValue(ATarget, LEventHandlerAsTValue);
+  end
   else
     raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
       Format('An "OnCloseQuery" event handler is already present in the class "%s".' +

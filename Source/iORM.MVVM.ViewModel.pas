@@ -70,7 +70,6 @@ type
     function ViewRegister: IioViewRegisterMVVM;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     function VMActions: IioVMActionContainer;
     function CloseQuery: Boolean; virtual;
     procedure Close;
@@ -194,12 +193,6 @@ begin
    FLocalVCProviderRegister := TioMVVMFactory.NewLocalVCProviderRegister;
    inherited;
    FViewRegister := TioMVVMFactory.NewViewRegisterMVVM;
-end;
-
-destructor TioViewModel.Destroy;
-begin
-  Sleep(1);
-  inherited;
 end;
 
 procedure TioViewModel.DoOnViewPairing;

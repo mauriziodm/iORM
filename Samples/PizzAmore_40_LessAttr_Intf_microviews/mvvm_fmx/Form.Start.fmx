@@ -5284,4 +5284,9 @@ object StartForm: TStartForm
       VMActionName = 'acShowPizzas'
     end
   end
+  object ioCloseQueryRepeater1: TioCloseQueryRepeater
+    Scope = sGlobal
+    Left = 317
+    Top = 373
+  end
 end
