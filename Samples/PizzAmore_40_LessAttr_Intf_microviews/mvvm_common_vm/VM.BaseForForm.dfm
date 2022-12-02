@@ -24,6 +24,6 @@ object VMBaseForForm: TVMBaseForForm
   object acBack: TioVMActionBSCloseQuery
     TargetBindSource = BSMaster
     Left = 192
-    Top = 56
+    Top = 48
   end
 end

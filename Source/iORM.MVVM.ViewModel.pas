@@ -57,9 +57,9 @@ type
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
-    function _CanClose: Boolean;
   protected
     procedure Loaded; override;
+    function _CanClose: Boolean;
     // DefaultPresenter
     function GetDefaultPresenter: IioNotifiableBindSource;
     // Presenter
@@ -70,6 +70,7 @@ type
     function ViewRegister: IioViewRegisterMVVM;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function VMActions: IioVMActionContainer;
     function CloseQuery: Boolean; virtual;
     procedure Close;
@@ -139,7 +140,8 @@ procedure TioViewModel.Loaded;
 begin
   inherited;
   // Load all VMActions
-  FVMActionContainer._InternalLoadVMActions(Self);
+  if not (csDesigning in ComponentState) then
+    FVMActionContainer._InternalLoadVMActions(Self);
 end;
 
 procedure TioViewModel.RegisterVCProvider(const AVCProvider: TioViewContextProvider);
@@ -192,6 +194,12 @@ begin
    FLocalVCProviderRegister := TioMVVMFactory.NewLocalVCProviderRegister;
    inherited;
    FViewRegister := TioMVVMFactory.NewViewRegisterMVVM;
+end;
+
+destructor TioViewModel.Destroy;
+begin
+  Sleep(1);
+  inherited;
 end;
 
 procedure TioViewModel.DoOnViewPairing;

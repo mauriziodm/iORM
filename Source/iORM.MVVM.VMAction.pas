@@ -27,6 +27,8 @@ type
   strict protected
     procedure _InternalExecuteStdAction; virtual;
     procedure _InternalUpdateStdAction; virtual;
+    procedure _UpdateOriginal;
+    procedure _ExecuteOriginal;
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
     procedure UnbindAllViewActions;
@@ -304,13 +306,14 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryVMAction)
+  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
   strict protected
     FExecuting: Boolean;
     FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
     FScope: TioBSCloseQueryActionScope;
-    [weak] FViewModel: IioViewModelInternal;
+    FViewModeAsTComponent: TComponent;
+    function GetViewModelIntf: IioViewModelInternal;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
@@ -320,6 +323,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Execute; override;
+    procedure Update; override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property OnEditingAction: TioActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
@@ -360,31 +365,13 @@ begin
 end;
 
 procedure TioVMActionCustom.Execute;
-var
-  LViewAction: IioViewAction;
 begin
-   // Execute the ViewAction.onBeforeExecute event
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoBeforeExecute;
-  // Execute the VMAction.onExecute event if assigned (or a standard action)
-  _InternalExecute;
-  // Execute the ViewAction.onAfterExecute event
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoAfterExecute;
+  _ExecuteOriginal;
 end;
 
 procedure TioVMActionCustom.Update;
-var
-  LViewAction: IioViewAction;
 begin
-  // Execute the ViewAction.onBeforeUpdate event
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoBeforeUpdate;
-  // Execute the VMAction.onUpdate event if assigned (or a standard action)
-  _InternalUpdate;
-  // Execute the ViewAction.onAfterUpdatee event ia assigned or standard action
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoAfterUpdate;
+  _UpdateOriginal;
 end;
 
 function TioVMActionCustom.GetCaption: String;
@@ -422,6 +409,20 @@ begin
   Result := False;
 end;
 
+procedure TioVMActionCustom._ExecuteOriginal;
+var
+  LViewAction: IioViewAction;
+begin
+   // Execute the ViewAction.onBeforeExecute event
+  for LViewAction in FBindedViewActionsContainer do
+    LViewAction.DoBeforeExecute;
+  // Execute the VMAction.onExecute event if assigned (or a standard action)
+  _InternalExecute;
+  // Execute the ViewAction.onAfterExecute event
+  for LViewAction in FBindedViewActionsContainer do
+    LViewAction.DoAfterExecute;
+end;
+
 procedure TioVMActionCustom._InternalExecute;
 begin
   // Execute the VMAction.onExecute event if assigned
@@ -448,6 +449,20 @@ end;
 procedure TioVMActionCustom._InternalUpdateStdAction;
 begin
   // Nothing to do here
+end;
+
+procedure TioVMActionCustom._UpdateOriginal;
+var
+  LViewAction: IioViewAction;
+begin
+  // Execute the ViewAction.onBeforeUpdate event
+  for LViewAction in FBindedViewActionsContainer do
+    LViewAction.DoBeforeUpdate;
+  // Execute the VMAction.onUpdate event if assigned (or a standard action)
+  _InternalUpdate;
+  // Execute the ViewAction.onAfterUpdatee event ia assigned or standard action
+  for LViewAction in FBindedViewActionsContainer do
+    LViewAction.DoAfterUpdate;
 end;
 
 procedure TioVMActionCustom.BindViewAction(const AViewAction: IioViewAction);
@@ -899,8 +914,24 @@ end;
 
 procedure TioVMActionBSCloseQuery.SetViewModel(const AViewModelAsTComponent: TComponent);
 begin
-  if not Supports(AViewModelAsTComponent, IioViewModelInternal, FViewModel) then
+  if not Supports(AViewModelAsTComponent, IioViewModelInternal) then
     raise EioException.Create(ClassName, 'SetViewModel', Format('Class "%s" doesn''t supports "IioViewModelInternal" interface.', [AViewModelAsTComponent.ClassName]));
+  FViewModeAsTComponent := AViewModelAsTComponent;
+end;
+
+procedure TioVMActionBSCloseQuery.Execute;
+begin
+  _ExecuteOriginal;  // Ritorna all'implementazione originale
+end;
+
+function TioVMActionBSCloseQuery.GetViewModelIntf: IioViewModelInternal;
+begin
+  Result := FViewModeAsTComponent as IioViewModelInternal;
+end;
+
+procedure TioVMActionBSCloseQuery.Update;
+begin
+  _UpdateOriginal;  // Ritorna all'implementazione originale
 end;
 
 procedure TioVMActionBSCloseQuery._InjectEventHandlerOnView(const AView: TComponent);
@@ -959,9 +990,9 @@ var
     I: integer;
   begin
     Result := True;
-    for I := 0 to FViewModel.ViewRegister.Count-1 do
+    for I := 0 to GetViewModelIntf.ViewRegister.Count-1 do
     begin
-      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(FViewModel.ViewRegister.View[I], True);
+      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(GetViewModelIntf.ViewRegister.View[I], True);
       if not Result then
         Exit;
     end;
