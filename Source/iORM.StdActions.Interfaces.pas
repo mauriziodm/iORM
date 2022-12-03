@@ -3,11 +3,9 @@ unit iORM.StdActions.Interfaces;
 interface
 
 uses
-  System.Classes;
+  System.Classes, iORM.CommonTypes;
 
 type
-
-  TioBSCloseQueryActionScope = (sOwnedStrictly, sOwnedRecursive, sGlobal);
 
   IioBSCloseQueryAction = interface
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']

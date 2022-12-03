@@ -306,7 +306,7 @@ type
   strict protected
     FEnabledForInternalUseOnly: Boolean;
     FExecuting: Boolean;
-    FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
+    FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
     function _CanClose: Boolean;
@@ -319,7 +319,7 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
-    property OnEditingAction: TioActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;

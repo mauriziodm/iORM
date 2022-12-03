@@ -17,11 +17,10 @@ type
 
   [diViewModelImplements(IVMStart)]
   TVMStart = class(TioViewModel, IVMStart)
-    acQuit: TioVMAction;
     acShowCustomers: TioVMAction;
     acShowOrders: TioVMAction;
     acShowPizzas: TioVMAction;
-    procedure acQuitExecute(Sender: TObject);
+    acQuit: TioVMActionBSCloseQuery;
     procedure acShowCustomersExecute(Sender: TObject);
     procedure acShowOrdersExecute(Sender: TObject);
     procedure acShowPizzasExecute(Sender: TObject);
@@ -39,11 +38,6 @@ uses
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
-
-procedure TVMStart.acQuitExecute(Sender: TObject);
-begin
-  io.TerminateApplication;
-end;
 
 procedure TVMStart.acShowCustomersExecute(Sender: TObject);
 begin

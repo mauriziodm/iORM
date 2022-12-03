@@ -308,9 +308,10 @@ type
 
   TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
   strict protected
-    FExecuting: Boolean;
-    FOnEditingAction: TioActionBSCloseQueryOnEditingAction;
+    FExecuting, FExecutingEventHandler: Boolean;
     FOnCloseQuery: TCloseQueryEvent;
+    FOnEditingAction: TioBSCloseQueryOnEditingAction;
+    FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FScope: TioBSCloseQueryActionScope;
     FViewModeAsTComponent: TComponent;
     function GetViewModelIntf: IioViewModelInternal;
@@ -327,7 +328,8 @@ type
     procedure Update; override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
-    property OnEditingAction: TioActionBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property OnExecuteAction: TioBSCloseQueryOnExecuteAction read FOnExecuteAction write FOnExecuteAction default eaClose;
     property Scope: TioBSCloseQueryActionScope read FScope write FScope default sOwnedStrictly;
     property TargetBindSource;
     // Events
@@ -901,7 +903,9 @@ constructor TioVMActionBSCloseQuery.Create(AOwner: TComponent);
 begin
   inherited;
   FExecuting := False;
+  FExecutingEventHandler := False;
   FOnEditingAction := eaDisable;
+  FOnExecuteAction := eaClose;
   FScope := sOwnedStrictly;
   TioBSCloseQueryActionRegister.RegisterAction(Self as IioBSCloseQueryAction);
 end;
@@ -960,28 +964,6 @@ begin
   TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(AViewModelAsTComponent, LEventHandlerToInject, True);
 end;
 
-procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
-var
-  LViewModel: IioViewModelInternal;
-begin
-  FExecuting := True;
-  try
-    if _CanClose then
-    begin
-      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
-        TargetBindSource.Persistence.Persist;
-      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
-        TargetBindSource.Persistence.Revert;
-      if Supports(Owner, IioViewModelInternal, LViewModel) then
-        LViewModel.Close
-      else
-        raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
-    end;
-  finally
-    FExecuting := False;
-  end;
-end;
-
 procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;
 var
   LEnabled: Boolean;
@@ -1019,13 +1001,47 @@ begin
   Result := Enabled;
 end;
 
+procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
+var
+  LViewModel: IioViewModelInternal;
+begin
+  FExecuting := True;
+  try
+    if _CanClose then
+    begin
+      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
+        TargetBindSource.Persistence.Persist;
+      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
+        TargetBindSource.Persistence.Revert;
+      if Supports(Owner, IioViewModelInternal, LViewModel) then
+      begin
+        if not FExecutingEventHandler then
+        begin
+          case FOnExecuteAction of
+            eaClose:
+              LViewModel.Close;
+            eaTerminateApplication:
+              io.TerminateApplication;
+          end;
+        end;
+      end
+      else
+        raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
+    end;
+  finally
+    FExecuting := False;
+  end;
+end;
+
 procedure TioVMActionBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := _CanClose;
-  if not FExecuting then
-  begin
-    CanClose := False;
-    _InternalExecuteStdAction;
+  FExecutingEventHandler := True;
+  try
+    CanClose := _CanClose;
+    if not FExecuting then
+      _InternalExecuteStdAction;
+  finally
+    FExecutingEventHandler := False;
   end;
 end;
 

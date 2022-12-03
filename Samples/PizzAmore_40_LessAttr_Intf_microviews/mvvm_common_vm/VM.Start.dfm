@@ -1,12 +1,6 @@
 object VMStart: TVMStart
   Height = 480
   Width = 640
-  object acQuit: TioVMAction
-    Name = 'acQuit'
-    OnExecute = acQuitExecute
-    Left = 48
-    Top = 32
-  end
   object acShowCustomers: TioVMAction
     Name = 'acShowCustomers'
     OnExecute = acShowCustomersExecute
@@ -24,5 +18,11 @@ object VMStart: TVMStart
     OnExecute = acShowPizzasExecute
     Left = 48
     Top = 200
+  end
+  object acQuit: TioVMActionBSCloseQuery
+    OnExecuteAction = eaTerminateApplication
+    Scope = sOwnedRecursive
+    Left = 48
+    Top = 32
   end
 end

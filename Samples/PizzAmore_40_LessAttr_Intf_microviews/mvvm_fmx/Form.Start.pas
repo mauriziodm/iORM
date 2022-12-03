@@ -35,7 +35,6 @@ type
     Label2: TLabel;
     Label1: TLabel;
     ImageLogo: TImage;
-    ioCloseQueryRepeater1: TioCloseQueryRepeater;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
