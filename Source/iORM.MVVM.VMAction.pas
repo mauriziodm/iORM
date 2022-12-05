@@ -309,10 +309,12 @@ type
   TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
   strict protected
     FExecuting, FExecutingEventHandler: Boolean;
+    FInjectVMEventHandler: Boolean;
+    FInjectViewEventHandler: Boolean;
     FOnCloseQuery: TCloseQueryEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
-    FScope: TioBSCloseQueryActionScope;
+    FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
     FViewModeAsTComponent: TComponent;
     function GetViewModelIntf: IioViewModelInternal;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
@@ -328,9 +330,11 @@ type
     procedure Update; override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
+    property InjectViewEventHandler: Boolean read FInjectViewEventHandler write FInjectViewEventHandler default True;
+    property InjectVMEventHandler: Boolean read FInjectVMEventHandler write FInjectVMEventHandler default True;
     property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
     property OnExecuteAction: TioBSCloseQueryOnExecuteAction read FOnExecuteAction write FOnExecuteAction default eaClose;
-    property Scope: TioBSCloseQueryActionScope read FScope write FScope default sOwnedStrictly;
+    property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usOwnedStrictly;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
@@ -904,9 +908,11 @@ begin
   inherited;
   FExecuting := False;
   FExecutingEventHandler := False;
+  FInjectViewEventHandler := True;
+  FInjectVMEventHandler := True;
   FOnEditingAction := eaDisable;
   FOnExecuteAction := eaClose;
-  FScope := sOwnedStrictly;
+  FOnUpdateScope := usOwnedStrictly;
   TioBSCloseQueryActionRegister.RegisterAction(Self as IioBSCloseQueryAction);
 end;
 
@@ -942,8 +948,8 @@ procedure TioVMActionBSCloseQuery._InjectEventHandlerOnView(const AView: TCompon
 var
   LEventHandlerToInject: TMethod;
 begin
-  // On runtime only
-  if (csDesigning in ComponentState) then
+  // On runtime only and only if enabled
+  if (csDesigning in ComponentState) or not FInjectViewEventHandler then
     Exit;
   // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
   LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
@@ -955,8 +961,8 @@ procedure TioVMActionBSCloseQuery._InjectEventHandlerOnViewModel(const AViewMode
 var
   LEventHandlerToInject: TMethod;
 begin
-  // On runtime only
-  if (csDesigning in ComponentState) then
+  // On runtime only and only if enabled
+  if (csDesigning in ComponentState) or not FInjectVMEventHandler then
     Exit;
   // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
   LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
@@ -983,10 +989,10 @@ begin
   LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
   // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
   //  in modo ricorsivo oppure no, se la action può essere attiva
-  case FScope of
-    sOwnedRecursive:
+  case FOnUpdateScope of
+    usOwnedRecursive:
       LEnabled := LEnabled and _CanCloseBindedViews;
-    sGlobal:
+    usGlobal:
       LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self);
   end;
   // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola

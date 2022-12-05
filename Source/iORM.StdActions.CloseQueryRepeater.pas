@@ -9,7 +9,7 @@ type
 
   TioCloseQueryRepeater = class (TComponent)
   private
-    FScope: TioBSCloseQueryActionScope;
+    FScope: TioBSCloseQueryActionUpdateScope;
     procedure _InjectEventHandler;
   protected
     procedure Loaded; override;
@@ -18,7 +18,7 @@ type
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     // properties
-    property Scope: TioBSCloseQueryActionScope read FScope write FScope default sOwnedStrictly;
+    property Scope: TioBSCloseQueryActionUpdateScope read FScope write FScope default usOwnedStrictly;
   end;
 
 
@@ -33,7 +33,7 @@ uses
 constructor TioCloseQueryRepeater.Create(AOwner: TComponent);
 begin
   inherited;
-  FScope := sOwnedStrictly;
+  FScope := usOwnedStrictly;
 end;
 
 procedure TioCloseQueryRepeater.Loaded;

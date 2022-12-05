@@ -96,7 +96,7 @@ type
   // ltFromBSReloadNewInstance: the bind source receives the object to bind from a source bind source and reloads it AS A NEW INSTANCE for any changes or lazy load
   TioLoadType = (ltManual, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
-  TioBSCloseQueryActionScope = (sOwnedStrictly, sOwnedRecursive, sGlobal);
+  TioBSCloseQueryActionUpdateScope = (usOwnedStrictly, usOwnedRecursive, usGlobal);
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);
 

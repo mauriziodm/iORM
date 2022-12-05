@@ -21,7 +21,7 @@ type
 
   TioBSCloseQueryCommonBehaviour = class
   public
-    class function CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
+    class function CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionUpdateScope): Boolean;
     class function CanClose_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean): Boolean;
     class function ExtractBSCloseQueryStdAction(const AView: TComponent): IioBSCloseQueryAction;
     class procedure InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
@@ -36,15 +36,15 @@ uses
 
 { TioBSCloseQueryCommonBehaviour }
 
-class function TioBSCloseQueryCommonBehaviour.CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
+class function TioBSCloseQueryCommonBehaviour.CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionUpdateScope): Boolean;
 begin
   Result := True;
   case AScope of
-    sOwnedStrictly:
+    usOwnedStrictly:
       Result := CanClose_Owned(Sender, AView, False);
-    sOwnedRecursive:
+    usOwnedRecursive:
       Result := CanClose_Owned(Sender, AView, True);
-    sGlobal:
+    usGlobal:
       Result := TioBSCloseQueryActionRegister.CanClose(Sender);
   end;
 end;
