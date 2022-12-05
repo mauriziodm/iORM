@@ -22,7 +22,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
+    procedure AddOrUpdate(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
     property Count: Integer read GetCount;
     property ItemByView[const AView:TComponent]:TioViewContextRegisterItem read GetItemByView;
     property ItemByViewContext[const AViewContext:TComponent]:TioViewContextRegisterItem read GetItemByViewContext;
@@ -47,7 +47,7 @@ type
     class var FInternalRegister: IioViewRegisterBase;
   public
     class procedure _Build;
-    class procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
+    class procedure AddOrUpdate(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider; const AViewContextFreeMethod:TProc);
     class procedure CloseView(const AView: TComponent);
     class procedure HideView(const AView: TComponent);
     class procedure ShowView(const AView: TComponent);
@@ -61,32 +61,52 @@ uses
 
 { TioViewContextRegister }
 
-procedure TioViewRegisterBase.Add(const AView, AViewContext: TComponent;
+procedure TioViewRegisterBase.AddOrUpdate(const AView, AViewContext: TComponent;
   const AViewContextProvider:TioViewContextProvider;
   const AViewContextFreeMethod:TProc);
 var
   LItem: TioViewContextRegisterItem;
 begin
   // Check parameters validity
+  // NB: Mauri 04/12/2022: Da ora deve essere possibile registrare una vista anche in assenza di un ViewModel,
+  //      mi serve per gestire correttamente le BSCloseQueryActions anche per quelle viste che non hanno un
+  //      ViewContext (es: la MainForm di alcuni esempi). Quindi commento le righe qui sotto.
+//  if not Assigned(AViewContext) then
+//    raise EioException.Create('TioViewContextRegister', 'Add', 'The ViewContext must be assigned.');
   if not Assigned(AView) then
     raise EioException.Create('TioViewContextRegister', 'Add', 'The View must be assigned.');
-  if not Assigned(AViewContext) then
-    raise EioException.Create('TioViewContextRegister', 'Add', 'The ViewContext must be assigned.');
   // Avoid duplicated Views or ViewContexts
   // NB: Il codice commentato qui sotto è stato sistutuito con l'if sottostante per risolvere
   //      l'errore che si creva nel caso in cui una View (e relativo ViewModel) fosse registrata (nel D.I.C.) come
   //      AsSingleton e quindi rimanendo vivi quando non servivano più, ma poi riutilizzati in seguito, ne causava
   //      una ulteriore registrazione della vista stessa nel ViewRegister del ViewModel (sempre quello) con conseguente
   //      errore di "Vista registrata due volte". Così sembra funzionare bene, vedere nel tempo se da problemi in altri casi.
+  // NB: Mauri 04/12/2022: Ripensandoci perchè c'è il "ContainsViewContext(AViewContext)" ???
+  //      in fondo può essere che assegno un ViewContext a più di una vista (es: Pizz'Amore che nell'ordine assegna la stessa
+  //      ScrollBox a tutte le microviste delle righe. Provo a togliere il controllo sul VM già registrato e vediamo come va.
+
 //  if ContainsView(Aview) then
 //    raise EioException.Create('TioViewContextRegister', 'Add', 'Duplicated View.');
 //  if ContainsViewContext(AViewContext) then
 //    raise EioException.Create('TioViewContextRegister', 'Add', 'Duplicated ViewContext.');
-  if ContainsView(Aview) or ContainsViewContext(AViewContext) then
-    Exit;
-  // Register
-  LItem := TioViewContextRegisterItem.Create(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
-  FInternalContainer.Add(LItem);
+
+//  if ContainsView(Aview) or ContainsViewContext(AViewContext) then
+
+//  if ContainsView(Aview) then
+//    Exit;
+
+  LItem := FindItemByView(AView);
+  if Assigned(LItem) then
+  begin
+    LItem.ViewContext := AViewContext;
+    LItem.ViewContextProvider := AViewContextProvider;
+    LItem.ViewContextFreeMethod := AViewContextFreeMethod;
+  end
+  else
+  begin
+    LItem := TioViewContextRegisterItem.Create(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
+    FInternalContainer.Add(LItem);
+  end;
 end;
 
 function TioViewRegisterBase.ContainsView(const AView: TComponent): Boolean;
@@ -162,10 +182,10 @@ end;
 
 { TioSimpleViewRegister }
 
-class procedure TioSimpleViewRegister.Add(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
+class procedure TioSimpleViewRegister.AddOrUpdate(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider;
   const AViewContextFreeMethod: TProc);
 begin
-  FInternalRegister.Add(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
+  FInternalRegister.AddOrUpdate(AView, AViewContext, AViewContextProvider, AViewContextFreeMethod);
 end;
 
 class procedure TioSimpleViewRegister.CloseView(const AView: TComponent);

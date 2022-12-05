@@ -197,7 +197,7 @@ type
     FConstructorMarker: String;
     FConstructorParams: TioConstructorParams;
     FPresenterSettings: TArray<TioDIPresenterSettings>;
-    FViewModel: IioViewModel;
+    FViewModel: IioViewModelInternal;
     FViewModelMarker: String;
     FSingletonKey: String;
     FVCProvider: TioViewContextProvider;
@@ -212,7 +212,7 @@ type
     procedure ClearPresenterSettings;
     function PresenterSettingsExists: Boolean;
     function ViewModelExist: Boolean;
-    function ExtractVMFromView(const AView: TComponent): IioViewModel;
+    function ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
     procedure CheckConstructorInfo(const AContainerItem: TioDIContainerImplementersItem);
   strict protected
     function _ShowCurrent: TComponent;
@@ -1289,14 +1289,14 @@ begin
   Result := Self.Container.Exists(FInterfaceName, Self.FAlias);
 end;
 
-function TioDependencyInjectionLocator.ExtractVMFromView(const AView: TComponent): IioViewModel;
+function TioDependencyInjectionLocator.ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
 var
   LVMBridge: TioViewModelBridge;
 begin
   Result := nil;
   LVMBridge := TioViewModelBridge.ExtractVMBridge(AView);
   if Assigned(LVMBridge) and LVMBridge.ViewModelIsAssigned then
-    Result := LVMBridge.ViewModel;
+    Result := LVMBridge.ViewModel as IioViewModelInternal;
 end;
 
 function TioDependencyInjectionLocator.Get: TObject;
@@ -1463,7 +1463,7 @@ end;
 function TioDependencyInjectionLocator.SetViewModel(const AViewModel: IioViewModel; const AMarker: String): IioDependencyInjectionLocator;
 begin
   FViewModelMarker := AMarker;
-  FViewModel := AViewModel;
+  FViewModel := AViewModel as IioViewModelInternal;
   Result := Self;
 end;
 
@@ -1611,10 +1611,15 @@ begin
       // Register View, ViewContext and ViewContextProvider in the ViewRegister of the ViewModel or in the SimpleViewRegster
       //  if a SimpleView was required
       if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
-        TioSimpleViewRegister.Add(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod)
+        TioSimpleViewRegister.AddOrUpdate(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod)
       else
+      // NB: Mauri 04/12/2022: Oltre a registrare la nuova View (e il relativo ViewContext) qui ora le viste vengono registrare
+      //      nel ViewRegister del ViewModel anche nel metodo TioViewModel.BindView (se non già registrata da qui.
+      //      Ho aggiunto questo perchè per far funzionare correttamente le BSCloseQueryActions avevo bisogno
+      //      che tutte le viste fossero registrate, anche quelle che non sono state create dal DIC o che cmq non venivano registrate.
+      //      Normalmente le viste infatti venivano registrate solo qui, ora anche nel metodo di cui sopra se necessario.
       if Assigned(FViewModel) then
-        (FViewModel as IioViewModelInternal).ViewRegister.Add(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
+        FViewModel.ViewRegister.AddOrUpdate(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
     end
   finally
     // if the ViewModel is present then UnLock it (MVVM)

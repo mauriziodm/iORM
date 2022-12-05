@@ -309,7 +309,7 @@ type
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
-    function _CanClose: Boolean;
+    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   protected
     procedure Loaded; override;
   public
@@ -875,7 +875,7 @@ procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
 begin
   FExecuting := True;
   try
-    if _CanClose then
+    if _CanClose(nil) then
     begin
       if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
         TargetBindSource.Persistence.Persist;
@@ -940,14 +940,14 @@ begin
         [Owner.ClassName, ClassName, ClassName]));
 end;
 
-function TioBSCloseQuery._CanClose: Boolean;
+function TioBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 begin
-  Result := FEnabledForInternalUseOnly;
+  Result := (Self = TObject(Sender)) or Enabled;
 end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := CanClose;
+  CanClose := _CanClose(nil);
   if not FExecuting then
     ExecuteTarget(Sender);
 end;

@@ -9,7 +9,7 @@ type
 
   IioBSCloseQueryAction = interface
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']
-    function _CanClose: Boolean;
+    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   end;
 
   IioBSCloseQueryVMAction = interface(IioBSCloseQueryAction)
@@ -21,8 +21,8 @@ type
 
   TioBSCloseQueryCommonBehaviour = class
   public
-    class function CanClose(const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
-    class function CanClose_Owned(const AView: TComponent; const ARecursive: Boolean): Boolean;
+    class function CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
+    class function CanClose_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean): Boolean;
     class function ExtractBSCloseQueryStdAction(const AView: TComponent): IioBSCloseQueryAction;
     class procedure InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
   end;
@@ -36,20 +36,20 @@ uses
 
 { TioBSCloseQueryCommonBehaviour }
 
-class function TioBSCloseQueryCommonBehaviour.CanClose(const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
+class function TioBSCloseQueryCommonBehaviour.CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionScope): Boolean;
 begin
   Result := True;
   case AScope of
     sOwnedStrictly:
-      Result := CanClose_Owned(AView, False);
+      Result := CanClose_Owned(Sender, AView, False);
     sOwnedRecursive:
-      Result := CanClose_Owned(AView, True);
+      Result := CanClose_Owned(Sender, AView, True);
     sGlobal:
-      Result := TioBSCloseQueryActionRegister.CanClose;
+      Result := TioBSCloseQueryActionRegister.CanClose(Sender);
   end;
 end;
 
-class function TioBSCloseQueryCommonBehaviour.CanClose_Owned(const AView: TComponent; const ARecursive: Boolean): Boolean;
+class function TioBSCloseQueryCommonBehaviour.CanClose_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean): Boolean;
 var
   I: Integer;
   LBSCloseQueryAction: IioBSCloseQueryAction;
@@ -59,15 +59,15 @@ begin
   begin
     // Se il componente è un ViewModelBridge
     if AView.Components[I] is TioViewModelBridge then
-      Result := TioViewModelBridge(AView.Components[I]).ViewModel._CanClose
+      Result := TioViewModelBridge(AView.Components[I]).ViewModel._CanClose(Sender)
     else
     // Se il componente è una CloseQueryAction
     if Supports(AView.Components[I], IioBSCloseQueryAction, LBSCloseQueryAction) then
-      Result := LBSCloseQueryAction._CanClose
+      Result := LBSCloseQueryAction._CanClose(Sender)
     else
     // Se il componente possiede altri componenti a sua volta richiama ricorsivamente se stessa
     if ARecursive and (AView.Components[I].ComponentCount > 0) then
-      Result := CanClose_Owned(AView.Components[I], ARecursive);
+      Result := CanClose_Owned(Sender, AView.Components[I], ARecursive);
     // Appena Result = false esce
     if not Result then
       Exit;

@@ -40,4 +40,6 @@ implementation
 
 {$R *.fmx}
 
+{ TViewPizza }
+
 end.

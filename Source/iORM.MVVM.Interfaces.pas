@@ -51,7 +51,7 @@ type
   // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    function _CanClose: Boolean;
+    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
     function CloseQuery: Boolean;
     function VMActions: IioVMActionContainer;
     // VCProvider local register
@@ -82,7 +82,7 @@ type
 
   IioViewRegisterBase = interface
     ['{7E0B50E8-B561-44E2-A8A0-6A13CA563875}']
-    procedure Add(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
+    procedure AddOrUpdate(const AView, AViewContext: TComponent; const AViewContextProvider: TioViewContextProvider; const AViewContextFreeMethod: TProc);
     function ContainsView(const AView:TComponent): Boolean;
     function ContainsViewContext(const AViewContext:TComponent): Boolean;
     function GetCount: Integer;

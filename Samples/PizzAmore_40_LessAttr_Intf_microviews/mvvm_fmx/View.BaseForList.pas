@@ -33,11 +33,18 @@ type
     { Private declarations }
   public
     { Public declarations }
+    destructor Destroy; override;
   end;
 
 implementation
 
 {$R *.fmx}
+
+destructor TViewBaseForList.Destroy;
+begin
+
+  inherited;
+end;
 
 procedure TViewBaseForList.ListViewDblClick(Sender: TObject);
 begin

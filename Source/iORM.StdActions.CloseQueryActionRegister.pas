@@ -15,19 +15,19 @@ type
   public
     class procedure RegisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
     class procedure UnregisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
-    class function CanClose: Boolean;
+    class function CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   end;
 
 implementation
 
 { TioCloseQueryActionsRegister }
 
-class function TioBSCloseQueryActionRegister.CanClose: Boolean;
+class function TioBSCloseQueryActionRegister.CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 var
   LBSCloseQueryAction: IioBSCloseQueryAction;
 begin
   for LBSCloseQueryAction in FInternalContainer do
-    if not LBSCloseQueryAction._CanClose then
+    if not LBSCloseQueryAction._CanClose(Sender) then
       Exit(False);
   Result := True;
 end;

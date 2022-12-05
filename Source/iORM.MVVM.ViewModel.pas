@@ -59,7 +59,7 @@ type
     procedure BindView(const AView: TComponent);
   protected
     procedure Loaded; override;
-    function _CanClose: Boolean;
+    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
     // DefaultPresenter
     function GetDefaultPresenter: IioNotifiableBindSource;
     // Presenter
@@ -70,6 +70,7 @@ type
     function ViewRegister: IioViewRegisterMVVM;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function VMActions: IioVMActionContainer;
     function CloseQuery: Boolean; virtual;
     procedure Close;
@@ -99,6 +100,11 @@ procedure TioViewModel.BindView(const AView: TComponent);
 begin
   FVMActionContainer.BindView(AView);
   FLocalVCProviderRegister.BindView(AView);
+  // NB: Mauri 04/12/2022: Se a questo punto la nuova vista non è ancora registrata nel ViewRegister (es: MainForm di alcuni esempi)
+  //      allora provvede a registrarla ora. Ho aggiunto questo perchè per far funzionare correttamente le BSCloseQueryActions avevo bisogno
+  //      che tutte le viste fossero registrate, anche quelle che non sono state create dal DIC o che cmq non venivano registrate.
+  //      Normalmente le viste infatti venivano registrate solo nel metodo TioDependencyInjectionLocator._Get ora anche qui se necessario.
+  FViewRegister.AddOrUpdate(AView, nil, nil, nil);
 end;
 
 
@@ -179,10 +185,10 @@ begin
   Result := FVMActionContainer;
 end;
 
-function TioViewModel._CanClose: Boolean;
+function TioViewModel._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 begin
-  if Assigned(FVMActionContainer.BSCloseQueryAction) then
-    Result := FVMActionContainer.BSCloseQueryAction._CanClose
+  if Assigned(FVMActionContainer.BSCloseQueryAction) and (FVMActionContainer.BSCloseQueryAction <> Sender) then
+    Result := FVMActionContainer.BSCloseQueryAction._CanClose(Sender)
   else
     Result := True;
 end;
@@ -193,6 +199,12 @@ begin
    FLocalVCProviderRegister := TioMVVMFactory.NewLocalVCProviderRegister;
    inherited;
    FViewRegister := TioMVVMFactory.NewViewRegisterMVVM;
+end;
+
+destructor TioViewModel.Destroy;
+begin
+
+  inherited;
 end;
 
 procedure TioViewModel.DoOnViewPairing;

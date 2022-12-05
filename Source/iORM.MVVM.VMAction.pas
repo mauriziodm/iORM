@@ -320,7 +320,7 @@ type
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
-    function _CanClose: Boolean;
+    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -974,7 +974,7 @@ var
     Result := True;
     for I := 0 to GetViewModelIntf.ViewRegister.Count-1 do
     begin
-      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(GetViewModelIntf.ViewRegister.View[I], True);
+      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(Self, GetViewModelIntf.ViewRegister.View[I], True);
       if not Result then
         Exit;
     end;
@@ -987,18 +987,18 @@ begin
     sOwnedRecursive:
       LEnabled := LEnabled and _CanCloseBindedViews;
     sGlobal:
-      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose;
+      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self);
   end;
-  // se c'è un event handler per l'evento OnCloseQuery lascia a lui lìultima parola
+  // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
   if Assigned(FOnCloseQuery) then
     FOnCloseQuery(Self, LEnabled);
 
   Enabled := LEnabled;
 end;
 
-function TioVMActionBSCloseQuery._CanClose: Boolean;
+function TioVMActionBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 begin
-  Result := Enabled;
+  Result := (Self = TObject(Sender)) or Enabled;
 end;
 
 procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
@@ -1007,7 +1007,7 @@ var
 begin
   FExecuting := True;
   try
-    if _CanClose then
+    if _CanClose(nil) then
     begin
       if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
         TargetBindSource.Persistence.Persist;
@@ -1037,7 +1037,7 @@ procedure TioVMActionBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var
 begin
   FExecutingEventHandler := True;
   try
-    CanClose := _CanClose;
+    CanClose := _CanClose(nil);
     if not FExecuting then
       _InternalExecuteStdAction;
   finally

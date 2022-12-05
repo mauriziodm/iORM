@@ -21,7 +21,6 @@ object VMStart: TVMStart
   end
   object acQuit: TioVMActionBSCloseQuery
     OnExecuteAction = eaTerminateApplication
-    Scope = sOwnedRecursive
     Left = 48
     Top = 32
   end

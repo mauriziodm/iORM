@@ -18,21 +18,22 @@ type
     procedure SetView(const AView:TComponent);
     procedure SetViewContext(const AViewContext:TComponent);
     procedure SetViewContextProvider(const AViewContextProvider:TioViewContextProvider);
+    procedure SetViewContextFreeMethod(const Value: TProc);
     procedure CheckForLife;
 //    function GetViewContext: TComponent; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
 //    function GetViewContextProvider: TioViewContextProvider; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
-    constructor Create(const AView, AViewContext: TComponent;
-      const AViewContextProvider:TioViewContextProvider;
+    constructor Create(const AView, AViewContext: TComponent; const AViewContextProvider:TioViewContextProvider;
       const AViewContextFreeMethod:TProc); reintroduce; overload;
     procedure ReleaseViewContext;
     procedure ShowViewContext;
     procedure HideViewContext;
-    property View:TComponent read FView;
-    property ViewContext:TComponent read FViewContext;
-    property ViewContextProvider:TioViewContextProvider read FViewContextProvider;
+    property View:TComponent read FView write SetView;
+    property ViewContext:TComponent read FViewContext write SetViewContext;
+    property ViewContextProvider:TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
+    property ViewContextFreeMethod: TProc read FViewContextFreeMethod write SetViewContextFreeMethod;
   end;
 
 implementation
@@ -56,8 +57,7 @@ begin
   SetView(AView);
   SetViewContext(AViewContext);
   SetViewContextProvider(AViewContextProvider);
-  FViewContextFreeMethod := AViewContextFreeMethod;
-  FViewContextFreeMethodIsPresent := Assigned(AViewContextFreeMethod);
+  SetViewContextFreeMethod(AViewContextFreeMethod);
 end;
 
 //function TioViewContextRegisterItem.GetViewContext: TComponent;
@@ -131,6 +131,12 @@ begin
   if Assigned(FViewContext) then
     FViewContext.FreeNotification(Self);
   CheckForLife;
+end;
+
+procedure TioViewContextRegisterItem.SetViewContextFreeMethod(const Value: TProc);
+begin
+  FViewContextFreeMethod := Value;
+  FViewContextFreeMethodIsPresent := Assigned(FViewContextFreeMethod);
 end;
 
 procedure TioViewContextRegisterItem.SetViewContextProvider(

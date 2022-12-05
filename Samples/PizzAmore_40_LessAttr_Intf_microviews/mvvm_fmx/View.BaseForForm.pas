@@ -27,10 +27,19 @@ type
     { Private declarations }
   public
     { Public declarations }
+    destructor Destroy; override;
   end;
 
 implementation
 
 {$R *.fmx}
+
+{ TViewBaseForForm }
+
+destructor TViewBaseForForm.Destroy;
+begin
+
+  inherited;
+end;
 
 end.

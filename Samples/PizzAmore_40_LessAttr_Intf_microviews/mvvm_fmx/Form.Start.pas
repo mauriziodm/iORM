@@ -84,12 +84,13 @@ end;
 
 procedure TStartForm.VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
-  TabControlStart.Delete((AViewCOntext as TTabItem).Index);
+//  TabControlStart.Delete((AViewCOntext as TTabItem).Index);
 end;
 
 procedure TStartForm.VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
 begin
-  ResultViewContext := TabControlStart.Add;
+//  ResultViewContext := TabControlStart.Add;
+  ResultViewContext := TabItemStart;
 end;
 
 initialization

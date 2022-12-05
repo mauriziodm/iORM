@@ -51,7 +51,7 @@ begin
   LSenderAsTComponent := Sender as TComponent;
   for I := 0 to LSenderAsTComponent.ComponentCount-1 do
   begin
-    CanClose := CanClose and TioBSCloseQueryCommonBehaviour.CanClose(LSenderAsTComponent.Components[I], FScope);
+    CanClose := CanClose and TioBSCloseQueryCommonBehaviour.CanClose(nil, LSenderAsTComponent.Components[I], FScope);
     if not CanClose then
       Exit;
   end;
