@@ -22,6 +22,7 @@ object VMBaseForForm: TVMBaseForForm
     Top = 176
   end
   object acBack: TioVMActionBSCloseQuery
+    OnUpdateScope = usOwnedRecursive
     TargetBindSource = BSMaster
     Left = 192
     Top = 48

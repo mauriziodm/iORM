@@ -20,16 +20,27 @@ type
 
 implementation
 
+uses
+  iORM.Exceptions, System.SysUtils, System.Classes;
+
 { TioCloseQueryActionsRegister }
 
 class function TioBSCloseQueryActionRegister.CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 var
-  LBSCloseQueryAction: IioBSCloseQueryAction;
+  I, LSenderIdx: Integer;
 begin
-  for LBSCloseQueryAction in FInternalContainer do
-    if not LBSCloseQueryAction._CanClose(Sender) then
-      Exit(False);
   Result := True;
+  // NB: Cicla per tutte le BSCloseQueryAction registrate successivamente a quella ricevuta come Sender
+  LSenderIdx := FInternalContainer.IndexOf(Sender);
+  if LSenderIdx > -1 then
+  begin
+    for I := LSenderIdx+1 to FInternalContainer.Count-1 do
+      if not FInternalContainer[I]._CanClose(Sender) then
+        Exit(False);
+  end
+  else
+    raise EioException.Create(ClassName, 'CanClose', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',
+      [TComponent(Sender).Name, TComponent(Sender).Owner.Name]));
 end;
 
 class procedure TioBSCloseQueryActionRegister.RegisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
