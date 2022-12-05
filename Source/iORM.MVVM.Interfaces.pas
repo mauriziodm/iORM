@@ -51,6 +51,7 @@ type
   // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
+    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
     function CloseQuery: Boolean;
     function VMActions: IioVMActionContainer;

@@ -15,6 +15,7 @@ type
   public
     class procedure RegisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
     class procedure UnregisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
+    class procedure Execute(const Sender: IioBSCloseQueryAction);
     class function CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   end;
 
@@ -40,6 +41,22 @@ begin
   end
   else
     raise EioException.Create(ClassName, 'CanClose', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',
+      [TComponent(Sender).Name, TComponent(Sender).Owner.Name]));
+end;
+
+class procedure TioBSCloseQueryActionRegister.Execute(const Sender: IioBSCloseQueryAction);
+var
+  I, LSenderIdx: Integer;
+begin
+  // NB: Cicla per tutte le BSCloseQueryAction registrate successivamente a quella ricevuta come Sender
+  LSenderIdx := FInternalContainer.IndexOf(Sender);
+  if LSenderIdx > -1 then
+  begin
+    for I := LSenderIdx+1 to FInternalContainer.Count-1 do
+      FInternalContainer[I]._BSCloseQueryActionExecute(Sender);
+  end
+  else
+    raise EioException.Create(ClassName, 'Execute', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',
       [TComponent(Sender).Name, TComponent(Sender).Owner.Name]));
 end;
 

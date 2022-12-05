@@ -322,6 +322,7 @@ type
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -970,6 +971,16 @@ begin
   TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(AViewModelAsTComponent, LEventHandlerToInject, True);
 end;
 
+procedure TioVMActionBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
+begin
+  Execute;
+end;
+
+function TioVMActionBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+begin
+  Result := (Self = TObject(Sender)) or Enabled;
+end;
+
 procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;
 var
   LEnabled: Boolean;
@@ -1002,19 +1013,31 @@ begin
   Enabled := LEnabled;
 end;
 
-function TioVMActionBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
-begin
-  Result := (Self = TObject(Sender)) or Enabled;
-end;
-
 procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
 var
   LViewModel: IioViewModelInternal;
+  function _ExecuteOnBindedViews: boolean;
+  var
+    I: integer;
+  begin
+    Result := True;
+    for I := 0 to GetViewModelIntf.ViewRegister.Count-1 do
+      TioBSCloseQueryCommonBehaviour.Execute_Owned(Self, GetViewModelIntf.ViewRegister.View[I], True);
+  end;
 begin
   FExecuting := True;
   try
     if _CanClose(nil) then
     begin
+      // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
+      //  in modo ricorsivo oppure no, se la action può essere attiva
+      case FOnUpdateScope of
+        usOwnedRecursive:
+          _ExecuteOnBindedViews;
+        usGlobal:
+          TioBSCloseQueryActionRegister.Execute(Self);
+      end;
+
       if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
         TargetBindSource.Persistence.Persist;
       if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
@@ -1033,6 +1056,7 @@ begin
       end
       else
         raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
+
     end;
   finally
     FExecuting := False;

@@ -10,6 +10,7 @@ type
   IioBSCloseQueryAction = interface
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
   end;
 
   IioBSCloseQueryVMAction = interface(IioBSCloseQueryAction)
@@ -23,6 +24,7 @@ type
   public
     class function CanClose(const Sender: IioBSCloseQueryAction; const AView: TComponent; const AScope: TioBSCloseQueryActionUpdateScope): Boolean;
     class function CanClose_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean): Boolean;
+    class procedure Execute_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean);
     class function ExtractBSCloseQueryStdAction(const AView: TComponent): IioBSCloseQueryAction;
     class procedure InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
   end;
@@ -71,6 +73,27 @@ begin
     // Appena Result = false esce
     if not Result then
       Exit;
+  end;
+end;
+
+class procedure TioBSCloseQueryCommonBehaviour.Execute_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean);
+var
+  I: Integer;
+  LBSCloseQueryAction: IioBSCloseQueryAction;
+begin
+  for I := 0 to AView.ComponentCount-1 do
+  begin
+    // Se il componente è un ViewModelBridge
+    if AView.Components[I] is TioViewModelBridge then
+      TioViewModelBridge(AView.Components[I]).ViewModel._BSCloseQueryActionExecute(Sender)
+    else
+    // Se il componente è una CloseQueryAction
+    if Supports(AView.Components[I], IioBSCloseQueryAction, LBSCloseQueryAction) then
+      LBSCloseQueryAction._BSCloseQueryActionExecute(Sender)
+    else
+    // Se il componente possiede altri componenti a sua volta richiama ricorsivamente se stessa
+    if ARecursive and (AView.Components[I].ComponentCount > 0) then
+      Execute_Owned(Sender, AView.Components[I], ARecursive);
   end;
 end;
 

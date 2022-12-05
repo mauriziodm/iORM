@@ -309,6 +309,7 @@ type
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnCloseQuery: TCloseQueryEvent;
     procedure _InjectOnCloseEventHandler;
+    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   protected
     procedure Loaded; override;
@@ -938,6 +939,11 @@ begin
         #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
         #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the form.',
         [Owner.ClassName, ClassName, ClassName]));
+end;
+
+procedure TioBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
+begin
+  Execute;
 end;
 
 function TioBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
