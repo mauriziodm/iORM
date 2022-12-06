@@ -22,7 +22,6 @@ object VMBaseForForm: TVMBaseForForm
     Top = 176
   end
   object acBack: TioVMActionBSCloseQuery
-    OnEditingAction = eaAutoPersist
     OnUpdateScope = usGlobal
     TargetBindSource = BSMaster
     Left = 192

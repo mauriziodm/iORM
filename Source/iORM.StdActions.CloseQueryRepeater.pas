@@ -9,7 +9,7 @@ type
 
   TioCloseQueryRepeater = class (TComponent)
   private
-    FScope: TioBSCloseQueryActionUpdateScope;
+    FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
     procedure _InjectEventHandler;
   protected
     procedure Loaded; override;
@@ -18,7 +18,7 @@ type
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     // properties
-    property Scope: TioBSCloseQueryActionUpdateScope read FScope write FScope default usOwnedStrictly;
+    property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usOwnedStrictly;
   end;
 
 
@@ -33,28 +33,13 @@ uses
 constructor TioCloseQueryRepeater.Create(AOwner: TComponent);
 begin
   inherited;
-  FScope := usOwnedStrictly;
+  FOnUpdateScope := usOwnedStrictly;
 end;
 
 procedure TioCloseQueryRepeater.Loaded;
 begin
   inherited;
   _InjectEventHandler;
-end;
-
-procedure TioCloseQueryRepeater._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
-var
-  I: Integer;
-  LSenderAsTComponent: TComponent;
-begin
-  CanClose := True;
-  LSenderAsTComponent := Sender as TComponent;
-  for I := 0 to LSenderAsTComponent.ComponentCount-1 do
-  begin
-    CanClose := CanClose and TioBSCloseQueryCommonBehaviour.CanClose(nil, LSenderAsTComponent.Components[I], FScope);
-    if not CanClose then
-      Exit;
-  end;
 end;
 
 procedure TioCloseQueryRepeater._InjectEventHandler;
@@ -68,6 +53,24 @@ begin
   LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
   LEventHandlerToInject.Data := Self;
   TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(Owner, LEventHandlerToInject, False);
+end;
+
+procedure TioCloseQueryRepeater._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
+var
+  I: Integer;
+  LSenderAsTComponent: TComponent;
+begin
+  CanClose := True;
+  LSenderAsTComponent := Sender as TComponent;
+  for I := 0 to LSenderAsTComponent.ComponentCount-1 do
+  begin
+    if (LSenderAsTComponent.Components[I].ComponentCount > 0) then
+    begin
+      CanClose := CanClose and TioBSCloseQueryCommonBehaviour.CanClose(nil, LSenderAsTComponent.Components[I], FOnUpdateScope);
+      if not CanClose then
+        Exit;
+    end;
+  end;
 end;
 
 end.
