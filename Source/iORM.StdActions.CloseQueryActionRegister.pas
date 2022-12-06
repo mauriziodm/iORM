@@ -16,7 +16,7 @@ type
     class procedure RegisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
     class procedure UnregisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
     class procedure Execute(const Sender: IioBSCloseQueryAction);
-    class function CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    class function CanClose(const Sender: IioBSCloseQueryAction; const ADisableIfChildExists: Boolean): Boolean;
   end;
 
 implementation
@@ -26,7 +26,7 @@ uses
 
 { TioCloseQueryActionsRegister }
 
-class function TioBSCloseQueryActionRegister.CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+class function TioBSCloseQueryActionRegister.CanClose(const Sender: IioBSCloseQueryAction; const ADisableIfChildExists: Boolean): Boolean;
 var
   I, LSenderIdx: Integer;
 begin
@@ -35,9 +35,16 @@ begin
   LSenderIdx := FInternalContainer.IndexOf(Sender);
   if LSenderIdx > -1 then
   begin
-    for I := LSenderIdx+1 to FInternalContainer.Count-1 do
-      if not FInternalContainer[I]._CanClose(Sender) then
-        Exit(False);
+    // NB: Se ADisableIfChildExists = True allora verifica semplicemente se il registro contiene altre BSCloseQueryActions
+    //      dopo quella che ha appena rilevato e se ne esistono ritorna direttametne False,
+    //      altrimenti continua a ciclare per tutte le BSCLoseQueryActions scessive a quella rilevata ed chiede il CanClose a
+    //      ognuno di esse fino alla prima che risponde False oppure fino a quando finiscono.
+    if ADisableIfChildExists and (FInternalContainer.Count > (LSenderIdx+1)) then
+      Exit(False)
+    else
+      for I := LSenderIdx+1 to FInternalContainer.Count-1 do
+        if not FInternalContainer[I]._CanClose(Sender) then
+          Exit(False);
   end
   else
     raise EioException.Create(ClassName, 'CanClose', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',

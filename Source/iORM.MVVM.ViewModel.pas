@@ -61,6 +61,8 @@ type
     procedure Loaded; override;
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
+    function _BSCloseQueryAssigned: Boolean;
+    function _GetBSCloseQuery: IioBSCloseQueryAction;
     // DefaultPresenter
     function GetDefaultPresenter: IioNotifiableBindSource;
     // Presenter
@@ -192,12 +194,22 @@ begin
     FVMActionContainer.BSCloseQueryAction._BSCloseQueryActionExecute(Sender);
 end;
 
+function TioViewModel._BSCloseQueryAssigned: Boolean;
+begin
+  Result := Assigned(FVMActionContainer.BSCloseQueryAction);
+end;
+
 function TioViewModel._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 begin
   if Assigned(FVMActionContainer.BSCloseQueryAction) and (FVMActionContainer.BSCloseQueryAction <> Sender) then
     Result := FVMActionContainer.BSCloseQueryAction._CanClose(Sender)
   else
     Result := True;
+end;
+
+function TioViewModel._GetBSCloseQuery: IioBSCloseQueryAction;
+begin
+  Result := FVMActionContainer.BSCloseQueryAction;
 end;
 
 constructor TioViewModel.Create(AOwner: TComponent);

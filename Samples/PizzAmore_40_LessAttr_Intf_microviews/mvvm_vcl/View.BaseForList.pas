@@ -34,4 +34,6 @@ implementation
 
 {$R *.dfm}
 
+{ TViewBaseForList }
+
 end.

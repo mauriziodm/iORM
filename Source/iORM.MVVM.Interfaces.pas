@@ -53,6 +53,8 @@ type
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    function _BSCloseQueryAssigned: Boolean;
+    function _GetBSCloseQuery: IioBSCloseQueryAction;
     function CloseQuery: Boolean;
     function VMActions: IioVMActionContainer;
     // VCProvider local register

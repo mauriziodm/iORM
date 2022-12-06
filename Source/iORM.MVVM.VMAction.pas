@@ -317,6 +317,7 @@ type
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
     FViewModeAsTComponent: TComponent;
     function GetViewModelIntf: IioViewModelInternal;
+    function DisableIfChildExists: Boolean;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
@@ -335,7 +336,7 @@ type
     property InjectVMEventHandler: Boolean read FInjectVMEventHandler write FInjectVMEventHandler default True;
     property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
     property OnExecuteAction: TioBSCloseQueryOnExecuteAction read FOnExecuteAction write FOnExecuteAction default eaClose;
-    property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usOwnedStrictly;
+    property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usLocal;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
@@ -913,7 +914,7 @@ begin
   FInjectVMEventHandler := True;
   FOnEditingAction := eaDisable;
   FOnExecuteAction := eaClose;
-  FOnUpdateScope := usOwnedStrictly;
+  FOnUpdateScope := usLocal;
   TioBSCloseQueryActionRegister.RegisterAction(Self as IioBSCloseQueryAction);
 end;
 
@@ -921,6 +922,11 @@ destructor TioVMActionBSCloseQuery.Destroy;
 begin
   TioBSCloseQueryActionRegister.UnregisterAction(Self as IioBSCloseQueryAction);
   inherited;
+end;
+
+function TioVMActionBSCloseQuery.DisableIfChildExists: Boolean;
+begin
+  Result := FOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds];
 end;
 
 procedure TioVMActionBSCloseQuery.SetViewModel(const AViewModelAsTComponent: TComponent);
@@ -991,7 +997,7 @@ var
     Result := True;
     for I := 0 to GetViewModelIntf.ViewRegister.Count-1 do
     begin
-      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(Self, GetViewModelIntf.ViewRegister.View[I], True);
+      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(Self, GetViewModelIntf.ViewRegister.View[I], True, DisableIfChildExists);
       if not Result then
         Exit;
     end;
@@ -1001,10 +1007,10 @@ begin
   // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
   //  in modo ricorsivo oppure no, se la action può essere attiva
   case FOnUpdateScope of
-    usOwnedRecursive:
+    usOwned, usOwnedDisableIfChilds:
       LEnabled := LEnabled and _CanCloseBindedViews;
-    usGlobal:
-      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self);
+    usGlobal, usGlobalDisableIfChilds:
+      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, _CanCloseBindedViews);
   end;
   // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
   if Assigned(FOnCloseQuery) then
@@ -1032,7 +1038,7 @@ begin
       // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
       //  in modo ricorsivo oppure no, se la action può essere attiva
       case FOnUpdateScope of
-        usOwnedRecursive:
+        usOwned:
           _ExecuteOnBindedViews;
         usGlobal:
           TioBSCloseQueryActionRegister.Execute(Self);
