@@ -68,8 +68,10 @@ begin
       Result := TioBSCloseQueryActionRegister.CanClose(nil, False);
     // NB: Nel caso del repeater se lo scope è uno dei due "...DisableIfChilds" non ho trovato altro modo se non quello di
     //      reperire la prima BSCloseQueryAction che si trova tra i suoi Owned e poi basare la risposta su questa.
-    //      Dovrebbe funzionare bene tranne forse nel caso raro in cui ci possono essere più viste collegate a un solo
-    //      ViewModel, in questo caso usa la prima che trova, cmq è un caso raro.
+    //      NB: Dovrebbe funzionare bene tranne forse nel caso raro in cui ci possono essere più viste collegate a un solo
+    //           ViewModel, in questo caso usa la prima che trova, cmq è un caso raro.
+    //      NB: Anche nel caso di applicazione non MVVM con MainForm che non ha altre viste owned, non può funzionare perchè
+    //           il funzionamento si basa proprio sull'individuazione di una BSCloseQueryAction tra gli owned.
     usOwnedDisableIfChilds, usGlobalDisableIfChilds:
       Result := _CanCloseQueryingFirstBSCloseQueryActionFound(AView);
   end;
@@ -107,12 +109,9 @@ begin
   LSenderAsTComponent := Sender as TComponent;
   for I := 0 to LSenderAsTComponent.ComponentCount-1 do
   begin
-    if (LSenderAsTComponent.Components[I].ComponentCount > 0) then
-    begin
-      CanClose := CanClose and _CanClose(LSenderAsTComponent.Components[I], FOnUpdateScope);
-      if not CanClose then
-        Exit;
-    end;
+    CanClose := CanClose and _CanClose(LSenderAsTComponent.Components[I], FOnUpdateScope);
+    if not CanClose then
+      Exit;
   end;
 end;
 

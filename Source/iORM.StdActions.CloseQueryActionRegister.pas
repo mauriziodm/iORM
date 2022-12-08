@@ -32,12 +32,15 @@ var
 begin
   Result := True;
   // NB: Cicla per tutte le BSCloseQueryAction registrate successivamente a quella ricevuta come Sender
-  LSenderIdx := FInternalContainer.IndexOf(Sender);
+  // NB: Se Sender = nil allora (caso repeater sulla MainForm senza alcuna action e non MVVM) allora verifica tutto
+  LSenderIdx := 0;
+  if Sender <> nil then
+    LSenderIdx := FInternalContainer.IndexOf(Sender);
   if LSenderIdx > -1 then
   begin
     // NB: Se ADisableIfChildExists = True allora verifica semplicemente se il registro contiene altre BSCloseQueryActions
     //      dopo quella che ha appena rilevato e se ne esistono ritorna direttametne False,
-    //      altrimenti continua a ciclare per tutte le BSCLoseQueryActions scessive a quella rilevata ed chiede il CanClose a
+    //      altrimenti continua a ciclare per tutte le BSCLoseQueryActions successive a quella rilevata e chiede il CanClose a
     //      ognuno di esse fino alla prima che risponde False oppure fino a quando finiscono.
     if ADisableIfChildExists and (FInternalContainer.Count > (LSenderIdx+1)) then
       Exit(False)

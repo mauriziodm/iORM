@@ -8503,9 +8503,9 @@ object MainForm: TMainForm
   end
   object ButtonOrders: TButton
     Left = 32
-    Top = 344
+    Top = 336
     Width = 217
-    Height = 49
+    Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Orders'
     Font.Charset = DEFAULT_CHARSET
@@ -8519,9 +8519,9 @@ object MainForm: TMainForm
   end
   object ButtonCustomers: TButton
     Left = 32
-    Top = 408
+    Top = 387
     Width = 217
-    Height = 49
+    Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Customers'
     Font.Charset = DEFAULT_CHARSET
@@ -8535,9 +8535,9 @@ object MainForm: TMainForm
   end
   object ButtonPizzas: TButton
     Left = 32
-    Top = 472
+    Top = 438
     Width = 217
-    Height = 49
+    Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Pizzas'
     Font.Charset = DEFAULT_CHARSET
@@ -8548,6 +8548,21 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     OnClick = ButtonPizzasClick
+  end
+  object ButtonQuit: TButton
+    Left = 32
+    Top = 502
+    Width = 217
+    Height = 32
+    Action = acQuit
+    Anchors = [akLeft, akRight, akBottom]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 3
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8588,5 +8603,16 @@ object MainForm: TMainForm
     Persistent = True
     Left = 216
     Top = 272
+  end
+  object ActionList1: TActionList
+    Left = 16
+    Top = 56
+    object acQuit: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Quit'
+      OnExecuteAction = eaTerminateApplication
+      OnUpdateScope = usGlobal
+      OnCloseQuery = acQuitCloseQuery
+    end
   end
 end

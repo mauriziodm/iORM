@@ -303,24 +303,31 @@ type
   end;
 
   TioBSCloseQuery = class(TioBSPersistenceStdActionFmx, IioBSCloseQueryAction)
-  strict protected
-    FEnabledForInternalUseOnly: Boolean;
-    FExecuting: Boolean;
-    FOnEditingAction: TioBSCloseQueryOnEditingAction;
+  strict private
+    FExecuting, FExecutingEventHandler: Boolean;
+    FInjectEventHandler: Boolean;
     FOnCloseQuery: TCloseQueryEvent;
-    procedure _InjectOnCloseEventHandler;
+    FOnEditingAction: TioBSCloseQueryOnEditingAction;
+    FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
+    FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
+    function DisableIfChildExists: Boolean;
+    procedure _InjectEventHandler;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
-  protected
+  strict protected
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
+    property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
     property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
+    property OnExecuteAction: TioBSCloseQueryOnExecuteAction read FOnExecuteAction write FOnExecuteAction default eaClose;
+    property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usLocal;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
@@ -862,7 +869,11 @@ constructor TioBSCloseQuery.Create(AOwner: TComponent);
 begin
   inherited;
   FExecuting := False;
+  FExecutingEventHandler := False;
+  FInjectEventHandler := True;
   FOnEditingAction := eaDisable;
+  FOnExecuteAction := eaClose;
+  FOnUpdateScope := usLocal;
   TioBSCloseQueryActionRegister.RegisterAction(Self as IioBSCloseQueryAction);
 end;
 
@@ -872,73 +883,144 @@ begin
   inherited;
 end;
 
+function TioBSCloseQuery.DisableIfChildExists: Boolean;
+begin
+  Result := FOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds];
+end;
+
+procedure TioBSCloseQuery.Loaded;
+begin
+  inherited;
+  _InjectEventHandler;
+end;
+
+function TioBSCloseQuery.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := True;
+end;
+
+procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
+var
+  LEnabled: Boolean;
+  LCanCloseOwned: Boolean;
+begin
+  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+  // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
+  //  in modo ricorsivo oppure no, se la action può essere attiva
+  case FOnUpdateScope of
+    usOwned, usOwnedDisableIfChilds:
+      begin
+        LCanCloseOwned := TioBSCloseQueryCommonBehaviour.CanClose_Owned(Self, Owner, True, DisableIfChildExists);
+        LEnabled := LEnabled and LCanCloseOwned;
+      end;
+    usGlobal, usGlobalDisableIfChilds:
+      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, DisableIfChildExists);
+  end;
+  // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
+  if Assigned(FOnCloseQuery) then
+    FOnCloseQuery(Self, LEnabled);
+
+  Enabled := LEnabled;
+end;
+//procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
+//var
+//  LEnabled: Boolean;
+//begin
+//  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+//  if Assigned(FOnCloseQuery) then
+//    FOnCloseQuery(Self, LEnabled);
+//  Enabled := LEnabled;
+//end;
+
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
+var
+  LCanClose: Boolean;
 begin
   FExecuting := True;
   try
-    if _CanClose(nil) then
+    LCanClose := _CanClose(nil);
+
+    // Se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
+    if Assigned(FOnCloseQuery) then
+      FOnCloseQuery(Self, LCanClose);
+
+    if LCanClose then
     begin
+      // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
+      //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
+      case FOnUpdateScope of
+        usOwned:
+          TioBSCloseQueryCommonBehaviour.Execute_Owned(Self, Owner, True);
+        usGlobal:
+          TioBSCloseQueryActionRegister.Execute(Self);
+      end;
+
       if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
         TargetBindSource.Persistence.Persist;
       if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
         TargetBindSource.Persistence.Revert;
-      if Owner is TForm then
-        TForm(Owner).Close
-      else
+      if not FExecutingEventHandler then
       begin
-        // To avoid invalid pointer error
-        if Owner.ComponentIndex > -1 then
-          Owner.Owner.RemoveComponent(Owner);
-        Owner.Free;
+        case FOnExecuteAction of
+          eaClose:
+            begin
+              if Owner is TForm then
+                TForm(Owner).Close
+              else
+              begin
+                // To avoid invalid pointer error
+                if Owner.ComponentIndex > -1 then
+                  Owner.Owner.RemoveComponent(Owner);
+                Owner.Free;
+              end;
+            end;
+          eaTerminateApplication:
+            io.TerminateApplication;
+        end;
       end;
+
     end;
   finally
     FExecuting := False;
   end;
 end;
 
-procedure TioBSCloseQuery.Loaded;
-begin
-  inherited;
-  _InjectOnCloseEventHandler;
-end;
+//procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
+//begin
+//  FExecuting := True;
+//  try
+//    if _CanClose(nil) then
+//    begin
+//      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
+//        TargetBindSource.Persistence.Persist;
+//      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
+//        TargetBindSource.Persistence.Revert;
+//      if Owner is TForm then
+//        TForm(Owner).Close
+//      else
+//      begin
+//        // To avoid invalid pointer error
+//        if Owner.ComponentIndex > -1 then
+//          Owner.Owner.RemoveComponent(Owner);
+//        Owner.Free;
+//      end;
+//    end;
+//  finally
+//    FExecuting := False;
+//  end;
+//end;
 
-procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
-var
-  LEnabled: Boolean;
-begin
-  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
-  if Assigned(FOnCloseQuery) then
-    FOnCloseQuery(Self, LEnabled);
-  Enabled := LEnabled;
-  FEnabledForInternalUseOnly := LEnabled;
-end;
-
-procedure TioBSCloseQuery._InjectOnCloseEventHandler;
+procedure TioBSCloseQuery._InjectEventHandler;
 var
   LEventHandlerToInject: TMethod;
-  LEventProperty: TRttiProperty;
 begin
-  // On runtime only
-  if (csDesigning in ComponentState) then
+  // On runtime only and only if enabled
+  if (csDesigning in ComponentState) or not FInjectEventHandler then
     Exit;
-  // Extract and check the event handler property of the owner (that is the view or the ViewContext)
-  LEventProperty := TioRttiFactory.GetRttiPropertyByClass(Owner.ClassType, 'OnCloseQuery', False);
-  if not Assigned(LEventProperty) then
-    Exit;
-  if LEventProperty.GetValue(Owner).IsEmpty then
-  begin
-    // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
-    LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
-    LEventHandlerToInject.Data := Self;
-    LEventProperty.SetValue(Owner, TValue.From<TCloseQueryEvent>(TCloseQueryEvent(LEventHandlerToInject)));
-  end
-  else
-    raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
-      Format('An "OnCloseQuery" event handler is already present in the class "%s".' +
-        #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
-        #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the form.',
-        [Owner.ClassName, ClassName, ClassName]));
+  // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
+  LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
+  LEventHandlerToInject.Data := Self;
+  TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(Owner, LEventHandlerToInject, False);
 end;
 
 procedure TioBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
@@ -954,8 +1036,9 @@ end;
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := _CanClose(nil);
-  if not FExecuting then
+  if CanClose and not FExecuting then
     ExecuteTarget(Sender);
+  CanClose := False;
 end;
 
 end.

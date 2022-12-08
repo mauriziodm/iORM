@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
-  iORM.Abstraction.VCL, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.Abstraction.VCL, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.StdActions.CloseQueryRepeater, System.Actions, Vcl.ActnList,
+  iORM.StdActions.Vcl;
 
 type
   TMainForm = class(TForm)
@@ -18,6 +19,9 @@ type
     Shape1: TShape;
     ioVCL1: TioVCL;
     SQLiteConn: TioSQLiteConnectionDef;
+    ActionList1: TActionList;
+    acQuit: TioBSCloseQuery;
+    ButtonQuit: TButton;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

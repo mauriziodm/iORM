@@ -169,6 +169,7 @@ object PizzasForm: TPizzasForm
     end
   end
   object DSPizzas: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TPizza'
     OrderBy = '[.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
@@ -198,10 +199,6 @@ object PizzasForm: TPizzasForm
       Caption = 'Add'
       OnExecute = acAddExecute
     end
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acDelete: TioBSPersistenceDelete
       Category = 'iORM-BSPersistence'
       Caption = 'Delete'
@@ -210,6 +207,12 @@ object PizzasForm: TPizzasForm
     object acShow: TAction
       Caption = 'Show'
       OnExecute = acShowExecute
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      OnUpdateScope = usGlobal
+      TargetBindSource = DSPizzas
     end
   end
 end

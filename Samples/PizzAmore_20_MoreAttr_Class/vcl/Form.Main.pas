@@ -5,13 +5,10 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
-  iORM.Abstraction.VCL;
+  iORM.Abstraction.VCL, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl;
 
 type
   TMainForm = class(TForm)
-    ButtonOrders: TButton;
-    ButtonCustomers: TButton;
-    ButtonPizzas: TButton;
     ImagePizza: TImage;
     LabelTitlePizz: TLabel;
     LabelTitleAmore: TLabel;
@@ -20,6 +17,12 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     FirebirdConn: TioFirebirdConnectionDef;
     RemoteConn: TioRemoteConnectionDef;
+    ButtonOrders: TButton;
+    ButtonCustomers: TButton;
+    ButtonPizzas: TButton;
+    ButtonQuit: TButton;
+    ActionList1: TActionList;
+    acQuit: TioBSCloseQuery;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -29,6 +32,7 @@ type
     procedure ButtonOrdersClick(Sender: TObject);
     procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings; var AAbort: Boolean);
+    procedure acQuitCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
   public
@@ -44,6 +48,11 @@ uses
   System.IOUtils, Utils.SampleData, Form.Customers, Form.Pizzas, Form.Orders;
 
 {$R *.dfm}
+
+procedure TMainForm.acQuitCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := MessageDlg('Close the application?', mtConfirmation, [mbOK, mbCancel], 0) = mrOk;
+end;
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);
 begin

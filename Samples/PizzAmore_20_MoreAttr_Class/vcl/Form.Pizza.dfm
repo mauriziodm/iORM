@@ -241,6 +241,7 @@ object PizzaForm: TPizzaForm
     TabOrder = 5
   end
   object DSPizza: TioDataSetMaster
+    AsDefault = True
     TypeName = 'TPizza'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
@@ -271,10 +272,6 @@ object PizzaForm: TPizzaForm
   object ActionList1: TActionList
     Left = 227
     Top = 208
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
@@ -288,6 +285,13 @@ object PizzaForm: TPizzaForm
     object acLoadImage: TAction
       Caption = '...'
       OnExecute = acLoadImageExecute
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      OnEditingAction = eaAutoPersist
+      OnUpdateScope = usGlobal
+      TargetBindSource = DSPizza
     end
   end
   object OpenPictureDialog: TOpenPictureDialog

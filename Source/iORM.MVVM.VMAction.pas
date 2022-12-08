@@ -307,7 +307,7 @@ type
   end;
 
   TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
-  strict protected
+  strict private
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
     FInjectViewEventHandler: Boolean;
@@ -315,16 +315,17 @@ type
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
-    FViewModeAsTComponent: TComponent;
+    FViewModelAsTComponent: TComponent;
     function GetViewModelIntf: IioViewModelInternal;
     function DisableIfChildExists: Boolean;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
-    procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -933,7 +934,7 @@ procedure TioVMActionBSCloseQuery.SetViewModel(const AViewModelAsTComponent: TCo
 begin
   if not Supports(AViewModelAsTComponent, IioViewModelInternal) then
     raise EioException.Create(ClassName, 'SetViewModel', Format('Class "%s" doesn''t supports "IioViewModelInternal" interface.', [AViewModelAsTComponent.ClassName]));
-  FViewModeAsTComponent := AViewModelAsTComponent;
+  FViewModelAsTComponent := AViewModelAsTComponent;
 end;
 
 procedure TioVMActionBSCloseQuery.Execute;
@@ -943,7 +944,7 @@ end;
 
 function TioVMActionBSCloseQuery.GetViewModelIntf: IioViewModelInternal;
 begin
-  Result := FViewModeAsTComponent as IioViewModelInternal;
+  Result := FViewModelAsTComponent as IioViewModelInternal;
 end;
 
 procedure TioVMActionBSCloseQuery.Update;
@@ -1035,8 +1036,8 @@ begin
   try
     if _CanClose(nil) then
     begin
-      // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
-      //  in modo ricorsivo oppure no, se la action può essere attiva
+      // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
+      //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
       case FOnUpdateScope of
         usOwned:
           _ExecuteOnBindedViews;
@@ -1074,7 +1075,7 @@ begin
   FExecutingEventHandler := True;
   try
     CanClose := _CanClose(nil);
-    if not FExecuting then
+    if CanClose and not FExecuting then
       _InternalExecuteStdAction;
   finally
     FExecutingEventHandler := False;

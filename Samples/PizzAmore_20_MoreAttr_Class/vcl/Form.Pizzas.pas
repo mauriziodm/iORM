@@ -27,11 +27,10 @@ type
     DSPizzasImage: TGraphicField;
     ActionList1: TActionList;
     acDelete: TioBSPersistenceDelete;
-    acBack: TAction;
     acAdd: TAction;
     acShow: TAction;
+    acBack: TioBSCloseQuery;
     procedure FormCreate(Sender: TObject);
-    procedure acBackExecute(Sender: TObject);
     procedure acAddExecute(Sender: TObject);
     procedure acShowExecute(Sender: TObject);
     procedure DBCtrlGrid1DblClick(Sender: TObject);
@@ -57,11 +56,6 @@ begin
   DSPizzas.Persistence.Append;
   DSPizzas.EnableControls;
   acShow.Execute;
-end;
-
-procedure TPizzasForm.acBackExecute(Sender: TObject);
-begin
-  Close;
 end;
 
 procedure TPizzasForm.acShowExecute(Sender: TObject);
