@@ -32,7 +32,7 @@ type
     procedure ButtonOrdersClick(Sender: TObject);
     procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings; var AAbort: Boolean);
-    procedure acQuitCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure acQuitConfirmationRequest(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
   public
@@ -49,7 +49,7 @@ uses
 
 {$R *.dfm}
 
-procedure TMainForm.acQuitCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TMainForm.acQuitConfirmationRequest(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := MessageDlg('Close the application?', mtConfirmation, [mbOK, mbCancel], 0) = mrOk;
 end;

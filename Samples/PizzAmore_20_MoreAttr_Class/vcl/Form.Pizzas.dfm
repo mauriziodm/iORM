@@ -13,6 +13,7 @@ object PizzasForm: TPizzasForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   TextHeight = 15
   object PanelTop: TPanel
@@ -123,6 +124,7 @@ object PizzasForm: TPizzasForm
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = DBCtrlGrid1DblClick
+    ExplicitTop = 16
     object DBTextName: TDBText
       Left = 99
       Top = 20

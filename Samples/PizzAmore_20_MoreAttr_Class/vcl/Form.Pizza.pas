@@ -40,6 +40,8 @@ type
     procedure acBackExecute(Sender: TObject);
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure acBackConfirmationRequest(Sender: TObject; var CanClose: Boolean);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -56,6 +58,11 @@ uses
 
 {$R *.dfm}
 
+procedure TPizzaForm.acBackConfirmationRequest(Sender: TObject; var CanClose: Boolean);
+begin
+//  CanClose := MessageDlg('Save the current pizza before closing?', mtConfirmation, [mbOK, mbCancel], 0) = mrOk;
+end;
+
 procedure TPizzaForm.acBackExecute(Sender: TObject);
 begin
   Close;
@@ -69,6 +76,11 @@ begin
     DSPizza.CurrentAs<TPizza>.Image.LoadFromFile(OpenPictureDialog.FileName);
     DSPizza.Refresh(False);
   end;
+end;
+
+procedure TPizzaForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 procedure TPizzaForm.FormShow(Sender: TObject);

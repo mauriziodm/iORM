@@ -307,6 +307,7 @@ type
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectEventHandler: Boolean;
     FOnCloseQuery: TCloseQueryEvent;
+    FOnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -316,6 +317,7 @@ type
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
   strict protected
     procedure Loaded; override;
+    function DoOnConfirmationRequest: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -331,6 +333,7 @@ type
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
+    property OnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent read FOnConfirmationRequest write FOnConfirmationRequest;
   end;
 
   // =================================================================================================
@@ -888,6 +891,13 @@ begin
   Result := FOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds];
 end;
 
+function TioBSCloseQuery.DoOnConfirmationRequest: Boolean;
+begin
+  Result := True;
+  if Assigned(FOnConfirmationRequest) then
+    FOnConfirmationRequest(Self, Result);
+end;
+
 procedure TioBSCloseQuery.Loaded;
 begin
   inherited;
@@ -933,18 +943,10 @@ end;
 //end;
 
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
-var
-  LCanClose: Boolean;
 begin
   FExecuting := True;
   try
-    LCanClose := _CanClose(nil);
-
-    // Se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
-    if Assigned(FOnCloseQuery) then
-      FOnCloseQuery(Self, LCanClose);
-
-    if LCanClose then
+    if _CanClose(nil) and DoOnConfirmationRequest then
     begin
       // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
       //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
@@ -1037,8 +1039,10 @@ procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClos
 begin
   CanClose := _CanClose(nil);
   if CanClose and not FExecuting then
+  begin
     ExecuteTarget(Sender);
-  CanClose := False;
+    CanClose := False;
+  end;
 end;
 
 end.

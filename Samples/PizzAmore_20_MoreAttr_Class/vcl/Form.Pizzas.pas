@@ -34,6 +34,7 @@ type
     procedure acAddExecute(Sender: TObject);
     procedure acShowExecute(Sender: TObject);
     procedure DBCtrlGrid1DblClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -68,6 +69,11 @@ end;
 procedure TPizzasForm.DBCtrlGrid1DblClick(Sender: TObject);
 begin
   acShow.Execute;
+end;
+
+procedure TPizzasForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 procedure TPizzasForm.FormCreate(Sender: TObject);

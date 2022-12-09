@@ -13,6 +13,7 @@ object PizzaForm: TPizzaForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
@@ -292,6 +293,7 @@ object PizzaForm: TPizzaForm
       OnEditingAction = eaAutoPersist
       OnUpdateScope = usGlobal
       TargetBindSource = DSPizza
+      OnConfirmationRequest = acBackConfirmationRequest
     end
   end
   object OpenPictureDialog: TOpenPictureDialog

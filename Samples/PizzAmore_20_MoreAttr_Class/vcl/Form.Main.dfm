@@ -8612,7 +8612,7 @@ object MainForm: TMainForm
       Caption = 'Quit'
       OnExecuteAction = eaTerminateApplication
       OnUpdateScope = usGlobal
-      OnCloseQuery = acQuitCloseQuery
+      OnConfirmationRequest = acQuitConfirmationRequest
     end
   end
 end
