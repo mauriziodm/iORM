@@ -360,6 +360,7 @@ begin
   FClearAfterExecute := True;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
+  FDisableIfSaved := False;
   FRaiseIfChangesDoesNotExists := False;
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
@@ -943,15 +944,6 @@ begin
 
   Enabled := LEnabled;
 end;
-//procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
-//var
-//  LEnabled: Boolean;
-//begin
-//  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
-//  if Assigned(FOnCloseQuery) then
-//    FOnCloseQuery(Self, LEnabled);
-//  Enabled := LEnabled;
-//end;
 
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
 begin
@@ -963,9 +955,9 @@ begin
     //      sia perchè altrimenti avevo un AV error.
     if _CanClose(nil) and ((FInternalExecutionMode = emPassive) or DoOnConfirmationRequest) then
     begin
-       // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
-       //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
-       // NB: Solo in modalità Attiva esegue le azioni child altrimenti no
+      // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
+      //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
+      // NB: Solo in modalità Attiva esegue le azioni child altrimenti no
       if FInternalExecutionMode = emActive then
       begin
         case FOnUpdateScope of
@@ -1011,31 +1003,6 @@ begin
   Result := FInternalExecutionMode;
 end;
 
-//procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
-//begin
-//  FExecuting := True;
-//  try
-//    if _CanClose(nil) then
-//    begin
-//      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
-//        TargetBindSource.Persistence.Persist;
-//      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
-//        TargetBindSource.Persistence.Revert;
-//      if Owner is TForm then
-//        TForm(Owner).Close
-//      else
-//      begin
-//        // To avoid invalid pointer error
-//        if Owner.ComponentIndex > -1 then
-//          Owner.Owner.RemoveComponent(Owner);
-//        Owner.Free;
-//      end;
-//    end;
-//  finally
-//    FExecuting := False;
-//  end;
-//end;
-
 procedure TioBSCloseQuery._InjectEventHandler;
 var
   LEventHandlerToInject: TMethod;
@@ -1051,7 +1018,8 @@ end;
 
 procedure TioBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
 begin
-  Execute;
+  if Self <> TObject(Sender) then
+    Execute;
 end;
 
 function TioBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;

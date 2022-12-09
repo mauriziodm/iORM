@@ -220,6 +220,11 @@ inherited ViewPizza: TViewPizza
       end
     end
   end
+  inherited ActionList1: TActionList
+    inherited acBack: TioBSCloseQuery
+      OnUpdateScope = usGlobal
+    end
+  end
   inherited BSMaster: TioPrototypeBindSourceMaster
     FieldDefs = <
       item

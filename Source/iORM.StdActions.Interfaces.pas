@@ -3,7 +3,7 @@ unit iORM.StdActions.Interfaces;
 interface
 
 uses
-  System.Classes, iORM.CommonTypes;
+  System.Classes, iORM.CommonTypes, System.Generics.Collections;
 
 type
 
@@ -26,7 +26,10 @@ type
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsComponent: TComponent); // TComponent to avoid circular reference
   end;
 
+  TioOwnedCloseQueryActionList = TList<IioBSCloseQueryAction>;
   TioBSCloseQueryCommonBehaviour = class
+  private
+    class function CreateOwnedCloseQueryActionsList(const AView: TComponent; const ARecursive: Boolean; ACloseQueryActionList: TioOwnedCloseQueryActionList = nil): TioOwnedCloseQueryActionList;
   public
     class function CanClose_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive, ADisableIfChildExists: Boolean): Boolean;
     class procedure Execute_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean);
@@ -72,24 +75,49 @@ begin
   end;
 end;
 
-class procedure TioBSCloseQueryCommonBehaviour.Execute_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean);
+class function TioBSCloseQueryCommonBehaviour.CreateOwnedCloseQueryActionsList(const AView: TComponent; const ARecursive: Boolean; ACloseQueryActionList: TioOwnedCloseQueryActionList = nil): TioOwnedCloseQueryActionList;
 var
   I: Integer;
   LBSCloseQueryAction: IioBSCloseQueryAction;
 begin
+  if Assigned(ACloseQueryActionList) then
+    Result := ACloseQueryActionList
+  else
+    Result := TioOwnedCloseQueryActionList.Create;
+  // Loop for all owned components
   for I := 0 to AView.ComponentCount - 1 do
   begin
     // Se il componente è un ViewModelBridge
-    if AView.Components[I] is TioViewModelBridge then
-      TioViewModelBridge(AView.Components[I]).ViewModel._BSCloseQueryActionExecute(Sender)
+    if (AView.Components[I] is TioViewModelBridge) and TioViewModelBridge(AView.Components[I]).ViewModel._BSCloseQueryAssigned then
+      Result.Add( TioViewModelBridge(AView.Components[I]).ViewModel._GetBSCloseQuery )
     else
     // Se il componente è una CloseQueryAction
     if Supports(AView.Components[I], IioBSCloseQueryAction, LBSCloseQueryAction) then
-      LBSCloseQueryAction._BSCloseQueryActionExecute(Sender)
+      Result.Add( LBSCloseQueryAction )
     else
       // Se il componente possiede altri componenti a sua volta richiama ricorsivamente se stessa
       if ARecursive and (AView.Components[I].ComponentCount > 0) then
-        Execute_Owned(Sender, AView.Components[I], ARecursive);
+        CreateOwnedCloseQueryActionsList(AView.Components[I], ARecursive, Result);
+  end;
+end;
+
+class procedure TioBSCloseQueryCommonBehaviour.Execute_Owned(const Sender: IioBSCloseQueryAction; const AView: TComponent; const ARecursive: Boolean);
+var
+  I: Integer;
+  LCloseQueryList: TioOwnedCloseQueryActionList;
+begin
+  LCloseQueryList := CreateOwnedCloseQueryActionsList(AView, ARecursive);
+  for I := LCloseQueryList.Count-1 downto 0 do
+  begin
+    if LCloseQueryList[I] <> Sender then
+    begin
+      LCloseQueryList[I].InternalExecutionMode := emPassive;
+      try
+        LCloseQueryList[I]._BSCloseQueryActionExecute(Sender);
+      finally
+        LCloseQueryList[I].InternalExecutionMode := emActive;
+      end;
+    end;
   end;
 end;
 

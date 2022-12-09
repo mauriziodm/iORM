@@ -160,7 +160,7 @@ type
     FTargetBindSource: IioBSPersistenceClient;
     function Get_Version: String;
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
-  protected
+  strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
@@ -947,15 +947,6 @@ begin
 
   Enabled := LEnabled;
 end;
-//procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
-//var
-//  LEnabled: Boolean;
-//begin
-//  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
-//  if Assigned(FOnCloseQuery) then
-//    FOnCloseQuery(Self, LEnabled);
-//  Enabled := LEnabled;
-//end;
 
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
 begin
@@ -1014,31 +1005,6 @@ function TioBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionM
 begin
   Result := FInternalExecutionMode;
 end;
-
-//procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
-//begin
-//  FExecuting := True;
-//  try
-//    if _CanClose(nil) then
-//    begin
-//      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
-//        TargetBindSource.Persistence.Persist;
-//      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
-//        TargetBindSource.Persistence.Revert;
-//      if Owner is TForm then
-//        TForm(Owner).Close
-//      else
-//      begin
-//        // To avoid invalid pointer error
-//        if Owner.ComponentIndex > -1 then
-//          Owner.Owner.RemoveComponent(Owner);
-//        Owner.Free;
-//      end;
-//    end;
-//  finally
-//    FExecuting := False;
-//  end;
-//end;
 
 procedure TioBSCloseQuery._InjectEventHandler;
 var

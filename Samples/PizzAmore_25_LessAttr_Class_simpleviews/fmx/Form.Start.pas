@@ -6,7 +6,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.Layouts, FMX.StdCtrls, FMX.Controls.Presentation, FMX.TabControl,
   System.Actions, FMX.ActnList, iORM.Abstraction.FMX, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
-  iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.StdActions.Fmx, Data.Bind.GenData, Fmx.Bind.GenData, iORM.Where.Interfaces, Data.Bind.Components,
+  Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master;
 
 type
   TStartForm = class(TForm)
@@ -26,14 +27,13 @@ type
     ActionList1: TActionList;
     NextTabAction1: TNextTabAction;
     PreviousTabAction1: TPreviousTabAction;
-    acQuit: TAction;
     ioFMX1: TioFMX;
     acShowCustomers: TAction;
     acShowPizzas: TAction;
     acShowOrders: TAction;
     SQLiteConn: TioSQLiteConnectionDef;
     VCProvider: TioViewContextProvider;
-    procedure acQuitExecute(Sender: TObject);
+    acQuit: TioBSCloseQuery;
     procedure acShowCustomersExecute(Sender: TObject);
     procedure acShowPizzasExecute(Sender: TObject);
     procedure acShowOrdersExecute(Sender: TObject);
@@ -60,11 +60,6 @@ uses
   Utils.SampleData, System.IOUtils, Model.Customer, Model.Pizza, Model.Order;
 
 {$R *.fmx}
-
-procedure TStartForm.acQuitExecute(Sender: TObject);
-begin
-  io.TerminateApplication;
-end;
 
 procedure TStartForm.acShowCustomersExecute(Sender: TObject);
 begin

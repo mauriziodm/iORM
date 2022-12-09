@@ -5221,11 +5221,6 @@ object StartForm: TStartForm
       Category = 'Tab'
       TabControl = TabControlStart
     end
-    object acQuit: TAction
-      Category = 'Tab'
-      Text = 'Quit'
-      OnExecute = acQuitExecute
-    end
     object acShowCustomers: TAction
       Category = 'Tab'
       Text = 'Customers'
@@ -5240,6 +5235,12 @@ object StartForm: TStartForm
       Category = 'Tab'
       Text = 'Orders'
       OnExecute = acShowOrdersExecute
+    end
+    object acQuit: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Text = 'Quit'
+      OnExecuteAction = eaTerminateApplication
+      OnUpdateScope = usGlobal
     end
   end
   object ioFMX1: TioFMX
@@ -5259,11 +5260,11 @@ object StartForm: TStartForm
     Top = 504
   end
   object VCProvider: TioViewContextProvider
+    AsDefault = True
     OnAfterRequest = VCProviderAfterRequest
     OnBeforeRelease = VCProviderBeforeRelease
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
-    AsDefault = True
     Left = 96
     Top = 448
   end
