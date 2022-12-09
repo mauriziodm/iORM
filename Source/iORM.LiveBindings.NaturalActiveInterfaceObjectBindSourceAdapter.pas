@@ -58,7 +58,8 @@ end;
 destructor TioNaturalActiveInterfaceObjectBindSourceAdapter.Destroy;
 begin
   // Unregister itself from the SourceBS.DetailAdaptersContainer
-  FSourceAdapter.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
+  if Assigned(FSourceAdapter) and Assigned(FSourceAdapter.DetailAdaptersContainer) then
+    FSourceAdapter.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
   inherited;
 end;
 

@@ -57,6 +57,9 @@ type
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
+    // InternalExecutionMode
+    function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
+    procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
   protected
     procedure Loaded; override;
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
@@ -85,6 +88,7 @@ type
     procedure RegisterVCProvider(const AVCProvider:TioViewContextProvider);
     procedure UnregisterVCProvider(const AVCProvider:TioViewContextProvider);
     // Properties
+    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
     property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
     property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
@@ -126,6 +130,12 @@ begin
       Exit(TioModelPresenterCustom(Components[I]));
 end;
 
+function TioViewModel.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
+begin
+  if Assigned(FVMActionContainer.BSCloseQueryAction) then
+    Result := FVMActionContainer.BSCloseQueryAction.InternalExecutionMode;
+end;
+
 function TioViewModel.GetPresenter(const AName: String): IioNotifiableBindSource;
 var
   LComponent: TComponent;
@@ -155,6 +165,12 @@ end;
 procedure TioViewModel.RegisterVCProvider(const AVCProvider: TioViewContextProvider);
 begin
   FLocalVCProviderRegister.RegisterVCProvider(AVCProvider);
+end;
+
+procedure TioViewModel.SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+begin
+  if Assigned(FVMActionContainer.BSCloseQueryAction) then
+    FVMActionContainer.BSCloseQueryAction.InternalExecutionMode := Value;
 end;
 
 procedure TioViewModel.Show;

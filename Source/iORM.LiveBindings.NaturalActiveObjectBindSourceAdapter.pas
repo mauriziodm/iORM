@@ -89,7 +89,8 @@ var
   FLoadType: TioLoadType;
 begin
   // Unregister itself from the SourceBS.DetailAdaptersContainer
-  FSourceAdapter.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
+  if Assigned(FSourceAdapter) and Assigned(FSourceAdapter.DetailAdaptersContainer) then
+    FSourceAdapter.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
   // If the LoadType is ltFromBSReloadNewInstance and it is inherited from TioActiveObjectBindSourceAdapter
   //  (it is'n an interfaced bind source) then free che DataObject (owns it)
   FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;

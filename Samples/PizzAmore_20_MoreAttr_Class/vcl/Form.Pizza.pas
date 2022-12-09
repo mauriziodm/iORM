@@ -60,7 +60,7 @@ uses
 
 procedure TPizzaForm.acBackConfirmationRequest(Sender: TObject; var CanClose: Boolean);
 begin
-//  CanClose := MessageDlg('Save the current pizza before closing?', mtConfirmation, [mbOK, mbCancel], 0) = mrOk;
+  CanClose := MessageDlg('Save the current pizza before closing?', mtConfirmation, [mbOK, mbCancel], 0) = mrOk;
 end;
 
 procedure TPizzaForm.acBackExecute(Sender: TObject);

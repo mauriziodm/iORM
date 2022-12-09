@@ -62,8 +62,15 @@ begin
   LSenderIdx := FInternalContainer.IndexOf(Sender);
   if LSenderIdx > -1 then
   begin
-    for I := LSenderIdx+1 to FInternalContainer.Count-1 do
-      FInternalContainer[I]._BSCloseQueryActionExecute(Sender);
+    for I := FInternalContainer.Count-1 downto LSenderIdx+1 do
+    begin
+      FInternalContainer[I].InternalExecutionMode := emPassive;
+      try
+        FInternalContainer[I]._BSCloseQueryActionExecute(Sender);
+      finally
+        FInternalContainer[I].InternalExecutionMode := emActive;
+      end;
+    end;
   end
   else
     raise EioException.Create(ClassName, 'Execute', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',

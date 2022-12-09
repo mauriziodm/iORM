@@ -311,7 +311,9 @@ type
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
     FInjectViewEventHandler: Boolean;
+    FInternalExecutionMode: TioCloseQueryActionExecutionMode;
     FOnCloseQuery: TCloseQueryEvent;
+    FOnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -323,14 +325,19 @@ type
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    // InternalExecutionMode
+    function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
+    procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+    function DoOnConfirmationRequest: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Execute; override;
     procedure Update; override;
+    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectViewEventHandler: Boolean read FInjectViewEventHandler write FInjectViewEventHandler default True;
@@ -341,6 +348,7 @@ type
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
+    property OnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent read FOnConfirmationRequest write FOnConfirmationRequest;
   end;
 
   // =================================================================================================
@@ -913,6 +921,7 @@ begin
   FExecutingEventHandler := False;
   FInjectViewEventHandler := True;
   FInjectVMEventHandler := True;
+  FInternalExecutionMode := emActive;
   FOnEditingAction := eaDisable;
   FOnExecuteAction := eaClose;
   FOnUpdateScope := usLocal;
@@ -930,6 +939,18 @@ begin
   Result := FOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds];
 end;
 
+function TioVMActionBSCloseQuery.DoOnConfirmationRequest: Boolean;
+begin
+  Result := True;
+  if Assigned(FOnConfirmationRequest) then
+    FOnConfirmationRequest(Self, Result);
+end;
+
+procedure TioVMActionBSCloseQuery.SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+begin
+  FInternalExecutionMode := Value;
+end;
+
 procedure TioVMActionBSCloseQuery.SetViewModel(const AViewModelAsTComponent: TComponent);
 begin
   if not Supports(AViewModelAsTComponent, IioViewModelInternal) then
@@ -940,6 +961,11 @@ end;
 procedure TioVMActionBSCloseQuery.Execute;
 begin
   _ExecuteOriginal;  // Ritorna all'implementazione originale
+end;
+
+function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
+begin
+  Result := FInternalExecutionMode;
 end;
 
 function TioVMActionBSCloseQuery.GetViewModelIntf: IioViewModelInternal;
@@ -1034,15 +1060,23 @@ var
 begin
   FExecuting := True;
   try
-    if _CanClose(nil) then
+    // NB: DoOnConfirmationRequest richiede eventuale conferma all'utente ma solo se è in modalità attiva
+    //      cioè è la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
+    //      fatto in questo modo sia perchè altrimenti ci sarebbero potute essere varie richieste di conferma
+    //      sia perchè altrimenti avevo un AV error.
+    if _CanClose(nil) and ((FInternalExecutionMode = emPassive) or DoOnConfirmationRequest) then
     begin
       // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
       //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
-      case FOnUpdateScope of
-        usOwned:
-          _ExecuteOnBindedViews;
-        usGlobal:
-          TioBSCloseQueryActionRegister.Execute(Self);
+      // NB: Solo in modalità Attiva esegue le azioni child altrimenti no
+      if FInternalExecutionMode = emActive then
+      begin
+        case FOnUpdateScope of
+          usOwned:
+            _ExecuteOnBindedViews;
+          usGlobal:
+            TioBSCloseQueryActionRegister.Execute(Self);
+        end;
       end;
 
       if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
