@@ -506,7 +506,7 @@ var
       end;
 
       // Automatic relation detection (only for class or interface member type)
-      if (not ATransientAsDefault) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
+      if (not ATransientAsDefault) and (not LMember_Transient) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
         (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
       begin
         // HasMany relation autodetect
@@ -517,13 +517,13 @@ var
           LMember_RelationChildPropertyName := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
         end
         else
-          // BelongsTo relation autodetect
-          if HasBelongsToRelation(LMember_FieldValueType) then
-          begin
-            LMember_RelationType := rtBelongsTo;
-            LMember_RelationChildTypeName := LMember_FieldValueType.Name;
-            LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
-          end;
+        // BelongsTo relation autodetect
+        if HasBelongsToRelation(LMember_FieldValueType) then
+        begin
+          LMember_RelationType := rtBelongsTo;
+          LMember_RelationChildTypeName := LMember_FieldValueType.Name;
+          LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
+        end;
       end;
 
       // If the current member has an HasMany relation and an "ioForeignKey" attribute has not been explicitly specified,

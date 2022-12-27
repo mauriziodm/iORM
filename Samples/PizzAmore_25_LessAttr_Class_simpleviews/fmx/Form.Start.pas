@@ -34,6 +34,7 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     VCProvider: TioViewContextProvider;
     acQuit: TioBSCloseQuery;
+    acQuit2: TAction;
     procedure acShowCustomersExecute(Sender: TObject);
     procedure acShowPizzasExecute(Sender: TObject);
     procedure acShowOrdersExecute(Sender: TObject);
@@ -45,6 +46,7 @@ type
     procedure VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderBeforeRelease(const Sender: TObject; const AView, AViewContext: TComponent);
+    procedure acQuit2Execute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -60,6 +62,11 @@ uses
   Utils.SampleData, System.IOUtils, Model.Customer, Model.Pizza, Model.Order;
 
 {$R *.fmx}
+
+procedure TStartForm.acQuit2Execute(Sender: TObject);
+begin
+  Application.Terminate;
+end;
 
 procedure TStartForm.acShowCustomersExecute(Sender: TObject);
 begin

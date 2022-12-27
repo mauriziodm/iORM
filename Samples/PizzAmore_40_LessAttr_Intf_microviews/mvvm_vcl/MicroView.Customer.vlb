@@ -1,49 +1,61 @@
 ﻿[Label3]
-Coordinates=118,10,46,51
+Coordinates=118,10,53,58
 
 [SourceCustomer]
-Coordinates=0,0,97,33
+Coordinates=0,0,111,36
 
 [ButtonSelectCustomer]
-Coordinates=10,212,125,33
+Coordinates=10,212,143,36
 
 [DBEditCustName]
-Coordinates=228,166,99,33
+Coordinates=228,166,115,36
 
 [DBECustPhone]
-Coordinates=114,166,90,33
+Coordinates=114,166,104,36
 
 [DBEditCustID]
-Coordinates=10,166,81,33
+Coordinates=10,166,94,36
 
 [Label4]
-Coordinates=244,10,46,51
+Coordinates=244,10,53,58
 
 [DBEditCustAddress]
-Coordinates=307,10,112,33
+Coordinates=307,10,128,36
 
 [Label5]
-Coordinates=181,10,46,51
+Coordinates=181,10,53,58
 
 []
-Coordinates=428,221,91,36
+Coordinates=167,240,91,36
 
 [VMBridgeMView]
-Coordinates=428,56,115,33
+Coordinates=428,56,109,36
 
 [BSCustomer]
-Coordinates=10,10,85,123
+Coordinates=10,10,87,146
 Visible=True
 
 [BSCustomerID]
-Coordinates=266,243,95,33
+Coordinates=266,243,100,36
 
 [BSCustomerName]
-Coordinates=247,78,113,33
+Coordinates=247,78,121,36
 
 [BSCustomerFullAddress]
-Coordinates=428,111,144,33
+Coordinates=428,111,155,36
 
 [BSCustomerPhoneNumber]
-Coordinates=428,1,155,33
+Coordinates=428,1,169,36
+
+[ButtonViewCustomer]
+Coordinates=473,166,135,36
+
+[acShowCustomer]
+Coordinates=130,87,115,36
+
+[acSelectCustomer]
+Coordinates=473,221,119,36
+
+[ActionListCustMView]
+Coordinates=646,1,135,36
 
