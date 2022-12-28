@@ -4,7 +4,7 @@ interface
 
 uses
   FMX.ActnList, iORM.LiveBindings.BSPersistence, System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.Interfaces,
-  Vcl.Forms, iORM.StdActions.Interfaces;
+  iORM.StdActions.Interfaces;
 
 type
 
@@ -350,7 +350,7 @@ implementation
 uses
   iORM.Abstraction, iORM.Exceptions, System.SysUtils, iORM.Utilities, iORM,
   System.Rtti, iORM.RttiContext.Factory,
-  iORM.StdActions.CloseQueryActionRegister;
+  iORM.StdActions.CloseQueryActionRegister, Fmx.Forms;
 
 { TioBSObjStateStdActionFmx }
 

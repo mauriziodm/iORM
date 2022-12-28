@@ -55,6 +55,8 @@ const
 
 type
 
+  TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
+
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
 
