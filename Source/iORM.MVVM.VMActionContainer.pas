@@ -66,7 +66,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions, Vcl.Forms;
+  System.SysUtils, iORM.Exceptions;
 
 { TioVMNotifyContainer }
 

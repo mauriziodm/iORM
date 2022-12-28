@@ -70,7 +70,10 @@ type
 implementation
 
 uses
-  Windows;
+  iORM.Exceptions;
+
+//uses
+//  Windows;
 
 { TInterfacedDataModule }
 
@@ -78,7 +81,7 @@ procedure TioInterfacedDataModule.AfterConstruction;
 begin
   FOwnerIsComponent := Assigned(Owner) and (Owner is TComponent);
   // Release the NewInstance/constructor's implicit refcount
-  InterlockedDecrement(FRefCount);
+  AtomicDecrement(FRefCount);
   inherited AfterConstruction;
 end;
 
@@ -98,7 +101,8 @@ begin
       WarningMessage := Format(
         'Trying to destroy an owned TInterfacedDataModule of class %s named %s that still has %d interface references left',
         [ClassName, Name, RefCount]);
-      OutputDebugString(PChar(WarningMessage));
+//      OutputDebugString(PChar(WarningMessage));
+      raise EioException.Create(ClassName, 'BeforeDestruction', WarningMessage);
     end;
 {$endif DEBUG}
   end;
@@ -133,7 +137,7 @@ begin
   if csDesigning in ComponentState then
     Result := -1   // -1 indicates no reference counting is taking place
   else
-    Result := InterlockedIncrement(FRefCount);
+    Result := AtomicIncrement(FRefCount);
 end;
 
 function TioInterfacedDataModule._Release: Integer;
@@ -142,7 +146,7 @@ begin
     Result := -1   // -1 indicates no reference counting is taking place
   else
   begin
-    Result := InterlockedDecrement(FRefCount);
+    Result := AtomicDecrement(FRefCount);
     { If we are not being used as a TComponent, then use refcount to manage our lifetime as with TInterfacedObject. }
     if (Result = 0) and not FOwnerIsComponent then
       Destroy;

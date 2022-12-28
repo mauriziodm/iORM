@@ -37,7 +37,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, iORM.CommonTypes, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ViewContextProvider, iORM.MVVM.ViewRegisterItem,
-  iORM.LiveBindings.Interfaces, iORM.StdActions.Interfaces, Vcl.Forms;
+  iORM.LiveBindings.Interfaces, iORM.StdActions.Interfaces;
 
 {$I ioGlobalDef.inc}   // io global definitions
 

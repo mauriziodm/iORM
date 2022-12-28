@@ -39,7 +39,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.MVVM.VMActionContainer, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces, Vcl.Forms,
+  iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces,// Vcl.Forms,
   iORM.StdActions.Interfaces;
 
 type
