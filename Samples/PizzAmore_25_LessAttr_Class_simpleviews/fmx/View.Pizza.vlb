@@ -1,10 +1,4 @@
-﻿[acBack]
-Coordinates=12,70,50,33
-
-[ActionList1]
-Coordinates=190,141,70,33
-
-[RectangleTitle]
+﻿[RectangleTitle]
 Coordinates=121,258,84,33
 
 [Rectangle1]
@@ -16,18 +10,9 @@ Coordinates=477,10,62,51
 [ButtonRevert]
 Coordinates=334,10,79,51
 
-[acPersist]
-Coordinates=307,1,60,33
-
 [BSMaster]
 Coordinates=136,10,61,123
 Visible=True
-
-[acRevert]
-Coordinates=307,53,57,33
-
-[ButtonBack]
-Coordinates=203,197,72,51
 
 [ButtonSave]
 Coordinates=10,197,71,51
@@ -70,7 +55,7 @@ Coordinates=339,197,46,51
 Coordinates=278,10,46,51
 
 []
-Coordinates=313,105,82,33
+Coordinates=190,141,70,33
 
 [BindingsList1]
 Coordinates=145,152,82,33

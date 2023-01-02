@@ -3,7 +3,7 @@ unit iORM.StdActions.Fmx;
 interface
 
 uses
-  FMX.ActnList, iORM.LiveBindings.BSPersistence, System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.Interfaces,
+  Fmx.ActnList, iORM.LiveBindings.BSPersistence, System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.Interfaces,
   iORM.StdActions.Interfaces;
 
 type
@@ -15,13 +15,8 @@ type
   // BEGIN: FMX MVVM STANDARD ACTIONS
   // =================================================================================================
 
-
-  // =================================================================================================
-  // END: FMX MVVM STANDARD ACTIONS
-  // =================================================================================================
-
   // Standard action for MVVM view use
-  TioViewAction = class(FMX.ActnList.TAction, IioViewAction)
+  TioViewAction = class(Fmx.ActnList.TAction, IioViewAction)
   strict private
     FCaptionLinkedToVMAction: Boolean;
     FEnabledLinkedToVMAction: Boolean;
@@ -91,11 +86,15 @@ type
   end;
 
   // =================================================================================================
+  // END: FMX MVVM STANDARD ACTIONS
+  // =================================================================================================
+
+  // =================================================================================================
   // BEGIN: FMX STANDARD ACTIONS FOR BIND SOURCES
   // =================================================================================================
 
   // Base class for all BindSource standard actions
-  TioBSStdActionFmx<T: IioStdActionTargetBindSource> = class(FMX.ActnList.TAction)
+  TioBSStdActionFmx<T: IioStdActionTargetBindSource> = class(Fmx.ActnList.TAction)
   strict private
     FTargetBindSource: T;
     function Get_Version: String;
@@ -117,7 +116,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
     property TargetBindSource;
@@ -127,7 +126,7 @@ type
   TioBSNextPage = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property TargetBindSource;
   end;
@@ -136,7 +135,7 @@ type
   TioBSPrevPage = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property TargetBindSource;
   end;
@@ -150,7 +149,7 @@ type
   // =================================================================================================
 
   // Base class for all BinsDourceObjState standard actions
-  TioBSPersistenceStdActionFmx = class(FMX.ActnList.TAction)
+  TioBSPersistenceStdActionFmx = class(Fmx.ActnList.TCustomAction)
   strict private
     FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
@@ -179,71 +178,109 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
   published
     property _Version: String read Get_Version;
+    // Publishing ancestor properties
+    property AutoCheck;
+    property Text;
+    property Checked;
+    property Enabled;
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ShortCut default 0;
+    property SecondaryShortCuts;
+    property Visible;
+    property UnsupportedArchitectures;
+    property UnsupportedPlatforms;
+    // Events
+    // property OnExecute;
+    property OnHint;
+    // property OnUpdate;
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceClear = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property DisableIfChangesExists;
     property RaiseIfChangesExists;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistencePersist = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
-//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceRevert = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
-//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
-//    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceDelete = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -251,13 +288,16 @@ type
   TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx)
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -268,7 +308,7 @@ type
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
@@ -278,6 +318,8 @@ type
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -288,7 +330,7 @@ type
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
   public
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
@@ -298,6 +340,8 @@ type
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -320,6 +364,7 @@ type
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
   strict protected
+    procedure _DummyOnExecute(Sender: TObject);
     procedure Loaded; override;
     function DoOnConfirmationRequest: Boolean;
   public
@@ -327,8 +372,9 @@ type
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget (Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    function Execute: Boolean; override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
@@ -357,6 +403,9 @@ uses
 constructor TioBSPersistenceStdActionFmx.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := True;
+  // New fields
   FClearAfterExecute := True;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
@@ -665,7 +714,7 @@ end;
 procedure TioBSNextPage.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
+  Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
 end;
 
 { TioBSPrevPage }
@@ -679,7 +728,7 @@ end;
 procedure TioBSPrevPage.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := TargetBindSource.IsActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
+  Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
 end;
 
 { TioViewAction }
@@ -772,7 +821,7 @@ end;
 
 function TioViewAction.GetVMAction: IioVMAction;
 begin
-  Result := FVmAction;
+  Result := FVMAction;
 end;
 
 function TioViewAction.GetVMActionName: String;
@@ -793,7 +842,7 @@ begin
   if Value <> GetCaption then
   begin
     inherited SetCaption(Value);
-    if FCaptionLinkedToVMAction and not (csDesigning in ComponentState) then
+    if FCaptionLinkedToVMAction and not(csDesigning in ComponentState) then
     begin
       CheckVMAction('SetCaption');
       FVMAction.Caption := Value;
@@ -811,7 +860,7 @@ begin
   if Value <> GetEnabled then
   begin
     inherited SetEnabled(Value);
-    if FEnabledLinkedToVMAction and not (csDesigning in ComponentState) then
+    if FEnabledLinkedToVMAction and not(csDesigning in ComponentState) then
     begin
       CheckVMAction('SetEnabled');
       FVMAction.Enabled := Value;
@@ -834,7 +883,7 @@ begin
   if Value <> GetVisible then
   begin
     inherited SetVisible(Value);
-    if FVisibleLinkedToVMAction and not (csDesigning in ComponentState) then
+    if FVisibleLinkedToVMAction and not(csDesigning in ComponentState) then
     begin
       CheckVMAction('SetVisible');
       FVMAction.Visible := Value;
@@ -877,6 +926,7 @@ end;
 constructor TioBSCloseQuery.Create(AOwner: TComponent);
 begin
   inherited;
+  OnExecute := _DummyOnExecute; // Set the dummy OnExecute event handler
   FExecuting := False;
   FExecutingEventHandler := False;
   FInjectEventHandler := True;
@@ -928,7 +978,7 @@ var
 begin
   LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
   // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
-  //  in modo ricorsivo oppure no, se la action può essere attiva
+  // in modo ricorsivo oppure no, se la action può essere attiva
   case FOnUpdateScope of
     usOwned, usOwnedDisableIfChilds:
       begin
@@ -945,18 +995,24 @@ begin
   Enabled := LEnabled;
 end;
 
+function TioBSCloseQuery.Execute: Boolean;
+begin
+  inherited;
+  Result := False;
+end;
+
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
 begin
   FExecuting := True;
   try
     // NB: DoOnConfirmationRequest richiede eventuale conferma all'utente ma solo se è in modalità attiva
-    //      cioè è la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
-    //      fatto in questo modo sia perchè altrimenti ci sarebbero potute essere varie richieste di conferma
-    //      sia perchè altrimenti avevo un AV error.
+    // cioè è la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
+    // fatto in questo modo sia perchè altrimenti ci sarebbero potute essere varie richieste di conferma
+    // sia perchè altrimenti avevo un AV error.
     if _CanClose(nil) and ((FInternalExecutionMode = emPassive) or DoOnConfirmationRequest) then
     begin
       // In base allo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
-      //  esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
+      // esegue o meno la action anche sulle BindedViews (sOwnedRecursive) o BSCloseQueryActions registrate succcesivamente nel registro (sGlobal)
       // NB: Solo in modalità Attiva esegue le azioni child altrimenti no
       if FInternalExecutionMode = emActive then
       begin
@@ -1025,6 +1081,11 @@ end;
 function TioBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 begin
   Result := (Self = TObject(Sender)) or Enabled;
+end;
+
+procedure TioBSCloseQuery._DummyOnExecute(Sender: TObject);
+begin
+  // Nothing, this is a dummy execute event handler (altrimenti l'azione non si esegue)
 end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);

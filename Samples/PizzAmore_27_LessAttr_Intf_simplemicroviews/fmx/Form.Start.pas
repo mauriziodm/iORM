@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.Layouts, FMX.StdCtrls, FMX.Controls.Presentation, FMX.TabControl,
   System.Actions, FMX.ActnList, iORM.Abstraction.FMX, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
-  iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, FMX.Edit;
 
 type
   TStartForm = class(TForm)
@@ -33,6 +33,7 @@ type
     acShowOrders: TAction;
     SQLiteConn: TioSQLiteConnectionDef;
     VCProvider: TioViewContextProvider;
+    Edit1: TEdit;
     procedure acQuitExecute(Sender: TObject);
     procedure acShowCustomersExecute(Sender: TObject);
     procedure acShowPizzasExecute(Sender: TObject);
@@ -106,7 +107,7 @@ end;
 
 procedure TStartForm.VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
-  TabControlStart.Delete((AViewCOntext as TTabItem).Index);
+  TabControlStart.Delete((AViewContext as TTabItem).Index);
 end;
 
 procedure TStartForm.VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);

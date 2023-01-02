@@ -57,7 +57,7 @@ object StartForm: TStartForm
           Text = ' Main men'#249
           TabOrder = 0
           object ButtonQuit: TSpeedButton
-            Action = acQuit2
+            Action = acQuit
             Align = Left
             Enabled = True
             StyledSettings = [Family, Size, Style]
@@ -5241,10 +5241,6 @@ object StartForm: TStartForm
       Text = 'Quit'
       OnExecuteAction = eaTerminateApplication
       OnUpdateScope = usGlobal
-    end
-    object acQuit2: TAction
-      Text = 'Quit2'
-      OnExecute = acQuit2Execute
     end
   end
   object ioFMX1: TioFMX

@@ -220,12 +220,7 @@ inherited ViewPizza: TViewPizza
       end
     end
   end
-  inherited ActionList1: TActionList
-    inherited acBack: TioBSCloseQuery
-      OnUpdateScope = usGlobal
-    end
-  end
-  inherited BSMaster: TioPrototypeBindSourceMaster
+  inherited BSMaster: TioPrototypeBindSourceMaster [3]
     FieldDefs = <
       item
         Name = 'ID'
@@ -251,10 +246,10 @@ inherited ViewPizza: TViewPizza
         ReadOnly = False
       end>
   end
-  object BindingsList1: TBindingsList
+  object BindingsList1: TBindingsList [4]
     Methods = <>
     OutputConverters = <>
-    Left = 20
+    Left = 100
     Top = 5
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
@@ -285,5 +280,7 @@ inherited ViewPizza: TViewPizza
       Control = Image
       Track = False
     end
+  end
+  inherited ActionList1: TActionList [5]
   end
 end

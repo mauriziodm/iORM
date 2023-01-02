@@ -28,7 +28,6 @@ type
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
-    procedure acBackExecute(Sender: TObject);
     procedure acShowOrSelectUpdate(Sender: TObject);
   private
   public
@@ -43,11 +42,6 @@ procedure TViewBaseForList.acAddExecute(Sender: TObject);
 begin
   BSMaster.Persistence.Append;
   acShowOrSelect.Execute;
-end;
-
-procedure TViewBaseForList.acBackExecute(Sender: TObject);
-begin
-  Free;
 end;
 
 procedure TViewBaseForList.acShowOrSelectExecute(Sender: TObject);

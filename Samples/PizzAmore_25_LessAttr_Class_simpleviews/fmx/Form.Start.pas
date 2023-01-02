@@ -8,7 +8,7 @@ uses
   System.Actions, FMX.ActnList, iORM.Abstraction.FMX, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
   iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.StdActions.Fmx, Data.Bind.GenData, Fmx.Bind.GenData, iORM.Where.Interfaces, Data.Bind.Components,
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
-  FireDAC.Phys.SQLiteWrapper.Stat;
+  FireDAC.Phys.SQLiteWrapper.Stat, FMX.Edit;
 
 type
   TStartForm = class(TForm)
@@ -35,7 +35,6 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     VCProvider: TioViewContextProvider;
     acQuit: TioBSCloseQuery;
-    acQuit2: TAction;
     procedure acShowCustomersExecute(Sender: TObject);
     procedure acShowPizzasExecute(Sender: TObject);
     procedure acShowOrdersExecute(Sender: TObject);

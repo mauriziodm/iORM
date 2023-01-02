@@ -176,6 +176,25 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
   published
     property _Version: String read Get_Version;
+    //  Publishing ancestor properties
+    property AutoCheck;
+    property Caption;
+    property Checked;
+    property Enabled;
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ImageName;
+    property SecondaryShortCuts;
+    property ShortCut  default 0;
+    property Visible;
+    // Events
+//    property OnExecute;
+    property OnHint;
+//    property OnUpdate;
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl)
@@ -184,6 +203,9 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceClear = class(TioBSPersistenceStdActionVcl)
@@ -194,6 +216,9 @@ type
     property DisableIfChangesExists;
     property RaiseIfChangesExists;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistencePersist = class(TioBSPersistenceStdActionVcl)
@@ -205,6 +230,9 @@ type
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceRevert = class(TioBSPersistenceStdActionVcl)
@@ -217,6 +245,9 @@ type
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionVcl)
@@ -229,6 +260,9 @@ type
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   end;
 
   TioBSPersistenceDelete = class(TioBSPersistenceStdActionVcl)
@@ -241,6 +275,9 @@ type
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -255,6 +292,9 @@ type
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
     property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -275,6 +315,8 @@ type
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -295,6 +337,8 @@ type
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
+    property OnExecute;
+    property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -317,6 +361,7 @@ type
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
   strict protected
+    procedure _DummyOnExecute(Sender: TObject);
     procedure Loaded; override;
     function DoOnConfirmationRequest: Boolean;
   public
@@ -326,6 +371,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    function Execute: Boolean; override;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
@@ -353,6 +399,9 @@ uses
 constructor TioBSPersistenceStdActionVcl.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := True;
+  // New fields
   FClearAfterExecute := True;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
@@ -880,6 +929,7 @@ end;
 constructor TioBSCloseQuery.Create(AOwner: TComponent);
 begin
   inherited;
+//  OnExecute := _DummyOnExecute; // Set the dummy OnExecute event handler // NB: Nella versione VCL causa problemi
   FExecuting := False;
   FExecutingEventHandler := False;
   FInternalExecutionMode := emActive;
@@ -946,6 +996,12 @@ begin
     FOnCloseQuery(Self, LEnabled);
 
   Enabled := LEnabled;
+end;
+
+function TioBSCloseQuery.Execute: Boolean;
+begin
+  inherited;
+  Result := False;
 end;
 
 procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
@@ -1028,6 +1084,11 @@ end;
 function TioBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
 begin
   Result := (Self = TObject(Sender)) or Enabled;
+end;
+
+procedure TioBSCloseQuery._DummyOnExecute(Sender: TObject);
+begin
+  // Nothing, this is a dummy execute event handler (altrimenti l'azione non si esegue, in realtà sembra servire solo su fmx)
 end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);

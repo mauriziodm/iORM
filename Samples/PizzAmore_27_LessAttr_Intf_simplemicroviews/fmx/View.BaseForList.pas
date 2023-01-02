@@ -24,7 +24,7 @@ type
     acShowOrSelect: TAction;
     acDelete: TioBSPersistenceDelete;
     BSMaster: TioPrototypeBindSourceMaster;
-    acBack: TioBSCloseQuery;
+    acBack: TAction;
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
@@ -47,6 +47,7 @@ end;
 
 procedure TViewBaseForList.acBackExecute(Sender: TObject);
 begin
+  Owner.RemoveComponent(Self);
   Free;
 end;
 

@@ -10,11 +10,6 @@ inherited ViewPizzas: TViewPizzas
     ItemEditAppearanceClassName = 'TImageListItemBottomDetailShowCheckAppearance'
     ItemIndex = 0
   end
-  inherited ActionList1: TActionList
-    inherited acBack: TioBSCloseQuery
-      OnUpdateScope = usGlobal
-    end
-  end
   inherited BSMaster: TioPrototypeBindSourceMaster
     AutoActivate = True
     FieldDefs = <
