@@ -147,7 +147,7 @@ type
   // =================================================================================================
 
   // Base class for all BinsDourceObjState standard actions
-  TioBSPersistenceStdActionVcl = class(Vcl.ActnList.TAction)
+  TioBSPersistenceStdActionVcl = class(Vcl.ActnList.TCustomAction)
   strict private
     FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
@@ -193,7 +193,7 @@ type
     property Visible;
     // Events
 //    property OnExecute;
-    property OnHint;
+//    property OnHint;
 //    property OnUpdate;
   end;
 
@@ -205,6 +205,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   end;
 
@@ -218,6 +219,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   end;
 
@@ -232,6 +234,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   end;
 
@@ -247,6 +250,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   end;
 
@@ -262,6 +266,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   end;
 
@@ -277,6 +282,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
@@ -294,6 +300,7 @@ type
     property TargetBindSource;
     // Events
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
@@ -316,6 +323,7 @@ type
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
@@ -338,6 +346,7 @@ type
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
     property OnExecute;
+    property OnHint;
     property OnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
@@ -382,6 +391,7 @@ type
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
     property OnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent read FOnConfirmationRequest write FOnConfirmationRequest;
+    property OnHint;
   end;
 
   // =================================================================================================
