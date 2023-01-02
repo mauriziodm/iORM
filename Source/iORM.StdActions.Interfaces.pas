@@ -63,7 +63,7 @@ begin
     else
       // Se il componente è una CloseQueryAction
       if Supports(AView.Components[I], IioBSCloseQueryAction, LBSCloseQueryAction) then
-        Result := (not(ADisableIfChildExists and TioViewModelBridge(AView.Components[I]).ViewModel._BSCloseQueryAssigned)) or
+        Result := (not(ADisableIfChildExists and LBSCloseQueryAction._CanClose(Sender))) or
           LBSCloseQueryAction._CanClose(Sender)
       else
         // Se il componente possiede altri componenti a sua volta richiama ricorsivamente se stessa
