@@ -8587,7 +8587,7 @@ object MainForm: TMainForm
       Category = 'iORM-BS'
       Caption = 'Quit'
       OnExecuteAction = eaTerminateApplication
-      OnUpdateScope = usGlobal
+      OnUpdateScope = usOwnedDisableIfChilds
     end
   end
 end

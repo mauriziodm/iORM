@@ -101,6 +101,7 @@ type
   TioBSCloseQueryConfirmationRequestEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
 
   TioBSCloseQueryActionUpdateScope = (usLocal, usOwned, usOwnedDisableIfChilds, usGlobal, usGlobalDisableIfChilds);
+//  TioBSCloseQueryActionUpdateScope = (usLocal, usOwned, usGlobal); // usBSDetails
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);
 
