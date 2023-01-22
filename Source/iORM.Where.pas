@@ -400,7 +400,7 @@ end;
 function TioWhere._And: IioWhere;
 begin
   Result := Self;
-  if not WhereConditionExists then
+  if WhereConditionExists then
     Self.FWhereItems.Add(TioDbFactory.LogicRelation._And);
 end;
 
@@ -441,14 +441,14 @@ end;
 
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
 begin
-  if not WhereConditionExists then
+  if WhereConditionExists then
     FWhereItems.Add(TioDbFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
   _AddCriteria(APropertyName, ACompareOp, AValue);
 end;
 
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp);
 begin
-  if not WhereConditionExists then
+  if WhereConditionExists then
     FWhereItems.Add(TioDbFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
   _AddCriteria(APropertyName, ACompareOp);
 end;
@@ -635,7 +635,7 @@ end;
 function TioWhere._And(AWhereCond: IioWhere): IioWhere;
 begin
   Result := Self;
-  if (not Assigned(AWhereCond)) or (AWhereCond.WhereConditionExists) then
+  if (not Assigned(AWhereCond)) or (not AWhereCond.WhereConditionExists) then
     Exit;
   Self._And;
   Self.Add(AWhereCond);
@@ -923,7 +923,7 @@ end;
 
 function TioWhere.WhereConditionExists: Boolean;
 begin
-  Result := (FWhereItems.Count = 0);
+  Result := (FWhereItems.Count > 0);
 end;
 
 procedure TioWhere.SetPagingObj(const APagingObj: TObject);
@@ -1173,7 +1173,7 @@ end;
 function TioWhere._Or: IioWhere;
 begin
   Result := Self;
-  if not WhereConditionExists then
+  if WhereConditionExists then
     Self.FWhereItems.Add(TioDbFactory.LogicRelation._Or);
 end;
 
