@@ -452,6 +452,9 @@ end;
 class function TioUtilities.TValueToObject(const AValue: TValue; const ASilentException: Boolean): Tobject;
 begin
   Result := nil;
+  // 2023-01-17 Carlo Marona
+  if AValue.IsEmpty then
+    exit;
   case AValue.TypeInfo.Kind of
     tkInterface:
       Result := AValue.AsInterface As Tobject;
