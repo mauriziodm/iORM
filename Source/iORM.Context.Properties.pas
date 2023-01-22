@@ -973,7 +973,11 @@ end;
 function TioField.GetValue(const Instance: Pointer): TValue;
 begin
   // No inherited
-  Result := FRttiProperty.GetValue(Instance);
+  // 2023-01-17 Carlo Marona
+  if Instance <> nil then
+    Result := FRttiProperty.GetValue(Instance)
+  else
+    Result := TValue.Empty;
 end;
 
 function TioField.IsWritable: Boolean;
