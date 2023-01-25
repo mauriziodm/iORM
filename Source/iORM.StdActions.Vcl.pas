@@ -368,6 +368,7 @@ type
     procedure _InjectEventHandler;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
@@ -1099,6 +1100,11 @@ begin
   LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
   LEventHandlerToInject.Data := Self;
   TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(Owner, LEventHandlerToInject, False);
+end;
+
+function TioBSCloseQuery._IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
+begin
+  Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
 procedure TioBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);

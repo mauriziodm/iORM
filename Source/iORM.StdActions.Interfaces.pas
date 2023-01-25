@@ -40,6 +40,7 @@ type
     class function ExtractBSCloseQueryStdAction(const AView: TComponent): IioBSCloseQueryAction;
     class procedure InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
     class function ExtractFirstBSCloseQueryActionFound(const AView: TComponent; const ARecursive: Boolean): IioBSCloseQueryAction;
+    class function IsChildOf(AQueryingCloseQueryAction: IioBSCloseQueryAction; const ATargetCloseQueryAction: IioBSCloseQueryAction): Boolean;
   end;
 
 implementation
@@ -180,6 +181,19 @@ begin
       #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
       #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the class "%s".',
       [ATarget.ClassName, ClassName, ClassName, ATarget.ClassName]));
+end;
+
+class function TioBSCloseQueryCommonBehaviour.IsChildOf(AQueryingCloseQueryAction: IioBSCloseQueryAction; const ATargetCloseQueryAction: IioBSCloseQueryAction): Boolean;
+begin
+  Result := False;
+  if not Assigned(ATargetCloseQueryAction) then
+    raise EioException.Create(ClassName, 'IsChildOf', 'The "ATargetCloseQueryAction" parameter is unassigned.' +
+      #13#13'This parameter cannot be left unassigned.');
+  while Assigned(AQueryingCloseQueryAction) do
+    if AQueryingCloseQueryAction.ParentCloseQueryAction = ATargetCloseQueryAction then
+      Exit(True)
+    else
+      AQueryingCloseQueryAction := AQueryingCloseQueryAction.ParentCloseQueryAction;
 end;
 
 end.

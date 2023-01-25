@@ -327,6 +327,7 @@ type
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
@@ -987,6 +988,11 @@ end;
 function TioVMActionBSCloseQuery.GetViewModelIntf: IioViewModelInternal;
 begin
   Result := FViewModelAsTComponent as IioViewModelInternal;
+end;
+
+function TioVMActionBSCloseQuery._IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
+begin
+  Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
 procedure TioVMActionBSCloseQuery.Update;
