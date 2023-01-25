@@ -362,6 +362,8 @@ type
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
+    [weak]
+    FParentCloseQueryAction: IioBSCloseQueryAction;
     function DisableIfChildExists: Boolean;
     procedure _InjectEventHandler;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
@@ -369,6 +371,9 @@ type
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+    // ParentCloseQueryAction
+    function GetParentCloseQueryAction: IioBSCloseQueryAction;
+    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
     procedure _DummyOnExecute(Sender: TObject);
     procedure Loaded; override;
@@ -381,6 +386,7 @@ type
     procedure UpdateTarget (Target: TObject); override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     function Execute: Boolean; override;
+    property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
@@ -979,6 +985,11 @@ begin
   FInternalExecutionMode := Value;
 end;
 
+procedure TioBSCloseQuery.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+begin
+  FParentCloseQueryAction := Value;
+end;
+
 function TioBSCloseQuery.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := True;
@@ -1070,6 +1081,11 @@ end;
 function TioBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
 begin
   Result := FInternalExecutionMode;
+end;
+
+function TioBSCloseQuery.GetParentCloseQueryAction: IioBSCloseQueryAction;
+begin
+  Result := FParentCloseQueryAction;
 end;
 
 procedure TioBSCloseQuery._InjectEventHandler;

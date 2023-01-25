@@ -318,6 +318,8 @@ type
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
     FViewModelAsTComponent: TComponent;
+    [weak]
+    FParentCloseQueryAction: IioBSCloseQueryAction;
     function GetViewModelIntf: IioViewModelInternal;
     function DisableIfChildExists: Boolean;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
@@ -328,6 +330,9 @@ type
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+    // ParentCloseQueryAction
+    function GetParentCloseQueryAction: IioBSCloseQueryAction;
+    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
@@ -338,6 +343,7 @@ type
     procedure Execute; override;
     procedure Update; override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectViewEventHandler: Boolean read FInjectViewEventHandler write FInjectViewEventHandler default True;
@@ -951,6 +957,11 @@ begin
   FInternalExecutionMode := Value;
 end;
 
+procedure TioVMActionBSCloseQuery.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+begin
+  FParentCloseQueryAction := Value;
+end;
+
 procedure TioVMActionBSCloseQuery.SetViewModel(const AViewModelAsTComponent: TComponent);
 begin
   if not Supports(AViewModelAsTComponent, IioViewModelInternal) then
@@ -966,6 +977,11 @@ end;
 function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
 begin
   Result := FInternalExecutionMode;
+end;
+
+function TioVMActionBSCloseQuery.GetParentCloseQueryAction: IioBSCloseQueryAction;
+begin
+  Result := FParentCloseQueryAction;
 end;
 
 function TioVMActionBSCloseQuery.GetViewModelIntf: IioViewModelInternal;
