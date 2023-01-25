@@ -17,6 +17,10 @@ type
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    // ParentCloseQueryAction
+    function GetParentCloseQueryAction: IioBSCloseQueryAction;
+    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
   end;
 
   IioBSCloseQueryVMAction = interface(IioBSCloseQueryAction)
