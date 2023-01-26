@@ -58,8 +58,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; virtual;
-    procedure Execute; virtual;
-    procedure Update; virtual;
+    function Execute: Boolean; virtual;
+    function Update: Boolean; virtual;
   published
     property _Version: String read Get_Version;
   end;
@@ -99,8 +99,8 @@ type
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
     property Owner: TComponent read GetOwnerComponent;
-    procedure Execute; override;
-    procedure Update; override;
+    function Execute: Boolean; override;
+    function Update: Boolean; override;
   published
     property Caption;
     property Enabled;
@@ -179,8 +179,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
-    procedure Execute; override;
-    procedure Update; override;
+    function Execute: Boolean; override;
+    function Update: Boolean; override;
   published
     property _Version: String read Get_Version;
   end;
@@ -326,7 +326,7 @@ type
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
-    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
@@ -341,8 +341,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Execute; override;
-    procedure Update; override;
+    function Execute: Boolean; override;
+    function Update: Boolean; override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
   published
@@ -388,14 +388,16 @@ begin
   inherited;
 end;
 
-procedure TioVMActionCustom.Execute;
+function TioVMActionCustom.Execute: Boolean;
 begin
   _ExecuteOriginal;
+  Result := False;
 end;
 
-procedure TioVMActionCustom.Update;
+function TioVMActionCustom.Update: Boolean;
 begin
   _UpdateOriginal;
+  Result := False;
 end;
 
 function TioVMActionCustom.GetCaption: String;
@@ -568,8 +570,9 @@ begin
   FTargetBindSource := nil;
 end;
 
-procedure TioVMActionBSCustom<T>.Execute;
+function TioVMActionBSCustom<T>.Execute: Boolean;
 begin
+  Result := False;
   if Assigned(FTargetBindSource) then
     inherited;
 end;
@@ -601,8 +604,9 @@ begin
   end;
 end;
 
-procedure TioVMActionBSCustom<T>.Update;
+function TioVMActionBSCustom<T>.Update: Boolean;
 begin
+  Result := False;
   if Assigned(FTargetBindSource) then
     inherited
   else
@@ -672,8 +676,9 @@ begin
   FRaiseIfRevertPointNotSaved := False;
 end;
 
-procedure TioVMActionBSPersistenceCustom.Execute;
+function TioVMActionBSPersistenceCustom.Execute: Boolean;
 begin
+  Result := False;
   if Assigned(FTargetBindSource) then
     inherited;
 end;
@@ -705,8 +710,9 @@ begin
   end;
 end;
 
-procedure TioVMActionBSPersistenceCustom.Update;
+function TioVMActionBSPersistenceCustom.Update: Boolean;
 begin
+  Result := False;
   if Assigned(FTargetBindSource) then
     inherited
   else
@@ -970,9 +976,10 @@ begin
   FViewModelAsTComponent := AViewModelAsTComponent;
 end;
 
-procedure TioVMActionBSCloseQuery.Execute;
+function TioVMActionBSCloseQuery.Execute: Boolean;
 begin
   _ExecuteOriginal;  // Ritorna all'implementazione originale
+  Result := False;
 end;
 
 function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
@@ -995,9 +1002,10 @@ begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
-procedure TioVMActionBSCloseQuery.Update;
+function TioVMActionBSCloseQuery.Update: Boolean;
 begin
   _UpdateOriginal;  // Ritorna all'implementazione originale
+  Result := False;
 end;
 
 procedure TioVMActionBSCloseQuery._InjectEventHandlerOnView(const AView: TComponent);
@@ -1031,9 +1039,9 @@ begin
   Execute;
 end;
 
-function TioVMActionBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+function TioVMActionBSCloseQuery._CanClose: Boolean;
 begin
-  Result := (Self = TObject(Sender)) or Enabled;
+  Result := Enabled;
 end;
 
 procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;

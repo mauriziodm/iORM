@@ -11,8 +11,9 @@ type
 
   IioBSCloseQueryAction = interface
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']
-    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
-    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
+    function _CanClose: Boolean;
+    function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
+    function Execute: Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);

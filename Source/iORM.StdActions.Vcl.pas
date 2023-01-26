@@ -367,7 +367,7 @@ type
     function DisableIfChildExists: Boolean;
     procedure _InjectEventHandler;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
-    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
@@ -1113,9 +1113,9 @@ begin
     Execute;
 end;
 
-function TioBSCloseQuery._CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+function TioBSCloseQuery._CanClose: Boolean;
 begin
-  Result := (Self = TObject(Sender)) or Enabled;
+  Result := Enabled;
 end;
 
 procedure TioBSCloseQuery._DummyOnExecute(Sender: TObject);

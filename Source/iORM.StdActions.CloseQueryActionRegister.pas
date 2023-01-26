@@ -29,53 +29,42 @@ uses
 
 class function TioBSCloseQueryActionRegister.CanClose(const Sender: IioBSCloseQueryAction; const ADisableIfChildExists: Boolean): Boolean;
 var
-  I, LSenderIdx: Integer;
+  I: Integer;
 begin
+  // Cicla al contrario finchè ci sono elementi oppure finchè non si raggiunge l'azione
+  //  stessa perchè non è possibile che possano esserci child actions registrate prima
+  //  della ADestroyingCQAction stessa.
   Result := True;
-  // NB: Cicla per tutte le BSCloseQueryAction registrate successivamente a quella ricevuta come Sender
-  // NB: Se Sender = nil allora (caso repeater sulla MainForm senza alcuna action e non MVVM) allora verifica tutto
-  LSenderIdx := 0;
-  if Sender <> nil then
-    LSenderIdx := FInternalContainer.IndexOf(Sender);
-  if LSenderIdx > -1 then
+  I := FInternalContainer.Count-1;
+  while (FInternalContainer[I] <> Sender) and (I >= 0) do
   begin
-    // NB: Se ADisableIfChildExists = True allora verifica semplicemente se il registro contiene altre BSCloseQueryActions
-    //      dopo quella che ha appena rilevato e se ne esistono ritorna direttametne False,
-    //      altrimenti continua a ciclare per tutte le BSCLoseQueryActions successive a quella rilevata e chiede il CanClose a
-    //      ognuno di esse fino alla prima che risponde False oppure fino a quando finiscono.
-    if ADisableIfChildExists and (FInternalContainer.Count > (LSenderIdx+1)) then
-      Exit(False)
-    else
-      for I := LSenderIdx+1 to FInternalContainer.Count-1 do
-        if not FInternalContainer[I]._CanClose(Sender) then
-          Exit(False);
-  end
-  else
-    raise EioException.Create(ClassName, 'CanClose', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',
-      [TComponent(Sender).Name, TComponent(Sender).Owner.Name]));
+    if FInternalContainer[I]._IsChildOf(Sender) and (ADisableIfChildExists or not FInternalContainer[I]._CanClose) then
+        Exit(False);
+    Dec(I);
+  end;
 end;
 
 class procedure TioBSCloseQueryActionRegister.Execute(const Sender: IioBSCloseQueryAction);
 var
-  I, LSenderIdx: Integer;
+  I: Integer;
 begin
-  // NB: Cicla per tutte le BSCloseQueryAction registrate successivamente a quella ricevuta come Sender
-  LSenderIdx := FInternalContainer.IndexOf(Sender);
-  if LSenderIdx > -1 then
+  // Cicla al contrario finchè ci sono elementi oppure finchè non si raggiunge l'azione
+  //  stessa perchè non è possibile che possano esserci child actions registrate prima
+  //  della ADestroyingCQAction stessa.
+  I := FInternalContainer.Count-1;
+  while (FInternalContainer[I] <> Sender) and (I >= 0) do
   begin
-    for I := FInternalContainer.Count-1 downto LSenderIdx+1 do
+    if FInternalContainer[I]._IsChildOf(Sender) then
     begin
-      FInternalContainer[I].InternalExecutionMode := emPassive;
+      FInternalContainer[I].InternalExecutionMode := emPassive; // That way it doesn't ask for confirmation
       try
-        FInternalContainer[I]._BSCloseQueryActionExecute(Sender);
+        FInternalContainer[I].Execute;
       finally
         FInternalContainer[I].InternalExecutionMode := emActive;
       end;
     end;
-  end
-  else
-    raise EioException.Create(ClassName, 'Execute', Format('The BSCloseQueryAction named "%s", owned by "%s", was not found in the BSCloseQueryActionRegister.',
-      [TComponent(Sender).Name, TComponent(Sender).Owner.Name]));
+    Dec(I);
+  end;
 end;
 
 class procedure TioBSCloseQueryActionRegister.RegisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
