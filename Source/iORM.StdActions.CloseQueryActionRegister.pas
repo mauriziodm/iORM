@@ -12,6 +12,7 @@ type
     class var FInternalContainer: TList<IioBSCloseQueryAction>;
     class procedure _Build;
     class procedure _Clean;
+    class procedure _RedirectChildActionsBeforeDestroy(const ADestroyingCQAction: IioBSCloseQueryAction);
   public
     class procedure RegisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
     class procedure UnregisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
@@ -84,6 +85,7 @@ end;
 
 class procedure TioBSCloseQueryActionRegister.UnregisterAction(const ABSCloseQueryAction: IioBSCloseQueryAction);
 begin
+  _RedirectChildActionsBeforeDestroy(ABSCloseQueryAction);
   FInternalContainer.Remove(ABSCloseQueryAction);
 end;
 
@@ -95,6 +97,22 @@ end;
 class procedure TioBSCloseQueryActionRegister._Clean;
 begin
   FInternalContainer.Free;
+end;
+
+class procedure TioBSCloseQueryActionRegister._RedirectChildActionsBeforeDestroy(const ADestroyingCQAction: IioBSCloseQueryAction);
+var
+  I: Integer;
+begin
+  // Cicla al contrario finchè ci sono elementi oppure finchè non si raggiunge l'azione
+  //  stessa perchè non è possibile che possano esserci child actions registrate prima
+  //  della ADestroyingCQAction stessa.
+  I := FInternalContainer.Count-1;
+  while (FInternalContainer[I] <> ADestroyingCQAction) and (I >= 0) do
+  begin
+    if FInternalContainer[I].ParentCloseQueryAction = ADestroyingCQAction then
+      FInternalContainer[I].ParentCloseQueryAction := ADestroyingCQAction.ParentCloseQueryAction;
+    Dec(I);
+  end;
 end;
 
 initialization
