@@ -1047,32 +1047,15 @@ end;
 procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;
 var
   LEnabled: Boolean;
-  function _CanCloseBindedViews: boolean;
-  var
-    I: integer;
-  begin
-    Result := True;
-    for I := 0 to GetViewModelIntf.ViewRegister.Count-1 do
-    begin
-      Result := Result and TioBSCloseQueryCommonBehaviour.CanClose_Owned(Self, GetViewModelIntf.ViewRegister.View[I], True, DisableIfChildExists);
-      if not Result then
-        Exit;
-    end;
-  end;
 begin
   LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
-  // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
-  //  in modo ricorsivo oppure no, se la action può essere attiva
-  case FOnUpdateScope of
-    usOwned, usOwnedDisableIfChilds:
-      LEnabled := LEnabled and _CanCloseBindedViews;
-    usGlobal, usGlobalDisableIfChilds:
-      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, _CanCloseBindedViews);
-  end;
+  // Se è il caso interroga anche le ChildCQA
+  if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
+    LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);
   // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
   if Assigned(FOnCloseQuery) then
     FOnCloseQuery(Self, LEnabled);
-
+  // Setta se la action è enabled o no
   Enabled := LEnabled;
 end;
 

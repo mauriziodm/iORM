@@ -367,7 +367,6 @@ type
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
     [weak]
     FParentCloseQueryAction: IioBSCloseQueryAction;
-    function DisableIfChildExists: Boolean;
     procedure _InjectEventHandler;
     procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose: Boolean;
@@ -960,11 +959,6 @@ begin
   inherited;
 end;
 
-function TioBSCloseQuery.DisableIfChildExists: Boolean;
-begin
-  Result := FOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds];
-end;
-
 function TioBSCloseQuery.DoOnConfirmationRequest: Boolean;
 begin
   Result := True;
@@ -996,24 +990,15 @@ end;
 procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
 var
   LEnabled: Boolean;
-  LCanCloseOwned: Boolean;
 begin
   LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
-  // In base alo Scope della action verifica Per ogni binded (sOwnedRecursive) view oppure nel TioBSCloseQueryActionRegister (sGlobal),
-  // in modo ricorsivo oppure no, se la action può essere attiva
-  case FOnUpdateScope of
-    usOwned, usOwnedDisableIfChilds:
-      begin
-        LCanCloseOwned := TioBSCloseQueryCommonBehaviour.CanClose_Owned(Self, Owner, True, DisableIfChildExists);
-        LEnabled := LEnabled and LCanCloseOwned;
-      end;
-    usGlobal, usGlobalDisableIfChilds:
-      LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, DisableIfChildExists);
-  end;
+  // Se è il caso interroga anche le ChildCQA
+  if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
+    LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);
   // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
   if Assigned(FOnCloseQuery) then
     FOnCloseQuery(Self, LEnabled);
-
+  // Setta se la action è enabled o no
   Enabled := LEnabled;
 end;
 
