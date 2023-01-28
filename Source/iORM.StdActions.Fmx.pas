@@ -1083,8 +1083,7 @@ end;
 
 procedure TioBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
 begin
-  if Self <> TObject(Sender) then
-    Execute;
+  Execute;
 end;
 
 function TioBSCloseQuery._CanClose: Boolean;
@@ -1099,7 +1098,7 @@ end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := _CanClose(nil);
+  CanClose := _CanClose;
   if CanClose and not FExecuting then
   begin
     ExecuteTarget(Sender);

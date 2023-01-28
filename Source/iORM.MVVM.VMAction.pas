@@ -321,7 +321,6 @@ type
     [weak]
     FParentCloseQueryAction: IioBSCloseQueryAction;
     function GetViewModelIntf: IioViewModelInternal;
-    function DisableIfChildExists: Boolean;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
@@ -947,11 +946,6 @@ begin
   inherited;
 end;
 
-function TioVMActionBSCloseQuery.DisableIfChildExists: Boolean;
-begin
-  Result := FOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds];
-end;
-
 function TioVMActionBSCloseQuery.DoOnConfirmationRequest: Boolean;
 begin
   Result := True;
@@ -1105,7 +1099,7 @@ procedure TioVMActionBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var
 begin
   FExecutingEventHandler := True;
   try
-    CanClose := _CanClose(nil);
+    CanClose := _CanClose;
     if CanClose and not FExecuting then
       _InternalExecuteStdAction;
   finally
