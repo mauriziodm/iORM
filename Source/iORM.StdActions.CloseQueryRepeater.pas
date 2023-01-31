@@ -3,17 +3,15 @@ unit iORM.StdActions.CloseQueryRepeater;
 interface
 
 uses
-  System.Classes, iORM.MVVM.ViewModelBridge, iORM.CommonTypes;
+  iORM.CommonTypes;
 
 type
 
   TioCloseQueryRepeater = class (TComponent)
   private
-    FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
-    procedure SetOnUpdateScope(const AOnUpdateScope: TioBSCloseQueryActionUpdateScope);
+    FScope: TioBSCloseQueryRepeaterScope;
     procedure _InjectEventHandler;
-    function _CanClose(const AView: TComponent; const AScope: TioBSCloseQueryActionUpdateScope): Boolean;
-    function _CanCloseQueryingFirstBSCloseQueryActionFound(const AView: TComponent): Boolean;
+    function _CanClose(const AView: TComponent; const ARecursive: Boolean): Boolean;
   protected
     procedure Loaded; override;
   public
@@ -21,23 +19,18 @@ type
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     // properties
-    property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write SetOnUpdateScope default usLocal;
+    property Scope: TioBSCloseQueryRepeaterScope read FScope write FScope default rsFirstLevelChilds;
   end;
 
 
 implementation
-
-uses
-  System.Rtti, iORM.RttiContext.Factory, iORM.Exceptions,
-  System.SysUtils, iORM.StdActions.Interfaces, iORM.Utilities,
-  iORM.StdActions.CloseQueryActionRegister;
 
 { TioCloseQueryRepeater }
 
 constructor TioCloseQueryRepeater.Create(AOwner: TComponent);
 begin
   inherited;
-  FOnUpdateScope := usLocal;
+  FScope := rsFirstLevelChilds;
 end;
 
 procedure TioCloseQueryRepeater.Loaded;
@@ -46,45 +39,37 @@ begin
   _InjectEventHandler;
 end;
 
-procedure TioCloseQueryRepeater.SetOnUpdateScope(const AOnUpdateScope: TioBSCloseQueryActionUpdateScope);
-begin
-//  if AOnUpdateScope in [usOwnedDisableIfChilds, usGlobalDisableIfChilds] then
-//    raise EioException.Create(ClassName, 'SetOnUpdateScope',
-//      Format('Attempt to set the invalid value "%s" to property "OnUpdateScope" of the component named "%s" owned by "%s".' +
-//        #13#13'This component accepts values "usLocal", "usOwned" or "usGlobal" only.',
-//        [TioUtilities.EnumToString(AOnUpdateScope), Name, Owner.Name]));
-  FOnUpdateScope := AOnUpdateScope;
-end;
-
-function TioCloseQueryRepeater._CanClose(const AView: TComponent; const AScope: TioBSCloseQueryActionUpdateScope): Boolean;
-begin
-  Result := True;
-  case AScope of
-    usLocal:
-      Result := TioBSCloseQueryCommonBehaviour.CanClose_Owned(nil, AView, False, False);
-    usOwned:
-      Result := TioBSCloseQueryCommonBehaviour.CanClose_Owned(nil, AView, True, False);
-    usGlobal:
-      Result := TioBSCloseQueryActionRegister.CanClose(nil, False);
-    // NB: Nel caso del repeater se lo scope è uno dei due "...DisableIfChilds" non ho trovato altro modo se non quello di
-    //      reperire la prima BSCloseQueryAction che si trova tra i suoi Owned e poi basare la risposta su questa.
-    //      NB: Dovrebbe funzionare bene tranne forse nel caso raro in cui ci possono essere più viste collegate a un solo
-    //           ViewModel, in questo caso usa la prima che trova, cmq è un caso raro.
-    //      NB: Anche nel caso di applicazione non MVVM con MainForm che non ha altre viste owned, non può funzionare perchè
-    //           il funzionamento si basa proprio sull'individuazione di una BSCloseQueryAction tra gli owned.
-    usOwnedDisableIfChilds, usGlobalDisableIfChilds:
-      Result := _CanCloseQueryingFirstBSCloseQueryActionFound(AView);
-  end;
-end;
-
-function TioCloseQueryRepeater._CanCloseQueryingFirstBSCloseQueryActionFound(const AView: TComponent): Boolean;
+function TioCloseQueryRepeater._CanClose(const AView: TComponent; const ARecursive: Boolean): Boolean;
 var
-  LCloseQueryAction: IioBSCloseQueryAction;
+  I: Integer;
+  LBSCloseQueryAction: IioBSCloseQueryAction;
 begin
   Result := True;
-  LCloseQueryAction := TioBSCloseQueryCommonBehaviour.ExtractFirstBSCloseQueryActionFound(AView, True);
-  if Assigned(LCloseQueryAction) then
-    Result := LCloseQueryAction._CanClose(nil);
+
+  // Primo ciclo per cercare un VMBridge o una CloseQueryAction
+  for I := 0 to AView.ComponentCount - 1 do
+  begin
+    // Se il componente è un ViewModelBridge
+    if AView.Components[I] is TioViewModelBridge then
+    begin
+      if not TioViewModelBridge(AView.Components[I]).ViewModel._CanClose then
+        Exit(False);
+    end
+    else
+    // Se il componente è una CloseQueryAction
+    if Supports(AView.Components[I], IioBSCloseQueryAction, LBSCloseQueryAction) then
+    begin
+      if not LBSCloseQueryAction._CanClose then
+        Exit(False);
+    end;
+  end;
+
+  // Secondo giro solo se ARecursive = True
+  if ARecursive then
+    for I := 0 to AView.ComponentCount - 1 do
+      if AView.Components[I].ComponentCount > 0 then
+        if not _CanClose(AView.Components[I], ARecursive) then
+          Exit(False);
 end;
 
 procedure TioCloseQueryRepeater._InjectEventHandler;
@@ -101,18 +86,8 @@ begin
 end;
 
 procedure TioCloseQueryRepeater._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
-var
-  I: Integer;
-  LSenderAsTComponent: TComponent;
 begin
-  CanClose := True;
-  LSenderAsTComponent := Sender as TComponent;
-  for I := 0 to LSenderAsTComponent.ComponentCount-1 do
-  begin
-    CanClose := CanClose and _CanClose(LSenderAsTComponent.Components[I], FOnUpdateScope);
-    if not CanClose then
-      Exit;
-  end;
+  CanClose := _CanClose(Owner, FScope = rsDeepChilds);
 end;
 
 end.
