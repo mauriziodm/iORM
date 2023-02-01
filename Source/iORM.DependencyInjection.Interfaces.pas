@@ -39,7 +39,8 @@ interface
 
 uses
   iORM.DependencyInjection.Implementers, System.Rtti, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, System.SysUtils;
+  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, System.SysUtils,
+  iORM.StdActions.Interfaces;
 
 type
 
@@ -94,6 +95,9 @@ type
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator;
     function SetViewContext(const AViewContext:TComponent; const AViewContextFreeMethod:TProc=nil): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
+    function SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator;
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
   end;
 
   IioDependencyInjectionLocator<TI> = interface(IioDependencyInjectionLocator)
@@ -126,6 +130,9 @@ type
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>;
     function SetViewContext(const AViewContext:TComponent; const AViewContextFreeMethod:TProc=nil): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
+    function SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator<TI>;
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
   end;
 
 implementation

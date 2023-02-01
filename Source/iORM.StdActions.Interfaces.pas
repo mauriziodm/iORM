@@ -35,6 +35,7 @@ type
   public
     class procedure InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod; const ARaiseIfOnCloseQueryEventNotExists: Boolean);
     class function IsChildOf(AQueryingCloseQueryAction: IioBSCloseQueryAction; const ATargetCloseQueryAction: IioBSCloseQueryAction): Boolean;
+    class function ExtractCloseQueryAction(const AView: TComponent): IioBSCloseQueryAction;
   end;
 
 implementation
@@ -45,6 +46,16 @@ uses
   iORM.StdActions.CloseQueryActionRegister;
 
 { TioBSCloseQueryCommonBehaviour }
+
+class function TioBSCloseQueryCommonBehaviour.ExtractCloseQueryAction(const AView: TComponent): IioBSCloseQueryAction;
+var
+  I: Integer;
+begin
+  Result := nil;
+  for I := 0 to AView.ComponentCount - 1 do
+    if Supports(AView.Components[I], IioBSCloseQueryAction, Result) then
+      Exit;
+end;
 
 class procedure TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(const ATarget: TComponent; const AMethod: TMethod;
   const ARaiseIfOnCloseQueryEventNotExists: Boolean);

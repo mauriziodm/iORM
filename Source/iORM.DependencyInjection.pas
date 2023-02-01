@@ -39,7 +39,7 @@ uses
   iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.Interfaces, System.SyncObjs, iORM.DependencyInjection.Interfaces, System.Rtti,
   iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes,
+  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, iORM.StdActions.Interfaces,
   System.SysUtils;
 
 const
@@ -204,6 +204,7 @@ type
     FVCProviderEnabled, FOwnerRequested: Boolean;
     FViewContext: TComponent; // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider
     FViewContextFreeMethod: TProc;
+    FParentCloseQueryAction: IioBSCloseQueryAction;
     // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider (or in combination with it)
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     FForEachModelPresenter: IioNotifiableBindSource;
@@ -267,6 +268,9 @@ type
     function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator;
     function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): IioDependencyInjectionLocator;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
+    function SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator;
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
   end;
 
   // Generic version of the Service Locator Class
@@ -304,6 +308,9 @@ type
     function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator<TI>;
     function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): IioDependencyInjectionLocator<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
+    function SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator<TI>;
+    // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
   end;
   // ===========================================================================
 
@@ -391,7 +398,7 @@ uses
   iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker, iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
   iORM.Context.Map.Interfaces, iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces, iORM.MVVM.ViewModelBridge, iORM.Abstraction,
-  iORM.MVVM.ViewModel, iORM.LiveBindings.CommonBSBehavior, DJSON;
+  iORM.LiveBindings.CommonBSBehavior, DJSON;
 
 { TioDependencyInjectionBase }
 
@@ -1282,6 +1289,7 @@ begin
   FViewContextFreeMethod := nil;
   FOwnerRequested := AOwnerRequested;
   FSingletonKey := '';
+  FParentCloseQueryAction := nil;
 end;
 
 function TioDependencyInjectionLocator.Exist: Boolean;
@@ -1448,6 +1456,12 @@ begin
   Result := SetBindSourceAsSelectorFor('', ASelectionDest);
 end;
 
+function TioDependencyInjectionLocator.SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator;
+begin
+  FParentCloseQueryAction := AParentCLoseQueryAction;
+  Result := Self;
+end;
+
 function TioDependencyInjectionLocator.SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator;
 begin
   Result := SetBindSource('', AWhere);
@@ -1522,6 +1536,21 @@ end;
 function TioDependencyInjectionLocator._Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
 var
   LValue: TValue;
+  procedure NestedSetParentCloseQueryActionToViewModel;
+  var
+    LViewModel: IioViewModel;
+  begin
+    if Supports(Result, IioViewModel, LViewModel) and LViewModel._BSCloseQueryAssigned then
+      LViewModel._GetBSCloseQuery.ParentCloseQueryAction := FParentCloseQueryAction;
+  end;
+  procedure NestedSetParentCloseQueryActionToSimpleView;
+  var
+    LCloseQueryAction: IioBSCloseQueryAction;
+  begin
+    LCloseQueryAction := TioBSCloseQueryCommonBehaviour.ExtractCloseQueryAction(Result as TComponent);
+    if Assigned(LCloseQueryAction) then
+      LCloseQueryAction.ParentCloseQueryAction := FParentCloseQueryAction;
+  end;
 begin
   Result := nil;
   // if the ViewModel is present then Lock it (MVVM)
@@ -1580,15 +1609,28 @@ begin
       // Object creation
       // Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
       Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
-      // If some PresenterSettings exists and the result object is a ViewModel then
-      //   apply it
-      // NB: Il codice commentato a dx della riga sotto poteva causare un errore dovuto alla
-      //   morte prematura del ViewModel appena creato per via del reference count, sostituito
-      //   con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
-      //   perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
-      // NB: Anche se stiamo cercando una SimpleView
-      if PresenterSettingsExists and (FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX)) then // Supports(Result, IioViewModel) then
-        TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
+      // Se stiamo creando un ViewModel oppure una SimpleView...
+      if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
+      begin
+        // If some PresenterSettings exists and the result object is a ViewModel then
+        //   apply it
+        // NB: Il codice commentato a dx della riga sotto poteva causare un errore dovuto alla
+        //   morte prematura del ViewModel appena creato per via del reference count, sostituito
+        //   con la condizione (Result is TioViewModel) il problema si è risolto e mi va bene così
+        //   perchè tanto un ViewModel deve per forza ereditare da TioViewModel.
+        if PresenterSettingsExists then // Supports(Result, IioViewModel) then
+          TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
+        // NB: Estrae eventuale BSCloseQueryAction presente nel ViewModel oppure nella SimpleView e ne
+        //      imposta la proprietà ParentCloseQueryAction
+        if Assigned(FParentCloseQueryAction) then
+        begin
+          if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) then
+            NestedSetParentCloseQueryActionToViewModel
+          else
+          if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
+            NestedSetParentCloseQueryActionToSimpleView;
+        end;
+      end;
       // If it is a new instance of a singleton then add it to the SingletonsContainer
       if AContainerItem.IsSingleton then
         TioSingletonsContainer.Add(FSingletonKey, FInterfaceName, FAlias, Result);
@@ -2152,6 +2194,12 @@ function TioDependencyInjectionLocator<TI>.SetBindSourceAsSelectorFor(const ASel
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSourceAsSelectorFor(ASelectionDest);
+end;
+
+function TioDependencyInjectionLocator<TI>.SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator<TI>;
+begin
+  Result := Self;
+  TioDependencyInjectionLocator(Self).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
 function TioDependencyInjectionLocator<TI>.SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator<TI>;
