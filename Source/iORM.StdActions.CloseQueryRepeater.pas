@@ -3,7 +3,7 @@ unit iORM.StdActions.CloseQueryRepeater;
 interface
 
 uses
-  iORM.CommonTypes;
+  iORM.CommonTypes, System.Classes;
 
 type
 
@@ -24,6 +24,9 @@ type
 
 
 implementation
+
+uses
+  iORM.StdActions.Interfaces, iORM.MVVM.ViewModelBridge;
 
 { TioCloseQueryRepeater }
 
