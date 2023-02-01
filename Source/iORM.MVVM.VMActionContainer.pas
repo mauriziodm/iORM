@@ -61,6 +61,7 @@ type
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure BindView(const AView: TComponent);
     function BSCloseQueryAction: IioBSCloseQueryVMAction;
+    function BSCloseQueryActionExists: Boolean;
   end;
 
 implementation
@@ -98,6 +99,11 @@ begin
   Result := FBSCloseQueryAction;
 end;
 
+function TioVMActionContainer.BSCloseQueryActionExists: Boolean;
+begin
+  Result := Assigned(FBSCloseQueryAction);
+end;
+
 procedure TioVMActionContainer.CopyVMAction(const AName: String; const ADestVMActionContainer: IioVMActionContainer);
 begin
   ADestVMActionContainer.Add(Get(Uppercase(AName), True)); // Note: raise exception if VMAction not found
@@ -114,6 +120,7 @@ end;
 constructor TioVMActionContainer.Create(const AViewModel: IioViewModelInternal);
 begin
   inherited Create;
+  FBSCloseQueryAction := nil;
   FViewModel := AViewModel;
   // Create the internal container
   FContainer := TDictionary<String, IioVMAction>.Create;

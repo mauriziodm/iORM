@@ -51,8 +51,7 @@ type
   // Public interface of ViewModels
   IioViewModel = interface(IInvokable)
     ['{B8A32927-A4DA-4B8D-8545-AB68DEDF17BC}']
-    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
-    function _CanClose(const Sender: IioBSCloseQueryAction): Boolean;
+    function _CanClose: Boolean;
     function _BSCloseQueryAssigned: Boolean;
     function _GetBSCloseQuery: IioBSCloseQueryAction;
     function CloseQuery: Boolean;
@@ -111,8 +110,8 @@ type
     // Methods
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
-    procedure Execute;
-    procedure Update;
+    function Update: Boolean;
+    function Execute: Boolean;
     // Caption property
     procedure SetCaption(const Value: string);
     function GetCaption: String;
@@ -191,6 +190,7 @@ type
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure BindView(const AView: TComponent);
     function BSCloseQueryAction: IioBSCloseQueryVMAction;
+    function BSCloseQueryActionExists: Boolean;
   end;
 
   IioLocalVCProviderRegister = interface

@@ -26,7 +26,7 @@ type
 implementation
 
 uses
-  iORM.StdActions.Interfaces, iORM.MVVM.ViewModelBridge;
+  iORM.StdActions.Interfaces, iORM.MVVM.ViewModelBridge, System.SysUtils;
 
 { TioCloseQueryRepeater }
 

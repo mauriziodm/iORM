@@ -1102,7 +1102,7 @@ end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := _CanClose(nil);
+  CanClose := _CanClose;
   if CanClose and not FExecuting then
   begin
     ExecuteTarget(Sender);
