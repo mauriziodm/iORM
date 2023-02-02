@@ -341,56 +341,27 @@ type
     class function TerminateApplication: boolean;
 
     // Create instance
-    class function Create<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function Create<T: IInterface>(const AParams: TioConstructorParams): T; overload;
+    class function Create<T: IInterface>(const AAlias: String = ''; const AParams: TioConstructorParams = nil): T;
 
     // Create View instance
-    class function CreateView<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AParams: TioConstructorParams): T; overload;
-    // Create View instance passing a ViewContextProvider
-    class function CreateView<T: IInterface>(const ATypeAlias: String; const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams = nil)
-      : T; overload;
-    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams = nil): T; overload;
-    // Create View instance passing an already created ViewContext
-    class function CreateView<T: IInterface>(const ATypeAlias: String; const AViewContext: TComponent; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AParams: TioConstructorParams = nil): T; overload;
-    // Create View instance passing a ViewModel
-    class function CreateView<T: IInterface>(const ATypeAlias: String; const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil): T; overload;
-    // Create View instance passing a ViewModel and a VCProvider)
-    class function CreateView<T: IInterface>(const ATypeAlias: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel;
-      const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel;
-      const AParams: TioConstructorParams = nil): T; overload;
-    // Create View instance passing a ViewModel and an already created ViewContext
-    class function CreateView<T: IInterface>(const ATypeAlias: String; const AViewContext: TComponent; const AViewModel: IioViewModel;
-      const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil)
-      : T; overload;
+    class function CreateView<T: IInterface>(const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AViewModel: IioViewModel; const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
 
     // Create View instance for a specified type of instances
     class function CreateViewFor<T>(const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AParams: TioConstructorParams): TComponent; overload;
-    // Create View instance for a specified type of instances passing a ViewContextProvider
-    class function CreateViewFor<T>(const AVVMAlias: String; const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams = nil)
-      : TComponent; overload;
-    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams = nil): TComponent; overload;
-    // Create View instance for a specified type of instances passing an already created ViewContext
-    class function CreateViewFor<T>(const AVVMAlias: String; const AViewContext: TComponent; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AViewContext: TComponent; const AParams: TioConstructorParams = nil): TComponent; overload;
-    // Create View instance for a specified type of instances passing a ViewModel
-    class function CreateViewFor<T>(const AVVMAlias: String; const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil): TComponent; overload;
-    // Create View instance for a specified type of instances passing a ViewModel and a VCProvider)
-    class function CreateViewFor<T>(const AVVMAlias: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel;
-      const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil)
-      : TComponent; overload;
-    // Create View instance for a specified type of instances passing a ViewModel and an already created ViewContext
-    class function CreateViewFor<T>(const AVVMAlias: String; const AViewContext: TComponent; const AViewModel: IioViewModel;
-      const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AParams: TioConstructorParams = nil)
-      : TComponent; overload;
+    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateViewFor<T>(const AViewContext: TComponent; const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateViewFor<T>(const AViewModel: IioViewModel; const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+
+
+
+
 
     // Create ViewModel instance
     class function CreateViewModel<T: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
@@ -1063,68 +1034,37 @@ begin
   Result := AWhere.Count;
 end;
 
-class function io.Create<T>(const ATypeAlias: String; const AParams: TioConstructorParams): T;
+class function io.Create<T>(const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.Locate<T>(ATypeAlias).ConstructorParams(AParams).Get;
+  Result := di.Locate<T>(AAlias).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const AViewContext: TComponent; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AViewContext: TComponent; const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>.SetViewContext(AViewContext).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AAlias).SetViewContext(AViewContext).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const ATypeAlias: String; const AViewContext: TComponent; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>(ATypeAlias).SetViewContext(AViewContext).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AAlias).VCProvider(AVCProvider).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const AViewModel: IioViewModel; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>.SetViewModel(AViewModel).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AAlias).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const ATypeAlias: String; const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>(ATypeAlias).VCProvider(AVCProvider).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const ATypeAlias: String; const AParams: TioConstructorParams): T;
-begin
-  Result := di.LocateView<T>(ATypeAlias).ConstructorParams(AParams).Get;
-end;
-
-class function io.CreateView<T>(const AParams: TioConstructorParams): T;
-begin
-  Result := di.LocateView<T>.ConstructorParams(AParams).Get;
-end;
-
-class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams): T;
-begin
-  Result := di.LocateView<T>.VCProvider(AVCProvider).ConstructorParams(AParams).Get;
-end;
-
-class function io.CreateView<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AParams: TioConstructorParams): T;
-begin
-  Result := di.LocateView<T>.SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
-end;
-
-class function io.CreateView<T>(const ATypeAlias: String; const AViewContext: TComponent; const AViewModel: IioViewModel;
-  const AParams: TioConstructorParams): T;
-begin
-  Result := di.LocateView<T>(ATypeAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
-end;
-
-class function io.CreateViewFor<T>(const AVVMAlias: String; const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).VCProvider(AVCProvider).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AViewContext: TComponent; const AParams: TioConstructorParams): TComponent;
-begin
-  Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).SetViewContext(AViewContext).GetAsGeneric.OfType<TComponent>;
-end;
-
-class function io.CreateViewFor<T>(const AVVMAlias: String; const AViewContext: TComponent; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AViewContext: TComponent; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).SetViewContext(AViewContext).GetAsGeneric.OfType<TComponent>;
 end;
@@ -1134,46 +1074,19 @@ begin
   Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AParams: TioConstructorParams): TComponent;
-begin
-  Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
-end;
-
-class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AParams: TioConstructorParams): TComponent;
-begin
-  Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).VCProvider(AVCProvider).GetAsGeneric.OfType<TComponent>;
-end;
-
-class function io.CreateViewFor<T>(const AVVMAlias: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel;
-  const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AParams: TioConstructorParams): TComponent;
-begin
-  Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
-end;
-
-class function io.CreateViewFor<T>(const AVVMAlias: String; const AViewContext: TComponent; const AViewModel: IioViewModel; const AParams: TioConstructorParams)
-  : TComponent;
+class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AViewModel: IioViewModel; const AParams: TioConstructorParams): TComponent;
-begin
-  Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
-end;
-
-class function io.CreateViewFor<T>(const AVVMAlias: String; const AViewModel: IioViewModel; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AViewModel: IioViewModel; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
-end;
-
-class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AParams: TioConstructorParams): TComponent;
-begin
-  Result := io.di.LocateViewFor<T>.ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateViewModelFor<T>(const AAlias: String; const AParams: TioConstructorParams): IioViewModel;
@@ -1186,20 +1099,14 @@ begin
   Result := io.di.LocateVMfor<T>.ConstructorParams(AParams).GetAsGeneric.OfType<IioViewModel>;
 end;
 
-class function io.CreateView<T>(const ATypeAlias: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel;
-  const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>(ATypeAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const ATypeAlias: String; const AViewModel: IioViewModel; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AViewModel: IioViewModel; const AAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>(ATypeAlias).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
-end;
-
-class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AParams: TioConstructorParams): T;
-begin
-  Result := di.LocateView<T>.VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AAlias).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
 class procedure io.CreateViewViewModel<TView, TViewModel>(const AAlias: String; const AVCProvider: TioViewContextProvider);
@@ -1261,11 +1168,6 @@ end;
 class function io.CreateViewModel<T>(const AAlias: String; const AParams: TioConstructorParams): T;
 begin
   Result := di.LocateVM<T>(AAlias).ConstructorParams(AParams).Get;
-end;
-
-class function io.Create<T>(const AParams: TioConstructorParams): T;
-begin
-  Result := di.Locate<T>.ConstructorParams(AParams).Get;
 end;
 
 class procedure io.Delete(const AObj: TObject);
