@@ -365,24 +365,11 @@ type
     class function CreateViewModelFor<T>(const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): IioViewModel; overload;
     class function CreateViewModelFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AParams: TioConstructorParams = nil): IioViewModel; overload;
 
-
-
-
-
     // Create View & ViewModel coupled instances
     class procedure CreateViewViewModel<TView: IInterface; TViewModel: IioViewModel>(const AAlias: String = ''); overload;
-    class procedure CreateViewViewModel<TView: IInterface; TViewModel: IioViewModel>(const AVCProvider: TioViewContextProvider; const AAlias: String = ''); overload;
-    class procedure CreateViewViewModel<TView: IInterface; TViewModel: IioViewModel>(const AViewContext: TComponent; const AAlias: String = ''); overload;
-
-
-
-
-
-
-    // Create View & ViewModel coupled for a specified type of instances
-    class procedure CreateViewViewModelFor<T>(const AVVMAlias: String = ''); overload;
-    class procedure CreateViewViewModelFor<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure CreateViewViewModelFor<T>(const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure CreateViewViewModel<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''); overload;
+    class procedure CreateViewViewModel<TView: IInterface; TViewModel: IioViewModel>(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AAlias: String = ''); overload;
+    class procedure CreateViewViewModel<TView: IInterface; TViewModel: IioViewModel>(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AAlias: String = ''); overload;
 
     // Show instance as TObject (even passing ViewContextProvider or an already created ViewContext)
     class procedure Show(const ATargetObj: TObject; const AVVMAlias: String = ''); overload;
@@ -1102,9 +1089,9 @@ begin
   Result := di.LocateView<T>(AAlias).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
-class procedure io.CreateViewViewModel<TView, TViewModel>(const AVCProvider: TioViewContextProvider; const AAlias: String);
+class procedure io.CreateViewViewModel<TView, TViewModel>(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String);
 begin
-  di.LocateViewVM<TView, TViewModel>(AAlias, AAlias).VCProvider(AVCProvider).Show;
+  di.LocateViewVM<TView, TViewModel>(AAlias, AAlias).VCProvider(AVCProvider).SetParentCloseQueryAction(AParentCloseQueryAction).Show;
 end;
 
 class procedure io.CreateViewViewModel<TView, TViewModel>(const AAlias: String);
@@ -1112,24 +1099,14 @@ begin
   di.LocateViewVM<TView, TViewModel>(AAlias, AAlias).Show;
 end;
 
-class procedure io.CreateViewViewModel<TView, TViewModel>(const AViewContext: TComponent; const AAlias: String);
+class procedure io.CreateViewViewModel<TView, TViewModel>(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String);
 begin
-  di.LocateViewVM<TView, TViewModel>(AAlias, AAlias).SetViewContext(AViewContext).Show;
+  di.LocateViewVM<TView, TViewModel>(AAlias, AAlias).SetViewContext(AViewContext).SetParentCloseQueryAction(AParentCloseQueryAction).Show;
 end;
 
-class procedure io.CreateViewViewModelFor<T>(const AVVMAlias: String);
+class procedure io.CreateViewViewModel<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String);
 begin
-  Self.Show<T>(AVVMAlias);
-end;
-
-class procedure io.CreateViewViewModelFor<T>(const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
-begin
-  Self.Show<T>(AVCProvider, AVVMAlias);
-end;
-
-class procedure io.CreateViewViewModelFor<T>(const AViewContext: TComponent; const AVVMAlias: String);
-begin
-  Self.Show<T>(AViewContext, AVVMAlias);
+  di.LocateViewVM<TView, TViewModel>(AAlias, AAlias).SetParentCloseQueryAction(AParentCloseQueryAction).Show;
 end;
 
 class function io.CreateViewModelFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AParams: TioConstructorParams): IioViewModel;
