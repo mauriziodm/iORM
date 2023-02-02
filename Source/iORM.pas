@@ -417,20 +417,6 @@ type
 
 implementation
 
-// uses
-// System.Rtti,
-// iORM.DuckTyped.Interfaces,
-// iORM.DuckTyped.Factory,
-// iORM.DuckTyped.StreamObject,
-// iORM.Exceptions,
-// iORM.DB.Factory,
-// iORM.Utilities,
-// iORM.Strategy.Factory,
-// iORM.Context.Container,
-// iORM.Abstraction,
-// iORM.DBBuilder.Factory,
-// iORM.Context.Map.Interfaces;
-
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Context.Container, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
