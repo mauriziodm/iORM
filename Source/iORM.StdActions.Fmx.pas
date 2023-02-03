@@ -368,7 +368,6 @@ type
     [weak]
     FParentCloseQueryAction: IioBSCloseQueryAction;
     procedure _InjectEventHandler;
-    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
@@ -1079,11 +1078,6 @@ end;
 function TioBSCloseQuery._IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
 begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
-end;
-
-procedure TioBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
-begin
-  Execute;
 end;
 
 function TioBSCloseQuery._CanClose: Boolean;

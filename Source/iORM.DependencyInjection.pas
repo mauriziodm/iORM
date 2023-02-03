@@ -243,6 +243,7 @@ type
     function _GetConstructorParams: PioConstructorParams;
     function _GetVCProvider: TioViewContextProvider;
     function _GetViewContext: TComponent;
+    function _GetParentCloseQueryAction: IioBSCloseQueryAction;
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): IioDependencyInjectionLocator;
@@ -1531,6 +1532,7 @@ begin
   FConstructorParams := ASourceLocator._GetConstructorParams^;
   FVCProvider := ASourceLocator._GetVCProvider;
   FViewContext := ASourceLocator._GetViewContext;
+  FParentCloseQueryAction := ASourceLocator._GetParentCloseQueryAction;
 end;
 
 function TioDependencyInjectionLocator._Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
@@ -1688,6 +1690,11 @@ end;
 function TioDependencyInjectionLocator._GetConstructorParams: PioConstructorParams;
 begin
   Result := @FConstructorParams;
+end;
+
+function TioDependencyInjectionLocator._GetParentCloseQueryAction: IioBSCloseQueryAction;
+begin
+  Result := FParentCloseQueryAction;
 end;
 
 function TioDependencyInjectionLocator._GetVCProvider: TioViewContextProvider;

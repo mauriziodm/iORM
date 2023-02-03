@@ -320,11 +320,9 @@ type
     FViewModelAsTComponent: TComponent;
     [weak]
     FParentCloseQueryAction: IioBSCloseQueryAction;
-    function GetViewModelIntf: IioViewModelInternal;
     procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
-    procedure _BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
@@ -986,11 +984,6 @@ begin
   Result := FParentCloseQueryAction;
 end;
 
-function TioVMActionBSCloseQuery.GetViewModelIntf: IioViewModelInternal;
-begin
-  Result := FViewModelAsTComponent as IioViewModelInternal;
-end;
-
 function TioVMActionBSCloseQuery._IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
 begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
@@ -1026,11 +1019,6 @@ begin
   LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
   LEventHandlerToInject.Data := Self;
   TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(AViewModelAsTComponent, LEventHandlerToInject, True);
-end;
-
-procedure TioVMActionBSCloseQuery._BSCloseQueryActionExecute(const Sender: IioBSCloseQueryAction);
-begin
-  Execute;
 end;
 
 function TioVMActionBSCloseQuery._CanClose: Boolean;
