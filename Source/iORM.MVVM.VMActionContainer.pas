@@ -171,7 +171,6 @@ begin
           #13#13'On ViewModel "%s" there can be only one "TioVMActionBSCloseQuery" action.' +
           #13#13'Please make sure there''s only one left and you''ll see that everything will be fine.',
           [(FViewModel as TComponent).Name]));
-      LBSCloseQueryAction.SetViewModel(FViewModel as TComponent);
       LBSCloseQueryAction._InjectEventHandlerOnViewModel(FViewModel as TComponent); // Inject its OnCloseQuery event handler on ViewModel
       FBSCloseQueryAction := LBSCloseQueryAction; // Take e direct reference
     end;

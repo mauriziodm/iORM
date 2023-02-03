@@ -26,7 +26,6 @@ type
 
   IioBSCloseQueryVMAction = interface(IioBSCloseQueryAction)
     ['{159EB42D-DBD9-44FA-A0C2-79E000634E20}']
-    procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsComponent: TComponent); // TComponent to avoid circular reference
   end;

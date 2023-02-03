@@ -317,10 +317,8 @@ type
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
-    FViewModelAsTComponent: TComponent;
     [weak]
     FParentCloseQueryAction: IioBSCloseQueryAction;
-    procedure SetViewModel(const AViewModelAsTComponent: TComponent);
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     function _CanClose: Boolean;
@@ -959,13 +957,6 @@ end;
 procedure TioVMActionBSCloseQuery.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
 begin
   FParentCloseQueryAction := Value;
-end;
-
-procedure TioVMActionBSCloseQuery.SetViewModel(const AViewModelAsTComponent: TComponent);
-begin
-  if not Supports(AViewModelAsTComponent, IioViewModelInternal) then
-    raise EioException.Create(ClassName, 'SetViewModel', Format('Class "%s" doesn''t supports "IioViewModelInternal" interface.', [AViewModelAsTComponent.ClassName]));
-  FViewModelAsTComponent := AViewModelAsTComponent;
 end;
 
 function TioVMActionBSCloseQuery.Execute: Boolean;
