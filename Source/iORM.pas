@@ -382,10 +382,12 @@ type
     class procedure Show(const ATargetIntf: IInterface; const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
     class procedure Show(const ATargetIntf: IInterface; const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
     // Show instance of generic type <T> (even passing ViewContextProvider or an already created ViewContext)
-    class procedure Show<T>(const AVVMAlias: String = ''); overload;
+//    class procedure Show<T>(const AVVMAlias: String = ''); overload;
     class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure Show<T>(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
-    class procedure Show<T>(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
+//    class procedure Show<T>(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
+    class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+//    class procedure Show<T>(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
+    class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AVVMAlias: String = ''); overload;
@@ -790,14 +792,6 @@ begin
     di.LocateViewVMfor(ATargetObj, AVVMAlias).Show;
 end;
 
-class procedure io.Show<T>(const AVVMAlias: String);
-begin
-  if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
-    di.LocateSimpleViewfor<T>(AVVMAlias).Show
-  else
-    di.LocateViewVMfor<T>(AVVMAlias).Show;
-end;
-
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
@@ -806,7 +800,7 @@ begin
     di.LocateViewVMfor<T>(AVVMAlias).SetParentCloseQueryAction(AParentCloseQueryAction).Show;
 end;
 
-class procedure io.Show<T>(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
+class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
     di.LocateSimpleViewfor<T>(AVVMAlias).VCProvider(AVCProvider).SetParentCloseQueryAction(AParentCloseQueryAction).Show
@@ -814,7 +808,7 @@ begin
     di.LocateViewVMfor<T>(AVVMAlias).VCProvider(AVCProvider).SetParentCloseQueryAction(AParentCloseQueryAction).Show;
 end;
 
-class procedure io.Show<T>(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
+class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor<T>(AVVMAlias).Exist then
     di.LocateSimpleViewfor<T>(AVVMAlias).SetViewContext(AViewContext).SetParentCloseQueryAction(AParentCloseQueryAction).Show

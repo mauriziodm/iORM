@@ -29,7 +29,6 @@ object VMBaseForList: TVMBaseForList
     Top = 240
   end
   object acBack: TioVMActionBSCloseQuery
-    OnUpdateScope = usGlobalDisableIfChilds
     TargetBindSource = BSMaster
     Left = 192
     Top = 48

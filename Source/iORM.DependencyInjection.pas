@@ -333,7 +333,7 @@ type
   TioDependencyInjection = class(TioDependencyInjectionBase)
   private
     class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AAlias: String = '';
+    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = '';
       const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
   public
     class function Singletons: TioSingletonsFacadeRef;
@@ -342,39 +342,39 @@ type
     class function Locate(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function Locate<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
     // Locate SimpleView
-    class function LocateSimpleView(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleView<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
-    class function LocateSimpleViewFor(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleViewFor(const AClassRef: TioClassRef; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleViewFor<T>(const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleViewFor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleViewFor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleViewFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
+    class function LocateSimpleViewFor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate View
-    class function LocateView(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateView<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
-    class function LocateViewFor(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor(const AClassRef: TioClassRef; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor<T>(const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateView(const AInterfaceName: String; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateView<T: IInterface>(const AVAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
+    class function LocateViewFor(const ATargetTypeName: String; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor(const AClassRef: TioClassRef; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor<T>(const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor(const ATargetObj: TObject; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor(const ATargetIntf: IInterface; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor(const ATargetMP: IioNotifiableBindSource; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate ViewModel
-    class function LocateVM(const AInterfaceName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateVM<T: IInterface>(const AAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
-    class function LocateVMfor(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateVMfor(const AClassRef: TioClassRef; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateVMfor<T>(const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateVMfor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateVMfor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateVM<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
+    class function LocateVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate View & ViewModel
-    class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AViewAlias: String = ''; const AViewModelAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator<TView>; overload;
-    class function LocateViewVMfor(const ATargetTypeName: String; const AAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor(const AClassRef: TioClassRef; const AAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor<T>(const AAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor(const ATargetObj: TObject; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor(const ATargetIntf: IInterface; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor(const ASourceMP: IioNotifiableBindSource; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator<TView>; overload;
+    class function LocateViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor(const ASourceMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -385,9 +385,9 @@ type
     class function GetRegister(const AContainerValue: TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): IioDependencyInjectionLocator; overload;
     class function GetLocator<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): IioDependencyInjectionLocator<TI>; overload;
-    class function GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator; overload;
+    class function GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): IioDependencyInjectionLocator; overload;
     class function GetViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator; overload;
-    class function GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String; const ACreateViewModel: Boolean)
+    class function GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String; const ACreateViewModel: Boolean)
       : IioDependencyInjectionLocator; overload;
     // NB: IL codice del metodo sotto commentato è anch'esso commentato
     // class function GetVMLocatorFor(const AModelPresenter:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
@@ -432,151 +432,151 @@ begin
   Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, False, False, dotRegular);
 end;
 
-class function TioDependencyInjection.LocateSimpleView(const AInterfaceName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, True, dotSimpleView);
+  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateSimpleView<T>(const AAlias: String): IioDependencyInjectionLocator<T>;
+class function TioDependencyInjection.LocateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator<T>;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, True, dotSimpleView);
+  Result := TioDependencyInjectionFactory.GetLocator<T>(ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const AClassRef: TioClassRef; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateSimpleViewFor(AClassRef.ClassName, AAlias);
+  Result := LocateSimpleViewFor(AClassRef.ClassName, AParentCloseQueryAction, ASVAlias);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetObj: TObject; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateSimpleViewFor(ATargetObj.ClassName, AAlias).SetBindSource(ATargetObj);
+  Result := LocateSimpleViewFor(ATargetObj.ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetObj);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateSimpleViewFor((ATargetIntf as TObject).ClassName, AAlias).SetBindSource(ATargetIntf);
+  Result := LocateSimpleViewFor((ATargetIntf as TObject).ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetIntf);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get the ViewLocator
-  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotSimpleView);
+  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateView(const AInterfaceName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateView(const AInterfaceName, AVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, True, dotView);
+  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AVAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection.LocateViewVM<TView, TViewModel>(const AViewAlias, AViewModelAlias, AViewModelMarker: String)
+class function TioDependencyInjection.LocateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String)
   : IioDependencyInjectionLocator<TView>;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := TioDependencyInjectionFactory.GetLocator<TView>(AViewAlias, True, True, dotView);
+  Result := TioDependencyInjectionFactory.GetLocator<TView>(AVVMAlias, True, True, dotView);
   // Get the ViewModel instance
-  LViewModel := io.di.LocateVM<TViewModel>(AViewModelAlias).Get;
+  LViewModel := io.di.LocateVM<TViewModel>(AParentCloseQueryAction, AVVMAlias).Get;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const AClassRef: TioClassRef; const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor(AClassRef.ClassName, AAlias, AViewModelMarker);
+  Result := LocateViewVMfor(AClassRef.ClassName, AParentCloseQueryAction, AVVMAlias, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): IioDependencyInjectionLocator;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetObj.ClassName, AAlias);
+  Result := LocateViewFor(ATargetObj.ClassName, AVVMAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetObj, AAlias).GetAsGeneric.OfType<IioViewModel>;
+  LViewModel := io.di.LocateVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): IioDependencyInjectionLocator;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetIntf, AAlias);
+  Result := LocateViewFor(ATargetIntf, AVVMAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetIntf, AAlias).GetAsGeneric.OfType<IioViewModel>;
+  LViewModel := io.di.LocateVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor<T>(const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewVMfor(TioUtilities.GenericToString<T>, AAlias, AViewModelMarker);
+  Result := LocateViewVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVVMAlias, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateView<T>(const AAlias: String): IioDependencyInjectionLocator<T>;
+class function TioDependencyInjection.LocateView<T>(const AVAlias: String): IioDependencyInjectionLocator<T>;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, True, dotView);
+  Result := TioDependencyInjectionFactory.GetLocator<T>(AVAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const AClassRef: TioClassRef; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor(const AClassRef: TioClassRef; const AVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewFor(AClassRef.ClassName, AAlias);
+  Result := LocateViewFor(AClassRef.ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetObj: TObject; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor(const ATargetObj: TObject; const AVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewFor(ATargetObj.ClassName, AAlias);
+  Result := LocateViewFor(ATargetObj.ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor<T>(const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor<T>(const AVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewFor(TioUtilities.GenericToString<T>, AAlias);
+  Result := LocateViewFor(TioUtilities.GenericToString<T>, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor(const ATargetMP: IioNotifiableBindSource; const AVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
-  Result := TioDependencyInjectionFactory.GetViewLocatorFor(ATargetMP, AAlias);
+  Result := TioDependencyInjectionFactory.GetViewLocatorFor(ATargetMP, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor(const ATargetTypeName, AVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get the ViewLocator
-  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView);
+  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AVAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection.LocateVM(const AInterfaceName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AAlias, True, False, dotViewModel);
+  Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateVM<T>(const AAlias: String): IioDependencyInjectionLocator<T>;
+class function TioDependencyInjection.LocateVM<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator<T>;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator<T>(AAlias, True, False, dotViewModel);
+  Result := TioDependencyInjectionFactory.GetLocator<T>(AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const AClassRef: TioClassRef; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMfor(AClassRef.ClassName, AAlias);
+  Result := LocateVMfor(AClassRef.ClassName, AParentCloseQueryAction, AVMAlias);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const ATargetObj: TObject; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMfor(ATargetObj.ClassName, AAlias).SetBindSource(ATargetObj);
+  Result := LocateVMfor(ATargetObj.ClassName, AParentCloseQueryAction, AVMAlias).SetBindSource(ATargetObj);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMfor((ATargetIntf as TObject).ClassName, AAlias).SetBindSource(ATargetIntf);
+  Result := LocateVMfor((ATargetIntf as TObject).ClassName, AParentCloseQueryAction, AVMAlias).SetBindSource(ATargetIntf);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, False, dotViewModel);
+  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateVMfor<T>(const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateVMfor(TioUtilities.GenericToString<T>, AAlias);
+  Result := LocateVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVMAlias);
 end;
 
 class function TioDependencyInjection.RegisterClass(const ARttiType: TRttiInstanceType): TioDependencyInjectionRegister;
@@ -602,15 +602,15 @@ begin
   Result := TioSingletonsFacade;
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetIntf: IInterface; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor(const ATargetIntf: IInterface; const AVAlias: String): IioDependencyInjectionLocator;
 begin
-  Result := LocateViewFor((ATargetIntf as TObject).ClassName, AAlias);
+  Result := LocateViewFor((ATargetIntf as TObject).ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
-  Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AAlias, False);
+  Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AParentCloseQueryAction, AVVMAlias, False);
 end;
 
 class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
@@ -620,39 +620,38 @@ begin
   Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource;
-  const ATargetTypeName, AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
   Result := LocateViewFor(ATargetTypeName, AAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetTypeName, AAlias).SetBindSource(ASourceMP).GetAsGeneric.OfType<IioViewModel>;
+  LViewModel := io.di.LocateVMfor(ATargetTypeName, AParentCloseQueryAction, AAlias).SetBindSource(ASourceMP).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ATargetTypeName, AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetTypeName, AAlias);
+  Result := LocateViewFor(ATargetTypeName, AVVMAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetTypeName, AAlias).GetAsGeneric.OfType<IioViewModel>;
+  LViewModel := io.di.LocateVMfor(ATargetTypeName, AParentCloseQueryAction, AVVMAlias).GetAsGeneric.OfType<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor<T>(const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
-  Result := LocateSimpleViewFor(TioUtilities.GenericToString<T>, AAlias);
+  Result := LocateSimpleViewFor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, ASVAlias);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
-  Result := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(ATargetMP, AAlias);
+  Result := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(ATargetMP, AParentCloseQueryAction, ASVAlias);
 end;
 
 { TioDependencyInjectionRegister }
@@ -1796,20 +1795,19 @@ begin
 // ---------- OLD CODE -----------
 end;
 
-class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String;
-  const ACreateViewModel: Boolean): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String; const ACreateViewModel: Boolean): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a SimpleView locator for MP.Current instance
-  if io.di.LocateSimpleViewFor(ATargetMP.Current, AAlias).Exist then
-    Result := GetSimpleViewLocatorFor(ATargetMP, AAlias)
+  if io.di.LocateSimpleViewFor(ATargetMP.Current, AParentCloseQueryAction, AAlias).Exist then
+    Result := GetSimpleViewLocatorFor(ATargetMP, AParentCloseQueryAction, AAlias)
   else
   // Try to retrieve a View + ViewModel locator for MP.Current instance
-  if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AAlias).Exist then
+  if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AParentCloseQueryAction, AAlias).Exist then
   begin
     if ACreateViewModel then
-      Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.Current.ClassName, AAlias)
+      Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.Current.ClassName, AParentCloseQueryAction, AAlias)
     else
       Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.Current.ClassName, AAlias);
     // Set the locator
@@ -1867,13 +1865,12 @@ begin
   Result := TioDependencyInjectionRegister.Create(AContainerValue);
 end;
 
-class function TioDependencyInjectionFactory.GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource;
-  const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a locator for MP.Current instance
-  Result := io.di.LocateSimpleViewFor(ATargetMP.Current.ClassName, AAlias).SetBindSource(ATargetMP);
+  Result := io.di.LocateSimpleViewFor(ATargetMP.Current.ClassName, AParentCloseQueryAction, AAlias).SetBindSource(ATargetMP);
   // Set the locator
   Result._SetForEachModelPresenter(ATargetMP, False);
 // -------- OLD CODE --------

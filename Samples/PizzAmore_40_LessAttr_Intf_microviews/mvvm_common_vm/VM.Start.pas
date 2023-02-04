@@ -41,17 +41,17 @@ uses
 
 procedure TVMStart.acShowCustomersExecute(Sender: TObject);
 begin
-  io.Show<IGenericCustomer>;
+  io.Show<IGenericCustomer>(acQuit);
 end;
 
 procedure TVMStart.acShowOrdersExecute(Sender: TObject);
 begin
-  io.Show<IOrder>;
+  io.Show<IOrder>(acQuit);
 end;
 
 procedure TVMStart.acShowPizzasExecute(Sender: TObject);
 begin
-  io.Show<IPizza>;
+  io.Show<IPizza>(acQuit);
 end;
 
 end.

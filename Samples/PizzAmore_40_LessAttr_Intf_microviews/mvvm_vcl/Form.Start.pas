@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, iORM.Abstraction.VCL, iORM, iORM.Attributes, iORM.CommonTypes,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, iORM.Abstraction.VCL, iORM.Attributes, iORM.CommonTypes,
   iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.ViewModelBridge, System.Actions,
-  Vcl.ActnList, iORM.StdActions.Vcl, Vcl.ExtActns;
+  Vcl.ActnList, iORM.StdActions.Vcl, Vcl.ExtActns, iORM;
 
 type
   TStartForm = class(TForm)

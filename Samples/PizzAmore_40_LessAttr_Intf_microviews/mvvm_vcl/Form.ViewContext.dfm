@@ -15,7 +15,6 @@ object ViewContextForm: TViewContextForm
   OnClose = FormClose
   TextHeight = 15
   object ioCloseQueryRepeater1: TioCloseQueryRepeater
-    OnUpdateScope = usOwned
     Left = 72
     Top = 72
   end
