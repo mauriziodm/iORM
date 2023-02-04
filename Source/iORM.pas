@@ -977,9 +977,9 @@ begin
   Result := di.LocateView<T>(AVAlias).SetViewContext(AViewContext).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AAlias: String; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AVAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>(AAlias).VCProvider(AVCProvider).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AVAlias).VCProvider(AVCProvider).ConstructorParams(AParams).Get;
 end;
 
 class function io.CreateView<T>(const AVAlias: String; const AParams: TioConstructorParams): T;
@@ -997,9 +997,9 @@ begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).VCProvider(AVCProvider).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AViewContext: TComponent; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AViewContext: TComponent; const AVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).SetViewContext(AViewContext).GetAsGeneric.OfType<TComponent>;
+  Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).SetViewContext(AViewContext).GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AVAlias: String; const AParams: TioConstructorParams): TComponent;
@@ -1012,9 +1012,9 @@ begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVVMAlias: String; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVVMAlias).ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
+  Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): TComponent;
@@ -1022,9 +1022,9 @@ begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AAlias: String; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): T;
 begin
-  Result := di.LocateView<T>(AAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
+  Result := di.LocateView<T>(AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
 class function io.CreateView<T>(const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): T;
@@ -1037,9 +1037,9 @@ begin
   di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
-class procedure io.CreateViewViewModel<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String);
+class procedure io.CreateViewViewModel<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AAlias).SetViewContext(AViewContext).Show;
+  di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.CreateViewViewModel<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);

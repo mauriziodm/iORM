@@ -1722,10 +1722,10 @@ begin
       '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Retrieve the correct locator
   if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
-    LLocator := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(FForEachModelPresenter, FAlias) as TioDependencyInjectionLocator
+    LLocator := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(FForEachModelPresenter, FParentCloseQueryAction, FAlias) as TioDependencyInjectionLocator
   else
   if FForEachLocateViewModel then
-    LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, FAlias, True) as TioDependencyInjectionLocator
+    LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, FParentCloseQueryAction, FAlias, True) as TioDependencyInjectionLocator
   else
     LLocator := TioDependencyInjectionFactory.GetViewLocatorFor(FForEachModelPresenter, FAlias) as TioDependencyInjectionLocator;
   // Set the locator
