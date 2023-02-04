@@ -200,15 +200,13 @@ type
     function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    procedure ShowCurrent(const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    procedure ShowCurrent(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
-    procedure ShowCurrent(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    procedure ShowEach(const AVVMAlias: String = ''); overload;
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    procedure ShowEach(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
-    procedure ShowEach(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction = nil; const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // DataObject
     procedure ClearDataObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -886,9 +884,9 @@ begin
   WhereOnChangeEventHandler(Self);
 end;
 
-procedure TioDataSetCustom.ShowCurrent(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
+procedure TioDataSetCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  io.ShowCurrent(Self, AViewContext, AParentCloseQueryAction, AVVMAlias);
+  io.ShowCurrent(Self, AParentCloseQueryAction, AViewContext, AVVMAlias);
 end;
 
 procedure TioDataSetCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
@@ -896,19 +894,14 @@ begin
   io.ShowCurrent(Self, AParentCloseQueryAction, AVVMAlias);
 end;
 
-procedure TioDataSetCustom.ShowCurrent(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
+procedure TioDataSetCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  io.ShowCurrent(Self, AVCProvider, AParentCloseQueryAction, AVVMAlias);
+  io.ShowCurrent(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;
 
-procedure TioDataSetCustom.ShowCurrent(const AVVMAlias: String);
+procedure TioDataSetCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  io.ShowCurrent(Self, AVVMAlias);
-end;
-
-procedure TioDataSetCustom.ShowEach(const AViewContext: TComponent; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
-begin
-  io.ShowEach(Self, AViewContext, AParentCloseQueryAction, AVVMAlias);
+  io.ShowEach(Self, AParentCloseQueryAction, AViewContext, AVVMAlias);
 end;
 
 procedure TioDataSetCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
@@ -916,14 +909,9 @@ begin
   io.ShowEach(Self, AParentCloseQueryAction, AVVMAlias);
 end;
 
-procedure TioDataSetCustom.ShowEach(const AVCProvider: TioViewContextProvider; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
+procedure TioDataSetCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  io.ShowEach(Self, AVCProvider, AParentCloseQueryAction, AVVMAlias);
-end;
-
-procedure TioDataSetCustom.ShowEach(const AVVMAlias: String);
-begin
-  io.ShowEach(Self, AVVMAlias);
+  io.ShowEach(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;
 
 procedure TioDataSetCustom.WhereOnChangeEventHandler(Sender: TObject);
