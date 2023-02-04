@@ -45,7 +45,8 @@ uses
   iORM.Interfaces, iORM.Containers.Interfaces, System.Rtti,
   iORM.CommonTypes, iORM.Resolver.Interfaces, System.Classes,
   Data.Bind.ObjectScope, iORM.Where.Destinations,
-  iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo;
+  iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
+  iORM.StdActions.Interfaces;
 type
 
   IioWhere = interface;
@@ -105,9 +106,9 @@ type
 
     procedure Delete;
 
-    procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
-    procedure ShowList(const AVVMAlias:String='');
-    procedure ShowEach(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
+    procedure Show(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
+    procedure ShowList(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias:String='');
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
 
     // ------ Conditions
     function ByID(const AID:Integer): IioWhere;

@@ -46,7 +46,7 @@ uses
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
-  DJSON.Attributes, iORM.Context.Interfaces;
+  DJSON.Attributes, iORM.Context.Interfaces, iORM.StdActions.Interfaces;
 
 type
 
@@ -76,8 +76,8 @@ type
     [djSkip] FPagingObj: TioCommonBSAPageManager;
     [djSkip] FPagingObjExists: Boolean;
 
-    procedure _Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
-    procedure _Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
+    procedure _Show(const ADataObject: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
+    procedure _Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
 
     procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
     procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
@@ -141,9 +141,9 @@ type
 
     procedure Delete;
 
-    procedure Show(const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
-    procedure ShowList(const AVVMAlias: String = ''); virtual;
-    procedure ShowEach(const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
+    procedure Show(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
+    procedure ShowList(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); virtual;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AForceTypeNameUse: Boolean = False); virtual;
 
     // ------ Conditions
     function ByID(const AID: Integer): IioWhere;
@@ -1004,7 +1004,7 @@ begin
   FTypeName := Value;
 end;
 
-procedure TioWhere.Show(const AVVMAlias: String; const AForceTypeNameUse: Boolean);
+procedure TioWhere.Show(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
 var
   LIntfInstance: IInterface;
   LClassInstance: TObject;
@@ -1013,13 +1013,13 @@ begin
   if TioUtilities.IsAnInterfaceTypeName(TypeName) then
   begin
     Supports(LClassInstance, IInterface, LIntfInstance);
-    _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
+    _Show(LIntfInstance, AParentCloseQueryAction, AVVMAlias, AForceTypeNameUse);
   end
   else
-    _Show(LClassInstance, AVVMAlias, AForceTypeNameUse);
+    _Show(LClassInstance, AParentCloseQueryAction, AVVMAlias, AForceTypeNameUse);
 end;
 
-procedure TioWhere.ShowEach(const AVVMAlias: String; const AForceTypeNameUse: Boolean);
+procedure TioWhere.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
 var
   LClassList: TList<TObject>;
   LClassInstance: TObject;
@@ -1031,7 +1031,7 @@ begin
     LIntfList := Self.ToGenericList.OfType<TList<IInterface>>;
     try
       for LIntfInstance in LIntfList do
-        _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
+        _Show(LIntfInstance, AParentCloseQueryAction, AVVMAlias, AForceTypeNameUse);
     finally
       LIntfList.Free;
     end;
@@ -1041,14 +1041,14 @@ begin
     LClassList := Self.ToGenericList.OfType<TList<TObject>>;
     try
       for LClassInstance in LClassList do
-        _Show(LClassInstance, AVVMAlias, AForceTypeNameUse);
+        _Show(LClassInstance, AParentCloseQueryAction, AVVMAlias, AForceTypeNameUse);
     finally
       LClassList.Free;
     end;
   end;
 end;
 
-procedure TioWhere.ShowList(const AVVMAlias: String);
+procedure TioWhere.ShowList(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 var
   LList: TObject;
 begin
@@ -1056,7 +1056,7 @@ begin
     LList := Self.ToList(TList<IInterface>)
   else
     LList := Self.ToList(TList<TObject>);
-  io.di.LocateViewVMFor(TypeName, AVVMAlias).SetBindSource(LList).Show;
+  io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(LList).Show;
 end;
 
 procedure TioWhere.ToList(const AList: TObject);
@@ -1275,44 +1275,44 @@ begin
   Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOIDEqualsTo(TValue.From<Integer>(AValue)));
 end;
 
-procedure TioWhere._Show(const ADataObject: TObject; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
+procedure TioWhere._Show(const ADataObject: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
 begin
   if not Assigned(ADataObject) then
     raise EioException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
   // If specific View/ViewModel were found for the instance then use them...
   // NB: But only if AForceTypeNameUse = False
   if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-    and io.di.LocateVMFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+    and io.di.LocateVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and not AForceTypeNameUse then
-    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetBindSource(ADataObject).Show
+    io.di.LocateViewVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
   else
     // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
     if (not TypeName.IsEmpty) and io.di.LocateViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-      and io.di.LocateVMFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+      and io.di.LocateVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     then
-      io.di.LocateViewVMFor(TypeName, AVVMAlias).SetBindSource(ADataObject).Show
+      io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
     else
       raise EioException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
         [ADataObject.ClassName, TypeName, AVVMAlias]));
 end;
 
-procedure TioWhere._Show(const ADataObject: IInterface; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
+procedure TioWhere._Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
 begin
   if not Assigned(ADataObject) then
     raise EioException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
   // If specific View/ViewModel were found for the instance then use them...
   // NB: But only if AForceTypeNameUse = False
   if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-    and io.di.LocateVMFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+    and io.di.LocateVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and not AForceTypeNameUse then
-    io.di.LocateViewVMFor(ADataObject, AVVMAlias).SetBindSource(ADataObject).Show
+    io.di.LocateViewVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
   else
     // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
     if (not TypeName.IsEmpty) and io.di.LocateViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-      and io.di.LocateVMFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+      and io.di.LocateVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     then
-      io.di.LocateViewVMFor(TypeName, AVVMAlias).SetBindSource(ADataObject).Show
+      io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
     else
       raise EioException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
