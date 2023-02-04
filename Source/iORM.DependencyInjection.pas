@@ -385,9 +385,9 @@ type
     class function GetRegister(const AContainerValue: TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): IioDependencyInjectionLocator; overload;
     class function GetLocator<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): IioDependencyInjectionLocator<TI>; overload;
-    class function GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): IioDependencyInjectionLocator; overload;
-    class function GetViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator; overload;
-    class function GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String; const ACreateViewModel: Boolean)
+    class function GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator; overload;
+    class function GetViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AVAlias: String): IioDependencyInjectionLocator; overload;
+    class function GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean)
       : IioDependencyInjectionLocator; overload;
     // NB: IL codice del metodo sotto commentato è anch'esso commentato
     // class function GetVMLocatorFor(const AModelPresenter:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
@@ -1767,12 +1767,12 @@ begin
   Result := TioDependencyInjectionLocator.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AVAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a locator for MP.Current instance
-  Result := io.di.LocateViewFor(ATargetMP.Current.ClassName, AAlias);
+  Result := io.di.LocateViewFor(ATargetMP.Current.ClassName, AVAlias);
   // Set the locator
   Result._SetForEachModelPresenter(ATargetMP, True);
  // ---------- OLD CODE -----------
@@ -1795,33 +1795,33 @@ begin
 // ---------- OLD CODE -----------
 end;
 
-class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String; const ACreateViewModel: Boolean): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a SimpleView locator for MP.Current instance
-  if io.di.LocateSimpleViewFor(ATargetMP.Current, AParentCloseQueryAction, AAlias).Exist then
-    Result := GetSimpleViewLocatorFor(ATargetMP, AParentCloseQueryAction, AAlias)
+  if io.di.LocateSimpleViewFor(ATargetMP.Current, AParentCloseQueryAction, AVVMAlias).Exist then
+    Result := GetSimpleViewLocatorFor(ATargetMP, AParentCloseQueryAction, AVVMAlias)
   else
   // Try to retrieve a View + ViewModel locator for MP.Current instance
-  if io.di.LocateViewFor(ATargetMP.Current, AAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AParentCloseQueryAction, AAlias).Exist then
+  if io.di.LocateViewFor(ATargetMP.Current, AVVMAlias).Exist and io.di.LocateVMfor(ATargetMP.Current, AParentCloseQueryAction, AVVMAlias).Exist then
   begin
     if ACreateViewModel then
-      Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.Current.ClassName, AParentCloseQueryAction, AAlias)
+      Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.Current.ClassName, AParentCloseQueryAction, AVVMAlias)
     else
-      Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.Current.ClassName, AAlias);
+      Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.Current.ClassName, AVVMAlias);
     // Set the locator
     Result._SetForEachModelPresenter(ATargetMP, True);
   end
   else
-    if AAlias.IsEmpty then
+    if AVVMAlias.IsEmpty then
       raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
         #13#13'A View+ViewModel or a SimpleView for the "%s" class is required but I cannot find any registered.',
         [ATargetMP.Current.ClassName]))
     else
       raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
         #13#13'A View+ViewModel or a SimpleView for the "%s" class (alias "%s") is required but I cannot find any registered.',
-        [ATargetMP.Current.ClassName, AAlias]));
+        [ATargetMP.Current.ClassName, AVVMAlias]));
 
 
   // ---------- OLD CODE -----------
@@ -1865,12 +1865,12 @@ begin
   Result := TioDependencyInjectionRegister.Create(AContainerValue);
 end;
 
-class function TioDependencyInjectionFactory.GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetSimpleViewLocatorFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetMP, True, True);
   // Try to retrieve a locator for MP.Current instance
-  Result := io.di.LocateSimpleViewFor(ATargetMP.Current.ClassName, AParentCloseQueryAction, AAlias).SetBindSource(ATargetMP);
+  Result := io.di.LocateSimpleViewFor(ATargetMP.Current.ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetMP);
   // Set the locator
   Result._SetForEachModelPresenter(ATargetMP, False);
 // -------- OLD CODE --------
