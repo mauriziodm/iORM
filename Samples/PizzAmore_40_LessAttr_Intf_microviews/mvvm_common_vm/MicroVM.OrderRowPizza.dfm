@@ -20,6 +20,7 @@ object MicroVMOrderRowPizza: TMicroVMOrderRowPizza
     Top = 104
   end
   object BSPizza: TioModelPresenterDetail
+    AsDefault = True
     MasterBindSource = BSOrderRow
     MasterPropertyName = 'Pizza'
     TypeOfCollection = tcSingleObject

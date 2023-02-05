@@ -332,7 +332,7 @@ type
 
   TioDependencyInjection = class(TioDependencyInjectionBase)
   private
-    class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = '';
       const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
   public
@@ -399,7 +399,7 @@ uses
   iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker, iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
   iORM.Context.Map.Interfaces, iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces, iORM.MVVM.ViewModelBridge, iORM.Abstraction,
-  iORM.LiveBindings.CommonBSBehavior, DJSON;
+  iORM.LiveBindings.CommonBSBehavior, DJSON, iORM.MVVM.ViewModel;
 
 { TioDependencyInjectionBase }
 
@@ -613,11 +613,11 @@ begin
   Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AParentCloseQueryAction, AVVMAlias, False);
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName, AAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): IioDependencyInjectionLocator;
 begin
   // NB: This method create the locator instance only (never create a VM like LocateViewVM methods)
   // Get the ViewLocator
-  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView);
+  Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
 class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
@@ -1538,11 +1538,10 @@ function TioDependencyInjectionLocator._Get(const AContainerItem: TioDIContainer
 var
   LValue: TValue;
   procedure NestedSetParentCloseQueryActionToViewModel;
-  var
-    LViewModel: IioViewModel;
   begin
-    if Supports(Result, IioViewModel, LViewModel) and LViewModel._BSCloseQueryAssigned then
-      LViewModel._GetBSCloseQuery.ParentCloseQueryAction := FParentCloseQueryAction;
+    // Non uso l'interfaccia IioViewModel perchè mi dava dei problemi con il RefCount
+    if Result is TioViewModel then
+      TioViewModel(Result)._GetBSCloseQuery.ParentCloseQueryAction := FParentCloseQueryAction;
   end;
   procedure NestedSetParentCloseQueryActionToSimpleView;
   var
@@ -1809,7 +1808,7 @@ begin
     if ACreateViewModel then
       Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetMP, ATargetMP.Current.ClassName, AParentCloseQueryAction, AVVMAlias)
     else
-      Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.Current.ClassName, AVVMAlias);
+      Result := io.di._LocateForEachVVM_1stPhase_Browse(ATargetMP.Current.ClassName, AParentCloseQueryAction, AVVMAlias);
     // Set the locator
     Result._SetForEachModelPresenter(ATargetMP, True);
   end

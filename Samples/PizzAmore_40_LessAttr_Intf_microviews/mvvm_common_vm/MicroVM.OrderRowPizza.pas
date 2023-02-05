@@ -53,7 +53,7 @@ end;
 
 procedure TMicroVMOrderRowPizza.acShowExecute(Sender: TObject);
 begin
-  BSPizza.ShowCurrent;
+  BSPizza.ShowCurrent(nil);
 end;
 
 end.

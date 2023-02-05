@@ -59,9 +59,6 @@ type
     procedure BindView(const AView: TComponent);
   protected
     procedure Loaded; override;
-    function _CanClose: Boolean;
-    function _BSCloseQueryAssigned: Boolean;
-    function _GetBSCloseQuery: IioBSCloseQueryAction;
     // DefaultPresenter
     function GetDefaultPresenter: IioNotifiableBindSource;
     // Presenter
@@ -73,6 +70,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function _CanClose: Boolean;
+    function _BSCloseQueryAssigned: Boolean;
+    function _GetBSCloseQuery: IioBSCloseQueryAction;
     function VMActions: IioVMActionContainer;
     function CloseQuery: Boolean; virtual;
     procedure Close;

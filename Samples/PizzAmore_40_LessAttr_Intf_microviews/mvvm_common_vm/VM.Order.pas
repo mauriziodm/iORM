@@ -36,13 +36,13 @@ uses
 procedure TVMOrder.acAddPizzaExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(BSMaster);
+  io.ShowAsSelector<IPizza>(BSMaster, acBack);
 end;
 
 procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-  BSRows.ShowEach(VCProviderByName('VCProviderOrderRows'));
+  BSRows.ShowEach(acBack, VCProviderByName('VCProviderOrderRows'));
 end;
 
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -57,7 +57,7 @@ begin
     else
     begin
       BSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
-      BSRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
+      BSRows.ShowCurrent(acBack, VCProviderByName('VCProviderOrderRows'));
     end;
   end;
 end;
@@ -69,7 +69,7 @@ begin
   inherited;
   LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
   BSRows.Append(LNewOrderRow);
-  BSRows.ShowCurrent(VCProviderByName('VCProviderOrderRows'));
+  BSRows.ShowCurrent(acBack, VCProviderByName('VCProviderOrderRows'));
 end;
 
 end.

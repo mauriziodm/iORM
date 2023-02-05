@@ -38,12 +38,12 @@ uses
 
 procedure TMicroVMCustomer.acSelectCustomerExecute(Sender: TObject);
 begin
-  io.ShowAsSelector<IGenericCustomer>(BSCustomer);
+  io.ShowAsSelector<IGenericCustomer>(BSCustomer, nil);
 end;
 
 procedure TMicroVMCustomer.acShowCustomerExecute(Sender: TObject);
 begin
-  BSCustomer.ShowCurrent;
+  BSCustomer.ShowCurrent(nil);
 end;
 
 end.

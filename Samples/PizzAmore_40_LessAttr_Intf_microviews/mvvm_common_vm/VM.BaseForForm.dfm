@@ -3,7 +3,7 @@ object VMBaseForForm: TVMBaseForForm
   Width = 640
   object BSMaster: TioModelPresenterMaster
     AsDefault = True
-    LoadType = ltFromBSReload
+    LoadType = ltFromBSAsIs
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
     OnReceiveSelectionCloneObject = False
@@ -22,6 +22,7 @@ object VMBaseForForm: TVMBaseForForm
     Top = 176
   end
   object acBack: TioVMActionBSCloseQuery
+    OnUpdateScope = usGlobal
     TargetBindSource = BSMaster
     Left = 192
     Top = 48

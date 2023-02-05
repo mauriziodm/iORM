@@ -21,7 +21,7 @@ object VMStart: TVMStart
   end
   object acQuit: TioVMActionBSCloseQuery
     OnExecuteAction = eaTerminateApplication
-    OnUpdateScope = usDisableIfChilds
+    OnUpdateScope = usGlobal
     Left = 48
     Top = 32
   end

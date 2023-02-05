@@ -29,6 +29,7 @@ object VMBaseForList: TVMBaseForList
     Top = 240
   end
   object acBack: TioVMActionBSCloseQuery
+    OnUpdateScope = usGlobal
     TargetBindSource = BSMaster
     Left = 192
     Top = 48
