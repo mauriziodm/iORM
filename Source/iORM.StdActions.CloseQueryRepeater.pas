@@ -5,13 +5,17 @@ interface
 uses
   iORM.CommonTypes, System.Classes;
 
+const
+  RECURSIVE_ONE_LEVEL = 1;
+  RECURSIVE_UNLIMITED = 0;
+
 type
 
   TioCloseQueryRepeater = class (TComponent)
   private
     FScope: TioBSCloseQueryRepeaterScope;
     procedure _InjectEventHandler;
-    function _CanClose(const AView: TComponent; const ARecursive: Boolean): Boolean;
+    function _CanCloseView(const AView: TComponent; const AMaxLevel: Integer; const ALevel: Integer = 0): Boolean;
   protected
     procedure Loaded; override;
   public
@@ -42,7 +46,7 @@ begin
   _InjectEventHandler;
 end;
 
-function TioCloseQueryRepeater._CanClose(const AView: TComponent; const ARecursive: Boolean): Boolean;
+function TioCloseQueryRepeater._CanCloseView(const AView: TComponent; const AMaxLevel, ALevel: Integer): Boolean;
 var
   I: Integer;
   LBSCloseQueryAction: IioBSCloseQueryAction;
@@ -67,11 +71,11 @@ begin
     end;
   end;
 
-  // Secondo giro solo se ARecursive = True
-  if ARecursive then
+  // Prosegue ricorsivamente nei childs se non ha raggionto il livello di annidamento massimo oppure se è illimitato
+  if (ALevel < AMaxLevel) or (AMaxLevel = RECURSIVE_UNLIMITED) then
     for I := 0 to AView.ComponentCount - 1 do
       if AView.Components[I].ComponentCount > 0 then
-        if not _CanClose(AView.Components[I], ARecursive) then
+        if not _CanCloseView(AView.Components[I], AMaxLevel, ALevel+1) then
           Exit(False);
 end;
 
@@ -90,7 +94,12 @@ end;
 
 procedure TioCloseQueryRepeater._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := _CanClose(Owner, FScope = rsDeepChilds);
+  case FScope of
+    rsFirstLevelChilds:
+      CanClose := _CanCloseView(Owner, RECURSIVE_ONE_LEVEL);
+    rsDeepChilds:
+      CanClose := _CanCloseView(Owner, RECURSIVE_UNLIMITED);
+  end;
 end;
 
 end.
