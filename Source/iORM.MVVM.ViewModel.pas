@@ -190,7 +190,7 @@ end;
 
 function TioViewModel._BSCloseQueryAssigned: Boolean;
 begin
-  Result := Assigned(FVMActionContainer.BSCloseQueryAction);
+  Result := FVMActionContainer.BSCloseQueryActionExists;
 end;
 
 procedure TioViewModel._BSCloseQueryExecute;
