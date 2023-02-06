@@ -1540,7 +1540,7 @@ var
   procedure NestedSetParentCloseQueryActionToViewModel;
   begin
     // Non uso l'interfaccia IioViewModel perchè mi dava dei problemi con il RefCount
-    if Result is TioViewModel then
+    if (Result is TioViewModel) and TioViewModel(Result)._BSCloseQueryAssigned then
       TioViewModel(Result)._GetBSCloseQuery.ParentCloseQueryAction := FParentCloseQueryAction;
   end;
   procedure NestedSetParentCloseQueryActionToSimpleView;
