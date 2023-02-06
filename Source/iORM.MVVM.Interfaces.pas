@@ -75,12 +75,10 @@ type
   // Private interface of ViewModels for INTERNAL USE ONLY
   IioViewModelInternal = interface(IioViewModel)
     ['{7DA6A783-6026-47C2-BFF7-83BF6FECFD2F}']
-    function ViewRegister: IioViewRegisterMVVM;
-    procedure DoOnViewPairing;
-    procedure Close;
-    procedure Hide;
-    procedure Show;
     procedure BindView(const AView: TComponent);
+    procedure Close;
+    procedure DoOnViewPairing;
+    function ViewRegister: IioViewRegisterMVVM;
   end;
 
   IioViewRegisterBase = interface
