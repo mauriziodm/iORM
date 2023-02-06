@@ -91,7 +91,8 @@ end;
 
 procedure TStartForm.VCProviderFormRelease(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
-  AViewContext.Free;
+//  AViewContext.Free;
+  (AViewContext as TForm).Close;
 end;
 
 procedure TStartForm.VCProviderFormRequest(const Sender: TObject; out ResultViewContext: TComponent);

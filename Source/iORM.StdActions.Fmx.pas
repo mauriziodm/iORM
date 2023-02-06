@@ -386,6 +386,7 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
     function Execute: Boolean; override;
+    function Executing: Boolean;
     procedure UpdateTarget(Target: TObject); override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
@@ -1050,6 +1051,11 @@ begin
   finally
     FExecuting := False;
   end;
+end;
+
+function TioBSCloseQuery.Executing: Boolean;
+begin
+  Result := FExecuting;
 end;
 
 function TioBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;

@@ -385,6 +385,7 @@ type
     procedure UpdateTarget (Target: TObject); override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     function Execute: Boolean; override;
+    function Executing: Boolean;
     property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
@@ -1053,6 +1054,11 @@ begin
   finally
     FExecuting := False;
   end;
+end;
+
+function TioBSCloseQuery.Executing: Boolean;
+begin
+  Result := FExecuting;
 end;
 
 function TioBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;

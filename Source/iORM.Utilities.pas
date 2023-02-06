@@ -165,7 +165,7 @@ end;
 
 class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
 begin
-  if Assigned(AIntf) then
+  if not Assigned(AIntf) then
     raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
   Result := ExtractOID(AIntf as Tobject);
 end;

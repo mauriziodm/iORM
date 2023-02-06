@@ -54,6 +54,7 @@ type
     function _CanClose: Boolean;
     function _BSCloseQueryAssigned: Boolean;
     function _GetBSCloseQuery: IioBSCloseQueryAction;
+    procedure _BSCloseQueryExecute;
     function CloseQuery: Boolean;
     function VMActions: IioVMActionContainer;
     // VCProvider local register

@@ -337,6 +337,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function Execute: Boolean; override;
+    function Executing: Boolean;
     function Update: Boolean; override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
@@ -963,6 +964,11 @@ function TioVMActionBSCloseQuery.Execute: Boolean;
 begin
   _ExecuteOriginal;  // Ritorna all'implementazione originale
   Result := False;
+end;
+
+function TioVMActionBSCloseQuery.Executing: Boolean;
+begin
+  Result := FExecuting;
 end;
 
 function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;

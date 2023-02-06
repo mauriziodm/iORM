@@ -73,6 +73,7 @@ type
     function _CanClose: Boolean;
     function _BSCloseQueryAssigned: Boolean;
     function _GetBSCloseQuery: IioBSCloseQueryAction;
+    procedure _BSCloseQueryExecute;
     function VMActions: IioVMActionContainer;
     function CloseQuery: Boolean; virtual;
     procedure Close;
@@ -190,6 +191,12 @@ end;
 function TioViewModel._BSCloseQueryAssigned: Boolean;
 begin
   Result := Assigned(FVMActionContainer.BSCloseQueryAction);
+end;
+
+procedure TioViewModel._BSCloseQueryExecute;
+begin
+  if FVMActionContainer.BSCloseQueryActionExists then
+    FVMActionContainer.BSCloseQueryAction.Execute;
 end;
 
 function TioViewModel._CanClose: Boolean;
