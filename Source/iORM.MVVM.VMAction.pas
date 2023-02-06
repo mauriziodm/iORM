@@ -1020,22 +1020,18 @@ end;
 
 function TioVMActionBSCloseQuery._CanClose: Boolean;
 begin
-  Result := Enabled;
+  Result := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+  // Se è il caso interroga anche le ChildCQA
+  if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
+    Result := Result and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);
+  // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
+  if Assigned(FOnCloseQuery) then
+    FOnCloseQuery(Self, Result);
 end;
 
 procedure TioVMActionBSCloseQuery._InternalUpdateStdAction;
-var
-  LEnabled: Boolean;
 begin
-  LEnabled := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
-  // Se è il caso interroga anche le ChildCQA
-  if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
-    LEnabled := LEnabled and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);
-  // se c'è un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
-  if Assigned(FOnCloseQuery) then
-    FOnCloseQuery(Self, LEnabled);
-  // Setta se la action è enabled o no
-  Enabled := LEnabled;
+  Enabled := _CanClose;
 end;
 
 procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
