@@ -27,6 +27,9 @@ type
 
 implementation
 
+uses
+  Vcl.Dialogs, Vcl.Controls;
+
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}

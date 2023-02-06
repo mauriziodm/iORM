@@ -43,7 +43,8 @@ implementation
 uses
   System.SysUtils, System.Rtti, iORM.RttiContext.Factory,
   iORM.Exceptions, iORM.MVVM.ViewModelBridge,
-  iORM.StdActions.CloseQueryActionRegister;
+  iORM.StdActions.CloseQueryActionRegister,
+  System.TypInfo;
 
 { TioBSCloseQueryCommonBehaviour }
 
