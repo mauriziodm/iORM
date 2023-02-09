@@ -86,6 +86,7 @@ object ViewBaseForForm: TViewBaseForForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Text = 'acBack'
+      OnUpdateScope = usGlobal
       TargetBindSource = BSMaster
     end
   end

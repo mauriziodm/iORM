@@ -57,7 +57,7 @@ begin
     );
   end
   else
-    BSMaster.ShowCurrent;
+    BSMaster.ShowCurrent(acBack);
 end;
 
 procedure TViewBaseForList.acShowOrSelectUpdate(Sender: TObject);

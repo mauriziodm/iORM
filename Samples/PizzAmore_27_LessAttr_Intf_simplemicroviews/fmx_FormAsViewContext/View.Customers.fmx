@@ -8,7 +8,23 @@ inherited ViewCustomers: TViewCustomers
   inherited ListView: TListView
     ItemIndex = 0
   end
-  object BindingsList1: TBindingsList [3]
+  inherited BSMaster: TioPrototypeBindSourceMaster
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'FullName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    Preview = True
+    TypeName = 'IGenericCustomer'
+  end
+  object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -26,24 +42,5 @@ inherited ViewCustomers: TViewCustomers
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
-  end
-  inherited BSMaster: TioPrototypeBindSourceMaster [4]
-    AutoActivate = True
-    AutoPost = True
-    FieldDefs = <
-      item
-        Name = 'FullName'
-        Generator = 'ContactNames'
-        ReadOnly = False
-      end
-      item
-        Name = 'PhoneNumber'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end>
-    Preview = True
-    TypeName = 'IGenericCustomer'
-  end
-  inherited ActionList1: TActionList [5]
   end
 end

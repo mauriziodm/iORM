@@ -112,9 +112,10 @@ object ViewBaseForList: TViewBaseForList
       Text = 'Delete'
       TargetBindSource = BSMaster
     end
-    object acBack: TAction
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
       Text = 'acBack'
-      OnExecute = acBackExecute
+      TargetBindSource = BSMaster
     end
   end
   object BSMaster: TioPrototypeBindSourceMaster

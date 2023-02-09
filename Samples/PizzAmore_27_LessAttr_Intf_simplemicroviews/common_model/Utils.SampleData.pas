@@ -18,7 +18,7 @@ implementation
 
 uses
   iORM, System.SysUtils, Model.Interfaces, Model.Customers, Model.Order,
-  Model.OrderRow, Model.Pizza;
+  Model.OrderRow, Model.Pizza, System.IOUtils;
 
 { TSampleData }
 
@@ -30,7 +30,7 @@ begin
     try
       CreatePizzas;
       CreateRealCustomers;
-//      CreateOtherCustomers;
+      CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except
@@ -43,18 +43,25 @@ end;
 class procedure TSampleData.CreatePizzas;
 var
   LPizza: IPizza;
+  LImagesPath: String;
 begin
+  // Detect the right images path for mobile or win32 (test "MargheritaPizza.bmp" file only)
+  if FileExists(TPath.Combine(TPath.GetDocumentsPath, 'MargheritaPizza.bmp')) then
+    LImagesPath := TPath.GetDocumentsPath
+  else
+    LImagesPath := TPath.GetFullPath('..\..\..\..\common_images');
+
   // Margherita pizza
-  LPizza := TPizza.Create('Margherita pizza', 4.50, '..\..\..\..\common_images\MargheritaPizza.bmp');
+  LPizza := TPizza.Create('Margherita pizza', 4.50, TPath.Combine(LImagesPath, 'MargheritaPizza.bmp'));
   io.Persist(LPizza);
   // Capricciosa pizza
-  LPizza := TPizza.Create('Capricciosa pizza', 7.00, '..\..\..\..\common_images\CapricciosaPizza.bmp');
+  LPizza := TPizza.Create('Capricciosa pizza', 7.00, TPath.Combine(LImagesPath, 'CapricciosaPizza.bmp'));
   io.Persist(LPizza);
   // Pepperoni pizza
-  LPizza := TPizza.Create('Pepperoni pizza', 6.50, '..\..\..\..\common_images\PepperoniPizza.bmp');
+  LPizza := TPizza.Create('Pepperoni pizza', 6.50, TPath.Combine(LImagesPath, 'PepperoniPizza.bmp'));
   io.Persist(LPizza);
   // Love pizza
-  LPizza := TPizza.Create('Love pizza', 5.00, '..\..\..\..\common_images\LovePizza.bmp');
+  LPizza := TPizza.Create('Love pizza', 5.00, TPath.Combine(LImagesPath, 'LovePizza.bmp'));
   io.Persist(LPizza);
 end;
 

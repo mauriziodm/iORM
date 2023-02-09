@@ -220,7 +220,7 @@ inherited ViewPizza: TViewPizza
       end
     end
   end
-  inherited BSMaster: TioPrototypeBindSourceMaster
+  inherited BSMaster: TioPrototypeBindSourceMaster [3]
     AutoActivate = True
     FieldDefs = <
       item
@@ -251,7 +251,7 @@ inherited ViewPizza: TViewPizza
     Left = 56
     Top = 170
   end
-  object BindingsList1: TBindingsList
+  object BindingsList1: TBindingsList [4]
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -285,5 +285,7 @@ inherited ViewPizza: TViewPizza
       Control = Image
       Track = False
     end
+  end
+  inherited ActionList1: TActionList [5]
   end
 end

@@ -1,10 +1,4 @@
 inherited ViewOrders: TViewOrders
-  inherited Rectangle1: TRectangle
-    inherited ButtonAdd: TSpeedButton [0]
-    end
-    inherited ButtonDelete: TSpeedButton [1]
-    end
-  end
   inherited RectangleTitle: TRectangle
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}

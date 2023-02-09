@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
-  iORM.Abstraction.VCL, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.Abstraction.VCL, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl;
 
 type
   TMainForm = class(TForm)
@@ -18,6 +18,8 @@ type
     Shape1: TShape;
     ioVCL1: TioVCL;
     SQLiteConn: TioSQLiteConnectionDef;
+    ActionList1: TActionList;
+    acQuit: TioBSCloseQuery;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -44,17 +46,17 @@ uses
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);
 begin
-  io.Show<IGenericCustomer>;
+  io.Show<IGenericCustomer>(acQuit);
 end;
 
 procedure TMainForm.ButtonOrdersClick(Sender: TObject);
 begin
-  io.Show<IOrder>;
+  io.Show<IOrder>(acQuit);
 end;
 
 procedure TMainForm.ButtonPizzasClick(Sender: TObject);
 begin
-  io.Show<IPizza>;
+  io.Show<IPizza>(acQuit);
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

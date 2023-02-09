@@ -39,12 +39,12 @@ implementation
 
 procedure TMicroViewCustomer.acSelectCustomerExecute(Sender: TObject);
 begin
-  io.ShowAsSelector<IGenericCustomer>(BSCustomer);
+  io.ShowAsSelector<IGenericCustomer>(BSCustomer, nil);
 end;
 
 procedure TMicroViewCustomer.acShowCustomerExecute(Sender: TObject);
 begin
-  BSCustomer.ShowCurrent;
+  BSCustomer.ShowCurrent(nil);
 end;
 
 end.

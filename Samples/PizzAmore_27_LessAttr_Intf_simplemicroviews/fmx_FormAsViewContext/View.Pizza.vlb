@@ -54,7 +54,7 @@ Coordinates=339,197,46,51
 Coordinates=278,10,46,51
 
 []
-Coordinates=319,80,82,33
+Coordinates=313,267,70,33
 Visible=True
 
 [VMBridge]
@@ -67,18 +67,6 @@ Visible=True
 [BSMaster]
 Coordinates=145,1,61,123
 Visible=True
-
-[acRevert]
-Coordinates=145,71,57,33
-
-[acBack]
-Coordinates=265,80,50,33
-
-[acPersist]
-Coordinates=313,132,60,33
-
-[ActionList1]
-Coordinates=313,267,70,33
 
 [BindingsList1]
 Coordinates=319,80,82,33

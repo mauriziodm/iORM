@@ -276,6 +276,7 @@ object CustomersForm: TCustomersForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
+      OnUpdateScope = usGlobal
       TargetBindSource = DSCustomers
     end
   end

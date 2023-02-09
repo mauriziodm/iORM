@@ -8565,4 +8565,14 @@ object MainForm: TMainForm
     Left = 64
     Top = 272
   end
+  object ActionList1: TActionList
+    Left = 208
+    Top = 272
+    object acQuit: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'acQuit'
+      OnExecuteAction = eaTerminateApplication
+      OnUpdateScope = usGlobal
+    end
+  end
 end

@@ -5213,14 +5213,6 @@ object StartForm: TStartForm
   object ActionList1: TActionList
     Left = 32
     Top = 392
-    object NextTabAction1: TNextTabAction
-      Category = 'Tab'
-      TabControl = TabControlStart
-    end
-    object PreviousTabAction1: TPreviousTabAction
-      Category = 'Tab'
-      TabControl = TabControlStart
-    end
     object acShowCustomers: TAction
       Category = 'Tab'
       Text = 'Customers'
@@ -5262,7 +5254,6 @@ object StartForm: TStartForm
   object VCProvider: TioViewContextProvider
     AsDefault = True
     OnAfterRequest = VCProviderAfterRequest
-    OnBeforeRelease = VCProviderBeforeRelease
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
     Left = 96

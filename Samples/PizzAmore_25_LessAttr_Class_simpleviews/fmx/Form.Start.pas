@@ -26,8 +26,6 @@ type
     Label1: TLabel;
     ImageLogo: TImage;
     ActionList1: TActionList;
-    NextTabAction1: TNextTabAction;
-    PreviousTabAction1: TPreviousTabAction;
     ioFMX1: TioFMX;
     acShowCustomers: TAction;
     acShowPizzas: TAction;
@@ -45,7 +43,6 @@ type
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
-    procedure VCProviderBeforeRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure acQuit2Execute(Sender: TObject);
   private
     { Private declarations }
@@ -70,17 +67,17 @@ end;
 
 procedure TStartForm.acShowCustomersExecute(Sender: TObject);
 begin
-  io.Show<TCustomer>('LIST');
+  io.Show<TCustomer>(acQuit, 'LIST');
 end;
 
 procedure TStartForm.acShowOrdersExecute(Sender: TObject);
 begin
-  io.Show<TOrder>('LIST');
+  io.Show<TOrder>(acQuit, 'LIST');
 end;
 
 procedure TStartForm.acShowPizzasExecute(Sender: TObject);
 begin
-  io.Show<TPizza>('LIST');
+  io.Show<TPizza>(acQuit, 'LIST');
 end;
 
 procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -98,17 +95,22 @@ end;
 procedure TStartForm.VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
 begin
   (AView as TFrame).Align := TAlignLayout.Client;
-  NextTabAction1.Execute;
-end;
-
-procedure TStartForm.VCProviderBeforeRelease(const Sender: TObject; const AView, AViewContext: TComponent);
-begin
-  PreviousTabAction1.Execute;
+  TabControlStart.SetActiveTabWithTransitionAsync(AViewContext as TTabItem, TTabTransition.Slide, TTabTransitionDirection.Normal, nil);
 end;
 
 procedure TStartForm.VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
+var
+  LTabItemToDestroy: TTabItem;
+  LTabItemToReactivate: TTabItem;
 begin
-  TabControlStart.Delete((AViewCOntext as TTabItem).Index);
+  LTabItemToDestroy := (AViewContext as TTabItem);
+  LTabItemToReactivate := TabControlStart.Tabs[LTabItemToDestroy.Index-1];
+  TabControlStart.SetActiveTabWithTransitionAsync(LTabItemToReactivate, TTabTransition.Slide, TTabTransitionDirection.Reversed,
+    procedure
+    begin
+      LTabItemToDestroy.DisposeOf;
+    end
+  );
 end;
 
 procedure TStartForm.VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);

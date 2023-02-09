@@ -72,7 +72,7 @@ end;
 
 procedure TPizzasForm.acShowExecute(Sender: TObject);
 begin
-  DSPizzas.ShowCurrent;
+  DSPizzas.ShowCurrent(acBack);
 end;
 
 procedure TPizzasForm.DBCtrlGrid1DblClick(Sender: TObject);

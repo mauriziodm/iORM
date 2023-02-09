@@ -69,7 +69,7 @@ uses
 procedure TViewOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<TPizza>(BSMaster, 'LIST');
+  io.ShowAsSelector<TPizza>(BSMaster, acBack, 'LIST');
 end;
 
 procedure TViewOrder.BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -83,7 +83,7 @@ end;
 procedure TViewOrder.scShowCustomerSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<TCustomer>(BSCustomer, 'LIST');
+  io.ShowAsSelector<TCustomer>(BSCustomer, acBack, 'LIST');
 end;
 
 end.

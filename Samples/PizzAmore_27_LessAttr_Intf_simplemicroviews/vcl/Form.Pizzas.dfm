@@ -213,6 +213,7 @@ object PizzasForm: TPizzasForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
+      OnUpdateScope = usGlobal
       TargetBindSource = DSPizzas
     end
   end

@@ -67,13 +67,13 @@ begin
   inherited;
   LNewOrderRow := io.Create<IOrderRow>('CustomOrderRow');
   BSRows.Append(LNewOrderRow);
-  BSRows.ShowCurrent(VCProviderOrderRows);
+  BSRows.ShowCurrent(acBack, VCProviderOrderRows);
 end;
 
 procedure TViewOrder.acAddPizzaExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(BSMaster);
+  io.ShowAsSelector<IPizza>(BSMaster, acBack);
 end;
 
 procedure TViewOrder.BSMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -88,7 +88,7 @@ begin
     else
     begin
       BSRows.Append( io.Create<IOrderRow>('PizzaOrderRow', [TValue.From<IPizza>(LPizza), 1]) );
-      BSRows.ShowCurrent(VCProviderOrderRows);
+      BSRows.ShowCurrent(acBack, VCProviderOrderRows);
     end;
   end;
 end;
@@ -96,7 +96,7 @@ end;
 procedure TViewOrder.BSRowsAfterOpen(Sender: TObject);
 begin
   inherited;
-  BSRows.ShowEach(VCProviderOrderRows);
+  BSRows.ShowEach(acBack, VCProviderOrderRows);
 end;
 
 procedure TViewOrder.VCProviderOrderRowsAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);

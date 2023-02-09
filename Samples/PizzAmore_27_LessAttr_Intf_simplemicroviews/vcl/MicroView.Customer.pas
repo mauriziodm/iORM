@@ -46,12 +46,12 @@ uses
 
 procedure TMicroViewCustomer.acSelectCustomerExecute(Sender: TObject);
 begin
-  io.ShowAsSelector<IGenericCustomer>(DSCustomer);
+  io.ShowAsSelector<IGenericCustomer>(DSCustomer, nil);
 end;
 
 procedure TMicroViewCustomer.acShowCustomerExecute(Sender: TObject);
 begin
-  DSCustomer.ShowCurrent;
+  DSCustomer.ShowCurrent(nil);
 end;
 
 end.

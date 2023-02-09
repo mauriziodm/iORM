@@ -66,7 +66,7 @@ end;
 
 procedure TOrdersForm.acShowExecute(Sender: TObject);
 begin
-  DSOrders.ShowCurrent;
+  DSOrders.ShowCurrent(acBack);
 end;
 
 procedure TOrdersForm.FormClose(Sender: TObject; var Action: TCloseAction);

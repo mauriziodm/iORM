@@ -84,7 +84,7 @@ begin
   end
   else
   begin
-    DSCustomers.ShowCurrent;
+    DSCustomers.ShowCurrent(acBack);
   end;
 end;
 

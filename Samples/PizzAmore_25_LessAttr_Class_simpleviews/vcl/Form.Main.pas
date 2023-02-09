@@ -47,17 +47,17 @@ uses
 
 procedure TMainForm.ButtonCustomersClick(Sender: TObject);
 begin
-  io.Show<TCustomer>('LIST');
+  io.Show<TCustomer>(acQuit, 'LIST');
 end;
 
 procedure TMainForm.ButtonOrdersClick(Sender: TObject);
 begin
-  io.Show<TOrder>('LIST');
+  io.Show<TOrder>(acQuit, 'LIST');
 end;
 
 procedure TMainForm.ButtonPizzasClick(Sender: TObject);
 begin
-  io.Show<TPizza>('LIST');
+  io.Show<TPizza>(acQuit, 'LIST');
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

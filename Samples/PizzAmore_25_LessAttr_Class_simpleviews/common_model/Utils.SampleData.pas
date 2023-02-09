@@ -17,7 +17,7 @@ type
 implementation
 
 uses
-  iORM, Model.Order, Model.OrderRow, Model.Pizza, Model.Customer, SysUtils;
+  iORM, Model.Order, Model.OrderRow, Model.Pizza, Model.Customer, SysUtils, System.IOUtils;
 
 { TSampleData }
 
@@ -29,7 +29,7 @@ begin
     try
       CreatePizzas;
       CreateRealCustomers;
-//      CreateOtherCustomers;
+      CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except
@@ -41,33 +41,40 @@ end;
 class procedure TSampleData.CreatePizzas;
 var
   LPizza: TPizza;
+  LImagesPath: String;
 begin
+  // Detect the right images path for mobile or win32 (test "MargheritaPizza.bmp" file only)
+  if FileExists(TPath.Combine(TPath.GetDocumentsPath, 'MargheritaPizza.bmp')) then
+    LImagesPath := TPath.GetDocumentsPath
+  else
+    LImagesPath := TPath.GetFullPath('..\..\..\..\common_images');
+
   // Margherita pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Margherita pizza';
   LPizza.Price := 4.5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\MargheritaPizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'MargheritaPizza.bmp'));
   io.Persist(LPizza);
   FreeAndnil(LPizza);
   //  Capricciosa pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Capricciosa pizza';
   LPizza.Price := 7;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\CapricciosaPizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'CapricciosaPizza.bmp'));
   io.Persist(LPizza);
   FreeAndnil(LPizza);
   // Pepperoni pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Pepperoni pizza';
   LPizza.Price := 6.5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\PepperoniPizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'PepperoniPizza.bmp'));
   io.Persist(LPizza);
   FreeAndnil(LPizza);
   // Love pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Love pizza';
   LPizza.Price := 5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\LovePizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'LovePizza.bmp'));
   io.Persist(LPizza);
   FreeAndnil(LPizza);
 end;

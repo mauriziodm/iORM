@@ -25,7 +25,6 @@ type
     acDelete: TioBSPersistenceDelete;
     BSMaster: TioPrototypeBindSourceMaster;
     acBack: TioBSCloseQuery;
-    acBackOld: TAction;
     procedure acAddExecute(Sender: TObject);
     procedure acShowOrSelectExecute(Sender: TObject);
     procedure ListViewDblClick(Sender: TObject);
@@ -64,7 +63,7 @@ begin
     );
   end
   else
-    BSMaster.ShowCurrent;
+    BSMaster.ShowCurrent(acBack);
 end;
 
 procedure TViewBaseForList.acShowOrSelectUpdate(Sender: TObject);

@@ -62,7 +62,7 @@ end;
 
 procedure TMicroViewOrderRowPizza.acShowExecute(Sender: TObject);
 begin
-  DSPizza.ShowCurrent;
+  DSPizza.ShowCurrent(nil);
 end;
 
 end.

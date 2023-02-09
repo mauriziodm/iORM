@@ -8,7 +8,7 @@ inherited ViewOrders: TViewOrders
   inherited ListView: TListView
     ItemIndex = 0
   end
-  inherited BSMaster: TioPrototypeBindSourceMaster [3]
+  inherited BSMaster: TioPrototypeBindSourceMaster
     AutoActivate = True
     FieldDefs = <
       item
@@ -31,7 +31,7 @@ inherited ViewOrders: TViewOrders
     Preview = True
     TypeName = 'IOrder'
   end
-  object BindingsList1: TBindingsList [4]
+  object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -51,7 +51,5 @@ inherited ViewOrders: TViewOrders
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
-  end
-  inherited ActionList1: TActionList [5]
   end
 end

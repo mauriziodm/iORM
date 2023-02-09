@@ -42,7 +42,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     object EditPrice: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
-      TabOrder = 40
+      TabOrder = 39
       Text = '67,67'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Trailing
@@ -69,7 +69,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     object EditQty: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
-      TabOrder = 38
+      TabOrder = 37
       Text = '-33'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Center
@@ -97,7 +97,7 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Anchors = [akTop, akRight]
       StyleLookup = 'transparentedit'
-      TabOrder = 39
+      TabOrder = 38
       ReadOnly = True
       Text = '67,67'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -134,9 +134,9 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
       Size.Width = 254.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 41
-      Viewport.Width = 254.000000000000000000
-      Viewport.Height = 50.000000000000000000
+      TabOrder = 40
+      Viewport.Width = 250.000000000000000000
+      Viewport.Height = 46.000000000000000000
     end
     object Label3: TLabel
       Position.X = 24.000000000000000000
@@ -201,7 +201,6 @@ object MicroViewOrderRowCustom: TMicroViewOrderRowCustom
     end
   end
   object BSRowCustom: TioPrototypeBindSourceDetail
-    AutoPost = False
     FieldDefs = <
       item
         Name = 'Description'

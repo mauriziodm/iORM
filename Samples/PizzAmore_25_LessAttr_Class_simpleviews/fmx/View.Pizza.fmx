@@ -220,7 +220,7 @@ inherited ViewPizza: TViewPizza
       end
     end
   end
-  inherited BSMaster: TioPrototypeBindSourceMaster [3]
+  inherited BSMaster: TioPrototypeBindSourceMaster
     FieldDefs = <
       item
         Name = 'ID'
@@ -246,7 +246,7 @@ inherited ViewPizza: TViewPizza
         ReadOnly = False
       end>
   end
-  object BindingsList1: TBindingsList [4]
+  object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 100
@@ -280,7 +280,5 @@ inherited ViewPizza: TViewPizza
       Control = Image
       Track = False
     end
-  end
-  inherited ActionList1: TActionList [5]
   end
 end
