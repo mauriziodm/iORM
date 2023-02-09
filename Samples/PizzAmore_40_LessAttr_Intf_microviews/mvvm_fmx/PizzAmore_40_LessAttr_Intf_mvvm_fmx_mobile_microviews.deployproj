@@ -129,15 +129,14 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Debug\libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\library\lib\arm64-v8a\</RemoteDir>
-            <RemoteName>libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="..\..\common_images\HamAndMushroomPizza.bmp" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
+            <RemoteName>HamAndMushroomPizza.bmp</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
-            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\drawable-xhdpi\</RemoteDir>
@@ -157,15 +156,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="..\..\common_images\HamAndMushroomPizza.bmp" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
-            <RemoteName>HamAndMushroomPizza.bmp</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\..\common_images\HamAndMushroomPizza.bmp" Condition="'$(Config)'=='Release'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
             <RemoteName>HamAndMushroomPizza.bmp</RemoteName>
@@ -174,6 +164,16 @@
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android64\Debug\libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\drawable-large\</RemoteDir>
@@ -283,15 +283,14 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Release\libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\library\lib\arm64-v8a\</RemoteDir>
-            <RemoteName>libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="..\..\common_images\LovePizza.bmp" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
+            <RemoteName>LovePizza.bmp</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
-            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="$(BDS)\lib\android\debug\mips\libnative-activity.so" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\library\lib\mips\</RemoteDir>
@@ -329,29 +328,30 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Release\styles.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values\</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-            <DeployClass>AndroidSplashStyles</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="..\..\common_images\LovePizza.bmp" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
-            <RemoteName>LovePizza.bmp</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\..\common_images\LovePizza.bmp" Condition="'$(Config)'=='Release'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
             <RemoteName>LovePizza.bmp</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android64\Release\libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libPizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.so</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="Android64\Release\styles.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values\</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+            <DeployClass>AndroidSplashStyles</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -374,11 +374,11 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Release\styles-v21.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values-v21\</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-            <DeployClass>AndroidSplashStylesV21</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="..\..\common_images\MargheritaPizza.bmp" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
+            <RemoteName>MargheritaPizza.bmp</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -437,7 +437,7 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="..\..\common_images\MargheritaPizza.bmp" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="..\..\common_images\MargheritaPizza.bmp" Condition="'$(Config)'=='Release'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
             <RemoteName>MargheritaPizza.bmp</RemoteName>
             <DeployClass>File</DeployClass>
@@ -446,11 +446,11 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="..\..\common_images\MargheritaPizza.bmp" Condition="'$(Config)'=='Release'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
-            <RemoteName>MargheritaPizza.bmp</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
+        <DeployFile Include="Android64\Release\styles-v21.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values-v21\</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+            <DeployClass>AndroidSplashStylesV21</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -500,15 +500,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Debug\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>Android_Strings</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\..\common_images\CapricciosaPizza.bmp" Condition="'$(Config)'=='Debug'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
             <RemoteName>CapricciosaPizza.bmp</RemoteName>
@@ -518,20 +509,29 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android64\Debug\styles-v21.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values-v21\</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-            <DeployClass>AndroidSplashStylesV21</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\..\common_images\CapricciosaPizza.bmp" Condition="'$(Config)'=='Release'">
             <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\assets\internal\</RemoteDir>
             <RemoteName>CapricciosaPizza.bmp</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android64\Debug\strings.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values\</RemoteDir>
+            <RemoteName>strings.xml</RemoteName>
+            <DeployClass>Android_Strings</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android64\Debug\styles-v21.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews\res\values-v21\</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+            <DeployClass>AndroidSplashStylesV21</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>

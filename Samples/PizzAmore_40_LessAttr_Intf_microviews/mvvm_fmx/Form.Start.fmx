@@ -62,7 +62,7 @@ object StartForm: TStartForm
             Enabled = True
             StyledSettings = [Family, Size, Style]
             ImageIndex = -1
-            Size.Width = 40.000000000000000000
+            Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'escapetoolbutton'
