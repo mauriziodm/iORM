@@ -44,8 +44,8 @@ type
 
   IioDuckTypedStreamObject = interface
     ['{D95AD3B5-02AC-49E6-B54E-2ECAA7D5B54B}']
-    procedure LoadFromStream(Stream: TStream);
-    procedure SaveToStream(Stream: TStream);
+    procedure LoadFromStream(AStream: TStream);
+    procedure SaveToStream(AStream: TStream);
     function IsEmpty: Boolean;
   end;
 

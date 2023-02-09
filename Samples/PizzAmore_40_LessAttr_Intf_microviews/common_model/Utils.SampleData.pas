@@ -29,8 +29,8 @@ begin
     io.StartTransaction;
     try
       CreatePizzas;
-      CreateRealCustomers;
-      CreateOtherCustomers;
+//      CreateRealCustomers;
+//      CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except
@@ -44,6 +44,20 @@ class procedure TSampleData.CreatePizzas;
 var
   LPizza: IPizza;
 begin
+{$IFDEF ioFMX}
+  // Margherita pizza
+  LPizza := TPizza.Create('Margherita pizza', 4.50);
+  io.Persist(LPizza);
+  // Capricciosa pizza
+  LPizza := TPizza.Create('Capricciosa pizza', 7.00);
+  io.Persist(LPizza);
+  // Pepperoni pizza
+  LPizza := TPizza.Create('Pepperoni pizza', 6.50);
+  io.Persist(LPizza);
+  // Love pizza
+  LPizza := TPizza.Create('Love pizza', 5.00);
+  io.Persist(LPizza);
+{$ELSE}
   // Margherita pizza
   LPizza := TPizza.Create('Margherita pizza', 4.50, '..\..\..\..\common_images\MargheritaPizza.bmp');
   io.Persist(LPizza);
@@ -56,6 +70,7 @@ begin
   // Love pizza
   LPizza := TPizza.Create('Love pizza', 5.00, '..\..\..\..\common_images\LovePizza.bmp');
   io.Persist(LPizza);
+{$IFEND}
 end;
 
 class procedure TSampleData.CreateRealCustomers;

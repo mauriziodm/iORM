@@ -28,6 +28,7 @@ type
   public
     constructor Create; overload;
     constructor Create(const AName: String; const APrice: Currency; const AImageFileName: String); overload;
+    constructor Create(const AName: String; const APrice: Currency); overload;
     destructor Destroy; override;
     property Name: String read GetName write SetName;
     property Price: Currency read GetPrice write SetPrice;
@@ -51,6 +52,13 @@ begin
   FName := AName;
   FPrice := APrice;
   FImage.LoadFromFile(AImageFileName);
+end;
+
+constructor TPizza.Create(const AName: String; const APrice: Currency);
+begin
+  Create;
+  FName := AName;
+  FPrice := APrice;
 end;
 
 destructor TPizza.Destroy;

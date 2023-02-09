@@ -56,9 +56,10 @@ type
     FSaveToStreamMethod: TRttiMethod;
     FIsEmptyMethod: TRttiMethod;
     FCountProperty: TRttiProperty;
+    FSizeProperty: TRttiProperty;
   public
     class function TryCreate(const AObjAsDuck:TObject): IdjDuckStreamable;
-    constructor Create(const AObjAsDuck:TObject; const ALoadFromStreamMethod,ASaveToStreamMethod,AIsEmptyMethod:TRTTIMethod; const ACountProperty:TRTTIProperty);
+    constructor Create(const AObjAsDuck:TObject; const ALoadFromStreamMethod,ASaveToStreamMethod,AIsEmptyMethod:TRTTIMethod; const ACountProperty, ASizeProperty:TRTTIProperty);
     procedure LoadFromStream(AStream: TStream);
     procedure SaveToStream(AStream: TStream);
     procedure SetObject(const AObj:TObject);
@@ -73,7 +74,7 @@ uses
 
 { TdjDuckStreamable }
 
-constructor TdjDuckStreamable.Create(const AObjAsDuck:TObject; const ALoadFromStreamMethod,ASaveToStreamMethod,AIsEmptyMethod:TRTTIMethod; const ACountProperty:TRTTIProperty);
+constructor TdjDuckStreamable.Create(const AObjAsDuck:TObject; const ALoadFromStreamMethod,ASaveToStreamMethod,AIsEmptyMethod:TRTTIMethod; const ACountProperty, ASizeProperty:TRTTIProperty);
 begin
   inherited Create;
   FObjAsDuck := AObjAsDuck;
@@ -81,6 +82,7 @@ begin
   FSaveToStreamMethod := ASaveToStreamMethod;
   FIsEmptyMethod := AIsEmptyMethod;
   FCountProperty := ACountProperty;
+  FSizeProperty := ASizeProperty;
 end;
 
 function TdjDuckStreamable.DuckObjQualifiedName: String;
@@ -90,24 +92,27 @@ end;
 
 function TdjDuckStreamable.IsEmpty: Boolean;
 begin
-  // FIsEmptyMethod method assigned
-  if Assigned(FIsEmptyMethod)
-    then Result := FIsEmptyMethod.Invoke(FObjAsDuck, []).AsBoolean
-  // FCountProperty method assigned
-  else if Assigned(FCountProperty)
-    then Result := (FCountProperty.GetValue(FObjAsDuck).AsInteger = 0)
-  // Otherwise return False
+  if Assigned(FIsEmptyMethod) then
+    Result := FIsEmptyMethod.Invoke(FObjAsDuck, []).AsBoolean
+  else
+  if Assigned(FCountProperty) then
+    Result := (FCountProperty.GetValue(FObjAsDuck).AsInteger = 0)
+  else
+  if Assigned(FSizeProperty) then
+    Result := (FSizeProperty.GetValue(FObjAsDuck).AsInteger = 0)
   else Result := False;
 end;
 
 procedure TdjDuckStreamable.LoadFromStream(AStream: TStream);
 begin
-  FLoadFromStreamMethod.Invoke(FObjAsDuck, [AStream]);
+  if AStream.Size <> 0 then
+    FLoadFromStreamMethod.Invoke(FObjAsDuck, [AStream]);
 end;
 
 procedure TdjDuckStreamable.SaveToStream(AStream: TStream);
 begin
-  FSaveToStreamMethod.Invoke(FObjAsDuck, [AStream]);
+  if not IsEmpty then
+    FSaveToStreamMethod.Invoke(FObjAsDuck, [AStream]);
 end;
 
 procedure TdjDuckStreamable.SetObject(const AObj: TObject);
@@ -123,6 +128,7 @@ var
   LSaveToStreamMethod: TRttiMethod;
   LIsEmptyMethod: TRttiMethod;
   LCountProperty: TRttiProperty;
+  LSizeProperty: TRttiProperty;
 begin
   // Check received object
   if not Assigned(AObjAsDuck) then Exit(nil);
@@ -137,10 +143,14 @@ begin
   if not Assigned(LSaveToStreamMethod) then Exit(nil);
   // IsEmpty method
   LIsEmptyMethod := LType.GetMethod('IsEmpty');
+  if not Assigned(LIsEmptyMethod) then
+    LIsEmptyMethod := LType.GetMethod('Empty');
   // Count Property
   LCountProperty := LType.GetProperty('Count');
+  // Size Property
+  LSizeProperty := LType.GetProperty('Size');
   // If everithing is OK then create the Duck
-  Result := Self.Create(AObjAsDuck, LLoadFromStreamMethod, LSaveToStreamMethod, LIsEmptyMethod, LCountProperty);
+  Result := Self.Create(AObjAsDuck, LLoadFromStreamMethod, LSaveToStreamMethod, LIsEmptyMethod, LCountProperty, LSizeProperty);
 end;
 
 end.

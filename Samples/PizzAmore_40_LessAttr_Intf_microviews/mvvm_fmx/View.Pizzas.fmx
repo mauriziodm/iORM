@@ -3,12 +3,20 @@ inherited ViewPizzas: TViewPizzas
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Pizzas'
+      inherited ButtonSelect: TSpeedButton
+        OnClick = nil
+      end
     end
   end
   inherited ListView: TListView
     ItemAppearanceClassName = 'TImageListItemBottomDetailAppearance'
     ItemEditAppearanceClassName = 'TImageListItemBottomDetailShowCheckAppearance'
     ItemIndex = 0
+  end
+  inherited Rectangle1: TRectangle
+    inherited ButtonAdd: TSpeedButton
+      OnClick = nil
+    end
   end
   inherited BSMaster: TioModelBindSource
     AutoActivate = True

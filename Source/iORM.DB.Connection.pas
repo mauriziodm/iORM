@@ -42,6 +42,7 @@ uses
   iORM.DB.Interfaces,
   FireDAC.Stan.Def,
   FireDAC.Phys.SQLite,
+  FireDAC.Phys.SQLiteWrapper.Stat, // Static link for SQLite
   FireDAC.Phys.FB,
   FireDAC.Stan.ExprFuncs,
   FireDAC.Stan.Intf,

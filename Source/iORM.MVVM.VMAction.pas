@@ -4,8 +4,7 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.CommonTypes, iORM.LiveBindings.BSPersistence, Vcl.Forms,
-  iORM.StdActions.Interfaces;
+  iORM.CommonTypes, iORM.LiveBindings.BSPersistence, iORM.StdActions.Interfaces;
 
 type
 
@@ -724,7 +723,7 @@ end;
 
 procedure TioVMActionBSPersistenceSaveRevertPoint._InternalUpdateStdAction;
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSave;
+  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
 end;
 
 { TioVMActionBSPersistenceClear }
@@ -797,7 +796,7 @@ procedure TioVMActionBSPersistenceDelete._InternalUpdateStdAction;
 begin
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioVMActionBSPersistenceReload }
@@ -818,7 +817,7 @@ begin
   inherited;
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioVMActionBSPersistenceAppend }
@@ -868,7 +867,7 @@ begin
   inherited;
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioVMActionBSPersistenceInsert }
@@ -918,7 +917,7 @@ begin
   inherited;
   Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSaved);
+  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioVMActionBSCloseQuery }
@@ -1020,7 +1019,7 @@ end;
 
 function TioVMActionBSCloseQuery._CanClose: Boolean;
 begin
-  Result := (TargetBindSource = nil) or TargetBindSource.Persistence.CanSave or (FOnEditingAction <> eaDisable);
+  Result := (TargetBindSource = nil) or TargetBindSource.Persistence.IsEmpty or TargetBindSource.Persistence.CanSaveRevertPoint or (FOnEditingAction <> eaDisable);
   // Se è il caso interroga anche le ChildCQA
   if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
     Result := Result and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);

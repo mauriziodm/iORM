@@ -52,10 +52,11 @@ type
     FSaveToStreamMethod: TRttiMethod;
     FIsEmptyMethod: TRttiMethod;
     FCountProperty: TRttiProperty;
+    FSizeProperty: TRttiProperty;
   public
     constructor Create(AObj: TObject);
-    procedure LoadFromStream(Stream: TStream); virtual;
-    procedure SaveToStream(Stream: TStream); virtual;
+    procedure LoadFromStream(AStream: TStream); virtual;
+    procedure SaveToStream(AStream: TStream); virtual;
     function IsEmpty: Boolean; virtual;
   end;
 
@@ -86,30 +87,36 @@ begin
     raise EioException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"SaveToStream" method not found in the object of "%s" class.', [AObj.ClassName]));
   // IsEmpty method
   FIsEmptyMethod := Typ.GetMethod('IsEmpty');
+  if not Assigned(FIsEmptyMethod) then
+    FIsEmptyMethod := Typ.GetMethod('Empty');
   // Count property method
   FCountProperty := Typ.GetProperty('Count');
 end;
 
 function TioDuckTypedStreamObject.IsEmpty: Boolean;
 begin
-  // FIsEmptyMethod method assigned
-  if Assigned(FIsEmptyMethod)
-    then Result := FIsEmptyMethod.Invoke(FObj, []).AsBoolean
-  // FCountProperty method assigned
-  else if Assigned(FCountProperty)
-    then Result := (FCountProperty.GetValue(FObj).AsInteger = 0)
-  // Otherwise return False
-  else Result := False;
+  if Assigned(FIsEmptyMethod) then
+    Result := FIsEmptyMethod.Invoke(FObj, []).AsBoolean
+  else
+  if Assigned(FCountProperty) then
+    Result := (FCountProperty.GetValue(FObj).AsInteger = 0)
+  else
+  if Assigned(FSizeProperty) then
+    Result := (FSizeProperty.GetValue(FObj).AsInteger = 0)
+  else
+    Result := False;
 end;
 
-procedure TioDuckTypedStreamObject.LoadFromStream(Stream: TStream);
+procedure TioDuckTypedStreamObject.LoadFromStream(AStream: TStream);
 begin
-  FLoadFromStreamMethod.Invoke(FObj, [Stream]);
+  if AStream.Size <> 0 then
+    FLoadFromStreamMethod.Invoke(FObj, [AStream]);
 end;
 
-procedure TioDuckTypedStreamObject.SaveToStream(Stream: TStream);
+procedure TioDuckTypedStreamObject.SaveToStream(AStream: TStream);
 begin
-  FSaveToStreamMethod.Invoke(FObj, [Stream]);
+  if not IsEmpty then
+    FSaveToStreamMethod.Invoke(FObj, [AStream]);
 end;
 
 end.

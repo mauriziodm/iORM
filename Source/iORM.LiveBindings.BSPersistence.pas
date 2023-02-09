@@ -65,6 +65,9 @@ type
     function GetOnInsertAction: TioOnInsertAction;
     procedure SetOnInsertAction(const Value: TioOnInsertAction);
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction;
+    // ItemCount
+    function GetCount: Integer;
+    property ItemCount: Integer read GetCount; // Public: Master+Detail
     // MasterDataSet (SourceBS) property
     // property MasterDataSet: TioMasterDataSet read GetMasterDataSet write SetMasterDataSet; // published: Detail
   end;
@@ -74,7 +77,7 @@ type
     [djSkip]
     FBindSource: IioBSPersistenceClient;
     [djSkip]
-    FSavedState: String;
+    FSavedRevertPointState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
     FSmartUpdateDetection: IioSmartUpdateDetection;
     FIsInserting: Boolean;
@@ -106,27 +109,28 @@ type
     procedure Insert(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False); overload;
     function CanAppend: Boolean;
     function CanAppendDetail: Boolean;
-    function CanInsert: Boolean;
-    function CanInsertDetail: Boolean;
-    function CanPersist: Boolean;
     function CanClear: Boolean;
     function CanDelete: Boolean;
     function CanDeleteDetail: Boolean;
+    function CanInsert: Boolean;
+    function CanInsertDetail: Boolean;
+    function CanPersist: Boolean;
     function CanReceiveSelection: Boolean;
     function CanReload: Boolean;
     function CanRevert: Boolean;
     function CanRevertOrDelete: Boolean;
-    function CanSave: Boolean;
+    function CanSaveRevertPoint: Boolean;
     function IsActive: Boolean;
-    function IsChanged: Boolean;
-    function IsSaved: Boolean;
-    function IsClear: Boolean;
-    function IsSmartUpdateDetectionEnabled: Boolean;
-    function IsInserting: Boolean;
     function IsAppending: Boolean;
+    function IsChanged: Boolean;
+    function IsClear: Boolean;
+    function IsEmpty: Boolean;
+    function IsInserting: Boolean;
+    function IsSavedRevertPoint: Boolean;
+    function IsSmartUpdateDetectionEnabled: Boolean;
     procedure NotifyBeforeScroll;
     procedure NotifySaveRevertPoint;
-    property SavedObjState: string read FSavedState;
+    property SavedObjState: string read FSavedRevertPointState;
     property SmartDeleteSystem: TioSmartDeleteSystem read FSmartDeleteSystem;
     property SmartUpdateDetection: IioSmartUpdateDetection read FSmartUpdateDetection write FSmartUpdateDetection;
     property State: TioBSPersistenceState read GetState;
@@ -243,7 +247,7 @@ begin
   Result := (GetState >= osSaved) or IsInserting;
 end;
 
-function TioBSPersistence.CanSave: Boolean;
+function TioBSPersistence.CanSaveRevertPoint: Boolean;
 begin
   Result := GetState = osUnsaved;
 end;
@@ -267,7 +271,7 @@ procedure TioBSPersistence.Clear(const ARaiseIfChangesExists: Boolean);
 begin
   if ARaiseIfChangesExists and (State > osSaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Clear', 'Pending changes exists');
-  FSavedState := '';
+  FSavedRevertPointState := '';
   FIsInserting := False;
   FSmartDeleteSystem.Clear;
   if Assigned(FSmartUpdateDetection) then
@@ -358,12 +362,17 @@ begin
   Result := GetState = osUnsaved;
 end;
 
+function TioBSPersistence.IsEmpty: Boolean;
+begin
+  Result := FBindSource.ItemCount = 0;
+end;
+
 function TioBSPersistence.IsInserting: Boolean;
 begin
   Result := (FBindSource.Current <> nil) and (FIsInserting or (TioUtilities.ExtractOID(FBindSource.Current) = 0));
 end;
 
-function TioBSPersistence.IsSaved: Boolean;
+function TioBSPersistence.IsSavedRevertPoint: Boolean;
 begin
   Result := GetState > osUnsaved;
 end;
@@ -383,11 +392,11 @@ end;
 
 procedure TioBSPersistence.NotifyBeforeScroll;
 begin
-  if ((FBindSource.OnRecordChangeAction = rcPersistAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcPersistIfChanged) and IsChanged) then
+  if ((FBindSource.OnRecordChangeAction = rcPersistAlways) and IsSavedRevertPoint) or ((FBindSource.OnRecordChangeAction = rcPersistIfChanged) and IsChanged) then
     Persist
-  else if ((FBindSource.OnRecordChangeAction = rcAbortAlways) and IsSaved) or ((FBindSource.OnRecordChangeAction = rcAbortIfChanged) and IsChanged) then
+  else if ((FBindSource.OnRecordChangeAction = rcAbortAlways) and IsSavedRevertPoint) or ((FBindSource.OnRecordChangeAction = rcAbortIfChanged) and IsChanged) then
     Abort
-  else if IsSaved then
+  else if IsSavedRevertPoint then
     Clear(False);
 end;
 
@@ -395,9 +404,9 @@ function TioBSPersistence.GetState: TioBSPersistenceState;
 begin
   if (FBindSource = nil) or (not FBindSource.IsActive) or (FBindSource.Current = nil) then
     Result := osUnassigned
-  else if FSavedState.IsEmpty then
+  else if FSavedRevertPointState.IsEmpty then
     Result := osUnsaved
-  else if GetCurrentAsString <> FSavedState then
+  else if GetCurrentAsString <> FSavedRevertPointState then
     Result := osChanged
   else
     Result := osSaved;
@@ -488,7 +497,7 @@ begin
   CheckUnassigned('Save', True);
   if ARaiseIfAlreadySavedRevertPoint and (State > osUnsaved) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Save', 'A previously saved revert point exists, it must be cleared before');
-  FSavedState := GetCurrentAsString
+  FSavedRevertPointState := GetCurrentAsString
 end;
 
 procedure TioBSPersistence._InternalRevert(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
@@ -505,7 +514,7 @@ begin
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
   // Execute the revert
-  dj.FromJSON(FSavedState).byFields.TypeAnnotationsON.ClearCollection.&To(FBindSource.Current);
+  dj.FromJSON(FSavedRevertPointState).byFields.TypeAnnotationsON.ClearCollection.&To(FBindSource.Current);
   FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSource.Current);
 end;
 

@@ -130,6 +130,7 @@ var
 
 begin
   inherited;
+  Result := 0;
   // Resolve the type and alias
   AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection

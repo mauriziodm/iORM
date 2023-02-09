@@ -3,6 +3,14 @@ inherited ViewOrders: TViewOrders
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Orders'
+      inherited ButtonSelect: TSpeedButton
+        OnClick = nil
+      end
+    end
+  end
+  inherited Rectangle1: TRectangle
+    inherited ButtonAdd: TSpeedButton
+      OnClick = nil
     end
   end
   inherited BSMaster: TioModelBindSource

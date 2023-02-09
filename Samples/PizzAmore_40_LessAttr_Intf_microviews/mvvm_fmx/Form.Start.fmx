@@ -5217,19 +5217,19 @@ object StartForm: TStartForm
   object SQLiteConn: TioSQLiteConnectionDef
     AsDefault = True
     AutoCreateDB.Enabled = True
+    AutoCreateDB.Indexes = False
+    AutoCreateDB.ForeignKeys = False
     Database = 'PizzAmore_40_mvvm_fmx.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
-    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 32
     Top = 504
   end
   object VCProvider: TioViewContextProvider
     AsDefault = True
     OnAfterRequest = VCProviderAfterRequest
-    OnBeforeRelease = VCProviderBeforeRelease
     OnRelease = VCProviderRelease
     OnRequest = VCProviderRequest
     Left = 160
@@ -5250,14 +5250,6 @@ object StartForm: TStartForm
       Visible = True
       Caption = 'Quit'
       VMActionName = 'acQuit'
-    end
-    object NextTabAction1: TNextTabAction
-      Category = 'Tab'
-      TabControl = TabControlStart
-    end
-    object PreviousTabAction1: TPreviousTabAction
-      Category = 'Tab'
-      TabControl = TabControlStart
     end
     object acShowOrders: TioViewAction
       Category = 'iORM-MVVM'
