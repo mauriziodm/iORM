@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Android64</Platform>
         <TargetedPlatforms>32787</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>PizzAmore_40_LessAttr_Intf_mvvm_fmx_mobile_microviews.dpr</MainSource>
@@ -595,6 +595,76 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\CapricciosaPizza.bmp" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>CapricciosaPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\CapricciosaPizza.bmp" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>CapricciosaPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\HamAndMushroomPizza.bmp" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>HamAndMushroomPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\HamAndMushroomPizza.bmp" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>HamAndMushroomPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\LovePizza.bmp" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>LovePizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\LovePizza.bmp" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>LovePizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\MargheritaPizza.bmp" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>MargheritaPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\MargheritaPizza.bmp" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>MargheritaPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\PepperoniPizza.bmp" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>PepperoniPizza.bmp</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\common_images\PepperoniPizza.bmp" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal</RemoteDir>
+                        <RemoteName>PepperoniPizza.bmp</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

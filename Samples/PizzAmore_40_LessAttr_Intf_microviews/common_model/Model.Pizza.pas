@@ -10,7 +10,7 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM, Model.Interfaces, Model.BaseBO;
+  iORM, Model.Interfaces, Model.BaseBO, DJSON.Attributes;
 
 type
 
@@ -19,6 +19,7 @@ type
   private
     FName: String;
     FPrice: Currency;
+    [djSkip]
     FImage: TBitmap;
     procedure SetName(const AValue: String);
     procedure SetPrice(const AValue: Currency);
