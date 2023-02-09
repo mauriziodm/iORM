@@ -3,8 +3,7 @@ unit VM.Order.PizzaSel;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VM.Order, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ModelPresenter.Detail,
+  System.SysUtils, System.Variants, System.Classes, VM.Order, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.ModelPresenter.Detail,
   iORM.MVVM.VMAction, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ViewModel;
 
 type
@@ -27,7 +26,7 @@ uses
 procedure TVMOrderPizzaSel.ioViewModelViewPairing(const Sender: TioViewModel);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(BSMaster, VCProviderByName('VCProviderOrder'), 'embedded');
+  io.ShowAsSelector<IPizza>(BSMaster, acBack, VCProviderByName('VCProviderOrder'), 'embedded');
 end;
 
 end.

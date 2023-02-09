@@ -3,8 +3,7 @@ unit VM.Order;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VM.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.VMAction,
+  System.SysUtils, System.Variants, System.Classes, VM.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.VMAction,
   iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, Model.Order,
   iORM.MVVM.ViewModel;
 
@@ -42,13 +41,13 @@ end;
 procedure TVMOrder.acShowCustomerSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<ICustomer>(BSCustomer);
+  io.ShowAsSelector<ICustomer>(BSCustomer, acBack);
 end;
 
 procedure TVMOrder.acShowPizzaSelectorExecute(Sender: TObject);
 begin
   inherited;
-  io.ShowAsSelector<IPizza>(BSMaster);
+  io.ShowAsSelector<IPizza>(BSMaster, acBack);
 end;
 
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);

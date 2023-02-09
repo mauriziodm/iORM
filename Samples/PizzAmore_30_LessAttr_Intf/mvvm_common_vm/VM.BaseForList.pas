@@ -60,7 +60,7 @@ begin
   if Assigned(BSMaster.SelectorFor) then
     BSMaster.SelectCurrent
   else
-    BSMaster.ShowCurrent;
+    BSMaster.ShowCurrent(acBack);
 end;
 
 procedure TVMBaseForList.acShowOrSelectUpdate(Sender: TObject);

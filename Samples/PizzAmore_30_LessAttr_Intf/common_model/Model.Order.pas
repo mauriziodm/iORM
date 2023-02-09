@@ -63,7 +63,7 @@ begin
     end;
   end;
   // Else create a new OrderRow
-  Rows.Add( io.Create<IOrderRow>([TValue.From<IPizza>(APizza)]) );
+  Rows.Add( io.Create<IOrderRow>('', [TValue.From<IPizza>(APizza)]) );
 end;
 
 constructor TOrder.Create;

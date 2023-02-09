@@ -10,7 +10,7 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM, Model.Interfaces;
+  iORM, Model.Interfaces, DJSON.Attributes;
 
 type
 
@@ -20,6 +20,7 @@ type
     FID: Integer;
     FName: String;
     FPrice: Currency;
+    [djSkip]
     FImage: TBitmap;
     // ID property
     function GetID: Integer;

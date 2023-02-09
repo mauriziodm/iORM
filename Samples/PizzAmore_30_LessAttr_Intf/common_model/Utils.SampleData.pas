@@ -17,7 +17,7 @@ type
 implementation
 
 uses
-  iORM, Model.Interfaces, SysUtils, Model.Customer;
+  iORM, Model.Interfaces, SysUtils, Model.Customer, System.IOUtils;
 
 { TSampleData }
 
@@ -42,30 +42,37 @@ end;
 class procedure TSampleData.CreatePizzas;
 var
   LPizza: IPizza;
+  LImagesPath: String;
 begin
+  // Detect the right images path for mobile or win32 (test "MargheritaPizza.bmp" file only)
+  if FileExists(TPath.Combine(TPath.GetDocumentsPath, 'MargheritaPizza.bmp')) then
+    LImagesPath := TPath.GetDocumentsPath
+  else
+    LImagesPath := TPath.GetFullPath('..\..\..\..\common_images');
+
   // Margherita pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Margherita pizza';
   LPizza.Price := 4.5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\MargheritaPizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'MargheritaPizza.bmp'));
   io.Persist(LPizza);
   //  Capricciosa pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Capricciosa pizza';
   LPizza.Price := 7;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\CapricciosaPizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'CapricciosaPizza.bmp'));
   io.Persist(LPizza);
   // Pepperoni pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Pepperoni pizza';
   LPizza.Price := 6.5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\PepperoniPizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'PepperoniPizza.bmp'));
   io.Persist(LPizza);
   // Love pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Love pizza';
   LPizza.Price := 5;
-  LPizza.Image.LoadFromFile('..\..\..\..\common_images\LovePizza.bmp');
+  LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'LovePizza.bmp'));
   io.Persist(LPizza);
 end;
 
@@ -121,23 +128,23 @@ begin
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(1);
   LOrder.Note := 'Well done';
-  LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 3]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([2, 'Capricciosa pizza', 7, 2]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
+  LOrder.Rows.Add( io.Create<IOrderRow>('', [1, 'Margherita pizza', 4.5, 3]) );
+  LOrder.Rows.Add( io.Create<IOrderRow>('', [2, 'Capricciosa pizza', 7, 2]) );
+  LOrder.Rows.Add( io.Create<IOrderRow>('', [4, 'Love pizza', 5, 1]) );
   io.Persist(LOrder);
   // Second order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(2);
   LOrder.Note := 'Double cheese please';
-  LOrder.Rows.Add( io.Create<IOrderRow>([1, 'Margherita pizza', 4.5, 1]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>([3, 'Pepperoni pizza', 6.5, 1]) );
+  LOrder.Rows.Add( io.Create<IOrderRow>('', [1, 'Margherita pizza', 4.5, 1]) );
+  LOrder.Rows.Add( io.Create<IOrderRow>('', [3, 'Pepperoni pizza', 6.5, 1]) );
   io.Persist(LOrder);
   // Third order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(3);
-  LOrder.Rows.Add( io.Create<IOrderRow>([4, 'Love pizza', 5, 1]) );
+  LOrder.Rows.Add( io.Create<IOrderRow>('', [4, 'Love pizza', 5, 1]) );
   io.Persist(LOrder);
 end;
 
