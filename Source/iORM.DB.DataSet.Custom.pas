@@ -143,7 +143,7 @@ type
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     property ItemIndex: Integer read GetItemIndex write SetItemIndex; // Public: Master+Detail
     // Published properties
-    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
+    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master  // non mettere default
     property TypeName: String read GetTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
     property Async: Boolean read FAsync write SetAsync default False; // published: Master

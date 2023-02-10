@@ -10,7 +10,7 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM;
+  iORM, DJSON.Attributes;
 
 type
 
@@ -20,6 +20,7 @@ type
     FID: Integer;
     FName: String;
     FPrice: Currency;
+    [djSkip]
     FImage: TBitmap;
   public
     constructor Create;

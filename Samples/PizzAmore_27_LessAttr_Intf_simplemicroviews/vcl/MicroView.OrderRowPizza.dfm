@@ -240,7 +240,7 @@ object MicroViewOrderRowPizza: TMicroViewOrderRowPizza
     end
   end
   object DSPizza: TioDataSetDetail
-    AsDefault = True
+    AsDefault = False
     MasterBindSource = DSOrderRow
     MasterPropertyName = 'Pizza'
     Left = 144

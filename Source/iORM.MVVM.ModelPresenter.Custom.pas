@@ -298,7 +298,7 @@ type
     function DataObjectAssigned: Boolean;
     // ----------------------------------------------------------------------------------------------------------------------------
     // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
-    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
+    property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master // non mettere default
     property ItemCount: Integer read GetCount; // Public: Master+Detail
     property MasterBindSource: IioNotifiableBindSource read FMasterBindSource write SetMasterBindSource; // Published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // Published: Detail

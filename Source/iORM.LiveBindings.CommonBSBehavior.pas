@@ -84,7 +84,7 @@ begin
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
   // NB: Is detail bind source initialize to false
-  if (csDesigning in ABindSource.ComponentState) then
+  if (csDesigning in ABindSource.ComponentState) and not (csLoading in ABindSource.ComponentState) then
   begin
     AAsDefaultValue := True;
     for I := 0 to ABindSource.Owner.ComponentCount - 1 do
