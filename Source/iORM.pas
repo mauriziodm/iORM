@@ -43,7 +43,7 @@ uses
   iORM.StdActions.Interfaces;
 
 const
-  IORM_VERSION = 'iORM 2 (beta 1.7)';
+  IORM_VERSION = 'iORM 2 (beta 1.8)';
 {$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // TioTypeOfCollection
   tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
