@@ -10,7 +10,7 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM;
+  iORM, DJSON.Attributes;
 
 type
 

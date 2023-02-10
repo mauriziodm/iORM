@@ -124,7 +124,6 @@ object PizzasForm: TPizzasForm
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = DBCtrlGrid1DblClick
-    ExplicitTop = 16
     object DBTextName: TDBText
       Left = 99
       Top = 20
@@ -213,7 +212,6 @@ object PizzasForm: TPizzasForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = DSPizzas
     end
   end

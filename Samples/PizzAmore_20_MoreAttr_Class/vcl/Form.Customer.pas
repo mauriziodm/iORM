@@ -34,8 +34,8 @@ type
     DSCustomerAddress: TStringField;
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
-    acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
+    acBack: TioBSCloseQuery;
     procedure acBackExecute(Sender: TObject);
     procedure acBackUpdate(Sender: TObject);
     procedure FormShow(Sender: TObject);

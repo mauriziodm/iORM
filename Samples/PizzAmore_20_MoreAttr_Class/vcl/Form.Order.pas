@@ -62,13 +62,13 @@ type
     DSCustomerFullAddress: TStringField;
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
-    acBack: TAction;
     acRevert: TioBSPersistenceRevertOrDelete;
     ButtonAdd: TSpeedButton;
     acSelectCustomer: TAction;
     acSelectPizza: TioBSSelectCurrent;
     ButtonDeleteRow: TSpeedButton;
     acDeleteRow: TDataSetDelete;
+    acBack: TioBSCloseQuery;
     procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure FormShow(Sender: TObject);
     procedure acBackExecute(Sender: TObject);

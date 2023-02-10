@@ -247,10 +247,6 @@ object CustomersForm: TCustomersForm
   object ActionList1: TActionList
     Left = 184
     Top = 112
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acDelete: TioBSPersistenceDelete
       Category = 'iORM-BSPersistence'
       Caption = 'Delete'
@@ -275,6 +271,11 @@ object CustomersForm: TCustomersForm
       Category = 'iORM-BSPersistence'
       Caption = 'Add'
       OnExecute = acAddExecute
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSCustomers
     end
   end
 end

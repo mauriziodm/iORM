@@ -8569,7 +8569,8 @@ object MainForm: TMainForm
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = False
+    AsDefault = True
+    AutoCreateDB.Enabled = True
     Database = 'PizzAmore_20_vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
@@ -8580,8 +8581,7 @@ object MainForm: TMainForm
     Top = 272
   end
   object FirebirdConn: TioFirebirdConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PizzAmore_20_vcl.fdb'
     DatabaseStdFolder = sfDocuments
     OSAuthent = oaNo
@@ -8611,7 +8611,6 @@ object MainForm: TMainForm
       Category = 'iORM-BS'
       Caption = 'Quit'
       OnExecuteAction = eaTerminateApplication
-      OnUpdateScope = usGlobal
       OnConfirmationRequest = acQuitConfirmationRequest
     end
   end
