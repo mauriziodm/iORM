@@ -61,8 +61,8 @@ type
     function GetRecord(Buffer: TRecordBuffer; GetMode: TGetMode; DoCheck: Boolean): TGetResult; override;
     procedure InternalFirst; override;
     procedure InternalLast; override;
-    function GetRecNo: Longint; override;
-    function GetRecordCount: Longint; override;
+    function GetRecNo: Integer; override;
+    function GetRecordCount: Integer; override;
     procedure SetRecNo(Value: Integer); override;
 
     // bookmarks
@@ -376,7 +376,7 @@ begin
 end;
 
 // II (optional): Record count
-function TioBaseDataSet.GetRecordCount: Longint;
+function TioBaseDataSet.GetRecordCount: Integer;
 begin
   CheckActive;
   Result := InternalRecordCount;
@@ -388,7 +388,7 @@ begin
 end;
 
 // II (optional): Get the number of the current record
-function TioBaseDataSet.GetRecNo: Longint;
+function TioBaseDataSet.GetRecNo: Integer;
 begin
   UpdateCursorPos;
   if FCurrentRecord < 0 then
@@ -1130,7 +1130,7 @@ begin
   FModified := not FIsReadingBlobData;
 end;
 
-function TioAbstractBlobStream.Write(const Buffer; Count: Integer): Longint;
+function TioAbstractBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   Result := inherited Write(Buffer, Count);
   // Se non siamo in fase di lettura dei dati del blob allora

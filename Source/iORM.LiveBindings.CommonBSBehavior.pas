@@ -91,8 +91,7 @@ begin
     begin
       LCurrentComponent := ABindSource.Owner.Components[I];
       // Ovviamente salta se stesso
-      if (LCurrentComponent <> ABindSource) and Supports(LCurrentComponent, IioNotifiableBindSource, LCurrentBindSource) and LCurrentBindSource.IsMasterBS
-        and LCurrentBindSource.AsDefault then
+      if (LCurrentComponent <> ABindSource) and Supports(LCurrentComponent, IioNotifiableBindSource, LCurrentBindSource) and LCurrentBindSource.AsDefault then
       begin
         AAsDefaultValue := False;
         Exit;

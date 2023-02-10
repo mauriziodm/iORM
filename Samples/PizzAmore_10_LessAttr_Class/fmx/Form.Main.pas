@@ -151,12 +151,12 @@ type
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
     procedure BSOrdersSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure ListViewCustomersDblClick(Sender: TObject);
-    procedure ListViewPizzasDblClick(Sender: TObject);
-    procedure ListViewOrdersDblClick(Sender: TObject);
     procedure acCustomerAddExecute(Sender: TObject);
     procedure acOrderAddExecute(Sender: TObject);
     procedure acPizzaAddExecute(Sender: TObject);
+    procedure ListViewPizzasItemClick(const Sender: TObject; const AItem: TListViewItem);
+    procedure ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
+    procedure ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
   private
     { Private declarations }
   public
@@ -216,7 +216,7 @@ begin
   ADone := True;
 end;
 
-procedure TMainForm.ListViewCustomersDblClick(Sender: TObject);
+procedure TMainForm.ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
 begin
   if TabControlMain.ActiveTab = TabItemOrder then
     BSCustomers.SelectCurrent
@@ -224,12 +224,12 @@ begin
     acMoveToCustomerTabItem.Execute
 end;
 
-procedure TMainForm.ListViewOrdersDblClick(Sender: TObject);
+procedure TMainForm.ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
 begin
   acMoveToOrderTabItem.Execute
 end;
 
-procedure TMainForm.ListViewPizzasDblClick(Sender: TObject);
+procedure TMainForm.ListViewPizzasItemClick(const Sender: TObject; const AItem: TListViewItem);
 begin
   if TabControlMain.ActiveTab = TabItemOrder then
     BSPizzas.SelectCurrent

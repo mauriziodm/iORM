@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 15
+          TabOrder = 16
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5284,7 +5284,7 @@ object MainForm: TMainForm
         object EditOrderDate: TEdit
           Touch.InteractiveGestures = [LongTap, DoubleTap]
           TabOrder = 9
-          Text = '01/11/2022'
+          Text = '01/11/2023'
           TextSettings.Font.Size = 14.000000000000000000
           TextSettings.HorzAlign = Center
           Position.X = 138.000000000000000000
@@ -6033,7 +6033,7 @@ object MainForm: TMainForm
       Size.Height = 607.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       TabStop = False
       TabPosition = Top
@@ -6051,7 +6051,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family, Style]
-        IsSelected = True
+        IsSelected = False
         Size.Width = 90.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6112,8 +6112,8 @@ object MainForm: TMainForm
           ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
           ItemAppearanceObjects.ItemObjects.Image.Visible = False
           StyleLookup = 'listviewstyle'
-          OnDblClick = ListViewOrdersDblClick
           CanSwipeDelete = False
+          OnItemClick = ListViewOrdersItemClick
           SearchAlwaysOnTop = False
         end
       end
@@ -6124,7 +6124,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family]
-        IsSelected = False
+        IsSelected = True
         Size.Width = 127.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6217,8 +6217,8 @@ object MainForm: TMainForm
           ItemAppearanceObjects.ItemObjects.Accessory.Visible = False
           ItemAppearanceObjects.ItemObjects.Image.Visible = False
           StyleLookup = 'listviewstyle'
-          OnDblClick = ListViewCustomersDblClick
           CanSwipeDelete = False
+          OnItemClick = ListViewCustomersItemClick
           SearchVisible = True
           SearchAlwaysOnTop = False
         end
@@ -6295,8 +6295,8 @@ object MainForm: TMainForm
           ItemAppearanceObjects.ItemObjects.TextButton.Text = 'Edit'
           ItemAppearanceObjects.ItemEditObjects.TextButton.TextColor = claBlack
           StyleLookup = 'listviewstyle'
-          OnDblClick = ListViewPizzasDblClick
           CanSwipeDelete = False
+          OnItemClick = ListViewPizzasItemClick
         end
       end
     end
@@ -6770,6 +6770,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     Preview = True
+    AsDefault = False
     MasterBindSource = BSOrders
     MasterPropertyName = 'Customer'
     Left = 703
@@ -6803,6 +6804,7 @@ object MainForm: TMainForm
       end>
     ScopeMappings = <>
     Preview = True
+    AsDefault = False
     MasterBindSource = BSOrders
     MasterPropertyName = 'Rows'
     Left = 703
