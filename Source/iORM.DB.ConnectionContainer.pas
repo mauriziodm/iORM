@@ -253,14 +253,21 @@ end;
 { TioConnectionManager }
 
 class function TioConnectionManager.CheckConnectionName(AConnectionName: String): String;
+var
+  LConnectionInfo: TioConnectionInfo;
 begin
   // NB: Lasciare anche se il parametro è già defaultizzato perchè in alcune circostanze serve
   if IsEmptyConnectionName(AConnectionName) then
     Result := IO_CONNECTIONDEF_DEFAULTNAME
   else
     Result := AConnectionName;
-  // If a connectionDef with this name is not found then raise an exception
-  if not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
+  // Check and get the ConnectionIfo instance relative to the ConnectionName
+  if FConnectionManagerContainer.ContainsKey(Result) then
+    LConnectionInfo := FConnectionManagerContainer.Items[Result]
+  else
+    raise EioException.Create(Self.ClassName + ': ConnectionInfo (TioConnectionInfo) for "' + Result + '" not found!');
+  // if the connection is of type then also check if it is present in the FireDAC's ConnectionDefs
+  if (LConnectionInfo.ConnectionType <> TioConnectionType.cdtRemote) and not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
     raise EioException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
 end;
 
