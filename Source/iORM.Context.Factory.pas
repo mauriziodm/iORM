@@ -576,7 +576,6 @@ var
   LGroupBy: IioGroupBy;
   LMapMode: TioMapModeType;
   LIndexList: TioIndexList;
-  LIsToBePersisted: Boolean;
 begin
   try
     // Prop Init
@@ -589,21 +588,18 @@ begin
     LGroupBy := nil;
     LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
-    LIsToBePersisted := False;
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
       if (LAttr is ioEntity) then
       begin
-        if not ioEntity(LAttr).TableName.IsEmpty then
-          LTableName := ioEntity(LAttr).TableName;
+        LTableName := ioEntity(LAttr).TableName;
         LMapMode := ioEntity(LAttr).MapMode;
-        LIsToBePersisted := True;
       end;
       if (LAttr is ioNotPersistedEntity) then
       begin
+        LTableName := NOT_PERSISTED_ENTITY_TABLE_NAME;
         LMapMode := ioNotPersistedEntity(LAttr).MapMode;
-        LIsToBePersisted := False;
       end;
       if LAttr is ioKeyGenerator then
         LKeyGenerator := ioKeyGenerator(LAttr).Value;
@@ -625,7 +621,7 @@ begin
       end;
     end;
     // Create result Properties object
-    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, LIsToBePersisted, Typ);
+    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

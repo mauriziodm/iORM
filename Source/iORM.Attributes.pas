@@ -49,6 +49,7 @@ const
   DEFAULT_MAP_MODE = mmHybrid;
   DEFAULT_TRUE_CLASS_MODE = tcSmart;
 
+  NOT_PERSISTED_ENTITY_TABLE_NAME = '___NOT_PERSISTED___';
 type
   // Relation types
   TioRelationType = (rtNone, rtBelongsTo, rtHasMany, rtHasOne, rtEmbeddedHasMany, rtEmbeddedHasOne);

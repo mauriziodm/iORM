@@ -136,11 +136,10 @@ type
     FKeyGenerator: String;
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
-    FIsToBePersisted: Boolean;
     FContainsSomeIioListProperty: Boolean;
   public
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
-      const AConnectionDefName: String; const AMapMode: TioMapModeType; const AIsToBePersisted: Boolean; const ARttiType: TRttiInstanceType); reintroduce; overload;
+      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
@@ -171,9 +170,8 @@ uses
 
 { TioContextTable }
 
-constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass;
-  const AJoins: IioJoins; const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType;
-  const AIsToBePersisted: Boolean; const ARttiType: TRttiInstanceType);
+constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
+      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType);
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
@@ -181,7 +179,6 @@ begin
   FMapMode := AMapMode;
   FRttiType := ARttiType;
   FIndexList := nil;
-  FIsToBePersisted := AIsToBePersisted;
   FContainsSomeIioListProperty := False;
   // Set TrueClass
   FTrueClass := ATrueClass;
@@ -205,12 +202,12 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FIsToBePersisted, FRttiType);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
 end;
 
 function TioTable.IsToBePersisted: Boolean;
 begin
-  Result := FIsToBePersisted;
+  Result := FSqlText <> NOT_PERSISTED_ENTITY_TABLE_NAME;
 end;
 
 function TioTable.GetTrueClass: IioTrueClass;

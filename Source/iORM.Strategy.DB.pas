@@ -339,6 +339,9 @@ begin
   Result := AObj;
   // Get the Context
   LContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result, nil, '', '');
+  // If the object is of a class mapped as NotPersisted then skip it
+  if not LContext.Map.GetTable.IsToBePersisted then
+    Exit;
   // Create & open query
   LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LContext);
   LQuery.Open;
@@ -593,17 +596,17 @@ end;
 
 class procedure TioStrategyDB.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
+  LResolvedTypeList: IioResolvedTypeList;
+  LResolvedTypeName: String;
+  LContext: IioContext;
+  LTransactionCollection: IioTransactionCollection;
   // Nested
   procedure NestedLoadToMemTable;
   var
     LQry: IioQuery;
   begin
     // Create & open query
-    LQry := TioDBFactory.QueryEngine.GetQuerySelectList(AContext);
+    LQry := TioDBFactory.QueryEngine.GetQuerySelectList(LContext);
     LQry.Open;
     try
       // Copy data to the MemoryTable
@@ -630,25 +633,28 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
+  LTransactionCollection := TioDBFactory.TransactionCollection;
   try
     // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
+    for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, nil, '', '');
+      LContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '');
+      // If the object is of a class mapped as NotPersisted then skip it
+      if not LContext.Map.GetTable.IsToBePersisted then
+        Continue;
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedLoadToMemTable;
     end;
     // Commit ALL transactions
-    ATransactionCollection.CommitAll;
+    LTransactionCollection.CommitAll;
   except
     // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
+    LTransactionCollection.RollbackAll;
     raise;
   end;
 end;
@@ -715,6 +721,9 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
+      // If the object is of a class mapped as NotPersisted then skip it
+      if not LOriginalContext.Map.GetTable.IsToBePersisted then
+        Continue;
       // Start transaction
       LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -778,6 +787,9 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
+      // If the object is of a class mapped as NotPersisted then skip it
+      if not LOriginalContext.Map.GetTable.IsToBePersisted then
+        Continue;
       // Start transaction
       LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class object is founded
