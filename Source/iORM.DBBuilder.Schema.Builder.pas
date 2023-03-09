@@ -99,7 +99,7 @@ var
   LProperty: IioProperty;
 begin
   // Check if the class/table must be skipped or not
-  if not(AMap.GetTable.GetAutoCreateDB and AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName)) then
+  if not(AMap.GetTable.IsToBePersisted and AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName)) then
     Exit;
   // Build or get the SchemaTable
   LSchemaTable := ASchema.FindOrCreateTable(AMap);

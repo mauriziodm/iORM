@@ -115,15 +115,13 @@ begin
   begin
     // Se la classe attuale è mappata (quindi è una entity) allora la considera altrimenti la salta e passa alla prossima
     // (in pratica considera solo le entity quindi se c'è ad esempmio una classe astratta come antenato comune ma questa
-    // giustamente non è uan entità (in quanto astratta non c'è l'attributo ioEntity) questa non viene considerata.
+    // giustamente non è una entità (in quanto astratta non c'è l'attributo ioEntity) questa non viene considerata.
     if TioMapContainer.Exist(LCurrentRttiInstanceType.Name) then
     begin
       LCurrentMap := TioMapContainer.GetMap(LCurrentRttiInstanceType.Name, False);
       // Se la classe corrente è mappata sulla stessa tabella/connessione...
       if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = FTable.GetConnectionDefName) then
-      begin
         Result := LCurrentMap;
-      end;
     end;
     // Go to the next next ancestor class
     LCurrentRttiInstanceType := LCurrentRttiInstanceType.BaseType;

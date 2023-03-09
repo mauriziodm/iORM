@@ -183,6 +183,9 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, nil, '', '');
+      // If the object is of a class mapped as NotPersisted then skip it
+      if not AContext.Map.GetTable.IsToBePersisted then
+        Continue;
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -247,6 +250,9 @@ begin
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
   LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, nil, '', '');
+  // If the object is of a class mapped as NotPersisted then exit
+  if not LContext.Map.GetTable.IsToBePersisted then
+    Exit;
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
@@ -411,6 +417,9 @@ begin
     Exit;
   // Create Context
   LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+  // If the object is of a class mapped as NotPersisted then exit
+  if not LContext.Map.GetTable.IsToBePersisted then
+    Exit;
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
@@ -659,6 +668,10 @@ var
     LObj: TObject;
     LCurrentContext: IioContext;
   begin
+    // NB: Se TrueClassMode = tcSmart in pratica LCurrentContext ora contiene la VirtualMap (o SuperMap) e la usa per
+    //      creare il codice SQL della query poi, una volta aperta la query, inizia a ciclare per tutti i record/oggetti
+    //      trovati dalla query stessa e per ognuno di essi si fa dare la mappa/context specifica della classe specifica
+    //      dell'oggetto corrente.
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectList(LOriginalContext);
     LQuery.Open;
