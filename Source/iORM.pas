@@ -162,7 +162,7 @@ type
 
   // Class attributes
   ioEntity = iORM.Attributes.ioEntity;
-  ioTable = iORM.Attributes.ioTable;
+  ioNotPersistedEntity = iORM.Attributes.ioNotPersistedEntity;
   ioKeyGenerator = iORM.Attributes.ioKeyGenerator;
   ioKeySequence = iORM.Attributes.ioKeySequence;
   ioConnectionDefName = iORM.Attributes.ioConnectionDefName;
@@ -170,7 +170,6 @@ type
   ioGroupBy = iORM.Attributes.ioGroupBy;
   ioJoin = iORM.Attributes.ioJoin;
   ioIndex = iORM.Attributes.ioIndex;
-  ioDisableAutoCreateOnDB = iORM.Attributes.ioDisableAutoCreateOnDB;
 
   // Dependency Injection attributes
   diRegister = iORM.Attributes.diRegister;

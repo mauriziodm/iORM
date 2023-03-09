@@ -72,7 +72,8 @@ type
     class function GetThreadID: TThreadID; static;
     class function ExtractItemRttiType<T>: TRttiType;
     class function TryGetMemberAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
-    class function HasAttribute<T: class>(ARTTIType: TRttiType): boolean; static;
+    class function HasAttribute<T: TCustomAttribute>(ARTTIType: TRttiType): boolean; static;
+    class function HasAttributes<T1, T2: TCustomAttribute>(ARTTIType: TRttiType): boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class function IsList(const AObj: TObject): Boolean;
     class procedure ClearList(const AList: TObject);
@@ -329,6 +330,18 @@ begin
     if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
       Exit(TRttiInterfaceType(LType).Handle);
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
+end;
+
+class function TioUtilities.HasAttributes<T1, T2>(ARTTIType: TRttiType): boolean;
+var
+  LAttributes: TArray<TCustomAttribute>;
+  LAttribute: TCustomAttribute;
+begin
+  Result := False;
+  LAttributes := ARTTIType.GetAttributes;
+  for LAttribute in LAttributes do
+    if (LAttribute is T1) or (LAttribute is T2) then
+      Exit(true);
 end;
 
 class function TioUtilities.HasAttribute<T>(ARTTIType: TRttiType): boolean;

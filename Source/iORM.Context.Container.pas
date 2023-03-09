@@ -444,7 +444,7 @@ var
 begin
   // Loop for all classes detecting attributes to register the current class into the MapContainer and into the DIC
   for LRttiType in TioRttiFactory.GetRttiContext.GetTypes do
-    if LRttiType.IsInstance and TioUtilities.HasAttribute<ioEntity>(LRttiType) then
+    if LRttiType.IsInstance and TioUtilities.HasAttributes<ioEntity, ioNotPersistedEntity>(LRttiType) then
       AddClassRef(LRttiType.AsInstance.MetaclassType);
 end;
 

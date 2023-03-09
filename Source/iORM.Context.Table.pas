@@ -136,12 +136,11 @@ type
     FKeyGenerator: String;
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
-    FAutoCreateDB: Boolean;
+    FIsToBePersisted: Boolean;
     FContainsSomeIioListProperty: Boolean;
   public
-    constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins;
-      const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType; const AAutoCreateDB: Boolean;
-      const ARttiType: TRttiInstanceType); reintroduce; overload;
+    constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
+      const AConnectionDefName: String; const AMapMode: TioMapModeType; const AIsToBePersisted: Boolean; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
@@ -156,7 +155,7 @@ type
     function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
-    function GetAutoCreateDB: Boolean;
+    function IsToBePersisted: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
     // IndexList
@@ -174,7 +173,7 @@ uses
 
 constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass;
   const AJoins: IioJoins; const AGroupBy: IioGroupBy; const AConnectionDefName: String; const AMapMode: TioMapModeType;
-  const AAutoCreateDB: Boolean; const ARttiType: TRttiInstanceType);
+  const AIsToBePersisted: Boolean; const ARttiType: TRttiInstanceType);
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
@@ -182,7 +181,7 @@ begin
   FMapMode := AMapMode;
   FRttiType := ARttiType;
   FIndexList := nil;
-  FAutoCreateDB := AAutoCreateDB;
+  FIsToBePersisted := AIsToBePersisted;
   FContainsSomeIioListProperty := False;
   // Set TrueClass
   FTrueClass := ATrueClass;
@@ -206,12 +205,12 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FAutoCreateDB, FRttiType);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FIsToBePersisted, FRttiType);
 end;
 
-function TioTable.GetAutoCreateDB: Boolean;
+function TioTable.IsToBePersisted: Boolean;
 begin
-  Result := FAutoCreateDB;
+  Result := FIsToBePersisted;
 end;
 
 function TioTable.GetTrueClass: IioTrueClass;

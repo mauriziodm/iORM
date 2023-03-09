@@ -101,7 +101,7 @@ type
     function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
-    function GetAutoCreateDB: Boolean;
+    function IsToBePersisted: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
     // IndexList

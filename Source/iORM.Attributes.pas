@@ -150,13 +150,11 @@ type
   // Skip attribute
   ioSkip = class(TioCustomAttribute)
   end;
-
   ioTransient = ioSkip;
 
   // ID attribute
   ioID = class(TioCustomAttribute)
   end;
-
   ioOID = ioID; // Deprecated
 
   // FieldName attribute
@@ -326,7 +324,15 @@ type
     property TableName: String read FTableName;
     property MapMode: TioMapModeType read FMapMode;
   end;
-  ioTable = ioEntity;
+
+  // NotPersistedEntity attribute
+  ioNotPersistedEntity = class(TioCustomAttribute)
+  strict private
+    FMapMode: TioMapModeType;
+  public
+    constructor Create(const AMapMode: TioMapModeType = DEFAULT_MAP_MODE);
+    property MapMode: TioMapModeType read FMapMode;
+  end;
 
   // KeyGeneratorName attribute
   ioKeyGenerator = class(TioCustomStringAttribute)
@@ -380,10 +386,6 @@ type
     property CommaSepFieldList: String read FCommaSepFieldList write FCommaSepFieldList;
     property IndexOrientation: TioIndexOrientation read FIndexOrientation;
     property Unique: Boolean read FUnique;
-  end;
-
-  // KeyGeneratorName attribute
-  ioDisableAutoCreateOnDB = class(TioCustomAttribute)
   end;
 
   // DIC - diRegister attribute (register the class as is, without interfaces)
@@ -471,7 +473,7 @@ type
 implementation
 
 uses
-  iORM.Utilities;
+  iORM.Utilities, System.SysUtils, iORM.Exceptions, iORM.Abstraction, iORM;
 
 { TioStringAttribute }
 
@@ -544,7 +546,7 @@ end;
 
 constructor ioEntity.Create(const ATableName: String; const AMapMode: TioMapModeType);
 begin
-  FTableName := ATableName;
+  FTableName := ATableName.Trim;
   FMapMode := AMapMode;
 end;
 
@@ -695,6 +697,13 @@ end;
 constructor ioTrueClass.Create(const ATrueClassMode: TioTrueClassMode);
 begin
   FTrueClassMode := ATrueClassMode;
+end;
+
+{ ioNotPersistedEntity }
+
+constructor ioNotPersistedEntity.Create(const AMapMode: TioMapModeType);
+begin
+  FMapMode := AMapMode;
 end;
 
 end.

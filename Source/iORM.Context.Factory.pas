@@ -261,7 +261,7 @@ begin
   LRttiType := LRttiContext.GetType(AClassRef).AsInstance;
   // Get the table
   LTable := Self.Table(LRttiType);
-  // Create the context
+  // Create the map
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
 end;
 
@@ -576,7 +576,7 @@ var
   LGroupBy: IioGroupBy;
   LMapMode: TioMapModeType;
   LIndexList: TioIndexList;
-  LAutoCreateDB: Boolean;
+  LIsToBePersisted: Boolean;
 begin
   try
     // Prop Init
@@ -589,7 +589,7 @@ begin
     LGroupBy := nil;
     LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
-    LAutoCreateDB := True;
+    LIsToBePersisted := False;
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
@@ -598,6 +598,12 @@ begin
         if not ioEntity(LAttr).TableName.IsEmpty then
           LTableName := ioEntity(LAttr).TableName;
         LMapMode := ioEntity(LAttr).MapMode;
+        LIsToBePersisted := True;
+      end;
+      if (LAttr is ioNotPersistedEntity) then
+      begin
+        LMapMode := ioNotPersistedEntity(LAttr).MapMode;
+        LIsToBePersisted := False;
       end;
       if LAttr is ioKeyGenerator then
         LKeyGenerator := ioKeyGenerator(LAttr).Value;
@@ -607,8 +613,6 @@ begin
         LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
       if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
         LGroupBy := Self.GroupBy(ioGroupBy(LAttr).Value);
-      if LAttr is ioDisableAutoCreateOnDB then
-        LAutoCreateDB := False;
       // TrueClass attribute
       if LAttr is ioTrueClass then
         LTrueClass.Mode := ioTrueClass(LAttr).TrueClassMode;
@@ -621,7 +625,7 @@ begin
       end;
     end;
     // Create result Properties object
-    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, LAutoCreateDB, Typ);
+    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, LIsToBePersisted, Typ);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);
