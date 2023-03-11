@@ -1334,7 +1334,7 @@ begin
   if not AFullPathPropName.IsEmpty then
   begin
     LMidPathProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
-    // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
+    // If it is not the last property of the path then it must have a  BelongsTo, HasOne or EmbeddedHasOne relationship
     if not(LMidPathProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
       raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
         [AOutObj.ClassName, LPropName]));

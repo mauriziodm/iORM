@@ -506,8 +506,10 @@ var
       end;
 
       // Automatic relation detection (only for class or interface member type)
-      if (not ATransientAsDefault) and (not LMember_Transient) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
-        (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
+      // NB: Se la proprietà corrente è una NotPersistedEntity entra anche se è marcata con [ioSkip] perchè al sistema di binding serve
+      if (not ATransientAsDefault) and (TioUtilities.HasAttribute<ioNotPersistedEntity>(LMember_FieldValueType) or not LMember_Transient)
+        and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone)
+        and (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
       begin
         // HasMany relation autodetect
         LMember_RelationChildTypeName := TioDuckTypedFactory.TryGetHasManyRelationChildTypeName(LMember_FieldValueType);

@@ -28,8 +28,8 @@ begin
     io.StartTransaction;
     try
       CreatePizzas;
-//      CreateRealCustomers;
-//      CreateOtherCustomers;
+      CreateRealCustomers;
+      CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except
@@ -134,41 +134,29 @@ begin
   // First order
   LOrder := TOrder.Create;
   LOrder.OrderDate := Date;
-  LOrder.Customer := TCustomer.Create;
+  LOrder.Customer := io.LoadObject<TCustomer>(1);
   LOrder.Note := 'Well done';
   LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 3) );
   LOrder.Rows.Add( TOrderRow.Create(2, 'Capricciosa pizza', 7, 2) );
   LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
   io.Persist(LOrder);
   FreeAndnil(LOrder);
-
-
-//  // First order
-//  LOrder := TOrder.Create;
-//  LOrder.OrderDate := Date;
-//  LOrder.Customer := io.LoadObject<TCustomer>(1);
-//  LOrder.Note := 'Well done';
-//  LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 3) );
-//  LOrder.Rows.Add( TOrderRow.Create(2, 'Capricciosa pizza', 7, 2) );
-//  LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
-//  io.Persist(LOrder);
-//  FreeAndnil(LOrder);
-//  // Second order
-//  LOrder := TOrder.Create;
-//  LOrder.OrderDate := Date;
-//  LOrder.Customer := io.LoadObject<TCustomer>(2);
-//  LOrder.Note := 'Double cheese please';
-//  LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 1) );
-//  LOrder.Rows.Add( TOrderRow.Create(2, 'Pepperoni pizza', 6.5, 1) );
-//  io.Persist(LOrder);
-//  FreeAndnil(LOrder);
-//  // Third order
-//  LOrder := TOrder.Create;
-//  LOrder.OrderDate := Date;
-//  LOrder.Customer := io.LoadObject<TCustomer>(3);
-//  LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
-//  io.Persist(LOrder);
-//  FreeAndnil(LOrder);
+  // Second order
+  LOrder := TOrder.Create;
+  LOrder.OrderDate := Date;
+  LOrder.Customer := io.LoadObject<TCustomer>(2);
+  LOrder.Note := 'Double cheese please';
+  LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 1) );
+  LOrder.Rows.Add( TOrderRow.Create(2, 'Pepperoni pizza', 6.5, 1) );
+  io.Persist(LOrder);
+  FreeAndnil(LOrder);
+  // Third order
+  LOrder := TOrder.Create;
+  LOrder.OrderDate := Date;
+  LOrder.Customer := io.LoadObject<TCustomer>(3);
+  LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
+  io.Persist(LOrder);
+  FreeAndnil(LOrder);
 end;
 
 end.

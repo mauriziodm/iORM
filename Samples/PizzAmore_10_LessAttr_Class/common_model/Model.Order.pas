@@ -12,7 +12,6 @@ type
   private
     FID: Integer;
     FOrderDate: TDate;
-    [ioSkip]
     FCustomer: TCustomer;
     FRows: TObjectList<TOrderRow>;
     FNote: String;
