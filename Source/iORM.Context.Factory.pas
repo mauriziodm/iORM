@@ -97,7 +97,7 @@ var
 begin
   // If the MasterProperty is of a class type (not an interface) then check if it has the "ioEntity" attribute
   if AMasterPropertyType.IsInstance then
-    Result := TioUtilities.HasAttribute<ioEntity>(AMasterPropertyType)
+    Result := TioUtilities.isEntityType(AMasterPropertyType)
   else
   // else if it isn't a class (so it is an interface) then use die DIC to verify if there are some
   //  class (entity) registered on it
@@ -598,7 +598,7 @@ begin
       end;
       if (LAttr is ioNotPersistedEntity) then
       begin
-        LTableName := NOT_PERSISTED_ENTITY_TABLE_NAME;
+        LTableName := ioNotPersistedEntity(LAttr).TableName;
         LMapMode := ioNotPersistedEntity(LAttr).MapMode;
       end;
       if LAttr is ioKeyGenerator then

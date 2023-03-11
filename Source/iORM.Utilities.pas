@@ -71,9 +71,9 @@ type
     class function EnumToString<T>(const AEnumValue:T): String;
     class function GetThreadID: TThreadID; static;
     class function ExtractItemRttiType<T>: TRttiType;
-    class function TryGetMemberAttribute<T: class>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
-    class function HasAttribute<T: TCustomAttribute>(ARTTIType: TRttiType): boolean; static;
-    class function HasAttributes<T1, T2: TCustomAttribute>(ARTTIType: TRttiType): boolean; static;
+    class function TryGetMemberAttribute<T: class>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
+    class function HasAttribute<T: TCustomAttribute>(const ARTTIType: TRttiType): boolean; static;
+    class function HasAttributes<T1, T2: TCustomAttribute>(const ARTTIType: TRttiType): boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class function IsList(const AObj: TObject): Boolean;
     class procedure ClearList(const AList: TObject);
@@ -86,6 +86,9 @@ type
     class function GetFarAncestorEntityWithSameTableAndConnection(AStartRttiInstanceType: TRttiInstanceType): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
+    // Funzioni che implementano verifiche riguardo l'essere Entità
+    class function isEntityType(const ARTTIType: TRttiType): Boolean;
+    class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
   end;
 
 implementation
@@ -93,7 +96,8 @@ implementation
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
-  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel;
+  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel,
+  iORM.Attributes;
 
 { TioRttiUtilities }
 
@@ -332,7 +336,7 @@ begin
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
 end;
 
-class function TioUtilities.HasAttributes<T1, T2>(ARTTIType: TRttiType): boolean;
+class function TioUtilities.HasAttributes<T1, T2>(const ARTTIType: TRttiType): boolean;
 var
   LAttributes: TArray<TCustomAttribute>;
   LAttribute: TCustomAttribute;
@@ -344,7 +348,17 @@ begin
       Exit(true);
 end;
 
-class function TioUtilities.HasAttribute<T>(ARTTIType: TRttiType): boolean;
+class function TioUtilities.isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
+begin
+  Result := (AAttribute is ioEntity) or (AAttribute is ioNotPersistedEntity);
+end;
+
+class function TioUtilities.isEntityType(const ARTTIType: TRttiType): Boolean;
+begin
+  Result := HasAttributes<ioEntity, ioNotPersistedEntity>(ARTTIType);
+end;
+
+class function TioUtilities.HasAttribute<T>(const ARTTIType: TRttiType): boolean;
 var
   LAttributes: TArray<TCustomAttribute>;
   LAttribute: TCustomAttribute;
@@ -356,7 +370,7 @@ begin
       Exit(true);
 end;
 
-class function TioUtilities.TryGetMemberAttribute<T>(ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
+class function TioUtilities.TryGetMemberAttribute<T>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
 var
   LAttributes: TArray<TCustomAttribute>;
   LAttribute: TCustomAttribute;
@@ -527,7 +541,11 @@ begin
   for LAttribute in LAttributes do
   begin
     if LAttribute is ioEntity then
-      LTableName := ioEntity(LAttribute).TableName;
+      LTableName := ioEntity(LAttribute).TableName
+    else
+    if LAttribute is ioNotPersistedEntity then
+      LTableName := ioNotPersistedEntity(LAttribute).TableName
+    else
     if LAttribute is ioConnectionDefName then
       LConnectionDefName := ioConnectionDefName(LAttribute).Value;
   end;

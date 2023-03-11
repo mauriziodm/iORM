@@ -330,8 +330,11 @@ type
   ioNotPersistedEntity = class(TioCustomAttribute)
   strict private
     FMapMode: TioMapModeType;
+  private
+    function GetTableName: String;
   public
     constructor Create(const AMapMode: TioMapModeType = DEFAULT_MAP_MODE);
+    property TableName: String read GetTableName;
     property MapMode: TioMapModeType read FMapMode;
   end;
 
@@ -705,6 +708,11 @@ end;
 constructor ioNotPersistedEntity.Create(const AMapMode: TioMapModeType);
 begin
   FMapMode := AMapMode;
+end;
+
+function ioNotPersistedEntity.GetTableName: String;
+begin
+  Result := NOT_PERSISTED_ENTITY_TABLE_NAME;
 end;
 
 end.

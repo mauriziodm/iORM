@@ -23,7 +23,5 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TOrdersForm, OrdersForm);
-  Application.CreateForm(TOrderForm, OrderForm);
   Application.Run;
 end.

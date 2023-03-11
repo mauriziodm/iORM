@@ -53,6 +53,7 @@ type
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class procedure PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class function ObjectExists(const AContext: IioContext): Boolean;
+    class procedure _RaiseExceptionIfIsNotPersistedEntity(const AContext: IioCOntext; const AMethodName, ADBActionName, ADalNelSul: String);
   public
     class procedure StartTransaction(const AConnectionName: String); override;
     class procedure CommitTransaction(const AConnectionName: String); override;
@@ -184,8 +185,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, nil, '', '');
       // If the object is of a class mapped as NotPersisted then skip it
-      if not AContext.Map.GetTable.IsToBePersisted then
-        Continue;
+      _RaiseExceptionIfIsNotPersistedEntity(AContext, 'Delete', 'delete', 'from the');
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -251,8 +251,7 @@ begin
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
   LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, nil, '', '');
   // If the object is of a class mapped as NotPersisted then exit
-  if not LContext.Map.GetTable.IsToBePersisted then
-    Exit;
+  _RaiseExceptionIfIsNotPersistedEntity(LContext, 'DeleteObject', 'delete', 'from the');
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
@@ -340,8 +339,7 @@ begin
   // Get the Context
   LContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result, nil, '', '');
   // If the object is of a class mapped as NotPersisted then skip it
-  if not LContext.Map.GetTable.IsToBePersisted then
-    Exit;
+  _RaiseExceptionIfIsNotPersistedEntity(LContext, 'LoadObjectByClassOnly', 'load', 'from the');
   // Create & open query
   LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LContext);
   LQuery.Open;
@@ -421,8 +419,7 @@ begin
   // Create Context
   LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
   // If the object is of a class mapped as NotPersisted then exit
-  if not LContext.Map.GetTable.IsToBePersisted then
-    Exit;
+  _RaiseExceptionIfIsNotPersistedEntity(LContext, 'PersistObject', 'persist', 'into the');
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
@@ -643,8 +640,7 @@ begin
       // Get the Context for the current ResolverTypeName
       LContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '');
       // If the object is of a class mapped as NotPersisted then skip it
-      if not LContext.Map.GetTable.IsToBePersisted then
-        Continue;
+      _RaiseExceptionIfIsNotPersistedEntity(LContext, 'LoadDataSet', 'load', 'from the');
       // Start transaction
       LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -722,8 +718,7 @@ begin
       // Get the Context for the current ResolverTypeName
       LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
       // If the object is of a class mapped as NotPersisted then skip it
-      if not LOriginalContext.Map.GetTable.IsToBePersisted then
-        Continue;
+      _RaiseExceptionIfIsNotPersistedEntity(LOriginalContext, 'LoadList', 'load', 'from the');
       // Start transaction
       LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -788,8 +783,7 @@ begin
       // Get the Context for the current ResolverTypeName
       LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
       // If the object is of a class mapped as NotPersisted then skip it
-      if not LOriginalContext.Map.GetTable.IsToBePersisted then
-        Continue;
+      _RaiseExceptionIfIsNotPersistedEntity(LOriginalContext, 'LoadObject', 'load', 'from the');
       // Start transaction
       LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
       // Load the current class object is founded
@@ -819,6 +813,16 @@ begin
     AContext.ObjVersion := AContext.TransactionTimestamp
   else
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
+end;
+
+class procedure TioStrategyDB._RaiseExceptionIfIsNotPersistedEntity(const AContext: IioCOntext; const AMethodName, ADBActionName, ADalNelSul: String);
+begin
+  if AContext.Map.GetTable.IsNotPersistedEntity then
+    raise EioException.Create(ClassName, AMethodName, Format('Hi, I''m iORM and there is a problem.'+
+      #13#13'I''m trying to %s an object of class "%s" %s DB but this class is marked as a "NotPersistedEntity".'+
+      #13#13'Perhaps you confused the "[ioEntity]" and "[ioNotPersistedEntity]" attributes; or you may have declared a property of this type in '+
+      'another (master) class without decorating it (the property) with the "[ioSkip]" attribute to make it not persisted or loaded to/from the DB.',
+      [ADBActionName, AContext.Map.GetClassName, ADalNelSul]));
 end;
 
 { TioContextCache }

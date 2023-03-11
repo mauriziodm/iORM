@@ -154,7 +154,7 @@ type
     function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function GetMapMode: TioMapModeType;
     function GetRttiType: TRttiInstanceType;
-    function IsToBePersisted: Boolean;
+    function IsNotPersistedEntity: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
     // IndexList
@@ -205,9 +205,9 @@ begin
   Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
 end;
 
-function TioTable.IsToBePersisted: Boolean;
+function TioTable.IsNotPersistedEntity: Boolean;
 begin
-  Result := FSqlText <> NOT_PERSISTED_ENTITY_TABLE_NAME;
+  Result := (FSqlText = NOT_PERSISTED_ENTITY_TABLE_NAME);
 end;
 
 function TioTable.GetTrueClass: IioTrueClass;

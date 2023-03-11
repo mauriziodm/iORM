@@ -42,26 +42,27 @@ var
   // LSchemaTable: IioDBBuilderSchemaTable;
   LProperty: IioProperty;
   LDependentProperty: IioProperty;
-  LResolvedTypeList: IioList<string>;
-  LResolvedTypeName: String;
-  LResolvedTypeMap: IioMap;
+  LResolvedChildTypeList: IioList<string>;
+  LResolvedChildTypeName: String;
+  LResolvedChildTypeMap: IioMap;
   LSchemaTable: IioDBBuilderSchemaTable;
 begin
   for LProperty in AMap.GetProperties do
   begin
-    if (LProperty.GetRelationType in [rtNone, rtEmbeddedHasOne, rtEmbeddedHasMany]) or
-      (LProperty.GetMetadata_FKCreate = fkDoNotCreate) then
+    if (LProperty.GetRelationType in [rtNone, rtEmbeddedHasOne, rtEmbeddedHasMany]) or (LProperty.GetMetadata_FKCreate = fkDoNotCreate) then
       Continue;
     // Resolve the type and alias for the relation child type
-    LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LProperty.GetRelationChildTypeName,
+    LResolvedChildTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LProperty.GetRelationChildTypeName,
       LProperty.GetRelationChildTypeAlias, rmAllDistinctByConnectionAndTable);
     // Loop for all classes in the resolved type list
-    for LResolvedTypeName in LResolvedTypeList do
+    for LResolvedChildTypeName in LResolvedChildTypeList do
     begin
       // Get the map for the current ResolverTypeName (Child)
-      LResolvedTypeMap := TioMapContainer.GetMap(LResolvedTypeName);
+      LResolvedChildTypeMap := TioMapContainer.GetMap(LResolvedChildTypeName);
       // If FK is between two classes mapped to two different ConnectionDefNames then skip it
-      if AMap.GetTable.GetConnectionDefName <> LResolvedTypeMap.GetTable.GetConnectionDefName then
+      // If one of the twi classes involved in the FK is a NotPersisted entity then skip it
+      if AMap.GetTable.IsNotPersistedEntity or LResolvedChildTypeMap.GetTable.IsNotPersistedEntity
+      or (AMap.GetTable.GetConnectionDefName <> LResolvedChildTypeMap.GetTable.GetConnectionDefName) then
         Continue;
       if LProperty.GetRelationType in [rtBelongsTo] then
       begin
@@ -78,15 +79,15 @@ begin
         LDependentProperty := LProperty;
         LSchemaTable := ASchema.FindTable(AMap.GetTable.TableName);
         if LSchemaTable <> nil then
-          LSchemaTable.AddForeignKey(LResolvedTypeMap, AMap, LProperty, LDependentProperty.GetMetadata_FKOnDeleteAction,
+          LSchemaTable.AddForeignKey(LResolvedChildTypeMap, AMap, LProperty, LDependentProperty.GetMetadata_FKOnDeleteAction,
             LDependentProperty.GetMetadata_FKOnUpdateAction);
       end
       else
       begin
-        LDependentProperty := LResolvedTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
-        LSchemaTable := ASchema.FindTable(LResolvedTypeMap.GetTable.TableName);
+        LDependentProperty := LResolvedChildTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
+        LSchemaTable := ASchema.FindTable(LResolvedChildTypeMap.GetTable.TableName);
         if LSchemaTable <> nil then
-          LSchemaTable.AddForeignKey(AMap, LResolvedTypeMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
+          LSchemaTable.AddForeignKey(AMap, LResolvedChildTypeMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
             LProperty.GetMetadata_FKOnUpdateAction);
       end;
     end;
@@ -99,7 +100,7 @@ var
   LProperty: IioProperty;
 begin
   // Check if the class/table must be skipped or not
-  if not(AMap.GetTable.IsToBePersisted and AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName)) then
+  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName) then
     Exit;
   // Build or get the SchemaTable
   LSchemaTable := ASchema.FindOrCreateTable(AMap);
