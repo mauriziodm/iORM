@@ -7,8 +7,7 @@ uses
 
 type
 
-//  [ioEntity('CUSTOMERS')]
-  [ioNotPersistedEntity]
+  [ioEntity('CUSTOMERS')]
   TCustomer = class
   private
     FID: Integer;

@@ -896,7 +896,7 @@ end;
 
 function TioBSABaseDataSet._IsValidRecNo: Boolean;
 begin
-  Result := (RecNo > 0) and (RecNo < RecordCount);
+  Result := (RecNo > 0) and (RecNo <= RecordCount);
 end;
 
 function TioBSABaseDataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;

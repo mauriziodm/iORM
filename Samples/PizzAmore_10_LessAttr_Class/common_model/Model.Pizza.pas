@@ -15,7 +15,6 @@ uses
 type
 
   [ioEntity('PIZZAS')]
-//  [ioNotPersistedEntity]
   TPizza = class
   private
     FID: Integer;
