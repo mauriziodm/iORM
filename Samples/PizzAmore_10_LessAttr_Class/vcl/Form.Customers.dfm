@@ -218,6 +218,7 @@ object CustomersForm: TCustomersForm
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
+    Paging.PagingType = ptHardPaging
     Left = 56
     Top = 112
     object DSCustomersID: TIntegerField

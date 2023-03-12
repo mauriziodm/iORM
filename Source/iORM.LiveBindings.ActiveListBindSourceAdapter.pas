@@ -564,7 +564,7 @@ end;
 
 function TioActiveListBindSourceAdapter.GetItems(const AIndex: Integer): TObject;
 begin
-  Result := List.Items[AIndex] as TObject;
+  Result := List.Items[AIndex] as TObject
 end;
 
 function TioActiveListBindSourceAdapter.GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;

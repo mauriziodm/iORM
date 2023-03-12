@@ -125,6 +125,7 @@ type
     // Methods
     function Get_Version: String;
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
+    function _IsValidRecNo: Boolean;
   protected
     function CheckAdapter: Boolean;
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
@@ -893,6 +894,11 @@ begin
   DataConvert(AField, LTempValueBuffer, ABuffer, ANativeFormat);
 end;
 
+function TioBSABaseDataSet._IsValidRecNo: Boolean;
+begin
+  Result := (RecNo > 0) and (RecNo < RecordCount);
+end;
+
 function TioBSABaseDataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
 var
   LValue: TValue;
@@ -1159,14 +1165,21 @@ var
 begin
   FIsReadingBlobData := True;
   try
-    // Get the current record index (corrected by the situations)
-    LRecordIndex := FDataset.GetRecordIdx;
-    // Get Property, Object, Value
-    LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-    LObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
-    LValue := LProperty.GetValue(LObj);
-    // Get value as TStrings
-    LStrings := LValue.AsType<TStrings>;
+    // To avoid an out of range error...
+    if FDataSet._IsValidRecNo then
+    begin
+      // Get the current record index (corrected by the situations)
+      LRecordIndex := FDataset.GetRecordIdx;
+      // Get Property, Object, Value
+      LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+      LObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
+      LValue := LProperty.GetValue(LObj);
+      // Get value as TStrings
+      LStrings := LValue.AsType<TStrings>;
+    end
+    else
+      // Create an empty StringList
+      LStrings := TStringList.Create;
     // Encode
     LBytes := TEncoding.Unicode.GetBytes(LStrings.Text);
     // Write data from the record data to the stream
@@ -1221,15 +1234,22 @@ var
 begin
   FIsReadingBlobData := True;
   try
-    // Get the current record index (corrected by the situations)
-    LRecordIndex := FDataset.GetRecordIdx;
-    // Get Property, Object, Value (Value as StremableObj instance)
-    LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
-    LCurrRecObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
-    // At this point the property refer to a blob field (and to an Object) type then
-    // check if the Object is assigned and if it isn't clear
-    // the parameter
-    LStreamableObj := LProperty.GetValueAsObject(LCurrRecObj);
+    // To avoid an out of range error...
+    if FDataSet._IsValidRecNo then
+    begin
+      // Get the current record index (corrected by the situations)
+      LRecordIndex := FDataset.GetRecordIdx;
+      // Get Property, Object, Value (Value as StremableObj instance)
+      LProperty := FDataset.Map.GetProperties.GetPropertyByName(FField.FieldName);
+      LCurrRecObj := FDataset.GetActiveBindSourceAdapter.Items[LRecordIndex];
+      // At this point the property refer to a blob field (and to an Object) type then
+      // check if the Object is assigned and if it isn't clear
+      // the parameter
+      LStreamableObj := LProperty.GetValueAsObject(LCurrRecObj);
+    end
+    else
+      LStreamableObj := nil;
+
     if Assigned(LStreamableObj) then
     begin
       // Wrap the object into a DuckTypedStreamObject
@@ -1246,6 +1266,7 @@ begin
     end
     else
       Self.Clear;
+
     // At the top of the stream
     Self.Position := 0;
   finally

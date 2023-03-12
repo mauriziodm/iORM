@@ -171,6 +171,8 @@ object PizzasForm: TPizzasForm
   object DSPizzas: TioDataSetMaster
     AsDefault = True
     TypeName = 'TPizza'
+    WhereStr.Strings = (
+      '1=2')
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 80
     Top = 176
