@@ -458,9 +458,12 @@ var
   LCount: Integer;
   LPagingObj: TioCommonBSAPageManager;
 begin
-  LCount := io.RefTo(ATypeName, ATypeAlias)._Where(AWhere).Count;
   LPagingObj := AWhere.GetPagingObj as TioCommonBSAPageManager;
-  LPagingObj.SetItemCount(LCount);
+  if LPagingObj.Enabled then
+  begin
+    LCount := io.RefTo(ATypeName, ATypeAlias)._Where(AWhere).Count;
+    LPagingObj.SetItemCount(LCount);
+  end;
 end;
 
 class procedure TioCommonBSAPersistence._SyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
@@ -653,9 +656,7 @@ begin
       io.StartTransaction;
       try
         // Persist the main obj
-        // io.Persist(AActiveBindSourceAdapter.Current, False);
         if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
-          // Persist the main obj
           io._PersistInternal(AActiveBindSourceAdapter.Current, '', 0, False, LBSPersistenceClient.Persistence, '', '');
         // Delete objects referenced into the SmartDeleteSystem
         LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(

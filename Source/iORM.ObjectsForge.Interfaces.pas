@@ -401,11 +401,23 @@ begin
     // Note: If the property is an interface then artificially increment the RefCount to avoid premature destruction of the instance
     Result := AProperty.GetRelationChildObject(AContext.DataObject);
     Result := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).Cacheable.ToObject(Result);
-    if not Assigned(Result) then
-      raise EioException.Create(ClassName, 'LoadPropertyBelongsTo', Format('Houston we have a problem.' +
-        #13#13'I am loading an object of class "%s" with ID = %d.' +
-        #13#13'The property "%s" of type "%s", on which a "BelongsTo" relationship exists, contains the value %d but I cannot find any object of this type and with this ID on the DB.' +
-        #13#13'How could this have happened?', [AContext.GetTable.GetClassName, AContext.GetID, AProperty.GetName, AProperty.GetTypeName, LChildID]));
+// NB: Ho eliminato questa verifica perchè nel caso il child object fosse stata una NotPersistedEntity
+//      in pratica sarebbe sempre stato in errore nel caso per qualche strano motivo avesse cmq
+//      persistito l'ID del child object sul campo del master object (BelongsTo).
+//      Togliendo questo controllo funziona tutto bene, inoltre avevo già dubbi se lasciarlo o meno,
+//      in pratica la domanda era: nel caso la proprietà master (es: Customer di un Order) contenesse un ID
+//      che ora non c'è più sulla tabella client è meglio che mi sollevi l'eccezione oppure che continui
+//      senza fare nulla? In fondo garantire che non venga eliminato l'oggetto child è compito della foreign key
+//      quindi può andare bene anche se elimino questa verifica e così ricolvo anche il problema nel caso della
+//      NotPersistedEntity.
+//      Lascio cmq le righe commentate con queste note per ricordarmi di non rifarle in futuro
+// ---------------------------------------------------------------------------------------------------------------
+//    if not Assigned(Result) then
+//      raise EioException.Create(ClassName, 'LoadPropertyBelongsTo', Format('Houston we have a problem.' +
+//        #13#13'I am loading an object of class "%s" with ID = %d.' +
+//        #13#13'The property "%s" of type "%s", on which a "BelongsTo" relationship exists, contains the value %d but I cannot find any object of this type and with this ID on the DB.' +
+//        #13#13'How could this have happened?', [AContext.GetTable.GetClassName, AContext.GetID, AProperty.GetName, AProperty.GetTypeName, LChildID]));
+// ---------------------------------------------------------------------------------------------------------------
     if AProperty.IsInterface and Assigned(Result) then
       TioUtilities.ObjectAsIInterface(Result)._AddRef;
   end
