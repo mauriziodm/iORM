@@ -147,6 +147,7 @@ type
     procedure DoAfterScroll; override;
     function GetRecordIdx: Integer;
   public
+    function MoveBy(Distance: Integer): Integer; override;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
@@ -896,7 +897,10 @@ end;
 
 function TioBSABaseDataSet._IsValidRecNo: Boolean;
 begin
-  Result := (RecNo > 0) and (RecNo <= RecordCount);
+  if State = dsInsert then
+    Result := (RecNo > 0) and (RecNo < RecordCount)
+  else
+    Result := (RecNo > 0) and (RecNo <= RecordCount);
 end;
 
 function TioBSABaseDataSet.GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean;
@@ -1062,6 +1066,16 @@ function TioBSABaseDataSet.InternalRecordCount: Integer;
 begin
   // Get the RecordCount from the linked BindSourceAdapter
   Result := FBindSourceAdapter.ItemCount;
+end;
+
+function TioBSABaseDataSet.MoveBy(Distance: Integer): Integer;
+begin
+  // Blocca l'AutoInsert di un nuovo record/object quando si
+  //  si preme il bottone VK_DOWN mentre si è sull'ultimo record.
+  //  In questo modo si comporta come i BindSource ed evito
+  //  alcuni problemi
+  if (Distance < 0) or not FBindSourceAdapter.EOF then
+    inherited;
 end;
 
 { TSqlTimeStampUtils }
