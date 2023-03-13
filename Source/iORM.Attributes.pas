@@ -38,6 +38,9 @@ interface
 uses
   System.Rtti, iORM.CommonTypes;
 
+
+{$REGION '===== TYPES & CONSTANTS ====='}
+
 type
   // Class mapping types
   TioMapModeType = (mmHybrid, mmProperties, mmFields);
@@ -50,6 +53,7 @@ const
   DEFAULT_TRUE_CLASS_MODE = tcSmart;
 
   NOT_PERSISTED_ENTITY_TABLE_NAME = '___NOT_PERSISTED___';
+
 type
   // Relation types
   TioRelationType = (rtNone, rtBelongsTo, rtHasMany, rtHasOne, rtEmbeddedHasMany, rtEmbeddedHasOne);
@@ -60,10 +64,10 @@ type
 
   // Join types
   TioJoinType = (jtInner, jtCross, jtLeftOuter, jtRightOuter, jtFullOuter);
+{$ENDREGION} // END OF TYPES & CONSTANTS
 
-  // ===========================================================================
-  // START BASE ATTRIBUTES
-  // ---------------------------------------------------------------------------
+
+{$REGION '===== BASE ATTRIBUTESS ====='}
 
   // Base simple attribute
   TioCustomAttribute = class(TCustomAttribute)
@@ -136,19 +140,12 @@ type
   ioMarker = class(TioCustomStringAttribute)
   end;
 
-  // ---------------------------------------------------------------------------
-  // END BASE ATTRIBUTES
-  // ===========================================================================
+{$ENDREGION} // END OF BASE ATTRIBUTES
 
 
+{$REGION '===== PROPERTY ATTRIBUTES ====='}
 
-
-
-  // ===========================================================================
-  // START PROPERTY ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // Skip attribute
+  // Skip the property when mapping the class
   ioSkip = class(TioCustomAttribute)
   end;
   ioTransient = ioSkip;
@@ -263,30 +260,6 @@ type
     property OnUpdateAction: TioFKAction read FOnUpdateAction;
   end;
 
-  // Relation BelongsTo attribute
-  ioBelongsTo = class(TioCustomRelationAttribute)
-  end;
-
-  // Relation HasMany attribute
-  ioHasMany = class(TioCustomRelationAttribute)
-  strict private
-    FChildPropertyName: String;
-  public
-    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String); overload;
-    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String); overload;
-    constructor Create(const AChildTypeName, AChildPropertyName: String); overload;
-    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String); overload;
-    constructor Create(AIID: TGUID; const AChildPropertyName: String); overload;
-    property ChildPropertyName: String read FChildPropertyName;
-  end;
-
-  // Disable automatic detection for HasMany relation(s)
-  ioDisableRelationAutodetect = class(TioCustomAttribute);
-
-  // Relation BelongsTo attribute
-  ioHasOne = class(ioHasMany)
-  end;
-
   // LazyLoad attribute
   ioLazyLoad = class(TioCustomAttribute)
   end;
@@ -304,18 +277,13 @@ type
   // TypeAlias attribute
   ioTypeAlias = class(TioCustomStringAttribute)
   end;
-  // ---------------------------------------------------------------------------
-  // END PROPERTY ATTRIBUTES
-  // ===========================================================================
+
+{$ENDREGION} // END OF PROPERTY ATTRIBUTES
 
 
+{$REGION '===== CLASS ATTRIBUTES ====='}
 
-
-  // ===========================================================================
-  // START CLASS ATTRIBUTES
-  // ---------------------------------------------------------------------------
-
-  // Entity attribute
+  // Map the class as an entity to be persisted
   ioEntity = class(TioCustomAttribute)
   strict private
     FTableName: String;
@@ -326,7 +294,7 @@ type
     property MapMode: TioMapModeType read FMapMode;
   end;
 
-  // NotPersistedEntity attribute
+  // Map the class as an entity NOT to be persisted
   ioNotPersistedEntity = class(TioCustomAttribute)
   strict private
     FMapMode: TioMapModeType;
@@ -338,17 +306,16 @@ type
     property MapMode: TioMapModeType read FMapMode;
   end;
 
-  // KeyGeneratorName attribute
+  // Set the name of the generator/sequence for the table (on the DB) related to this class
   ioKeyGenerator = class(TioCustomStringAttribute)
   end;
-
   ioKeySequence = ioKeyGenerator;
 
-  // ConnectionDefName attribute
+  // Link the class/entity to a specific connection
   ioConnectionDefName = class(TioCustomStringAttribute)
   end;
 
-  // TrueClass mode
+  // Set the TrueClass mode for the class
   ioTrueClass = class(TioCustomAttribute)
   strict private
     FTrueClassMode: TioTrueClassMode;
@@ -357,11 +324,11 @@ type
     property TrueClassMode: TioTrueClassMode read FTrueClassMode;
   end;
 
-  // GroupBy
+  // Set the GroupBy info for the class
   ioGroupBy = class(TioCustomStringAttribute)
   end;
 
-  // Join attribute
+  // Set the join info for the class
   ioJoin = class(TioCustomAttribute)
   strict private
     FJoinType: TioJoinType;
@@ -374,7 +341,7 @@ type
     property JoinCondition: String read FJoinCondition;
   end;
 
-  // Indexes attribute
+  // Add an index definition to the class map
   ioIndex = class(TioCustomAttribute)
   strict private
     FIndexName: String;
@@ -392,11 +359,53 @@ type
     property Unique: Boolean read FUnique;
   end;
 
-  // DIC - diRegister attribute (register the class as is, without interfaces)
+{$ENDREGION} // END OF CLASS ATTRIBUTES
+
+
+{$REGION '===== RELATION ATTRIBUTES ====='}
+
+  // Disable automatic detection for HasMany relation(s)
+  ioDisableRelationAutodetect = class(TioCustomAttribute);
+
+  // Relation BelongsTo attribute
+  ioBelongsTo = class(TioCustomRelationAttribute)
+  end;
+
+  // Relation HasMany attribute
+  ioHasMany = class(TioCustomRelationAttribute)
+  strict private
+    FChildPropertyName: String;
+  public
+    constructor Create(const AChildClassRef: TioClassRef; const AChildPropertyName: String); overload;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName: String); overload;
+    constructor Create(AIID: TGUID; const AChildTypeAlias, AChildPropertyName: String); overload;
+    constructor Create(AIID: TGUID; const AChildPropertyName: String); overload;
+    property ChildPropertyName: String read FChildPropertyName;
+  end;
+
+  // Relation BelongsTo attribute
+  ioHasOne = class(ioHasMany)
+  end;
+
+  // EmbeddedHasMany attribute
+  ioEmbeddedHasMany = class(TioCustomRelationAttribute)
+  end;
+
+  // EmbeddedHasOne attribute
+  ioEmbeddedHasOne = class(TioCustomRelationAttribute)
+  end;
+
+{$ENDREGION} // END OF EMBEDDED ATTRIBUTES
+
+
+{$REGION '===== DEPENDENCY INJECTION ATTRIBUTES ====='}
+
+  // Register the class as is, without interfaces
   diRegister = class(TioCustomAttribute)
   end;
 
-  // DIC - diImplements attribute
+  // Register the class as implementer of the AIID interface
   diImplements = class(TioCustomAttribute)
   strict private
     FIID: TGUID;
@@ -407,56 +416,38 @@ type
     property Alias: String read FAlias;
   end;
 
-  // DIC - diAsSingleton diDoNotRegisterAsInterfacedEntity
+  // Disable the autoregistration as interfaced entity of the class
   diDoNotRegisterAsInterfacedEntity = class(TioCustomAttribute)
   end;
 
-  // DIC - diAsSingleton attribute
+  // Register the class as singleton life management
   diAsSingleton = class(TioCustomAttribute)
   end;
 
-  // DIC - diSimpleViewFor(TargetModelClassName) (register the calss as SimpleView for the TargetModelClassName)
+  // Register the class as SimpleView that implements the interface
   diSimpleViewImplements = class(diImplements)
   end;
+
+  // Register the class as SimpleView for the target model class name
   diSimpleViewFor = class(TioCustomForTargetModel)
   end;
 
-  // DIC - diViewFor(TargetModelClassName) (register the calss as View for the TargetModelClassName)
+  // Register the class as View (MVVM) that implements the interface
   diViewImplements = class(diImplements)
   end;
+
+  // Register the class as View (MVVM) for the target model class name
   diViewFor = class(TioCustomForTargetModel)
   end;
 
-  // DIC - diViewModelFor(TargetModelClassName) (register the calls as Views for the TargetModelClassName)
+  // Register the class as ViewModel (MVVM) that implements the interface
   diViewModelImplements = class(diImplements)
   end;
   diVMImplements = diViewModelImplements;
+
+  // Register the class as ViewModel (MVVM) for the target model class name
   diViewModelFor = class(TioCustomForTargetModel)
   end;
-  // ---------------------------------------------------------------------------
-  // END CLASS ATTRIBUTES
-  // ===========================================================================
-
-  // ===========================================================================
-  // START EMBEDDED ATTRIBUTES
-  // ---------------------------------------------------------------------------
-  // EmbeddedHasMany attribute
-  ioEmbeddedHasMany = class(TioCustomRelationAttribute)
-  end;
-
-  // EmbeddedHasOne attribute
-  ioEmbeddedHasOne = class(TioCustomRelationAttribute)
-  end;
-  // ---------------------------------------------------------------------------
-  // end EMBEDDED ATTRIBUTES
-  // ===========================================================================
-
-
-
-
-  // ===========================================================================
-  // START DEPENDENCY INJECTION ATTRIBUTES
-  // ---------------------------------------------------------------------------
 
   // ioInject attribute
   ioInject = class(TioCustomAttribute)
@@ -470,9 +461,8 @@ type
     property TypeAlias: String read FTypeAlias;
   end;
 
-  // ---------------------------------------------------------------------------
-  // END DEPENDENCY INJECTION ATTRIBUTES
-  // ===========================================================================
+{$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
+
 
 implementation
 
