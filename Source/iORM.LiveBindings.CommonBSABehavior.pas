@@ -603,7 +603,7 @@ var
   LRttiField: TRttiProperty;
   LValue: TValue;
 begin
-  // NB: If it's a property relative to the BindSource then raise an exception because
+  // NB: If it's a property relative to a BindSource virtual field then raise an exception because
   //      these type of properties are ReadOnly
   if FField.MemberName.StartsWith('%') then
     raise EioException.Create(Self.ClassName, 'SetValue',
