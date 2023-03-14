@@ -7,6 +7,9 @@ uses
 
 type
 
+  [ioBindEnumAsString(['Waiting', 'In progress', 'Ready', 'Delivered'])]
+  TOrderState = (osWaiting, osInProgress, osReady, osDelivered);
+
   [ioEntity('Orders')]
   TOrder = class
   private
@@ -15,6 +18,7 @@ type
     FCustomer: TCustomer;
     FRows: TObjectList<TOrderRow>;
     FNote: String;
+    FState: TOrderState;
     function GetGrandTotal: Currency;
   public
     constructor Create;
@@ -25,6 +29,7 @@ type
     property Customer: TCustomer read FCustomer write FCustomer;
     property Rows: TObjectList<TOrderRow> read FRows; // ReadOnly
     property Note: String read FNote write FNote;
+    property State: TOrderState read FState write FState;
     property GrandTotal: Currency read GetGrandTotal; // ReadOnly
   end;
 

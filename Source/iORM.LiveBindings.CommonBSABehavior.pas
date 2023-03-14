@@ -553,7 +553,7 @@ var
   LObject: TObject;
   LCtxt: TRTTIContext;
   LRttiType: TRttiType;
-  LRttiField: TRttiProperty;
+  LRttiProperty: TRttiProperty;
 begin
   // Do not inherit
   // LObject := FField.GetMemberObject; // original code
@@ -570,13 +570,13 @@ begin
   if LObject <> nil then
   begin
     LRttiType := LCtxt.GetType(LObject.ClassType);
-    LRttiField := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
-    if LRttiField <> nil then
+    LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+    if LRttiProperty <> nil then
     begin
-      if (LRttiField.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiField.PropertyType.Handle) then
-        Result := T(LRttiField.GetValue(LObject).GetReferenceToRawData^)
+      if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
+        Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^)
       else
-        Result := LRttiField.GetValue(LObject).AsType<T>
+        Result := LRttiProperty.GetValue(LObject).AsType<T>
     end
     else
       Result := TValue.Empty.AsType<T>;
@@ -600,7 +600,7 @@ var
   LObject: TObject;
   LCtxt: TRTTIContext;
   LRttiType: TRttiType;
-  LRttiField: TRttiProperty;
+  LRttiProperty: TRttiProperty;
   LValue: TValue;
 begin
   // NB: If it's a property relative to a BindSource virtual field then raise an exception because
@@ -615,16 +615,16 @@ begin
   if LObject <> nil then
   begin
     LRttiType := LCtxt.GetType(LObject.ClassType);
-    LRttiField := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
-    if LRttiField <> nil then
+    LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+    if LRttiProperty <> nil then
     begin
-      if (LRttiField.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiField.PropertyType.Handle) then
+      if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
       begin
-        TValue.Make(@AValue, LRttiField.PropertyType.Handle, LValue);
-        LRttiField.SetValue(LObject, LValue);
+        TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);
+        LRttiProperty.SetValue(LObject, LValue);
       end
       else
-        LRttiField.SetValue(LObject, TValue.From<T>(AValue));
+        LRttiProperty.SetValue(LObject, TValue.From<T>(AValue));
       // RecordChanged;
     end;
   end

@@ -82,6 +82,15 @@ type
     property Value: String read FValue;
   end;
 
+  // Base string array attribute
+  TioCustomStringArrayAttribute = class(TCustomAttribute)
+  strict private
+    FValues: TArray<string>;
+  public
+    constructor Create(const AValues: TArray<string> = []);
+    property Values: TArray<string> read FValues;
+  end;
+
   // Base integer attribute
   TioCustomIntegerAttribute = class(TCustomAttribute)
   strict private
@@ -134,10 +143,6 @@ type
     constructor Create(ATargetIID: TGUID; const AAlias: String = ''); overload;
     property TargetTypeName: String read FTargetTypeName;
     property TargetTypeAlias: String read FTargetTypeAlias;
-  end;
-
-  // Standard AttributeLabel
-  ioMarker = class(TioCustomStringAttribute)
   end;
 
 {$ENDREGION} // END OF BASE ATTRIBUTES
@@ -464,6 +469,19 @@ type
 {$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
 
 
+{$REGION '===== OTHER ATTRIBUTES ====='}
+
+  // Mark something (ex: a constructor) with a label
+  ioMarker = class(TioCustomStringAttribute)
+  end;
+
+  // Add to an enumerated type a list of string constants related to values
+  ioBindEnumAsString = class(TioCustomStringArrayAttribute)
+  end;
+
+{$ENDREGION} // END OTHER ATTRIBUTES
+
+
 implementation
 
 uses
@@ -703,6 +721,13 @@ end;
 function ioNotPersistedEntity.GetTableName: String;
 begin
   Result := NOT_PERSISTED_ENTITY_TABLE_NAME;
+end;
+
+{ TioCustomStringArrayAttribute }
+
+constructor TioCustomStringArrayAttribute.Create(const AValues: TArray<string>);
+begin
+  FValues := Values;
 end;
 
 end.

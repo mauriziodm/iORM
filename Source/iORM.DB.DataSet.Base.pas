@@ -1075,7 +1075,9 @@ begin
   //  In questo modo si comporta come i BindSource ed evito
   //  alcuni problemi
   if (Distance < 0) or not FBindSourceAdapter.EOF then
-    inherited;
+    Result := inherited
+  else
+    Result := 0;
 end;
 
 { TSqlTimeStampUtils }

@@ -69,6 +69,7 @@ type
     class function ExtractOID(const AObj: Tobject): Integer; overload; static;
     class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
     class function EnumToString<T>(const AEnumValue:T): String;
+    class function StringToEnum<T>(const AStringValue: String): T;
     class function GetThreadID: TThreadID; static;
     class function ExtractItemRttiType<T>: TRttiType;
     class function TryGetMemberAttribute<T: class>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
@@ -178,6 +179,11 @@ end;
 class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;
 begin
   Result := TRttiEnumerationType.GetName<T>(AEnumValue);
+end;
+
+class function TioUtilities.StringToEnum<T>(const AStringValue: String): T;
+begin
+  Result := TRttiEnumerationType.GetValue<T>(AStringValue);
 end;
 
 class function TioUtilities.ExtractItemRttiType<T>: TRttiType;

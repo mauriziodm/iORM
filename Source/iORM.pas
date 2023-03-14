@@ -123,7 +123,6 @@ type
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
-  ioMarker = iORM.Attributes.ioMarker;
 
   // Property attributes
   ioSkip = iORM.Attributes.ioSkip;
@@ -153,12 +152,6 @@ type
   ioLoadOnly = iORM.Attributes.ioLoadOnly;
   ioPersistOnly = iORM.Attributes.ioPersistOnly;
   ioTypeAlias = iORM.Attributes.ioTypeAlias;
-  ioBelongsTo = iORM.Attributes.ioBelongsTo;
-  ioHasMany = iORM.Attributes.ioHasMany;
-  ioHasOne = iORM.Attributes.ioHasOne;
-  ioEmbeddedHasMany = iORM.Attributes.ioEmbeddedHasMany;
-  ioEmbeddedHasOne = iORM.Attributes.ioEmbeddedHasOne;
-  ioDisableRelationAutodetect = iORM.Attributes.ioDisableRelationAutodetect;
 
   // Class attributes
   ioEntity = iORM.Attributes.ioEntity;
@@ -170,6 +163,14 @@ type
   ioGroupBy = iORM.Attributes.ioGroupBy;
   ioJoin = iORM.Attributes.ioJoin;
   ioIndex = iORM.Attributes.ioIndex;
+
+  // Relations attributes
+  ioBelongsTo = iORM.Attributes.ioBelongsTo;
+  ioHasMany = iORM.Attributes.ioHasMany;
+  ioHasOne = iORM.Attributes.ioHasOne;
+  ioEmbeddedHasMany = iORM.Attributes.ioEmbeddedHasMany;
+  ioEmbeddedHasOne = iORM.Attributes.ioEmbeddedHasOne;
+  ioDisableRelationAutodetect = iORM.Attributes.ioDisableRelationAutodetect;
 
   // Dependency Injection attributes
   diRegister = iORM.Attributes.diRegister;
@@ -183,6 +184,10 @@ type
   diDoNotRegisterAsInterfacedEntity = iORM.Attributes.diDoNotRegisterAsInterfacedEntity;
   diAsSingleton = iORM.Attributes.diAsSingleton;
   ioInject = iORM.Attributes.ioInject;
+
+  // Other attributes
+  ioMarker = iORM.Attributes.ioMarker;
+  ioBindEnumAsString = iORM.Attributes.ioBindEnumAsString;
 
 {$ENDREGION}
 
@@ -1328,6 +1333,7 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
 // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
+TioEnumContainer.Build;
 TioMapContainer.Build;
 
 end.
