@@ -36,7 +36,7 @@ unit iORM.Attributes;
 interface
 
 uses
-  System.Rtti, iORM.CommonTypes;
+  System.Rtti, iORM.CommonTypes, System.Classes;
 
 
 {$REGION '===== TYPES & CONSTANTS ====='}
@@ -85,10 +85,13 @@ type
   // Base string array attribute
   TioCustomStringArrayAttribute = class(TCustomAttribute)
   strict private
-    FValues: TArray<string>;
+    FValues: TStrings;
+    function GetIsEmpty: Boolean;
   public
-    constructor Create(const ACommaSepValues: String);
-    property Values: TArray<string> read FValues;
+    constructor Create(const ACommaSepValues: String = '');
+    destructor Destroy; override;
+    property IsEmpty: Boolean read GetIsEmpty;
+    property Values: TStrings read FValues;
   end;
 
   // Base integer attribute
@@ -729,9 +732,22 @@ constructor TioCustomStringArrayAttribute.Create(const ACommaSepValues: String);
 var
   I: Integer;
 begin
-  FValues := ACommaSepValues.Split([','], TStringSplitOptions.None);
-  for I := Low(FValues) to High(FValues) do
+  FValues := TStringList.Create(#0, ',', [soStrictDelimiter]);
+  FValues.DelimitedText := ACommaSepValues;
+  // Trim all lines
+  for I := 0 to FValues.Count-1 do
     FValues[I] := FValues[I].Trim;
+end;
+
+destructor TioCustomStringArrayAttribute.Destroy;
+begin
+  FValues.Free;
+  inherited;
+end;
+
+function TioCustomStringArrayAttribute.GetIsEmpty: Boolean;
+begin
+  Result := FValues.Count = 0;
 end;
 
 end.

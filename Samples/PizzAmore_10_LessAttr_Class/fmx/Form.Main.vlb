@@ -6,7 +6,7 @@ Visible=True
 Coordinates=230,658,70,33
 
 [BSOrders]
-Coordinates=1152,122,81,159
+Coordinates=1152,122,81,213
 Visible=True
 
 [BSPizzas]
@@ -23,7 +23,7 @@ Coordinates=759,331,73,33
 Coordinates=759,496,82,33
 
 []
-Coordinates=666,496,89,33
+Coordinates=1140,450,89,51
 
 [TabItemOrders]
 Coordinates=687,1089,87,33
@@ -344,4 +344,13 @@ Coordinates=19,52,73,33
 
 [acCustomerAdd]
 Coordinates=268,1,93,33
+
+[EditState]
+Coordinates=1000,340,58,51
+
+[ComboBoxState]
+Coordinates=1160,380,94,123
+
+[ListBoxState]
+Coordinates=980,440,116,177
 

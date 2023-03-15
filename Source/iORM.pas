@@ -40,7 +40,7 @@ uses
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
   iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
-  iORM.StdActions.Interfaces;
+  iORM.StdActions.Interfaces, iORM.Context.Container;
 
 const
   IORM_VERSION = 'iORM 2 (beta 1.8)';
@@ -196,6 +196,9 @@ type
   public
     // AnonymousTimer
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
+
+    // Fill a TStrings with an enumeration type values (the EnumerationType is decorated with the [ioEnumBindAsString] attribute
+    class procedure FillWithEnumStringValues<T>(const ATargetStrings: TStrings; const AAddBlank: Boolean);
 
     // Global VCProvider register
     class function DefaultVCProvider: TioViewContextProvider;
@@ -412,7 +415,7 @@ type
 implementation
 
 uses
-  System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Context.Container, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
+  System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
   iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
@@ -1171,6 +1174,11 @@ end;
 class function io.ExtractOID(const AIntfObj: IInterface): Integer;
 begin
   Result := TioUtilities.ExtractOID(AIntfObj);
+end;
+
+class procedure io.FillWithEnumStringValues<T>(const ATargetStrings: TStrings; const AAddBlank: Boolean);
+begin
+  TioEnumContainer.FillStrings<T>(ATargetStrings, AAddBlank);
 end;
 
 class function io.ExtractOID(const AObj: TObject): Integer;

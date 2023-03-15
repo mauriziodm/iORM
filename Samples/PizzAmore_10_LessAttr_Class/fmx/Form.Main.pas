@@ -9,7 +9,7 @@ uses
   iORM.Abstraction.FMX, iORM.DB.ConnectionDef, FMX.ListView.Types, FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, Data.Bind.GenData,
   iORM.Where.Interfaces, Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.GenData, FMX.Edit, FMX.Grid.Style, FMX.ScrollBox,
-  FMX.Grid, iORM.LiveBindings.PrototypeBindSource.Detail, Fmx.Bind.Grid, Data.Bind.Grid, iORM.StdActions.Fmx;
+  FMX.Grid, iORM.LiveBindings.PrototypeBindSource.Detail, Fmx.Bind.Grid, Data.Bind.Grid, iORM.StdActions.Fmx, FMX.ListBox;
 
 type
   TMainForm = class(TForm)
@@ -147,6 +147,12 @@ type
     acCustomerAdd: TAction;
     acOrderAdd: TAction;
     acPizzaAdd: TAction;
+    EditState: TEdit;
+    LinkControlToField18: TLinkControlToField;
+    ComboBoxState: TComboBox;
+    LinkFillControlToField1: TLinkFillControlToField;
+    ListBoxState: TListBox;
+    LinkFillControlToField2: TLinkFillControlToField;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
@@ -157,6 +163,7 @@ type
     procedure ListViewPizzasItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
+    procedure EditOrderNoteChangeTracking(Sender: TObject);
   private
     { Private declarations }
   public
@@ -175,6 +182,8 @@ uses
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  io.FillWithEnumStringValues<TOrderState>(ComboBoxState.Items, False);
+  io.FillWithEnumStringValues<TOrderState>(ListBoxState.Items, False);
   // Set TabControls
   TabControlMain.TabPosition := TTabPosition.None;
   TabControlMain.ActiveTab := TabItemStart;
@@ -214,6 +223,11 @@ begin
   BSOrders.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   BSOrders.Refresh;
   ADone := True;
+end;
+
+procedure TMainForm.EditOrderNoteChangeTracking(Sender: TObject);
+begin
+//  TLinkObservers.ControlChanged(Tcontrol(Sender));
 end;
 
 procedure TMainForm.ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);

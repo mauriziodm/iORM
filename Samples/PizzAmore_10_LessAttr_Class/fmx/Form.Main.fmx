@@ -24,7 +24,7 @@ object MainForm: TMainForm
       Size.Height = 607.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
@@ -40,7 +40,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = True
+        IsSelected = False
         Size.Width = 45.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 17
+          TabOrder = 21
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5192,7 +5192,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = False
+        IsSelected = True
         Size.Width = 51.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -5328,6 +5328,7 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           TextPrompt = 'note'
           StyledSettings = [Family, Style, FontColor]
+          OnChangeTracking = EditOrderNoteChangeTracking
         end
         object Label4: TLabel
           StyledSettings = [Family]
@@ -5489,6 +5490,52 @@ object MainForm: TMainForm
             Size.PlatformDefault = False
             StyledSettings = [Family, Style, FontColor]
           end
+        end
+        object EditState: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          TabOrder = 13
+          Text = 
+            'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+            'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+            'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+            'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+            'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+            'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+            ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+            'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+            ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+            ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+            'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+            'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+            'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+            'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+            'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+            'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+            'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+            'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+            'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+            'por, velit sit'
+          Position.X = 16.000000000000000000
+          Position.Y = 303.000000000000000000
+        end
+        object ComboBoxState: TComboBox
+          Position.X = 16.000000000000000000
+          Position.Y = 333.000000000000000000
+          TabOrder = 14
+        end
+        object ListBoxState: TListBox
+          Position.X = 16.000000000000000000
+          Position.Y = 363.000000000000000000
+          Size.Width = 114.000000000000000000
+          Size.Height = 147.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 15
+          DisableFocusEffect = True
+          DefaultItemStyles.ItemStyle = ''
+          DefaultItemStyles.GroupHeaderStyle = ''
+          DefaultItemStyles.GroupFooterStyle = ''
+          Viewport.Width = 110.000000000000000000
+          Viewport.Height = 143.000000000000000000
         end
       end
       object TabItemCustomer: TTabItem
@@ -6033,7 +6080,7 @@ object MainForm: TMainForm
       Size.Height = 607.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 0
       TabStop = False
       TabPosition = Top
@@ -6051,7 +6098,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family, Style]
-        IsSelected = False
+        IsSelected = True
         Size.Width = 90.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6124,7 +6171,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family]
-        IsSelected = True
+        IsSelected = False
         Size.Width = 127.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6666,6 +6713,35 @@ object MainForm: TMainForm
       Component = LabelCustomerPage
       ComponentProperty = 'Text'
     end
+    object LinkControlToField18: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSOrders
+      FieldName = 'State'
+      Control = EditState
+      Track = False
+    end
+    object LinkFillControlToField1: TLinkFillControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSOrders
+      FieldName = 'State'
+      Control = ComboBoxState
+      Track = True
+      AutoFill = True
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkFillControlToField2: TLinkFillControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSOrders
+      FieldName = 'State'
+      Control = ListBoxState
+      Track = True
+      AutoFill = True
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
   end
   object BSPizzas: TioPrototypeBindSourceMaster
     AutoActivate = True
@@ -6732,6 +6808,11 @@ object MainForm: TMainForm
       end
       item
         Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'State'
         Generator = 'LoremIpsum'
         ReadOnly = False
       end>

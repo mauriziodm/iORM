@@ -252,8 +252,14 @@ begin
 {$ENDIF}
           case LProperty.PropertyType.TypeKind of
             tkEnumeration:
+              // Boolean enumemeration type
               if SameText(LTypeName, 'boolean') or SameText(LTypeName, 'bool') then // 'bool' for C++
                 LCollectionEditorField := CreateRttiPropertyField<Boolean>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBoolean, APath+LProperty.Name)
+              // Enumeration type to bund as string (decorated with [ioBindEnumAsString] attribute)
+              else
+              if TioEnumContainer.Contains(TRttiEnumerationType(LProperty.PropertyType)) then
+                LCollectionEditorField := CreateRttiPropertyField<String>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath+LProperty.Name)
+              // Regural enumeration type
               else
                 case LProperty.PropertyType.TypeSize of
                 1:
@@ -573,8 +579,17 @@ begin
     LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
     if LRttiProperty <> nil then
     begin
+      // Enumeration type
       if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
-        Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^)
+      begin
+        // Enumeration binded as string
+        if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+          Result := TioEnumContainer.OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
+        // Enumeration binded as integer
+        else
+          Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^);
+      end
+      // Other types
       else
         Result := LRttiProperty.GetValue(LObject).AsType<T>
     end
@@ -618,11 +633,19 @@ begin
     LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
     if LRttiProperty <> nil then
     begin
+      // Enumeration type
       if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
       begin
-        TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);
+        // Enumeration binded as string
+        if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+          LValue := TioEnumContainer.StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), TValue.From<T>(AValue).AsString)
+        // Enumeration binded as integer
+        else
+          TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);
+        // Set the enumeration value
         LRttiProperty.SetValue(LObject, LValue);
       end
+      // Other types
       else
         LRttiProperty.SetValue(LObject, TValue.From<T>(AValue));
       // RecordChanged;

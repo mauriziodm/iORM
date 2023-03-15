@@ -97,21 +97,23 @@ type
   end;
 
   // Enumerated type string values container
-  TioEnumInternalContainerValues = TArray<string>;
-  PioEnumInternalContainerValues = ^TioEnumInternalContainerValues;
-  TioEnumInternalContainer = TDictionary<TRttiEnumerationType, PioEnumInternalContainerValues>;
+  TioEnumInternalContainer = TDictionary<TRttiEnumerationType, TStrings>;
   TioEnumContainer = class
     private
       class var FInternalContainer: TioEnumInternalContainer;
-      class procedure LoadValues(const ARttiEnumerationType: TRttiEnumerationType; const AEnumerationInternalContainerValuePointer: PioEnumInternalContainerValues);
+      class function LoadValues(const ARttiEnumerationType: TRttiEnumerationType): TStrings;
     public
       /// This method creates the internal container instance and initiates its initialization
       class procedure Build;
       class procedure CleanUp;
       class procedure Add(const ARttiEnumerationType: TRttiEnumerationType);
-      class function StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Integer;
-      class function OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Integer): String;
-      class procedure FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const AToFillStrings: TStrings; const AAddBlank: Boolean);
+      class function Contains(const ARttiEnumerationType: TRttiEnumerationType): Boolean;
+      class function StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Byte;
+      class function StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue;
+      class function OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): String;
+      class function OrdinalToStringAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): TValue;
+      class procedure FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings; const AAddBlank: Boolean); overload;
+      class procedure FillStrings<T>(const ATargetStrings: TStrings; const AAddBlank: Boolean); overload;
   end;
 
 implementation
@@ -503,12 +505,9 @@ end;
 { TioEnumerationContainer }
 
 class procedure TioEnumContainer.Add(const ARttiEnumerationType: TRttiEnumerationType);
-var
-  LEnumerationInternalContainerValue: TioEnumInternalContainerValues;
 begin
   // Fill the values as string then add it to the internal container
-  LoadValues(ARttiEnumerationType, @LEnumerationInternalContainerValue);
-  FInternalContainer.Add(ARttiEnumerationType, @LEnumerationInternalContainerValue);
+  FInternalContainer.Add(ARttiEnumerationType, LoadValues(ARttiEnumerationType));
 end;
 
 class procedure TioEnumContainer.Build;
@@ -521,65 +520,87 @@ begin
   FInternalContainer.Free;
 end;
 
-class function TioEnumContainer.OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Integer): String;
-var
-  LEnumerationInternalContainerValue: TioEnumInternalContainerValues;
+class function TioEnumContainer.Contains(const ARttiEnumerationType: TRttiEnumerationType): Boolean;
 begin
-  LEnumerationInternalContainerValue := TioEnumInternalContainerValues(FInternalContainer.Items[ARttiEnumerationType]);
+  Result := FInternalContainer.ContainsKey(ARttiEnumerationType);
+end;
+
+class function TioEnumContainer.OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): String;
+begin
   if AOrdinalValue <= ARttiEnumerationType.MaxValue then
-    Result := LEnumerationInternalContainerValue[AOrdinalValue]
+    Result := FInternalContainer.Items[ARttiEnumerationType][AOrdinalValue]
   else
-  raise EioException.Create(ClassName, 'OrdinalToString',
-    Format('Oops!!!#13#13''Ordinal value %d is out of range for %s enumerated type.', [AOrdinalValue, ARttiEnumerationType.Name]));
+    raise EioException.Create(ClassName, 'OrdinalToString',
+      Format('Ordinal value %d is out of range for %s enumerated type', [AOrdinalValue, ARttiEnumerationType.Name]));
 end;
 
-class function TioEnumContainer.StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Integer;
-var
-  LEnumerationInternalContainerValue: TioEnumInternalContainerValues;
-  I: Integer;
+class function TioEnumContainer.OrdinalToStringAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): TValue;
 begin
-  LEnumerationInternalContainerValue := TioEnumInternalContainerValues(FInternalContainer.Items[ARttiEnumerationType]);
-  for I := 0 to Length(LEnumerationInternalContainerValue)-1 do
-    if LEnumerationInternalContainerValue[I].Equals(AStringValue) then
-      Exit(I);
-  raise EioException.Create(ClassName, 'StringToOrdinal',
-    Format('Oops!!!#13#13''"%s" string value not found for %s enumerated type.', [AStringValue, ARttiEnumerationType.Name]));
+  Result := TValue.From<String>( OrdinalToString(ARttiEnumerationType, AOrdinalValue) );
 end;
 
-class procedure TioEnumContainer.FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const AToFillStrings: TStrings; const AAddBlank: Boolean);
+class function TioEnumContainer.StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Byte;
 var
-  LEnumerationInternalContainerValue: TioEnumInternalContainerValues;
-  I: Integer;
+  LIndexOf: Smallint;
 begin
-  LEnumerationInternalContainerValue := TioEnumInternalContainerValues(FInternalContainer.Items[ARttiEnumerationType]);
+  LIndexOf := FInternalContainer.Items[ARttiEnumerationType].IndexOf(AStringValue);
+  if LIndexOf > -1 then
+    Result := LIndexOf
+  else
+    raise EioException.Create(ClassName, 'StringToOrdinal',
+      Format('"%s" string value not found for %s enumerated type', [AStringValue, ARttiEnumerationType.Name]));
+end;
+
+class function TioEnumContainer.StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue;
+var
+  LOrdinalValue: Smallint;
+begin
+  LOrdinalValue := StringToOrdinal(ARttiEnumerationType, AStringValue);
+  TValue.Make(@LOrdinalValue, ARttiEnumerationType.Handle, Result);
+end;
+
+class procedure TioEnumContainer.FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings; const AAddBlank: Boolean);
+begin
+  ATargetStrings.Text := FInternalContainer.Items[ARttiEnumerationType].Text;
   if AAddBlank then
-    AToFillStrings.Add('');
-  for I := 0 to Length(LEnumerationInternalContainerValue)-1 do
-    AToFillStrings.Add(LEnumerationInternalContainerValue[I]);
+    ATargetStrings.Insert(0, '');
 end;
 
-class procedure TioEnumContainer.LoadValues(const ARttiEnumerationType: TRttiEnumerationType;
-  const AEnumerationInternalContainerValuePointer: PioEnumInternalContainerValues);
+class procedure TioEnumContainer.FillStrings<T>(const ATargetStrings: TStrings; const AAddBlank: Boolean);
 var
-  LBindEnumerationAsStringAttribute: ioBindEnumAsString;
-  LEnumerationInternalContainerValue: TioEnumInternalContainerValues;
+  LRttiType: TRttiType;
+begin
+  LRttiType := TioRttiFactory.GetRttiTypeByTypeInfo(TypeInfo(T));
+  if LRttiType is TRttiEnumerationType then
+    FillStrings(TRttiEnumerationType(LRttiType), ATargetStrings, AAddBlank)
+  else
+    raise EioException.Create(ClassName, 'FillStrings<T>', Format('"%s"(T) is not an enumerated type', [TioUtilities.GenericToString<T>]));
+end;
+
+class function TioEnumContainer.LoadValues(const ARttiEnumerationType: TRttiEnumerationType): TStrings;
+var
+  LBindEnumAsStringAttribute: ioBindEnumAsString;
   I: Integer;
 begin
-  LEnumerationInternalContainerValue := AEnumerationInternalContainerValuePointer^;
-  LBindEnumerationAsStringAttribute := ARttiEnumerationType.GetAttribute<ioBindEnumAsString>;
+  LBindEnumAsStringAttribute := ARttiEnumerationType.GetAttribute<ioBindEnumAsString>;
+  // Check the presence of the [ioBindEnumAsString] attribute
+  //  NB: Se arriva qui significa che dovrebbe esserci l'attributo  , se non c'è significa che c'è un errore
+  //       da qualche parte, molto probabilmente  su iORM
+  if not Assigned(LBindEnumAsStringAttribute) then
+    raise EioException.Create(ClassName, 'LoadValues',
+      Format('Attribute [ioBindEnumAsString] not found on type "%s".',
+        [ARttiEnumerationType.Name]));
   // Check the number of string values in the attribute
-  if (Length(LBindEnumerationAsStringAttribute.Values) > 0) and (Length(LBindEnumerationAsStringAttribute.Values) <> ARttiEnumerationType.MaxValue+1) then
+  if (LBindEnumAsStringAttribute.Values.Count > 0) and (LBindEnumAsStringAttribute.Values.Count <> ARttiEnumerationType.MaxValue+1) then
     raise EioException.Create(ClassName, 'LoadValues',
       Format('Attribute [ioBindEnumAsString] on type "%s", the number of elements specified in the parameter does not match the number of values allowed in the enumeration.',
         [ARttiEnumerationType.Name]));
   // Set the length of the array containing the string values
-  SetLength(LEnumerationInternalContainerValue, ARttiEnumerationType.MaxValue+1);
-  // Fill the values of the string arrays
-  for I := 0 to ARttiEnumerationType.MaxValue do
-    if Assigned(LBindEnumerationAsStringAttribute) then
-      LEnumerationInternalContainerValue[I] := LBindEnumerationAsStringAttribute.Values[I]
-    else
-      LEnumerationInternalContainerValue[I] := GetEnumName(ARttiEnumerationType.Handle, I);
+  Result := LBindEnumAsStringAttribute.Values;
+  // Fill the values if the TStrings of the attribute is empty
+  if LBindEnumAsStringAttribute.IsEmpty then
+    for I := 0 to ARttiEnumerationType.MaxValue do
+        Result.Add( GetEnumName(ARttiEnumerationType.Handle, I) );
 end;
 
 initialization
