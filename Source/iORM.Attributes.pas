@@ -87,7 +87,7 @@ type
   strict private
     FValues: TArray<string>;
   public
-    constructor Create(const AValues: TArray<string> = []);
+    constructor Create(const ACommaSepValues: String);
     property Values: TArray<string> read FValues;
   end;
 
@@ -725,9 +725,13 @@ end;
 
 { TioCustomStringArrayAttribute }
 
-constructor TioCustomStringArrayAttribute.Create(const AValues: TArray<string>);
+constructor TioCustomStringArrayAttribute.Create(const ACommaSepValues: String);
+var
+  I: Integer;
 begin
-  FValues := Values;
+  FValues := ACommaSepValues.Split([','], TStringSplitOptions.None);
+  for I := Low(FValues) to High(FValues) do
+    FValues[I] := FValues[I].Trim;
 end;
 
 end.
