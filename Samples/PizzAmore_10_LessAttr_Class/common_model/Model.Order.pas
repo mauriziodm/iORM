@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioBindEnumAsString('Waiting,   In progress,   Ready,   Delivered')]
+  [ioBindEnumAsString('Waiting, In progress, Ready, Delivered')]
   TOrderState = (osWaiting, osInProgress, osReady, osDelivered);
 
   [ioEntity('Orders')]

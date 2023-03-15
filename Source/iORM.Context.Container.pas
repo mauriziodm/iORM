@@ -569,10 +569,9 @@ begin
   LBindEnumerationAsStringAttribute := ARttiEnumerationType.GetAttribute<ioBindEnumAsString>;
   // Check the number of string values in the attribute
   if (Length(LBindEnumerationAsStringAttribute.Values) > 0) and (Length(LBindEnumerationAsStringAttribute.Values) <> ARttiEnumerationType.MaxValue+1) then
-    raise EioException.Create(ClassName, '_FillStringValuesByAttributeIfExists', Format('Hi, I''m iORM and there is a problem.'+
-      #13#13'It appears that you have decorated the enumerated type "%s" with the attribute "[ioBindEnumerationAsString]" '+
-      'but the number of elements entered into the attribute parameter does not match the number of values of the enumerated type.'+
-      #13#13'Please correct and try again.', [ARttiEnumerationType.Name]));
+    raise EioException.Create(ClassName, 'LoadValues',
+      Format('Attribute [ioBindEnumAsString] on type "%s", the number of elements specified in the parameter does not match the number of values allowed in the enumeration.',
+        [ARttiEnumerationType.Name]));
   // Set the length of the array containing the string values
   SetLength(LEnumerationInternalContainerValue, ARttiEnumerationType.MaxValue+1);
   // Fill the values of the string arrays
