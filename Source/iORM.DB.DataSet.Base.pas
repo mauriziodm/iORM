@@ -1416,14 +1416,14 @@ begin
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
     begin
       // Enumeration binded as string
-      if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+      if TioEnumsContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
       begin
-        Result := TioEnumContainer.OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
+        Result := TioEnumsContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
         if not (AField is TStringField) then
           raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
             #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as a string decorating it '+
-            '(the enum type) with the attribute [ioBindEnumAsString], however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TStringField".'+
-            #13#13'NOTE: if you prefer to bind this enumerated type as integer instead then you can remove the [ioBindEnumAsString] attribute from its declaration.' +
+            '(the enum type) with the attribute [ioEnumerated], however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TStringField".'+
+            #13#13'NOTE: if you prefer to bind this enumerated type as integer instead then you can remove the [ioEnumerated] attribute from its declaration.' +
             #13#13'Can you fix this for me?',
             [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name, AField.ClassName]));
       end
@@ -1435,7 +1435,7 @@ begin
           raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
             #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as integer, ' +
             'however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TIntegerField".'+
-            #13#13'NOTE: if you prefer to bind this enumerated type as a string instead, then you can decorate it with the [ioBindEnumAsString] attribute.' +
+            #13#13'NOTE: if you prefer to bind this enumerated type as a string instead, then you can decorate it with the [ioEnumerated] attribute.' +
             #13#13'Can you fix this for me?',
             [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name, AField.ClassName]));
       end;
@@ -1505,7 +1505,6 @@ end;
 class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
   LRttiProperty: TRttiProperty;
-  LValue: TValue;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
   //      these type of properties are ReadOnly
@@ -1521,8 +1520,8 @@ begin
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
     begin
       // Enumeration binded as string
-      if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-        LRttiProperty.SetValue(AObj, TioEnumContainer.StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
+      if TioEnumsContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+        LRttiProperty.SetValue(AObj, TioEnumsContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
       // Enumeration binded as integer
       else
         LRttiProperty.SetValue(AObj, TValue.FromOrdinal(LRttiProperty.PropertyType.Handle, AValue.AsOrdinal))

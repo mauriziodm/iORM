@@ -45,6 +45,7 @@ type
     class function GetRttiContext: TRttiContext;
     class function GetRttiTypeByTypeInfo(const ATypeInfo: Pointer): TRttiType;
     class function GetRttiTypeByClass(const AClass: TClass): TRttiType;
+    class function GetRttiTypeByTypeName(const AQualifiedTypeNme: String): TRttiType;
     class function GetRttiPropertyByTypeInfo(const ATypeInfo: Pointer; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;
     class function GetRttiPropertyByClass(const AClass: TClass; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;
   end;
@@ -76,6 +77,13 @@ begin
   Result := ARttiContext.GetType(ATypeInfo);
   if Result = nil then
     raise EioException.Create(ClassName, 'GetRttiTypeByTypeInfo', Format('RttiType not found for type "%s"', [TTypeInfo(ATypeInfo^).Name]));
+end;
+
+class function TioRttiFactory.GetRttiTypeByTypeName(const AQualifiedTypeNme: String): TRttiType;
+begin
+  Result := ARttiContext.FindType(AQualifiedTypeNme);
+  if Result = nil then
+    raise EioException.Create(ClassName, 'GetRttiTypeByTypeName', Format('RttiType not found for type "%s"', [AQualifiedTypeNme]));
 end;
 
 class function TioRttiFactory.GetRttiPropertyByClass(const AClass: TClass; const APropertyName: String; const ARaiseIfNotExists: Boolean): TRttiProperty;

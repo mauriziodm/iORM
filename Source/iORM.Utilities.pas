@@ -78,6 +78,7 @@ type
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class function IsList(const AObj: TObject): Boolean;
     class procedure ClearList(const AList: TObject);
+    class procedure TrimStrings(const AStrings: TStrings);
     class function CloneObject(const ASourceObj: TObject): TObject;
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
@@ -374,6 +375,15 @@ begin
   for LAttribute in LAttributes do
     if LAttribute is T then
       Exit(true);
+end;
+
+class procedure TioUtilities.TrimStrings(const AStrings: TStrings);
+var
+  I: Integer;
+begin
+  // Trim all lines
+  for I := 0 to AStrings.Count-1 do
+    AStrings[I] := AStrings[I].Trim;
 end;
 
 class function TioUtilities.TryGetMemberAttribute<T>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;

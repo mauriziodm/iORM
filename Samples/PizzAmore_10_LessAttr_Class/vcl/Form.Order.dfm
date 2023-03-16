@@ -269,7 +269,7 @@ object OrderForm: TOrderForm
       Left = 0
       Top = 0
       Width = 350
-      Height = 482
+      Height = 480
       Align = alClient
       AllowDelete = False
       AllowInsert = False
@@ -281,6 +281,7 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGridPizzasDblClick
+      ExplicitHeight = 482
       object DBTextName: TDBText
         Left = 99
         Top = 20

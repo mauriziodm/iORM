@@ -255,9 +255,9 @@ begin
               // Boolean enumemeration type
               if SameText(LTypeName, 'boolean') or SameText(LTypeName, 'bool') then // 'bool' for C++
                 LCollectionEditorField := CreateRttiPropertyField<Boolean>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBoolean, APath+LProperty.Name)
-              // Enumeration type to bund as string (decorated with [ioBindEnumAsString] attribute)
+              // Enumeration type to bund as string (decorated with [ioEnumerated] attribute)
               else
-              if TioEnumContainer.Contains(TRttiEnumerationType(LProperty.PropertyType)) then
+              if TioEnumsContainer._Contains(TRttiEnumerationType(LProperty.PropertyType)) then
                 LCollectionEditorField := CreateRttiPropertyField<String>(LProperty, ABindSourceAdapter, AGetMemberObject, mtText, APath+LProperty.Name)
               // Regural enumeration type
               else
@@ -583,8 +583,8 @@ begin
       if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
       begin
         // Enumeration binded as string
-        if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-          Result := TioEnumContainer.OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
+        if TioEnumsContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+          Result := TioEnumsContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
         // Enumeration binded as integer
         else
           Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^);
@@ -637,8 +637,8 @@ begin
       if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
       begin
         // Enumeration binded as string
-        if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-          LValue := TioEnumContainer.StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), TValue.From<T>(AValue).AsString)
+        if TioEnumsContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+          LValue := TioEnumsContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), TValue.From<T>(AValue).AsString)
         // Enumeration binded as integer
         else
           TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);

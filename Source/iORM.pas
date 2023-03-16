@@ -187,7 +187,7 @@ type
 
   // Other attributes
   ioMarker = iORM.Attributes.ioMarker;
-  ioBindEnumAsString = iORM.Attributes.ioBindEnumAsString;
+  ioEnumerated = iORM.Attributes.ioEnumerated;
 
 {$ENDREGION}
 
@@ -197,8 +197,8 @@ type
     // AnonymousTimer
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
 
-    // Fill a TStrings with an enumeration type values (the EnumerationType is decorated with the [ioEnumBindAsString] attribute
-    class procedure FillWithEnumStringValues<T>(const ATargetStrings: TStrings; const AAddBlank: Boolean);
+    // Registered enumerated types container
+    class function Enums: TioEnumsContainerRef;
 
     // Global VCProvider register
     class function DefaultVCProvider: TioViewContextProvider;
@@ -1152,6 +1152,11 @@ begin
   Result := Self.RefTo(ATypeName, ATypeAlias).Exists;
 end;
 
+class function io.Enums: TioEnumsContainerRef;
+begin
+  Result := TioEnumsContainer;
+end;
+
 class function io.Exists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;
 begin
   AWhere.TypeName := ATypeName;
@@ -1174,11 +1179,6 @@ end;
 class function io.ExtractOID(const AIntfObj: IInterface): Integer;
 begin
   Result := TioUtilities.ExtractOID(AIntfObj);
-end;
-
-class procedure io.FillWithEnumStringValues<T>(const ATargetStrings: TStrings; const AAddBlank: Boolean);
-begin
-  TioEnumContainer.FillStrings<T>(ATargetStrings, AAddBlank);
 end;
 
 class function io.ExtractOID(const AObj: TObject): Integer;
@@ -1341,7 +1341,7 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
 // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
-TioEnumContainer.Build;
-TioMapContainer.Build;
+TioEnumsContainer._Build;
+TioMapContainer._Build;
 
 end.

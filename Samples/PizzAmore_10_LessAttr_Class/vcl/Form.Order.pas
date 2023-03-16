@@ -98,10 +98,10 @@ uses
 
 procedure TOrderForm.FormCreate(Sender: TObject);
 begin
-  io.FillWithEnumStringValues<TOrderState>(DBComboBoxState.Items, False);
-  io.FillWithEnumStringValues<TOrderState>(DBListBoxState.Items, False);
-  io.FillWithEnumStringValues<TOrderState>(DBRadioGroupState.Items, False);
-  io.FillWithEnumStringValues<TOrderState>(DBRadioGroupState.Values, False);
+  io.Enums.FillStrings<TOrderState>(DBComboBoxState.Items);
+  io.Enums.FillStrings<TOrderState>(DBListBoxState.Items);
+  io.Enums.FillStrings<TOrderState>(DBRadioGroupState.Items);
+  io.Enums.FillStrings<TOrderState>(DBRadioGroupState.Values);
 end;
 
 procedure TOrderForm.FormShow(Sender: TObject);

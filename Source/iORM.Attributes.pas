@@ -82,18 +82,6 @@ type
     property Value: String read FValue;
   end;
 
-  // Base string array attribute
-  TioCustomStringArrayAttribute = class(TCustomAttribute)
-  strict private
-    FValues: TStrings;
-    function GetIsEmpty: Boolean;
-  public
-    constructor Create(const ACommaSepValues: String = '');
-    destructor Destroy; override;
-    property IsEmpty: Boolean read GetIsEmpty;
-    property Values: TStrings read FValues;
-  end;
-
   // Base integer attribute
   TioCustomIntegerAttribute = class(TCustomAttribute)
   strict private
@@ -479,7 +467,7 @@ type
   end;
 
   // Add to an enumerated type a list of string constants related to values
-  ioBindEnumAsString = class(TioCustomStringArrayAttribute)
+  ioEnumerated = class(TioCustomStringAttribute)
   end;
 
 {$ENDREGION} // END OTHER ATTRIBUTES
@@ -724,30 +712,6 @@ end;
 function ioNotPersistedEntity.GetTableName: String;
 begin
   Result := NOT_PERSISTED_ENTITY_TABLE_NAME;
-end;
-
-{ TioCustomStringArrayAttribute }
-
-constructor TioCustomStringArrayAttribute.Create(const ACommaSepValues: String);
-var
-  I: Integer;
-begin
-  FValues := TStringList.Create(#0, ',', [soStrictDelimiter]);
-  FValues.DelimitedText := ACommaSepValues;
-  // Trim all lines
-  for I := 0 to FValues.Count-1 do
-    FValues[I] := FValues[I].Trim;
-end;
-
-destructor TioCustomStringArrayAttribute.Destroy;
-begin
-  FValues.Free;
-  inherited;
-end;
-
-function TioCustomStringArrayAttribute.GetIsEmpty: Boolean;
-begin
-  Result := FValues.Count = 0;
 end;
 
 end.

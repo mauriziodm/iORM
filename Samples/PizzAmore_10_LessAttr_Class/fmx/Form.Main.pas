@@ -182,8 +182,8 @@ uses
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  io.FillWithEnumStringValues<TOrderState>(ComboBoxState.Items, False);
-  io.FillWithEnumStringValues<TOrderState>(ListBoxState.Items, False);
+  io.Enums.FillStrings<TOrderState>(ComboBoxState.Items);
+  io.Enums.FillStrings<TOrderState>(ListBoxState.Items);
   // Set TabControls
   TabControlMain.TabPosition := TTabPosition.None;
   TabControlMain.ActiveTab := TabItemStart;

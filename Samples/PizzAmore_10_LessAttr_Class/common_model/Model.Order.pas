@@ -7,8 +7,8 @@ uses
 
 type
 
-//  [ioBindEnumAsString('Waiting, In progress, Ready, Delivered')]
-  [ioBindEnumAsString]
+//  [ioEnumerated('Waiting, In progress, Ready, Delivered')]
+  [ioEnumerated]
   TOrderState = (osWaiting, osInProgress, osReady, osDelivered);
 
   [ioEntity('Orders')]
