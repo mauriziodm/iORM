@@ -552,11 +552,8 @@ begin
 end;
 
 class function TioEnumContainer.StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue;
-var
-  LOrdinalValue: Smallint;
 begin
-  LOrdinalValue := StringToOrdinal(ARttiEnumerationType, AStringValue);
-  TValue.Make(@LOrdinalValue, ARttiEnumerationType.Handle, Result);
+  Result := TValue.FromOrdinal(ARttiEnumerationType.Handle, StringToOrdinal(ARttiEnumerationType, AStringValue));
 end;
 
 class procedure TioEnumContainer.FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings; const AAddBlank: Boolean);

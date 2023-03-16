@@ -197,7 +197,7 @@ type
     class function _ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
     class function _GetValueForBSProp(const ADataSet: TioBSABaseDataSet; APropName: String): TValue;
   public
-    class function GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String): TValue;
+    class function GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AField: TField): TValue;
     class procedure SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
   end;
 
@@ -934,7 +934,7 @@ begin
     Exit;
   // Get Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and returns the value
-  LValue := TioFullPathPropertyReadWrite.GetValue(Self, FBindSourceAdapter.Items[LRecordIndex], Field.FieldName);
+  LValue := TioFullPathPropertyReadWrite.GetValue(Self, FBindSourceAdapter.Items[LRecordIndex], Field);
   // ---------- DATA FROM THE OBJECTS ----------
   // Move the value to the buffer
   case Field.DataType of
@@ -1399,17 +1399,51 @@ end;
 //  else
 //    Result := TValue.Empty;
 //end;
-class function TioFullPathPropertyReadWrite.GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String): TValue;
+class function TioFullPathPropertyReadWrite.GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AField: TField): TValue;
 var
-  LProperty: TRttiProperty;
+  LRttiProperty: TRttiProperty;
+  LFullPathPropName: String;
 begin
+  LFullPathPropName := AField.FieldName;
   // In case of special bind source related property
-  if AFullPathPropName.StartsWith('%') then
-    Result := _GetValueForBSProp(ADataSet, AFullPathPropName)
-  // In case of normal property of the current object (cirrent record)
+  if LFullPathPropName.StartsWith('%') then
+    Result := _GetValueForBSProp(ADataSet, LFullPathPropName)
+  // In case of normal property of the current object (current record)
   else
-  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-    Result := LProperty.GetValue(AObj)
+  if _ResolvePath(AObj, LRttiProperty, LFullPathPropName) then
+  begin
+    // Enumeration type
+    if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
+    begin
+      // Enumeration binded as string
+      if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+      begin
+        Result := TioEnumContainer.OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
+        if not (AField is TStringField) then
+          raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
+            #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as a string decorating it '+
+            '(the enum type) with the attribute [ioBindEnumAsString], however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TStringField".'+
+            #13#13'NOTE: if you prefer to bind this enumerated type as integer instead then you can remove the [ioBindEnumAsString] attribute from its declaration.' +
+            #13#13'Can you fix this for me?',
+            [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name, AField.ClassName]));
+      end
+      // Enumeration binded as integer
+      else
+      begin
+        Result := Byte(LRttiProperty.GetValue(AObj).GetReferenceToRawData^);
+        if not (AField is TIntegerField) then
+          raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
+            #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as integer, ' +
+            'however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TIntegerField".'+
+            #13#13'NOTE: if you prefer to bind this enumerated type as a string instead, then you can decorate it with the [ioBindEnumAsString] attribute.' +
+            #13#13'Can you fix this for me?',
+            [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name, AField.ClassName]));
+      end;
+    end
+    // Other types
+    else
+      Result := LRttiProperty.GetValue(AObj)
+  end
   // Else return an empty value
   else
     Result := TValue.Empty;
@@ -1470,7 +1504,8 @@ end;
 //end;
 class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
-  LProperty: TRttiProperty;
+  LRttiProperty: TRttiProperty;
+  LValue: TValue;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
   //      these type of properties are ReadOnly
@@ -1479,9 +1514,23 @@ begin
       Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".' +
       #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
       #13#13'Please, try to Assign the value to the DataSet property directly by code.', [AFullPathPropName]));
-
-  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-    LProperty.SetValue(AObj, AValue)
+  // In case of normal property of the current object (current record)
+  if _ResolvePath(AObj, LRttiProperty, AFullPathPropName) then
+  begin
+    // Enumeration type
+    if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
+    begin
+      // Enumeration binded as string
+      if TioEnumContainer.Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+        LRttiProperty.SetValue(AObj, TioEnumContainer.StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
+      // Enumeration binded as integer
+      else
+        LRttiProperty.SetValue(AObj, TValue.FromOrdinal(LRttiProperty.PropertyType.Handle, AValue.AsOrdinal))
+    end
+    // Other types
+    else
+      LRttiProperty.SetValue(AObj, AValue)
+  end
   else
     raise EioException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));

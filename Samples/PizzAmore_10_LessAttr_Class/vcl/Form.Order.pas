@@ -69,11 +69,17 @@ type
     acSelectPizza: TioBSSelectCurrent;
     ButtonDeleteRow: TSpeedButton;
     acDeleteRow: TDataSetDelete;
+    DBEditState: TDBEdit;
+    DBComboBoxState: TDBComboBox;
+    DBListBoxState: TDBListBox;
+    DBRadioGroupState: TDBRadioGroup;
+    DSOrderState: TStringField;
     procedure FormShow(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure DBCtrlGridPizzasDblClick(Sender: TObject);
     procedure acSelectCustomerExecute(Sender: TObject);
     procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -89,6 +95,14 @@ uses
   Model.Order, Model.OrderRow, Model.Pizza, Form.Customers;
 
 {$R *.dfm}
+
+procedure TOrderForm.FormCreate(Sender: TObject);
+begin
+  io.FillWithEnumStringValues<TOrderState>(DBComboBoxState.Items, False);
+  io.FillWithEnumStringValues<TOrderState>(DBListBoxState.Items, False);
+  io.FillWithEnumStringValues<TOrderState>(DBRadioGroupState.Items, False);
+  io.FillWithEnumStringValues<TOrderState>(DBRadioGroupState.Values, False);
+end;
 
 procedure TOrderForm.FormShow(Sender: TObject);
 begin

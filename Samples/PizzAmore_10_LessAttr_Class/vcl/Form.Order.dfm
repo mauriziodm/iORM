@@ -13,6 +13,7 @@ object OrderForm: TOrderForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
@@ -513,6 +514,52 @@ object OrderForm: TOrderForm
         Visible = True
       end>
   end
+  object DBEditState: TDBEdit
+    Left = 310
+    Top = 57
+    Width = 107
+    Height = 25
+    BorderStyle = bsNone
+    Color = clInactiveBorder
+    DataField = 'State'
+    DataSource = SourceOrder
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 11
+  end
+  object DBComboBoxState: TDBComboBox
+    Left = 244
+    Top = 296
+    Width = 145
+    Height = 23
+    DataField = 'State'
+    DataSource = SourceOrder
+    TabOrder = 12
+  end
+  object DBListBoxState: TDBListBox
+    Left = 244
+    Top = 325
+    Width = 145
+    Height = 84
+    DataField = 'State'
+    DataSource = SourceOrder
+    ItemHeight = 15
+    TabOrder = 13
+  end
+  object DBRadioGroupState: TDBRadioGroup
+    Left = 243
+    Top = 411
+    Width = 146
+    Height = 105
+    Caption = 'DBRadioGroupState'
+    DataField = 'State'
+    DataSource = SourceOrder
+    TabOrder = 14
+  end
   object DSPizzas: TioDataSetMaster
     AsDefault = False
     TypeName = 'TPizza'
@@ -563,6 +610,9 @@ object OrderForm: TOrderForm
     object DSOrderGrandTotal: TCurrencyField
       FieldName = 'GrandTotal'
     end
+    object DSOrderState: TStringField
+      FieldName = 'State'
+    end
   end
   object SourceOrder: TDataSource
     DataSet = DSOrder
@@ -570,6 +620,7 @@ object OrderForm: TOrderForm
     Top = 312
   end
   object DSCustomer: TioDataSetDetail
+    AsDefault = False
     MasterBindSource = DSOrder
     MasterPropertyName = 'Customer'
     Left = 56
@@ -597,6 +648,7 @@ object OrderForm: TOrderForm
     Top = 376
   end
   object DSRows: TioDataSetDetail
+    AsDefault = False
     MasterBindSource = DSOrder
     MasterPropertyName = 'Rows'
     OnReceiveSelectionCloneObject = False

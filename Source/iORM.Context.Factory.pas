@@ -377,125 +377,155 @@ var
       for LAttribute in LMember.GetAttributes do
       begin
         if LAttribute is ioOID then
-          LMember_IsID := True;
+          LMember_IsID := True
+        else
         if LAttribute is ioField then
         begin
           if not ioField(LAttribute).Value.IsEmpty then
             LMember_FieldName := ioField(LAttribute).Value;
           LMember_Transient := False;
-        end;
+        end
+        else
         if LAttribute is ioSkip then // Leave after ioField attribute detection
-          LMember_Transient := True;
+          LMember_Transient := True
+        else
         if LAttribute is ioTypeAlias then
-          LMember_TypeAlias := ioTypeAlias(LAttribute).Value;
+          LMember_TypeAlias := ioTypeAlias(LAttribute).Value
+        else
         if LAttribute is ioFieldType then
-          LMember_FieldType := ioFieldType(LAttribute).Value;
+          LMember_FieldType := ioFieldType(LAttribute).Value
+        else
         if LAttribute is ioLoadSql then
-          LMember_LoadSql := ioLoadSql(LAttribute).Value;
+          LMember_LoadSql := ioLoadSql(LAttribute).Value
+        else
         if LAttribute is ioLoadOnly then
-          LMember_LoadPersist := lpLoadOnly;
+          LMember_LoadPersist := lpLoadOnly
+        else
         if LAttribute is ioPersistOnly then
-          LMember_LoadPersist := lpPersistOnly;
+          LMember_LoadPersist := lpPersistOnly
+        else
         // Relations attributes
         if LAttribute is ioEmbeddedHasMany then
         begin
           LMember_RelationType := rtEmbeddedHasMany;
           LMember_RelationChildTypeName := ioEmbeddedHasMany(LAttribute).ChildTypeName;
           LMember_RelationChildTypeAlias := ioEmbeddedHasMany(LAttribute).ChildTypeAlias;
-        end;
+        end
+        else
         if LAttribute is ioEmbeddedHasOne then
         begin
           LMember_RelationType := rtEmbeddedHasOne;
           LMember_RelationChildTypeName := ioEmbeddedHasOne(LAttribute).ChildTypeName;
           LMember_RelationChildTypeAlias := ioEmbeddedHasOne(LAttribute).ChildTypeAlias;
-        end;
+        end
+        else
         if LAttribute is ioBelongsTo then
         begin
           LMember_RelationType := rtBelongsTo;
           LMember_RelationChildTypeName := ioBelongsTo(LAttribute).ChildTypeName;
           LMember_RelationChildTypeAlias := ioBelongsTo(LAttribute).ChildTypeAlias;
           LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
-        end;
+        end
+        else
         if LAttribute is ioHasOne then
         begin
           LMember_RelationType := rtHasOne;
           LMember_RelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
           LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
           LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
-        end;
+        end
+        else
         if LAttribute is ioHasMany then
         begin
           LMember_RelationType := rtHasMany;
           LMember_RelationChildTypeName := ioHasMany(LAttribute).ChildTypeName;
           LMember_RelationChildTypeAlias := ioHasMany(LAttribute).ChildTypeAlias;
           LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
-        end;
+        end
+        else
         if LAttribute is ioLazyLoad then
-          LMember_RelationChildLazyLoad := True;
+          LMember_RelationChildLazyLoad := True
+        else
         // Attribute to disable the relation auto detection
         if LAttribute is ioDisableRelationAutodetect then
-          LMember_RelationAutodetectEnabled := False;
+          LMember_RelationAutodetectEnabled := False
+        else
         // Indexes
         if LAttribute is ioIndex then
         begin
           if ioIndex(LAttribute).CommaSepFieldList.IsEmpty then // If the "ACommaSepFieldList" is empty then set the current property field name
             ioIndex(LAttribute).CommaSepFieldList := LMember_FieldName;
           ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
-        end;
+        end
+        else
         // Metadata Used by DBBuilder (M.M. 01/08/18)
         if LAttribute is ioNotNull then
-          LDB_FieldNotNull := True;
+          LDB_FieldNotNull := True
+        else
         if LAttribute is ioVarchar then
         begin
           LDB_FieldType := ioMdVarchar;
           LDB_FieldLength := ioVarchar(LAttribute).Length;
           LDB_FieldUnicode := ioVarchar(LAttribute).IsUnicode;
-        end;
+        end
+        else
         if LAttribute is ioChar then
         begin
           LDB_FieldType := ioMdChar;
           LDB_FieldLength := ioChar(LAttribute).Length;
           LDB_FieldUnicode := ioChar(LAttribute).IsUnicode;
-        end;
+        end
+        else
         if LAttribute is ioInteger then
         begin
           LDB_FieldType := ioMdInteger;
           LDB_FieldPrecision := ioInteger(LAttribute).Precision;
-        end;
+        end
+        else
         if LAttribute is ioFloat then
-          LDB_FieldType := ioMdFloat;
+          LDB_FieldType := ioMdFloat
+        else
         if LAttribute is ioDate then
-          LDB_FieldType := ioMdDate;
+          LDB_FieldType := ioMdDate
+        else
         if LAttribute is ioTime then
-          LDB_FieldType := ioMdTime;
+          LDB_FieldType := ioMdTime
+        else
         if LAttribute is ioDateTime then
-          LDB_FieldType := ioMdDateTime;
+          LDB_FieldType := ioMdDateTime
+        else
         if LAttribute is ioDecimal then
         begin
           LDB_FieldType := ioMdDecimal;
           LDB_FieldPrecision := ioDecimal(LAttribute).Precision;
           LDB_FieldScale := ioDecimal(LAttribute).Scale;
-        end;
+        end
+        else
         if LAttribute is ioNumeric then
         begin
           LDB_FieldType := ioMdNumeric;
           LDB_FieldPrecision := ioNumeric(LAttribute).Precision;
           LDB_FieldScale := ioNumeric(LAttribute).Scale;
-        end;
+        end
+        else
         if LAttribute is ioBoolean then
-          LDB_FieldType := ioMdBoolean;
+          LDB_FieldType := ioMdBoolean
+        else
         if LAttribute is ioBinary then
         begin
           LDB_FieldType := ioMdBinary;
-          LDB_FieldSubType := ioBinary(LAttribute).BinarySubType;
-        end;
+          LDB_FieldSubType := ioBinary(LAttribute).BinarySubType
+        end
+        else
         if LAttribute is ioFTCustom then
         begin
           LDB_FieldType := ioMdCustomFieldType;
           LDB_CustomFieldType := ioFTCustom(LAttribute).Value;
-        end;
+        end
+        else
         if LAttribute is ioDefault then
-          LDB_Default := ioDefault(LAttribute).Value;
+          LDB_Default := ioDefault(LAttribute).Value
+        else
         if LAttribute is ioForeignKey then
         begin
           LForeignKeyAttributeExists := True;
