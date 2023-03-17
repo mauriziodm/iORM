@@ -204,7 +204,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, System.SysUtils, iORM.Attributes,
+  iORM.Exceptions, System.SysUtils, System.TypInfo, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
   iORM.RttiContext.Factory, iORM;
@@ -1416,9 +1416,9 @@ begin
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
     begin
       // Enumeration binded as string
-      if TioEnumsContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+      if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
       begin
-        Result := TioEnumsContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
+        Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
         if not (AField is TStringField) then
           raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
             #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as a string decorating it '+
@@ -1520,8 +1520,8 @@ begin
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
     begin
       // Enumeration binded as string
-      if TioEnumsContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-        LRttiProperty.SetValue(AObj, TioEnumsContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
+      if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+        LRttiProperty.SetValue(AObj, TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
       // Enumeration binded as integer
       else
         LRttiProperty.SetValue(AObj, TValue.FromOrdinal(LRttiProperty.PropertyType.Handle, AValue.AsOrdinal))

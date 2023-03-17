@@ -63,10 +63,9 @@ type
   // for efficient ClassRef reference and is initializated at the start
   // of the application itself
   TioMapContainer = class
-  private
+  strict private
     class var FInternalContainer: TioMapContainerInstance;
     class var FAutodetectedHasManyRelationCollection: TList<IioProperty>;
-    class procedure _CleanUp;
     /// This method is the starting point from where iORM, at the start of the application,
     ///  begins to detect and register the classes (both the entities but not only the classes
     ///  that must only be registered in the Dependency Injection Container) to be able to perform its functions
@@ -84,6 +83,7 @@ type
   public
     /// This method creates the internal container instance and initiates its initialization
     class procedure _Build;
+    class procedure _CleanUp;
     class procedure AddClassRef(const AClassRef: TioClassRef);
     /// This function create and add (to the MapContainer) the TrueTypeVirtualMap for the base class map received as parameter
     ///  and return it as result
@@ -96,35 +96,45 @@ type
     class function GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
   end;
 
-  // Enumerated type string values container
-  TioEnumsContainerRef = class of TioEnumsContainer;
-  TioEnumsContainer = class
-  private
+  // Enumerated container
+  TioEnumContainer = class
+  strict private
     class var FInternalContainer: TObjectDictionary<TRttiEnumerationType, TStrings>;
-    class procedure _CleanUp; static;
     class procedure _LoadValuesByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String; const ATargetStrings: TStrings); static;
     class function _LoadValuesByAttribute(const ARttiEnumerationType: TRttiEnumerationType): TStrings; static;
-    class function _GetRttiEnumerationTypeByGeneric<T>: TRttiEnumerationType; static;
-    class function _GetRttiEnumerationTypeByTypeInfo(const ATypeInfo: PTypeInfo): TRttiEnumerationType; static;
-    class function _GetRttiEnumerationTypeByTypeName(const AQualifiedTypeName: String): TRttiEnumerationType; static;
-    class procedure _RaiseIfRttiEnumerationTypeAlreadyExists(const ARttiEnumerationType: TRttiEnumerationType); static;
-    class procedure _RaiseIfRttiEnumerationTypeDoesNotExists(const ARttiEnumerationType: TRttiEnumerationType); static;
   public
     // Internal use recommended
     class procedure _Build; static;
+    class procedure _CleanUp; static;
     class procedure _AddByAttribute(const ARttiEnumerationType: TRttiEnumerationType); static;
     class procedure _AddByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String); static;
-    class procedure _UpdateByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String); static;
     class function _Contains(const ARttiEnumerationType: TRttiEnumerationType): Boolean; static;
-    class function _StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Byte; static;
-    class function _StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue; static;
+    class procedure _FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings); static;
     class function _OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): String; static;
     class function _OrdinalToStringAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): TValue; static;
-    class procedure _FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings); static;
-    // External use
+    class procedure _Remove(const ARttiEnumerationType: TRttiEnumerationType); static;
+    class function _StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Byte; static;
+    class function _StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue; static;
+    class procedure _UpdateByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String); static;
+  end;
+
+  // Enumerated external item
+  TioEnumContainerExRef = class of TioEnumContainerEx;
+  TioEnumContainerEx = class
+  strict private
+    type TioEnumsContainerRaiseTrigger = (ecrtNone, ecrtExists, ecrtNotExists);
+    class function _GetRttiEnumerationTypeByGeneric<T>(const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType; static;
+    class function _GetRttiEnumerationTypeByTypeInfo(const ATypeInfo: PTypeInfo; const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType; static;
+    class function _GetRttiEnumerationTypeByTypeName(const AQualifiedTypeName: String; const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType; static;
+    class procedure _RaiseIfRttiEnumerationTypeAlreadyExists(const ARttiEnumerationType: TRttiEnumerationType); static;
+    class procedure _RaiseIfRttiEnumerationTypeDoesNotExists(const ARttiEnumerationType: TRttiEnumerationType); static;
+  public
     class procedure Add<T>(const ACommaSepValues: String); overload;
     class procedure Add(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String); overload;
     class procedure Add(const AEnumQualifiedTypeName: String; const ACommaSepValues: String); overload;
+    class procedure AddOrUpdate<T>(const ACommaSepValues: String); overload;
+    class procedure AddOrUpdate(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String); overload;
+    class procedure AddOrUpdate(const AEnumQualifiedTypeName: String; const ACommaSepValues: String); overload;
     class function Contains<T>: Boolean; overload;
     class function Contains(const AEnumTypeInfo: PTypeInfo): Boolean; overload;
     class function Contains(const AEnumQualifiedTypeName: String): Boolean; overload;
@@ -501,7 +511,7 @@ begin
       AddClassRef(LRttiType.AsInstance.MetaclassType)
     else
     if (LRttiType is TRttiEnumerationType) and LRttiType.HasAttribute(ioEnumerated) then
-      TioEnumsContainer._AddByAttribute(TRttiEnumerationType(LRttiType));
+      TioEnumContainer._AddByAttribute(TRttiEnumerationType(LRttiType));
   end;
 end;
 
@@ -533,12 +543,12 @@ end;
 
 { TioEnumerationContainer }
 
-class procedure TioEnumsContainer._AddByAttribute(const ARttiEnumerationType: TRttiEnumerationType);
+class procedure TioEnumContainer._AddByAttribute(const ARttiEnumerationType: TRttiEnumerationType);
 begin
   FInternalContainer.Add(ARttiEnumerationType, _LoadValuesByAttribute(ARttiEnumerationType));
 end;
 
-class procedure TioEnumsContainer._AddByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String);
+class procedure TioEnumContainer._AddByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String);
 var
   LStrings: TStrings;
 begin
@@ -547,55 +557,22 @@ begin
   FInternalContainer.Add(ARttiEnumerationType, LStrings);
 end;
 
-class procedure TioEnumsContainer._Build;
+class procedure TioEnumContainer._Build;
 begin
   FInternalContainer := TObjectDictionary<TRttiEnumerationType, TStrings>.Create([doOwnsValues]);
 end;
 
-class procedure TioEnumsContainer._CleanUp;
+class procedure TioEnumContainer._CleanUp;
 begin
   FInternalContainer.Free;
 end;
 
-class function TioEnumsContainer._GetRttiEnumerationTypeByGeneric<T>: TRttiEnumerationType;
-var
-  LRttiType: TRttiType;
-begin
-  LRttiType := TioRttiFactory.GetRttiTypeByTypeInfo(TypeInfo(T));
-  if LRttiType is TRttiEnumerationType then
-    Result := TRttiEnumerationType(LRttiType)
-  else
-    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByGeneric', Format('"%s" (T) is not an enumerated type', [TioUtilities.GenericToString<T>]));
-end;
-
-class function TioEnumsContainer._GetRttiEnumerationTypeByTypeInfo(const ATypeInfo: PTypeInfo): TRttiEnumerationType;
-var
-  LRttiType: TRttiType;
-begin
-  LRttiType := TioRttiFactory.GetRttiTypeByTypeInfo(ATypeInfo);
-  if LRttiType is TRttiEnumerationType then
-    Result := TRttiEnumerationType(LRttiType)
-  else
-    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByTypeInfo', Format('"%s" is not an enumerated type', [TioUtilities.TypeInfoToTypeName(ATypeInfo)]));
-end;
-
-class function TioEnumsContainer._GetRttiEnumerationTypeByTypeName(const AQualifiedTypeName: String): TRttiEnumerationType;
-var
-  LRttiType: TRttiType;
-begin
-  LRttiType := TioRttiFactory.GetRttiTypeByTypeName(AQualifiedTypeName);
-  if LRttiType is TRttiEnumerationType then
-    Result := TRttiEnumerationType(LRttiType)
-  else
-    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByTypeName', Format('"%s" is not an enumerated type', [AQualifiedTypeName]));
-end;
-
-class function TioEnumsContainer._Contains(const ARttiEnumerationType: TRttiEnumerationType): Boolean;
+class function TioEnumContainer._Contains(const ARttiEnumerationType: TRttiEnumerationType): Boolean;
 begin
   Result := FInternalContainer.ContainsKey(ARttiEnumerationType);
 end;
 
-class function TioEnumsContainer._OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): String;
+class function TioEnumContainer._OrdinalToString(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): String;
 begin
   if AOrdinalValue <= ARttiEnumerationType.MaxValue then
     Result := FInternalContainer.Items[ARttiEnumerationType][AOrdinalValue]
@@ -604,26 +581,17 @@ begin
       Format('Ordinal value %d is out of range for %s enumerated type', [AOrdinalValue, ARttiEnumerationType.Name]));
 end;
 
-class function TioEnumsContainer._OrdinalToStringAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): TValue;
+class function TioEnumContainer._OrdinalToStringAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AOrdinalValue: Byte): TValue;
 begin
   Result := TValue.From<String>( _OrdinalToString(ARttiEnumerationType, AOrdinalValue) );
 end;
 
-class procedure TioEnumsContainer._RaiseIfRttiEnumerationTypeAlreadyExists(const ARttiEnumerationType: TRttiEnumerationType);
+class procedure TioEnumContainer._Remove(const ARttiEnumerationType: TRttiEnumerationType);
 begin
-  if FInternalContainer.ContainsKey(ARttiEnumerationType) then
-    raise EioException.Create(ClassName, '_RaiseIfRttiEnumerationTypeAlreadyExists',
-      Format('"%s" enumerated type already registered in the iORM EnumsCountainer', [ARttiEnumerationType.Name]));
+  FInternalContainer.Remove(ARttiEnumerationType);
 end;
 
-class procedure TioEnumsContainer._RaiseIfRttiEnumerationTypeDoesNotExists(const ARttiEnumerationType: TRttiEnumerationType);
-begin
-  if not FInternalContainer.ContainsKey(ARttiEnumerationType) then
-    raise EioException.Create(ClassName, '_RaiseIfRttiEnumerationTypeDoesNotExists',
-      Format('"%s" enumerated type does not exists in the iORM EnumsCountainer', [ARttiEnumerationType.Name]));
-end;
-
-class function TioEnumsContainer._StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Byte;
+class function TioEnumContainer._StringToOrdinal(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): Byte;
 var
   LIndexOf: Smallint;
 begin
@@ -635,199 +603,22 @@ begin
       Format('"%s" string value not found for %s enumerated type', [AStringValue, ARttiEnumerationType.Name]));
 end;
 
-class function TioEnumsContainer._StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue;
+class function TioEnumContainer._StringToOrdinalAsTValue(const ARttiEnumerationType: TRttiEnumerationType; const AStringValue: String): TValue;
 begin
   Result := TValue.FromOrdinal(ARttiEnumerationType.Handle, _StringToOrdinal(ARttiEnumerationType, AStringValue));
 end;
 
-class procedure TioEnumsContainer._UpdateByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String);
+class procedure TioEnumContainer._UpdateByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String);
 begin
   _LoadValuesByString(ARttiEnumerationType, ACommaSepValues, FInternalContainer.Items[ARttiEnumerationType]);
 end;
 
-class procedure TioEnumsContainer._FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings);
+class procedure TioEnumContainer._FillStrings(const ARttiEnumerationType: TRttiEnumerationType; const ATargetStrings: TStrings);
 begin
   ATargetStrings.Text := FInternalContainer.Items[ARttiEnumerationType].Text;
 end;
 
-class function TioEnumsContainer.Contains(const AEnumTypeInfo: PTypeInfo): Boolean;
-begin
-  Result := _Contains(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo));
-end;
-
-class procedure TioEnumsContainer.Add(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo);
-  _RaiseIfRttiEnumerationTypeAlreadyExists(LRttiEnumerationType);
-  _AddByString(LRttiEnumerationType, ACommaSepValues);
-end;
-
-class procedure TioEnumsContainer.Add(const AEnumQualifiedTypeName, ACommaSepValues: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName);
-  _RaiseIfRttiEnumerationTypeAlreadyExists(LRttiEnumerationType);
-  _AddByString(LRttiEnumerationType, ACommaSepValues);
-end;
-
-class procedure TioEnumsContainer.Add<T>(const ACommaSepValues: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByGeneric<T>;
-  _RaiseIfRttiEnumerationTypeAlreadyExists(LRttiEnumerationType);
-  _AddByString(LRttiEnumerationType, ACommaSepValues);
-end;
-
-class function TioEnumsContainer.Contains(const AEnumQualifiedTypeName: String): Boolean;
-begin
-  Result := _Contains(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName));
-end;
-
-class function TioEnumsContainer.Contains<T>: Boolean;
-begin
-  _Contains(_GetRttiEnumerationTypeByGeneric<T>);
-end;
-
-class procedure TioEnumsContainer.FillStrings(const AEnumQualifiedTypeName: String; const ATargetStrings: TStrings);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  _FillStrings(LRttiEnumerationType, ATargetStrings);
-end;
-
-class procedure TioEnumsContainer.FillStrings(const AEnumTypeInfo: PTypeInfo; const ATargetStrings: TStrings);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  _FillStrings(LRttiEnumerationType, ATargetStrings);
-end;
-
-class procedure TioEnumsContainer.FillStrings<T>(const ATargetStrings: TStrings);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByGeneric<T>;
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  _FillStrings(LRttiEnumerationType, ATargetStrings);
-end;
-
-class function TioEnumsContainer.OrdinalToString(const AEnumTypeInfo: PTypeInfo; const AOrdinalValue: Byte): String;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  Result := _OrdinalToString(LRttiEnumerationType, AOrdinalValue);
-end;
-
-class function TioEnumsContainer.OrdinalToString(const AEnumQualifiedTypeName: String; const AOrdinalValue: Byte): String;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  Result := _OrdinalToString(LRttiEnumerationType, AOrdinalValue);
-end;
-
-class function TioEnumsContainer.OrdinalToString<T>(const AOrdinalValue: Byte): String;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByGeneric<T>;
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  Result := _OrdinalToString(LRttiEnumerationType, AOrdinalValue);
-end;
-
-class procedure TioEnumsContainer.Remove(const AEnumTypeInfo: PTypeInfo);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  FInternalContainer.Remove(LRttiEnumerationType);
-end;
-
-class procedure TioEnumsContainer.Remove(const AEnumQualifiedTypeName: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  FInternalContainer.Remove(LRttiEnumerationType);
-end;
-
-class procedure TioEnumsContainer.Remove<T>;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByGeneric<T>;
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  FInternalContainer.Remove(LRttiEnumerationType);
-end;
-
-class function TioEnumsContainer.StringToOrdinal(const AEnumTypeInfo: PTypeInfo; const AStringValue: String): Byte;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  Result := _StringToOrdinal(LRttiEnumerationType, AStringValue);
-end;
-
-class function TioEnumsContainer.StringToOrdinal(const AEnumQualifiedTypeName, AStringValue: String): Byte;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  Result := _StringToOrdinal(LRttiEnumerationType, AStringValue);
-end;
-
-class function TioEnumsContainer.StringToOrdinal<T>(const AStringValue: String): Byte;
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByGeneric<T>;
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  Result := _StringToOrdinal(LRttiEnumerationType, AStringValue);
-end;
-
-class procedure TioEnumsContainer.Update(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  _UpdateByString(LRttiEnumerationType, ACommaSepValues);
-end;
-
-class procedure TioEnumsContainer.Update(const AEnumQualifiedTypeName, ACommaSepValues: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName);
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  _UpdateByString(LRttiEnumerationType, ACommaSepValues);
-end;
-
-class procedure TioEnumsContainer.Update<T>(const ACommaSepValues: String);
-var
-  LRttiEnumerationType: TRttiENumerationType;
-begin
-  LRttiEnumerationType := _GetRttiEnumerationTypeByGeneric<T>;
-  _RaiseIfRttiEnumerationTypeDoesNotExists(LRttiEnumerationType);
-  _UpdateByString(LRttiEnumerationType, ACommaSepValues);
-end;
-
-class function TioEnumsContainer._LoadValuesByAttribute(const ARttiEnumerationType: TRttiEnumerationType): TStrings;
+class function TioEnumContainer._LoadValuesByAttribute(const ARttiEnumerationType: TRttiEnumerationType): TStrings;
 var
   LEnumeratedAttribute: ioEnumerated;
 begin
@@ -844,7 +635,7 @@ begin
   _LoadValuesByString(ARttiEnumerationType, LEnumeratedAttribute.Value, Result);
 end;
 
-class procedure TioEnumsContainer._LoadValuesByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String; const ATargetStrings: TStrings);
+class procedure TioEnumContainer._LoadValuesByString(const ARttiEnumerationType: TRttiEnumerationType; const ACommaSepValues: String; const ATargetStrings: TStrings);
 var
   I: Integer;
 begin
@@ -871,6 +662,190 @@ begin
   TioUtilities.TrimStrings(ATargetStrings);
 end;
 
+{ TioEnumsContainerEx }
+
+class function TioEnumContainerEx._GetRttiEnumerationTypeByGeneric<T>(const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType;
+var
+  LRttiType: TRttiType;
+begin
+  LRttiType := TioRttiFactory.GetRttiTypeByTypeInfo(TypeInfo(T));
+  if LRttiType is TRttiEnumerationType then
+    Result := TRttiEnumerationType(LRttiType)
+  else
+    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByGeneric', Format('"%s" (T) is not an enumerated type', [TioUtilities.GenericToString<T>]));
+  case ARaiseTrigger of
+    ecrtExists:
+      _RaiseIfRttiEnumerationTypeAlreadyExists(Result);
+    ecrtNotExists:
+      _RaiseIfRttiEnumerationTypeDoesNotExists(Result);
+  end;
+end;
+
+class function TioEnumContainerEx._GetRttiEnumerationTypeByTypeInfo(const ATypeInfo: PTypeInfo; const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType;
+var
+  LRttiType: TRttiType;
+begin
+  LRttiType := TioRttiFactory.GetRttiTypeByTypeInfo(ATypeInfo);
+  if LRttiType is TRttiEnumerationType then
+    Result := TRttiEnumerationType(LRttiType)
+  else
+    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByTypeInfo', Format('"%s" is not an enumerated type', [TioUtilities.TypeInfoToTypeName(ATypeInfo)]));
+end;
+
+class function TioEnumContainerEx._GetRttiEnumerationTypeByTypeName(const AQualifiedTypeName: String; const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType;
+var
+  LRttiType: TRttiType;
+begin
+  LRttiType := TioRttiFactory.GetRttiTypeByTypeName(AQualifiedTypeName);
+  if LRttiType is TRttiEnumerationType then
+    Result := TRttiEnumerationType(LRttiType)
+  else
+    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByTypeName', Format('"%s" is not an enumerated type', [AQualifiedTypeName]));
+end;
+
+class procedure TioEnumContainerEx._RaiseIfRttiEnumerationTypeAlreadyExists(const ARttiEnumerationType: TRttiEnumerationType);
+begin
+  if TioEnumContainer._Contains(ARttiEnumerationType) then
+    raise EioException.Create(ClassName, '_RaiseIfRttiEnumerationTypeAlreadyExists',
+      Format('"%s" enumerated type already registered in the iORM EnumsCountainer', [ARttiEnumerationType.Name]));
+end;
+
+class procedure TioEnumContainerEx._RaiseIfRttiEnumerationTypeDoesNotExists(const ARttiEnumerationType: TRttiEnumerationType);
+begin
+  if not TioEnumContainer._Contains(ARttiEnumerationType) then
+    raise EioException.Create(ClassName, '_RaiseIfRttiEnumerationTypeDoesNotExists',
+      Format('"%s" enumerated type does not exists in the iORM EnumsCountainer', [ARttiEnumerationType.Name]));
+end;
+
+class procedure TioEnumContainerEx.Add(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String);
+begin
+  TioEnumContainer._AddByString(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtExists), ACommaSepValues);
+end;
+
+class procedure TioEnumContainerEx.Add(const AEnumQualifiedTypeName, ACommaSepValues: String);
+begin
+  TioEnumContainer._AddByString(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtExists), ACommaSepValues);
+end;
+
+class procedure TioEnumContainerEx.Add<T>(const ACommaSepValues: String);
+begin
+  TioEnumContainer._AddByString(_GetRttiEnumerationTypeByGeneric<T>(ecrtExists), ACommaSepValues);
+end;
+
+class procedure TioEnumContainerEx.AddOrUpdate(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String);
+begin
+  if Contains(AEnumTypeInfo) then
+    Add(AEnumTypeInfo, ACommaSepValues)
+  else
+    Update(AEnumTypeInfo, ACommaSepValues)
+end;
+
+class procedure TioEnumContainerEx.AddOrUpdate(const AEnumQualifiedTypeName, ACommaSepValues: String);
+begin
+  if Contains(AEnumQualifiedTypeName) then
+    Add(AEnumQualifiedTypeName, ACommaSepValues)
+  else
+    Update(AEnumQualifiedTypeName, ACommaSepValues)
+end;
+
+class procedure TioEnumContainerEx.AddOrUpdate<T>(const ACommaSepValues: String);
+begin
+  if Contains<T> then
+    Add<T>(ACommaSepValues)
+  else
+    Update<T>(ACommaSepValues)
+end;
+
+class function TioEnumContainerEx.Contains(const AEnumTypeInfo: PTypeInfo): Boolean;
+begin
+  Result := TioEnumContainer._Contains(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtNone));
+end;
+
+class function TioEnumContainerEx.Contains(const AEnumQualifiedTypeName: String): Boolean;
+begin
+  Result := TioEnumContainer._Contains(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtNone));
+end;
+
+class function TioEnumContainerEx.Contains<T>: Boolean;
+begin
+  Result := TioEnumContainer._Contains(_GetRttiEnumerationTypeByGeneric<T>(ecrtNone));
+end;
+
+class procedure TioEnumContainerEx.FillStrings(const AEnumTypeInfo: PTypeInfo; const ATargetStrings: TStrings);
+begin
+  TioEnumContainer._FillStrings(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtNotExists), ATargetStrings);
+end;
+
+class procedure TioEnumContainerEx.FillStrings(const AEnumQualifiedTypeName: String; const ATargetStrings: TStrings);
+begin
+  TioEnumContainer._FillStrings(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtNotExists), ATargetStrings);
+end;
+
+class procedure TioEnumContainerEx.FillStrings<T>(const ATargetStrings: TStrings);
+begin
+  TioEnumContainer._FillStrings(_GetRttiEnumerationTypeByGeneric<T>(ecrtNotExists), ATargetStrings);
+end;
+
+class function TioEnumContainerEx.OrdinalToString(const AEnumTypeInfo: PTypeInfo; const AOrdinalValue: Byte): String;
+begin
+  Result := TioEnumContainer._OrdinalToString(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtNotExists), AOrdinalValue);
+end;
+
+class function TioEnumContainerEx.OrdinalToString(const AEnumQualifiedTypeName: String; const AOrdinalValue: Byte): String;
+begin
+  Result := TioEnumContainer._OrdinalToString(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtNotExists), AOrdinalValue);
+end;
+
+class function TioEnumContainerEx.OrdinalToString<T>(const AOrdinalValue: Byte): String;
+begin
+  Result := TioEnumContainer._OrdinalToString(_GetRttiEnumerationTypeByGeneric<T>(ecrtNotExists), AOrdinalValue);
+end;
+
+class procedure TioEnumContainerEx.Remove(const AEnumTypeInfo: PTypeInfo);
+begin
+  TioEnumContainer._Remove(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtNotExists));
+end;
+
+class procedure TioEnumContainerEx.Remove(const AEnumQualifiedTypeName: String);
+begin
+  TioEnumContainer._Remove(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtNotExists));
+end;
+
+class procedure TioEnumContainerEx.Remove<T>;
+begin
+  TioEnumContainer._Remove(_GetRttiEnumerationTypeByGeneric<T>(ecrtNotExists));
+end;
+
+class function TioEnumContainerEx.StringToOrdinal(const AEnumTypeInfo: PTypeInfo; const AStringValue: String): Byte;
+begin
+  Result := TioEnumContainer._StringToOrdinal(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtNotExists), AStringValue);
+end;
+
+class function TioEnumContainerEx.StringToOrdinal(const AEnumQualifiedTypeName, AStringValue: String): Byte;
+begin
+  Result := TioEnumContainer._StringToOrdinal(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtNotExists), AStringValue);
+end;
+
+class function TioEnumContainerEx.StringToOrdinal<T>(const AStringValue: String): Byte;
+begin
+  Result := TioEnumContainer._StringToOrdinal(_GetRttiEnumerationTypeByGeneric<T>(ecrtNotExists), AStringValue);
+end;
+
+class procedure TioEnumContainerEx.Update(const AEnumTypeInfo: PTypeInfo; const ACommaSepValues: String);
+begin
+  TioEnumContainer._UpdateByString(_GetRttiEnumerationTypeByTypeInfo(AEnumTypeInfo, ecrtNotExists), ACommaSepValues);
+end;
+
+class procedure TioEnumContainerEx.Update(const AEnumQualifiedTypeName, ACommaSepValues: String);
+begin
+  TioEnumContainer._UpdateByString(_GetRttiEnumerationTypeByTypeName(AEnumQualifiedTypeName, ecrtNotExists), ACommaSepValues);
+end;
+
+class procedure TioEnumContainerEx.Update<T>(const ACommaSepValues: String);
+begin
+  TioEnumContainer._UpdateByString(_GetRttiEnumerationTypeByGeneric<T>(ecrtNotExists), ACommaSepValues);
+end;
+
 initialization
 
 // NB: Spostato sulla initialize della unit iORM
@@ -882,6 +857,6 @@ initialization
 finalization
 
 TioMapContainer._CleanUp;
-TioEnumsContainer._CleanUp;
+TioEnumContainer._CleanUp;
 
 end.

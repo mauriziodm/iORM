@@ -198,7 +198,7 @@ type
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
 
     // Registered enumerated types container
-    class function Enums: TioEnumsContainerRef;
+    class function Enums: TioEnumContainerExRef;
 
     // Global VCProvider register
     class function DefaultVCProvider: TioViewContextProvider;
@@ -1152,9 +1152,9 @@ begin
   Result := Self.RefTo(ATypeName, ATypeAlias).Exists;
 end;
 
-class function io.Enums: TioEnumsContainerRef;
+class function io.Enums: TioEnumContainerExRef;
 begin
-  Result := TioEnumsContainer;
+  Result := TioEnumContainerEx;
 end;
 
 class function io.Exists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;
@@ -1341,7 +1341,7 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
 // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
-TioEnumsContainer._Build;
+TioEnumContainer._Build;
 TioMapContainer._Build;
 
 end.
