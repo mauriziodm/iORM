@@ -647,7 +647,7 @@ begin
     ATargetStrings.Delimiter := ',';
     ATargetStrings.QuoteChar := #0;
     ATargetStrings.StrictDelimiter := True;
-    ATargetStrings.Text := ACommaSepValues;
+    ATargetStrings.DelimitedText := ACommaSepValues;
     // Check the number of string values in the attribute
     if (ATargetStrings.Count > 0) and (ATargetStrings.Count <> ARttiEnumerationType.MaxValue+1) then
       raise EioException.Create(ClassName, '_LoadValuesByString',
