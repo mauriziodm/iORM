@@ -289,6 +289,14 @@ var
     LDB_FKAutoCreate: TioFKCreate;
     LDB_FKOnDeleteAction: TioFKAction;
     LDB_FKOnUpdateAction: TioFKAction;
+    // Smart where
+    LWhereCompareOp: TioCompareOp;
+    LWhereLogicOp: TioLogicOp;
+    LWhereTargetPropName: String;
+    LWhereGroupName: String;
+    LWhereGroupLogicOp: TioLogicOp;
+    LWhereMasterGroupName: String;
+    LWhereNullValue: TValue;
     // Map metadata
     LMember_IsID: Boolean;
     LMember_TypeAlias: String;
@@ -341,6 +349,14 @@ var
       LDB_FKAutoCreate := fkCreate;
       LDB_FKOnDeleteAction := fkUnspecified;
       LDB_FKOnUpdateAction := fkUnspecified;
+      // Smart where initialization
+      LWhereCompareOp := TioCompareOp.coEqual;
+      LWhereLogicOp := TioLogicOp.loAnd;
+      LWhereTargetPropName := LMember_FieldName; // Default where target property name equals the property name itself
+      LWhereGroupName := String.Empty;
+      LWhereGroupLogicOp := TioLogicOp.loAnd;
+      LWhereMasterGroupName := String.Empty;
+      LWhereNullValue := TValue.Empty;
       // Map members (props and/or fields) initialization
       LMember_IsID := (Uppercase(LMember_FieldName) = 'ID');
       LMember_TypeAlias := '';
@@ -458,6 +474,23 @@ var
           ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
         end
         else
+        // Smart where attributes
+        if LAttribute is ioWhere then
+        begin
+          LWhereCompareOp := ioWhere(LAttribute).CompareOp;
+          LWhereLogicOp := ioWhere(LAttribute).LogicOp;
+          LWhereTargetPropName := ioWhere(LAttribute).TargetPropName;
+        end
+        else
+        if LAttribute is ioWhereGroup then
+        begin
+          LWhereGroupName := ioWhereGroup(LAttribute).GroupName;
+          LWhereGroupLogicOp := ioWhereGroup(LAttribute).GroupLogicOp;
+          LWhereMasterGroupName := ioWhereGroup(LAttribute).MasterGroupName;
+        end
+        else
+        if LAttribute is ioWhereNullValue then
+          LWhereNullValue := ioWhereNullValue(LAttribute).Value;
         // Metadata Used by DBBuilder (M.M. 01/08/18)
         if LAttribute is ioNotNull then
           LDB_FieldNotNull := True
@@ -574,6 +607,13 @@ var
         LMember_RelationChildPropertyName, LMember_RelationChildLazyLoad, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
         LDB_FieldScale, LDB_FieldNotNull, LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
         LDB_FKOnUpdateAction);
+      LNewProperty.WhereCompareOp := LWhereCompareOp;
+      LNewProperty.WhereLogicOp := LWhereLogicOp;
+      LNewProperty.WhereTargetPropName := LWhereTargetPropName;
+      LNewProperty.WhereGroupName := LWhereGroupName;
+      LNewProperty.WhereGroupLogicOp := LWhereGroupLogicOp;
+      LNewProperty.WhereMasterGroupName := LWhereMasterGroupName;
+      LNewProperty.WhereNullValue := LWhereNullValue;
       Result.Add(LNewProperty);
       // If the current property is a virtual property (autodetected has many relation) then
       // add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
