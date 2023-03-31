@@ -395,6 +395,46 @@ type
 {$ENDREGION} // END OF EMBEDDED ATTRIBUTES
 
 
+{$REGION '===== SMART WHERE ATTRIBUTES ====='}
+
+  // Set some where generation params for the property
+  ioWhere = class(TioCustomAttribute)
+  private
+    FCompareOp: TioCompareOp;
+    FLogicOp: TioLogicOp;
+    FTargetPropName: String;
+  public
+    constructor Create; overload;
+    constructor Create(ATargetPropName: String; const ACompareOp: TioCompareOp = coEqual); overload;
+    constructor Create(const ALogicRelation: TioLogicOp; const ACompareOp: TioCompareOp = coEqual); overload;
+    constructor Create(const ACompareOp: TioCompareOp); overload;
+    constructor Create(const ALogicRelation: TioLogicOp; ATargetPropName: String; const ACompareOp: TioCompareOp); overload;
+    property CompareOp: TioCompareOp read FCompareOp;
+    property LogicOp: TioLogicOp read FLogicOp;
+    property TargetPropName: String read FTargetPropName;
+  end;
+
+  // Set shere group for the property
+  ioWhereGroup = class(TioCustomAttribute)
+  private
+    FGroupName: String;
+    FGroupLogicOp: TioLogicOp;
+    FMasterGroupName: String;
+  public
+    constructor Create(const AGroupLogicRelation: TioLogicOp; AGroupName: String; AMasterGroupName: String = ''); overload;
+    constructor Create(AGroupName: String; AMasterGroupName: String = ''); overload;
+    property GroupName: String read FGroupName;
+    property GroupLogicOp: TioLogicOp read FGroupLogicOp;
+    property MasterGroupName: String read FMasterGroupName;
+  end;
+
+  // Set the value to be treated as null for the proprerty (for where generation purpose)
+  ioWhereNullValue = class(TioCustomTValueAttribute)
+  end;
+
+{$ENDREGION} // END OF SMART WHERE ATTRIBUTES
+
+
 {$REGION '===== DEPENDENCY INJECTION ATTRIBUTES ====='}
 
   // Register the class as is, without interfaces
@@ -712,6 +752,58 @@ end;
 function ioNotPersistedEntity.GetTableName: String;
 begin
   Result := NOT_PERSISTED_ENTITY_TABLE_NAME;
+end;
+
+{ ioWhere }
+
+constructor ioWhere.Create;
+begin
+  FCompareOp := TioCompareOp.coEqual;
+  FLogicOp := TioLogicOp.loAnd;
+  FTargetPropName := String.Empty;
+end;
+
+constructor ioWhere.Create(const ALogicRelation: TioLogicOp; const ACompareOp: TioCompareOp);
+begin
+  Create;
+  FCompareOp := ACompareOp;
+  FLogicOp := ALogicRelation;
+end;
+
+constructor ioWhere.Create(ATargetPropName: String; const ACompareOp: TioCompareOp);
+begin
+  Create;
+  FCompareOp := ACompareOp;
+  FTargetPropName := ATargetPropName;
+end;
+
+constructor ioWhere.Create(const ACompareOp: TioCompareOp);
+begin
+  Create;
+  FCompareOp := ACompareOp;
+end;
+
+constructor ioWhere.Create(const ALogicRelation: TioLogicOp; ATargetPropName: String; const ACompareOp: TioCompareOp);
+begin
+  Create;
+  FCompareOp := ACompareOp;
+  FLogicOp := ALogicRelation;
+  FTargetPropName := ATargetPropName;
+end;
+
+{ ioWhereGroup }
+
+constructor ioWhereGroup.Create(AGroupName, AMasterGroupName: String);
+begin
+  FGroupName := AGroupName;
+  FMasterGroupName := AMasterGroupName;
+  FGroupLogicOp := TioLogicOp.loAnd;
+end;
+
+constructor ioWhereGroup.Create(const AGroupLogicRelation: TioLogicOp; AGroupName, AMasterGroupName: String);
+begin
+  Create(AGroupName, AMasterGroupName);
+  FGroupLogicOp := AGroupLogicRelation;
 end;
 
 end.
