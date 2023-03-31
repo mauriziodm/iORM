@@ -128,6 +128,34 @@ type
     function GetMetadata_FKOnDeleteAction: TioFKAction;
     function GetMetadata_FKOnUpdateAction: TioFKAction;
 
+    // WhereCompareOp property
+    procedure SetWhereCompareOp(const Value: TioCompareOp);
+    function GetWhereCompareOp: TioCompareOp;
+    property WhereCompareOp: TioCompareOp read GetWhereCompareOp write SetWhereCompareOp;
+    // WhereLogicOp property
+    procedure SetWhereLogicOp(const Value: TioLogicOp);
+    function GetWhereLogicOp: TioLogicOp;
+    property WhereLogicOp: TioLogicOp read GetWhereLogicOp write SetWhereLogicOp;
+    // WhereGroupName property
+    procedure SetWhereGroupName(const Value: String);
+    function GetWhereGroupName: String;
+    property WhereGroupName: String read GetWhereGroupName write SetWhereGroupName;
+    // WhereGroupLogicOp property
+    procedure SetWhereGroupLogicOp(const Value: TioLogicOp);
+    function GetWhereGroupLogicOp: TioLogicOp;
+    property WhereGroupLogicOp: TioLogicOp read GetWhereGroupLogicOp write SetWhereGroupLogicOp;
+    // WhereMasterGroupName property
+    procedure SetWhereMasterGroupName(const Value: String);
+    function GetWhereMasterGroupName: String;
+    property WhereMasterGroupName: String read GetWhereMasterGroupName write SetWhereMasterGroupName;
+    // WhereNullValue property
+    procedure SetWhereNullValue(const Value: TValue);
+    function GetWhereNullValue: TValue;
+    property WhereNullValue: TValue read GetWhereNullValue write SetWhereNullValue;
+    // WhereTargetPropName property
+    procedure SetWhereTargetPropName(const Value: String);
+    function GetWhereTargetPropName: String;
+    property WhereTargetPropName: String read GetWhereTargetPropName write SetWhereTargetPropName;
   end;
 
   IioProperties = interface(IioSqlItem)

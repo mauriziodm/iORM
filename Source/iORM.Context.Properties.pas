@@ -65,6 +65,14 @@ type
     FNotHasMany: Boolean;
     FTable: IioTable;
     FReadWrite: TioLoadPersist;
+    // Smart where
+    FWhereCompareOp: TioCompareOp;
+    FWhereLogicOp: TioLogicOp;
+    FWhereTargetPropName: String;
+    FWhereGroupName: String;
+    FWhereGroupLogicOp: TioLogicOp;
+    FWhereMasterGroupName: String;
+    FWhereNullValue: TValue;
     // M.M. 01/08/18 - MetadataType used by DBBuilder
     FMetadata_FieldType: TioMetadataFieldType;
     FMetadata_FieldLength: Integer;
@@ -81,6 +89,20 @@ type
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
     procedure SetFieldData;
     procedure SetLoadSqlData;
+    procedure SetWhereCompareOp(const Value: TioCompareOp);
+    procedure SetWhereGroupLogicOp(const Value: TioLogicOp);
+    procedure SetWhereGroupName(const Value: String);
+    procedure SetWhereLogicOp(const Value: TioLogicOp);
+    procedure SetWhereMasterGroupName(const Value: String);
+    procedure SetWhereNullValue(const Value: TValue);
+    procedure SetWhereTargetPropName(const Value: String);
+    function GetWhereGroupName: String; protected
+    function GetWhereCompareOp: TioCompareOp;
+    function GetWhereGroupLogicOp: TioLogicOp;
+    function GetWhereLogicOp: TioLogicOp;
+    function GetWhereMasterGroupName: String;
+    function GetWhereNullValue: TValue;
+    function GetWhereTargetPropName: String;
   strict protected
     constructor Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
@@ -168,6 +190,14 @@ type
     function GetMetadata_FKCreate: TioFKCreate;
     function GetMetadata_FKOnDeleteAction: TioFKAction;
     function GetMetadata_FKOnUpdateAction: TioFKAction;
+
+    property WhereCompareOp: TioCompareOp read GetWhereCompareOp write SetWhereCompareOp;
+    property WhereLogicOp: TioLogicOp read GetWhereLogicOp write SetWhereLogicOp;
+    property WhereGroupName: String read GetWhereGroupName write SetWhereGroupName;
+    property WhereGroupLogicOp: TioLogicOp read GetWhereGroupLogicOp write SetWhereGroupLogicOp;
+    property WhereMasterGroupName: String read GetWhereMasterGroupName write SetWhereMasterGroupName;
+    property WhereNullValue: TValue read GetWhereNullValue write SetWhereNullValue;
+    property WhereTargetPropName: String read GetWhereTargetPropName write SetWhereTargetPropName;
   end;
 
   // Autodetected HasMany relation child virtual property (foreign key)
@@ -593,6 +623,41 @@ begin
   Result := TioUtilities.TValueToObject(AValue, False)
 end;
 
+function TioProperty.GetWhereCompareOp: TioCompareOp;
+begin
+  Result := FWhereCompareOp;
+end;
+
+function TioProperty.GetWhereGroupLogicOp: TioLogicOp;
+begin
+  Result := FWhereGroupLogicOp;
+end;
+
+function TioProperty.GetWhereGroupName: String;
+begin
+  Result := FWhereGroupName;
+end;
+
+function TioProperty.GetWhereLogicOp: TioLogicOp;
+begin
+  Result := FWhereLogicOp;
+end;
+
+function TioProperty.GetWhereMasterGroupName: String;
+begin
+  Result := FWhereMasterGroupName;
+end;
+
+function TioProperty.GetWhereNullValue: TValue;
+begin
+  Result := FWhereNullValue;
+end;
+
+function TioProperty.GetWhereTargetPropName: String;
+begin
+  Result := FWhereTargetPropName;
+end;
+
 function TioProperty.HasAutodetectedHasManyRelation: Boolean;
 begin
   Result := (FRelationType = rtHasMany) and (FRelationChildPropertyName = IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME);
@@ -806,6 +871,41 @@ procedure TioProperty.SetValue(const Instance: Pointer; const AValue: TValue);
 begin
   FRttiProperty.SetValue(Instance, AValue);
   // ***ChildPropertyPath***
+end;
+
+procedure TioProperty.SetWhereCompareOp(const Value: TioCompareOp);
+begin
+  FWhereCompareOp := Value;
+end;
+
+procedure TioProperty.SetWhereGroupLogicOp(const Value: TioLogicOp);
+begin
+  FWhereGroupLogicOp := Value;
+end;
+
+procedure TioProperty.SetWhereGroupName(const Value: String);
+begin
+  FWhereGroupName := Value;
+end;
+
+procedure TioProperty.SetWhereLogicOp(const Value: TioLogicOp);
+begin
+  FWhereLogicOp := Value;
+end;
+
+procedure TioProperty.SetWhereMasterGroupName(const Value: String);
+begin
+  FWhereMasterGroupName := Value;
+end;
+
+procedure TioProperty.SetWhereNullValue(const Value: TValue);
+begin
+  FWhereNullValue := Value;
+end;
+
+procedure TioProperty.SetWhereTargetPropName(const Value: String);
+begin
+  FWhereTargetPropName := Value;
 end;
 
 { TioProperties }
