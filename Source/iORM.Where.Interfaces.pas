@@ -58,13 +58,14 @@ type
   TioWhereDetailsContainerInternalInstance = TDictionary<String, IioWhere>;
   IioWhereDetailsContainer = interface
     ['{0BB026DD-F087-4B57-9CB6-59D4F80A3792}']
-    function GetKeyList: String;
-    function Count: Integer;
-    function Get(const AMasterPropertyName: string): IioWhere;
-    function Exists(const AMasterPropertyName:String): Boolean;
     procedure AddOrUpdate(const AMasterPropertyName: string; const AWhere: IioWhere);
-    procedure SetConnectionName(const Value: String);
     procedure Clear;
+    function Count: Integer;
+    function Exists(const AMasterPropertyName:String): Boolean;
+    function GetKeyList: String;
+    function Get(const AMasterPropertyName: string): IioWhere;
+    function IsEmpty: Boolean;
+    procedure SetConnectionName(const Value: String);
   end;
 
   // Where interface
@@ -102,6 +103,7 @@ type
 
     function Count: Integer;
     function Exists: Boolean;
+    function IsEmpty: Boolean;
     function NotExists: Boolean;
 
     procedure Delete;
@@ -352,6 +354,18 @@ type
     function _Value(AValue: IInterface): IioWhere<T>; overload;
     function _OrderBy(const ATextOrderBy:String): IioWhere<T>; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere<T>; overload;
+  end;
+
+  // Internal where interfaces (for internal use only)
+  IioWhereInternal = interface(IioWhere)
+    ['{D2CEA705-8CEA-4321-8D20-B512B6FC1D4D}']
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria(const AText: String); overload;
+    procedure _AddCriteria(const AWhere: IioWhere); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const AWhere: IioWhere); overload;
   end;
 
 implementation

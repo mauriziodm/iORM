@@ -85,6 +85,7 @@ type
     procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
     procedure _AddCriteria(const AText: String); overload;
     procedure _AddCriteria(const AWhere: IioWhere); overload;
+    procedure _AddCriteria(const ALogicOp: TioLogicOp; const AWhere: IioWhere); overload;
     // -------------------------------------------
     // Details property
     function GetDetails: IioWhereDetailsContainer;
@@ -137,6 +138,7 @@ type
 
     function Count: Integer;
     function Exists: Boolean;
+    function IsEmpty: Boolean;
     function NotExists: Boolean;
 
     procedure Delete;
@@ -472,6 +474,18 @@ begin
   if Assigned(AWhere) then
     for AItem in AWhere.GetWhereItems do
       FWhereItems.Add(AItem);
+end;
+
+procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const AWhere: IioWhere);
+begin
+  if Assigned(AWhere) and AWhere.WhereConditionExists then
+  begin
+    if Self.WhereConditionExists then
+      FWhereItems.Add(TioDbFactory.LogicRelation.LogicOpToLogicRelation(ALogicOp));
+    _OpenPar;
+    _AddCriteria(AWhere);
+    _ClosePar;
+  end;
 end;
 
 procedure TioWhere._AddCriteria(const AText: String);
@@ -935,6 +949,11 @@ end;
 function TioWhere.IsCacheable: Boolean;
 begin
   Result := FCacheable;
+end;
+
+function TioWhere.IsEmpty: Boolean;
+begin
+  Result := FWhereItems.Count = 0;
 end;
 
 function TioWhere.IsLazyProp(const AClassName: String; const AProperty: IioProperty): Boolean;

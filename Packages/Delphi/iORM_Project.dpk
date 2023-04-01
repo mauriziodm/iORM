@@ -221,7 +221,8 @@ contains
   iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter in '..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas',
   iORM.StdActions.CloseQueryRepeater in '..\..\Source\iORM.StdActions.CloseQueryRepeater.pas',
   iORM.StdActions.Interfaces in '..\..\Source\iORM.StdActions.Interfaces.pas',
-  iORM.StdActions.CloseQueryActionRegister in '..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas';
+  iORM.StdActions.CloseQueryActionRegister in '..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas',
+  iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas';
 
 end.
 

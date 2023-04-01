@@ -48,14 +48,15 @@ type
   private
     FInternalContainer_NoDirectAccess: TioWhereDetailsContainerInternalInstance;
     FConnectionName: String;
-    function GetInternalContainerCreateIfNoAssigned: TioWhereDetailsContainerInternalInstance;
     procedure AddOrUpdate(const AMasterPropertyName: string; const AWhere: IioWhere);
+    procedure Clear;
+    function Count: Integer;
     procedure Delete(const AMasterPropertyName: string);
     function Exists(const AMasterPropertyName:String): Boolean;
     function Get(const AMasterPropertyName: string): IioWhere;
-    function Count: Integer;
+    function GetInternalContainerCreateIfNoAssigned: TioWhereDetailsContainerInternalInstance;
     function GetKeyList: String;
-    procedure Clear;
+    function IsEmpty: Boolean;
     procedure SetConnectionName(const Value: String);
   public
     constructor Create;
@@ -100,6 +101,11 @@ begin
   Result := '';
   for LKey in FInternalContainer_NoDirectAccess.Keys do
     Result := Result + LKey + '; ';
+end;
+
+function TioWhereDetailsContainer.IsEmpty: Boolean;
+begin
+  Result := (Count = 0);
 end;
 
 procedure TioWhereDetailsContainer.SetConnectionName(const Value: String);

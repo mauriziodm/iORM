@@ -58,8 +58,6 @@ type
     class function JoinItem(const AJoinAttribute: ioJoin): IioJoinItem;
     class function GroupBy(const ASqlText: String): IioGroupBy;
     class function HasBelongsToRelation(const AMasterPropertyType: TRttiType): Boolean;
-  public
-    // I primi due metodi di classe dovranno essere spostati come protetti o privati
     class function GetProperty(const ATable: IioTable; const AMember: TRttiMember; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType: String;
       const ATransient, AIsID: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
@@ -67,6 +65,7 @@ type
       const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
       const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
       const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
+  public
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String): IioContext;

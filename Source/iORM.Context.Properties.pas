@@ -885,7 +885,7 @@ end;
 
 procedure TioProperty.SetWhereGroupName(const Value: String);
 begin
-  FWhereGroupName := Value;
+  FWhereGroupName := Value.ToUpper;
 end;
 
 procedure TioProperty.SetWhereLogicOp(const Value: TioLogicOp);
@@ -895,7 +895,7 @@ end;
 
 procedure TioProperty.SetWhereMasterGroupName(const Value: String);
 begin
-  FWhereMasterGroupName := Value;
+  FWhereMasterGroupName := Value.ToUpper;
 end;
 
 procedure TioProperty.SetWhereNullValue(const Value: TValue);
