@@ -51,7 +51,7 @@ uses
 type
 
   // Where conditions (standard version)
-  TioWhere = class(TioSqlItem, IioWhere)
+  TioWhere = class(TioSqlItem, IioWhere, IioWhereInternal)
   strict protected
     FTypeName, FTypeAlias: String;
     FTypeInfo: PTypeInfo;

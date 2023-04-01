@@ -38,17 +38,17 @@ var
   LValue: TValue;
 begin
   LValue := AProp.GetValue(AObj);
-  if (not LValue.IsEmpty) and (LValue.ToString.Trim.ToUpper <> AProp.WhereNullValue.ToString.Trim.ToUpper) then
+//  if (not LValue.IsEmpty) and (LValue.ToString.Trim.ToUpper <> AProp.WhereNullValue.ToString.Trim.ToUpper) then
+  if AProp.GetName = 'City' then
     (AWhere as IioWhereInternal)._AddCriteria(AProp.WhereLogicOp, AProp.WhereTargetPropName, AProp.WhereCompareOp, LValue);
 end;
 
 class function TioWhereSmartBuilder.BuildGroupWhere(const AObj: TObject; const AMap: IioMap; const AGroupName: String): IioWhere;
 var
   LProp: IioProperty;
-  LGroupWhere: IioWhere;
 begin
   // Create a new IioWhere instance for the current group
-  LGroupWhere := TioWhereFactory.NewWhere;
+  Result := TioWhereFactory.NewWhere;
   // Loop for all properties
   for LProp in AMap.GetProperties do
   begin
@@ -58,7 +58,7 @@ begin
       CheckWhereNullValueAffinity(LProp);
       case LProp.GetRelationType of
         rtNone:
-          BuildPropWhere(AObj, LProp, LGroupWhere);
+          BuildPropWhere(AObj, LProp, Result);
         rtBelongsTo:
           {To be implemented};
         rtHasOne, rtEmbeddedHasOne:
@@ -70,7 +70,7 @@ begin
     else
     // If the current property is of a child group nested into the current group
     if LProp.WhereMasterGroupName.Equals(AGroupName) then
-      (LGroupWhere as IioWhereInternal)._AddCriteria(LProp.WhereGroupLogicOp, BuildGroupWhere(AObj, AMap, LProp.WhereGroupName)); // Recursion
+      (Result as IioWhereInternal)._AddCriteria(LProp.WhereGroupLogicOp, BuildGroupWhere(AObj, AMap, LProp.WhereGroupName)); // Recursion
   end;
 end;
 

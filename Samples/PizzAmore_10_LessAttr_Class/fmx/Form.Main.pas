@@ -153,6 +153,13 @@ type
     LinkFillControlToField1: TLinkFillControlToField;
     ListBoxState: TListBox;
     LinkFillControlToField2: TLinkFillControlToField;
+    PanelCustomerFilter: TPanel;
+    BSFilterCustomer: TioPrototypeBindSourceMaster;
+    Label18: TLabel;
+    Label19: TLabel;
+    EditCustomerSearchCity: TEdit;
+    ButtonSearchCustomer: TButton;
+    LinkControlToField19: TLinkControlToField;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
@@ -164,6 +171,7 @@ type
     procedure ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure EditOrderNoteChangeTracking(Sender: TObject);
+    procedure ButtonSearchCustomerClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -176,7 +184,8 @@ var
 implementation
 
 uses
-  System.IOUtils, Utils.SampleData, Model.Order, Model.Pizza, Model.OrderRow;
+  System.IOUtils, Utils.SampleData, Model.Order, Model.Pizza, Model.OrderRow,
+  Model.Customer;
 
 {$R *.fmx}
 
@@ -192,6 +201,10 @@ begin
   BSOrders.Open;
   BSCustomers.Open;
   BSPizzas.Open;
+  // Open filter bind sources
+  var LCustomer := TCustomer.Create;
+  LCustomer.City := 'New York';
+  BSFilterCustomer.SetDataObject(LCustomer);
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -223,6 +236,18 @@ begin
   BSOrders.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   BSOrders.Refresh;
   ADone := True;
+end;
+
+procedure TMainForm.ButtonSearchCustomerClick(Sender: TObject);
+var
+  LObj: TObject;
+  LWhere: IioWhere;
+begin
+  BSFilterCustomer.PostIfEditing;
+  LObj := BSFilterCustomer.DataObject;
+  LWhere := io.GlobalFactory.WhereFactory.NewWhereSmartBuilder.BuildWhere(LObj);
+  BSCustomers.Where := LWhere;
+  BSCustomers.Persistence.Reload;
 end;
 
 procedure TMainForm.EditOrderNoteChangeTracking(Sender: TObject);

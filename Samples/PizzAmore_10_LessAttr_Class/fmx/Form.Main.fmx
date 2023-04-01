@@ -3,8 +3,8 @@ object MainForm: TMainForm
   Top = 0
   ActiveControl = TabItemPIzzas
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 607
-  ClientWidth = 1014
+  ClientHeight = 800
+  ClientWidth = 1000
   Position = ScreenCenter
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -13,29 +13,29 @@ object MainForm: TMainForm
   DesignerMasterStyle = 0
   object ScaledLayoutMain: TScaledLayout
     Align = Client
-    OriginalWidth = 1014.000000000000000000
-    OriginalHeight = 607.000000000000000000
-    Size.Width = 1014.000000000000000000
-    Size.Height = 607.000000000000000000
+    OriginalWidth = 1000.000000000000000000
+    OriginalHeight = 800.000000000000000000
+    Size.Width = 1000.000000000000000000
+    Size.Height = 800.000000000000000000
     Size.PlatformDefault = False
     object TabControlMain: TTabControl
       Align = Client
-      Size.Width = 654.000000000000000000
-      Size.Height = 607.000000000000000000
+      Size.Width = 640.000000000000000000
+      Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
       TabIndex = 1
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
-        654s
-        558s
-        654s
-        558s
-        654s
-        558s
-        654s
-        558s)
+        640s
+        751s
+        640s
+        751s
+        640s
+        751s
+        640s
+        751s)
       object TabItemStart: TTabItem
         CustomIcon = <
           item
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 25
+          TabOrder = 30
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5161,14 +5161,14 @@ object MainForm: TMainForm
           end
         end
         object ToolBar1: TToolBar
-          Size.Width = 654.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 48.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
           object Label17: TLabel
             Align = Client
             StyledSettings = [Family, FontColor]
-            Size.Width = 654.000000000000000000
+            Size.Width = 640.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'toollabel'
@@ -5181,8 +5181,8 @@ object MainForm: TMainForm
         object Rectangle8: TRectangle
           Align = Bottom
           Fill.Color = xFFF0F0F0
-          Position.Y = 518.000000000000000000
-          Size.Width = 654.000000000000000000
+          Position.Y = 711.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           Stroke.Kind = None
@@ -5202,7 +5202,7 @@ object MainForm: TMainForm
         ExplicitSize.cx = 124.000000000000000000
         ExplicitSize.cy = 49.000000000000000000
         object ToolBarOrder: TToolBar
-          Size.Width = 654.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 48.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
@@ -5221,7 +5221,7 @@ object MainForm: TMainForm
             Align = MostRight
             Enabled = True
             ImageIndex = -1
-            Position.X = 606.000000000000000000
+            Position.X = 592.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
@@ -5230,7 +5230,7 @@ object MainForm: TMainForm
           object LabelOrderTitle: TLabel
             Align = Client
             StyledSettings = [Family, FontColor]
-            Size.Width = 558.000000000000000000
+            Size.Width = 544.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'toollabel'
@@ -5244,7 +5244,7 @@ object MainForm: TMainForm
               Align = Right
               Enabled = True
               ImageIndex = -1
-              Position.X = 510.000000000000000000
+              Position.X = 496.000000000000000000
               Size.Width = 48.000000000000000000
               Size.Height = 48.000000000000000000
               Size.PlatformDefault = False
@@ -5323,7 +5323,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 265.000000000000000000
           Position.Y = 60.000000000000000000
-          Size.Width = 367.000000000000000000
+          Size.Width = 353.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'note'
@@ -5382,7 +5382,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 433.000000000000000000
           Position.Y = 108.000000000000000000
-          Size.Width = 199.000000000000000000
+          Size.Width = 185.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'phone'
@@ -5417,7 +5417,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 90.000000000000000000
           Position.Y = 141.000000000000000000
-          Size.Width = 542.000000000000000000
+          Size.Width = 528.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'address'
@@ -5429,15 +5429,15 @@ object MainForm: TMainForm
           ClipChildren = True
           Position.X = 90.000000000000000000
           Position.Y = 191.000000000000000000
-          Size.Width = 542.000000000000000000
-          Size.Height = 313.000000000000000000
+          Size.Width = 528.000000000000000000
+          Size.Height = 506.000000000000000000
           Size.PlatformDefault = False
           TextSettings.Font.Size = 14.000000000000000000
           StyledSettings = [Family, Style, FontColor]
           TabOrder = 11
           RowCount = 200
-          Viewport.Width = 522.000000000000000000
-          Viewport.Height = 288.000000000000000000
+          Viewport.Width = 508.000000000000000000
+          Viewport.Height = 481.000000000000000000
         end
         object Label5: TLabel
           StyledSettings = [Family]
@@ -5455,15 +5455,15 @@ object MainForm: TMainForm
         object Rectangle6: TRectangle
           Align = Bottom
           Fill.Color = xFFF0F0F0
-          Position.Y = 518.000000000000000000
-          Size.Width = 654.000000000000000000
+          Position.Y = 711.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           Stroke.Kind = None
           object Label6: TLabel
             Anchors = [akRight, akBottom]
             StyledSettings = [Family]
-            Position.X = 459.000000000000000000
+            Position.X = 445.000000000000000000
             Position.Y = 8.000000000000000000
             Size.Width = 75.000000000000000000
             Size.Height = 25.000000000000000000
@@ -5483,7 +5483,7 @@ object MainForm: TMainForm
             Text = '67,67 '#8364
             TextSettings.Font.Size = 18.000000000000000000
             TextSettings.HorzAlign = Trailing
-            Position.X = 542.000000000000000000
+            Position.X = 528.000000000000000000
             Position.Y = 8.000000000000000000
             Size.Width = 90.000000000000000000
             Size.Height = 25.000000000000000000
@@ -5552,7 +5552,7 @@ object MainForm: TMainForm
         ExplicitSize.cx = 124.000000000000000000
         ExplicitSize.cy = 49.000000000000000000
         object ToolBarCustomer: TToolBar
-          Size.Width = 654.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 48.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
@@ -5571,7 +5571,7 @@ object MainForm: TMainForm
             Align = MostRight
             Enabled = True
             ImageIndex = -1
-            Position.X = 606.000000000000000000
+            Position.X = 592.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
@@ -5580,7 +5580,7 @@ object MainForm: TMainForm
           object LabelCustomerTitle: TLabel
             Align = Client
             StyledSettings = [Family, FontColor]
-            Size.Width = 510.000000000000000000
+            Size.Width = 496.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'toollabel'
@@ -5595,7 +5595,7 @@ object MainForm: TMainForm
             Align = Right
             Enabled = True
             ImageIndex = -1
-            Position.X = 558.000000000000000000
+            Position.X = 544.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
@@ -5653,7 +5653,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 98.000000000000000000
           Position.Y = 101.000000000000000000
-          Size.Width = 535.000000000000000000
+          Size.Width = 521.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'name'
@@ -5681,7 +5681,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 97.000000000000000000
           Position.Y = 158.000000000000000000
-          Size.Width = 536.000000000000000000
+          Size.Width = 522.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'phone'
@@ -5729,7 +5729,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 98.000000000000000000
           Position.Y = 214.000000000000000000
-          Size.Width = 536.000000000000000000
+          Size.Width = 522.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'city'
@@ -5777,7 +5777,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 97.000000000000000000
           Position.Y = 247.000000000000000000
-          Size.Width = 536.000000000000000000
+          Size.Width = 522.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'address'
@@ -5786,8 +5786,8 @@ object MainForm: TMainForm
         object Rectangle7: TRectangle
           Align = Bottom
           Fill.Color = xFFF0F0F0
-          Position.Y = 518.000000000000000000
-          Size.Width = 654.000000000000000000
+          Position.Y = 711.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           Stroke.Kind = None
@@ -5807,7 +5807,7 @@ object MainForm: TMainForm
         ExplicitSize.cx = 126.000000000000000000
         ExplicitSize.cy = 49.000000000000000000
         object ToolBarPizza: TToolBar
-          Size.Width = 654.000000000000000000
+          Size.Width = 640.000000000000000000
           Size.Height = 48.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
@@ -5826,7 +5826,7 @@ object MainForm: TMainForm
             Align = MostRight
             Enabled = True
             ImageIndex = -1
-            Position.X = 606.000000000000000000
+            Position.X = 592.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
@@ -5835,7 +5835,7 @@ object MainForm: TMainForm
           object LabelPizzaTitle: TLabel
             Align = Client
             StyledSettings = [Family, FontColor]
-            Size.Width = 558.000000000000000000
+            Size.Width = 544.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'toollabel'
@@ -5849,7 +5849,7 @@ object MainForm: TMainForm
               Align = Right
               Enabled = True
               ImageIndex = -1
-              Position.X = 510.000000000000000000
+              Position.X = 496.000000000000000000
               Size.Width = 48.000000000000000000
               Size.Height = 48.000000000000000000
               Size.PlatformDefault = False
@@ -5908,7 +5908,7 @@ object MainForm: TMainForm
           TextSettings.Font.Size = 14.000000000000000000
           Position.X = 97.000000000000000000
           Position.Y = 101.000000000000000000
-          Size.Width = 535.000000000000000000
+          Size.Width = 521.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'name'
@@ -6075,22 +6075,22 @@ object MainForm: TMainForm
     end
     object TabControlLists: TTabControl
       Align = MostRight
-      Position.X = 654.000000000000000000
+      Position.X = 640.000000000000000000
       Size.Width = 360.000000000000000000
-      Size.Height = 607.000000000000000000
+      Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       TabStop = False
       TabPosition = Top
       Sizes = (
         360s
-        558s
+        751s
         360s
-        558s
+        751s
         360s
-        558s)
+        751s)
       object TabItemOrders: TTabItem
         CustomIcon = <
           item
@@ -6098,7 +6098,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family, Style]
-        IsSelected = True
+        IsSelected = False
         Size.Width = 90.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6110,7 +6110,7 @@ object MainForm: TMainForm
         object Rectangle5: TRectangle
           Align = Bottom
           Fill.Color = xFFF0F0F0
-          Position.Y = 518.000000000000000000
+          Position.Y = 711.000000000000000000
           Size.Width = 360.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
@@ -6145,7 +6145,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 518.000000000000000000
+          Size.Height = 711.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 60
@@ -6171,7 +6171,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family]
-        IsSelected = False
+        IsSelected = True
         Size.Width = 127.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6183,7 +6183,7 @@ object MainForm: TMainForm
         object Rectangle3: TRectangle
           Align = Bottom
           Fill.Color = xFFF0F0F0
-          Position.Y = 518.000000000000000000
+          Position.Y = 711.000000000000000000
           Size.Width = 360.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
@@ -6251,7 +6251,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 518.000000000000000000
+          Size.Height = 576.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 60
@@ -6268,6 +6268,57 @@ object MainForm: TMainForm
           OnItemClick = ListViewCustomersItemClick
           SearchVisible = True
           SearchAlwaysOnTop = False
+        end
+        object PanelCustomerFilter: TPanel
+          Align = Bottom
+          Position.Y = 576.000000000000000000
+          Size.Width = 360.000000000000000000
+          Size.Height = 135.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'pushpanel'
+          TabOrder = 2
+          object Label18: TLabel
+            Align = Top
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 360.000000000000000000
+            Size.Height = 21.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = 'Search for'
+            TabOrder = 0
+          end
+          object Label19: TLabel
+            StyledSettings = [Family]
+            Position.X = 9.000000000000000000
+            Position.Y = 29.000000000000000000
+            Size.Width = 75.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'City'
+            TabOrder = 2
+          end
+          object EditCustomerSearchCity: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 9
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Center
+            Position.X = 98.000000000000000000
+            Position.Y = 29.000000000000000000
+            Size.Width = 123.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object ButtonSearchCustomer: TButton
+            Position.X = 229.000000000000000000
+            Position.Y = 29.000000000000000000
+            TabOrder = 10
+            Text = 'Search'
+            OnClick = ButtonSearchCustomerClick
+          end
         end
       end
       object TabItemPIzzas: TTabItem
@@ -6289,7 +6340,7 @@ object MainForm: TMainForm
         object Rectangle4: TRectangle
           Align = Bottom
           Fill.Color = xFFF0F0F0
-          Position.Y = 518.000000000000000000
+          Position.Y = 711.000000000000000000
           Size.Width = 360.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
@@ -6324,7 +6375,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 518.000000000000000000
+          Size.Height = 711.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 100
@@ -6742,6 +6793,13 @@ object MainForm: TMainForm
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
+    object LinkControlToField19: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSFilterCustomer
+      FieldName = 'City'
+      Control = EditCustomerSearchCity
+      Track = False
+    end
   end
   object BSPizzas: TioPrototypeBindSourceMaster
     AutoActivate = True
@@ -6890,5 +6948,21 @@ object MainForm: TMainForm
     MasterPropertyName = 'Rows'
     Left = 703
     Top = 273
+  end
+  object BSFilterCustomer: TioPrototypeBindSourceMaster
+    FieldDefs = <
+      item
+        Name = 'City'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    AsDefault = False
+    TypeName = 'TCustomer'
+    LoadType = ltManual
+    TypeOfCollection = tcSingleObject
+    Paging.CurrentPageOfFormat = '%d/%d'
+    Left = 688
+    Top = 561
   end
 end
