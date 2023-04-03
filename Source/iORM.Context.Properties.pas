@@ -67,12 +67,13 @@ type
     FReadWrite: TioLoadPersist;
     // Smart where
     FWhereCompareOp: TioCompareOp;
-    FWhereLogicOp: TioLogicOp;
-    FWhereTargetPropName: String;
-    FWhereGroupName: String;
     FWhereGroupLogicOp: TioLogicOp;
+    FWhereGroupName: String;
+    FWhereLogicOp: TioLogicOp;
     FWhereMasterGroupName: String;
     FWhereNullValue: TValue;
+    FWhereSkip: Boolean;
+    FWhereTargetPropName: String;
     // M.M. 01/08/18 - MetadataType used by DBBuilder
     FMetadata_FieldType: TioMetadataFieldType;
     FMetadata_FieldLength: Integer;
@@ -95,13 +96,15 @@ type
     procedure SetWhereLogicOp(const Value: TioLogicOp);
     procedure SetWhereMasterGroupName(const Value: String);
     procedure SetWhereNullValue(const Value: TValue);
+    procedure SetWhereSkip(const Value: Boolean);
     procedure SetWhereTargetPropName(const Value: String);
-    function GetWhereGroupName: String; protected
+    function GetWhereGroupName: String;
     function GetWhereCompareOp: TioCompareOp;
     function GetWhereGroupLogicOp: TioLogicOp;
     function GetWhereLogicOp: TioLogicOp;
     function GetWhereMasterGroupName: String;
     function GetWhereNullValue: TValue;
+    function GetWhereSkip: Boolean;
     function GetWhereTargetPropName: String;
   strict protected
     constructor Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
@@ -192,12 +195,13 @@ type
     function GetMetadata_FKOnUpdateAction: TioFKAction;
 
     property WhereCompareOp: TioCompareOp read GetWhereCompareOp write SetWhereCompareOp;
-    property WhereLogicOp: TioLogicOp read GetWhereLogicOp write SetWhereLogicOp;
     property WhereGroupName: String read GetWhereGroupName write SetWhereGroupName;
     property WhereGroupLogicOp: TioLogicOp read GetWhereGroupLogicOp write SetWhereGroupLogicOp;
+    property WhereLogicOp: TioLogicOp read GetWhereLogicOp write SetWhereLogicOp;
     property WhereMasterGroupName: String read GetWhereMasterGroupName write SetWhereMasterGroupName;
     property WhereNullValue: TValue read GetWhereNullValue write SetWhereNullValue;
     property WhereTargetPropName: String read GetWhereTargetPropName write SetWhereTargetPropName;
+    property WhereSkip: Boolean read GetWhereSkip write SetWhereSkip;
   end;
 
   // Autodetected HasMany relation child virtual property (foreign key)
@@ -653,6 +657,11 @@ begin
   Result := FWhereNullValue;
 end;
 
+function TioProperty.GetWhereSkip: Boolean;
+begin
+  Result := FWhereSkip;
+end;
+
 function TioProperty.GetWhereTargetPropName: String;
 begin
   Result := FWhereTargetPropName;
@@ -901,6 +910,11 @@ end;
 procedure TioProperty.SetWhereNullValue(const Value: TValue);
 begin
   FWhereNullValue := Value;
+end;
+
+procedure TioProperty.SetWhereSkip(const Value: Boolean);
+begin
+  FWhereSkip := Value;
 end;
 
 procedure TioProperty.SetWhereTargetPropName(const Value: String);

@@ -432,6 +432,10 @@ type
   ioWhereNullValue = class(TioCustomTValueAttribute)
   end;
 
+  // Skip the property for where filter purposes
+  ioWhereSkip = class(TioCustomAttribute)
+  end;
+
 {$ENDREGION} // END OF SMART WHERE ATTRIBUTES
 
 

@@ -21,6 +21,7 @@ type
     property Name: String read FName write FName;
     property City: String read FCity write FCity;
     property Address: String read FAddress write FAddress;
+    [ioWhereSkip]
     property FullAddress: String read GetFullAddress;  // ReadOnly - Not mapped
     property PhoneNumber: String read FPhoneNumber write FPhoneNumber;
   end;

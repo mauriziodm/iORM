@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 30
+          TabOrder = 35
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5328,7 +5328,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           TextPrompt = 'note'
           StyledSettings = [Family, Style, FontColor]
-          OnChangeTracking = EditOrderNoteChangeTracking
         end
         object Label4: TLabel
           StyledSettings = [Family]
@@ -6303,8 +6302,28 @@ object MainForm: TMainForm
           object EditCustomerSearchCity: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
             TabOrder = 9
+            Text = 
+              'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+              'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+              'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+              'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+              'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+              'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+              ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+              'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+              ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+              ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+              'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+              'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+              'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+              'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+              'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+              'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+              'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+              'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+              'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+              'por, velit sit'
             TextSettings.Font.Size = 14.000000000000000000
-            TextSettings.HorzAlign = Center
             Position.X = 98.000000000000000000
             Position.Y = 29.000000000000000000
             Size.Width = 123.000000000000000000
@@ -6315,9 +6334,32 @@ object MainForm: TMainForm
           object ButtonSearchCustomer: TButton
             Position.X = 229.000000000000000000
             Position.Y = 29.000000000000000000
-            TabOrder = 10
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 12
             Text = 'Search'
             OnClick = ButtonSearchCustomerClick
+          end
+          object ButtonCreateCustomer: TButton
+            Position.X = 229.000000000000000000
+            Position.Y = 69.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 11
+            Text = 'Create'
+            OnClick = ButtonCreateCustomerClick
+          end
+          object ButtonOpen: TButton
+            Position.X = 117.000000000000000000
+            Position.Y = 69.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 10
+            Text = 'Open'
+            OnClick = ButtonOpenClick
           end
         end
       end
@@ -6950,6 +6992,7 @@ object MainForm: TMainForm
     Top = 273
   end
   object BSFilterCustomer: TioPrototypeBindSourceMaster
+    AutoActivate = True
     FieldDefs = <
       item
         Name = 'City'
@@ -6957,11 +7000,12 @@ object MainForm: TMainForm
         ReadOnly = False
       end>
     ScopeMappings = <>
+    Preview = True
     AsDefault = False
     TypeName = 'TCustomer'
-    LoadType = ltManual
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
+    OnEditAction = eaDoNothing
     Left = 688
     Top = 561
   end

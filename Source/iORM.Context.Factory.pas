@@ -290,12 +290,13 @@ var
     LDB_FKOnUpdateAction: TioFKAction;
     // Smart where
     LWhereCompareOp: TioCompareOp;
-    LWhereLogicOp: TioLogicOp;
-    LWhereTargetPropName: String;
-    LWhereGroupName: String;
     LWhereGroupLogicOp: TioLogicOp;
+    LWhereGroupName: String;
+    LWhereLogicOp: TioLogicOp;
     LWhereMasterGroupName: String;
     LWhereNullValue: TValue;
+    LWhereSkip: Boolean;
+    LWhereTargetPropName: String;
     // Map metadata
     LMember_IsID: Boolean;
     LMember_TypeAlias: String;
@@ -350,12 +351,13 @@ var
       LDB_FKOnUpdateAction := fkUnspecified;
       // Smart where initialization
       LWhereCompareOp := TioCompareOp.coEqual;
-      LWhereLogicOp := TioLogicOp.loAnd;
-      LWhereTargetPropName := LMember_FieldName; // Default where target property name equals the property name itself
-      LWhereGroupName := String.Empty;
       LWhereGroupLogicOp := TioLogicOp.loAnd;
+      LWhereGroupName := String.Empty;
+      LWhereLogicOp := TioLogicOp.loAnd;
       LWhereMasterGroupName := String.Empty;
       LWhereNullValue := TValue.Empty;
+      LWhereSkip := False;
+      LWhereTargetPropName := LMember_FieldName; // Default where target property name equals the property name itself
       // Map members (props and/or fields) initialization
       LMember_IsID := (Uppercase(LMember_FieldName) = 'ID');
       LMember_TypeAlias := '';
@@ -490,6 +492,8 @@ var
         else
         if LAttribute is ioWhereNullValue then
           LWhereNullValue := ioWhereNullValue(LAttribute).Value;
+        if LAttribute is ioWhereSkip then
+          LWhereSkip := True;
         // Metadata Used by DBBuilder (M.M. 01/08/18)
         if LAttribute is ioNotNull then
           LDB_FieldNotNull := True
@@ -607,12 +611,13 @@ var
         LDB_FieldScale, LDB_FieldNotNull, LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
         LDB_FKOnUpdateAction);
       LNewProperty.WhereCompareOp := LWhereCompareOp;
-      LNewProperty.WhereLogicOp := LWhereLogicOp;
-      LNewProperty.WhereTargetPropName := LWhereTargetPropName;
-      LNewProperty.WhereGroupName := LWhereGroupName;
       LNewProperty.WhereGroupLogicOp := LWhereGroupLogicOp;
+      LNewProperty.WhereGroupName := LWhereGroupName;
+      LNewProperty.WhereLogicOp := LWhereLogicOp;
       LNewProperty.WhereMasterGroupName := LWhereMasterGroupName;
       LNewProperty.WhereNullValue := LWhereNullValue;
+      LNewProperty.WhereSkip := LWhereSkip;
+      LNewProperty.WhereTargetPropName := LWhereTargetPropName;
       Result.Add(LNewProperty);
       // If the current property is a virtual property (autodetected has many relation) then
       // add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer

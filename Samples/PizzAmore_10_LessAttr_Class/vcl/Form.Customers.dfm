@@ -13,6 +13,7 @@ object CustomersForm: TCustomersForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 15
   object PanelBottom: TPanel
@@ -163,7 +164,7 @@ object CustomersForm: TCustomersForm
     Left = 0
     Top = 40
     Width = 384
-    Height = 681
+    Height = 576
     Align = alClient
     DataSource = SourceCustomers
     TabOrder = 2
@@ -211,6 +212,68 @@ object CustomersForm: TCustomersForm
         Width = 100
         Visible = True
       end>
+  end
+  object PanelWhere: TPanel
+    Left = 0
+    Top = 616
+    Width = 384
+    Height = 105
+    Align = alBottom
+    BevelOuter = bvNone
+    Color = clMenu
+    ParentBackground = False
+    TabOrder = 3
+    object ButtonSearch: TSpeedButton
+      Left = 288
+      Top = 6
+      Width = 72
+      Height = 30
+      Caption = 'Search'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      OnClick = ButtonSearchClick
+    end
+    object ButtonWhereOpen: TSpeedButton
+      Left = 288
+      Top = 36
+      Width = 72
+      Height = 30
+      Caption = 'Open'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      OnClick = ButtonWhereOpenClick
+    end
+    object ButtonWhereCreate: TSpeedButton
+      Left = 288
+      Top = 66
+      Width = 72
+      Height = 30
+      Caption = 'Create'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      OnClick = ButtonWhereCreateClick
+    end
+    object DBEditWhereCity: TDBEdit
+      Left = 161
+      Top = 40
+      Width = 121
+      Height = 23
+      DataField = 'City'
+      DataSource = SourceWhere
+      TabOrder = 0
+    end
   end
   object DSCustomers: TioDataSetMaster
     AsDefault = True
@@ -275,5 +338,23 @@ object CustomersForm: TCustomersForm
       OnExecute = acShowOrSelectExecute
       OnUpdate = acShowOrSelectUpdate
     end
+  end
+  object DSWhere: TioDataSetMaster
+    AsDefault = False
+    TypeName = 'TCustomer'
+    LoadType = ltManual
+    TypeOfCollection = tcSingleObject
+    Paging.CurrentPageOfFormat = '%d/%d'
+    Left = 16
+    Top = 640
+    object DSWhereCity: TStringField
+      FieldName = 'City'
+      Size = 30
+    end
+  end
+  object SourceWhere: TDataSource
+    DataSet = DSWhere
+    Left = 80
+    Top = 640
   end
 end

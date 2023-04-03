@@ -160,6 +160,8 @@ type
     EditCustomerSearchCity: TEdit;
     ButtonSearchCustomer: TButton;
     LinkControlToField19: TLinkControlToField;
+    ButtonCreateCustomer: TButton;
+    ButtonOpen: TButton;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
@@ -170,8 +172,9 @@ type
     procedure ListViewPizzasItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
-    procedure EditOrderNoteChangeTracking(Sender: TObject);
     procedure ButtonSearchCustomerClick(Sender: TObject);
+    procedure ButtonCreateCustomerClick(Sender: TObject);
+    procedure ButtonOpenClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -202,9 +205,10 @@ begin
   BSCustomers.Open;
   BSPizzas.Open;
   // Open filter bind sources
-  var LCustomer := TCustomer.Create;
-  LCustomer.City := 'New York';
-  BSFilterCustomer.SetDataObject(LCustomer);
+//  var LCustomer := TCustomer.Create;
+//  LCustomer.City := 'New York';
+//  BSFilterCustomer.SetDataObject(LCustomer);
+//  BSFilterCustomer.Open;
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -238,21 +242,30 @@ begin
   ADone := True;
 end;
 
+procedure TMainForm.ButtonCreateCustomerClick(Sender: TObject);
+begin
+  var LCustomer := TCustomer.Create;
+  LCustomer.City := 'Union City';
+  BSFilterCustomer.Close;
+  BSFilterCustomer.LoadType := ltManual;
+  BSFilterCustomer.SetDataObject(LCustomer);
+end;
+
+procedure TMainForm.ButtonOpenClick(Sender: TObject);
+begin
+  BSFilterCustomer.Open;
+end;
+
 procedure TMainForm.ButtonSearchCustomerClick(Sender: TObject);
 var
   LObj: TObject;
   LWhere: IioWhere;
 begin
   BSFilterCustomer.PostIfEditing;
-  LObj := BSFilterCustomer.DataObject;
+  LObj := BSFilterCustomer.Current;
   LWhere := io.GlobalFactory.WhereFactory.NewWhereSmartBuilder.BuildWhere(LObj);
   BSCustomers.Where := LWhere;
   BSCustomers.Persistence.Reload;
-end;
-
-procedure TMainForm.EditOrderNoteChangeTracking(Sender: TObject);
-begin
-//  TLinkObservers.ControlChanged(Tcontrol(Sender));
 end;
 
 procedure TMainForm.ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);

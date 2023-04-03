@@ -172,6 +172,12 @@ type
   ioEmbeddedHasOne = iORM.Attributes.ioEmbeddedHasOne;
   ioDisableRelationAutodetect = iORM.Attributes.ioDisableRelationAutodetect;
 
+  // SmartWhereAttributes
+  ioWhere = iORM.Attributes.ioWhere;
+  ioWhereGroup = iORM.Attributes.ioWhereGroup;
+  ioWhereNullValue = iORM.Attributes.ioWhereNullValue;
+  ioWhereSkip = iORM.Attributes.ioWhereSkip;
+
   // Dependency Injection attributes
   diRegister = iORM.Attributes.diRegister;
   diImplements = iORM.Attributes.diImplements;

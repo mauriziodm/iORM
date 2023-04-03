@@ -1,377 +1,380 @@
 ﻿[BSCustomers]
-Coordinates=776,302,119,213
+Coordinates=776,302,143,240
 Visible=True
 
 [ActionList1]
-Coordinates=230,658,70,33
+Coordinates=230,658,78,36
 
 [BSOrders]
-Coordinates=224,429,81,213
+Coordinates=224,429,96,236
 Visible=True
 
 [BSPizzas]
-Coordinates=1706,122,60,177
+Coordinates=1706,122,69,188
 Visible=True
 
 [ioFMX1]
-Coordinates=759,111,50,33
+Coordinates=759,111,59,36
 
 [SQLiteConn]
-Coordinates=759,331,73,33
+Coordinates=759,331,84,36
 
 [BindingsList1]
-Coordinates=759,496,82,33
+Coordinates=759,496,91,36
 
 []
 Coordinates=1140,450,89,51
 
 [TabItemOrders]
-Coordinates=348,1582,87,33
+Coordinates=348,1582,101,36
 
 [LabelPizzaTitle]
-Coordinates=1767,1242,88,51
+Coordinates=1767,1242,102,58
 
 [ButtonCustomerPersist]
-Coordinates=763,1242,129,51
+Coordinates=763,1242,147,58
 
 [TabItemOrder]
-Coordinates=1753,1498,81,33
+Coordinates=1753,1498,94,36
 
 [Layout3D1]
-Coordinates=607,263,66,33
+Coordinates=607,263,76,36
 
 [TabItemPizza]
-Coordinates=1101,1582,79,33
+Coordinates=1101,1582,93,36
 
 [ButtonCustomerAdd]
-Coordinates=1022,1242,115,51
+Coordinates=1022,1242,130,58
 
 [ButtonPizzaBack]
-Coordinates=1464,1242,97,51
+Coordinates=1464,1242,112,58
 
 [ListViewOrders]
-Coordinates=416,636,89,195
+Coordinates=416,636,107,234
 Visible=True
 
 [Rectangle4]
-Coordinates=1285,1498,69,33
+Coordinates=1285,1498,80,36
 
 [Layout1]
-Coordinates=1873,1498,53,33
+Coordinates=1873,1498,60,36
 
 [TabControlLists]
-Coordinates=621,1582,93,33
+Coordinates=621,1582,105,36
 
 [TabItemCustomers]
-Coordinates=951,1582,107,33
+Coordinates=951,1582,124,36
 
 [TabItemCustomer]
-Coordinates=1576,1582,101,33
+Coordinates=1576,1582,117,36
 
 [ScaledLayoutMain]
-Coordinates=475,1582,104,33
+Coordinates=475,1582,120,36
 
 [TabItemStart]
-Coordinates=1638,1498,77,33
+Coordinates=1638,1498,89,36
 
 [LabelCustomerTitle]
-Coordinates=573,1414,110,51
+Coordinates=573,1414,126,58
 
 [TabItemPIzzas]
-Coordinates=222,1582,85,33
+Coordinates=222,1582,100,36
 
 [ButtonPizzaPersist]
-Coordinates=725,1414,107,51
+Coordinates=725,1414,123,58
 
 [Rectangle5]
-Coordinates=1352,1582,69,33
+Coordinates=1352,1582,80,36
 
 [Rectangle3]
-Coordinates=1391,1498,69,33
+Coordinates=1391,1498,80,36
 
 [ButtonCustomerBack]
-Coordinates=1228,1414,120,51
+Coordinates=1228,1414,136,58
 
 [ToolBarPizza]
-Coordinates=1168,1498,79,33
+Coordinates=1168,1498,91,36
 
 [ButtonOrderPersist]
-Coordinates=1714,1414,109,51
+Coordinates=1714,1414,124,58
 
 [Rectangle1]
-Coordinates=845,1582,69,33
+Coordinates=845,1582,80,36
 
 [ListViewCustomers]
-Coordinates=999,246,109,195
+Coordinates=999,246,125,234
 
 [TabControlMain]
-Coordinates=1220,1582,92,33
+Coordinates=1220,1582,106,36
 
 [Rectangle2]
-Coordinates=10,1582,69,33
+Coordinates=10,1582,80,36
 
 [ListViewPizzas]
-Coordinates=1519,88,89,213
+Coordinates=1519,88,107,256
 
 [ToolBarOrder]
-Coordinates=1458,1582,81,33
+Coordinates=1458,1582,92,36
 
 [ToolBarCustomer]
-Coordinates=1497,1498,101,33
+Coordinates=1497,1498,115,36
 
 [ButtonPizzaAdd]
-Coordinates=2067,1242,93,51
+Coordinates=2067,1242,106,58
 
 [Label1]
-Coordinates=1149,1414,46,51
+Coordinates=1149,1414,53,58
 
 [ButtonPizzaDelete]
-Coordinates=340,1498,104,51
+Coordinates=340,1498,121,58
 
 [Label3]
-Coordinates=10,1414,46,51
+Coordinates=10,1414,53,58
 
 [ButtonOrderBack]
-Coordinates=1178,1242,100,51
+Coordinates=1178,1242,113,58
 
 [Label2]
-Coordinates=1602,1242,46,51
+Coordinates=1602,1242,53,58
 
 [ButtonCustomerDelete]
-Coordinates=752,1498,126,51
+Coordinates=752,1498,145,58
 
 [LabelOrderTitle]
-Coordinates=1950,1414,90,51
+Coordinates=1950,1414,104,58
 
 [EditOrderID]
-Coordinates=428,518,72,51
+Coordinates=428,518,83,58
 
 [EditOrderDate]
-Coordinates=421,10,84,51
+Coordinates=421,10,97,58
 
 [EditOrderCustID]
-Coordinates=1367,10,95,51
+Coordinates=1367,10,109,58
 
 [Label4]
-Coordinates=96,1498,46,51
+Coordinates=96,1498,53,58
 
 [Rectangle6]
-Coordinates=116,1582,69,33
+Coordinates=116,1582,80,36
 
 [EditOrderCustAddress]
-Coordinates=1350,128,125,51
+Coordinates=1350,128,143,58
 
 [EditOrderCustPhone]
-Coordinates=1355,246,116,51
+Coordinates=1355,246,133,58
 
 [EditOrderCustName]
-Coordinates=1356,364,112,51
+Coordinates=1356,364,130,58
 
 [Label5]
-Coordinates=684,1242,46,51
+Coordinates=684,1242,53,58
 
 [EditOrderNote]
-Coordinates=421,1158,84,51
+Coordinates=421,1158,97,58
 
 [BSOrderCustomer]
-Coordinates=1150,143,104,123
+Coordinates=1150,143,120,146
 
 [EditOrderGrandTotal]
-Coordinates=10,518,116,51
+Coordinates=10,518,134,58
 Visible=True
 
 [BSOrderRows]
-Coordinates=10,1242,84,123
+Coordinates=10,1242,96,146
 
 [Label6]
-Coordinates=175,1498,46,51
+Coordinates=175,1498,53,58
 
 [GridOrderRows]
-Coordinates=186,1242,91,123
+Coordinates=186,1242,104,146
 
 [acMoveToOrderTabItem]
-Coordinates=98,77,132,33
+Coordinates=98,77,154,36
 
 [acMoveToStartTabItem]
-Coordinates=524,318,127,33
+Coordinates=524,318,149,36
 
 [acOrderPersist]
-Coordinates=98,1,88,33
+Coordinates=98,1,100,36
 
 [EditCustCity]
-Coordinates=1018,540,76,51
+Coordinates=1018,540,86,58
 
 [Label7]
-Coordinates=923,1498,46,51
+Coordinates=923,1498,53,58
 
 [Label11]
-Coordinates=487,1498,52,51
+Coordinates=487,1498,60,58
 
 [EditCustID]
-Coordinates=1023,776,66,51
+Coordinates=1023,776,76,58
 
 [EditCustPhone]
-Coordinates=1011,658,88,51
+Coordinates=1011,658,100,58
 
 [EditCustName]
-Coordinates=1013,128,84,51
+Coordinates=1013,128,97,58
 
 [Label8]
-Coordinates=89,1414,46,51
+Coordinates=89,1414,53,58
 
 [Rectangle7]
-Coordinates=2223,1498,69,33
+Coordinates=2223,1498,80,36
 
 [EditCustAddress]
-Coordinates=1006,10,97,51
+Coordinates=1006,10,110,58
 
 [Label9]
-Coordinates=1070,1414,46,51
+Coordinates=1070,1414,53,58
 
 [Label10]
-Coordinates=254,1498,52,51
+Coordinates=254,1498,60,58
 
 [Label15]
-Coordinates=10,1498,52,51
+Coordinates=10,1498,60,58
 
 [Label12]
-Coordinates=1523,1414,52,51
+Coordinates=1523,1414,60,58
 
 [acMoveToPizzaTabItem]
-Coordinates=358,80,129,33
+Coordinates=358,80,153,36
 
 [Label13]
-Coordinates=316,1414,52,51
+Coordinates=316,1414,60,58
 
 [acMoveToCustomerTabItem]
-Coordinates=629,71,152,33
+Coordinates=629,71,177,36
 
 [Label16]
-Coordinates=1681,1242,52,51
+Coordinates=1681,1242,60,58
 
 [acPizzaPersist]
-Coordinates=358,191,85,33
+Coordinates=358,191,99,36
 
 [ButtonOrderRevert]
-Coordinates=2080,1414,107,51
+Coordinates=2080,1414,122,58
 
 [acPizzaRevertOrDelete]
-Coordinates=629,123,126,33
+Coordinates=629,123,149,36
 
 [Label14]
-Coordinates=1864,1414,52,51
+Coordinates=1864,1414,60,58
 
 [acOrderRevertOrDelete]
-Coordinates=629,374,128,33
+Coordinates=629,374,150,36
 
 [acCustomerPersist]
-Coordinates=819,80,108,33
+Coordinates=819,80,123,36
 
 [acCustomerRevertOrDelete]
-Coordinates=480,393,148,33
+Coordinates=480,393,173,36
 
 [ImageLogo]
-Coordinates=1609,1414,69,51
+Coordinates=1609,1414,79,58
 
 [ButtonCustomerRevert]
-Coordinates=402,1414,127,51
+Coordinates=402,1414,145,58
 
 [ImagePizza]
-Coordinates=1865,364,69,51
+Coordinates=1865,364,82,58
 Visible=True
 
 [EditPizzaID]
-Coordinates=1866,128,69,51
+Coordinates=1866,128,81,58
 Visible=True
 
 [EditPizzaName]
-Coordinates=1855,246,87,51
+Coordinates=1855,246,102,58
 
 [EditPizzaPrice]
-Coordinates=1857,10,84,51
+Coordinates=1857,10,98,58
 
 [ButtonPizzaRevert]
-Coordinates=1317,1242,105,51
+Coordinates=1317,1242,121,58
 
 [RectanglePizzaImage]
-Coordinates=1002,1498,119,33
+Coordinates=1002,1498,140,36
 
 [ButtonOrderAdd]
-Coordinates=1390,1414,95,51
+Coordinates=1390,1414,107,58
 
 [ButtonOrderDelete]
-Coordinates=168,1414,106,51
+Coordinates=168,1414,122,58
 
 [acPizzaDelete]
-Coordinates=525,1,82,33
+Coordinates=525,1,97,36
 
 [ToolBar1]
-Coordinates=752,1582,58,33
+Coordinates=752,1582,67,36
 
 [acCustomerDelete]
-Coordinates=828,413,104,33
+Coordinates=828,413,121,36
 
 [LabelCustomerPage]
-Coordinates=565,393,113,51
+Coordinates=565,393,131,58
 Visible=True
 
 [ButtonCustomerPageUp]
-Coordinates=573,1498,133,51
+Coordinates=573,1498,153,58
 
 [ButtonCustomerPageDown]
-Coordinates=874,1414,148,51
+Coordinates=874,1414,170,58
 
 [acOrderDelete]
-Coordinates=525,105,84,33
+Coordinates=525,105,98,36
 
 [Rectangle8]
-Coordinates=1959,1498,69,33
+Coordinates=1959,1498,80,36
 
 [Label17]
-Coordinates=936,1242,52,51
+Coordinates=936,1242,60,58
 
 [acCustomersNextPage]
-Coordinates=978,1,126,33
+Coordinates=978,1,146,36
 
 [acCustomersPrevPage]
-Coordinates=978,53,126,33
+Coordinates=978,53,146,36
 
 [acPizzaAdd]
-Coordinates=0,0,71,33
+Coordinates=0,0,82,36
 
 [acOrderAdd]
-Coordinates=19,52,73,33
+Coordinates=19,52,84,36
 
 [acCustomerAdd]
-Coordinates=268,1,93,33
+Coordinates=268,1,106,36
 
 [EditState]
-Coordinates=436,128,58,51
+Coordinates=436,128,67,58
 
 [ComboBoxState]
-Coordinates=415,930,94,141
+Coordinates=415,930,108,168
 ExplicitSubNodes=ItemIndex
 
 [ListBoxState]
-Coordinates=400,246,116,177
+Coordinates=400,246,139,212
 
 [BSFilterCustomer]
-Coordinates=316,1242,101,69
+Coordinates=316,1242,116,80
 Visible=True
 
 [Label19]
-Coordinates=1895,1242,52,51
+Coordinates=1895,1242,60,58
 
 [PanelCustomerFilter]
-Coordinates=2065,1498,115,33
+Coordinates=2065,1498,132,36
 
 [Label18]
-Coordinates=1981,1242,52,51
+Coordinates=1981,1242,60,58
 
 [ButtonSearchCustomer]
-Coordinates=399,132,129,51
+Coordinates=399,132,148,58
 
 [EditCustomerSearchCity]
-Coordinates=512,1253,135,51
+Coordinates=512,1253,155,58
 Visible=True
+
+[ButtonCreateCustomer]
+Coordinates=209,154,146,58
 

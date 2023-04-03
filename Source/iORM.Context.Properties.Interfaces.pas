@@ -152,6 +152,10 @@ type
     procedure SetWhereNullValue(const Value: TValue);
     function GetWhereNullValue: TValue;
     property WhereNullValue: TValue read GetWhereNullValue write SetWhereNullValue;
+    // WhereSkip property
+    procedure SetWhereSkip(const Value: Boolean);
+    function GetWhereSkip: Boolean;
+    property WhereSkip: Boolean read GetWhereSkip write SetWhereSkip;
     // WhereTargetPropName property
     procedure SetWhereTargetPropName(const Value: String);
     function GetWhereTargetPropName: String;
