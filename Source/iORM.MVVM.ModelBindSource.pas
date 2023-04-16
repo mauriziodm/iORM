@@ -287,11 +287,8 @@ begin
 
   // If the ModelPresenter is a master model presenter then clear the
   //  relative Persistence layer
-  if not (csDesigning in ComponentState) then
-  begin
-    if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
-      LBSPersistenceClient.Persistence.Clear(False);
-  end;
+  if (not (csDesigning in ComponentState)) and Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+    LBSPersistenceClient.Persistence.Clear(False);
 
 // ----- OLD CODE -----
 //  inherited;
