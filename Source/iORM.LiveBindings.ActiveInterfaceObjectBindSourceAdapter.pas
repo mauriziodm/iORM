@@ -726,6 +726,7 @@ begin
   else
   begin
     inherited SetDataObject(nil, AOwnsObject);
+    AddFields; // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
     FDetailAdaptersContainer.SetMasterObject(nil);
   end;
   // DataSet synchro

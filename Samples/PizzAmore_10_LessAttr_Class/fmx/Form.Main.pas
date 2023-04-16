@@ -201,9 +201,9 @@ begin
   TabControlMain.ActiveTab := TabItemStart;
   TabControlLists.ActiveTab := TabItemOrders;
   // Open bind sources
-//  BSOrders.Open;
-//  BSCustomers.Open;
-//  BSPizzas.Open;
+  BSOrders.Open;
+  BSCustomers.Open;
+  BSPizzas.Open;
   // Open filter bind sources
 //  var LCustomer := TCustomer.Create;
 //  LCustomer.City := 'New York';
