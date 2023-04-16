@@ -278,7 +278,7 @@ procedure TioModelBindSource.SetActive(const Value: Boolean);
 var
   LBSPersistenceClient: IioBSPersistenceClient;
 begin
-  // If we are in the opening of the bind source and we are at design-time then
+  // If we are in the opening of the bind source and we aren't at design-time then
   //  create the active bind source adapter
   if Value and (not Assigned(FBindSourceAdapter)) and (not(csDesigning in ComponentState)) then
     _CreateAdapter;

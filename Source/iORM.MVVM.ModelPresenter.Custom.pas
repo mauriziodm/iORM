@@ -283,11 +283,12 @@ type
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction;const AVCProvider: TioViewContextProvider;  const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String = ''); overload;
     // DataObject
     procedure ClearDataObject;
@@ -471,7 +472,7 @@ destructor TioModelPresenterCustom.Destroy;
 begin
   FWhereStr.Free;
   // Destroy the BindSourceAdapter was created then destroy it
-  if CheckAdapter and not (csDestroying in TComponent(FBindSourceAdapter).ComponentState) then
+  if CheckAdapter and not(csDestroying in TComponent(FBindSourceAdapter).ComponentState) then
     FBindSourceAdapter.Free;
   // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
   // la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
@@ -730,7 +731,7 @@ end;
 
 function TioModelPresenterCustom.GetTypeName: String;
 begin
- Result := FTypeName;
+  Result := FTypeName;
 end;
 
 function TioModelPresenterCustom.GetVirtualFields: Boolean;
@@ -807,12 +808,12 @@ begin
   begin
     if Assigned(MasterBindSource) then
       MasterBindSource.RegisterDetailBindSource(Self);
-// ----- OLD CODE -----
-//    if not Assigned(FMasterBindSource) then
-//      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterPresenter" property has not been set in the component "%s".' +
-//        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
-//    MasterBindSource.RegisterDetailBindSource(Self);
-// ----- OLD CODE -----
+    // ----- OLD CODE -----
+    // if not Assigned(FMasterBindSource) then
+    // raise EioException.Create(ClassName, 'Loaded', Format('The "MasterPresenter" property has not been set in the component "%s".' +
+    // #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
+    // MasterBindSource.RegisterDetailBindSource(Self);
+    // ----- OLD CODE -----
   end;
   // ===========================================================================
 
@@ -952,12 +953,12 @@ begin
   if Value = IsActive then
     Exit;
 
-  if not (csDesigning in ComponentState) then
+  if not(csDesigning in ComponentState) then
   begin
     if Value then
     begin
       // If we are in the opening of the bind source and we are NOT at design-time then
-      //  create the active bind source adapter
+      // create the active bind source adapter
       CheckAdapter(True);
       DoBeforeOpen;
     end
@@ -970,7 +971,7 @@ begin
   // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
   OpenCloseViewBindSources(Value);
 
-  if not (csDesigning in ComponentState) then
+  if not(csDesigning in ComponentState) then
   begin
     // Open/Close registered details model presenters
     OpenCloseDetails(Value);
@@ -981,15 +982,15 @@ begin
   end;
 
   // ----- OLD CODE -----
-//  if CheckAdapter(True) then
-//  begin
-//    GetActiveBindSourceAdapter.Active := Value;
-//    // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
-//    OpenCloseViewBindSources(Value);
-//    // Open/Close registered details model presenters
-//    OpenCloseDetails(Value);
-//  end;
-// ----- OLD CODE -----
+  // if CheckAdapter(True) then
+  // begin
+  // GetActiveBindSourceAdapter.Active := Value;
+  // // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
+  // OpenCloseViewBindSources(Value);
+  // // Open/Close registered details model presenters
+  // OpenCloseDetails(Value);
+  // end;
+  // ----- OLD CODE -----
 end;
 
 procedure TioModelPresenterCustom.SetAsDefault(const Value: Boolean);
@@ -1068,11 +1069,11 @@ end;
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
+  // if it is assigned then automatically activated the BindSource otherwise exits immediately
+  // because it does not need to do anything (the BindSource is already closed and if the new
+  // DataObject is being set to nil...)
   // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  // altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
   if not IsActive then
     if Assigned(ADataObject) then
       Open
@@ -1095,11 +1096,11 @@ end;
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
   // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
+  // if it is assigned then automatically activated the BindSource otherwise exits immediately
+  // because it does not need to do anything (the BindSource is already closed and if the new
+  // DataObject is being set to nil...)
   // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  // altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
   if not IsActive then
     if Assigned(ADataObject) then
       Open
@@ -1251,7 +1252,8 @@ begin
   io.ShowCurrent(Self, AParentCloseQueryAction, AVVMAlias);
 end;
 
-procedure TioModelPresenterCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+procedure TioModelPresenterCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+const AVVMAlias: String);
 begin
   io.ShowCurrent(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;
@@ -1278,7 +1280,8 @@ begin
   end;
 end;
 
-procedure TioModelPresenterCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+procedure TioModelPresenterCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+const AVVMAlias: String);
 begin
   io.ShowEach(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;

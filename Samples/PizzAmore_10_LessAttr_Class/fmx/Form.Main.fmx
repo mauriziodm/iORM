@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 35
+          TabOrder = 38
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -6352,7 +6352,7 @@ object MainForm: TMainForm
             OnClick = ButtonCreateCustomerClick
           end
           object ButtonOpen: TButton
-            Position.X = 117.000000000000000000
+            Position.X = 141.000000000000000000
             Position.Y = 69.000000000000000000
             Size.Width = 80.000000000000000000
             Size.Height = 25.000000000000000000
@@ -7005,8 +7005,7 @@ object MainForm: TMainForm
     TypeName = 'TCustomer'
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
-    OnEditAction = eaDoNothing
-    Left = 688
-    Top = 561
+    Left = 680
+    Top = 689
   end
 end

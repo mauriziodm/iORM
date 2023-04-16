@@ -4,12 +4,14 @@ inherited VMOrder: TVMOrder
     OnSelectionInterface = MPMasterSelectionInterface
   end
   object BSCustomer: TioModelPresenterDetail
+    AsDefault = False
     MasterBindSource = BSMaster
     MasterPropertyName = 'Customer'
     Left = 56
     Top = 112
   end
   object BSRows: TioModelPresenterDetail
+    AsDefault = False
     MasterBindSource = BSMaster
     MasterPropertyName = 'Rows'
     Left = 56

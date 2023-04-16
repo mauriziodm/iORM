@@ -709,7 +709,8 @@ end;
 
 function TioProperty.IsSqlUpdateRequestCompliant: Boolean;
 begin
-  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and not (FRelationType in [rtHasMany, rtHasOne]);
+{ TODO : Una qualche sorta di parametro per poter decidere se nelle query update ci deve essere anche l'ID oppure no? }
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not FIsID) and not (FRelationType in [rtHasMany, rtHasOne]);
 end;
 
 function TioProperty.IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;

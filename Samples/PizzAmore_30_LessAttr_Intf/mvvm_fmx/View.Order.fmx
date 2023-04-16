@@ -16,7 +16,6 @@ inherited ViewOrder: TViewOrder
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
       TabOrder = 42
-      Text = '-33'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Position.X = 5.000000000000000000
       Position.Y = 20.000000000000000000
@@ -38,7 +37,6 @@ inherited ViewOrder: TViewOrder
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
       TabOrder = 41
-      Text = '01/11/2022'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Position.X = 50.000000000000000000
       Position.Y = 20.000000000000000000
@@ -61,27 +59,6 @@ inherited ViewOrder: TViewOrder
       Anchors = [akLeft, akTop, akRight]
       StyleLookup = 'transparentedit'
       TabOrder = 40
-      Text = 
-        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-        'por, velit sit'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Position.X = 135.000000000000000000
       Position.Y = 20.000000000000000000
@@ -111,7 +88,6 @@ inherited ViewOrder: TViewOrder
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
       TabOrder = 41
-      Text = 'Mark Anderson (-33)'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Position.X = 5.000000000000000000
       Position.Y = 15.000000000000000000
@@ -133,27 +109,6 @@ inherited ViewOrder: TViewOrder
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
       TabOrder = 40
-      Text = 
-        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-        'por, velit sit'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Position.X = 5.000000000000000000
       Position.Y = 40.000000000000000000
@@ -191,7 +146,6 @@ inherited ViewOrder: TViewOrder
       StyleLookup = 'transparentedit'
       TabOrder = 41
       ReadOnly = True
-      Text = '67,67 '#8364
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Trailing
@@ -266,8 +220,8 @@ inherited ViewOrder: TViewOrder
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 396.000000000000000000
-      Viewport.Height = 310.000000000000000000
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 335.000000000000000000
     end
   end
   inherited ActionList1: TActionList
