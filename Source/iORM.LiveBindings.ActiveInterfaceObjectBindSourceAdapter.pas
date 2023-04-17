@@ -726,7 +726,13 @@ begin
   else
   begin
     inherited SetDataObject(nil, AOwnsObject);
-    AddFields; // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
+    // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
+    // NB: Questo "AddFields" che sembrerebbe non aver senso in questo punto in realtà risolve un errore che mi ha segnalato
+    //      Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
+    //      ed era dovuto perchè nell'inherited viene richiamato "ClearFields" che evidentemente eliminava dal sistema di LookUp
+    //      di LiveBindings non solo i links relativi al DataObject precedente ma anche appunto "Value" e "Owner" e chissà quali
+    //      altri. Con questa riga evidentemente si registrano di nuovo questi IScope nel sistema di LookUp stesso.
+    AddFields;
     FDetailAdaptersContainer.SetMasterObject(nil);
   end;
   // DataSet synchro
