@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 38
+          TabOrder = 43
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -6840,7 +6840,7 @@ object MainForm: TMainForm
       DataSource = BSFilterCustomer
       FieldName = 'City'
       Control = EditCustomerSearchCity
-      Track = False
+      Track = True
     end
   end
   object BSPizzas: TioPrototypeBindSourceMaster

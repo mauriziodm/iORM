@@ -134,6 +134,10 @@ type
     // ItemCount
     function GetCount: Integer;
     property ItemCount: Integer read GetCount; // Public: Master+Detail
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection;
   end;
 
   // Interface for standard action target bind source

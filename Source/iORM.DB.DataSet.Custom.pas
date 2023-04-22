@@ -103,6 +103,9 @@ type
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     // VirtualFields
     function GetVirtualFields: Boolean;
     // Where
@@ -150,7 +153,7 @@ type
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
-    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
@@ -518,6 +521,11 @@ begin
   Result := FTypeName;
 end;
 
+function TioDataSetCustom.GetTypeOfCollection: TioTypeOfCollection;
+begin
+  Result := FTypeOfCollection;
+end;
+
 function TioDataSetCustom.GetVirtualFields: Boolean;
 begin
   Result := FVirtualFields;
@@ -849,6 +857,11 @@ begin
   // update the where of the adapter also
   if CheckAdapter then
     GetActiveBindSourceAdapter.ioTypeName := Value;
+end;
+
+procedure TioDataSetCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);
+begin
+  FTypeOfCollection := Value;
 end;
 
 procedure TioDataSetCustom.SetWhere(const AWhere: IioWhere);

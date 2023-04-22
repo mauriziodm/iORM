@@ -151,6 +151,9 @@ type
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     // VirtualFields
     function GetVirtualFields: Boolean;
     // Where
@@ -206,7 +209,7 @@ type
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
-    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // Published: Master
@@ -734,6 +737,11 @@ begin
   Result := FTypeName;
 end;
 
+function TioModelPresenterCustom.GetTypeOfCollection: TioTypeOfCollection;
+begin
+  Result := FTypeOfCollection;
+end;
+
 function TioModelPresenterCustom.GetVirtualFields: Boolean;
 begin
   Result := FVirtualFields;
@@ -1194,6 +1202,11 @@ begin
   // update the where of the adapter also
   if CheckAdapter then
     FBindSourceAdapter.ioTypeName := Value;
+end;
+
+procedure TioModelPresenterCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);
+begin
+  FTypeOfCollection := Value;
 end;
 
 procedure TioModelPresenterCustom.SetAutoPost(const Value: Boolean);

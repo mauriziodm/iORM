@@ -378,3 +378,6 @@ Visible=True
 [ButtonCreateCustomer]
 Coordinates=209,154,146,58
 
+[ButtonOpen]
+Coordinates=0,0,83,58
+
