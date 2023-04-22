@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 44
+          TabOrder = 46
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -6337,7 +6337,7 @@ object MainForm: TMainForm
             Size.Width = 80.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
-            TabOrder = 12
+            TabOrder = 13
             Text = 'Search'
             OnClick = ButtonSearchCustomerClick
           end
@@ -6347,7 +6347,7 @@ object MainForm: TMainForm
             Size.Width = 80.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
-            TabOrder = 11
+            TabOrder = 12
             Text = 'Create'
             OnClick = ButtonCreateCustomerClick
           end
@@ -6360,6 +6360,16 @@ object MainForm: TMainForm
             TabOrder = 10
             Text = 'Open'
             OnClick = ButtonOpenClick
+          end
+          object ButtonClear: TButton
+            Position.X = 229.000000000000000000
+            Position.Y = 102.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 11
+            Text = 'Clear'
+            OnClick = ButtonClearClick
           end
         end
       end

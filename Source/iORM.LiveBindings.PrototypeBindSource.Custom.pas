@@ -158,6 +158,9 @@ type
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     // VirtualFields
     function GetVirtualFields: Boolean;
     // Where
@@ -206,7 +209,7 @@ type
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
-    property TypeOfCollection: TioTypeOfCollection read FTypeOfCollection write FTypeOfCollection default tcList;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
@@ -364,7 +367,7 @@ end;
 
 function TioPrototypeBindSourceCustom.CheckActiveAdapter: Boolean;
 begin
-  Result := Assigned(FBindSourceAdapter);
+  Result := GetActiveBindSourceAdapter <> nil;
 end;
 
 function TioPrototypeBindSourceCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
@@ -558,10 +561,13 @@ end;
 
 function TioPrototypeBindSourceCustom.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
-  Result := nil;
   if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
-    raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter',
-      Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
+    Result := nil;
+// ----- OLD CODE FROM 22/04/2023 -----
+//  if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
+//    raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter',
+//      Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
+// ----- OLD CODE FROM 22/04/2023 -----
 end;
 
 function TioPrototypeBindSourceCustom.GetAsDefault: Boolean;
@@ -624,9 +630,10 @@ function TioPrototypeBindSourceCustom.GetDetailBindSourceAdapter(const AOwner: T
 var
   AContainedBSA: IioContainedBindSourceAdapter;
 begin
-  Result := nil;
   if Supports(Self.InternalAdapter, IioContainedBindSourceAdapter, AContainedBSA) then
-    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
+    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere)
+  else
+    Result := nil;
 end;
 
 function TioPrototypeBindSourceCustom.GetWhere: IioWhere;
@@ -744,6 +751,11 @@ end;
 function TioPrototypeBindSourceCustom.GetTypeName: String;
 begin
   Result := FTypeName;
+end;
+
+function TioPrototypeBindSourceCustom.GetTypeOfCollection: TioTypeOfCollection;
+begin
+  Result := FTypeOfCollection;
 end;
 
 function TioPrototypeBindSourceCustom.GetVirtualFields: Boolean;
@@ -877,10 +889,12 @@ begin
   begin
     if Value then
     begin
+      // Check if the operation (Open) is allowed
+      TioCommonBSBehavior.CheckForOpen(Self, LoadType);
       // If we are in the opening of the bind source and we are NOT at design-time then
       //  create the active bind source adapter
       if not Assigned(FBindSourceAdapter) then
-        _CreateAdapter(Current, False);
+        _CreateAdapter(nil, False);
       DoBeforeOpen;
     end
     else
@@ -960,31 +974,6 @@ begin
   FAutoRefreshOnNotification := Value;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
-begin
-  // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
-  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
-  if not IsActive then
-    if Assigned(ADataObject) then
-      Open
-    else
-      Exit;
-  // Some checks
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
-  // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
-  // si faceva un SetDataObject dava un errore perchè la funzione
-  // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
-  // assegnato (se prima avevo chiamato il  ClearDataObject
-  // if CheckActiveAdapter then
-  GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
-  // else
-  // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
-end;
-
 procedure TioPrototypeBindSourceCustom.SetMasterBindSource(const Value: IioNotifiableBindSource);
 begin
   FMasterBindSource := Value;
@@ -997,27 +986,70 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
+  // Check if the operation (SetDataObject) is allowed
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
+  // If the BS is active then set the DataObject
+  if IsActive then
+  begin
+    // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
+    // si faceva un SetDataObject dava un errore perchè la funzione
+    // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
+    // assegnato (se prima avevo chiamato il  ClearDataObject)
+    // if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+    // else
+    // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+  end
   // If the BindSource is not active it checks if the new DataObject is assigned,
   //  if it is assigned then automatically activated the BindSource otherwise exits immediately
   //  because it does not need to do anything (the BindSource is already closed and if the new
   //  DataObject is being set to nil...)
   // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
   //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
-  if not IsActive then
+  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
+  else
+  begin
     if Assigned(ADataObject) then
-      Open
-    else
-      Exit;
-  // Some checks
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
-  // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
-  // si faceva un SetDataObject dava un errore perchè la funzione
-  // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
-  // assegnato (se prima avevo chiamato il  ClearDataObject
-  // if CheckActiveAdapter then
-  GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
-  // else
-  // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+    begin
+      if GetActiveBindSourceAdapter = nil then
+        _CreateAdapter(ADataObject, AOwnsObject);
+      Open;
+    end;
+  end;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+begin
+  // Check if the operation (SetDataObject) is allowed
+  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
+  // If the BS is active then set the DataObject
+  if IsActive then
+  begin
+    // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
+    // si faceva un SetDataObject dava un errore perchè la funzione
+    // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
+    // assegnato (se prima avevo chiamato il  ClearDataObject)
+    // if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+    // else
+    // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
+  end
+  // If the BindSource is not active it checks if the new DataObject is assigned,
+  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+  //  because it does not need to do anything (the BindSource is already closed and if the new
+  //  DataObject is being set to nil...)
+  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
+  else
+  begin
+    if Assigned(ADataObject) then
+    begin
+      if GetActiveBindSourceAdapter = nil then
+        _CreateAdapter(ADataObject as TObject, AOwnsObject);
+      Open;
+    end;
+  end;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetWhere(const AWhere: IioWhere);
@@ -1137,6 +1169,11 @@ begin
   // update the where of the adapter also
   if CheckActiveAdapter then
     GetActiveBindSourceAdapter.ioTypeName := Value;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);
+begin
+  FTypeOfCollection := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetWhereDetailsFromDetailAdapters(const Value: Boolean);

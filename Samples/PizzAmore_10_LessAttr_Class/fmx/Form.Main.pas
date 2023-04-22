@@ -162,6 +162,7 @@ type
     LinkControlToField19: TLinkControlToField;
     ButtonCreateCustomer: TButton;
     ButtonOpen: TButton;
+    ButtonClear: TButton;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
@@ -175,6 +176,7 @@ type
     procedure ButtonSearchCustomerClick(Sender: TObject);
     procedure ButtonCreateCustomerClick(Sender: TObject);
     procedure ButtonOpenClick(Sender: TObject);
+    procedure ButtonClearClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -240,6 +242,12 @@ begin
   BSOrders.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   BSOrders.Refresh;
   ADone := True;
+end;
+
+procedure TMainForm.ButtonClearClick(Sender: TObject);
+begin
+//  BSFilterCustomer.SetDataObject(nil);
+  BSFilterCustomer.ClearDataObject;
 end;
 
 procedure TMainForm.ButtonCreateCustomerClick(Sender: TObject);
