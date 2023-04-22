@@ -207,10 +207,7 @@ begin
   BSCustomers.Open;
   BSPizzas.Open;
   // Open filter bind sources
-//  var LCustomer := TCustomer.Create;
-//  LCustomer.City := 'New York';
-//  BSFilterCustomer.SetDataObject(LCustomer);
-//  BSFilterCustomer.Open;
+  BSFilterCustomer.SetDataObject(TCustomer.Create);
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -246,8 +243,7 @@ end;
 
 procedure TMainForm.ButtonClearClick(Sender: TObject);
 begin
-//  BSFilterCustomer.SetDataObject(nil);
-  BSFilterCustomer.ClearDataObject;
+  BSFilterCustomer.Persistence.Revert;
 end;
 
 procedure TMainForm.ButtonCreateCustomerClick(Sender: TObject);
