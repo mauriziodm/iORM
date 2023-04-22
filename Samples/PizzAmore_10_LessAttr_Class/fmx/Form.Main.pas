@@ -247,7 +247,7 @@ begin
   var LCustomer := TCustomer.Create;
   LCustomer.City := 'Union City';
   BSFilterCustomer.Close;
-//  BSFilterCustomer.LoadType := ltManual;
+  BSFilterCustomer.LoadType := ltManual;
   BSFilterCustomer.SetDataObject(LCustomer);
 end;
 

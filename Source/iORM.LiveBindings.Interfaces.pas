@@ -75,6 +75,7 @@ type
     procedure Next;
     function CheckAdapter: Boolean; overload;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
+    function CheckActiveAdapter: Boolean;
     function Current: TObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetMasterPropertyName: String;

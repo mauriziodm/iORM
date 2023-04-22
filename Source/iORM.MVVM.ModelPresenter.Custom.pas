@@ -244,6 +244,7 @@ type
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function CheckAdapter: Boolean; overload;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
+    function CheckActiveAdapter: Boolean;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
@@ -374,6 +375,11 @@ end;
 function TioModelPresenterCustom.CheckAdapter: Boolean;
 begin
   Result := CheckAdapter(False);
+end;
+
+function TioModelPresenterCustom.CheckActiveAdapter: Boolean;
+begin
+  Result := GetActiveBindSourceAdapter <> nil;
 end;
 
 function TioModelPresenterCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;

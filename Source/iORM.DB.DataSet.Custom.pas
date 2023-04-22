@@ -185,9 +185,10 @@ type
     destructor Destroy; override;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
-    function IsFromBSLoadType: boolean;
+    function IsFromBSLoadType: Boolean;
     function CheckAdapter: Boolean; overload;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
+    function CheckActiveAdapter: Boolean;
     procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
     procedure ForceDetailAdaptersCreation;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
@@ -204,7 +205,8 @@ type
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
@@ -236,13 +238,18 @@ end;
 
 function TioDataSetCustom.CanDoSelection: Boolean;
 begin
-  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and FSelectorFor.GetActiveBindSourceAdapter.Notify(Self,
-    TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
+  Result := IsActive and (Current <> nil) and Assigned(FSelectorFor) and FSelectorFor.IsActive and
+    FSelectorFor.GetActiveBindSourceAdapter.Notify(Self, TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection));
 end;
 
 function TioDataSetCustom.CheckAdapter: Boolean;
 begin
   Result := CheckAdapter(False);
+end;
+
+function TioDataSetCustom.CheckActiveAdapter: Boolean;
+begin
+  Result := GetActiveBindSourceAdapter <> nil;
 end;
 
 function TioDataSetCustom.CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean;
@@ -570,7 +577,7 @@ begin
   Result := Active;
 end;
 
-function TioDataSetCustom.IsFromBSLoadType: boolean;
+function TioDataSetCustom.IsFromBSLoadType: Boolean;
 begin
   Result := TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(FLoadType);
 end;
@@ -589,11 +596,11 @@ begin
   begin
     if Assigned(MasterBindSource) then
       MasterBindSource.RegisterDetailBindSource(Self);
-// ----- OLD CODE -----
-//    if not Assigned(FMasterBindSource) then
-//      raise EioException.Create(ClassName, 'Loaded', Format('The "MasterDataSet" property has not been set in the component "%s".' +
-//        #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
-// ----- OLD CODE -----
+    // ----- OLD CODE -----
+    // if not Assigned(FMasterBindSource) then
+    // raise EioException.Create(ClassName, 'Loaded', Format('The "MasterDataSet" property has not been set in the component "%s".' +
+    // #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.', [Name]));
+    // ----- OLD CODE -----
   end;
   // ===========================================================================
 
@@ -651,9 +658,9 @@ end;
 procedure TioDataSetCustom.SelectCurrent(ASelectionType: TioSelectionType);
 begin
   // C'era un problema se il target è un BS che espone un singolo oggetto e in
-  //  precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
-  //  ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
-  //  il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
+  // precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
+  // ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
+  // il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
   if not FSelectorFor.IsActive then
     FSelectorFor.Open;
   if IsInterfacePresenting then
@@ -716,11 +723,11 @@ end;
 procedure TioDataSetCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
+  // if it is assigned then automatically activated the BindSource otherwise exits immediately
+  // because it does not need to do anything (the BindSource is already closed and if the new
+  // DataObject is being set to nil...)
   // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  // altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
   if not IsActive then
     if Assigned(ADataObject) then
       Open
@@ -743,11 +750,11 @@ end;
 procedure TioDataSetCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
   // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
+  // if it is assigned then automatically activated the BindSource otherwise exits immediately
+  // because it does not need to do anything (the BindSource is already closed and if the new
+  // DataObject is being set to nil...)
   // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+  // altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
   if not IsActive then
     if Assigned(ADataObject) then
       Open
@@ -780,7 +787,7 @@ end;
 
 procedure TioDataSetCustom.SetMasterBindSource(const Value: IioNotifiableBindSource);
 begin
-  FMasterBindSource:= Value;
+  FMasterBindSource := Value;
 end;
 
 procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);
@@ -802,7 +809,7 @@ begin
   LActiveBSA.LazyProps := FLazyProps;
   LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   LActiveBSA.ioWhere := GetWhere; // Do not directly access to the FWhere field here
-//  LActiveBSA.ioWhere := FWhere;
+  // LActiveBSA.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
   LActiveBSA.SetBindSource(Self);
   FTypeOfCollection := LActiveBSA.TypeOfCollection;
@@ -907,7 +914,8 @@ begin
   io.ShowCurrent(Self, AParentCloseQueryAction, AVVMAlias);
 end;
 
-procedure TioDataSetCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+procedure TioDataSetCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+const AVVMAlias: String);
 begin
   io.ShowCurrent(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;
@@ -942,13 +950,12 @@ begin
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS and not MasterPropertyName.IsEmpty then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName))
-  else
-  if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
+  else if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),
-      TypeOfCollection, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
+      ._OrderBy(FOrderBy), TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

@@ -17,6 +17,7 @@ type
     class procedure Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Common code for some checks by the bind sources
+    class procedure CheckForOpen(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
@@ -35,6 +36,14 @@ uses
   iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions, iORM.Utilities;
 
 { TioCommonBSBehavior }
+
+class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
+begin
+  if ABindSource.IsMasterBS and (ALoadType = ltManual) and not ABindSource.CheckActiveAdapter then
+    raise EioException.Create(ClassName, 'CheckForOpen',
+      Format('You are not allowed to activate the BindSource "%s" if its "LoadType" property is set to "ltManual" unless the "SetDataObject" method has been executed at least once with a valid object.',
+      [ABindSource.GetName]));
+end;
 
 class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
 begin
