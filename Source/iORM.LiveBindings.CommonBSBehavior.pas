@@ -4,7 +4,8 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
-  iORM.CommonTypes, System.Classes;
+  iORM.CommonTypes, System.Classes, iORM.Where.Interfaces,
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -27,13 +28,16 @@ type
     class procedure InitAsDefaultOnCreate(const ABindSource: TComponent; var AAsDefaultValue: Boolean);
 
     class function IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
+    // Common code for WhereBuilder purposes
+    class function WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
+    class function WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
   end;
 
 implementation
 
 uses
-  Data.Bind.ObjectScope, System.SysUtils,
-  iORM.LiveBindings.BSPersistence, System.Rtti, iORM.Exceptions, iORM.Utilities;
+  Data.Bind.ObjectScope, System.SysUtils, System.Rtti, iORM.Exceptions, iORM.Utilities,
+  iORM, iORM.Where.Factory;
 
 { TioCommonBSBehavior }
 
@@ -257,6 +261,28 @@ begin
     for I := 0 to AOwner.ComponentCount - 1 do
       if Supports(AOwner.Components[I], IioNotifiableBindSource, LBindSource) then
         LBindSource.SetAsDefault(False);
+end;
+
+class function TioCommonBSBehavior.WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
+begin
+  if not Assigned(ATargetBS) then
+    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the "WhereBuilder" property is unassigned (%s))', [ASourceBS.GetName]));
+  if not ASourceBS.IsActive then
+    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
+  if not Assigned(ASourceBS.Current) then
+    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
+
+  Result := TioWhereFactory.NewWhereSmartBuilder.BuildWhere(ASourceBS.Current);
+  ATargetBS.SetWhere(Result);
+
+  if AExecuteOnTarget then
+    ATargetBS.Persistence.Reload;
+end;
+
+class function TioCommonBSBehavior.WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
+begin
+  ASourceBS.Persistence.Reload;
+  Result := WhereBuild(ASourceBS, ATargetBS, AExecuteOnTarget);
 end;
 
 end.

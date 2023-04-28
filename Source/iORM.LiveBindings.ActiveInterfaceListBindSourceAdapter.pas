@@ -145,10 +145,13 @@ type
     procedure _InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True); overload;
+    constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
+      const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+      const AOwnsObject: Boolean = True); overload;
+    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
+      const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -337,7 +340,12 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
-  TioCommonBSAPersistence.Load(Self);
+  case FLoadType of
+    ltCreate:
+      TioCommonBSAPersistence.Create(Self);
+    ltAuto:
+      TioCommonBSAPersistence.Load(Self);
+  end;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Refresh(const ANotify: Boolean = True);
@@ -347,7 +355,10 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Reload;
 begin
-  TioCommonBSAPersistence.Reload(Self);
+  if FLoadType = ltCreate then
+    TioCommonBSAPersistence.Create(Self)
+  else
+    TioCommonBSAPersistence.Reload(Self);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
@@ -593,7 +604,8 @@ begin
   Self.Insert;
 end;
 
-constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const AOwnsObject: Boolean = True);
+constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
+  const AOwnsObject: Boolean = True);
 begin
   FInterfacedList := nil;
   FLoadType := ltAuto;
@@ -697,7 +709,7 @@ begin
   LDone := False;
 
   // NB: OnReceiveSelectionCloneObject property of the BindSource is not
-  //  useful in an interface bindsource adapter
+  // useful in an interface bindsource adapter
 
   // Do the selection
   DoBeforeSelection(ASelected, ASelectionType);
@@ -712,7 +724,7 @@ begin
   DoAfterSelection(ASelected, ASelectionType);
 
   // NB: OnReceiveSelectionFreeObject property of the BindSource is not
-  //  useful in an interface bindsource adapter
+  // useful in an interface bindsource adapter
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetLazy(const Value: Boolean);
@@ -798,10 +810,10 @@ begin
     SetList(nil, AOwnsObject);
     // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
     // NB: Questo "AddFields" che sembrerebbe non aver senso in questo punto in realtà risolve un errore che mi ha segnalato
-    //      Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
-    //      ed era dovuto perchè nell'inherited viene richiamato "ClearFields" che evidentemente eliminava dal sistema di LookUp
-    //      di LiveBindings non solo i links relativi al DataObject precedente ma anche appunto "Value" e "Owner" e chissà quali
-    //      altri. Con questa riga evidentemente si registrano di nuovo questi IScope nel sistema di LookUp stesso.
+    // Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
+    // ed era dovuto perchè nell'inherited viene richiamato "ClearFields" che evidentemente eliminava dal sistema di LookUp
+    // di LiveBindings non solo i links relativi al DataObject precedente ma anche appunto "Value" e "Owner" e chissà quali
+    // altri. Con questa riga evidentemente si registrano di nuovo questi IScope nel sistema di LookUp stesso.
     AddFields;
     FDetailAdaptersContainer.SetMasterObject(nil);
   end;

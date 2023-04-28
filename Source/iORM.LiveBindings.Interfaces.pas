@@ -154,6 +154,10 @@ type
     // Paging
     function GetPaging: TioCommonBSAPageManager;
     property Paging: TioCommonBSAPageManager read GetPaging;
+    // WhereBuilder
+    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+    procedure SetWhere(const AWhere: IioWhere);
   end;
 
   // The common ancestor for all PrototypeBindSource components

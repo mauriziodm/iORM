@@ -349,7 +349,12 @@ end;
 procedure TioActiveObjectBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
-  TioCommonBSAPersistence.Load(Self);
+  case FLoadType of
+    ltCreate:
+      TioCommonBSAPersistence.Create(Self);
+    ltAuto:
+      TioCommonBSAPersistence.Load(Self);
+  end;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
@@ -699,7 +704,10 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Reload;
 begin
-  TioCommonBSAPersistence.Reload(Self);
+  if FLoadType = ltCreate then
+    TioCommonBSAPersistence.Create(Self)
+  else
+    TioCommonBSAPersistence.Reload(Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetLazy(const Value: Boolean);

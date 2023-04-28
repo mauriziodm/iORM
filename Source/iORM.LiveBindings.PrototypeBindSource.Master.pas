@@ -4,7 +4,8 @@ interface
 
 uses
   iORM.LiveBindings.BSPersistence, iORM.LiveBindings.PrototypeBindSource.Custom,
-  System.Classes, iORM.LiveBindings.Interfaces, Data.Bind.Components, iORM.CommonTypes;
+  System.Classes, iORM.LiveBindings.Interfaces, Data.Bind.Components, iORM.CommonTypes,
+  iORM;
 
 type
 
@@ -16,6 +17,7 @@ type
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    FWhereBuilderFor: IioBSPersistenceClient;
     // SourcePrototypeBindSource
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetSourceBS(const Value: IioNotifiableBindSource);
@@ -47,6 +49,11 @@ type
     destructor Destroy; override;
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
+
+    // WhereBuilder
+    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+
     property Where;
     property ItemCount;
     // Added properties
@@ -84,6 +91,7 @@ type
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
+    property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -105,7 +113,8 @@ implementation
 
 uses
   System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.Notification, iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.Notification, iORM.LiveBindings.CommonBSBehavior,
+  iORM.Where.Factory;
 
 { TioPrototypeBindSourceMaster }
 
@@ -229,6 +238,16 @@ begin
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterBindSource := Value;
+end;
+
+function TioPrototypeBindSourceMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
+begin
+  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget);
+end;
+
+function TioPrototypeBindSourceMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+begin
+  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget);
 end;
 
 end.

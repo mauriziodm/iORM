@@ -24,7 +24,7 @@ object MainForm: TMainForm
       Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
@@ -40,7 +40,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = False
+        IsSelected = True
         Size.Width = 45.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 47
+          TabOrder = 58
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5128,7 +5128,7 @@ object MainForm: TMainForm
                   2DC0AB68A6BEE10FFC88CB15C0FA6E7D1E65368D157816F7B12C5E5981B20265
                   05CA0A9415282B5056A0AC405981B2026505CA0A9415282B5056A0AC405981B2
                   026505BEED15F80D5028718DF09E12830000000049454E44AE426082}
-                FileName = 'C:\delphi\tools\iorm_dev\DDay2022\common_images\LovePizza.bmp'
+                FileName = 'C:\delphi\tools\iorm\Samples\common_images\LovePizza.bmp'
               end>
             Position.X = 25.000000000000000000
             Position.Y = 87.000000000000000000
@@ -5192,7 +5192,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = True
+        IsSelected = False
         Size.Width = 51.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6332,44 +6332,26 @@ object MainForm: TMainForm
             StyledSettings = [Family, Style, FontColor]
           end
           object ButtonSearchCustomer: TButton
+            Action = acWhereBuild
+            Enabled = True
+            ImageIndex = -1
             Position.X = 229.000000000000000000
             Position.Y = 29.000000000000000000
             Size.Width = 80.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
-            TabOrder = 13
-            Text = 'Search'
-            OnClick = ButtonSearchCustomerClick
+            TabOrder = 11
           end
-          object ButtonCreateCustomer: TButton
+          object ButtonFilterClear: TButton
+            Action = acWhereClear
+            Enabled = True
+            ImageIndex = -1
             Position.X = 229.000000000000000000
-            Position.Y = 69.000000000000000000
-            Size.Width = 80.000000000000000000
-            Size.Height = 25.000000000000000000
-            Size.PlatformDefault = False
-            TabOrder = 12
-            Text = 'Create'
-            OnClick = ButtonCreateCustomerClick
-          end
-          object ButtonOpen: TButton
-            Position.X = 141.000000000000000000
-            Position.Y = 69.000000000000000000
+            Position.Y = 62.000000000000000000
             Size.Width = 80.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 10
-            Text = 'Open'
-            OnClick = ButtonOpenClick
-          end
-          object ButtonClear: TButton
-            Position.X = 229.000000000000000000
-            Position.Y = 102.000000000000000000
-            Size.Width = 80.000000000000000000
-            Size.Height = 25.000000000000000000
-            Size.PlatformDefault = False
-            TabOrder = 11
-            Text = 'Clear'
-            OnClick = ButtonClearClick
           end
         end
       end
@@ -6539,6 +6521,17 @@ object MainForm: TMainForm
       Category = 'iORM-BSPaging'
       Text = 'acCustomersPrevPage'
       TargetBindSource = BSCustomers
+    end
+    object acWhereBuild: TioBSWhereBuild
+      Category = 'iORM-BSWhereBuilder'
+      Text = 'Search'
+      TargetBindSource = BSFilterCustomer
+    end
+    object acWhereClear: TioBSWhereClear
+      Category = 'iORM-BSWhereBuilder'
+      Text = 'Clear'
+      ExecuteOnTarget = True
+      TargetBindSource = BSFilterCustomer
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
@@ -7013,9 +7006,10 @@ object MainForm: TMainForm
     Preview = True
     AsDefault = False
     TypeName = 'TCustomer'
-    LoadType = ltManual
+    LoadType = ltCreate
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
+    WhereBuilderFor = BSCustomers
     Left = 680
     Top = 689
   end

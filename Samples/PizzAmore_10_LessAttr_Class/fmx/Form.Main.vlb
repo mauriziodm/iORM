@@ -23,7 +23,7 @@ Coordinates=759,331,84,36
 Coordinates=759,496,91,36
 
 []
-Coordinates=1140,450,89,51
+Coordinates=209,154,146,58
 
 [TabItemOrders]
 Coordinates=348,1582,101,36
@@ -374,10 +374,4 @@ Coordinates=399,132,148,58
 [EditCustomerSearchCity]
 Coordinates=512,1253,155,58
 Visible=True
-
-[ButtonCreateCustomer]
-Coordinates=209,154,146,58
-
-[ButtonOpen]
-Coordinates=0,0,83,58
 

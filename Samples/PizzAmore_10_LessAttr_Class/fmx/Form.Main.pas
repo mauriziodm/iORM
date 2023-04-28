@@ -160,9 +160,9 @@ type
     EditCustomerSearchCity: TEdit;
     ButtonSearchCustomer: TButton;
     LinkControlToField19: TLinkControlToField;
-    ButtonCreateCustomer: TButton;
-    ButtonOpen: TButton;
-    ButtonClear: TButton;
+    ButtonFilterClear: TButton;
+    acWhereBuild: TioBSWhereBuild;
+    acWhereClear: TioBSWhereClear;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
@@ -173,10 +173,6 @@ type
     procedure ListViewPizzasItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
-    procedure ButtonSearchCustomerClick(Sender: TObject);
-    procedure ButtonCreateCustomerClick(Sender: TObject);
-    procedure ButtonOpenClick(Sender: TObject);
-    procedure ButtonClearClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -207,7 +203,9 @@ begin
   BSCustomers.Open;
   BSPizzas.Open;
   // Open filter bind sources
-  BSFilterCustomer.SetDataObject(TCustomer.Create);
+  BSFilterCustomer.Open;
+//  BSFilterCustomer.SetDataObject(TCustomer.Create);
+//  BSFilterCustomer.SetDataObject(io.di.Locate('TCustomer').Get);
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -239,37 +237,6 @@ begin
   BSOrders.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   BSOrders.Refresh;
   ADone := True;
-end;
-
-procedure TMainForm.ButtonClearClick(Sender: TObject);
-begin
-  BSFilterCustomer.Persistence.Revert;
-end;
-
-procedure TMainForm.ButtonCreateCustomerClick(Sender: TObject);
-begin
-  var LCustomer := TCustomer.Create;
-  LCustomer.City := 'Union City';
-  BSFilterCustomer.Close;
-  BSFilterCustomer.LoadType := ltManual;
-  BSFilterCustomer.SetDataObject(LCustomer);
-end;
-
-procedure TMainForm.ButtonOpenClick(Sender: TObject);
-begin
-  BSFilterCustomer.Open;
-end;
-
-procedure TMainForm.ButtonSearchCustomerClick(Sender: TObject);
-var
-  LObj: TObject;
-  LWhere: IioWhere;
-begin
-  BSFilterCustomer.PostIfEditing;
-  LObj := BSFilterCustomer.Current;
-  LWhere := io.GlobalFactory.WhereFactory.NewWhereSmartBuilder.BuildWhere(LObj);
-  BSCustomers.Where := LWhere;
-  BSCustomers.Persistence.Reload;
 end;
 
 procedure TMainForm.ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);

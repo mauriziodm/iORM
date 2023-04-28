@@ -6,7 +6,7 @@ uses
   iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  DJSON.Attributes, iORM.CommonTypes;
+  DJSON.Attributes, iORM.CommonTypes, iORM.Where.Interfaces;
 
 type
 
@@ -37,6 +37,7 @@ type
     function GetName: String;
     function IsFromBSLoadType: Boolean;
     function GetSourceBS: IioNotifiableBindSource;
+    procedure SetWhere(const AWhere: IioWhere);
     // LoadType property
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;

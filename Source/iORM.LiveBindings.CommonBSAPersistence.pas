@@ -64,6 +64,8 @@ type
     // Page manager
     class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
   public
+    // Create (ObjectBindSourceAdapter only)
+    class procedure Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Load
     class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -228,6 +230,27 @@ begin
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
 end;
 
+class procedure TioCommonBSAPersistence.Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LObj: TObject;
+  LIntf: IInterface;
+begin
+  case AActiveBindSourceAdapter.TypeOfCollection of
+    TioTypeOfCollection.tcSingleObject:
+      begin
+        LObj := io.di.Locate(AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias).Get;
+        if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(LObj, IInterface, LIntf) then
+          AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+        else
+          AActiveBindSourceAdapter.InternalSetDataObject(LObj, AActiveBindSourceAdapter.ioOwnsObjects);
+      end;
+    TioTypeOfCollection.tcList:
+      raise EioException.Create(ClassName, 'Create', '"ltCreate" value for "LoadType" property is valid only if "TypeOfCollection" is set to "tcSingleObject"');
+  else
+    raise EioException.Create(ClassName, 'Create', 'Wrong TypeOfCollection');
+  end;
+end;
+
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
   LTargetClass: TioClassRef;
@@ -236,7 +259,7 @@ begin
   LTargetClass := nil;
   // If AutoLoadData is disabled then exit
   // Prevent AutoLoadData when reloading
-  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.AutoLoad then
+  if AActiveBindSourceAdapter.Reloading  or not AActiveBindSourceAdapter.AutoLoad then
     Exit;
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
@@ -260,7 +283,7 @@ begin
       _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
-    raise EioException.Create('TioCommonBSAPersistence.Load: wrong ViewDataType.');
+    raise EioException.Create('TioCommonBSAPersistence.Load: wrong TypeOfCollection');
   end;
 end;
 

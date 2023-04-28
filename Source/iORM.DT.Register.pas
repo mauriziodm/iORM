@@ -113,6 +113,8 @@ begin
   RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSCloseQuery], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
+  RegisterActions('iORM-BSWhereBuilder', [iORM.StdActions.Fmx.TioBSWhereBuild], nil);
+  RegisterActions('iORM-BSWhereBuilder', [iORM.StdActions.Fmx.TioBSWhereClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceAppend], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Fmx.TioBSPersistenceDelete], nil);

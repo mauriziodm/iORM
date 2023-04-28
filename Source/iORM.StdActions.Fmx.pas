@@ -140,6 +140,32 @@ type
     property TargetBindSource;
   end;
 
+  // WhereBuild
+  TioBSWhereBuild = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
+  strict private
+    FExecuteOnTarget: Boolean;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
+  published
+    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default True;
+    property TargetBindSource;
+  end;
+
+  // WhereClear
+  TioBSWhereClear = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
+  strict private
+    FExecuteOnTarget: Boolean;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
+  published
+    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default False;
+    property TargetBindSource;
+  end;
+
   // =================================================================================================
   // END: FMX STANDARD ACTIONS FOR BIND SOURCES
   // =================================================================================================
@@ -1100,6 +1126,46 @@ begin
     ExecuteTarget(Sender);
     CanClose := False;
   end;
+end;
+
+{ TioBSWhereBuild }
+
+constructor TioBSWhereBuild.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExecuteOnTarget := True;
+end;
+
+procedure TioBSWhereBuild.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  TargetBindSource.WhereBuild(FExecuteOnTarget);
+end;
+
+procedure TioBSWhereBuild.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := TargetBindSource.isActive;
+end;
+
+{ TioBSWhereClear }
+
+constructor TioBSWhereClear.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExecuteOnTarget := False;
+end;
+
+procedure TioBSWhereClear.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  TargetBindSource.WhereClear(FExecuteOnTarget);
+end;
+
+procedure TioBSWhereClear.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := TargetBindSource.isActive;
 end;
 
 end.

@@ -4,7 +4,8 @@ interface
 
 uses
   iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.BSPersistence,
-  System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes;
+  System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
+  iORM.Where.Interfaces;
 
 type
 
@@ -17,6 +18,7 @@ type
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
+    FWhereBuilderFor: IioBSPersistenceClient;
     // SourceModelPresenter
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetSourceBS(const Value: IioNotifiableBindSource);
@@ -54,6 +56,11 @@ type
     procedure Close; override;
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
+
+    // WhereBuilder
+    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+
     property Active;
     property Where;
     property ItemCount;
@@ -83,6 +90,7 @@ type
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
+    property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -226,6 +234,16 @@ begin
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterBindSource := Value;
+end;
+
+function TioModelPresenterMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
+begin
+
+end;
+
+function TioModelPresenterMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+begin
+
 end;
 
 procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);

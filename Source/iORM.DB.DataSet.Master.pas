@@ -4,7 +4,7 @@ interface
 
 uses
   iORM.DB.DataSet.Custom, iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.BSPersistence, System.Classes, iORM.CommonTypes;
+  iORM.LiveBindings.BSPersistence, System.Classes, iORM.CommonTypes, iORM;
 
 type
 
@@ -16,6 +16,7 @@ type
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FOnInsertAction: TioOnInsertAction;
+    FWhereBuilderFor: IioBSPersistenceClient;
     // SourceDataSet
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetSourceBS(const Value: IioNotifiableBindSource);
@@ -46,6 +47,11 @@ type
     destructor Destroy; override;
     function IsMasterBS: boolean; override;
     function IsDetailBS: boolean; override;
+
+    // WhereBuilder
+    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+
     property Where;
     property ItemCount;
     property ItemIndex;
@@ -75,6 +81,7 @@ type
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
+    property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
     // Published Events: selectors
     property OnBeforeSelectionObject;
     property OnSelectionObject;
@@ -218,6 +225,16 @@ begin
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterBindSource := Value;
+end;
+
+function TioDataSetMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
+begin
+
+end;
+
+function TioDataSetMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+begin
+
 end;
 
 end.
