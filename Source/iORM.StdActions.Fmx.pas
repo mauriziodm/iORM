@@ -143,26 +143,26 @@ type
   // WhereBuild
   TioBSWhereBuild = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
-    FExecuteOnTarget: Boolean;
+    FWhereAutoExecuteOnTargetBS: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default True;
+    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
     property TargetBindSource;
   end;
 
   // WhereClear
   TioBSWhereClear = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
-    FExecuteOnTarget: Boolean;
+    FWhereAutoExecuteOnTargetBS: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default False;
+    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default False;
     property TargetBindSource;
   end;
 
@@ -1133,13 +1133,13 @@ end;
 constructor TioBSWhereBuild.Create(AOwner: TComponent);
 begin
   inherited;
-  FExecuteOnTarget := True;
+  FWhereAutoExecuteOnTargetBS := True;
 end;
 
 procedure TioBSWhereBuild.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  TargetBindSource.WhereBuild(FExecuteOnTarget);
+  TargetBindSource.WhereBuild(FWhereAutoExecuteOnTargetBS);
 end;
 
 procedure TioBSWhereBuild.UpdateTarget(Target: TObject);
@@ -1153,13 +1153,13 @@ end;
 constructor TioBSWhereClear.Create(AOwner: TComponent);
 begin
   inherited;
-  FExecuteOnTarget := False;
+  FWhereAutoExecuteOnTargetBS := False;
 end;
 
 procedure TioBSWhereClear.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  TargetBindSource.WhereClear(FExecuteOnTarget);
+  TargetBindSource.WhereClear(FWhereAutoExecuteOnTargetBS);
 end;
 
 procedure TioBSWhereClear.UpdateTarget(Target: TObject);

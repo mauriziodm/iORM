@@ -145,28 +145,28 @@ type
   // WhereBuild
   TioVMActionWhereBuild = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
   strict private
-    FExecuteOnTarget: Boolean;
+    FWhereAutoExecuteOnTargetBS: Boolean;
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default True;
+    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
     property TargetBindSource;
   end;
 
   // WhereClear
   TioVMActionWhereClear = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
   strict private
-    FExecuteOnTarget: Boolean;
+    FWhereAutoExecuteOnTargetBS: Boolean;
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default True;
+    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
     property TargetBindSource;
   end;
 
@@ -1120,13 +1120,13 @@ end;
 constructor TioVMActionWhereBuild.Create(AOwner: TComponent);
 begin
   inherited;
-  FExecuteOnTarget := True;
+  FWhereAutoExecuteOnTargetBS := True;
 end;
 
 procedure TioVMActionWhereBuild._InternalExecuteStdAction;
 begin
   inherited;
-  TargetBindSource.WhereBuild(FExecuteOnTarget);
+  TargetBindSource.WhereBuild(FWhereAutoExecuteOnTargetBS);
 end;
 
 procedure TioVMActionWhereBuild._InternalUpdateStdAction;
@@ -1140,13 +1140,13 @@ end;
 constructor TioVMActionWhereClear.Create(AOwner: TComponent);
 begin
   inherited;
-  FExecuteOnTarget := False;
+  FWhereAutoExecuteOnTargetBS := False;
 end;
 
 procedure TioVMActionWhereClear._InternalExecuteStdAction;
 begin
   inherited;
-  TargetBindSource.WhereClear(FExecuteOnTarget);
+  TargetBindSource.WhereClear(FWhereAutoExecuteOnTargetBS);
 end;
 
 procedure TioVMActionWhereClear._InternalUpdateStdAction;
