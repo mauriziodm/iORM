@@ -116,6 +116,7 @@ begin
   FOnInsertAction := iaSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
   FPersistence := TioBSPersistence.Create(Self);
+  FWhereBuilderFor := nil;
 end;
 
 destructor TioDataSetMaster.Destroy;
@@ -229,12 +230,12 @@ end;
 
 function TioDataSetMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
 begin
-
+  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget);
 end;
 
 function TioDataSetMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
 begin
-
+  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget);
 end;
 
 end.

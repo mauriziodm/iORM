@@ -76,6 +76,8 @@ begin
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSCloseQuery]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSNextPage]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPrevPage]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionWhereBuild]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionWhereClear]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSSelectCurrent]);
   RegisterSelectionEditor(TioVMActionBSSelectCurrent, TioMVVMSelectionEditor);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPersistenceSaveRevertPoint]);
@@ -95,6 +97,8 @@ begin
   RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSCloseQuery], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
+  RegisterActions('iORM-BSWhereBuilder', [iORM.StdActions.Vcl.TioBSWhereBuild], nil);
+  RegisterActions('iORM-BSWhereBuilder', [iORM.StdActions.Vcl.TioBSWhereClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceAppend], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceClear], nil);
   RegisterActions('iORM-BSPersistence', [iORM.StdActions.Vcl.TioBSPersistenceDelete], nil);

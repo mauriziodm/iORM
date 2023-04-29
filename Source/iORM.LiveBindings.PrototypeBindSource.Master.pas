@@ -128,6 +128,7 @@ begin
   FOnInsertAction := iaSaveRevertPoint;
   FOnRecordChangeAction := rcPersistIfChanged;
   FPersistence := TioBSPersistence.Create(Self);
+  FWhereBuilderFor := nil;
 end;
 
 destructor TioPrototypeBindSourceMaster.Destroy;

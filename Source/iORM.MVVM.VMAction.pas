@@ -142,6 +142,34 @@ type
     property TargetBindSource;
   end;
 
+  // WhereBuild
+  TioVMActionWhereBuild = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
+  strict private
+    FExecuteOnTarget: Boolean;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default True;
+    property TargetBindSource;
+  end;
+
+  // WhereClear
+  TioVMActionWhereClear = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
+  strict private
+    FExecuteOnTarget: Boolean;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property ExecuteOnTarget: Boolean read FExecuteOnTarget write FExecuteOnTarget default True;
+    property TargetBindSource;
+  end;
+
   // =================================================================================================
   // END: MVVM STANDARD VMACTIONS FOR BIND SOURCES
   // =================================================================================================
@@ -1085,6 +1113,46 @@ begin
   finally
     FExecutingEventHandler := False;
   end;
+end;
+
+{ TioVMActionWhereBuild }
+
+constructor TioVMActionWhereBuild.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExecuteOnTarget := True;
+end;
+
+procedure TioVMActionWhereBuild._InternalExecuteStdAction;
+begin
+  inherited;
+  TargetBindSource.WhereBuild(FExecuteOnTarget);
+end;
+
+procedure TioVMActionWhereBuild._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := TargetBindSource.isActive;
+end;
+
+{ TioVMActionWhereClear }
+
+constructor TioVMActionWhereClear.Create(AOwner: TComponent);
+begin
+  inherited;
+  FExecuteOnTarget := False;
+end;
+
+procedure TioVMActionWhereClear._InternalExecuteStdAction;
+begin
+  inherited;
+  TargetBindSource.WhereClear(FExecuteOnTarget);
+end;
+
+procedure TioVMActionWhereClear._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := TargetBindSource.isActive;
 end;
 
 end.
