@@ -40,7 +40,8 @@ uses
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
   iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
-  iORM.StdActions.Interfaces, iORM.Context.Container;
+  iORM.StdActions.Interfaces, iORM.Context.Container,
+  iORM.Context.Properties.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 1.8)';
@@ -113,6 +114,7 @@ type
   TioTypeOfCollection = iORM.CommonTypes.TioTypeOfCollection;
 
   IioWhere = iORM.Where.Interfaces.IioWhere;
+  IioProperty = iORM.Context.Properties.Interfaces.IioProperty;
 
   TioMapModeType = iORM.Attributes.TioMapModeType;
   TioRelationType = iORM.Attributes.TioRelationType;

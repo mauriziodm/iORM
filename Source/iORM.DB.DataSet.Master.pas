@@ -4,7 +4,8 @@ interface
 
 uses
   iORM.DB.DataSet.Custom, iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.BSPersistence, System.Classes, iORM.CommonTypes, iORM;
+  iORM.LiveBindings.BSPersistence, System.Classes, iORM.CommonTypes, iORM,
+  iORM.LiveBindings.CommonBSBehavior;
 
 type
 
@@ -17,6 +18,13 @@ type
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FOnInsertAction: TioOnInsertAction;
     FWhereBuilderFor: IioBSPersistenceClient;
+    // Events
+    FBeforeWhereBuild: TioBeforeWhereBuilderEvent;
+    FBeforeWhereClear: TioBeforeWhereBuilderEvent;
+    FOnWhereBuild: TioOnWhereBuilderEvent;
+    FOnWhereClear: TioOnWhereBuilderEvent;
+    FAfterWhereBuild: TioAfterWhereBuilderEvent;
+    FAfterWhereClear: TioAfterWhereBuilderEvent;
     // SourceDataSet
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetSourceBS(const Value: IioNotifiableBindSource);
@@ -96,13 +104,20 @@ type
     property AfterOpen;
     property BeforeClose;
     property BeforeOpen;
+    // Published events where builder
+    property BeforeWhereBuild: TioBeforeWhereBuilderEvent read FBeforeWhereBuild write FBeforeWhereBuild;
+    property BeforeWhereClear: TioBeforeWhereBuilderEvent read FBeforeWhereClear write FBeforeWhereClear;
+    property OnWhereBuild: TioOnWhereBuilderEvent read FOnWhereBuild write FOnWhereBuild;
+    property OnWhereClear: TioOnWhereBuilderEvent read FOnWhereClear write FOnWhereClear;
+    property AfterWhereBuild: TioAfterWhereBuilderEvent read FAfterWhereBuild write FAfterWhereBuild;
+    property AfterWhereClear: TioAfterWhereBuilderEvent read FAfterWhereClear write FAfterWhereClear;
   end;
 
 implementation
 
 uses
   System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.Notification, iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.Notification;
 
 { TioDataSetMaster }
 
@@ -230,12 +245,12 @@ end;
 
 function TioDataSetMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget);
+  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
 end;
 
 function TioDataSetMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget);
+  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
 end;
 
 end.

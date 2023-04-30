@@ -5,7 +5,7 @@ interface
 uses
   iORM.LiveBindings.BSPersistence, iORM.LiveBindings.PrototypeBindSource.Custom,
   System.Classes, iORM.LiveBindings.Interfaces, Data.Bind.Components, iORM.CommonTypes,
-  iORM;
+  iORM, iORM.LiveBindings.CommonBSBehavior;
 
 type
 
@@ -18,6 +18,13 @@ type
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FWhereBuilderFor: IioBSPersistenceClient;
+    // Events
+    FBeforeWhereBuild: TioBeforeWhereBuilderEvent;
+    FBeforeWhereClear: TioBeforeWhereBuilderEvent;
+    FOnWhereBuild: TioOnWhereBuilderEvent;
+    FOnWhereClear: TioOnWhereBuilderEvent;
+    FAfterWhereBuild: TioAfterWhereBuilderEvent;
+    FAfterWhereClear: TioAfterWhereBuilderEvent;
     // SourcePrototypeBindSource
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetSourceBS(const Value: IioNotifiableBindSource);
@@ -40,6 +47,8 @@ type
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
     // procedure DoBeforeOpen; // In TioDataSetMaster is DoBeforeOpen but here is SetActive
   protected
+//    procedure DoAfterWhereBuild;
+//    procedure DoBeforeWhereBuild;
     procedure SetActive(const Value: Boolean); override; // In TioDataSetMaster is DoBeforeOpen/DoAfterOpen/DoBeforeClose but here is SetActive
     procedure PosChanging(ABindComp: TBasicBindComponent); override; // In TioDataSetMaster is DoBeforeScroll but here is PosChanging
     // LoadType
@@ -107,13 +116,20 @@ type
     property AfterOpen;
     property BeforeClose;
     property BeforeOpen;
+    // Published events where builder
+    property BeforeWhereBuild: TioBeforeWhereBuilderEvent read FBeforeWhereBuild write FBeforeWhereBuild;
+    property BeforeWhereClear: TioBeforeWhereBuilderEvent read FBeforeWhereClear write FBeforeWhereClear;
+    property OnWhereBuild: TioOnWhereBuilderEvent read FOnWhereBuild write FOnWhereBuild;
+    property OnWhereClear: TioOnWhereBuilderEvent read FOnWhereClear write FOnWhereClear;
+    property AfterWhereBuild: TioAfterWhereBuilderEvent read FAfterWhereBuild write FAfterWhereBuild;
+    property AfterWhereClear: TioAfterWhereBuilderEvent read FAfterWhereClear write FAfterWhereClear;
   end;
 
 implementation
 
 uses
   System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.Notification, iORM.LiveBindings.CommonBSBehavior,
+  iORM.LiveBindings.Notification,
   iORM.Where.Factory;
 
 { TioPrototypeBindSourceMaster }
@@ -243,12 +259,12 @@ end;
 
 function TioPrototypeBindSourceMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget);
+  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
 end;
 
 function TioPrototypeBindSourceMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget);
+  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
 end;
 
 end.

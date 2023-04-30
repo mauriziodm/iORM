@@ -6,10 +6,9 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.TabControl, FMX.Layouts, FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects,
   System.Math.Vectors, FMX.Controls3D, FMX.Layers3D, System.Actions, FMX.ActnList, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces,
-  iORM.Abstraction.FMX, iORM.DB.ConnectionDef, FMX.ListView.Types, FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, Data.Bind.GenData,
-  iORM.Where.Interfaces, Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
+  iORM.Abstraction.FMX, iORM.DB.ConnectionDef, FMX.ListView.Types, FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView, Data.Bind.GenData, Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
   System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.GenData, FMX.Edit, FMX.Grid.Style, FMX.ScrollBox,
-  FMX.Grid, iORM.LiveBindings.PrototypeBindSource.Detail, Fmx.Bind.Grid, Data.Bind.Grid, iORM.StdActions.Fmx, FMX.ListBox;
+  FMX.Grid, iORM.LiveBindings.PrototypeBindSource.Detail, Fmx.Bind.Grid, Data.Bind.Grid, iORM.StdActions.Fmx, FMX.ListBox, iORM.Where.Interfaces;
 
 type
   TMainForm = class(TForm)

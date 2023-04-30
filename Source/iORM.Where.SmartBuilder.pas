@@ -3,25 +3,27 @@ unit iORM.Where.SmartBuilder;
 interface
 
 uses
-  iORM.Where.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces;
+  iORM.Where.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces,
+  System.Rtti;
 
 type
+  TioOnWhereBuildEventAnonymousMethod = reference to procedure(const AFilterObj: TObject; const AWhere: IioWhere; const AProp: IioProperty;
+    const AValue: TValue; var ADone: Boolean);
 
   TioWhereSmartBuilderRef = class of TioWhereSmartBuilder;
-
   TioWhereSmartBuilder = class
   private
-    class function BuildGroupWhere(const AObj: TObject; const AMap: IioMap; const AGroupName: String): IioWhere;
-    class procedure BuildPropWhere(const AObj: TObject; const AProp: IioProperty; const AWhere: IioWhere);
+    class function BuildGroupWhere(const AObj: TObject; const AMap: IioMap; const AGroupName: String; const AOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod): IioWhere;
+    class procedure BuildPropWhere(const AWhere: IioWhere; const AObj: TObject; const AProp: IioProperty; const AOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod);
     class procedure CheckWhereNullValueAffinity(const AProp: IioProperty);
   public
-    class function BuildWhere(const AObj: TObject): IioWhere;
+    class procedure BuildWhere(const AWhere: IioWhere; const AObj: TObject; const AOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod = nil);
   end;
 
 implementation
 
 uses
-  iORM.Context.Container, iORM.Where.Factory, System.SysUtils, iORM.Attributes, System.Rtti,
+  iORM.Context.Container, iORM.Where.Factory, System.SysUtils, iORM.Attributes,
   iORM.DB.Factory, iORM.Exceptions, iORM.Utilities;
 
 { TioWhereSmartBuilder }
@@ -35,11 +37,19 @@ begin
       [AProp.GetName, TioUtilities.TypeInfoToTypeName(AProp.WhereNullValue.TypeInfo), AProp.GetTypeName]));
 end;
 
-class procedure TioWhereSmartBuilder.BuildPropWhere(const AObj: TObject; const AProp: IioProperty; const AWhere: IioWhere);
+class procedure TioWhereSmartBuilder.BuildPropWhere(const AWhere: IioWhere; const AObj: TObject; const AProp: IioProperty;
+  const AOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod);
 var
+  LDone: Boolean;
   LValue: TValue;
 begin
+  LDone := False;
   LValue := AProp.GetValue(AObj);
+  // Call OnWhereBuildEvent if assigned
+  if Assigned(AOnWhereBuildEventAnonymousMethod) then
+    AOnWhereBuildEventAnonymousMethod(AObj, AWhere, AProp, LValue, LDone);
+  if LDone then
+    Exit;
   // Check if the value of the prop is null
   if (not AProp.WhereSkip) and (not LValue.IsEmpty) then
   begin
@@ -49,7 +59,7 @@ begin
         if LValue.AsString.Trim.ToUpper = AProp.WhereNullValue.AsString.Trim.ToUpper then
           Exit;
       // Integer/Float/DateTime
-      tkInteger, tkInt64, tkFloat:    
+      tkInteger, tkInt64, tkFloat:
         if LValue.AsInteger.ToString = AProp.WhereNullValue.AsInteger.ToString then
           Exit;
       // Enumeration
@@ -64,7 +74,8 @@ begin
   end;
 end;
 
-class function TioWhereSmartBuilder.BuildGroupWhere(const AObj: TObject; const AMap: IioMap; const AGroupName: String): IioWhere;
+class function TioWhereSmartBuilder.BuildGroupWhere(const AObj: TObject; const AMap: IioMap; const AGroupName: String;
+  const AOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod): IioWhere;
 var
   LProp: IioProperty;
 begin
@@ -79,7 +90,7 @@ begin
       CheckWhereNullValueAffinity(LProp);
       case LProp.GetRelationType of
         rtNone:
-          BuildPropWhere(AObj, LProp, Result);
+          BuildPropWhere(Result, AObj, LProp, AOnWhereBuildEventAnonymousMethod);
         rtBelongsTo:
           { To be implemented };
         rtHasOne, rtEmbeddedHasOne:
@@ -91,16 +102,19 @@ begin
     else
       // If the current property is of a child group nested into the current group
       if LProp.WhereMasterGroupName.Equals(AGroupName) then
-        (Result as IioWhereInternal)._AddCriteria(LProp.WhereGroupLogicOp, BuildGroupWhere(AObj, AMap, LProp.WhereGroupName)); // Recursion
+        (Result as IioWhereInternal)._AddCriteria(LProp.WhereGroupLogicOp, BuildGroupWhere(AObj, AMap, LProp.WhereGroupName, AOnWhereBuildEventAnonymousMethod)
+          ); // Recursion
   end;
 end;
 
-class function TioWhereSmartBuilder.BuildWhere(const AObj: TObject): IioWhere;
+class procedure TioWhereSmartBuilder.BuildWhere(const AWhere: IioWhere; const AObj: TObject;
+  const AOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod = nil);
 var
   LMap: IioMap;
 begin
   LMap := TioMapContainer.GetMap(AObj.ClassName, True);
-  Result := BuildGroupWhere(AObj, LMap, String.Empty); // Begin from the main group named '' (empty string)
+  // Begin from the main group named '' (empty string)
+  (AWhere as IioWhereInternal)._AddCriteria(BuildGroupWhere(AObj, LMap, String.Empty, AOnWhereBuildEventAnonymousMethod));
 end;
 
 end.

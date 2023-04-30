@@ -5,9 +5,14 @@ interface
 uses
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes, System.Classes, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.Context.Properties.Interfaces,
+  System.Rtti, iORM.Where.SmartBuilder;
 
 type
+  // Event hendlers
+  TioBeforeWhereBuilderEvent = procedure(const ASenderBS, AFilterObj: TObject; const AWhere: IioWhere) of object;
+  TioOnWhereBuilderEvent = procedure(const ASenderBS, AFilterObj: TObject; const AWhere: IioWhere; const AProp: IioProperty; const AValue: TValue; var ADone: Boolean) of object;
+  TioAfterWhereBuilderEvent = procedure(const ASenderBS, AFilterObj: TObject; const AWhere: IioWhere) of object;
 
   // Methods and functionalities common to all BindSouces (ioDataSet also)
   TioCommonBSBehavior = class
@@ -22,21 +27,21 @@ type
     class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
-    class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
+    class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): Boolean;
     // Common code for AsDefaulr property (for master BindSources)
     class procedure SetAsDefaultPropertyOfAllBindSourcesToFalse(const AOwner: TComponent; const AValue: Boolean);
     class procedure InitAsDefaultOnCreate(const ABindSource: TComponent; var AAsDefaultValue: Boolean);
 
     class function IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     // Common code for WhereBuilder purposes
-    class function WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
-    class function WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
+    class function WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
+    class function WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
   end;
 
 implementation
 
 uses
-  Data.Bind.ObjectScope, System.SysUtils, System.Rtti, iORM.Exceptions, iORM.Utilities,
+  Data.Bind.ObjectScope, System.SysUtils, iORM.Exceptions, iORM.Utilities,
   iORM, iORM.Where.Factory;
 
 { TioCommonBSBehavior }
@@ -60,10 +65,9 @@ begin
   if (ABindSource.TypeOfCollection = TioTypeOfCollection.tcList) and not TioUtilities.IsList(ADataObject) then
     raise EioException.Create(ClassName, 'CheckForSetDataObject',
       Format('You are trying to set the DataObject of the BindSource "%s" (it could also be a DataSet) but there is a problem:' +
-      #13#13'the "TypeOfCollection" property of the BindSource itself is set to "tcList", this means that iORM expects a list but the object you are trying to set does not appear to have the characteristics of a list.' +
-      #13#13'You''ve probably just forgotten to set the BindSource''s "TypeOfCollection" property to "tcSingleObject" or are trying to set the wrong DataObject.' +
-      #13#13'Please fix either of these two things and try again, it will work.',
-      [ABindSource.GetName]));
+      #13#13'the "TypeOfCollection" property of the BindSource itself is set to "tcList", this means that iORM expects a list but the object you are trying to set does not appear to have the characteristics of a list.'
+      + #13#13'You''ve probably just forgotten to set the BindSource''s "TypeOfCollection" property to "tcSingleObject" or are trying to set the wrong DataObject.'
+      + #13#13'Please fix either of these two things and try again, it will work.', [ABindSource.GetName]));
 end;
 
 class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
@@ -71,7 +75,8 @@ begin
   if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioException.Create(ClassName, 'CheckForSetLoadType',
       Format('In order to set the "LoadType" property to a value other than "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance", you must first set the "SourceXXX" property to blank (nil).'
-      + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.', [ABindSource.GetName]));
+      + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.',
+      [ABindSource.GetName]));
 end;
 
 class procedure TioCommonBSBehavior.CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
@@ -79,10 +84,11 @@ begin
   if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioException.Create(ClassName, 'CheckForSetSourceBS',
       Format('In order to set the "SourceXXX" property, you must first set the "LoadType" property to one of the values "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance".'
-      + #13#13'Please set the "LoadType" property of the bind source "%s" (maybe a DataSet or BindSource) to one of the above values and then try again.', [ABindSource.GetName]));
+      + #13#13'Please set the "LoadType" property of the bind source "%s" (maybe a DataSet or BindSource) to one of the above values and then try again.',
+      [ABindSource.GetName]));
 end;
 
-class function TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): boolean;
+class function TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): Boolean;
 begin
   Result := ALoadType in [ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance];
 end;
@@ -97,7 +103,7 @@ begin
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
   // NB: Is detail bind source initialize to false
-  if (csDesigning in ABindSource.ComponentState) and not (csLoading in ABindSource.ComponentState) then
+  if (csDesigning in ABindSource.ComponentState) and not(csLoading in ABindSource.ComponentState) then
   begin
     AAsDefaultValue := True;
     for I := 0 to ABindSource.Owner.ComponentCount - 1 do
@@ -115,8 +121,8 @@ begin
     AAsDefaultValue := False;
 end;
 
-class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj,
-  ARaiseExceptions: Boolean): Boolean;
+class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource;
+  const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
 begin
   // Init
   Result := True;
@@ -228,8 +234,8 @@ begin
       [(ASender as TComponent).Name]));
   if not ATargetBS.IsActive then
     raise EioException.Create(ClassName, 'Select<T>',
-      Format('You have tried to make a selection by invoking the "SelectCurrent" method of component "%s" but the target component of the selection ("%s") is not active.' +
-      #13#13'iORM cannot forward the selection.'#13#13'Please make sure that the target component of the selection is active as well and try again.',
+      Format('You have tried to make a selection by invoking the "SelectCurrent" method of component "%s" but the target component of the selection ("%s") is not active.'
+      + #13#13'iORM cannot forward the selection.'#13#13'Please make sure that the target component of the selection is active as well and try again.',
       [(ASender as TComponent).Name, ATargetBS.GetName]));
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
@@ -263,26 +269,51 @@ begin
         LBindSource.SetAsDefault(False);
 end;
 
-class function TioCommonBSBehavior.WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
+class function TioCommonBSBehavior.WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
+var
+  LOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod;
+  LWhere: IioWhere;
 begin
+  // Some checks
   if not Assigned(ATargetBS) then
-    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the "WhereBuilder" property is unassigned (%s))', [ASourceBS.GetName]));
+    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the "WhereBuilder" property is unassigned (%s))',
+      [ASourceBS.GetName]));
   if not ASourceBS.IsActive then
     raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
   if not Assigned(ASourceBS.Current) then
-    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
-
-  Result := TioWhereFactory.NewWhereSmartBuilder.BuildWhere(ASourceBS.Current);
-  ATargetBS.SetWhere(Result);
-
+    raise EioException.Create(ClassName, 'WhereBuild',
+      Format('"WhereBuild" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
+  // Create e new where instance
+  LWhere := TioWhereFactory.NewWhere;
+  // Define the LOnWhereBuildEventAnonymousMethod for OnWhereBuildEvent event handling
+  if Assigned(AOnWhereBuildEvent) then
+    LOnWhereBuildEventAnonymousMethod := procedure(const AFilterObj: TObject; const AWhere: IioWhere; const AProp: IioProperty; const AValue: TValue; var ADone: Boolean)
+      begin
+        AOnWhereBuildEvent(ASourceBS as TObject, ASourceBS.Current, LWhere, AProp, AValue, ADone);
+      end
+  else
+    LOnWhereBuildEventAnonymousMethod := nil;
+  // Before build event
+  if Assigned(ABeforeWhereBuildEvent) then
+    ABeforeWhereBuildEvent(ASourceBS as TObject, ASourceBS.Current, LWhere);
+  // Execute the BuildWhere passing the LOnWhereBuildEventAnonymousMethod
+  TioWhereFactory.NewWhereSmartBuilder.BuildWhere(LWhere, ASourceBS.Current, LOnWhereBuildEventAnonymousMethod);
+  // After build event
+  if Assigned(AAfterWhereBuildEvent) then
+    AAfterWhereBuildEvent(ASourceBS as TObject, ASourceBS.Current, LWhere);
+  // Set the result where
+  ATargetBS.SetWhere(LWhere);
+  Result := LWhere;
+  // If enabled execute a reload on the target BS
   if AExecuteOnTarget then
     ATargetBS.Persistence.Reload;
 end;
 
-class function TioCommonBSBehavior.WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean): IioWhere;
+class function TioCommonBSBehavior.WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
 begin
+  // Reset the filter object (sourceBS)
   ASourceBS.Persistence.Reload;
-  Result := WhereBuild(ASourceBS, ATargetBS, AExecuteOnTarget);
+  Result := WhereBuild(ASourceBS, ATargetBS, AExecuteOnTarget, ABeforeWhereClearEvent, AOnWhereClearEvent, AAfterWhereClearEvent);
 end;
 
 end.

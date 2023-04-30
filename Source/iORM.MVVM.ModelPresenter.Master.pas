@@ -5,7 +5,7 @@ interface
 uses
   iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.BSPersistence,
   System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, iORM.LiveBindings.CommonBSBehavior;
 
 type
 
@@ -19,6 +19,13 @@ type
     FOnInsertAction: TioOnInsertAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FWhereBuilderFor: IioBSPersistenceClient;
+    // Events
+    FBeforeWhereBuild: TioBeforeWhereBuilderEvent;
+    FBeforeWhereClear: TioBeforeWhereBuilderEvent;
+    FOnWhereBuild: TioOnWhereBuilderEvent;
+    FOnWhereClear: TioOnWhereBuilderEvent;
+    FAfterWhereBuild: TioAfterWhereBuilderEvent;
+    FAfterWhereClear: TioAfterWhereBuilderEvent;
     // SourceModelPresenter
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetSourceBS(const Value: IioNotifiableBindSource);
@@ -106,13 +113,19 @@ type
     property AfterOpen;
     property BeforeClose;
     property BeforeOpen;
+    // Published events where builder
+    property BeforeWhereBuild: TioBeforeWhereBuilderEvent read FBeforeWhereBuild write FBeforeWhereBuild;
+    property BeforeWhereClear: TioBeforeWhereBuilderEvent read FBeforeWhereClear write FBeforeWhereClear;
+    property OnWhereBuild: TioOnWhereBuilderEvent read FOnWhereBuild write FOnWhereBuild;
+    property OnWhereClear: TioOnWhereBuilderEvent read FOnWhereClear write FOnWhereClear;
+    property AfterWhereBuild: TioAfterWhereBuilderEvent read FAfterWhereBuild write FAfterWhereBuild;
+    property AfterWhereClear: TioAfterWhereBuilderEvent read FAfterWhereClear write FAfterWhereClear;
   end;
 
 implementation
 
 uses
-  iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 { TioModelPresenterMaster }
 
@@ -239,12 +252,12 @@ end;
 
 function TioModelPresenterMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget);
+  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
 end;
 
 function TioModelPresenterMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget);
+  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
 end;
 
 procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);

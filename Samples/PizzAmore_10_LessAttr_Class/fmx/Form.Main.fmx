@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 61
+          TabOrder = 64
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5435,8 +5435,8 @@ object MainForm: TMainForm
           StyledSettings = [Family, Style, FontColor]
           TabOrder = 11
           RowCount = 200
-          Viewport.Width = 508.000000000000000000
-          Viewport.Height = 481.000000000000000000
+          Viewport.Width = 528.000000000000000000
+          Viewport.Height = 506.000000000000000000
         end
         object Label5: TLabel
           StyledSettings = [Family]
@@ -6530,6 +6530,7 @@ object MainForm: TMainForm
     object acWhereClear: TioBSWhereClear
       Category = 'iORM-BSWhereBuilder'
       Text = 'Clear'
+      WhereAutoExecuteOnTargetBS = True
       TargetBindSource = BSFilterCustomer
     end
   end
