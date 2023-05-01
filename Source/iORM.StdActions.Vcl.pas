@@ -435,7 +435,7 @@ type
   // =================================================================================================
 
   // ShowCurrent action to show the current object of the BS
-  TioShowAction = class(Vcl.ActnList.TAction)
+  TioBSShow = class(Vcl.ActnList.TAction)
   strict private
     FEntityTypeName: String;
     FFromBS: IioStdActionTargetBindSource;
@@ -1225,7 +1225,7 @@ end;
 
 { TioShowAction }
 
-constructor TioShowAction.Create(AOwner: TComponent);
+constructor TioBSShow.Create(AOwner: TComponent);
 begin
   inherited;
   FEntityTypeName := '';
@@ -1242,17 +1242,17 @@ begin
   FViewContextProviderName := '';
 end;
 
-function TioShowAction.Get_Version: String;
+function TioBSShow.Get_Version: String;
 begin
   Result := io.Version;
 end;
 
-function TioShowAction.HandlesTarget(Target: TObject): Boolean;
+function TioBSShow.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := Assigned(Target);
 end;
 
-procedure TioShowAction.UpdateTarget(Target: TObject);
+procedure TioBSShow.UpdateTarget(Target: TObject);
 begin
   inherited;
   // ShowBy
@@ -1275,7 +1275,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.ExecuteTarget(Target: TObject);
+procedure TioBSShow.ExecuteTarget(Target: TObject);
 begin
   inherited;
   // ShowBy...
@@ -1354,7 +1354,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TioBSShow.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) then
@@ -1376,7 +1376,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.SetFromBS(const Value: IioStdActionTargetBindSource);
+procedure TioBSShow.SetFromBS(const Value: IioStdActionTargetBindSource);
 begin
   if Value <> FFromBS then
   begin
@@ -1386,7 +1386,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+procedure TioBSShow.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
 begin
   if Value <> FParentCloseQueryAction then
   begin
@@ -1396,7 +1396,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.SetSelectorForBS(const Value: IioStdActionTargetBindSource);
+procedure TioBSShow.SetSelectorForBS(const Value: IioStdActionTargetBindSource);
 begin
   if Value <> FSelectorForBS then
   begin
@@ -1406,7 +1406,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.SetViewContext(const Value: TComponent);
+procedure TioBSShow.SetViewContext(const Value: TComponent);
 begin
   if Value <> FViewContext then
   begin
@@ -1416,7 +1416,7 @@ begin
   end;
 end;
 
-procedure TioShowAction.SetViewContextProvider(const Value: TioViewContextProvider);
+procedure TioBSShow.SetViewContextProvider(const Value: TioViewContextProvider);
 begin
   if Value <> FViewContextProvider then
   begin
