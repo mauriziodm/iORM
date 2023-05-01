@@ -440,12 +440,14 @@ type
   // ShowCurrent action to show the current object of the BS
   TioShowAction = class(Vcl.ActnList.TAction)
   strict private
+    FEntityTypeName: String;
     FFromBS: IioStdActionTargetBindSource;
     FParentCloseQueryAction: IioBSCloseQueryAction;
     FShowBy: TioShowBy;
     FSelectorForBS: IioStdActionTargetBindSource;
-    FTypeAlias: String;
-    FTypeName: String;
+    FViewTypeName: String;
+    FVMTypeName: String;
+    FVVMTypeAlias: String;
     FViewContext: TComponent;
     FViewContextBy: TioViewContextBy;
     FViewContextProvider: TioViewContextProvider;
@@ -464,17 +466,19 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
-    property _Version: String read Get_Version;
+    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property FromBS: IioStdActionTargetBindSource read FFromBS write SetFromBS;
     property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
     property ShowBy: TioShowBy read FShowBy write FShowBy;
     property SelectorForBS: IioStdActionTargetBindSource read FSelectorForBS write SetSelectorForBS;
-    property TypeAlias: String read FTypeAlias write FTypeAlias;
-    property TypeName: String read FTypeName write FTypeName;
+    property ViewTypeName: String read FViewTypeName write FViewTypeName;
+    property VMTypeName: String read FVMTypeName write FVMTypeName;
+    property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property ViewContext: TComponent read FViewContext write SetViewContext;
     property ViewContextBy: TioViewContextBy read FViewContextBy write FViewContextBy;
     property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
     property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
+    property _Version: String read Get_Version;
   end;
 
   // =================================================================================================
@@ -1227,22 +1231,18 @@ end;
 constructor TioShowAction.Create(AOwner: TComponent);
 begin
   inherited;
+  FEntityTypeName := '';
   FFromBS := nil;
   FParentCloseQueryAction := nil;
   FShowBy := TioShowBy.byBSCurrent;
   FSelectorForBS := nil;
-  FTypeAlias := '';
-  FTypeName := '';
+  FViewTypeName := '';
+  FVMTypeName := '';
+  FVVMTypeAlias := '';
   FViewContext := nil;
   FViewContextBy := TioViewContextBy.vcByDefaultViewContextProvider;
   FViewContextProvider := nil;
   FViewContextProviderName := '';
-end;
-
-procedure TioShowAction.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-
 end;
 
 function TioShowAction.Get_Version: String;
@@ -1262,8 +1262,10 @@ begin
   case FShowBy of
     byBSCurrent, byBSEach:  
       Enabled := Enabled and assigned(FFromBS) and FFromBS.IsActive;
-    byEntityTypeName, byVVMTypeName:
-      Enabled := Enabled and not FTypeName.Trim.IsEmpty;
+    byEntityTypeName:
+      Enabled := Enabled and not FEntityTypeName.Trim.IsEmpty;
+    byVVMTypeName:
+      Enabled := Enabled and not FViewTypeName.Trim.IsEmpty;
   end;
   // ViewContextBy
   case FViewContextBy of
@@ -1274,6 +1276,55 @@ begin
     vcByViewContext:
       Enabled := Enabled and Assigned(FViewContext);
   end;
+end;
+
+procedure TioShowAction.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  // ShowBy...
+  case FShowBy of
+    // byBSCurrent
+    byBSCurrent:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+      end;
+    // byBSEach
+    byBSEach:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+      end;
+    // byEntityTypeName
+    byEntityTypeName:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.Show(FEntityTypeName, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.Show(FEntityTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+      end;
+  end;
+
+
+  
+//  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byVVMTypeName);
+//  TioViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);
 end;
 
 procedure TioShowAction.Notification(AComponent: TComponent; Operation: TOperation);

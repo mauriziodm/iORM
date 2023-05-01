@@ -368,6 +368,7 @@ type
     class function LocateVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate View & ViewModel
+    class function LocateViewVM(const AViewInterfaceName, AVMInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator<TView>; overload;
     class function LocateViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
@@ -466,6 +467,18 @@ end;
 class function TioDependencyInjection.LocateView(const AInterfaceName, AVAlias: String): IioDependencyInjectionLocator;
 begin
   Result := TioDependencyInjectionFactory.GetLocator(AInterfaceName, AVAlias, True, True, dotView);
+end;
+
+class function TioDependencyInjection.LocateViewVM(const AViewInterfaceName, AVMInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AVVMAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
+var
+  LViewModel: IioViewModel;
+begin
+  // Get the ViewLocator
+  Result := TioDependencyInjectionFactory.GetLocator(AViewInterfaceName, AVVMAlias, True, True, dotView);
+  // Get the ViewModel instance
+  LViewModel := io.di.LocateVM(AVMInterfaceName, AParentCloseQueryAction, AVVMAlias).GetAsGeneric.OfType<IioViewModel>;
+  Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
 class function TioDependencyInjection.LocateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String)
