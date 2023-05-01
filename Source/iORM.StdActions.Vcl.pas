@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence,
-  Vcl.Forms, iORM.StdActions.Interfaces;
+  Vcl.Forms, iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -427,7 +427,58 @@ type
   end;
 
   // =================================================================================================
-  // ENS: VCL STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
+  // END: VCL STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
+  // =================================================================================================
+
+  // =================================================================================================
+  // BEGIN: VCL STANDARD ACTIONS TO SHOW AN OBJECT
+  // =================================================================================================
+
+  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byVVMTypeName);
+  TioViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);
+
+  // ShowCurrent action to show the current object of the BS
+  TioShowAction = class(Vcl.ActnList.TAction)
+  strict private
+    FFromBS: IioStdActionTargetBindSource;
+    FParentCloseQueryAction: IioBSCloseQueryAction;
+    FShowBy: TioShowBy;
+    FSelectorForBS: IioStdActionTargetBindSource;
+    FTypeAlias: String;
+    FTypeName: String;
+    FViewContext: TComponent;
+    FViewContextBy: TioViewContextBy;
+    FViewContextProvider: TioViewContextProvider;
+    FViewContextProviderName: String;
+    function Get_Version: String;
+    procedure SetFromBS(const Value: IioStdActionTargetBindSource);
+    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    procedure SetSelectorForBS(const Value: IioStdActionTargetBindSource);
+    procedure SetViewContext(const Value: TComponent);
+    procedure SetViewContextProvider(const Value: TioViewContextProvider);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    property _Version: String read Get_Version;
+    property FromBS: IioStdActionTargetBindSource read FFromBS write SetFromBS;
+    property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
+    property ShowBy: TioShowBy read FShowBy write FShowBy;
+    property SelectorForBS: IioStdActionTargetBindSource read FSelectorForBS write SetSelectorForBS;
+    property TypeAlias: String read FTypeAlias write FTypeAlias;
+    property TypeName: String read FTypeName write FTypeName;
+    property ViewContext: TComponent read FViewContext write SetViewContext;
+    property ViewContextBy: TioViewContextBy read FViewContextBy write FViewContextBy;
+    property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
+    property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
+  end;
+
+  // =================================================================================================
+  // END: VCL STANDARD ACTIONS TO SHOW AN OBJECT
   // =================================================================================================
 
 implementation
@@ -1169,6 +1220,132 @@ procedure TioBSWhereClear.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
+end;
+
+{ TioShowAction }
+
+constructor TioShowAction.Create(AOwner: TComponent);
+begin
+  inherited;
+  FFromBS := nil;
+  FParentCloseQueryAction := nil;
+  FShowBy := TioShowBy.byBSCurrent;
+  FSelectorForBS := nil;
+  FTypeAlias := '';
+  FTypeName := '';
+  FViewContext := nil;
+  FViewContextBy := TioViewContextBy.vcByDefaultViewContextProvider;
+  FViewContextProvider := nil;
+  FViewContextProviderName := '';
+end;
+
+procedure TioShowAction.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+
+end;
+
+function TioShowAction.Get_Version: String;
+begin
+  Result := io.Version;
+end;
+
+function TioShowAction.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target);
+end;
+
+procedure TioShowAction.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  // ShowBy
+  case FShowBy of
+    byBSCurrent, byBSEach:  
+      Enabled := Enabled and assigned(FFromBS) and FFromBS.IsActive;
+    byEntityTypeName, byVVMTypeName:
+      Enabled := Enabled and not FTypeName.Trim.IsEmpty;
+  end;
+  // ViewContextBy
+  case FViewContextBy of
+    vcByViewContextProviderName:  
+      Enabled := Enabled and not FViewContextProviderName.Trim.IsEmpty;
+    vcByViewContextProvider:
+      Enabled := Enabled and Assigned(FViewContextProvider);
+    vcByViewContext:
+      Enabled := Enabled and Assigned(FViewContext);
+  end;
+end;
+
+procedure TioShowAction.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) then
+  begin
+    if (AComponent = (FFromBS as TComponent)) then
+      FFromBS := nil
+    else
+    if (AComponent = (FParentCloseQueryAction as TComponent)) then
+      FParentCloseQueryAction := nil
+    else
+    if (AComponent = (FSelectorForBS as TComponent)) then
+      FSelectorForBS := nil
+    else
+    if (AComponent = (FViewContext as TComponent)) then
+      FViewContext := nil
+    else
+    if (AComponent = (FViewContextProvider as TComponent)) then
+      FViewContextProvider:= nil;
+  end;
+end;
+
+procedure TioShowAction.SetFromBS(const Value: IioStdActionTargetBindSource);
+begin
+  if Value <> FFromBS then
+  begin
+    FFromBS := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioShowAction.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+begin
+  if Value <> FParentCloseQueryAction then
+  begin
+    FParentCloseQueryAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioShowAction.SetSelectorForBS(const Value: IioStdActionTargetBindSource);
+begin
+  if Value <> FSelectorForBS then
+  begin
+    FSelectorForBS := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioShowAction.SetViewContext(const Value: TComponent);
+begin
+  if Value <> FViewContext then
+  begin
+    FViewContext := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioShowAction.SetViewContextProvider(const Value: TioViewContextProvider);
+begin
+  if Value <> FViewContextProvider then
+  begin
+    FViewContextProvider := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
 end;
 
 end.
