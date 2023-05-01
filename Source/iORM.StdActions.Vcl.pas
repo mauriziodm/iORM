@@ -1319,6 +1319,30 @@ begin
         vcByViewContext:
           io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
       end;
+    // byVVMTypeName
+    byVVMTypeName:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          if FVMTypeName.IsEmpty then                                               
+            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FVVMTypeAlias)
+          else
+            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          if FVMTypeName.IsEmpty then                                               
+            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias)
+          else
+            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          if FVMTypeName.IsEmpty then                                               
+            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias)
+          else
+            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          if FVMTypeName.IsEmpty then                                               
+            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias)
+          else
+            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+      end;
   end;
 
 
