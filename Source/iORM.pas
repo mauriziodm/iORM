@@ -45,6 +45,7 @@ uses
 
 const
   IORM_VERSION = 'iORM 2 (beta 1.8)';
+
 {$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // TioTypeOfCollection
   tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
@@ -94,6 +95,17 @@ const
   stAppend = iORM.CommonTypes.TioSelectionType.stAppend;
   stInsert = iORM.CommonTypes.TioSelectionType.stInsert;
 
+  // TioShowBy
+  byBSCurrent = iORM.StdActions.Interfaces.byBSCurrent;
+  byBSEach = iORM.StdActions.Interfaces.byBSEach;
+  byEntityTypeName = iORM.StdActions.Interfaces.byEntityTypeName;
+  byVVMTypeName = iORM.StdActions.Interfaces.byVVMTypeName;
+  // TioViewContextBy
+  vcByDefaultViewContextProvider = iORM.StdActions.Interfaces.vcByDefaultViewContextProvider;
+  vcByViewContextProviderName = iORM.StdActions.Interfaces.vcByViewContextProviderName;
+  vcByViewContextProvider = iORM.StdActions.Interfaces.vcByViewContextProvider;
+  vcByViewContext = iORM.StdActions.Interfaces.vcByViewContext;
+//  vcNone = iORM.StdActions.Interfaces.vcNone;
 {$ENDREGION}
 
 type
@@ -121,6 +133,9 @@ type
   TioFKAction = iORM.Attributes.TioFKAction;
   TioFKCreate = iORM.Attributes.TioFKCreate;
   TioJoinType = iORM.Attributes.TioJoinType;
+
+  TioShowBy = iORM.StdActions.Interfaces.TioShowBy;
+  TioViewContextBy = iORM.StdActions.Interfaces.TioViewContextBy;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM

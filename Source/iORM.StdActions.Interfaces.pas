@@ -7,6 +7,9 @@ uses
 
 type
 
+  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byVVMTypeName);
+  TioViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);//, vcNone);
+
   TioCloseQueryActionExecutionMode = (emActive, emPassive);
 
   IioBSCloseQueryAction = interface

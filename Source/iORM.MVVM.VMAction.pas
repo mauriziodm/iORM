@@ -385,6 +385,58 @@ type
   // END: MVVM STANDARD ACTIONS FOR BIND SOURCES WITH PERSISTENCE PROPERTY (MASTER BIND SOURCES ONLY)
   // =================================================================================================
 
+  // =================================================================================================
+  // BEGIN: MVVM STANDARD ACTIONS TO SHOW AN OBJECT
+  // =================================================================================================
+
+  // ShowCurrent action to show the current object of the BS
+//  TioShowAction = class(TioVMActionCustom)
+//  strict private
+//    FEntityTypeName: String;
+//    FFromBS: IioStdActionTargetBindSource;
+//    FParentCloseQueryAction: IioBSCloseQueryAction;
+//    FShowBy: TioShowBy;
+//    FSelectorForBS: IioStdActionTargetBindSource;
+//    FViewTypeName: String;
+//    FVMTypeName: String;
+//    FVVMTypeAlias: String;
+//    FViewContext: TComponent;
+//    FViewContextBy: TioViewContextBy;
+//    FViewContextProvider: TioViewContextProvider;
+//    FViewContextProviderName: String;
+//    function Get_Version: String;
+//    procedure SetFromBS(const Value: IioStdActionTargetBindSource);
+//    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+//    procedure SetSelectorForBS(const Value: IioStdActionTargetBindSource);
+//    procedure SetViewContext(const Value: TComponent);
+//    procedure SetViewContextProvider(const Value: TioViewContextProvider);
+//  strict protected
+//    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+//  public
+//    constructor Create(AOwner: TComponent); override;
+//    function HandlesTarget(Target: TObject): Boolean; override;
+//    procedure ExecuteTarget(Target: TObject); override;
+//    procedure UpdateTarget (Target: TObject); override;
+//  published
+//    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
+//    property FromBS: IioStdActionTargetBindSource read FFromBS write SetFromBS;
+//    property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
+//    property ShowBy: TioShowBy read FShowBy write FShowBy;
+//    property SelectorForBS: IioStdActionTargetBindSource read FSelectorForBS write SetSelectorForBS;
+//    property ViewTypeName: String read FViewTypeName write FViewTypeName;
+//    property VMTypeName: String read FVMTypeName write FVMTypeName;
+//    property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
+//    property ViewContext: TComponent read FViewContext write SetViewContext;
+//    property ViewContextBy: TioViewContextBy read FViewContextBy write FViewContextBy;
+//    property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
+//    property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
+//    property _Version: String read Get_Version;
+//  end;
+
+  // =================================================================================================
+  // END: MVVM STANDARD ACTIONS TO SHOW AN OBJECT
+  // =================================================================================================
+
 implementation
 
 uses

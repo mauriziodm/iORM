@@ -434,9 +434,6 @@ type
   // BEGIN: VCL STANDARD ACTIONS TO SHOW AN OBJECT
   // =================================================================================================
 
-  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byVVMTypeName);
-  TioViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);
-
   // ShowCurrent action to show the current object of the BS
   TioShowAction = class(Vcl.ActnList.TAction)
   strict private
@@ -1294,6 +1291,8 @@ begin
           io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
           io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
     // byBSEach
     byBSEach:
@@ -1306,6 +1305,8 @@ begin
           io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
           io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
     // byEntityTypeName
     byEntityTypeName:
@@ -1318,37 +1319,39 @@ begin
           io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
           io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.Show(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
     // byVVMTypeName
     byVVMTypeName:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          if FVMTypeName.IsEmpty then                                               
+          if FVMTypeName.IsEmpty then
             io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FVVMTypeAlias)
           else
             io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          if FVMTypeName.IsEmpty then                                               
+          if FVMTypeName.IsEmpty then
             io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias)
           else
             io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          if FVMTypeName.IsEmpty then                                               
+          if FVMTypeName.IsEmpty then
             io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias)
           else
             io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          if FVMTypeName.IsEmpty then                                               
+          if FVMTypeName.IsEmpty then
             io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias)
           else
             io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          if FVMTypeName.IsEmpty then
+//            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias)
+//          else
+//            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
   end;
-
-
-  
-//  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byVVMTypeName);
-//  TioViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);
 end;
 
 procedure TioShowAction.Notification(AComponent: TComponent; Operation: TOperation);
