@@ -7,7 +7,8 @@ uses
 
 type
 
-  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byVVMTypeName, byEntityTypeNameAsSelector, byVVMTypeNameAsSelector);
+//  TioShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smVVMTypeName, smSelector
+  TioShowBy = (byBSCurrent, byBSEach, byEntityTypeName, byEntityTypeNameAsSelector);     // , byEntityTypeNameAsSelector, byBSTypeNameAsSelector
   TioViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);//, vcNone);
 
   TioCloseQueryActionExecutionMode = (emActive, emPassive);

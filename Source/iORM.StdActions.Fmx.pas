@@ -444,8 +444,6 @@ type
     FParentCloseQueryAction: IioBSCloseQueryAction;
     FShowBy: TioShowBy;
     FTargetBindSource: IioStdActionTargetBindSource;
-    FViewTypeName: String;
-    FVMTypeName: String;
     FVVMTypeAlias: String;
     FViewContext: TComponent;
     FViewContextBy: TioViewContextBy;
@@ -468,8 +466,6 @@ type
     property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
     property ShowBy: TioShowBy read FShowBy write FShowBy;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
-    property ViewTypeName: String read FViewTypeName write FViewTypeName;
-    property VMTypeName: String read FVMTypeName write FVMTypeName;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property ViewContext: TComponent read FViewContext write SetViewContext;
     property ViewContextBy: TioViewContextBy read FViewContextBy write FViewContextBy;
@@ -1226,8 +1222,6 @@ begin
   FTargetBindSource := nil;
   FParentCloseQueryAction := nil;
   FShowBy := TioShowBy.byBSCurrent;
-  FViewTypeName := '';
-  FVMTypeName := '';
   FVVMTypeAlias := '';
   FViewContext := nil;
   FViewContextBy := TioViewContextBy.vcByDefaultViewContextProvider;
@@ -1281,35 +1275,6 @@ begin
           io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.Show(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
-      end;
-    // byVVMTypeName
-    byVVMTypeName:
-      case FViewContextBy of
-        vcByDefaultViewContextProvider:
-          if FVMTypeName.IsEmpty then
-            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FVVMTypeAlias)
-          else
-            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FVVMTypeAlias);
-        vcByViewContextProviderName:
-          if FVMTypeName.IsEmpty then
-            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias)
-          else
-            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
-        vcByViewContextProvider:
-          if FVMTypeName.IsEmpty then
-            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias)
-          else
-            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
-        vcByViewContext:
-          if FVMTypeName.IsEmpty then
-            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias)
-          else
-            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
-//        vcNone:
-//          if FVMTypeName.IsEmpty then
-//            io.CreateSimpleView(FViewTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias)
-//          else
-//            io.CreateViewVM(FViewTypeName, FVMTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
   end;
 end;
@@ -1392,8 +1357,6 @@ begin
       Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive;
     byEntityTypeName:
       Enabled := Enabled and not FEntityTypeName.Trim.IsEmpty;
-    byVVMTypeName:
-      Enabled := Enabled and not FViewTypeName.Trim.IsEmpty;
   end;
   // ViewContextBy
   case FViewContextBy of
