@@ -112,12 +112,17 @@ type
   // SelectCurrent action to make a selection for a Selector BindSource
   TioBSSelectCurrent = class(TioBSStdActionFmx<IioStdActionTargetBindSource>)
   strict private
+    FCloseQueryAction: IioBSCloseQueryAction;
     FSelectionType: TioSelectionType;
+    procedure SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
+    property CloseQueryAction: IioBSCloseQueryAction read FCloseQueryAction write SetCloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
     property TargetBindSource;
   end;
@@ -396,6 +401,7 @@ type
     procedure _InjectEventHandler;
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
+    function _IsEnabled: Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
@@ -438,7 +444,7 @@ type
   // =================================================================================================
 
   // ShowCurrent action to show the current object of the BS
-  TioBSShow = class(Fmx.ActnList.TAction)
+  TioBSShowOrSelect = class(Fmx.ActnList.TAction)
   strict private
     FEntityTypeName: String;
     FParentCloseQueryAction: IioBSCloseQueryAction;
@@ -740,6 +746,7 @@ end;
 constructor TioBSSelectCurrent.Create(AOwner: TComponent);
 begin
   inherited;
+  FCloseQueryAction := nil;
   FSelectionType := stAppend;
 end;
 
@@ -747,6 +754,25 @@ procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
+  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
+    FCloseQueryAction.Execute;
+end;
+
+procedure TioBSSelectCurrent.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
+    FCloseQueryAction := nil;
+end;
+
+procedure TioBSSelectCurrent.SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+begin
+  if Value <> FCloseQueryAction then
+  begin
+    FCloseQueryAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
 end;
 
 procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
@@ -777,7 +803,7 @@ procedure TioBSStdActionFmx<T>.Notification(AComponent: TComponent; Operation: T
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
-    TargetBindSource := nil;
+    FTargetBindSource := nil;
 end;
 
 procedure TioBSStdActionFmx<T>.SetTargetBindSource(const Value: T);
@@ -1147,6 +1173,11 @@ begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
+function TioBSCloseQuery._IsEnabled: Boolean;
+begin
+  Result := Enabled;
+end;
+
 function TioBSCloseQuery._CanClose: Boolean;
 begin
   Result := (TargetBindSource = nil) or TargetBindSource.Persistence.IsEmpty or TargetBindSource.Persistence.CanSaveRevertPoint or (FOnEditingAction <> eaDisable);
@@ -1215,7 +1246,7 @@ end;
 
 { TioShowAction }
 
-constructor TioBSShow.Create(AOwner: TComponent);
+constructor TioBSShowOrSelect.Create(AOwner: TComponent);
 begin
   inherited;
   FEntityTypeName := '';
@@ -1229,7 +1260,7 @@ begin
   FViewContextProviderName := '';
 end;
 
-procedure TioBSShow.ExecuteTarget(Target: TObject);
+procedure TioBSShowOrSelect.ExecuteTarget(Target: TObject);
 begin
   inherited;
   // ShowBy...
@@ -1307,17 +1338,17 @@ begin
   end;
 end;
 
-function TioBSShow.Get_Version: String;
+function TioBSShowOrSelect.Get_Version: String;
 begin
   Result := io.Version;
 end;
 
-function TioBSShow.HandlesTarget(Target: TObject): Boolean;
+function TioBSShowOrSelect.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := Assigned(Target);
 end;
 
-procedure TioBSShow.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TioBSShowOrSelect.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) then
@@ -1336,7 +1367,7 @@ begin
   end;
 end;
 
-procedure TioBSShow.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+procedure TioBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
   if Value <> FTargetBindSource then
   begin
@@ -1346,7 +1377,7 @@ begin
   end;
 end;
 
-procedure TioBSShow.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+procedure TioBSShowOrSelect.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
 begin
   if Value <> FParentCloseQueryAction then
   begin
@@ -1356,7 +1387,7 @@ begin
   end;
 end;
 
-procedure TioBSShow.SetViewContext(const Value: TComponent);
+procedure TioBSShowOrSelect.SetViewContext(const Value: TComponent);
 begin
   if Value <> FViewContext then
   begin
@@ -1366,7 +1397,7 @@ begin
   end;
 end;
 
-procedure TioBSShow.SetViewContextProvider(const Value: TioViewContextProvider);
+procedure TioBSShowOrSelect.SetViewContextProvider(const Value: TioViewContextProvider);
 begin
   if Value <> FViewContextProvider then
   begin
@@ -1376,7 +1407,7 @@ begin
   end;
 end;
 
-procedure TioBSShow.UpdateTarget(Target: TObject);
+procedure TioBSShowOrSelect.UpdateTarget(Target: TObject);
 begin
   inherited;
   // ShowBy

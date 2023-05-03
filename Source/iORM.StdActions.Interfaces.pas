@@ -16,6 +16,7 @@ type
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
+    function _IsEnabled: Boolean;
     function Execute: Boolean;
     function Executing: Boolean;
     // InternalExecutionMode

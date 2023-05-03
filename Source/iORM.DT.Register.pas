@@ -73,7 +73,7 @@ begin
 
   // MVVM - VMActions
   RegisterComponents('iORM-MVVM-VMActions', [TioVMAction]);
-  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSShow]);
+  RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSShowOrSelect]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSCloseQuery]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSNextPage]);
   RegisterComponents('iORM-MVVM-VMActions', [TioVMActionBSPrevPage]);
@@ -95,7 +95,7 @@ begin
 
   // VCL standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
-  RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSShow], nil);
+  RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSShowOrSelect], nil);
   RegisterActions('iORM-BS', [iORM.StdActions.Vcl.TioBSCloseQuery], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
@@ -116,7 +116,7 @@ begin
 
   // FMX standard actions
   RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
-  RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSShow], nil);
+  RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSShowOrSelect], nil);
   RegisterActions('iORM-BS', [iORM.StdActions.Fmx.TioBSCloseQuery], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
   RegisterActions('iORM-BSPaging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
