@@ -12,6 +12,13 @@ type
 
   TioCloseQueryActionExecutionMode = (emActive, emPassive);
 
+  IioEmbeddedBSSelectCurrentAction = interface
+    ['{2755E391-FB7A-47D2-8A24-93C2F2EF8654}']
+    function _IsEnabled: Boolean;
+    procedure _SetTargetBindSource(const AObj: TObject);
+    function Execute: Boolean;
+  end;
+
   IioBSCloseQueryAction = interface
     ['{BFBCB5A6-2406-435A-8C31-91593BDD9D63}']
     function _CanClose: Boolean;

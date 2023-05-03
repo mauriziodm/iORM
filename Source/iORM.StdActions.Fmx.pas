@@ -98,9 +98,9 @@ type
   strict private
     FTargetBindSource: T;
     function Get_Version: String;
-    procedure SetTargetBindSource(const Value: T);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetTargetBindSource(const Value: T); virtual;
     property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -110,13 +110,17 @@ type
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
-  TioBSSelectCurrent = class(TioBSStdActionFmx<IioStdActionTargetBindSource>)
+  TioBSSelectCurrent = class(TioBSStdActionFmx<IioStdActionTargetBindSource>, IioEmbeddedBSSelectCurrentAction)
   strict private
     FCloseQueryAction: IioBSCloseQueryAction;
+    FIsSlave: Boolean;
     FSelectionType: TioSelectionType;
+    function _IsEnabled: Boolean;
+    procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
@@ -746,6 +750,7 @@ end;
 constructor TioBSSelectCurrent.Create(AOwner: TComponent);
 begin
   inherited;
+  FIsSlave := False;
   FCloseQueryAction := nil;
   FSelectionType := stAppend;
 end;
@@ -775,10 +780,34 @@ begin
   end;
 end;
 
+procedure TioBSSelectCurrent.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+begin
+  if FIsSlave then
+    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action')
+  else
+    inherited;
+end;
+
 procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.CanDoSelection;
+end;
+
+function TioBSSelectCurrent._IsEnabled: Boolean;
+begin
+  Result := Enabled;
+end;
+
+procedure TioBSSelectCurrent._SetTargetBindSource(const AObj: TObject);
+var
+  LTargetBindSource: IioStdActionTargetBindSource;
+begin
+  if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
+    raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
+  FIsSlave := False;
+  TargetBindSource := LTargetBindSource;
+  FIsSlave := True;
 end;
 
 { TioBSStdActionFmx<T> }
