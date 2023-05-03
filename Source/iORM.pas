@@ -96,9 +96,12 @@ const
   stInsert = iORM.CommonTypes.TioSelectionType.stInsert;
 
   // TioShowBy
-  byBSCurrent = iORM.StdActions.Interfaces.byBSCurrent;
-  byBSEach = iORM.StdActions.Interfaces.byBSEach;
-  byEntityTypeName = iORM.StdActions.Interfaces.byEntityTypeName;
+  smBSCurrent = iORM.StdActions.Interfaces.smBSCurrent;
+  smBSEach = iORM.StdActions.Interfaces.smBSEach;
+  smEntityTypeName = iORM.StdActions.Interfaces.smEntityTypeName;
+  smEntityTypeNameAsSelector = iORM.StdActions.Interfaces.smEntityTypeNameAsSelector;
+  smBSTypeNameAsSelector = iORM.StdActions.Interfaces.smBSTypeNameAsSelector;
+
   // TioViewContextBy
   vcByDefaultViewContextProvider = iORM.StdActions.Interfaces.vcByDefaultViewContextProvider;
   vcByViewContextProviderName = iORM.StdActions.Interfaces.vcByViewContextProviderName;
@@ -133,8 +136,8 @@ type
   TioFKCreate = iORM.Attributes.TioFKCreate;
   TioJoinType = iORM.Attributes.TioJoinType;
 
-  TioShowBy = iORM.StdActions.Interfaces.TioShowBy;
-  TioViewContextBy = iORM.StdActions.Interfaces.TioViewContextBy;
+  TioActionShowMode = iORM.StdActions.Interfaces.TioActionShowMode;
+  TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
