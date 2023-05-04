@@ -110,12 +110,12 @@ type
   // SelectCurrent action to make a selection for a Selector BindSource
   TioBSSelectCurrent = class(TioBSStdActionVcl<IioStdActionTargetBindSource>, IioBSSlaveAction)
   strict private
-    FCloseQueryAction: IioBSCloseQueryAction;
+    FCloseQueryAction: IioBSSlaveAction;
     FIsSlave: Boolean;
     FSelectionType: TioSelectionType;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
-    procedure SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+    procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource); override;
@@ -124,7 +124,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property CloseQueryAction: IioBSCloseQueryAction read FCloseQueryAction write SetCloseQueryAction;
+    property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
     property TargetBindSource;
   end;
@@ -194,12 +194,14 @@ type
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
+    FShowOrSelectAction: IioBSSlaveAction;
     FTargetBindSource: IioBSPersistenceClient;
     function Get_Version: String;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
     procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
+    procedure SetShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
@@ -520,6 +522,7 @@ begin
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
   FRaiseIfRevertPointNotSaved := False;
+  FShowOrSelectAction := nil;
 end;
 
 function TioBSPersistenceStdActionVcl.Get_Version: String;
@@ -554,6 +557,18 @@ begin
   end;
 end;
 
+procedure TioBSPersistenceStdActionVcl.SetShowOrSelectAction(const Value: IioBSSlaveAction);
+begin
+  if Value <> FShowOrSelectAction then
+  begin
+    FShowOrSelectAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+    if Assigned(FShowOrSelectAction) then
+      FShowOrSelectAction._SetTargetBindSource(FTargetBindSource as TObject);
+  end;
+end;
+
 procedure TioBSPersistenceStdActionVcl.SetTargetBindSource(const Value: IioBSPersistenceClient);
 begin
   if FIsSlave then
@@ -564,7 +579,9 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
     if Assigned(FCloseQueryAction) then
-      (FCloseQueryAction as IioBSSlaveAction)._SetTargetBindSource(Value as TObject);
+      FCloseQueryAction._SetTargetBindSource(Value as TObject);
+    if Assigned(FShowOrSelectAction) then
+      FShowOrSelectAction._SetTargetBindSource(Value as TObject);
   end;
 end;
 
@@ -815,7 +832,7 @@ begin
     FCloseQueryAction := nil;
 end;
 
-procedure TioBSSelectCurrent.SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+procedure TioBSSelectCurrent.SetCloseQueryAction(const Value: IioBSSlaveAction);
 begin
   if Value <> FCloseQueryAction then
   begin
