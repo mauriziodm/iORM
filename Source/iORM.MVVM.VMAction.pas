@@ -191,7 +191,7 @@ type
   TioVMActionBSPersistenceCustom = class(TioVMActionCustom, IioBSSlaveAction)
   strict private
     FClearAfterExecute: Boolean;
-    FCloseQueryAction: IioBSCloseQueryAction;
+    FCloseQueryAction: IioBSSlaveAction;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -205,11 +205,11 @@ type
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
-    procedure SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+    procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
-    property CloseQueryAction: IioBSCloseQueryAction read FCloseQueryAction write SetCloseQueryAction;
+    property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
@@ -839,7 +839,7 @@ begin
     FCloseQueryAction := nil;
 end;
 
-procedure TioVMActionBSPersistenceCustom.SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+procedure TioVMActionBSPersistenceCustom.SetCloseQueryAction(const Value: IioBSSlaveAction);
 begin
   if Value <> FCloseQueryAction then
   begin
@@ -847,7 +847,7 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
     if Assigned(FCloseQueryAction) then
-      (FCloseQueryAction as IioBSSlaveAction)._SetTargetBindSource(FTargetBindSource as TObject);
+      FCloseQueryAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 
