@@ -108,7 +108,7 @@ type
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
-  TioBSSelectCurrent = class(TioBSStdActionVcl<IioStdActionTargetBindSource>, IioEmbeddedBSSelectCurrentAction)
+  TioBSSelectCurrent = class(TioBSStdActionVcl<IioStdActionTargetBindSource>, IioBSSelectCurrentAction_Slave)
   strict private
     FCloseQueryAction: IioBSCloseQueryAction;
     FIsSlave: Boolean;
@@ -449,6 +449,7 @@ type
   strict private
     FEntityTypeName: String;
     FParentCloseQueryAction: IioBSCloseQueryAction;
+    FSelectCurrentAction: IioBSSelectCurrentAction_Slave;
     FShowMode: TioActionShowMode;
     FTargetBindSource: IioStdActionTargetBindSource;
     FVVMTypeAlias: String;
@@ -457,8 +458,9 @@ type
     FViewContextProvider: TioViewContextProvider;
     FViewContextProviderName: String;
     function Get_Version: String;
-    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
     procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    procedure SetSelectCurrentAction(const Value: IioBSSelectCurrentAction_Slave);
+    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
     procedure SetViewContext(const Value: TComponent);
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
   strict protected
@@ -471,6 +473,7 @@ type
   published
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
+    property SelectCurrentAction: IioBSSelectCurrentAction_Slave read FSelectCurrentAction write SetSelectCurrentAction;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
@@ -756,7 +759,7 @@ procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
+  if Assigned(FCloseQueryAction) then
     FCloseQueryAction.Execute;
 end;
 
@@ -788,7 +791,7 @@ end;
 procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := TargetBindSource.CanDoSelection;
+  Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
 end;
 
 function TioBSSelectCurrent._IsEnabled: Boolean;
@@ -1283,6 +1286,7 @@ begin
   inherited;
   FEntityTypeName := '';
   FParentCloseQueryAction := nil;
+  FSelectCurrentAction := nil;
   FShowMode := TioActionShowMode.smBSCurrent;
   FTargetBindSource := nil;
   FVVMTypeAlias := '';
@@ -1305,6 +1309,14 @@ end;
 procedure TioBSShowOrSelect.UpdateTarget(Target: TObject);
 begin
   inherited;
+
+  // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
+  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  begin
+    Enabled := FSelectCurrentAction._IsEnabled;
+    Exit;
+  end;
+
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach, smBSTypeNameAsSelector:
@@ -1314,20 +1326,28 @@ begin
     smEntityTypeNameAsSelector:
       Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
-  // ViewContextBy
-  case FViewContextBy of
-    vcByViewContextProviderName:
-      Enabled := Enabled and not FViewContextProviderName.Trim.IsEmpty;
-    vcByViewContextProvider:
-      Enabled := Enabled and Assigned(FViewContextProvider);
-    vcByViewContext:
-      Enabled := Enabled and Assigned(FViewContext);
-  end;
+//  // ViewContextBy
+//  case FViewContextBy of
+//    vcByViewContextProviderName:
+//      Enabled := Enabled and not FViewContextProviderName.Trim.IsEmpty;
+//    vcByViewContextProvider:
+//      Enabled := Enabled and Assigned(FViewContextProvider);
+//    vcByViewContext:
+//      Enabled := Enabled and Assigned(FViewContext);
+//  end;
 end;
 
 procedure TioBSShowOrSelect.ExecuteTarget(Target: TObject);
 begin
   inherited;
+
+  // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
+  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  begin
+    FSelectCurrentAction.Execute;
+    Exit;
+  end;
+
   // ShowBy...
   case FShowMode of
     // smBSCurrent
@@ -1401,13 +1421,6 @@ begin
 //          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
   end;
-
-
-
-
-
-
-//  TioActionShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smEntityTypeNameAsSelector, smBSTypeNameAsSelector);
 end;
 
 procedure TioBSShowOrSelect.Notification(AComponent: TComponent; Operation: TOperation);
@@ -1420,6 +1433,9 @@ begin
     else
     if (AComponent = (FParentCloseQueryAction as TComponent)) then
       FParentCloseQueryAction := nil
+    else
+    if (AComponent = (FSelectCurrentAction as TComponent)) then
+      FSelectCurrentAction := nil
     else
     if (AComponent = (FViewContext as TComponent)) then
       FViewContext := nil
@@ -1436,6 +1452,8 @@ begin
     FTargetBindSource := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
+    if Assigned(FSelectCurrentAction) then
+      FSelectCurrentAction._SetTargetBindSource(Value as TObject);
   end;
 end;
 
@@ -1446,6 +1464,18 @@ begin
     FParentCloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioBSShowOrSelect.SetSelectCurrentAction(const Value: IioBSSelectCurrentAction_Slave);
+begin
+  if Value <> FSelectCurrentAction then
+  begin
+    FSelectCurrentAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+    if Assigned(FSelectCurrentAction) then
+      FSelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 

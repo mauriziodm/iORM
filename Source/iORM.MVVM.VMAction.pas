@@ -113,7 +113,7 @@ type
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
-  TioVMActionBSSelectCurrent = class(TioVMActionBSCustom<IioStdActionTargetBindSource>, IioEmbeddedBSSelectCurrentAction)
+  TioVMActionBSSelectCurrent = class(TioVMActionBSCustom<IioStdActionTargetBindSource>, IioBSSelectCurrentAction_Slave)
   strict private
     FCloseQueryAction: IioBSCloseQueryAction;
     FIsSlave: Boolean;
@@ -403,17 +403,19 @@ type
   TioVMActionBSShowOrSelect = class(TioVMActionCustom)
   strict private
     FEntityTypeName: String;
-    FTargetBindSource: IioStdActionTargetBindSource;
     FParentCloseQueryAction: IioBSCloseQueryAction;
+    FSelectCurrentAction: IioBSSelectCurrentAction_Slave;
     FShowMode: TioActionShowMode;
+    FTargetBindSource: IioStdActionTargetBindSource;
     FVVMTypeAlias: String;
     FViewContext: TComponent;
     FViewContextBy: TioActionViewContextBy;
     FViewContextProvider: TioViewContextProvider;
     FViewContextProviderName: String;
 //    function Get_Version: String;
-    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
     procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    procedure SetSelectCurrentAction(const Value: IioBSSelectCurrentAction_Slave);
+    procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
     procedure SetViewContext(const Value: TComponent);
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
   strict protected
@@ -425,9 +427,10 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
   published
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
-    property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
+    property SelectCurrentAction: IioBSSelectCurrentAction_Slave read FSelectCurrentAction write SetSelectCurrentAction;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
+    property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property ViewContext: TComponent read FViewContext write SetViewContext;
     property ViewContextBy: TioActionViewContextBy read FViewContextBy write FViewContextBy;
@@ -737,7 +740,7 @@ end;
 procedure TioVMActionBSSelectCurrent._InternalUpdateStdAction;
 begin
   inherited;
-  Enabled := TargetBindSource.CanDoSelection;
+  Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
 end;
 
 function TioVMActionBSSelectCurrent._IsEnabled: Boolean;
@@ -1266,9 +1269,10 @@ constructor TioVMActionBSShowOrSelect.Create(AOwner: TComponent);
 begin
   inherited;
   FEntityTypeName := '';
-  FTargetBindSource := nil;
   FParentCloseQueryAction := nil;
+  FSelectCurrentAction := nil;
   FShowMode := TioActionShowMode.smBSCurrent;
+  FTargetBindSource := nil;
   FVVMTypeAlias := '';
   FViewContext := nil;
   FViewContextBy := TioActionViewContextBy.vcByDefaultViewContextProvider;
@@ -1292,6 +1296,9 @@ begin
     if (AComponent = (FParentCloseQueryAction as TComponent)) then
       FParentCloseQueryAction := nil
     else
+    if (AComponent = (FSelectCurrentAction as TComponent)) then
+      FSelectCurrentAction := nil
+    else
     if (AComponent = (FViewContext as TComponent)) then
       FViewContext := nil
     else
@@ -1307,6 +1314,8 @@ begin
     FTargetBindSource := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
+    if Assigned(FSelectCurrentAction) then
+      FSelectCurrentAction._SetTargetBindSource(Value as TObject);
   end;
 end;
 
@@ -1317,6 +1326,18 @@ begin
     FParentCloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioVMActionBSShowOrSelect.SetSelectCurrentAction(const Value: IioBSSelectCurrentAction_Slave);
+begin
+  if Value <> FSelectCurrentAction then
+  begin
+    FSelectCurrentAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+    if Assigned(FSelectCurrentAction) then
+      FSelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 
@@ -1343,6 +1364,14 @@ end;
 procedure TioVMActionBSShowOrSelect._InternalExecuteStdAction;
 begin
   inherited;
+
+  // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
+  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  begin
+    FSelectCurrentAction.Execute;
+    Exit;
+  end;
+
   // ShowBy...
   case FShowMode of
     // smBSCurrent
@@ -1421,6 +1450,14 @@ end;
 procedure TioVMActionBSShowOrSelect._InternalUpdateStdAction;
 begin
   inherited;
+
+  // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
+  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  begin
+    Enabled := FSelectCurrentAction._IsEnabled;
+    Exit;
+  end;
+
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach, smBSTypeNameAsSelector:
@@ -1430,15 +1467,15 @@ begin
     smEntityTypeNameAsSelector:
       Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
-  // ViewContextBy
-  case FViewContextBy of
-    vcByViewContextProviderName:
-      Enabled := Enabled and not FViewContextProviderName.Trim.IsEmpty;
-    vcByViewContextProvider:
-      Enabled := Enabled and Assigned(FViewContextProvider);
-    vcByViewContext:
-      Enabled := Enabled and Assigned(FViewContext);
-  end;
+//  // ViewContextBy
+//  case FViewContextBy of
+//    vcByViewContextProviderName:
+//      Enabled := Enabled and not FViewContextProviderName.Trim.IsEmpty;
+//    vcByViewContextProvider:
+//      Enabled := Enabled and Assigned(FViewContextProvider);
+//    vcByViewContext:
+//      Enabled := Enabled and Assigned(FViewContext);
+//  end;
 end;
 
 end.

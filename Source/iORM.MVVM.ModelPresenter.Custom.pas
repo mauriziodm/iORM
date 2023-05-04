@@ -164,6 +164,7 @@ type
     // WhereStr
     procedure SetWhereStr(const Value: TStrings);
     // SelectorFor
+    function GetSelectorFor: IioNotifiableBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
   protected
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
@@ -311,7 +312,7 @@ type
     property TypeName: String read GetTypeName write SetTypeName; // Published: Master
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
     // Published properties: selectors (NB: lasciata public perchè usata da qualche parte nel codice)
-    property SelectorFor: IioNotifiableBindSource read FSelectorFor write SetSelectorFor; // published: Master
+    property SelectorFor: IioNotifiableBindSource read GetSelectorFor write SetSelectorFor; // published: Master
   published
     property _Version: String read Get_Version;
   end;
@@ -728,6 +729,11 @@ end;
 function TioModelPresenterCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
+end;
+
+function TioModelPresenterCustom.GetSelectorFor: IioNotifiableBindSource;
+begin
+  Result := FSelectorFor;
 end;
 
 function TioModelPresenterCustom.GetState: TBindSourceAdapterState;

@@ -172,6 +172,7 @@ type
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     // SelectorFor
+    function GetSelectorFor: IioNotifiableBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
   protected
     procedure SetActive(const Value: Boolean); override;
@@ -219,7 +220,7 @@ type
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     // Published properties: selectors
-    property SelectorFor: IioNotifiableBindSource read FSelectorFor write SetSelectorFor; // published: Master
+    property SelectorFor: IioNotifiableBindSource read GetSelectorFor write SetSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
@@ -738,6 +739,11 @@ end;
 function TioPrototypeBindSourceCustom.GetPaging: TioCommonBSAPageManager;
 begin
   Result := FPaging;
+end;
+
+function TioPrototypeBindSourceCustom.GetSelectorFor: IioNotifiableBindSource;
+begin
+  Result := FSelectorFor;
 end;
 
 function TioPrototypeBindSourceCustom.GetState: TBindSourceAdapterState;

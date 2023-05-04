@@ -91,7 +91,6 @@ type
     procedure SetMasterPropertyName(const Value: String);
     procedure SetWhere(const AWhere: IioWhere);
     procedure SetOrderBy(const Value: String);
-    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
@@ -139,6 +138,10 @@ type
     function GetTypeOfCollection: TioTypeOfCollection;
     procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection;
+    // SelectorFor
+    function GetSelectorFor: IioNotifiableBindSource;
+    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+    property SelectorFor: IioNotifiableBindSource read GetSelectorFor write SetSelectorFor; // published: Master
   end;
 
   // Interface for standard action target bind source
