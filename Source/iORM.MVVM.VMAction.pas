@@ -846,6 +846,8 @@ begin
     FCloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
+    if Assigned(FCloseQueryAction) then
+      (FCloseQueryAction as IioBSSlaveAction)._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 
@@ -858,6 +860,8 @@ begin
     FTargetBindSource := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
+    if Assigned(FCloseQueryAction) then
+      (FCloseQueryAction as IioBSSlaveAction)._SetTargetBindSource(Value as TObject);
   end;
 end;
 
