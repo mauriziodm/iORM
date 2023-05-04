@@ -194,12 +194,14 @@ type
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
+    FIsSlave: Boolean;
     FRaiseIfChangesDoesNotExists: Boolean;
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
     function Get_Version: String;
+    procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -755,7 +757,7 @@ begin
   if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
-  TargetBindSource := LTargetBindSource;
+  SetTargetBindSource(LTargetBindSource);
   FIsSlave := True;
 end;
 
@@ -796,6 +798,7 @@ begin
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
   FDisableIfSaved := False;
+  FIsSlave := False;
   FRaiseIfChangesDoesNotExists := False;
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
@@ -828,6 +831,8 @@ end;
 
 procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioBSPersistenceClient);
 begin
+  if FIsSlave then
+    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin
     FTargetBindSource := Value;
@@ -843,6 +848,17 @@ begin
     inherited
   else
     Enabled := False;
+end;
+
+procedure TioVMActionBSPersistenceCustom._SetTargetBindSource(const AObj: TObject);
+var
+  LTargetBindSource: IioBSPersistenceClient;
+begin
+  if not Supports(AObj, IioBSPersistenceClient, LTargetBindSource) then
+    raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
+  FIsSlave := False;
+  SetTargetBindSource(LTargetBindSource);
+  FIsSlave := True;
 end;
 
 { TioVMActionBSPersistenceSaveRevertPoint }
