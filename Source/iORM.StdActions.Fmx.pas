@@ -110,7 +110,7 @@ type
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
-  TioBSSelectCurrent = class(TioBSStdActionFmx<IioStdActionTargetBindSource>, IioBSSelectCurrentAction_Slave)
+  TioBSSelectCurrent = class(TioBSStdActionFmx<IioStdActionTargetBindSource>, IioBSSlaveAction)
   strict private
     FCloseQueryAction: IioBSCloseQueryAction;
     FIsSlave: Boolean;
@@ -197,6 +197,7 @@ type
     FRaiseIfRevertPointNotSaved: Boolean;
     FTargetBindSource: IioBSPersistenceClient;
     function Get_Version: String;
+    function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
   strict protected
@@ -454,7 +455,7 @@ type
   strict private
     FEntityTypeName: String;
     FParentCloseQueryAction: IioBSCloseQueryAction;
-    FSelectCurrentAction: IioBSSelectCurrentAction_Slave;
+    FSelectCurrentAction: IioBSSlaveAction;
     FShowMode: TioActionShowMode;
     FTargetBindSource: IioStdActionTargetBindSource;
     FVVMTypeAlias: String;
@@ -464,7 +465,7 @@ type
     FViewContextProviderName: String;
     function Get_Version: String;
     procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
-    procedure SetSelectCurrentAction(const Value: IioBSSelectCurrentAction_Slave);
+    procedure SetSelectCurrentAction(const Value: IioBSSlaveAction);
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
     procedure SetViewContext(const Value: TComponent);
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
@@ -478,7 +479,7 @@ type
   published
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
-    property SelectCurrentAction: IioBSSelectCurrentAction_Slave read FSelectCurrentAction write SetSelectCurrentAction;
+    property SelectCurrentAction: IioBSSlaveAction read FSelectCurrentAction write SetSelectCurrentAction;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
@@ -546,6 +547,11 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
+end;
+
+function TioBSPersistenceStdActionFmx._IsEnabled: Boolean;
+begin
+  Result := Enabled;
 end;
 
 procedure TioBSPersistenceStdActionFmx._SetTargetBindSource(const AObj: TObject);
@@ -1449,7 +1455,7 @@ begin
   end;
 end;
 
-procedure TioBSShowOrSelect.SetSelectCurrentAction(const Value: IioBSSelectCurrentAction_Slave);
+procedure TioBSShowOrSelect.SetSelectCurrentAction(const Value: IioBSSlaveAction);
 begin
   if Value <> FSelectCurrentAction then
   begin
