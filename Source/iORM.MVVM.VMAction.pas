@@ -188,9 +188,10 @@ type
   // =================================================================================================
 
   // Base class for all BinsDourceObjState standard actions
-  TioVMActionBSPersistenceCustom = class(TioVMActionCustom)
+  TioVMActionBSPersistenceCustom = class(TioVMActionCustom, IioBSSlaveAction)
   strict private
     FClearAfterExecute: Boolean;
+    FCloseQueryAction: IioBSCloseQueryAction;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -204,9 +205,11 @@ type
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
+    procedure SetCloseQueryAction(const Value: IioBSCloseQueryAction);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
+    property CloseQueryAction: IioBSCloseQueryAction read FCloseQueryAction write SetCloseQueryAction;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
@@ -345,7 +348,7 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
+  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction)
   strict private
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
@@ -362,7 +365,6 @@ type
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
-    function _IsEnabled: Boolean;
     // InternalExecutionMode
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
@@ -403,9 +405,10 @@ type
   // =================================================================================================
 
   // ShowCurrent action to show the current object of the BS
-  TioVMActionBSShowOrSelect = class(TioVMActionCustom)
+  TioVMActionBSShowOrSelect = class(TioVMActionCustom, IioBSSlaveAction)
   strict private
     FEntityTypeName: String;
+    FIsSlave: Boolean;
     FParentCloseQueryAction: IioBSCloseQueryAction;
     FSelectCurrentAction: IioBSSlaveAction;
     FShowMode: TioActionShowMode;
@@ -416,6 +419,8 @@ type
     FViewContextProvider: TioViewContextProvider;
     FViewContextProviderName: String;
 //    function Get_Version: String;
+    function _IsEnabled: Boolean;
+    procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
     procedure SetSelectCurrentAction(const Value: IioBSSlaveAction);
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
@@ -796,6 +801,7 @@ constructor TioVMActionBSPersistenceCustom.Create(AOwner: TComponent);
 begin
   inherited;
   FClearAfterExecute := True;
+  FCloseQueryAction := nil;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
   FDisableIfSaved := False;
@@ -827,7 +833,20 @@ procedure TioVMActionBSPersistenceCustom.Notification(AComponent: TComponent; Op
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
-    TargetBindSource := nil;
+    TargetBindSource := nil
+  else
+  if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
+    FCloseQueryAction := nil;
+end;
+
+procedure TioVMActionBSPersistenceCustom.SetCloseQueryAction(const Value: IioBSCloseQueryAction);
+begin
+  if Value <> FCloseQueryAction then
+  begin
+    FCloseQueryAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
 end;
 
 procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioBSPersistenceClient);
@@ -1138,11 +1157,6 @@ begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
-function TioVMActionBSCloseQuery._IsEnabled: Boolean;
-begin
-  Result := Enabled;
-end;
-
 function TioVMActionBSCloseQuery.Update: Boolean;
 begin
   _UpdateOriginal;  // Ritorna all'implementazione originale
@@ -1291,6 +1305,7 @@ constructor TioVMActionBSShowOrSelect.Create(AOwner: TComponent);
 begin
   inherited;
   FEntityTypeName := '';
+  FIsSlave := False;
   FParentCloseQueryAction := nil;
   FSelectCurrentAction := nil;
   FShowMode := TioActionShowMode.smBSCurrent;
@@ -1331,6 +1346,8 @@ end;
 
 procedure TioVMActionBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
+  if FIsSlave then
+    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin
     FTargetBindSource := Value;
@@ -1498,6 +1515,22 @@ begin
 //    vcByViewContext:
 //      Enabled := Enabled and Assigned(FViewContext);
 //  end;
+end;
+
+function TioVMActionBSShowOrSelect._IsEnabled: Boolean;
+begin
+  Result := Enabled;
+end;
+
+procedure TioVMActionBSShowOrSelect._SetTargetBindSource(const AObj: TObject);
+var
+  LTargetBindSource: IioStdActionTargetBindSource;
+begin
+  if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
+    raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
+  FIsSlave := False;
+  SetTargetBindSource(LTargetBindSource);
+  FIsSlave := True;
 end;
 
 end.
