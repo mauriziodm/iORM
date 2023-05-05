@@ -387,6 +387,7 @@ type
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
+    property ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -814,12 +815,15 @@ begin
   end;
   // New instance not provided (created by the ABSAdapter itself)
   TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // If assigned the "ShowOrExecuteAction" then execute it
+  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
+    ShowOrSelectAction.Execute;
 end;
 
 procedure TioBSPersistenceInsert.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
