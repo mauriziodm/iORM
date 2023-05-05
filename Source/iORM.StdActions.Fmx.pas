@@ -277,6 +277,7 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    property CloseQueryAction;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -292,6 +293,7 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    property CloseQueryAction;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -308,6 +310,7 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    property CloseQueryAction;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -651,11 +654,14 @@ procedure TioBSPersistencePersist.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
   TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  // If assigned the "CloseQueryAction" then execute it
+  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+    CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistencePersist.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
   Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
 
@@ -664,11 +670,14 @@ end;
 procedure TioBSPersistenceRevert.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  // If assigned the "CloseQueryAction" then execute it
+  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+    CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceRevert.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
   Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
 
@@ -677,11 +686,14 @@ end;
 procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  // If assigned the "CloseQueryAction" then execute it
+  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+    CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
   Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
 end;
 
