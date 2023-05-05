@@ -292,6 +292,7 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
+    property CloseQueryAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -357,7 +358,7 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction)
+  TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
   strict private
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
@@ -1010,11 +1011,14 @@ end;
 procedure TioVMActionBSPersistenceDelete._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // If assigned the "CloseQueryAction" then execute it
+  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+    CloseQueryAction.Execute;
 end;
 
 procedure TioVMActionBSPersistenceDelete._InternalUpdateStdAction;
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;

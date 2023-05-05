@@ -323,6 +323,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
+    property CloseQueryAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -704,11 +705,14 @@ end;
 procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // If assigned the "CloseQueryAction" then execute it
+  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+    CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
