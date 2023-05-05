@@ -209,6 +209,7 @@ type
     procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetShowOrSelectAction(const Value: IioBSSlaveAction);
   protected
+    procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
@@ -219,12 +220,13 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
+    property ShowOrSelectAction: IioBSSlaveAction read FShowOrSelectAction write SetShowOrSelectAction;
     property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
-    function Execute: Boolean; override;
     function Update: Boolean; override;
+    function Execute: Boolean; override;
   published
     property _Version: String read Get_Version;
   end;
@@ -322,6 +324,7 @@ type
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
+    property ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -743,7 +746,7 @@ procedure TioVMActionBSSelectCurrent._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
+  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled and FCloseQueryAction._IsEnabled then
     FCloseQueryAction.Execute;
 end;
 
@@ -839,7 +842,10 @@ begin
     TargetBindSource := nil
   else
   if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
-    FCloseQueryAction := nil;
+    FCloseQueryAction := nil
+  else
+  if (Operation = opRemove) and (AComponent = (FShowOrSelectAction as TComponent)) then
+    FShowOrSelectAction := nil;
 end;
 
 procedure TioVMActionBSPersistenceCustom.SetCloseQueryAction(const Value: IioBSSlaveAction);
@@ -889,6 +895,14 @@ begin
     inherited
   else
     Enabled := False;
+end;
+
+procedure TioVMActionBSPersistenceCustom._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := True;
+  Enabled := Enabled and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
+  Enabled := Enabled and ((not Assigned(FShowOrSelectAction)) or FShowOrSelectAction._IsEnabled);
 end;
 
 function TioVMActionBSPersistenceCustom._IsEnabled: Boolean;
@@ -1053,12 +1067,15 @@ begin
   end;
   // New instance not provided (created by the ABSAdapter itself)
   TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // If assigned the "ShowOrExecuteAction" then execute it
+  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
+    ShowOrSelectAction.Execute;
 end;
 
 procedure TioVMActionBSPersistenceAppend._InternalUpdateStdAction;
 begin
   inherited;
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
@@ -1426,7 +1443,7 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  if Assigned(FSelectCurrentAction) and FSelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
   begin
     FSelectCurrentAction.Execute;
     Exit;

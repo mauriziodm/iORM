@@ -213,10 +213,12 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
+    property ShowOrSelectAction: IioBSSlaveAction read FShowOrSelectAction write SetShowOrSelectAction;
     property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+    procedure UpdateTarget (Target: TObject); override;
   published
     property _Version: String read Get_Version;
     //  Publishing ancestor properties
@@ -361,6 +363,7 @@ type
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
+    property ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -542,7 +545,10 @@ begin
     TargetBindSource := nil
   else
   if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
-    FCloseQueryAction := nil;
+    FCloseQueryAction := nil
+  else
+  if (Operation = opRemove) and (AComponent = (FShowOrSelectAction as TComponent)) then
+    FShowOrSelectAction := nil;
 end;
 
 procedure TioBSPersistenceStdActionVcl.SetCloseQueryAction(const Value: IioBSSlaveAction);
@@ -583,6 +589,14 @@ begin
     if Assigned(FShowOrSelectAction) then
       FShowOrSelectAction._SetTargetBindSource(Value as TObject);
   end;
+end;
+
+procedure TioBSPersistenceStdActionVcl.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := True;
+  Enabled := Enabled and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
+  Enabled := Enabled and ((not Assigned(FShowOrSelectAction)) or FShowOrSelectAction._IsEnabled);
 end;
 
 function TioBSPersistenceStdActionVcl._IsEnabled: Boolean;
@@ -747,12 +761,15 @@ begin
   end;
   // New instance not provided (created by the ABSAdapter itself)
   TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // If assigned the "ShowOrExecuteAction" then execute it
+  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
+    ShowOrSelectAction.Execute;
 end;
 
 procedure TioBSPersistenceAppend.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
@@ -821,7 +838,7 @@ procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FCloseQueryAction) then
+  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
     FCloseQueryAction.Execute;
 end;
 
@@ -1416,7 +1433,7 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  if Assigned(FSelectCurrentAction) and FSelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
   begin
     FSelectCurrentAction.Execute;
     Exit;
