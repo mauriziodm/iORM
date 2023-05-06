@@ -398,7 +398,7 @@ type
 {$REGION '===== SMART WHERE ATTRIBUTES ====='}
 
   // Set some where generation params for the property
-  ioWhere = class(TioCustomAttribute)
+  ioWhereAttribute = class(TioCustomAttribute)
   private
     FCompareOp: TioCompareOp;
     FLogicOp: TioLogicOp;
@@ -415,7 +415,7 @@ type
   end;
 
   // Set shere group for the property
-  ioWhereGroup = class(TioCustomAttribute)
+  ioWhereGroupAttribute = class(TioCustomAttribute)
   private
     FGroupName: String;
     FGroupLogicOp: TioLogicOp;
@@ -429,11 +429,11 @@ type
   end;
 
   // Set the value to be treated as null for the proprerty (for where generation purpose)
-  ioWhereNullValue = class(TioCustomTValueAttribute)
+  ioWhereNullValueAttribute = class(TioCustomTValueAttribute)
   end;
 
   // Skip the property for where filter purposes
-  ioWhereSkip = class(TioCustomAttribute)
+  ioWhereSkipAttribute = class(TioCustomAttribute)
   end;
 
 {$ENDREGION} // END OF SMART WHERE ATTRIBUTES
@@ -760,34 +760,34 @@ end;
 
 { ioWhere }
 
-constructor ioWhere.Create;
+constructor ioWhereAttribute.Create;
 begin
   FCompareOp := TioCompareOp.coEqual;
   FLogicOp := TioLogicOp.loAnd;
   FTargetPropName := String.Empty;
 end;
 
-constructor ioWhere.Create(const ALogicRelation: TioLogicOp; const ACompareOp: TioCompareOp);
+constructor ioWhereAttribute.Create(const ALogicRelation: TioLogicOp; const ACompareOp: TioCompareOp);
 begin
   Create;
   FCompareOp := ACompareOp;
   FLogicOp := ALogicRelation;
 end;
 
-constructor ioWhere.Create(ATargetPropName: String; const ACompareOp: TioCompareOp);
+constructor ioWhereAttribute.Create(ATargetPropName: String; const ACompareOp: TioCompareOp);
 begin
   Create;
   FCompareOp := ACompareOp;
   FTargetPropName := ATargetPropName;
 end;
 
-constructor ioWhere.Create(const ACompareOp: TioCompareOp);
+constructor ioWhereAttribute.Create(const ACompareOp: TioCompareOp);
 begin
   Create;
   FCompareOp := ACompareOp;
 end;
 
-constructor ioWhere.Create(const ALogicRelation: TioLogicOp; ATargetPropName: String; const ACompareOp: TioCompareOp);
+constructor ioWhereAttribute.Create(const ALogicRelation: TioLogicOp; ATargetPropName: String; const ACompareOp: TioCompareOp);
 begin
   Create;
   FCompareOp := ACompareOp;
@@ -797,14 +797,14 @@ end;
 
 { ioWhereGroup }
 
-constructor ioWhereGroup.Create(AGroupName, AMasterGroupName: String);
+constructor ioWhereGroupAttribute.Create(AGroupName, AMasterGroupName: String);
 begin
   FGroupName := AGroupName;
   FMasterGroupName := AMasterGroupName;
   FGroupLogicOp := TioLogicOp.loAnd;
 end;
 
-constructor ioWhereGroup.Create(const AGroupLogicRelation: TioLogicOp; AGroupName, AMasterGroupName: String);
+constructor ioWhereGroupAttribute.Create(const AGroupLogicRelation: TioLogicOp; AGroupName, AMasterGroupName: String);
 begin
   Create(AGroupName, AMasterGroupName);
   FGroupLogicOp := AGroupLogicRelation;

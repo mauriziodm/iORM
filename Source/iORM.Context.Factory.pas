@@ -476,23 +476,24 @@ var
         end
         else
         // Smart where attributes
-        if LAttribute is ioWhere then
+        if LAttribute is ioWhereAttribute then
         begin
-          LWhereCompareOp := ioWhere(LAttribute).CompareOp;
-          LWhereLogicOp := ioWhere(LAttribute).LogicOp;
-          LWhereTargetPropName := ioWhere(LAttribute).TargetPropName;
+          LWhereCompareOp := ioWhereAttribute(LAttribute).CompareOp;
+          LWhereLogicOp := ioWhereAttribute(LAttribute).LogicOp;
+          if not ioWhereAttribute(LAttribute).TargetPropName.IsEmpty then
+            LWhereTargetPropName := ioWhereAttribute(LAttribute).TargetPropName;
         end
         else
-        if LAttribute is ioWhereGroup then
+        if LAttribute is ioWhereGroupAttribute then
         begin
-          LWhereGroupName := ioWhereGroup(LAttribute).GroupName;
-          LWhereGroupLogicOp := ioWhereGroup(LAttribute).GroupLogicOp;
-          LWhereMasterGroupName := ioWhereGroup(LAttribute).MasterGroupName;
+          LWhereGroupName := ioWhereGroupAttribute(LAttribute).GroupName;
+          LWhereGroupLogicOp := ioWhereGroupAttribute(LAttribute).GroupLogicOp;
+          LWhereMasterGroupName := ioWhereGroupAttribute(LAttribute).MasterGroupName;
         end
         else
-        if LAttribute is ioWhereNullValue then
-          LWhereNullValue := ioWhereNullValue(LAttribute).Value;
-        if LAttribute is ioWhereSkip then
+        if LAttribute is ioWhereNullValueAttribute then
+          LWhereNullValue := ioWhereNullValueAttribute(LAttribute).Value;
+        if LAttribute is ioWhereSkipAttribute then
           LWhereSkip := True;
         // Metadata Used by DBBuilder (M.M. 01/08/18)
         if LAttribute is ioNotNull then

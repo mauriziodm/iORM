@@ -192,10 +192,10 @@ type
   ioDisableRelationAutodetect = iORM.Attributes.ioDisableRelationAutodetect;
 
   // SmartWhereAttributes
-  ioWhere = iORM.Attributes.ioWhere;
-  ioWhereGroup = iORM.Attributes.ioWhereGroup;
-  ioWhereNullValue = iORM.Attributes.ioWhereNullValue;
-  ioWhereSkip = iORM.Attributes.ioWhereSkip;
+  ioWhereAttribute = iORM.Attributes.ioWhereAttribute;
+  ioWhereGroupAttribute = iORM.Attributes.ioWhereGroupAttribute;
+  ioWhereNullValueAttribute = iORM.Attributes.ioWhereNullValueAttribute;
+  ioWhereSkipAttribute = iORM.Attributes.ioWhereSkipAttribute;
 
   // Dependency Injection attributes
   diRegister = iORM.Attributes.diRegister;
