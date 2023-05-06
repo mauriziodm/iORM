@@ -203,12 +203,12 @@ type
     FShowOrSelectAction: IioBSSlaveAction;
     FTargetBindSource: IioBSPersistenceClient;
     function Get_Version: String;
-    function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
     procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetShowOrSelectAction(const Value: IioBSSlaveAction);
   protected
+    function _IsEnabled: Boolean; virtual;
     procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
@@ -382,6 +382,7 @@ type
     function GetParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
+    function _IsEnabled: Boolean; override;
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
     function DoOnConfirmationRequest: Boolean;
@@ -741,7 +742,7 @@ end;
 
 procedure TioVMActionBSSelectCurrent.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
-  if FIsSlave then
+  if not(csLoading in ComponentState) and FIsSlave then
     raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action')
   else
     inherited;
@@ -1221,6 +1222,12 @@ begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
+function TioVMActionBSCloseQuery._IsEnabled: Boolean;
+begin
+  // Do not inherit
+  Result := _CanClose;
+end;
+
 function TioVMActionBSCloseQuery.Update: Boolean;
 begin
   _UpdateOriginal;  // Ritorna all'implementazione originale
@@ -1410,7 +1417,7 @@ end;
 
 procedure TioVMActionBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
-  if FIsSlave then
+  if not(csLoading in ComponentState) and FIsSlave then
     raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin

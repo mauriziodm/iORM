@@ -197,12 +197,12 @@ type
     FShowOrSelectAction: IioBSSlaveAction;
     FTargetBindSource: IioBSPersistenceClient;
     function Get_Version: String;
-    function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
     procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
+    function _IsEnabled: Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
@@ -302,12 +302,18 @@ type
   end;
 
   TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionVcl)
+  private
+    FCloseQueryActionOnDelete:Boolean;
+    FCloseQueryActionOnRevert:Boolean;
   public
+    constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
 //    property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property CloseQueryAction;
+    property CloseQueryActionOnDelete: Boolean read FCloseQueryActionOnDelete write FCloseQueryActionOnDelete default True;
+    property CloseQueryActionOnRevert: Boolean read FCloseQueryActionOnRevert write FCloseQueryActionOnRevert default False;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -426,6 +432,7 @@ type
     procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
     procedure _DummyOnExecute(Sender: TObject);
+    function _IsEnabled: Boolean; override;
     procedure Loaded; override;
     function DoOnConfirmationRequest: Boolean;
   public
@@ -639,12 +646,23 @@ end;
 
 { TioBSPersistenceRevertOrDelete }
 
-procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
+constructor TioBSPersistenceRevertOrDelete.Create(AOwner: TComponent);
 begin
+  inherited;
+  FCloseQueryActionOnDelete := True;
+  FCloseQueryActionOnRevert := False;
+end;
+
+procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
+var
+  LIsDeleting: Boolean;
+begin
+  LIsDeleting := TargetBindSource.Persistence.IsInserting;
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // If assigned the "CloseQueryAction" then execute it
   if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
-    CloseQueryAction.Execute;
+    if (LIsDeleting and FCloseQueryActionOnDelete) or (not LIsDeleting and FCloseQueryActionOnRevert) then
+      CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
@@ -887,7 +905,7 @@ end;
 
 procedure TioBSSelectCurrent.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
-  if FIsSlave then
+  if not(csLoading in ComponentState) and FIsSlave then
     raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action')
   else
     inherited;
@@ -1313,6 +1331,12 @@ begin
   Result := TioBSCloseQueryCommonBehaviour.IsChildOf(Self, ATargetQueryAction);
 end;
 
+function TioBSCloseQuery._IsEnabled: Boolean;
+begin
+  // Do not inherit
+  Result := _CanClose;
+end;
+
 function TioBSCloseQuery._CanClose: Boolean;
 begin
   Result := (TargetBindSource = nil) or TargetBindSource.Persistence.IsEmpty or TargetBindSource.Persistence.CanSaveRevertPoint or (FOnEditingAction <> eaDisable);
@@ -1564,7 +1588,7 @@ end;
 
 procedure TioBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
-  if FIsSlave then
+  if not(csLoading in ComponentState) and FIsSlave then
     raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin
