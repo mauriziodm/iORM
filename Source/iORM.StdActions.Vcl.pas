@@ -613,7 +613,7 @@ procedure TioBSPersistenceStdActionVcl._SetTargetBindSource(const AObj: TObject)
 var
   LTargetBindSource: IioBSPersistenceClient;
 begin
-  if not Supports(AObj, IioBSPersistenceClient, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioBSPersistenceClient, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
@@ -902,7 +902,7 @@ procedure TioBSSelectCurrent._SetTargetBindSource(const AObj: TObject);
 var
   LTargetBindSource: IioStdActionTargetBindSource;
 begin
-  if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
@@ -1441,7 +1441,7 @@ procedure TioBSShowOrSelect._SetTargetBindSource(const AObj: TObject);
 var
   LTargetBindSource: IioStdActionTargetBindSource;
 begin
-  if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
@@ -1493,13 +1493,13 @@ begin
     smEntityTypeName:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.Show(FTargetBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.Show(FTargetBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.Show(FEntityTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.Show(FTargetBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.Show(FTargetBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.Show(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;

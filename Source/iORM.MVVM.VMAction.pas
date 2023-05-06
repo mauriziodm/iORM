@@ -770,7 +770,7 @@ procedure TioVMActionBSSelectCurrent._SetTargetBindSource(const AObj: TObject);
 var
   LTargetBindSource: IioStdActionTargetBindSource;
 begin
-  if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
@@ -919,7 +919,7 @@ procedure TioVMActionBSPersistenceCustom._SetTargetBindSource(const AObj: TObjec
 var
   LTargetBindSource: IioBSPersistenceClient;
 begin
-  if not Supports(AObj, IioBSPersistenceClient, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioBSPersistenceClient, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
@@ -1584,7 +1584,7 @@ procedure TioVMActionBSShowOrSelect._SetTargetBindSource(const AObj: TObject);
 var
   LTargetBindSource: IioStdActionTargetBindSource;
 begin
-  if not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
