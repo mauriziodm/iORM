@@ -879,7 +879,7 @@ end;
 
 procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioBSPersistenceClient);
 begin
-  if FIsSlave then
+  if not(csLoading in ComponentState) and FIsSlave then
     raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin
@@ -935,7 +935,8 @@ end;
 
 procedure TioVMActionBSPersistenceSaveRevertPoint._InternalUpdateStdAction;
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
+  inherited;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
 end;
 
 { TioVMActionBSPersistenceClear }
@@ -947,7 +948,8 @@ end;
 
 procedure TioVMActionBSPersistenceClear._InternalUpdateStdAction;
 begin
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
+  inherited;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
 end;
 
@@ -964,6 +966,7 @@ end;
 
 procedure TioVMActionBSPersistencePersist._InternalUpdateStdAction;
 begin
+  Enabled := True;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
   Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
@@ -980,6 +983,7 @@ end;
 
 procedure TioVMActionBSPersistenceRevert._InternalUpdateStdAction;
 begin
+  Enabled := True;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
   Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
@@ -996,8 +1000,9 @@ end;
 
 procedure TioVMActionBSPersistenceRevertOrDelete._InternalUpdateStdAction;
 begin
-//  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
-//  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
+  Enabled := True;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
+  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
 end;
 
 { TioVMActionBSPersistenceDelete }
@@ -1018,6 +1023,7 @@ end;
 
 procedure TioVMActionBSPersistenceDelete._InternalUpdateStdAction;
 begin
+  inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
@@ -1039,7 +1045,7 @@ end;
 procedure TioVMActionBSPersistenceReload._InternalUpdateStdAction;
 begin
   inherited;
-  Enabled := Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
+  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
