@@ -305,12 +305,18 @@ type
   end;
 
   TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx)
+  private
+    FCloseQueryActionOnDelete:Boolean;
+    FCloseQueryActionOnRevert:Boolean;
   public
+    constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property CloseQueryAction;
+    property CloseQueryActionOnDelete: Boolean read FCloseQueryActionOnDelete write FCloseQueryActionOnDelete default True;
+    property CloseQueryActionOnRevert: Boolean read FCloseQueryActionOnRevert write FCloseQueryActionOnRevert default False;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -689,12 +695,23 @@ end;
 
 { TioBSPersistenceRevertOrDelete }
 
-procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
+constructor TioBSPersistenceRevertOrDelete.Create(AOwner: TComponent);
 begin
+  inherited;
+  FCloseQueryActionOnDelete := True;
+  FCloseQueryActionOnRevert := False;
+end;
+
+procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
+var
+  LIsDeleting: Boolean;
+begin
+  LIsDeleting := TargetBindSource.Persistence.IsInserting;
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // If assigned the "CloseQueryAction" then execute it
   if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
-    CloseQueryAction.Execute;
+    if (LIsDeleting and FCloseQueryActionOnDelete) or (not LIsDeleting and FCloseQueryActionOnRevert) then
+      CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
