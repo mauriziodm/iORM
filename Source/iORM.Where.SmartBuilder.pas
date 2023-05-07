@@ -30,6 +30,10 @@ uses
 
 class procedure TioWhereSmartBuilder.CheckWhereNullValueAffinity(const AProp: IioProperty);
 begin
+  // Check enumerations
+  if AProp.IsEnumeration and AProp.WhereNullValue.IsType<Integer> then
+    Exit;
+  // Check all other types
   if not AProp.WhereNullValue.IsType(AProp.GetTypeInfo, True) then
     raise EioException.Create(ClassName, 'CheckWhereNullValueAffinity',
       Format('Oops, there''s a type incompatibility problem.' +

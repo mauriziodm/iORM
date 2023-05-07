@@ -168,6 +168,7 @@ type
     function IsStream: Boolean;
     function HasAutodetectedHasManyRelation: Boolean;
     function isHasManyChildVirtualProperty: Boolean; virtual;
+    function IsEnumeration: Boolean; virtual;
 
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);
@@ -223,6 +224,7 @@ type
     function GetTypeInfo: PTypeInfo; override;
     function IsWritable: Boolean; override;
     function isHasManyChildVirtualProperty: Boolean; override;
+    function IsEnumeration: Boolean; override;
   end;
 
   // Classe che rappresenta un field della classe
@@ -245,6 +247,7 @@ type
     function GetRttiType: TRttiType; override;
     function GetTypeInfo: PTypeInfo; override;
     function IsWritable: Boolean; override;
+    function IsEnumeration: Boolean; override;
   end;
 
   // Classe con l'elenco delle proprietà della classe
@@ -734,6 +737,11 @@ begin
   Result := (FReadWrite >= lpLoadAndPersist) and not FTransient;
 end;
 
+function TioProperty.IsEnumeration: Boolean;
+begin
+  Result := FRttiProperty.PropertyType is TRttiEnumerationType;
+end;
+
 function TioProperty.isHasManyChildVirtualProperty: Boolean;
 begin
   Result := False;
@@ -1095,6 +1103,11 @@ begin
     Result := TValue.Empty;
 end;
 
+function TioField.IsEnumeration: Boolean;
+begin
+  Result := FRttiProperty.FieldType is TRttiEnumerationType;
+end;
+
 function TioField.IsWritable: Boolean;
 begin
   // A private field is always writable
@@ -1180,6 +1193,12 @@ function TioHasManyChildVirtualProperty.GetValue(const Instance: Pointer): TValu
 begin
   // No inherited
   raise EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+end;
+
+function TioHasManyChildVirtualProperty.IsEnumeration: Boolean;
+begin
+  // No inherited
+  Result := FRttiType is TRttiEnumerationType;
 end;
 
 function TioHasManyChildVirtualProperty.isHasManyChildVirtualProperty: Boolean;
