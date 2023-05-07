@@ -58,13 +58,18 @@ begin
       tkString, tkUString, tkWString, tkLString, tkChar, tkWChar:
         if LValue.AsString.Trim.ToUpper = AProp.WhereNullValue.AsString.Trim.ToUpper then
           Exit;
-      // Integer/Float/DateTime
-      tkInteger, tkInt64, tkFloat:
+      // Integer
+      tkInteger, tkInt64:
         if LValue.AsInteger.ToString = AProp.WhereNullValue.AsInteger.ToString then
+          Exit;
+      // Float/DateTime
+      tkFloat:
+        if LValue.AsExtended.ToString = AProp.WhereNullValue.AsExtended.ToString then
           Exit;
       // Enumeration
       tkEnumeration:
-        if AProp.WhereNullValue.IsEmpty or (LValue.AsOrdinal = AProp.WhereNullValue.AsOrdinal) then
+//        if AProp.WhereNullValue.IsEmpty or (LValue.AsOrdinal = AProp.WhereNullValue.AsOrdinal) then
+        if (LValue.AsOrdinal = AProp.WhereNullValue.AsOrdinal) then
           Exit;
     else
       Exit;
