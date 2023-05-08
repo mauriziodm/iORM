@@ -152,7 +152,13 @@ type
   // WhereBuild
   TioBSWhereBuild = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
+    FPersistAction: IioBSSlaveAction;
+    FCloseQueryAction: IioBSSlaveAction;
     FWhereAutoExecuteOnTargetBS: Boolean;
+    procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
+    procedure SetPersistAction(const Value: IioBSSlaveAction);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
@@ -1366,6 +1372,8 @@ end;
 constructor TioBSWhereBuild.Create(AOwner: TComponent);
 begin
   inherited;
+  FCloseQueryAction := nil;
+  FPersistAction := nil;
   FWhereAutoExecuteOnTargetBS := True;
 end;
 
@@ -1373,12 +1381,47 @@ procedure TioBSWhereBuild.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.WhereBuild(FWhereAutoExecuteOnTargetBS);
+  if Assigned(FPersistAction) and FPersistAction._IsEnabled then
+    FPersistAction.Execute;
+  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
+    FCloseQueryAction.Execute;
+end;
+
+procedure TioBSWhereBuild.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
+    FCloseQueryAction := nil;
+  if (Operation = opRemove) and (AComponent = (FPersistAction as TComponent)) then
+    FPersistAction := nil;
+end;
+
+procedure TioBSWhereBuild.SetCloseQueryAction(const Value: IioBSSlaveAction);
+begin
+  if Value <> FCloseQueryAction then
+  begin
+    FCloseQueryAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioBSWhereBuild.SetPersistAction(const Value: IioBSSlaveAction);
+begin
+  if Value <> FPersistAction then
+  begin
+    FPersistAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
 end;
 
 procedure TioBSWhereBuild.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
+//  Enabled := Enabled and ((not Assigned(FPersistAction)) or FPersistAction._IsEnabled); // To avoid incorrect disabling of the action
+  Enabled := Enabled and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
 end;
 
 { TioBSWhereClear }
