@@ -533,7 +533,7 @@ constructor TioBSPersistenceStdActionVcl.Create(AOwner: TComponent);
 begin
   inherited;
   // Copied from TAction.Create
-  DisableIfNoHandler := True;
+  DisableIfNoHandler := False;
   // New fields
   FClearAfterExecute := True;
   FCloseQueryAction := nil;
@@ -946,6 +946,9 @@ end;
 constructor TioBSStdActionVcl<T>.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := False;
+  // New fields
   FTargetBindSource := nil;
 end;
 
@@ -1017,6 +1020,9 @@ end;
 constructor TioViewAction.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := False;
+  // New fields
   FCaptionLinkedToVMAction := False;
   FEnabledLinkedToVMAction := True;
   FVisibleLinkedToVMAction := True;
@@ -1490,11 +1496,11 @@ begin
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach, smBSTypeNameAsSelector:
-      Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive;
+      Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive;
     smEntityTypeName:
-      Enabled := Enabled and not FEntityTypeName.Trim.IsEmpty;
+      Enabled := not FEntityTypeName.Trim.IsEmpty;
     smEntityTypeNameAsSelector:
-      Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
+      Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
 //  // ViewContextBy
 //  case FViewContextBy of

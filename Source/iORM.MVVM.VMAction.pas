@@ -1631,11 +1631,11 @@ begin
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach, smBSTypeNameAsSelector:
-      Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive;
+      Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive;
     smEntityTypeName:
-      Enabled := Enabled and not FEntityTypeName.Trim.IsEmpty;
+      Enabled := not FEntityTypeName.Trim.IsEmpty;
     smEntityTypeNameAsSelector:
-      Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
+      Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
 //  // ViewContextBy
 //  case FViewContextBy of

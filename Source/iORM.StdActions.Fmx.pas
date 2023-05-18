@@ -535,7 +535,7 @@ constructor TioBSPersistenceStdActionFmx.Create(AOwner: TComponent);
 begin
   inherited;
   // Copied from TAction.Create
-  DisableIfNoHandler := True;
+  DisableIfNoHandler := False;
   // New fields
   FClearAfterExecute := True;
   FCloseQueryAction := nil;
@@ -823,6 +823,7 @@ begin
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
   Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
   Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  Enabled := True;
 end;
 
 { TioBSPersistenceInsert }
@@ -948,6 +949,9 @@ end;
 constructor TioBSStdActionFmx<T>.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := False;
+  // New fields
   FTargetBindSource := nil;
 end;
 
@@ -1201,6 +1205,9 @@ end;
 constructor TioBSCloseQuery.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := True; // Qui lo rimetto altrimenti ho problemi
+  // New fields
   OnExecute := _DummyOnExecute; // Set the dummy OnExecute event handler
   FExecuting := False;
   FExecutingEventHandler := False;
@@ -1449,6 +1456,9 @@ end;
 constructor TioBSShowOrSelect.Create(AOwner: TComponent);
 begin
   inherited;
+  // Copied from TAction.Create
+  DisableIfNoHandler := False;
+  // New fields
   FEntityTypeName := '';
   FIsSlave := False;
   FParentCloseQueryAction := nil;
@@ -1474,7 +1484,7 @@ begin
   end;
 
   // ShowBy...
-  case smBSCurrent of
+  case FShowMode of
     // byBSCurrent
     smBSCurrent:
       case FViewContextBy of
@@ -1650,11 +1660,11 @@ begin
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach, smBSTypeNameAsSelector:
-      Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive;
+      Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive;
     smEntityTypeName:
-      Enabled := Enabled and not FEntityTypeName.Trim.IsEmpty;
+      Enabled := not FEntityTypeName.Trim.IsEmpty;
     smEntityTypeNameAsSelector:
-      Enabled := Enabled and assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
+      Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
 //  // ViewContextBy
 //  case FViewContextBy of
