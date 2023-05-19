@@ -1205,8 +1205,6 @@ end;
 constructor TioBSCloseQuery.Create(AOwner: TComponent);
 begin
   inherited;
-  // Copied from TAction.Create
-  DisableIfNoHandler := True; // Qui lo rimetto altrimenti ho problemi
   // New fields
   OnExecute := _DummyOnExecute; // Set the dummy OnExecute event handler
   FExecuting := False;
@@ -1361,7 +1359,12 @@ end;
 
 procedure TioBSCloseQuery._DummyOnExecute(Sender: TObject);
 begin
-  // Nothing, this is a dummy execute event handler (altrimenti l'azione non si esegue)
+  // Questo inizialmente era un dummy event (non serviva a nulla, sono a falìr si che ci fosse un event handler)
+  //  ma poi c'è stato il problema che se si eseguiva l'azione da codice (MyAction.Execute) questa non veniva
+  //  eseguita. Con questo codice ho risolto (Mauri 19/05/2023)
+  // NB: Questo dummy event c'è solo nella versione FMX perchè in quella VCL dava dei problemi
+  if not Assigned(ActionComponent) then
+    ExecuteTarget(nil);
 end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
