@@ -177,8 +177,8 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default False;
     property TargetBindSource;
+    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default False;
   end;
 
   // =================================================================================================
@@ -371,6 +371,8 @@ type
 
   TioBSPersistenceAppend = class(TioBSPersistenceStdActionVcl)
   private
+    FEntityTypeAlias: String;
+    FEntityTypeName: String;
     FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
   public
@@ -379,6 +381,8 @@ type
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
+    property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
+    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
     property ShowOrSelectAction;
@@ -395,6 +399,8 @@ type
 
   TioBSPersistenceInsert = class(TioBSPersistenceStdActionVcl)
   private
+    FEntityTypeAlias: String;
+    FEntityTypeName: String;
     FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
   public
@@ -403,6 +409,8 @@ type
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
+    property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
+    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
     property ShowOrSelectAction;
@@ -775,6 +783,8 @@ end;
 constructor TioBSPersistenceAppend.Create(AOwner: TComponent);
 begin
   inherited;
+  FEntityTypeAlias := '';
+  FEntityTypeName := '';
   RaiseIfChangesExists := False;
 end;
 
@@ -784,35 +794,63 @@ var
   LNewInstanceAsInterface: IInterface;
 begin
   inherited;
-  // New instance as object (OnNewInstanceAsObject event handler)
-  if Assigned(FOnNewInstanceAsObject) then
-  begin
-    FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
-    if LNewInstanceAsObject <> nil then
+  try
+    // New instance as object (OnNewInstanceAsObject event handler)
+    if Assigned(FOnNewInstanceAsObject) then
     begin
-      TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-      Exit;
-    end
-    else
-      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
-  end;
-  // New instance as Interface (OnNewInstanceAsInterface event handler)
-  if Assigned(FOnNewInstanceAsInterface) then
-  begin
-    FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
-    if LNewInstanceAsInterface <> nil then
+      FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
+      if LNewInstanceAsObject <> nil then
+      begin
+        TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        Exit;
+      end
+      else
+        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+    end;
+    // New instance as Interface (OnNewInstanceAsInterface event handler)
+    if Assigned(FOnNewInstanceAsInterface) then
     begin
-      TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-      Exit;
-    end
-    else
-      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+      FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
+      if LNewInstanceAsInterface <> nil then
+      begin
+        TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        Exit;
+      end
+      else
+        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+    end;
+    // New instance ny EntityType/Alias
+    if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
+    begin
+      LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
+      if Assigned(LNewInstanceAsObject) then
+      begin
+        // ...as interface
+        if TioUtilities.IsAnInterfaceTypeName(FEntityTypeName) then
+        begin
+          if Supports(LNewInstanceAsObject, IInterface, LNewInstanceAsInterface) then
+          begin
+            TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+            Exit;
+          end;
+        end
+        else
+        // as object
+        begin
+          TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+          Exit;
+        end;
+      end
+      else
+        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+    end;
+    // New instance not provided (created by the ABSAdapter itself)
+    TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  finally
+    // If assigned the "ShowOrExecuteAction" then execute it
+    if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
+      ShowOrSelectAction.Execute;
   end;
-  // New instance not provided (created by the ABSAdapter itself)
-  TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
-  // If assigned the "ShowOrExecuteAction" then execute it
-  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
-    ShowOrSelectAction.Execute;
 end;
 
 procedure TioBSPersistenceAppend.UpdateTarget(Target: TObject);
@@ -828,6 +866,8 @@ end;
 constructor TioBSPersistenceInsert.Create(AOwner: TComponent);
 begin
   inherited;
+  FEntityTypeAlias := '';
+  FEntityTypeName := '';
   RaiseIfChangesExists := False;
 end;
 
@@ -837,35 +877,63 @@ var
   LNewInstanceAsInterface: IInterface;
 begin
   inherited;
-  // New instance as object (OnNewInstanceAsObject event handler)
-  if Assigned(FOnNewInstanceAsObject) then
-  begin
-    FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
-    if LNewInstanceAsObject <> nil then
+  try
+    // New instance as object (OnNewInstanceAsObject event handler)
+    if Assigned(FOnNewInstanceAsObject) then
     begin
-      TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-      Exit;
-    end
-    else
-      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
-  end;
-  // New instance as Interface (OnNewInstanceAsInterface event handler)
-  if Assigned(FOnNewInstanceAsInterface) then
-  begin
-    FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
-    if LNewInstanceAsInterface <> nil then
+      FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
+      if LNewInstanceAsObject <> nil then
+      begin
+        TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        Exit;
+      end
+      else
+        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+    end;
+    // New instance as Interface (OnNewInstanceAsInterface event handler)
+    if Assigned(FOnNewInstanceAsInterface) then
     begin
-      TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-      Exit;
-    end
-    else
-      raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+      FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
+      if LNewInstanceAsInterface <> nil then
+      begin
+        TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        Exit;
+      end
+      else
+        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+    end;
+    // New instance ny EntityType/Alias
+    if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
+    begin
+      LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
+      if Assigned(LNewInstanceAsObject) then
+      begin
+        // ...as interface
+        if TioUtilities.IsAnInterfaceTypeName(FEntityTypeName) then
+        begin
+          if Supports(LNewInstanceAsObject, IInterface, LNewInstanceAsInterface) then
+          begin
+            TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+            Exit;
+          end;
+        end
+        else
+        // as object
+        begin
+          TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+          Exit;
+        end;
+      end
+      else
+        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+    end;
+    // New instance not provided (created by the ABSAdapter itself)
+    TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  finally
+    // If assigned the "ShowOrExecuteAction" then execute it
+    if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
+      ShowOrSelectAction.Execute;
   end;
-  // New instance not provided (created by the ABSAdapter itself)
-  TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
-  // If assigned the "ShowOrExecuteAction" then execute it
-  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
-    ShowOrSelectAction.Execute;
 end;
 
 procedure TioBSPersistenceInsert.UpdateTarget(Target: TObject);
