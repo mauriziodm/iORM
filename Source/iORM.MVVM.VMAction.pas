@@ -131,6 +131,7 @@ type
   published
     property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
+    property TargetBindSource;
   end;
 
   // Paging NextPage action
