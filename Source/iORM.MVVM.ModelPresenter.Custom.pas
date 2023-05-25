@@ -42,7 +42,7 @@ uses
 
 type
 
-  TioModelPresenterCustom = class abstract(TComponent, IioNotifiableBindSource)
+  TioModelPresenterCustom = class abstract(TComponent, IioNotifiableBindSource, IioStdActionTargetBindSource)
   private
     FAsDefault: Boolean;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
