@@ -235,6 +235,10 @@ type
     function Update: Boolean; override;
     function Execute: Boolean; override;
   published
+    property Caption;
+    property Enabled;
+    property Name;
+    property Visible;
     property _Version: String read Get_Version;
   end;
 
@@ -467,7 +471,10 @@ type
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
   published
+    property Caption;
+    property Enabled;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
+    property Name;
     property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
     property SelectCurrentAction: IioBSSlaveAction read FSelectCurrentAction write SetSelectCurrentAction;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
@@ -477,6 +484,7 @@ type
     property ViewContextBy: TioActionViewContextBy read FViewContextBy write FViewContextBy;
     property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
     property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
+    property Visible;
 //    property _Version: String read Get_Version;
   end;
 
