@@ -11,7 +11,7 @@ uses
   iORM.DB.DataSet.Detail, iORM.DB.MemTable, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
-  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater,
+  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater, iORM.Abstraction.uniGUI,
   iORM.DT.CompAutoUses, iORM.MVVM.VMAction;
 
 procedure Register;
@@ -19,6 +19,7 @@ begin
   // Abstraction layer components
   RegisterComponents('iORM', [TioVCL]);
   RegisterComponents('iORM', [TioFMX]);
+  RegisterComponents('iORM', [TioUniGUI]);
 
   // Connection components
   RegisterComponents('iORM', [TioRemoteConnectionDef]);

@@ -52,7 +52,11 @@ requires
   vclFireDAC,
   FireDACCommonODBC,
   FireDACMSSQLDriver,
-  FireDACSqliteDriver;
+  FireDACSqliteDriver,
+  uniGUI28,
+  uniGUI28Core,
+  uniTools28,
+  uIndy28;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',
@@ -222,7 +226,8 @@ contains
   iORM.StdActions.CloseQueryRepeater in '..\..\Source\iORM.StdActions.CloseQueryRepeater.pas',
   iORM.StdActions.Interfaces in '..\..\Source\iORM.StdActions.Interfaces.pas',
   iORM.StdActions.CloseQueryActionRegister in '..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas',
-  iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas';
+  iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas',
+  iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas';
 
 end.
 
