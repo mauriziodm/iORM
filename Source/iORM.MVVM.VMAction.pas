@@ -184,7 +184,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property TargetBindSource;
-    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
+    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default False;
   end;
 
   // =================================================================================================
