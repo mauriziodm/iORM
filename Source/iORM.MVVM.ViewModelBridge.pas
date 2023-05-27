@@ -62,7 +62,7 @@ implementation
 uses
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Utilities,
   System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces,
-  iORM, iORM.Abstraction, iORM.DB.ConnectionDef;
+  iORM, iORM.Abstraction, iORM.DB.ConnectionDef, System.Threading;
 
 { TioViewModelBridge }
 
@@ -269,6 +269,8 @@ begin
     //  otherwise if the ModelPresenters were Opened in the OnCreate event
     //  they could be of sequence problems (the ConnectionDefs were not
     //  registered yet so a connection was not found).
+{ TODO : Ragionare se sostituire i timers di iORM con una versione implementata con Thread/Task (vedi codice sotto) }
+{$IFNDEF ioUniGUI}
     TioAnonymousTimer.Create(10,
       function: Boolean
       var
@@ -283,6 +285,18 @@ begin
             Exit(True);
         (FViewModel as IioViewModelInternal).DoOnViewPairing;
       end);
+{$ELSE}
+//      TTask.Run(
+//        procedure
+//        begin
+//          Sleep(10);
+//          TThread.Synchronize(nil,
+//            procedure
+//            begin
+              (FViewModel as IioViewModelInternal).DoOnViewPairing;
+//            end);
+//        end);
+{$ENDIF}
   end;
   // ===========================================================================
 end;

@@ -218,15 +218,19 @@ end;
 constructor TioViewRegisterMVVM.Create;
 begin
   inherited;
+{$IFNDEF ioUniGUI}
   FFreeViewsTimer := TioTimer.CreateNewTimer;
   FFreeViewsTimer.Enabled := False;
   FFreeViewsTimer.OnTimer := _FreeViewTimerEventHandler;
   FFreeViewsTimer.Interval := 100;
+{$ENDIF}
 end;
 
 destructor TioViewRegisterMVVM.Destroy;
 begin
+{$IFNDEF ioUniGUI}
   FFreeViewsTimer.Free;
+{$ENDIF}
   inherited;
 end;
 
@@ -244,7 +248,11 @@ begin
   //  e, di conseguenza, di tutte le viste.
   //  NB: Ho dovuto posticiparlo con un timer perchè altrimenti con i TcxButton
   //       della DevExpress c'erano dei problemi in alcuni casi
+{$IFNDEF ioUniGUI}
   FFreeViewsTimer.Enabled := True;
+{$ELSE}
+  _PostponedReleaseAllViewContexts;
+{$ENDIF}
 end;
 
 procedure TioViewRegisterMVVM.ShowAllViewContexts;

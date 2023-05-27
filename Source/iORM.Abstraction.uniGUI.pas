@@ -26,6 +26,7 @@ type
     class procedure _SetVisible(const AControl: TObject; const AVisible: Boolean); override;
   end;
 
+{ TODO : The uniGUI timers don't seem to work properly at least for how I would use them. In practice, the "OnTimer" event is never fired }
   TioTimerUniGUI = class(TioTimer)
   private
     FInternalTimer: TUniTimer;
@@ -82,7 +83,7 @@ type
 implementation
 
 uses
-  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls;
+  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls, UniGUIApplication;
 
 { TioUniGUI }
 
@@ -106,7 +107,7 @@ end;
 class function TioApplicationUniGUI._Terminate: Boolean;
 begin
   Result := True;
-  Application.Terminate;
+  UniApplication.Terminate('Closing...');
 end;
 
 { TioControlUniGUI }
@@ -134,7 +135,8 @@ end;
 constructor TioTimerUniGUI.Create;
 begin
   inherited;
-  FInternalTimer := TUniTimer.Create(nil);
+  FInternalTimer := TUniTimer.Create(UniApplication);
+  FInternalTimer.ChainMode := True;
 end;
 
 destructor TioTimerUniGUI.Destroy;
