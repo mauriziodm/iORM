@@ -99,12 +99,12 @@ type
     property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
     property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
     // Published Events: selectors
-    property OnBeforeSelectionObject;
+    property BeforeSelectionObject;
     property OnSelectionObject;
-    property OnAfterSelectionObject;
-    property OnBeforeSelectionInterface;
+    property AfterSelectionObject;
+    property BeforeSelectionInterface;
     property OnSelectionInterface;
-    property OnAfterSelectionInterface;
+    property AfterSelectionInterface;
     // Published properties: selectors
     property OnReceiveSelectionCloneObject;
     property OnReceiveSelectionFreeObject;

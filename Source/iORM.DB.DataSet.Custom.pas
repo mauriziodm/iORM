@@ -46,12 +46,12 @@ type
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
     FDetailBindSourceContainer: TList<IioNotifiableBindSource>;
     // Selection related events
-    FonBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
+    FBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
     FonSelectionObject: TioBSASelectionObjectEvent;
-    FonAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
-    FonBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    FAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
+    FBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
-    FonAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    FAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean; // IioStdActionTargetBindSource
     procedure OpenCLoseDetails(const AActive: Boolean);
@@ -175,12 +175,12 @@ type
     property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True;
     // published: Master+Detail
     // Published Events: selectors
-    property OnBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonBeforeSelectionObject write FonBeforeSelectionObject;
+    property BeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FBeforeSelectionObject write FBeforeSelectionObject;
     property OnSelectionObject: TioBSASelectionObjectEvent read FonSelectionObject write FonSelectionObject;
-    property OnAfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FonAfterSelectionObject write FonAfterSelectionObject;
-    property OnBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonBeforeSelectionInterface write FonBeforeSelectionInterface;
+    property AfterSelectionObject: TioBSABeforeAfterSelectionObjectEvent read FAfterSelectionObject write FAfterSelectionObject;
+    property BeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FBeforeSelectionInterface write FBeforeSelectionInterface;
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
-    property OnAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FonAfterSelectionInterface write FonAfterSelectionInterface;
+    property AfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FAfterSelectionInterface write FAfterSelectionInterface;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -381,8 +381,8 @@ end;
 
 procedure TioDataSetCustom.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonAfterSelectionObject) then
-    FonAfterSelectionObject(Self, ASelected, ASelectionType);
+  if Assigned(FAfterSelectionObject) then
+    FAfterSelectionObject(Self, ASelected, ASelectionType);
 end;
 
 procedure TioDataSetCustom.DoAfterOpen;
@@ -393,8 +393,8 @@ end;
 
 procedure TioDataSetCustom.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonAfterSelectionInterface) then
-    FonAfterSelectionInterface(Self, ASelected, ASelectionType);
+  if Assigned(FAfterSelectionInterface) then
+    FAfterSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
 procedure TioDataSetCustom.DoBeforeClose;
@@ -405,14 +405,14 @@ end;
 
 procedure TioDataSetCustom.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonBeforeSelectionInterface) then
-    FonBeforeSelectionInterface(Self, ASelected, ASelectionType);
+  if Assigned(FBeforeSelectionInterface) then
+    FBeforeSelectionInterface(Self, ASelected, ASelectionType);
 end;
 
 procedure TioDataSetCustom.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
-  if Assigned(FonBeforeSelectionObject) then
-    FonBeforeSelectionObject(Self, ASelected, ASelectionType);
+  if Assigned(FBeforeSelectionObject) then
+    FBeforeSelectionObject(Self, ASelected, ASelectionType);
 end;
 
 procedure TioDataSetCustom.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
