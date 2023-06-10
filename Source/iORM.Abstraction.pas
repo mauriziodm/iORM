@@ -30,11 +30,6 @@
 {  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
 {                                                                           }
 {***************************************************************************}
-
-
-
-
-
 unit iORM.Abstraction;
 
 interface
@@ -43,6 +38,8 @@ uses
   System.Classes, System.SysUtils, System.Rtti;
 
 type
+  TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
+
   TioApplicationRef = class of TioApplication;
   TioApplication = class abstract
   private
@@ -52,11 +49,13 @@ type
     class procedure SetConcreteClass(const AClass: TioApplicationRef);
     class procedure _HandleException(const Sender: TObject); virtual; abstract;
     class procedure _ShowMessage(const AMessage: string); virtual; abstract;
+    class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
     class function _Terminate: Boolean; virtual; abstract;
   public
     class procedure CheckIfAbstractionLayerComponentExists;
     class procedure HandleException(const Sender: TObject);
     class procedure ShowMessage(const AMessage: string);
+    class function ProjectPlatform: TioProjectPlatform;
     class function Terminate: Boolean;
   end;
 
@@ -248,6 +247,11 @@ end;
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
   GetConcreteClass._HandleException(Sender);
+end;
+
+class function TioApplication.ProjectPlatform: TioProjectPlatform;
+begin
+  Result := GetConcreteClass._ProjectPlatform;
 end;
 
 class procedure TioApplication.SetConcreteClass(const AClass: TioApplicationRef);

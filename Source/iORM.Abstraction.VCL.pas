@@ -30,11 +30,6 @@
 {  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
 {                                                                           }
 {***************************************************************************}
-
-
-
-
-
 unit iORM.Abstraction.VCL;
 
 interface
@@ -55,6 +50,7 @@ type
   protected
     class procedure _HandleException(const Sender: TObject); override;
     class procedure _ShowMessage(const AMessage: string); override;
+    class function _ProjectPlatform: TioProjectPlatform; override;
     class function _Terminate: Boolean; override;
   end;
 
@@ -127,6 +123,11 @@ uses
 class procedure TioApplicationVCL._HandleException(const Sender: TObject);
 begin
   Application.HandleException(Sender);
+end;
+
+class function TioApplicationVCL._ProjectPlatform: TioProjectPlatform;
+begin
+  Result := ppVCL;
 end;
 
 class procedure TioApplicationVCL._ShowMessage(const AMessage: string);

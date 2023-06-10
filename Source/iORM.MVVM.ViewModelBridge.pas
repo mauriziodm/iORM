@@ -269,34 +269,26 @@ begin
     //  otherwise if the ModelPresenters were Opened in the OnCreate event
     //  they could be of sequence problems (the ConnectionDefs were not
     //  registered yet so a connection was not found).
-{ TODO : Ragionare se sostituire i timers di iORM con una versione implementata con Thread/Task (vedi codice sotto) }
-{$IFNDEF ioUniGUI}
-    TioAnonymousTimer.Create(10,
-      function: Boolean
-      var
-        I: Integer;
-      begin
-        // If result is True then the timer remains enabled (continue to loop), if result is False then
-        // the timer is disabled and destroyed
-        Result := False;
-        // Loop for Owner's components and if there is
-        for I := 0 to Owner.ComponentCount - 1 do
-          if (Owner.Components[I] is TioCustomConnectionDef) and not TioCustomConnectionDef(Owner.Components[I]).IsRegistered then
-            Exit(True);
-        (FViewModel as IioViewModelInternal).DoOnViewPairing;
-      end);
-{$ELSE}
-//      TTask.Run(
-//        procedure
-//        begin
-//          Sleep(10);
-//          TThread.Synchronize(nil,
-//            procedure
-//            begin
-              (FViewModel as IioViewModelInternal).DoOnViewPairing;
-//            end);
-//        end);
-{$ENDIF}
+    // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
+    if TioApplication.ProjectPlatform <> ppUniGUI then
+    begin
+      TioAnonymousTimer.Create(10,
+        function: Boolean
+        var
+          I: Integer;
+        begin
+          // If result is True then the timer remains enabled (continue to loop), if result is False then
+          // the timer is disabled and destroyed
+          Result := False;
+          // Loop for Owner's components and if there is
+          for I := 0 to Owner.ComponentCount - 1 do
+            if (Owner.Components[I] is TioCustomConnectionDef) and not TioCustomConnectionDef(Owner.Components[I]).IsRegistered then
+              Exit(True);
+          (FViewModel as IioViewModelInternal).DoOnViewPairing;
+        end);
+    end
+    else
+      (FViewModel as IioViewModelInternal).DoOnViewPairing;
   end;
   // ===========================================================================
 end;

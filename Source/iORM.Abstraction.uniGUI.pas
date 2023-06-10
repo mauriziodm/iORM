@@ -1,9 +1,55 @@
+{***************************************************************************}
+{                                                                           }
+{           iORM - (interfaced ORM)                                         }
+{                                                                           }
+{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
+{                                                                           }
+{           mauriziodm@levantesw.it                                         }
+{           mauriziodelmagno@gmail.com                                      }
+{           https://github.com/mauriziodm/iORM.git                          }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  This file is part of iORM (Interfaced Object Relational Mapper).         }
+{                                                                           }
+{  Licensed under the GNU Lesser General Public License, Version 3;         }
+{  you may not use this file except in compliance with the License.         }
+{                                                                           }
+{  iORM is free software: you can redistribute it and/or modify             }
+{  it under the terms of the GNU Lesser General Public License as published }
+{  by the Free Software Foundation, either version 3 of the License, or     }
+{  (at your option) any later version.                                      }
+{                                                                           }
+{  iORM is distributed in the hope that it will be useful,                  }
+{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
+{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
+{  GNU Lesser General Public License for more details.                      }
+{                                                                           }
+{  You should have received a copy of the GNU Lesser General Public License }
+{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
+{                                                                           }
+{***************************************************************************}
+{***************************************************************************}
+{                         A T T E N T I O N !!!                             }
+{                         A T T E N T I O N !!!                             }
+{                         A T T E N T I O N !!!                             }
+{                                                                           }
+{ 1) If you use iORM TDataSets with TUniDBGrids, remember to set the Grid's }
+{    "BufferdStore.Enabled" property to True.                               }
+{                                                                           }
+{ 2) Do not use the TioTimer (alias TioTimerUniGUI), it doesn't work.       }
+{                                                                           }
+{ 3) Do not use the TioApplication (alias TioApplicationUniGUI) methods,    }
+{    it doesn't work.                                                       }
+{                                                                           }
+{***************************************************************************}
 unit iORM.Abstraction.uniGUI;
 
 interface
 
 uses
-  System.Classes, iORM.Abstraction, uniTimer, Vcl.ActnList, System.Rtti;
+  System.Classes, iORM.Abstraction, Vcl.ActnList, System.Rtti;
 
 type
   TioUniGUI = class(TComponent)
@@ -13,10 +59,12 @@ type
     property _Version: String read Get_Version;
   end;
 
+  // Note: TioApplication features not implemented for uniGUI platform
   TioApplicationUniGUI = class(TioApplication)
   protected
     class procedure _HandleException(const Sender: TObject); override;
     class procedure _ShowMessage(const AMessage: string); override;
+    class function _ProjectPlatform: TioProjectPlatform; override;
     class function _Terminate: Boolean; override;
   end;
 
@@ -26,10 +74,10 @@ type
     class procedure _SetVisible(const AControl: TObject; const AVisible: Boolean); override;
   end;
 
-{ TODO : The uniGUI timers don't seem to work properly at least for how I would use them. In practice, the "OnTimer" event is never fired }
+  // Note: TioApplication features not implemented for uniGUI platform
   TioTimerUniGUI = class(TioTimer)
   private
-    FInternalTimer: TUniTimer;
+//    FInternalTimer: TUniTimer;
   protected
     function GetEnabled: Boolean; override;
     function GetInterval: Cardinal; override;
@@ -48,28 +96,28 @@ type
   private
     FInternalAction: TAction;
   protected
-    class function _CreateNewAction(const AOwner:TComponent): TioAction; override;
-    class function _CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; override;
+    class function _CreateNewAction(const AOwner: TComponent): TioAction; override;
+    class function _CreateNewAction(const AOwner: TComponent; const AAction: TObject): TioAction; override;
     class function _IsValid(const AField: TRttiField): Boolean; override;
     function GetCaption: string; override;
-    function GetChecked: boolean; override;
-    function GetEnabled: boolean; override;
-    function GetGroupIndex: integer; override;
+    function GetChecked: Boolean; override;
+    function GetEnabled: Boolean; override;
+    function GetGroupIndex: Integer; override;
     function GetHint: string; override;
-    function GetImageIndex: integer; override;
+    function GetImageIndex: Integer; override;
     function GetName: TComponentName; override;
-    function GetVisible: boolean; override;
+    function GetVisible: Boolean; override;
     function GetOnExecute: TNotifyEvent; override;
     function GetOnHint: THintEvent; override;
     function GetOnUpdate: TNotifyEvent; override;
     procedure SetCaption(const Value: string); override;
-    procedure SetChecked(const Value: boolean); override;
-    procedure SetEnabled(const Value: boolean); override;
-    procedure SetGroupIndex(const Value: integer); override;
+    procedure SetChecked(const Value: Boolean); override;
+    procedure SetEnabled(const Value: Boolean); override;
+    procedure SetGroupIndex(const Value: Integer); override;
     procedure SetHint(const Value: string); override;
-    procedure SetImageIndex(const Value: integer); override;
+    procedure SetImageIndex(const Value: Integer); override;
     procedure SetName(const Value: TComponentName); override;
-    procedure SetVisible(const Value: boolean); override;
+    procedure SetVisible(const Value: Boolean); override;
     procedure SetOnExecute(const Value: TNotifyEvent); override;
     procedure SetOnHint(const Value: THintEvent); override;
     procedure SetOnUpdate(const Value: TNotifyEvent); override;
@@ -96,18 +144,22 @@ end;
 
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);
 begin
-  Application.HandleException(Sender);
+  raise EioException.Create(ClassName, '_HandleException', 'Feature not implemented for then uniGUI platform.');
+end;
+
+class function TioApplicationUniGUI._ProjectPlatform: TioProjectPlatform;
+begin
+  Result := ppUniGUI;
 end;
 
 class procedure TioApplicationUniGUI._ShowMessage(const AMessage: string);
 begin
-  Vcl.Dialogs.ShowMessage(AMessage);
+  raise EioException.Create(ClassName, '_HandleException', 'Feature not implemented for then uniGUI platform.');
 end;
 
 class function TioApplicationUniGUI._Terminate: Boolean;
 begin
-  Result := True;
-  UniApplication.Terminate('Closing...');
+  raise EioException.Create(ClassName, '_Terminate', 'Feature not implemented for then uniGUI platform.');
 end;
 
 { TioControlUniGUI }
@@ -115,9 +167,9 @@ end;
 class procedure TioControlUniGUI._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
-  if not (AControl is TControl) then
+  if not(AControl is TControl) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
-  if not (AParent is TWinControl) then
+  if not(AParent is TWinControl) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
   TControl(AControl).Parent := TWinControl(AParent);
 end;
@@ -125,7 +177,7 @@ end;
 class procedure TioControlUniGUI._SetVisible(const AControl: TObject; const AVisible: Boolean);
 begin
   inherited;
-  if not (AControl is TControl) then
+  if not(AControl is TControl) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
 end;
@@ -134,55 +186,59 @@ end;
 
 constructor TioTimerUniGUI.Create;
 begin
-  inherited;
-  FInternalTimer := TUniTimer.Create(UniApplication);
-  FInternalTimer.ChainMode := True;
+  raise EioException.Create(ClassName, 'Create', 'Feature not implemented for then uniGUI platform.');
+//  inherited;
+//  FInternalTimer := TUniTimer.Create(UniApplication);
+//  FInternalTimer.ChainMode := True;
 end;
 
 destructor TioTimerUniGUI.Destroy;
 begin
-  FInternalTimer.Free;
+//  FInternalTimer.Free;
   inherited;
 end;
 
 function TioTimerUniGUI.GetEnabled: Boolean;
 begin
-  Result := FInternalTimer.Enabled;
+//  Result := FInternalTimer.Enabled;
+  Result := False;
 end;
 
 function TioTimerUniGUI.GetInterval: Cardinal;
 begin
-  Result := FInternalTimer.Interval;
+//  Result := FInternalTimer.Interval;
+  Result := 0;
 end;
 
 function TioTimerUniGUI.GetOnTimer: TNotifyEvent;
 begin
-  Result := FInternalTimer.OnTimer;
+//  Result := FInternalTimer.OnTimer;
 end;
 
 function TioTimerUniGUI.GetTag: Integer;
 begin
-  Result := FInternalTimer.Tag;
+//  Result := FInternalTimer.Tag;
+  Result := 0;
 end;
 
 procedure TioTimerUniGUI.SetEnabled(const Value: Boolean);
 begin
-  FInternalTimer.Enabled := Value;
+//  FInternalTimer.Enabled := Value;
 end;
 
 procedure TioTimerUniGUI.SetInterval(const Value: Cardinal);
 begin
-  FInternalTimer.Interval := Value;
+//  FInternalTimer.Interval := Value;
 end;
 
 procedure TioTimerUniGUI.SetOnTimer(const Value: TNotifyEvent);
 begin
-  FInternalTimer.OnTimer := Value;
+//  FInternalTimer.OnTimer := Value;
 end;
 
 procedure TioTimerUniGUI.SetTag(const Value: Integer);
 begin
-  FInternalTimer.Tag := Value;
+//  FInternalTimer.Tag := Value;
 end;
 
 { TioActionUniGUI }
@@ -214,17 +270,17 @@ begin
   Result := FInternalAction.Caption;
 end;
 
-function TioActionUniGUI.GetChecked: boolean;
+function TioActionUniGUI.GetChecked: Boolean;
 begin
   Result := FInternalAction.Checked;
 end;
 
-function TioActionUniGUI.GetEnabled: boolean;
+function TioActionUniGUI.GetEnabled: Boolean;
 begin
   Result := FInternalAction.Enabled;
 end;
 
-function TioActionUniGUI.GetGroupIndex: integer;
+function TioActionUniGUI.GetGroupIndex: Integer;
 begin
   Result := FInternalAction.GroupIndex;
 end;
@@ -234,7 +290,7 @@ begin
   Result := FInternalAction.Hint;
 end;
 
-function TioActionUniGUI.GetImageIndex: integer;
+function TioActionUniGUI.GetImageIndex: Integer;
 begin
   Result := FInternalAction.ImageIndex;
 end;
@@ -259,7 +315,7 @@ begin
   Result := FInternalAction.OnUpdate;
 end;
 
-function TioActionUniGUI.GetVisible: boolean;
+function TioActionUniGUI.GetVisible: Boolean;
 begin
   Result := FInternalAction.Visible;
 end;
@@ -269,17 +325,17 @@ begin
   FInternalAction.Caption := Value;
 end;
 
-procedure TioActionUniGUI.SetChecked(const Value: boolean);
+procedure TioActionUniGUI.SetChecked(const Value: Boolean);
 begin
   FInternalAction.Checked := Value;
 end;
 
-procedure TioActionUniGUI.SetEnabled(const Value: boolean);
+procedure TioActionUniGUI.SetEnabled(const Value: Boolean);
 begin
   FInternalAction.Enabled := Value;
 end;
 
-procedure TioActionUniGUI.SetGroupIndex(const Value: integer);
+procedure TioActionUniGUI.SetGroupIndex(const Value: Integer);
 begin
   FInternalAction.GroupIndex := Value;
 end;
@@ -289,7 +345,7 @@ begin
   FInternalAction.Hint := Value;
 end;
 
-procedure TioActionUniGUI.SetImageIndex(const Value: integer);
+procedure TioActionUniGUI.SetImageIndex(const Value: Integer);
 begin
   FInternalAction.ImageIndex := Value;
 end;
@@ -314,7 +370,7 @@ begin
   FInternalAction.OnUpdate := Value;
 end;
 
-procedure TioActionUniGUI.SetVisible(const Value: boolean);
+procedure TioActionUniGUI.SetVisible(const Value: Boolean);
 begin
   FInternalAction.Visible := Value;
 end;
@@ -337,9 +393,9 @@ end;
 
 initialization
 
-  TioApplicationUniGUI.SetConcreteClass(TioApplicationUniGUI);
-  TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
-  TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
-  TioActionUniGUI.SetConcreteClass(TioActionUniGUI);
+TioApplicationUniGUI.SetConcreteClass(TioApplicationUniGUI);
+TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
+TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
+TioActionUniGUI.SetConcreteClass(TioActionUniGUI);
 
 end.

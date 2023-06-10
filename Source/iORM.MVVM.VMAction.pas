@@ -497,7 +497,8 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
-  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister;
+  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
+  iORM.Abstraction;
 
 { TioVMActionCustom }
 
@@ -575,11 +576,11 @@ begin
     LViewAction.DoBeforeExecute;
   // Execute the VMAction.onExecute event if assigned (or a standard action)
   _InternalExecute;
-{$IFNDEF ioUniGUI}
   // Execute the ViewAction.onAfterExecute event
-  for LViewAction in FBindedViewActionsContainer do
-    LViewAction.DoAfterExecute;
-{$ENDIF}
+  // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
+  if TioApplication.ProjectPlatform <> ppUniGUI then
+    for LViewAction in FBindedViewActionsContainer do
+      LViewAction.DoAfterExecute;
 end;
 
 procedure TioVMActionCustom._InternalExecute;
