@@ -719,7 +719,7 @@ begin
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
-    // Loop for all classes in the sesolved type list
+    // Loop for all classes in the resolved type list
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName

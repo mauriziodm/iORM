@@ -83,7 +83,8 @@ type
     Persistent: Boolean;
     Strategy: TioStrategyRef;
     UserName: String;
-    constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean; const AKeyGenerationTime: TioKeyGenerationTime);
+    constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
+      const AKeyGenerationTime: TioKeyGenerationTime);
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -177,18 +178,18 @@ type
     procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
     procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
     procedure ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-//    procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
+    // procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
     procedure ParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     procedure ParamByProp_SetValueAsDate(const AProp: IioProperty; const AValue: TDate);
     procedure ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
-//    procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+    // procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
     procedure ParamObjVer_SetValue(const AContext: IioContext);
-//    procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-//    procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
-//    procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+    // procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
+    // procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
+    // procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
     procedure WhereParamObjVer_SetValue(const AContext: IioContext);
 
@@ -235,6 +236,7 @@ type
     class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class function GenerateSqlSelectNestedWhere(const AContext: IioContext; const ANestedPropName: String): String; virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
   end;
 
@@ -366,7 +368,9 @@ implementation
 
 uses
   iORM.SqlTranslator, iORM.Strategy.Factory, System.SysUtils, iORM.Attributes,
-  iORM.Exceptions, iORM.Utilities, iORM.SqlItems;
+  iORM.Exceptions, iORM.Utilities, iORM.SqlItems, iORM.Context.Map.Interfaces,
+  System.StrUtils, iORM.Context.Container, iORM.Resolver.Interfaces,
+  iORM.Resolver.Factory;
 
 { TioSqlGenerator }
 
@@ -562,6 +566,60 @@ begin
   AQuery.SQL.Add(AContext.GetOrderBySql);
 end;
 
+class function TioSqlGenerator.GenerateSqlSelectNestedWhere(const AContext: IioContext; const ANestedPropName: String): String;
+  procedure _GenerateNestedWhere(const NMasterMap: IioMap; const NNestedPropName: String; const NPreviousBuildingResult: String; var NFinalResult: String);
+  var
+    LFirstDotPos, LSecondDotPos: integer;
+    LMasterPropName, LDetailPropName, LRemainingPropName: String;
+    LDetailMap: IioMap;
+    LMasterProp, LDetailProp: IioProperty;
+    LResolvedTypeList: IioResolvedTypeList;
+    LResolvedTypeName: String;
+    LCurrentBuildingResult: String;
+  begin
+    // Extract the position of the first and second dots in the ANestedPropName string parameter
+    // and set the RemainingPropName for the next recursion if needed,
+    // if the second dot does not exists then set its position to the length of the whole string and stop the recursion
+    LFirstDotPos := Pos('.', NNestedPropName);
+    LSecondDotPos := PosEx('.', NNestedPropName, LFirstDotPos + 1);
+    LRemainingPropName := String.Empty;
+    if LSecondDotPos > 0 then
+      LRemainingPropName := Copy(ANestedPropName, LFirstDotPos + 1, Length(NNestedPropName))
+    else
+      LSecondDotPos := ANestedPropName.Length + 1;
+    // Gte the master and detail prop name
+    LMasterPropName := Copy(ANestedPropName, 1, LFirstDotPos - 1);
+    LDetailPropName := Copy(ANestedPropName, LFirstDotPos + 1, LSecondDotPos - 1);
+    // Get the master property
+    LMasterProp := NMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
+    // Resolve the type and alias then loop for all classes in the resolved type list
+    LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LMasterProp.GetRelationChildTypeName,
+      LMasterProp.GetRelationChildTypeAlias, rmAllDistinctByConnectionAndTable);
+    for LResolvedTypeName in LResolvedTypeList do
+    begin
+      // Get the detail Map and Property
+      LDetailMap := TioMapContainer.GetMap(LResolvedTypeName);
+      LDetailProp := LDetailMap.GetProperties.GetPropertyByName(LDetailPropName);
+      // If the current resolved type is not for the same connection the skip it
+      if not LDetailMap.GetTable.IsForThisConnection(NMasterMap.GetTable.GetConnectionDefName) then
+        Continue;
+      // Build the result nested props where query
+      LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
+        LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
+      // If the LRemainingPropName is empty (we are processing the last nested property) then add the LCurrentBuildingResult to the NFinalResult
+      //  else (LRemainingPropName is not empty) call itself recursively
+      // NB: add the 'OR' if the NFinalResult is not empty
+      if LRemainingPropName.IsEmpty then
+        NFinalResult := Format('%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult])
+      else
+        _GenerateNestedWhere(LDetailMap, LDetailPropName, LCurrentBuildingResult, NFinalResult);
+    end;
+  end;
+begin
+  Result := String.Empty;
+  // Ricorda che il parametro "NBuildingResult" deve essere valorizzato con il GetSqlQualifiedFieldName della proprietà di inizio (es: ORDER.CUSTOMER)
+end;
+
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);
 var
   Prop: IioProperty;
@@ -574,7 +632,8 @@ end;
 
 { TioConnectionInfo }
 
-constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean; const AKeyGenerationTime: TioKeyGenerationTime);
+constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
+  const AKeyGenerationTime: TioKeyGenerationTime);
 begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;

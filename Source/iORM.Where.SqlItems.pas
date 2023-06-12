@@ -38,7 +38,7 @@ interface
 uses
   iORM.SqlItems,
   iORM.Where.SqlItems.Interfaces,
-  System.Rtti, iORM.Context.Map.Interfaces;
+  System.Rtti, iORM.Context.Map.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -54,6 +54,9 @@ type
   // Specialized SqlItemWhere for property (PropertyName to FieldName)
   // NB: Property.Name is in FSqlText ancestor field
   TioSqlItemsWhereProperty = class(TioSqlItemsWhere)
+  strict private
+    function IsNestedPropName(const APropName: String): boolean;
+    function ResolveNestedWhereProperty(const AMasterMap: IioMap; ANestedPropName: String): String;
   public
     function GetSql(const AMap: IioMap): String; override;
     function HasParameter: Boolean; override;
@@ -68,7 +71,7 @@ type
     function HasParameter: Boolean; override;
   end;
 
-  // Specialized SqlItemWhere returning an SQL compatible repreentation
+  // Specialized SqlItemWhere returning an SQL compatible representation
   // of TValue
   TioSqlItemsWhereTValue = class(TioSqlItemsWhere)
   strict private
@@ -120,25 +123,26 @@ type
     function HasParameter: Boolean; override;
   end;
 
-//  TioSqlItemsCriteria<T> = class(TioSqlItemsWhere)
-//  strict private
-//    FValue: TValue;
-//    FCompareOp: String;
-//    FLogicOp: String;
-//  public
-//    constructor Create(const ASqlText: String); reintroduce; overload; // raise exception
-//    constructor Create(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: T); reintroduce; overload;
-//    function GetSql(const AMap: IioMap): String; override;
-//    function GetSqlParamName(const AMap: IioMap): String; override;
-//    function GetValue(const AMap: IioMap): TValue; override;
-//    function HasParameter: Boolean; override;
-//  end;
+  TioSqlItemsCriteria<T> = class(TioSqlItemsWhere)
+  strict private
+    FValue: TValue;
+    FCompareOp: String;
+    FLogicOp: String;
+  public
+    constructor Create(const ASqlText: String); reintroduce; overload; // raise exception
+    constructor Create(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: T); reintroduce; overload;
+    function GetSql(const AMap: IioMap): String; override;
+    function GetSqlParamName(const AMap: IioMap): String; override;
+    function GetValue(const AMap: IioMap): TValue; override;
+    function HasParameter: Boolean; override;
+  end;
 
 implementation
 
 uses
   iORM.Exceptions, iORM.DB.Factory, iORM.SqlTranslator,
-  iORM.Context.Properties.Interfaces, System.SysUtils;
+  iORM.Context.Properties.Interfaces, System.SysUtils, System.Types,
+  iORM.Context.Container, SYstem.StrUtils;
 
 { TioSqlItemsWhereValue }
 
@@ -165,13 +169,41 @@ end;
 
 { TioSqlItemsWhereProperty }
 
+function TioSqlItemsWhereProperty.IsNestedPropName(const APropName: String): boolean;
+begin
+  Result := APropName.Contains('.');
+end;
+
+function TioSqlItemsWhereProperty.ResolveNestedWhereProperty(const AMasterMap: IioMap; ANestedPropName: String): String;
+var
+  LFirstDotPos, LSecondDotPos: Integer;
+  LMasterPropName, LDetailPropName: String;
+  LMasterProp: IioProperty;
+  LDetailMap: IioMap;
+begin
+  // Extract the position of the first and second dots in the ANestedPropName string parameter,
+  //  if the second dot does not exists then set its position to the length of the whole string
+  LFirstDotPos := Pos('.', ANestedPropName);
+  LSecondDotPos := PosEx('.', ANestedPropName, LFirstDotPos+1);
+  if LSecondDotPos = 0 then
+    LSecondDotPos := ANestedPropName.Length+1;
+  // Gte the master and detail prop name
+  LMasterPropName := Copy(ANestedPropName, 1, LFirstDotPos-1);
+  LDetailPropName := Copy(ANestedPropName, LFirstDotPos+1, LSecondDotPos-1);
+  // Get the detail Map
+  LDetailMap := TioMapContainer.GetMap(LMasterProp.GetTypeName);
+
+
+  LMasterProp := AMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
+
+
+end;
+
 function TioSqlItemsWhereProperty.GetSql(const AMap: IioMap): String;
 begin
   // NB: No inherited
   Result := AMap.GetProperties.GetPropertyByName(FSqlText).GetSqlQualifiedFieldName;
 end;
-
-{ TioSqlItemsWhere }
 
 function TioSqlItemsWhereProperty.HasParameter: Boolean;
 begin
@@ -303,41 +335,41 @@ end;
 
 { TioSqlItemsCriteria }
 
-//constructor TioSqlItemsCriteria<T>.Create(const ASqlText: String);
-//begin
-//  raise EioException.Create(Self.ClassName + ': wrong constructor called');
-//end;
-//
-//constructor TioSqlItemsCriteria<T>.Create(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: T);
-//begin
-//  inherited Create(APropertyName);
-//  FLogicOp := TioDBFactory.LogicRelation.GetLogicOp(ALogicOp);
-//  FCompareOp := TioDBFactory.CompareOperator.GetCompareOp(ACompareOperator);
-//  FValue := TValue.From<T>(AValue);
-//end;
-//
-//function TioSqlItemsCriteria<T>.GetSql(const AMap: IioMap): String;
-//var
-//  AProp: IioContextProperty;
-//begin
-//  // NB: No inherited
-//  AProp := AMap.GetProperties.GetPropertyByName(FSqlText);
-//  Result := Format('%s %s %s :%s', [FLogicOp, AProp.GetSqlQualifiedFieldName, FCompareOp, AProp.GetSqlParamName]).Trim;
-//end;
-//
-//function TioSqlItemsCriteria<T>.GetSqlParamName(const AMap: IioMap): String;
-//begin
-//  Result := AMap.GetProperties.GetPropertyByName(FSqlText).GetSqlParamName;
-//end;
-//
-//function TioSqlItemsCriteria<T>.GetValue(const AMap: IioMap): TValue;
-//begin
-//  Result := FValue;
-//end;
-//
-//function TioSqlItemsCriteria<T>.HasParameter: Boolean;
-//begin
-//  Result := True;
-//end;
+constructor TioSqlItemsCriteria<T>.Create(const ASqlText: String);
+begin
+  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+end;
+
+constructor TioSqlItemsCriteria<T>.Create(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: T);
+begin
+  inherited Create(APropertyName);
+  FLogicOp := TioDBFactory.LogicRelation.GetLogicOp(ALogicOp);
+  FCompareOp := TioDBFactory.CompareOperator.GetCompareOp(ACompareOperator);
+  FValue := TValue.From<T>(AValue);
+end;
+
+function TioSqlItemsCriteria<T>.GetSql(const AMap: IioMap): String;
+var
+  AProp: IioContextProperty;
+begin
+  // NB: No inherited
+  AProp := AMap.GetProperties.GetPropertyByName(FSqlText);
+  Result := Format('%s %s %s :%s', [FLogicOp, AProp.GetSqlQualifiedFieldName, FCompareOp, AProp.GetSqlParamName]).Trim;
+end;
+
+function TioSqlItemsCriteria<T>.GetSqlParamName(const AMap: IioMap): String;
+begin
+  Result := AMap.GetProperties.GetPropertyByName(FSqlText).GetSqlParamName;
+end;
+
+function TioSqlItemsCriteria<T>.GetValue(const AMap: IioMap): TValue;
+begin
+  Result := FValue;
+end;
+
+function TioSqlItemsCriteria<T>.HasParameter: Boolean;
+begin
+  Result := True;
+end;
 
 end.
