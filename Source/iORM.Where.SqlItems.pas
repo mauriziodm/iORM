@@ -132,11 +132,12 @@ type
     function GetValueSqlItem: IioSqlItemWhere;
   public
     constructor Create(const ASqlText: String); reintroduce; overload; // raise exception
-    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue); reintroduce; overload;
+    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; AValue: TValue); reintroduce; overload;
     function GetSql(const AMap: IioMap): String; override;
     property CompareOpSqlItem: IioSqlItem read GetCompareOpSqlItem;
     property PropertyName: String read GetPropertyName;
     property ValueSqlItem: IioSqlItemWhere read GetValueSqlItem;
+    function HasParameter: Boolean; override;
   end;
 
 implementation
@@ -144,7 +145,7 @@ implementation
 uses
   iORM.Exceptions, iORM.DB.Factory, iORM.SqlTranslator,
   iORM.Context.Properties.Interfaces, System.SysUtils, System.Types,
-  iORM.Context.Container, System.StrUtils;
+  iORM.Context.Container, System.StrUtils, iORM.Utilities;
 
 { TioSqlItemsWhereValue }
 
@@ -307,15 +308,24 @@ end;
 
 { TioSqlItemsCriteria }
 
-//constructor TioSqlItemsCriteria.Create(const ASqlText: String);
-//begin
-//  raise EioException.Create(Self.ClassName + ': wrong constructor called');
-//end;
-
-constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue);
+constructor TioSqlItemsCriteria.Create(const ASqlText: String);
 begin
+  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+end;
+
+constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; AValue: TValue);
+begin
+  // PropertyName
   inherited Create(APropertyName);
+  // Compare operator
   FCompareOpSqlItem := TioDBFactory.CompareOperator.CompareOpToCompareOperator(ACompareOperator);
+  // Value
+  case AValue.Kind of
+    tkClass:
+      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsObject));
+    tkInterface:
+      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsInterface));
+  end;
   FValueSqlItem := TioDBFactory.WhereItemTValue(AValue);
 end;
 
@@ -342,6 +352,11 @@ end;
 function TioSqlItemsCriteria.GetValueSqlItem: IioSqlItemWhere;
 begin
   Result := FValueSqlItem;
+end;
+
+function TioSqlItemsCriteria.HasParameter: Boolean;
+begin
+  Result := False;
 end;
 
 function TioSqlItemsCriteria.IsNestedPropName(const APropName: String): Boolean;

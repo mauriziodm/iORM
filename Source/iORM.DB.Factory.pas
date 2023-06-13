@@ -48,10 +48,7 @@ type
 
   TioDbFactory = class
   public
-    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp): IioSqlItemWhere; overload;
-    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: Variant): IioSqlItemWhere; overload;
-    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AObject: TObject): IioSqlItemWhere; overload;
-    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AInterface: IInterface): IioSqlItemWhere; overload;
+    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue): IioSqlItemWhere;
     class function WhereItemProperty(APropertyName: String): IioSqlItemWhere;
     class function WhereItemPropertyOID: IioSqlItemWhere;
     class function WhereItemTValue(AValue: TValue): IioSqlItemWhere;
@@ -255,24 +252,9 @@ begin
   Result := TioTransactionCollection.Create;
 end;
 
-class function TioDbFactory.WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp): IioSqlItemWhere;
+class function TioDbFactory.WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue): IioSqlItemWhere;
 begin
-  Result := TioSqlItemsCriteria.Create(APropertyName, ACompareOperator, nil);
-end;
-
-class function TioDbFactory.WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: Variant): IioSqlItemWhere;
-begin
-  Result := TioSqlItemsCriteria.Create(APropertyName, ACompareOperator, TValue.FromVariant(AValue));
-end;
-
-class function TioDbFactory.WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AObject: TObject): IioSqlItemWhere;
-begin
-  Result := TioSqlItemsCriteria.Create(APropertyName, ACompareOperator, TValue.From<TObject>(AObject));
-end;
-
-class function TioDbFactory.WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AInterface: IInterface): IioSqlItemWhere;
-begin
-  Result := TioSqlItemsCriteria.Create(APropertyName, ACompareOperator, TValue.From<IInterface>(AInterface));
+  Result := TioSqlItemsCriteria.Create(APropertyName, ACompareOperator, AValue);
 end;
 
 class function TioDbFactory.WhereItemProperty(APropertyName: String): IioSqlItemWhere;

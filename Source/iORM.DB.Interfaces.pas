@@ -594,7 +594,7 @@ var
       LSecondDotPos := NNestedPropName.Length + 1;
     // Gte the master and detail prop name
     LMasterPropName := Copy(NNestedPropName, 1, LFirstDotPos - 1);
-    LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos - 1);
+    LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos-LFirstDotPos-1);
     // Get the master property
     LMasterProp := NMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
     // Resolve the type and alias then loop for all classes in the resolved type list
@@ -618,7 +618,7 @@ var
         NFinalResult := Format('%s%s%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult,
           ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
       else
-        _RecursiveGenerateNestedWhere(LDetailMap, LDetailPropName, LCurrentBuildingResult, NFinalResult);
+        _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult);
     end;
   end;
 

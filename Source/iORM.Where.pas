@@ -79,8 +79,8 @@ type
     procedure _Show(const ADataObject: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
 
-    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
     procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
+    procedure _AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp); overload;
     procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp); overload;
     procedure _AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue); overload;
     procedure _AddCriteria(const AText: String); overload;
@@ -423,22 +423,12 @@ end;
 
 procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp);
 begin
-  FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
-  FWhereItems.Add(TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOp));
+  _AddCriteria(APropertyName, ACompareOp, TValue.Empty);
 end;
 
 procedure TioWhere._AddCriteria(const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
 begin
-  _AddCriteria(APropertyName, ACompareOp);
-  if AValue.IsEmpty then
-    Exit;
-  case AValue.Kind of
-    tkClass:
-      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsObject));
-    tkInterface:
-      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsInterface));
-  end;
-  FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
+  FWhereItems.Add(TioDBFactory.WhereItemCriteria(APropertyName, ACompareOp, AValue));
 end;
 
 procedure TioWhere._AddCriteria(const ALogicOp: TioLogicOp; const APropertyName: String; const ACompareOp: TioCompareOp; AValue: TValue);
