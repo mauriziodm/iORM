@@ -54,9 +54,6 @@ type
   // Specialized SqlItemWhere for property (PropertyName to FieldName)
   // NB: Property.Name is in FSqlText ancestor field
   TioSqlItemsWhereProperty = class(TioSqlItemsWhere)
-  strict private
-    function IsNestedPropName(const APropName: String): boolean;
-    function ResolveNestedWhereProperty(const AMasterMap: IioMap; ANestedPropName: String): String;
   public
     function GetSql(const AMap: IioMap): String; override;
     function HasParameter: Boolean; override;
@@ -123,13 +120,16 @@ type
     function HasParameter: Boolean; override;
   end;
 
-  TioSqlItemsCriteria = class(TioSqlItemsWhere)
+  TioSqlItemsCriteria = class(TioSqlItemsWhere, IioSqlItemCriteria)
   strict private
     FCompareOpSqlItem: IioSqlItem;
-    FPropertySqlItem: IioSqlItemWhere;
     FValueSqlItem: IioSqlItemWhere;
+    function IsNestedPropName(const APropName: String): Boolean;
   strict protected
     constructor _Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue); reintroduce; overload;
+    function GetCompareOpSqlItem: IioSqlItem;
+    function GetPropertyName: String;
+    function GetValueSqlItem: IioSqlItemWhere;
   public
     constructor Create(const ASqlText: String); reintroduce; overload; // raise exception
     constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp); reintroduce; overload;
@@ -137,9 +137,9 @@ type
     constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AObject: TObject); reintroduce; overload;
     constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AInterfce: IInterface); reintroduce; overload;
     function GetSql(const AMap: IioMap): String; override;
-    property CompareOpSqlItem: IioSqlItem read FCompareOpSqlItem;
-    property PropertySqlItem: IioSqlItemWhere read FPropertySqlItem;
-    property ValueSqlItem: IioSqlItemWhere read FValueSqlItem;
+    property CompareOpSqlItem: IioSqlItem read GetCompareOpSqlItem;
+    property PropertyName: String read GetPropertyName;
+    property ValueSqlItem: IioSqlItemWhere read GetValueSqlItem;
   end;
 
 implementation
@@ -147,7 +147,7 @@ implementation
 uses
   iORM.Exceptions, iORM.DB.Factory, iORM.SqlTranslator,
   iORM.Context.Properties.Interfaces, System.SysUtils, System.Types,
-  iORM.Context.Container, SYstem.StrUtils;
+  iORM.Context.Container, System.StrUtils;
 
 { TioSqlItemsWhereValue }
 
@@ -173,36 +173,6 @@ begin
 end;
 
 { TioSqlItemsWhereProperty }
-
-function TioSqlItemsWhereProperty.IsNestedPropName(const APropName: String): boolean;
-begin
-  Result := APropName.Contains('.');
-end;
-
-function TioSqlItemsWhereProperty.ResolveNestedWhereProperty(const AMasterMap: IioMap; ANestedPropName: String): String;
-var
-  LFirstDotPos, LSecondDotPos: Integer;
-  LMasterPropName, LDetailPropName: String;
-  LMasterProp: IioProperty;
-  LDetailMap: IioMap;
-begin
-  // Extract the position of the first and second dots in the ANestedPropName string parameter,
-  //  if the second dot does not exists then set its position to the length of the whole string
-  LFirstDotPos := Pos('.', ANestedPropName);
-  LSecondDotPos := PosEx('.', ANestedPropName, LFirstDotPos+1);
-  if LSecondDotPos = 0 then
-    LSecondDotPos := ANestedPropName.Length+1;
-  // Gte the master and detail prop name
-  LMasterPropName := Copy(ANestedPropName, 1, LFirstDotPos-1);
-  LDetailPropName := Copy(ANestedPropName, LFirstDotPos+1, LSecondDotPos-1);
-  // Get the detail Map
-  LDetailMap := TioMapContainer.GetMap(LMasterProp.GetTypeName);
-
-
-  LMasterProp := AMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
-
-
-end;
 
 function TioSqlItemsWhereProperty.GetSql(const AMap: IioMap): String;
 begin
@@ -298,8 +268,8 @@ end;
 function TioSqlItemsWherePropertyIDEqualsTo.GetSql(const AMap: IioMap): String;
 begin
   // NB: No inherited
-  Result := AMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + TioDBFactory.CompareOperator._Equal.GetSql +
-    ':' + AMap.GetProperties.GetIdProperty.GetSqlParamName;
+  Result := AMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + TioDBFactory.CompareOperator._Equal.GetSql + ':' +
+    AMap.GetProperties.GetIdProperty.GetSqlParamName;
 end;
 
 function TioSqlItemsWherePropertyIDEqualsTo.GetSqlParamName(const AMap: IioMap): String;
@@ -348,9 +318,8 @@ end;
 constructor TioSqlItemsCriteria._Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue);
 begin
   inherited Create(APropertyName);
-  FPropertySqlItem := TioDbFactory.WhereItemProperty(APropertyName);
-  FCompareOpSqlItem := TioDbFactory.CompareOperator.CompareOpToCompareOperator(ACompareOperator);
-  FValueSqlItem := TioDbFactory.WhereItemTValue(AValue);
+  FCompareOpSqlItem := TioDBFactory.CompareOperator.CompareOpToCompareOperator(ACompareOperator);
+  FValueSqlItem := TioDBFactory.WhereItemTValue(AValue);
 end;
 
 constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp);
@@ -373,9 +342,33 @@ begin
   _Create(APropertyName, ACompareOperator, TValue.From<IInterface>(AInterfce));
 end;
 
+function TioSqlItemsCriteria.GetCompareOpSqlItem: IioSqlItem;
+begin
+  Result := FCompareOpSqlItem;
+end;
+
+function TioSqlItemsCriteria.GetPropertyName: String;
+begin
+  Result := FSqlText;
+end;
+
 function TioSqlItemsCriteria.GetSql(const AMap: IioMap): String;
 begin
+  if IsNestedPropName(PropertyName) then
+    Result := TioDbFactory.SqlGenerator(AMap.GetTable.GetConnectionDefName).GenerateSqlSelectNestedWhere(AMap, Self)
+  else
+    Result := Format('%s%s%s', [AMap.GetProperties.GetPropertyByName(PropertyName).GetSqlQualifiedFieldName, FCompareOpSqlItem.GetSql,
+      FValueSqlItem.GetSql(AMap)]);
+end;
 
+function TioSqlItemsCriteria.GetValueSqlItem: IioSqlItemWhere;
+begin
+  Result := FValueSqlItem;
+end;
+
+function TioSqlItemsCriteria.IsNestedPropName(const APropName: String): Boolean;
+begin
+  Result := APropName.Contains('.');
 end;
 
 end.

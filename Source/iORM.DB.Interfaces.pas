@@ -45,7 +45,8 @@ uses
   FireDAC.Comp.Client, FireDAC.Stan.Param,
   Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes,
   System.JSON, iORM.Where.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence;
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
+  iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces;
 
 const
   TRANSACTION_TIMESTAMP_NULL = 0;
@@ -236,7 +237,7 @@ type
     class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class function GenerateSqlSelectNestedWhere(const AContext: IioContext; const ANestedPropName: String): String; virtual;
+    class function GenerateSqlSelectNestedWhere(const AMap: IioMap; const ANestedCriteria: IioSqlItemCriteria): String; virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
   end;
 
@@ -368,7 +369,7 @@ implementation
 
 uses
   iORM.SqlTranslator, iORM.Strategy.Factory, System.SysUtils, iORM.Attributes,
-  iORM.Exceptions, iORM.Utilities, iORM.SqlItems, iORM.Context.Map.Interfaces,
+  iORM.Exceptions, iORM.Utilities, iORM.SqlItems,
   System.StrUtils, iORM.Context.Container, iORM.Resolver.Interfaces,
   iORM.Resolver.Factory;
 
@@ -566,8 +567,12 @@ begin
   AQuery.SQL.Add(AContext.GetOrderBySql);
 end;
 
-class function TioSqlGenerator.GenerateSqlSelectNestedWhere(const AContext: IioContext; const ANestedPropName: String): String;
-  procedure _GenerateNestedWhere(const NMasterMap: IioMap; const NNestedPropName: String; const NPreviousBuildingResult: String; var NFinalResult: String);
+class function TioSqlGenerator.GenerateSqlSelectNestedWhere(const AMap: IioMap; const ANestedCriteria: IioSqlItemCriteria): String;
+var
+  LDotPos: integer;
+  FQualifiedStartingPropertyName: String;
+  procedure _RecursiveGenerateNestedWhere(const NMasterMap: IioMap; const NNestedPropName: String; const NPreviousBuildingResult: String;
+    var NFinalResult: String);
   var
     LFirstDotPos, LSecondDotPos: integer;
     LMasterPropName, LDetailPropName, LRemainingPropName: String;
@@ -584,12 +589,12 @@ class function TioSqlGenerator.GenerateSqlSelectNestedWhere(const AContext: IioC
     LSecondDotPos := PosEx('.', NNestedPropName, LFirstDotPos + 1);
     LRemainingPropName := String.Empty;
     if LSecondDotPos > 0 then
-      LRemainingPropName := Copy(ANestedPropName, LFirstDotPos + 1, Length(NNestedPropName))
+      LRemainingPropName := Copy(NNestedPropName, LFirstDotPos + 1, Length(NNestedPropName))
     else
-      LSecondDotPos := ANestedPropName.Length + 1;
+      LSecondDotPos := NNestedPropName.Length + 1;
     // Gte the master and detail prop name
-    LMasterPropName := Copy(ANestedPropName, 1, LFirstDotPos - 1);
-    LDetailPropName := Copy(ANestedPropName, LFirstDotPos + 1, LSecondDotPos - 1);
+    LMasterPropName := Copy(NNestedPropName, 1, LFirstDotPos - 1);
+    LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos - 1);
     // Get the master property
     LMasterProp := NMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
     // Resolve the type and alias then loop for all classes in the resolved type list
@@ -607,17 +612,31 @@ class function TioSqlGenerator.GenerateSqlSelectNestedWhere(const AContext: IioC
       LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
         LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
       // If the LRemainingPropName is empty (we are processing the last nested property) then add the LCurrentBuildingResult to the NFinalResult
-      //  else (LRemainingPropName is not empty) call itself recursively
+      // else (LRemainingPropName is not empty) call itself recursively
       // NB: add the 'OR' if the NFinalResult is not empty
       if LRemainingPropName.IsEmpty then
-        NFinalResult := Format('%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult])
+        NFinalResult := Format('%s%s%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult,
+          ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
       else
-        _GenerateNestedWhere(LDetailMap, LDetailPropName, LCurrentBuildingResult, NFinalResult);
+        _RecursiveGenerateNestedWhere(LDetailMap, LDetailPropName, LCurrentBuildingResult, NFinalResult);
     end;
   end;
+
 begin
   Result := String.Empty;
-  // Ricorda che il parametro "NBuildingResult" deve essere valorizzato con il GetSqlQualifiedFieldName della proprietà di inizio (es: ORDER.CUSTOMER)
+  LDotPos := Pos('.', ANestedCriteria.PropertyName);
+  if LDotPos > 0 then
+  begin
+    // Ricorda che il parametro "NPreviousBuildingResult" deve essere valorizzato con il GetSqlQualifiedFieldName della proprietà di inizio (es: ORDER.CUSTOMER)
+    // Extract the qualified name of the first property in the nested property name
+    FQualifiedStartingPropertyName := Copy(ANestedCriteria.PropertyName, 1, LDotPos - 1);
+    FQualifiedStartingPropertyName := AMap.GetProperties.GetPropertyByName(FQualifiedStartingPropertyName).GetSqlQualifiedFieldName;
+    // Recursion entry point and final build of the result
+    _RecursiveGenerateNestedWhere(AMap, ANestedCriteria.PropertyName, FQualifiedStartingPropertyName, Result);
+    Result := Format('(%s)', [Result]);
+  end
+  else
+    raise EioException.Create(ClassName, 'GenerateSqlSelectNestedWhere', 'Dot char not found on nested property name.');
 end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);

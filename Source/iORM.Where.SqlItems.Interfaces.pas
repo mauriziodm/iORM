@@ -52,6 +52,19 @@ type
     function HasParameter: Boolean;
   end;
 
+  IioSqlItemCriteria = interface
+    ['{DD050F5B-9ED2-4E47-85FC-7270D9581E9A}']
+    // CompareOpSqlItem
+    function GetCompareOpSqlItem: IioSqlItem;
+    property CompareOpSqlItem: IioSqlItem read GetCompareOpSqlItem;
+    // PropertyName
+    function GetPropertyName: String;
+    property PropertyName: String read GetPropertyName;
+    // ValueSqlItem
+    function GetValueSqlItem: IioSqlItemWhere;
+    property ValueSqlItem: IioSqlItemWhere read GetValueSqlItem;
+  end;
+
 implementation
 
 end.
