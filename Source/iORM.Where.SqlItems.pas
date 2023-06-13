@@ -120,22 +120,19 @@ type
     function HasParameter: Boolean; override;
   end;
 
+  // Specialized SqlItemWhere for a complete criteria even with nested property name
   TioSqlItemsCriteria = class(TioSqlItemsWhere, IioSqlItemCriteria)
   strict private
     FCompareOpSqlItem: IioSqlItem;
     FValueSqlItem: IioSqlItemWhere;
     function IsNestedPropName(const APropName: String): Boolean;
   strict protected
-    constructor _Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue); reintroduce; overload;
     function GetCompareOpSqlItem: IioSqlItem;
     function GetPropertyName: String;
     function GetValueSqlItem: IioSqlItemWhere;
   public
     constructor Create(const ASqlText: String); reintroduce; overload; // raise exception
-    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp); reintroduce; overload;
-    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: Variant); reintroduce; overload;
-    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AObject: TObject); reintroduce; overload;
-    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AInterfce: IInterface); reintroduce; overload;
+    constructor Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue); reintroduce; overload;
     function GetSql(const AMap: IioMap): String; override;
     property CompareOpSqlItem: IioSqlItem read GetCompareOpSqlItem;
     property PropertyName: String read GetPropertyName;
@@ -310,37 +307,18 @@ end;
 
 { TioSqlItemsCriteria }
 
-constructor TioSqlItemsCriteria.Create(const ASqlText: String);
-begin
-  raise EioException.Create(Self.ClassName + ': wrong constructor called');
-end;
+//constructor TioSqlItemsCriteria.Create(const ASqlText: String);
+//begin
+//  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+//end;
 
-constructor TioSqlItemsCriteria._Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue);
+constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue);
 begin
   inherited Create(APropertyName);
   FCompareOpSqlItem := TioDBFactory.CompareOperator.CompareOpToCompareOperator(ACompareOperator);
   FValueSqlItem := TioDBFactory.WhereItemTValue(AValue);
 end;
 
-constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp);
-begin
-  _Create(APropertyName, ACompareOperator, nil);
-end;
-
-constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: Variant);
-begin
-  _Create(APropertyName, ACompareOperator, TValue.FromVariant(AValue));
-end;
-
-constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AObject: TObject);
-begin
-  _Create(APropertyName, ACompareOperator, TValue.From<TObject>(AObject));
-end;
-
-constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; const AInterfce: IInterface);
-begin
-  _Create(APropertyName, ACompareOperator, TValue.From<IInterface>(AInterfce));
-end;
 
 function TioSqlItemsCriteria.GetCompareOpSqlItem: IioSqlItem;
 begin
