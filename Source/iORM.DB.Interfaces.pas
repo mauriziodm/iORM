@@ -577,7 +577,7 @@ var
     LFirstDotPos, LSecondDotPos: integer;
     LMasterPropName, LDetailPropName, LRemainingPropName: String;
     LDetailMap: IioMap;
-    LMasterProp, LDetailProp: IioProperty;
+    LMasterProp, LDetailProp, LRelationChildProp: IioProperty;
     LResolvedTypeList: IioResolvedTypeList;
     LResolvedTypeName: String;
     LCurrentBuildingResult: String;
@@ -594,7 +594,7 @@ var
       LSecondDotPos := NNestedPropName.Length + 1;
     // Gte the master and detail prop name
     LMasterPropName := Copy(NNestedPropName, 1, LFirstDotPos - 1);
-    LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos-LFirstDotPos-1);
+    LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos - LFirstDotPos - 1);
     // Get the master property
     LMasterProp := NMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
     // Resolve the type and alias then loop for all classes in the resolved type list
@@ -609,16 +609,32 @@ var
       if not LDetailMap.GetTable.IsForThisConnection(NMasterMap.GetTable.GetConnectionDefName) then
         Continue;
       // Build the result nested props where query
-      LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
-        LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
-      // If the LRemainingPropName is empty (we are processing the last nested property) then add the LCurrentBuildingResult to the NFinalResult
-      // else (LRemainingPropName is not empty) call itself recursively
-      // NB: add the 'OR' if the NFinalResult is not empty
-      if LRemainingPropName.IsEmpty then
-        NFinalResult := Format('%s%s%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult,
-          ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
+      case LMasterProp.GetRelationType of
+        rtBelongsTo:
+          begin
+            LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
+              LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
+            // If the LRemainingPropName is empty (we are processing the last nested property) then add the LCurrentBuildingResult to the NFinalResult
+            // else (LRemainingPropName is not empty) call itself recursively
+            // NB: add the 'OR' if the NFinalResult is not empty
+            if LRemainingPropName.IsEmpty then
+              NFinalResult := Format('%s%s%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult,
+                ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
+            else
+              _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult);
+          end;
+        rtHasMany, rtHasOne:
+          begin
+            LRelationChildProp := LDetailMap.GetProperties.GetPropertyByName(LMasterProp.GetRelationChildPropertyName);
+            LCurrentBuildingResult := Format('EXISTS(SELECT 1 FROM %s WHERE %s = %s AND %s %s %s)',
+              [LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
+              LDetailProp.GetSqlQualifiedFieldName, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)]);
+            NFinalResult := LCurrentBuildingResult;
+          end;
       else
-        _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult);
+        raise EioException.Create(ClassName, 'GenerateSqlSelectNestedWhere', Format('Wrong relation type (%s) on property "%s" of class "%s"',
+          [TioUtilities.EnumToString<TioRelationType>(LMasterProp.GetRelationType), LMasterProp.GetName, NMasterMap.GetClassName]));
+      end;
     end;
   end;
 
