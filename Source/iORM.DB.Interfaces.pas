@@ -581,6 +581,7 @@ var
     LResolvedTypeList: IioResolvedTypeList;
     LResolvedTypeName: String;
     LCurrentBuildingResult: String;
+    LIsFirstLoop, LIsFinalLoop: Boolean;
   begin
     // Extract the position of the first and second dots in the ANestedPropName string parameter
     // and set the RemainingPropName for the next recursion if needed,
@@ -592,7 +593,7 @@ var
       LRemainingPropName := Copy(NNestedPropName, LFirstDotPos + 1, Length(NNestedPropName))
     else
       LSecondDotPos := NNestedPropName.Length + 1;
-    // Gte the master and detail prop name
+    // Get the master and detail prop name
     LMasterPropName := Copy(NNestedPropName, 1, LFirstDotPos - 1);
     LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos - LFirstDotPos - 1);
     // Get the master property
@@ -608,28 +609,39 @@ var
       // If the current resolved type is not for the same connection the skip it
       if not LDetailMap.GetTable.IsForThisConnection(NMasterMap.GetTable.GetConnectionDefName) then
         Continue;
-      // Build the result nested props where query
+      // If the NFinalResult is empty then we are in the first loop (recursion possible)
+      LIsFirstLoop := NFinalResult.IsEmpty;
+      // If the LRemainingPropName is empty then we are in the final loop (recursion is ending)
+      LIsFinalLoop := LRemainingPropName.IsEmpty;
+      // Depending on relation type...
       case LMasterProp.GetRelationType of
+        // BelongsTo relation type...
         rtBelongsTo:
+          if LIsFinalLoop then
+            NFinalResult := Format('%s%s(SELECT %s FROM %s WHERE %s = %s)%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '),
+              LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL, LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
+              NPreviousBuildingResult, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
+          else
           begin
             LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
               LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
-            // If the LRemainingPropName is empty (we are processing the last nested property) then add the LCurrentBuildingResult to the NFinalResult
-            // else (LRemainingPropName is not empty) call itself recursively
-            // NB: add the 'OR' if the NFinalResult is not empty
-            if LRemainingPropName.IsEmpty then
-              NFinalResult := Format('%s%s%s%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '), LCurrentBuildingResult,
-                ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
-            else
-              _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult);
+            _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult); // Recursion
           end;
+        // HasOne or HasMany relation type
         rtHasMany, rtHasOne:
           begin
             LRelationChildProp := LDetailMap.GetProperties.GetPropertyByName(LMasterProp.GetRelationChildPropertyName);
-            LCurrentBuildingResult := Format('EXISTS(SELECT 1 FROM %s WHERE %s = %s AND %s %s %s)',
-              [LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
-              LDetailProp.GetSqlQualifiedFieldName, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)]);
-            NFinalResult := LCurrentBuildingResult;
+            if LIsFinalLoop then
+              NFinalResult := Format('%s%sEXISTS (SELECT 1 FROM %s WHERE %s = %s AND %s %s %s)', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '),
+                LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName,
+                IfThen(LIsFirstLoop, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult),
+                LDetailProp.GetSqlQualifiedFieldName, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
+            else
+            begin
+              LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
+                LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
+              _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult); // Recursion
+            end;
           end;
       else
         raise EioException.Create(ClassName, 'GenerateSqlSelectNestedWhere', Format('Wrong relation type (%s) on property "%s" of class "%s"',
