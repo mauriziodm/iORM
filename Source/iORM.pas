@@ -47,23 +47,23 @@ const
   IORM_VERSION = 'iORM 2 (beta 2.0)';
 
 {$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
-  // TioTypeOfCollection
+  // TioTypeOfCollection = (tcSingleObject, tcList);
   tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
   tcList = iORM.CommonTypes.TioTypeOfCollection.tcList;
 
-  // TioLoadType
+  // TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto)
   ltManual = iORM.CommonTypes.TioLoadType.ltManual;
   ltFromBSAsIs = iORM.CommonTypes.TioLoadType.ltFromBSAsIs;
   ltFromBSReload = iORM.CommonTypes.TioLoadType.ltFromBSReload;
   ltFromBSReloadNewInstance = iORM.CommonTypes.TioLoadType.ltFromBSReloadNewInstance;
   ltAuto = iORM.CommonTypes.TioLoadType.ltAuto;
 
-  // TioObjStatus
+  // TioObjStatus = (osDirty = 0, osClean, osDeleted)
   osDirty = iORM.CommonTypes.TioObjStatus.osDirty;
   osClean = iORM.CommonTypes.TioObjStatus.osClean;
   osDeleted = iORM.CommonTypes.TioObjStatus.osDeleted;
 
-  // TioCompareOp
+  // TioCompareOp = (coEqual, coNotEqual, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull)
   coEqual = iORM.CommonTypes.TioCompareOp.coEqual;
   coNotEqual = iORM.CommonTypes.TioCompareOp.coNotEqual;
   coGreater = iORM.CommonTypes.TioCompareOp.coGreater;
@@ -75,39 +75,70 @@ const
   coIsNull = iORM.CommonTypes.TioCompareOp.coIsNull;
   coIsNotNull = iORM.CommonTypes.TioCompareOp.coIsNotNull;
 
-  // TioLogicOp
+  // TioLogicOp = (loAnd, loOr, loNot, loOpenPar, loClosePar)
   loAnd = iORM.CommonTypes.TioLogicOp.loAnd;
   loOr = iORM.CommonTypes.TioLogicOp.loOr;
   loNot = iORM.CommonTypes.TioLogicOp.loNot;
   loOpenPar = iORM.CommonTypes.TioLogicOp.loOpenPar;
   loClosePar = iORM.CommonTypes.TioLogicOp.loClosePar;
 
-  // TioIndexOrientation
+  // TioIndexOrientation = (ioAscending = 0, ioDescending)
   ioAscending = iORM.CommonTypes.TioIndexOrientation.ioAscending;
   ioDescending = iORM.CommonTypes.TioIndexOrientation.ioDescending;
 
-  // TioMonitorMode
+  // TioMonitorMode = (mmDisabled = 0, mmRemote, mmFlatFile)
   mmDisabled = iORM.CommonTypes.TioMonitorMode.mmDisabled;
   mmRemote = iORM.CommonTypes.TioMonitorMode.mmRemote;
   mmFlatFile = iORM.CommonTypes.TioMonitorMode.mmFlatFile;
 
-  // TioSelectionType
+  // TioSelectionType = (stAppend, stInsert)
   stAppend = iORM.CommonTypes.TioSelectionType.stAppend;
   stInsert = iORM.CommonTypes.TioSelectionType.stInsert;
 
-  // TioShowBy
+  // TioActionShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smEntityTypeNameAsSelector, smBSTypeNameAsSelector)
   smBSCurrent = iORM.StdActions.Interfaces.smBSCurrent;
   smBSEach = iORM.StdActions.Interfaces.smBSEach;
   smEntityTypeName = iORM.StdActions.Interfaces.smEntityTypeName;
   smEntityTypeNameAsSelector = iORM.StdActions.Interfaces.smEntityTypeNameAsSelector;
   smBSTypeNameAsSelector = iORM.StdActions.Interfaces.smBSTypeNameAsSelector;
 
-  // TioViewContextBy
+  // TioActionViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext)
   vcByDefaultViewContextProvider = iORM.StdActions.Interfaces.vcByDefaultViewContextProvider;
   vcByViewContextProviderName = iORM.StdActions.Interfaces.vcByViewContextProviderName;
   vcByViewContextProvider = iORM.StdActions.Interfaces.vcByViewContextProvider;
   vcByViewContext = iORM.StdActions.Interfaces.vcByViewContext;
 //  vcNone = iORM.StdActions.Interfaces.vcNone;
+
+  // TioFKAction = (fkUnspecified, fkNoAction, fkSetNull, fkSetDefault, fkCascade);
+  fkUnspecified = iORM.Attributes.fkUnspecified;
+  fkNoAction = iORM.Attributes.fkNoAction;
+  fkSetNull = iORM.Attributes.fkSetNull;
+  fkSetDefault = iORM.Attributes.fkSetDefault;
+  fkCascade = iORM.Attributes.fkCascade;
+
+  // TioFKCreate = (fkCreate, fkDoNotCreate);
+  fkCreate = iORM.Attributes.fkCreate;
+  fkDoNotCreate = iORM.Attributes.fkDoNotCreate;
+
+  // TioJoinType = (jtInner, jtCross, jtLeftOuter, jtRightOuter, jtFullOuter);
+  jtInner = iORM.Attributes.jtInner;
+  jtCross = iORM.Attributes.jtCross;
+  jtLeftOuter = iORM.Attributes.jtLeftOuter;
+  jtRightOuter = iORM.Attributes.jtRightOuter;
+  jtFullOuter = iORM.Attributes.jtFullOuter;
+
+  // TioMapModeType = (mmHybrid, mmProperties, mmFields);
+  mmHybrid = iORM.Attributes.mmHybrid;
+  mmProperties = iORM.Attributes.mmProperties;
+  mmFields = iORM.Attributes.mmFields;
+
+  // TioRelationType = (rtNone, rtBelongsTo, rtHasMany, rtHasOne, rtEmbeddedHasMany, rtEmbeddedHasOne);
+  rtNone = iORM.Attributes.rtNone;
+  rtBelongsTo = iORM.Attributes.rtBelongsTo;
+  rtHasMany = iORM.Attributes.rtHasMany;
+  rtHasOne = iORM.Attributes.rtHasOne;
+  rtEmbeddedHasMany = iORM.Attributes.rtEmbeddedHasMany;
+  rtEmbeddedHasOne = iORM.Attributes.rtEmbeddedHasOne;
 {$ENDREGION}
 
 type
