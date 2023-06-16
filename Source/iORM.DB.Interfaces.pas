@@ -575,7 +575,7 @@ var
     var NFinalResult: String; const NIsFirstLoop: Boolean);
   var
     LFirstDotPos, LSecondDotPos: integer;
-    LMasterPropName, LDetailPropName, LRemainingPropName: String;
+    LMasterPropName, LDetailPropName, LRemainingPropName, LResultPropertyName: String;
     LDetailMap: IioMap;
     LMasterProp, LDetailProp, LRelationChildProp: IioProperty;
     LResolvedTypeList: IioResolvedTypeList;
@@ -611,6 +611,12 @@ var
         Continue;
       // If the LRemainingPropName is empty then we are in the final loop (recursion is ending)
       LIsFinalLoop := LRemainingPropName.IsEmpty;
+      // Get the relation type
+      //  NB: If the relation type of the DetailProp is rtHasMany/rtHasOne then use it else use those of the MasterProp
+//      if (LDetailProp.GetRelationType = rtHasMany) or (LDetailProp.GetRelationType = rtHasOne) then
+//        LRelationType := LDetailProp.GetRelationType
+//      else
+//        LRelationType := LMasterProp.GetRelationType;
       // Depending on relation type...
       case LMasterProp.GetRelationType of
         // BelongsTo relation type...
@@ -621,7 +627,11 @@ var
               NPreviousBuildingResult, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
           else
           begin
-            LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
+            if (LDetailProp.GetRelationType = rtHasMany) or (LDetailProp.GetRelationType = rtHasOne) then
+              LResultPropertyName := LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName
+            else
+              LResultPropertyName := LDetailProp.GetSqlQualifiedFieldName;
+            LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LResultPropertyName, LDetailMap.GetTable.GetSQL,
               LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
             _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
           end;
