@@ -572,7 +572,7 @@ var
   LDotPos: integer;
   FQualifiedStartingPropertyName: String;
   procedure _RecursiveGenerateNestedWhere(const NMasterMap: IioMap; const NNestedPropName: String; const NPreviousBuildingResult: String;
-    var NFinalResult: String);
+    var NFinalResult: String; const NIsFirstLoop: Boolean);
   var
     LFirstDotPos, LSecondDotPos: integer;
     LMasterPropName, LDetailPropName, LRemainingPropName: String;
@@ -581,7 +581,7 @@ var
     LResolvedTypeList: IioResolvedTypeList;
     LResolvedTypeName: String;
     LCurrentBuildingResult: String;
-    LIsFirstLoop, LIsFinalLoop: Boolean;
+    LIsFinalLoop: Boolean;
   begin
     // Extract the position of the first and second dots in the ANestedPropName string parameter
     // and set the RemainingPropName for the next recursion if needed,
@@ -609,8 +609,6 @@ var
       // If the current resolved type is not for the same connection the skip it
       if not LDetailMap.GetTable.IsForThisConnection(NMasterMap.GetTable.GetConnectionDefName) then
         Continue;
-      // If the NFinalResult is empty then we are in the first loop (recursion possible)
-      LIsFirstLoop := NFinalResult.IsEmpty;
       // If the LRemainingPropName is empty then we are in the final loop (recursion is ending)
       LIsFinalLoop := LRemainingPropName.IsEmpty;
       // Depending on relation type...
@@ -625,7 +623,7 @@ var
           begin
             LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL,
               LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
-            _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult); // Recursion
+            _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
           end;
         // HasOne or HasMany relation type
         rtHasMany, rtHasOne:
@@ -634,13 +632,13 @@ var
             if LIsFinalLoop then
               NFinalResult := Format('%s%sEXISTS (SELECT 1 FROM %s WHERE %s = %s AND %s %s %s)', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '),
                 LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName,
-                IfThen(LIsFirstLoop, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult),
+                IfThen(NIsFirstLoop, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult),
                 LDetailProp.GetSqlQualifiedFieldName, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
             else
             begin
               LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
                 LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
-              _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult); // Recursion
+              _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
             end;
           end;
       else
@@ -660,7 +658,7 @@ begin
     FQualifiedStartingPropertyName := Copy(ANestedCriteria.PropertyName, 1, LDotPos - 1);
     FQualifiedStartingPropertyName := AMap.GetProperties.GetPropertyByName(FQualifiedStartingPropertyName).GetSqlQualifiedFieldName;
     // Recursion entry point and final build of the result
-    _RecursiveGenerateNestedWhere(AMap, ANestedCriteria.PropertyName, FQualifiedStartingPropertyName, Result);
+    _RecursiveGenerateNestedWhere(AMap, ANestedCriteria.PropertyName, FQualifiedStartingPropertyName, Result, True);
     Result := Format('(%s)', [Result]);
   end
   else
