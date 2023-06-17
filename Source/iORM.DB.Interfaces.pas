@@ -575,7 +575,7 @@ var
     var NFinalResult: String; const NIsFirstLoop: Boolean);
   var
     LFirstDotPos, LSecondDotPos: integer;
-    LMasterPropName, LDetailPropName, LRemainingPropName, LResultPropertyName: String;
+    LMasterPropName, LDetailPropName, LRemainingPropName, LTempPropName: String;
     LDetailMap: IioMap;
     LMasterProp, LDetailProp, LRelationChildProp: IioProperty;
     LResolvedTypeList: IioResolvedTypeList;
@@ -603,8 +603,13 @@ var
       LMasterProp.GetRelationChildTypeAlias, rmAllDistinctByConnectionAndTable);
     for LResolvedTypeName in LResolvedTypeList do
     begin
-      // Get the detail Map and Property
+      // Get the detail Map but if the current resolved class is not a persisted entity then skip it
       LDetailMap := TioMapContainer.GetMap(LResolvedTypeName);
+      if LDetailMap.GetTable.IsNotPersistedEntity then
+        Continue;
+      // Get the detail Property but if not exists in the current resolved class then skip it
+      if not LDetailMap.GetProperties.PropertyExists(LDetailPropName) then
+        Continue;
       LDetailProp := LDetailMap.GetProperties.GetPropertyByName(LDetailPropName);
       // If the current resolved type is not for the same connection the skip it
       if not LDetailMap.GetTable.IsForThisConnection(NMasterMap.GetTable.GetConnectionDefName) then
@@ -628,10 +633,10 @@ var
           else
           begin
             if (LDetailProp.GetRelationType = rtHasMany) or (LDetailProp.GetRelationType = rtHasOne) then
-              LResultPropertyName := LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName
+              LTempPropName := LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName
             else
-              LResultPropertyName := LDetailProp.GetSqlQualifiedFieldName;
-            LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LResultPropertyName, LDetailMap.GetTable.GetSQL,
+              LTempPropName := LDetailProp.GetSqlQualifiedFieldName;
+            LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LTempPropName, LDetailMap.GetTable.GetSQL,
               LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
             _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
           end;
@@ -647,7 +652,7 @@ var
             else
             begin
               LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
-                LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
+                LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName]);
               _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
             end;
           end;
