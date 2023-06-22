@@ -377,6 +377,7 @@
         <DCCReference Include="..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.SmartBuilder.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.uniGUI.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Where.NestedProp.Resolver.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

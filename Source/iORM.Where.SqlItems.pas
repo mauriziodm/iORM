@@ -145,7 +145,7 @@ implementation
 uses
   iORM.Exceptions, iORM.DB.Factory, iORM.SqlTranslator,
   iORM.Context.Properties.Interfaces, System.SysUtils, System.Types,
-  iORM.Context.Container, System.StrUtils, iORM.Utilities;
+  iORM.Context.Container, System.StrUtils, iORM.Utilities, iORM.Where.Factory;
 
 { TioSqlItemsWhereValue }
 
@@ -343,7 +343,7 @@ end;
 function TioSqlItemsCriteria.GetSql(const AMap: IioMap): String;
 begin
   if IsNestedPropName(PropertyName) then
-    Result := TioDbFactory.SqlGenerator(AMap.GetTable.GetConnectionDefName).GenerateSqlSelectNestedWhere(AMap, Self)
+    Result := TioWhereFactory.NewWhereNestedWhereResolver(Self).GenerateSqlNestedWhere(AMap)
   else
     Result := Format('%s%s%s', [AMap.GetProperties.GetPropertyByName(PropertyName).GetSqlQualifiedFieldName, FCompareOpSqlItem.GetSql,
       FValueSqlItem.GetSql(AMap)]);

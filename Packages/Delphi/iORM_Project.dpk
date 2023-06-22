@@ -226,7 +226,8 @@ contains
   iORM.StdActions.Interfaces in '..\..\Source\iORM.StdActions.Interfaces.pas',
   iORM.StdActions.CloseQueryActionRegister in '..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas',
   iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas',
-  iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas';
+  iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas',
+  iORM.Where.NestedProp.Resolver in '..\..\Source\iORM.Where.NestedProp.Resolver.pas';
 
 end.
 
