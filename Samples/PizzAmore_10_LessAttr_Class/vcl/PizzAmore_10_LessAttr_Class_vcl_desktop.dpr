@@ -13,9 +13,12 @@ uses
   Form.Pizzas in 'Form.Pizzas.pas' {PizzasForm},
   Form.Pizza in 'Form.Pizza.pas' {PizzaForm},
   Form.Orders in 'Form.Orders.pas' {OrdersForm},
-  Form.Order in 'Form.Order.pas' {OrderForm};
+  Form.Order in 'Form.Order.pas' {OrderForm},
+  Model.Where.Order in '..\common_model\Model.Where.Order.pas',
+  Model.Where.Pizza in '..\common_model\Model.Where.Pizza.pas';
 
 {$R *.res}
+{$STRONGLINKTYPES ON}
 
 begin
   ReportMemoryLeaksOnShutdown := True;

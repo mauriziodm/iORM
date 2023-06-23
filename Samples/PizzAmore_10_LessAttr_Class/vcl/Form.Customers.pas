@@ -6,9 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
   iORM.DB.DataSet.Master, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.Buttons, Vcl.DBGrids, Vcl.DBCtrls, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
-  Vcl.Mask;
+  Vcl.Mask, Model.Customer;
 
 type
+
+  [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomersForm = class(TForm)
     DSCustomers: TioDataSetMaster;
     DSCustomersID: TIntegerField;
@@ -31,121 +33,51 @@ type
     acDelete: TioBSPersistenceDelete;
     acNextPage: TioBSNextPage;
     acPrevPage: TioBSPrevPage;
-    acShowOrSelect: TAction;
-    acBack: TAction;
-    acAdd: TAction;
     PanelWhere: TPanel;
-    ButtonSearch: TSpeedButton;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    DBEditWhereID: TDBEdit;
+    DBEditWhereName: TDBEdit;
+    DBEditWhereCity: TDBEdit;
     DSWhere: TioDataSetMaster;
+    DSWhereID: TIntegerField;
+    DSWhereName: TStringField;
     DSWhereCity: TStringField;
     SourceWhere: TDataSource;
-    DBEditWhereCity: TDBEdit;
-    ButtonWhereOpen: TSpeedButton;
-    ButtonWhereCreate: TSpeedButton;
-    procedure acShowOrSelectExecute(Sender: TObject);
-    procedure acBackExecute(Sender: TObject);
-    procedure acShowOrSelectUpdate(Sender: TObject);
-    procedure GridCustomersDblClick(Sender: TObject);
-    procedure acAddExecute(Sender: TObject);
+    ButtonSearch: TSpeedButton;
+    ButtonClear: TSpeedButton;
+    acBack: TioBSCloseQuery;
+    acAdd: TioBSPersistenceAppend;
+    acShowOrSelect: TioBSShowOrSelect;
+    acSelectCurrent: TioBSSelectCurrent;
+    acWhereBuild: TioBSWhereBuild;
+    acWhereClear: TioBSWhereClear;
     procedure FormShow(Sender: TObject);
-    procedure ButtonWhereOpenClick(Sender: TObject);
-    procedure ButtonWhereCreateClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure ButtonSearchClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure GridCustomersDblClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-var
-  CustomersForm: TCustomersForm;
-
 implementation
 
 uses
-  Form.Customer, System.Generics.Collections, Model.Customer;
+  Form.Customer, System.Generics.Collections;
 
 {$R *.dfm}
 
-procedure TCustomersForm.acBackExecute(Sender: TObject);
+procedure TCustomersForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Close;
-end;
-
-procedure TCustomersForm.acAddExecute(Sender: TObject);
-begin
-  DSCustomers.Persistence.Append;
-  acShowOrSelect.Execute;
-end;
-
-procedure TCustomersForm.acShowOrSelectExecute(Sender: TObject);
-begin
-  if Assigned(DSCustomers.SelectorFor) then
-  begin
-    DSCustomers.SelectCurrent;
-    acBack.Execute;
-  end
-  else
-  begin
-    Application.CreateForm(TCustomerForm, CustomerForm);
-    CustomerForm.DSCustomer.SourceBS := DSCustomers;
-    CustomerForm.Show;
-  end;
-end;
-
-procedure TCustomersForm.acShowOrSelectUpdate(Sender: TObject);
-begin
-  if Assigned(DSCustomers.SourceBS) then
-    acShowOrSelect.Caption := 'Select'
-  else
-    acShowOrSelect.Caption := 'Show';
-end;
-
-procedure TCustomersForm.ButtonSearchClick(Sender: TObject);
-var
-  LObj: TObject;
-  LWhere: IioWhere;
-begin
-  DSWhere.PostIfEditing;
-  LObj := DSWhere.Current;
-  LWhere := io.GlobalFactory.WhereFactory.NewWhereSmartBuilder.BuildWhere(LObj);
-  DSCustomers.Where := LWhere;
-  DSCustomers.Persistence.Reload;
-end;
-
-procedure TCustomersForm.ButtonWhereCreateClick(Sender: TObject);
-var
-  LCustomer: TCustomer;
-begin
-  LCustomer := TCustomer.Create;
-  LCustomer.City := 'Union City';
-//  DSWhere.Close;
-//  DSWhere.LoadType := ltManual;
-  DSWhere.SetDataObject(LCustomer);
-end;
-
-procedure TCustomersForm.ButtonWhereOpenClick(Sender: TObject);
-begin
-  DSWhere.Open;
-end;
-
-procedure TCustomersForm.GridCustomersDblClick(Sender: TObject);
-begin
-  acShowOrSelect.Execute;
-end;
-
-procedure TCustomersForm.FormCreate(Sender: TObject);
-var
-  LCustomer: TCustomer;
-begin
-  LCustomer := TCustomer.Create;
-//  LCustomer.City := 'Union City';
-  DSWhere.SetDataObject(LCustomer);
+  Action := caFree;
 end;
 
 procedure TCustomersForm.FormShow(Sender: TObject);
 begin
+  // Open the where builder dataset
+  DSWhere.Open;
   // Fully automatic loading by the component itself (LoadType = ltAuto)
   DSCustomers.Open;
 
@@ -171,6 +103,11 @@ begin
 //  DSCustomers.Open;
 //  DSCustomers.SetDataObject(LList);
 {$endregion}
+end;
+
+procedure TCustomersForm.GridCustomersDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
 end;
 
 end.

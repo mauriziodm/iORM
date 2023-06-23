@@ -5,9 +5,12 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.DBCGrids, iORM, iORM.Attributes, iORM.CommonTypes,
-  iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl;
+  iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl,
+  Vcl.Mask, Model.Pizza;
 
 type
+
+  [diSimpleViewFor(TPizza, 'LIST')]
   TPizzasForm = class(TForm)
     PanelTop: TPanel;
     ButtonSelect: TSpeedButton;
@@ -25,24 +28,38 @@ type
     DSPizzasName: TStringField;
     DSPizzasPrice: TCurrencyField;
     DSPizzasImage: TGraphicField;
+    DSWhere: TioDataSetMaster;
+    DSWhereID: TIntegerField;
+    DSWhereName: TStringField;
+    DSWhereFromPrice: TCurrencyField;
+    DSWhereToPrice: TCurrencyField;
+    SourceWhere: TDataSource;
+    PanelWhere: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    ButtonSearch: TSpeedButton;
+    ButtonClear: TSpeedButton;
+    Label4: TLabel;
+    DBEditWhereID: TDBEdit;
+    DBEditWhereName: TDBEdit;
+    DBEditWhereFromPrice: TDBEdit;
+    DBEditWhereToPrice: TDBEdit;
     ActionList1: TActionList;
     acDelete: TioBSPersistenceDelete;
-    acBack: TAction;
-    acAdd: TAction;
-    acShow: TAction;
+    acBack: TioBSCloseQuery;
+    acShowOrSelect: TioBSShowOrSelect;
+    acAdd: TioBSPersistenceAppend;
+    acWhereBuild: TioBSWhereBuild;
+    acWhereClear: TioBSWhereClear;
     procedure FormCreate(Sender: TObject);
-    procedure acBackExecute(Sender: TObject);
-    procedure acAddExecute(Sender: TObject);
-    procedure acShowExecute(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DBCtrlGrid1DblClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
-
-var
-  PizzasForm: TPizzasForm;
 
 implementation
 
@@ -51,34 +68,20 @@ uses
 
 {$R *.dfm}
 
-procedure TPizzasForm.acAddExecute(Sender: TObject);
-begin
-  DSPizzas.DisableControls;
-  DSPizzas.Persistence.Append;
-  DSPizzas.EnableControls;
-  acShow.Execute;
-end;
-
-procedure TPizzasForm.acBackExecute(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TPizzasForm.acShowExecute(Sender: TObject);
-begin
-    Application.CreateForm(TPizzaForm, PizzaForm);
-    PizzaForm.DSPizza.SourceBS := DSPizzas;
-    PizzaForm.Show;
-end;
-
 procedure TPizzasForm.DBCtrlGrid1DblClick(Sender: TObject);
 begin
-  acShow.Execute;
+  acShowOrSelect.Execute;
+end;
+
+procedure TPizzasForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 procedure TPizzasForm.FormCreate(Sender: TObject);
 begin
   DSPizzas.Open;
+  DSWhere.Open;
 end;
 
 end.

@@ -162,6 +162,7 @@ type
     ButtonFilterClear: TButton;
     acWhereBuild: TioBSWhereBuild;
     acWhereClear: TioBSWhereClear;
+    Label20: TLabel;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
@@ -203,8 +204,6 @@ begin
   BSPizzas.Open;
   // Open filter bind sources
   BSFilterCustomer.Open;
-//  BSFilterCustomer.SetDataObject(TCustomer.Create);
-//  BSFilterCustomer.SetDataObject(io.di.Locate('TCustomer').Get);
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

@@ -24,7 +24,7 @@ object MainForm: TMainForm
       Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
@@ -40,7 +40,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = True
+        IsSelected = False
         Size.Width = 45.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 65
+          TabOrder = 66
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5192,7 +5192,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = False
+        IsSelected = True
         Size.Width = 51.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6250,7 +6250,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 576.000000000000000000
+          Size.Height = 633.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 60
@@ -6270,9 +6270,9 @@ object MainForm: TMainForm
         end
         object PanelCustomerFilter: TPanel
           Align = Bottom
-          Position.Y = 576.000000000000000000
+          Position.Y = 633.000000000000000000
           Size.Width = 360.000000000000000000
-          Size.Height = 135.000000000000000000
+          Size.Height = 78.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'pushpanel'
           TabOrder = 2
@@ -6289,19 +6289,19 @@ object MainForm: TMainForm
           end
           object Label19: TLabel
             StyledSettings = [Family]
-            Position.X = 9.000000000000000000
+            Position.X = 8.000000000000000000
             Position.Y = 29.000000000000000000
-            Size.Width = 75.000000000000000000
+            Size.Width = 33.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
             TextSettings.Font.Size = 14.000000000000000000
             TextSettings.HorzAlign = Trailing
             Text = 'City'
-            TabOrder = 2
+            TabOrder = 3
           end
           object EditCustomerSearchCity: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
-            TabOrder = 9
+            TabOrder = 10
             Text = 
               'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
               'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -6324,7 +6324,7 @@ object MainForm: TMainForm
               'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
               'por, velit sit'
             TextSettings.Font.Size = 14.000000000000000000
-            Position.X = 98.000000000000000000
+            Position.X = 55.000000000000000000
             Position.Y = 29.000000000000000000
             Size.Width = 123.000000000000000000
             Size.Height = 25.000000000000000000
@@ -6335,23 +6335,37 @@ object MainForm: TMainForm
             Action = acWhereBuild
             Enabled = True
             ImageIndex = -1
-            Position.X = 229.000000000000000000
+            Position.X = 186.000000000000000000
+            Position.Y = 29.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 12
+          end
+          object ButtonFilterClear: TButton
+            Action = acWhereClear
+            Enabled = True
+            ImageIndex = -1
+            Position.X = 272.000000000000000000
             Position.Y = 29.000000000000000000
             Size.Width = 80.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 11
           end
-          object ButtonFilterClear: TButton
-            Action = acWhereClear
-            Enabled = True
-            ImageIndex = -1
-            Position.X = 229.000000000000000000
-            Position.Y = 62.000000000000000000
-            Size.Width = 80.000000000000000000
-            Size.Height = 25.000000000000000000
+          object Label20: TLabel
+            AutoSize = True
+            StyledSettings = [Family]
+            Position.X = 4.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 217.000000000000000000
+            Size.Height = 19.000000000000000000
             Size.PlatformDefault = False
-            TabOrder = 10
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Trailing
+            Text = 'Note: the filter is case sensitive'
+            TabOrder = 2
           end
         end
       end
@@ -7010,7 +7024,7 @@ object MainForm: TMainForm
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
     WhereBuilderFor = BSCustomers
-    Left = 680
-    Top = 689
+    Left = 688
+    Top = 593
   end
 end

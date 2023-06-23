@@ -4,8 +4,8 @@ object OrderForm: TOrderForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 562
-  ClientWidth = 784
+  ClientHeight = 561
+  ClientWidth = 780
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -107,7 +107,7 @@ object OrderForm: TOrderForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 784
+    Width = 780
     Height = 40
     Align = alTop
     BevelOuter = bvNone
@@ -115,8 +115,9 @@ object OrderForm: TOrderForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 784
     DesignSize = (
-      784
+      780
       40)
     object ButtonBack: TSpeedButton
       Left = 0
@@ -135,7 +136,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 681
+      Width = 673
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -151,7 +152,7 @@ object OrderForm: TOrderForm
       ExplicitWidth = 481
     end
     object ButtonAdd: TSpeedButton
-      Left = 734
+      Left = 730
       Top = 0
       Width = 50
       Height = 40
@@ -168,14 +169,16 @@ object OrderForm: TOrderForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 522
-    Width = 784
+    Top = 521
+    Width = 780
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 522
+    ExplicitWidth = 784
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -256,15 +259,17 @@ object OrderForm: TOrderForm
     end
   end
   object PanelPizzas: TPanel
-    Left = 434
+    Left = 430
     Top = 40
     Width = 350
-    Height = 482
+    Height = 481
     Align = alRight
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
+    ExplicitLeft = 434
+    ExplicitHeight = 482
     object DBCtrlGridPizzas: TDBCtrlGrid
       Left = 0
       Top = 0

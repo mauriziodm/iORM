@@ -8502,12 +8502,12 @@ object MainForm: TMainForm
     ParentFont = False
   end
   object ButtonOrders: TButton
-    Left = 32
-    Top = 344
-    Width = 217
-    Height = 49
+    Left = 35
+    Top = 337
+    Width = 205
+    Height = 44
+    Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Orders'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -19
@@ -8515,15 +8515,16 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    OnClick = ButtonOrdersClick
+    ExplicitTop = 336
+    ExplicitWidth = 201
   end
   object ButtonCustomers: TButton
-    Left = 32
-    Top = 408
-    Width = 217
-    Height = 49
+    Left = 35
+    Top = 387
+    Width = 205
+    Height = 44
+    Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Customers'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -19
@@ -8531,15 +8532,16 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    OnClick = ButtonCustomersClick
+    ExplicitTop = 386
+    ExplicitWidth = 201
   end
   object ButtonPizzas: TButton
-    Left = 32
-    Top = 472
-    Width = 217
-    Height = 49
+    Left = 35
+    Top = 438
+    Width = 205
+    Height = 44
+    Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
-    Caption = 'Pizzas'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -19
@@ -8547,7 +8549,25 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    OnClick = ButtonPizzasClick
+    ExplicitTop = 437
+    ExplicitWidth = 201
+  end
+  object ButtonQuit: TButton
+    Left = 35
+    Top = 502
+    Width = 205
+    Height = 32
+    Action = acQuit
+    Anchors = [akLeft, akRight, akBottom]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 3
+    ExplicitTop = 501
+    ExplicitWidth = 201
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8561,8 +8581,44 @@ object MainForm: TMainForm
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
-    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 64
     Top = 272
+  end
+  object ActionList1: TActionList
+    Left = 184
+    Top = 272
+    object acQuit: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Quit'
+      OnExecuteAction = eaTerminateApplication
+      OnUpdateScope = usGlobal
+    end
+    object acShowOrders: TioBSShowOrSelect
+      Category = 'iORM-BS'
+      Caption = 'Orders'
+      EntityTypeName = 'TOrder'
+      ParentCloseQueryAction = acQuit
+      ShowMode = smEntityTypeName
+      VVMTypeAlias = 'LIST'
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
+    object acShowCustomers: TioBSShowOrSelect
+      Category = 'iORM-BS'
+      Caption = 'Customers'
+      EntityTypeName = 'TCustomer'
+      ParentCloseQueryAction = acQuit
+      ShowMode = smEntityTypeName
+      VVMTypeAlias = 'LIST'
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
+    object acShowPizzas: TioBSShowOrSelect
+      Category = 'iORM-BS'
+      Caption = 'Pizzas'
+      EntityTypeName = 'TPizza'
+      ParentCloseQueryAction = acQuit
+      ShowMode = smEntityTypeName
+      VVMTypeAlias = 'LIST'
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
   end
 end

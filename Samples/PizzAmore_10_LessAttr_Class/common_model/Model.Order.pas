@@ -7,9 +7,8 @@ uses
 
 type
 
-  [ioEnumerated('Waiting, In progress, Ready, Delivered')]
-//  [ioEnumerated]
-  TOrderState = (osWaiting, osInProgress, osReady, osDelivered);
+  [ioEnumerated('All, Waiting, In progress, Ready, Delivered')]
+  TOrderState = (osUnknown, osWaiting, osInProgress, osReady, osDelivered);
 
   [ioEntity('Orders')]
   TOrder = class

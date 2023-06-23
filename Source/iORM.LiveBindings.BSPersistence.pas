@@ -67,6 +67,7 @@ type
     procedure Insert; overload;
     procedure Insert(AObject: TObject); overload;
     procedure Insert(AObject: IInterface); overload;
+    procedure PostIfEditing;
     function GetName: String;
     function IsFromBSLoadType: Boolean;
     function GetSourceBS: IioNotifiableBindSource;

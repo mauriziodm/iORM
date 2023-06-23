@@ -11,7 +11,9 @@ type
   TCustomer = class
   private
     FID: Integer;
+    [ioWhere(coLike)]
     FName: String;
+    [ioWhere(coLike)]
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;

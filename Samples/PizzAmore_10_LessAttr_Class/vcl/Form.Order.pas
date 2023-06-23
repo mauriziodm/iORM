@@ -117,9 +117,9 @@ end;
 
 procedure TOrderForm.acSelectCustomerExecute(Sender: TObject);
 begin
-  Application.CreateForm(TCustomersForm, CustomersForm);
-  CustomersForm.DSCustomers.SelectorFor := DSCustomer;
-  CustomersForm.Show;
+//  Application.CreateForm(TCustomersForm, CustomersForm);
+//  CustomersForm.DSCustomers.SelectorFor := DSCustomer;
+//  CustomersForm.Show;
 end;
 
 procedure TOrderForm.DBCtrlGridPizzasDblClick(Sender: TObject);

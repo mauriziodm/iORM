@@ -13,7 +13,8 @@ object CustomersForm: TCustomersForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
-  OnCreate = FormCreate
+  Visible = True
+  OnClose = FormClose
   OnShow = FormShow
   TextHeight = 15
   object PanelBottom: TPanel
@@ -26,6 +27,8 @@ object CustomersForm: TCustomersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 0
+    ExplicitTop = 720
+    ExplicitWidth = 380
     object ButtonAdd: TSpeedButton
       Left = 334
       Top = 0
@@ -69,7 +72,7 @@ object CustomersForm: TCustomersForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 8
+      ExplicitTop = 6
     end
     object ButtonPageDown: TSpeedButton
       Left = 50
@@ -113,10 +116,10 @@ object CustomersForm: TCustomersForm
     Height = 40
     Align = alTop
     BevelOuter = bvNone
-    Caption = 'Select'
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
+    ExplicitWidth = 380
     object ButtonSelect: TSpeedButton
       Left = 334
       Top = 0
@@ -164,7 +167,7 @@ object CustomersForm: TCustomersForm
     Left = 0
     Top = 40
     Width = 384
-    Height = 576
+    Height = 602
     Align = alClient
     DataSource = SourceCustomers
     TabOrder = 2
@@ -215,64 +218,143 @@ object CustomersForm: TCustomersForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 616
+    Top = 642
     Width = 384
-    Height = 105
+    Height = 79
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 648
+    DesignSize = (
+      384
+      79)
+    object Label1: TLabel
+      Left = 8
+      Top = 7
+      Width = 17
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'ID'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label2: TLabel
+      Left = 98
+      Top = 7
+      Width = 51
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Name'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label3: TLabel
+      Left = 7
+      Top = 37
+      Width = 30
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'City'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object ButtonSearch: TSpeedButton
-      Left = 288
+      Left = 334
+      Top = 0
+      Width = 50
+      Height = 45
+      Action = acWhereBuild
+      Anchors = [akTop, akRight]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object ButtonClear: TSpeedButton
+      Left = 334
+      Top = 49
+      Width = 50
+      Height = 25
+      Action = acWhereClear
+      Anchors = [akTop, akRight]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
+    object DBEditWhereID: TDBEdit
+      Left = 43
+      Top = 7
+      Width = 40
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'ID'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+    end
+    object DBEditWhereName: TDBEdit
+      Left = 155
       Top = 6
-      Width = 72
-      Height = 30
-      Caption = 'Search'
+      Width = 146
+      Height = 25
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'Name'
+      DataSource = SourceWhere
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
+      Font.Color = clWindowText
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      OnClick = ButtonSearchClick
-    end
-    object ButtonWhereOpen: TSpeedButton
-      Left = 288
-      Top = 36
-      Width = 72
-      Height = 30
-      Caption = 'Open'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-      OnClick = ButtonWhereOpenClick
-    end
-    object ButtonWhereCreate: TSpeedButton
-      Left = 288
-      Top = 66
-      Width = 72
-      Height = 30
-      Caption = 'Create'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-      OnClick = ButtonWhereCreateClick
+      TabOrder = 1
     end
     object DBEditWhereCity: TDBEdit
-      Left = 161
-      Top = 40
-      Width = 121
-      Height = 23
+      Left = 43
+      Top = 37
+      Width = 258
+      Height = 25
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Color = clWhite
       DataField = 'City'
       DataSource = SourceWhere
-      TabOrder = 0
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
     end
   end
   object DSCustomers: TioDataSetMaster
@@ -309,15 +391,6 @@ object CustomersForm: TCustomersForm
   object ActionList1: TActionList
     Left = 184
     Top = 112
-    object acAdd: TAction
-      Category = 'iORM-BSPersistence'
-      Caption = 'Add'
-      OnExecute = acAddExecute
-    end
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
     object acDelete: TioBSPersistenceDelete
       Category = 'iORM-BSPersistence'
       Caption = 'Delete'
@@ -333,28 +406,69 @@ object CustomersForm: TCustomersForm
       Caption = 'Pg.Dn'
       TargetBindSource = DSCustomers
     end
-    object acShowOrSelect: TAction
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      OnUpdateScope = usGlobal
+      TargetBindSource = DSCustomers
+    end
+    object acAdd: TioBSPersistenceAppend
+      Category = 'iORM-BSPersistence'
+      Caption = 'Add'
+      ShowOrSelectAction = acShowOrSelect
+      TargetBindSource = DSCustomers
+    end
+    object acShowOrSelect: TioBSShowOrSelect
+      Category = 'iORM-BS'
       Caption = 'Select'
-      OnExecute = acShowOrSelectExecute
-      OnUpdate = acShowOrSelectUpdate
+      ParentCloseQueryAction = acBack
+      SelectCurrentAction = acSelectCurrent
+      ShowMode = smBSCurrent
+      TargetBindSource = DSCustomers
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
+    object acSelectCurrent: TioBSSelectCurrent
+      Category = 'iORM-BS'
+      Caption = 'Select'
+      CloseQueryAction = acBack
+      TargetBindSource = DSCustomers
+    end
+    object acWhereBuild: TioBSWhereBuild
+      Category = 'iORM-BSWhereBuilder'
+      Caption = 'Search'
+      TargetBindSource = DSWhere
+    end
+    object acWhereClear: TioBSWhereClear
+      Category = 'iORM-BSWhereBuilder'
+      Caption = 'Clear'
+      TargetBindSource = DSWhere
+      WhereAutoExecuteOnTargetBS = True
     end
   end
   object DSWhere: TioDataSetMaster
     AsDefault = False
     TypeName = 'TCustomer'
-    LoadType = ltManual
+    LoadType = ltCreate
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 16
-    Top = 640
+    WhereBuilderFor = DSCustomers
+    Left = 199
+    Top = 673
+    object DSWhereID: TIntegerField
+      FieldName = 'ID'
+    end
+    object DSWhereName: TStringField
+      FieldName = 'Name'
+      Size = 100
+    end
     object DSWhereCity: TStringField
       FieldName = 'City'
-      Size = 30
+      Size = 100
     end
   end
   object SourceWhere: TDataSource
     DataSet = DSWhere
-    Left = 80
-    Top = 640
+    Left = 264
+    Top = 673
   end
 end

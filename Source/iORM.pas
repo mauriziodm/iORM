@@ -41,7 +41,7 @@ uses
   iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
   iORM.StdActions.Interfaces, iORM.Context.Container,
-  iORM.Context.Properties.Interfaces;
+  iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.0)';
@@ -382,6 +382,8 @@ type
     class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
     class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
     class function Where<T>(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
+
+    class function SmartWhereBuilder: TioWhereSmartBuilderRef;
 
     class function SQL(const ASQL: String): IioSQLDestination; overload;
     class function SQL(const ASQL: TStrings; const AOwns: boolean = False): IioSQLDestination; overload;
@@ -991,6 +993,11 @@ end;
 class procedure io.ShowWait;
 begin
   TioConnectionManager.ShowWaitProc;
+end;
+
+class function io.SmartWhereBuilder: TioWhereSmartBuilderRef;
+begin
+  Result := TioWhereFactory.NewWhereSmartBuilder;
 end;
 
 class function io.SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination;

@@ -163,6 +163,8 @@
             <Form>OrderForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\common_model\Model.Where.Order.pas"/>
+        <DCCReference Include="..\common_model\Model.Where.Pizza.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -187,6 +189,12 @@
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="Win32\Debug\PizzAmore_10_LessAttr_Class_vcl_desktop.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="Win32\Debug\PizzAmore_10_LessAttr_Class_vcl_desktop.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>PizzAmore_10_LessAttr_Class_vcl_desktop.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>

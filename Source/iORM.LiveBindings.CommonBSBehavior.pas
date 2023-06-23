@@ -309,13 +309,15 @@ var
 begin
   // Some checks
   if not Assigned(ATargetBS) then
-    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the "WhereBuilder" property is unassigned (%s))',
+    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the "WhereBuilderFor" property is unassigned (%s))',
       [ASourceBS.GetName]));
   if not ASourceBS.IsActive then
     raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
   if not Assigned(ASourceBS.Current) then
     raise EioException.Create(ClassName, 'WhereBuild',
       Format('"WhereBuild" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
+  // Post pending changes
+  ASourceBS.PostIfEditing;
   // Create e new where instance
   LWhere := TioWhereFactory.NewWhere;
   // Define the LOnWhereBuildEventAnonymousMethod for OnWhereBuildEvent event handling
