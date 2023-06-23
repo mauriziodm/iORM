@@ -1,49 +1,52 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-{***************************************************************************}
-{                         A T T E N T I O N !!!                             }
-{                         A T T E N T I O N !!!                             }
-{                         A T T E N T I O N !!!                             }
-{                                                                           }
-{ 1) If you use iORM TDataSets with TUniDBGrids, remember to set the Grid's }
-{    "BufferdStore.Enabled" property to True.                               }
-{                                                                           }
-{ 2) Do not use the TioTimer (alias TioTimerUniGUI), it doesn't work.       }
-{                                                                           }
-{ 3) Do not use the TioApplication (alias TioApplicationUniGUI) methods,    }
-{    it doesn't work.                                                       }
-{                                                                           }
-{***************************************************************************}
+{
+  ****************************************************************************
+  *                                                                          *
+  *           iORM - (interfaced ORM)                                        *
+  *                                                                          *
+  *           Copyright (C) 2015-2023 Maurizio Del Magno                     *
+  *                                                                          *
+  *           mauriziodm@levantesw.it                                        *
+  *           mauriziodelmagno@gmail.com                                     *
+  *           https://github.com/mauriziodm/iORM.git                         *
+  *                                                                          *
+  ****************************************************************************
+  *                                                                          *
+  * This file is part of iORM (Interfaced Object Relational Mapper).         *
+  *                                                                          *
+  * Licensed under the GNU Lesser General Public License, Version 3;         *
+  *  you may not use this file except in compliance with the License.        *
+  *                                                                          *
+  * iORM is free software: you can redistribute it and/or modify             *
+  * it under the terms of the GNU Lesser General Public License as published *
+  * by the Free Software Foundation, either version 3 of the License, or     *
+  * (at your option) any later version.                                      *
+  *                                                                          *
+  * iORM is distributed in the hope that it will be useful,                  *
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  * GNU Lesser General Public License for more details.                      *
+  *                                                                          *
+  * You should have received a copy of the GNU Lesser General Public License *
+  * along with iORM.  If not, see <http://www.gnu.org/licenses/>.            *
+  *                                                                          *
+  ****************************************************************************
+}
+{
+  ****************************************************************************
+  *                         A T T E N T I O N !!!                            *
+  *                         A T T E N T I O N !!!                            *
+  *                         A T T E N T I O N !!!                            *
+  *                                                                          *
+  * 1) If you use iORM TDataSets with TUniDBGrids, remember to set the Grid's*
+  *    "BufferdStore.Enabled" property to True.                              *
+  *                                                                          *
+  * 2) Do not use the TioTimer (alias TioTimerUniGUI), it doesn't work.      *
+  *                                                                          *
+  * 3) Do not use the TioApplication (alias TioApplicationUniGUI) methods,   *
+  *    it doesn't work.                                                      *
+  *                                                                          *
+  ****************************************************************************
+}
 unit iORM.Abstraction.uniGUI;
 
 interface
@@ -77,7 +80,7 @@ type
   // Note: TioApplication features not implemented for uniGUI platform
   TioTimerUniGUI = class(TioTimer)
   private
-//    FInternalTimer: TUniTimer;
+    // FInternalTimer: TUniTimer;
   protected
     function GetEnabled: Boolean; override;
     function GetInterval: Cardinal; override;
@@ -187,58 +190,58 @@ end;
 constructor TioTimerUniGUI.Create;
 begin
   raise EioException.Create(ClassName, 'Create', 'Feature not implemented for then uniGUI platform.');
-//  inherited;
-//  FInternalTimer := TUniTimer.Create(UniApplication);
-//  FInternalTimer.ChainMode := True;
+  // inherited;
+  // FInternalTimer := TUniTimer.Create(UniApplication);
+  // FInternalTimer.ChainMode := True;
 end;
 
 destructor TioTimerUniGUI.Destroy;
 begin
-//  FInternalTimer.Free;
+  // FInternalTimer.Free;
   inherited;
 end;
 
 function TioTimerUniGUI.GetEnabled: Boolean;
 begin
-//  Result := FInternalTimer.Enabled;
+  // Result := FInternalTimer.Enabled;
   Result := False;
 end;
 
 function TioTimerUniGUI.GetInterval: Cardinal;
 begin
-//  Result := FInternalTimer.Interval;
+  // Result := FInternalTimer.Interval;
   Result := 0;
 end;
 
 function TioTimerUniGUI.GetOnTimer: TNotifyEvent;
 begin
-//  Result := FInternalTimer.OnTimer;
+  // Result := FInternalTimer.OnTimer;
 end;
 
 function TioTimerUniGUI.GetTag: Integer;
 begin
-//  Result := FInternalTimer.Tag;
+  // Result := FInternalTimer.Tag;
   Result := 0;
 end;
 
 procedure TioTimerUniGUI.SetEnabled(const Value: Boolean);
 begin
-//  FInternalTimer.Enabled := Value;
+  // FInternalTimer.Enabled := Value;
 end;
 
 procedure TioTimerUniGUI.SetInterval(const Value: Cardinal);
 begin
-//  FInternalTimer.Interval := Value;
+  // FInternalTimer.Interval := Value;
 end;
 
 procedure TioTimerUniGUI.SetOnTimer(const Value: TNotifyEvent);
 begin
-//  FInternalTimer.OnTimer := Value;
+  // FInternalTimer.OnTimer := Value;
 end;
 
 procedure TioTimerUniGUI.SetTag(const Value: Integer);
 begin
-//  FInternalTimer.Tag := Value;
+  // FInternalTimer.Tag := Value;
 end;
 
 { TioActionUniGUI }

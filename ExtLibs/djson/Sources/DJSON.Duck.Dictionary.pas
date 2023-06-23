@@ -1,45 +1,37 @@
-{***************************************************************************}
-{                                                                           }
-{           DJSON - (Delphi JSON library)                                   }
-{                                                                           }
-{           Copyright (C) 2016 Maurizio Del Magno                           }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/DSON.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of DJSON (Delphi JSON library).                        }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  DJSON is free software: you can redistribute it and/or modify            }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  DJSON is distributed in the hope that it will be useful,                 }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with DJSON.  If not, see <http://www.gnu.org/licenses/>.           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This project is based off of the ObjectsMappers unit included with the   }
-{  Delphi MVC Framework project by Daniele Teti and the DMVCFramework Team. }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
-
+{
+  ****************************************************************************
+  *                                                                          *
+  *           DJSON - (Delphi JSON library)                                  *
+  *                                                                          *
+  *           Copyright (C) 2016-2023 Maurizio Del Magno                     *
+  *                                                                          *
+  *           mauriziodm@levantesw.it                                        *
+  *           mauriziodelmagno@gmail.com                                     *
+  *           https://github.com/mauriziodm/DSON.git                         *
+  *                                                                          *
+  *                                                                          *
+  ****************************************************************************
+  *                                                                          *
+  * This file is part of DJSON (Delphi JSON library).                        *
+  *                                                                          *
+  * Licensed under the GNU Lesser General Public License, Version 3;         *
+  * you may not use this file except in compliance with the License.         *
+  *                                                                          *
+  * DJSON is free software: you can redistribute it and/or modify            *
+  * it under the terms of the GNU Lesser General Public License as published *
+  * by the Free Software Foundation, either version 3 of the License, or     *
+  * (at your option) any later version.                                      *
+  *                                                                          *
+  * DJSON is distributed in the hope that it will be useful,                 *
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  * GNU Lesser General Public License for more details.                      *
+  *                                                                          *
+  * You should have received a copy of the GNU Lesser General Public License *
+  * along with DJSON.  If not, see <http://www.gnu.org/licenses/>.           *
+  *                                                                          *
+  ****************************************************************************
+}
 unit DJSON.Duck.Dictionary;
 
 interface
@@ -73,12 +65,12 @@ type
     procedure ExtractEnumerator;
     procedure FreeEnumerator;
   public
-    class function TryCreate(const AObjAsDuck:TObject): IdjDuckDictionary;
-    constructor Create(AObjAsDuck:TObject; const AKeysProperty,AValuesProperty,ACountProperty:TRTTIProperty;
-      const AAddMethod:TRTTIMethod; const AKeysEnumerator,AValuesEnumerator:TdjDuckDictionaryEnumerator);
+    class function TryCreate(const AObjAsDuck: TObject): IdjDuckDictionary;
+    constructor Create(AObjAsDuck: TObject; const AKeysProperty, AValuesProperty, ACountProperty: TRttiProperty; const AAddMethod: TRttiMethod;
+      const AKeysEnumerator, AValuesEnumerator: TdjDuckDictionaryEnumerator);
     destructor Destroy; override;
     procedure Add(const AKey, AValue: TValue);
-    procedure SetObject(const AObj:TObject);
+    procedure SetObject(const AObj: TObject);
     function GetCurrentKey: TValue;
     function GetCurrentValue: TValue;
     function MoveNext: Boolean;
@@ -95,7 +87,7 @@ type
 implementation
 
 uses
-  DJSON.Utils.RTTI, DJSON.Exceptions;
+  DJSON.Utils.Rtti, DJSON.Exceptions;
 
 { TdjDuckDictionary }
 
@@ -109,8 +101,8 @@ begin
   Result := FCountProperty.GetValue(FObjAsDuck).AsInteger;
 end;
 
-constructor TdjDuckDictionary.Create(AObjAsDuck:TObject; const AKeysProperty,AValuesProperty,ACountProperty:TRTTIProperty;
-  const AAddMethod:TRTTIMethod; const AKeysEnumerator,AValuesEnumerator:TdjDuckDictionaryEnumerator);
+constructor TdjDuckDictionary.Create(AObjAsDuck: TObject; const AKeysProperty, AValuesProperty, ACountProperty: TRttiProperty; const AAddMethod: TRttiMethod;
+  const AKeysEnumerator, AValuesEnumerator: TdjDuckDictionaryEnumerator);
 begin
   inherited Create;
   FObjAsDuck := AObjAsDuck;
@@ -140,11 +132,11 @@ begin
   // Keys enumerator
   LObj := FKeysProperty.GetValue(FObjAsDuck).AsObject;
   LObj := TdjRTTI.Ctx.GetType(LObj.ClassInfo).GetMethod('GetEnumerator').Invoke(LObj, []).AsObject;
-  FKeysEnumerator := TdjDuckDictionaryEnumerator.Create(   LObj   );
+  FKeysEnumerator := TdjDuckDictionaryEnumerator.Create(LObj);
   // Values enumerator
   LObj := FValuesProperty.GetValue(FObjAsDuck).AsObject;
   LObj := TdjRTTI.Ctx.GetType(LObj.ClassInfo).GetMethod('GetEnumerator').Invoke(LObj, []).AsObject;
-  FValuesEnumerator := TdjDuckDictionaryEnumerator.Create(   LObj   );
+  FValuesEnumerator := TdjDuckDictionaryEnumerator.Create(LObj);
 end;
 
 procedure TdjDuckDictionary.FreeEnumerator;
@@ -174,8 +166,8 @@ function TdjDuckDictionary.GetKeyTypeInfo: PTypeInfo;
 begin
   // Get the parameters array of the "Add" method
   // NB: The "Add" method of a TDictionary has 2 parameters,
-  //      The first parameter (Index=0) is the "Key" parameters
-  //      The second parameter (Index=1) is the "Value" parameters
+  // The first parameter (Index=0) is the "Key" parameters
+  // The second parameter (Index=1) is the "Value" parameters
   Result := FAddMethod.GetParameters[0].ParamType.Handle;
 end;
 
@@ -193,8 +185,8 @@ function TdjDuckDictionary.GetValueTypeInfo: PTypeInfo;
 begin
   // Get the parameters array of the "Add" method
   // NB: The "Add" method of a TDictionary has 2 parameters,
-  //      The first parameter (Index=0) is the "Key" parameters
-  //      The second parameter (Index=1) is the "Value" parameters
+  // The first parameter (Index=0) is the "Key" parameters
+  // The second parameter (Index=1) is the "Value" parameters
   Result := FAddMethod.GetParameters[1].ParamType.Handle;
 end;
 
@@ -227,30 +219,36 @@ var
   LObj: TObject;
 begin
   // Check received object
-  if not Assigned(AObjAsDuck) then Exit(nil);
+  if not assigned(AObjAsDuck) then
+    Exit(nil);
   // Init Rtti
   LType := TdjRTTI.Ctx.GetType(AObjAsDuck.ClassInfo);
-  if not Assigned(LType) then Exit(nil);
+  if not assigned(LType) then
+    Exit(nil);
   // Keys Property
   LKeysProperty := LType.GetProperty('Keys');
-  if not Assigned(LKeysProperty) then Exit(nil);
+  if not assigned(LKeysProperty) then
+    Exit(nil);
   // Values Property
   LValuesProperty := LType.GetProperty('Values');
-  if not Assigned(LValuesProperty) then Exit(nil);
+  if not assigned(LValuesProperty) then
+    Exit(nil);
   // Keys Property
   LCountProperty := LType.GetProperty('Count');
-  if not Assigned(LCountProperty) then Exit(nil);
+  if not assigned(LCountProperty) then
+    Exit(nil);
   // Add method
   LAddMethod := LType.GetMethod('Add');
-  if not Assigned(LAddMethod) then Exit(nil);
+  if not assigned(LAddMethod) then
+    Exit(nil);
   // Keys enumerator
   LObj := LKeysProperty.GetValue(AObjAsDuck).AsObject;
   LObj := TdjRTTI.Ctx.GetType(LObj.ClassInfo).GetMethod('GetEnumerator').Invoke(LObj, []).AsObject;
-  LKeysEnumerator := TdjDuckDictionaryEnumerator.Create(   LObj   );
+  LKeysEnumerator := TdjDuckDictionaryEnumerator.Create(LObj);
   // Values enumerator
   LObj := LValuesProperty.GetValue(AObjAsDuck).AsObject;
   LObj := TdjRTTI.Ctx.GetType(LObj.ClassInfo).GetMethod('GetEnumerator').Invoke(LObj, []).AsObject;
-  LValuesEnumerator := TdjDuckDictionaryEnumerator.Create(   LObj   );
+  LValuesEnumerator := TdjDuckDictionaryEnumerator.Create(LObj);
   // If everithing is OK then create the Duck
   Result := Self.Create(AObjAsDuck, LKeysProperty, LValuesProperty, LCountProperty, LAddMethod, LKeysEnumerator, LValuesEnumerator);
 end;
@@ -263,11 +261,11 @@ begin
   FObjectAsDuck := AObjectAsDuck;
   // GetCurrent method
   FCurrentProperty := TdjRTTI.Ctx.GetType(AObjectAsDuck.ClassInfo).GetProperty('Current');
-  if not Assigned(FCurrentProperty) then
+  if not assigned(FCurrentProperty) then
     raise EdsonDuckException.Create('Cannot find property "Current" in the duck object');
   // MoveNext method
   FMoveNextMethod := TdjRTTI.Ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('MoveNext');
-  if not Assigned(FMoveNextMethod) then
+  if not assigned(FMoveNextMethod) then
     raise EdsonDuckException.Create('Cannot find method "MoveNext" in the duck object');
 end;
 

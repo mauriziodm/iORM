@@ -1,40 +1,36 @@
-{***************************************************************************}
-{                                                                           }
-{           iORM - (interfaced ORM)                                         }
-{                                                                           }
-{           Copyright (C) 2015-2016 Maurizio Del Magno                      }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/iORM.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of iORM (Interfaced Object Relational Mapper).         }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  iORM is free software: you can redistribute it and/or modify             }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  iORM is distributed in the hope that it will be useful,                  }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with iORM.  If not, see <http://www.gnu.org/licenses/>.            }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
-
+{
+  ****************************************************************************
+  *                                                                          *
+  *           iORM - (interfaced ORM)                                        *
+  *                                                                          *
+  *           Copyright (C) 2015-2023 Maurizio Del Magno                     *
+  *                                                                          *
+  *           mauriziodm@levantesw.it                                        *
+  *           mauriziodelmagno@gmail.com                                     *
+  *           https://github.com/mauriziodm/iORM.git                         *
+  *                                                                          *
+  ****************************************************************************
+  *                                                                          *
+  * This file is part of iORM (Interfaced Object Relational Mapper).         *
+  *                                                                          *
+  * Licensed under the GNU Lesser General Public License, Version 3;         *
+  *  you may not use this file except in compliance with the License.        *
+  *                                                                          *
+  * iORM is free software: you can redistribute it and/or modify             *
+  * it under the terms of the GNU Lesser General Public License as published *
+  * by the Free Software Foundation, either version 3 of the License, or     *
+  * (at your option) any later version.                                      *
+  *                                                                          *
+  * iORM is distributed in the hope that it will be useful,                  *
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  * GNU Lesser General Public License for more details.                      *
+  *                                                                          *
+  * You should have received a copy of the GNU Lesser General Public License *
+  * along with iORM.  If not, see <http://www.gnu.org/licenses/>.            *
+  *                                                                          *
+  ****************************************************************************
+}
 unit iORM.Abstraction.FMX;
 
 interface
@@ -87,28 +83,28 @@ type
   private
     FInternalAction: TAction;
   protected
-    class function _CreateNewAction(const AOwner:TComponent): TioAction; override;
-    class function _CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; override;
+    class function _CreateNewAction(const AOwner: TComponent): TioAction; override;
+    class function _CreateNewAction(const AOwner: TComponent; const AAction: TObject): TioAction; override;
     class function _IsValid(const AField: TRttiField): Boolean; override;
     function GetCaption: string; override;
-    function GetChecked: boolean; override;
-    function GetEnabled: boolean; override;
-    function GetGroupIndex: integer; override;
+    function GetChecked: Boolean; override;
+    function GetEnabled: Boolean; override;
+    function GetGroupIndex: Integer; override;
     function GetHint: string; override;
-    function GetImageIndex: integer; override;
+    function GetImageIndex: Integer; override;
     function GetName: TComponentName; override;
-    function GetVisible: boolean; override;
+    function GetVisible: Boolean; override;
     function GetOnExecute: TNotifyEvent; override;
     function GetOnHint: THintEvent; override;
     function GetOnUpdate: TNotifyEvent; override;
     procedure SetCaption(const Value: string); override;
-    procedure SetChecked(const Value: boolean); override;
-    procedure SetEnabled(const Value: boolean); override;
-    procedure SetGroupIndex(const Value: integer); override;
+    procedure SetChecked(const Value: Boolean); override;
+    procedure SetEnabled(const Value: Boolean); override;
+    procedure SetGroupIndex(const Value: Integer); override;
     procedure SetHint(const Value: string); override;
-    procedure SetImageIndex(const Value: integer); override;
+    procedure SetImageIndex(const Value: Integer); override;
     procedure SetName(const Value: TComponentName); override;
-    procedure SetVisible(const Value: boolean); override;
+    procedure SetVisible(const Value: Boolean); override;
     procedure SetOnExecute(const Value: TNotifyEvent); override;
     procedure SetOnHint(const Value: THintEvent); override;
     procedure SetOnUpdate(const Value: TNotifyEvent); override;
@@ -213,7 +209,6 @@ begin
   FInternalAction := TAction.Create(AOwner);
 end;
 
-
 constructor TioActionFMX.Create(AOwner: TComponent; const AAction: TObject);
 begin
   inherited Create(AOwner);
@@ -230,17 +225,17 @@ begin
   Result := FInternalAction.Caption;
 end;
 
-function TioActionFMX.GetChecked: boolean;
+function TioActionFMX.GetChecked: Boolean;
 begin
   Result := FInternalAction.Checked;
 end;
 
-function TioActionFMX.GetEnabled: boolean;
+function TioActionFMX.GetEnabled: Boolean;
 begin
   Result := FInternalAction.Enabled;
 end;
 
-function TioActionFMX.GetGroupIndex: integer;
+function TioActionFMX.GetGroupIndex: Integer;
 begin
   Result := FInternalAction.GroupIndex;
 end;
@@ -250,7 +245,7 @@ begin
   Result := FInternalAction.Hint;
 end;
 
-function TioActionFMX.GetImageIndex: integer;
+function TioActionFMX.GetImageIndex: Integer;
 begin
   Result := FInternalAction.ImageIndex;
 end;
@@ -275,7 +270,7 @@ begin
   Result := FInternalAction.OnUpdate;
 end;
 
-function TioActionFMX.GetVisible: boolean;
+function TioActionFMX.GetVisible: Boolean;
 begin
   Result := FInternalAction.Visible;
 end;
@@ -285,17 +280,17 @@ begin
   FInternalAction.Caption := Value;
 end;
 
-procedure TioActionFMX.SetChecked(const Value: boolean);
+procedure TioActionFMX.SetChecked(const Value: Boolean);
 begin
   FInternalAction.Checked := Value;
 end;
 
-procedure TioActionFMX.SetEnabled(const Value: boolean);
+procedure TioActionFMX.SetEnabled(const Value: Boolean);
 begin
   FInternalAction.Enabled := Value;
 end;
 
-procedure TioActionFMX.SetGroupIndex(const Value: integer);
+procedure TioActionFMX.SetGroupIndex(const Value: Integer);
 begin
   FInternalAction.GroupIndex := Value;
 end;
@@ -305,7 +300,7 @@ begin
   FInternalAction.Hint := Value;
 end;
 
-procedure TioActionFMX.SetImageIndex(const Value: integer);
+procedure TioActionFMX.SetImageIndex(const Value: Integer);
 begin
   FInternalAction.ImageIndex := Value;
 end;
@@ -330,7 +325,7 @@ begin
   FInternalAction.OnUpdate := Value;
 end;
 
-procedure TioActionFMX.SetVisible(const Value: boolean);
+procedure TioActionFMX.SetVisible(const Value: Boolean);
 begin
   FInternalAction.Visible := Value;
 end;
@@ -356,9 +351,9 @@ end;
 class procedure TioControlFMX._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
-  if not (AControl is TFmxObject) then
+  if not(AControl is TFmxObject) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TFmxObject.');
-  if not (AParent is TFmxObject) then
+  if not(AParent is TFmxObject) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TFmxObject.');
   TFmxObject(AControl).Parent := TFmxObject(AParent);
 end;
@@ -366,7 +361,7 @@ end;
 class procedure TioControlFMX._SetVisible(const AControl: TObject; const AVisible: Boolean);
 begin
   inherited;
-  if not (AControl is TControl) then
+  if not(AControl is TControl) then
     raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
 end;
@@ -380,8 +375,9 @@ end;
 
 initialization
 
-  TioApplicationFMX.SetConcreteClass(TioApplicationFMX);
-  TioControlFMX.SetConcreteClass(TioControlFMX);
-  TioTimerFMX.SetConcreteClass(TioTimerFMX);
-  TioActionFMX.SetConcreteClass(TioActionFMX);
+TioApplicationFMX.SetConcreteClass(TioApplicationFMX);
+TioControlFMX.SetConcreteClass(TioControlFMX);
+TioTimerFMX.SetConcreteClass(TioTimerFMX);
+TioActionFMX.SetConcreteClass(TioActionFMX);
+
 end.

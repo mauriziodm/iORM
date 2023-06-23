@@ -1,45 +1,37 @@
-{***************************************************************************}
-{                                                                           }
-{           DJSON - (Delphi JSON library)                                   }
-{                                                                           }
-{           Copyright (C) 2016 Maurizio Del Magno                           }
-{                                                                           }
-{           mauriziodm@levantesw.it                                         }
-{           mauriziodelmagno@gmail.com                                      }
-{           https://github.com/mauriziodm/DSON.git                          }
-{                                                                           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This file is part of DJSON (Delphi JSON library).                        }
-{                                                                           }
-{  Licensed under the GNU Lesser General Public License, Version 3;         }
-{  you may not use this file except in compliance with the License.         }
-{                                                                           }
-{  DJSON is free software: you can redistribute it and/or modify            }
-{  it under the terms of the GNU Lesser General Public License as published }
-{  by the Free Software Foundation, either version 3 of the License, or     }
-{  (at your option) any later version.                                      }
-{                                                                           }
-{  DJSON is distributed in the hope that it will be useful,                 }
-{  but WITHOUT ANY WARRANTY; without even the implied warranty of           }
-{  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            }
-{  GNU Lesser General Public License for more details.                      }
-{                                                                           }
-{  You should have received a copy of the GNU Lesser General Public License }
-{  along with DJSON.  If not, see <http://www.gnu.org/licenses/>.           }
-{                                                                           }
-{***************************************************************************}
-{                                                                           }
-{  This project is based off of the ObjectsMappers unit included with the   }
-{  Delphi MVC Framework project by Daniele Teti and the DMVCFramework Team. }
-{                                                                           }
-{***************************************************************************}
-
-
-
-
-
+{
+  ****************************************************************************
+  *                                                                          *
+  *           DJSON - (Delphi JSON library)                                  *
+  *                                                                          *
+  *           Copyright (C) 2016-2023 Maurizio Del Magno                     *
+  *                                                                          *
+  *           mauriziodm@levantesw.it                                        *
+  *           mauriziodelmagno@gmail.com                                     *
+  *           https://github.com/mauriziodm/DSON.git                         *
+  *                                                                          *
+  *                                                                          *
+  ****************************************************************************
+  *                                                                          *
+  * This file is part of DJSON (Delphi JSON library).                        *
+  *                                                                          *
+  * Licensed under the GNU Lesser General Public License, Version 3;         *
+  * you may not use this file except in compliance with the License.         *
+  *                                                                          *
+  * DJSON is free software: you can redistribute it and/or modify            *
+  * it under the terms of the GNU Lesser General Public License as published *
+  * by the Free Software Foundation, either version 3 of the License, or     *
+  * (at your option) any later version.                                      *
+  *                                                                          *
+  * DJSON is distributed in the hope that it will be useful,                 *
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  * GNU Lesser General Public License for more details.                      *
+  *                                                                          *
+  * You should have received a copy of the GNU Lesser General Public License *
+  * along with DJSON.  If not, see <http://www.gnu.org/licenses/>.           *
+  *                                                                          *
+  ****************************************************************************
+}
 unit DJSON.Attributes;
 
 interface
@@ -68,7 +60,7 @@ type
   private
     FQualifiedName: String;
   public
-    constructor Create; overload;  // For initialization
+    constructor Create; overload; // For initialization
     constructor Create(const Value: TClass); overload;
     constructor Create(const ATypeInfo: PTypeInfo); overload;
     property QualifiedName: String read FQualifiedName;
@@ -82,10 +74,10 @@ type
     procedure SetValue(const Value: TClass);
     function GetValue: TClass;
   public
-    constructor Create; overload;  // For initialization
-    constructor Create(const Value: TClass); overload;  // Use with lists (for compatibility)
-    constructor Create(const AValueTypeInfo: PTypeInfo); overload;  // Use with lists
-    constructor Create(const AKeyTypeInfo, AValueTypeInfo: PTypeInfo); overload;  // Use with TDIctionary
+    constructor Create; overload; // For initialization
+    constructor Create(const Value: TClass); overload; // Use with lists (for compatibility)
+    constructor Create(const AValueTypeInfo: PTypeInfo); overload; // Use with lists
+    constructor Create(const AKeyTypeInfo, AValueTypeInfo: PTypeInfo); overload; // Use with TDIctionary
     property Value: TClass read GetValue write SetValue;
     property KeyQualifiedName: String read FKeyQualifiedName;
     property ValueQualifiedName: String read FValueQualifiedName;
@@ -96,15 +88,17 @@ type
   private
     FSerializer: T;
   public
-    constructor Create(const ASerializer:T);
-    property Serializer:T read FSerializer;
+    constructor Create(const ASerializer: T);
+    property Serializer: T read FSerializer;
   end;
+
   // djSerializerDOM
   djSerializerDOMAttribute = class(djSerializerAttribute<TdjDOMCustomSerializerRef>)
   end;
+
   // djSerializerXML
-//  djSerializerXMLAttribute = class(djSerializerAttribute<TdjXMLCustomSerializerRef>)
-//  end;
+  // djSerializerXMLAttribute = class(djSerializerAttribute<TdjXMLCustomSerializerRef>)
+  // end;
   // djSerializerStream
   // djSerializerXML
   djSerializerStreamAttribute = class(djSerializerAttribute<TdjStreamCustomSerializerRef>)
@@ -115,6 +109,7 @@ type
   strict private
     FEncoding: string;
     procedure SetEncoding(const Value: string);
+
   const
     DefaultEncoding = 'utf-8';
   public
@@ -122,11 +117,10 @@ type
     property Encoding: string read FEncoding write SetEncoding;
   end;
 
-
 implementation
 
 uses
-  System.SysUtils, DJSON.Utils.RTTI, System.Generics.Collections;
+  System.SysUtils, DJSON.Utils.Rtti, System.Generics.Collections;
 
 { djEncodingAttribute }
 
@@ -168,7 +162,7 @@ constructor djItemsTypeAttribute.Create;
 begin
   inherited Create;
   // Init
-  FKeyQualifiedName   := '';
+  FKeyQualifiedName := '';
   FValueQualifiedName := '';
 end;
 
@@ -179,8 +173,7 @@ begin
   FValueQualifiedName := TdjRTTI.TypeInfoToQualifiedTypeName(AValueTypeInfo);
 end;
 
-constructor djItemsTypeAttribute.Create(const AKeyTypeInfo,
-  AValueTypeInfo: PTypeInfo);
+constructor djItemsTypeAttribute.Create(const AKeyTypeInfo, AValueTypeInfo: PTypeInfo);
 begin
   // Extract the qualified type name for the values
   Self.Create(AValueTypeInfo);
@@ -233,4 +226,3 @@ begin
 end;
 
 end.
-

@@ -1,35 +1,36 @@
-{ *************************************************************************** }
-{ }
-{ iORM - (interfaced ORM) }
-{ }
-{ Copyright (C) 2015-2016 Maurizio Del Magno }
-{ }
-{ mauriziodm@levantesw.it }
-{ mauriziodelmagno@gmail.com }
-{ https://github.com/mauriziodm/iORM.git }
-{ }
-{ }
-{ *************************************************************************** }
-{ }
-{ This file is part of iORM (Interfaced Object Relational Mapper). }
-{ }
-{ Licensed under the GNU Lesser General Public License, Version 3; }
-{ you may not use this file except in compliance with the License. }
-{ }
-{ iORM is free software: you can redistribute it and/or modify }
-{ it under the terms of the GNU Lesser General Public License as published }
-{ by the Free Software Foundation, either version 3 of the License, or }
-{ (at your option) any later version. }
-{ }
-{ iORM is distributed in the hope that it will be useful, }
-{ but WITHOUT ANY WARRANTY; without even the implied warranty of }
-{ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the }
-{ GNU Lesser General Public License for more details. }
-{ }
-{ You should have received a copy of the GNU Lesser General Public License }
-{ along with iORM.  If not, see <http://www.gnu.org/licenses/>. }
-{ }
-{ *************************************************************************** }
+{
+  ****************************************************************************
+  *                                                                          *
+  *           iORM - (interfaced ORM)                                        *
+  *                                                                          *
+  *           Copyright (C) 2015-2023 Maurizio Del Magno                     *
+  *                                                                          *
+  *           mauriziodm@levantesw.it                                        *
+  *           mauriziodelmagno@gmail.com                                     *
+  *           https://github.com/mauriziodm/iORM.git                         *
+  *                                                                          *
+  ****************************************************************************
+  *                                                                          *
+  * This file is part of iORM (Interfaced Object Relational Mapper).         *
+  *                                                                          *
+  * Licensed under the GNU Lesser General Public License, Version 3;         *
+  *  you may not use this file except in compliance with the License.        *
+  *                                                                          *
+  * iORM is free software: you can redistribute it and/or modify             *
+  * it under the terms of the GNU Lesser General Public License as published *
+  * by the Free Software Foundation, either version 3 of the License, or     *
+  * (at your option) any later version.                                      *
+  *                                                                          *
+  * iORM is distributed in the hope that it will be useful,                  *
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  * GNU Lesser General Public License for more details.                      *
+  *                                                                          *
+  * You should have received a copy of the GNU Lesser General Public License *
+  * along with iORM.  If not, see <http://www.gnu.org/licenses/>.            *
+  *                                                                          *
+  ****************************************************************************
+}
 unit iORM.Where.NestedProp.Resolver;
 
 interface
@@ -47,7 +48,7 @@ type
     function _IsFirstLoop(const ABuildingResult: String): Boolean;
     function _IsLastLoop(const AFullPathPropertyName: String): Boolean;
     function _ExtractNextPropName(var AFullPathPropName: String): String;
-    procedure _GenerateMiddleJoins(const AMasterMap: IioMap; const AMasterProp: IioProperty; AFullPathPropName: String; const APreviousBuildingResult: String);
+    procedure _GenerateSql(const AMasterMap: IioMap; const AMasterProp: IioProperty; AFullPathPropName: String; const APreviousBuildingResult: String);
     function _ComposeWhereConditions: String;
   public
     constructor Create(const ANestedCriteria: IioSqlItemCriteria);
@@ -97,7 +98,6 @@ var
   LMasterProp: IioProperty;
   LMasterPropName: String;
   LFullPathPropertyName: String;
-  LWhereText: String;
 begin
   // Work with a copy of the FullPathPropertyName reached from the criteria
   LFullPathPropertyName := FNestedCriteria.PropertyName;
@@ -105,12 +105,12 @@ begin
   LMasterPropName := _ExtractNextPropName(LFullPathPropertyName);
   LMasterProp := AMap.GetProperties.GetPropertyByName(LMasterPropName);
   // Generate the where condition collection
-  _GenerateMiddleJoins(AMap, LMasterProp, LFullPathPropertyName, String.Empty);
+  _GenerateSql(AMap, LMasterProp, LFullPathPropertyName, String.Empty);
   // Compose the where conditions
   Result := _ComposeWhereConditions;
 end;
 
-procedure TioWhereNestedPropResolver._GenerateMiddleJoins(const AMasterMap: IioMap; const AMasterProp: IioProperty; AFullPathPropName: String; const APreviousBuildingResult: String);
+procedure TioWhereNestedPropResolver._GenerateSql(const AMasterMap: IioMap; const AMasterProp: IioProperty; AFullPathPropName: String; const APreviousBuildingResult: String);
 var
   LDetailProp, LRelationChildProp: IioProperty;
   LDetailPropName: String;
@@ -173,7 +173,7 @@ begin
       FResultStrings.Add(LResult);
     end
     else
-      _GenerateMiddleJoins(LDetailMap, LDetailProp, AFullPathPropName, LResult);
+      _GenerateSql(LDetailMap, LDetailProp, AFullPathPropName, LResult); // Recursion
   end;
 end;
 
