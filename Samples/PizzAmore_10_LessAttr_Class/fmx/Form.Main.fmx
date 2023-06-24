@@ -24,7 +24,7 @@ object MainForm: TMainForm
       Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
@@ -40,7 +40,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = False
+        IsSelected = True
         Size.Width = 45.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 66
+          TabOrder = 67
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5192,7 +5192,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = True
+        IsSelected = False
         Size.Width = 51.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6079,7 +6079,7 @@ object MainForm: TMainForm
       Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 0
       TabStop = False
       TabPosition = Top
@@ -6097,7 +6097,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family, Style]
-        IsSelected = False
+        IsSelected = True
         Size.Width = 90.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -6170,7 +6170,7 @@ object MainForm: TMainForm
         TextSettings.Font.Size = 22.000000000000000000
         TextSettings.FontColor = claNavy
         StyledSettings = [Family]
-        IsSelected = True
+        IsSelected = False
         Size.Width = 127.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False

@@ -6,9 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.DBCGrids, iORM, iORM.Attributes, iORM.CommonTypes,
   iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.Mask, Vcl.Grids, Vcl.DBGrids, iORM.DB.DataSet.Detail,
-  iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Vcl.DBActns;
+  iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Vcl.DBActns, Model.Order;
 
 type
+
+  [diSimpleViewFor(TOrder)]
   TOrderForm = class(TForm)
     PanelTop: TPanel;
     ButtonBack: TSpeedButton;
@@ -60,53 +62,46 @@ type
     DSRowsRowTotal: TCurrencyField;
     SourceRows: TDataSource;
     DSCustomerFullAddress: TStringField;
-    ActionList1: TActionList;
-    acPersist: TioBSPersistencePersist;
-    acBack: TAction;
-    acRevert: TioBSPersistenceRevertOrDelete;
-    ButtonAdd: TSpeedButton;
-    acSelectCustomer: TAction;
-    acSelectPizza: TioBSSelectCurrent;
+    ButtonSelectPizza: TSpeedButton;
     ButtonDeleteRow: TSpeedButton;
-    acDeleteRow: TDataSetDelete;
-    DBEditState: TDBEdit;
-    DBComboBoxState: TDBComboBox;
-    DBListBoxState: TDBListBox;
-    DBRadioGroupState: TDBRadioGroup;
     DSOrderState: TStringField;
-    procedure FormShow(Sender: TObject);
+    DBComboBoxOrderState: TDBComboBox;
+    Label7: TLabel;
+    DSOrderOrderState: TStringField;
     procedure acBackExecute(Sender: TObject);
-    procedure DBCtrlGridPizzasDblClick(Sender: TObject);
-    procedure acSelectCustomerExecute(Sender: TObject);
     procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ButtonSelectCustomerClick(Sender: TObject);
+    procedure ButtonSelectPizzaClick(Sender: TObject);
+    procedure ButtonPersistClick(Sender: TObject);
+    procedure ButtonDeleteRowClick(Sender: TObject);
+    procedure ButtonRevertClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-var
-  OrderForm: TOrderForm;
+// *** Note: the lines below have been deleted ***
+// var
+// CustomerForm: TCustomerForm;
 
 implementation
 
 uses
-  Model.Order, Model.OrderRow, Model.Pizza, Form.Customers;
+  Model.OrderRow, Model.Pizza, Model.Customer;
 
 {$R *.dfm}
 
-procedure TOrderForm.FormCreate(Sender: TObject);
+procedure TOrderForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  io.Enums.FillStrings<TOrderState>(DBComboBoxState.Items);
-  io.Enums.FillStrings<TOrderState>(DBListBoxState.Items);
-  io.Enums.FillStrings<TOrderState>(DBRadioGroupState.Items);
-  io.Enums.FillStrings<TOrderState>(DBRadioGroupState.Values);
+  Action := caFree;
 end;
 
-procedure TOrderForm.FormShow(Sender: TObject);
+procedure TOrderForm.FormCreate(Sender: TObject);
 begin
-  DSOrder.Open;
+  io.Enums.FillStrings<TOrderState>(DBComboBoxOrderState.Items);
   DSPizzas.Open;
 end;
 
@@ -115,16 +110,34 @@ begin
   Close;
 end;
 
-procedure TOrderForm.acSelectCustomerExecute(Sender: TObject);
+procedure TOrderForm.ButtonDeleteRowClick(Sender: TObject);
 begin
-//  Application.CreateForm(TCustomersForm, CustomersForm);
-//  CustomersForm.DSCustomers.SelectorFor := DSCustomer;
-//  CustomersForm.Show;
+  DSRows.Delete;
 end;
 
-procedure TOrderForm.DBCtrlGridPizzasDblClick(Sender: TObject);
+procedure TOrderForm.ButtonPersistClick(Sender: TObject);
 begin
-  acSelectPizza.Execute;
+  DSOrder.Persistence.Persist;
+end;
+
+procedure TOrderForm.ButtonRevertClick(Sender: TObject);
+var
+  LIsInserting: Boolean;
+begin
+  LIsInserting := DSOrder.Persistence.IsInserting;
+  DSOrder.Persistence.RevertOrDelete;
+  if LIsInserting then
+    Close;
+end;
+
+procedure TOrderForm.ButtonSelectCustomerClick(Sender: TObject);
+begin
+  io.ShowAsSelector<TCustomer>(DSCustomer, nil, 'LIST');
+end;
+
+procedure TOrderForm.ButtonSelectPizzaClick(Sender: TObject);
+begin
+  DSPizzas.SelectCurrent;
 end;
 
 procedure TOrderForm.DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);

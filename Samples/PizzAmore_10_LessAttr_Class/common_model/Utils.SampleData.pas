@@ -139,7 +139,7 @@ begin
   LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 3) );
   LOrder.Rows.Add( TOrderRow.Create(2, 'Capricciosa pizza', 7, 2) );
   LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
-  LOrder.State := osWaiting;
+  LOrder.OrderState := osWaiting;
   io.Persist(LOrder);
   FreeAndnil(LOrder);
   // Second order
@@ -149,7 +149,7 @@ begin
   LOrder.Note := 'Double cheese please';
   LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 1) );
   LOrder.Rows.Add( TOrderRow.Create(2, 'Pepperoni pizza', 6.5, 1) );
-  LOrder.State := osInProgress;
+  LOrder.OrderState := osInProgress;
   io.Persist(LOrder);
   FreeAndnil(LOrder);
   // Third order
@@ -157,7 +157,7 @@ begin
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<TCustomer>(3);
   LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
-  LOrder.State := osReady;
+  LOrder.OrderState := osReady;
   io.Persist(LOrder);
   FreeAndnil(LOrder);
 end;

@@ -13,7 +13,8 @@ object PizzaForm: TPizzaForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
-  OnShow = FormShow
+  Visible = True
+  OnClose = FormClose
   TextHeight = 15
   object Label1: TLabel
     Left = 10
@@ -80,13 +81,14 @@ object PizzaForm: TPizzaForm
     Top = 180
     Width = 30
     Height = 30
-    Action = acLoadImage
+    Caption = '...'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
     ParentFont = False
+    OnClick = ButtonLoadImageClick
   end
   object PanelTop: TPanel
     Left = 0
@@ -98,6 +100,7 @@ object PizzaForm: TPizzaForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 409
     DesignSize = (
       413
       40)
@@ -106,19 +109,20 @@ object PizzaForm: TPizzaForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acBack
       Align = alLeft
+      Caption = 'Back'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonBackClick
     end
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 310
+      Width = 298
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -144,19 +148,22 @@ object PizzaForm: TPizzaForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 460
+    ExplicitWidth = 409
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
       Width = 50
       Height = 40
-      Action = acRevert
       Align = alLeft
+      Caption = 'Revert'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonRevertClick
       ExplicitLeft = 334
       ExplicitTop = -6
     end
@@ -165,24 +172,17 @@ object PizzaForm: TPizzaForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acPersist
       Align = alRight
+      Caption = 'Persist'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnClick = ButtonPersistClick
       ExplicitLeft = 334
       ExplicitTop = -6
-    end
-    object Button1: TButton
-      Left = 56
-      Top = 8
-      Width = 75
-      Height = 25
-      Action = acRevert
-      TabOrder = 0
     end
   end
   object DBEditID: TDBEdit
@@ -275,28 +275,6 @@ object PizzaForm: TPizzaForm
     DataSet = DSPizza
     Left = 32
     Top = 280
-  end
-  object ActionList1: TActionList
-    Left = 227
-    Top = 208
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
-    object acPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Caption = 'Persist'
-      TargetBindSource = DSPizza
-    end
-    object acRevert: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Revert'
-      TargetBindSource = DSPizza
-    end
-    object acLoadImage: TAction
-      Caption = '...'
-      OnExecute = acLoadImageExecute
-    end
   end
   object OpenPictureDialog: TOpenPictureDialog
     Left = 232

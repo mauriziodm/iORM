@@ -501,7 +501,7 @@ type
     class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show selector (Entity type from generic type parameter)
-    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String); overload;
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 

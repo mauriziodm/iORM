@@ -34,14 +34,15 @@ object CustomersForm: TCustomersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acAdd
       Align = alRight
+      Caption = 'Add'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnClick = ButtonAddClick
       ExplicitLeft = 264
     end
     object ButtonPageUp: TSpeedButton
@@ -49,14 +50,15 @@ object CustomersForm: TCustomersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acNextPage
       Align = alLeft
+      Caption = 'Pg.Up'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonPageUpClick
       ExplicitLeft = 94
     end
     object ButtonDelete: TSpeedButton
@@ -64,14 +66,15 @@ object CustomersForm: TCustomersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acDelete
       Align = alLeft
+      Caption = 'Delete'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonDeleteClick
       ExplicitTop = 6
     end
     object ButtonPageDown: TSpeedButton
@@ -79,14 +82,15 @@ object CustomersForm: TCustomersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acPrevPage
       Align = alLeft
+      Caption = 'Pg.Dn'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonPageDownClick
       ExplicitLeft = 56
       ExplicitTop = 6
     end
@@ -125,14 +129,15 @@ object CustomersForm: TCustomersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acShowOrSelect
       Align = alRight
+      Caption = 'Select'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonSelectClick
       ExplicitTop = -6
     end
     object ButtonBack: TSpeedButton
@@ -140,14 +145,15 @@ object CustomersForm: TCustomersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acBack
       Align = alLeft
+      Caption = 'Back'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonBackClick
     end
     object LabelTitle: TLabel
       Left = 150
@@ -226,7 +232,8 @@ object CustomersForm: TCustomersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 648
+    ExplicitTop = 641
+    ExplicitWidth = 380
     DesignSize = (
       384
       79)
@@ -276,32 +283,36 @@ object CustomersForm: TCustomersForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 334
+      Left = 326
       Top = 0
       Width = 50
       Height = 45
-      Action = acWhereBuild
       Anchors = [akTop, akRight]
+      Caption = 'Search'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnClick = ButtonSearchClick
+      ExplicitLeft = 334
     end
     object ButtonClear: TSpeedButton
-      Left = 334
+      Left = 326
       Top = 49
       Width = 50
       Height = 25
-      Action = acWhereClear
       Anchors = [akTop, akRight]
+      Caption = 'Clear'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonClearClick
+      ExplicitLeft = 334
     end
     object DBEditWhereID: TDBEdit
       Left = 43
@@ -323,7 +334,7 @@ object CustomersForm: TCustomersForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 146
+      Width = 138
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -337,11 +348,12 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
+      ExplicitWidth = 134
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 258
+      Width = 250
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -355,6 +367,7 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
+      ExplicitWidth = 246
     end
   end
   object DSCustomers: TioDataSetMaster
@@ -387,63 +400,6 @@ object CustomersForm: TCustomersForm
     DataSet = DSCustomers
     Left = 56
     Top = 168
-  end
-  object ActionList1: TActionList
-    Left = 184
-    Top = 112
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Delete'
-      TargetBindSource = DSCustomers
-    end
-    object acNextPage: TioBSNextPage
-      Category = 'iORM-BSPaging'
-      Caption = 'Pg.Up'
-      TargetBindSource = DSCustomers
-    end
-    object acPrevPage: TioBSPrevPage
-      Category = 'iORM-BSPaging'
-      Caption = 'Pg.Dn'
-      TargetBindSource = DSCustomers
-    end
-    object acBack: TioBSCloseQuery
-      Category = 'iORM-BS'
-      Caption = 'Back'
-      OnUpdateScope = usGlobal
-      TargetBindSource = DSCustomers
-    end
-    object acAdd: TioBSPersistenceAppend
-      Category = 'iORM-BSPersistence'
-      Caption = 'Add'
-      ShowOrSelectAction = acShowOrSelect
-      TargetBindSource = DSCustomers
-    end
-    object acShowOrSelect: TioBSShowOrSelect
-      Category = 'iORM-BS'
-      Caption = 'Select'
-      ParentCloseQueryAction = acBack
-      SelectCurrentAction = acSelectCurrent
-      ShowMode = smBSCurrent
-      TargetBindSource = DSCustomers
-      ViewContextBy = vcByDefaultViewContextProvider
-    end
-    object acSelectCurrent: TioBSSelectCurrent
-      Category = 'iORM-BS'
-      Caption = 'Select'
-      CloseQueryAction = acBack
-      TargetBindSource = DSCustomers
-    end
-    object acWhereBuild: TioBSWhereBuild
-      Category = 'iORM-BSWhereBuilder'
-      Caption = 'Search'
-      TargetBindSource = DSWhere
-    end
-    object acWhereClear: TioBSWhereClear
-      Category = 'iORM-BSWhereBuilder'
-      Caption = 'Clear'
-      TargetBindSource = DSWhere
-      WhereAutoExecuteOnTargetBS = True
-    end
   end
   object DSWhere: TioDataSetMaster
     AsDefault = False

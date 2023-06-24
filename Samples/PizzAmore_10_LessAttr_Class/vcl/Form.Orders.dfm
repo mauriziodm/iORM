@@ -5,7 +5,7 @@ object OrdersForm: TOrdersForm
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
   ClientHeight = 561
-  ClientWidth = 434
+  ClientWidth = 538
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,12 +13,14 @@ object OrdersForm: TOrdersForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  Visible = True
+  OnClose = FormClose
   OnCreate = FormCreate
   TextHeight = 15
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 434
+    Width = 538
     Height = 40
     Align = alTop
     BevelOuter = bvNone
@@ -27,18 +29,19 @@ object OrdersForm: TOrdersForm
     TabOrder = 0
     ExplicitWidth = 430
     object ButtonSelect: TSpeedButton
-      Left = 384
+      Left = 488
       Top = 0
       Width = 50
       Height = 40
-      Action = acShow
       Align = alRight
+      Caption = 'Show'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonSelectClick
       ExplicitLeft = 334
       ExplicitTop = -6
     end
@@ -47,14 +50,15 @@ object OrdersForm: TOrdersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acBack
       Align = alLeft
+      Caption = 'Back'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = acBackExecute
     end
     object LabelTitle: TLabel
       Left = 190
@@ -73,7 +77,7 @@ object OrdersForm: TOrdersForm
   object PanelBottom: TPanel
     Left = 0
     Top = 521
-    Width = 434
+    Width = 538
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
@@ -83,18 +87,19 @@ object OrdersForm: TOrdersForm
     ExplicitTop = 520
     ExplicitWidth = 430
     object ButtonAdd: TSpeedButton
-      Left = 384
+      Left = 488
       Top = 0
       Width = 50
       Height = 40
-      Action = acAdd
       Align = alRight
+      Caption = 'Add'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnClick = ButtonAddClick
       ExplicitLeft = 264
     end
     object ButtonDelete: TSpeedButton
@@ -102,22 +107,23 @@ object OrdersForm: TOrdersForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acDelete
       Align = alLeft
+      Caption = 'Delete'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonDeleteClick
       ExplicitLeft = 8
     end
   end
   object GridOrders: TDBGrid
     Left = 0
     Top = 40
-    Width = 434
-    Height = 481
+    Width = 538
+    Height = 411
     Align = alClient
     DataSource = SourceOrders
     TabOrder = 2
@@ -176,7 +182,281 @@ object OrdersForm: TOrdersForm
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
         Visible = True
+      end
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'OrderState'
+        Title.Alignment = taCenter
+        Title.Caption = 'Status'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clNavy
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 102
+        Visible = True
       end>
+  end
+  object PanelWhere: TPanel
+    Left = 0
+    Top = 451
+    Width = 538
+    Height = 70
+    Align = alBottom
+    BevelOuter = bvNone
+    Color = clMenu
+    ParentBackground = False
+    TabOrder = 3
+    ExplicitTop = 344
+    DesignSize = (
+      538
+      70)
+    object Label1: TLabel
+      Left = 9
+      Top = 7
+      Width = 17
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'ID'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label2: TLabel
+      Left = 287
+      Top = 7
+      Width = 79
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'From date'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label3: TLabel
+      Left = 105
+      Top = 7
+      Width = 54
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Status'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object ButtonSearch: TSpeedButton
+      Left = 488
+      Top = 0
+      Width = 50
+      Height = 45
+      Anchors = [akTop, akRight]
+      Caption = 'Search'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+      OnClick = ButtonSearchClick
+    end
+    object ButtonClear: TSpeedButton
+      Left = 481
+      Top = 68
+      Width = 50
+      Height = 25
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label4: TLabel
+      Left = 303
+      Top = 41
+      Width = 63
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'To date'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label5: TLabel
+      Left = -5
+      Top = 41
+      Width = 51
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Note'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Shape1: TShape
+      Left = 286
+      Top = 6
+      Width = 1
+      Height = 57
+      Pen.Color = clGray
+    end
+    object ButtonHistory: TSpeedButton
+      Left = 488
+      Top = 44
+      Width = 50
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'Clear'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      OnClick = ButtonHistoryClick
+    end
+    object Label6: TLabel
+      Left = 113
+      Top = 41
+      Width = 86
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Cust.name'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object DBEditWhereID: TDBEdit
+      Left = 54
+      Top = 7
+      Width = 40
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'OrderID'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+    end
+    object DBEditWhereFromDate: TDBEdit
+      Left = 375
+      Top = 6
+      Width = 100
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'FromDate'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 3
+    end
+    object DBEditWhereToDate: TDBEdit
+      Left = 375
+      Top = 41
+      Width = 100
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'ToDate'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 4
+    end
+    object DBComboBoxWhereOrderState: TDBComboBox
+      Left = 167
+      Top = 6
+      Width = 113
+      Height = 29
+      BevelInner = bvNone
+      BevelOuter = bvNone
+      Color = clInactiveBorder
+      Ctl3D = False
+      DataField = 'OrderState'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentCtl3D = False
+      ParentFont = False
+      Sorted = True
+      TabOrder = 1
+    end
+    object DBEditWhereNote: TDBEdit
+      Left = 54
+      Top = 41
+      Width = 56
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'Note'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+    end
+    object DBEditWhereCustName: TDBEdit
+      Left = 205
+      Top = 39
+      Width = 74
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'CustomerName'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 5
+    end
   end
   object DSOrders: TioDataSetMaster
     AsDefault = True
@@ -194,6 +474,10 @@ object OrdersForm: TOrdersForm
       Alignment = taCenter
       FieldName = 'OrderDate'
     end
+    object DSOrdersOrderState: TStringField
+      FieldName = 'OrderState'
+      Size = 30
+    end
     object DSOrdersCustomerName: TStringField
       FieldName = 'Customer.Name'
       Size = 100
@@ -207,26 +491,41 @@ object OrdersForm: TOrdersForm
     Left = 56
     Top = 168
   end
-  object ActionList1: TActionList
-    Left = 184
-    Top = 112
-    object acAdd: TAction
-      Category = 'iORM-BSPersistence'
-      Caption = 'Add'
-      OnExecute = acAddExecute
+  object DSWhere: TioDataSetMaster
+    AsDefault = False
+    TypeName = 'TWhereOrder'
+    LoadType = ltCreate
+    TypeOfCollection = tcSingleObject
+    Paging.CurrentPageOfFormat = '%d/%d'
+    WhereBuilderFor = DSOrders
+    OnReceiveSelectionFreeObject = False
+    Left = 223
+    Top = 512
+    object DSWhereOrderID: TIntegerField
+      FieldName = 'OrderID'
     end
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
+    object DSWhereOrderState: TStringField
+      FieldName = 'OrderState'
+      Size = 100
     end
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Delete'
-      TargetBindSource = DSOrders
+    object DSWhereNote: TStringField
+      FieldName = 'Note'
+      Size = 100
     end
-    object acShow: TAction
-      Caption = 'Show'
-      OnExecute = acShowExecute
+    object DSWhereFromDate: TDateField
+      FieldName = 'FromDate'
     end
+    object DSWhereToDate: TDateField
+      FieldName = 'ToDate'
+    end
+    object DSWhereCustomerName: TStringField
+      FieldName = 'CustomerName'
+      Size = 100
+    end
+  end
+  object SourceWhere: TDataSource
+    DataSet = DSWhere
+    Left = 288
+    Top = 512
   end
 end

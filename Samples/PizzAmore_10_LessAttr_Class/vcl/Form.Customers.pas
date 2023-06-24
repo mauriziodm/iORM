@@ -29,10 +29,6 @@ type
     GridCustomers: TDBGrid;
     DBTextPageOf: TDBText;
     DSCustomersPagingCurrentPageOf: TStringField;
-    ActionList1: TActionList;
-    acDelete: TioBSPersistenceDelete;
-    acNextPage: TioBSNextPage;
-    acPrevPage: TioBSPrevPage;
     PanelWhere: TPanel;
     Label1: TLabel;
     Label2: TLabel;
@@ -47,27 +43,77 @@ type
     SourceWhere: TDataSource;
     ButtonSearch: TSpeedButton;
     ButtonClear: TSpeedButton;
-    acBack: TioBSCloseQuery;
-    acAdd: TioBSPersistenceAppend;
-    acShowOrSelect: TioBSShowOrSelect;
-    acSelectCurrent: TioBSSelectCurrent;
-    acWhereBuild: TioBSWhereBuild;
-    acWhereClear: TioBSWhereClear;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ButtonBackClick(Sender: TObject);
+    procedure ButtonSelectClick(Sender: TObject);
     procedure GridCustomersDblClick(Sender: TObject);
+    procedure ButtonAddClick(Sender: TObject);
+    procedure ButtonDeleteClick(Sender: TObject);
+    procedure ButtonPageUpClick(Sender: TObject);
+    procedure ButtonPageDownClick(Sender: TObject);
+    procedure ButtonSearchClick(Sender: TObject);
+    procedure ButtonClearClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
+// *** Note: the lines below have been deleted ***
+//var
+//  CustomerssForm: TCustomersForm;
+
 implementation
 
-uses
-  Form.Customer, System.Generics.Collections;
-
 {$R *.dfm}
+
+procedure TCustomersForm.ButtonAddClick(Sender: TObject);
+begin
+  DSCustomers.Persistence.Append;
+  DSCustomers.ShowCurrent(nil);
+end;
+
+procedure TCustomersForm.ButtonBackClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TCustomersForm.ButtonClearClick(Sender: TObject);
+begin
+  DSWhere.WhereClear(True);
+end;
+
+procedure TCustomersForm.ButtonDeleteClick(Sender: TObject);
+begin
+  DSCustomers.Persistence.Delete;
+end;
+
+procedure TCustomersForm.ButtonPageDownClick(Sender: TObject);
+begin
+  DSCustomers.Paging.PrevPage;
+end;
+
+procedure TCustomersForm.ButtonPageUpClick(Sender: TObject);
+begin
+  DSCustomers.Paging.NextPage;
+end;
+
+procedure TCustomersForm.ButtonSearchClick(Sender: TObject);
+begin
+  DSWhere.WhereBuild(True);
+end;
+
+procedure TCustomersForm.ButtonSelectClick(Sender: TObject);
+begin
+  if Assigned(DSCustomers.SelectorFor) then
+  begin
+    DSCustomers.SelectCurrent;
+    Close;
+  end
+  else
+    DSCustomers.ShowCurrent(nil);
+end;
 
 procedure TCustomersForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -80,34 +126,31 @@ begin
   DSWhere.Open;
   // Fully automatic loading by the component itself (LoadType = ltAuto)
   DSCustomers.Open;
-
-{$region 'Manual loading (also objects originating from REST servers) (LoadType = ltManual)'}
-//  var LList: TObjectList<TCustomer>;
-//  LList := io.LoadList<TObjectList<TCustomer>>;
-//  DSCustomers.Open;
-//  DSCustomers.SetDataObject(LList);
-{$endregion}
-
-{$region 'Manual loading filtered by some criteria 1'}
-//  var LList: TObjectList<TCustomer> := TObjectList<TCustomer>.Create;
-//  io.Load<TCustomer>._Where('City', coEqual, 'New York').ToList(LList);
-//  DSCustomers.Open;
-//  DSCustomers.SetDataObject(LList);
-{$endregion}
-
-{$region 'Manual loading filtered by some criteria 2'}
-//  var LList: TObjectList<TCustomer>;
-//  var LWhere: IioWhere := io.Where<TCustomer>('City', coEqual, 'New York');
-//  LWhere._And('Name', coLike, 'Maurizio%');
-//  LList := io.LoadList<TObjectList<TCustomer>>(LWhere);
-//  DSCustomers.Open;
-//  DSCustomers.SetDataObject(LList);
-{$endregion}
+{$REGION 'Manual loading (also objects originating from REST servers) (LoadType = ltManual)'}
+  // var LList: TObjectList<TCustomer>;
+  // LList := io.LoadList<TObjectList<TCustomer>>;
+  // DSCustomers.Open;
+  // DSCustomers.SetDataObject(LList);
+{$ENDREGION}
+{$REGION 'Manual loading filtered by some criteria 1'}
+  // var LList: TObjectList<TCustomer> := TObjectList<TCustomer>.Create;
+  // io.Load<TCustomer>._Where('City', coEqual, 'New York').ToList(LList);
+  // DSCustomers.Open;
+  // DSCustomers.SetDataObject(LList);
+{$ENDREGION}
+{$REGION 'Manual loading filtered by some criteria 2'}
+  // var LList: TObjectList<TCustomer>;
+  // var LWhere: IioWhere := io.Where<TCustomer>('City', coEqual, 'New York');
+  // LWhere._And('Name', coLike, 'Maurizio%');
+  // LList := io.LoadList<TObjectList<TCustomer>>(LWhere);
+  // DSCustomers.Open;
+  // DSCustomers.SetDataObject(LList);
+{$ENDREGION}
 end;
 
 procedure TCustomersForm.GridCustomersDblClick(Sender: TObject);
 begin
-  acShowOrSelect.Execute;
+  ButtonSelectClick(ButtonSelect);
 end;
 
 end.

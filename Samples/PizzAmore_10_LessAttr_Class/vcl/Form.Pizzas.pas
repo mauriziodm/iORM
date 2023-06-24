@@ -45,32 +45,60 @@ type
     DBEditWhereName: TDBEdit;
     DBEditWhereFromPrice: TDBEdit;
     DBEditWhereToPrice: TDBEdit;
-    ActionList1: TActionList;
-    acDelete: TioBSPersistenceDelete;
-    acBack: TioBSCloseQuery;
-    acShowOrSelect: TioBSShowOrSelect;
-    acAdd: TioBSPersistenceAppend;
-    acWhereBuild: TioBSWhereBuild;
-    acWhereClear: TioBSWhereClear;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure DBCtrlGrid1DblClick(Sender: TObject);
+    procedure ButtonBackClick(Sender: TObject);
+    procedure ButtonSelectClick(Sender: TObject);
+    procedure ButtonDeleteClick(Sender: TObject);
+    procedure ButtonAddClick(Sender: TObject);
+    procedure ButtonSearchClick(Sender: TObject);
+    procedure ButtonClearClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-implementation
+// *** Note: the lines below have been deleted ***
+//var
+//  PizzasForm: TPizzasForm;
 
-uses
-  Form.Pizza;
+implementation
 
 {$R *.dfm}
 
-procedure TPizzasForm.DBCtrlGrid1DblClick(Sender: TObject);
+procedure TPizzasForm.ButtonAddClick(Sender: TObject);
 begin
-  acShowOrSelect.Execute;
+  DSPizzas.Persistence.Append;
+  DSPizzas.ShowCurrent(nil);
+end;
+
+procedure TPizzasForm.ButtonBackClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TPizzasForm.ButtonClearClick(Sender: TObject);
+begin
+  DSWhere.WhereClear(True);
+end;
+
+procedure TPizzasForm.ButtonDeleteClick(Sender: TObject);
+begin
+  DSPizzas.Persistence.Delete;
+end;
+
+procedure TPizzasForm.ButtonSearchClick(Sender: TObject);
+begin
+  DSWhere.WhereBuild(True);
+end;
+
+procedure TPizzasForm.ButtonSelectClick(Sender: TObject);
+begin
+  if Assigned(DSPizzas.SelectorFor) then
+    DSPizzas.SelectCurrent
+  else
+    DSPizzas.ShowCurrent(nil);
 end;
 
 procedure TPizzasForm.FormClose(Sender: TObject; var Action: TCloseAction);

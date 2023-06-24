@@ -13,7 +13,8 @@ object CustomerForm: TCustomerForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
-  OnShow = FormShow
+  Visible = True
+  OnClose = FormClose
   TextHeight = 15
   object Label1: TLabel
     Left = 10
@@ -97,10 +98,10 @@ object CustomerForm: TCustomerForm
     Height = 40
     Align = alTop
     BevelOuter = bvNone
-    Caption = 'Back'
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 580
     DesignSize = (
       584
       40)
@@ -109,19 +110,20 @@ object CustomerForm: TCustomerForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acBack
       Align = alLeft
+      Caption = 'Back'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonBackClick
     end
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 481
+      Width = 477
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -134,6 +136,7 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
+      ExplicitWidth = 481
     end
   end
   object PanelBottom: TPanel
@@ -146,19 +149,22 @@ object CustomerForm: TCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 262
+    ExplicitWidth = 580
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
       Width = 50
       Height = 40
-      Action = acRevert
       Align = alLeft
+      Caption = 'Revert'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonRevertClick
       ExplicitLeft = 334
       ExplicitTop = -6
     end
@@ -167,33 +173,17 @@ object CustomerForm: TCustomerForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acPersist
       Align = alRight
+      Caption = 'Persist'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnClick = ButtonPersistClick
       ExplicitLeft = 334
       ExplicitTop = -6
-    end
-    object Button1: TButton
-      Left = 56
-      Top = 8
-      Width = 75
-      Height = 25
-      Action = acRevert
-      TabOrder = 0
-    end
-    object ButtonManualSetDataObject: TButton
-      Left = 137
-      Top = 8
-      Width = 192
-      Height = 25
-      Caption = 'Manual SetDataObject example'
-      TabOrder = 1
-      OnClick = ButtonManualSetDataObjectClick
     end
   end
   object DBEditID: TDBEdit
@@ -315,23 +305,5 @@ object CustomerForm: TCustomerForm
     DataSet = DSCustomer
     Left = 320
     Top = 104
-  end
-  object ActionList1: TActionList
-    Left = 416
-    Top = 48
-    object acPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Caption = 'Persist'
-      TargetBindSource = DSCustomer
-    end
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
-    object acRevert: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Revert'
-      TargetBindSource = DSCustomer
-    end
   end
 end

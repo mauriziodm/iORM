@@ -13,8 +13,9 @@ object OrderForm: TOrderForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poMainFormCenter
+  Visible = True
+  OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
     Left = 5
@@ -96,9 +97,25 @@ object OrderForm: TOrderForm
     Top = 137
     Width = 25
     Height = 25
-    Action = acSelectCustomer
+    Caption = '...'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    OnClick = ButtonSelectCustomerClick
+  end
+  object Label7: TLabel
+    Left = 209
+    Top = 57
+    Width = 75
+    Height = 25
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Status'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = [fsBold]
@@ -111,11 +128,11 @@ object OrderForm: TOrderForm
     Height = 40
     Align = alTop
     BevelOuter = bvNone
-    Caption = 'Back'
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 784
+    ExplicitLeft = -8
+    ExplicitTop = 1
     DesignSize = (
       780
       40)
@@ -124,19 +141,20 @@ object OrderForm: TOrderForm
       Top = 0
       Width = 50
       Height = 40
-      Action = acBack
       Align = alLeft
+      Caption = 'Back'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = acBackExecute
     end
     object LabelTitle: TLabel
       Left = 56
-      Top = 7
-      Width = 673
+      Top = 9
+      Width = 665
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -149,22 +167,21 @@ object OrderForm: TOrderForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 481
     end
-    object ButtonAdd: TSpeedButton
-      Left = 730
+    object ButtonSelectPizza: TSpeedButton
+      Left = 704
       Top = 0
-      Width = 50
+      Width = 76
       Height = 40
-      Action = acSelectPizza
       Align = alRight
+      Caption = 'Select pizza'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 712
+      OnClick = ButtonSelectPizzaClick
     end
   end
   object PanelBottom: TPanel
@@ -177,37 +194,40 @@ object OrderForm: TOrderForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 522
-    ExplicitWidth = 784
+    ExplicitTop = 520
+    ExplicitWidth = 776
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
       Width = 50
       Height = 40
-      Action = acRevert
       Align = alLeft
+      Caption = 'Revert'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonRevertClick
       ExplicitLeft = 334
       ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 734
+      Left = 730
       Top = 0
       Width = 50
       Height = 40
-      Action = acPersist
       Align = alRight
+      Caption = 'Persist'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnClick = ButtonPersistClick
+      ExplicitLeft = 734
       ExplicitTop = 8
     end
     object Label6: TLabel
@@ -229,14 +249,16 @@ object OrderForm: TOrderForm
       Top = 0
       Width = 79
       Height = 40
-      Action = acDeleteRow
+      Hint = 'Delete'
       Align = alLeft
+      Caption = 'Delete row'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnClick = ButtonDeleteRowClick
     end
     object DBEditGrandTotal: TDBEdit
       Left = 310
@@ -268,13 +290,13 @@ object OrderForm: TOrderForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
-    ExplicitLeft = 434
-    ExplicitHeight = 482
+    ExplicitLeft = 426
+    ExplicitHeight = 480
     object DBCtrlGridPizzas: TDBCtrlGrid
       Left = 0
       Top = 0
       Width = 350
-      Height = 480
+      Height = 481
       Align = alClient
       AllowDelete = False
       AllowInsert = False
@@ -285,8 +307,8 @@ object OrderForm: TOrderForm
       RowCount = 5
       SelectedColor = 13828095
       ShowFocus = False
-      OnDblClick = DBCtrlGridPizzasDblClick
-      ExplicitHeight = 482
+      OnDblClick = ButtonSelectPizzaClick
+      ExplicitHeight = 480
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -300,7 +322,7 @@ object OrderForm: TOrderForm
         Font.Name = 'Segoe UI'
         Font.Style = [fsBold]
         ParentFont = False
-        OnDblClick = DBCtrlGridPizzasDblClick
+        OnDblClick = ButtonSelectPizzaClick
       end
       object DBTextPrice: TDBText
         Left = 99
@@ -315,7 +337,7 @@ object OrderForm: TOrderForm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        OnDblClick = DBCtrlGridPizzasDblClick
+        OnDblClick = ButtonSelectPizzaClick
       end
       object DBImage: TDBImage
         Left = 7
@@ -329,7 +351,7 @@ object OrderForm: TOrderForm
         Proportional = True
         Stretch = True
         TabOrder = 0
-        OnDblClick = DBCtrlGridPizzasDblClick
+        OnDblClick = ButtonSelectPizzaClick
       end
     end
   end
@@ -351,7 +373,7 @@ object OrderForm: TOrderForm
     TabOrder = 3
   end
   object DBEditDate: TDBEdit
-    Left = 140
+    Left = 128
     Top = 57
     Width = 100
     Height = 25
@@ -520,51 +542,26 @@ object OrderForm: TOrderForm
         Visible = True
       end>
   end
-  object DBEditState: TDBEdit
-    Left = 310
-    Top = 57
-    Width = 107
-    Height = 25
-    BorderStyle = bsNone
+  object DBComboBoxOrderState: TDBComboBox
+    Left = 290
+    Top = 54
+    Width = 127
+    Height = 29
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Color = clInactiveBorder
-    DataField = 'State'
+    Ctl3D = False
+    DataField = 'OrderState'
     DataSource = SourceOrder
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ParentCtl3D = False
     ParentFont = False
+    Sorted = True
     TabOrder = 11
-  end
-  object DBComboBoxState: TDBComboBox
-    Left = 244
-    Top = 296
-    Width = 145
-    Height = 23
-    DataField = 'State'
-    DataSource = SourceOrder
-    TabOrder = 12
-  end
-  object DBListBoxState: TDBListBox
-    Left = 244
-    Top = 325
-    Width = 145
-    Height = 84
-    DataField = 'State'
-    DataSource = SourceOrder
-    ItemHeight = 15
-    TabOrder = 13
-  end
-  object DBRadioGroupState: TDBRadioGroup
-    Left = 243
-    Top = 411
-    Width = 146
-    Height = 105
-    Caption = 'DBRadioGroupState'
-    DataField = 'State'
-    DataSource = SourceOrder
-    TabOrder = 14
   end
   object DSPizzas: TioDataSetMaster
     AsDefault = False
@@ -618,6 +615,10 @@ object OrderForm: TOrderForm
     end
     object DSOrderState: TStringField
       FieldName = 'State'
+    end
+    object DSOrderOrderState: TStringField
+      FieldName = 'OrderState'
+      Size = 30
     end
   end
   object SourceOrder: TDataSource
@@ -679,40 +680,5 @@ object OrderForm: TOrderForm
     DataSet = DSRows
     Left = 144
     Top = 440
-  end
-  object ActionList1: TActionList
-    Left = 256
-    Top = 312
-    object acBack: TAction
-      Caption = 'Back'
-      OnExecute = acBackExecute
-    end
-    object acPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Caption = 'Persist'
-      TargetBindSource = DSOrder
-    end
-    object acRevert: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Revert'
-      TargetBindSource = DSOrder
-    end
-    object acSelectCustomer: TAction
-      Category = 'iORM-BSPersistence'
-      Caption = '...'
-      OnExecute = acSelectCustomerExecute
-    end
-    object acSelectPizza: TioBSSelectCurrent
-      Category = 'iORM-BS'
-      Caption = 'Add'
-      TargetBindSource = DSPizzas
-    end
-    object acDeleteRow: TDataSetDelete
-      Category = 'Dataset'
-      Caption = 'Delete row'
-      Hint = 'Delete'
-      ImageIndex = 5
-      DataSource = SourceRows
-    end
   end
 end

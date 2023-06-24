@@ -6,9 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
   iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.ExtDlgs, System.Actions, Vcl.ActnList,
-  iORM.StdActions.Vcl;
+  iORM.StdActions.Vcl, Model.Pizza;
 
 type
+
+  [diSimpleViewFor(TPizza)]
   TPizzaForm = class(TForm)
     PanelTop: TPanel;
     ButtonBack: TSpeedButton;
@@ -31,50 +33,59 @@ type
     DSPizzaImage: TGraphicField;
     SourcePizza: TDataSource;
     ButtonLoadImage: TSpeedButton;
-    ActionList1: TActionList;
-    acPersist: TioBSPersistencePersist;
-    acBack: TAction;
-    acRevert: TioBSPersistenceRevertOrDelete;
-    acLoadImage: TAction;
     OpenPictureDialog: TOpenPictureDialog;
-    Button1: TButton;
-    procedure acBackExecute(Sender: TObject);
-    procedure acLoadImageExecute(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure ButtonLoadImageClick(Sender: TObject);
+    procedure ButtonBackClick(Sender: TObject);
+    procedure ButtonPersistClick(Sender: TObject);
+    procedure ButtonRevertClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
 
-var
-  PizzaForm: TPizzaForm;
+// *** Note: the lines below have been deleted ***
+// var
+// CustomerForm: TCustomerForm;
 
 implementation
 
-uses
-  Model.Pizza;
-
 {$R *.dfm}
 
-procedure TPizzaForm.FormShow(Sender: TObject);
-begin
-  DSPizza.Open;
-end;
-
-procedure TPizzaForm.acBackExecute(Sender: TObject);
+procedure TPizzaForm.ButtonBackClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TPizzaForm.acLoadImageExecute(Sender: TObject);
+procedure TPizzaForm.ButtonLoadImageClick(Sender: TObject);
 begin
   if OpenPictureDialog.Execute then
   begin
     DSPizza.Edit;
     DSPizza.CurrentAs<TPizza>.Image.LoadFromFile(OpenPictureDialog.FileName);
-    DSPizza.Refresh(False);
+    DSPizza.Refresh;
   end;
+end;
+
+procedure TPizzaForm.ButtonPersistClick(Sender: TObject);
+begin
+  DSPizza.Persistence.Persist;
+end;
+
+procedure TPizzaForm.ButtonRevertClick(Sender: TObject);
+var
+  LIsInserting: Boolean;
+begin
+  LIsInserting := DSPizza.Persistence.IsInserting;
+  DSPizza.Persistence.RevertOrDelete;
+  if LIsInserting then
+    Close;
+end;
+
+procedure TPizzaForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
 end;
 
 end.

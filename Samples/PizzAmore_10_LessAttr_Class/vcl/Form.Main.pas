@@ -20,13 +20,12 @@ type
     ButtonCustomers: TButton;
     ButtonPizzas: TButton;
     ButtonQuit: TButton;
-    ActionList1: TActionList;
-    acQuit: TioBSCloseQuery;
-    acShowOrders: TioBSShowOrSelect;
-    acShowCustomers: TioBSShowOrSelect;
-    acShowPizzas: TioBSShowOrSelect;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
+    procedure ButtonQuitClick(Sender: TObject);
+    procedure ButtonOrdersClick(Sender: TObject);
+    procedure ButtonCustomersClick(Sender: TObject);
+    procedure ButtonPizzasClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -39,9 +38,29 @@ var
 implementation
 
 uses
-  Utils.SampleData, Model.Customer;
+  Utils.SampleData, Model.Customer, Model.Order, Model.Pizza;
 
 {$R *.dfm}
+
+procedure TMainForm.ButtonCustomersClick(Sender: TObject);
+begin
+  io.Show<TCustomer>(nil, 'LIST');
+end;
+
+procedure TMainForm.ButtonOrdersClick(Sender: TObject);
+begin
+  io.Show<TOrder>(nil, 'LIST');
+end;
+
+procedure TMainForm.ButtonPizzasClick(Sender: TObject);
+begin
+  io.Show<TPizza>(nil, 'LIST');
+end;
+
+procedure TMainForm.ButtonQuitClick(Sender: TObject);
+begin
+  io.TerminateApplication;
+end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
   AWarnings: TStrings);

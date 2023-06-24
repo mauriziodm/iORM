@@ -18,7 +18,7 @@ type
     FCustomer: TCustomer;
     FRows: TObjectList<TOrderRow>;
     FNote: String;
-    FState: TOrderState;
+    FOrderState: TOrderState;
     function GetGrandTotal: Currency;
   public
     constructor Create;
@@ -29,7 +29,7 @@ type
     property Customer: TCustomer read FCustomer write FCustomer;
     property Rows: TObjectList<TOrderRow> read FRows; // ReadOnly
     property Note: String read FNote write FNote;
-    property State: TOrderState read FState write FState;
+    property OrderState: TOrderState read FOrderState write FOrderState;
     property GrandTotal: Currency read GetGrandTotal; // ReadOnly
   end;
 
@@ -44,6 +44,7 @@ constructor TOrder.Create;
 begin
   inherited;
   FOrderDate := Date;
+  FOrderState := osWaiting;
   FRows := TObjectList<TOrderRow>.Create;
 end;
 
