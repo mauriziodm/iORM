@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('WHERE_ORDERS')]
+  [ioNotPersistedEntity]
   TWhereOrder = class
   private
     [ioWhereSkip]
@@ -23,8 +23,8 @@ type
     FToDate: TDate;
     [ioWhere('Customer.Name', coLike)]
     FCustomerName: String;
-    [ioWhere('Customer.State.Name', coLike)]
-    FCustomerStateName: String;
+    [ioWhere('Rows.Description', coLike)]
+    FRowDescription: String;
   public
     constructor Create;
     property OrderID: Integer read FOrderID write FOrderID;
@@ -33,7 +33,7 @@ type
     property FromDate: TDate read FFromDate Write FFromDate;
     property ToDate: TDate read FToDate Write FToDate;
     property CustomerName: String read FCustomerName write FCustomerName;
-    property CustomerStateName: String read FCustomerStateName write FCustomerStateName;
+    property RowDescription: String read FRowDescription write FRowDescription;
   end;
 
 implementation

@@ -88,7 +88,6 @@ type
     LinkControlToField7: TLinkControlToField;
     LinkControlToField8: TLinkControlToField;
     LinkGridToDataSourceBSOrderRows: TLinkGridToDataSource;
-    acOrderPersist: TioBSPersistencePersist;
     acMoveToStartTabItem: TChangeTabAction;
     acMoveToOrderTabItem: TChangeTabAction;
     Label7: TLabel;
@@ -108,15 +107,10 @@ type
     LinkControlToField12: TLinkControlToField;
     LinkControlToField13: TLinkControlToField;
     ButtonCustomerRevert: TSpeedButton;
-    acCustomerPersist: TioBSPersistencePersist;
-    acCustomerRevertOrDelete: TioBSPersistenceRevertOrDelete;
     acMoveToCustomerTabItem: TChangeTabAction;
     acMoveToPizzaTabItem: TChangeTabAction;
     Label12: TLabel;
     ButtonOrderRevert: TSpeedButton;
-    acOrderRevertOrDelete: TioBSPersistenceRevertOrDelete;
-    acPizzaRevertOrDelete: TioBSPersistenceRevertOrDelete;
-    acPizzaPersist: TioBSPersistencePersist;
     Label13: TLabel;
     EditPizzaID: TEdit;
     Label14: TLabel;
@@ -134,45 +128,100 @@ type
     ToolBar1: TToolBar;
     Label17: TLabel;
     Rectangle8: TRectangle;
-    acOrderDelete: TioBSPersistenceDelete;
-    acCustomerDelete: TioBSPersistenceDelete;
-    acPizzaDelete: TioBSPersistenceDelete;
     ButtonCustomerPageDown: TSpeedButton;
     ButtonCustomerPageUp: TSpeedButton;
-    acCustomersNextPage: TioBSNextPage;
-    acCustomersPrevPage: TioBSPrevPage;
     LabelCustomerPage: TLabel;
     LinkPropertyToFieldText: TLinkPropertyToField;
-    acCustomerAdd: TAction;
-    acOrderAdd: TAction;
-    acPizzaAdd: TAction;
-    EditState: TEdit;
-    LinkControlToField18: TLinkControlToField;
     ComboBoxState: TComboBox;
-    LinkFillControlToField1: TLinkFillControlToField;
-    ListBoxState: TListBox;
-    LinkFillControlToField2: TLinkFillControlToField;
     PanelCustomerFilter: TPanel;
-    BSFilterCustomer: TioPrototypeBindSourceMaster;
+    BSWhereCustomer: TioPrototypeBindSourceMaster;
     Label18: TLabel;
     Label19: TLabel;
-    EditCustomerSearchCity: TEdit;
-    ButtonSearchCustomer: TButton;
-    LinkControlToField19: TLinkControlToField;
-    ButtonFilterClear: TButton;
-    acWhereBuild: TioBSWhereBuild;
-    acWhereClear: TioBSWhereClear;
+    EditSearchCustID: TEdit;
+    ButtonCustomerWhereBuild: TButton;
+    ButtonCustomerWhereClear: TButton;
+    LinkFillControlToField1: TLinkFillControlToField;
     Label20: TLabel;
+    EditSearchCustName: TEdit;
+    Label21: TLabel;
+    EditSearchCustCity: TEdit;
+    LinkControlToField18: TLinkControlToField;
+    LinkControlToField19: TLinkControlToField;
+    LinkControlToField20: TLinkControlToField;
+    BSWherePizzas: TioPrototypeBindSourceMaster;
+    Panel1: TPanel;
+    Label22: TLabel;
+    Label23: TLabel;
+    EditWherePizzaID: TEdit;
+    ButtonPizzaWhereBuild: TButton;
+    ButtonPizzaWhereClear: TButton;
+    Label24: TLabel;
+    EditWherePizzaName: TEdit;
+    Label25: TLabel;
+    EditWherePizzaFromPrice: TEdit;
+    Label26: TLabel;
+    EditWherePizzaToPrice: TEdit;
+    LinkControlToField21: TLinkControlToField;
+    LinkControlToField22: TLinkControlToField;
+    LinkControlToField23: TLinkControlToField;
+    LinkControlToField24: TLinkControlToField;
+    BSWhereOrders: TioPrototypeBindSourceMaster;
+    Panel2: TPanel;
+    Label27: TLabel;
+    Label28: TLabel;
+    EditWhereOrderID: TEdit;
+    ButtonOrderWhereBuild: TButton;
+    ButtonOrderWhereClear: TButton;
+    Label29: TLabel;
+    EditWhereOrderNote: TEdit;
+    Label30: TLabel;
+    EditWhereOrderFromDate: TEdit;
+    ComboBoxWhereOrderStatus: TComboBox;
+    Label31: TLabel;
+    Label32: TLabel;
+    EditWhereOrderToDate: TEdit;
+    Label33: TLabel;
+    EditWhereOrderCustomerName: TEdit;
+    Label34: TLabel;
+    EditWhereOrderRowDescription: TEdit;
+    LinkControlToField25: TLinkControlToField;
+    LinkControlToField26: TLinkControlToField;
+    LinkControlToField27: TLinkControlToField;
+    LinkFillControlToField2: TLinkFillControlToField;
+    LinkControlToField28: TLinkControlToField;
+    LinkControlToField29: TLinkControlToField;
+    LinkControlToField30: TLinkControlToField;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
     procedure BSOrdersSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure acCustomerAddExecute(Sender: TObject);
-    procedure acOrderAddExecute(Sender: TObject);
-    procedure acPizzaAddExecute(Sender: TObject);
     procedure ListViewPizzasItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewOrdersItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);
+    procedure ButtonCustomerAddClick(Sender: TObject);
+    procedure ButtonCustomerPageDownClick(Sender: TObject);
+    procedure ButtonCustomerPageUpClick(Sender: TObject);
+    procedure ButtonCustomerDeleteClick(Sender: TObject);
+    procedure ButtonCustomerPersistClick(Sender: TObject);
+    procedure ButtonCustomerRevertClick(Sender: TObject);
+    procedure ButtonSearchCustomerClick(Sender: TObject);
+    procedure ButtonFilterClearClick(Sender: TObject);
+    procedure ButtonPizzaAddClick(Sender: TObject);
+    procedure ButtonPizzaDeleteClick(Sender: TObject);
+    procedure ButtonPizzaPersistClick(Sender: TObject);
+    procedure ButtonPizzaRevertClick(Sender: TObject);
+    procedure ButtonOrderAddClick(Sender: TObject);
+    procedure ButtonOrderDeleteClick(Sender: TObject);
+    procedure ButtonOrderPersistClick(Sender: TObject);
+    procedure ButtonOrderRevertClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure ButtonPizzaWhereBuildClick(Sender: TObject);
+    procedure ButtonPizzaWhereClearClick(Sender: TObject);
+    procedure ButtonCustomerWhereBuildClick(Sender: TObject);
+    procedure ButtonCustomerWhereClearClick(Sender: TObject);
+    procedure ButtonOrderWhereBuildClick(Sender: TObject);
+    procedure ButtonOrderWhereClearClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -193,7 +242,7 @@ uses
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   io.Enums.FillStrings<TOrderState>(ComboBoxState.Items);
-  io.Enums.FillStrings<TOrderState>(ListBoxState.Items);
+  io.Enums.FillStrings<TOrderState>(ComboBoxWhereOrderStatus.Items);
   // Set TabControls
   TabControlMain.TabPosition := TTabPosition.None;
   TabControlMain.ActiveTab := TabItemStart;
@@ -202,8 +251,10 @@ begin
   BSOrders.Open;
   BSCustomers.Open;
   BSPizzas.Open;
-  // Open filter bind sources
-  BSFilterCustomer.Open;
+  // Open where bind sources
+  BSWhereCustomer.Open;
+  BSWherePizzas.Open;
+  BSWhereOrders.Open;
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -212,29 +263,149 @@ begin
   TSampleData.CheckForSampleDataCreation;
 end;
 
-procedure TMainForm.acCustomerAddExecute(Sender: TObject);
-begin
-  BSCustomers.Persistence.Append;
-  acMoveToCustomerTabItem.Execute;
-end;
-
-procedure TMainForm.acOrderAddExecute(Sender: TObject);
-begin
-  BSOrders.Persistence.Append;
-  acMoveToOrderTabItem.Execute;
-end;
-
-procedure TMainForm.acPizzaAddExecute(Sender: TObject);
-begin
-  BSPizzas.Persistence.Append;
-  acMoveToPizzaTabItem.Execute;
-end;
-
 procedure TMainForm.BSOrdersSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   BSOrders.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   BSOrders.Refresh;
   ADone := True;
+end;
+
+procedure TMainForm.Button1Click(Sender: TObject);
+begin
+  BSWherePizzas.WhereBuild(True);
+end;
+
+procedure TMainForm.Button2Click(Sender: TObject);
+begin
+  BSWherePizzas.WhereClear(True);
+end;
+
+procedure TMainForm.ButtonCustomerAddClick(Sender: TObject);
+begin
+  BSCustomers.Persistence.Append;
+  acMoveToCustomerTabItem.Execute;
+end;
+
+procedure TMainForm.ButtonCustomerDeleteClick(Sender: TObject);
+begin
+  BSCustomers.Persistence.Delete;
+end;
+
+procedure TMainForm.ButtonCustomerPageDownClick(Sender: TObject);
+begin
+  BSCustomers.Paging.PrevPage;
+end;
+
+procedure TMainForm.ButtonCustomerPageUpClick(Sender: TObject);
+begin
+  BSCustomers.Paging.NextPage;
+end;
+
+procedure TMainForm.ButtonCustomerPersistClick(Sender: TObject);
+begin
+  BSCustomers.Persistence.Persist;
+end;
+
+procedure TMainForm.ButtonCustomerRevertClick(Sender: TObject);
+var
+  LIsInserting: Boolean;
+begin
+  LIsInserting := BSCustomers.Persistence.IsInserting;
+  BSCustomers.Persistence.RevertOrDelete;
+  if LIsInserting then
+    acMoveToOrderTabItem.Execute;
+end;
+
+procedure TMainForm.ButtonCustomerWhereBuildClick(Sender: TObject);
+begin
+  BSWhereCustomer.WhereBuild(True);
+end;
+
+procedure TMainForm.ButtonCustomerWhereClearClick(Sender: TObject);
+begin
+  BSWhereCustomer.WhereClear(True);
+end;
+
+procedure TMainForm.ButtonFilterClearClick(Sender: TObject);
+begin
+  BSWhereCustomer.WhereClear(True);
+end;
+
+procedure TMainForm.ButtonOrderAddClick(Sender: TObject);
+begin
+  BSOrders.Persistence.Append;
+  acMoveToOrderTabItem.Execute;
+end;
+
+procedure TMainForm.ButtonOrderDeleteClick(Sender: TObject);
+begin
+  BSOrders.Persistence.Delete;
+end;
+
+procedure TMainForm.ButtonOrderPersistClick(Sender: TObject);
+begin
+  BSOrders.Persistence.Persist;
+end;
+
+procedure TMainForm.ButtonOrderRevertClick(Sender: TObject);
+var
+  LIsInserting: Boolean;
+begin
+  LIsInserting := BSOrders.Persistence.IsInserting;
+  BSOrders.Persistence.RevertOrDelete;
+  if LIsInserting then
+    acMoveToStartTabItem.Execute;
+end;
+
+procedure TMainForm.ButtonOrderWhereBuildClick(Sender: TObject);
+begin
+  BSWhereOrders.WhereBuild(True);
+end;
+
+procedure TMainForm.ButtonOrderWhereClearClick(Sender: TObject);
+begin
+  BSWhereOrders.WhereClear(True);
+end;
+
+procedure TMainForm.ButtonPizzaAddClick(Sender: TObject);
+begin
+  BSPizzas.Persistence.Append;
+  acMoveToPizzaTabItem.Execute;
+end;
+
+procedure TMainForm.ButtonPizzaDeleteClick(Sender: TObject);
+begin
+  BSPizzas.Persistence.Delete;
+end;
+
+procedure TMainForm.ButtonPizzaPersistClick(Sender: TObject);
+begin
+  BSPizzas.Persistence.Persist;
+end;
+
+procedure TMainForm.ButtonPizzaRevertClick(Sender: TObject);
+var
+  LIsInserting: Boolean;
+begin
+  LIsInserting := BSPizzas.Persistence.IsInserting;
+  BSPizzas.Persistence.RevertOrDelete;
+  if LIsInserting then
+    acMoveToPizzaTabItem.Execute;
+end;
+
+procedure TMainForm.ButtonPizzaWhereBuildClick(Sender: TObject);
+begin
+  BSWherePizzas.WhereBuild(True);
+end;
+
+procedure TMainForm.ButtonPizzaWhereClearClick(Sender: TObject);
+begin
+  BSWherePizzas.WhereClear(True);
+end;
+
+procedure TMainForm.ButtonSearchCustomerClick(Sender: TObject);
+begin
+  BSWhereCustomer.WhereBuild(True);
 end;
 
 procedure TMainForm.ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);

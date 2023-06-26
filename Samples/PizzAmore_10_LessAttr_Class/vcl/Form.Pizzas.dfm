@@ -130,6 +130,9 @@ object PizzasForm: TPizzasForm
     TabOrder = 3
     ExplicitTop = 441
     ExplicitWidth = 380
+    DesignSize = (
+      384
+      79)
     object Label1: TLabel
       Left = 8
       Top = 7
@@ -179,6 +182,7 @@ object PizzasForm: TPizzasForm
       Top = 0
       Width = 50
       Height = 45
+      Anchors = [akTop, akRight]
       Caption = 'Search'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -193,6 +197,7 @@ object PizzasForm: TPizzasForm
       Top = 49
       Width = 50
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'Clear'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack

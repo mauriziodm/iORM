@@ -30,8 +30,6 @@ type
     procedure ButtonCustomersClick(Sender: TObject);
     procedure ButtonPizzasClick(Sender: TObject);
     procedure ButtonOrdersClick(Sender: TObject);
-    procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings; var AAbort: Boolean);
     procedure acQuitConfirmationRequest(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
@@ -70,12 +68,6 @@ procedure TMainForm.ButtonPizzasClick(Sender: TObject);
 begin
   Application.CreateForm(TPizzasForm, PizzasForm);
   PizzasForm.Show;
-end;
-
-procedure TMainForm.FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings; var AAbort: Boolean);
-begin
-  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_Script_Firebird.txt'));
 end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

@@ -24,7 +24,7 @@ object MainForm: TMainForm
       Size.Height = 800.000000000000000000
       Size.PlatformDefault = False
       TabHeight = 49.000000000000000000
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
@@ -40,7 +40,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = True
+        IsSelected = False
         Size.Width = 45.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 67
+          TabOrder = 72
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -5192,7 +5192,7 @@ object MainForm: TMainForm
         CustomIcon = <
           item
           end>
-        IsSelected = False
+        IsSelected = True
         Size.Width = 51.000000000000000000
         Size.Height = 49.000000000000000000
         Size.PlatformDefault = False
@@ -5217,15 +5217,14 @@ object MainForm: TMainForm
             StyleLookup = 'priortoolbutton'
           end
           object ButtonOrderPersist: TSpeedButton
-            Action = acOrderPersist
             Align = MostRight
-            Enabled = True
-            ImageIndex = -1
             Position.X = 592.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'organizetoolbutton'
+            Text = 'acOrderPersist'
+            OnClick = ButtonOrderPersistClick
           end
           object LabelOrderTitle: TLabel
             Align = Client
@@ -5240,15 +5239,14 @@ object MainForm: TMainForm
             Text = 'Order'
             TabOrder = 1
             object ButtonOrderRevert: TSpeedButton
-              Action = acOrderRevertOrDelete
               Align = Right
-              Enabled = True
-              ImageIndex = -1
               Position.X = 496.000000000000000000
               Size.Width = 48.000000000000000000
               Size.Height = 48.000000000000000000
               Size.PlatformDefault = False
-              StyleLookup = 'stoptoolbutton'
+              StyleLookup = 'refreshtoolbutton'
+              Text = 'acOrderRevertOrDelete'
+              OnClick = ButtonOrderRevertClick
             end
           end
         end
@@ -5289,7 +5287,7 @@ object MainForm: TMainForm
           TextSettings.HorzAlign = Center
           Position.X = 138.000000000000000000
           Position.Y = 60.000000000000000000
-          Size.Width = 119.000000000000000000
+          Size.Width = 87.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'order date'
@@ -5321,9 +5319,9 @@ object MainForm: TMainForm
             'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
             'por, velit sit'
           TextSettings.Font.Size = 14.000000000000000000
-          Position.X = 265.000000000000000000
+          Position.X = 233.000000000000000000
           Position.Y = 60.000000000000000000
-          Size.Width = 353.000000000000000000
+          Size.Width = 264.000000000000000000
           Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
           TextPrompt = 'note'
@@ -5490,51 +5488,13 @@ object MainForm: TMainForm
             StyledSettings = [Family, Style, FontColor]
           end
         end
-        object EditState: TEdit
-          Touch.InteractiveGestures = [LongTap, DoubleTap]
-          TabOrder = 13
-          Text = 
-            'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
-            'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
-            'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
-            'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
-            'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
-            'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
-            ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
-            'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
-            ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
-            ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
-            'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
-            'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
-            'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
-            'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
-            'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
-            'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
-            'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
-            'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
-            'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
-            'por, velit sit'
-          Position.X = 16.000000000000000000
-          Position.Y = 303.000000000000000000
-        end
         object ComboBoxState: TComboBox
-          Position.X = 16.000000000000000000
-          Position.Y = 333.000000000000000000
-          TabOrder = 14
-        end
-        object ListBoxState: TListBox
-          Position.X = 16.000000000000000000
-          Position.Y = 363.000000000000000000
-          Size.Width = 114.000000000000000000
-          Size.Height = 147.000000000000000000
+          Position.X = 505.000000000000000000
+          Position.Y = 60.000000000000000000
+          Size.Width = 113.000000000000000000
+          Size.Height = 25.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 15
-          DisableFocusEffect = True
-          DefaultItemStyles.ItemStyle = ''
-          DefaultItemStyles.GroupHeaderStyle = ''
-          DefaultItemStyles.GroupFooterStyle = ''
-          Viewport.Width = 110.000000000000000000
-          Viewport.Height = 143.000000000000000000
+          TabOrder = 13
         end
       end
       object TabItemCustomer: TTabItem
@@ -5566,15 +5526,14 @@ object MainForm: TMainForm
             StyleLookup = 'priortoolbutton'
           end
           object ButtonCustomerPersist: TSpeedButton
-            Action = acCustomerPersist
             Align = MostRight
-            Enabled = True
-            ImageIndex = -1
             Position.X = 592.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'organizetoolbutton'
+            Text = 'acCustomerPersist'
+            OnClick = ButtonCustomerPersistClick
           end
           object LabelCustomerTitle: TLabel
             Align = Client
@@ -5590,15 +5549,14 @@ object MainForm: TMainForm
             TabOrder = 1
           end
           object ButtonCustomerRevert: TSpeedButton
-            Action = acCustomerRevertOrDelete
             Align = Right
-            Enabled = True
-            ImageIndex = -1
             Position.X = 544.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'stoptoolbutton'
+            Text = 'acCustomerRevertOrDelete'
+            OnClick = ButtonCustomerRevertClick
           end
         end
         object Label7: TLabel
@@ -5821,15 +5779,14 @@ object MainForm: TMainForm
             StyleLookup = 'priortoolbutton'
           end
           object ButtonPizzaPersist: TSpeedButton
-            Action = acPizzaPersist
             Align = MostRight
-            Enabled = True
-            ImageIndex = -1
             Position.X = 592.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'organizetoolbutton'
+            Text = 'acPizzaPersist'
+            OnClick = ButtonPizzaPersistClick
           end
           object LabelPizzaTitle: TLabel
             Align = Client
@@ -5844,15 +5801,14 @@ object MainForm: TMainForm
             Text = 'Pizza'
             TabOrder = 1
             object ButtonPizzaRevert: TSpeedButton
-              Action = acPizzaRevertOrDelete
               Align = Right
-              Enabled = True
-              ImageIndex = -1
               Position.X = 496.000000000000000000
               Size.Width = 48.000000000000000000
               Size.Height = 48.000000000000000000
               Size.PlatformDefault = False
               StyleLookup = 'stoptoolbutton'
+              Text = 'acPizzaRevertOrDelete'
+              OnClick = ButtonPizzaRevertClick
             end
           end
         end
@@ -6107,7 +6063,7 @@ object MainForm: TMainForm
         ExplicitSize.cx = 90.000000000000000000
         ExplicitSize.cy = 49.000000000000000000
         object Rectangle5: TRectangle
-          Align = Bottom
+          Align = MostBottom
           Fill.Color = xFFF0F0F0
           Position.Y = 711.000000000000000000
           Size.Width = 360.000000000000000000
@@ -6115,25 +6071,23 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           Stroke.Kind = None
           object ButtonOrderDelete: TSpeedButton
-            Action = acOrderDelete
             Align = MostRight
-            Enabled = True
-            ImageIndex = -1
             Position.X = 312.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'trashtoolbutton'
+            Text = 'acOrderDelete'
+            OnClick = ButtonOrderDeleteClick
           end
           object ButtonOrderAdd: TSpeedButton
-            Action = acOrderAdd
             Align = MostLeft
-            Enabled = True
-            ImageIndex = -1
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'additembutton'
+            Text = 'acOrderAdd'
+            OnClick = ButtonOrderAddClick
           end
         end
         object ListViewOrders: TListView
@@ -6144,7 +6098,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 711.000000000000000000
+          Size.Height = 532.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 60
@@ -6161,6 +6115,249 @@ object MainForm: TMainForm
           CanSwipeDelete = False
           OnItemClick = ListViewOrdersItemClick
           SearchAlwaysOnTop = False
+        end
+        object Panel2: TPanel
+          Align = Bottom
+          Position.Y = 532.000000000000000000
+          Size.Width = 360.000000000000000000
+          Size.Height = 179.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'pushpanel'
+          TabOrder = 2
+          object Label27: TLabel
+            Align = Top
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 360.000000000000000000
+            Size.Height = 21.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = 'Search for'
+            TabOrder = 0
+          end
+          object Label28: TLabel
+            StyledSettings = [Family]
+            Position.Y = 27.000000000000000000
+            Size.Width = 35.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'ID'
+            TabOrder = 8
+          end
+          object EditWhereOrderID: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 16
+            Text = '-33'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 43.000000000000000000
+            Position.Y = 26.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object ButtonOrderWhereBuild: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 320.000000000000000000
+            Position.Y = 11.000000000000000000
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'searchtoolbutton'
+            TabOrder = 19
+            Text = 'Search'
+            OnClick = ButtonOrderWhereBuildClick
+          end
+          object ButtonOrderWhereClear: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 320.000000000000000000
+            Position.Y = 51.000000000000000000
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'stoptoolbutton'
+            TabOrder = 17
+            Text = 'Clear'
+            OnClick = ButtonOrderWhereClearClick
+          end
+          object Label29: TLabel
+            StyledSettings = [Family]
+            Position.Y = 58.000000000000000000
+            Size.Width = 35.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Note'
+            TabOrder = 6
+          end
+          object EditWhereOrderNote: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 15
+            Text = 
+              'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+              'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+              'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+              'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+              'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+              'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+              ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+              'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+              ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+              ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+              'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+              'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+              'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+              'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+              'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+              'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+              'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+              'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+              'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+              'por, velit sit'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 43.000000000000000000
+            Position.Y = 56.000000000000000000
+            Size.Width = 274.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object Label30: TLabel
+            StyledSettings = [Family]
+            Position.Y = 89.000000000000000000
+            Size.Width = 68.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'From date'
+            TabOrder = 5
+          end
+          object EditWhereOrderFromDate: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 14
+            Text = '01/11/2023'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 76.000000000000000000
+            Position.Y = 89.000000000000000000
+            Size.Width = 90.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object ComboBoxWhereOrderStatus: TComboBox
+            Position.X = 174.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 143.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 18
+          end
+          object Label31: TLabel
+            StyledSettings = [Family]
+            Position.X = 120.000000000000000000
+            Position.Y = 26.000000000000000000
+            Size.Width = 44.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Status'
+            TabOrder = 7
+          end
+          object Label32: TLabel
+            StyledSettings = [Family]
+            Position.X = 167.000000000000000000
+            Position.Y = 89.000000000000000000
+            Size.Width = 52.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'to date'
+            TabOrder = 2
+          end
+          object EditWhereOrderToDate: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 13
+            Text = '01/11/2023'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 227.000000000000000000
+            Position.Y = 89.000000000000000000
+            Size.Width = 90.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object Label33: TLabel
+            StyledSettings = [Family]
+            Position.Y = 120.000000000000000000
+            Size.Width = 104.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Customer name'
+            TabOrder = 4
+          end
+          object EditWhereOrderCustomerName: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 12
+            Text = 'Mark Anderson'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 114.000000000000000000
+            Position.Y = 120.000000000000000000
+            Size.Width = 203.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object Label34: TLabel
+            StyledSettings = [Family]
+            Position.Y = 151.000000000000000000
+            Size.Width = 104.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Row description'
+            TabOrder = 3
+          end
+          object EditWhereOrderRowDescription: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 11
+            Text = 
+              'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+              'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+              'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+              'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+              'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+              'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+              ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+              'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+              ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+              ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+              'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+              'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+              'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+              'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+              'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+              'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+              'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+              'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+              'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+              'por, velit sit'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 114.000000000000000000
+            Position.Y = 151.000000000000000000
+            Size.Width = 203.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
         end
       end
       object TabItemCustomers: TTabItem
@@ -6188,52 +6385,48 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           Stroke.Kind = None
           object ButtonCustomerDelete: TSpeedButton
-            Action = acCustomerDelete
             Align = MostRight
-            Enabled = True
-            ImageIndex = -1
-            Position.X = 312.000000000000000000
-            Size.Width = 48.000000000000000000
+            Position.X = 320.000000000000000000
+            Size.Width = 40.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'trashtoolbutton'
+            Text = 'acCustomerDelete'
+            OnClick = ButtonCustomerDeleteClick
           end
           object ButtonCustomerAdd: TSpeedButton
-            Action = acCustomerAdd
             Align = MostLeft
-            Enabled = True
-            ImageIndex = -1
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'additembutton'
+            Text = 'acCustomerAdd'
+            OnClick = ButtonCustomerAddClick
           end
           object ButtonCustomerPageDown: TSpeedButton
-            Action = acCustomersPrevPage
             Align = MostLeft
-            Enabled = True
-            ImageIndex = -1
             Position.X = 48.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'arrowdowntoolbutton'
+            Text = 'acCustomersPrevPage'
+            OnClick = ButtonCustomerPageDownClick
           end
           object ButtonCustomerPageUp: TSpeedButton
-            Action = acCustomersNextPage
             Align = MostLeft
-            Enabled = True
-            ImageIndex = -1
             Position.X = 96.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'arrowuptoolbutton'
+            Text = 'acCustomersNextPage'
+            OnClick = ButtonCustomerPageUpClick
           end
           object LabelCustomerPage: TLabel
             Align = Client
             StyledSettings = [Family, Style, FontColor]
-            Size.Width = 168.000000000000000000
+            Size.Width = 176.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             TextSettings.Font.Size = 14.000000000000000000
@@ -6250,7 +6443,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 633.000000000000000000
+          Size.Height = 616.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 60
@@ -6270,9 +6463,9 @@ object MainForm: TMainForm
         end
         object PanelCustomerFilter: TPanel
           Align = Bottom
-          Position.Y = 633.000000000000000000
+          Position.Y = 616.000000000000000000
           Size.Width = 360.000000000000000000
-          Size.Height = 78.000000000000000000
+          Size.Height = 95.000000000000000000
           Size.PlatformDefault = False
           StyleLookup = 'pushpanel'
           TabOrder = 2
@@ -6289,19 +6482,91 @@ object MainForm: TMainForm
           end
           object Label19: TLabel
             StyledSettings = [Family]
-            Position.X = 8.000000000000000000
-            Position.Y = 29.000000000000000000
-            Size.Width = 33.000000000000000000
+            Position.X = 5.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'ID'
+            TabOrder = 4
+          end
+          object EditSearchCustID: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 11
+            Text = '-33'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 63.000000000000000000
+            Position.Y = 26.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object ButtonCustomerWhereBuild: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 320.000000000000000000
+            Position.Y = 12.000000000000000000
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'searchtoolbutton'
+            TabOrder = 13
+            Text = 'Search'
+            OnClick = ButtonCustomerWhereBuildClick
+          end
+          object ButtonCustomerWhereClear: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 320.000000000000000000
+            Position.Y = 52.000000000000000000
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'stoptoolbutton'
+            TabOrder = 12
+            Text = 'Clear'
+            OnClick = ButtonCustomerWhereClearClick
+          end
+          object Label20: TLabel
+            StyledSettings = [Family]
+            Position.X = 111.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Name'
+            TabOrder = 3
+          end
+          object EditSearchCustName: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 10
+            Text = 'Mark Anderson'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 169.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 135.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object Label21: TLabel
+            StyledSettings = [Family]
+            Position.X = 5.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 50.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
             TextSettings.Font.Size = 14.000000000000000000
             TextSettings.HorzAlign = Trailing
             Text = 'City'
-            TabOrder = 3
+            TabOrder = 2
           end
-          object EditCustomerSearchCity: TEdit
+          object EditSearchCustCity: TEdit
             Touch.InteractiveGestures = [LongTap, DoubleTap]
-            TabOrder = 10
+            TabOrder = 9
             Text = 
               'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
               'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -6324,48 +6589,12 @@ object MainForm: TMainForm
               'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
               'por, velit sit'
             TextSettings.Font.Size = 14.000000000000000000
-            Position.X = 55.000000000000000000
-            Position.Y = 29.000000000000000000
-            Size.Width = 123.000000000000000000
+            Position.X = 61.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 243.000000000000000000
             Size.Height = 25.000000000000000000
             Size.PlatformDefault = False
             StyledSettings = [Family, Style, FontColor]
-          end
-          object ButtonSearchCustomer: TButton
-            Action = acWhereBuild
-            Enabled = True
-            ImageIndex = -1
-            Position.X = 186.000000000000000000
-            Position.Y = 29.000000000000000000
-            Size.Width = 80.000000000000000000
-            Size.Height = 25.000000000000000000
-            Size.PlatformDefault = False
-            TabOrder = 12
-          end
-          object ButtonFilterClear: TButton
-            Action = acWhereClear
-            Enabled = True
-            ImageIndex = -1
-            Position.X = 272.000000000000000000
-            Position.Y = 29.000000000000000000
-            Size.Width = 80.000000000000000000
-            Size.Height = 25.000000000000000000
-            Size.PlatformDefault = False
-            TabOrder = 11
-          end
-          object Label20: TLabel
-            AutoSize = True
-            StyledSettings = [Family]
-            Position.X = 4.000000000000000000
-            Position.Y = 59.000000000000000000
-            Size.Width = 217.000000000000000000
-            Size.Height = 19.000000000000000000
-            Size.PlatformDefault = False
-            TextSettings.Font.Size = 14.000000000000000000
-            TextSettings.Font.StyleExt = {00070000000000000004000000}
-            TextSettings.HorzAlign = Trailing
-            Text = 'Note: the filter is case sensitive'
-            TabOrder = 2
           end
         end
       end
@@ -6394,25 +6623,23 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           Stroke.Kind = None
           object ButtonPizzaDelete: TSpeedButton
-            Action = acPizzaDelete
             Align = MostRight
-            Enabled = True
-            ImageIndex = -1
             Position.X = 312.000000000000000000
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'trashtoolbutton'
+            Text = 'acPizzaDelete'
+            OnClick = ButtonPizzaDeleteClick
           end
           object ButtonPizzaAdd: TSpeedButton
-            Action = acPizzaAdd
             Align = MostLeft
-            Enabled = True
-            ImageIndex = -1
             Size.Width = 48.000000000000000000
             Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'additembutton'
+            Text = 'acPizzaAdd'
+            OnClick = ButtonPizzaAddClick
           end
         end
         object ListViewPizzas: TListView
@@ -6423,7 +6650,7 @@ object MainForm: TMainForm
           ItemIndex = 0
           Align = Client
           Size.Width = 360.000000000000000000
-          Size.Height = 711.000000000000000000
+          Size.Height = 616.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           ItemAppearance.ItemHeight = 100
@@ -6444,67 +6671,150 @@ object MainForm: TMainForm
           CanSwipeDelete = False
           OnItemClick = ListViewPizzasItemClick
         end
+        object Panel1: TPanel
+          Align = Bottom
+          Position.Y = 616.000000000000000000
+          Size.Width = 360.000000000000000000
+          Size.Height = 95.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'pushpanel'
+          TabOrder = 2
+          object Label22: TLabel
+            Align = Top
+            StyledSettings = [Family, Size, FontColor]
+            Size.Width = 360.000000000000000000
+            Size.Height = 21.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Center
+            Text = 'Search for'
+            TabOrder = 0
+          end
+          object Label23: TLabel
+            StyledSettings = [Family]
+            Position.X = 5.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 30.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'ID'
+            TabOrder = 5
+          end
+          object EditWherePizzaID: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 12
+            Text = '-33'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 43.000000000000000000
+            Position.Y = 26.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object ButtonPizzaWhereBuild: TButton
+            Position.X = 320.000000000000000000
+            Position.Y = 12.000000000000000000
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'searchtoolbutton'
+            TabOrder = 14
+            Text = 'Search'
+            OnClick = ButtonPizzaWhereBuildClick
+          end
+          object ButtonPizzaWhereClear: TButton
+            Position.X = 320.000000000000000000
+            Position.Y = 52.000000000000000000
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            StyleLookup = 'stoptoolbutton'
+            TabOrder = 13
+            Text = 'Clear'
+            OnClick = ButtonPizzaWhereClearClick
+          end
+          object Label24: TLabel
+            StyledSettings = [Family]
+            Position.X = 91.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'Name'
+            TabOrder = 4
+          end
+          object EditWherePizzaName: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 11
+            Text = 'Mark Anderson'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 149.000000000000000000
+            Position.Y = 27.000000000000000000
+            Size.Width = 158.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object Label25: TLabel
+            StyledSettings = [Family]
+            Position.X = 5.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 70.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'From price'
+            TabOrder = 3
+          end
+          object EditWherePizzaFromPrice: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 10
+            Text = '67,67'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 80.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+          object Label26: TLabel
+            StyledSettings = [Family]
+            Position.X = 152.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 70.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Text = 'to price'
+            TabOrder = 2
+          end
+          object EditWherePizzaToPrice: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 9
+            Text = '67,67'
+            TextSettings.Font.Size = 14.000000000000000000
+            Position.X = 227.000000000000000000
+            Position.Y = 59.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = [Family, Style, FontColor]
+          end
+        end
       end
     end
   end
   object ActionList1: TActionList
-    Left = 704
-    Top = 456
-    object acCustomerAdd: TAction
-      Category = 'iORM-BSPersistence'
-      Text = 'acCustomerAdd'
-      OnExecute = acCustomerAddExecute
-    end
-    object acCustomerDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'acCustomerDelete'
-      TargetBindSource = BSCustomers
-    end
-    object acCustomerPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Text = 'acCustomerPersist'
-      TargetBindSource = BSCustomers
-    end
-    object acCustomerRevertOrDelete: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'acCustomerRevertOrDelete'
-      TargetBindSource = BSCustomers
-    end
-    object acOrderAdd: TAction
-      Category = 'iORM-BSPersistence'
-      Text = 'acOrderAdd'
-      OnExecute = acOrderAddExecute
-    end
-    object acOrderDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'acOrderDelete'
-      TargetBindSource = BSOrders
-    end
-    object acOrderPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Text = 'acOrderPersist'
-      TargetBindSource = BSOrders
-    end
-    object acOrderRevertOrDelete: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'acOrderRevertOrDelete'
-      TargetBindSource = BSOrders
-    end
-    object acPizzaAdd: TAction
-      Category = 'iORM-BSPersistence'
-      Text = 'acPizzaAdd'
-      OnExecute = acPizzaAddExecute
-    end
-    object acPizzaDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'acPizzaDelete'
-      TargetBindSource = BSPizzas
-    end
-    object acPizzaPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Text = 'acPizzaPersist'
-      TargetBindSource = BSPizzas
-    end
+    Left = 568
+    Top = 408
     object acMoveToCustomerTabItem: TChangeTabAction
       Category = 'Tab'
       Tab = TabItemCustomer
@@ -6513,11 +6823,6 @@ object MainForm: TMainForm
       Category = 'Tab'
       Tab = TabItemOrder
     end
-    object acPizzaRevertOrDelete: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'acPizzaRevertOrDelete'
-      TargetBindSource = BSPizzas
-    end
     object acMoveToStartTabItem: TChangeTabAction
       Category = 'Tab'
       Tab = TabItemStart
@@ -6525,27 +6830,6 @@ object MainForm: TMainForm
     object acMoveToPizzaTabItem: TChangeTabAction
       Category = 'Tab'
       Tab = TabItemPizza
-    end
-    object acCustomersNextPage: TioBSNextPage
-      Category = 'iORM-BSPaging'
-      Text = 'acCustomersNextPage'
-      TargetBindSource = BSCustomers
-    end
-    object acCustomersPrevPage: TioBSPrevPage
-      Category = 'iORM-BSPaging'
-      Text = 'acCustomersPrevPage'
-      TargetBindSource = BSCustomers
-    end
-    object acWhereBuild: TioBSWhereBuild
-      Category = 'iORM-BSWhereBuilder'
-      Text = 'Search'
-      TargetBindSource = BSFilterCustomer
-    end
-    object acWhereClear: TioBSWhereClear
-      Category = 'iORM-BSWhereBuilder'
-      Text = 'Clear'
-      TargetBindSource = BSFilterCustomer
-      WhereAutoExecuteOnTargetBS = True
     end
   end
   object SQLiteConn: TioSQLiteConnectionDef
@@ -6823,17 +7107,10 @@ object MainForm: TMainForm
       Component = LabelCustomerPage
       ComponentProperty = 'Text'
     end
-    object LinkControlToField18: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSOrders
-      FieldName = 'State'
-      Control = EditState
-      Track = False
-    end
     object LinkFillControlToField1: TLinkFillControlToField
       Category = 'Quick Bindings'
       DataSource = BSOrders
-      FieldName = 'State'
+      FieldName = 'OrderState'
       Control = ComboBoxState
       Track = True
       AutoFill = True
@@ -6841,23 +7118,107 @@ object MainForm: TMainForm
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
+    object LinkControlToField18: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereCustomer
+      FieldName = 'Name'
+      Control = EditSearchCustName
+      Track = False
+    end
+    object LinkControlToField19: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereCustomer
+      FieldName = 'ID'
+      Control = EditSearchCustID
+      Track = False
+    end
+    object LinkControlToField20: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereCustomer
+      FieldName = 'City'
+      Control = EditSearchCustCity
+      Track = False
+    end
+    object LinkControlToField21: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWherePizzas
+      FieldName = 'Name'
+      Control = EditWherePizzaName
+      Track = False
+    end
+    object LinkControlToField22: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWherePizzas
+      FieldName = 'ToPrice'
+      Control = EditWherePizzaToPrice
+      Track = False
+    end
+    object LinkControlToField23: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWherePizzas
+      FieldName = 'ID'
+      Control = EditWherePizzaID
+      Track = False
+    end
+    object LinkControlToField24: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWherePizzas
+      FieldName = 'FromPrice'
+      Control = EditWherePizzaFromPrice
+      Track = False
+    end
+    object LinkControlToField25: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereOrders
+      FieldName = 'OrderID'
+      Control = EditWhereOrderID
+      Track = False
+    end
+    object LinkControlToField26: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereOrders
+      FieldName = 'ToDate'
+      Control = EditWhereOrderToDate
+      Track = False
+    end
+    object LinkControlToField27: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereOrders
+      FieldName = 'FromDate'
+      Control = EditWhereOrderFromDate
+      Track = False
+    end
     object LinkFillControlToField2: TLinkFillControlToField
       Category = 'Quick Bindings'
-      DataSource = BSOrders
-      FieldName = 'State'
-      Control = ListBoxState
+      DataSource = BSWhereOrders
+      FieldName = 'OrderState'
+      Control = ComboBoxWhereOrderStatus
       Track = True
       AutoFill = True
       FillExpressions = <>
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
-    object LinkControlToField19: TLinkControlToField
+    object LinkControlToField28: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = BSFilterCustomer
-      FieldName = 'City'
-      Control = EditCustomerSearchCity
-      Track = True
+      DataSource = BSWhereOrders
+      FieldName = 'Note'
+      Control = EditWhereOrderNote
+      Track = False
+    end
+    object LinkControlToField29: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereOrders
+      FieldName = 'CustomerName'
+      Control = EditWhereOrderCustomerName
+      Track = False
+    end
+    object LinkControlToField30: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhereOrders
+      FieldName = 'RowDescription'
+      Control = EditWhereOrderRowDescription
+      Track = False
     end
   end
   object BSPizzas: TioPrototypeBindSourceMaster
@@ -6918,6 +7279,11 @@ object MainForm: TMainForm
         ReadOnly = False
       end
       item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
         Name = 'GrandTotal'
         FieldType = ftCurrency
         Generator = 'Currency'
@@ -6925,11 +7291,6 @@ object MainForm: TMainForm
       end
       item
         Name = 'Note'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = 'State'
         Generator = 'LoremIpsum'
         ReadOnly = False
       end>
@@ -7008,9 +7369,20 @@ object MainForm: TMainForm
     Left = 703
     Top = 273
   end
-  object BSFilterCustomer: TioPrototypeBindSourceMaster
+  object BSWhereCustomer: TioPrototypeBindSourceMaster
     AutoActivate = True
     FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
       item
         Name = 'City'
         Generator = 'LoremIpsum'
@@ -7024,7 +7396,96 @@ object MainForm: TMainForm
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
     WhereBuilderFor = BSCustomers
-    Left = 688
-    Top = 593
+    Left = 800
+    Top = 545
+  end
+  object BSWherePizzas: TioPrototypeBindSourceMaster
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'FromPrice'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'ToPrice'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    Preview = True
+    AsDefault = False
+    TypeName = 'TWherePizza'
+    LoadType = ltCreate
+    TypeOfCollection = tcSingleObject
+    Paging.CurrentPageOfFormat = '%d/%d'
+    WhereBuilderFor = BSPizzas
+    Left = 904
+    Top = 545
+  end
+  object BSWhereOrders: TioPrototypeBindSourceMaster
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'OrderID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'FromDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end
+      item
+        Name = 'ToDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end
+      item
+        Name = 'CustomerName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'RowDescription'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    Preview = True
+    AsDefault = False
+    TypeName = 'TWhereOrder'
+    LoadType = ltCreate
+    TypeOfCollection = tcSingleObject
+    Paging.CurrentPageOfFormat = '%d/%d'
+    WhereBuilderFor = BSOrders
+    Left = 696
+    Top = 545
   end
 end

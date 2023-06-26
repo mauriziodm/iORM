@@ -32,11 +32,10 @@ type
     Label2: TLabel;
     Label3: TLabel;
     ButtonSearch: TSpeedButton;
-    ButtonClear: TSpeedButton;
     Label4: TLabel;
     Label5: TLabel;
     Shape1: TShape;
-    ButtonHistory: TSpeedButton;
+    ButtonClear: TSpeedButton;
     Label6: TLabel;
     DBEditWhereID: TDBEdit;
     DBEditWhereFromDate: TDBEdit;
@@ -52,6 +51,9 @@ type
     DSWhereToDate: TDateField;
     DSWhereCustomerName: TStringField;
     SourceWhere: TDataSource;
+    Label7: TLabel;
+    DBEditWhereRowDescription: TDBEdit;
+    DSWhereRowDescription: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure acBackExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -61,6 +63,7 @@ type
     procedure GridOrdersDblClick(Sender: TObject);
     procedure ButtonSearchClick(Sender: TObject);
     procedure ButtonHistoryClick(Sender: TObject);
+    procedure ButtonClearClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -79,6 +82,11 @@ procedure TOrdersForm.ButtonAddClick(Sender: TObject);
 begin
   DSOrders.Persistence.Append;
   DSOrders.ShowCurrent(nil);
+end;
+
+procedure TOrdersForm.ButtonClearClick(Sender: TObject);
+begin
+  DSWhere.WhereClear(True);
 end;
 
 procedure TOrdersForm.ButtonDeleteClick(Sender: TObject);
