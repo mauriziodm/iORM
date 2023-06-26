@@ -8504,7 +8504,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 32
     Top = 336
-    Width = 209
+    Width = 201
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Orders'
@@ -8517,12 +8517,12 @@ object MainForm: TMainForm
     TabOrder = 0
     OnClick = ButtonOrdersClick
     ExplicitTop = 335
-    ExplicitWidth = 205
+    ExplicitWidth = 197
   end
   object ButtonCustomers: TButton
     Left = 32
     Top = 387
-    Width = 209
+    Width = 201
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Customers'
@@ -8535,12 +8535,12 @@ object MainForm: TMainForm
     TabOrder = 1
     OnClick = ButtonCustomersClick
     ExplicitTop = 386
-    ExplicitWidth = 205
+    ExplicitWidth = 197
   end
   object ButtonPizzas: TButton
     Left = 32
     Top = 438
-    Width = 209
+    Width = 201
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Pizzas'
@@ -8553,12 +8553,12 @@ object MainForm: TMainForm
     TabOrder = 2
     OnClick = ButtonPizzasClick
     ExplicitTop = 437
-    ExplicitWidth = 205
+    ExplicitWidth = 197
   end
   object ButtonQuit: TButton
     Left = 32
     Top = 502
-    Width = 209
+    Width = 201
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8570,14 +8570,14 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     ExplicitTop = 501
-    ExplicitWidth = 205
+    ExplicitWidth = 197
   end
   object ioVCL1: TioVCL
     Left = 8
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
+    AsDefault = False
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_20_vcl.db'
     DatabaseStdFolder = sfDocuments
