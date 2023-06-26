@@ -428,20 +428,20 @@ Coordinates=372,1389,93,33
 Coordinates=188,676,160,123
 
 [ButtonPizzaWhereBuild]
-Coordinates=486,1235,53,51
+Coordinates=486,1235,130,51
 
 [ButtonPizzaWhereClear]
-Coordinates=274,1235,53,51
+Coordinates=274,1235,130,51
 
 [ButtonCustomerWhereBuild]
-Coordinates=2054,1235,129,51
+Coordinates=2054,1235,152,51
 
 [ButtonCustomerWhereClear]
-Coordinates=715,1235,98,51
+Coordinates=715,1235,152,51
 
 [ButtonOrderWhereBuild]
-Coordinates=1383,1235,53,51
+Coordinates=1383,1235,132,51
 
 [ButtonOrderWhereClear]
-Coordinates=985,1312,53,51
+Coordinates=985,1312,132,51
 

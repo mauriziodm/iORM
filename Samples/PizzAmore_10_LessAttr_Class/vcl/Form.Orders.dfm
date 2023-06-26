@@ -208,6 +208,8 @@ object OrdersForm: TOrdersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 416
+    ExplicitWidth = 534
     DesignSize = (
       538
       104)
@@ -257,7 +259,7 @@ object OrdersForm: TOrdersForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 484
+      Left = 480
       Top = 0
       Width = 50
       Height = 45
@@ -310,7 +312,7 @@ object OrdersForm: TOrdersForm
       Pen.Color = clGray
     end
     object ButtonClear: TSpeedButton
-      Left = 484
+      Left = 480
       Top = 44
       Width = 50
       Height = 25

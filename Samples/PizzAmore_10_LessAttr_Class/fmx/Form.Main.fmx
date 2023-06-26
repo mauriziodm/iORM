@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 72
+          TabOrder = 73
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000
@@ -6913,7 +6913,9 @@ object MainForm: TMainForm
         item
           SourceMemberName = 'GrandTotal'
           ControlMemberName = 'Detail'
-          CustomFormat = 'Format('#39'%%m'#39', Value) + '#39'   '#39' + Owner.Note.Value'
+          CustomFormat = 
+            'Format('#39'%%m'#39', Value) + '#39' - '#39' + Owner.OrderState.Value + '#39' - '#39' + ' +
+            'Owner.Note.Value'
         end>
       FillHeaderExpressions = <>
       FillBreakGroups = <>
