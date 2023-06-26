@@ -259,7 +259,7 @@ object OrdersForm: TOrdersForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 480
+      Left = 488
       Top = 0
       Width = 50
       Height = 45
@@ -272,7 +272,6 @@ object OrdersForm: TOrdersForm
       Font.Style = [fsBold]
       ParentFont = False
       OnClick = ButtonSearchClick
-      ExplicitLeft = 488
     end
     object Label4: TLabel
       Left = 303
@@ -312,7 +311,7 @@ object OrdersForm: TOrdersForm
       Pen.Color = clGray
     end
     object ButtonClear: TSpeedButton
-      Left = 480
+      Left = 488
       Top = 44
       Width = 50
       Height = 25
@@ -325,7 +324,6 @@ object OrdersForm: TOrdersForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonClearClick
-      ExplicitLeft = 488
     end
     object Label6: TLabel
       Left = 2
