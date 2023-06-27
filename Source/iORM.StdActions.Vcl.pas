@@ -201,7 +201,7 @@ type
     property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
   end;
 
-  // WhereClear
+  // ClearWhere
   TioBSWhereClear = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   strict private
     FWhereAutoExecuteOnTargetBS: Boolean;

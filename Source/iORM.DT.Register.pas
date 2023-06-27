@@ -7,12 +7,18 @@ procedure Register;
 implementation
 
 uses
-  ToolsAPI, System.Classes, iORM.Abstraction.VCL, iORM.Abstraction.FMX, iORM.DB.ConnectionDef, iORM.DB.ConnectionDef.MSSQLServer, iORM.DB.DataSet.Master,
+  ToolsAPI, System.Classes, iORM.Abstraction.VCL, iORM.Abstraction.FMX, iORM.DB.ConnectionDef, iORM.DB.DataSet.Master,
+{$IFNDEF ioDelphiProfessional}
+  iORM.DB.ConnectionDef.MSSQLServer,
+{$ENDIF}
   iORM.DB.DataSet.Detail, iORM.DB.MemTable, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
   iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater, iORM.Abstraction.uniGUI,
   iORM.DT.CompAutoUses, iORM.MVVM.VMAction;
+
+
+
 
 procedure Register;
 begin
@@ -28,8 +34,10 @@ begin
   RegisterSelectionEditor(TioSQLiteConnectionDef, TioConnectionDefSelectionEditor);
   RegisterComponents('iORM', [TioFirebirdConnectionDef]);
   RegisterSelectionEditor(TioFirebirdConnectionDef, TioConnectionDefSelectionEditor);
+{$IFNDEF ioDelphiProfessional}
   RegisterComponents('iORM', [TioSQLServerConnectionDef]);
   RegisterSelectionEditor(TioSQLServerConnectionDef, TioConnectionDefSelectionEditor);
+{$ENDIF}
   RegisterComponents('iORM', [TioSQLMonitor]);
 
   // DataSet components

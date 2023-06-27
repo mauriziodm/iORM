@@ -1,4 +1,4 @@
-package iORM_Project_DesignTime;
+package iORM_DT;
 
 {$R *.res}
 {$R '..\..\source\iORM.DT.dcr'}
@@ -33,7 +33,7 @@ package iORM_Project_DesignTime;
 requires
   rtl,
   Designide,
-  iORM_Project;
+  iORM_RT;
 
 contains
   iORM.DT.ViewModel.Wizard in '..\..\Source\iORM.DT.ViewModel.Wizard.pas',

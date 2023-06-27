@@ -74,14 +74,12 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.Connection,
-  iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator,
-  iORM.Where.SqlItems, System.SysUtils, iORM.DB.QueryContainer,
-  iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter,
-  iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
-  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.DB.MSSqlServer.SqlGenerator,
-  iORM.Remote.Connection, iORM.DB.MSSqlServer.SqlDataConverter, iORM.DB.Script,
-  iORM.DB.Query.FireDAC;
+  System.IOUtils, iORM.DB.Connection, iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator, iORM.Where.SqlItems, System.SysUtils,
+  iORM.DB.QueryContainer, iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter, iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
+{$IFNDEF ioDelphiProfessional}
+  iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,
+{$ENDIF}
+  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Remote.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC;
 
 { TioDbBuilder }
 
@@ -187,7 +185,7 @@ begin
   if not LConnection.IsDBConnection then
     raise EioException.Create(ClassName, 'Query', 'Operation not allowed by this type of connection.');
   // If the query is already present in the QueryContainer of the connection then get it and return...
-  //   ...else create a new query and insert it in the QueryContainer of the connection
+  // ...else create a new query and insert it in the QueryContainer of the connection
   if not LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, Result) then
   begin
     Result := TioFDQuery.Create(LConnection);
@@ -216,8 +214,10 @@ begin
       Result := TioSqlDataConverterFirebird;
     cdtSQLite:
       Result := TioSqlDataConverterSqLite;
+{$IFNDEF ioDelphiProfessional}
     cdtSQLServer:
       Result := TioSqlDataConverterMSSqlServer;
+{$ENDIF}
   else
     raise EioException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
   end;
@@ -240,8 +240,10 @@ begin
       Result := TioSqlGeneratorFirebird;
     cdtSQLite:
       Result := TioSqlGeneratorSqLite;
+{$IFNDEF ioDelphiProfessional}
     cdtSQLServer:
       Result := TioSqlGeneratorMSSqlServer;
+{$ENDIF}
   else
     raise EioException.Create(ClassName + ': Connection type not found (SqlGenerator).');
   end;

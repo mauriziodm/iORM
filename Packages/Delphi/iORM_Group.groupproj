@@ -3,10 +3,10 @@
         <ProjectGuid>{39ABCB18-C20E-428C-9A69-8BA1BED36324}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="iORM_Project_DesignTime.dproj">
-            <Dependencies>iORM_Project.dproj</Dependencies>
+        <Projects Include="iORM_RT.dproj">
+            <Dependencies/>
         </Projects>
-        <Projects Include="iORM_Project.dproj">
+        <Projects Include="iORM_DT.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -17,32 +17,32 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="iORM_Project_DesignTime" DependsOnTargets="iORM_Project">
-        <MSBuild Projects="iORM_Project_DesignTime.dproj"/>
+    <Target Name="iORM_RT">
+        <MSBuild Projects="iORM_RT.dproj"/>
     </Target>
-    <Target Name="iORM_Project_DesignTime:Clean" DependsOnTargets="iORM_Project:Clean">
-        <MSBuild Projects="iORM_Project_DesignTime.dproj" Targets="Clean"/>
+    <Target Name="iORM_RT:Clean">
+        <MSBuild Projects="iORM_RT.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="iORM_Project_DesignTime:Make" DependsOnTargets="iORM_Project:Make">
-        <MSBuild Projects="iORM_Project_DesignTime.dproj" Targets="Make"/>
+    <Target Name="iORM_RT:Make">
+        <MSBuild Projects="iORM_RT.dproj" Targets="Make"/>
     </Target>
-    <Target Name="iORM_Project">
-        <MSBuild Projects="iORM_Project.dproj"/>
+    <Target Name="iORM_DT">
+        <MSBuild Projects="iORM_DT.dproj"/>
     </Target>
-    <Target Name="iORM_Project:Clean">
-        <MSBuild Projects="iORM_Project.dproj" Targets="Clean"/>
+    <Target Name="iORM_DT:Clean">
+        <MSBuild Projects="iORM_DT.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="iORM_Project:Make">
-        <MSBuild Projects="iORM_Project.dproj" Targets="Make"/>
+    <Target Name="iORM_DT:Make">
+        <MSBuild Projects="iORM_DT.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_Project_DesignTime;iORM_Project"/>
+        <CallTarget Targets="iORM_RT;iORM_DT"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_Project_DesignTime:Clean;iORM_Project:Clean"/>
+        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_Project_DesignTime:Make;iORM_Project:Make"/>
+        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

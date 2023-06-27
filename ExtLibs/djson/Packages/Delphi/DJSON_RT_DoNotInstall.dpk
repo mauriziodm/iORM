@@ -1,0 +1,55 @@
+package DJSON_RT_DoNotInstall;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  RESTComponents;
+
+contains
+  DJSON.Attributes in '..\..\Sources\DJSON.Attributes.pas',
+  DJSON.Duck.Dictionary in '..\..\Sources\DJSON.Duck.Dictionary.pas',
+  DJSON.Duck.List in '..\..\Sources\DJSON.Duck.List.pas',
+  DJSON.Duck.Obj in '..\..\Sources\DJSON.Duck.Obj.pas',
+  DJSON.Duck.PropField in '..\..\Sources\DJSON.Duck.PropField.pas',
+  DJSON.Engine.DOM in '..\..\Sources\DJSON.Engine.DOM.pas',
+  DJSON in '..\..\Sources\DJSON.pas',
+  DJSON.Utils.RTTI in '..\..\Sources\DJSON.Utils.RTTI.pas',
+  DJSON.Serializers in '..\..\Sources\DJSON.Serializers.pas',
+  DJSON.Params in '..\..\Sources\DJSON.Params.pas',
+  DJSON.Constants in '..\..\Sources\DJSON.Constants.pas',
+  DJSON.Factory in '..\..\Sources\DJSON.Factory.pas',
+  DJSON.Utils in '..\..\Sources\DJSON.Utils.pas',
+  DJSON.Duck.Interfaces in '..\..\Sources\DJSON.Duck.Interfaces.pas',
+  DJSON.Exceptions in '..\..\Sources\DJSON.Exceptions.pas',
+  DJSON.Engine.Stream in '..\..\Sources\DJSON.Engine.Stream.pas',
+  DJSON.TypeInfoCache in '..\..\Sources\DJSON.TypeInfoCache.pas',
+  DJSON.Engine.Stream.BSON in '..\..\Sources\DJSON.Engine.Stream.BSON.pas',
+  DJSON.ISO8601Processor in '..\..\Sources\DJSON.ISO8601Processor.pas';
+
+end.

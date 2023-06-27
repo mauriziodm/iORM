@@ -102,8 +102,10 @@ type
       const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+{$IFNDEF ioDelphiProfessional}
     class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+{$ENDIF}
     class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class procedure NewRemoteConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
@@ -513,6 +515,7 @@ begin
   end;
 end;
 
+{$IFNDEF ioDelphiProfessional}
 class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True;
   const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
@@ -530,6 +533,7 @@ begin
     _Unlock;
   end;
 end;
+{$ENDIF}
 
 class procedure TioConnectionManager.Use(AConnectionName: String);
 begin

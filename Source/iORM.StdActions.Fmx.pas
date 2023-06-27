@@ -182,7 +182,7 @@ type
     property TargetBindSource;
   end;
 
-  // WhereBuild
+  // BuildWhere
   TioBSWhereBuild = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
     FPersistAction: IioBSSlaveAction;
@@ -203,7 +203,7 @@ type
     property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
   end;
 
-  // WhereClear
+  // ClearWhere
   TioBSWhereClear = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
     FWhereAutoExecuteOnTargetBS: Boolean;
