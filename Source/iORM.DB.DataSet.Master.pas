@@ -90,8 +90,8 @@ type
     function IsDetailBS: boolean; override;
 
     // WhereBuilder
-    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
-    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+    function BuildWhere(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function ClearWhere(const AExecuteOnTarget: Boolean = False): IioWhere;
 
     property Where;
     property ItemCount;
@@ -276,14 +276,14 @@ begin
   MasterBindSource := Value;
 end;
 
-function TioDataSetMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
+function TioDataSetMaster.BuildWhere(const AExecuteOnTarget: Boolean): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
+  Result := TioCommonBSBehavior.BuildWhere(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
 end;
 
-function TioDataSetMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+function TioDataSetMaster.ClearWhere(const AExecuteOnTarget: Boolean = False): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
+  Result := TioCommonBSBehavior.ClearWhere(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
 end;
 
 end.

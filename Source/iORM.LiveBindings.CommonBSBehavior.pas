@@ -67,8 +67,8 @@ type
 
     class function IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     // Common code for WhereBuilder purposes
-    class function WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
-    class function WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
+    class function BuildWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
+    class function ClearWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
   end;
 
 implementation
@@ -302,20 +302,20 @@ begin
         LBindSource.SetAsDefault(False);
 end;
 
-class function TioCommonBSBehavior.WhereBuild(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
+class function TioCommonBSBehavior.BuildWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
 var
   LOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod;
   LWhere: IioWhere;
 begin
   // Some checks
   if not Assigned(ATargetBS) then
-    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable if the "WhereBuilderFor" property is unassigned (%s))',
+    raise EioException.Create(ClassName, 'BuildWhere', Format('"BuildWhere" method is not invokable if the "WhereBuilderFor" property is unassigned (%s))',
       [ASourceBS.GetName]));
   if not ASourceBS.IsActive then
-    raise EioException.Create(ClassName, 'WhereBuild', Format('"WhereBuild" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
+    raise EioException.Create(ClassName, 'BuildWhere', Format('"BuildWhere" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
   if not Assigned(ASourceBS.Current) then
-    raise EioException.Create(ClassName, 'WhereBuild',
-      Format('"WhereBuild" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
+    raise EioException.Create(ClassName, 'BuildWhereuild',
+      Format('"BuildWhere" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
   // Post pending changes
   ASourceBS.PostIfEditing;
   // Create e new where instance
@@ -344,11 +344,11 @@ begin
     ATargetBS.Persistence.Reload;
 end;
 
-class function TioCommonBSBehavior.WhereClear(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
+class function TioCommonBSBehavior.ClearWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
 begin
   // Reset the filter object (sourceBS)
   ASourceBS.Persistence.Reload;
-  Result := WhereBuild(ASourceBS, ATargetBS, AExecuteOnTarget, ABeforeWhereClearEvent, AOnWhereClearEvent, AAfterWhereClearEvent);
+  Result := BuildWhere(ASourceBS, ATargetBS, AExecuteOnTarget, ABeforeWhereClearEvent, AOnWhereClearEvent, AAfterWhereClearEvent);
 end;
 
 end.

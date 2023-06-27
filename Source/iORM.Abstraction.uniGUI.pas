@@ -134,7 +134,7 @@ type
 implementation
 
 uses
-  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls, UniGUIApplication;
+  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls;
 
 { TioUniGUI }
 

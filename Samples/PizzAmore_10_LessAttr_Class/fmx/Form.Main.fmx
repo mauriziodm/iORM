@@ -58,7 +58,7 @@ object MainForm: TMainForm
           Size.Width = 316.000000000000000000
           Size.Height = 457.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 73
+          TabOrder = 74
           object Rectangle2: TRectangle
             Fill.Kind = None
             Position.X = 5.000000000000000000

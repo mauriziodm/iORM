@@ -180,7 +180,7 @@ type
     property TargetBindSource;
   end;
 
-  // WhereBuild
+  // BuildWhere
   TioBSWhereBuild = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   strict private
     FPersistAction: IioBSSlaveAction;
@@ -1491,7 +1491,7 @@ end;
 procedure TioBSWhereBuild.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  TargetBindSource.WhereBuild(FWhereAutoExecuteOnTargetBS);
+  TargetBindSource.BuildWhere(FWhereAutoExecuteOnTargetBS);
   if Assigned(FPersistAction) and FPersistAction._IsEnabled then
     FPersistAction.Execute;
   if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
@@ -1546,7 +1546,7 @@ end;
 procedure TioBSWhereClear.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  TargetBindSource.WhereClear(FWhereAutoExecuteOnTargetBS);
+  TargetBindSource.ClearWhere(FWhereAutoExecuteOnTargetBS);
 end;
 
 procedure TioBSWhereClear.UpdateTarget(Target: TObject);

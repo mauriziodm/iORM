@@ -51,11 +51,7 @@ requires
   vclFireDAC,
   FireDACCommonODBC,
   FireDACMSSQLDriver,
-  FireDACSqliteDriver,
-  uniGUI28,
-  uniGUI28Core,
-  uniTools28,
-  uIndy28;
+  FireDACSqliteDriver;
 
 contains
   iORM.Attributes in '..\..\Source\iORM.Attributes.pas',

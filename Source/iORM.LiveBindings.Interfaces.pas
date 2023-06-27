@@ -158,8 +158,8 @@ type
     function GetPaging: TioCommonBSAPageManager;
     property Paging: TioCommonBSAPageManager read GetPaging;
     // WhereBuilder
-    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
-    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+    function BuildWhere(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function ClearWhere(const AExecuteOnTarget: Boolean = False): IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
   end;
 

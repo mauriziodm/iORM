@@ -86,7 +86,7 @@ end;
 
 procedure TOrdersForm.ButtonClearClick(Sender: TObject);
 begin
-  DSWhere.WhereClear(True);
+  DSWhere.ClearWhere(True);
 end;
 
 procedure TOrdersForm.ButtonDeleteClick(Sender: TObject);
@@ -96,12 +96,12 @@ end;
 
 procedure TOrdersForm.ButtonHistoryClick(Sender: TObject);
 begin
-  DSWhere.WhereClear(True);
+  DSWhere.ClearWhere(True);
 end;
 
 procedure TOrdersForm.ButtonSearchClick(Sender: TObject);
 begin
-  DSWhere.WhereBuild(true);
+  DSWhere.BuildWhere(true);
 end;
 
 procedure TOrdersForm.ButtonSelectClick(Sender: TObject);

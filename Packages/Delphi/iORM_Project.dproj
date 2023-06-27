@@ -205,10 +205,6 @@
         <DCCReference Include="FireDACCommonODBC.dcp"/>
         <DCCReference Include="FireDACMSSQLDriver.dcp"/>
         <DCCReference Include="FireDACSqliteDriver.dcp"/>
-        <DCCReference Include="uniGUI28.dcp"/>
-        <DCCReference Include="uniGUI28Core.dcp"/>
-        <DCCReference Include="uniTools28.dcp"/>
-        <DCCReference Include="uIndy28.dcp"/>
         <DCCReference Include="..\..\Source\iORM.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\iORM.Context.Container.pas"/>

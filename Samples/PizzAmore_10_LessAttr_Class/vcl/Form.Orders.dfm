@@ -4,8 +4,8 @@ object OrdersForm: TOrdersForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 561
-  ClientWidth = 538
+  ClientHeight = 560
+  ClientWidth = 534
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,14 +20,13 @@ object OrdersForm: TOrdersForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 538
+    Width = 534
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 534
     object ButtonSelect: TSpeedButton
       Left = 488
       Top = 0
@@ -76,16 +75,14 @@ object OrdersForm: TOrdersForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 521
-    Width = 538
+    Top = 520
+    Width = 534
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 520
-    ExplicitWidth = 534
     object ButtonAdd: TSpeedButton
       Left = 488
       Top = 0
@@ -122,8 +119,8 @@ object OrdersForm: TOrdersForm
   object GridOrders: TDBGrid
     Left = 0
     Top = 40
-    Width = 538
-    Height = 377
+    Width = 534
+    Height = 376
     Align = alClient
     DataSource = SourceOrders
     TabOrder = 2
@@ -200,18 +197,18 @@ object OrdersForm: TOrdersForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 417
-    Width = 538
+    Top = 416
+    Width = 534
     Height = 104
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 416
-    ExplicitWidth = 534
+    ExplicitTop = 417
+    ExplicitWidth = 542
     DesignSize = (
-      538
+      534
       104)
     object Label1: TLabel
       Left = 9
@@ -259,7 +256,7 @@ object OrdersForm: TOrdersForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 488
+      Left = 480
       Top = 0
       Width = 50
       Height = 45
@@ -272,6 +269,7 @@ object OrdersForm: TOrdersForm
       Font.Style = [fsBold]
       ParentFont = False
       OnClick = ButtonSearchClick
+      ExplicitLeft = 488
     end
     object Label4: TLabel
       Left = 303
@@ -311,7 +309,7 @@ object OrdersForm: TOrdersForm
       Pen.Color = clGray
     end
     object ButtonClear: TSpeedButton
-      Left = 488
+      Left = 480
       Top = 44
       Width = 50
       Height = 25
@@ -324,6 +322,7 @@ object OrdersForm: TOrdersForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonClearClick
+      ExplicitLeft = 488
     end
     object Label6: TLabel
       Left = 2

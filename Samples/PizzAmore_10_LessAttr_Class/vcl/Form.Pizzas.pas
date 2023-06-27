@@ -80,7 +80,7 @@ end;
 
 procedure TPizzasForm.ButtonClearClick(Sender: TObject);
 begin
-  DSWhere.WhereClear(True);
+  DSWhere.ClearWhere(True);
 end;
 
 procedure TPizzasForm.ButtonDeleteClick(Sender: TObject);
@@ -90,7 +90,7 @@ end;
 
 procedure TPizzasForm.ButtonSearchClick(Sender: TObject);
 begin
-  DSWhere.WhereBuild(True);
+  DSWhere.BuildWhere(True);
 end;
 
 procedure TPizzasForm.ButtonSelectClick(Sender: TObject);

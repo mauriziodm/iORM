@@ -185,7 +185,7 @@ type
     property TargetBindSource;
   end;
 
-  // WhereBuild
+  // BuildWhere
   TioVMActionWhereBuild = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
   strict private
     FPersistAction: IioBSSlaveAction;
@@ -206,7 +206,7 @@ type
     property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
   end;
 
-  // WhereClear
+  // ClearWhere
   TioVMActionWhereClear = class(TioVMActionBSCustom<IioStdActionTargetMasterBindSource>)
   strict private
     FWhereAutoExecuteOnTargetBS: Boolean;
@@ -1510,7 +1510,7 @@ end;
 procedure TioVMActionWhereBuild._InternalExecuteStdAction;
 begin
   inherited;
-  TargetBindSource.WhereBuild(FWhereAutoExecuteOnTargetBS);
+  TargetBindSource.BuildWhere(FWhereAutoExecuteOnTargetBS);
   if Assigned(FPersistAction) and FPersistAction._IsEnabled then
     FPersistAction.Execute;
   if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
@@ -1536,7 +1536,7 @@ end;
 procedure TioVMActionWhereClear._InternalExecuteStdAction;
 begin
   inherited;
-  TargetBindSource.WhereClear(FWhereAutoExecuteOnTargetBS);
+  TargetBindSource.ClearWhere(FWhereAutoExecuteOnTargetBS);
 end;
 
 procedure TioVMActionWhereClear._InternalUpdateStdAction;

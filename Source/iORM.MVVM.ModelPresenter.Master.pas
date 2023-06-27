@@ -98,8 +98,8 @@ type
     function IsDetailBS: Boolean; override;
 
     // WhereBuilder
-    function WhereBuild(const AExecuteOnTarget: Boolean = True): IioWhere;
-    function WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+    function BuildWhere(const AExecuteOnTarget: Boolean = True): IioWhere;
+    function ClearWhere(const AExecuteOnTarget: Boolean = False): IioWhere;
 
     property Active;
     property Where;
@@ -283,14 +283,14 @@ begin
   MasterBindSource := Value;
 end;
 
-function TioModelPresenterMaster.WhereBuild(const AExecuteOnTarget: Boolean): IioWhere;
+function TioModelPresenterMaster.BuildWhere(const AExecuteOnTarget: Boolean): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereBuild(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
+  Result := TioCommonBSBehavior.BuildWhere(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereBuild, FOnWhereBuild, FAfterWhereBuild);
 end;
 
-function TioModelPresenterMaster.WhereClear(const AExecuteOnTarget: Boolean = False): IioWhere;
+function TioModelPresenterMaster.ClearWhere(const AExecuteOnTarget: Boolean = False): IioWhere;
 begin
-  Result := TioCommonBSBehavior.WhereClear(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
+  Result := TioCommonBSBehavior.ClearWhere(Self, FWhereBuilderFor, AExecuteOnTarget, FBeforeWhereClear, FOnWhereClear, FAfterWhereClear);
 end;
 
 procedure TioModelPresenterMaster.SetOnDeleteAction(const Value: TioBSOnDeleteAction);

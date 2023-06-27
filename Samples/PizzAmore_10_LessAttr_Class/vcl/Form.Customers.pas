@@ -81,7 +81,7 @@ end;
 
 procedure TCustomersForm.ButtonClearClick(Sender: TObject);
 begin
-  DSWhere.WhereClear(True);
+  DSWhere.ClearWhere(True);
 end;
 
 procedure TCustomersForm.ButtonDeleteClick(Sender: TObject);
@@ -101,7 +101,7 @@ end;
 
 procedure TCustomersForm.ButtonSearchClick(Sender: TObject);
 begin
-  DSWhere.WhereBuild(True);
+  DSWhere.BuildWhere(True);
 end;
 
 procedure TCustomersForm.ButtonSelectClick(Sender: TObject);

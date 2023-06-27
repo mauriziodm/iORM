@@ -272,12 +272,12 @@ end;
 
 procedure TMainForm.Button1Click(Sender: TObject);
 begin
-  BSWherePizzas.WhereBuild(True);
+  BSWherePizzas.BuildWhere(True);
 end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
 begin
-  BSWherePizzas.WhereClear(True);
+  BSWherePizzas.ClearWhere(True);
 end;
 
 procedure TMainForm.ButtonCustomerAddClick(Sender: TObject);
@@ -318,17 +318,17 @@ end;
 
 procedure TMainForm.ButtonCustomerWhereBuildClick(Sender: TObject);
 begin
-  BSWhereCustomer.WhereBuild(True);
+  BSWhereCustomer.BuildWhere(True);
 end;
 
 procedure TMainForm.ButtonCustomerWhereClearClick(Sender: TObject);
 begin
-  BSWhereCustomer.WhereClear(True);
+  BSWhereCustomer.ClearWhere(True);
 end;
 
 procedure TMainForm.ButtonFilterClearClick(Sender: TObject);
 begin
-  BSWhereCustomer.WhereClear(True);
+  BSWhereCustomer.ClearWhere(True);
 end;
 
 procedure TMainForm.ButtonOrderAddClick(Sender: TObject);
@@ -359,12 +359,12 @@ end;
 
 procedure TMainForm.ButtonOrderWhereBuildClick(Sender: TObject);
 begin
-  BSWhereOrders.WhereBuild(True);
+  BSWhereOrders.BuildWhere(True);
 end;
 
 procedure TMainForm.ButtonOrderWhereClearClick(Sender: TObject);
 begin
-  BSWhereOrders.WhereClear(True);
+  BSWhereOrders.ClearWhere(True);
 end;
 
 procedure TMainForm.ButtonPizzaAddClick(Sender: TObject);
@@ -395,17 +395,17 @@ end;
 
 procedure TMainForm.ButtonPizzaWhereBuildClick(Sender: TObject);
 begin
-  BSWherePizzas.WhereBuild(True);
+  BSWherePizzas.BuildWhere(True);
 end;
 
 procedure TMainForm.ButtonPizzaWhereClearClick(Sender: TObject);
 begin
-  BSWherePizzas.WhereClear(True);
+  BSWherePizzas.ClearWhere(True);
 end;
 
 procedure TMainForm.ButtonSearchCustomerClick(Sender: TObject);
 begin
-  BSWhereCustomer.WhereBuild(True);
+  BSWhereCustomer.BuildWhere(True);
 end;
 
 procedure TMainForm.ListViewCustomersItemClick(const Sender: TObject; const AItem: TListViewItem);

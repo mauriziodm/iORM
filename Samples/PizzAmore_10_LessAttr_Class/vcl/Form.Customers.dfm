@@ -4,8 +4,8 @@ object CustomersForm: TCustomersForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 761
-  ClientWidth = 384
+  ClientHeight = 760
+  ClientWidth = 380
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,16 +19,14 @@ object CustomersForm: TCustomersForm
   TextHeight = 15
   object PanelBottom: TPanel
     Left = 0
-    Top = 721
-    Width = 384
+    Top = 720
+    Width = 380
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 720
-    ExplicitWidth = 380
     object ButtonAdd: TSpeedButton
       Left = 334
       Top = 0
@@ -116,14 +114,13 @@ object CustomersForm: TCustomersForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 384
+    Width = 380
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 380
     object ButtonSelect: TSpeedButton
       Left = 334
       Top = 0
@@ -172,8 +169,8 @@ object CustomersForm: TCustomersForm
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 384
-    Height = 602
+    Width = 380
+    Height = 601
     Align = alClient
     DataSource = SourceCustomers
     TabOrder = 2
@@ -224,18 +221,16 @@ object CustomersForm: TCustomersForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 642
-    Width = 384
+    Top = 641
+    Width = 380
     Height = 79
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 641
-    ExplicitWidth = 380
     DesignSize = (
-      384
+      380
       79)
     object Label1: TLabel
       Left = 8
@@ -283,7 +278,7 @@ object CustomersForm: TCustomersForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 334
+      Left = 326
       Top = 0
       Width = 50
       Height = 45
@@ -296,9 +291,10 @@ object CustomersForm: TCustomersForm
       Font.Style = [fsBold]
       ParentFont = False
       OnClick = ButtonSearchClick
+      ExplicitLeft = 334
     end
     object ButtonClear: TSpeedButton
-      Left = 334
+      Left = 326
       Top = 49
       Width = 50
       Height = 25
@@ -311,6 +307,7 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonClearClick
+      ExplicitLeft = 334
     end
     object DBEditWhereID: TDBEdit
       Left = 43
@@ -332,7 +329,7 @@ object CustomersForm: TCustomersForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 130
+      Width = 122
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -351,7 +348,7 @@ object CustomersForm: TCustomersForm
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 242
+      Width = 234
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
