@@ -1,0 +1,46 @@
+package iORM_DT;
+
+{$R *.res}
+{$R '..\..\source\iORM.DT.dcr'}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$DEFINE ioDelphiProfessional}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'iORM Designtime'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  Designide,
+  iORM_RT;
+
+contains
+  iORM.DT.ViewModel.Wizard in '..\..\Source\iORM.DT.ViewModel.Wizard.pas',
+  iORM.DT.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas',
+  iORM.DT.Register in '..\..\Source\iORM.DT.Register.pas',
+  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas',
+  iORM.DT.CompAutoUses in '..\..\Source\iORM.DT.CompAutoUses.pas';
+
+end.

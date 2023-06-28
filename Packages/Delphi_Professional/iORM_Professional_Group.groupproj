@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{39ABCB18-C20E-428C-9A69-8BA1BED36324}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="iORM_RT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iORM_DT.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="iORM_RT">
+        <MSBuild Projects="iORM_RT.dproj"/>
+    </Target>
+    <Target Name="iORM_RT:Clean">
+        <MSBuild Projects="iORM_RT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_RT:Make">
+        <MSBuild Projects="iORM_RT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="iORM_DT">
+        <MSBuild Projects="iORM_DT.dproj"/>
+    </Target>
+    <Target Name="iORM_DT:Clean">
+        <MSBuild Projects="iORM_DT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_DT:Make">
+        <MSBuild Projects="iORM_DT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="iORM_RT;iORM_DT"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
