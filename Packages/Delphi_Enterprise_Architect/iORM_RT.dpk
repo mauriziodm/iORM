@@ -26,7 +26,8 @@ package iORM_RT;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'iORM Runtime'}
-{$IMPLICITBUILD ON}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
@@ -50,9 +51,7 @@ requires
   vcl,
   vclFireDAC,
   FireDACCommonODBC,
-{$IFNDEF ioDelphiProfessional}
   FireDACMSSQLDriver,
-{$ENDIF}
   FireDACSqliteDriver;
 
 contains
@@ -157,8 +156,8 @@ contains
   iORM.MVVM.ViewRegisterItem in '..\..\Source\iORM.MVVM.ViewRegisterItem.pas',
   iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
   iORM.Abstraction in '..\..\Source\iORM.Abstraction.pas',
-  iORM.Abstraction.vcl in '..\..\Source\iORM.Abstraction.VCL.pas',
-  iORM.Abstraction.fmx in '..\..\Source\iORM.Abstraction.FMX.pas',
+  iORM.Abstraction.VCL in '..\..\Source\iORM.Abstraction.VCL.pas',
+  iORM.Abstraction.FMX in '..\..\Source\iORM.Abstraction.FMX.pas',
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
   iORM.DBBuilder.Interfaces in '..\..\Source\iORM.DBBuilder.Interfaces.pas',
   iORM.DBBuilder.Schema.Field in '..\..\Source\iORM.DBBuilder.Schema.Field.pas',
@@ -182,8 +181,8 @@ contains
   iORM.DB.DataSet.Master in '..\..\Source\iORM.DB.DataSet.Master.pas',
   iORM.DB.DataSet.Detail in '..\..\Source\iORM.DB.DataSet.Detail.pas',
   iORM.LiveBindings.BSPersistence in '..\..\Source\iORM.LiveBindings.BSPersistence.pas',
-  iORM.StdActions.vcl in '..\..\Source\iORM.StdActions.Vcl.pas',
-  iORM.StdActions.fmx in '..\..\Source\iORM.StdActions.Fmx.pas',
+  iORM.StdActions.Vcl in '..\..\Source\iORM.StdActions.Vcl.pas',
+  iORM.StdActions.Fmx in '..\..\Source\iORM.StdActions.Fmx.pas',
   iORM.LiveBindings.CommonBSBehavior in '..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas',
   iORM.LiveBindings.PrototypeBindSource.Master in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Master.pas',
   iORM.LiveBindings.PrototypeBindSource.Detail in '..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas',
@@ -196,7 +195,7 @@ contains
   iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
   iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas',
 {$IFNDEF ioDelphiProfessional}
-  iORM.DB.ConnectionDef.MSSqlServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
+  iORM.DB.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
   iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
   iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
   iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas',
